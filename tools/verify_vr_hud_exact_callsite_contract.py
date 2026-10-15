@@ -457,12 +457,25 @@ def test_mutations(ui, manifest):
     must_fail('goal 150 retargeted to 020',
               ui.replace('GoalTime_TagHelper(0xBE150);',
                          'GoalTime_TagHelper(0xBE020);', 1))
+    # The original GOAL helper now drains its tracked D3DX batch before
+    # restoring source ownership. Mutate the one original call within that
+    # live boundary, not a retired adjacent original()/reset() sequence.
+    goal_original = ('        original();\n'
+                     '        if (directGoal)\n'
+                     '            FlushD3DXAtDirectGoalSourceExit();')
+    if ui.count(goal_original) != 1:
+        fail('GOAL original-call mutation anchor missing or duplicated')
     must_fail('original course/time helper called twice',
-              ui.replace('original();\n        goalDirectDrawOwner.reset();',
-                         'original();\n        original();\n        goalDirectDrawOwner.reset();', 1))
+              ui.replace(goal_original,
+                         '        original();\n'
+                         '        original();\n'
+                         '        if (directGoal)\n'
+                         '            FlushD3DXAtDirectGoalSourceExit();', 1))
     must_fail('original course/time helper skipped',
-              ui.replace('original();\n        goalDirectDrawOwner.reset();',
-                         'return;\n        goalDirectDrawOwner.reset();', 1))
+              ui.replace(goal_original,
+                         '        return;\n'
+                         '        if (directGoal)\n'
+                         '            FlushD3DXAtDirectGoalSourceExit();', 1))
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0x97BE4)['expectedBytes'] = 'e800000000' + '00'*11
     must_fail('original result E8 destination corrupted', changed_manifest=corrupt)
