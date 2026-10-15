@@ -1,0 +1,109 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00895",
+  "production_id": "CONVERSION-DX9EX-00895",
+  "event_id": "CONVERSION-DX9EX-00895-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00895",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:STEREO:COMPLETED_TWO_EYE_ADMISSION",
+  "symptom_id": "DX9EX:SYMPTOM:FAILED_RIGHT_EYE_FALSE_COMPLETION",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "a0c5a771f2ea9540b6a42b2e449654e16a561a94",
+  "material_result_sha": "435b0b3fac14c60c55fa8628e3f9cd2b0bfa5199",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/stereo_completion_gate.hpp",
+    "vrhost/tests/dx9ex_stereo_completion_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00895.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:STEREO:COMPLETED_TWO_EYE_ADMISSION",
+    "goal": "Keep the R84 frame stereo completion and accepted HUD/world producer latches truthful after all GPU left/right submissions and state restoration, so failed right-eye draws cannot be recorded as successful stereo output.",
+    "scope_boundary": "R30 lower and R33 final R84 game renderers only; preserve left game HRESULT, current-frame right-eye failure veto and recovery safety, SkyGlow/world visual owner, external F11, R26_SAFE, DX11 and frozen DXVK.",
+    "special_work_evidence": "Source-confirmed runtime correctness defect: R29OwnerRecordWorldStereoDuplicate and R29OwnerRecordHudStereoDuplicate set FrameHadDuplicatedDraw and FrameHadWorldStereo before R30/R33 check rightHr or restoreOk. This advertises an incomplete stereo draw as complete despite downstream frame failure veto.",
+    "trace_stages": [
+      "Original D3D9 Draw and source HUD/world producer arrive in the R30 or R33 stereo dispatcher for two-eye GPU submission.",
+      "After successful left draw, right SetRenderTarget/viewport/c64/Draw and restoration independently return rightHr and restoreOk, which can fail even though the left game HRESULT was successful.",
+      "Before source repair, RecordWorldStereoDuplicate/RecordHudStereoDuplicate stamped per-frame duplicate and pose status unconditionally; the new gate publishes completion only on both successful HRESULTs and successful state restore."
+    ],
+    "subcomponents": [
+      "Correct complete two-eye admission in both R30 XYZRHW and R30 HUD fallback paths without changing failure recovery or geometry.",
+      "Correct R33 primary fast world and screen HUD admission and stable telemetry, with a portable all-eight-combinations predicate regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "complete_eye_frame_latch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 R30/R33 frame duplicate and world HUD pose state",
+        "expected_behavior": "GPU left and right draw plus restoration all succeed before either path asserts completed binocular duplicate/pose evidence."
+      },
+      {
+        "id": "failed_right_and_restore_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "R30/R33 GPU HRESULT and renderer state restore",
+        "expected_behavior": "Any failed right-eye submission or failed restore does not publish completed binocular status; existing failure poisoning and returned original left draw HRESULT remain unchanged."
+      },
+      {
+        "id": "exact_sha_r84_integration",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 game plus host x64 package and Domain/Inspector/Full Source",
+        "expected_behavior": "All required GitHub Actions pass on the same validation-bearing commit before BUILD_VERIFIED, with HMD runtime validation separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "complete_eye_frame_latch": "SOURCE_IMPLEMENTED",
+    "failed_right_and_restore_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_r84_integration": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "R30 and R33 unconditionally invoke the World/HUD duplicate admission counters after the right-eye GPU submission block and before testing FAILED(rightHr) or !restoreOk.",
+    "root_cause": "R84 duplicate and stable-frame admission was placed before final right-eye HRESULT and render-state restoration verification.",
+    "fix_evidence": "Both fallback R30 pathways and primary R33 pathways now condition world/HUD frame latching and successful binocular telemetry on CanPublishStereoDraw(left,right,restored).",
+    "negative_test_evidence": "Shared constexpr admission contract has all success and failure static assertions; portable smoke enumerates 2x2x2 GPU/restore permutations.",
+    "evidence_limits": "No Quest3/VDXR runtime or live GPU fault injection; evidence is source and static/portable tests pending exact-SHA CI.",
+    "source_trace": [
+      "Left GPU draw is issued under the original R30/R33 caller and returns the game's left-eye HRESULT.",
+      "Right GPU draw and state-restoration status are collected independently before the original right-eye failure veto.",
+      "World/HUD duplicate and pose evidence are now recorded only after successful right-eye GPU completion and restoration."
+    ],
+    "alternatives_rejected": [
+      "This is not a new stereo transform, world/F11 semantic tag or lens flare producer repair; the observed incorrect frame-completion placement is explicit in the code."
+    ],
+    "eye_ownership": "R84 renders left/backbuffer then right/per-eye RT; both physically successful draws and restored D3D state are now necessary to claim binocular completion."
+  },
+  "runtime_evidence": "Quest3/VDXR not executed in this task.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "PENDING_EXACT_SHA_CI",
+  "result_commit_ci_skip": false,
+  "ci_evidence": {
+    "original_material_sha": "435b0b3fac14c60c55fa8628e3f9cd2b0bfa5199",
+    "dx9ex_active_first_attempt": {
+      "id": 38727945968,
+      "status": "completed",
+      "conclusion": "failure",
+      "reason": "RUN_RECORD_NOT_FOUND"
+    },
+    "required_final_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ]
+  }
+}
