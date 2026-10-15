@@ -4716,27 +4716,27 @@ namespace OutRunVRStereo
                     // Preserve original colour, UV, depth and RHW. Reject
                     // the WHOLE candidate if any referenced eye is invalid;
                     // the caller retains its original one-draw fallback.
-                    for (UINT i = 0; i < vertexCount; ++i)
+                    for (UINT stageVertex = 0; stageVertex < vertexCount; ++stageVertex)
                     {
-                        if (usedMask && !(*usedMask)[i])
+                        if (usedMask && !(*usedMask)[stageVertex])
                             continue;
                         const std::size_t offset =
-                            static_cast<std::size_t>(i) * stride;
-                        const auto* src = reinterpret_cast<const float*>(
+                            static_cast<std::size_t>(stageVertex) * stride;
+                        const auto* stagePixel = reinterpret_cast<const float*>(
                             static_cast<const std::uint8_t*>(source) + offset);
-                        if (!std::isfinite(src[2]) || !std::isfinite(src[3]))
+                        if (!std::isfinite(stagePixel[2]) || !std::isfinite(stagePixel[3]))
                             return false;
                         float leftX = 0.0f, leftY = 0.0f;
                         float rightX = 0.0f, rightY = 0.0f;
                         if (!OutRunVR::StageExtensionPlane::ProjectPixel(
                                 reinterpret_cast<const float*>(
                                     &state.stageExtensionClipFromGameNdc[0]),
-                                src[0], src[1], x0, y0, width, height,
+                                stagePixel[0], stagePixel[1], x0, y0, width, height,
                                 state.stageExtensionScale, leftX, leftY) ||
                             !OutRunVR::StageExtensionPlane::ProjectPixel(
                                 reinterpret_cast<const float*>(
                                     &state.stageExtensionClipFromGameNdc[1]),
-                                src[0], src[1], x0, y0, width, height,
+                                stagePixel[0], stagePixel[1], x0, y0, width, height,
                                 state.stageExtensionScale, rightX, rightY))
                             return false;
                         auto* leftDst = reinterpret_cast<float*>(
