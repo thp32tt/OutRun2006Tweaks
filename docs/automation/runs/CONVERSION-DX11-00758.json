@@ -10,22 +10,26 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:MENU_RACE_STAGE1_GPU_CONSTANT_OWNER",
   "feature_id": "DX11-MENU-RACE-STAGE1-CONSTANT-OWNERSHIP",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "3ddf9b56c9372365e788a0c20f43edd8b4b6b07d",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "ea75f5f8a03516e3b8ef132c7daf43bd9dcc9891",
+  "validation_bearing_result_sha": "165b4198e505f629db63d277c20c1300db0e21a2",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_stage1_game_constant_owner_00758.py",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-00758.json"
+    "docs/automation/runs/CONVERSION-DX11-00758.json",
+    "tools/test_dx11_stage1_factor_00673.py",
+    "tools/test_dx11_stage1_triop_00705.py",
+    "tools/test_dx11_stage1_constant_00707.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "change_summary": "Real game Stage1 texture combiner b1 uses one device-owned native D3D11 constant buffer, refreshes the captured game operands/factors for every Draw/DrawIndexed, explicitly unbinds for stage0-only menu/HUD draws, and releases on rebuild/Reset, preserving original D3D9 game/input fallback.",
   "feature_contract": {
@@ -53,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "full-game-stage1-native-gpu-binding": "PENDING",
-    "device-reset-stage0-gamepad-fallback": "PENDING",
-    "stage1-source-and-exact-gate": "PENDING"
+    "full-game-stage1-native-gpu-binding": "PASS_EXACT_SHA",
+    "device-reset-stage0-gamepad-fallback": "PASS_EXACT_SHA",
+    "stage1-source-and-exact-gate": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -90,9 +94,17 @@
     "C0_RECOVER": "PASS remote HEAD 3ddf9b56c9372365e788a0c20f43edd8b4b6b07d; 00757 complete; new Stage1 per-game-draw immutable b1 allocation found",
     "C1_REVIEW": "PASS evidence: each actual game Stage1 Draw calls CreateBuffer IMMUTABLE, risks unbounded resource churn and stale stage0 PS b1; disjoint from previous VB/IB owner fix",
     "C2_IMPLEMENT": "PASS production C++ Stage1 per-device mutable constant buffer, exact payload refresh, unconditional b1 bind/unbind, Reset lifetime",
-    "C3_VALIDATE": "PENDING exact-SHA five GitHub Actions; static destructive source validation in Fast",
-    "C4_COMMIT": "PENDING material SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact 165b4198e505f629db63d277c20c1300db0e21a2 Fast #38688159948, Backend #38688159944, Build #38688163532, OpenXR #38688163468, HUD #38688163463 all SUCCESS; HMD/game/gamepad UNTESTED.",
+    "C4_COMMIT": "PASS: material ea75f5f8a03516e3b8ef132c7daf43bd9dcc9891 production C++ with destructive game-combiner regression, four follow-up source-regression repairs, latest validation-bearing 165b4198e505f629db63d277c20c1300db0e21a2 (no CI skip).",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
-  }
+    "C6_STATE": "PASS_EXACT_SHA: five required workflows SUCCESS for 165b4198e505f629db63d277c20c1300db0e21a2; this separate bookkeeping record uses [skip ci], does not change validation-bearing result. Quest3/VDXR/real game/gamepad UNTESTED."
+  },
+  "validation_workflow_runs": {
+    "dx11_fast": 38688159948,
+    "backend_conversion": 38688159944,
+    "windows_build": 38688163532,
+    "openxr": 38688163468,
+    "hud_inspector": 38688163463
+  },
+  "c6_trigger_reason": "CI_COMPLETE_FIVE_REQUIRED_EXACT_SHA"
 }
