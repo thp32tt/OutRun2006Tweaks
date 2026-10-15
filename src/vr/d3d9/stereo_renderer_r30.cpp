@@ -2485,6 +2485,37 @@ namespace OutRunVRStereo
             });
         }
 
+        // Port the HMD-proven R26+HUD original-c64 admission to R84.
+        // A live GPU c64 register can already contain a previous head/eye
+        // reprojection. Never feed it into a second HUD world-plane transform.
+        bool R30GetRecentOriginalHudWvp(float out[16]) noexcept
+        {
+            if (!out ||
+                !OutRunVR::GameSemantic::CorroboratesHud(
+                    OutRunVR::GameSemantic::EffectiveScope()))
+                return false;
+            std::uint64_t writeSerial = 0, writeDrawSerial = 0;
+            std::uintptr_t writeShader = 0, currentShader = 0;
+            std::uint64_t writeEpoch = 0, currentEpoch = 0;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    out, writeSerial, writeDrawSerial,
+                    writeShader, writeEpoch) ||
+                !R29OwnerCurrentShaderEpoch(currentShader, currentEpoch) ||
+                !writeShader || writeShader != currentShader ||
+                !writeEpoch || writeEpoch != currentEpoch ||
+                !OutRunVRRenderer::GetCurrentLatchedPoseEpoch() ||
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch() !=
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch())
+                return false;
+            // R26 used a 12-draw original WVP window for direct and queued
+            // HUD glyphs. Longer-lived/stale uploads must keep the lower
+            // fail-closed path, never borrow an unrelated world's c64.
+            const std::uint64_t nextDraw =
+                R29OwnerTopLevelDrawSerial() + 1u;
+            return nextDraw > writeDrawSerial &&
+                nextDraw - writeDrawSerial <= 12u;
+        }
+
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
         {
@@ -5549,6 +5580,107 @@ namespace OutRunVRStereo
                         return false;
                     const D3DMATRIX t = R29OwnerTransposeMatrix(corrected);
                     std::memcpy(eyeConstants[eye], &t, sizeof(t));
+                }
+                return true;
+            }
+
+            const bool exactHud =
+                OutRunVR::GameSemantic::CorroboratesHud(
+                    OutRunVR::GameSemantic::EffectiveScope()) &&
+                (screenKind == R30ScreenSpaceKind::Hud2D ||
+                 screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect);
+            if (exactHud)
+            {
+                // R26 screen HUD is world-locked at a finite, recentered
+                // view-plane depth. R84's clip-only Hud2D route followed
+                // headset yaw and its live c64 could double-inject pose.
+                float rawGameWvp[16]{};
+                float baseRaw[16]{};
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                if (!R30GetRecentOriginalHudWvp(rawGameWvp) ||
+                    !OutRunVRRenderer::GetRendererBaseProjection(baseRaw) ||
+                    !OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+
+                D3DMATRIX rawUploadedT{}, baseProjection{}, headInverse{};
+                std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT));
+                std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                const D3DMATRIX hudWvp =
+                    R29OwnerTransposeMatrix(rawUploadedT);
+                D3DMATRIX inverseBase{};
+                if (!R29OwnerMatrixFinite(hudWvp) ||
+                    !R29OwnerMatrixFinite(baseProjection) ||
+                    !R29OwnerMatrixFinite(headInverse) ||
+                    !R29OwnerInvertMatrix(baseProjection, inverseBase))
+                    return false;
+
+                // The original HMD-proven R26 HUD used a uniform requested
+                // optical scale. Do not apply a second source/portrait
+                // aspect compensation to text/gauges on this world plane.
+                D3DMATRIX hudScale = R29OwnerIdentityMatrix();
+                const float userScale = R30HudScaleValue();
+                hudScale._11 = userScale;
+                hudScale._22 = userScale;
+                const D3DMATRIX scaledClip =
+                    R29OwnerMultiplyMatrix(hudWvp, hudScale);
+                constexpr float HudPlaneZ = -2.50f;
+                const float planeW =
+                    HudPlaneZ * baseProjection._34 + baseProjection._44;
+                const float planeZ =
+                    HudPlaneZ * baseProjection._33 + baseProjection._43;
+                if (!std::isfinite(planeW) || !std::isfinite(planeZ) ||
+                    std::fabs(planeW) <= 1.0e-4f)
+                    return false;
+                D3DMATRIX depthReset = R29OwnerIdentityMatrix();
+                depthReset._33 = 0.0f;
+                depthReset._43 = planeZ / planeW;
+                const D3DMATRIX commonPlane =
+                    R29OwnerMultiplyMatrix(
+                        R29OwnerMultiplyMatrix(scaledClip, depthReset),
+                        inverseBase);
+                if (!R29OwnerMatrixFinite(commonPlane))
+                    return false;
+
+                const float centre[3]{
+                    0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                    0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                    0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+                };
+                const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const float relative[3]{
+                        stereo.eyeOffset[eye][0] - centre[0],
+                        stereo.eyeOffset[eye][1] - centre[1],
+                        stereo.eyeOffset[eye][2] - centre[2]
+                    };
+                    const D3DMATRIX eyePose =
+                        R29OwnerMatrixFromQuaternionTranslation(
+                            identity, relative,
+                            Settings::VRWorldScale *
+                                Settings::VRStereoDepth);
+                    const D3DMATRIX eyeInverse =
+                        R29OwnerInverseRigid(eyePose);
+                    const D3DMATRIX eyeProjection =
+                        R29OwnerProjectionFromFov(
+                            baseProjection, stereo.eyeFov[eye]);
+                    const D3DMATRIX corrected =
+                        R29OwnerMultiplyMatrix(
+                            R29OwnerMultiplyMatrix(
+                                R29OwnerMultiplyMatrix(
+                                    commonPlane, headInverse),
+                                eyeInverse),
+                            eyeProjection);
+                    if (!R29OwnerMatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        R29OwnerTransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
                 }
                 return true;
             }
