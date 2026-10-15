@@ -1,0 +1,145 @@
+{
+  "schema": "outrun-c-source-atlas-reassembly-v1",
+  "TASK_ID": "OUTRUN-C-SALVAGE-Q032-ATLAS-20261015T1503KST",
+  "queue_id": "Q032",
+  "date": "2026-10-15",
+  "run_role": "C-SALVAGE_OFFLINE_NO_IMAGEGEN",
+  "state": "SOURCE_REASSEMBLY_TEST_ONLY__HOLD_CLEAN_COMPOSITE",
+  "source_png": "Q032_DCC7B488_BASE_READABLE_FLIPY.png",
+  "source_png_sha256_from_mapping_UNVERIFIED_FULL_FILE": "42971c0fabbb10d7ca4969574c9529e02e1111586578607c066640c95d86fab7",
+  "source_dds_path_from_mapping": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+  "source_dds_sha256": null,
+  "source_dds_probe": "HOLD_DDS_FILE_NOT_STAGED_UNVERIFIED",
+  "tile_count": 3,
+  "tiles_sha256_and_bbox": [
+    {
+      "tile": "Q032_DCC7B488_BASE_READABLE_FLIPY__r01c01__x0_y0__683x1024.png",
+      "tile_sha256": "366103d2f56080f1ba0fb7e4ffd906b260c926d41c45180b24cd461e288fad55",
+      "bbox": [
+        0,
+        0,
+        683,
+        1024
+      ]
+    },
+    {
+      "tile": "Q032_DCC7B488_BASE_READABLE_FLIPY__r01c02__x683_y0__682x1024.png",
+      "tile_sha256": "cb824b1bb2e1cd38d1a9ca14d94cb4661d26cd77b25bb76e0d2f86b353e300ca",
+      "bbox": [
+        683,
+        0,
+        1365,
+        1024
+      ]
+    },
+    {
+      "tile": "Q032_DCC7B488_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x1024.png",
+      "tile_sha256": "033f2472a69dcdd6c732581198cc299fda88b1936e6af5660f043db395ee7c21",
+      "bbox": [
+        1365,
+        0,
+        2048,
+        1024
+      ]
+    }
+  ],
+  "tile_checks": "SHA256_RGBA_DIMENSIONS_NONOVERLAP_FULL_PIXEL_COVERAGE_PASS",
+  "source_size": [
+    2048,
+    1024
+  ],
+  "source_orientation": "FLIP_Y_PREVIEW_PER_SPRITE_VERIFY",
+  "orientation_native_dds_comparison": "UNVERIFIED",
+  "reassembled_source_png": {
+    "n100_path": "/home/chatgpt-runner2/work/c-salvage-q032-atlas-20261015-1503/atlases/Q032_DCC7B488_BASE_READABLE_FLIPY--37e762c79d33/source_reassembled_readable.png",
+    "sha256": "bb27c31a54b46dc6127c6e69c410e2cdb8dd53ed8c55eeb99705875154686319",
+    "status": "TEST_ONLY"
+  },
+  "full_source_png": "REFERENCE_FULL_PNG_NOT_STAGED",
+  "psd": {
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha": "ced16bf18964ca57c1d9365169c5f9b71e48fa70",
+    "repo_copy": "localization/graphics/plate_library/upstream_psd/DCC7B488/DCC7B488_512x256.psd",
+    "sha256": "5d90681d0ca9d2343026c063f5de31dd06702dc4c58878e32c95ef0311bbd883",
+    "size": [
+      2048,
+      1024
+    ],
+    "layer_count": 41,
+    "merged_rgba_pixel_difference_vs_reassembled_atlas": 0,
+    "merged_rgba_pixel_difference_after_flipy": 710540,
+    "status": "EXACT_MERGED_PIXELS_MATCH__LAYER_PATHS_UNREVIEWED",
+    "english_layer_candidate_unconfirmed": "4xLexicaDAT2_otf",
+    "selected_english_layer_paths": [],
+    "clean_plate_sha256": null
+  },
+  "original_english_text_observed_in_atlas": "Total Rank",
+  "original_english_removal_mask_sha256": null,
+  "generated_a_candidates": [
+    {
+      "source_tile": "Q032_DCC7B488_BASE_READABLE_FLIPY__r01c01__x0_y0__683x1024.png",
+      "output_path": "/home/chatgpt-runner2/work/image-src/ab_batches/candidate_outputs/A/Q032_DCC7B488_BASE_READABLE_FLIPY__r01c01__x0_y0__683x1024_k.png",
+      "output_sha256": "f0471bff9603fee931ef2a917bc6e7b65b7b16156039f86892e1bade3b9da154",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ]
+    },
+    {
+      "source_tile": "Q032_DCC7B488_BASE_READABLE_FLIPY__r01c02__x683_y0__682x1024.png",
+      "output_path": "/home/chatgpt-runner2/work/image-src/ab_batches/candidate_outputs/A/Q032_DCC7B488_BASE_READABLE_FLIPY__r01c02__x683_y0__682x1024_k.png",
+      "output_sha256": "4004adab7219d4a2bd75a6e28557025e5bb2c774c4e0b6be0b3aa74ff658e142",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ]
+    },
+    {
+      "source_tile": "Q032_DCC7B488_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x1024.png",
+      "output_path": "/home/chatgpt-runner2/work/image-src/ab_batches/candidate_outputs/A/Q032_DCC7B488_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x1024_k.png",
+      "output_sha256": "bc2bb26932c567412c2b0dd8ab037eff9ba4e60a0726d86fd42e5953c6e9d9a3",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ]
+    }
+  ],
+  "generated_qa": "ONE_INSPECTED_OUTPUT_CONTAINS_KOREAN_AND_NON_TEXT_BALLOON_ART__MASK_NOT_APPROVED; ALL_3_REQUIRE_TEXT_ONLY_SEGMENTATION",
+  "korean_letter_only_sha256": null,
+  "clean_sha256": null,
+  "composite_sha256": null,
+  "dds_test_sha256": null,
+  "blocked_reasons": [
+    "CANONICAL_DDS_NOT_STAGED_NO_SHA_OR_HEADER",
+    "FULL_SOURCE_PNG_FILE_NOT_STAGED_DECLARED_SHA_ONLY",
+    "PSD_ENGLISH_LAYER_PATH_NOT_MANUALLY_VALIDATED",
+    "ENGLISH_GLYPH_REMOVAL_MASK_NOT_VERIFIED",
+    "GENERATED_HANGUL_GLYPH_MASK_NOT_VERIFIED_AND_CANVAS_DIMENSION_MISMATCH"
+  ],
+  "protected_pixel_diff": "NOT_TESTED_NO_COMPOSITE",
+  "crop_slant_overlap_qa": "NOT_TESTED_NO_TEXT_ONLY_LAYER",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "final_dds_approved": false,
+  "input_mounted_read_only": true,
+  "ab_state_and_queue_modified": false,
+  "output_report_n100": "/home/chatgpt-runner2/work/c-salvage-q032-atlas-20261015-1503/Q032_ATLAS_SOURCE_AND_GENERATED_EVIDENCE.json",
+  "notes": "One entire source atlas group reconstructed and inspected. Do not apply generated full-scene images to original; no approval or DDS promotion."
+}
