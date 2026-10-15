@@ -55,8 +55,8 @@ SCHEDULED_LOCALIZATION_LANES.update({3: "C", 33: "C"})''',
 ''',
         "c-is-not-retired-c1")
     s=replace_once(s,
-        'if CONTROLLER_MODE == "localization" and _outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true":',
-        'if CONTROLLER_MODE == "localization" and slot.name in ("A", "B") and _outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true":',
+        'if CONTROLLER_MODE == "localization" and (_outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true" or _outrun_smoke_os.environ.get("OUTRUN_AB_TEXT_ROI_QUEUE", "").lower() == "true"):',
+        'if CONTROLLER_MODE == "localization" and slot.name in ("A", "B") and (_outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true" or _outrun_smoke_os.environ.get("OUTRUN_AB_TEXT_ROI_QUEUE", "").lower() == "true"):',
         "ab-library-result-gate-only-ab")
     s=replace_once(s,
         '    if CONTROLLER_MODE == "localization" and slot.name not in ("A", "B"):\n'
