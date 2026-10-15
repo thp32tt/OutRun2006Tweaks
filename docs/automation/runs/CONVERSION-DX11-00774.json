@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_GAME_DYNAMIC_STREAM_DISCARD",
   "feature_id": "DX11-LIVE-GAME-DYNAMIC-VERTEX-INDEX-STREAM",
-  "status": "MATERIAL_COMMITTED_GATE_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "64183e04d87305b15ed4cffc423940587ecacc7b",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "972203d60c3c8f0e9181f016fef27be4c28b7312",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_dynamic_stream.hpp",
@@ -95,6 +95,6 @@
     "C3_VALIDATE": "C++17 dynamic stream compiled probe and exact-SHA mandatory GitHub CI queued by source commit; no real Quest3 test.",
     "C4_COMMIT": "Material source commit includes exact [AUTO:CONVERSION-DX11-00774] marker, no skip-ci.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA; Quest3/VDXR/gamepad UNTESTED."
+    "C6_STATE": "PASS_EXACT_SHA; CI SUCCESS for exact validation-bearing SHA 972203d60c3c8f0e9181f016fef27be4c28b7312; Quest3/VDXR/gamepad UNTESTED."
   }
 }
