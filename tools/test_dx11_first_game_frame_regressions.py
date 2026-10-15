@@ -225,9 +225,9 @@ def main() -> None:
             "GetRenderState(D3DRS_FILLMODE, &fillMode)",
             "const DWORD legalMask = D3DCOLORWRITEENABLE_RED |",
             "const DWORD visibleMask = D3DCOLORWRITEENABLE_RED |",
-            // 00763: RGB-only remains mandatory for the inset; full-size
-            // game Draw/DrawIndexed may write only destination alpha (A8)
-            // or DSV depth. Unknown masks still fail closed.
+            # 00763: RGB-only remains mandatory for the inset; full-size
+            # game Draw/DrawIndexed may write only destination alpha (A8)
+            # or DSV depth. Unknown masks still fail closed.
             "if ((colorMask & ~legalMask) ||",
             "(!(colorMask & visibleMask) &&",
             "!GameNativeMaskedDraw::accepts_source_mask(",
