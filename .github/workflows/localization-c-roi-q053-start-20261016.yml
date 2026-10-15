@@ -89,7 +89,12 @@ jobs:
             if not np.any(a): raise RuntimeError('HOLD_SOURCE_REGION_ALPHA_EMPTY')
             # Text isolation must not be claimed on an opaque plate or on touching alpha.
             if np.all(a==255): raise RuntimeError('HOLD_OPAQUE_PLATE_NO_REVIEWED_TEXT_MASK')
-            audit['alpha_edge_2px_nonzero_counts']={\n              'top':int(np.count_nonzero(a[:2])),\n              'bottom':int(np.count_nonzero(a[-2:])),\n              'left':int(np.count_nonzero(a[:,:2])),\n              'right':int(np.count_nonzero(a[:,-2:]))}\n            if any(audit['alpha_edge_2px_nonzero_counts'].values()):
+            audit['alpha_edge_2px_nonzero_counts']={
+              'top':int(np.count_nonzero(a[:2])),
+              'bottom':int(np.count_nonzero(a[-2:])),
+              'left':int(np.count_nonzero(a[:,:2])),
+              'right':int(np.count_nonzero(a[:,-2:]))}
+            if any(audit['alpha_edge_2px_nonzero_counts'].values()):
               raise RuntimeError('HOLD_ORIGINAL_ALPHA_TOUCHES_CROP_EDGE_EXTEND_ROI')
             audit['edge_2px_alpha_pixels']=0
             audit['source_isolation']='alpha'
