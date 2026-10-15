@@ -26,6 +26,14 @@ def check(code: str, header: str) -> list[str]:
     hook = code[start:end]
     queue = code[end:]
     source = code[:start]
+    # Check each predicate within its owning function. A second GOAL
+    # predicate must not hide a destructive mutation of the +TIME one.
+    def predicate(name: str) -> str:
+        begin = header.find("inline constexpr bool " + name + "(")
+        finish = header.find("    static_assert(", begin)
+        return header[begin:finish] if begin >= 0 and finish > begin else ""
+    stage_predicate = predicate("CanFlushD3DXDirectStageAtExit")
+    goal_predicate = predicate("CanFlushD3DXDirectGoalAtExit")
     need("StageExtensionSpraniCalls[]" in source and
          "0x9898E, 0x98A36, 0x98AC6" in source and
          "StageExtensionPrintCalls[]" in source and
@@ -110,10 +118,10 @@ def check(code: str, header: str) -> list[str]:
          "if (FlushTracked(sprite))" in hook and
          "VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();" in code,
          "source exit must flush only proven homogeneous live +TIME D3DX batch")
-    need("pendingDraws != 0 && homogeneous" in header and
-         "pendingProducer == ProducerToken::StageExtensionTime" in header and
-         "currentScope == pendingScope" in header and
-         "currentProducer == pendingProducer" in header,
+    need("pendingDraws != 0 && homogeneous" in stage_predicate and
+         "pendingProducer == ProducerToken::StageExtensionTime" in stage_predicate and
+         "currentScope == pendingScope" in stage_predicate and
+         "currentProducer == pendingProducer" in stage_predicate,
          "direct source-exit predicate may not promote unrelated batches")
     need("PendingHomogeneous = false" in hook and
          "CanFlushD3DXPreQueueStageBatch(" in hook and
@@ -149,6 +157,36 @@ def check(code: str, header: str) -> list[str]:
     for token in ("GoalTime020", "GoalTime150", "ResultProgress"):
         need(f"source == ProducerToken::{token}" in hook,
              f"GOAL token {token} missing")
+    # GOAL time/title helper batching is independent of the +TIME owner.
+    # Prove both original CALL boundaries and the exact producer limitation
+    # survive refactors, while accepting eager native GOAL Flush behavior.
+    goal_helper_start = source.find("static void GoalTime_TagHelper(")
+    goal_helper_end = source.find("static void __cdecl GoalTime_Help020()", goal_helper_start)
+    goal_helper = source[goal_helper_start:goal_helper_end] if (
+        goal_helper_start >= 0 and goal_helper_end > goal_helper_start) else ""
+    need("FlushD3DXBeforeDirectGoalSource();" in goal_helper and
+         "FlushD3DXAtDirectGoalSourceExit();" in goal_helper and
+         "goalDirectDrawOwner.emplace(" in goal_helper and
+         goal_helper.find("FlushD3DXBeforeDirectGoalSource();") <
+         goal_helper.find("goalDirectDrawOwner.emplace(") <
+         goal_helper.find("FlushD3DXAtDirectGoalSourceExit();") <
+         goal_helper.find("goalDirectDrawOwner.reset();") and
+         "ProducerToken::GoalTime020" in goal_helper and
+         "ProducerToken::GoalTime150" in goal_helper,
+         "direct GOAL producer must split previous and submit own D3DX batch")
+    need("static void BeforeDirectGoalSource() noexcept" in hook and
+         "static void AfterDirectGoalSource() noexcept" in hook and
+         "CanFlushD3DXDirectGoalAtExit(" in hook and
+         "VRProjectedD3DXSpriteIsolationR64::BeforeDirectGoalSource();" in code and
+         "VRProjectedD3DXSpriteIsolationR64::AfterDirectGoalSource();" in code,
+         "GOAL direct owner hooks must reach actual D3DX batch submission")
+    need("pendingDraws != 0 && homogeneous" in goal_predicate and
+         "pendingProducer == ProducerToken::GoalTime020" in goal_predicate and
+         "pendingProducer == ProducerToken::GoalTime150" in goal_predicate and
+         "currentScope == pendingScope" in goal_predicate and
+         "currentProducer == pendingProducer" in goal_predicate and
+         "!queueActive && batchActive && exactSprite" in goal_predicate,
+         "GOAL direct source must fail closed for mixed, stale or foreign buffers")
     # +TIME now coalesces draws until the exact queue transition/exit or
     # direct source exit. A per-Draw stage Flush regresses GPU batching and
     # can break the original texture grouping; GOAL stays eager separately.
@@ -257,6 +295,12 @@ def main() -> int:
         "goal-queue-admission-lost":
             code.replace("StageBoundaryReady = enteringStage || enteringGoal",
                          "StageBoundaryReady = enteringStage;", 1),
+        "goal-direct-before-removed":
+            code.replace("            FlushD3DXBeforeDirectGoalSource();",
+                         "            // GOAL old batch not flushed", 1),
+        "goal-direct-after-removed":
+            code.replace("            FlushD3DXAtDirectGoalSourceExit();",
+                         "            // GOAL exit not flushed", 1),
         "goal-progress-owner-lost":
             code.replace("source == ProducerToken::ResultProgress",
                          "source == ProducerToken::None", 1),
@@ -329,7 +373,28 @@ def main() -> int:
         if altered == header or not check(code, altered):
             print("DX9Ex +TIME D3DX FAIL: header mutation", label)
             return 1
-    print("DX9Ex +TIME batched GPU exit / GOAL eager / source isolation mutations PASS")
+    # Mutate only the GOAL function: the still-intact +TIME predicate must
+    # not mask loss of GOAL's separate batch ownership.
+    goal_begin = header.find("inline constexpr bool CanFlushD3DXDirectGoalAtExit(")
+    goal_end = header.find("    static_assert(CanFlushD3DXDirectGoalAtExit(", goal_begin)
+    if goal_begin < 0 or goal_end <= goal_begin:
+        print("DX9Ex +TIME D3DX FAIL: GOAL predicate boundary missing")
+        return 1
+    goal_body = header[goal_begin:goal_end]
+    for label, before, after in (
+        ("goal-permit-mixed", "pendingDraws != 0 && homogeneous",
+         "pendingDraws != 0 && true"),
+        ("goal-permit-foreign", "pendingProducer == ProducerToken::GoalTime020",
+         "pendingProducer != ProducerToken::GoalTime020"),
+        ("goal-permit-owner-swap", "currentProducer == pendingProducer",
+         "true"),
+    ):
+        changed = goal_body.replace(before, after, 1)
+        altered = header[:goal_begin] + changed + header[goal_end:]
+        if changed == goal_body or not check(code, altered):
+            print("DX9Ex +TIME D3DX FAIL: GOAL header mutation", label)
+            return 1
+    print("DX9Ex +TIME/GOAL isolated direct D3DX owner and negative mutations PASS")
     return 0
 
 
