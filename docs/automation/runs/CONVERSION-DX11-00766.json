@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "84eeb9460be3a8aa8c834b9a81fbf32ef5f133c1",
-  "material_result_sha": null,
+  "material_result_sha": "3e2e0e1a9eb6c2b31895bb6231a65f8659386f85",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "src/vr/d3d11/native_game_eye_pair_sources.hpp",
@@ -61,19 +61,35 @@
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "menu_to_race_native_frame",
-    "gameplay_delivery_target": "SAFE_NATIVE_STEREO_EYE_HANDOFF",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "activation_guard_and_fallback": "Opt-in native OpenXR producer only; original game rendering/input unchanged",
     "full_gate_plan": "one_validation_bearing_sha",
     "conflict_keys": [
       "DX11:OPENXR_NATIVE_EYE_ACK_REPLAY"
-    ]
+    ],
+    "integration_path": [
+      "Real native D3D11 producer frame obtained from gameplay Draw eye targets",
+      "Validate strictly increasing same-generation frame identity before SharedEyeRing slot acquisition",
+      "Copy/Resolve both actual game eye textures into shared native D3D11 transport slot and signal producer EVENT",
+      "Publish fenced OpenXR consumer eye pair, retire only provenance-matched cumulative ACK, preserve D3D9 gamepad/Present fallback"
+    ],
+    "batch_components": [
+      "NativeSharedEyeRing x86/x64 shared eye/ACK lifetime source updates",
+      "Portable C++ ACK high-watermark and destructive Fast source graph proof",
+      "Windows WARP same-device D3D11 event/ACK/replay negative and positive integration probe"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP native eye producer acquires increasing frame IDs, signals EVENT, publishes ACK-owned pair, retires valid cumulative ACK and accepts a newer game frame; portable C++ verifies numerical boundaries.",
+      "negative_regression": "WARP and destructively mutated source tests reject frame ID reuse, newer-frame cumulative ACK replay, old source/foreign transport while preserving original game frame/input fallback.",
+      "component_integration": "D3D11 real game stereo producer -> shared-eye slot acquisition -> GPU Copy/Resolve -> exact producer fence -> OpenXR published handles -> cumulative IPC ACK retirement; distinct DX9Ex Present fallback."
+    }
   },
   "pipeline": {
     "C0_RECOVER": "Remote GitHub HEAD/00765 pending Fast+Build checked",
     "C1_REVIEW": "Cumulative ACK (frameId >= owned ID) can retire reused frame ID in same generation",
     "C2_IMPLEMENT": "Native ring monotonic frame ID and ACK high watermark plus native WARP positive/negative probe",
-    "C3_VALIDATE": "AWAIT_EXACT_SHA_GATES",
-    "C4_COMMIT": "SOURCE_COMMIT_PENDING",
+    "C3_VALIDATE": "First exact-SHA Fast rejected incomplete machine-readable acceptance strategy; corrected without relaxing test or runtime guards.",
+    "C4_COMMIT": "3e2e0e1a9eb6c2b31895bb6231a65f8659386f85 material source + ab1ff786b1b7751bb7dac7644259855fe077d416 test correction; exact gates require final commit",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "AWAIT_VALIDATION"
   },
