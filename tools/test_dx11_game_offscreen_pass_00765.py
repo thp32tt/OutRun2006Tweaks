@@ -20,8 +20,8 @@ def integrated(hook, body):
         "observe_scene_boundary(device)" in rt and
         'native_game_offscreen_pass.hpp' in body and
         'GameNativeOffscreenPass::preserve_transition(' in body and
-        'GetRenderState(D3DRS_ZENABLE, &zEnabled)' in body and
-        'GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)' in body and
+        'GetRenderState(D3DRS_ZENABLE, &zEnabled)' in offscreen and
+        'GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)' in offscreen and
         'GetDeviceCaps(&caps)' in offscreen and
         'GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs)' in offscreen and
         'for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)' in offscreen and
