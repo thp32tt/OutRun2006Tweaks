@@ -86,6 +86,7 @@
       "NATIVE_LR_GAME_EYE_SOURCE",
       "HOST_DIRECTGPU_LATEST_GENERATION",
       "OPENXR_PROJECTION",
+      "VISIBLE_FRAME_OUTPUT",
       "DX9EX_INPUT_FALLBACK"
     ],
     "visible_frame_acceptance": "Host runtime smoke and required Actions only; live menu/vehicle/race visual and Quest3 fps NOT TESTED.",
@@ -101,8 +102,8 @@
     "C0_RECOVER": "GitHub current HEAD and completed 00795 exact-SHA verified; distinct x64 host consumption files isolated.",
     "C1_REVIEW": "R41 chooses DirectGPU generation by largest numerical frame ID across generations and ReadFrame lacked exact generation filter.",
     "C2_IMPLEMENT": "Generation-aware OpenXR host native game frame selection and exact generation reread; host C++ smoke cases.",
-    "C3_VALIDATE": "PENDING_GITHUB_EXACT_SHA",
-    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C3_VALIDATE": "CI_REPAIR_CANDIDATE: previous exact SHA Backend/Fast failed on missing visible output integration stage; repair plus same-generation native eye frame ordering regression; final mandatory five exact SHA checks pending",
+    "C4_COMMIT": "MATERIAL_REPAIR_PENDING",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA_GATES"
   },
@@ -114,7 +115,13 @@
       "vrhost/src/main_r23.cpp",
       "vrhost/tests/native_direct_eye_pair_smoke.cpp"
     ],
-    "previous_task_00795_complete": true
+    "previous_task_00795_complete": true,
+    "failed_gate_run_ids": [
+      38823397115,
+      38823397147
+    ],
+    "failure_cause": "DX11 acceptance missing VISIBLE_FRAME_OUTPUT between native Draw and OpenXR projection",
+    "runtime_visual_status": "NOT_OBSERVED"
   },
   "score": {
     "run_key": "CONVERSION-DX11-00796",

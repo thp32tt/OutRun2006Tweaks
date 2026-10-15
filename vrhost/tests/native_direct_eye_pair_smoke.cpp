@@ -131,6 +131,14 @@ int main()
                  "equal-QPC generations are ambiguous") ||
         !require(DirectFrameAlreadyProcessed(7u, 400u, 7u, 400u),
                  "duplicate consumed native frame must be rejected") ||
+        !require(PreferNativeDirectFrame(8u, 3u, 5000, 8u, 2u, 6000),
+                 "same-generation producer frame order wins despite QPC jitter") ||
+        !require(!PreferNativeDirectFrame(8u, 2u, 9000, 8u, 3u, 6000),
+                 "stale same-generation frame cannot regress on late QPC") ||
+        !require(!PreferNativeDirectFrame(8u, 3u, 0, 7u, 400u, 5000),
+                 "missing timestamp cannot replace known older generation") ||
+        !require(PreferNativeDirectFrame(8u, 3u, 7000, 7u, 400u, 0),
+                 "known new transport Present replaces unknown older generation") ||
         !require(!DirectFrameAlreadyProcessed(8u, 1u, 7u, 400u),
                  "new transport frame must not inherit stale consumed ID") ||
         !require(DirectFrameAlreadyProcessed(8u, 1u, 8u, 2u),

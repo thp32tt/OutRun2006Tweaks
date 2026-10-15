@@ -21,12 +21,20 @@ namespace OutRunVrNativeEyePair
     {
         if (!candidateGeneration || !candidateFrame) return false;
         if (!currentGeneration || !currentFrame) return true;
-        if (candidatePresentQpc > 0 && currentPresentQpc > 0 &&
-            candidatePresentQpc != currentPresentQpc)
-            return candidatePresentQpc > currentPresentQpc;
-        if (candidateGeneration != currentGeneration)
-            return candidatePresentQpc > 0 && currentPresentQpc <= 0;
-        return NativeFrameIdNewer(currentFrame, candidateFrame);
+        // A reset creates a new generation with its own frame counter.
+        // Within one generation the producer's frame order is authoritative:
+        // delayed or noisy Present QPC samples must not roll back that order.
+        if (candidateGeneration == currentGeneration)
+            return NativeFrameIdNewer(currentFrame, candidateFrame);
+
+        // Only independent generations need wall-clock ordering. An absent
+        // timestamp cannot displace a known Present, and equal timestamps
+        // cannot establish which transport generation is newer.
+        if (candidatePresentQpc <= 0)
+            return false;
+        if (currentPresentQpc <= 0)
+            return true;
+        return candidatePresentQpc > currentPresentQpc;
     }
 
     [[nodiscard]] constexpr bool DirectFrameAlreadyProcessed(
