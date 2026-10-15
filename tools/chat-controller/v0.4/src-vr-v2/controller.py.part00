@@ -1135,6 +1135,14 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
+    if lane in {"DX11", "DX9EX"}:
+        lines += [
+            "DEVELOPMENT_FIRST_20261015=ON. 기능 단위 실제 C++/HLSL/후킹/host·입력 소스 구현을 C2 최우선으로 한다. 이미 PASS인 동일 SHA 검증·C6 기록·상태 문서·CI 스크립트 정비만으로 신규 기능 또는 점수를 만들지 마.",
+            "분류 먼저: (A) 미완료 사용자 가시 기능/실제 결함 → 현재 TASK_ID/FEATURE_ID에서 소스 구현, (B) 정확한 필수 CI 실패 → 동일 TASK_ID에서 실패 원인 한정 수리, (C) 과거 PASS/기록 미완료 → 중복 CI 없이 최소 C6 정합화. 새로운 TASK_ID를 테스트/메타데이터/한 가지 enum 변형용으로 소모하지 마.",
+            "소스+관련 회귀를 가능한 하나의 응집된 배치에 묶고 개발 중 변경 영역 테스트만 실행해. 기능 후보의 최종 validation-bearing exact SHA에서 필수 GitHub Actions 전체 Gate를 유지하며, 실제 실패 수리로 SHA가 달라진 경우만 새 SHA를 검증해. 안전성/빌드/음성 회귀 검증을 무력화하지 마.",
+            "C6·checkpoint·롤오버·기존 테스트 문자열/정규식 조정은 독립 개발 성과가 아니다. 같은 TASK_ID/FEATURE_ID에 귀속하고 구현 커밋 vs 검사·기록 커밋을 최종 보고에서 구분해. HMD 실기 미실행이면 RUNTIME_VALIDATION=UNTESTED.",
+            "개발 방향: DX11은 실제 메뉴→차량 선택→레이스 전체 프레임/입력/OpenXR; DX9Ex는 R84 실게임 HUD·렌즈·+TIME·GOAL·측정 성능. 원본 입력/FFB/SkyGlow·DX9Ex 폴백, 기존 owner lease, DXVK 동결 보호.",
+        ]
     if VR_CONTINUOUS_30M_ENABLED and lane in {"DX11", "DX9EX"}:
         lines += [
             "CONTINUOUS_DEVELOPMENT=ON. TASK_ID는 커밋·이력·점수 중복 방지 식별자일 뿐이며 이전 TASK 완료/C6, FEATURE_CONTRACT, backlog 상태는 다음 개발 착수의 선행 조건이 아니다.",
