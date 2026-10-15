@@ -1053,7 +1053,14 @@ for x in ("savedDirectProducer_ = CurrentDirectExactProducer;",
 sel = sem[sem.index("inline ProducerToken CurrentRenderProducerToken()"):
           sem.index("inline const ProjectedMarkerInfo* CurrentProjectedMarker()")]
 assert "SpriteQueueDepth != 0" in sel
-assert "? CurrentSpriteQueueProducer : CurrentDirectExactProducer;" in sel
+assert "return CurrentSpriteQueueProducer;" in sel
+assert "return CurrentDirectExactProducer;" in sel
+assert sel.index("if (SpriteQueueDepth != 0)") < (
+    sel.index("return CurrentSpriteQueueProducer;")) < (
+    sel.index("if (ExactLensCentreDrawOwnsSemantic())")) < (
+    sel.index("return CurrentDirectExactProducer;"))
+# The direct non-lens HUD owner still survives when no SpriteNode is active.
+assert "return ProducerToken::LensFlareCentre;" in sel
 src = (root / "src/hooks_uiscaling.cpp").read_text()
 direct = src[src.index("static void __cdecl OutRunHudTextProducer_dest("):
              src.index("static int __cdecl OutRunHudText_clip(")]
