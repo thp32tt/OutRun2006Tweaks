@@ -55,25 +55,40 @@ struct GameNativeSourceMutation {
         return full && targetOnly && sameOwner && sameBackbuffer &&
                activeBatch && targetReady && noMrt;
     }
-    // D3D9 Clear rectangles are screen-space, intersected with viewport.
-    // Validate the whole batch before touching the GPU, fail closed on gaps.
+    // D3D9 Clear rectangles are screen-space, intersected with the current
+    // viewport. A valid rectangle fully outside it writes no pixels: this is
+    // NOT a failed native replay, and a mixed batch can still be preserved.
+    // Malformed rectangles and unknown viewport extents remain fail-closed.
+    enum class TargetClearClip : std::uint8_t { Invalid, Empty, Pixels };
+    [[nodiscard]] static constexpr TargetClearClip classify_target_clear_rect(
+        std::int64_t l, std::int64_t t, std::int64_t r, std::int64_t b,
+        std::uint32_t vx, std::uint32_t vy,
+        std::uint32_t vw, std::uint32_t vh,
+        std::uint32_t width, std::uint32_t height,
+        TargetClearRect& out) noexcept {
+        out = {};
+        if (!vw || !vh || !width || !height ||
+            vx >= width || vy >= height || r <= l || b <= t ||
+            static_cast<std::uint64_t>(vx) + vw > width ||
+            static_cast<std::uint64_t>(vy) + vh > height)
+            return TargetClearClip::Invalid;
+        const auto x0 = static_cast<std::int64_t>(vx);
+        const auto y0 = static_cast<std::int64_t>(vy);
+        out = { l > x0 ? l : x0, t > y0 ? t : y0,
+                r < x0 + vw ? r : x0 + vw,
+                b < y0 + vh ? b : y0 + vh };
+        return out.left < out.right && out.top < out.bottom
+            ? TargetClearClip::Pixels : TargetClearClip::Empty;
+    }
     [[nodiscard]] static constexpr bool clipped_target_clear_rect(
         std::int64_t l, std::int64_t t, std::int64_t r, std::int64_t b,
         std::uint32_t vx, std::uint32_t vy,
         std::uint32_t vw, std::uint32_t vh,
         std::uint32_t width, std::uint32_t height,
         TargetClearRect& out) noexcept {
-        if (!vw || !vh || !width || !height ||
-            vx >= width || vy >= height ||
-            static_cast<std::uint64_t>(vx) + vw > width ||
-            static_cast<std::uint64_t>(vy) + vh > height)
-            return false;
-        const auto x0 = static_cast<std::int64_t>(vx);
-        const auto y0 = static_cast<std::int64_t>(vy);
-        out = { l > x0 ? l : x0, t > y0 ? t : y0,
-                r < x0 + vw ? r : x0 + vw,
-                b < y0 + vh ? b : y0 + vh };
-        return out.left < out.right && out.top < out.bottom;
+        return classify_target_clear_rect(
+            l, t, r, b, vx, vy, vw, vh, width, height, out)
+            == TargetClearClip::Pixels;
     }
     [[nodiscard]] static constexpr bool invalidates_full_game_frame(
         bool fullMode, bool succeeded, bool gameOwner,

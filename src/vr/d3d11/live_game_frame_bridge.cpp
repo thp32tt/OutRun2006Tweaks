@@ -5593,11 +5593,14 @@ bool preserve_game_partial_target_clear(
                     s.frameBatch.submitted != 0u, ready, true))
             return false;
 
-        // Do not enqueue even the first ClearView until every rectangle has
-        // passed clipping. A later malformed rect must keep native fallback.
+        // Validate and clip the ENTIRE successful game Clear batch before
+        // touching the GPU. Fully disjoint rectangles are D3D9 no-ops, not
+        // reasons to abandon the native menu/car/race frame. ClearView must
+        // receive only populated, nonempty rectangles (never empty extents).
         std::array<D3D11_RECT,
             GameNativeSourceMutation::kMaxPartialTargetClearRects> regions{};
         const std::uint32_t n = count ? count : 1u;
+        std::uint32_t nativeRegionCount = 0u;
         for (std::uint32_t i = 0u; i < n; ++i) {
             const std::int64_t l = count ? rects[i].x1 : vp.X;
             const std::int64_t t = count ? rects[i].y1 : vp.Y;
@@ -5606,16 +5609,22 @@ bool preserve_game_partial_target_clear(
             const std::int64_t b = count ? rects[i].y2 :
                 static_cast<std::int64_t>(vp.Y) + vp.Height;
             GameNativeSourceMutation::TargetClearRect clipped{};
-            if (!GameNativeSourceMutation::clipped_target_clear_rect(
-                    l,t,r,b,vp.X,vp.Y,vp.Width,vp.Height,
-                    backbufferDesc.Width,backbufferDesc.Height,clipped))
+            const auto coverage = GameNativeSourceMutation::classify_target_clear_rect(
+                l,t,r,b,vp.X,vp.Y,vp.Width,vp.Height,
+                backbufferDesc.Width,backbufferDesc.Height,clipped);
+            if (coverage == GameNativeSourceMutation::TargetClearClip::Invalid)
                 return false;
-            regions[i] = {
+            if (coverage == GameNativeSourceMutation::TargetClearClip::Empty)
+                continue;
+            regions[nativeRegionCount++] = {
                 static_cast<LONG>(clipped.left),
                 static_cast<LONG>(clipped.top),
                 static_cast<LONG>(clipped.right),
                 static_cast<LONG>(clipped.bottom)};
         }
+        // An entirely off-viewport successful D3D9 Clear did not touch the
+        // original frame. Keep the existing native RTV/DSV and Draw ordinals.
+        if (nativeRegionCount == 0u) return true;
         ComPtr<ID3D11DeviceContext1> ctx1;
         if (FAILED(s.backend.context()->QueryInterface(
                 IID_PPV_ARGS(ctx1.GetAddressOf()))) || !ctx1)
@@ -5628,7 +5637,8 @@ bool preserve_game_partial_target_clear(
             backbufferDesc.Format == D3DFMT_X8R8G8B8 ? 1.0f :
                 float((color >> 24) & 255u) * scale
         };
-        ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(), n);
+        ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(),
+                        nativeRegionCount);
         // No Draw ordinal, DSV, original D3D9 Present, FFB or SkyGlow change.
         return true;
     } catch (...) { return false; }

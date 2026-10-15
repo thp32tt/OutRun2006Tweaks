@@ -142,6 +142,44 @@ constexpr bool native_partial_target_clear_regression() {
         M::kMaxPartialTargetClearRects >= 2u;
 }
 static_assert(native_partial_target_clear_regression());
+// Successful multi-rect D3D9 TARGET Clear: only intersecting viewport pixels
+ // reach D3D11.1 ClearView. Other well-formed rects are no-ops and cannot
+ // cancel native menu/vehicle/race Draw continuity or gamepad/Present.
+constexpr bool native_target_clear_disjoint_batch_regression() {
+    using M = GameNativeSourceMutation;
+    using C = M::TargetClearClip;
+    M::TargetClearRect out{};
+    std::uint32_t visible = 0u;
+    // One rectangle entirely left of the viewport, one intersecting it,
+    // one entirely below it. All three were accepted by original D3D9 Clear.
+    if (M::classify_target_clear_rect(-100,20,0,120,10,30,200,100,
+                                      640,480,out) != C::Empty) return false;
+    if (M::classify_target_clear_rect(-100,20,50,120,10,30,200,100,
+                                      640,480,out) != C::Pixels ||
+        out.left != 10 || out.top != 30 ||
+        out.right != 50 || out.bottom != 120) return false;
+    ++visible;
+    if (M::classify_target_clear_rect(20,200,100,300,10,30,200,100,
+                                      640,480,out) != C::Empty) return false;
+    if (visible != 1u ||
+        M::classify_target_clear_rect(100,50,100,70,10,30,200,100,
+                                      640,480,out) != C::Invalid ||
+        M::classify_target_clear_rect(100,70,50,80,10,30,200,100,
+                                      640,480,out) != C::Invalid ||
+        M::classify_target_clear_rect(10,20,20,30,600,30,100,100,
+                                      640,480,out) != C::Invalid)
+        return false;
+    // An all-empty native region batch must return success without a GPU
+    // clear; neither that nor a mixed batch retires the same-Present source.
+    GameNativeFrameBatch frame{};
+    frame.succeeded(true);
+    frame.record_source_draw(0u);
+    return frame.publishable_full(true,1u) &&
+        !frame.stopped && frame.submitted == 1u &&
+        frame.depthReady && frame.accepts_full(1u);
+}
+static_assert(native_target_clear_disjoint_batch_regression());
+
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};
