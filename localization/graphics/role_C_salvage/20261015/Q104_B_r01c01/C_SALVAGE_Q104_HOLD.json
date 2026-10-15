@@ -1,0 +1,183 @@
+{
+  "schema": "outrun-c-salvage-hold-evidence-v1",
+  "task_id": "OUTRUN-C-SALVAGE-20261015-Q104-B-R01C01",
+  "date_kst": "2026-10-15",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_id": "Q104",
+  "producer": "B",
+  "tile": "r01c01",
+  "source_git": {
+    "dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+    "dds_git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+    "dds_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+    "psd_path": "localization/graphics/plate_library/upstream_psd/62BEBF33/62BEBF33_512x64.psd",
+    "psd_upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "psd_upstream_blob_sha": "e1879720c281a41059d0cfec12cbc46fb716cfd6",
+    "psd_sha256": "eefb1c6a234e49e16789fd9fb2307f200cea84f3b8e6423e50d029eced60249b"
+  },
+  "source_png": {
+    "sha256": null,
+    "status": "SOURCE_READABLE_TILE_NOT_STAGED",
+    "note": "Canonical DXT5 DDS was physically fetched and decoded; an exactly matched upright source tile has not been staged or SHA-verified."
+  },
+  "generated_png": {
+    "input_path": "work/image-src/ab_batches/candidate_outputs/B/Q104_62BEBF33_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256_k.png",
+    "sha256": "c9d8a572f04bcd54e71e0f02a0947c8ed5074ec7b21db28fb0c1444d4417954a",
+    "size": [
+      2048,
+      768
+    ],
+    "visible_content_assessment": "Korean OutRun Mode rendering is clipped at right image edge, with an opaque white scene/background; cannot be treated as isolated editable text.",
+    "rightmost_column_nonwhite_pixels": 315,
+    "rightmost_10_columns_dark_pixels": 3150,
+    "fully_opaque_fraction": 1,
+    "source_copy_byte_integrity": "ORIGINAL_SHA_UNCHANGED_AFTER_RUN"
+  },
+  "source_dds": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "fourcc": "DXT5",
+    "mip_count": 1,
+    "sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+    "encoder": "ENCODER_UNSUPPORTED"
+  },
+  "psd_analysis": {
+    "sha256_verified": true,
+    "header_dimensions": [
+      2048,
+      256
+    ],
+    "header_mode": "8_BIT_RGB",
+    "native_dimensions_match_dds": true,
+    "parsed_layer_count": 2,
+    "layers": [
+      {
+        "index": 0,
+        "name_pascal": "Decompressed Image",
+        "bounds": [
+          396,
+          48,
+          1352,
+          196
+        ],
+        "channels": 5,
+        "blend": "norm",
+        "opacity": 255,
+        "flags": 10
+      },
+      {
+        "index": 1,
+        "name_pascal": "OutRun Mode",
+        "bounds": [
+          414,
+          74,
+          1335,
+          179
+        ],
+        "channels": 4,
+        "blend": "norm",
+        "opacity": 255,
+        "flags": 40
+      }
+    ],
+    "layer_status": "PSD_LAYER_NAMES_FOUND_BUT_PIXEL_EQUIVALENCE_AND_ENGLISH_REMOVAL_NOT_VERIFIED",
+    "layer_tool_availability": "psd_tools NOT_INSTALLED_IN_ISOLATED_N100_RUN",
+    "chosen_english_layer_paths": [],
+    "clean_review": "HOLD_NO_VERIFIED_PSD_LAYER_SELECTION_OR_SOURCE_CLEAN"
+  },
+  "mask_and_qa": {
+    "english_original_text_mask_sha256": null,
+    "korean_generated_glyph_mask_sha256": null,
+    "korean_only_layer_sha256": null,
+    "clean_sha256": null,
+    "composite_sha256": null,
+    "TEST_ONLY_DDS_sha256": null,
+    "source_tile_sha256": null,
+    "original_pixel_protection": "NOT_TESTED_NO_COMPOSITE",
+    "orientation": "FLIP_Y_EXPECTED_NOT_VERIFIED_FOR_COMPOSITION",
+    "text_clipping": "FAIL_VISIBLE_KOREAN_RIGHT_EDGE_CROPPED",
+    "preserved_pixels": "NOT_TESTED_NO_COMPOSITE",
+    "overlap": "NOT_TESTED_NO_COMPOSITE",
+    "english_residue": "NOT_TESTED_NO_CLEAN",
+    "glyph_legibility": "FAIL_RIGHT_CLIPPED",
+    "DDS_codec": "HOLD_DXT5_ENCODER_UNSUPPORTED",
+    "status": "HOLD_OPAQUE_GENERATED_REQUIRES_EXPLICIT_GLYPH_MASK"
+  },
+  "worker_receipt": {
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "candidate": {
+      "dimensions": [
+        2048,
+        768
+      ],
+      "filename": "Q104_62BEBF33_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256_k.png",
+      "positive_alpha_pixels": 1572864,
+      "role": "B",
+      "sha256": "c9d8a572f04bcd54e71e0f02a0947c8ed5074ec7b21db28fb0c1444d4417954a",
+      "transparent_fraction": 0
+    },
+    "generated_text_mask": {
+      "kind": "REVIEW_PENDING",
+      "manual_mask_sha256": null
+    },
+    "official_promoted": false,
+    "psd_sources": [
+      {
+        "copied_into_branch": true,
+        "copies": [
+          {
+            "catalog_sha256": "eefb1c6a234e49e16789fd9fb2307f200cea84f3b8e6423e50d029eced60249b",
+            "local_present": true,
+            "repo_relative_path": "localization/graphics/plate_library/upstream_psd/62BEBF33/62BEBF33_512x64.psd",
+            "sha256_verified": true,
+            "size_bytes": 606606,
+            "status": "PSD_SHA_VERIFIED_LAYER_REVIEW_PENDING"
+          }
+        ],
+        "source_match_only": true,
+        "upstream_blob_sha": "e1879720c281a41059d0cfec12cbc46fb716cfd6",
+        "upstream_source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/62BEBF33_512x64.psd"
+      }
+    ],
+    "queue_index": 104,
+    "schema": "outrun-c-salvage-worker-v1",
+    "source": {
+      "source_status": "SOURCE_TILE_MISSING_NEEDS_STAGING"
+    },
+    "status": "HOLD_OPAQUE_GENERATED_REQUIRES_EXPLICIT_GLYPH_MASK",
+    "texture_hash": "62BEBF33"
+  },
+  "isolated_workspace": "work/c-salvage-q104-isolated-20261015",
+  "local_files": [
+    "output/candidates/B-104-c9d8a572f04bcd54-autoalpha-356d1192e9cd/receipt.json",
+    "qa_q104_inspection.json",
+    "qa_q104_psd_structure.json",
+    "output/last_cycle.json"
+  ],
+  "idempotence": {
+    "second_cycle_new_processed_items": 0,
+    "second_cycle_counts": {}
+  },
+  "qa_status": "HOLD",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_promoted": false,
+  "generated_images_new": 0,
+  "clean_or_layer_artifacts_new": 0,
+  "test_DDS_new": 0,
+  "A_B_queue_modified": false,
+  "A_B_inputs_modified": false,
+  "controller_modified": false,
+  "unblock_requirements": [
+    "Obtain a nonclipped Korean standalone lettering candidate OR manually review a mask with no adjacent art and exact generated PNG SHA.",
+    "Review Photoshop English/effects layer pixel content and verify a clean plate against canonical DDS (not just PSD layer names).",
+    "Pin English removal mask, native ROI/FLIP_Y transform, protective regions, all SHAs, before a separate TEST_ONLY composite.",
+    "Use exact native DXT5-compatible encoder and validate persisted DDS; never apply the BGRA32-only writer.",
+    "Keep C1 independent QA, high-risk C3 and user in-game gates separate."
+  ]
+}
