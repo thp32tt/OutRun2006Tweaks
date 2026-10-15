@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "64881d8d35387c75edf9eef76b33fc25dc397611",
-  "material_result_sha": "4a4cbef6514d0276cde1602d1ca799a3cd45fbbd",
+  "material_result_sha": "7092dacf3f69a6e8b2ecbd9864dc39f4ea22eed0",
   "source_paths": [
     "src/hooks_uiscaling.cpp"
   ],
@@ -77,16 +77,17 @@
       "Global D3DX flush would disturb unrelated batch order and does not repair a stale queued SpriteNode pointer.",
       "Changing generic world, projected billboard or SkyGlow classification would not validate a source queue tail and risks stereo regressions."
     ],
-    "fix_evidence": "C++ source committed on GitHub: initial d1fdef6b, follow-on 4a4cbef; constexpr true/false queue fixture compiled successfully locally as a standalone C++17 test.",
+    "fix_evidence": "Final C++ material 7092dacf restores ordinary rival/rank/GOAL fast-path literally and sends only StageExtensionTime through bounded live-chain membership; original StageExtensionLeave direct/D3DX and six tagged calls unchanged. Static_assert queue cases retained.",
     "negative_test_evidence": "Orphaned old tail, unchanged tail and insufficient traversal bound return no new tag without dereferencing the stale pointer.",
     "eye_ownership": "Only genuine StageExtensionTime tagged nodes may receive finite ScreenHud stereo routing; effect of this patch on actual Quest3 binocular +TIME visuals is untested."
   },
   "ci_evidence": {
-    "source_commit": "4a4cbef6514d0276cde1602d1ca799a3cd45fbbd",
+    "source_commit": "7092dacf3f69a6e8b2ecbd9864dc39f4ea22eed0",
     "initial_material_sha": "d1fdef6b24d89077d14bf221890b428181a1ff53",
     "initial_failures": [
       "DX9Ex Active policy failed because exact run JSON was not yet committed.",
-      "HUD Inspector visual composition test assumed the older direct TagAppendedNodes syntax; follow-on source commit preserves original exact producer call and semantics."
+      "HUD Inspector visual composition test assumed the older direct TagAppendedNodes syntax; follow-on source commit preserves original exact producer call and semantics.",
+      "The original 4a4 unified tagging branch preserved StageExtensionLeave but altered rival fast-path assertion; 7092 restored the original non-stage node = before[prio] else-branch and retained exact +TIME-only bounded queue scan."
     ],
     "validation_bearing_result_sha": null,
     "status": "PENDING_EXACT_SHA"
