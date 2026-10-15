@@ -381,8 +381,10 @@ namespace OutRunVRStereo
             // zeroing previously unused scratch bytes every stereo draw.
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch source;
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch indexSource;
-            std::vector<std::uint8_t> left;
-            std::vector<std::uint8_t> right;
+            // Both eye outputs receive the complete game-source vertex window
+            // before reprojection; no value-initialization is needed on growth.
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch left;
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch right;
             std::vector<std::uint8_t> used;
             std::vector<std::uint32_t> physical;
             std::vector<std::uint16_t> indices16;
@@ -3321,7 +3323,7 @@ namespace OutRunVRStereo
         bool R30TransformXyzrhwVertices(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state, int eye,
-            std::vector<std::uint8_t>& out,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out,
             const std::vector<std::uint8_t>* usedMask,
             bool allowFullReprojection, bool& usedFullReprojection) noexcept
         {
@@ -3336,16 +3338,6 @@ namespace OutRunVRStereo
             if (usedMask && usedMask->size() < vertexCount)
                 return false;
 
-            try
-            {
-                out.resize(bytes);
-            }
-            catch (...)
-            {
-                return false;
-            }
-            std::memcpy(out.data(), source, bytes);
-
             const float x0 = static_cast<float>(state.viewport.X);
             const float y0 = static_cast<float>(state.viewport.Y);
             const float width = static_cast<float>(state.viewport.Width);
@@ -3356,6 +3348,20 @@ namespace OutRunVRStereo
             if (width <= 0.0f || height <= 0.0f ||
                 !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
                 return false;
+
+            // Fail before the expensive clone for invalid viewport state.
+            // Fully overwrite the logical payload (including attributes and
+            // unused indexed vertices) before changing either eye's XYZRHW.
+            // A rejected full projection may re-copy original bytes below.
+            try
+            {
+                out.resize(bytes);
+            }
+            catch (...)
+            {
+                return false;
+            }
+            std::memcpy(out.data(), source, bytes);
 
             auto selected = [&](UINT i) noexcept
             {
@@ -3685,8 +3691,8 @@ namespace OutRunVRStereo
         bool R30TransformXyzrhwStereo(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>& right,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
             const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
         {
             bool leftFull = false;

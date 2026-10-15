@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00874",
+  "production_id": "CONVERSION-DX9EX-00874",
+  "event_id": "CONVERSION-DX9EX-00874-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00874",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R26_XYZRHW_EYE_STAGING",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R26_XYZRHW_EYE_STAGING",
+    "goal": "Remove redundant value-initialization of shipped R26+HUD XYZRHW left/right per-eye vertex output while preserving full original buffer bytes, independent stereo reprojection, and original/fallback behavior.",
+    "scope_boundary": "Only R26+HUD per-eye transformed vertex staging and its portable host smoke. No source/index shadow rework, DX11/DXVK, lens, HUD classification, SkyGlow, GOAL, FFB or original input changes.",
+    "special_work_evidence": "R26+HUD R30TransformXyzrhwVertices unconditionally vector-resizes BOTH left and right output arrays, zero-filling newly enlarged spans before complete memcpy of all bytes from source. The previous 00873 improvement changed source/index scratch ONLY. Removing this separately confirmed redundant eye-buffer CPU write does not prove Quest3 FPS improvement.",
+    "trace_stages": [
+      "Original game DrawPrimitiveUP, IndexedPrimitiveUP, VB/IB Lock/Unlock submit original indexed/non-indexed XYZRHW vertex windows.",
+      "R26+HUD copies the complete validated vertex bytes into independent per-eye buffers before transform.",
+      "World, HUD and projected-marker per-eye geometry changes only XYZRHW; unused vertices and texture/attribute payload remain unmodified.",
+      "When full reprojection fails or eyes disagree, original source is copied again for affine fallback; D3D9 left/right draw and E_NOTIMPL original fallback are preserved."
+    ],
+    "subcomponents": [
+      "Replace both left/right per-eye std::vector with existing capacity-retaining write-only scratch, removing zero-fill on growth.",
+      "Check invalid viewport before cloning and keep full memcpy plus bilateral original-source restore unchanged.",
+      "Extend existing Active no-HMD host regression with two independent eye buffers, attribute and unused vertex survival, reused capacity and original-source fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "eye-copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R26+HUD per-eye XYZRHW byte staging",
+        "expected_behavior": "All bytes of exact original source are copied for both eyes before per-eye XYZRHW transform, with no vector growth zero fill."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Indexed vertex attributes and bilateral fallback",
+        "expected_behavior": "Unused indexed vertices and nonposition attributes remain identical, and full reprojection failure resets eye payload from original source."
+      },
+      {
+        "id": "ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA shipped Windows game and OpenXR host",
+        "expected_behavior": "Windows Active game/host/package, Domain Isolation, relevant Full Source Impact and portable changed-area smoke succeed on validation-bearing SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Both R30ScratchBuffers.left/right were std::vector<uint8_t>; each eye's resize grew with zero-initialization, immediately overwritten by complete memcpy(source,bytes).",
+    "source_trace": [
+      "D3D9 original producer submits XYZRHW draw or captured indexed VB/IB.",
+      "R30TransformXyzrhwVertices validates input and creates each eye clone.",
+      "Only selected XYZRHW vertex positions/depth change; arbitrary trailing attributes remain.",
+      "Stereo submit uses separate left/right DrawPrimitiveUP and source-recopy on bilateral fallback."
+    ],
+    "root_cause": "Unnecessary value-initialization on repeated growth of both transformed-eye buffers before a complete memcpy generates avoidable CPU memory writes.",
+    "alternatives_rejected": [
+      "Do not skip memcpy or mutate original source directly.",
+      "Do not share one eye's storage with the other or alter per-eye reprojection/fallback.",
+      "Do not revisit already completed 00873 source/index scratch improvements."
+    ],
+    "fix_evidence": "Output eye buffers use already validated write-only scratch with full-source copy and viewport early reject.",
+    "negative_test_evidence": "Host smoke covers independent eyes, untouched indexed/texture attributes, resizing without stale reuse, original clone rollback, clear; exact-SHA Windows gate pending."
+  },
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_GATES",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "runtime_evidence": "No physical Quest3/VDXR/gameplay performance measurement.",
+  "source_parent_sha": "998e79578002769f831a03c6084b8ce66ca11171",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "vrhost/tests/r30_shadow_ranges_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00874.json"
+  ],
+  "acceptance_results": {
+    "eye-copy": "PENDING_EXACT_SHA",
+    "fallback": "PENDING_EXACT_SHA",
+    "ci": "PENDING_EXACT_SHA"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "PENDING_EXACT_SHA_AND_HMD",
+  "result_commit_ci_skip": false,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null
+}

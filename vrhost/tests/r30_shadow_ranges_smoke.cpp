@@ -202,6 +202,51 @@ int main()
                 return 23;
         }
     }
+    // Separate full-byte cloned XYZRHW eye staging (not 00873's source
+    // shadow scratch). Preserve untouched indexed vertices and attributes.
+    WriteOnlyByteScratch leftEye, rightEye;
+    constexpr std::size_t Stride = sizeof(float) * 4u + 4u;
+    std::uint8_t original[Stride * 3u]{};
+    for (std::size_t i = 0; i < sizeof(original); ++i)
+        original[i] = static_cast<std::uint8_t>((i * 17u + 3u) & 0xFFu);
+    leftEye.resize(sizeof(original));
+    rightEye.resize(sizeof(original));
+    std::memcpy(leftEye.data(), original, sizeof(original));
+    std::memcpy(rightEye.data(), original, sizeof(original));
+    if (leftEye.data() == rightEye.data() ||
+        std::memcmp(leftEye.data(), original, sizeof(original)) ||
+        std::memcmp(rightEye.data(), original, sizeof(original)))
+        return 26;
+    const float lx = -2.0f, rx = 3.0f;
+    std::memcpy(leftEye.data(), &lx, sizeof(lx));
+    std::memcpy(rightEye.data(), &rx, sizeof(rx));
+    if (std::memcmp(leftEye.data() + Stride, original + Stride, Stride) ||
+        std::memcmp(rightEye.data() + Stride, original + Stride, Stride) ||
+        std::memcmp(leftEye.data() + 16u, original + 16u, 4u) ||
+        std::memcmp(rightEye.data() + 16u, original + 16u, 4u))
+        return 27;
+    auto* lp = leftEye.data();
+    auto* rp = rightEye.data();
+    leftEye.resize(Stride);
+    rightEye.resize(Stride);
+    leftEye.resize(sizeof(original));
+    rightEye.resize(sizeof(original));
+    if (leftEye.data() != lp || rightEye.data() != rp)
+        return 28;
+    // Bilateral affine fallback restarts both eye buffers from the immutable
+    // original rather than consuming a previous eye's projected result.
+    std::memcpy(leftEye.data(), original, sizeof(original));
+    std::memcpy(rightEye.data(), original, sizeof(original));
+    if (std::memcmp(leftEye.data(), original, sizeof(original)) ||
+        std::memcmp(rightEye.data(), original, sizeof(original)))
+        return 29;
+    leftEye.clear();
+    rightEye.clear();
+    if (leftEye.data() || rightEye.data() ||
+        leftEye.size() || rightEye.size() ||
+        leftEye.capacity() || rightEye.capacity())
+        return 30;
+
     vertexScratch.clear();
     indexScratch.clear();
     if (vertexScratch.data() || vertexScratch.size() ||
