@@ -1039,7 +1039,11 @@ namespace
         const OutRunVR::SharedRenderFrameState& before)
     {
         OutRunVR::SharedRenderFrameState after{};
-        return reader.ReadFrame(before.frameId, after) &&
+        return reader.ReadFrame(
+            before.frameId, after,
+            (before.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0
+                ? before.reserved[OutRunVR::RenderFrameDirectGenerationIndex]
+                : 0u) &&
             (after.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
             after.sequence == before.sequence &&
             after.clientPid == before.clientPid &&
@@ -2046,6 +2050,7 @@ int main(int argc, char** argv)
         std::array<XrView, 2> matchedViews{};
         bool matchedStereoValid = false;
         std::uint32_t lastProcessedStereoFrame = 0;
+        std::uint32_t lastProcessedDirectGeneration = 0;
         ULONGLONG lastStereoMatchMs = 0;
         std::array<XrCompositionLayerProjectionView, 2>
             cachedProjectionViews{};
@@ -2121,6 +2126,7 @@ int main(int argc, char** argv)
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
                         if (renderFrames.Read(rf)) lastProcessedStereoFrame = rf.frameId;
+                         lastProcessedDirectGeneration = 0;
                     }
                     else if (state == XR_SESSION_STATE_EXITING || state == XR_SESSION_STATE_LOSS_PENDING)
                         quit = true;
@@ -2166,6 +2172,7 @@ int main(int argc, char** argv)
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                lastProcessedDirectGeneration = 0;
                 pendingReferenceSpaceChange = false; pendingReferenceSpaceChangeTime = 0;
             }
 
@@ -2254,6 +2261,7 @@ int main(int argc, char** argv)
                 OutRunVrR23VerifiedBundle::Invalidate();
                 OutRunVR::SharedRenderFrameState rf{};
                 lastProcessedStereoFrame = renderFrames.Read(rf) ? rf.frameId : shared.ReadStereoMeta().frame;
+                lastProcessedDirectGeneration = 0;
                 if (presentation != OutRunVR::PresentationGameplay)
                 {
                     cachedProjectionValid = false;
@@ -2334,6 +2342,7 @@ int main(int argc, char** argv)
                         {
                             std::uint32_t currentGeneration = 0;
                             std::uint32_t newestDirectFrame = 0;
+                            std::int64_t newestDirectQpc = 0;
                             bool haveCurrentGeneration = false;
                             for (std::size_t i = 0; i < historyCount; ++i)
                             {
@@ -2346,10 +2355,13 @@ int main(int argc, char** argv)
                                     (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
                                     continue;
                                 if (!haveCurrentGeneration ||
-                                    R37FrameIdBefore(
-                                        newestDirectFrame, frame.frameId))
+                                    OutRunVrNativeEyePair::PreferNativeDirectFrame(
+                                        generation, frame.frameId, frame.presentQpc,
+                                        currentGeneration, newestDirectFrame,
+                                        newestDirectQpc))
                                 {
                                     newestDirectFrame = frame.frameId;
+                                    newestDirectQpc = frame.presentQpc;
                                     currentGeneration = generation;
                                     haveCurrentGeneration = true;
                                 }
@@ -2363,10 +2375,10 @@ int main(int argc, char** argv)
                                 const std::uint32_t generation =
                                     frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
                                 if (!frame.frameId ||
-                                    (lastProcessedStereoFrame != 0 &&
-                                     !R37FrameIdBefore(
-                                         lastProcessedStereoFrame,
-                                         frame.frameId)) ||
+                                    OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
+                                        generation, frame.frameId,
+                                        lastProcessedDirectGeneration,
+                                        lastProcessedStereoFrame) ||
                                     frame.state != OutRunVR::StereoSbsActive ||
                                     (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                     (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
@@ -2377,8 +2389,10 @@ int main(int argc, char** argv)
                                     continue;
 
                                 if (!foundDirect ||
-                                    R37FrameIdBefore(
-                                        selectedDirect.frameId, frame.frameId))
+                                    OutRunVrNativeEyePair::PreferNativeDirectFrame(
+                                        generation, frame.frameId, frame.presentQpc,
+                                        currentGeneration, selectedDirect.frameId,
+                                        selectedDirect.presentQpc))
                                 {
                                     selectedDirect = frame;
                                     foundDirect = true;
@@ -2396,10 +2410,10 @@ int main(int argc, char** argv)
                                         frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
                                     if (!frame.frameId ||
                                         frame.frameId == selectedDirect.frameId ||
-                                        (lastProcessedStereoFrame != 0 &&
-                                         !R37FrameIdBefore(
-                                             lastProcessedStereoFrame,
-                                             frame.frameId)) ||
+                                        OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
+                                            generation, frame.frameId,
+                                            lastProcessedDirectGeneration,
+                                            lastProcessedStereoFrame) ||
                                         frame.state != OutRunVR::StereoSbsActive ||
                                         (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                         (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
@@ -2451,6 +2465,13 @@ int main(int argc, char** argv)
                     constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
                         OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
                         OutRunVR::RenderFrameEffectivePoseValid;
+                    const bool beforeAlreadyProcessed = have &&
+                        ((before.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0
+                            ? OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
+                                before.reserved[OutRunVR::RenderFrameDirectGenerationIndex],
+                                before.frameId, lastProcessedDirectGeneration,
+                                lastProcessedStereoFrame)
+                            : before.frameId == lastProcessedStereoFrame);
                     if (have)
                     {
                         candidateGameFrameId = before.frameId;
@@ -2467,7 +2488,7 @@ int main(int argc, char** argv)
                         candidateRejectReason = "not-sbs-active";
                     else if (!before.frameId)
                         candidateRejectReason = "zero-frame-id";
-                    else if (before.frameId == lastProcessedStereoFrame)
+                    else if (beforeAlreadyProcessed)
                         candidateRejectReason = "already-processed";
                     else if (!before.sourcePoseSequence)
                         candidateRejectReason = "zero-pose-sequence";
@@ -2480,7 +2501,7 @@ int main(int argc, char** argv)
                         (before.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
                         before.state == OutRunVR::StereoSbsActive &&
                         before.frameId &&
-                        before.frameId != lastProcessedStereoFrame &&
+                        !beforeAlreadyProcessed &&
                         before.sourcePoseSequence &&
                         (before.flags & need) == need)
                     {
@@ -2724,6 +2745,12 @@ int main(int argc, char** argv)
                             }
                             lastProcessedStereoFrame =
                                 pendingBundleFrame.frameId;
+                            lastProcessedDirectGeneration =
+                                pendingBundleSource ==
+                                    OutRunVrR23VerifiedBundle::SourceKind::DirectGpu
+                                    ? pendingBundleFrame.reserved[
+                                        OutRunVR::RenderFrameDirectGenerationIndex]
+                                    : 0u;
                             lastStereoMatchMs = projectionNow;
                             candidateRejectReason = "displayed-fresh";
                             pendingBundlePublish = false;

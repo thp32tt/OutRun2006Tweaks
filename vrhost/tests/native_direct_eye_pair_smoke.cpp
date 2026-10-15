@@ -114,6 +114,30 @@ int main()
                      StereoSourceRoute::None,
                  "missing SBS view must never submit an OpenXR layer"))
         return 1;
+    // New-generation OpenXR eyes must not be blocked by old high IDs.
+    using OutRunVrNativeEyePair::PreferNativeDirectFrame;
+    using OutRunVrNativeEyePair::DirectFrameAlreadyProcessed;
+    if (!require(PreferNativeDirectFrame(8u, 1u, 6000, 7u, 400u, 5000),
+                 "new generation must beat old high frame ID") ||
+        !require(!PreferNativeDirectFrame(7u, 400u, 5000, 8u, 1u, 6000),
+                 "stale transport must not replace current eyes") ||
+        !require(PreferNativeDirectFrame(8u, 2u, 6050, 8u, 1u, 6000),
+                 "later same-generation Present wins") ||
+        !require(!PreferNativeDirectFrame(8u, 1u, 6000, 8u, 2u, 6050),
+                 "older Present must not regress the native eyes") ||
+        !require(!PreferNativeDirectFrame(7u, 30u, 0, 8u, 2u, 6050),
+                 "unknown QPC from stale generation must fail closed") ||
+        !require(!PreferNativeDirectFrame(8u, 2u, 6000, 9u, 1u, 6000),
+                 "equal-QPC generations are ambiguous") ||
+        !require(DirectFrameAlreadyProcessed(7u, 400u, 7u, 400u),
+                 "duplicate consumed native frame must be rejected") ||
+        !require(!DirectFrameAlreadyProcessed(8u, 1u, 7u, 400u),
+                 "new transport frame must not inherit stale consumed ID") ||
+        !require(DirectFrameAlreadyProcessed(8u, 1u, 8u, 2u),
+                 "old frame within same generation must remain rejected") ||
+        !require(!DirectFrameAlreadyProcessed(8u, 3u, 8u, 2u),
+                 "fresh same-generation native frame must progress"))
+        return 1;
     std::cout << "Native two-eye host source/projection contract PASS\n";
     return 0;
 }

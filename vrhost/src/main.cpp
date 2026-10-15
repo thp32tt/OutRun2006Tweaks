@@ -731,7 +731,8 @@ namespace
         }
 
         bool ReadFrame(std::uint32_t frameId,
-            OutRunVR::SharedRenderFrameState& out) const
+            OutRunVR::SharedRenderFrameState& out,
+            std::uint32_t directGeneration = 0) const
         {
             if (!frameId || !ValidateRing())
                 return false;
@@ -748,7 +749,11 @@ namespace
                 {
                     OutRunVR::SharedRenderFrameState candidate{};
                     if (ReadSlot(i, candidate) &&
-                        candidate.frameId == frameId)
+                        candidate.frameId == frameId &&
+                        (directGeneration == 0 ||
+                         ((candidate.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 &&
+                          candidate.reserved[OutRunVR::RenderFrameDirectGenerationIndex] ==
+                              directGeneration)))
                     {
                         selected = candidate;
                         found = true;

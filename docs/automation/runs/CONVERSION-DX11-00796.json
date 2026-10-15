@@ -1,0 +1,124 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00796",
+  "production_id": "CONVERSION-DX11-00796",
+  "event_id": "CONVERSION-DX11-00796-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:HOST_DIRECTGPU_GENERATION_AWARE_OPENXR_GAME_FRAME_HANDOFF",
+  "feature_id": "DX11-HOST-GENERATION-SAFE-NATIVE-EYE-CONSUMPTION",
+  "status": "VALIDATING_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "ec07aa12a5f3598d17b8e8ddb8ec4d4f4cb24592",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "vrhost/src/runtime/native_stereo_source_route.hpp",
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-HOST-GENERATION-SAFE-NATIVE-EYE-CONSUMPTION",
+    "goal": "Continue actual game-native stereo eye frames through transport generation restart in the x64 OpenXR DirectGPU host without reselecting old frames or dropping legitimate new low-frame-ID results. Preserve SBS, gamepad and classic fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-latest-cross-generation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "OpenXR_host_native_eye_selection",
+        "expected_behavior": "Select the newest game Present by QPC when comparing native stereo generations and by frame ordering within a generation."
+      },
+      {
+        "id": "native-current-generation-publish",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Host_DirectGPU_generation_handoff",
+        "expected_behavior": "Recheck exact generation during frame re-read, reject duplicate stale frames, commit current-generation source pair to R23 host-owned GPU hold and OpenXR."
+      },
+      {
+        "id": "classic-gameplay-input-safe",
+        "category": "fallback_regression",
+        "behavior_area": "Host_SBS_D3D9_input_fallback",
+        "expected_behavior": "No changes to original D3D9 input/FFB/SkyGlow/DX9Ex or DXVK; untrustworthy competing frame generations are not submitted as valid stereo eyes."
+      },
+      {
+        "id": "all-five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Build_OpenXR_HUD",
+        "expected_behavior": "Required DX11 Fast, Backend, Windows Build, OpenXR and HUD checks succeed at the identical final result SHA; real Quest3 remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Game D3D9 frame ring produced native stereo per-eye sources with generation/frame/QPC",
+      "Host selection chooses newest valid generation by Present QPC, then current-generation frame ordering",
+      "R23 validates generation-safe source identity, copies native game eyes to host GPU hold, submits OpenXR; original SBS/input fallback unchanged"
+    ],
+    "batch_components": [
+      "Actual x64 host DirectGPU OpenXR frame consumer source code",
+      "Native generation-aware frame candidate selection and exact source re-read",
+      "Positive and negative C++ smoke cases covering Reset/new generation and stale frame"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "New-generation low-frame-ID game output selected over stale higher previous-generation IDs.",
+      "negative_regression": "Old QPC and ambiguous generations denied, stale consumed IDs cannot suppress new frame and classic fallback remains.",
+      "component_integration": "Native full-screen game eye ring -> host DirectGPU latest frame selection -> generation-checked GPU eye hold -> OpenXR projection."
+    },
+    "conflict_keys": [
+      "DX11:HOST_DIRECTGPU_GENERATION_AWARE_OPENXR_GAME_FRAME_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_LR_GAME_EYE_SOURCE",
+      "HOST_DIRECTGPU_LATEST_GENERATION",
+      "OPENXR_PROJECTION",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Host runtime smoke and required Actions only; live menu/vehicle/race visual and Quest3 fps NOT TESTED.",
+    "activation_guard_and_fallback": "Current DirectGPU opt-in only, no promotion; original SBS/D3D9 input FFB SkyGlow remain, DXVK frozen."
+  },
+  "acceptance_results": {
+    "native-latest-cross-generation": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "native-current-generation-publish": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "classic-gameplay-input-safe": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "all-five-exact-sha-gates": "PENDING"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub current HEAD and completed 00795 exact-SHA verified; distinct x64 host consumption files isolated.",
+    "C1_REVIEW": "R41 chooses DirectGPU generation by largest numerical frame ID across generations and ReadFrame lacked exact generation filter.",
+    "C2_IMPLEMENT": "Generation-aware OpenXR host native game frame selection and exact generation reread; host C++ smoke cases.",
+    "C3_VALIDATE": "PENDING_GITHUB_EXACT_SHA",
+    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA_GATES"
+  },
+  "evidence": {
+    "real_game_quest3_test": false,
+    "source_paths": [
+      "vrhost/src/runtime/native_stereo_source_route.hpp",
+      "vrhost/src/main.cpp",
+      "vrhost/src/main_r23.cpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+    ],
+    "previous_task_00795_complete": true
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00796",
+    "score_change": 0,
+    "award_only_after_exact_sha_build_success": true
+  }
+}
