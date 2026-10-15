@@ -174,6 +174,18 @@ def mutate_classifier(old, new):
     return R30[:first] + part.replace(old, new, 1) + R30[last:]
 
 
+def mutate_depth_off(old, new):
+    begin = "R30ScreenSpaceKind R30ClassifyScreenSpacePass("
+    gate = "if (zEnable == D3DZB_FALSE &&"
+    end = "// Only the OpenXR pose/FOV"
+    first = R30.index(begin)
+    pos = R30.index(gate, first)
+    last = R30.index(end, pos)
+    body = R30[pos:last]
+    require(body.count(old) == 1, "depth-off mutation ambiguous: " + old)
+    return R30[:pos] + body.replace(old, new, 1) + R30[last:]
+
+
 def mutate_accessor(old, new):
     # A whole-file replace can mutate GetRendererBaseProjection or older
     # culling paths instead, giving a false negative regression failure.
@@ -217,15 +229,15 @@ def negative_mutations():
         ("delete positive screen overlay owner",
          mutate_classifier("CorroboratesScreenOverlay2D(scope)", "false")),
         ("remove billboard exception",
-         mutate_classifier(
+         mutate_depth_off(
              "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",
              "false")),
         ("promote all world particles",
-         mutate_classifier(
+         mutate_depth_off(
              "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",
              "OutRunVR::GameSemantic::CorroboratesWorld(scope)")),
         ("promote queued effects",
-         mutate_classifier(
+         mutate_depth_off(
              "if (!OutRunVR::GameSemantic::QueueRenderActive() &&",
              "if (true &&")),
         ("break flat fallback",
