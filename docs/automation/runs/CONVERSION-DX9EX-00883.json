@@ -17,19 +17,20 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "71ea0b8354de211f86d7d327579288be4149c1d1",
-  "material_result_sha": null,
+  "material_result_sha": "453680b15bc1676db24fb6960845ba340e46ff53",
   "validation_bearing_result_sha": "ac0052b74bd328eb2bb2f3d9c21c9a5113d2e311",
   "source_paths": [
     "src/hooks_uiscaling.cpp"
   ],
   "changed_files": [
     "src/hooks_uiscaling.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00883.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00883.json",
+    "tools/verify_vr_ui_matrix_safety.py"
   ],
   "acceptance_results": {
-    "pivoted_2d_matrix": "SOURCE_IMPLEMENTED",
-    "fallback_pivot_isolation": "SOURCE_IMPLEMENTED",
-    "exact_sha_game_host_package": "PENDING"
+    "pivoted_2d_matrix": "PASS",
+    "fallback_pivot_isolation": "PASS",
+    "exact_sha_game_host_package": "PASS"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
@@ -84,14 +85,31 @@
     "negative_test_evidence": "C++ static_asserts cover rotated X/Y matrix coefficients and native 4:3 identity, and conditional gating excludes Vanilla/gameplay/HUD.",
     "eye_ownership": "The original 2D menu sprite matrix is corrected before the existing R84 per-eye compositor; no per-eye world or SkyGlow owner changes."
   },
-  "runtime_evidence": "No Quest3/VDXR HMD verification in this run.",
-  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "runtime_evidence": "No Quest3/VDXR headset or game-screen execution was performed in this run.",
+  "hold_reason": "NEED_HMD_TEST",
   "ci_evidence": {
     "status": "PASS_EXACT_SHA",
     "exact_sha": "ac0052b74bd328eb2bb2f3d9c21c9a5113d2e311",
-    "conclusion": "SUCCESS",
-    "source": "USER_CONFIRMED_EXACT_SHA_CI",
+    "dx9ex_active": {
+      "run_id": 38699519678,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, host, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38699519449,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38699519512,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38699519454,
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain (3/3)"
+    },
     "runtime": "UNTESTED"
   },
-  "result_commit_ci_skip": true
+  "result_commit_ci_skip": false,
+  "bookkeeping_ci_skip": true
 }
