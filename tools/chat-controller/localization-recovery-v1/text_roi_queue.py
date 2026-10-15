@@ -172,7 +172,7 @@ def _prompt(role, batch_id, tiles, translations):
     for i,item in enumerate(tiles,1):
         lines.append(f"[{i}/{len(tiles)}] {item['filename']} : {item['english']} → {item['korean']}; {item['width']}×{item['height']} px; 출력 {item['output_filename']}")
     lines.append("전송과 결과 검증은 각 PNG 실제 첨부·생성물 수량·저장 SHA 증빙이 필요합니다. 게임 DDS/실게임 PASS를 주장하지 마세요.")
-    prompt="\\n".join(lines)
+    prompt="\n".join(lines)
     if len(prompt) > 26000:
         raise ValueError("ROI_PROMPT_TOO_LONG")
     return prompt
