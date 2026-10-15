@@ -57,17 +57,28 @@ def main() -> None:
         # SkyGlow restore block can neither hide nor cause this failure.
         for name in functions:
             fn = function_block(source, name)
-            assert fn.count(marker) >= 1, (path, name)
-            mutant = source.replace(fn, fn.replace(
-                marker, "/* omitted current-frame failure veto */", 1), 1)
+            owned = RESTORE.search(fn)
+            assert owned is not None and marker in owned.group(1), (path, name)
+            # The right-eye Draw failure already marks the frame earlier in
+            # this same function. Mutate only the *restore* branch, never the
+            # earlier working rightHr failure marker.
+            restore_guard = owned.group(0)
+            mutated_guard = restore_guard.replace(
+                marker, "/* omitted current-frame failure veto */", 1)
+            mutant = source.replace(
+                fn, fn.replace(restore_guard, mutated_guard, 1), 1)
             assert not check(mutant, functions, marker, invalidate, arm), (path, name)
         # A condition inversion must fail even if a later function still has
         # a valid failure branch and the same frame marker.
         for name in functions:
             fn = function_block(source, name)
-            assert "if (!restoreOk)" in fn, (path, name)
-            mutant = source.replace(fn, fn.replace(
-                "if (!restoreOk)", "if (restoreOk)", 1), 1)
+            owned = RESTORE.search(fn)
+            assert owned is not None, (path, name)
+            restore_guard = owned.group(0)
+            mutated_guard = restore_guard.replace(
+                "if (!restoreOk)", "if (restoreOk)", 1)
+            mutant = source.replace(
+                fn, fn.replace(restore_guard, mutated_guard, 1), 1)
             assert not check(mutant, functions, marker, invalidate, arm), (path, name)
     print("R84 restore failure publication veto: PASS (4 paths, 8 scoped mutations)")
 
