@@ -17,7 +17,7 @@ def integrated(src: str, header: str) -> bool:
     probe = body.find("if (sourcePitchValid && !fullMode) {")
     publish = body.find("GameNativeFramePublication::should_upload(", probe)
     copy = body.find("GameNativeFrameUpload::copy_rows(", publish)
-    update = body.find("game->UpdateSurface(", copy)
+    update = body.find("uploaded = SUCCEEDED(game->UpdateSurface(", copy)
     reset = body.find("s.frameBatch.reset();", update)
     return all((
         '#include "native_game_frame_publication.hpp"' in src,
