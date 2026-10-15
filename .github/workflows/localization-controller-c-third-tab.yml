@@ -1,0 +1,47 @@
+name: Existing localization controller C third-tab check
+on:
+  push:
+    branches:
+      - localization-controller-recovery-20260928
+    paths:
+      - 'tools/chat-controller/localization-recovery-v1/patch_controller_c_slot.py'
+      - 'tools/chat-controller/localization-recovery-v1/patch_controller_png_upload.py'
+      - 'tools/chat-controller/localization-recovery-v1/Dockerfile'
+      - 'tools/chat-controller/localization-recovery-v1/docker-compose.yml'
+      - 'tools/chat-controller/localization-recovery-v1/prompts/localization_C.md'
+      - 'tools/chat-controller/localization-recovery-v1/tests/test_controller_c_third_tab.py'
+      - '.github/workflows/localization-controller-c-third-tab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-build-source-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Three slots and pinned A/B/C build-time patch (no ChatGPT)
+        run: python tools/chat-controller/localization-recovery-v1/tests/test_controller_c_third_tab.py
+      - name: Compose has same one default controller service
+        run: |
+          python -m pip install PyYAML==6.0.2
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          p=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml')
+          c=yaml.safe_load(p.read_text())
+          assert list(c['services']['outrun-chat-controller-localization-recovery']['environment'].keys())
+          controller=c['services']['outrun-chat-controller-localization-recovery']
+          env=controller['environment']
+          assert env['CHAT_SLOTS']=='3'
+          times={int(x) for x in env['SCHEDULE_MINUTES'].split(',')}
+          assert times == set(range(0,60,5)) | {3,33}, times
+          assert env['OUTRUN_AB_BATCH_QUEUE']=='true'
+          assert env['OUTRUN_AB_PROJECT_NAME']=='아웃런 한글화 신규'
+          optional=c['services'].get('outrun-c-salvage-offline')
+          assert optional is None or optional.get('profiles') == ['optional-offline-c']
+          print('PASS: A/B preserved, C :03/:33, one default Docker service')
+          PY
