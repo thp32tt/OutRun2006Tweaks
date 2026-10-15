@@ -675,6 +675,9 @@ namespace OutRunVRStereo
                 }
                 if (!rolledBack)
                 {
+                    // A failed original-WVP rollback invalidates this Present,
+                    // not only future mono-safety frames.
+                    R32ReviewMarkFrameRightDrawFailed();
                     R32ReviewReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R33/fast-left-WVP-rollback");
                     R32ReviewNoteRestoreFailure("R33 fast left-eye c64 rollback");
@@ -691,6 +694,10 @@ namespace OutRunVRStereo
             R32ReviewOwnedResult result{ true, actualDraw() };
             if (FAILED(result.hr))
             {
+                // R30's lower owner already vetoes this frame on a failed
+                // left-eye draw. Match it in both R84 fast-world and HUD paths:
+                // future mono safety cannot retract a pending stereo Present.
+                R32ReviewMarkFrameRightDrawFailed();
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R32ReviewReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
@@ -857,6 +864,9 @@ namespace OutRunVRStereo
                 }
                 if (!rolledBack)
                 {
+                    // A failed original-WVP rollback invalidates this Present,
+                    // not only future mono-safety frames.
+                    R32ReviewMarkFrameRightDrawFailed();
                     R32ReviewReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R33/HUD-left-WVP-rollback");
                     R32ReviewNoteRestoreFailure("R33 HUD left-eye c64 rollback");
@@ -873,6 +883,10 @@ namespace OutRunVRStereo
             R32ReviewOwnedResult result{ true, actualDraw() };
             if (FAILED(result.hr))
             {
+                // R30's lower owner already vetoes this frame on a failed
+                // left-eye draw. Match it in both R84 fast-world and HUD paths:
+                // future mono safety cannot retract a pending stereo Present.
+                R32ReviewMarkFrameRightDrawFailed();
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 bool restored = false;

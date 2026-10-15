@@ -123,7 +123,71 @@ def check_left_mutations(source: str) -> None:
     cases += 1
     print(f"R84 R30 left draw + c64 rollback current-frame veto: PASS ({cases} negative mutations)")
 
+
+def check_r33_left(source: str) -> bool:
+    """R84 world and HUD left-eye failures must veto the *current* Present."""
+    try:
+        for signature in ("R32ReviewOwnedResult R33TryFastWorld(",
+                          "R32ReviewOwnedResult R33TryHud("):
+            fn = function_block(source, signature)
+            upload = scoped_guard(fn, "if (!leftWvpOk)")
+            rollback = scoped_guard(upload, "if (!rolledBack)")
+            for token in (
+                "R32ReviewMarkFrameRightDrawFailed();",
+                "R32ReviewReportStereoFailure(",
+                "R32ReviewArmStereoRecoverySafety();",
+                "return { true, E_FAIL };",
+            ):
+                assert token in rollback
+            assert "return {};" in upload  # only a clean rollback may fall through
+            assert rollback.index("R32ReviewMarkFrameRightDrawFailed();") < rollback.index("R32ReviewReportStereoFailure(")
+            draw = scoped_guard(fn, "if (FAILED(result.hr))")
+            required = (
+                "R32ReviewMarkFrameRightDrawFailed();",
+                "R33InvalidateRightForLeftWrite(",
+                "R32ReviewReportStereoFailure(",
+                "R32ReviewArmStereoRecoverySafety();",
+                "return result;",
+            )
+            last = -1
+            for token in required:
+                last = draw.index(token, last + 1)
+        return True
+    except (ValueError, AssertionError):
+        return False
+
+
+def check_r33_left_mutations(source: str) -> None:
+    assert check_r33_left(source), "R84 world/HUD left-eye current-frame veto missing"
+    mutations = 0
+    for signature in ("R32ReviewOwnedResult R33TryFastWorld(",
+                      "R32ReviewOwnedResult R33TryHud("):
+        fn = function_block(source, signature)
+        upload = scoped_guard(fn, "if (!leftWvpOk)")
+        rollback = scoped_guard(upload, "if (!rolledBack)")
+        draw = scoped_guard(fn, "if (FAILED(result.hr))")
+        for owned, marker in (
+            (rollback, "R32ReviewMarkFrameRightDrawFailed();"),
+            (draw, "R32ReviewMarkFrameRightDrawFailed();"),
+            (draw, "R33InvalidateRightForLeftWrite("),
+        ):
+            mutant_fn = fn.replace(owned, owned.replace(marker, "/* veto removed */", 1), 1)
+            mutant = source.replace(fn, mutant_fn, 1)
+            assert not check_r33_left(mutant), (signature, marker)
+            mutations += 1
+        for owned, test, inverted in (
+            (rollback, "if (!rolledBack)", "if (rolledBack)"),
+            (draw, "if (FAILED(result.hr))", "if (SUCCEEDED(result.hr))"),
+        ):
+            mutant_fn = fn.replace(test, inverted, 1)
+            mutant = source.replace(fn, mutant_fn, 1)
+            assert not check_r33_left(mutant), (signature, test)
+            mutations += 1
+    print(f"R84 fast-world + HUD left-eye frame veto PASS ({mutations} negative mutations)")
+
+
 def main() -> None:
+    check_r33_left_mutations((ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8"))
     check_left_mutations((ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8"))
     for path, functions, marker, invalidate, arm in GUARDS:
         source = (ROOT / path).read_text(encoding="utf-8")

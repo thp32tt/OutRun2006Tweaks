@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00898",
+  "production_id": "CONVERSION-DX9EX-00898",
+  "event_id": "CONVERSION-DX9EX-00898-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00898",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:STEREO:LEFT_EYE_FRAME_VETO",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "c813d2480cbbbfce08789475e3778f0491ba7c14",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_stereo_restore_publication.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00898.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:STEREO:LEFT_EYE_FRAME_VETO",
+    "goal": "Prevent incomplete binocular R84 frames after left-eye Draw or unrecoverable left-eye WVP rollback failures for both fast world geometry and gameplay HUD; keep safe lower-renderer fallback intact.",
+    "scope_boundary": "Only R84 R33 FastWorld/HUD left-eye failure publication safety; preserve successful eyes, R30/R29 fallback, right-eye restore handling, SkyGlow, native input, DX11 and frozen DXVK.",
+    "special_work_evidence": "R30 R29OwnerMarkRightDrawFailed is present in failed-left submission and failed-rollback branches; R84 R33 had no matching R32ReviewMarkFrameRightDrawFailed in its four corresponding branches, allowing current-Present completion state to outlive a partial eye failure.",
+    "trace_stages": [
+      "Original game's D3D9 world/HUD draws enter R33 physical DrawPrimitive and DrawIndexed owner and choose per-eye fast-world or HUD c64 uploads.",
+      "A failed left draw or impossible original c64 rollback bypasses the right-eye draw and previously armed future mono safety without revoking the current Present's frame-right validity.",
+      "R29 FrameRightDrawFailed is consumed by existing Present/stereo/DirectGPU publication gating; mark it before poisoning the failed draw in both R84 paths."
+    ],
+    "subcomponents": [
+      "Veto the current Present in FastWorld on failed left Draw and irrecoverable c64 rollback.",
+      "Veto the current Present in ScreenHUD on identical failure paths while allowing clean WVP rollback to fall through to R29.",
+      "Enforce branch-local source contracts and destructive mutation checks for failure and safe fallthrough."
+    ],
+    "acceptance_items": [
+      {
+        "id": "fast_world_current_frame_veto",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 FastWorld original game depth/WVP and left eye",
+        "expected_behavior": "Every unrecoverable left-WVP rollback or failed FastWorld left draw sets FrameRightDrawFailed before recovery/return and preserves native HRESULT."
+      },
+      {
+        "id": "hud_failure_and_clean_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "R84 gameplay HUD left eye plus R29 fallback and desktop",
+        "expected_behavior": "HUD equivalent failure paths veto current Present; a successful rollback still falls through to lower R29 and unrelated SkyGlow/right-eye logic remains unchanged."
+      },
+      {
+        "id": "exact_sha_integrated_active",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 game, R26_SAFE, x64 OpenXR host and release package",
+        "expected_behavior": "Source-mutation regressions and exact-SHA GitHub DX9Ex Active/Domain/affected Inspector or Full Source pass, HMD acceptance stays separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "fast_world_current_frame_veto": "SOURCE_IMPLEMENTED",
+    "hud_failure_and_clean_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_integrated_active": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "The R30 HUD lower stereo failure route marks current FrameRightDrawFailed before both failed-left Draw and unrecoverable WVP rollback; R33FastWorld and R33Hud did not set this flag on those same failure paths.",
+    "root_cause": "R84 split dispatch retained future mono safety and R9Poison reporting but omitted the current frame-right validity latch on left-eye failure; the latch is needed independently of recovery.",
+    "source_trace": [
+      "D3D9 original draw arrives in R33Dispatch FastWorld or screenHUD.",
+      "Failed left c64 upload with failed rollback and failed left actualDraw follow two separate early returns in each route.",
+      "R29 FrameRightDrawFailed downstream guards delivery of complete stereo frames."
+    ],
+    "alternatives_rejected": [
+      "Do not skip normal right-eye rendering, assume a later recovery arm repairs the already-captured present, or globally suppress alpha/SkyGlow/desktop presentation."
+    ],
+    "fix_evidence": "Four R84 physical failure branches mark current frame invalid prior to poison/return, while clean WVP rollback still returns to lower R29.",
+    "negative_test_evidence": "Extended existing tools/verify_vr_stereo_restore_publication.py with 10 targeted negative source mutations; exact-SHA CI pending.",
+    "eye_ownership": "Only complete left/right physical submissions may be exposed as one DirectGPU/OpenXR stereo frame; R29 receives explicit invalid-right-frame latch if left is not valid.",
+    "evidence_limits": "No Quest3/VDXR hardware run; Windows exact-SHA CI requested through normal branch push."
+  },
+  "ci_evidence": {
+    "workflow": "DX9Ex Active Validation",
+    "status": "PENDING",
+    "head": null
+  },
+  "score_delta": 0
+}
