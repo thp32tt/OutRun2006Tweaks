@@ -246,24 +246,25 @@ jobs:
           set CI=
           cmake -S . -B build-vr-game -G "Visual Studio 17 2022" -A Win32
 
-      - name: Verify regenerated R26 safe production source graph
+      - name: Verify regenerated R84 MAIN independent game graph
         shell: pwsh
         run: |
           $projects = Get-ChildItem build-vr-game -Filter *.vcxproj -Recurse
           if (-not $projects) { throw 'no Visual Studio project files were generated' }
           $projectText = ($projects | ForEach-Object { Get-Content $_.FullName -Raw }) -join "`n"
-
+          $cache = Get-Content build-vr-game/CMakeCache.txt
+          foreach ($flag in @(
+            'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON'
+          )) {
+            if ($cache -notcontains $flag) { throw "option-free R84 owner missing: $flag" }
+          }
           foreach ($required in @(
             'ex_device_upgrade_r15.cpp',
-            'stereo_renderer_r26_compare.cpp',
-            'outrun_renderer_r23.cpp'
-          )) {
-            if (-not $projectText.Contains($required)) {
-              throw "authoritative safe VR translation unit missing from generated build graph: $required"
-            }
-          }
-
-          foreach ($excluded in @(
             'stereo_renderer_r29.cpp',
             'stereo_renderer_r30.cpp',
             'stereo_renderer_r31.cpp',
@@ -271,10 +272,21 @@ jobs:
             'stereo_renderer_r33.cpp',
             'outrun_renderer_r29.cpp'
           )) {
+            $escaped = [regex]::Escape($required)
+            $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
+            if ($projectText -notmatch $pattern) {
+              throw "R84 independent game translation unit missing: $required"
+            }
+          }
+          foreach ($excluded in @(
+            'stereo_renderer_r26_compare.cpp',
+            'stereo_renderer_r30_r26_safe.cpp',
+            'outrun_renderer_r23.cpp'
+          )) {
             $escaped = [regex]::Escape($excluded)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
             if ($projectText -match $pattern) {
-              throw "post-e20 fast/HUD implementation compiled into safe production build: $excluded"
+              throw "R26 fallback compiled into R84 MAIN: $excluded"
             }
           }
 
@@ -290,32 +302,27 @@ jobs:
       - name: Build Win32 VR DLL and v3 contract
         run: cmake --build build-vr-game --config Release
 
-      - name: Verify Win32 R26-safe/R15 binary markers
+      - name: Verify Win32 R84 MAIN x86 binary identity
         shell: pwsh
         run: |
           $dllPath = 'build-vr-game/bin/dinput8.dll'
-          if (-not (Test-Path $dllPath)) { throw 'dinput8.dll was not produced' }
+          if (-not (Test-Path $dllPath)) { throw 'R84 MAIN dinput8.dll was not produced' }
           $bytes = [System.IO.File]::ReadAllBytes($dllPath)
           $ascii = [Text.Encoding]::ASCII.GetString($bytes)
           foreach ($marker in @(
             'VR stereo: D3D9 full-eye renderer installed',
-            'VR R13: stereo hardening ACTIVE',
-            'VR R22 GAME: shadow-tracked viewport/scissor replay',
-            'VR R23 GAME: single-owner live-state recovery baseline ACTIVE',
-            'VR R23/R25 BASELINE: authoritative first seed',
-            'VR R23 RENDERER: BeginScene/WVP guards READY; recovery pose warmup is stock-visible',
-            'VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE',
+            'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
+            'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE;',
+            'VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY',
             'VR v3 shadow: live dual-protocol diagnostics active'
           )) {
-            if (-not $ascii.Contains($marker)) { throw "VR safe DLL marker missing: $marker" }
+            if (-not $ascii.Contains($marker)) { throw "R84 MAIN DLL marker missing: $marker" }
           }
           foreach ($forbidden in @(
-            'VR R29 PERF: stable main-backbuffer draws now execute LEFT+RIGHT only',
-            'VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]=',
-            'VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY',
-            'VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility'
+            'VR SAFE-DRAW COMPARE: R26/R23/R22/R13/R9 stereo draw chain ACTIVE',
+            'VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE'
           )) {
-            if ($ascii.Contains($forbidden)) { throw "regressed fast/HUD marker present: $forbidden" }
+            if ($ascii.Contains($forbidden)) { throw "R26-only marker in main DLL: $forbidden" }
           }
           $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
           if ([BitConverter]::ToUInt16($bytes, $peOffset + 4) -ne 0x014C) { throw 'expected x86 DLL' }

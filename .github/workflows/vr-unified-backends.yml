@@ -51,9 +51,9 @@ jobs:
           - variant: P2_C2_FAST_HUD
             flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON"
             purpose: "P1 plus R30 HUD/XYZRHW/SkyGlow correction"
-          - variant: P3_FULL_R34
-            flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF"
-            purpose: "Full R29-R34 current correction chain"
+          - variant: P3_R84_MAIN
+            flags: ""
+            purpose: "Default independent R84 R29-R33 development/test mainline; no CMake overrides"
           - variant: P4_R26_HUD_SAFE
             flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON"
             purpose: "Conservative R26 world plus R30 HUD/effect overlay"
@@ -112,8 +112,8 @@ jobs:
           path: payload/P2_C2_FAST_HUD
       - uses: actions/download-artifact@v4
         with:
-          name: dx9ex-game-P3_FULL_R34
-          path: payload/P3_FULL_R34
+          name: dx9ex-game-P3_R84_MAIN
+          path: payload/P3_R84_MAIN
       - uses: actions/download-artifact@v4
         with:
           name: dx9ex-game-P4_R26_HUD_SAFE
@@ -125,7 +125,7 @@ jobs:
           $variants = @(
             'P1_C1_FAST_WORLD',
             'P2_C2_FAST_HUD',
-            'P3_FULL_R34',
+            'P3_R84_MAIN',
             'P4_R26_HUD_SAFE'
           )
           $short = $env:GITHUB_SHA.Substring(0,12)
