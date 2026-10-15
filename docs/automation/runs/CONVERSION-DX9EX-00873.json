@@ -73,14 +73,37 @@
     "docs/automation/runs/CONVERSION-DX9EX-00873.json"
   ],
   "acceptance_results": {
-    "staging": "PENDING_EXACT_SHA",
-    "indexed": "PENDING_EXACT_SHA",
-    "ci": "PENDING_EXACT_SHA"
+    "staging": "PASS",
+    "indexed": "PASS",
+    "ci": "PASS_EXACT_SHA"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
   "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
   "result_commit_ci_skip": true,
   "material_result_sha": "151fc73b50a59c0a18de3f7c677c446518078ec5",
-  "validation_bearing_result_sha": "399baa944e8db7774d6facb1fdc5bbff746e0cec"
+  "validation_bearing_result_sha": "399baa944e8db7774d6facb1fdc5bbff746e0cec",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "399baa944e8db7774d6facb1fdc5bbff746e0cec",
+    "dx9ex_active": {
+      "run_id": 38659618811,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy/game/host/full-chain-compile/package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38659618739,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38659618723,
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain/msvc-analyze-openxr-host/msvc-analyze-active-game (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38659618716,
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  }
 }
