@@ -14,10 +14,12 @@ assert 'Setting<bool> VRHudEdgeAnchors{ "VR", "HudEdgeAnchors", false' in settin
 assert 'Setting<bool> VRHudResponsiveLayout{ "VR", "HudResponsiveLayout", true' in settings
 assert "(!Settings::VRHudResponsiveLayout.get() &&" in code
 assert "!Settings::VRHudEdgeAnchors.get())" in code
-# ESC owner no longer hides the lower slider beneath a hard 1.25 floor.
-# Preserve a 1.0 -> 1.25 readable default while all finite settings move.
-assert "const float readable = OutRunVrPauseEye::ResponsiveUserScale(" in code
-assert "requested, Settings::VRHudResponsiveLayout.get());" in code
+# Quest3 R84 reported that the default 1.0 pause slider is magnified twice.
+# The R84 visual recovery keeps the displayed ESC scale exactly user-defined.
+assert "const float readable = OutRunVrPauseEye::ResponsiveUserScale(" not in code
+assert "return std::clamp(requested, 0.55f, 1.50f);" in code
+assert "const float opticalScale = userScale;" in code
+assert "ResponsiveMenuScale(" not in code
 pause_helper = (root / "src/vr/d3d9/pause_menu_eye_affine.hpp").read_text()
 assert "inline float ResponsiveUserScale(" in pause_helper
 assert "0.55f + (bounded - 0.55f) * (0.70f / 0.45f)" in pause_helper
@@ -27,13 +29,11 @@ def responsive_pause(requested):
     return (.55 + (bounded - .55) * (.70 / .45) if bounded <= 1.
             else 1.25 + (bounded - 1.) * .50)
 def quest_profile(responsive, legacy, pause):
-    if responsive:
-        pause = responsive_pause(pause)
     return responsive or legacy, max(.55, min(1.5, pause))
-assert quest_profile(True, False, 1.) == (True, 1.25)
+assert quest_profile(True, False, 1.) == (True, 1.)
 assert quest_profile(False, False, 1.) == (False, 1.)
 assert quest_profile(False, True, .8) == (True, .8)
-assert quest_profile(True, False, 1.4) == (True, 1.45)
+assert quest_profile(True, False, 1.4) == (True, 1.4)
 assert quest_profile(True, False, .55) == (True, .55)
 assert quest_profile(True, False, .75)[1] < quest_profile(True, False, 1.0)[1]
 assert quest_profile(True, False, 1.0)[1] < quest_profile(True, False, 1.5)[1]
@@ -278,7 +278,7 @@ for token in (
     "if (R30IsPauseMenuElement())",
     "if (!std::isfinite(requested) || requested <= 0.0f)",
     "Settings::VRPauseMenuScale.get()",
-    "std::clamp(readable,",
+    "std::clamp(requested,",
     "0.55f, 1.50f",
     "return R30HudScaleValue();",
 ):
@@ -303,17 +303,17 @@ def effective(mode, semantic, f11=False, hud=.55, pause=1.0,
     pause_owned = semantic == "overlay" or (
         semantic == "hud" and producer == "exact_menu_arrow")
     if mode == 0x12 and pause_owned and not f11 and math.isfinite(pause) and pause > 0:
-        requested = responsive_pause(pause) if responsive else pause
+        requested = pause
         return max(.55, min(1.50, requested))
     return hud
 for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     for eye_w, eye_h in ((1024,768),(2496,2688)):
         factor = max(.75, min(3.50, (source_w/source_h)/(eye_w/eye_h)))
         assert effective(0x12, "overlay") / factor > 0
-        assert effective(0x12, "overlay") == 1.25
+        assert effective(0x12, "overlay") == 1.0
         assert effective(0x12, "overlay", responsive=False) == 1.0
         assert effective(0x12, "hud") == .55
-        assert effective(0x12, "hud", producer="exact_menu_arrow") == 1.25
+        assert effective(0x12, "hud", producer="exact_menu_arrow") == 1.0
         assert effective(0x12, "hud", producer="result_progress") == .55
         assert effective(0x09, "hud", producer="exact_menu_arrow") == .55
         assert effective(0x12, "world") == .55
@@ -346,7 +346,7 @@ for bad, good in (
     ("*Game::current_mode == GameState::STATE_SMPAUSEMENU",
      "*Game::current_mode == GameState::STATE_GAME"),
     ("R30IsPauseMenuExactArrow());", "R30IsPauseMenuExactArrow() || true);"),
-    ("std::clamp(readable,",
+    ("std::clamp(requested,",
      "std::clamp(Settings::VRHudScale.get(),"),
 ):
     assert scope.count(bad) == 1, bad
@@ -355,7 +355,7 @@ for bad, good in (
         "ExternalOverlaySemanticDepth == 0 &&",
         "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
         "R30IsPauseMenuExactArrow());",
-        "std::clamp(readable,"))
+        "std::clamp(requested,"))
 print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect fixtures")
 
 
