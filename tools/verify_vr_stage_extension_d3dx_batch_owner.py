@@ -35,6 +35,7 @@ def check(code: str, header: str) -> list[str]:
     stage_predicate = predicate("CanFlushD3DXDirectStageAtExit")
     goal_predicate = predicate("CanFlushD3DXDirectGoalAtExit")
     queued_stage_predicate = predicate("CanArmD3DXQueueStageAfterDraw")
+    queued_goal_predicate = predicate("CanArmD3DXQueueGoalAfterDraw")
     need("StageExtensionSpraniCalls[]" in source and
          "0x9898E, 0x98A36, 0x98AC6" in source and
          "StageExtensionPrintCalls[]" in source and
@@ -152,7 +153,7 @@ def check(code: str, header: str) -> list[str]:
          "!QueueRenderActive()" in hook,
          "mixed/unknown owner fail-closed fallback missing")
     need("CanFlushD3DXPreQueueStageBatch(" in hook and
-         "QueueRenderActive(), enteringStage, PendingHomogeneous" in hook and
+         "QueueRenderActive(), enteringStage || enteringGoal," in hook and
          "PendingScope, PendingProducer" in hook and
          "EffectiveScope(), CurrentRenderProducerToken()" in hook,
          "first +TIME queue old-direct-source boundary not wired")
@@ -174,6 +175,16 @@ def check(code: str, header: str) -> list[str]:
          "nextProducer != CurrentRenderProducerToken()" in hook and
          "StageBoundaryReady = enteringStage || enteringGoal" in hook,
          "GOAL queue enter/leave and two-helper switching must isolate old batch")
+    need("queueActive && batchActive && exactSprite" in queued_goal_predicate and
+         "pendingDraws == 1u && homogeneous" in queued_goal_predicate and
+         "pendingScope == RenderScope::ScreenHud" in queued_goal_predicate and
+         all(("pendingProducer == ProducerToken::" + token) in queued_goal_predicate
+             for token in ("GoalTime020", "GoalTime150", "ResultProgress")) and
+         "currentScope == pendingScope" in queued_goal_predicate and
+         "currentProducer == pendingProducer" in queued_goal_predicate and
+         "if (exactGoal && CanArmD3DXQueueGoalAfterDraw(" in hook and
+         "(QueueRenderActive() && StageBoundaryReady)" in hook,
+         "late GOAL queue Begin must rearm exact original GOAL GPU submission")
     need("GoalOwner(scope, source) && PendingHomogeneous" in hook and
          "exactGoal &&\n            PendingScope == scope" in hook and
          "GoalFlushes" in hook and "GoalFallbacks" in hook,
@@ -352,6 +363,15 @@ def main() -> int:
         "stage-draw-steals-goal-eager-path":
             code.replace("            exactGoal &&\n            PendingScope == scope",
                          "            (exactStage || exactGoal) &&\n            PendingScope == scope", 1),
+        "goal-late-begin-rearm-removed":
+            code.replace("if (exactGoal && CanArmD3DXQueueGoalAfterDraw(",
+                         "if (false && CanArmD3DXQueueGoalAfterDraw(", 1),
+        "goal-prequeue-old-owner-split-removed":
+            code.replace("enteringStage || enteringGoal,",
+                         "enteringStage,", 1),
+        "goal-queue-eager-flush-removed":
+            code.replace("(QueueRenderActive() && StageBoundaryReady)",
+                         "(false && StageBoundaryReady)", 1),
         "goal-batch-source-lost":
             code.replace("GoalOwner(scope, source) && PendingHomogeneous",
                          "false && PendingHomogeneous", 1),

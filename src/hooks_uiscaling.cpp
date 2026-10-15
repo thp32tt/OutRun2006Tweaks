@@ -2575,7 +2575,11 @@ public:
             // Mixed, unknown prehook and mismatched buffers still fail closed;
             // ordinary first-queue GOAL/unrelated entries keep the old rule.
             if (!CanFlushD3DXPreQueueStageBatch(
-                    QueueRenderActive(), enteringStage, PendingHomogeneous,
+                    // A first GOAL SpriteNode is also a valid queue transition:
+                    // drain a proven prior direct batch under its OLD owner
+                    // before selecting the GOAL source, exactly as for +TIME.
+                    QueueRenderActive(), enteringStage || enteringGoal,
+                    PendingHomogeneous,
                     PendingScope, PendingProducer,
                     EffectiveScope(), CurrentRenderProducerToken()) ||
                 !FlushTracked(sprite))
@@ -2678,7 +2682,18 @@ private:
         const bool directStageIsolated =
             !QueueRenderActive() && PendingDraws == 1u;
         const bool exactGoal = GoalOwner(scope, source) && PendingHomogeneous;
-        if ((queuedStageIsolated || directStageIsolated) &&
+        // D3DX Begin may occur after SelectSpriteQueueNode and clear the
+        // earlier queue boundary. The first clean GOAL Draw must rearm it
+        // before the existing eager, source-owned GPU Flush. Without this,
+        // the 0-99% progress and both GOAL glyph helpers can survive until
+        // an unrelated End/batch with no original producer scope.
+        if (exactGoal && CanArmD3DXQueueGoalAfterDraw(
+                QueueRenderActive(), BatchActive, self == TrackedSprite,
+                PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
+                scope, source))
+            StageBoundaryReady = true;
+        if ((queuedStageIsolated || directStageIsolated ||
+                (QueueRenderActive() && StageBoundaryReady)) &&
             BatchActive && self == TrackedSprite &&
             exactGoal &&
             PendingScope == scope && PendingProducer == source)

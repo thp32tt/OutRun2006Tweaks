@@ -176,6 +176,57 @@ namespace OutRunVR::GameSemantic
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
         RenderScope::ScreenHud, ProducerToken::DispRankFirst));
 
+    // A Begin issued AFTER selecting a GOAL queue node resets the pending
+    // queue boundary. Permit only the first successful, homogeneous draw of
+    // the exact original GOAL progress or glyph producer to restore it.
+    // This is never a generic ScreenHud/StageExtension admission.
+    inline constexpr bool CanArmD3DXQueueGoalAfterDraw(
+        bool queueActive, bool batchActive, bool exactSprite,
+        unsigned pendingDraws, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope currentScope, ProducerToken currentProducer) noexcept
+    {
+        return queueActive && batchActive && exactSprite &&
+            pendingDraws == 1u && homogeneous &&
+            pendingScope == RenderScope::ScreenHud &&
+            (pendingProducer == ProducerToken::GoalTime020 ||
+             pendingProducer == ProducerToken::GoalTime150 ||
+             pendingProducer == ProducerToken::ResultProgress) &&
+            currentScope == pendingScope &&
+            currentProducer == pendingProducer;
+    }
+
+    static_assert(CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, false,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(true, true, false, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanArmD3DXQueueGoalAfterDraw(true, false, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+
     // Direct GOAL time helpers and the separate 0-99% progress source
     // are distinct from +TIME and queued SpriteNodes. Only submit owned,
     // homogeneous deferred batches while the original caller is alive.
