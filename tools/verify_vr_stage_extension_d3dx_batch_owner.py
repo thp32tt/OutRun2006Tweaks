@@ -149,10 +149,20 @@ def check(code: str, header: str) -> list[str]:
     for token in ("GoalTime020", "GoalTime150", "ResultProgress"):
         need(f"source == ProducerToken::{token}" in hook,
              f"GOAL token {token} missing")
-    need("StageOwner(scope, source) && PendingHomogeneous" in hook and
-         "queuedStageIsolated || directStageIsolated" in hook and
-         "FlushTracked(self)" in hook,
-         "+TIME submission must flush only under proven ScreenHud producer")
+    # +TIME now coalesces draws until the exact queue transition/exit or
+    # direct source exit. A per-Draw stage Flush regresses GPU batching and
+    # can break the original texture grouping; GOAL stays eager separately.
+    stage_draw = hook[hook.find("const bool exactStage = StageOwner(scope, source)"):
+                      hook.find("// Preserve HMD-verified R64 rank isolation")]
+    need("const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;" in stage_draw and
+         "if (exactStage)\n            return hr;" in stage_draw and
+         stage_draw.find("if (exactStage)\n            return hr;") <
+         stage_draw.find("const bool exactGoal = GoalOwner(scope, source)") and
+         "exactGoal &&\n            PendingScope == scope" in stage_draw and
+         "(exactStage || exactGoal)" not in stage_draw and
+         "GoalFlushes.fetch_add(" in stage_draw and
+         "StageFlushes.fetch_add(" not in stage_draw,
+         "+TIME must defer batched D3DX GPU submission to its queue/source exit; GOAL eager owner protected")
     need("StageBoundaryReady = false" in hook and
          "StageFallbacks.fetch_add" in hook,
          "failed preboundary should never promote an unknown batch")
@@ -232,6 +242,12 @@ def main() -> int:
         "lost-rank-exact-source":
             code.replace("queuedSource == ProducerToken::DispRankClipSprite",
                          "queuedSource == ProducerToken::None", 1),
+        "stage-eager-draw-regression":
+            code.replace("if (exactStage)\n            return hr;",
+                         "if (false)\n            return hr;", 1),
+        "stage-draw-steals-goal-eager-path":
+            code.replace("            exactGoal &&\n            PendingScope == scope",
+                         "            (exactStage || exactGoal) &&\n            PendingScope == scope", 1),
         "goal-batch-source-lost":
             code.replace("GoalOwner(scope, source) && PendingHomogeneous",
                          "false && PendingHomogeneous", 1),
@@ -313,7 +329,7 @@ def main() -> int:
         if altered == header or not check(code, altered):
             print("DX9Ex +TIME D3DX FAIL: header mutation", label)
             return 1
-    print("DX9Ex +TIME/GOAL D3DX first-queue source and 14 negative regressions PASS")
+    print("DX9Ex +TIME batched GPU exit / GOAL eager / source isolation mutations PASS")
     return 0
 
 

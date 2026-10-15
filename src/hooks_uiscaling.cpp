@@ -2370,47 +2370,45 @@ private:
                 ++PendingDraws;
         }
 
-        // Entire +TIME stage sprite queue: the pre-node boundary already
-        // submitted the previous producer's homogeneous D3DX batch BEFORE
-        // the stage tag became active. Submit this stage batch while the
-        // exact queue owner still exists; a later End cannot head-lock it.
-        // Numeric direct glyph callers retain their existing exact scope;
-        // never silently adopt their unknown preceding D3DX buffer.
+        // +TIME is a complete producer batch, not one GPU submission per
+        // sprite. The first node/source entry splits the previous producer;
+        // BeforeQueueNode and BeforeQueueEnd submit queued +TIME under its
+        // exact ScreenHud owner. StageExtensionLeave submits direct numeric
+        // glyphs before restoring that caller's owner. Do NOT flush every
+        // D3DX Draw: it both defeats native D3DX texture batching and inserts
+        // avoidable driver submissions during the stage transition.
+        // A mixed/unknown batch remains on the game's normal End path.
+        const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;
+        if (exactStage)
+            return hr;
+
+        // GOAL is a different source family: its direct/queued parents do
+        // not share +TIME's explicit StageExtensionLeave batch boundary.
+        // Keep its existing eager, narrowly proven submission unchanged.
         const bool queuedStageIsolated =
             QueueRenderActive() && StageBoundaryReady;
-        // The three original numeric E8 callers can use D3DX directly
-        // without creating a SpriteNode. Submit their exact batch only if
-        // the observed Begin contains no earlier Draw of another owner.
-        // Unknown/mixed buffers retain the original D3DX End behavior.
         const bool directStageIsolated =
             !QueueRenderActive() && PendingDraws == 1u;
-        // GOAL uses the SAME fail-closed Begin/Draw provenance and exact
-        // queue boundary as +TIME. Never label a preexisting mixed/unknown
-        // sprite batch as a GOAL glyph, even with a matching current token.
-        const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;
         const bool exactGoal = GoalOwner(scope, source) && PendingHomogeneous;
         if ((queuedStageIsolated || directStageIsolated) &&
             BatchActive && self == TrackedSprite &&
-            (exactStage || exactGoal) &&
+            exactGoal &&
             PendingScope == scope && PendingProducer == source)
         {
             if (FlushTracked(self))
             {
-                const auto n = (exactGoal ? GoalFlushes : StageFlushes)
-                    .fetch_add(1, std::memory_order_relaxed) + 1;
+                const auto n = GoalFlushes.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
                 if ((n & (n - 1)) == 0)
                     spdlog::info(
-                        "VR P0 {} D3DX batch: exact {} submission; flushes={} fallback={}",
-                        exactGoal ? "GOAL" : "+TIME",
+                        "VR P0 GOAL D3DX batch: exact {} submission; flushes={} fallback={}",
                         queuedStageIsolated ? "queued" : "direct",
-                        n, (exactGoal ? GoalFallbacks : StageFallbacks)
-                            .load(std::memory_order_relaxed));
+                        n, GoalFallbacks.load(std::memory_order_relaxed));
             }
             else
             {
                 StageBoundaryReady = false;
-                (exactGoal ? GoalFallbacks : StageFallbacks)
-                    .fetch_add(1, std::memory_order_relaxed);
+                GoalFallbacks.fetch_add(1, std::memory_order_relaxed);
             }
             return hr;
         }
