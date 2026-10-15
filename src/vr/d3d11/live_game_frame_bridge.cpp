@@ -44,6 +44,7 @@
 #include "native_game_offscreen_pass.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
+#include "native_game_main_stencil_clear.hpp"
 #include "native_game_backbuffer_admission.hpp"
 #include "native_game_texture_atlas_budget.hpp"
 
@@ -5431,10 +5432,18 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
 
 bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                               const D3DRECT* rects, DWORD flags, float z) noexcept {
+    // Stencil-only and combined Z|STENCIL game Clears do not affect native
+    // color and need no native stencil translation: all admitted native game
+    // Draws explicitly reject D3DRS_STENCILENABLE. Preserve the contiguous
+    // main menu/vehicle/race frame only with proved same main Z/S identity.
+    // A partial/foreign/unknown Clear still invalidates the native frame.
+    constexpr DWORD kDepthStencilFlags = D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL;
+    const bool clearZ = (flags & D3DCLEAR_ZBUFFER) != 0u;
+    const bool clearStencil = (flags & D3DCLEAR_STENCIL) != 0u;
     if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
-        (flags & D3DCLEAR_ZBUFFER) == 0u ||
-        (flags & (D3DCLEAR_TARGET | D3DCLEAR_STENCIL)) != 0u ||
-        !(z >= 0.0f && z <= 1.0f)) return false;
+        (flags & kDepthStencilFlags) == 0u ||
+        (flags & ~kDepthStencilFlags) != 0u ||
+        (clearZ && !(z >= 0.0f && z <= 1.0f))) return false;
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
@@ -5468,6 +5477,17 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             !GameNativeClearCoverage::covers_whole(
                 bbDesc.Width, bbDesc.Height, vp.X, vp.Y, vp.Width, vp.Height,
                 count, rects)) return false;
+        if (clearStencil) {
+            ComPtr<IUnknown> depthIdentity;
+            if (FAILED(depth.As(&depthIdentity)) || !depthIdentity ||
+                !GameNativeMainStencilClear::may_ignore(
+                    true, s.clearColor.matches(owner,
+                        reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())),
+                    s.clearColor.main_depth_still_bound(
+                        reinterpret_cast<std::uintptr_t>(depthIdentity.Get())),
+                    true, !s.frameBatch.stopped))
+                return false;
+        }
         // Prove the same canonical D3D9 backbuffer/color Clear before
         // admitting a separate full Z Clear with zero native game Draws.
         // This covers menu->vehicle->race startup where TARGET and ZBUFFER
@@ -5483,7 +5503,9 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             return false;
         // The next real native depth Draw clears the DSV to the exact game
         // Z while keeping the native RTV color; DX9Ex/input are untouched.
-        s.frameBatch.note_full_depth_clear(z);
+        // Stencil-only Clear does not modify the native DSV depth. Combined
+        // Z|STENCIL must still seed the native depth with the exact game z.
+        if (clearZ) s.frameBatch.note_full_depth_clear(z);
         return true;
     } catch (...) {
         return false; // Never change original game Draw/Present/gamepad.
@@ -5576,13 +5598,24 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
                     depthDesc.Width == bbDesc.Width &&
                     depthDesc.Height == bbDesc.Height &&
                     depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE;
-                if (GameNativeFullColorDepthClear::can_mirror(
-                        (flags & D3DCLEAR_ZBUFFER) != 0u,
-                        (flags & D3DCLEAR_STENCIL) != 0u,
-                        depthMatches, z)) {
+                // TARGET|STENCIL and TARGET|Z|STENCIL can seed the exact
+                // menu/race main color frame because the native fixed-function
+                // path never admits stencil-tested/writing Draws. Prove the
+                // owner, canonical main Z/S identity and matching size first.
+                // When Z is not cleared, do not fabricate a native Z Clear.
+                const bool clearZ = (flags & D3DCLEAR_ZBUFFER) != 0u;
+                const bool clearStencil = (flags & D3DCLEAR_STENCIL) != 0u;
+                const bool ignoreStencil = clearStencil &&
+                    GameNativeMainStencilClear::may_ignore(
+                        env_full_game_opt_in(), wholeBackbuffer,
+                        mainDepthIdentity != 0u, depthMatches,
+                        !s.frameBatch.stopped);
+                if ((clearStencil && !ignoreStencil) ||
+                    (clearZ && !GameNativeFullColorDepthClear::can_mirror(
+                        true, false, depthMatches, z))) {
+                    s.frameBatch.abort(); // failed proof: original D3D9 lives
+                } else if (clearZ) {
                     s.frameBatch.note_full_depth_clear(z);
-                } else {
-                    s.frameBatch.abort(); // fail closed: D3D9 game unchanged
                 }
             }
         }
