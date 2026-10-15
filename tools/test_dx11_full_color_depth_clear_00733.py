@@ -28,6 +28,8 @@ def valid(cpp,hook,policy):
    "GameNativeFullColorDepthClear::can_mirror(" in s,
    "s.frameBatch.note_full_depth_clear(z);" in s,
    "s.frameBatch.abort();" in s,
+   "if ((clearStencil && !ignoreStencil) ||" in s,
+   "mainDepthIdentity != 0u" in s,
    0 <= s.find("s.frameBatch.reset();") < s.find("s.frameBatch.note_full_depth_clear(z);"),
    "s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u)" in draw,
    "s.frameBatch.consume_depth_clear();" in draw,
@@ -39,7 +41,10 @@ def valid(cpp,hook,policy):
 assert valid(c,r,helper)
 for old,new in (
  ("s.frameBatch.note_full_depth_clear(z);","s.frameBatch.consume_depth_clear();"),
- ("s.frameBatch.abort(); // fail closed","s.frameBatch.reset(); // fail open"),
+ ("s.frameBatch.abort(); // failed proof: original D3D9 lives",
+   "s.frameBatch.reset(); // fail open"),
+ ("if ((clearStencil && !ignoreStencil) ||",
+   "if ((clearStencil && ignoreStencil) ||"),
  ("depthDesc.Width == bbDesc.Width","depthDesc.Width != bbDesc.Width"),
  ("GameNativeFullColorDepthClear::can_mirror(","GameNativeFullColorDepthClear::ignored("),
 ):

@@ -14,7 +14,10 @@ def valid(code,hook,batch):
  return all((
     a>=0 and z>a,
     "s.frameBatch.submitted == 0u || s.frameBatch.stopped" in sec,
-    "D3DCLEAR_TARGET | D3DCLEAR_STENCIL" in sec,
+    "constexpr DWORD kDepthStencilFlags = D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL;" in sec,
+    "(flags & ~kDepthStencilFlags) != 0u" in sec,
+    "if (clearZ) s.frameBatch.note_full_depth_clear(z);" in sec,
+    "GameNativeMainStencilClear::may_ignore(" in sec,
     "targetIdentity.Get() != backbufferIdentity.Get()" in sec,
     "dsDesc.Width != bbDesc.Width" in sec,
     "GameNativeClearCoverage::covers_whole(" in sec,
@@ -30,6 +33,8 @@ for old,new in (
  ("s.frameBatch.note_full_depth_clear(z);","s.frameBatch.abort();"),
  ("GameNativeClearCoverage::covers_whole(","GameNativeClearCoverage::skipped("),
  ("s.frameBatch.consume_depth_clear();","/* removed */"),
+ ("if (clearZ) s.frameBatch.note_full_depth_clear(z);","/* suppress real Z */"),
+ ("(flags & ~kDepthStencilFlags) != 0u","false /* allow TARGET */"),
 ):
  mutant=c.replace(old,new,1)
  assert mutant!=c and not valid(mutant,h,b), old
