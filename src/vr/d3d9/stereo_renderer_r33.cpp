@@ -944,6 +944,31 @@ namespace OutRunVRStereo
                 R32ReviewNoteRestoreFailure("R33 HUD right-eye draw");
                 R32ReviewArmStereoRecoverySafety();
             }
+            // The C993 original-WVP source was merely *eligible* at R30.
+            // Only this actual physical R33 draw confirms two per-eye GPU
+            // submissions plus state restoration. Keep the diagnostic
+            // separately identifiable from original lens CABE halos.
+            if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld &&
+                R33TelemetryEnabled())
+            {
+                const bool complete = SUCCEEDED(result.hr) &&
+                    SUCCEEDED(rightHr) && restoreOk;
+                static thread_local bool recordedComplete = false;
+                static thread_local bool recordedFailure = false;
+                bool& recorded = complete
+                    ? recordedComplete : recordedFailure;
+                if (!recorded)
+                {
+                    recorded = true;
+                    spdlog::info(
+                        "VR R84 C993 EXACT_STEREO_DRAW: {} "
+                        "left=0x{:08X} right=0x{:08X} restored={} poseSeq={}",
+                        complete ? "BOTH_EYES_OK" : "EYE_OR_RESTORE_FAILED",
+                        static_cast<unsigned>(result.hr),
+                        static_cast<unsigned>(rightHr), restoreOk,
+                        stereo->poseSequence);
+                }
+            }
             return result;
         }
 

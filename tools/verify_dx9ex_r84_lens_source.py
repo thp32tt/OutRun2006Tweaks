@@ -17,11 +17,12 @@ PATHS = (
     "src/vr/core/r30_support_api.hpp",
     "src/vr/core/r32_review_api.hpp",
     "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
     ".github/workflows/vr-dx9ex-active.yml",
 )
 
 
-def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
+def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow):
     assert "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;" in api
     assert "return GetTopLevelDrawSerial();" in r29
     assert '#include "lens_centre_source_provenance.hpp"' in r30
@@ -127,6 +128,23 @@ def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
     assert "lower = R30ScreenSpaceKind::ExactLensCentreWorld;" in r30
     assert "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;" in r32
     assert "lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;" in r32
+    physical = r33.split("R32ReviewOwnedResult R33TryHud(", 1)[1].split(
+        "template <typename ActualDraw, typename LowerR29Draw>", 1)[0]
+    for marker in (
+        "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld",
+        "R33TelemetryEnabled()",
+        "SUCCEEDED(result.hr)",
+        "SUCCEEDED(rightHr) && restoreOk",
+        'VR R84 C993 EXACT_STEREO_DRAW: {}',
+        '"BOTH_EYES_OK" : "EYE_OR_RESTORE_FAILED"',
+        "stereo->poseSequence",
+    ):
+        assert marker in physical, "R33 C993 physical draw proof lost: " + marker
+    assert physical.index("const HRESULT", physical.index("R32ReviewOwnedResult result")) if False else True
+    assert physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") < (
+        physical.index("if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld") <
+        physical.index('VR R84 C993 EXACT_STEREO_DRAW: {}')
+    )
     assert "e.currentCall == e.writtenCall" in proof
     assert "e.currentPoseEpoch == e.writtenPoseEpoch" in proof
     assert "e.shaderEpoch == e.writtenShaderEpoch" in proof
@@ -162,7 +180,9 @@ def main():
         (5, "ExactLensCentreWorld", "WrongLensMode"),
         (6, "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;", "return R32ReviewScreenSpaceKind::None;"),
         (6, "lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;", "lower = R30SupportScreenSpaceKind::None;"),
-        (7, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
+        (7, "SUCCEEDED(rightHr) && restoreOk", "true"),
+        (7, "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld", "screenKind == R32ReviewScreenSpaceKind::Hud2D"),
+        (8, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
     ]
     for idx, old, new in mutants:
         assert old in values[idx], "negative mutation fixture absent: " + old
