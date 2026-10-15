@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:LIVE_GAME_D3D9_RASTER_CENTER_PARITY",
   "feature_id": "DX11-LIVE-GAME-PIXEL-CENTER-PARITY",
-  "status": "MATERIAL_COMMITTED_GATE_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "c08878760a1131bf2fdae7e74981a197dd5dc225",
   "material_result_sha": "81460e0e85152b9ac3a439c52db67e8e6f01c25a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "b5b8f08531504b2a6b9d710c1abe819d2d4f9780",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_pixel_center.hpp",
@@ -89,9 +89,51 @@
     "C0_RECOVER": "HEAD c08878760a1131bf2fdae7e74981a197dd5dc225 and AGENTS/policy/00772 reviewed",
     "C1_REVIEW": "Native Draw XYZRHW/WVP had uncorrected D3D9 integer vs D3D11 half-integer raster pixel centers.",
     "C2_IMPLEMENT": "Shared live FVF bridge homogeneous half-pixel correction with helper and compiled destructive test.",
-    "C3_VALIDATE": "DX11 Fast 7f7dbaeb failed because zero-width viewport mutation was redundantly rejected by finite X guard; changed destructive mutation to reject valid viewport and preserved original fail-closed behavior.",
-    "C4_COMMIT": "This material source commit, no skip-ci.",
+    "C3_VALIDATE": "Exact-SHA b5b8f08531504b2a6b9d710c1abe819d2d4f9780 DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all SUCCESS (5/5); portable 00773 destructive C++ checks PASS.",
+    "C4_COMMIT": "Source material 81460e0e85152b9ac3a439c52db67e8e6f01c25a; final repair/validation-bearing b5b8f08531504b2a6b9d710c1abe819d2d4f9780.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING exact-SHA CI, HMD UNTESTED."
+    "C6_STATE": "PASS_EXACT_SHA / COMPLETE_BUILD_VERIFIED. Runtime Quest 3/VDXR and gamepad UNTESTED; only separate bookkeeping after CI."
+  },
+  "acceptance_results": {
+    "menu-and-race-pixel-parity": "PASS",
+    "camera-plane-fallback": "PASS",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  },
+  "evidence": {
+    "validated_sha": "b5b8f08531504b2a6b9d710c1abe819d2d4f9780",
+    "ci_checks": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38735571271,
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38735571271",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38735571254,
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38735571254",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Build",
+        "run_id": 38735580622,
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38735580622",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38735580591,
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38735580591",
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38735580590,
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38735580590",
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "source_probe": "DX11 Fast run confirms 00773 native game Draw/Indexed C++17 and destructive source regressions PASS",
+    "runtime_notes": "No actual OutRun 2006 Quest 3/VDXR or physical gamepad session was performed; gameplay and HMD parity UNTESTED"
   }
 }
