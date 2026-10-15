@@ -100,13 +100,36 @@ def check(code: str, header: str) -> list[str]:
          begin_path.find("if (FAILED(hr) && existingBatch)") <
          begin_path.find("ForgetBatch();"),
          "failed nested D3DX Begin must keep existing exact sprite provenance")
-    need("if (FAILED(hr))\n        {" in draw_path and
-         "if (self && self == TrackedSprite)\n            {" in draw_path and
-         "BatchActive = false;" in draw_path and
-         "StageBoundaryReady = false;" in draw_path and
-         "ForgetBatch();" in draw_path and
-         draw_path.find("if (FAILED(hr))") < draw_path.find("using namespace OutRunVR::GameSemantic;"),
+    failed_start = draw_path.find("if (FAILED(hr))")
+    failed_end = draw_path.find("return hr;", failed_start)
+    failed_draw = draw_path[failed_start:failed_end] if (
+        0 <= failed_start < failed_end) else ""
+    need("if (self && self == TrackedSprite)" in failed_draw and
+         "BatchActive = false;" in failed_draw and
+         "StageBoundaryReady = false;" in failed_draw and
+         "ForgetBatch();" in failed_draw and
+         failed_start < draw_path.find("using namespace OutRunVR::GameSemantic;"),
          "failed D3DX Draw must invalidate untrusted +TIME/GOAL batch ownership")
+    # Inspect the actual HRESULT-accepted, tracked Draw's mixed-owner branch.
+    # A matching assignment in lifecycle/queue/failure handling is not proof
+    # that the GPU batch stops being homogeneous when its producer changes.
+    owner_switch = draw_path.find(
+        "else if (PendingScope != scope || PendingProducer != source)")
+    next_draw_count = draw_path.find("if (PendingDraws != ~0u)", owner_switch)
+    mixed_owner = draw_path[owner_switch:next_draw_count] if (
+        0 <= owner_switch < next_draw_count) else ""
+    need("PendingHomogeneous = false;" in mixed_owner,
+         "successful D3DX Draw must quarantine mixed scope/producer batches")
+    flush_start = hook.find("static HRESULT __stdcall FlushDest(")
+    flush_end = hook.find("static HRESULT __stdcall EndDest(", flush_start)
+    explicit_flush = hook[flush_start:flush_end] if (
+        0 <= flush_start < flush_end) else ""
+    need("if (self == TrackedSprite)" in explicit_flush and
+         "if (SUCCEEDED(hr))" in explicit_flush and
+         "ForgetBatch();\n                StageBoundaryReady = false;" in explicit_flush and
+         "BatchActive = false;" in explicit_flush and
+         "return hr;" in explicit_flush,
+         "explicit native Flush must discard consumed +TIME/GOAL ownership only on success")
     # The tracked object can outlive the mutable 0x55B218 global sprite.
     # Verify BOTH the old owner reset path and live-sprite Flush identity.
     lifetime_start = code.find("namespace DX9ExD3DXSpriteLifetime")
@@ -420,7 +443,19 @@ def main() -> int:
                 "\t\tVRProjectedD3DXSpriteIsolationR64::BeforeQueueNode(node);",
                 1),
         "stale-shared-batch":
-            code.replace("PendingHomogeneous = false;", "PendingHomogeneous = true;", 1),
+            code.replace(
+                "else if (PendingScope != scope || PendingProducer != source)\n"
+                "            {\n"
+                "                PendingHomogeneous = false;\n"
+                "            }",
+                "else if (PendingScope != scope || PendingProducer != source)\n"
+                "            {\n"
+                "                PendingHomogeneous = true;\n"
+                "            }", 1),
+        "explicit-flush-keeps-stale-stage-owner":
+            code.replace(
+                "ForgetBatch();\n                StageBoundaryReady = false;",
+                "ForgetBatch();\n                StageBoundaryReady = true;", 1),
         "native-flush-keeps-stale-queue-boundary":
             code.replace(
                 "ForgetBatch();\n                StageBoundaryReady = false;",
