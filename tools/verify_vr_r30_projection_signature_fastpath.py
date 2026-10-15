@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R30 classification-only projection accessor: source and negative regression."""
+"""R30 projection signature and R84 source-owned screen-route regression."""
 import math
 import pathlib
 import random
@@ -44,27 +44,45 @@ def source_contract(renderer=RENDERER, r30=R30):
                   "D3DRS_ALPHATESTENABLE"):
         require(guard in cls, "HUD / fragile effect fallback lost: " + guard)
 
-    # Only a verified, nonqueued world billboard may veto flattening on the
-    # original depth-off alpha branch. A generic world particle or queued
-    # billboard must retain the conservative screen-effect fallback.
+    # HMD failure 2026-10-15: the old state-only route promoted unrelated
+    # depth-disabled road/sky/particle geometry into an XR HUD plane.
+    # R26+HUD's positive game semantics must veto unowned draws BEFORE
+    # projection/alpha state is evaluated; only exact source-scoped overlays
+    # can be transformed as HUD.
+    for token in (
+        "const bool ownedHud =", "CorroboratesHud(scope)",
+        "const bool ownedOverlay =", "CorroboratesScreenOverlay2D(scope)",
+        "const bool ownedEffect =", "CorroboratesProjectedScreenEffect(scope)",
+        "const bool ownedLensCentre =", "ProducerToken::LensFlareCentre",
+        "if (!ownedHud && !ownedOverlay && !ownedEffect &&",
+        "!ownedLensCentre)", "return R30ScreenSpaceKind::None;",
+        "marker && marker->valid",
+    ):
+        require(token in cls, "R84 semantic admission missing: " + token)
+    require(cls.index("if (!ownedHud && !ownedOverlay && !ownedEffect &&") <
+            cls.index("GetRendererProjectionSignature(m34, m44)"),
+            "screen ownership must be checked before projection classification")
+    require("? R30ScreenSpaceKind::Hud2D" in cls and
+            "return (ownedHud || ownedOverlay)" in cls,
+            "orthographic world/no-owner must not silently become HUD")
+
     depth_off = cls.split("if (zEnable == D3DZB_FALSE &&", 1)
     require(len(depth_off) == 2, "depth-off alpha gate lost")
     depth_off = depth_off[1]
     for token in ("(alphaBlend != FALSE || alphaTest != FALSE)",
-                  "const auto scope = OutRunVR::GameSemantic::EffectiveScope();",
+                  "if (!ownedHud && !ownedOverlay && !ownedEffect &&",
                   "if (!OutRunVR::GameSemantic::QueueRenderActive() &&",
                   "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)",
                   "return R30ScreenSpaceKind::None;",
                   "return R30ScreenSpaceKind::FlatPerspectiveEffect;"):
-        require(token in depth_off, "world/effect owner gate missing: " + token)
-    require(depth_off.index("const auto scope =") <
-            depth_off.index("!OutRunVR::GameSemantic::QueueRenderActive()") <
-            depth_off.index("scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard") <
-            depth_off.index("return R30ScreenSpaceKind::None;") <
+        require(token in depth_off, "R84 depth-off semantic gate missing: " + token)
+    require(depth_off.index("if (!ownedHud && !ownedOverlay && !ownedEffect &&") <
+            depth_off.index("if (!OutRunVR::GameSemantic::QueueRenderActive() &&") <
+            depth_off.index("scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)") <
             depth_off.index("return R30ScreenSpaceKind::FlatPerspectiveEffect;"),
-            "only explicit nonqueued billboard can veto flattening")
+            "unowned alpha must be rejected before any flattening")
     require("CorroboratesWorld(scope)" not in depth_off,
-            "generic world promotion would reintroduce translucent flicker")
+            "world particles cannot authorize HUD/flat effect")
     require("GetLastVerifiedWvp(" not in cls,
             "stale WVP shader epoch must never become world ownership")
 
@@ -102,36 +120,46 @@ def model_cases():
 
 def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
                           scope, queued=False):
-    """Depth-off classification preserves only exact non-queued billboard."""
+    """Exact producer-scoped admission, independent of fragile D3D state."""
+    hud = scope == "ScreenHud"
+    overlay = scope == "ScreenOverlay2D"
+    effect = scope in ("ProjectedScreenEffect2D", "SceneEffect")
+    centre = scope == "WorldBillboard" and not queued
+    if not (hud or overlay or effect or centre):
+        return "none"
     if projection == "orthographic":
-        return "hud"
+        return "hud" if hud or overlay else "none"
     if projection != "perspective":
         return "none"
     if not z_enabled and (alpha_blend or alpha_test):
-        return "none" if scope == "WorldBillboard" and not queued else "flat"
+        return "none" if centre else "flat"
     return "none"
 
 
 def effect_scope_model_cases():
     for scope in ("WorldParticle", "WorldBillboard", "ScreenHud",
                   "ScreenOverlay2D", "ProjectedScreenEffect2D",
-                  "ProjectedWorldMarker2D", "SkyGlow", "None"):
+                  "ProjectedWorldMarker2D", "SkyGlow", "SceneEffect", "None"):
         for queued in (False, True):
             for alpha_blend, alpha_test in (
                     (True, False), (False, True), (True, True)):
-                expected = ("none" if scope == "WorldBillboard" and not queued
-                            else "flat")
+                expected = ("flat" if scope in (
+                    "ScreenHud", "ScreenOverlay2D",
+                    "ProjectedScreenEffect2D", "SceneEffect") else "none")
                 require(classify_effect_route("perspective", False,
                         alpha_blend, alpha_test, scope, queued) == expected,
-                        "depth-off effect owner/queue mismatch: " +
+                        "explicit producer ownership mismatch: " +
                         scope + "/" + str(queued))
-    for scope in ("WorldParticle", "WorldBillboard", "ProjectedScreenEffect2D"):
+    for scope in ("WorldParticle", "WorldBillboard",
+                  "ProjectedScreenEffect2D", "ScreenHud", "ScreenOverlay2D"):
         require(classify_effect_route("perspective", True, True, False, scope)
-                == "none", "depth-enabled effect may not enter depth-off HUD")
+                == "none", "depth-enabled effect may not enter flat HUD")
         require(classify_effect_route("orthographic", False, True, False, scope)
-                == "hud", "orthographic HUD ownership must win")
+                == ("hud" if scope in ("ScreenHud", "ScreenOverlay2D")
+                    else "none"),
+                "orthographic must require exact screen owner")
     require(classify_effect_route("unknown", False, True, False,
-                                  "WorldParticle") == "none",
+                                  "ScreenHud") == "none",
             "unknown projection must stay conservative")
 
 
@@ -184,6 +212,10 @@ def negative_mutations():
     else:
         raise AssertionError("swapped projection classification survived")
     for label, mutation in (
+        ("delete positive HUD owner",
+         mutate_classifier("CorroboratesHud(scope)", "false")),
+        ("delete positive screen overlay owner",
+         mutate_classifier("CorroboratesScreenOverlay2D(scope)", "false")),
         ("remove billboard exception",
          mutate_classifier(
              "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",
@@ -194,7 +226,8 @@ def negative_mutations():
              "OutRunVR::GameSemantic::CorroboratesWorld(scope)")),
         ("promote queued effects",
          mutate_classifier(
-             "!OutRunVR::GameSemantic::QueueRenderActive()", "true")),
+             "if (!OutRunVR::GameSemantic::QueueRenderActive() &&",
+             "if (true &&")),
         ("break flat fallback",
          mutate_classifier("return R30ScreenSpaceKind::FlatPerspectiveEffect;",
                            "return R30ScreenSpaceKind::None;")),
@@ -212,4 +245,4 @@ if __name__ == "__main__":
     model_cases()
     effect_scope_model_cases()
     negative_mutations()
-    print("PASS: R30 projection signature, nonqueued-billboard ownership, 4009 matrix cases, 9 negative mutations")
+    print("PASS: R30 projection signature, R84 source-owned HUD/effect gate, 4009 matrix cases and negative mutations")
