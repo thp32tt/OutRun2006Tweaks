@@ -1014,6 +1014,22 @@ struct ReadbackSlot {
     bool completeFullFrame = false;
     GameReadbackProvenance provenance{};
 };
+// GPU-only per-stage scratch ownership. Source D3D9 pixels are re-read each Draw.
+// Stage 0 and stage 1 cannot overwrite one another before a shared Draw.
+struct NativeGameTextureScratch {
+    ComPtr<ID3D11Texture2D> texture;
+    ComPtr<ID3D11ShaderResourceView> view;
+    UINT width = 0u, height = 0u, levels = 0u;
+    DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+    [[nodiscard]] bool matches(UINT w, UINT h, UINT mips, DXGI_FORMAT fmt) const noexcept {
+        return texture && view && width == w && height == h && levels == mips && format == fmt;
+    }
+    void reset() noexcept {
+        texture.Reset(); view.Reset();
+        width = height = levels = 0u;
+        format = DXGI_FORMAT_UNKNOWN;
+    }
+};
 struct State {
     std::mutex mutex;
     // Non-owning identity only: reset at every Present/Reset. Never retain a
@@ -1023,6 +1039,8 @@ struct State {
     GameNativeClearColor clearColor{};
     std::uint64_t outputGeneration = 0u;
     NativeBackend backend;
+    // No cached D3D9 COM object; reused D3D11 allocations are source-neutral.
+    std::array<NativeGameTextureScratch, 2> liveTextureSlots{};
     UINT nativeWidth = 0u, nativeHeight = 0u;
     // Diagnostic-only depth is never shared with the original D3D9 renderer.
     ComPtr<ID3D11Texture2D> diagnosticDepth;
@@ -1490,6 +1508,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     for (auto& depthState : s.diagnosticDepthAlwaysStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthOrderingStates) depthState.Reset();
+    for (auto& slot : s.liveTextureSlots) slot.reset();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
@@ -3552,10 +3571,11 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
 
-bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
+bool mirror_texture(ID3D11Device* dev, ID3D11DeviceContext* ctx,
+                    NativeGameTextureScratch& scratch, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
-    if (!dev || !capture.enabled || !capture.texture) return false;
+    if (!dev || !ctx || !capture.enabled || !capture.texture) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
     // A complete 2048x2048 menu/vehicle atlas has twelve mip levels.
     if (sourceLevels == 0 || sourceLevels > 12u) return false;
@@ -3932,22 +3952,43 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         if (FAILED(unlockResult)) return false;
         if (!readable) return false;
     }
-    std::vector<D3D11_SUBRESOURCE_DATA> initial(levels);
-    for (UINT level = 0; level < levels; ++level) {
-        initial[level].pSysMem = copied[level].data();
-        initial[level].SysMemPitch = pitches[level];
-    }
     D3D11_TEXTURE2D_DESC desc{};
     desc.Width = base.Width; desc.Height = base.Height;
     desc.MipLevels = levels; desc.ArraySize = 1;
     desc.Format = nativeFormat;
     desc.SampleDesc.Count = 1;
-    desc.Usage = D3D11_USAGE_IMMUTABLE;
+    // Keep GPU allocations resident but NEVER reuse source contents. A game
+    // texture may be modified between any two Draw/DrawIndexed submissions.
+    desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    ComPtr<ID3D11Texture2D> texture;
-    if (FAILED(dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())) ||
-        FAILED(dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())))
-        return false;
+    ComPtr<ID3D11Texture2D> candidate;
+    ComPtr<ID3D11ShaderResourceView> candidateView;
+    const bool reuse = scratch.matches(desc.Width, desc.Height,
+                                       desc.MipLevels, desc.Format);
+    ID3D11Texture2D* target = scratch.texture.Get();
+    if (!reuse) {
+        if (FAILED(dev->CreateTexture2D(&desc, nullptr, candidate.GetAddressOf())) ||
+            FAILED(dev->CreateShaderResourceView(candidate.Get(), nullptr,
+                                                candidateView.GetAddressOf())))
+            return false;
+        target = candidate.Get();
+    }
+    // UpdateSubresource on the immediate context is ordered before Draw.
+    // Stage 0 and stage 1 have independent targets for the same draw.
+    for (UINT level = 0; level < levels; ++level)
+        ctx->UpdateSubresource(target, level, nullptr, copied[level].data(),
+                               pitches[level], 0u);
+    if (FAILED(dev->GetDeviceRemovedReason())) return false;
+    // Do not replace the prior resource until the replacement is fully ready.
+    if (!reuse) {
+        scratch.texture = std::move(candidate);
+        scratch.view = std::move(candidateView);
+        scratch.width = desc.Width;
+        scratch.height = desc.Height;
+        scratch.levels = desc.MipLevels;
+        scratch.format = desc.Format;
+    }
+    view = scratch.view;
     return create_game_sampler(dev, capture, levels, sampler);
 }
 
@@ -3962,7 +4003,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ComPtr<ID3D11ShaderResourceView> sampledView;
     ComPtr<ID3D11SamplerState> sampledSampler;
     if (capture.enabled &&
-        !mirror_texture(dev, capture, sampledView, sampledSampler)) return false;
+        !mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,
+                         sampledView, sampledSampler)) return false;
     ComPtr<ID3D11ShaderResourceView> stage1View;
     ComPtr<ID3D11SamplerState> stage1Sampler;
     if (capture.stage1SeparateTexture) {
@@ -3998,7 +4040,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             if (!create_game_sampler(dev, second, mirroredLevels, stage1Sampler))
                 return false;
             stage1View = sampledView;
-        } else if (!mirror_texture(dev, second, stage1View, stage1Sampler))
+        } else if (!mirror_texture(dev, ctx, s.liveTextureSlots[1], second,
+                               stage1View, stage1Sampler))
             return false;
     }
     // Stage-1 combiner is an isolated game-authored PS constant (b1).
@@ -5784,6 +5827,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.stage1TextureOnlyPs.Reset(); s.stage1AddPs.Reset();
     s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset(); s.blendFactorDiffuseAlphaPs.Reset(); s.blendFactorAddAlphaPs.Reset(); s.blendFactorSubtractAlphaPs.Reset(); s.blendFactorAddSmoothAlphaPs.Reset(); s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset(); s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset(); s.vs.Reset();
+    for (auto& slot : s.liveTextureSlots) slot.reset();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
 }
