@@ -1,0 +1,88 @@
+{
+  "schema": "outrun-c-roi-source-verification-v1",
+  "TASK_ID": "OUTRUN-C-ROI-SOURCE-Q095-TUNED-20261015-2203",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_platform": "PC",
+  "source_dds_path": "localization/validation/binary_compare/pairs/37759842/original/37759842_1024x1024.dds",
+  "source_dds_git_blob_sha": "c888e9b1c87dabdc7a6f5ef47dd88498b95b2d83",
+  "source_dds_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+  "source_dds_dimensions": [
+    1024,
+    1024
+  ],
+  "source_dds_decoded_mode": "RGBA32",
+  "source_png_sha256": "8b78a092b5ca82276076cc5d99b05afd0831651ae2d4afbbcf7486f4693fa7c9",
+  "source_orientation": "FLIP_Y_READABLE",
+  "full_png_source_type": "PIXEL_EXACT_FROM_ORIGINAL_PC_DDS",
+  "english": "Tuned",
+  "korean": "튜닝",
+  "translation_source": "Q095 reviewed graphic mapping transcriptions.jsonl",
+  "roi_bbox_native_xyxy": [
+    746,
+    8,
+    843,
+    45
+  ],
+  "native_dimensions": [
+    97,
+    37
+  ],
+  "native_png_sha256": "bd0abfb2ad66dadbfe18d6640393c9eff370f8d601bc9a6b2284be05af08cb38",
+  "upscale": 4,
+  "imagegen_input_dimensions": [
+    388,
+    148
+  ],
+  "imagegen_input_sha256": "de300263c65ae57e0559d893bb4844116f0a3bdca880c072133729648a3e5241",
+  "alpha_bbox_global_xyxy": [
+    752,
+    11,
+    834,
+    38
+  ],
+  "alpha_margin_LTRB_px": [
+    6,
+    3,
+    9,
+    7
+  ],
+  "alpha_edge_2px_nonzero_counts_TBLR": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "alpha_nonzero_count": 1825,
+  "source_text_visual_observation": "single full Tuned lettering+outline+shadow; no adjoining label or glyph in ROI",
+  "test_checks": {
+    "github_blob_sha_pinned": "c888e9b1c87dabdc7a6f5ef47dd88498b95b2d83",
+    "source_original_dds_sha": true,
+    "source_full_png_sha": true,
+    "dds_pc_rgba32_1024x1024": true,
+    "full_png_pixel_exact_to_direct_pc_dds_flip_y": true,
+    "exact_native_full_source_crop": true,
+    "rgba_dimensions": true,
+    "native_sha": true,
+    "upscaled_sha": true,
+    "boundary_alpha_2px_empty": true,
+    "alpha_margin_at_least_2px": true,
+    "english_and_korean_mapping": true,
+    "schema_is_outrun_hd_text_roi_v1": true,
+    "source_direct_full_not_tile": true
+  },
+  "old_986_tile_inputs_used": false,
+  "existing_AB_queue_consumed_or_changed_by_this_run": false,
+  "imagegen_called": false,
+  "new_AB_dispatch_enabled": false,
+  "hangul_output_generated": false,
+  "CLEAN_PLATE": "NOT_GENERATED",
+  "manual_mask_used": false,
+  "native_restore": "ASPECT_RATIO_PRESERVE_AND_REVIEW_UI_CELL_UV_SAFETY; WIDTH_DIFFERENCE_ALONE_NOT_REJECT",
+  "C1_QA": "NOT_RUN",
+  "C3_QA": "NOT_RUN",
+  "REAL_GAME": "NOT_RUN",
+  "QA": "TEST_ONLY",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY"
+}

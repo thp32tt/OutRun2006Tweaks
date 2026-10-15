@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q095",
+      "source_png": "37759842_FULL_ENGLISH_ORIGINAL_FLIPY_1024x1024.png",
+      "source_sha256": "8b78a092b5ca82276076cc5d99b05afd0831651ae2d4afbbcf7486f4693fa7c9",
+      "source_kind": "FULL_HD_PNG_FROM_DIRECT_ORIGINAL_PC_DDS_PIXEL_EXACT_FLIP_Y",
+      "source_dds_path": "localization/validation/binary_compare/pairs/37759842/original/37759842_1024x1024.dds",
+      "regions": [
+        {
+          "id": "tuned_label",
+          "english": "Tuned",
+          "korean": "튜닝",
+          "bbox": [
+            746,
+            8,
+            843,
+            45
+          ],
+          "isolation": "alpha",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}
