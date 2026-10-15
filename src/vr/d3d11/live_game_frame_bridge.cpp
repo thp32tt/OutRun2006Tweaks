@@ -5416,9 +5416,9 @@ void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
 
 bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
                                          DWORD flags) noexcept {
-    // Legacy hook name retained for callers. Now accepts auxiliary color,
-    // depth, stencil and combined Clears when all affected render surfaces
-    // are proven isolated from the native main color/depth frame.
+    // Legacy hook name retained for callers. Auxiliary Z/STENCIL-only
+    // Clears cannot change the main color even when the main RT0 stays
+    // bound; exact independent Z/S identity is still mandatory.
     const DWORD clearBits = D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL;
     if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
         (flags & clearBits) == 0u || (flags & ~clearBits) != 0u) return false;
@@ -5471,8 +5471,14 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
         const bool seeded = s.clearColor.matches(
             owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()));
         const bool offscreen = targetIdentity.Get() != backbufferIdentity.Get();
+        // Menu/vehicle previews may clear a distinct Z/S surface while
+        // retaining the canonical backbuffer as RT0. Such a Clear writes no
+        // color and must not tear the native full game Draw/Present stream.
+        // Color TARGET Clears retain strict RT0/MRT isolation.
+        const bool clearsColor = (flags & D3DCLEAR_TARGET) != 0u;
         const bool safe = GameNativeOffscreenPass::isolated_auxiliary_clear(
-            seeded, offscreen, true, clearsDepth, true, s.frameBatch.stopped);
+            seeded, offscreen, true, clearsDepth, true,
+            s.frameBatch.stopped, clearsColor);
         if (safe && clearsDepth) s.clearColor.note_auxiliary_depth_clear();
         return safe;
     } catch (...) {

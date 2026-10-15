@@ -28,16 +28,17 @@ struct GameNativeOffscreenPass {
         bool provenAuxiliaryDepth = false) noexcept {
         return !depthEnabled || !depthWritesEnabled || provenAuxiliaryDepth;
     }
-    // Preserve actual menu/vehicle offscreen Clear calls only when neither
-    // the canonical main RT0, any extra MRT, nor the seeded main depth can
-    // be written. A Z/stencil Clear bypasses D3D9 ZWRITEENABLE: only a
-    // distinct, proven depth surface is safe; merely being on RT0 offscreen
-    // does not protect the main depth buffer.
+    // A TARGET Clear may modify RT0 and every bound MRT regardless of
+    // color-write masks: every color target must be isolated from the game.
+    // Z/STENCIL-only Clears cannot modify color, even with main RT0 bound.
+    // They are safe only with an independently identified auxiliary Z/S
+    // surface. Unknown or aliased main depth always fails closed.
     [[nodiscard]] static constexpr bool isolated_auxiliary_clear(
         bool sourceSeeded, bool offscreenRt0, bool extraMrtUnbound,
         bool depthOrStencilClear, bool separateDepth,
-        bool stopped) noexcept {
-        return sourceSeeded && offscreenRt0 && extraMrtUnbound && !stopped &&
+        bool stopped, bool clearsColor = true) noexcept {
+        return sourceSeeded && !stopped &&
+            (!clearsColor || (offscreenRt0 && extraMrtUnbound)) &&
             (!depthOrStencilClear || separateDepth);
     }
     // Enabled D3D9 stencil testing alone does not write stencil. With the

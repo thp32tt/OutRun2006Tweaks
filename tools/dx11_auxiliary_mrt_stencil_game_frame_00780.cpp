@@ -75,9 +75,47 @@ constexpr bool unsafe_main_alias_and_unknown_state_stay_d3d9() {
     return !frame.absorb_empty_source_draw(1u) &&
         !frame.publishable_full(true, 2u);
 }
+
+// Whole live main Draw -> auxiliary Z/STENCIL Clear with main RT0 bound ->
+// main Draw -> same-Present publication. No native color/Z writes are lost.
+constexpr bool main_rt_auxiliary_z_clear_continuity() {
+    GameNativeClearColor main{};
+    main.record(4u, 10u, 0xff203040u, true, false, 11u);
+    GameNativeFrameBatch batch{};
+    if (!batch.accepts_full_on_source_target(0u, main.matches(4u, 10u))) return false;
+    batch.succeeded(true); batch.record_source_draw(0u);
+    const bool auxiliaryZ = !main.main_depth_still_bound(13u);
+    if (!Pass::isolated_auxiliary_clear(
+            main.matches(4u, 10u), false, true, true,
+            auxiliaryZ, batch.stopped, false)) return false;
+    main.note_auxiliary_depth_clear();
+    if (!main.auxiliaryDepthCleared || !main.main_depth_still_bound(11u)) return false;
+    if (!batch.accepts_full_on_source_target(1u, main.matches(4u, 10u))) return false;
+    batch.succeeded(true); batch.record_source_draw(1u);
+    return batch.publishable_full(true, 2u);
+}
+constexpr bool auxiliary_z_clear_fail_closed() {
+    // Main color TARGET|Z is NOT isolated, even if Z is auxiliary.
+    if (Pass::isolated_auxiliary_clear(true,false,true,true,true,false,true))
+        return false;
+    // Main/unknown depth, missing game color seed or stopped batch.
+    if (Pass::isolated_auxiliary_clear(true,false,true,true,false,false,false) ||
+        Pass::isolated_auxiliary_clear(false,false,true,true,true,false,false) ||
+        Pass::isolated_auxiliary_clear(true,false,true,true,true,true,false))
+        return false;
+    // An offscreen TARGET Clear with an active/unknown MRT cannot be skipped.
+    if (Pass::isolated_auxiliary_clear(true,true,false,false,false,false,true))
+        return false;
+    // An isolated TARGET-only Clear does not write depth, even if main Z bound.
+    return Pass::isolated_auxiliary_clear(true,true,true,false,false,false,true);
+}
+static_assert(main_rt_auxiliary_z_clear_continuity());
+static_assert(auxiliary_z_clear_fail_closed());
 static_assert(main_menu_car_race_frame_over_auxiliary_outputs());
 static_assert(unsafe_main_alias_and_unknown_state_stay_d3d9());
 int main() {
+    assert(main_rt_auxiliary_z_clear_continuity());
+    assert(auxiliary_z_clear_fail_closed());
     assert(main_menu_car_race_frame_over_auxiliary_outputs());
     assert(unsafe_main_alias_and_unknown_state_stay_d3d9());
 }
