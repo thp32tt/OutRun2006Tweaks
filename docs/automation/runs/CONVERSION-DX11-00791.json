@@ -1,0 +1,128 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00791",
+  "production_id": "CONVERSION-DX11-00791",
+  "event_id": "CONVERSION-DX11-00791-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_FULLFRAME_COLORFILL_MIRROR_CONTINUITY",
+  "feature_id": "DX11-LIVE-GAME-COLORFILL-RTV-MIRROR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "bdedc6bfc38f4737ff8049485420dd4aadc97634",
+  "changed_files": [
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_native_frame_batch_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-GAME-COLORFILL-RTV-MIRROR",
+    "goal": "Preserve a full-resolution real-game D3D9 Draw/DrawIndexed native frame across successful whole canonical backbuffer ColorFill in menu/vehicle/race, replaying original game color to D3D11 RTV while retaining D3D9 Present/input/FFB.",
+    "acceptance_items": [
+      {
+        "id": "complete-game-colorfill-native-replay",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_game_ColorFill_native_D3D11_RTV",
+        "expected_behavior": "Same canonical game backbuffer full surface ColorFill after native Draw submits native full-size color clear without skipping game Draw source ordinals."
+      },
+      {
+        "id": "predraw-color-baseline",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_menu_car_race_first_Draw_frame_seed",
+        "expected_behavior": "Full ColorFill before first game Draw updates native Clear baseline and preserves seeded depth identity."
+      },
+      {
+        "id": "partial-foreign-failed-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_original_Present_gamepad_FFB",
+        "expected_behavior": "Partial/foreign/failed/unsupported ColorFill does not enter native replay; retains prior game source mutation abort and original D3D9 result/input."
+      },
+      {
+        "id": "exact-sha-five-gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "Exact same material SHA passes five unchanged mandatory CI Gate suites."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real D3D9 game ColorFill hook success and exact destination surface identity",
+      "Game frame bridge full-surface/format/owner/active-target verification and D3D11 RTV full clear or pre-draw color seed",
+      "Subsequent original Draw/DrawIndexed, guarded native frame Present and original D3D9/gamepad/FFB fallback"
+    ],
+    "batch_components": [
+      "R30 D3D9 ColorFill live hook -> native preserve-or-invalidate routing",
+      "Real same-frame D3D11 ClearRenderTargetView replay and pre-draw seeded native color",
+      "Native full-frame C++ positive/negative mutation regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compile-time C++ frame-batch successful whole-source ColorFill preserved with same ordinal; actual D3D11 ClearRenderTargetView source hook.",
+      "negative_regression": "Failed/foreign/partial/unsupported ColorFill keeps existing frame-batch mutation abort and unchanged original D3D9 original HRESULT/input.",
+      "component_integration": "Actual D3D9 ColorFill -> exact main backbuffer -> native color RTV -> full game Draw continuity."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_FULLFRAME_COLORFILL_MIRROR_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_COLORFILL",
+      "D3D11_NATIVE_RTV_CLEAR",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Five required GitHub Actions exact-SHA gates SUCCESS; real Quest3/VDXR menu/car/race HMD output UNTESTED.",
+    "activation_guard_and_fallback": "Native game full frame remains explicit opt-in and fail closed. Original D3D9 Draw/Present/input/FFB/SkyGlow and DX9Ex fallback preserved; DXVK frozen."
+  },
+  "acceptance_results": {
+    "complete-game-colorfill-native-replay": "PASS_BUILD",
+    "predraw-color-baseline": "PASS_BUILD",
+    "partial-foreign-failed-fallback": "PASS_BUILD",
+    "exact-sha-five-gate": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD bdedc6bf from previous 00790 successful CPU surface write source observer; ColorFill was hooked but entire frame always aborted.",
+    "C1_REVIEW": "Successful ColorFill on whole canonical game backbuffer can replay as identical D3D11 RTV clear without losing prior scene Draw, unlike partial/unknown writes.",
+    "C2_IMPLEMENT": "Live R30 ColorFill -> native bridge exact game-owner backbuffer full-surface success and A8/X8 color admission; before first game Draw updates clear seed and after GPU Draw issues D3D11 ClearRenderTargetView; add C++ regression.",
+    "C3_VALIDATE": "Exact SHA 531cd8b3079987a9694e8873610c1c2e31e92e21: DX11 Fast #38808830828, Backend #38808830891, Windows Build #38808839513, OpenXR #38808839500, HUD #38808839634 all SUCCESS; HMD UNTESTED.",
+    "C4_COMMIT": "Material and validation-bearing source 531cd8b3079987a9694e8873610c1c2e31e92e21 [AUTO:CONVERSION-DX11-00791], GitHub nonforced; no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "Five exact-SHA required Gates SUCCESS, separate bookkeeping [skip ci] with source SHA preserved; runtime and gamepad HMD UNTESTED."
+  },
+  "evidence": {
+    "material_commit": "531cd8b3079987a9694e8873610c1c2e31e92e21",
+    "validation_bearing_result_sha": "531cd8b3079987a9694e8873610c1c2e31e92e21",
+    "ci_repairs": [],
+    "runtime_testing": "Quest3/VDXR real game HMD and gamepad not executed",
+    "fast_gate_run_id": 38808830828,
+    "backend_gate_run_id": 38808830891,
+    "windows_build_run_id": 38808839513,
+    "openxr_gate_run_id": 38808839500,
+    "hud_gate_run_id": 38808839634,
+    "fast_gate_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_gate_conclusion": "success",
+    "hud_gate_conclusion": "success",
+    "same_sha_verified": true,
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "531cd8b3079987a9694e8873610c1c2e31e92e21",
+  "validation_bearing_result_sha": "531cd8b3079987a9694e8873610c1c2e31e92e21"
+}
