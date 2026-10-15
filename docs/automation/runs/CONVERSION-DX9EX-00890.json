@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL_CI_REPAIR",
-  "automation_validation": "IN_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "f9fb7429231b6c6689e58f678299b73cc93a01ef",
   "material_result_sha": "3b36a6b38ef05373301ce00d296ed8fb69d26b09",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp"
@@ -90,7 +90,7 @@
   "runtime_evidence": "No Windows game or Quest3/VDXR headset visual test was performed for this retry.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "result_commit_ci_skip": false,
+  "result_commit_ci_skip": true,
   "failure_context": {
     "active_run_id": 38713028962,
     "failed_job": "policy",
@@ -101,5 +101,39 @@
       "host",
       "game"
     ]
+  },
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "checkpoint_commit_ci_skip": true,
+  "bookkeeping_ci_skip": true,
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
+    "material_sha": "3b36a6b38ef05373301ce00d296ed8fb69d26b09",
+    "dx9ex_active": {
+      "run_id": 38713526285,
+      "head_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
+      "conclusion": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38713526341,
+      "head_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38713526272,
+      "head_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38713526264,
+      "head_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
+      "conclusion": "SUCCESS"
+    },
+    "vr_autodev_coordination": {
+      "run_id": 38713526257,
+      "head_sha": "e6065cd78a2df364f23fc5921b6f5d3472c171f0",
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
   }
 }
