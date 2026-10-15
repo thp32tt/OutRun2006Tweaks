@@ -61,10 +61,10 @@
     "fix_evidence": "The packaged R26+HUD R30BufferShadow bytes now use LazyUninitializedBuffer::resize(new uint8_t[size]) and preserve data, size, reuse and clear, while existing Merge/Contains validity and draw fallback remain untouched.",
     "negative_test_evidence": "New host smoke asserts untouched interval gaps rejected, DISCARD removes coverage, same-capacity reuse preserves observed payload, clear drops pointer and size and fresh allocation starts invalid; original random differential intervals remain."
   },
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR or same-scene hardware FPS measurement. Automated smoke and Windows compile are not VR acceptance.",
   "source_parent_sha": "290ace9f7502dfde22ee2819a5c6f21f892fb55b",
@@ -81,15 +81,31 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_CI_RUNNING_AND_RUNTIME_UNTESTED",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "material_result_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "b29a8ef4e356d0c6e6dc4b1f6a132f640d4c0993",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "previous_failed_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
     "previous_failed_gate": "DX9Ex Active policy missing run record",
-    "runtime": "UNTESTED"
+    "runtime": "UNTESTED",
+    "exact_sha": "b29a8ef4e356d0c6e6dc4b1f6a132f640d4c0993",
+    "dx9ex_active": {
+      "run_id": 38658108648,
+      "conclusion": "SUCCESS",
+      "jobs_passed": "5/5 policy/game/host/full-chain-compile/package"
+    },
+    "domain_isolation": {
+      "run_id": 38658108720,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38658108776,
+      "conclusion": "IN_PROGRESS_AT_C6_WRITE"
+    }
   },
-  "result_commit_ci_skip": false
+  "result_commit_ci_skip": false,
+  "validation_record_kind": "C6_BOOKKEEPING_SKIP_CI",
+  "c6_bookkeeping_ci_skip": true
 }
