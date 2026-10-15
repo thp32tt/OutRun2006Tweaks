@@ -84,9 +84,9 @@
     "eye_ownership": "No stereo eye transform changes; both original DirectGPU eyes keep the selected producer slot protected by the existing GPU EVENT, while only previous unconsumed candidate frames may be released without a GPU read."
   },
   "acceptance_results": {
-    "ring_ack_same_run_older_only": "PENDING",
-    "ring_ack_reset_wrap_fallback": "PENDING",
-    "ring_ack_exact_sha_host_ci": "PENDING"
+    "ring_ack_same_run_older_only": "PASS_BUILD",
+    "ring_ack_reset_wrap_fallback": "PASS_BUILD",
+    "ring_ack_exact_sha_host_ci": "PASS_EXACT_SHA"
   },
   "ci_evidence": {
     "initial_material_sha": "fb003de2a53e560514abc3477557509751de6ed5",
@@ -100,9 +100,46 @@
     "revalidation": "PASS_EXACT_SHA",
     "initial_policy_repair": "Corrected obsolete R37 literal invariant to strict R41 same-run temporal ACK checks and built the portable regression as a Windows host-smoke CMake target.",
     "second_active_run_id": 38754004023,
-    "second_policy_failure": "Architecture verifier looked for removed !R37FrameIdBefore literal instead of stronger direct-ring skip ACK helper."
+    "second_policy_failure": "Architecture verifier looked for removed !R37FrameIdBefore literal instead of stronger direct-ring skip ACK helper.",
+    "validation_bearing_result_sha": "2debc4a5c89c8ee6e5a340efc96722380737eb49",
+    "verified_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38754440895,
+        "sha": "2debc4a5c89c8ee6e5a340efc96722380737eb49",
+        "status": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38754440998,
+        "sha": "2debc4a5c89c8ee6e5a340efc96722380737eb49",
+        "status": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38754441102,
+        "sha": "2debc4a5c89c8ee6e5a340efc96722380737eb49",
+        "status": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38754441124,
+        "sha": "2debc4a5c89c8ee6e5a340efc96722380737eb49",
+        "status": "success"
+      }
+    ],
+    "material_result_sha": "fb003de2a53e560514abc3477557509751de6ed5"
   },
-  "runtime_evidence": "No same-SHA Quest3/VDXR game/HMD test. Renderer and real-world FPS not claimed.",
-  "score_once": false,
-  "score_delta_this_attempt": 0
+  "runtime_evidence": "No matching Quest3/VDXR live HMD/game evidence. BUILD_VERIFIED only; visual correctness and FPS gain not asserted.",
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "hold_reason": "NEED_HMD_TEST",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "commit_sha": "665168a39db3c46f5e782288d47b004ef6eca17c",
+    "previous_ai2_score": 1380,
+    "delta": 1,
+    "new_ai2_score": 1381
+  }
 }
