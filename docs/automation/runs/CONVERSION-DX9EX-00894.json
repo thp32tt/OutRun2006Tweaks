@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00894",
+  "production_id": "CONVERSION-DX9EX-00894",
+  "event_id": "CONVERSION-DX9EX-00894-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00894",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:RESET:DIRECTGPU_CONTEXT_EPOCH",
+  "symptom_id": "DX9EX:SYMPTOM:DIRECTGPU_STALE_CONTEXT",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "CI_PENDING_EXACT_SHA",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "0121755240a6e3333268634ea988e400d781caa7",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "vrhost/src/runtime/direct_ack_device_epoch.hpp",
+    "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/runtime/direct_ack_device_epoch.hpp",
+    "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
+    "vrhost/tests/direct_ack_device_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00894.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:RESET:DIRECTGPU_CONTEXT_EPOCH",
+    "goal": "Retire stale host DirectGPU SafeEye buffers, opened shared resources and D3D11 EVENT completion query whenever either the host D3D11 device or immediate context changes during reset, recenter or OpenXR lifecycle recovery, so stereo copies and ACKs cannot be reused across context epochs.",
+    "scope_boundary": "Only the R32 x64 host DirectGPU SafeEye/cache/fence binding and portable recovery smoke; R84 x86 renderer geometry, HUD, F11, ESC, SkyGlow, DX11 and DXVK remain unchanged. Do not activate IPC v3 or infer HMD acceptance.",
+    "special_work_evidence": "Source-proven lifecycle inconsistency: R32SyncDirectDeviceOwner compared OutRunVrFinalTest::Device only and returned without retiring CopyFence, SafeEye and shared slot caches when OutRunVrFinalTest::Context changed with the same device; the existing device-epoch helper already recognizes both identities but R32 never used it.",
+    "trace_stages": [
+      "Producer ring frame and shared handles enter R32 EnsureSafeFrameR32, which first synchronizes the host transport binding.",
+      "Before change, same-device changed-context returns early; CopySharedFrameToSafeEyesR32 reused an EVENT query and SafeEye/opened-resource caches from the previous immediate context.",
+      "The binding now compares device and context together, retires R32 slot/active SafeEye resources plus CopyFence on either change, then the next draw/copy rebuilds under the new host context."
+    ],
+    "subcomponents": [
+      "Use one shared device-and-context binding owner in production R32 before cache reuse and before D3D11 GPU copy completion checks.",
+      "Exercise stable, context-only, device-only, device-loss and recovered bindings in the existing portable host smoke test; retain regular unchanged hot-path behavior."
+    ],
+    "acceptance_items": [
+      {
+        "id": "context_rebind_resets_directgpu",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R32 live DirectGPU reset/host device-context identity",
+        "expected_behavior": "Changing context alone invalidates the active SafeEye and GPU fence before the next producer frame can be reused."
+      },
+      {
+        "id": "unchanged_and_recovery_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Stable host transport and device-loss recovery",
+        "expected_behavior": "Unchanged pair never resets; device changes, loss and recovery invalidate exactly once; old fallback remains available."
+      },
+      {
+        "id": "exact_sha_build_and_smokes",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game x86 / host x64 / package / domain GitHub Actions",
+        "expected_behavior": "Exact material-result SHA builds the R84 main and R26_SAFE rollback, host smoke and protected domain validation; HMD remains separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "context_rebind_resets_directgpu": "SOURCE_IMPLEMENTED",
+    "unchanged_and_recovery_fallback": "SMOKE_ADDED_PENDING_CI",
+    "exact_sha_build_and_smokes": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "R32SyncDirectDeviceOwner checks only R32DirectDeviceOwner == OutRunVrFinalTest::Device; no cached immediate context participates, unlike the existing Changed(device,context) helper.",
+    "root_cause": "Cache lifetime and fence-query ownership were bound to an incomplete device-only identity, permitting reuse across a same-device, different-context rebind.",
+    "fix_evidence": "The production R32 synchronization now adopts a single typed Binding<Device,Context> before cache/fence reuse and releases staged/active SafeEye resources, slot textures and CopyFence whenever either pointer changes.",
+    "negative_test_evidence": "The direct_ack_device_epoch_smoke simulates context-only rebind with unchanged device, repeated identical binds, replacement device, full loss and restored pair, asserting exactly one invalidation per epoch transition.",
+    "evidence_limits": "Static/source-confirmed rebind defect and portable smoke; no actual D3D11 recovery run, GPU timing measurement or Quest3/VDXR test. Windows GitHub CI pending."
+  },
+  "runtime_evidence": "Not tested in a real Quest 3 / VDXR session.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "CI_PENDING_EXACT_SHA",
+  "result_commit_ci_skip": false
+}

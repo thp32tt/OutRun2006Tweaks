@@ -10,6 +10,7 @@
 // longer re-opens the same resources every frame.
 
 #include "d3d9ex_direct_passthrough.hpp"
+#include "direct_ack_device_epoch.hpp"
 
 #include <array>
 #include <cstdint>
@@ -47,7 +48,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline std::uint32_t R32InactiveWidth = 0;
     inline std::uint32_t R32InactiveHeight = 0;
     inline ID3D11Device* R32InactiveDevice = nullptr;
-    inline ID3D11Device* R32DirectDeviceOwner = nullptr;
+    inline OutRunVrDirectAckDeviceEpoch::Binding<
+        ID3D11Device, ID3D11DeviceContext> R32DirectBinding{};
 
     inline std::uint64_t R32SharedCacheHits = 0;
     inline std::uint64_t R32SharedCacheMisses = 0;
@@ -86,20 +88,21 @@ namespace OutRunVrD3D9ExDirectPassthrough
         R32SafeTimeoutPreserves = 0;
     }
 
-    // A host D3D11 device replacement invalidates all previously opened
-    // textures, SRVs, and the D3D11 EVENT query even when producer frame ID,
-    // ring generation and numeric handles happen to match. Synchronize BEFORE
-    // SafeEyesOwnFrame so an old-device SafeEye cannot be accepted as current.
+    // The DirectGPU SafeEye pair, shared textures and EVENT completion query
+    // belong to the host's *device and immediate context together*. A Reset,
+    // OpenXR rebind or renderer recovery can replace the context without
+    // changing the device pointer. Before accepting SafeEyesOwnFrame and
+    // before submitting another copy/fence, retire that old-context state.
+    // Stable bindings avoid extra releases and preserve the hot path.
     inline void R32SyncDirectDeviceOwner() noexcept
     {
-        ID3D11Device* const current = OutRunVrFinalTest::Device;
-        if (R32DirectDeviceOwner == current)
+        if (!R32DirectBinding.Rebind(
+                OutRunVrFinalTest::Device, OutRunVrFinalTest::Context))
             return;
         R32ResetDirectCaches();
         ResetSafeEyes();
         ResetSharedEyeCache();
         ReleaseCom(CopyFence);
-        R32DirectDeviceOwner = current;
     }
 
     inline bool R32OpenSharedSlot(
