@@ -999,6 +999,18 @@ struct OutputCapture {
     std::uint8_t colorWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 };
 
+// Native pixel-shader stage-1 combiner uses an 80-byte, 16-byte-aligned
+// D3D11 b1 payload across live menu, vehicle-select and race draws.
+struct Stage1Upload {
+    float factor[4];
+    std::int32_t operations[4];
+    std::int32_t arguments[4];
+    std::int32_t argZero[4];
+    float stageConstant[4];
+};
+static_assert(sizeof(Stage1Upload) == 80u && sizeof(Stage1Upload) % 16u == 0u,
+              "Native game stage-1 constant buffer ABI must match PS b1");
+
 struct ReadbackSlot {
     ComPtr<ID3D11Texture2D> staging;
     ComPtr<ID3D11Query> fence;
@@ -1181,6 +1193,9 @@ struct State {
     // never collide with SUBTRACT/REVSUBTRACT under changing color masks.
     std::array<ComPtr<ID3D11BlendState>, 128> extremumMaskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
+    // Per-device mutable b1 state; changed game combiners update before
+    // each Draw instead of creating thousands of immutable GPU objects.
+    ComPtr<ID3D11Buffer> stage1Constants;
     std::array<ReadbackSlot, kReadbackSlots> readbacks{};
     UINT readSlot = 0;
     UINT writeSlot = 0;
@@ -1488,7 +1503,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
          s.sourceAlphaSaturateCopyBlend && s.sourceAlphaSaturateAddBlend &&
         s.sourceAlphaCopyBlend && s.inverseAlphaCopyBlend &&
         s.inverseAlphaAddBlend && s.sourceReplaceBlend &&
-        s.alphaConstants && readbackReady)
+        s.alphaConstants && s.stage1Constants && readbackReady)
         return true;
     s.diagnosticDepthView.Reset();
     s.diagnosticDepth.Reset();
@@ -1513,6 +1528,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
+    s.stage1Constants.Reset();
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
         item.mapPending = false;
@@ -2016,6 +2032,12 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     constants.Usage = D3D11_USAGE_DEFAULT;
     constants.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     if (FAILED(dev->CreateBuffer(&constants, nullptr, s.alphaConstants.GetAddressOf())))
+        return false;
+    // A single GPU buffer is owned by this D3D11 generation. Source game
+    // stage-1 states (including TEMP, factors and texture operands) change
+    // per Draw; Upload/PS b1 binding below must refresh on every use.
+    constants.ByteWidth = sizeof(Stage1Upload);
+    if (FAILED(dev->CreateBuffer(&constants, nullptr, s.stage1Constants.GetAddressOf())))
         return false;
     D3D11_TEXTURE2D_DESC desc{};
     s.backend.color_texture()->GetDesc(&desc);
@@ -4041,19 +4063,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         } else if (!mirror_texture(dev, second, stage1View, stage1Sampler))
             return false;
     }
-    // Stage-1 combiner is an isolated game-authored PS constant (b1).
-    // Create before issuing any Draw: failure preserves the original D3D9
-    // renderer and never partially publishes a new native frame.
-    ComPtr<ID3D11Buffer> stage1Constants;
+    // Real game Stage-1 PS b1 is updated in original Draw order, using
+    // the same device-owned GPU allocation through menu, car and race.
+    // No immutable buffer allocation per game-authored Draw.
     if (capture.stage1Enabled) {
-        struct Stage1Upload {
-            float factor[4];
-            std::int32_t operations[4];
-            std::int32_t arguments[4];
-            std::int32_t argZero[4];
-            float stageConstant[4];
-        };
-        static_assert(sizeof(Stage1Upload) == 80u);
         Stage1Upload payload{};
         std::copy(capture.stage1Factor.begin(), capture.stage1Factor.end(),
                   payload.factor);
@@ -4068,14 +4081,12 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
         for (std::size_t i = 0; i < 2; ++i)
             payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);
-        D3D11_BUFFER_DESC cb{};
-        cb.ByteWidth = sizeof(payload);
-        cb.Usage = D3D11_USAGE_IMMUTABLE;
-        cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        D3D11_SUBRESOURCE_DATA data{};
-        data.pSysMem = &payload;
-        if (FAILED(dev->CreateBuffer(&cb, &data, stage1Constants.GetAddressOf())))
-            return false;
+        // D3D11_USAGE_DEFAULT UpdateSubresource is ordered ahead of this
+        // game's native Draw on the same immediate context. The driver
+        // preserves in-flight draw state even when a later draw overwrites b1.
+        if (!s.stage1Constants) return false;
+        ctx->UpdateSubresource(s.stage1Constants.Get(), 0u, nullptr,
+                               &payload, 0u, 0u);
     }
     ComPtr<ID3D11Buffer> vb, ib;
     if (env_full_game_opt_in()) {
@@ -4561,10 +4572,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr, nullptr, 0xffffffffu);
     ID3D11Buffer* alphaBuffer = s.alphaConstants.Get();
     ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);
-    if (capture.stage1Enabled) {
-        ID3D11Buffer* combiner = stage1Constants.Get();
-        ctx->PSSetConstantBuffers(1, 1, &combiner);
-    }
+    // Explicitly clear b1 for a following stage-0-only menu/HUD Draw.
+    // Never let a previous stage-1 combiner leak into a new game draw.
+    ID3D11Buffer* combiner = capture.stage1Enabled ? s.stage1Constants.Get() : nullptr;
+    ctx->PSSetConstantBuffers(1, 1, &combiner);
     // Both source modes must bind the exact buffers populated above. In
     // particular, the bounded D3D9 diagnostic fallback must not shadow these
     // owners with short-lived local ComPtrs and submit with a null IA vertex
@@ -5868,6 +5879,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
+    s.stage1Constants.Reset();
     for (auto& masked : s.maskedBlends) masked.Reset();
     for (auto& masked : s.multiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseDestMultiplyMaskedBlends) masked.Reset();
