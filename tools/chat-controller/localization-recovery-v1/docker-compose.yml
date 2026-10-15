@@ -15,9 +15,9 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "true"
-      # Staggered two-tab HD ImageGen: A at :00/:10/... and B at :05/:15/...
-      SCHEDULE_MINUTES: "0,5,10,15,20,25,30,35,40,45,50,55"
-      CHAT_SLOTS: "2"
+      # Existing A/B native ImageGen slots unchanged; C text-only salvage at :03/:33.
+      SCHEDULE_MINUTES: "0,3,5,10,15,20,25,30,33,35,40,45,50,55"
+      CHAT_SLOTS: "3"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "true"
@@ -75,10 +75,12 @@ services:
       - outrun_chat_localization_recovery_logs:/logs
 
 
-  # Offline C salvage runs independently of two-tab ChatGPT A/B ImageGen.
+  # HISTORICAL optional offline C fallback, disabled in default Stack.
+  # C is the third tab of the existing A/B controller; no extra service starts.
   # Binds source image-src read-only; never deploys localized DDS or approves QA.
   # This service only starts when the user manually redeploys the Portainer Git stack.
   outrun-c-salvage-offline:
+    profiles: ["optional-offline-c"]
     build:
       context: ./c_salvage
       dockerfile: Dockerfile
