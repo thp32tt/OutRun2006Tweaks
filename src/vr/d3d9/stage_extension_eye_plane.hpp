@@ -4,9 +4,34 @@
 // XYZRHW producer. The R84 caller constructs the finite HUD plane with
 // its latched head inverse and both per-eye projection matrices.
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 
 namespace OutRunVR::StageExtensionPlane
 {
+    // This flag is passed only after R30SeedTouchedXyzrhwVertices validated
+    // the same index/mask list and copied exactly those source vertices.
+    // Never choose the sparse path for an unseeded, mixed or dense draw.
+    constexpr bool CanUseVerifiedTouchedVertices(
+        std::uint32_t vertexCount, std::size_t touchedCount,
+        bool hasMask, bool hasTouchedList, bool copiedFromTouched) noexcept
+    {
+        return hasMask && hasTouchedList && copiedFromTouched &&
+            touchedCount != 0u && touchedCount <= vertexCount / 4u;
+    }
+    static_assert(CanUseVerifiedTouchedVertices(128u, 8u, true, true, true),
+        "validated sparse +TIME/GOAL indices avoid a full VB-span walk");
+    static_assert(!CanUseVerifiedTouchedVertices(128u, 8u, true, true, false),
+        "mask-only copy cannot authorize a sparse GPU-eye transform");
+    static_assert(!CanUseVerifiedTouchedVertices(128u, 8u, false, true, true),
+        "unknown mask cannot prove original referenced coverage");
+    static_assert(!CanUseVerifiedTouchedVertices(128u, 8u, true, false, true),
+        "no authoritative touched list means the old full walk");
+    static_assert(!CanUseVerifiedTouchedVertices(128u, 34u, true, true, true),
+        "dense source stays on the verified original path");
+    static_assert(!CanUseVerifiedTouchedVertices(0u, 0u, true, true, true),
+        "empty or invalid span is never sparsely transformed");
+
     inline bool ProjectPixel(
         const float clipFromGameNdc[16], float sourceX, float sourceY,
         float viewportX, float viewportY, float viewportWidth,

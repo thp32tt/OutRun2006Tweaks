@@ -4729,6 +4729,10 @@ namespace OutRunVRStereo
                 // two full-span copies on lightly used VB/IB regions; both
                 // eyes share one reference mask and one contiguous-run scan.
                 bool sparseCopied = false;
+                // Only this fully validated referenced-index copy may authorize
+                // +TIME/GOAL to skip unused vertices at the GPU-eye stage.
+                // A mask-only span keeps its existing dense visitation.
+                bool stageTouchedSeeded = false;
                 if (usedMask && vertexCount >= 64u)
                 {
                     const std::size_t selectedCount = knownUsedCount <= vertexCount
@@ -4742,9 +4746,10 @@ namespace OutRunVRStereo
                     {
                         const auto* srcBytes =
                             static_cast<const std::uint8_t*>(source);
-                        if (!R30SeedTouchedXyzrhwVertices(
-                                srcBytes, vertexCount, stride, left, &right,
-                                *usedMask, touched, selectedCount))
+                        stageTouchedSeeded = R30SeedTouchedXyzrhwVertices(
+                            srcBytes, vertexCount, stride, left, &right,
+                            *usedMask, touched, selectedCount);
+                        if (!stageTouchedSeeded)
                         {
                         UINT cursor = 0;
                         while (cursor < vertexCount)
@@ -4784,8 +4789,27 @@ namespace OutRunVRStereo
                     // Preserve original colour, UV, depth and RHW. Reject
                     // the WHOLE candidate if any referenced eye is invalid;
                     // the caller retains its original one-draw fallback.
-                    for (UINT stageVertex = 0; stageVertex < vertexCount; ++stageVertex)
+                    // Exact indexed +TIME and GOAL sprites may reference a
+                    // small subset of a large VB/IB window. The scratch copies
+                    // above already proved the touched list and its mask:
+                    // only in that case iterate those exact vertices. All
+                    // other draws retain the original full-span walk.
+                    const bool sparseStage = OutRunVR::StageExtensionPlane::
+                        CanUseVerifiedTouchedVertices(
+                            vertexCount, touched ? touched->size() : 0u,
+                            usedMask != nullptr, touched != nullptr,
+                            stageTouchedSeeded);
+                    const UINT stageVisits = sparseStage
+                        ? static_cast<UINT>(touched->size()) : vertexCount;
+                    for (UINT visit = 0; visit < stageVisits; ++visit)
                     {
+                        const UINT stageVertex =
+                            sparseStage ? (*touched)[visit] : visit;
+                        // Corrupt index evidence fails closed to the original
+                        // one-draw path; never read or write outside the span.
+                        if (stageVertex >= vertexCount ||
+                            (sparseStage && !(*usedMask)[stageVertex]))
+                            return false;
                         if (usedMask && !(*usedMask)[stageVertex])
                             continue;
                         const std::size_t offset =
