@@ -1,0 +1,67 @@
+{
+  "task_id": "OUTRUN-C-ROI-SOURCE-Q097-MORE-ENGINE-SOUND-20261016-0003",
+  "schema": "outrun-hd-text-roi-v1",
+  "qa_level": "TEST_ONLY",
+  "status": "TEST_ONLY_REFERENCE_ONLY_WITH_HOLDS",
+  "source_approved": "PINNED_GITHUB_DIRECT_HD_DDS_PC",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "original_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "source_full_png_sha256": "2ecc253ac9db49a9c1189f1f814d562a45462b660af94877ce1f66737cfe58af",
+  "dds_dimensions": [
+    2048,
+    2048
+  ],
+  "source_dimensions": [
+    2048,
+    2048
+  ],
+  "direct_dds_readable_flip_y_full_pixel_exact": true,
+  "native_exact_full_png_pixel_crop": true,
+  "scale4_lanczos_pixel_exact": true,
+  "english_visual": "More Engine Sound",
+  "transcription_reviewed_source": "More Engine sound",
+  "korean_reviewed_mapping": "엔진음 크게",
+  "english_case_variant": "official transcription lowercase s; visual artwork uppercase S; ROI uses visually exact title case",
+  "bbox_xyxy": [
+    1480,
+    316,
+    1928,
+    432
+  ],
+  "native_dimensions": [
+    448,
+    116
+  ],
+  "scale": 4,
+  "imagegen_dimensions": [
+    1792,
+    464
+  ],
+  "native_png_sha256": "6afcbf5de2bcac733a1405763833acf15c61b6f7302dd52d093c92ced4b6b6fb",
+  "imagegen_input_sha256": "597b56376152e04189783af3edfaef3b54ee1a9e5eba9301dc61a932d5f9fc6e",
+  "crop_2px_edge_nonzero_source_alpha_top_bottom_left_right": [
+    0,
+    231,
+    0,
+    12
+  ],
+  "glyph_alpha_isolated": false,
+  "opaque_plate_present": true,
+  "visual_crop_whole_phrase": "MANUAL_REVIEWED_NOT_CUT",
+  "hold": [
+    "HOLD_GLYPH_MASK_OR_PSD_TEXT_LAYER_UNREVIEWED",
+    "HOLD_CLEAN_PLATE_UNREVIEWED",
+    "HOLD_UI_CELL_UV_SAFE_BOUNDS_UNMEASURED",
+    "HOLD_OFFICIAL_MAPPING_CSV_RECHECK"
+  ],
+  "generated_korean": "NOT_RUN",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "game": "NOT_RUN",
+  "DDS_output": "NOT_RUN",
+  "portainer": "NOT_REDEPLOYED",
+  "A_B_queue_state": "UNTOUCHED",
+  "legacy_986_tiles": "NOT_USED",
+  "resize_return_policy": "Preserve aspect ratio inside measured UI cell/UV safe bounds; shorter/wider Korean text alone not rejection",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
