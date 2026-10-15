@@ -398,7 +398,8 @@ def require_partial_menu_vectors(code: str) -> None:
         "Game::screen_scale && Game::screen_resolution",
         "pScaling ? pScaling->x : 1.0f",
         "pTranslation ? pTranslation->x : 0.0f",
-        "CenterMultiSpriteAxis(",
+        "nextTx = CenterMultiSpriteAxis(",
+        "nextTy = CenterMultiSpriteAxis(",
         "forwardedScaling = (&localScaling);",
         "forwardedTranslation = (&localTranslation);",
     ):

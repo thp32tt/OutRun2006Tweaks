@@ -54,7 +54,7 @@
   ],
   "status": "BUILD_PENDING",
   "phase": "C3_VALIDATE",
-  "checkpoint": "C3_RETRY_SYNTAX_REPAIR",
+  "checkpoint": "C3_MUTATION_TEST_REPAIR",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -89,7 +89,10 @@
     "failed_run": 38692708718,
     "failed_job": "policy",
     "reason": "Legacy mutation test false-negative: new optional branch repeated same complete-vector assignment literal; new branch now uses equivalent syntactically distinct local reference.",
-    "syntax_repair": "Restored missing close-parenthesis on new branch after disambiguating original-path mutation verifier; same RUN_KEY; game compiler CI still pending."
+    "syntax_repair": "Restored missing close-parenthesis on new branch after disambiguating original-path mutation verifier; same RUN_KEY; game compiler CI still pending.",
+    "retry_validation_sha": "e9c208e52b3c7a473ea86465ace93e975f542822",
+    "retry_failed_run_id": 38693050911,
+    "retry_failure": "New negative mutation changed only X projection; generic CenterMultiSpriteAxis marker still matched Y projection. Test now verifies exact X and Y calls independently."
   },
   "runtime_evidence": "No Quest3/VDXR HMD session performed."
 }
