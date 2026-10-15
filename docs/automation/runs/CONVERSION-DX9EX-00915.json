@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00915",
+  "production_id": "CONVERSION-DX9EX-00915",
+  "event_id": "CONVERSION-DX9EX-00915-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00915",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "feature_class": "VISIBLE_DEFECT",
+  "symptom_id": "DX9EX:VIS:FRONTEND_ROTATION_ONLY_ASPECT",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "642372adc3282501292172008c16b2f53d68e8e0",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00915.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:VIS:FRONTEND_ROTATION_ONLY_ASPECT",
+    "goal": "Restore native-aspect rendering of all originally rotated title/menu/car-selector D3DX sprites, including rotation-only calls without optional scale/translation vectors, while retaining the authored 2D pivot and the original gameplay, overlay and desktop fallback behavior.",
+    "scope_boundary": "Exact original title/menu/car-selection D3DXMatrixTransformation2D call path; only contained UI modes (OnlineArcade/KeepCentered); no gameplay ScreenHud, rank, GOAL/+TIME, lens, F11, input/FFB, SkyGlow, R26_SAFE or DXVK modification.",
+    "trace_stages": [
+      "Original game title/menu/selector calls D3DXMatrixTransformation2D with optional scale/translation and independent rotation/rotation-center inputs.",
+      "D3DX writes a full native 2D affine matrix including its rotation/pivot before the hook applies min-axis 4:3 containment across both XY bases and translation.",
+      "Exact front-end state/mode limits prevent transformation of unrelated HUD and world draw owners."
+    ],
+    "subcomponents": [
+      "Accept valid rotation-only D3DX calls in the existing post-composition path without manufacturing optional scale/translation arguments.",
+      "Keep mixed scale/translation, pivoted sprites, native 4:3, vanilla and non-front-end input fallbacks intact; test the admission matrix with compile-time positive/negative cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rotation_only_frontend_aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Title, menu and vehicle-selection rotated affine sprites",
+        "expected_behavior": "A rotation-only D3DX call with both optional vectors absent uses full affine min-axis containment with the original rotation and pivot, preserving art proportions on 4:3, 16:9, 21:9 and portrait targets."
+      },
+      {
+        "id": "optional_vector_and_owner_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Nullable D3DX vectors and original gameplay/vanilla/identity owners",
+        "expected_behavior": "Rotated/pivoted scaling and translation retain the old path; no-op centres, non-front-end gameplay ScreenHud/GOAL/+TIME/F11 and vanilla mode do not gain a new transform; reset/invalid matrix retains original."
+      },
+      {
+        "id": "exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game plus host/package, Domain and affected source gates",
+        "expected_behavior": "Mandatory DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector checks are successful on one exact final source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rotation_only_frontend_aspect": "PENDING_BUILD",
+    "optional_vector_and_owner_fallback": "PENDING_BUILD",
+    "exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "The menu full-affine path was gated on (pScaling || pTranslation) even though both D3DX inputs are optional and an independently supplied rotation can yield a non-identity matrix; the rotation-only matrix bypassed aspect-preserving post-composition.",
+    "alternatives_rejected": [
+      "Do not change the unrelated R84 world stereo or host menu capture/crop: the fault is in the exact 2D producer admission.",
+      "Do not fill missing D3DX inputs with invented vectors: post-compose the original D3DX matrix to preserve pivots and rotation."
+    ],
+    "fix_evidence": "Source-built constexpr input-ownership regressions for rotation-only, pivoted scale, translation, no-op centres, gameplay and vanilla, plus unchanged full 2D matrix composition."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ]
+  },
+  "runtime_evidence": "Quest3/VDXR run not performed; no claim of fixed optical menu in real hardware.",
+  "score_delta_this_attempt": 0,
+  "score_once": false
+}

@@ -56,6 +56,47 @@ namespace
     static_assert(CenterMultiSpriteAxis(1200.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 900.0f);
 
 
+    // A rotation-only D3DXMatrixTransformation2D call can legitimately omit
+    // both optional scale/translation vectors. The old (scale || translate)
+    // prerequisite skipped whole-matrix containment for such menu/car-select
+    // sprites and left the already rotated art anisotropically stretched.
+    // Keep identity/unsupported states, gameplay HUD and F11 unchanged.
+    constexpr bool NeedsFrontEndAffineContain(
+        bool exactFrontEnd, bool containedMode,
+        bool hasScale, bool hasTranslation, bool hasScaleCenter,
+        bool hasRotationCenter, float scaleRotation, float rotation) noexcept
+    {
+        return exactFrontEnd && containedMode &&
+            (hasScale || hasTranslation || rotation != 0.0f) &&
+            (hasScaleCenter || hasRotationCenter ||
+             scaleRotation != 0.0f || rotation != 0.0f);
+    }
+
+    static_assert(NeedsFrontEndAffineContain(
+        true, true, false, false, false, false, 0, 1.5707963f),
+        "Rotation-only title sprites must use full affine containment");
+    static_assert(NeedsFrontEndAffineContain(
+        true, true, false, false, false, true, 0, 0.35f),
+        "Pivoted rotation-only vehicle sprites must retain source aspect");
+    static_assert(NeedsFrontEndAffineContain(
+        true, true, true, false, true, false, 0, 0),
+        "Pivoted scale-only sprites must retain source aspect");
+    static_assert(NeedsFrontEndAffineContain(
+        true, true, false, true, false, true, 0, 0),
+        "Translation with an authored pivot retains the old transform path");
+    static_assert(!NeedsFrontEndAffineContain(
+        true, true, false, false, true, true, 0, 0),
+        "Unused centres alone cannot justify rewriting an identity matrix");
+    static_assert(!NeedsFrontEndAffineContain(
+        true, true, false, false, true, false, 0.75f, 0),
+        "Scale rotation without a scale vector is not an authored transform");
+    static_assert(!NeedsFrontEndAffineContain(
+        false, true, false, false, false, false, 0, 1),
+        "Never transform gameplay HUD/GOAL/+TIME through the front end");
+    static_assert(!NeedsFrontEndAffineContain(
+        true, false, false, false, false, false, 0, 1),
+        "Vanilla must preserve the original menu matrix");
+
     // The six +TIME caller tails are snapshots, not owned queue pointers.
     // Validate both boundaries against the live chain before dereferencing
     // any old tail (which may have been freed by a nested queue rebuild).
@@ -299,17 +340,18 @@ class UIScaling : public Hook
         // Complete 2D composition is required when the game supplies a
         // non-origin scale/rotation pivot. Only title/menu/car-selection
         // producers take this path; other visual owners remain unchanged.
-        const bool frontEndPivot = Game::current_mode &&
-            (*Game::current_mode == GameState::STATE_TITLE ||
-             *Game::current_mode == GameState::STATE_MENU ||
-             *Game::current_mode == GameState::STATE_SELECTOR ||
-             *Game::current_mode == GameState::STATE_SELEXIT ||
-             *Game::current_mode == GameState::STATE_SELRESET) &&
-            (pScaling || pTranslation) &&
-            (pScalingCenter || pRotationCenter ||
-             pScalingRotation != 0.0f || Rotation != 0.0f) &&
-            (mode == ScalingMode::KeepCentered ||
-             mode == ScalingMode::OnlineArcade);
+        const bool frontEndPivot = NeedsFrontEndAffineContain(
+            Game::current_mode &&
+                (*Game::current_mode == GameState::STATE_TITLE ||
+                 *Game::current_mode == GameState::STATE_MENU ||
+                 *Game::current_mode == GameState::STATE_SELECTOR ||
+                 *Game::current_mode == GameState::STATE_SELEXIT ||
+                 *Game::current_mode == GameState::STATE_SELRESET),
+            mode == ScalingMode::KeepCentered ||
+                mode == ScalingMode::OnlineArcade,
+            pScaling != nullptr, pTranslation != nullptr,
+            pScalingCenter != nullptr, pRotationCenter != nullptr,
+            pScalingRotation, Rotation);
 		// D3DX allows optional 2D scaling/translation inputs. During resolution
 		// or device reset the game scale may also be invalid. Preserve input
 		// values and forward the original call when reprojection is unsafe.
