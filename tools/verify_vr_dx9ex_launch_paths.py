@@ -53,7 +53,7 @@ if __name__ == "__main__":
     assert not check(src), "; ".join(check(src))
     mutations = [
         (0, '} elseif ($Backend -eq "d3d9") {', '} elseif ($Backend -eq "d3d9" -and $variant -eq "CURRENT_FOCUS") {'),
-        (0, 'R84_TEST payload missing: $slotPayload', 'R84 payload missing: $slotPayload'),
+        (0, 'if (-not (Test-Path $slotPayload)) { throw "R84_TEST payload missing: $slotPayload" }', 'if (-not (Test-Path $slotPayload)) { Write-Warning "R84_TEST payload missing: $slotPayload" }'),
         (0, '$rendererBuildVariant -ne "R84_SPLIT_R33_R32_R31_R30_R29"', '$rendererBuildVariant -ne "R26"'),
         (0, '$sourceSha -ne (Get-Content $baselineShaFile', '$sourceSha -eq (Get-Content $baselineShaFile'),
         (1, '$quotedRunner = \'"\' + $runner + \'"\'', '$quotedRunner = $runner'),
