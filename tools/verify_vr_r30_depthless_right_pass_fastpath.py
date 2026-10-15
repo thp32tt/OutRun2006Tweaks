@@ -75,8 +75,10 @@ def main():
         ("R29OwnerRestoreRightPassState(", "R29OwnerOmitFallback("),
         ("R29OwnerCallOriginalSetRenderTarget(", "R29OwnerNoRtRestore("),
         ("if (restoreWvp &&", "if (false &&"),
-        ("if (!restoreOk)\n            {\n                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);",
-         "if (false)\n            {\n                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);"),
+        # Mutate the guard itself, not an adjacent restore-body substring:
+        # current-frame failure marking is an intentionally inserted first step.
+        ("if (!restoreOk)\n            {",
+         "if (false)\n            {"),
         ("savedDepth ? frame.rightEyeDepth : nullptr", "frame.rightEyeDepth"),
     ]
     for n, (old, new) in enumerate(mutations, 1):
