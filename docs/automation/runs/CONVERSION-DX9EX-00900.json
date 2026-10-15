@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00900",
+  "production_id": "CONVERSION-DX9EX-00900",
+  "event_id": "CONVERSION-DX9EX-00900-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00900",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C5_VALIDATING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "58453945bafb272651393c5745c009ca8633b5ce",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/texture_pack_cursor.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/texture_pack_cursor.hpp",
+    "tools/verify_vr_texture_pack_cursor.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00900.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Keep car-selection and other front-end indexed DDS art bound to the correct UI xstset across scene xmtset loads and reused mutable game filename buffers; preserve original texture decode/rollback and object-order semantics.",
+    "scope_boundary": "Only the original xstset/xmtset filename-to-indexed DDS selection and stream counters; unchanged DDS bytes, texture decoding, FFB, SkyGlow, host, R84 stereo and R26_SAFE fallback.",
+    "trace_stages": [
+      "Original UI LoadXstsetSprite and stage LoadXmtsetObject announce the current pack; the original engine may reuse char* storage and xstset slots.",
+      "HandleTexture combines per-pack ordinal with DDS hash/dimensions to select indexed replacement filename; previously both streams incremented CurrentTextureIdx and scene changed pack only on pointer inequality.",
+      "Independent value-snapshotted pack cursors bind indexed DDS names to their own stream before D3DX fast/native decoder and R84 game/UI stereo composition."
+    ],
+    "subcomponents": [
+      "Decouple scene XMT sequential DDS ordinal from UI XST/vehicle-selection ordinal.",
+      "Detect reused mutable scene filename buffers by copying path contents and switch UI pack upon xstset slot change even with same name.",
+      "Keep xmt object index from resetting the scene pack and preserve original fast/native DDS fallback, RGB alpha, UI scaling and selected car art."
+    ],
+    "acceptance_items": [
+      {
+        "id": "vehicle_select_indexed_dds_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Vehicle-select XST art and interleaved stage XMT DDS source",
+        "expected_behavior": "UI and scene independently start index zero per changed pack; same pack resumes sequential indexed DDS; same char* overwritten with different path rebinds scene."
+      },
+      {
+        "id": "native_texture_rollback_unchanged",
+        "category": "fallback_regression",
+        "behavior_area": "D3DX fast/native fallback, GUI/scene old source and per-slot UI scaling",
+        "expected_behavior": "Original decoder/rollback untouched, same xmt object pack does not reset on XmtIndex change, malformed/no-name pack does not leak into new selection."
+      },
+      {
+        "id": "exact_sha_win32_r84",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Active Win32, R26_SAFE, x64 host, package/Domain/affected Inspector and Full Source",
+        "expected_behavior": "Existing exact-SHA GitHub Actions Gate success at validation-bearing source/result commit; Quest3 run remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "vehicle_select_indexed_dds_owner": "SOURCE_PENDING_CI",
+    "native_texture_rollback_unchanged": "SOURCE_PENDING_CI",
+    "exact_sha_win32_r84": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "LoadXstsetSprite_dest and LoadXmtsetObject_dest both reset one shared CurrentTextureIdx; HandleTexture increments it regardless of isUITexture; scene PrevXmtName compares two char* addresses, not path content. XMT index belongs to objects, XST eax is an xstset slot.",
+    "root_cause": "Indexed filename sequence crossed UI/scene pack boundaries and mutable scene file path buffer reuse could skip pack reset; existing path identity was not a durable value.",
+    "alternatives_rejected": [
+      "Do not change D3DX texture loader, mutate replacement DDS or reset scene sequence for every XmtIndex object. Preserve original fallback."
+    ],
+    "fix_evidence": "Independent value-snapshotted C++ cursors and source-bound ordinal selection; targeted mutated regression verifier.",
+    "negative_test_evidence": "Five source contract mutations cover shared-index leak, scene object-index reset, UI slot alias, pointer identity and off-by-one ordinal reset.",
+    "eye_ownership": "Texture binding remains original game D3D9; R84 stereo render path unchanged."
+  },
+  "runtime_evidence": "No Quest3/VDXR test.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "AWAIT_EXACT_SHA_CI"
+}

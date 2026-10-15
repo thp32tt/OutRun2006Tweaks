@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "vr/hud_semantics.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/texture_pack_cursor.hpp"
 #include <fstream>
 #include <xxhash.h>
 #include <d3d9.h>
@@ -708,7 +709,10 @@ class TextureReplacement : public Hook
 	//
 	// UI texture replacement code
 	//
-	inline static int CurrentTextureIdx = 0;
+	// UI and scene have independent filename-index namespaces. A scene load
+	// must never advance the car-selection/other UI indexed DDS lookup.
+	inline static OutRunVR::TexturePacks::Cursor UiTextureCursor;
+	inline static OutRunVR::TexturePacks::Cursor SceneTextureCursor;
 	inline static std::filesystem::path CurrentXstsetFilename;
 	inline static int CurrentXstsetIndex = 0;
 
@@ -945,11 +949,12 @@ class TextureReplacement : public Hook
 	static void LoadXstsetSprite_dest(safetyhook::Context& ctx)
 	{
 		const char* xstsetFilename = (char*)ctx.ecx;
-		if (CurrentXstsetFilename != xstsetFilename)
+		// A repeated xstset filename can occupy another slot; both the
+		// filename *contents* and original game slot identify its textures.
+		if (UiTextureCursor.Select(xstsetFilename, static_cast<int>(ctx.eax)))
 		{
-			CurrentXstsetFilename = xstsetFilename; // sprite xstset filename
-			CurrentXstsetIndex = (int)(ctx.eax); // index into xstset array
-			CurrentTextureIdx = 0;
+			CurrentXstsetFilename = UiTextureCursor.Name();
+			CurrentXstsetIndex = static_cast<int>(ctx.eax);
 			OutRunVRHudInspector::TraceXstSet(
 				CurrentXstsetIndex, CurrentXstsetFilename.string().c_str());
 		}
@@ -1001,7 +1006,9 @@ class TextureReplacement : public Hook
 		}
 
 		std::string ddsName = std::format("{:X}_{}x{}.dds", hash, width, height);
-		std::string ddsNameIndexed = std::format("{}_{}", CurrentTextureIdx++, ddsName);
+		const std::uint64_t ordinal = isUITexture
+			? UiTextureCursor.NextIndex() : SceneTextureCursor.NextIndex();
+		std::string ddsNameIndexed = std::format("{}_{}", ordinal, ddsName);
 
 		if (allowReplacement)
 		{
@@ -1290,7 +1297,6 @@ class TextureReplacement : public Hook
 	//
 
 	inline static std::filesystem::path CurrentXmtsetFilename;
-	inline static const char* PrevXmtName = nullptr;
 
 	// Two versions of the func depending on Settings::UseNewTextureAllocator, to reduce branching
 	inline static SafetyHookInline D3DXCreateTextureFromFileInMemoryEx = {};
@@ -1387,12 +1393,11 @@ class TextureReplacement : public Hook
 	inline static SafetyHookInline LoadXmtsetObject = {};
 	static int __cdecl LoadXmtsetObject_dest(char* XmtFileName, int XmtIndex)
 	{
-		if (PrevXmtName != XmtFileName)
-		{
-			CurrentXmtsetFilename = XmtFileName;
-			PrevXmtName = XmtFileName;
-			CurrentTextureIdx = 0;
-		}
+		// The engine may overwrite and reuse the same char* for another
+		// stage/car pack. Compare contents, not the storage address. XmtIndex
+		// is an object index inside a pack, not a new pack identity.
+		if (SceneTextureCursor.Select(XmtFileName, 0))
+			CurrentXmtsetFilename = SceneTextureCursor.Name();
 
 		return LoadXmtsetObject.call<int>(XmtFileName, XmtIndex);
 	}

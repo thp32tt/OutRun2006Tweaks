@@ -27,6 +27,8 @@ on:
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_exceptions.cpp'
       - 'src/hooks_textures.cpp'
+      - 'src/vr/game/texture_pack_cursor.hpp'
+      - 'tools/verify_vr_texture_pack_cursor.py'
       - 'vrhost/**'
       - 'tools/Start-OutRunVRPacing.ps1'
       - 'tools/Collect-OutRunVRFramePacing.ps1'
@@ -402,6 +404,7 @@ jobs:
             'tools/verify_vr_visual_composition_p0.py',
             'tools/audit_vr_result_full_source.py',
             'tools/verify_vr_texture_scene_contract.py',
+             'tools/verify_vr_texture_pack_cursor.py',
             'tools/verify_vr_r31_r32_retirement_guard.py',
             'tools/verify_vr_recenter_contract.py',
             'tools/verify_vr_recenter_publication_snapshot.py',
