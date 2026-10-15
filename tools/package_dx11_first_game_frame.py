@@ -39,7 +39,7 @@ def session_labeled_runner(runner):
     suffix = (
         b"\n$dx11TestCase = $env:OUTRUN_DX11_TEST_CASE\n"
         b"if ($dx11TestCase -ne 'CONTROL' -and "
-        b"$dx11TestCase -ne 'DIAGNOSTIC') { "
+        b"$dx11TestCase -ne 'NATIVE_FULL_FRAME') { "
         b"throw 'DX11 test session selector missing or invalid' }\n"
         b'$variant = "${variant}-${dx11TestCase}"'
     )
@@ -56,6 +56,7 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME') {
     $gameDraws = 0L
     $nativeDraws = 0L
     $published = 0L
+    $fullFrameModeObserved = $false
     foreach ($file in @(Get-ChildItem -Path $session -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue)) {
         foreach ($line in [System.IO.File]::ReadLines($file.FullName)) {
             $hit = [regex]::Match($line, 'DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws=(\d+) native_draws=(\d+) desktop_insets=(\d+)')
@@ -64,11 +65,15 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME') {
             $gameDraws = [Math]::Max($gameDraws, [long]$hit.Groups[1].Value)
             $nativeDraws = [Math]::Max($nativeDraws, [long]$hit.Groups[2].Value)
             $published = [Math]::Max($published, [long]$hit.Groups[3].Value)
+            if ($line -match 'full_frame_mode=1') { $fullFrameModeObserved = $true }
         }
     }
-    $nativeFrameEvidenceOk = $env:OUTRUN_DX11_FIRST_GAME_FRAME -eq '1' -and
+    $nativeFrameEvidenceOk = (
+        $env:OUTRUN_DX11_FIRST_GAME_FRAME -eq '1' -and
         $env:OUTRUN_DX11_FULL_GAME_FRAME -eq '1' -and $seen -and
-        $gameDraws -gt 0 -and $nativeDraws -gt 0 -and $published -gt 0
+        $gameDraws -gt 0 -and $nativeDraws -gt 0 -and $published -gt 0 -and
+        $fullFrameModeObserved
+    )
     $verdict = if ($nativeFrameEvidenceOk) { 'NATIVE_FULL_FRAME_GPU_COPYBACK_OBSERVED' } else { 'NO_NATIVE_FULL_FRAME_EVIDENCE' }
     @(
         "verdict=$verdict",
@@ -76,6 +81,7 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME') {
         "nativeDraws=$nativeDraws",
         "publishedBackbufferFrames=$published",
         "nativeModeRequested=$($env:OUTRUN_DX11_FULL_GAME_FRAME)",
+        "fullFrameModeObserved=$fullFrameModeObserved",
         "outputRoute=D3D11_GPU_TO_CPU_TO_D3D9_BACKBUFFER",
         "menuVehicleRaceVisualParity=UNTESTED",
         "quest3Stereo=UNTESTED",
@@ -83,7 +89,7 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME') {
     ) | Set-Content (Join-Path $session 'DX11_NATIVE_EVIDENCE.txt') -Encoding UTF8
 }
 """.encode("ascii")
-    failure = b"\nif ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -and -not $nativeFrameEvidenceOk) { throw 'DX11 full native game frame NOT observed; examine DX11_NATIVE_EVIDENCE.txt inside the saved log ZIP.' }\n"
+    failure = b"\nif ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -and -not $nativeFrameEvidenceOk) { Write-Host ('Evidence log ZIP preserved: ' + $zip); throw 'DX11 full native game frame NOT observed; examine DX11_NATIVE_EVIDENCE.txt inside the saved log ZIP.' }\n"
     return staged.replace(archiver, evidence + b"\n" + archiver + failure, 1)
 
 
@@ -174,6 +180,17 @@ def verify(blob):
         if pe_machine(z.read("dinput8.dll")) != 0x14c or \
            pe_machine(z.read("outrun-vr-host.exe")) != 0x8664:
             raise ValueError("PE machine mismatch")
+        native = z.read("RUN_DX11_FIRST_GAME_FRAME.cmd")
+        control = z.read("RUN_DX9EX_CONTROL.cmd")
+        runner = z.read("Run-DX9ExFocusTest.ps1")
+        if (b'OUTRUN_DX11_FIRST_GAME_FRAME=1' not in native or
+                b'OUTRUN_DX11_FULL_GAME_FRAME=1' not in native or
+                b'OUTRUN_DX11_TEST_CASE=NATIVE_FULL_FRAME' not in native or
+                b'OUTRUN_DX11_FULL_GAME_FRAME="' not in control or
+                b'OUTRUN_DX11_FIRST_GAME_FRAME="' not in control or
+                b'DX11_NATIVE_EVIDENCE.txt' not in runner or
+                b'fullFrameModeObserved' not in runner):
+            raise ValueError("native full-frame activation/evidence contract missing")
 
 
 def pack(payload):

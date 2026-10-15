@@ -129,6 +129,8 @@ def main():
     assert packaged_runner.count(b'$variant = "${variant}-${dx11TestCase}"') == 1
     assert b"OUTRUN_DX11_TEST_CASE" in packaged_runner
     assert b"DX11_NATIVE_EVIDENCE.txt" in packaged_runner
+    assert b"$dx11TestCase -ne 'NATIVE_FULL_FRAME'" in packaged_runner
+    assert b"fullFrameModeObserved" in packaged_runner
     assert b"gameDraws -gt 0" in packaged_runner
     assert b"nativeDraws -gt 0" in packaged_runner
     assert b"published -gt 0" in packaged_runner

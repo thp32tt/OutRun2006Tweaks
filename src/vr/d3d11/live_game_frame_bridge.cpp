@@ -6191,12 +6191,14 @@ void before_game_present(IDirect3DDevice9* game,
         // restricted FVF subset was admitted, nor that GPU pixels became
         // visible in the game's backbuffer. Log both missing links explicitly.
         ++s.presents;
-        if (s.presents == 300 ||
-            (s.presents % 1800u == 0u && s.visible == 0u)) {
+        // This is runtime evidence, not a source-only/CI PASS. Keep a
+        // periodic 300-Present heartbeat even AFTER native frames become
+        // visible, so a menu->vehicle->race session can be audited.
+        if (s.presents % 300u == 0u || (fullMode && s.visible == 1u)) {
             spdlog::info(
-                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={}; unsupported draws stay DX9Ex; HMD UNTESTED",
                 s.observed, s.issued, s.visible, s.failed, s.presents,
-                s.eligible, s.staleReadbacks, s.probeSlot);
+                s.eligible, s.staleReadbacks, s.probeSlot, fullMode ? 1 : 0);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.

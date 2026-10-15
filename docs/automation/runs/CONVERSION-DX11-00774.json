@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "64183e04d87305b15ed4cffc423940587ecacc7b",
-  "material_result_sha": null,
+  "material_result_sha": "972203d60c3c8f0e9181f016fef27be4c28b7312",
   "validation_bearing_result_sha": "972203d60c3c8f0e9181f016fef27be4c28b7312",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -96,5 +96,10 @@
     "C4_COMMIT": "Material source commit includes exact [AUTO:CONVERSION-DX11-00774] marker, no skip-ci.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PASS_EXACT_SHA; CI SUCCESS for exact validation-bearing SHA 972203d60c3c8f0e9181f016fef27be4c28b7312; Quest3/VDXR/gamepad UNTESTED."
+  },
+  "acceptance_results": {
+    "live-menu-race-vb-and-ib": "PASS_BUILD",
+    "failed-native-upload-fallback": "PASS_BUILD",
+    "exact-sha-ci": "PASS_EXACT_SHA"
   }
 }
