@@ -144,11 +144,21 @@ void Overlay::render_shell()
 	// change otherwise leaves its saved bounds off-screen or clipped.
 	// Reflow only on a real layout transition, preserving user drag/resize
 	// across every steady desktop and VR frame.
+	// The same ImGui window survives XR and desktop frames. Retain the real
+	// desktop user geometry before VR temporarily centres/resizes the shell,
+	// then restore it on exit without forcing every desktop resize back to centre.
+	static ImVec2 lastDesktopPosition{};
+	static ImVec2 lastDesktopSize{};
+	static bool haveDesktopGeometry = false;
 	static ContentRect previousContent{};
 	static float previousDensity = 1.0f;
 	static bool previousVrShell = false;
 	static bool havePreviousLayout = false;
-	const bool layoutChanged = havePreviousLayout && (
+	const bool leavingVr = havePreviousLayout && previousVrShell && !externalVrShell;
+	const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;
+	// Only the XR shell owns forced reflow. The native desktop window is
+	// draggable/resizable across mirror changes and retains its saved bounds.
+	const bool layoutChanged = havePreviousLayout && externalVrShell && (
 		previousVrShell != externalVrShell ||
 		std::fabs(previousContent.x - content.x) > 0.5f ||
 		std::fabs(previousContent.y - content.y) > 0.5f ||
@@ -170,14 +180,24 @@ void Overlay::render_shell()
 		ImGui::SetNextWindowSizeConstraints(
 			ImVec2((std::min)(240.f, maxWidth), (std::min)(140.f, maxHeight)),
 			ImVec2(maxWidth, maxHeight));
-	ImGui::SetNextWindowSize(windowSize, layoutPlacement);
-	ImGui::SetNextWindowPos(
-		ImVec2(
-			content.x + (content.width - windowSize.x) * 0.5f,
-			content.y + (content.height - windowSize.y) * 0.5f
-		),
-		layoutPlacement
-	);
+	if (restoreDesktopGeometry)
+	{
+		// Restore both coordinates and interactive hitbox extents together.
+		// No VR-only size constraint is installed on this desktop frame.
+		ImGui::SetNextWindowSize(lastDesktopSize, ImGuiCond_Always);
+		ImGui::SetNextWindowPos(lastDesktopPosition, ImGuiCond_Always);
+	}
+	else
+	{
+		ImGui::SetNextWindowSize(windowSize, layoutPlacement);
+		ImGui::SetNextWindowPos(
+			ImVec2(
+				content.x + (content.width - windowSize.x) * 0.5f,
+				content.y + (content.height - windowSize.y) * 0.5f
+			),
+			layoutPlacement
+		);
+	}
 
 	// Enlarging a font atlas alone leaves keyboard/mouse hit targets and
 	// frame padding tiny at Quest3 eye density. Scale ONLY the F11 shell's
@@ -213,7 +233,23 @@ void Overlay::render_shell()
 
 	// Tab contents scroll in a child of their own, so the tab bar stays at the top rather than
 	// sliding out of view with them.
-	if (ImGui::Begin("OutRun2006Tweaks", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+	const bool shellOpen = ImGui::Begin("OutRun2006Tweaks", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	// Capture the final desktop ImGui rectangle, including any user drag or
+	// manual resize. Never capture the temporary XR-centred rectangle.
+	if (!externalVrShell)
+	{
+		const ImVec2 position = ImGui::GetWindowPos();
+		const ImVec2 size = ImGui::GetWindowSize();
+		if (std::isfinite(position.x) && std::isfinite(position.y) &&
+			std::isfinite(size.x) && std::isfinite(size.y) &&
+			size.x > 0.0f && size.y > 0.0f)
+		{
+			lastDesktopPosition = position;
+			lastDesktopSize = size;
+			haveDesktopGeometry = true;
+		}
+	}
+	if (shellOpen)
 	{
 		// Restore 1x on a live VR->desktop transition: per-window font
 		// scale otherwise persists in the ImGui window instance. Do not

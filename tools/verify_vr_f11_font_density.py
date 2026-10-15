@@ -1319,5 +1319,79 @@ def main():
     assert f11_y > game_y and f11_x > game_x
     print("VR F11 atlas + responsive shell reflow + stereo plane PASS; 16 negative mutants rejected")
 
+
+def check_f11_desktop_vr_geometry_lifecycle() -> None:
+    """Original ImGui desktop bounds survive VR entry/exit and desktop resize."""
+    shell = FONT.read_text(encoding="utf-8").split(
+        "void Overlay::render_shell()", 1)[1].split("void Overlay::init()", 1)[0]
+    required = (
+        "static ImVec2 lastDesktopPosition{};",
+        "static ImVec2 lastDesktopSize{};",
+        "static bool haveDesktopGeometry = false;",
+        "const bool leavingVr = havePreviousLayout && previousVrShell && !externalVrShell;",
+        "const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;",
+        "const bool layoutChanged = havePreviousLayout && externalVrShell && (",
+        "if (restoreDesktopGeometry)",
+        "ImGui::SetNextWindowSize(lastDesktopSize, ImGuiCond_Always);",
+        "ImGui::SetNextWindowPos(lastDesktopPosition, ImGuiCond_Always);",
+        "ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
+        "ImGui::SetNextWindowPos(",
+        "const bool shellOpen = ImGui::Begin(",
+        "if (!externalVrShell)",
+        "const ImVec2 position = ImGui::GetWindowPos();",
+        "const ImVec2 size = ImGui::GetWindowSize();",
+        "size.x > 0.0f && size.y > 0.0f",
+        "lastDesktopPosition = position;",
+        "lastDesktopSize = size;",
+        "haveDesktopGeometry = true;",
+        "if (shellOpen)",
+    )
+    for marker in required:
+        assert shell.count(marker) >= 1, marker
+        assert marker not in shell.replace(marker, "REMOVED", 1)
+    assert shell.index("const bool leavingVr") < shell.index("previousVrShell = externalVrShell;")
+    assert shell.index("ImGui::SetNextWindowSize(lastDesktopSize") < shell.index(
+        "ImGui::SetNextWindowSize(windowSize, layoutPlacement);")
+    assert shell.index("const bool shellOpen = ImGui::Begin(") < shell.index(
+        "const ImVec2 position = ImGui::GetWindowPos();")
+    assert shell.index("lastDesktopPosition = position;") < shell.index("if (shellOpen)")
+
+    # Stateful model: initial desktop drag -> VR layout change and eye-density
+    # update -> desktop restore; native desktop resolution change stays free.
+    saved = (280., 170., 800., 520.)
+    previous_vr = False
+    for vr, has_prior, geometry, expected_reflow, expected_restore in (
+        (False, False, (280., 170., 800., 520.), False, False),
+        (True, True, (0., 0., 1130., 600.), True, False),
+        (True, True, (0., 0., 900., 550.), True, False),
+        (False, True, saved, False, True),
+        (False, True, (340., 215., 850., 530.), False, False),
+        (True, True, (0., 0., 960., 600.), True, False),
+        (False, True, (340., 215., 850., 530.), False, True),
+    ):
+        leaving = has_prior and previous_vr and not vr
+        restoring = leaving and saved is not None
+        changed = has_prior and vr and (previous_vr != vr or
+                                          geometry != saved)
+        assert restoring is expected_restore
+        assert changed is expected_reflow
+        if not vr:
+            if restoring:
+                assert saved == geometry
+            saved = geometry
+        previous_vr = vr
+    # The old code recentered on every desktop resize and overwrote a
+    # previously dragged desktop shell on the VR->desktop transition.
+    broken = shell.replace(
+        "havePreviousLayout && externalVrShell && (",
+        "havePreviousLayout && (", 1)
+    assert required[5] not in broken
+    broken = shell.replace(
+        "const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;",
+        "const bool restoreDesktopGeometry = false;", 1)
+    assert required[4] not in broken
+    print("PASS F11 native desktop placement/VR reflow and exit lifecycle")
+
 if __name__ == "__main__":
+    check_f11_desktop_vr_geometry_lifecycle()
     main()

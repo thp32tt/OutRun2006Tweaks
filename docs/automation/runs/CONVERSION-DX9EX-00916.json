@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00916",
+  "production_id": "CONVERSION-DX9EX-00916",
+  "event_id": "CONVERSION-DX9EX-00916-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00916",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "d2bf7aa6b95ecf432d3f5dcf8f7f1ddadb1c5a75",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/overlay/overlay.cpp"
+  ],
+  "changed_files": [
+    "src/overlay/overlay.cpp",
+    "tools/verify_vr_f11_font_density.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00916.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Preserve the entire user-positioned F11 desktop shell, its clickable size and input geometry through XR entry, changing recommended-eye density, reset, and return to desktop without snapping native windows to the centre.",
+    "scope_boundary": "F11 external ImGui shell placement only; preserve F11 atlas quality, controls and focus, gameplay HUD, ESC/GOAL/+TIME, lens, original game input and FFB, SkyGlow, R84/R26_SAFE stereo semantics, and frozen DXVK.",
+    "trace_stages": [
+      "Desktop ImGui F11 drag and resize creates real window position and hitbox extents.",
+      "VR transition uses source-aspect responsive F11 geometry, while preserving last desktop rectangle.",
+      "Original ImGui DX9 shell is submitted through the existing external stereo overlay and restored at VR exit without changing native controls."
+    ],
+    "subcomponents": [
+      "Save a valid final desktop F11 window rectangle separately from XR compositor-driven centering and resizing.",
+      "Force centering and size reflow on real VR layout changes only; restore both desktop position and hitbox size once on leaving VR.",
+      "Preserve normal native ImGui user dragging/resizing across desktop resolution changes and ensure no invalid/zero-sized geometry is cached."
+    ],
+    "acceptance_items": [
+      {
+        "id": "vr_shell_reflow",
+        "category": "end_to_end_behavior",
+        "behavior_area": "F11 external menu geometry",
+        "expected_behavior": "On VR entry and real source or eye density changes re-centre only the VR F11 shell; its existing ImGui controls and pointer hitboxes follow the same ImGui window rectangle."
+      },
+      {
+        "id": "desktop_drag_restore",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop input and saved F11 position",
+        "expected_behavior": "Preserve native desktop F11 manual drag and size across XR entry/exit and ordinary desktop resize without a forced recenter; reject invalid zero-sized snapshots."
+      },
+      {
+        "id": "exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "x86 R84 game and x64 OpenXR host build plus Domain and source inspector",
+        "expected_behavior": "Run required DX9Ex Active Windows game and host package, Domain Isolation, Full Source Impact and EXE HUD Inspector on the final exact source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "vr_shell_reflow": "PENDING_CI",
+    "desktop_drag_restore": "PENDING_CI",
+    "exact_sha_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The original unified layoutChanged predicate treated desktop mirror resolution changes and the VR->desktop transition as permission to apply ImGuiCond_Always centring, destroying desktop drag placement and discarding its independent interactive window size.",
+    "alternatives_rejected": [
+      "Do not change XR HUD vertex transforms or D3DX game sprite projection: F11 is authored as independent ImGui window geometry.",
+      "Do not change native input/FFB or disable user-driven ImGui resize; preserve the original external shell compositor."
+    ],
+    "fix_evidence": "ImGui shell C++ lifecycle now saves desktop rectangle and restores it atomically across XR entry/exit; focused Python positive, negative and destructive source-mutation regression is integrated with canonical F11 verifier.",
+    "original_evidence": "Original F11 render_shell derived layoutChanged from prior content, density and XR state without restricting it to VR; it used ImGuiCond_Always and a new centered window for both VR and desktop changes.",
+    "source_trace": [
+      "Original user mouse drag/resize writes ImGui F11 window geometry during desktop render_shell.",
+      "XR entry re-centres the F11 shell with density-bound size, keeping separate lastDesktopPosition/Size snapshots.",
+      "XR exit restores desktop ImGui rectangle before Begin, then captures any new desktop changes after Begin without modifying stereo render owner."
+    ],
+    "eye_ownership": "External VR shell continues using the existing R84 ScreenOverlay2D binocular submission; this change affects ImGui surface and hitbox geometry before per-eye compositing, not the world or gameplay HUD."
+  },
+  "next_action": "Wait for exact-SHA mandatory Windows and Domain plus source inspection results. Matching Quest3/VDXR F11 optical and pointer behavior remain untested."
+}
