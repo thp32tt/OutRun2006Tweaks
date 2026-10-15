@@ -13,8 +13,15 @@ def check(src):
     selector, gui, runner, workflow = src
     failures = []
     expected = [
-        (selector, r'\$src\s*=\s*if\s*\(\$Backend\s*-eq\s*"d3d9"\)\s*\{\s*\$backendPayload', "all DX9Ex slots must use the canonical payload"),
-        (gui, r'\$effectivePath=if\(\$cfg\.Backend -eq \'d3d9\'\)\s*\{\s*#.*?\s*\$backendPath', "GUI buttons must inspect canonical payload"),
+        (selector, r'\}\s*elseif\s*\(\$Backend\s*-eq\s*"d3d9"\)\s*\{\s*\$backendPayload', "every non-R84 DX9Ex slot must use the canonical payload"),
+        (selector, r'\$src\s*=\s*if\s*\(\$Backend\s*-eq\s*"d3d9"\s*-and\s*\$variant\s*-eq\s*"R84_TEST"\)', "explicit opt-in R84 selection must be present"),
+        (selector, r'if\s*\(-not\s*\(Test-Path\s+\$slotPayload\)\)\s*\{\s*throw', "missing R84 payload must fail closed"),
+        (selector, r'\$rendererBuildVariant\s*-ne\s*"R84_SPLIT_R33_R32_R31_R30_R29"', "R84 variant must be tied to independently compiled owner"),
+        (selector, r'\$sourceSha\s*-ne\s*\(Get-Content\s+\$baselineShaFile', "R84 must reject a different source SHA"),
+        (selector, r'R84_TEST host is not the matching exact-SHA host', "R84 must reject a mismatched host"),
+        (gui, r'\}\s*elseif\(\$cfg\.Backend -eq \'d3d9\'\)\s*\{.*?\$backendPath', "non-R84 GUI buttons must inspect canonical payload"),
+        (gui, r"\$effectivePath=if\(\$cfg\.Backend -eq 'd3d9' -and \$slot -eq 'R84_TEST'\)\s*\{\s*\$slotPath", "R84 GUI button must inspect its dedicated payload"),
+        (gui, r"'R84_TEST'=\[ordered\]@\{Backend='d3d9'", "R84 opt-in GUI entry must remain available"),
         (gui, r'(?m)^[ \t]*&[ \t]+\$selector -Backend \$cfg\.Backend -TestProfile \$cfg\.Profile -VariantId \$slot[ \t]*$', "slot preparation must preserve paths with spaces and propagate failures"),
         (gui, r'\$session\.SessionId -eq \$previousSessionId', "selector must reject a reused session ID"),
         (gui, r'\$session\.Backend -ne \$cfg\.Backend', "new manifest backend must match the selected slot"),
@@ -29,8 +36,8 @@ def check(src):
     for value, pattern, label in expected:
         if not re.search(pattern, value, re.S):
             failures.append(label)
-    if re.search(r'\$src\s*=\s*if\s*\(\$Backend\s*-eq\s*"d3d9"\s*-and', selector):
-        failures.append("CURRENT_FOCUS-only fallback leaves other slots stale")
+    if re.search(r'\}\s*elseif\s*\(\$Backend\s*-eq\s*"d3d9"\s*-and', selector):
+        failures.append("CURRENT_FOCUS-only fallback leaves other protected slots stale")
     if re.search(r'Start-Process powershell -Wait -PassThru -WindowStyle Hidden -ArgumentList \$args', gui):
         failures.append("unquoted and silent hidden backend selector remains")
     return failures
@@ -45,10 +52,14 @@ if __name__ == "__main__":
     src = tuple(p.read_text(encoding="utf-8-sig") for p in files)
     assert not check(src), "; ".join(check(src))
     mutations = [
-        (0, '$src = if ($Backend -eq "d3d9") {', '$src = if ($Backend -eq "d3d9" -and $variant -eq "CURRENT_FOCUS") {'),
+        (0, '} elseif ($Backend -eq "d3d9") {', '} elseif ($Backend -eq "d3d9" -and $variant -eq "CURRENT_FOCUS") {'),
+        (0, 'R84_TEST payload missing: $slotPayload', 'R84 payload missing: $slotPayload'),
+        (0, '$rendererBuildVariant -ne "R84_SPLIT_R33_R32_R31_R30_R29"', '$rendererBuildVariant -ne "R26"'),
+        (0, '$sourceSha -ne (Get-Content $baselineShaFile', '$sourceSha -eq (Get-Content $baselineShaFile'),
         (1, '$quotedRunner = \'"\' + $runner + \'"\'', '$quotedRunner = $runner'),
         (1, '    & $selector -Backend $cfg.Backend', '    # & $selector -Backend $cfg.Backend'),
-        (1, "$effectivePath=if($cfg.Backend -eq 'd3d9')", "$effectivePath=if($slot -eq 'CURRENT_FOCUS')"),
+        (1, "} elseif($cfg.Backend -eq 'd3d9')", "} elseif($slot -eq 'CURRENT_FOCUS')"),
+        (1, "$effectivePath=if($cfg.Backend -eq 'd3d9' -and $slot -eq 'R84_TEST')", "$effectivePath=if($cfg.Backend -eq 'd3d9' -and $slot -eq 'CURRENT_FOCUS')"),
         (1, '$session.SessionId -eq $previousSessionId', '$session.SessionId -ne $previousSessionId'),
         (1, '$session.Backend -ne $cfg.Backend', '$session.Backend -eq $cfg.Backend'),
         (1, '$session.TestProfile -ne $cfg.Profile', '$session.TestProfile -eq $cfg.Profile'),
@@ -61,4 +72,4 @@ if __name__ == "__main__":
         changed = list(src)
         changed[index] = changed[index].replace(original, mutant, 1)
         assert check(changed), f"regression mutation escaped: {original}"
-    print("DX9Ex launch paths PASS (canonical slots, quoted invocation, visible error, ten destructive mutations)")
+    print(f"DX9Ex launch paths PASS (protected R26 canonical, R84 opt-in fail-close, quoted invocation, visible error, {len(mutations)} destructive mutations)")

@@ -19,6 +19,7 @@
 #endif
 // Needed by independent R30 TU as well as textual R29/R30 owner.
 #include "r30_indexed_up_bounds.hpp"
+#include "r30_shadow_bytes.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../game/render_semantics.hpp"
@@ -191,7 +192,10 @@ namespace OutRunVRStereo
             DWORD usage = 0;
             D3DPOOL pool = D3DPOOL_DEFAULT;
             D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
-            std::vector<std::uint8_t> bytes;
+            // The protected R26+HUD route already proved that invalid shadow
+            // bytes are never consumed. R84 shares that same lazy backing store:
+            // every copy remains gated by the independent valid-range map.
+            OutRunVR::R30ShadowBytes::LazyUninitializedBuffer bytes;
             std::vector<R30ByteRange> valid;
             // Incremented while holding mutex whenever known shadow contents or
             // coverage change. Draw scratch copies are reusable only for this
