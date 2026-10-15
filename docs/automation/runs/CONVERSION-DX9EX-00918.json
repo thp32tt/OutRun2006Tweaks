@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "CI_REPAIR_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "EXACT_SHA_GATE_REPAIR",
-  "automation_validation": "FAILED_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "84c4c71b5b0bcde7816151635d6b87afc1386d4e",
   "material_result_sha": "4cdc45823d50635a189a156dfa87b4b8b3a9706d",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp"
   ],
@@ -64,9 +64,9 @@
     ]
   },
   "acceptance_results": {
-    "esc_shader_pause_scale_and_position": "PENDING_CI",
-    "preserve_non_pause_and_control": "PENDING_CI",
-    "required_exact_sha_ci": "PENDING_CI"
+    "esc_shader_pause_scale_and_position": "PASS_BUILD",
+    "preserve_non_pause_and_control": "PASS_BUILD",
+    "required_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The R84 shader-backed HUD world-plane branch used gameplay HudScale and omitted signed pause vertical clip translation although the existing XYZRHW pause shell already honored independent VRPauseMenuScale and VRPauseMenuVerticalOffset. This is a source-level candidate until actual Quest3 testing.",
@@ -83,21 +83,54 @@
     "eye_ownership": "Existing R84 physical left/right eye submission uses one corrected original clip-plane matrix per permitted pause producer; unknown and nonpause content keeps prior conservative fallback."
   },
   "ci_evidence": {
-    "status": "FAILED_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
     "material_sha": "4cdc45823d50635a189a156dfa87b4b8b3a9706d",
-    "failed_run_id": 38809988413,
-    "failed_job": "policy",
-    "failure": "verify_vr_feature_unit_policy.py --check-head: run record missing docs/automation/runs/CONVERSION-DX9EX-00918.json; host, game, full-chain-compile and package skipped, not build verified.",
-    "remediation": "Supply exact TASK_ID feature record with factual nonterminal state; do not downgrade verifier or mark unexecuted gates PASS.",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
     ],
-    "exact_sha_gate_runs": []
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38810397178,
+        "sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
+        "conclusion": "success",
+        "jobs": "policy/game/full-chain-compile/host/package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38810397207,
+        "sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
+        "conclusion": "success",
+        "jobs": "domain-isolation 1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38810397172,
+        "sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
+        "conclusion": "success",
+        "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38810397222,
+        "sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
+        "conclusion": "success",
+        "jobs": "static-exe-analysis/build-hud-inspector 2/2"
+      }
+    ],
+    "repaired_failure": {
+      "failed_sha": "4cdc45823d50635a189a156dfa87b4b8b3a9706d",
+      "failed_run_id": 38809988413,
+      "reason": "HEAD contract record missing; no source compile failures proven on failed SHA",
+      "repair_commit_sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a"
+    },
+    "notes": "All four required GitHub workflows succeeded on the exact record-bearing SHA. Automated build-only evidence. Quest3/VDXR in-game optics and original game input/FFB are not hardware-validated."
   },
-  "next_action": "Re-run required GitHub exact SHA gates on this record-bearing candidate; update terminal evidence only after all pass; no Quest3 runtime claim or added score for this bookkeeping/CI repair.",
+  "next_action": "BUILD_VERIFIED exact-SHA; Quest3/VDXR real ESC pause shell, arrows, options navigation, recenter/reset and desktop fallback still require user runtime evidence. Preserve original material and validation-bearing SHA; do not repeat gate or score on retry/C6.",
   "score_delta_this_attempt": 0,
   "ci_repair_history": [
     {
@@ -105,5 +138,11 @@
       "run_id": 38809988413,
       "failure": "Missing head-matched per-feature run JSON blocked policy and skipped all builds."
     }
-  ]
+  ],
+  "bookkeeping": {
+    "commit_kind": "C6_RESULT_ONLY",
+    "validation_bearing_result_sha": "189bd772c3a46c9b61bfe2d87aadfc22463e711a",
+    "skip_ci": true,
+    "no_additional_score": true
+  }
 }
