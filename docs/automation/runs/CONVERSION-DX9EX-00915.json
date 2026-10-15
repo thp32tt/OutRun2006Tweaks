@@ -9,8 +9,8 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
-  "feature_class": "VISIBLE_DEFECT",
-  "symptom_id": "DX9EX:VIS:FRONTEND_ROTATION_ONLY_ASPECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "status": "NEEDS_VALIDATION",
   "phase": "C2_IMPLEMENT",
   "checkpoint": "C2_MATERIAL",
@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "642372adc3282501292172008c16b2f53d68e8e0",
-  "material_result_sha": null,
+  "material_result_sha": "2859f8ea9938db5a35cf779764540bf896129662",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/hooks_uiscaling.cpp"
@@ -29,7 +29,7 @@
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
-    "symptom_id": "DX9EX:VIS:FRONTEND_ROTATION_ONLY_ASPECT",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
     "goal": "Restore native-aspect rendering of all originally rotated title/menu/car-selector D3DX sprites, including rotation-only calls without optional scale/translation vectors, while retaining the authored 2D pivot and the original gameplay, overlay and desktop fallback behavior.",
     "scope_boundary": "Exact original title/menu/car-selection D3DXMatrixTransformation2D call path; only contained UI modes (OnlineArcade/KeepCentered); no gameplay ScreenHud, rank, GOAL/+TIME, lens, F11, input/FFB, SkyGlow, R26_SAFE or DXVK modification.",
     "trace_stages": [
@@ -73,7 +73,15 @@
       "Do not change the unrelated R84 world stereo or host menu capture/crop: the fault is in the exact 2D producer admission.",
       "Do not fill missing D3DX inputs with invented vectors: post-compose the original D3DX matrix to preserve pivots and rotation."
     ],
-    "fix_evidence": "Source-built constexpr input-ownership regressions for rotation-only, pivoted scale, translation, no-op centres, gameplay and vanilla, plus unchanged full 2D matrix composition."
+    "fix_evidence": "Source-built constexpr input-ownership regressions for rotation-only, pivoted scale, translation, no-op centres, gameplay and vanilla, plus unchanged full 2D matrix composition.",
+    "original_evidence": "Game code passes nullable 2D D3DX scale and translation independently of a nonzero authored menu/car-selection rotation. Existing gate excluded exactly both-null rotation-only sprites, despite output rotation and nonuniform Game::screen_scale on ultrawide and portrait targets.",
+    "source_trace": [
+      "Original title/menu/car-selector D3DXMatrixTransformation2D call accepts a nonzero Rotation and optional null pScaling/pTranslation.",
+      "Source D3DX game hook forwards original nullable vectors; previously frontEndPivot required at least one vector, so skipped full post-matrix min-axis containment for a rotated sprite.",
+      "Corrected rotated 2D matrix is drawn through the existing original game menu sprite path and then R84/host per-eye menu compositor. HMD optical confirmation remains pending."
+    ],
+    "negative_test_evidence": "Source-level constexpr admission/denial checks include both-null rotation-only, pivot rotation, pivot scaling, translation, idle/no-op centres, nonfront-end and Vanilla modes; existing all-or-nothing nonfinite matrix guard and game fallback left unchanged.",
+    "eye_ownership": "Same original game-menu matrix is authored before R84 binocular LOCAL menu composition; both eyes inherit identical contained native-aspect source sprite."
   },
   "ci_evidence": {
     "status": "PENDING_EXACT_SHA",
@@ -86,5 +94,6 @@
   },
   "runtime_evidence": "Quest3/VDXR run not performed; no claim of fixed optical menu in real hardware.",
   "score_delta_this_attempt": 0,
-  "score_once": false
+  "score_once": false,
+  "ci_repair_note": "Exact-SHA 2859f8e policy gate rejected noncanonical symptom_id and visual feature_class before any compilation. Canonicalized existing MAIN_MENU symptom and class, retained unchanged material source and all gate coverage."
 }
