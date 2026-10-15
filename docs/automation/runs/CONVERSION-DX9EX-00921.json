@@ -11,9 +11,9 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_SOURCE",
+  "status": "VALIDATING_EXACT_SHA",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_EXACT_GATE_REQUESTED",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -70,9 +70,23 @@
     "exact_sha_game_host_domain_and_inspector": "PENDING_CI"
   },
   "diagnosis": {
-    "root_cause": "Exact +TIME already branches to finite HUD eye plane in R84 R30 while exact GOAL progress/time/stage-printf ScreenHud source takes generic XYZRHW 2D path at physical deferred D3DX submission.",
-    "evidence": "Read canonical GOAL producer tags and R64 GPU-owner hook; R30 XYZRHw exact-stage branch matches only StageExtensionTime, leaving four proven GOAL D3DX producers unhandled."
+    "root_cause": "The physical R84 R30 fixed-function XYZRHW path provided finite recentered headset/world plane only to exact StageExtensionTime. The same screen-HUD GOAL 0-99% progress, finish-time helpers and verified stage-result printf paths survived D3DX GPU batching but fell into generic 2D FOV-only placement. Unlike the shader HUD, that path did not reproject game clip coordinates through the latched head/world plane, causing optical disparity/duplicate risk.",
+    "original_evidence": "Original EXE result progress source 0x97BE4/0x97DEC and GOAL time helpers 0xBEA5A/0xBEA5F plus exact stage-result Sumo_Printf owner use explicit ScreenHud producer tagging in src/hooks_uiscaling.cpp, with R64 ID3DXSprite::Draw/Flush bridge.",
+    "eye_ownership": "GameSemantic::CanReprojectFiniteResultHudPlane now gates only five producer identities on ScreenHud at the R84 physical R30 XYZRHW Draw, where R30BuildStageExtensionXyzrhwEyePlane retains latched head pose, both eye FOV and world-depth HUD plane.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp: exact GOAL ResultProgress, GoalTime020, GoalTime150 and OutRunStagePrintf owners carry ScreenHud through queue and D3DX batch.",
+      "src/vr/game/render_semantics.hpp: source predicate includes only proven GOAL/+TIME D3DX owners, with compile-negative B9200, rank, world and generic queue cases.",
+      "src/vr/d3d9/stereo_renderer_r30.cpp: physical XYZRHW stereo candidate consults scoped producer BEFORE fog/depth heuristics, then transforms both eyes with pose-matched HUD plane."
+    ],
+    "alternatives_rejected": [
+      "Unknown nineteen B9200 text calls are not proven D3DX batch owners and are explicitly excluded from the new XYZRHW admission.",
+      "Broad acceptance of alpha, all ScreenHud or generic queue sprites would affect HUD, SkyGlow, world, and existing F11; exact scope+producer predicate prevents it.",
+      "Changing timer/GOAL data or disabling an eye does not repair projection ownership; fixed original draw fallbacks remain."
+    ],
+    "next_hmd_experiment": "Quest3/VDXR on exact installed R84 SHA: verify GOAL 0-99%, finish-time glyph and stage result text binocular fusion; confirm +TIME, ordinary timer, title, outer lens, F11, rank, SkyGlow, stereo and FPS unchanged."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Commit integrated C++ GOAL stereo route and exact producer regression, check required exact SHA GitHub CI; HMD visual acceptance separately."
+  "next_action": "Automated exact-SHA DX9Ex Active/Domain/Full Source/HUD Inspector gates pending after actual C++ GOAL renderer source and regression repair; HMD UNTESTED.",
+  "material_result_sha": "7303037ffefa3122b0d90e46e10fec7d11ebef31",
+  "verifier_fix_sha": "11c4995a9f7675e9a9ba918b676d9bf5658fc67f"
 }
