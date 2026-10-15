@@ -30,14 +30,14 @@ def integrated(src, hdr):
         "status == 0 && hasPixels && valid_readback_pitch(width, rowPitch)" in hdr,
         "GameNativeReadbackMap::Failed" in hdr,
         "if (fullMode && fullQueued &&" in body[mapping:ready],
-        "mapResult == GameNativeReadbackMap::Pending" in body[mapping:ready],
+        "if (fullMode && fullQueued &&\n                        mapResult == GameNativeReadbackMap::Pending)" in body[mapping:ready],
         "GameNativeFramePublication::retry_same_present_map(" in body[mapping:ready],
         "QueryPerformanceCounter(&startedMap)" in body[mapping:ready],
         "QueryPerformanceCounter(&nowMap)" in body[mapping:ready],
         "mapStatus = ctx->Map(oldest.staging.Get()" in body[mapping:ready],
         "D3D11_MAP_FLAG_DO_NOT_WAIT" in body[mapping:ready],
         "mapResult != GameNativeReadbackMap::Pending) break;" in body[mapping:ready],
-        "fullMode && queuedNow && mapPending &&" in hdr,
+        "mapPending && queuedNow && fullMode &&" in hdr,
         "extraPolls < kMaxSamePresentMapExtraPolls" in hdr,
         "elapsedTicks < frequencyTicks / kSamePresentMapBudgetDivisor" in hdr,
     ))
@@ -69,7 +69,7 @@ for old, new in (
     mutant = SRC.replace(old, new, 1)
     assert mutant != SRC and not integrated(mutant, HDR), old
 for old, new in (
-    ("fullMode && queuedNow && mapPending &&", "fullMode || queuedNow || mapPending ||"),
+    ("mapPending && queuedNow && fullMode &&", "mapPending || queuedNow || fullMode ||"),
     ("extraPolls < kMaxSamePresentMapExtraPolls", "true"),
     ("elapsedTicks < frequencyTicks / kSamePresentMapBudgetDivisor", "true"),
 ):

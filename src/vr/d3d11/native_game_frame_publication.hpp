@@ -84,7 +84,7 @@ struct GameNativeFramePublication {
         bool fullMode, bool queuedNow, bool mapPending,
         std::uint32_t extraPolls, std::uint64_t elapsedTicks,
         std::uint64_t frequencyTicks) noexcept {
-        return fullMode && queuedNow && mapPending &&
+        return mapPending && queuedNow && fullMode &&
             extraPolls < kMaxSamePresentMapExtraPolls &&
             frequencyTicks >= kSamePresentMapBudgetDivisor &&
             elapsedTicks < frequencyTicks / kSamePresentMapBudgetDivisor;
