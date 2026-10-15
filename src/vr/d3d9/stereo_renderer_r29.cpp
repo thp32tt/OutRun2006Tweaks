@@ -15,6 +15,7 @@
 
 #include "stereo_renderer_r26.cpp"
 #include "../core/r29_owner_api.hpp"
+#include "../ipc/coherent_host_identity.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "vr/game/render_semantics.hpp"
 namespace OutRunVRRenderer
@@ -1071,11 +1072,19 @@ namespace OutRunVRStereo
         R29OwnerTransportIdentity& out) noexcept
     {
         out = {};
-        if (!SharedState || !DirectInteropVerified)
+        if (!DirectInteropVerified)
             return false;
-        out.hostPid = SharedState->hostPid;
-        out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;
-        out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;
+        // PID and adapter LUID are one host generation. A reconnect can
+        // update them between three independent reads even after D3D9Ex
+        // interop was previously verified. Fail closed on a torn seqlock
+        // snapshot so R32 never reuses a slot for a mixed host identity.
+        OutRunVR::HostIdentity::Snapshot identity{};
+        if (!OutRunVR::HostIdentity::TryRead(SharedState, identity,
+                []() noexcept { MemoryBarrier(); }))
+            return false;
+        out.hostPid = identity.hostPid;
+        out.hostAdapterLuidLow = identity.adapterLuidLow;
+        out.hostAdapterLuidHigh = identity.adapterLuidHigh;
         return true;
     }
 
