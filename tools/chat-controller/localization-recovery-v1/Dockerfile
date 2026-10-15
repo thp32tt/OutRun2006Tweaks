@@ -28,7 +28,7 @@ COPY text_roi_queue.py /opt/outrun/app/text_roi_queue.py
 COPY project_library_gate.py /opt/outrun/app/project_library_gate.py
 COPY patch_controller_png_upload.py /tmp/patch_controller_png_upload.py
 RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py \
- && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py /opt/outrun/app/ab_batch_queue.py /opt/outrun/app/tile_orientation_policy.py /opt/outrun/app/project_library_gate.py \
+ && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py /opt/outrun/app/ab_batch_queue.py /opt/outrun/app/text_roi_queue.py /opt/outrun/app/tile_orientation_policy.py /opt/outrun/app/project_library_gate.py \
  && rm -f /tmp/patch_controller_png_upload.py
 
 # Add the third logical C tab to the SAME controller after A/B native PNG wiring.
