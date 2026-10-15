@@ -74,12 +74,9 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY TRUE)
 unset(_vr_source)
 
-# Production-safe stereo draw owner. The user-visible regression reproduced on
-# Quest while the monitor SBS remained individually plausible is tied to the
-# post-e20 R29+ fast L+R/HUD dispatch chain. Default back to the last proven
-# R26/R23/R22/R13/R9 draw + R23 renderer boundary. R29-R33 comparison builds
-# remain available only when this option is explicitly disabled.
-option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use proven R26/R23 safe stereo draw production path" ON)
+# DX9Ex development/production mainline: R84 independently compiled R29-R33.
+# R26/R23 old renderer remains an EXPLICIT comparison/rollback only.
+option(OUTRUN_VR_SAFE_DRAW_COMPARE "Opt-in R26/R23 historical stereo fallback" OFF)
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r26_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
@@ -111,7 +108,15 @@ endif()
 # C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R33 stay excluded in both.
 option(OUTRUN_VR_C1_COMPARE "Build C1: R29 fast L+R with R27/R28 classification" OFF)
 option(OUTRUN_VR_C2_COMPARE "Build C2: C1 plus R30 HUD correction" OFF)
-option(OUTRUN_VR_REFACTOR_SPLIT_R33_R32 "Refactor gate: compile R32 and R33 as separate translation units" OFF)
+# Fresh, option-free CMake = R84 mainline. Explicit comparison builds
+# automatically disable all four split owners on first configure, so preserved
+# R26_SAFE/C1/C2 validation jobs never compile two owners.
+set(OUTRUN_VR_R84_MAIN_DEFAULT ON)
+if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+   OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+    set(OUTRUN_VR_R84_MAIN_DEFAULT OFF)
+endif()
+option(OUTRUN_VR_REFACTOR_SPLIT_R33_R32 "R84 mainline: independently compile R33/R32" ${OUTRUN_VR_R84_MAIN_DEFAULT})
 if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
     if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
        OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
@@ -123,7 +128,7 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R33_R32=1)
     message(STATUS "OutRun VR refactor gate: R32 + R33 separate translation units")
 endif()
-option(OUTRUN_VR_REFACTOR_SPLIT_R32_R31 "Compile R31 independently below R32" OFF)
+option(OUTRUN_VR_REFACTOR_SPLIT_R32_R31 "Compile R31 independently below R32" ${OUTRUN_VR_R84_MAIN_DEFAULT})
 if(OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
     if(NOT OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
         message(FATAL_ERROR "R32/R31 split requires the R33/R32 interface boundary")
@@ -138,15 +143,14 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R32_R31=1)
     message(STATUS "OutRun VR refactor: R33/R32/R31 separate translation units")
 endif()
-# Combined R33/R32/R31/R30 ownership is checked by the canonical Win32 gate.
-# The R29 and lower original renderer chain remains textual until independently
-# exported and verified; never compile R29 both standalone and through R30.
+# Compile all independent R29-R33 owners for normal development/test. Never
+# compile R29 both standalone and as a textual include inside R30.
 if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 AND
    NOT OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
     message(FATAL_ERROR
         "Combined R31/R30 extraction requires the R32/R31 support boundary")
 endif()
-option(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 "Refactor gate: compile R30 separately from the R31 textual chain" OFF)
+option(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 "Refactor gate: compile R30 separately from the R31 textual chain" ${OUTRUN_VR_R84_MAIN_DEFAULT})
 if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
     if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
        OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
@@ -158,10 +162,9 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R31_R30=1)
     message(STATUS "OutRun VR refactor gate: R30 compiled separately below R31")
 endif()
-# R84 compile development gate: R29 owns the lower original renderer
-# implementation, R30 consumes only its public ABI. Default runtime variants
-# remain unchanged until exact Win32 link and protected regressions pass.
-option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29 "Compile R29 separately from R30" OFF)
+# R84 production graph: R29 owns the lower renderer, R30 consumes its public
+# ABI; R31/R32/R33 are independent translation units by default.
+option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29 "Compile R29 separately from R30" ${OUTRUN_VR_R84_MAIN_DEFAULT})
 if(OUTRUN_VR_REFACTOR_SPLIT_R30_R29)
     if(NOT OUTRUN_VR_REFACTOR_SPLIT_R31_R30 OR
        NOT OUTRUN_VR_REFACTOR_SPLIT_R32_R31 OR

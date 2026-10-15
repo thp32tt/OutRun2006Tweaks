@@ -62,6 +62,7 @@ on:
       - 'tools/verify_vr_hook_graph.py'
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_r84_focus_inventory.py'
+      - 'tools/verify_dx9ex_r84_mainline.py'
       - 'tools/verify_vr_r29_effect_cache_generation.py'
       - 'tools/verify_vr_r29_depth_off_probe_fastpath.py'
       - 'tools/verify_vr_r29_stencil_write_fastpath.py'
@@ -421,6 +422,9 @@ jobs:
               throw "$verifier failed with exit code $LASTEXITCODE"
             }
           }
+      - name: Verify DX9Ex R84 development/test mainline
+        shell: pwsh
+        run: python tools/verify_dx9ex_r84_mainline.py
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
         run: python tools/verify_vr_nearplane_active_gate.py
@@ -514,11 +518,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Configure Win32 active DX9Ex path
+      - name: Configure Win32 R26_SAFE fallback (explicit comparison)
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
           cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          $fallbackCache = Get-Content build-game/CMakeCache.txt
+          foreach ($entry in @(
+            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF')) {
+            if ($fallbackCache -notcontains $entry) {
+              throw "DX9Ex R26_SAFE explicit fallback owner drift: $entry"
+            }
+          }
       - name: Apply VC2022 dependency workarounds
         shell: pwsh
         run: |
@@ -552,11 +567,27 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Configure Win32 R84 independent R29-R33 full-chain gate
+      - name: Configure Win32 R84 MAIN from option-free CMake
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON
+          # This option-FREE configuration is the canonical development and test
+          # build, not an isolated R84 opt-in compiler probe.
+          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32
+          $mainCache = Get-Content build-full-chain/CMakeCache.txt
+          foreach ($entry in @(
+            'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_C1_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_C2_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON')) {
+            if ($mainCache -notcontains $entry) {
+              throw "DX9Ex unqualified CMake does not select R84 MAIN: $entry"
+            }
+          }
       - name: Apply VC2022 dependency workarounds for full-chain gate
         shell: pwsh
         run: |
@@ -576,6 +607,7 @@ jobs:
           Copy-Item $dll.FullName stage-r84-chain/dinput8.dll
           Set-Content stage-r84-chain/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
           Set-Content stage-r84-chain/BUILD_VARIANT.txt 'R84_SPLIT_R33_R32_R31_R30_R29' -Encoding ascii
+          Set-Content stage-r84-chain/MAINLINE_BUILD_MODE.txt 'R84_DEFAULT_CMAKE_OPTIONS' -Encoding ascii
           $bytes = [IO.File]::ReadAllBytes((Resolve-Path stage-r84-chain/dinput8.dll))
           if ($bytes.Length -lt 512 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'R84 Win32 DLL PE header invalid' }
           $pe = [BitConverter]::ToInt32($bytes,0x3c)
@@ -619,6 +651,7 @@ jobs:
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'VARIANT_ID.txt')
           Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'BUILD_VARIANT.txt')
+          Copy-Item payload/r84/MAINLINE_BUILD_MODE.txt (Join-Path $backend 'MAINLINE_BUILD_MODE.txt')
           $r84CmakeFlags = '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON'
           Set-Content (Join-Path $backend 'CMAKE_FLAGS.txt') $r84CmakeFlags -Encoding ascii
           $r26 = Join-Path $dir 'slots/R26_SAFE'
@@ -704,6 +737,7 @@ jobs:
             IntegrationSha = $env:GITHUB_SHA
             VariantId = 'R84_SPLIT_R33_R32_R31_R30_R29'
             DefaultRendererSlot = 'CURRENT_FOCUS'
+            DefaultBuildMode = 'R84_DEFAULT_CMAKE_OPTIONS'
             PreviousR84AliasSlot = 'R84_TEST'
             FallbackRendererSlot = 'R26_SAFE'
             FallbackVariantId = 'ACTIVE_R26_R43_R44'
@@ -770,6 +804,9 @@ jobs:
           if ((Get-Content (Join-Path $r26Dir 'SOURCE_SHA.txt') -Raw).Trim() -ne $env:GITHUB_SHA -or
               (Get-Content (Join-Path $r26Dir 'VARIANT_ID.txt') -Raw).Trim() -ne 'ACTIVE_R26_R43_R44') {
             throw 'R26 rollback source SHA or build variant mismatch'
+          }
+          if ((Get-Content 'verify/backends/d3d9/MAINLINE_BUILD_MODE.txt' -Raw).Trim() -ne 'R84_DEFAULT_CMAKE_OPTIONS') {
+            throw 'DX9Ex packaged main was not built with the default R84 CMake options'
           }
           if ((Get-Content 'verify/backends/d3d9/VARIANT_ID.txt' -Raw).Trim() -ne 'R84_SPLIT_R33_R32_R31_R30_R29' -or
               (Get-Content 'verify/backends/d3d9/CMAKE_FLAGS.txt' -Raw) -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') {
