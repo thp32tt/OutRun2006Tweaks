@@ -255,9 +255,10 @@ int main()
     require(!ring.try_acquire_slot(d3d.context, 5, nullptr, recycledSlot) &&
             recycledSlot == OutRunVR::RenderFrameRingSize && ring.all_slots_idle(),
             "retired frame ID cannot be replayed in a transport lifetime");
-    require(!ring.try_acquire_slot(d3d.context, 6, &exactAck, recycledSlot) &&
+    auto futureAck = make_ack(generationB, slot, 6);
+    require(!ring.try_acquire_slot(d3d.context, 6, &futureAck, recycledSlot) &&
             ring.all_slots_idle(),
-            "delayed cumulative ACK cannot retire a new eye pair");
+            "future cumulative ACK cannot retire a new eye pair");
     require(ring.try_acquire_slot(d3d.context, 6, nullptr, recycledSlot) &&
             ring.cancel_acquired_slot(recycledSlot, 6) && ring.all_slots_idle(),
             "new frame ID still permits input-safe cancellation");

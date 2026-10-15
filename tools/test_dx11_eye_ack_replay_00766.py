@@ -26,13 +26,13 @@ def linked(ring, header, source, probe):
         "next > highWatermark && next > sameLifetimeAck" in source,
         "OutRunVR::Core::TransportAckIdentityMatches(*ack, identity_)" in acquire,
         "native_game_eye_frame_id_admitted(" in acquire,
-        acquire.index("native_game_eye_frame_id_admitted(") <
-            acquire.index("if (slot.state == SharedEyeSlotState::Published)"),
+        0 <= acquire.find("native_game_eye_frame_id_admitted(") <
+            acquire.find("if (slot.state == SharedEyeSlotState::Published)"),
         acquire.count("frame_id_high_watermark_ = native_game_eye_frame_high_watermark(") == 2,
         "frame_id_high_watermark_ = native_game_eye_frame_high_watermark(" in retire,
         "frame_id_high_watermark_ = 0u;" in bind,
         "retired frame ID cannot be replayed" in probe,
-        "delayed cumulative ACK cannot retire a new eye pair" in probe,
+        "future cumulative ACK cannot retire a new eye pair" in probe,
         "cumulative ACK high watermark rejects old or already ACKed frame" in probe,
     ))
 
