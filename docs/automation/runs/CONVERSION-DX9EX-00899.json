@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00899",
+  "production_id": "CONVERSION-DX9EX-00899",
+  "event_id": "CONVERSION-DX9EX-00899-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00899",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_PENDING_EXACT_SHA",
+  "automation_validation": "FAILED_PRIOR_SHA_POLICY_RECORD_MISSING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "c58bcbc4c5e85f06186596e230741a1b453cbf3c",
+  "material_result_sha": "c30a67fba979b4f53ada99e7b31f9e6b12a501f8",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00899.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Restore source-owned first GOAL 0–99% progress sprite and both original GOAL time glyph D3DX GPU submissions when ID3DXSprite Begin arrives after queue-node selection, with no unrelated alpha, stage +TIME or race-result distortion.",
+    "scope_boundary": "Only original GOAL progress and GoalTime020/GoalTime150 producers through queue transitions, tracked D3DX sprite Draw/Flush and existing stereo eye submission. Preserve separate +TIME, race final result, input, FFB, SkyGlow, DX9Ex R26_SAFE rollback, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original GOAL 0–99% progress from result-progress CALL ownership and the two adjacent GoalTime020/GoalTime150 E8 helpers enters ScreenHud sprite-queue semantics.",
+      "VRProjectedD3DXSpriteIsolationR64 observes producer transitions and native D3DX Begin/Draw; late Begin resets StageBoundaryReady after the queue source has already been selected.",
+      "On the first exact homogeneous GOAL Draw the new CanArmD3DXQueueGoalAfterDraw restores the source-owned GPU Flush gate, allowing R84 stereo draw ownership to feed distinct OpenXR eye targets."
+    ],
+    "subcomponents": [
+      "Drain a previously proven homogeneous direct D3DX batch before switching to a first GOAL queue owner, just as for the independent +TIME queue transition.",
+      "Rearm the lost queue boundary only for the exact first GOAL progress/time helper Draw under matching tracked sprite, batch, scope and producer.",
+      "Keep non-GOAL, stage +TIME, mixed, failed and multi-draw owners outside eager GOAL GPU submission; preserve native game Draw/Flush behavior and protected fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_first_queue_owned_gpu_submission",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL 0–99% progress sprite and two glyph helpers through late Begin and D3DX GPU Flush",
+        "expected_behavior": "A correctly tracked first GOAL queue Draw restores the exact original GOAL boundary after late Begin and submits its homogeneous sprite data before the semantic producer is lost."
+      },
+      {
+        "id": "goal_stage_and_unknown_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Normal +TIME, non-GOAL, mixed producer batches and original game fallback",
+        "expected_behavior": "Only exact GoalTime020, GoalTime150 or ResultProgress matching source may rearm, while stage +TIME, unknown/mixed owners, unrelated HUD, multi-draw and failed native paths remain fail-closed."
+      },
+      {
+        "id": "r84_final_exact_sha_integrated",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 game, R26_SAFE, x64 OpenXR host, package, Domain and affected impact gates",
+        "expected_behavior": "Existing mandatory GitHub Actions full gate passes at the exact validation-bearing commit; HMD stereo visuals and performance remain untested until matching Quest3/VDXR evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_first_queue_owned_gpu_submission": "SOURCE_IMPLEMENTED",
+    "goal_stage_and_unknown_fallback": "SOURCE_IMPLEMENTED",
+    "r84_final_exact_sha_integrated": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "GOAL queue-node selection precedes D3DXSprite Begin in a supported path; BeginDest resets StageBoundaryReady so the first otherwise-homogeneous queued GOAL Draw cannot enter the prior eager Flush guard. Source commit c30a67f corrects that boundary.",
+    "source_trace": [
+      "Original GOAL result-progress and two time helper producers create source-owned ScreenHud sprite submissions.",
+      "VRProjectedD3DXSpriteIsolationR64 transitions from selected queue node through tracked D3DX Begin/Draw and permits eager original-owner Flush only for proven homogeneous producer.",
+      "R84 game stereo renderer and x64 host consume submitted D3D9 GPU draws; the original source scope must survive until actual Draw/Flush, not merely until the caller returns."
+    ],
+    "root_cause": "Late D3DX Begin clears the queue boundary established before Begin; without a first-draw rearm, GOAL progress and glyph draws can be delayed until End or an unrelated semantic producer, losing exact GOAL source ownership.",
+    "alternatives_rejected": [
+      "Do not globally force ID3DXSprite::Flush on every Draw, broaden GOAL admission to generic ScreenHud or stage +TIME, suppress original effects, or infer native eye correctness from a static semantic predicate."
+    ],
+    "fix_evidence": "Material source SHA c30a67fba979b4f53ada99e7b31f9e6b12a501f8 updates queue enter/prequeue GOAL handling, exact first-draw rearm with matching original source in render_semantics.hpp, and dedicated source-mutation regression cases.",
+    "negative_test_evidence": "Material commit adds specific destructive mutation cases for late GOAL Begin, old-direct-source queue transition and GOAL eager Flush gating. Full exact-SHA CI was blocked before changed-area checks by missing run record; gate remains pending.",
+    "eye_ownership": "Only original tagged GOAL data may enter the exact ScreenHud D3DX batch; R84 and OpenXR host per-eye composition must still pass full CI and later headset acceptance."
+  },
+  "ci_evidence": {
+    "prior_failed_exact_source_sha": "c30a67fba979b4f53ada99e7b31f9e6b12a501f8",
+    "prior_failed_run_id": 38738880638,
+    "prior_failed_job_id": 116435125762,
+    "prior_failure": "DX9Ex feature policy --check-head rejected missing docs/automation/runs/CONVERSION-DX9EX-00899.json; full-chain, game, host and package jobs skipped.",
+    "required_final_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "revalidation_state": "PENDING_PUSH"
+  },
+  "runtime_evidence": "No Quest3/VDXR hardware run or matching original game visual capture in this retry.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "EXACT_SHA_CI_PENDING"
+}
