@@ -5387,6 +5387,35 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
         ++s.observed;
         const bool fullMode = env_full_game_opt_in();
         if (!observe_source_frame_mode(s, fullMode)) return;
+        // An unavailable VB/IB shadow still represents a successful game
+        // Draw/DrawIndexed. If its enabled scissor excludes the entire game
+        // viewport, it cannot change color, Z or stencil. Preserve that exact
+        // source ordinal so following native menu/car/race draws can publish;
+        // an overlapping or unproved scissor must retain D3D9 fallback.
+        if (fullMode) {
+            DWORD scissorEnabled = FALSE;
+            if (SUCCEEDED(game->GetRenderState(D3DRS_SCISSORTESTENABLE,
+                                               &scissorEnabled)) &&
+                scissorEnabled == TRUE) {
+                D3DVIEWPORT9 sourceViewport{};
+                RECT sourceScissor{};
+                if (SUCCEEDED(game->GetViewport(&sourceViewport)) &&
+                    SUCCEEDED(game->GetScissorRect(&sourceScissor)) &&
+                    GameNativeScissorClip::excludes_viewport(
+                        sourceViewport.X, sourceViewport.Y,
+                        sourceViewport.Width, sourceViewport.Height,
+                        sourceScissor.left, sourceScissor.top,
+                        sourceScissor.right, sourceScissor.bottom)) {
+                    const bool sameSourceFullClear = s.clearColor.valid &&
+                        s.clearColor.sourceDevice ==
+                            reinterpret_cast<std::uintptr_t>(game);
+                    if (!s.frameBatch.absorb_empty_source_draw(
+                            sourceOrdinal, sameSourceFullClear))
+                        s.frameBatch.abort();
+                    return;
+                }
+            }
+        }
         // A VB/IB shadow miss during an isolated offscreen texture pass does
         // not imply an invisible gap in the real backbuffer's Draw stream.
         if (fullMode && isolated_offscreen_game_draw(game, s)) {

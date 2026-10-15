@@ -1,5 +1,6 @@
 #include "../src/vr/d3d11/native_game_masked_draw.hpp"
 #include "../src/vr/d3d11/native_game_frame_batch.hpp"
+#include "../src/vr/d3d11/native_game_scissor_clip.hpp"
 #include <cassert>
 #include <cstdint>
 
@@ -46,7 +47,31 @@ constexpr bool noClearCannotRescue() {
 }
 static_assert(noClearCannotRescue());
 
+// A successful, completely clipped game DrawIndexed can lack a usable VB/IB
+// shadow without introducing any invisible geometry into the native frame.
+// The next real Draw must still clear and draw at its exact source ordinal.
+constexpr bool missingShadowClippedSourceContinues() {
+    if (!GameNativeScissorClip::excludes_viewport(
+            0u, 0u, 1920u, 1080u, 1920, 0, 2100, 100) ||
+        GameNativeScissorClip::excludes_viewport(
+            0u, 0u, 1920u, 1080u, 1919, 0, 2100, 100) ||
+        GameNativeScissorClip::excludes_viewport(
+            0u, 0u, 1920u, 1080u, 2100, 0, 2000, 100))
+        return false;
+    GameNativeFrameBatch b{};
+    if (!b.absorb_empty_source_draw(0u, true) || // harmless setup Draw
+        !b.absorb_empty_source_draw(1u, true) || // clipped missing-IB Draw
+        b.publishable_full(true, 2u) ||
+        !b.accepts_full_seeded(2u, true)) return false;
+    b.succeeded(false);
+    b.record_source_draw(2u); // real game native DrawIndexed
+    return b.publishable_full(true, 3u) &&
+        !b.absorb_empty_source_draw(4u, true);
+}
+static_assert(missingShadowClippedSourceContinues());
+
 int main() {
+    assert(missingShadowClippedSourceContinues());
     assert(menuCarRaceSequence());
     assert(noClearCannotRescue());
 }

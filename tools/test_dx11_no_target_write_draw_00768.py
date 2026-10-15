@@ -32,6 +32,44 @@ def linked(source: str) -> bool:
         "s.clearColor.matches(" in helper,
     ))
 
+def unavailable_scissor_linked(source: str) -> bool:
+    part = source.split("void observe_unavailable_game_draw(", 1)[-1].split(
+        "void observe_failed_game_draw(", 1)[0]
+    scissor = part.split("if (fullMode && isolated_offscreen_game_draw(", 1)[0]
+    tokens = (
+        "if (fullMode) {",
+        "GetRenderState(D3DRS_SCISSORTESTENABLE,",
+        "scissorEnabled == TRUE",
+        "SUCCEEDED(game->GetViewport(&sourceViewport))",
+        "SUCCEEDED(game->GetScissorRect(&sourceScissor))",
+        "GameNativeScissorClip::excludes_viewport(",
+        "s.frameBatch.absorb_empty_source_draw(",
+        "sourceOrdinal, sameSourceFullClear",
+        "s.frameBatch.abort();",
+        "return;",
+    )
+    cursor = 0
+    for token in tokens:
+        position = scissor.find(token, cursor)
+        if position < 0:
+            return False
+        cursor = position + len(token)
+    return "s.clearColor.sourceDevice ==" in scissor
+
+assert unavailable_scissor_linked(bridge), (
+    "missing VB/IB fully clipped DrawIndexed must preserve native source ordinal")
+head, tail = bridge.split("void observe_unavailable_game_draw(", 1)
+for old, new in (
+    ("scissorEnabled == TRUE", "scissorEnabled == FALSE"),
+    ("GameNativeScissorClip::excludes_viewport(",
+     "false && GameNativeScissorClip::excludes_viewport("),
+    ("sourceOrdinal, sameSourceFullClear",
+     "sourceOrdinal + 1u, sameSourceFullClear"),
+):
+    mutated = tail.replace(old, new, 1)
+    assert mutated != tail and not unavailable_scissor_linked(
+        head + "void observe_unavailable_game_draw(" + mutated), old
+
 assert linked(bridge), "real game Draw/Indexed no-write continuity missing"
 assert not linked(bridge.replace(
     "if (fullMode && proven_game_draw_no_target_writes(game, s))",
@@ -48,7 +86,8 @@ with TemporaryDirectory(prefix="dx11-no-write-source-") as tmp:
     dst = Path(tmp)
     (dst / "tools").mkdir()
     (dst / "src/vr/d3d11").mkdir(parents=True)
-    for filename in ("native_game_masked_draw.hpp", "native_game_frame_batch.hpp"):
+    for filename in ("native_game_masked_draw.hpp", "native_game_frame_batch.hpp",
+                     "native_game_scissor_clip.hpp"):
         shutil.copyfile(root / "src/vr/d3d11" / filename,
                         dst / "src/vr/d3d11" / filename)
     shutil.copyfile(probe, dst / "tools" / probe.name)
