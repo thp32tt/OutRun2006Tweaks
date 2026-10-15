@@ -138,9 +138,23 @@ public:
         if(i<routeCounts_.size()) ++routeCounts_[i];
     }
     void reset() noexcept {
-        active_=nullptr; for(Slot& s:ring_) s.release();
+        // A D3D9Ex Reset/device replacement invalidates GPU clock domains
+        // and the render-target size baseline. Do not mix pre-loss samples
+        // (including pending query gaps) with a recovered Quest3/VDXR run.
+        // Query polling remains nonblocking and disabled when not requested.
+        active_=nullptr;
+        for (Slot& s:ring_) s.release();
         game_=nullptr; unsupported_=skip_=false;
         referenceWidth_=referenceHeight_=0;
+        next_=0; lastDraws_=1024; frame_=0;
+        samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=0;
+        timedBlend_=timedOpaque_=0;
+        noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
+        rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
+        logicalDrawCalls_=0; routeCounts_.fill(0);
+        sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0.0;
+        gpuSpanCount_=gpuSpanOverflow_=0;
+        logAt_=0;
     }
     bool beforeDraw(IDirect3DDevice9* d,UINT /*primitives*/) noexcept {
         if(!Enabled()||!d) return false;
