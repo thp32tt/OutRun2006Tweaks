@@ -20,7 +20,8 @@ services:
       CHAT_SLOTS: "3"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
-      OUTRUN_AB_BATCH_QUEUE: "true"
+      OUTRUN_AB_BATCH_QUEUE: "false"
+      OUTRUN_AB_TEXT_ROI_QUEUE: "true"
       OUTRUN_AB_BATCH_SIZE: "5"
       OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
       OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
