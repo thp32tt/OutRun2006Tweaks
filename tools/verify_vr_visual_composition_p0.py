@@ -1912,8 +1912,10 @@ require('ImGui_ImplDX9_RenderDrawData', overlay, 'F11 guarded draw call')
 # in the original D3DEndScene owner, with the semantic RAII scope inside the
 # gameplay branch and immediately enclosing the draw call.
 endscene = function_body(overlay, 'static void D3DEndScene(')
+if endscene.count('const bool vrGameplay = Game::is_vr_gameplay_presentation();') != 1:
+    raise SystemExit('P0 visual composition drift: F11 gameplay cache must own exact state')
 if not re.search(
-    r'if\s*\(\s*overlayActive\s*&&\s*Game::is_vr_gameplay_presentation\(\)\s*\)\s*'
+    r'if\s*\(\s*overlayActive\s*&&\s*vrGameplay\s*\)\s*'
     r'\{\s*OutRunVR::GameSemantic::ScopedExternalOverlaySemantic\s+semantic\(\s*'
     r'OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D\s*\);\s*'
     r'ImGui_ImplDX9_RenderDrawData\(ImGui::GetDrawData\(\)\);\s*\}\s*'
@@ -1943,8 +1945,13 @@ def check_f11_shared_presentation(game_header, game_source, overlay_source):
     if 'switch (state)' in presenter:
         raise SystemExit('P0 renderer duplicated the F11 state switch')
     endscene = function_body(overlay_source, 'static void D3DEndScene(')
-    if 'overlayActive && Game::is_vr_gameplay_presentation()' not in endscene:
-        raise SystemExit('P0 F11 overlay not gated by actual theater/gameplay split')
+    shared_guard = 'const bool vrGameplay = Game::is_vr_gameplay_presentation();'
+    if endscene.count(shared_guard) != 1:
+        raise SystemExit('P0 F11 gameplay predicate no longer has a single source')
+    if 'overlayActive && vrGameplay' not in endscene:
+        raise SystemExit('P0 F11 overlay not gated by shared gameplay predicate')
+    if endscene.index(shared_guard) > endscene.index('overlayActive && vrGameplay'):
+        raise SystemExit('P0 F11 presentation snapshot is not established before drawing')
     if 'overlayActive && Game::is_in_game()' in endscene:
         raise SystemExit('P0 F11 regressed to broader selector-adjacent state predicate')
 
@@ -1957,7 +1964,7 @@ for name, broken_h, broken_renderer, broken_overlay in (
      game_addrs, renderer.replace('return Game::is_vr_gameplay_presentation()',
                                 'return Game::is_in_game()', 1), overlay),
     ('F11 goes back to broad predicate',
-     game_addrs, renderer, overlay.replace('overlayActive && Game::is_vr_gameplay_presentation()',
+     game_addrs, renderer, overlay.replace('overlayActive && vrGameplay',
                                           'overlayActive && Game::is_in_game()', 1)),
 ):
     try:
