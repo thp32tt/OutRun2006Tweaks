@@ -14,7 +14,7 @@
   "status": "CI_REPAIR_PENDING_EXACT_SHA",
   "phase": "C3_VALIDATE_REPAIR",
   "checkpoint": "C3_STATE",
-  "automation_validation": "FAILED_EXACT_SHA_NEGATIVE_MUTATION_HANDLING_REPAIRING",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ab5b1786c4da5a8738a225586017bcd46919e80c",
@@ -94,6 +94,10 @@
     "second_attempt_sha": "9687a746d7c9b7cd9d81c5754405e80ee9d0e564",
     "second_active_run_id": 38758151723,
     "second_failure": "New architecture verifier negative mutation intentionally removed C993 admission token, but .index raised ValueError rather than the expected AssertionError; add explicit require before ordered index assertion, retain mutation.",
-    "third_repair": "Add precise assertion on positive C993 markers before ordered index verification; negative mutation now exercises fail-closed assertion rather than Python exception leak."
+    "third_repair": "Add precise assertion on positive C993 markers before ordered index verification; negative mutation now exercises fail-closed assertion rather than Python exception leak.",
+    "third_attempt_sha": "9f13dc46c225341b2d50e4463eb2eaad10b6ec28",
+    "third_active_run_id": 38758420431,
+    "third_policy_failure": "C993 source verifier still required old ProducerToken::LensFlareCentre) from depth-off nested branch; current exact ownedLensCentre predicate uses ProducerToken::LensFlareCentre; and admits verified centre before raster inference.",
+    "fourth_repair": "Update exact centre verifier token to new ownedLensCentre source-authority classifier and require explicit ownership branch; retain strict raw WVP, shader/pose, physical R33 per-eye and mutation gates."
   }
 }
