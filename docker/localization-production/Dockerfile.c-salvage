@@ -3,8 +3,8 @@ FROM python:3.12-slim
 WORKDIR /repo
 COPY docker/localization-production/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
-COPY tools/localization/c_salvage_compose.py tools/localization/c_salvage_worker.py tools/localization/c_salvage_plate.py tools/localization/psd_layer_workbase.py /repo/tools/localization/
+COPY tools/localization/c_salvage_atlas.py tools/localization/c_salvage_compose.py tools/localization/c_salvage_worker.py tools/localization/c_salvage_plate.py tools/localization/psd_layer_workbase.py /repo/tools/localization/
 COPY localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json /repo/localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 ENTRYPOINT ["python", "/repo/tools/localization/c_salvage_worker.py"]
-CMD ["--input-root", "/data/image-src", "--output-root", "/data/c-salvage", "--repo-root", "/repo", "--max-per-cycle", "10", "--interval-seconds", "1800", "--loop"]
+CMD ["--input-root", "/data/image-src", "--output-root", "/data/c-salvage", "--repo-root", "/repo", "--max-per-cycle", "10", "--require-atlas", "--interval-seconds", "1800", "--loop"]
