@@ -1,0 +1,104 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00897",
+  "production_id": "CONVERSION-DX9EX-00897",
+  "event_id": "CONVERSION-DX9EX-00897-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00897",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "SOURCE_IMPLEMENTED_NEEDS_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "98d627d3bd8aaa852692e8d7e50434dfc5f1c12e",
+  "material_result_sha": "71f4335c5a534e57548d78a6397fb4fb0e2289c7",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/lens_centre_partial_wvp.hpp"
+  ],
+  "changed_files": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/lens_centre_partial_wvp.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00897.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Restore the exact original C993 central lens flare's raw c64..c67 source-WVP provenance even when the game supplies all four shader registers across several successful partial uploads; preserve outer halo and conservative stereo fallback.",
+    "scope_boundary": "Only original direct C993 LensFlareCentre WorldBillboard WVP, shared game shader constant injector and R84 consumer already gated by source call, shader and pose; no wider world, CABE halo, SkyGlow, alpha, HUD, DX11 or DXVK changes.",
+    "trace_stages": [
+      "Original D3A5/C993 central producer tags a direct WorldBillboard call before game VS c64..c67 writes.",
+      "OutRunVRRenderer::SetVertexShaderConstantFDest previously invalidated raw evidence for every partial c64 upload then returned without recording a newly assembled matrix, leaving R84 R30HasExactLensCentreRawWvp unable to admit legitimate split producers.",
+      "On successful original-game subuploads, stage each register across only matching call/pose/shader/device, publish the fully proven raw WVP through RecordGameWvpWrite and preserve the existing R84 R30/R33 per-eye GPU/host composition."
+    ],
+    "subcomponents": [
+      "Accumulate all four exact-centre original c64 registers through same-call partial GPU uploads without reading already injected live shader state.",
+      "Reject failed partial writes, mixed shader/pose/game-device/producer, full uploads and scene/reset crossing before publishing any raw source.",
+      "Provide portable positive and negative C++17 compile regressions, then validate actual R84 game + host + package and Domain/Inspector/Full Source at final exact CI SHA; HMD remains untested."
+    ],
+    "acceptance_items": [
+      {
+        "id": "split_c993_raw_wvp_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original C993 partial game c64 uploads to R84 R30/R33 per-eye raw WVP",
+        "expected_behavior": "A successful coherent sequence of split c64..c67 original writes yields one fully source-owned raw matrix; R30 subsequently applies the exact sun spatial stereo route rather than losing WVP provenance."
+      },
+      {
+        "id": "cross_epoch_failure_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Failed device writes, pose/recenter, shader epoch, device, queue and desktop fallback",
+        "expected_behavior": "No mixed/failed/other-owner register batch can be promoted as exact central WVP; full upload, EndScene, Present and Reset preserve original game paths, CABE halo and SkyGlow."
+      },
+      {
+        "id": "exact_sha_r84_mainline",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 game, R26_SAFE rollback, x64 OpenXR host, package, Domain, HUD and Full Source",
+        "expected_behavior": "All required GitHub Actions complete SUCCESS on the exact validation-bearing commit and the result is recorded separately from Quest3/VDXR headset acceptance."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "split_c993_raw_wvp_source": "SOURCE_IMPLEMENTED",
+    "cross_epoch_failure_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_r84_mainline": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "In the real SetVertexShaderConstantFDest hook, any c64-touching write calls InvalidateGameWvpWrite; when UploadContainsOutRunWvp is false the original partial upload returns without RecordGameWvpWrite. Four successful partial c64 writes never create the raw source matrix demanded by R30 lens centre admission.",
+    "source_trace": [
+      "Original EXE D3A5 and C993 direct centre ownership reaches the game shader constant hook.",
+      "Game D3D9 successful 1..3-register writes are aggregated only under exact source call, latched pose, shader epoch and device; a four-register source proof is then published into existing raw-game-WVP provenance.",
+      "R84 R30 and R33 use that proof for source-backed per-eye rendering when the spatial affine/depth checks pass; the host composes separately."
+    ],
+    "root_cause": "The original-game WVP provenance capture only supports a single four-register-containing SetVertexShaderConstantF call; partial writes always invalidate source proof without reassembly.",
+    "alternatives_rejected": [
+      "Do not infer source WVP from possibly head-injected live c64, broaden alpha lens classification to CABE halos, relax draw age 128 or bypass matrix depth/affine checks."
+    ],
+    "fix_evidence": "New source-owner-restricted four-register staging records only successful direct C993 game uploads and resets on call/pose/shader/device changes, invalid owner, scene end, Present and Reset. The unchanged R30 source proof and spatial route consume the published complete matrix.",
+    "negative_test_evidence": "C++17 constexpr regression static_assert covers positive 2+2 completion and rejects mixed call, pose, shader identity, shader epoch, device, non-centre source and reset. g++ -std=c++17 -Wall -Wextra -Werror -pedantic smoke on staged helper passed.",
+    "eye_ownership": "Only exact original-world WVP is captured; R84 R30 constructs two pose/FOV eye matrices from raw world-view while R33 requires physical left/right successful GPU draws and correct restoration."
+  },
+  "runtime_evidence": "No original OutRun game, Quest3 or VDXR screen was executed; game-side split-upload actual frequency is not measured, and full visual centre ghost repair is not claimed.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "PENDING_EXACT_SHA_CI_AND_HMD",
+  "result_commit_ci_skip": false,
+  "ci_evidence": {
+    "source_material_sha": "71f4335c5a534e57548d78a6397fb4fb0e2289c7",
+    "required_final_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "portable_cpp17_smoke": "PASS",
+    "exact_sha": "PENDING",
+    "runtime": "UNTESTED"
+  }
+}
