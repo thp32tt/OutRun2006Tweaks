@@ -1,0 +1,1045 @@
+{
+  "schema": "outrun-upstream-psd-catalog-v2",
+  "upstream_repo": "Sonic-TV/OR2006Sprites",
+  "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "discovery": "GITHUB_FULL_TREE_34110_ITEMS",
+  "total_psd_in_upstream": 184,
+  "matching_psd_files": 81,
+  "matching_distinct_hashes": 65,
+  "license_statement": "Upstream README offers working sources but no repository-wide LICENSE found; retain attribution and independently confirm permission before broader redistribution.",
+  "files": [
+    {
+      "texture_hash": "132A1B1F",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Sumo Backgrounds/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.psd",
+      "git_blob_sha": "d2bc5480505e7cc400b85d0f3c443bed74403a62",
+      "size_bytes": 44709588,
+      "queue_indexes": [
+        238
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "19CEDB9",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/19CEDB9_512x512.psd",
+      "git_blob_sha": "f801e65a1a96c8a650842a4394f4d7988775aaf5",
+      "size_bytes": 37625133,
+      "queue_indexes": [
+        44
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "1A43E9D9",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/1A43E9D9_512x64.psd",
+      "git_blob_sha": "0589de5e9a3ac2e2d032ca1943f7502c07890312",
+      "size_bytes": 938768,
+      "queue_indexes": [
+        92
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/1A43E9D9/1A43E9D9_512x64.psd",
+          "source_sha256": "ee000ce057b58891a62ecfe419ac50fd798a6d660bf5a2bb47a6870f798b8923",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "1F5FE6E9",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Sumo Backgrounds/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.psd",
+      "git_blob_sha": "ff08309d8709d26de2d181a3cfee40fd1a7c4270",
+      "size_bytes": 44957577,
+      "queue_indexes": [
+        132
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "20389D70",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/20389D70_v02/20389D70_512x256.psd",
+      "git_blob_sha": "65ecb7937552724ebdc274e1e064f69160896148",
+      "size_bytes": 1095004,
+      "queue_indexes": [
+        15
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/20389D70/20389D70_512x256.psd",
+          "source_sha256": "eb3ee5b4e813dd0469746ebe04740e88cce867920a35c81c80f03c1f6184be71",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "23DDB6EC",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/23DDB6EC_512x512.psd",
+      "git_blob_sha": "c0f3ff8e0fe47fb410d9a069586b5ae135043681",
+      "size_bytes": 85862452,
+      "queue_indexes": [
+        16
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "2B0863D6",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/2B0863D6_v02/2B0863D6_512x64.psd",
+      "git_blob_sha": "fc60ed582ccdeab322ab24ffd87bea7d89c98087",
+      "size_bytes": 601382,
+      "queue_indexes": [
+        135
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/2B0863D6/2B0863D6_512x64.psd",
+          "source_sha256": "cf4e75aa86b730322456d5bdfdf5d74a4028f2cda1a15008e3c61f21989972f8",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/2B0863D6/fc60ed58_2B0863D6_512x64.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "2DA43E41",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/2DA43E41_1024x1024.psd",
+      "git_blob_sha": "ad1377c4256072baa32062e7238178c5b5d898f8",
+      "size_bytes": 42465165,
+      "queue_indexes": [
+        94
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "2DA43E41",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/2DA43E41_1024x1024.psd",
+      "git_blob_sha": "942b4aab2b3a678b71701d93ebe9486b3795b82c",
+      "size_bytes": 48517907,
+      "queue_indexes": [
+        94
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "313DB8CB",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256-v02-rankings-mini-flags.psd",
+      "git_blob_sha": "a0a8601bdd0fcfd4857ffbd045bf83cd67096cdd",
+      "size_bytes": 28477972,
+      "queue_indexes": [
+        139
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "31C58963",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v01/spr_sprani_sumo_fe_cvt_Exst/PRESS START Variants/31C58963_512x256-v01.psd",
+      "git_blob_sha": "8faecf3fb1010c4e8cfec2cf32c772cfbf490606",
+      "size_bytes": 775854,
+      "queue_indexes": [
+        140
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/31C58963/31C58963_512x256-v01.psd",
+          "source_sha256": "eb9ad0f04f22a5ea00a4d6ce7ea90dbb6618c5d02871be341a83a75d122d100f",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "31C58963",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_sumo_fe_cvt_Exst/31C58963-v02/31C58963_512x256-v02.psd",
+      "git_blob_sha": "1e00a7ab87ba5ad4d141fc6d36c4d4723134fe1e",
+      "size_bytes": 2089840,
+      "queue_indexes": [
+        140
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "33491F83",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/33491F83_512x256.psd",
+      "git_blob_sha": "e22ed4d6b9f7d8464fc40d724dd0b1d37e306104",
+      "size_bytes": 8669875,
+      "queue_indexes": [
+        62
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "37759842",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/37759842_1024x1024.psd",
+      "git_blob_sha": "22856a7bac060583c1a48b1df582b9dac4c65e3d",
+      "size_bytes": 33837910,
+      "queue_indexes": [
+        95
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "37759842",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/37759842_1024x1024.psd",
+      "git_blob_sha": "05251ab2d8549b405ec0437ac9cb00b1d5285988",
+      "size_bytes": 76719453,
+      "queue_indexes": [
+        95
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "39229D64",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_game_cvt_Exst/39229D64_1024x1024-v02_merged_layers-skip-action-step1.psd",
+      "git_blob_sha": "a149a602c91f2d1b1ab35170f311e864cc0041ac",
+      "size_bytes": 29419122,
+      "queue_indexes": [
+        57
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "39229D64",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_game_cvt_Exst/39229D64_1024x1024-v02-nearest-neighbor-clarissa.psd",
+      "git_blob_sha": "0e1bb7ed0ebaf416754413c6a85f0726a374e630",
+      "size_bytes": 76631362,
+      "queue_indexes": [
+        57
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "39BCA907",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_sumo_fe_cvt_Exst/39BCA907_512x256-v02-rankings.psd",
+      "git_blob_sha": "e962839fd046bfc6bbcb43175faaf1b53ff3275b",
+      "size_bytes": 1002696,
+      "queue_indexes": [
+        147
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/39BCA907/39BCA907_512x256-v02-rankings.psd",
+          "source_sha256": "93c8e7e8120dc71ed858dac7e712915d3aff48295d9d6a090907eb127030bbb0",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "411827E",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/411827E_512x512.psd",
+      "git_blob_sha": "196caae3ff5c9d9981e33d5a82f1d153b2842b80",
+      "size_bytes": 6880742,
+      "queue_indexes": [
+        97
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "411827E",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/411827E_512x512.psd",
+      "git_blob_sha": "308b43091d823c67cb39436cd67f052e2d04305f",
+      "size_bytes": 25713201,
+      "queue_indexes": [
+        97
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "42E618FD",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/42E618FD_512x32.psd",
+      "git_blob_sha": "1e376029dffd4ee9ecb1d517d1870d64e7102873",
+      "size_bytes": 2067761,
+      "queue_indexes": [
+        98
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/42E618FD/42E618FD_512x32.psd",
+          "source_sha256": "e1444b1bc64bf03a3ede344c8ad85b9c947cd9c63e75b5cf3fb28ef59e29042a",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "42E618FD",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/42E618FD_512x32.psd",
+      "git_blob_sha": "fd594e3cdb6f2f7b725a7aee2707b7af55b9012d",
+      "size_bytes": 2358759,
+      "queue_indexes": [
+        98
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "43B07A77",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_route_cvt_Exst/43B07A77_512x64.psd",
+      "git_blob_sha": "3c6976f1734d8d5a9de09022765401a3e1a4f2ac",
+      "size_bytes": 1277707,
+      "queue_indexes": [
+        89
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/43B07A77/43B07A77_512x64.psd",
+          "source_sha256": "d2a54d9b7a237e510466dcb3c37a6198bf6b1f737cdaef22131f7f85aadb4dc5",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "455717B2",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_congrats_cvt_Exst/455717B2_512x512-v02_merged_layers-skip-action-step1.psd",
+      "git_blob_sha": "eb43a59c6d827b9d5efd25b9e9c3deed31cae275",
+      "size_bytes": 9241974,
+      "queue_indexes": [
+        43
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "455717B2",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_congrats_cvt_Exst/455717B2_512x512-v02.psd",
+      "git_blob_sha": "378a24a765cdddc5f50e112afc6674d715f9d41b",
+      "size_bytes": 40153932,
+      "queue_indexes": [
+        43
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "4AFC1BED",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/clarissa/4AFC1BED_512x512.psd",
+      "git_blob_sha": "4100a80b7bcec51faa5f7214b41ae1d26bd1becb",
+      "size_bytes": 5500541,
+      "queue_indexes": [
+        25
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "4D38BBB0",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Header Backgrounds/4D38BBB0_1024x256-v01.psd",
+      "git_blob_sha": "8cd88789b01c01326da64fd580a681b8d41f845a",
+      "size_bytes": 64196550,
+      "queue_indexes": [
+        154
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "4F68708E",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/4F68708E_512x64.psd",
+      "git_blob_sha": "2438e4cfd3e370ca3fe0b9fda4502484941b9cc7",
+      "size_bytes": 2734504,
+      "queue_indexes": [
+        99
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/4F68708E/4F68708E_512x64.psd",
+          "source_sha256": "b16da54d9aee12014b7e732cb345b27410f964332fd575a86597b2d65d7906ba",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "53CE39D5",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/53CE39D5_512x512.psd",
+      "git_blob_sha": "5a6c3bca1c160a5c17b3ada597ca4f2b44a8792f",
+      "size_bytes": 7839222,
+      "queue_indexes": [
+        100
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "53CE39D5",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/53CE39D5_512x512.psd",
+      "git_blob_sha": "f440dfa1d25c9922627dc1b6174f9668c2ed7ec3",
+      "size_bytes": 49716834,
+      "queue_indexes": [
+        100
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "560FA536",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/560FA536_1024x1024.psd",
+      "git_blob_sha": "8e268fa4977e81ec1ae5902b07bf105755ec21e2",
+      "size_bytes": 40533651,
+      "queue_indexes": [
+        101
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "560FA536",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/560FA536_1024x1024.psd",
+      "git_blob_sha": "aeb6c31ca6b5170a09a441c4db326abe5670f534",
+      "size_bytes": 82198109,
+      "queue_indexes": [
+        101
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "560FA536",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/560FA536_1024x1024-stage-shots-source-only.psd",
+      "git_blob_sha": "566dc01ebe4a55defabfec9c5a220e2042c07204",
+      "size_bytes": 94263078,
+      "queue_indexes": [
+        101
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "590A4724",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/590A4724_512x512.psd",
+      "git_blob_sha": "8dab091572e028c54cf8ef5a07d4d19e366f0b22",
+      "size_bytes": 11189423,
+      "queue_indexes": [
+        103
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "590A4724",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/590A4724_512x512.psd",
+      "git_blob_sha": "c2010f99c35d4978f35410dd68735478b3082951",
+      "size_bytes": 35179524,
+      "queue_indexes": [
+        103
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "5B65E08C",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Main Menu Header Backgrounds/5B65E08C_512x256-v01.psd",
+      "git_blob_sha": "e047817a9c72e4ab8ed07eef675573f379aaa31b",
+      "size_bytes": 14929535,
+      "queue_indexes": [
+        164
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "62BEBF33",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/62BEBF33_512x64.psd",
+      "git_blob_sha": "e1879720c281a41059d0cfec12cbc46fb716cfd6",
+      "size_bytes": 606606,
+      "queue_indexes": [
+        104
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/62BEBF33/62BEBF33_512x64.psd",
+          "source_sha256": "eefb1c6a234e49e16789fd9fb2307f200cea84f3b8e6423e50d029eced60249b",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "638F38C0",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Polaroids/638F38C0_512x256.psd",
+      "git_blob_sha": "d0def12bf2a1b599aaf33a300eeaf270d27820aa",
+      "size_bytes": 63194548,
+      "queue_indexes": [
+        169
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "63C91067",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/clarissa/63C91067_512x512.psd",
+      "git_blob_sha": "27218ff76d0168ca0ece24d873a6d26413fdad95",
+      "size_bytes": 9179168,
+      "queue_indexes": [
+        26
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "6AB5CEE",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/jennifer/6AB5CEE_1024x1024.psd",
+      "git_blob_sha": "fe01eae2e49b4dcdcb375745648fdf7542400194",
+      "size_bytes": 38981445,
+      "queue_indexes": [
+        38
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "75C3586A",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/75C3586A_v02/75C3586A_512x512.psd",
+      "git_blob_sha": "9d9cb0607460dbc9460e0b75a76a2aeff9037a7d",
+      "size_bytes": 6109203,
+      "queue_indexes": [
+        176
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/75C3586A/75C3586A_512x512.psd",
+          "source_sha256": "792370acb2c535e6ee077c5a5b10a23bea5c8c38a1f762da6af00a9882046890",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/75C3586A/9d9cb060_75C3586A_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "788CE557",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/788CE557_512x256.psd",
+      "git_blob_sha": "966ffcc1339ee6304bd5fe8f212b91f8a977d58b",
+      "size_bytes": 3942669,
+      "queue_indexes": [
+        106
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "788CE557",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/788CE557_512x256.psd",
+      "git_blob_sha": "4a569fb023c5aa32342ac87de4da4eff03d4cd08",
+      "size_bytes": 8295538,
+      "queue_indexes": [
+        106
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "798A1E",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Polaroids/798A1E_1024x256.psd",
+      "git_blob_sha": "023b51fe7326dabfe530666f6d35f5a0744f06e5",
+      "size_bytes": 9224213,
+      "queue_indexes": [
+        178
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "7ABD5110",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Polaroids/7ABD5110_1024x256.psd",
+      "git_blob_sha": "580c46c3a2786cc17d3c31d458e600c59345a9d5",
+      "size_bytes": 15625317,
+      "queue_indexes": [
+        180
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "7D747BED",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/7D747BED_v02/7D747BED_512x128.psd",
+      "git_blob_sha": "7ba240db792aab14041a43818a049fcbd80e5ecc",
+      "size_bytes": 1402329,
+      "queue_indexes": [
+        182
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/7D747BED/7D747BED_512x128.psd",
+          "source_sha256": "58a3504fe3602b9ba943813b693cb1456a1093b02b91b3f4137aba1b9104e978",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "8215FD25",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/flagman/8215FD25_1024x512.psd",
+      "git_blob_sha": "a2fa10346185ef39e1dcb753184b0e605f3c7829",
+      "size_bytes": 32399305,
+      "queue_indexes": [
+        30
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "841E796B",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/841E796B_512x128.psd",
+      "git_blob_sha": "f2e82aac975f652066b2e3b18eb1f152bdb6e22d",
+      "size_bytes": 3263512,
+      "queue_indexes": [
+        107
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/841E796B/841E796B_512x128.psd",
+          "source_sha256": "9331393520f55930ffa9b60ecee4f4ae5fb514400a1b5d31f875e101b45c370f",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "8C259C68",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/8C259C68_v02/8C259C68_512x512.psd",
+      "git_blob_sha": "e1b1b75f40136d17c108746a9ba5eafcd06fc62f",
+      "size_bytes": 1773904,
+      "queue_indexes": [
+        188
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/8C259C68/8C259C68_512x512.psd",
+          "source_sha256": "41aa999f764109eec5a4d3153077bd9b1bd084214bd8701187cbc80eb09d132b",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/8C259C68/e1b1b75f_8C259C68_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "A05BF610",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/clarissa/A05BF610_512x512.psd",
+      "git_blob_sha": "d7ccc90fd6d6a22c920d2e1dfb6f9e993d323f9a",
+      "size_bytes": 22860492,
+      "queue_indexes": [
+        28
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "A064FDFC",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_game_cvt_Exst/A064FDFC_1024x512-v02.psd",
+      "git_blob_sha": "872dd7661e5ff659170b0eabdd2ca9bb5d13cfee",
+      "size_bytes": 44136566,
+      "queue_indexes": [
+        60
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/A064FDFC/A064FDFC_1024x512-v02.psd",
+          "source_sha256": "cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/A064FDFC/872dd766_A064FDFC_1024x512-v02.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "A82266FC",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/flagman/A82266FC_1024x512.psd",
+      "git_blob_sha": "d6cee831ac74ef55fa39811597b7a8d1096d3288",
+      "size_bytes": 10207352,
+      "queue_indexes": [
+        31
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "AA04D779",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/AA04D779_v02/AA04D779_512x512.psd",
+      "git_blob_sha": "6dc822abb5ee5539f6dd5cc1b56910b7b090b454",
+      "size_bytes": 10280244,
+      "queue_indexes": [
+        46
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "ACF61D7C",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_sumo_fe_cvt_Exst/ACF61D7C-v02/ACF61D7C_1024x512-v02.psd",
+      "git_blob_sha": "ef8c36f043bcbda666f71d9013bfe0495be438ed",
+      "size_bytes": 9986288,
+      "queue_indexes": [
+        205
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/source_psd_upstream/ACF61D7C/ef8c36f0_ACF61D7C_1024x512-v02.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "AD720950",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/AD720950_v02/AD720950_1024x256.psd",
+      "git_blob_sha": "c7a3ff06b81f3e22f31ab3a693b800998f4bf9c3",
+      "size_bytes": 5374793,
+      "queue_indexes": [
+        47
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/AD720950/AD720950_1024x256.psd",
+          "source_sha256": "53292beece6e09aba049a2c36a6e4bf43e445393250a7334502f17ab05fc3c66",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "B1696633",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/B1696633_v02/B1696633_512x512.psd",
+      "git_blob_sha": "afef4d1da2bff90d8b7a8816fffcc3160cccceb4",
+      "size_bytes": 10390422,
+      "queue_indexes": [
+        48
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "B7E25BAD",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/holly/B7E25BAD_1024x512.psd",
+      "git_blob_sha": "3f7944dfbb98393e3cc6788f88c75a596c4c3dd4",
+      "size_bytes": 29901162,
+      "queue_indexes": [
+        34
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "BA0147DA",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/BA0147DA_v02/BA0147DA_512x512.psd",
+      "git_blob_sha": "28117e7e18fbdd95b9c26a6aefd79d5d1af85383",
+      "size_bytes": 7838153,
+      "queue_indexes": [
+        212
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/BA0147DA/BA0147DA_512x512.psd",
+          "source_sha256": "be5095d2598a831461e2e345c8fd2cead0cdd8de00ea7481256f0494c671d736",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/BA0147DA/28117e7e_BA0147DA_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "BF3EE5C6",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/BF3EE5C6_v02/BF3EE5C6_512x512.psd",
+      "git_blob_sha": "498540db2fec8bb4f6528ef41c3af79ad6f4d22f",
+      "size_bytes": 9339228,
+      "queue_indexes": [
+        49
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/BF3EE5C6/BF3EE5C6_512x512.psd",
+          "source_sha256": "7efc2461045eea5623282e3bab2e8ede8b6d71933cde7ba43d3b9c8bc92b51a2",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/BF3EE5C6/498540db_BF3EE5C6_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "C05E67EF",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_sumo_fe_cvt_Exst/C05E67EF_128x64-v02-rankings.psd",
+      "git_blob_sha": "83c55a4bbff5921bda98f95041ba2c2524dd54b2",
+      "size_bytes": 184228,
+      "queue_indexes": [
+        215
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/C05E67EF/C05E67EF_128x64-v02-rankings.psd",
+          "source_sha256": "3da2f0b0489143666ade6f5addf33337da0ee21a7a142c13ef642999145f413b",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "C075FB49",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/C075FB49_512x512.psd",
+      "git_blob_sha": "95d6162f096b12c65142305554d685ffb98d833c",
+      "size_bytes": 10965436,
+      "queue_indexes": [
+        111
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "C075FB49",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/C075FB49_512x512.psd",
+      "git_blob_sha": "ef62593ca844c60c37e7cbc4a1b3f3ad0f6f961f",
+      "size_bytes": 19238763,
+      "queue_indexes": [
+        111
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "C4A2937B",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024-v02-nearest-neighbor-clarissa.psd",
+      "git_blob_sha": "2e9fc845c7eea006839b94c429a4457efd6bf6f5",
+      "size_bytes": 54406852,
+      "queue_indexes": [
+        61
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "CBF8ECBF",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/CBF8ECBF_v02/CBF8ECBF_1024x512_gamepad-xbox-controller-s.psd",
+      "git_blob_sha": "d7972db69a280d44879d68f72c8e84b7940032c4",
+      "size_bytes": 5428721,
+      "queue_indexes": [
+        50
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "CBF8ECBF",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/CBF8ECBF_v02/CBF8ECBF_1024x512.psd",
+      "git_blob_sha": "545259dc267af6e4f14207d5d9d5fdc0e19ed671",
+      "size_bytes": 71074278,
+      "queue_indexes": [
+        50
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "D263B3F1",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_sumo_fe_cvt_Exst/D263B3F1_512x512-v02-lens-flare+photo-border.psd",
+      "git_blob_sha": "e590832caa0e339728a0a87e1da9c44522c37fc7",
+      "size_bytes": 54357547,
+      "queue_indexes": [
+        219
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "D41D0B1",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/D41D0B1_512x64.psd",
+      "git_blob_sha": "78ca4ec63a501bbf2f6669cc8bd6d69e354e8efc",
+      "size_bytes": 1634378,
+      "queue_indexes": [
+        112
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/D41D0B1/D41D0B1_512x64.psd",
+          "source_sha256": "a7b9afc8cc9b4884f4d86015d489ea830076af0da63423191796b84141de0440",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "DCC7B488",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/flagman/DCC7B488_512x256.psd",
+      "git_blob_sha": "ced16bf18964ca57c1d9365169c5f9b71e48fa70",
+      "size_bytes": 3413518,
+      "queue_indexes": [
+        32
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/DCC7B488/DCC7B488_512x256.psd",
+          "source_sha256": "5d90681d0ca9d2343026c063f5de31dd06702dc4c58878e32c95ef0311bbd883",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "E3C455FA",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/E3C455FA_v02/E3C455FA_512x256.psd",
+      "git_blob_sha": "0a58c3b7b92e711a907bab4e726fc1d4c57ec122",
+      "size_bytes": 7060575,
+      "queue_indexes": [
+        225
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "E3FD08BE",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/E3FD08BE_512x64.psd",
+      "git_blob_sha": "55935a5e99b34ee99390a922db9f81fa471ac937",
+      "size_bytes": 699662,
+      "queue_indexes": [
+        116
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/E3FD08BE/E3FD08BE_512x64.psd",
+          "source_sha256": "3406257ce04ed7af0ef554496095236587133df445fb695aa305ac6703800185",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "E596B7AC",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/E596B7AC_v02/E596B7AC_512x512.psd",
+      "git_blob_sha": "def2717473a5fdbb1e16d602bf967af1959be152",
+      "size_bytes": 3729525,
+      "queue_indexes": [
+        227
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/E596B7AC/E596B7AC_512x512.psd",
+          "source_sha256": "560e794deeaa1f0293241885f4bd4ffe1677285a8623a129ca6ebac149963e29",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/E596B7AC/def27174_E596B7AC_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "E95DA5",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/E95DA5_v02/E95DA5_512x256.psd",
+      "git_blob_sha": "0ca28fa2ee93985682f2a4a19d8a66551ca388f7",
+      "size_bytes": 2596632,
+      "queue_indexes": [
+        230
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/E95DA5/E95DA5_512x256.psd",
+          "source_sha256": "7c10141cd63e39a61e83dd12d18b99194e252cf25a7b2d1150caa4109fca4043",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/E95DA5/0ca28fa2_E95DA5_512x256.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "E989E3B7",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/holly/E989E3B7_1024x1024.psd",
+      "git_blob_sha": "d53a2891b396507f209d3b1c643862daf0c75800",
+      "size_bytes": 26001968,
+      "queue_indexes": [
+        35
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "EBEF6D20",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.psd",
+      "git_blob_sha": "e1bf95fb3f3a40cc25ba04ca4b3ed6539a4e733b",
+      "size_bytes": 10322648,
+      "queue_indexes": [
+        65
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "F6811E94",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/F6811E94_512x64.psd",
+      "git_blob_sha": "880d979295860599033dd062f042a8db278a4417",
+      "size_bytes": 744254,
+      "queue_indexes": [
+        119
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/F6811E94/F6811E94_512x64.psd",
+          "source_sha256": "7050d00f3c621b580076be1e65fd75ab5751638dbf6a5b1530b2799556126b87",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "FA7BBB13",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512-v02_merged_layers-skip-action-step1.psd",
+      "git_blob_sha": "f4d5e46bd48f23ac3cbe7ea018b8f28d0bca6488",
+      "size_bytes": 20796164,
+      "queue_indexes": [
+        54
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "FA7BBB13",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512-v02.psd",
+      "git_blob_sha": "2b519abccae42e4a0980174ad3aea2c7376c57eb",
+      "size_bytes": 44620580,
+      "queue_indexes": [
+        54
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "FBCAB18D",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/flagman/FBCAB18D_1024x512.psd",
+      "git_blob_sha": "1ee1bcd72dbd1104598c452443211861920d4f84",
+      "size_bytes": 1607713,
+      "queue_indexes": [
+        33
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "FD90AA9",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/FD90AA9_1024x1024.psd",
+      "git_blob_sha": "33ab6d90ea8e9c9cb75125aaff1efa3d4e4e299d",
+      "size_bytes": 27273462,
+      "queue_indexes": [
+        121
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/FD90AA9/FD90AA9_1024x1024.psd",
+          "source_sha256": "0b5f7d32ea66b4d6546775af7759b927b8b26f1a5e768dd99adf80a02f95e081",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
+    },
+    {
+      "texture_hash": "FD90AA9",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v02/FD90AA9_1024x1024.psd",
+      "git_blob_sha": "68e32365e868f014bbb923b025103bb54ae1cd88",
+      "size_bytes": 46065393,
+      "queue_indexes": [
+        121
+      ],
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/source_psd_upstream/FD90AA9/68e32365_FD90AA9_1024x1024.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
+    },
+    {
+      "texture_hash": "FF2462BB",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/FF2462BB_v02/FF2462BB_1024x512.psd",
+      "git_blob_sha": "a86cb699f5962157204d6d403ab7f50576974945",
+      "size_bytes": 16990645,
+      "queue_indexes": [
+        51
+      ],
+      "copied_into_branch": false
+    }
+  ],
+  "copied_unique_source_files": 27,
+  "copied_distinct_texture_hashes": 26,
+  "copy_status": "SOURCE_PSD_BYTES_ONLY_LAYER_AND_CANONICAL_GAME_DDS_VALIDATION_SEPARATE",
+  "last_verified_at_kst": "2026-10-11 20:47 KST"
+}
