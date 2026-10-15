@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "2ab53f33c025c03a0c7cf7f42fe014c8ad35dcfd",
-  "material_result_sha": null,
+  "material_result_sha": "94c91bcfd400e99f5b4e19d3b3d436a290f3d02a",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
@@ -90,6 +90,24 @@
     "eye_ownership": "Existing R29 R7 left/right GPU physical replay and conservative R13 recovery remain in force; only a proven player contact-shadow changes disparity decision.",
     "negative_test_evidence": "Portable C++ guard rejects foreign tokens, queues, HUD, central lens, missing WVP, depth writes, stencil writes and forced zero disparity."
   },
-  "next_action": "Inspect mandatory GitHub Actions at final SHA; repair only real failures and then record C6. Quest3/VDXR runtime remains UNTESTED.",
-  "score_delta_this_attempt": 0
+  "next_action": "Use this single final result/feature-record commit as exact input for four required DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector Gates; do not claim C6 until all four SUCCESS; preserve original source material SHA. HMD UNTESTED.",
+  "score_delta_this_attempt": 0,
+  "source_candidate_sha": "38f243818335ee42885b101ae909c71274aaa0f4",
+  "ci_repair_history": [
+    {
+      "sha": "94c91bcfd400e99f5b4e19d3b3d436a290f3d02a",
+      "failure": "DX9Ex Active policy verifier expected a sole legacy stencil-disabled source predicate; new exact player-shadow branch repeated the same text.",
+      "run_id": 38806963949
+    },
+    {
+      "sha": "cad688e19e97f17eb107aad5820fb12d7b46cc0d",
+      "failure": "Legacy start-shadow source verifier expected the old three-argument ScopedExactProducerSemantic call, not the new exact CarBaseShadow producer.",
+      "run_id": 38807238874
+    },
+    {
+      "sha": "38f243818335ee42885b101ae909c71274aaa0f4",
+      "repair": "Preserve unchanged equivalent stencil zero condition and extend exact source-regression pattern to require CarBaseShadow with negative wrong-owner mutation; DX9Ex policy and Domain Guard confirmed PASS.",
+      "run_id": 38807317348
+    }
+  ]
 }
