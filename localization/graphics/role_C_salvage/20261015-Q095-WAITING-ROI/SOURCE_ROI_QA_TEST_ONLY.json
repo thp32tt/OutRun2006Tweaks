@@ -1,0 +1,89 @@
+{
+  "schema": "outrun-c-roi-source-verification-v1",
+  "TASK_ID": "OUTRUN-C-ROI-SOURCE-Q095-WAITING-20261015-2233",
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "QA": "TEST_ONLY",
+  "source_platform": "PC",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "original_dds_git_blob": "c888e9b1c87dabdc7a6f5ef47dd88498b95b2d83",
+  "source_dds_path": "localization/validation/binary_compare/pairs/37759842/original/37759842_1024x1024.dds",
+  "source_dds_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+  "source_png_original_path": "localization/graphics/reference_packs/full_dds_test/37759842_FULL_ENGLISH_ORIGINAL_FLIPY_1024x1024.png",
+  "source_png_sha256": "8b78a092b5ca82276076cc5d99b05afd0831651ae2d4afbbcf7486f4693fa7c9",
+  "source_dimensions": [
+    1024,
+    1024
+  ],
+  "source_orientation": "FLIP_Y_READABLE",
+  "source_provenance": "PINNED_FULL_ORIGINAL_PC_DDS; PNG_DIRECT_DDS_PIXEL_EXACT",
+  "english": "Waiting for entries.",
+  "korean": "참가자를 기다리는 중입니다.",
+  "translation_source": "localization/graphics/transcriptions.jsonl:index=95:transcribed_reviewed",
+  "native_bbox_xyxy": [
+    0,
+    180,
+    395,
+    236
+  ],
+  "alpha_bbox_xyxy": [
+    2,
+    184,
+    388,
+    233
+  ],
+  "alpha_margins_LTRB_px": [
+    2,
+    4,
+    7,
+    3
+  ],
+  "edge_alpha_2px_nonzero_TBLR": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "alpha_nonzero_count": 13092,
+  "native_dimensions": [
+    395,
+    56
+  ],
+  "native_png_sha256": "b96ca5b4a3afd90c34270d47efc7a920fa25fe847ab048dcbd713c97ab8e7bb0",
+  "upscale": 4,
+  "input_dimensions": [
+    1580,
+    224
+  ],
+  "imagegen_input_sha256": "322626bcb8548b0dfb44d43853d90e0d4da9d779b78875e2a35e798374388052",
+  "visual_review": "ONE_INDEPENDENT_FULL_WAITING_FOR_ENTRIES_PHRASE_WITH_SHADOW_OUTLINE; NO_NEIGHBOR_PHRASE_IN_CROP",
+  "old_986_tiles_used": false,
+  "original_ab_queue_consumed": false,
+  "imagegen_called": false,
+  "ab_automatic_dispatch": false,
+  "hangul_layer": "NOT_GENERATED",
+  "CLEAN_PLATE": "NOT_GENERATED",
+  "manual_mask": "NOT_USED",
+  "ui_cell_uv_safety": "PENDING_INDEPENDENT_REVIEW",
+  "native_restore_policy": "PRESERVE_ASPECT_RATIO; FIT_INSIDE_VERIFIED_UI_CELL_UV; DO_NOT_REJECT_WIDTH_DIFFERENCE_ALONE",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER_GAME": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "checks": {
+    "github_direct_original_dds_sha": true,
+    "full_original_png_sha": true,
+    "full_png_pixel_equal_direct_pc_dds_flip_y": true,
+    "native_pixel_exact_source_crop": true,
+    "upscaled_pixel_exact_4x_lanczos": true,
+    "source_and_crop_rgba": true,
+    "source_and_crop_dimensions": true,
+    "native_sha_matches_extractor_manifest": true,
+    "input_sha_matches_extractor_manifest": true,
+    "no_alpha_edge_touch_2px": true,
+    "alpha_margins_at_least_2px": true,
+    "approved_exact_translation": true,
+    "spec_mapping_and_source_binding": true,
+    "schema_and_test_only": true
+  }
+}
