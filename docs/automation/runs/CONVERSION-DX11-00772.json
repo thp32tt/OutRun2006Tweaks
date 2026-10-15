@@ -10,16 +10,16 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:LIVE_HOMOGENEOUS_CAMERA_PLANE_DRAW",
   "feature_id": "DX11-LIVE-CAMERA-PLANE-FRAME",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "62c8bda5bbf2d2220db6355427340e2263441219",
+  "validation_bearing_result_sha": "62c8bda5bbf2d2220db6355427340e2263441219",
   "changed_files": [
     "src/vr/d3d11/live_game_object_clip.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -50,9 +50,9 @@
     ]
   },
   "acceptance_results": {
-    "live-camera-plane-draw": "PENDING",
-    "degenerate-clip-fallback": "PENDING",
-    "exact-build-ci": "PENDING"
+    "live-camera-plane-draw": "PASS",
+    "degenerate-clip-fallback": "PASS",
+    "exact-build-ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -91,14 +91,23 @@
     "C0_RECOVER": "Read branch c619aee, AGENTS.md, policy, and latest 00771 source; selected disjoint near-camera geometry gate.",
     "C1_REVIEW": "Existing object clip guard rejected every W=0 world-space vertex despite homogeneous GPU clip capability.",
     "C2_IMPLEMENT": "Admit finite nondegenerate W=0 camera-plane edge vertex in real bridge source and preserve zero-vector/nonfinite fallbacks; update connected C++/mutation regressions.",
-    "C3_VALIDATE": "Local portable C++17 smoke PASS; GitHub five exact-SHA CI pending.",
-    "C4_COMMIT": "PENDING_BRANCH_COMMIT",
+    "C3_VALIDATE": "Local portable C++17 smoke PASS; user-confirmed GitHub exact-SHA CI SUCCESS at 62c8bda5bbf2d2220db6355427340e2263441219.",
+    "C4_COMMIT": "Material source+regression commit 62c8bda5bbf2d2220db6355427340e2263441219; no source changes in C6 bookkeeping.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GATE"
+    "C6_STATE": "PASS_EXACT_SHA/COMPLETE_BUILD_VERIFIED at 62c8bda5bbf2d2220db6355427340e2263441219; Quest3/VDXR/gamepad runtime UNTESTED."
   },
   "evidence": {
     "runtime": "No OutRun game, Quest3, VDXR or gamepad tests were executed; no backend promotion.",
-    "local_probe": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic /tmp/dx11_00772_probe.cpp PASS"
+    "local_probe": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic /tmp/dx11_00772_probe.cpp PASS",
+    "c6_validation": {
+      "validation_sha": "62c8bda5bbf2d2220db6355427340e2263441219",
+      "ci_result": "SUCCESS",
+      "ci_result_source": "user-confirmed exact-SHA GitHub CI result",
+      "validated_source_commit_verified": true,
+      "branch_matched_validation_sha_at_c6": true,
+      "hmd_test_performed": false,
+      "bookkeeping_does_not_change_validated_sha": true
+    }
   },
   "base_head_sha": "c619aee003bf26d22565e2c742be4906b9b70956"
 }
