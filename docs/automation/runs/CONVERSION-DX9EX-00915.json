@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "642372adc3282501292172008c16b2f53d68e8e0",
   "material_result_sha": "2859f8ea9938db5a35cf779764540bf896129662",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
   "source_paths": [
     "src/hooks_uiscaling.cpp"
   ],
@@ -63,9 +63,9 @@
     ]
   },
   "acceptance_results": {
-    "rotation_only_frontend_aspect": "PENDING_BUILD",
-    "optional_vector_and_owner_fallback": "PENDING_BUILD",
-    "exact_sha_ci": "PENDING_EXACT_SHA"
+    "rotation_only_frontend_aspect": "PASS_BUILD",
+    "optional_vector_and_owner_fallback": "PASS_BUILD",
+    "exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The menu full-affine path was gated on (pScaling || pTranslation) even though both D3DX inputs are optional and an independently supplied rotation can yield a non-identity matrix; the rotation-only matrix bypassed aspect-preserving post-composition.",
@@ -84,16 +84,57 @@
     "eye_ownership": "Same original game-menu matrix is authored before R84 binocular LOCAL menu composition; both eyes inherit identical contained native-aspect source sprite."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
-    ]
+    ],
+    "validation_bearing_result_sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
+    "material_result_sha": "2859f8ea9938db5a35cf779764540bf896129662",
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38798233917,
+        "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38798234034,
+        "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38798234451,
+        "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38798234206,
+        "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ],
+    "initial_failed_gate": {
+      "run_id": 38798036808,
+      "sha": "2859f8ea9938db5a35cf779764540bf896129662",
+      "reason": "Noncanonical symptom_id and visual feature_class in feature record; compiled source not evaluated by failed policy gate"
+    },
+    "repair_sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
+    "record_note": "C6 bookkeeping-only [skip ci] after four exact-SHA SUCCESS workflows; preserve original C++ material commit and no duplicate score."
   },
-  "runtime_evidence": "Quest3/VDXR run not performed; no claim of fixed optical menu in real hardware.",
+  "runtime_evidence": "Quest3/VDXR HMD gameplay has not been executed for this exact-SHA build; visual/optical and FPS correctness remain UNTESTED.",
   "score_delta_this_attempt": 0,
   "score_once": false,
-  "ci_repair_note": "Exact-SHA 2859f8e policy gate rejected noncanonical symptom_id and visual feature_class before any compilation. Canonicalized existing MAIN_MENU symptom and class, retained unchanged material source and all gate coverage."
+  "ci_repair_note": "Exact-SHA 2859f8e policy gate rejected noncanonical symptom_id and visual feature_class before any compilation. Canonicalized existing MAIN_MENU symptom and class, retained unchanged material source and all gate coverage.",
+  "retry_recovered_event_id": "CONVERSION-DX9EX-00915-E003",
+  "retry_recovered_attempt": 2
 }
