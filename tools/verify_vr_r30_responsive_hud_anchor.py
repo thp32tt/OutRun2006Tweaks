@@ -376,7 +376,25 @@ assert "CurrentSpriteQueueProducer ==" not in arrow_scope
 # synchronous original call, that same semantic API supplies direct owner.
 semantic_src = (root / "src/vr/game/render_semantics.hpp").read_text()
 assert "SpriteQueueDepth != 0" in semantic_src
-assert "? CurrentSpriteQueueProducer : CurrentDirectExactProducer;" in semantic_src
+# The exact synchronous C993 lens lifetime now takes precedence over nested
+# direct helper scopes, but never over an active queued ESC SpriteNode.
+# Keep the ESC contract tied to executable producer priority, not to the
+# historical ternary implementation's literal source formatting.
+queue_ownership = semantic_src.split(
+    "inline ProducerToken CurrentRenderProducerToken() noexcept", 1)[1].split(
+    "class ScopedExactLensCentreGpuDraw", 1)[0]
+assert queue_ownership.index("if (SpriteQueueDepth != 0)") < (
+    queue_ownership.index("return CurrentSpriteQueueProducer;")) < (
+    queue_ownership.index("if (ExactLensCentreDrawOwnsSemantic())")) < (
+    queue_ownership.index("return CurrentDirectExactProducer;"))
+assert "return ProducerToken::LensFlareCentre;" in queue_ownership
+for original, corrupt in (
+    ("if (SpriteQueueDepth != 0)", "if (false)"),
+    ("return CurrentSpriteQueueProducer;", "return CurrentDirectExactProducer;"),
+    ("return CurrentDirectExactProducer;", "return ProducerToken::None;"),
+):
+    mutant = queue_ownership.replace(original, corrupt, 1)
+    assert original not in mutant
 for original, corrupt in (
     ("RenderScope::ScreenHud", "RenderScope::WorldBillboard"),
     ("ProducerToken::ExactScreenHudClipSprite",
