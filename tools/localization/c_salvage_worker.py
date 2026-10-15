@@ -22,6 +22,7 @@ import numpy as np
 from PIL import Image
 
 import c_salvage_compose as composer
+import c_salvage_atlas
 
 SCHEMA = "outrun-c-salvage-worker-v1"
 NAME = re.compile(r"^(Q(?P<index>\d+)_)(?P<hash>[0-9A-Fa-f]{7,8})_.+_k\.png$")
@@ -118,7 +119,8 @@ def source_tile_evidence(candidate: Path, source_dirs: list[Path]):
 
 
 def handle_png(role: str, p: Path, output: Path, source_dirs: list[Path],
-               masks: Path | None, catalog: dict, repo_root: Path | None):
+               masks: Path | None, catalog: dict, repo_root: Path | None,
+               atlas_proof: dict | None = None):
     match = NAME.match(p.name)
     if not match:
         return "SKIP_FILENAME", False
@@ -135,6 +137,8 @@ def handle_png(role: str, p: Path, output: Path, source_dirs: list[Path],
     rawsha = sha(raw)
     masksha = sha(mask_blob)[:10] if mask_blob is not None else "autoalpha"
     source_ev = source_tile_evidence(p, source_dirs)
+    if atlas_proof is not None:
+        source_ev['assembled_full_atlas'] = atlas_proof
     psd_ev = psd_evidence(int(match.group("index")), match.group("hash"), catalog, repo_root)
     # A formerly missing source/PSD may be staged after the first HOLD. It must
     # cause a new receipt without overwriting the historical inspection.
@@ -253,7 +257,18 @@ def run_once(args):
         if repo_root else None)
     counts = {}
     added = 0
-    source_dirs = [root / name for name in ("a_tile_batches/upright_sources", "ab_batches/upright_sources")]
+    # Assemble the full English texture first. Never treat one tile as a DDS.
+    atlas_result = c_salvage_atlas.run_atlas_first(
+        root, out, max_groups=min(4, args.max_per_cycle))
+    added += atlas_result["new"]
+    counts.update(atlas_result["counts"])
+    atlas_ready = atlas_result["ready"]
+    require_atlas = getattr(args, "require_atlas", False) or atlas_result["mapping_present"]
+    if require_atlas and not atlas_result["mapping_present"]:
+        counts["HOLD_CANONICAL_TILE_MAPPING_MISSING"] = 1
+    source_dirs = [root / name for name in (
+        "a_tile_batches/upright_sources", "ab_batches/upright_sources",
+        str(c_salvage_atlas.MAP_REL.parent))]
     mask_dir = Path(args.masks_dir).resolve() if args.masks_dir else None
     for role in ("A", "B"):
         directory = root / "ab_batches/candidate_outputs" / role
@@ -263,8 +278,16 @@ def run_once(args):
         for path in sorted(directory.glob("*.png")):
             if added >= args.max_per_cycle:
                 break
+            # Never extract/move an A/B tile before its entire source atlas
+            # has been reassembled with exact SHA and complete pixel coverage.
+            original_name = path.name[:-6] + ".png" if path.name.endswith("_k.png") else ""
+            proof = atlas_ready.get(original_name)
+            if require_atlas and proof is None:
+                counts["HOLD_ATLAS_NOT_READY"] = counts.get("HOLD_ATLAS_NOT_READY", 0) + 1
+                continue
             try:
-                status, changed = handle_png(role, path, out, source_dirs, mask_dir, catalog, repo_root)
+                status, changed = handle_png(role, path, out, source_dirs,
+                                             mask_dir, catalog, repo_root, proof)
             except (ValueError, OSError) as err:
                 status, changed = ("HOLD_CANDIDATE_ERROR", False)
                 print(json.dumps({"file": path.name, "error": str(err)}, ensure_ascii=False), file=sys.stderr)
@@ -292,6 +315,9 @@ def run_once(args):
                 added += int(changed)
     report = {"schema": SCHEMA, "at": datetime.now(timezone.utc).isoformat(),
               "new_processed_items": added, "counts": counts,
+              "source_atlas_groups_processed": atlas_result["new"],
+              "source_atlas_ready_tile_count": len(atlas_ready),
+              "require_source_atlas": require_atlas,
               "source_root": str(root), "output_root": str(out),
               "mode": "OFFLINE_NO_IMAGEGEN_TEST_ONLY",
               "C1": "NOT_RUN", "game": "UNTESTED", "deployment_attestation": "NOT_CHECKED_BY_WORKER"}
@@ -313,6 +339,8 @@ def main():
     p.add_argument("--bundle-root", default=None, help="Optional isolated reviewed source/DDS/PSD/CLEAN bundle; never A/B live data")
     p.add_argument("--plate-jobs-dir", default=None, help="Reviewed PSD/source English-removal jobs")
     p.add_argument("--masks-dir", default=None)
+    p.add_argument("--require-atlas", action="store_true",
+                   help="Fail closed when canonical tile mapping/full atlas is absent")
     p.add_argument("--max-per-cycle", type=int, default=10)
     p.add_argument("--interval-seconds", type=int, default=1800)
     p.add_argument("--loop", action="store_true", help="Only after user's manual deployment")
