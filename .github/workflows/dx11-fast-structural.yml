@@ -153,6 +153,8 @@ jobs:
           python tools/test_dx11_pre_draw_depth_clear_00734.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_depth_clear_00734.cpp -o /tmp/dx11_pre_draw_depth_00734 && /tmp/dx11_pre_draw_depth_00734
           python tools/test_dx11_full_frame_color_seed_00735.py
+          python tools/test_dx11_full_game_masked_draw_00763.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_game_masked_draw_00763.cpp -o /tmp/dx11_masked_game_00763 && /tmp/dx11_masked_game_00763
           python tools/test_dx11_full_clear_clipped_00762.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_clear_clipped_00762.cpp -o /tmp/dx11_clear_clip_00762 && /tmp/dx11_clear_clip_00762
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_color_seed_00735.cpp -o /tmp/dx11_color_seed_00735 && /tmp/dx11_color_seed_00735

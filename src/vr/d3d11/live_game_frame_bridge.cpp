@@ -36,6 +36,7 @@
 #include "native_game_partial_dirty_upload.hpp"
 #include "native_game_multi_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
+#include "native_game_masked_draw.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
 #include "native_game_backbuffer_admission.hpp"
@@ -2239,9 +2240,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                             D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA;
     const DWORD visibleMask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
                               D3DCOLORWRITEENABLE_BLUE;
-    // Zero, alpha-only and unknown bits cannot produce trustworthy RGB inset
-    // evidence. D3D9 still draws those game primitives without interception.
-    if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;
+    // The inset remains RGB-only. Full-size A8 destination alpha is sampled
+    // by later game blend passes; a source depth-write-only game Draw updates
+    // native DSV even when RGB is masked off. Reject unobservable or unknown
+    // writes and retain original D3D9 gamepad/Draw/Present as fallback.
+    if ((colorMask & ~legalMask) ||
+        (!(colorMask & visibleMask) &&
+         !GameNativeMaskedDraw::accepts_source_mask(
+             colorMask, fullFrame, sourceDesc.Format == D3DFMT_A8R8G8B8,
+             output.nativeDepthTest && output.nativeDepthWrite)))
+        return false;
     output.colorWriteMask = static_cast<std::uint8_t>(
         ((colorMask & D3DCOLORWRITEENABLE_RED) ? D3D11_COLOR_WRITE_ENABLE_RED : 0u) |
         ((colorMask & D3DCOLORWRITEENABLE_GREEN) ? D3D11_COLOR_WRITE_ENABLE_GREEN : 0u) |
@@ -4865,6 +4873,13 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             output.colorWriteMask = s.clearColor.native_write_mask(
                 reinterpret_cast<std::uintptr_t>(game), output.targetIdentity,
                 output.colorWriteMask);
+            // X8 masks alpha to zero. Such a game draw is still meaningful
+            // only if the accepted native DSV can record its depth prepass.
+            // No-effect Draws must not certify a full game color frame.
+            if (output.colorWriteMask == 0u && !output.nativeDepthWrite) {
+                s.frameBatch.abort();
+                return;
+            }
         }
         if (indexCount && (!indices || indexCount != expectedElements ||
                            vertexCount > kMaxVertices)) {
