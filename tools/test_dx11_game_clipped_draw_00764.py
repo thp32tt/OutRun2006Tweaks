@@ -20,7 +20,6 @@ def wired(src, predicate):
         "SUCCEEDED(game->GetViewport(&sourceViewport))",
         "SUCCEEDED(game->GetScissorRect(&sourceScissor))",
         "&& GameNativeScissorClip::excludes_viewport(",
-        "GameNativeScissorClip::excludes_viewport(",
         "s.frameBatch.absorb_empty_source_draw(",
         "s.frameBatch.abort();",
         "return;",
@@ -35,7 +34,7 @@ def wired(src, predicate):
         if pos < 0:
             return False
         cursor = pos + len(token)
-    if "if (!s.frameBatch.absorb_empty_source_draw(\\n                            sourceOrdinal, sameSourceFullClear))" not in body:
+    if "if (!s.frameBatch.absorb_empty_source_draw(\n                            sourceOrdinal, sameSourceFullClear))" not in body:
         return False
     return all(t in predicate for t in (
         "viewportWidth == 0u || viewportHeight == 0u",
@@ -49,8 +48,8 @@ assert wired(bridge,header), "scissor no-op Draw/DrawIndexed path not connected"
 for old,new in (
     ("scissorEnabled == TRUE", "scissorEnabled == FALSE"),
     ("GameNativeScissorClip::excludes_viewport(", "false /* skip scissor */ && GameNativeScissorClip::excludes_viewport("),
-    ("if (!s.frameBatch.absorb_empty_source_draw(\\n                            sourceOrdinal, sameSourceFullClear))",
-     "if (false /* no clipped ordinal */ && !s.frameBatch.absorb_empty_source_draw(\\n                            sourceOrdinal, sameSourceFullClear))"),
+    ("if (!s.frameBatch.absorb_empty_source_draw(\n                            sourceOrdinal, sameSourceFullClear))",
+     "if (false /* no clipped ordinal */ && !s.frameBatch.absorb_empty_source_draw(\n                            sourceOrdinal, sameSourceFullClear))"),
 ):
     bad = bridge.replace(old,new,1)
     assert bad != bridge and not wired(bad,header), old
