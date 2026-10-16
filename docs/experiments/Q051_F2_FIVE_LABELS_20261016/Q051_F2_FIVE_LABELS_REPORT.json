@@ -1,0 +1,148 @@
+{
+  "schema": "outrun-q051-f2-five-labels-native-v2",
+  "F2_STATIC": "PASS_CANDIDATE",
+  "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "f1_dds_sha256": "4f07654689e93bfb65cdd0ca710490e7ecbc0e40f31f3109f7adceb442f2a956",
+  "source_readable_sha256": "2da1b6f01219356ddc6ea925bd8fcd4afd37d9040eb48081a40861cc649da6f0",
+  "sprite_bundle_sha256": "2dd9088f4ab315e2008d334bb905cd5257b2910387cfda5f736f1c2399f3bbd0",
+  "dds_format": "DDS_UNCOMPRESSED_RGBA32",
+  "dds_size_bytes": 33554560,
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "mips": 1,
+  "labels": [
+    {
+      "id": "TOTAL_TIME",
+      "ko": "총 시간",
+      "english_glyph_bbox_readable": [
+        20,
+        634,
+        482,
+        709
+      ],
+      "safe_bbox_readable": [
+        22,
+        636,
+        480,
+        707
+      ],
+      "clean_mask_pixels": 26052,
+      "ko_rgba_size": [
+        219,
+        71
+      ],
+      "ko_nontransparent_pixels": 11841,
+      "paste_xy_readable": [
+        141,
+        636
+      ],
+      "transfer_sprite_sha256": "59b5c05b6d804ecbf347ee673d6e7abe89e08b90a19554049b9670fb3ad54d32",
+      "art_exclusion": "NONE"
+    },
+    {
+      "id": "LAP_TIME",
+      "ko": "랩 타임",
+      "english_glyph_bbox_readable": [
+        523,
+        634,
+        928,
+        710
+      ],
+      "safe_bbox_readable": [
+        525,
+        636,
+        926,
+        708
+      ],
+      "clean_mask_pixels": 21332,
+      "ko_rgba_size": [
+        223,
+        71
+      ],
+      "ko_nontransparent_pixels": 12315,
+      "paste_xy_readable": [
+        614,
+        636
+      ],
+      "transfer_sprite_sha256": "1751cf84c797638365088bb91ea7dddb2e8c2540d53d31b8c1ced5b64a6f9623",
+      "art_exclusion": "HUD_TIP_AT_X610_658_Y708_PLUS"
+    },
+    {
+      "id": "HEARTS",
+      "ko": "하트",
+      "english_glyph_bbox_readable": [
+        1015,
+        634,
+        1319,
+        710
+      ],
+      "safe_bbox_readable": [
+        1017,
+        636,
+        1317,
+        708
+      ],
+      "clean_mask_pixels": 17413,
+      "ko_rgba_size": [
+        146,
+        72
+      ],
+      "ko_nontransparent_pixels": 8286,
+      "paste_xy_readable": [
+        1094,
+        636
+      ],
+      "transfer_sprite_sha256": "3a8e7a121169df5309af216c3eefbedda6e0b7bef77ccaa8f7ca55d482df7a9e",
+      "art_exclusion": "NONE"
+    },
+    {
+      "id": "SCORE",
+      "ko": "점수",
+      "english_glyph_bbox_readable": [
+        1333,
+        633,
+        1594,
+        710
+      ],
+      "safe_bbox_readable": [
+        1335,
+        635,
+        1592,
+        708
+      ],
+      "clean_mask_pixels": 14348,
+      "ko_rgba_size": [
+        146,
+        73
+      ],
+      "ko_nontransparent_pixels": 8130,
+      "paste_xy_readable": [
+        1390,
+        635
+      ],
+      "transfer_sprite_sha256": "6b56f6c64ca16d530c3d52061d3785c7bb57efafe803e4984caee978f7b96fd1",
+      "art_exclusion": "NONE"
+    },
+    {
+      "id": "TIME",
+      "ko": "시간",
+      "preserved_exact_from_F1": true
+    }
+  ],
+  "changed_pixels_vs_original": 102562,
+  "protected_changed_pixels": 0,
+  "f1_time_exact": true,
+  "original_header_exact": true,
+  "output_redecode_rgba_exact": true,
+  "runtime_validation": "WAIVED_BY_USER_FOR_THIS_TEST_UNTESTED_NOT_PASS",
+  "C1_C3": "NOT_RUN",
+  "approval": "TEST_ONLY_NOT_GAME_RELEASE",
+  "original_and_F1_modified": false,
+  "output_dds_sha256": "7adb55e7e539409bb917a00429e6bab6c1b4beb7af0973d7e287046639cd3fb7",
+  "outputs": {
+    "Q051_5_LABELS_KO_F2_TEST_ONLY.dds": "7adb55e7e539409bb917a00429e6bab6c1b4beb7af0973d7e287046639cd3fb7",
+    "Q051_F2_FIVE_LABELS_COMPARE_TEST_ONLY.png": "ddf3f19ebacca27c5bb372530a4b77c4dfaecf9dbce0e4c79be6242b014f1eb8"
+  }
+}
