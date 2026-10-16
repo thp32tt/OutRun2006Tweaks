@@ -16,6 +16,19 @@ function Has-Argument($profile,[string]$argument) {
 $control = Get-OutRunVRTestProfile -Name CONTROL
 $correctness = Get-OutRunVRTestProfile -Name CORRECTNESS
 $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
+$cockpit = Get-OutRunVRTestProfile -Name COCKPIT_PARTICLES
+
+Assert-True (Has-Argument $cockpit '-DriverSeatView=true') 'G_COCKPIT must activate the gameplay driver-seat camera'
+Assert-True (Has-Argument $cockpit '-DriverSeatCarSpaceBasis=true') 'G_COCKPIT must activate car-space seat test'
+Assert-True (Has-Argument $cockpit '-DriverSeatFullCar=true') 'G_COCKPIT must keep full car visible'
+Assert-True (Has-Argument $cockpit '-DriverSeatHideDriver=true') 'G_COCKPIT must preserve verified driver-only suppression'
+Assert-True ($cockpit.Environment.OUTRUN_VR_R30_PARTICLE_VB -eq '1') 'G_COCKPIT must opt in to R30 dual-eye WorldParticle VB path'
+Assert-True (-not $correctness.Environment.Contains('OUTRUN_VR_R30_PARTICLE_VB')) 'CORRECTNESS must not opt into untested R30 uploads'
+$slotSource = Get-Content (Join-Path $root 'OutRunVR-Slot-Selector.ps1') -Raw
+$runSource = Get-Content (Join-Path $root 'Run-OutRunVRTest.ps1') -Raw
+Assert-True ($slotSource.Contains("Profile='COCKPIT_PARTICLES'")) 'G_COCKPIT UI must select the actual experimental runtime profile'
+Assert-True ($runSource.Contains('$env:OUTRUN_VR_R30_PARTICLE_VB = $null')) 'baseline must clear inherited experimental uploads'
+Assert-True ($runSource.Contains('$env:OUTRUN_VR_R30_PARTICLE_VB=$oldParticleGpuUpload')) 'runner must restore prior experimental upload state'
 
 # A FastLoad value above zero is not safe for the current VR recovery-baseline
 # startup path. 2026-09-23 Quest/VDXR evidence showed every FastLoad=3 profile
@@ -23,7 +36,7 @@ $performance = Get-OutRunVRTestProfile -Name PERFORMANCE
 # while HUD_MENU (FastLoad=0) progressed to a verified c64 baseline/gameplay.
 $allRuntimeProfileNames = @(
     'CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE',
-    'STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512'
+    'STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512'
 )
 foreach($profileName in $allRuntimeProfileNames) {
     $runtimeProfile = Get-OutRunVRTestProfile -Name $profileName

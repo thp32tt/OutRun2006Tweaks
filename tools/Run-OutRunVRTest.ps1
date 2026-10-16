@@ -1,6 +1,6 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
-    [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
+    [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
     [string]$GpuDiagnostics = 'OFF',
@@ -215,6 +215,9 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "gpuLabCulling=$GpuLabCulling"
     "gpuLabMsaa=$GpuLabMsaa"
     "gpuLabScene=$GpuLabScene"
+    "cockpitParticleExperiment=$($backend -eq 'd3d9' -and $TestProfile -eq 'COCKPIT_PARTICLES')"
+    "particleRingRequiresVerifiedWorldParticleDraw=true"
+    "cockpitGlassAssetInjection=NOT_SUPPORTED_BY_THIS_PROFILE"
     "gpuLabSSAAExpectedGate=$(if($gpuLabActive){$GpuLabTransparency}else{'UNSPECIFIED'})"
     "gpuLabSSAAValidation=CHECK_VR_GPU_LAB_SSAA_GATE_AND_DEVICE_LINES"
     "forceVrDisabled=$($backend -eq '2d')"
@@ -232,6 +235,7 @@ $oldPacingDiagnostics = $env:OUTRUN_VR_PACING_DIAGNOSTICS
 $oldGpuScene = $env:OUTRUN_VR_GPU_SCENE
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
+$oldParticleGpuUpload = $env:OUTRUN_VR_R30_PARTICLE_VB
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
 $oldExeSemanticsVerified = $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED
 $identityKeys = @(
@@ -284,6 +288,9 @@ if($backend -ne '2d'){
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
 }
 
+# Never leak an inherited experimental draw flag into CORRECTNESS or
+# rollback slots. The selected profile is the only activation authority.
+$env:OUTRUN_VR_R30_PARTICLE_VB = $null
 foreach($entry in $profile.Environment.GetEnumerator()){
     Set-Item -Path ("Env:" + $entry.Key) -Value ([string]$entry.Value)
 }
@@ -595,6 +602,7 @@ try{
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
+    $env:OUTRUN_VR_R30_PARTICLE_VB=$oldParticleGpuUpload
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
     $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticsVerified
     foreach($key in $identityKeys){

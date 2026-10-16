@@ -13,7 +13,7 @@ $slots=[ordered]@{
     'B_HUD'=[ordered]@{Backend='d3d9';Profile='HUD_SCREEN';Title='B HUD';Help='6th/6, YES/NO, 시간/랭크 HUD 확인.'}
     'C_FLARE'=[ordered]@{Backend='d3d9';Profile='HUD_WORLD';Title='C FLARE / WORLD';Help='렌즈 플레어/월드 마커 producer 진단.'}
     'D_PERF'=[ordered]@{Backend='d3d9';Profile='PERFORMANCE';Title='D PERFORMANCE';Help='프레임 페이싱/fence telemetry.'}
-    'G_COCKPIT'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='G COCKPIT (실험)';Help='운전석 카메라만 별도로 활성화.'}
+    'G_COCKPIT'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Title='G COCKPIT + PARTICLES (실험)';Help='운전석/전체 차량/운전자 가림과 검증된 WorldParticle 양안 업로드 시험. 유리 PMT 교체는 포함하지 않음.'}
     'E_DXVK_SAFE'=[ordered]@{Backend='dxvk-safe';Profile='CORRECTNESS';Title='E DXVK SAFE (진단)';Help='현재 SBS/DesktopDup fallback 재현용. 성능 기준으로 사용 금지.'}
 }
 

@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 function Get-OutRunVRTestProfile {
     param(
         [Parameter(Mandatory=$true)]
-        [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
+        [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','COCKPIT_PARTICLES','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
         [string]$Name
     )
 
@@ -228,6 +228,35 @@ function Get-OutRunVRTestProfile {
                     OUTRUN_VR_TEST_PROFILE='D_CULLING_NO_SSAA_R512'
                     OUTRUN_VR_PERFORMANCE_PROFILE='1'
                     OUTRUN_VR_AB_GROUP='D'
+                }
+            }
+        }
+        'COCKPIT_PARTICLES' {
+            # Explicit Quest3 experiment, never a silent CORRECTNESS default.
+            # The native PC gameplay camera and render hooks already exist.
+            # Enable them together with the R30 known-WorldParticle per-eye
+            # VB upload seam. Unknown glass materials are NOT modified.
+            return [ordered]@{
+                Name='COCKPIT_PARTICLES'
+                Description='R84 cockpit/car/driver + verified-world-particle dual-eye upload A/B test. Does not patch unknown PC glass assets.'
+                Arguments=@(
+                    '-FramerateLimit=0',
+                    '-FramerateFastLoad=0',
+                    '-FramerateInterpolation=true',
+                    '-FramerateUnlockExperimental=true',
+                    '-FrameCadenceMode=1',
+                    '-FrameCadenceTargetHz=0',
+                    '-DisableDesktopVsync=true',
+                    '-DriverSeatView=true',
+                    '-DriverSeatNativeMode=1',
+                    '-DriverSeatCarSpaceBasis=true',
+                    '-DriverSeatFullCar=true',
+                    '-DriverSeatHideDriver=true'
+                ) + $visualSafeVr
+                Environment=[ordered]@{
+                    OUTRUN_VR_TEST_PROFILE='COCKPIT_PARTICLES'
+                    OUTRUN_VR_PERFORMANCE_PROFILE='0'
+                    OUTRUN_VR_R30_PARTICLE_VB='1'
                 }
             }
         }
