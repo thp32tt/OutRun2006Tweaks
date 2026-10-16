@@ -19,7 +19,6 @@ public:
 
     void reset() noexcept {
         source_.Reset();
-        destination_.Reset();
         fence_.Reset();
         shared9_.Reset();
         game9Ex_.Reset();
