@@ -1,0 +1,55 @@
+{
+  "schema": "outrun-q051-f0-time-clean-v1",
+  "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "source_png_sha256": "2da1b6f01219356ddc6ea925bd8fcd4afd37d9040eb48081a40861cc649da6f0",
+  "clean_dds_sha256": "7c1a81b1570ffc910d71ea25d05819d93c8ed0a80be7d2c0437fce6b43fbdd43",
+  "native_source_size": [
+    4096,
+    2048
+  ],
+  "readable_bbox_xyxy": [
+    1595,
+    608,
+    1845,
+    727
+  ],
+  "raw_bbox_xyxy": [
+    1595,
+    1321,
+    1845,
+    1440
+  ],
+  "tested_region": "Q051-TIME_HUD",
+  "source_alpha_positive_pixels": 12376,
+  "changed_pixels": 12376,
+  "neighbor_manifest_alpha_mask_intersections": [
+    {
+      "id": "Q051-YOU",
+      "intersection_pixels": 1157
+    },
+    {
+      "id": "Q051-TIME_HUD_2",
+      "intersection_pixels": 12376
+    }
+  ],
+  "overlap_caveat": "Q051-YOU crop contains end of adjacent TIME text, while its actual white YOU label/red icon are outside removal area; duplicate TIME_HUD_2 excluded. Requires independent visual review.",
+  "outside_region_rgba_exact": true,
+  "within_region_difference_matches_alpha_mask_exact": true,
+  "english_glyphs_visible_remaining_inside_test_roi": 0,
+  "clean_region_alpha_nonzero": 0,
+  "format": "DDS_RGBA32_UNCOMPRESSED",
+  "mip_count": 1,
+  "full_dds_header_exact": true,
+  "output_paths": {
+    "Q051_TIME_ONLY_CLEAN_F0_TEST_ONLY.dds": "7c1a81b1570ffc910d71ea25d05819d93c8ed0a80be7d2c0437fce6b43fbdd43",
+    "Q051_TIME_CLEAN_SIDE_BY_SIDE_TEST_ONLY.png": "985c7ab7d0bf25ed935a14ef8abf7da0a1a378cb5c70f61fe5f9fdb280ec6372",
+    "Q051_TIME_CLEAN_NATIVE_RGBA_TEST_ONLY.png": "bd482c574fda788b6bf35888d652b706955e057e850513fdeb74e1c84d71c8a2",
+    "Q051_TIME_REMOVAL_MASK_TEST_ONLY.png": "81d202117286dd5943aedf7fe2156b3d6d6ef396f38b476e719159f599fe5b99"
+  },
+  "safety": "TEST_ONLY; other atlas sections unchanged; in-game sampling and shared UV not verified.",
+  "CLEAN_STATIC": "CANDIDATE_REVIEW_NEEDED",
+  "F0": "HOLD_PENDING_VISUAL_REVIEW_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN"
+}
