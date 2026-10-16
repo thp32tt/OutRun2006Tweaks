@@ -1,0 +1,101 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00928",
+  "production_id": "CONVERSION-DX9EX-00928",
+  "event_id": "CONVERSION-DX9EX-00928-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00928",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_POLICY_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "0718d4c6ea0415ae461ee6f133bc3d1a5f51c230",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00928.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve a single spatially recentered +TIME stage-extension display across all six original sprite/numeric producer calls, deferred D3DX native Flush/End and per-eye R84 D3D9 rendering, including when an unrelated following D3DX Draw forces an earlier homogeneous +TIME/GOAL batch to the GPU.",
+    "scope_boundary": "Only the exact outbound homogeneous +TIME/GOAL D3DX pending-batch producer on a foreign next Draw; no global queue Flush, unknown or mixed batch promotion, GOAL result text widening, gameplay camera, FFB, SkyGlow, R26_SAFE, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original 0x9898E/0x98A36/0x98AC6 stage sprites and 0x989AD/0x98A10/0x98A89 +TIME glyph calls tag direct and queued ScreenHud scope before original D3DX Draw.",
+      "ID3DXSprite::DrawDest tracks homogeneous pending scope/producer; when a foreign next Draw arrives, CanDrainDeferredResultBeforeForeignDraw admits old batch before D3DX itself may internally flush.",
+      "Now ScopedExactProducerSemantic restores exactly the saved outgoing stage/result producer around FlushTracked and native FlushDest, then restores the incoming owner before dispatching new original Draw; R33 physical GPU draw can classify the correct ScreenHud path."
+    ],
+    "subcomponents": [
+      "Actual R84 src/hooks_uiscaling.cpp source repair: scoped outgoing GPU producer handoff for foreign D3DX Draw, preserving old Draw HRESULT and native texture-batching for same producer.",
+      "Portable stage_extension_direct_owner_smoke.cpp cases exercise StageExtensionTime, GOAL progress/time owner rebind and outgoing-vs-incoming one-shot and live-queue negative restoration.",
+      "Changed-area verify_vr_stage_extension_d3dx_batch_owner.py regression requires the RAII scope at the physical preforeign Flush and actively mutates that owner guard away to prove fail-before detection."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_and_goal_preforign_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Six original +TIME source producers through D3DX deferred submission and per-eye R33 ScreenHud classification",
+        "expected_behavior": "When next foreign original sprite Draw triggers native GPU submission of a proven pending +TIME/GOAL batch, its GPU triangles are classified under the saved outgoing exact producer, not the unrelated new draw producer; no second broad HUD submission."
+      },
+      {
+        "id": "stage_native_fallback_and_queue",
+        "category": "fallback_regression",
+        "behavior_area": "D3DX live queue, mixed producer, failed batch and incoming one-shot/owner restoration",
+        "expected_behavior": "Pending nonmatching or nonhomogeneous producer never gains exact HUD ownership, queued producer retains its own scope, normal D3DX End/Flush and failed HRESULT remain unchanged, and pending one-shot/foreign owner are restored."
+      },
+      {
+        "id": "dx9ex_required_final_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA Windows x86 R84 game and x64 host, package with R26_SAFE fallback and all domain/full-source/HUD checks",
+        "expected_behavior": "Required DX9Ex Active, Domain Isolation, Full Source Impact and OutRun EXE HUD Inspector GitHub Actions must succeed on a single validation-bearing source+contract SHA; Quest3/VDXR optical acceptance remains UNTESTED until actual test."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_and_goal_preforign_owner": "PENDING",
+    "stage_native_fallback_and_queue": "PENDING",
+    "dx9ex_required_final_ci": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "DrawDest drained a previous homogeneous StageExtensionTime/GOAL batch on incoming foreign sprite Draw but its FlushTracked call used the already-selected INCOMING GameSemantic scope. That physically submits the previous GPU geometry with wrong ScreenHud/producer identity, unlike FlushDest/EndDest which already rebind the original deferred owner.",
+    "original_evidence": "Actual source direct and queued six +TIME edges have tags; native D3DX Flush may execute at new Draw texture boundary. Latest 2026-10-16 static execution-order findings #132 corroborate deferred execution as an unverified visual-risk path, not HMD-proof.",
+    "eye_ownership": "Actual D3D9 physical Draw hooks classify and reproject R84 left/right eye only using GPU-time source semantics. The old batch must remain ScreenHud exact source while flushing; R33 and R30 per-eye HMD path are unchanged.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp StageExtensionEnter/Leave records exact original CALL family, queues+direct scope and D3DX batch; immediate print and SpriteNode separate.",
+      "src/hooks_uiscaling.cpp DrawDest CanDrainDeferredResultBeforeForeignDraw verifies homogeneous pending old source, previous implementation directly invoked FlushTracked under incoming effective scope.",
+      "src/hooks_uiscaling.cpp FlushDest/EndDest native GPU execution uses ScopedExactProducerSemantic to rebind old producer; DrawDest now provides the same saved-source RAII across direct vtable FlushTracked and restores foreign one-shot.",
+      "vrhost/tests/stage_extension_direct_owner_smoke.cpp exercises source restore with four result tokens and protects live queue on attempted direct override."
+    ],
+    "alternatives_rejected": [
+      "Do not add unconditional D3DX Flush per glyph: it defeats native batching and may cause frame drops.",
+      "Do not globally mark generic ScreenOverlay2D or untagged GOAL/B9200 result as ScreenHud: risks duplicate text/incorrect depth.",
+      "Do not replace R30/R33 per-eye c64 or R26_SAFE/FFB/SkyGlow; the proven source bug is the GPU-time outgoing owner around existing native Flush."
+    ],
+    "negative_test_evidence": "Portable semantic smoke and structural mutation guard included in material source; exact workflow result still pending.",
+    "runtime_evidence": "Actual Quest3 and Virtual Desktop VDXR frame playback not run; GPU classification source repair is not optical HMD acceptance.",
+    "next_hmd_experiment": "On exact R84 release and R26_SAFE control, stage-extension +TIME during driving and GOAL 0-99 screens: inspect duplicated numeric and sprite glyphs, head yaw/recenter, both eyes, native speed/timer and SkyGlow under 72Hz."
+  },
+  "material_result_sha": "a148790b2c003268f2df7afdf042bd386c2d3dcc",
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "failed_ci_evidence": {
+    "initial_material_sha": "a148790b2c003268f2df7afdf042bd386c2d3dcc",
+    "run_id": 38834283711,
+    "policy_job_id": 116759779019,
+    "cause": "Required per-task feature contract run JSON absent at validation-bearing HEAD; host/game/package jobs skipped, compiler not run.",
+    "ci_result": "FAIL_POLICY_ONLY"
+  },
+  "next_action": "Run mandatory unchanged exact-SHA gates on the source+record commit, then record C6 only after all required gates PASS. Actual Quest3/VDXR remains NEED_HMD_TEST."
+}
