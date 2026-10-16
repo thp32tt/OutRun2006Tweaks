@@ -187,10 +187,10 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert bypass in dispatch, "mono/aux must bypass classification"
     assert dispatch.index("StateBlockTracker::Recording()") < dispatch.index(bypass)
     assert dispatch.index(bypass) < dispatch.index("R32ReviewClassifyScreenSpacePass(device)")
-    # Unflushed original C993 or an independently source-proven +TIME/GOAL
-    # finite-HUD command has no stereo raster proof. Both must bypass generic
-    # R29 cached-world reprojection, unlike ordinary mono, auxiliary, other
-    # screen overlays and outer CABE draws, which retain the R29 fallback.
+    # Unflushed exact C993, car contact shadow or source-proven +TIME/GOAL
+    # has no stereo raster proof. Only those physical producers bypass generic
+    # R29 cached-world reprojection. Untagged mono/aux/overlays and CABE
+    # still follow the original lower R29 fail-closed route.
     # This is restricted by the captured physical producer, not alpha/FVF.
     early = dispatch.split(bypass, 1)[1].split(
         "// Classify exactly once", 1
@@ -203,26 +203,46 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert dispatch.count(
         "const bool exactResultHud = drawCommand.IsExactFiniteResultHud();"
     ) == 1, "exact HUD must come from captured physical source"
-    assert re.search(r"if\s*\(\s*exactResultHud\s*\|\|\s*" +
+    assert dispatch.count(
+        "const bool directCarShadow ="
+    ) == 1 and "drawCommand.IsDirectCarBaseShadow();" in dispatch, (
+        "car shadow bypass must come from captured physical source"
+    )
+    assert re.search(r"if\s*\(\s*exactResultHud\s*\|\|\s*"
+                     r"directCarShadow\s*\|\|\s*" +
                      re.escape(centre) +
                      r".*?\)\s*\{\s*if\s*\(telemetry\)\s*"
                      r"R32ReviewNoteDispatchFallback\(\);\s*"
                      r"return actualDraw\(\);\s*\}\s*"
                      r"return fallbackToR29\(\);", early, re.S), (
-        "only exact C993 or source-proven result HUD may bypass R29"
+        "only exact C993, shadow or result HUD may bypass unready R29"
+    )
+    assert re.search(r"const bool provenCarShadowStereo\s*=\s*"
+                     r"screenKind\s*==\s*"
+                     r"R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld;", dispatch), (
+        "car shadow stereo must require its own exact classifier"
+    )
+    assert re.search(r"if\s*\(directCarShadow\s*&&\s*"
+                     r"!provenCarShadowStereo\)\s*\{\s*"
+                     r"if\s*\(telemetry\)\s*"
+                     r"R32ReviewNoteDispatchFallback\(\);\s*"
+                     r"return actualDraw\(\);", dispatch), (
+        "unproven car shadow must keep original GPU draw"
     )
     # Three physical-source fences are required: raster not ready, no
     # screen HUD classification, and classified-but-unhandled GPU stereo.
     # All three must keep the native Draw; an uncertain source never enters
     # the cached R31 fast-world or generic R29 substitution paths.
-    assert re.search(r"if\s*\(exactResultHud\s*&&\s*"
+    assert re.search(r"if\s*\(\s*\(exactResultHud\s*\|\|\s*"
+                     r"directCarShadow\)\s*&&\s*"
                      r"screenKind\s*==\s*R32ReviewScreenSpaceKind::None\)",
-                     dispatch), "unclassified exact result was sent to world"
+                     dispatch), "unclassified result/shadow was sent to world"
     assert re.search(r"if\s*\(hud.handled\)\s*return hud.hr;\s*"
-                     r".*?if\s*\(exactResultHud\)\s*\{\s*"
+                     r".*?if\s*\(exactResultHud\s*\|\|\s*"
+                     r"\(directCarShadow\s*&&\s*!hud.handled\)\)\s*\{\s*"
                      r"if\s*\(telemetry\)\s*R32ReviewNoteDispatchFallback\(\);\s*"
                      r"return actualDraw\(\);",
-                     dispatch, re.S), "unhandled result HUD leaked to R29"
+                     dispatch, re.S), "unhandled result/shadow leaked to R29"
     assert dispatch.rfind("return fallbackToR29();") > dispatch.index(
         "R33TryFastWorld(device,"), "stereo fallback must use identical R29 policy"
 
@@ -236,10 +256,10 @@ def mutate_dispatch(src: str, before: str, after: str) -> str:
 
 
 def negative_mono_aux_fastpath(src: str) -> None:
-    # Keep original R29 fallback, reject loss of direct C993 identity or
-    # exact source-proven HUD identity, and reject raw bypass for every draw.
+    # Preserve R29 fallback and reject lost C993/result/shadow source proof
+    # or allowing raw bypass for unclassified physical draws.
     bypass = "if (!resyncAlreadyFlushed)\n            {"
-    exact = ("if (exactResultHud ||\n"
+    exact = ("if (exactResultHud || directCarShadow ||\n"
              "                    OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(")
     early_raw = ("return actualDraw();\n"
                  "                }\n"
@@ -253,6 +273,18 @@ def negative_mono_aux_fastpath(src: str) -> None:
          "const bool exactResultHud = true;"),
         ("const bool exactResultHud = drawCommand.IsExactFiniteResultHud();",
          "const bool exactResultHud = false;"),
+        ("drawCommand.IsDirectCarBaseShadow();",
+         "false;"),
+        ("if (exactResultHud || directCarShadow ||",
+         "if (exactResultHud || false ||"),
+        ("screenKind == R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld;",
+         "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;"),
+        ("if (directCarShadow && !provenCarShadowStereo)",
+         "if (false && !provenCarShadowStereo)"),
+        ("if ((exactResultHud || directCarShadow) &&",
+         "if ((exactResultHud || false) &&"),
+        ("(directCarShadow && !hud.handled))",
+         "(false && !hud.handled))"),
         ("directLensCentre, resyncAlreadyFlushed)",
          "false, resyncAlreadyFlushed)"),
         (early_raw, "return actualDraw();\n"
@@ -483,7 +515,7 @@ def main() -> None:
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"resync regression mutation {i} was not rejected")
-    print("PASS R33 classification/resync plus cached depth-stencil write flags (30 negative mutations)")
+    print("PASS R33 classification/resync plus exact car-shadow fail-closed fences and cached depth-stencil write flags")
 
 
 if __name__ == "__main__":
