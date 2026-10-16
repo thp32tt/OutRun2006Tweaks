@@ -896,6 +896,24 @@ int main()
     d3d.context->VSSetShader(gameVertexShader, nullptr, 0u);
     d3d.context->PSSetShader(gamePixelShader, nullptr, 0u);
     d3d.context->GSSetShader(originalGeometryShader, nullptr, 0u);
+    // GPU-backed, game-owned intermediate color surface. Verify actual
+    // per-eye post-Draw copy pixels rather than a simulated CPU image.
+    D3D11_TEXTURE2D_DESC gameSurfaceDesc{};
+    gameSurfaceDesc.Width = gameSurfaceDesc.Height = 64u;
+    gameSurfaceDesc.MipLevels = gameSurfaceDesc.ArraySize = 1u;
+    gameSurfaceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    gameSurfaceDesc.SampleDesc.Count = 1u;
+    gameSurfaceDesc.Usage = D3D11_USAGE_DEFAULT;
+    gameSurfaceDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+    ID3D11Texture2D* gameSurface = nullptr;
+    ID3D11RenderTargetView* gameSurfaceView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &gameSurfaceDesc, nullptr, &gameSurface)) && gameSurface &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                gameSurface, nullptr, &gameSurfaceView)) && gameSurfaceView,
+            "00833 game-owned native GPU source surface created");
+    constexpr float intermediateBlue[4]{0.f, 0.f, 1.f, 1.f};
+    d3d.context->ClearRenderTargetView(gameSurfaceView, intermediateBlue);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
@@ -920,6 +938,9 @@ int main()
         bool rejectedForeignClear[2]{};
         bool rejectedInvalidClear[2]{};
         bool replayedMidSceneClear[2]{};
+        ID3D11Texture2D* gameSurface{};
+        bool rejectedInvalidSurfaceCopy[2]{};
+        bool replayedPostDrawSurfaceCopy[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -945,6 +966,7 @@ int main()
     gameEyeFixture.callerColor = originalGameTarget;
     gameEyeFixture.callerGeometryShader = originalGeometryShader;
     gameEyeFixture.gamePixelShader = gamePixelShader;
+    gameEyeFixture.gameSurface = gameSurface;
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -1182,8 +1204,28 @@ int main()
                 eyeIndex == 0u ? 0.30f : 0.70f,
                 static_cast<std::uint8_t>(eyeIndex + 7u), true, true) &&
             encoder.draw_count() == issuedDraws;
+        // Replay a same-device game post-process COPY after real eye Draws.
+        // Negative cases must leave OM/depth state and both eyes unchanged.
+        const D3D11_BOX sourcePatch{0u, 0u, 0u, 8u, 8u, 1u};
+        const D3D11_BOX invalidSourcePatch{60u, 0u, 0u, 68u, 8u, 1u};
+        const UINT destX = eyeIndex == 0u ? 16u : 48u;
+        fixture.rejectedInvalidSurfaceCopy[eyeIndex] =
+            !encoder.copy_game_surface(nullptr, &sourcePatch, destX, 38u) &&
+            !encoder.copy_game_surface(
+                fixture.gameSurface, &invalidSourcePatch, destX, 38u) &&
+            !encoder.copy_game_surface(
+                fixture.gameSurface, &sourcePatch, 61u, 38u);
+        const auto beforeCopyDraws = encoder.draw_count();
+        const auto beforeCopyColorDraws = encoder.color_draw_count();
+        fixture.replayedPostDrawSurfaceCopy[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameSurface, &sourcePatch, destX, 38u) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         if (!fixture.rejectedInvalidClear[eyeIndex] ||
             !fixture.replayedMidSceneClear[eyeIndex] ||
+            !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
+            !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !encoder.color_draw_count()) return false;
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
@@ -1224,7 +1266,11 @@ int main()
             gameEyeFixture.rejectedInvalidClear[0] &&
             gameEyeFixture.rejectedInvalidClear[1] &&
             gameEyeFixture.replayedMidSceneClear[0] &&
-            gameEyeFixture.replayedMidSceneClear[1],
+            gameEyeFixture.replayedMidSceneClear[1] &&
+            gameEyeFixture.rejectedInvalidSurfaceCopy[0] &&
+            gameEyeFixture.rejectedInvalidSurfaceCopy[1] &&
+            gameEyeFixture.replayedPostDrawSurfaceCopy[0] &&
+            gameEyeFixture.replayedPostDrawSurfaceCopy[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
@@ -1340,6 +1386,8 @@ int main()
     }
     preservedDepthView->Release();
     preservedDepthTexture->Release();
+    gameSurfaceView->Release();
+    gameSurface->Release();
     outrun::vr::dx11::NativeGameStereoPublishedFrame gameEyeFrame{};
     bool gameEyeReady = false;
     for (int retry = 0; retry < 2000 && !gameEyeReady; ++retry) {
@@ -1389,9 +1437,15 @@ int main()
                       << unsigned(later[3])
                       << " rowPitch=" << mapped.RowPitch << '\n';
         }
+        const UINT copyX = eyeIndex == 0u ? 17u : 49u;
+        const auto* copied = pixel + 39u * mapped.RowPitch + copyX * 4u;
+        const bool gameSurfaceCopied =
+            copied[0] == 0u && copied[1] == 0u &&
+            copied[2] == 255u && copied[3] == 255u;
         d3d.context->Unmap(readback, 0);
-        require(distinctColor && actualPartialClear && orderedAfterDrawClear,
-                "00832 native L/R Draw then source TARGET RECT clear preserves ordered pixels");
+        require(distinctColor && actualPartialClear &&
+                orderedAfterDrawClear && gameSurfaceCopied,
+                "00833 native L/R actual Draw, ordered Clear and game GPU surface copy pixels");
     }
     hostFrame.frameId = 24u;
     hostFrame.sourcePoseSequence = 33u;

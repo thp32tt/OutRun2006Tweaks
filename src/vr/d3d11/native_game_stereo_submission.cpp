@@ -171,6 +171,66 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
     return true;
 }
 
+// Copy a genuine GPU-resident game intermediate (not the mono desktop
+// backbuffer) after a real Draw without passing it through system memory.
+// Unscaled same-format rectangles are the only operation representable by
+// D3D11 CopySubresourceRegion. On rejection the original D3D9 StretchRect,
+// original input and both independent XR eye resources remain untouched.
+bool NativeGameEyeDrawEncoder::copy_game_surface(
+    ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
+    UINT destX, UINT destY) noexcept
+{
+    if (!source || !eye_targets_bound() || !targetWidth_ || !targetHeight_)
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> eyeResource;
+    eyeTarget_->GetResource(eyeResource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> eyeColor;
+    if (!eyeResource || FAILED(eyeResource.As(&eyeColor)) ||
+        !eyeColor || eyeColor.Get() == source)
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> owner, sourceOwner;
+    context_->GetDevice(owner.GetAddressOf());
+    source->GetDevice(sourceOwner.GetAddressOf());
+    if (!owner || owner.Get() != sourceOwner.Get()) return false;
+    D3D11_TEXTURE2D_DESC sourceDesc{}, eyeDesc{};
+    source->GetDesc(&sourceDesc);
+    eyeColor->GetDesc(&eyeDesc);
+    constexpr UINT sharedFlags =
+        D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+        D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+    if (sourceDesc.Format == DXGI_FORMAT_UNKNOWN ||
+        sourceDesc.Format != eyeDesc.Format ||
+        sourceDesc.MipLevels != 1u || sourceDesc.ArraySize != 1u ||
+        eyeDesc.MipLevels != 1u || eyeDesc.ArraySize != 1u ||
+        sourceDesc.SampleDesc.Count != 1u ||
+        eyeDesc.SampleDesc.Count != 1u ||
+        sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
+        sourceDesc.CPUAccessFlags != 0u ||
+        (sourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u ||
+        (sourceDesc.MiscFlags & sharedFlags) != 0u ||
+        eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
+        return false;
+    const D3D11_BOX box = sourceRegion
+        ? *sourceRegion
+        : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
+    if (box.front != 0u || box.back != 1u ||
+        box.left >= box.right || box.top >= box.bottom ||
+        box.right > sourceDesc.Width || box.bottom > sourceDesc.Height ||
+        destX > eyeDesc.Width || destY > eyeDesc.Height ||
+        box.right - box.left > eyeDesc.Width - destX ||
+        box.bottom - box.top > eyeDesc.Height - destY)
+        return false;
+
+    // The destination must not remain OM-bound while the immediate context
+    // records the GPU copy; rebind precisely this eye's original DSV+RTV.
+    context_->OMSetRenderTargets(0u, nullptr, nullptr);
+    context_->CopySubresourceRegion(
+        eyeColor.Get(), 0u, destX, destY, 0u, source, 0u, &box);
+    ID3D11RenderTargetView* target = eyeTarget_;
+    context_->OMSetRenderTargets(1u, &target, eyeDepth_);
+    return eye_targets_bound();
+}
+
 // The D3D9 game and native OpenXR path may share an immediate D3D11 context.
 // A game eye pass must rasterize into the ring's actual RTV, not whichever
 // desktop/probe target happened to be bound by an earlier native draw. Save

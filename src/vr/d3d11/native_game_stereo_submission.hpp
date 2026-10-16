@@ -37,6 +37,13 @@ public:
     [[nodiscard]] bool clear_depth_stencil(
         float depth, std::uint8_t stencil,
         bool clearDepth, bool clearStencil) noexcept;
+    // Replay an actual game-authored, unscaled GPU surface copy (for example
+    // an offscreen menu/vehicle post-pass) into THIS bound eye. No D3D9
+    // StretchRect scaling/filtering approximation, no other eye/desktop RTV,
+    // and no manufactured Draw evidence. Unsupported copies fall back to D3D9.
+    [[nodiscard]] bool copy_game_surface(
+        ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
+        UINT destX, UINT destY) noexcept;
     [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
     // Depth-only and color-masked game Draws still execute and contribute to
     // the command stream, but cannot by themselves certify a visible XR eye.
