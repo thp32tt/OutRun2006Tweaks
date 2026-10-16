@@ -178,7 +178,13 @@ def require_portrait_center(code):
     required = (
         "!std::isfinite(Game::screen_resolution->y)",
         "!std::isfinite(Game::original_resolution.y)",
-        "const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(",
+        "const auto quadMap = precontained",
+        "? OutRunVrMenuQuad::PixelMap{1.f, 1.f, 0.f, 0.f, true}",
+        ": OutRunVrMenuQuad::BuildPixelMap(",
+        "precontained = contained && frontEnd &&",
+        "OutRunVrMenuQuad::ContainedMatrices.Contains(",
+        "screenScaleX, screenScaleY,",
+        "Game::screen_resolution->x, Game::screen_resolution->y);",
         "if (!quadMap.valid)",
         "quad[1] = OutRunVrMenuQuad::ProjectY(quadMap, topLeft.y);",
         "quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);",
@@ -192,9 +198,35 @@ def require_portrait_center(code):
     for token in required:
         if token not in sprite:
             raise AssertionError(token)
-    if sprite.index("const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(") > (
+    if sprite.index("const auto quadMap = precontained") > (
             sprite.index("quad[1] = OutRunVrMenuQuad::ProjectY(")):
         raise AssertionError("quad map must precede all transformed corners")
+
+
+    # Original D3DX result is the sole provenance source. Never globally
+    # bypass quad mapping based on a frontend mode/INI setting alone.
+    producer = code.split("static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
+    for required in (
+        "bool publishedPrecontainedMenuMatrix = false;",
+        "publishedPrecontainedMenuMatrix = true;",
+        "if (result && pOut && publishedPrecontainedMenuMatrix &&",
+        "partialFrontEndMenu && Game::screen_scale &&",
+        "OutRunVrMenuQuad::ContainedMatrices.Remember(",
+        "std::memcpy(fingerprint.data(), pOut, sizeof(D3DMATRIX));",
+    ):
+        if required not in producer:
+            raise AssertionError("menu matrix source provenance: " + required)
+    if sprite.index("precontained = contained && frontEnd &&") > sprite.index(
+        "const auto quadMap = precontained"):
+        raise AssertionError("original matrix proof must precede custom quad map")
+    if sprite.index("OutRunVrMenuQuad::ContainedMatrices.Contains(") > sprite.index(
+        "const auto quadMap = precontained"):
+        raise AssertionError("custom quad must verify exact D3DX matrix first")
+    if sprite.index(": OutRunVrMenuQuad::BuildPixelMap(") > sprite.index(
+        "if (!quadMap.valid)"):
+        raise AssertionError("unproven quad fallback must remain live")
+
 
 
 def require_physical_containment(header):
@@ -222,6 +254,33 @@ def require_physical_containment(header):
 
 
 require_portrait_center(text)
+
+# 00977: pin positive exact D3DX provenance and negative unchanged fallback.
+# Mutating the guard, identity map, matrix read or native map must be caught,
+# in addition to the preexisting 6 X/Y vertex and physical geometry controls.
+for before, after in (
+    ("precontained = contained && frontEnd &&", "precontained = true &&"),
+    ("OutRunVrMenuQuad::ContainedMatrices.Contains(", "OutRunVrMenuQuad::ContainedMatrices.WrongOwner("),
+    ("? OutRunVrMenuQuad::PixelMap{1.f, 1.f, 0.f, 0.f, true}",
+     "? OutRunVrMenuQuad::PixelMap{0.5f, 1.f, 0.f, 0.f, true}"),
+    (": OutRunVrMenuQuad::BuildPixelMap(",
+     ": OutRunVrMenuQuad::PixelMap{1.f,1.f,0.f,0.f,true} /* no physical fallback */("),
+    ("if (result && pOut && publishedPrecontainedMenuMatrix &&",
+     "if (result && pOut && true &&"),
+    ("std::memcpy(fingerprint.data(), pOut, sizeof(D3DMATRIX));",
+     "std::memcpy(fingerprint.data(), &sourceMatrix, sizeof(D3DMATRIX));"),
+):
+    assert before in text, "menu provenance mutation anchor: " + before
+    mutant = text.replace(before, after, 1)
+    try:
+        require_portrait_center(mutant)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("double containment provenance mutant escaped: " + before)
+print("DX9Ex exact native D3DX/custom quad menu containment PASS (6 negative controls)")
+
+
 for w, h, margin in ((2496, 2688, 408), (3440, 1440, 0),
                      (1920, 1440, 0)):
     s = min(w / 640, h / 480)
