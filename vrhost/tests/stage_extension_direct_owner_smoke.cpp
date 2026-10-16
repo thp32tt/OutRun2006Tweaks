@@ -1,4 +1,5 @@
 #include "../../src/vr/game/render_semantics.hpp"
+#include "../../src/vr/game/sprite_queue_tail_proof.hpp"
 #include "../../src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
 #include <iostream>
 #include <cmath>
