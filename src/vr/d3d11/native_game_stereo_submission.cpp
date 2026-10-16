@@ -173,9 +173,11 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
 
 // Copy a genuine GPU-resident game intermediate (not the mono desktop
 // backbuffer) after a real Draw without passing it through system memory.
-// Unscaled same-format rectangles are the only operation representable by
-// D3D11 CopySubresourceRegion. On rejection the original D3D9 StretchRect,
-// original input and both independent XR eye resources remain untouched.
+// CopySubresourceRegion replays single-sample game pixels without scaling.
+// MSAA offscreen menu/car/race color requires an explicit GPU resolve first;
+// partial transfers resolve into a private temporary before copying the box.
+// Never touch the original D3D9 StretchRect, game input or independent XR eye
+// when source format, dimensions, ownership or resolve support is invalid.
 bool NativeGameEyeDrawEncoder::copy_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
     UINT destX, UINT destY) noexcept
@@ -207,7 +209,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         sourceDesc.Format != eyeDesc.Format ||
         sourceDesc.MipLevels != 1u || sourceDesc.ArraySize != 1u ||
         eyeDesc.MipLevels != 1u || eyeDesc.ArraySize != 1u ||
-        sourceDesc.SampleDesc.Count != 1u ||
+        sourceDesc.SampleDesc.Count == 0u ||
         eyeDesc.SampleDesc.Count != 1u ||
         sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
         sourceDesc.CPUAccessFlags != 0u ||
@@ -216,6 +218,17 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         (sourceDesc.MiscFlags & sharedFlags) != 0u ||
         eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;
+    const bool needsResolve = sourceDesc.SampleDesc.Count > 1u;
+    if (needsResolve) {
+        // The only supported multisample source is a GPU color render
+        // target. D3D11 cannot resolve a depth surface or an arbitrary
+        // unresolvable/typeless color format; retain D3D9 in that case.
+        UINT support = 0u;
+        if ((sourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u ||
+            FAILED(owner->CheckFormatSupport(sourceDesc.Format, &support)) ||
+            (support & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
+            return false;
+    }
     const D3D11_BOX box = sourceRegion
         ? *sourceRegion
         : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
@@ -226,6 +239,28 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         box.right - box.left > eyeDesc.Width - destX ||
         box.bottom - box.top > eyeDesc.Height - destY)
         return false;
+
+    // A full-source MSAA resolve can write directly into the full-size eye.
+    // Cropped menu/vehicle postpasses must not overwrite unaffected pixels:
+    // resolve the original full source to an owned, GPU-only intermediate,
+    // then copy only the genuine source rectangle to its eye destination.
+    const bool fullResolve = needsResolve &&
+        box.left == 0u && box.top == 0u &&
+        box.right == sourceDesc.Width && box.bottom == sourceDesc.Height &&
+        destX == 0u && destY == 0u &&
+        sourceDesc.Width == eyeDesc.Width &&
+        sourceDesc.Height == eyeDesc.Height;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> resolved;
+    if (needsResolve && !fullResolve) {
+        D3D11_TEXTURE2D_DESC resolvedDesc = sourceDesc;
+        resolvedDesc.SampleDesc.Count = 1u;
+        resolvedDesc.SampleDesc.Quality = 0u;
+        resolvedDesc.BindFlags = 0u; // GPU copy-only, no RTV/SRV/UAV alias
+        resolvedDesc.MiscFlags = 0u;
+        if (FAILED(owner->CreateTexture2D(
+                &resolvedDesc, nullptr, resolved.GetAddressOf())) || !resolved)
+            return false;
+    }
 
     // The game may have additional color MRT attachments (e.g. deferred
     // vehicle/HUD output) beside this eye's RT0. A one-RTV rebind after the
@@ -255,8 +290,19 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     {
         ScopedCopyOutputMerger restore{context_};
         context_->OMSetRenderTargets(0u, nullptr, nullptr);
-        context_->CopySubresourceRegion(
-            eyeColor.Get(), 0u, destX, destY, 0u, source, 0u, &box);
+        if (needsResolve) {
+            context_->ResolveSubresource(
+                fullResolve ? eyeColor.Get() : resolved.Get(),
+                0u, source, 0u, sourceDesc.Format);
+            if (!fullResolve) {
+                context_->CopySubresourceRegion(
+                    eyeColor.Get(), 0u, destX, destY, 0u,
+                    resolved.Get(), 0u, &box);
+            }
+        } else {
+            context_->CopySubresourceRegion(
+                eyeColor.Get(), 0u, destX, destY, 0u, source, 0u, &box);
+        }
     }
     return eye_targets_bound();
 }

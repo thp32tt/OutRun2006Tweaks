@@ -40,9 +40,11 @@ public:
     // Replay an actual game-authored, unscaled GPU surface copy (for example
     // an offscreen menu/vehicle post-pass) into THIS bound eye. Accept a
     // game-owned DEFAULT GPU RT or shader-readable intermediate texture.
-    // No D3D9
-    // StretchRect scaling/filtering approximation, no other eye/desktop RTV,
-    // and no manufactured Draw evidence. Unsupported copies fall back to D3D9.
+    // Also resolve a real game multisampled color RT into the eye: full-size
+    // resolves stay entirely on GPU, and bounded source patches use a private
+    // resolve texture without overwriting untouched eye pixels. Scaling and
+    // filtering remain unsupported, with original D3D9 StretchRect fallback;
+    // no foreign desktop RTV and no manufactured Draw evidence.
     [[nodiscard]] bool copy_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
         UINT destX, UINT destY) noexcept;

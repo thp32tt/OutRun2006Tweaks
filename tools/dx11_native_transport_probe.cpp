@@ -925,6 +925,34 @@ int main()
             gameShaderIntermediate,
             "00834 native game shader-readable GPU intermediate created");
     d3d.context->CopyResource(gameShaderIntermediate, gameSurface);
+    // A game scene may render to MSAA before a full-frame or cropped menu
+    // postpass. The native eye path must GPU-resolve the *actual* RT instead
+    // of dropping the pixels or staging the entire eye through system memory.
+    D3D11_TEXTURE2D_DESC multisampleDesc = gameSurfaceDesc;
+    UINT msaaQualityLevels = 0u;
+    multisampleDesc.SampleDesc.Count = 4u;
+    HRESULT qualityHr = d3d.device->CheckMultisampleQualityLevels(
+        multisampleDesc.Format, multisampleDesc.SampleDesc.Count,
+        &msaaQualityLevels);
+    if (FAILED(qualityHr) || msaaQualityLevels == 0u) {
+        multisampleDesc.SampleDesc.Count = 2u;
+        qualityHr = d3d.device->CheckMultisampleQualityLevels(
+            multisampleDesc.Format, multisampleDesc.SampleDesc.Count,
+            &msaaQualityLevels);
+    }
+    require(SUCCEEDED(qualityHr) && msaaQualityLevels > 0u,
+            "00835 WARP game MSAA color RT supported");
+    ID3D11Texture2D* gameMultisample = nullptr;
+    ID3D11RenderTargetView* gameMultisampleView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &multisampleDesc, nullptr, &gameMultisample)) &&
+            gameMultisample && SUCCEEDED(d3d.device->CreateRenderTargetView(
+                gameMultisample, nullptr, &gameMultisampleView)) &&
+            gameMultisampleView,
+            "00835 game-owned multisample color surface created");
+    constexpr float multisampleMagenta[4]{1.f, 0.f, 1.f, 1.f};
+    d3d.context->ClearRenderTargetView(
+        gameMultisampleView, multisampleMagenta);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
@@ -951,10 +979,12 @@ int main()
         bool replayedMidSceneClear[2]{};
         ID3D11Texture2D* gameSurface{};
         ID3D11Texture2D* gameShaderIntermediate{};
+        ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
+        bool replayedPostDrawMsaaResolve[2]{};
         bool preservedPostDrawMrt[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
@@ -983,6 +1013,7 @@ int main()
     gameEyeFixture.gamePixelShader = gamePixelShader;
     gameEyeFixture.gameSurface = gameSurface;
     gameEyeFixture.gameShaderIntermediate = gameShaderIntermediate;
+    gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
 
     // 00819: the renderer callback itself emits independent eye GPU work
@@ -1231,7 +1262,11 @@ int main()
             !encoder.copy_game_surface(
                 fixture.gameSurface, &invalidSourcePatch, destX, 38u) &&
             !encoder.copy_game_surface(
-                fixture.gameSurface, &sourcePatch, 61u, 38u);
+                fixture.gameSurface, &sourcePatch, 61u, 38u) &&
+            !encoder.copy_game_surface(
+                fixture.gameMultisample, &invalidSourcePatch, destX, 54u) &&
+            !encoder.copy_game_surface(
+                fixture.gameMultisample, &sourcePatch, 61u, 54u);
         const auto beforeCopyDraws = encoder.draw_count();
         const auto beforeCopyColorDraws = encoder.color_draw_count();
         // A real game can bind its offscreen intermediate as MRT1 while the
@@ -1252,6 +1287,13 @@ int main()
                 fixture.gameShaderIntermediate, &sourcePatch, destX, 48u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // A real game MSAA RT must resolve on the GPU before copying just
+        // the selected menu/vehicle patch, preserving the rest of both eyes.
+        fixture.replayedPostDrawMsaaResolve[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameMultisample, &sourcePatch, destX, 54u) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         ID3D11RenderTargetView* afterCopyMrt[2]{};
         ID3D11DepthStencilView* afterCopyDepth = nullptr;
         ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
@@ -1267,6 +1309,7 @@ int main()
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
+            !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
             !encoder.color_draw_count()) return false;
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
@@ -1314,6 +1357,8 @@ int main()
             gameEyeFixture.replayedPostDrawSurfaceCopy[1] &&
             gameEyeFixture.replayedPostDrawShaderCopy[0] &&
             gameEyeFixture.replayedPostDrawShaderCopy[1] &&
+            gameEyeFixture.replayedPostDrawMsaaResolve[0] &&
+            gameEyeFixture.replayedPostDrawMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
             gameEyeFixture.preservedPostDrawMrt[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
@@ -1433,6 +1478,8 @@ int main()
     preservedDepthTexture->Release();
     gameSurfaceView->Release();
     gameShaderIntermediate->Release();
+    gameMultisampleView->Release();
+    gameMultisample->Release();
     gameSurface->Release();
     outrun::vr::dx11::NativeGameStereoPublishedFrame gameEyeFrame{};
     bool gameEyeReady = false;
@@ -1493,11 +1540,16 @@ int main()
         const bool gameShaderIntermediateCopied =
             shaderCopied[0] == 0u && shaderCopied[1] == 0u &&
             shaderCopied[2] == 255u && shaderCopied[3] == 255u;
+        const auto* msaaResolved =
+            pixel + 55u * mapped.RowPitch + copyX * 4u;
+        const bool gameMsaaResolved =
+            msaaResolved[0] == 255u && msaaResolved[1] == 0u &&
+            msaaResolved[2] == 255u && msaaResolved[3] == 255u;
         d3d.context->Unmap(readback, 0);
         require(distinctColor && actualPartialClear &&
                 orderedAfterDrawClear && gameSurfaceCopied &&
-                gameShaderIntermediateCopied,
-                "00834 native L/R Draw, ordered Clear, RT and shader-only GPU intermediate copies");
+                gameShaderIntermediateCopied && gameMsaaResolved,
+                "00835 native L/R Draw, ordered Clear, RT, SRV and GPU MSAA patch resolve");
     }
     hostFrame.frameId = 24u;
     hostFrame.sourcePoseSequence = 33u;
