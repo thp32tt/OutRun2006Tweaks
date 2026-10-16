@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:RENDER:PARTICLE_FIRST_EYE_GPU_BIND",
   "symptom_id": "DX9EX:SYMPTOM:PARTICLE_FIRST_EYE_GPU_BIND",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "phase": "C6_RESULT",
-  "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_VALIDATION",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PARTIAL_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "9b5449402cad8dc186debace5a2f68206ada2e45",
   "material_result_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
-  "validation_bearing_result_sha": "bd5b69dcc2a87506c63e46010bc716350409cfb0",
+  "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/r30_particle_upload_policy.hpp",
@@ -71,8 +71,8 @@
     ]
   },
   "acceptance_results": {
-    "particle_pre_gpu_bind_fallback": "PENDING_EXACT_SHA",
-    "particle_no_duplicate_alpha": "PENDING_EXACT_SHA",
+    "particle_pre_gpu_bind_fallback": "PASS_LOCAL_CXX_RELEASE_MUTATION",
+    "particle_no_duplicate_alpha": "PASS_LOCAL_CXX_RELEASE_MUTATION",
     "particle_exact_sha_gates": "PENDING_EXACT_SHA"
   },
   "diagnosis": {
@@ -93,11 +93,24 @@
   },
   "ci_evidence": {
     "initial_failed_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
-    "initial_failure": "DX9Ex Active policy job run 38923462196: required exact-head run record was missing; no C++ build failure verified",
-    "final_exact_sha": "bd5b69dcc2a87506c63e46010bc716350409cfb0",
-    "mandatory_gates": "PASS_EXACT_SHA (GitHub CI SUCCESS confirmed by user; not rerun)",
-    "runtime_validation": "UNTESTED"
+    "initial_failure": "DX9Ex Active policy failed for missing required 00962 record (run 38923462196)",
+    "material_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
+    "repaired_source_sha": "bd5b69dcc2a87506c63e46010bc716350409cfb0",
+    "repaired_sha_gates": {
+      "DX9EX_ACTIVE": "SUCCESS run 38924163606",
+      "DOMAIN": "SUCCESS run 38924163285",
+      "HUD_INSPECTOR": "SUCCESS run 38924163413",
+      "FULL_SOURCE": "CANCELLED run 38924163251 (concurrent branch push)"
+    },
+    "integrated_candidate_sha": "ed76f97d4166b1a33e1d58120d7568ec341ae5e5",
+    "integrated_candidate_gates": {
+      "FULL_SOURCE": "SUCCESS run 38924602563",
+      "DOMAIN": "SUCCESS run 38924602277",
+      "HUD_INSPECTOR": "SUCCESS run 38924602307",
+      "DX9EX_ACTIVE": "IN_PROGRESS run 38924602246"
+    },
+    "verification_rule": "No PASS_EXACT_SHA until all mandatory four workflows SUCCESS for ONE SHA; no user-HMD assertion or assumed successful cancellation."
   },
-  "next_action": "C6 BUILD_VERIFIED recorded at exact validation-bearing SHA bd5b69dcc2a87506c63e46010bc716350409cfb0; previous material implementation 7af3a47d81ad088f3952f85bc793ab1529e82205 preserved. Quest3/VDXR HMD runtime remains UNTESTED (NEED_HMD_TEST).",
+  "next_action": "Complete the DX9Ex Active run 38924602246 on integrated sha ed76f97d4166b1a33e1d58120d7568ec341ae5e5, then record 4/4 success (or actual failure) and separate Quest3 runtime as UNTESTED. Previously recorded C6 PASS on bd5b69 lacked matching Full Source CI.",
   "score_delta_this_attempt": 0
 }
