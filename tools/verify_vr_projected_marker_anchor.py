@@ -366,13 +366,32 @@ if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
 if "RankMarkerSubScreenHudDepth == 0" not in calc:
     fail("NaviPub rank HUD must not poison the next vehicle's projected anchor")
 rank_digit = function_body(ui, "static int __cdecl RankMarker_putClipSprite(")
+exact_owned = function_body(ui, "static int ExactScreenHud_putClipSpriteOwned(")
 exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
+pause_clip = function_body(ui, "static int __cdecl PauseOptionArrow_putClipSprite(")
+# Shared queue snapshot/tagging now lives in Owned, not in the forwarding
+# exact clip wrapper. Keep the full priority-queue sibling requirement on
+# the REAL registration function and verify both caller-specific tokens.
 for label, body in (("rank 4th+ digits", rank_digit),
-                    ("menu/result HUD", exact_clip)):
+                    ("menu/result HUD", exact_owned)):
     if "TagAppendedNodes(tailsBefore," not in body:
         fail(f"{label} must propagate semantic tags to every appended sibling")
     if "Game::SpritePriorityCount" not in body:
         fail(f"{label} must enumerate original sprite priority queues")
+if ("Game::put_clip_sprite(" not in exact_owned or
+        "RenderScope::ScreenHud, producer" not in exact_owned or
+        exact_owned.find("Game::put_clip_sprite(") >
+        exact_owned.find("TagAppendedNodes(tailsBefore,")):
+    fail("menu/result owned original Draw must precede all sibling tags")
+if ("ExactScreenHud_putClipSpriteOwned(" not in exact_clip or
+        "ProducerToken::ExactScreenHudClipSprite" not in exact_clip or
+        "PauseOptionArrow" in exact_clip):
+    fail("generic HUD clip must not borrow exact pause-arrow semantics")
+if ("ExactScreenHud_putClipSpriteOwned(" not in pause_clip or
+        "ProducerToken::PauseOptionArrow" not in pause_clip or
+        "GameState::STATE_SMPAUSEMENU" not in pause_clip or
+        "return ExactScreenHud_putClipSprite(" not in pause_clip):
+    fail("pause-specific E8 producer/fallback lost its own queue authority")
 for marker in ("const auto projectedAnchor = RivalMarkerProjectedInfo;",
                "RivalMarkerProjectedInfo = {};",
                "projected ? &projectedAnchor : nullptr"):
