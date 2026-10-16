@@ -37,7 +37,7 @@ def check(c,p,g,w):
               'if($gameExitCode -ne 0){','exit 7',
               "Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force"):
         assert s in p, 'OpenXR host check missing: '+s
-    start=g.split('function Start-Slot(',1)[1].split('$form=New-Object',1)[0]
+    # PowerShell script-to-script calls do not guarantee a native LASTEXITCODE.\n    # The 2026-10-17 Quest session ended successfully, but its collector's\n    # follow-up raised VariableIsUndefined under StrictMode. Check $? for both.\n    assert "& $collector\\nif (-not $?)" in p, 'collector must not read an unset native exit code'\n    assert "& $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant\\n    if (-not $?)" in p, 'selector must use script invocation status'\n    assert not __import__('re').search(r'if\\s*\\(\\s*\\$LASTEXITCODE\\b',p), 'unsafe unbound LASTEXITCODE test'\n    start=g.split('function Start-Slot(',1)[1].split('$form=New-Object',1)[0]
     assert '-WindowStyle Hidden' not in start, 'hidden child masks launch errors'
     for s in ('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md',
               'if ($launchers.Count -ne 2','verify_vr_dx9ex_launch_batch.py'):
@@ -46,7 +46,7 @@ def check(c,p,g,w):
 if __name__ == '__main__':
     check(CMD,PS,GUI,WF)
     mutants=[
-       ('no quoted cwd',CMD.replace('pushd "%~dp0"','rem no working directory',1),PS,GUI,WF),
+       ('unbound collector exit',CMD,PS.replace("& $collector\\nif (-not $?)", "& $collector\\nif($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}",1),GUI,WF),\n       ('unbound selector exit',CMD,PS.replace("    if (-not $?) { throw 'Failed to prepare current test session.' }", "    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare current test session.'}",1),GUI,WF),\n       ('no quoted cwd',CMD.replace('pushd "%~dp0"','rem no working directory',1),PS,GUI,WF),
        ('missing original EXE preflight',CMD.replace('OR2006C2C.EXE','OTHER.EXE'),PS,GUI,WF),
        ('missing host payload',CMD.replace('backends\\d3d9\\outrun-vr-host.exe','missing.exe'),PS,GUI,WF),
        ('missing host lifecycle',CMD,PS.replace('HOST_NEVER_STARTED','HOST_UNKNOWN'),GUI,WF),
