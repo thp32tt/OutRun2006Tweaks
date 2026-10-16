@@ -10,15 +10,15 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
   "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
-  "status": "SOURCE_INTEGRATING",
-  "checkpoint": "C4_MATERIAL_COMMITTED",
-  "automation_validation": "FAILED_PENDING_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "material_result_sha": "08a72352b03003506e80a04115aa65aadc2f4616",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "52ef466ae7cfa9284a7758990db3d3129b23a66c",
   "packaging_status": "NOT_REQUIRED",
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.hpp",
@@ -99,7 +99,7 @@
     "C3_VALIDATE": "Initial 08a72352 exact SHA Fast and Backend failed at inherited 00818 run-record policy; other checks ongoing; repaired by adding honest current nonterminal 00819 run record, not rewriting historical C6.",
     "C4_COMMIT": "Material 08a72352b03003506e80a04115aa65aadc2f4616 (no skip). CI-causal run-record fix separate (no skip).",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "NOT_COMPLETE_SOURCE_PHASE"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA at exact validation-bearing SHA 52ef466ae7cfa9284a7758990db3d3129b23a66c; bookkeeping [skip ci] only; RUNTIME_VALIDATION=UNTESTED and NEED_HMD_TEST; full native renderer/live game stereo integration remains incomplete."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00819",
