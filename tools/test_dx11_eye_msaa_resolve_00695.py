@@ -12,7 +12,7 @@ header=(root/"src/vr/d3d11/native_game_eye_pair_sources.hpp").read_text(encoding
 def connected(s,h):
     try:
         fn=s.split("bool NativeSharedEyeRing::submit_eye_pair(",1)[1].split(
-            "bool NativeSharedEyeRing::signal_producer_fence(",1)[0]
+            "bool NativeSharedEyeRing::render_eye_pair(",1)[0]
     except IndexError:
         return False
     checks=[
@@ -55,7 +55,7 @@ assert connected(source,header), "native game MSAA eyes not linked to safe DX11 
 # Existing R306 transport lifetime check must accept the new descriptor-aware
 # MSAA source signature, but fail if any GPU preflight or either eye is removed.
 submission = source.split("bool NativeSharedEyeRing::submit_eye_pair(", 1)[1].split(
-    "bool NativeSharedEyeRing::signal_producer_fence(", 1)[0]
+    "bool NativeSharedEyeRing::render_eye_pair(", 1)[0]
 verify_eye_pair_submission(submission)
 # Negative controls must reject removal of queued-eye provenance, the guarded
 # EVENT call, or the failure-path quarantine. Do not allow legacy direct-return
