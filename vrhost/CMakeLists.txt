@@ -237,6 +237,19 @@ add_custom_command(TARGET outrun-vr-goal-b9200-stack-smoke POST_BUILD
     COMMENT "Run native exact GOAL B9200 E8 return-address/fallback regression"
     VERBATIM)
 # Real game-side cockpit basis is compiled and executed by the mandatory host gate.
+# Quest-inspired binocular sphere visibility. Cache per-eye tangents once
+# per pose and fail open on invalid XR data. The original game culling hook
+# is unchanged until exact world-space sphere inputs are established.
+add_executable(outrun-vr-quest-stereo-cull-smoke
+    tests/quest_stereo_sphere_visibility_smoke.cpp)
+target_include_directories(outrun-vr-quest-stereo-cull-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-quest-stereo-cull-smoke)
+add_custom_command(TARGET outrun-vr-quest-stereo-cull-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-quest-stereo-cull-smoke>"
+    COMMENT "Run Quest-inspired per-eye geometric visibility regression"
+    VERBATIM)
+
 add_executable(outrun-vr-driver-seat-camera-smoke tests/driver_seat_camera_smoke.cpp)
 target_include_directories(outrun-vr-driver-seat-camera-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 add_dependencies(outrun-vr-host outrun-vr-driver-seat-camera-smoke)
@@ -320,6 +333,7 @@ foreach(target
     outrun-vr-menu-content-aspect-smoke
     outrun-vr-stage-edge-cull-smoke
     outrun-vr-driver-seat-camera-smoke
+    outrun-vr-quest-stereo-cull-smoke
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-rank-marker-fraction-smoke
