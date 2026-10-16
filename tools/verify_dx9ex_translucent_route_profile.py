@@ -12,7 +12,32 @@ assert r33.count('DrawRoute::Xyzrhw')==4, 'all four indexed/VB/UP routes'
 for route in ('ScreenHud','FastWorld','R29Fallback','RecordingRaw'):
     assert r33.count(f'DrawRoute::{route}')==1, route
 assert r33.count('GpuWaterProbe::Enabled()')>=10, 'diagnostics default-off gate'
-assert 'if(!Enabled()||!d) return false;\n        ++logicalDrawCalls_;' in gpu
+# The diagnostic's first Draw on a new D3D9 device must be counted AFTER
+# new-device reset and BEFORE any sticky unsupported/skip early return.
+probe = gpu.split("bool beforeDraw(IDirect3DDevice9* d,", 1)[1].split(
+    "void afterDraw(bool timed)", 1)[0]
+guard = "if(!Enabled()||!d) return false;"
+reset = "if(game_&&game_!=d) reset();"
+binding = "game_=d;"
+counting = "++logicalDrawCalls_;"
+early = "if(unsupported_||skip_) return false;"
+assert all(x in probe for x in (guard, reset, binding, counting, early))
+assert probe.index(guard) < probe.index(reset) < probe.index(binding) < (
+    probe.index(counting)) < probe.index(early)
+# Reject old-device lockout, premature draw count, or bypassed opt-in gate.
+for mutant in (
+    probe.replace(reset, "if(false) reset();", 1),
+    probe.replace(reset + "\n        " + binding,
+                  binding + "\n        " + reset, 1),
+    probe.replace(counting + "\n        " + early,
+                  early + "\n        " + counting, 1),
+    probe.replace(guard, "if(false) return false;", 1),
+):
+    assert mutant != probe
+    assert not (all(x in mutant for x in (guard, reset, binding, counting, early))
+                and mutant.index(guard) < mutant.index(reset)
+                < mutant.index(binding) < mutant.index(counting)
+                < mutant.index(early)), "GPU profiler device-epoch mutant escaped"
 assert 'if(unsupported_||skip_) return false;' in gpu
 assert 'routeCounts_.fill(0);' in gpu
 assert 'logicalDrawCalls_ - (routeCounts_' in gpu
