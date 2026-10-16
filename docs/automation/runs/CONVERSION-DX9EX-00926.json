@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATION_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_GATE_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_BOOKKEEPING_AFTER_ALL_EXACT_SHA_GATES",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "025b6665967bc8a456713880756ab3b3a571f094",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "menu_full_content_optical_aspect": "SOURCE_IMPLEMENTED",
-    "menu_native_and_partial_fallback": "SOURCE_IMPLEMENTED",
-    "dx9ex_exact_sha_required_gates": "PENDING_EXACT_SHA"
+    "menu_full_content_optical_aspect": "PASS_EXACT_SHA",
+    "menu_native_and_partial_fallback": "PASS_EXACT_SHA",
+    "dx9ex_exact_sha_required_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R23 native LOCAL-fixed menu projected a complete uncropped 3440x1440 captured game client using its wide desktop aspect. The source menu's intentionally authored 4:3 visual proportions became optically ultrawide, whereas center-only texture crop discards user-observed car-selection/menu pixels outside that rectangle.",
@@ -109,19 +109,33 @@
     }
   },
   "material_result_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "cb95cf1ac776e45bcbd695900a86d1b7e75ed7fa",
   "score_delta_this_attempt": 0,
-  "next_action": "Re-run mandatory exact-SHA Gate on same material feature after test-only causal repair: source-owned menu configuration binding, native/no-crop fallback, and three destructive mutations required. No material re-score; physical HMD remains UNTESTED.",
+  "next_action": "BUILD_VERIFIED only. Quest3/VDXR physical A/B must test full menu+car selection at matching exact cb95cf1ac776 source against native aspect rollback, plus R26_SAFE/FFB/SkyGlow and HUD sanity. No automated headset PASS; do not double-score retries/C6.",
   "ci_evidence": {
-    "candidate_material_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
-    "active_material_attempt": {
-      "run_id": 38829694004,
-      "conclusion": "failure_missing_feature_record_before_compilation"
+    "validation_bearing_result_sha": "cb95cf1ac776e45bcbd695900a86d1b7e75ed7fa",
+    "original_material_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
+    "dx9ex_active": {
+      "run_id": 38830196822,
+      "conclusion": "success",
+      "jobs": "policy/game/host/full-chain-compile/package 5/5"
     },
-    "exact_sha_requirement": "Must pass all mandatory workflows on final record-bearing result SHA, do not borrow predecessor Green, no HMD inference.",
-    "second_recorded_attempt": {
-      "run_id": 38829989160,
-      "conclusion": "failed_obsolete_menu_call_scanner"
-    }
+    "domain_isolation": {
+      "run_id": 38830196645,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38830196639,
+      "conclusion": "success",
+      "jobs": "MSVC x86 game/x64 host/source-cross-domain 3/3"
+    },
+    "hud_inspector": {
+      "run_id": 38830196755,
+      "conclusion": "success",
+      "jobs": "Win32 build/static EXE analysis 2/2"
+    },
+    "compile_and_smoke": "OpenXR host job compiled and executed native menu_content_aspect_smoke C++ along with deterministic host regression suite.",
+    "c6_bookkeeping_is_not_validation_bearing": true,
+    "runtime_proof": "No matching Quest3/VDXR headset or original game's image trial was executed; optical correctness NEED_HMD_TEST."
   }
 }
