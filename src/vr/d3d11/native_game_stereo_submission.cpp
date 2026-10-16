@@ -271,6 +271,23 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     D3D11_TEXTURE2D_DESC sourceDesc{}, eyeDesc{};
     source->GetDesc(&sourceDesc);
     eyeColor->GetDesc(&eyeDesc);
+    // Clip a game-origin unscaled postpass at the native eye edge, while
+    // preserving the original pixel-to-pixel map. This must be done BEFORE
+    // choosing Copy, shader format conversion, or MSAA Resolve. All of them
+    // must see the same nonempty game source box.
+    const D3D11_BOX requested = sourceRegion
+        ? *sourceRegion
+        : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
+    if (requested.front != 0u || requested.back != 1u)
+        return false;
+    const auto clippedCopy = native_game_copy_clipped_region(
+        sourceDesc.Width, sourceDesc.Height,
+        requested.left, requested.top, requested.right, requested.bottom,
+        targetWidth_, targetHeight_, destX, destY);
+    if (!clippedCopy.valid) return false;
+    const D3D11_BOX box{
+        clippedCopy.sourceLeft, clippedCopy.sourceTop, 0u,
+        clippedCopy.sourceRight, clippedCopy.sourceBottom, 1u};
     // D3D9 StretchRect also performs format conversion for unscaled
     // menu/vehicle postpasses. CopySubresourceRegion cannot do that. Replay
     // the caller's exact mip-zero source rectangle with a native point-sampled
@@ -279,11 +296,6 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // rejects unsupported/foreign resources before GPU mutation. This path
     // must never count its fullscreen shader triangle as game Draw evidence.
     if (sourceDesc.Format != eyeDesc.Format) {
-        const D3D11_BOX box = sourceRegion
-            ? *sourceRegion
-            : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
-        if (box.left >= box.right || box.top >= box.bottom)
-            return false;
         const UINT width = box.right - box.left;
         const UINT height = box.bottom - box.top;
         const UINT maxLong = static_cast<UINT>(
@@ -347,15 +359,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
             (support & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
             return false;
     }
-    const D3D11_BOX box = sourceRegion
-        ? *sourceRegion
-        : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
-    if (box.front != 0u || box.back != 1u ||
-        box.left >= box.right || box.top >= box.bottom ||
-        box.right > sourceDesc.Width || box.bottom > sourceDesc.Height ||
-        destX > eyeDesc.Width || destY > eyeDesc.Height ||
-        box.right - box.left > eyeDesc.Width - destX ||
-        box.bottom - box.top > eyeDesc.Height - destY)
+    if (box.right > sourceDesc.Width || box.bottom > sourceDesc.Height ||
+        eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;
 
     // Only mip zero of the caller-proven camera eye slice enters the native
@@ -1189,10 +1194,14 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         return false;
                     if (event.kind ==
                         NativeGameEyePartialTargetClear::Kind::SourceCopy) {
-                        if (event.destX > ring_.width() ||
-                            event.destY > ring_.height() ||
-                            b.right - b.left > ring_.width() - event.destX ||
-                            b.bottom - b.top > ring_.height() - event.destY)
+                        // Preflight both eyes with the exact same GPU Copy
+                        // clipping as the encoder. A fully offscreen copy
+                        // remains invalid before any eye queues GPU work.
+                        if (!native_game_copy_clipped_region(
+                                desc.Width, desc.Height,
+                                b.left, b.top, b.right, b.bottom,
+                                ring_.width(), ring_.height(),
+                                event.destX, event.destY).valid)
                             return false;
                     } else {
                         const auto& d = event.destination;

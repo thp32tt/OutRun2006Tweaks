@@ -38,6 +38,45 @@ native_game_stretch_source_transfer(
         ? NativeGameStretchSourceTransfer::DirectSample
         : NativeGameStretchSourceTransfer::CopyToSampled;
 }
+// An unscaled game GPU Copy/Resolve can overlap the right/bottom of an XR
+// eye. D3D11 CopySubresourceRegion rejects an oversize destination; preserve
+// the visible game pixels by shortening only the source box, NOT stretching
+// the remaining texels. Fully offscreen/invalid copies still fail closed.
+// The same clip is used by the bilateral source timeline preflight and by
+// both ordinary Copy and format-converted / MSAA eye replay.
+struct NativeGameCopyClippedRegion {
+    std::uint32_t sourceLeft{}, sourceTop{}, sourceRight{}, sourceBottom{};
+    std::uint32_t destX{}, destY{};
+    bool valid{};
+};
+[[nodiscard]] constexpr NativeGameCopyClippedRegion
+native_game_copy_clipped_region(
+    std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+    std::uint32_t sourceLeft, std::uint32_t sourceTop,
+    std::uint32_t sourceRight, std::uint32_t sourceBottom,
+    std::uint32_t targetWidth, std::uint32_t targetHeight,
+    std::uint32_t destX, std::uint32_t destY) noexcept
+{
+    if (!sourceWidth || !sourceHeight || !targetWidth || !targetHeight ||
+        sourceLeft >= sourceRight || sourceTop >= sourceBottom ||
+        sourceRight > sourceWidth || sourceBottom > sourceHeight ||
+        destX >= targetWidth || destY >= targetHeight) return {};
+    const auto width = sourceRight - sourceLeft;
+    const auto height = sourceBottom - sourceTop;
+    const auto clippedWidth = width < targetWidth - destX
+        ? width : targetWidth - destX;
+    const auto clippedHeight = height < targetHeight - destY
+        ? height : targetHeight - destY;
+    return {sourceLeft, sourceTop, sourceLeft + clippedWidth,
+            sourceTop + clippedHeight, destX, destY, true};
+}
+static_assert(native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 62u, 61u).sourceRight == 4u);
+static_assert(native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 62u, 61u).sourceBottom == 6u);
+static_assert(!native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 64u, 61u).valid);
+
 // Region packing for the real menu/vehicle/race GPU postpass HLSL.
  // A cropped StretchRect samples only texels inside the game-authored box:
  // linear filtering at the first/last destination pixel must not bleed

@@ -1047,6 +1047,9 @@ int main()
         bool replayedDistinctArrayEyeCopy[2]{};
         bool replayedFormatConvertedArrayCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
+        bool replayedClippedSurfaceCopy[2]{};
+        bool replayedClippedConvertedCopy[2]{};
+        bool replayedClippedMsaaResolve[2]{};
         bool replayedScaledPostpass[2]{};
         bool replayedScaledArrayEye[2]{};
         bool preservedPostDrawMrt[2]{};
@@ -1058,7 +1061,7 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 6u;
+    partialGameClear.count[0] = partialGameClear.count[1] = 7u;
     // Game-origin full Z/stencil Clear after three masked geometry Draws,
     // followed by per-eye HUD TARGET Clears after the remaining geometry.
     // Chronological replay must preserve BOTH independent eye command lists.
@@ -1145,6 +1148,17 @@ int main()
         zRect.stencil = static_cast<std::uint8_t>(eye + 13u);
         zRect.clearDepth = true;
         zRect.clearStencil = true;
+        // A genuine post-geometry eye-array Copy whose 8-pixel box
+        // intersects only the final two native eye pixels. The other six
+        // source texels must not invalidate the entire menu frame.
+        auto& edgeCopy = partialGameClear.entries[eye][6];
+        edgeCopy.kind = SourceClear::Kind::SourceCopy;
+        edgeCopy.afterDrawOrdinal = eye == 0u ? 5u : 6u;
+        edgeCopy.source = gameEyeArray;
+        edgeCopy.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        edgeCopy.destX = 62u;
+        edgeCopy.destY = 20u;
+        edgeCopy.sourceArraySlice = eye;
     }
 
     std::cerr << "R178-DIAG stereo fixture ready\n";
@@ -1406,11 +1420,11 @@ int main()
             !encoder.copy_game_surface(
                 fixture.gameSurface, &invalidSourcePatch, destX, 38u) &&
             !encoder.copy_game_surface(
-                fixture.gameSurface, &sourcePatch, 61u, 38u) &&
+                fixture.gameSurface, &sourcePatch, 64u, 38u) &&
             !encoder.copy_game_surface(
                 fixture.gameMultisample, &invalidSourcePatch, destX, 54u) &&
             !encoder.copy_game_surface(
-                fixture.gameMultisample, &sourcePatch, 61u, 54u);
+                fixture.gameMultisample, &sourcePatch, 64u, 54u);
         const auto beforeCopyDraws = encoder.draw_count();
         const auto beforeCopyColorDraws = encoder.color_draw_count();
         // A real game can bind its offscreen intermediate as MRT1 while the
@@ -1462,7 +1476,7 @@ int main()
                 fixture.gameConvertedArray, &sourcePatch,
                 convertedDestX, 42u, 2u) &&
             !encoder.copy_game_surface(
-                fixture.gameConvertedArray, &sourcePatch, 63u, 42u, eyeIndex) &&
+                fixture.gameConvertedArray, &sourcePatch, 64u, 42u, eyeIndex) &&
             encoder.copy_game_surface(
                 fixture.gameConvertedArray, &sourcePatch,
                 convertedDestX, 42u, eyeIndex) &&
@@ -1473,6 +1487,28 @@ int main()
         fixture.replayedPostDrawMsaaResolve[eyeIndex] =
             encoder.copy_game_surface(
                 fixture.gameMultisample, &sourcePatch, destX, 54u) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        // Preserve GPU-visible overlap for menu/vehicle postpasses with
+        // right-edge destinations (including format conversion and MSAA).
+        // These do not count as extra game geometry Draws.
+        fixture.replayedClippedSurfaceCopy[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameEyeArray, &sourcePatch, 62u, 14u, eyeIndex) &&
+            !encoder.copy_game_surface(
+                fixture.gameEyeArray, &sourcePatch, 64u, 14u, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        fixture.replayedClippedConvertedCopy[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, 62u, 44u, eyeIndex) &&
+            !encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, 64u, 44u, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        fixture.replayedClippedMsaaResolve[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameMultisample, &sourcePatch, 62u, 58u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
         // A real game StretchRect scales 8x8 GPU pixels into a 12x5
@@ -1537,6 +1573,9 @@ int main()
             !fixture.replayedDistinctArrayEyeCopy[eyeIndex] ||
             !fixture.replayedFormatConvertedArrayCopy[eyeIndex] ||
             !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
+            !fixture.replayedClippedSurfaceCopy[eyeIndex] ||
+            !fixture.replayedClippedConvertedCopy[eyeIndex] ||
+            !fixture.replayedClippedMsaaResolve[eyeIndex] ||
             !fixture.replayedScaledPostpass[eyeIndex] ||
             !fixture.replayedScaledArrayEye[eyeIndex] ||
             !encoder.color_draw_count()) return false;
@@ -1635,6 +1674,12 @@ int main()
             gameEyeFixture.replayedFormatConvertedArrayCopy[1] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[0] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[1] &&
+            gameEyeFixture.replayedClippedSurfaceCopy[0] &&
+            gameEyeFixture.replayedClippedSurfaceCopy[1] &&
+            gameEyeFixture.replayedClippedConvertedCopy[0] &&
+            gameEyeFixture.replayedClippedConvertedCopy[1] &&
+            gameEyeFixture.replayedClippedMsaaResolve[0] &&
+            gameEyeFixture.replayedClippedMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
             gameEyeFixture.preservedPostDrawMrt[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
@@ -1850,6 +1895,31 @@ int main()
               convertedPixel[1] == 0u && convertedPixel[2] == 0u
             : convertedPixel[0] == 0u &&
               convertedPixel[1] == 255u && convertedPixel[2] == 0u;
+        // Read actual edge pixels after the source timeline AND immediate
+        // postpasses; checked separately for each camera to reject copying
+        // one eye's buffer to the other. The unmodified inner-eye samples
+        // below still prove that clipping did not rescale the scene.
+        const auto* timelineEdge = pixel + 22u * mapped.RowPitch + 63u * 4u;
+        const auto* copyEdge = pixel + 15u * mapped.RowPitch + 63u * 4u;
+        const auto* convertEdge = pixel + 45u * mapped.RowPitch + 63u * 4u;
+        const auto* msaaEdge = pixel + 59u * mapped.RowPitch + 63u * 4u;
+        const bool expectedSourceEdge = eyeIndex == 0u
+            ? timelineEdge[0] == 0x11u && timelineEdge[1] == 0u &&
+              timelineEdge[2] == 0xccu && copyEdge[0] == 0x11u &&
+              copyEdge[1] == 0u && copyEdge[2] == 0xccu
+            : timelineEdge[0] == 0x33u && timelineEdge[1] == 0xbbu &&
+              timelineEdge[2] == 0x22u && copyEdge[0] == 0x33u &&
+              copyEdge[1] == 0xbbu && copyEdge[2] == 0x22u;
+        const bool expectedConvertedEdge = eyeIndex == 0u
+            ? convertEdge[0] == 255u && convertEdge[1] == 0u &&
+              convertEdge[2] == 0u
+            : convertEdge[0] == 0u && convertEdge[1] == 255u &&
+              convertEdge[2] == 0u;
+        const bool expectedMsaaEdge = msaaEdge[0] == 255u &&
+            msaaEdge[1] == 0u && msaaEdge[2] == 255u;
+        require(expectedSourceEdge && expectedConvertedEdge &&
+                expectedMsaaEdge,
+                "00851 real GPU clipped Copy/convert/Resolve left/right edge pixels");
         const UINT mipX = eyeIndex == 0u ? 18u : 50u;
         const auto* mipPixel = pixel + 34u * mapped.RowPitch + mipX * 4u;
         const bool actualMipZeroCopy =
