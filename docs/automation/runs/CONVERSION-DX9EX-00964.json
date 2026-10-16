@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:COCKPIT:ATOMIC_CAR_DRIVER_HOOKS",
   "symptom_id": "DX9EX:SYMPTOM:HALF_INSTALLED_COCKPIT",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "d1a691e2b4d6826a783f3eb2cc60b6bc7c88c4f4",
   "material_result_sha": "4536421f2dd0cb970c201adf9a7039d15e10cf8c",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
   "source_paths": [
     "src/vr/game/driver_seat_render_pass.hpp",
     "src/hooks_graphics.cpp",
@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "atomic_cockpit_visible_pass": "PENDING_EXACT_SHA",
-    "atomic_cockpit_native_fallback": "PENDING_EXACT_SHA",
-    "atomic_cockpit_exact_sha": "PENDING_EXACT_SHA"
+    "atomic_cockpit_visible_pass": "PASS_EXACT_SHA",
+    "atomic_cockpit_native_fallback": "PASS_EXACT_SHA",
+    "atomic_cockpit_exact_sha": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "At the real player-car native hook registration site, the prior car-state detour was directly committed before attempting driver robot inline detour; both hooks were independent but failure returned false without the car callback being removed.",
@@ -90,8 +90,43 @@
     "source": "src/hooks_graphics.cpp::VRDriverSeatRenderTest::apply"
   },
   "ci_evidence": {
-    "result": "PENDING"
+    "result": "PASS_EXACT_SHA_4_OF_4",
+    "material_result_sha": "4536421f2dd0cb970c201adf9a7039d15e10cf8c",
+    "source_test_repair_sha": "229d1049c0ba5a6ff1eb86b3b5357a02dd00e4a8",
+    "validation_bearing_result_sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38932001171,
+        "status": "SUCCESS",
+        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001171"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38932001547,
+        "status": "SUCCESS",
+        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001547"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38932001429,
+        "status": "SUCCESS",
+        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001429"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38932001389,
+        "status": "SUCCESS",
+        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001389"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "note": "Executable cockpit RAII smoke is included in DX9Ex Active x64 host build; final Win32 R84/R26_SAFE and package compile verified by Active; independent Domain/HUD/Full Source all exact-SHA SUCCESS."
   },
-  "next_action": "Exact-SHA policy now classifies the original source-confirmed half-installed cockpit blocker as CRITICAL_BLOCKER; full Win32 R84 host/packaging/Domain/Full Source/HUD Actions needed. Quest3 runtime UNTESTED.",
-  "score_delta_this_attempt": 0
+  "next_action": "BUILD_VERIFIED on exact immutable SHA; only Quest3/VDXR HMD visual acceptance remains NEED_HMD_TEST. Preserve original material SHA and do not rescore C6/retry.",
+  "score_delta_this_attempt": 1
 }
