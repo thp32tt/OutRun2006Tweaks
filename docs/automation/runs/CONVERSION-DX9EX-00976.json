@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00976",
+  "production_id": "CONVERSION-DX9EX-00976",
+  "event_id": "CONVERSION-DX9EX-00976-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00976",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING",
+  "phase": "C5_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "undefined",
+  "material_result_sha": "dee5d8d412b8fddef34bbb08b4dbc888afb9fe3d",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/lens_centre_partial_wvp.hpp",
+    "src/vr/game/outrun_renderer.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/lens_centre_partial_wvp.hpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00976.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Restore original C993 central lens-dot WVP provenance through successful full and partial game D3D9 vertex constant uploads within the exact same physical draw, then enable the existing R84 per-eye lens centre correction without promoting any stale or foreign matrix as stereo evidence.",
+    "scope_boundary": "Only original C993 lens-centre raw c64..c67 staging and source ownership; protect CABE outer flare discs, SkyGlow, original input/FFB, DX9Ex fallback, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Native C993 central D3A5 lens source emits full or partial c64..c67 game SetVertexShaderConstantF under exact semantic producer token.",
+      "OutRun renderer accepts native game D3D9 writes and collects committed full matrix plus subsequent same-call/same-draw c64 row replacements with device, shader, pose and epoch ownership.",
+      "R84 optical path consumes only validated raw WVP evidence for original centre render; differing scene effects or invalid owners fall back to original source and preserve per-eye host composition."
+    ],
+    "subcomponents": [
+      "Modify PartialWvpUpload to distinguish committed full original c64..c67 state from tentative partial row collection and preserve exact same-draw unwritten D3D9 rows.",
+      "Wire successful direct full uploads and complete split uploads in live outrun_renderer.cpp to commit source WVP, while invalid or failed/cross-draw/non-centre uploads revoke unsafe reuse.",
+      "Extend C++ regression smoke/static assertions for full-to-partial row replacement, foreign call, new physical draw, failed native write and no accidental completion of an incomplete upload."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_same_draw_wvp",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native C993 source upload to renderer WVP owner",
+        "expected_behavior": "A successful same C993/same draw full game c64 matrix followed by partial row replacement retains untouched native rows for complete lens centre stereo WVP evidence."
+      },
+      {
+        "id": "centre_provenance_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "Failed/native and unrelated lens or draw provenance",
+        "expected_behavior": "Cross draw, foreign centre call, device or shader epoch, failed upload and uncommitted overlapping partial rows cannot borrow previously accepted WVP state; native optical fallback remains available."
+      },
+      {
+        "id": "centre_exact_sha_pipeline",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub exact SHA DX9Ex x86 game and x64 OpenXR host package",
+        "expected_behavior": "All required DX9Ex Active, Domain Isolation and applicable Full Source/HUD checks run on the final validation-bearing SHA; Quest3/VDXR binocular correctness stays UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "centre_same_draw_wvp": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA",
+    "centre_provenance_fail_closed": "SOURCE_STATIC_ASSERT_PENDING_CI",
+    "centre_exact_sha_pipeline": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Original D3D9 SetVertexShaderConstantF retains earlier c64 rows across later successful partial writes. Existing R84 C993 staging reset a complete matrix immediately and would not retain native untouched rows for a same-physical-draw source update.",
+    "source_trace": [
+      "Original D3A5→C993 direct lens central dot producer and semantic SourceRender token.",
+      "outRun_renderer game device native SetVertexShaderConstantF c64..c67 succeeds before partial WVP collection and CommitComplete bookkeeping.",
+      "R84 stereo lens raw-WVP ownership checks same producer call, latched pose, physical draw, shader epoch and device before any per-eye optical transform."
+    ],
+    "root_cause": "A completed but immediately discarded exact C993 source raw WVP lost unwritten native D3D9 c64 rows when a later same-draw partial upload occurred, despite real D3D9 register retention; this could deny otherwise valid central-dot stereo evidence.",
+    "alternatives_rejected": [
+      "Previously present raw source provenance and R84 per-eye lens handling were not missing, so introducing a duplicate C993 hook or altering CABE outer discs would be unrelated.",
+      "Combining rows across different physical draws, foreign source tokens, invalid writes or different shader/device epochs is forbidden because it can synthesize an incorrect centre transform."
+    ],
+    "fix_evidence": "Material GitHub SHA dee5d8d412b8fddef34bbb08b4dbc888afb9fe3d includes C++ PartialWvpUpload committed state, renderer native-success CommitComplete flow and constexpr plus smoke regression. Exact GitHub gates still pending after policy run-record repair.",
+    "negative_test_evidence": "CommittedFullAcceptsOwnedPartialRows checks cross-draw, foreign call and native failure after a successful full-to-partial case; prior RejectsCrossDrawAndOverlappingPartialWvp and RejectsMixedAndFailedUploads remain active.",
+    "eye_ownership": "Only the exact successfully submitted C993 source WVP with owned call, shader, pose, device and physical draw may feed R84 stereo; absent Quest3/VDXR evidence the binocular picture is not certified."
+  },
+  "ci_failure_context": {
+    "failed_run_id": 38970210098,
+    "failed_head_sha": "dee5d8d412b8fddef34bbb08b4dbc888afb9fe3d",
+    "failed_job": "policy",
+    "failure_reason": "Missing docs/automation/runs/CONVERSION-DX9EX-00976.json in exact-head policy check; host/game/full-chain/package skipped, not compiled failures.",
+    "repair_type": "RUN_RECORD_RECONCILIATION_FOR_EXISTING_MATERIAL_RESULT",
+    "no_new_independent_feature_or_score": true
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Allow required exact-SHA workflows to complete on the new record-bearing commit; on success record C6 separately without rerunning PASS or changing original material SHA. Quest3/VDXR stays UNTESTED."
+}
