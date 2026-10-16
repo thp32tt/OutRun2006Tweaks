@@ -367,6 +367,17 @@ add_custom_command(TARGET outrun-vr-hud-command-batch-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-hud-command-batch-smoke>"
     COMMENT "Run native HUD command batch transaction, mixed-owner, and Reset regression"
     VERBATIM)
+# Opt-in WorldParticle DynamicVB: no original-UP retry after physical GPU
+# submission, but preserve native alpha particles if first-eye binding fails.
+add_executable(outrun-vr-r30-particle-gpu-fallback-smoke
+    tests/r30_particle_gpu_fallback_smoke.cpp)
+target_include_directories(outrun-vr-r30-particle-gpu-fallback-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-r30-particle-gpu-fallback-smoke)
+add_custom_command(TARGET outrun-vr-r30-particle-gpu-fallback-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-r30-particle-gpu-fallback-smoke>"
+    COMMENT "Run GPU particle pre-draw fallback and protected alpha-owner regression"
+    VERBATIM)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
 add_executable(outrun-vr-r30-early-rhw-shadow-smoke tests/r30_early_rhw_shadow_smoke.cpp)
@@ -442,6 +453,7 @@ foreach(target
     outrun-vr-rank-marker-fraction-smoke
     outrun-vr-r30-early-rhw-shadow-smoke
     outrun-vr-r30-indexed-up-bounds-smoke
+    outrun-vr-r30-particle-gpu-fallback-smoke
     outrun-vr-r30-shadow-ranges-smoke
     outrun-vr-goal-progress-owner-smoke
     outrun-vr-goal-b9200-stack-smoke

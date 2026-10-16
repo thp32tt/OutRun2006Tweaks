@@ -30,6 +30,19 @@ constexpr bool Eligible(const Gate& g) noexcept {
     return g.vertices <= kMaxPerEyeBytes / g.stride &&
            g.vertices * g.stride >= kMinPerEyeBytes;
 }
+// A failed first-eye DynamicVB stream bind invokes no GPU DrawPrimitive.
+// Once a physical eye draw has been attempted (even if its HRESULT failed),
+// replaying native DrawPrimitiveUP could double-blend particles or leave the
+// right eye partially published. Likewise, an un-restored stream is unsafe.
+// Permit the original UP fallback ONLY for a proved pre-draw failure.
+constexpr bool MayUseNativeUpAfterGpuAttempt(
+    bool physicalDrawAttempted, bool streamRestored, bool gpuAttemptFailed) noexcept {
+    return !physicalDrawAttempted && streamRestored && gpuAttemptFailed;
+}
+static_assert(MayUseNativeUpAfterGpuAttempt(false,true,true));
+static_assert(!MayUseNativeUpAfterGpuAttempt(true,true,true));
+static_assert(!MayUseNativeUpAfterGpuAttempt(false,false,true));
+static_assert(!MayUseNativeUpAfterGpuAttempt(false,true,false));
 static_assert(Eligible({true,true,true,true,true,false,false,false,24,100}));
 static_assert(!Eligible({true,false,true,true,true,false,false,false,24,100}));
 static_assert(!Eligible({true,true,true,true,true,true,false,false,24,100}));

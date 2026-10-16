@@ -5384,11 +5384,15 @@ namespace OutRunVRStereo
                             device, scratch.left.data(),
                             scratch.right.data(), vertexCount, stride))
                     {
+                        bool physicalDrawAttempted = false;
                         auto physicalEye = [&](unsigned eye) {
                             R30ScopedInternalPass guard;
                             const HRESULT bind =
                                 R30ParticleGpuRing.bindEye(eye);
                             if (FAILED(bind)) return bind;
+                            // Mark BEFORE issuing the real driver call: even a
+                            // failed Draw may already have rasterized fragments.
+                            physicalDrawAttempted = true;
                             return R29OwnerCallRawDrawPrimitive(
                                 device, type, 0u, primitiveCount);
                         };
@@ -5407,8 +5411,14 @@ namespace OutRunVRStereo
                             R29OwnerArmMonoSafety();
                             return FAILED(gpuHr) ? gpuHr : E_FAIL;
                         }
-                        // E_NOTIMPL must never become a fallback AFTER GPU
-                        // raster may have been submitted.
+                        // A failed first-eye SetStreamSource cannot draw a
+                        // particle. With the stream restored, retry the
+                        // original UP path instead of silently losing it.
+                        // Never retry after either eye attempted GPU raster:
+                        // that could duplicate alpha or hide a half-eye frame.
+                        if (OutRunVR::R30ParticleUpload::MayUseNativeUpAfterGpuAttempt(
+                                physicalDrawAttempted, true, FAILED(gpuHr)))
+                            return E_NOTIMPL;
                         return gpuHr == E_NOTIMPL ? E_FAIL : gpuHr;
                     }
                 }
