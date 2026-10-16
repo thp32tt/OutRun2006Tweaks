@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00935",
+  "production_id": "CONVERSION-DX9EX-00935",
+  "event_id": "CONVERSION-DX9EX-00935-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00935",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:CRITICAL:STAGE_EDGE_CULL_INVALID_VIEWPORT",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "VALIDATION_PENDING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL_RESULT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "2fc40f2e86a2bf552c08aa1eae540cd37715713b",
+  "source_paths": [
+    "src/hooks_graphics.cpp",
+    "src/vr/game/stage_edge_cull_projection.hpp",
+    "vrhost/tests/stage_edge_cull_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_graphics.cpp",
+    "src/vr/game/stage_edge_cull_projection.hpp",
+    "vrhost/tests/stage_edge_cull_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00935.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:CRITICAL:STAGE_EDGE_CULL_INVALID_VIEWPORT",
+    "goal": "Prevent the original game's screen-edge stage sphere projection from corrupting culling bounds when the DX9Ex R84 source viewport is unavailable, zero-sized, nonfinite or overflows during Reset, VR resize and native 4:3/16:9/21:9/portrait transitions while keeping normal scene-edge visibility.",
+    "scope_boundary": "Original screen-edge CalcBall3D2D sphere-correction hook and native C++ regression only; no world stereo matrix, stage-culling policy toggle, R84 shader owner, HUD, SkyGlow, FFB, input, R26_SAFE or DXVK change.",
+    "special_work_evidence": "Source-confirmed unchecked Game::screen_resolution dereference and division by zero/NaN followed by non-atomic writes to both original game culling sphere components; deterministic finite/invalid source cases are covered in a native compiled test.",
+    "trace_stages": [
+      "Original CalcBall3D2D produces current stage-object screen-space culling sphere and float return",
+      "ScreenEdgeCullFix game hook maps both output components from actual source aspect to canonical native 4:3, accepting only fully finite results",
+      "Stage visibility consumes uncorrupted original or validated corrected sphere; R84 world eye draw and host OpenXR composition stay unchanged"
+    ],
+    "subcomponents": [
+      "Make viewport dependency and game-culling sphere correction atomic and fail-closed across zero/unpublished dimensions, NaN, Inf and arithmetic overflow.",
+      "Keep original numeric mapping bit-identical for all valid native, wide and portrait viewports and integrate compiled native positive/negative regression with the R84 source build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_edge_cull_valid_aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original-game 4:3/16:9/21:9/portrait stage visibility",
+        "expected_behavior": "Correct both original game sphere components at valid source sizes without changing old arithmetic or screen-edge object visibility."
+      },
+      {
+        "id": "stage_edge_cull_reset_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex Reset, minimized viewport, malformed/corrupted culling bounds",
+        "expected_behavior": "Invalid viewport or overflow never writes a partially mapped Sphere; game original value and CalcBall3D2D HRESULT-equivalent return are preserved."
+      },
+      {
+        "id": "stage_edge_cull_full_integration",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 active game, R26_SAFE rollback, host package and independent Domain isolation",
+        "expected_behavior": "Full exact-SHA DX9Ex Active, Domain, Full Source/HUD as applicable and native game-host smoke gates pass without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_edge_cull_valid_aspect": "PENDING_BUILD",
+    "stage_edge_cull_reset_fallback": "PENDING_BUILD",
+    "stage_edge_cull_full_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Game ScreenEdgeCullFix directly dereferenced Game::screen_resolution and divided by source height without checking valid Reset/VR resize transition values; it overwrote a3->f0 and a3->f1 independently before validating finite results.",
+    "source_trace": [
+      "Original CalcBall3D2D_Addr=0x49E70 writes native 4:3 stage Cull sphere and returns original float.",
+      "ScreenEdgeCullFix::destination modifies the original game's a3->f0/f1 using source aspect after the original call, even if the source height is zero.",
+      "CorrectBallProjection stages finite pair then commits only on success, protecting the R84 draw submission input and preserving R26_SAFE and original stage-culling switch."
+    ],
+    "root_cause": "Unconditional source resolution dereference and float division plus sequential unchecked writes can poison original game Cull sphere when viewport is absent or invalid.",
+    "alternatives_rejected": [
+      "Do not globally disable stage culling or widen VR FOV without a proven source camera/visibility mapping.",
+      "Do not modify the R84 renderer or reduce native DX9Ex quality; this specific defect occurs before game 3D draw and must preserve all correct old mappings."
+    ],
+    "fix_evidence": "Actual source CalcBall3D2D now takes a fully validated pure finite projection result and changes original sphere only if both corrected coordinates pass; portable native smoke adds valid and poisoned viewport cases.",
+    "negative_test_evidence": "Negative cases zero/negative height, NaN, Inf, sphere overflow and source aspect overflow reject without valid update.",
+    "eye_ownership": "This original game culling sphere feeds the shared source visibility before R84 projects world content separately for both eyes; this fix does not modify binocular c64 matrices or host projection."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run final exact SHA DX9Ex Active, Domain, Full Source and HUD where triggered; then only record BUILD_VERIFIED if all gates pass. Real Quest3 stage objects/flicker and frame time remain RUNTIME_VALIDATION=UNTESTED."
+}

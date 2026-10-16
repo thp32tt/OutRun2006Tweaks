@@ -158,6 +158,11 @@ add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_uplo
 add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
 target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smoke.cpp)
+# Build the real game CalcBall3D2D correction without a Windows game or HMD.
+add_executable(outrun-vr-stage-edge-cull-smoke tests/stage_edge_cull_smoke.cpp)
+target_include_directories(outrun-vr-stage-edge-cull-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+)
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
@@ -221,6 +226,7 @@ foreach(target
     outrun-vr-projection-blit-upload-smoke
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-menu-content-aspect-smoke
+    outrun-vr-stage-edge-cull-smoke
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-rank-marker-fraction-smoke

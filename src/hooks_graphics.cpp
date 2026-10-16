@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -1355,15 +1356,22 @@ class ScreenEdgeCullFix : public Hook
 	{
 		float ret = dest_orig.ccall<float>(a1, a2, a3);
 
-		if (!Settings::ScreenEdgeCullFix)
+		if (!Settings::ScreenEdgeCullFix || !a3 || !Game::screen_resolution)
 			return ret;
 
-		constexpr float ratio_4_3 = 4.f / 3.f;
-
-		float ratio_screen = Game::screen_resolution->x / Game::screen_resolution->y;
-
-		a3->f0 = (a3->f0 / ratio_screen) * ratio_4_3;
-		a3->f1 = (a3->f1 * ratio_screen) / ratio_4_3;
+		// CalcBall3D2D already wrote the game's culling sphere. During
+		// VR eye-extent changes, device Reset and minimize the original
+		// source viewport can transiently be zero/invalid. Correct both
+		// coordinates only after a complete finite 4:3 projection succeeds;
+		// otherwise keep the original game's sphere and return value intact.
+		const auto mapped = OutRunVrStageCull::CorrectBallProjection(
+			a3->f0, a3->f1,
+			Game::screen_resolution->x, Game::screen_resolution->y);
+		if (mapped.valid)
+		{
+			a3->f0 = mapped.x;
+			a3->f1 = mapped.y;
+		}
 		return ret;
 	}
 
