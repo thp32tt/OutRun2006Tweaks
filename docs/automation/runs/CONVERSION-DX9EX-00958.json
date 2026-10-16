@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "3bf4ca82869cdd5aab7517bd593fda4a8cd5d6ee",
-  "material_result_sha": "PENDING_COMMIT",
+  "material_result_sha": "b76fb352f670b5209d7b7604fe078dbe88b65d0f",
   "validation_bearing_result_sha": "PENDING_COMMIT",
   "source_paths": [
     "src/vr/game/render_semantics.hpp"
@@ -75,7 +75,8 @@
       "render_semantics.hpp SelectSpriteQueueNode selects exact scope but previous ConsumeForDraw drained unrelated NextDrawScope first",
       "R84 stereo_renderer_r33.cpp R33GuardStereoRasterState invokes ConsumeForDraw at every physical game primitive before scoped classification"
     ],
-    "runtime_limit": "Source-level semantic-owner failure and native regressions only. No Quest3/VDXR/game optical evidence."
+    "runtime_limit": "Source-level semantic-owner failure and native regressions only. No Quest3/VDXR/game optical evidence.",
+    "ci_repair": "The source-level queue guard referenced SpriteQueueDepth before its later inline declaration (MSVC C2065). Relocate the existing variable declaration above ConsumeForDraw without changing its storage or state lifetime; preserve original material SHA."
   },
-  "next_action": "CI on new exact material result SHA must pass four mandatory gates before C6. Do not claim HMD visuals until matching Quest3/VDXR test."
+  "next_action": "Build-source repair must be validated under the new exact SHA; prior b76fb352 host CI C2065 is FAIL and not counted."
 }

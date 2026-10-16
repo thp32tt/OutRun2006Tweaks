@@ -502,6 +502,9 @@ namespace OutRunVR::GameSemantic
     // complete queue draw. Temporary helper scopes must not replace it.
     // Generic untagged ScreenOverlay2D is deliberately excluded.
     inline thread_local RenderScope CurrentQueueExactScope = RenderScope::None;
+    // The native queue is read by ConsumeForDraw before its deferred scope
+    // selection; declare the thread-local owner before that inline function.
+    inline thread_local unsigned SpriteQueueDepth = 0;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local unsigned ExternalOverlaySemanticDepth = 0;
     // Exact C993 draw can nest ordinary SceneEffect helper scopes. Preserve
@@ -807,7 +810,6 @@ namespace OutRunVR::GameSemantic
     inline thread_local std::uint64_t SpriteQueueSemanticCutoff = 0;
 
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
-    inline thread_local unsigned SpriteQueueDepth = 0;
     // Monotonic per-thread identity for the canonical queue node currently
     // being rendered. This is diagnostic/provenance state only; it does not
     // change semantic classification or draw ownership.
