@@ -325,6 +325,17 @@ add_custom_command(TARGET outrun-vr-driver-seat-camera-smoke POST_BUILD
     COMMENT "Run Quest-derived cockpit camera and render eligibility regression"
     VERBATIM)
 
+# RGB-only car-selector/menu DDS may retain an A8-shaped high-byte mask.
+# Exercise the actual source classifier in Release before building the host.
+add_executable(outrun-vr-dds-alpha-mask-smoke tests/dds_alpha_mask_smoke.cpp)
+target_include_directories(outrun-vr-dds-alpha-mask-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-dds-alpha-mask-smoke)
+add_custom_command(TARGET outrun-vr-dds-alpha-mask-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-dds-alpha-mask-smoke>"
+    COMMENT "Run opaque-versus-alpha DDS source mask regression"
+    VERBATIM)
+
 # Original UI/car-selector XST pack re-open with unchanged filename/slot
 # must restart indexed DDS ordinals only on a native texture-counter rewind.
 add_executable(outrun-vr-texture-pack-cursor-smoke

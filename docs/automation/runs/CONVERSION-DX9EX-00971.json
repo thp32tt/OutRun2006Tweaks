@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00971",
+  "production_id": "CONVERSION-DX9EX-00971",
+  "event_id": "CONVERSION-DX9EX-00971-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00971",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "4c96529038506b752e422180bc5c6466f09f2103",
+  "material_result_sha": "PENDING_THIS_COMMIT",
+  "validation_bearing_result_sha": "PENDING_THIS_COMMIT",
+  "source_paths": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/dds_alpha_mask_policy.hpp",
+    "vrhost/tests/dds_alpha_mask_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/dds_alpha_mask_policy.hpp",
+    "vrhost/tests/dds_alpha_mask_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00971.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Keep opaque car-selector/menu DDS sprites visible even when their RGB-only pixel descriptor retains a nonauthoritative high-byte A8-shaped mask; preserve independently declared alpha sprites and unchanged native fallback.",
+    "scope_boundary": "Only 32-bit RGB/RGBA DDS fast-loader format interpretation and Release regression. No HUD coordinate, game timer, world rendering, driver seat, FFB/input, SkyGlow, R84/R26 renderer, DX11 or frozen DXVK changes.",
+    "trace_stages": [
+      "Game UI/car-selection original or replacement DDS header flags and channel masks",
+      "Fast DDS loader D3D9 texture-format selection, opaque X8 versus declared A8",
+      "R84 game UI draw loads resulting texture unchanged and R26_SAFE preserves the same loader; native D3DX fallback for unsupported headers"
+    ],
+    "subcomponents": [
+      "Distinguish RGB-only masked opaque sprites from RGBA declared alpha for native and swizzled channel orders",
+      "Preserve both alpha and no-alpha formats and reject unsupported/inconsistent masks to original D3DX",
+      "Compile and execute Release no-assert mutation-sensitive source classifier regression before host/package and final exact-SHA Windows/Domain/Full Source gates"
+    ],
+    "acceptance_items": [
+      {
+        "id": "opaque_rgb_and_swizzled_selector",
+        "category": "end_to_end_behavior",
+        "behavior_area": "RGB-only car-selector and main-menu DDS source format",
+        "expected_behavior": "32-bit RGB-only with zero or stale FF alpha mask loads as opaque X8 in both native and swizzled formats, not fully transparent A8."
+      },
+      {
+        "id": "real_alpha_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Genuine alpha sprites, invalid RGB masks, desktop and R26_SAFE",
+        "expected_behavior": "DDPF_ALPHAPIXELS declared alpha remains A8 with byte conversion, ambiguous inputs preserve D3DX fallback; SkyGlow/world unchanged."
+      },
+      {
+        "id": "exact_sha_integrated",
+        "category": "integrated_validation",
+        "behavior_area": "R84/R26_SAFE x86, x64 host, package, Domain and Full Source/HUD CI",
+        "expected_behavior": "All mandatory exact-SHA GitHub Actions succeed before BUILD_VERIFIED or score; Quest3 VDXR test separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "opaque_rgb_and_swizzled_selector": "PENDING_EXACT_SHA_CI",
+    "real_alpha_fallback": "PENDING_EXACT_SHA_CI",
+    "exact_sha_integrated": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The DDS fast pixel-mask decoder selected D3DFMT_A8R8G8B8 or A8B8G8R8 when only the high-byte mask matched, without requiring DDPF_ALPHAPIXELS. An RGB-only opaque sprite retaining a stale FF high-byte mask could thus read undefined/zero high bytes as alpha.",
+    "alternatives_rejected": [
+      "Texture placement/aspect and prior X8 mask-zero decoding already exist, so neither lens/GOAL hooks nor R84 compositor changes address this source format mismatch."
+    ],
+    "runtime_limit": "Classification bug established from source; actual affected DDS from user's car-selection pack not yet collected, no HMD/Quest3 visual test."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check exact material SHA required Windows/host/package/Domain/Full Source/HUD gates, update C6 bookkeeping only after all succeed; Quest3 still untested."
+}

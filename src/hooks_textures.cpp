@@ -4,6 +4,7 @@
 #include "vr/hud_semantics.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/texture_pack_cursor.hpp"
+#include "vr/game/dds_alpha_mask_policy.hpp"
 #include <fstream>
 #include <xxhash.h>
 #include <d3d9.h>
@@ -67,6 +68,9 @@ struct DDS_FILE
 
 inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 {
+	const auto rgb32Intent = OutRunVR::DdsAlphaMask::Classify(
+		format.dwFlags, format.dwRGBBitCount, format.dwRGBAlphaBitMask);
+	using OutRunVR::DdsAlphaMask::Rgb32Intent;
 	if (format.dwFourCC == FOURCC_DXT1) return D3DFMT_DXT1;
 	if (format.dwFourCC == FOURCC_DXT3) return D3DFMT_DXT3;
 	if (format.dwFourCC == FOURCC_DXT5) return D3DFMT_DXT5;
@@ -79,7 +83,8 @@ inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 	{
 		return D3DFMT_A4R4G4B4;
 	}
-	if (format.dwRGBBitCount == 32 &&
+	if (rgb32Intent == Rgb32Intent::Alpha &&
+		format.dwRGBBitCount == 32 &&
 		format.dwRBitMask == 0x00ff0000 &&
 		format.dwGBitMask == 0x0000ff00 &&
 		format.dwBBitMask == 0x000000ff &&
@@ -87,13 +92,31 @@ inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 	{
 		return D3DFMT_A8R8G8B8;
 	}
-	if (format.dwRGBBitCount == 32 &&
+	if (rgb32Intent == Rgb32Intent::Alpha &&
+		format.dwRGBBitCount == 32 &&
 		format.dwRBitMask == 0x000000ff &&
 		format.dwGBitMask == 0x0000ff00 &&
 		format.dwBBitMask == 0x00ff0000 &&
 		format.dwRGBAlphaBitMask == 0xff000000)
 	{
 		return D3DFMT_A8B8G8R8; // not supported by most cards, will need conversion >.>
+	}
+
+	// Some RGB-only DDS authors preserve a high-byte alpha *mask* without
+	// declaring DDPF_ALPHAPIXELS. Its byte is undefined and must NOT hide
+	// car-selection/menu sprites. Honor declared alpha intent for both native
+	// BGRA and swizzled RGBA; keep genuine RGBA alpha unchanged.
+	if (rgb32Intent == Rgb32Intent::Opaque &&
+		format.dwRGBAlphaBitMask == 0xff000000u)
+	{
+		if (format.dwRBitMask == 0x00ff0000 &&
+			format.dwGBitMask == 0x0000ff00 &&
+			format.dwBBitMask == 0x000000ff)
+			return D3DFMT_X8R8G8B8;
+		if (format.dwRBitMask == 0x000000ff &&
+			format.dwGBitMask == 0x0000ff00 &&
+			format.dwBBitMask == 0x00ff0000)
+			return D3DFMT_X8B8G8R8;
 	}
 
 	// Opaque 32-bit DDS menus and car-selection sprites carry RGB without
