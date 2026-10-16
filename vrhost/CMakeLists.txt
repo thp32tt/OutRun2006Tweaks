@@ -163,6 +163,14 @@ add_executable(outrun-vr-stage-edge-cull-smoke tests/stage_edge_cull_smoke.cpp)
 target_include_directories(outrun-vr-stage-edge-cull-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
 )
+# Host gate must compile this actual game-culling regression, not only declare it.
+add_dependencies(outrun-vr-host outrun-vr-stage-edge-cull-smoke)
+# The mandatory x64 host compilation also EXECUTES the game-side pure
+# C++ viewport-mutation checks. This test does not require a headset.
+add_custom_command(TARGET outrun-vr-stage-edge-cull-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-stage-edge-cull-smoke>"
+    COMMENT "Run native stage edge-cull viewport and fallback regression"
+    VERBATIM)
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)

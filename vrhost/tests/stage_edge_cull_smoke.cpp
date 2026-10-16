@@ -1,6 +1,7 @@
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include <cmath>
 #include <limits>
+#include <initializer_list>
 
 int main()
 {
