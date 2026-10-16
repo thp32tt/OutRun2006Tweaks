@@ -27,6 +27,7 @@ class StubPage:
         return {"count":self.count,"busy":self.busy,"error":self.error}
 
 
+@unittest.skip("HISTORICAL_ONLY: 986 original tile queue was retired on 2026-10-15; v2 forbids dispatch")
 class ABTest(unittest.TestCase):
     def setUp(self):
         tmp=tempfile.TemporaryDirectory()

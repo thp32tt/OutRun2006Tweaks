@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Fail closed BEFORE Chrome/VNC or any saved browser automation can start.
+# This image does not yet support the 5-label v2 production dispatcher.
+python /opt/outrun/app/v2_automation_policy.py \
+  --policy /opt/outrun/v2_docker_policy.json \
+  --evidence-root /data/imagegen/korean_v2/stage_evidence
+
+
 mkdir -p /data/browser-profile /data/state /logs /tmp/.X11-unix
 
 # Only clean after the previous container's Chrome is gone.

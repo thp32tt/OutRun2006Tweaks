@@ -1,3 +1,5 @@
+> **2026-10-16 v2 Docker STOP/FAIL-CLOSED:** all scheduled localization sends and retired C-SALVAGE are disabled. See [V2_DOCKER_AUTOMATION_POLICY_20261016.md](V2_DOCKER_AUTOMATION_POLICY_20261016.md). The 2026-10-14 A/B 986-tile schedule below is **HISTORICAL ONLY**, not current production. No Portainer restart/deploy was performed.
+
 > **Next deployment profile (GitHub-only until user manually redeploys Portainer; 2026-10-14):**
 > **A/B image translation slots** with `CHAT_SLOTS=2`. A runs :00/:10/:20/:30/:40/:50
 > on original PNG ordinals **1–500**; B runs :05/:15/:25/:35/:45/:55 on

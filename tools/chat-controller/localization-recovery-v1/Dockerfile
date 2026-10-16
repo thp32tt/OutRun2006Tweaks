@@ -38,6 +38,9 @@ RUN python /tmp/patch_controller_c_slot.py /opt/outrun/app/controller.py \
  && python -m py_compile /opt/outrun/app/controller.py \
  && rm -f /tmp/patch_controller_c_slot.py
 
+COPY v2_automation_policy.py /opt/outrun/app/v2_automation_policy.py
+COPY v2_docker_policy.json /opt/outrun/v2_docker_policy.json
+RUN python -m py_compile /opt/outrun/app/v2_automation_policy.py
 COPY entrypoint.sh /opt/outrun/entrypoint.sh
 COPY prompts/localization_A.md /opt/outrun/prompts/localization_A.md
 COPY prompts/localization_B.md /opt/outrun/prompts/localization_B.md

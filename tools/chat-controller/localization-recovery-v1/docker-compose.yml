@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     pull_policy: build
     container_name: outrun-chat-controller-localization-recovery
-    restart: unless-stopped
+    restart: "no" # v2 PAUSED: no auto-restart on host boot or Docker daemon restart
     init: true
     shm_size: "1g"
     mem_limit: 4g
@@ -14,14 +14,20 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
-      AUTO_SEND: "false" # 2026-10-16 user emergency PAUSE, no auto-send
-      # Existing A/B native ImageGen slots unchanged; C text-only salvage at :03/:33.
-      SCHEDULE_MINUTES: "3,33" # C-only reserved; AUTO_SEND=false, no automatic tasks
+      AUTO_SEND: "false" # HARD PAUSE: never enable without a new verified release
+      OUTRUN_KR_V2_PHASE: "PAUSED"
+      OUTRUN_KR_V2_NO_SEND: "true" # startup interlock, not a production permission
+      OUTRUN_KR_V2_AUTO_GENERATE: "false"
+      OUTRUN_KR_V2_AUTO_COMPOSE: "false"
+      OUTRUN_KR_V2_AUTO_DEPLOY: "false"
+      # v2 has NO scheduled sends, including C. All stages need independent evidence.
+      SCHEDULE_MINUTES: "" # empty = no scheduled slots; controller supports empty list
       CHAT_SLOTS: "3"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
-      OUTRUN_AB_TEXT_ROI_QUEUE: "false" # stop A/B ImageGen dispatch
+      OUTRUN_AB_TEXT_ROI_QUEUE: "false" # old one-phrase queue not a v2 batch-sheet runner
+      # Fresh v2 manifest + CLEAN/DDS/runtime gates are NOT implemented: no sends.
       OUTRUN_AB_BATCH_SIZE: "5"
       OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
       OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
@@ -81,14 +87,14 @@ services:
   # Binds source image-src read-only; never deploys localized DDS or approves QA.
   # This service only starts when the user manually redeploys the Portainer Git stack.
   outrun-c-salvage-offline:
-    profiles: ["optional-offline-c"]
+    profiles: ["retired-c-salvage-do-not-run"]
     build:
       context: ./c_salvage
       dockerfile: Dockerfile
     image: outrun-kor-c-salvage:20261015
     pull_policy: build
     container_name: outrun-c-salvage-offline
-    restart: unless-stopped
+    restart: "no" # retired C must never automatically repeat
     init: true
     cpus: 0.5
     mem_limit: 512m
@@ -113,6 +119,8 @@ services:
         target: /data/c-salvage
         bind:
           create_host_path: false
+    # Prevent accidental execution of outdated CLEAN/DDS/loop role under manual profile.
+    entrypoint: ["/bin/sh", "-c", "echo OUTRUN_V2_RETIRED_C_SALVAGE_DISABLED >&2; exit 64"]
     command:
       - --input-root
       - /data/image-src
@@ -132,7 +140,7 @@ services:
       - "10"
       - --interval-seconds
       - "1800"
-      - --loop
+      # --loop RETIRED: C is only the native unmodified HD crop worker.
 
 volumes:
   outrun_chat_localization_recovery_data:
