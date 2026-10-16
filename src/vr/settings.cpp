@@ -101,6 +101,8 @@ namespace Settings
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
 	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,
 		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
+    Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", false,
+        "Restart-required read-only bounded canonical PMT material probe; logs candidate blend/material IDs, never changes any glass or world opacity." };
 	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", false,
         "Experimental: align cockpit camera offsets to the player's car matrix_B0 rather than camera yaw. Invalid/sideways transforms suppress the cockpit pass; verify each vehicle in HMD before enabling." };
 	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,

@@ -8,6 +8,7 @@
 #include "vr/game/driver_seat_car_space.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
+#include "vr/game/cockpit_glass_material_probe.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
@@ -38,6 +39,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRDriverSeatView;
+    extern Setting<bool> VRDriverSeatGlassMaterialTrace;
 	extern Setting<bool> VRDriverSeatCarSpaceBasis;
 	extern Setting<int> VRDriverSeatNativeMode;
 	extern Setting<float> VRDriverSeatForward;
@@ -319,6 +321,61 @@ public:
 	static VRDriverSeatRenderTest instance;
 };
 VRDriverSeatRenderTest VRDriverSeatRenderTest::instance;
+
+// Canonical EXE+0x4901: PUSH EDX; CALL 0x408C80 (material application).
+// EXE+0x48F2 loads the PMT material table; EXE+0x48F5 multiplies
+// the selected material index by 0x58. This global loop is NOT glass-only.
+class VRDriverSeatGlassMaterialProbe : public Hook
+{
+    static constexpr int ApplyMaterialRva = 0x4901;
+    inline static SafetyHookMid ApplyMaterialHook{};
+    inline static std::array<std::uintptr_t, 32> Seen{};
+    inline static std::size_t Count = 0;
+
+    static void MaterialEntry(SafetyHookContext& ctx)
+    {
+        if (!Settings::VREnabled || !Settings::VRDriverSeatView ||
+            !VRDriverSeatGameplayActive() || !Game::pl_car() ||
+            !ctx.edx || Count >= Seen.size())
+            return;
+        const auto* material = reinterpret_cast<const std::uint32_t*>(ctx.edx);
+        const std::uint32_t attr = material[1];
+        if (!OutRunVR::CockpitGlassProbe::CandidateBlend(attr))
+            return;
+        const auto identity = reinterpret_cast<std::uintptr_t>(material);
+        for (std::size_t i=0; i<Count; ++i)
+            if (Seen[i] == identity)
+                return;
+        Seen[Count++] = identity;
+        spdlog::info(
+            "VR COCKPIT GLASS PROBE (candidate only, ownership unknown): "
+            "material=0x{:X} colorIndex={} attr=0x{:08X} src={} dst={} count={}",
+            identity, material[0], attr, (attr>>8)&15u, (attr>>12)&15u, Count);
+    }
+
+public:
+    std::string_view description() override { return "VRDriverSeatGlassMaterialProbe"; }
+    bool validate() override { return Settings::VRDriverSeatGlassMaterialTrace; }
+    void declare_settings() override { Settings::VRDriverSeatGlassMaterialTrace.needs_restart(); }
+    bool apply() override
+    {
+        // Reject variant or relocated code, never install on an unknown EXE.
+        const auto* p = Module::exe_ptr<std::uint8_t>(ApplyMaterialRva);
+        constexpr std::array<std::uint8_t, 6> signature =
+            { 0x52, 0xE8, 0x79, 0x43, 0x00, 0x00 };
+        if (!std::equal(signature.begin(), signature.end(), p))
+        {
+            spdlog::warn("VR GLASS PROBE: original PMT call signature differs; hook not installed");
+            return false;
+        }
+        ApplyMaterialHook = safetyhook::create_mid(
+            Module::exe_ptr(ApplyMaterialRva), MaterialEntry);
+        return !!ApplyMaterialHook;
+    }
+    static VRDriverSeatGlassMaterialProbe instance;
+};
+VRDriverSeatGlassMaterialProbe VRDriverSeatGlassMaterialProbe::instance;
+
 
 class RestoreCarBaseShadow : public Hook
 {

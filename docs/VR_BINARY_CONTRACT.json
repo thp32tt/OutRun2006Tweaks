@@ -115,6 +115,24 @@
       ]
     },
     {
+      "id": "VR-EXE-COCKPIT-PMT-MATERIAL-CALL",
+      "rva": "0x00004901",
+      "signatureLength": 6,
+      "disassemblyWindow": 24,
+      "expectedBytes": "52e879430000",
+      "purpose": "Canonical PMT material-apply call: EXE+0x48F5 scales material index by 0x58 and EXE+0x4901 passes that entry into 0x408C80. Read-only candidate probe only; NOT identified as front glass.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "ApplyMaterialRva = 0x4901"
+        },
+        {
+          "path": "src/vr/game/cockpit_glass_material_probe.hpp",
+          "needle": "CandidateBlend"
+        }
+      ]
+    },
+    {
       "id": "VR-EXE-CAR-BASE-SHADOW-DISPCAR-CALL",
       "rva": "0x00069EB4",
       "signatureLength": 1,
