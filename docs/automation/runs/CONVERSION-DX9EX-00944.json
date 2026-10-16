@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
-  "status": "C5_CI_RUNNING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_EXACT_SHA_REQUIRED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "66a32a567898a80e664be0eaee83df69f7b2c946",
   "material_result_sha": "3e44ecd798f83fb48c954c280b60479fcded09c4",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "2e7cd1d6cdc9f6d0bce4d6032d89bc6e7c919729",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp"
   ],
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "lens_original_c993_world_owner": "PENDING_CI",
-    "lens_unknown_and_unrelated_fallback": "PENDING_CI",
-    "lens_exact_sha_windows_gates": "PENDING_CI"
+    "lens_original_c993_world_owner": "PASS",
+    "lens_unknown_and_unrelated_fallback": "PASS",
+    "lens_exact_sha_windows_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Original game c64 is separately source-owned, but the R84 C993 route was physically placed after early returns using a shared projection signature potentially inherited from a previous orthographic draw or absent after menu/device transition.",
@@ -88,13 +88,17 @@
     "eye_ownership": "Exact source-owned sun uses original game WVP and current latched head inverse with two head-local eye poses and asymmetric FOV; HMD binocular result UNTESTED."
   },
   "ci_evidence": {
-    "exact_sha": null,
-    "dx9ex_active": "PENDING",
-    "domain_isolation": "PENDING",
-    "full_source_impact": "PENDING",
-    "hud_inspector": "PENDING",
-    "hmd_validation": "UNTESTED"
+    "exact_sha": "2e7cd1d6cdc9f6d0bce4d6032d89bc6e7c919729",
+    "dx9ex_active": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "dx9ex_active_run": 38866059806,
+    "domain_isolation_run": 38866059471,
+    "full_source_impact_run": 38866059497,
+    "hud_inspector_run": 38866059378,
+    "runtime_hmd": "UNTESTED"
   },
-  "score_delta_this_attempt": 0,
-  "next_action": "Validation-bearing CI commit aligns the existing projection classification regression with source-proven C993 before shared signature; required exact SHA gates pending. HMD remains untested."
+  "score_delta_this_attempt": 1,
+  "next_action": "All mandatory exact-SHA GitHub Windows/host/source gates SUCCESS. Quest3+VDXR same-build optical/latency test remains NEED_HMD_TEST; do not claim headset PASS or re-run completed CI. Continue separate next source item."
 }
