@@ -14,7 +14,13 @@ def check(s: str, h: str) -> None:
     assert 'R30IsPauseMenuExactArrow()' in s
     arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuElement()')]
     assert 'OutRunVrPauseEye::ExactArrowOwner(' in arrow
-    assert 'GameSemantic::CurrentRenderProducerToken()' in arrow
+    # R84 accepts both the newly isolated exact pause-arrow producer and
+    # already-owned generic paused UI. Mutating either producer lookup to a
+    # queue-only lookup must fail: synchronous native E8 calls also render.
+    assert arrow.count('GameSemantic::CurrentRenderProducerToken() ==') == 2
+    assert 'ProducerToken::PauseOptionArrow' in arrow
+    assert 'ProducerToken::ExactScreenHudClipSprite' in arrow
+    assert 'GameSemantic::CurrentQueueProducerToken()' not in arrow
     assert 'CurrentSpriteQueueProducer ==' not in arrow
     assert 'constexpr bool ExactArrowOwner(bool screenHud, bool exactProducer)' in h
     assert 'return screenHud && exactProducer;' in h
