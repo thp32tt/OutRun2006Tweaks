@@ -683,6 +683,25 @@ namespace OutRunVR::GameSemantic
         return scope == RenderScope::ScreenOverlay2D;
     }
 
+    // R26 HMD-proven queue-owned generic HUD uses the recentered finite
+    // screen plane, not head-following per-eye FOV-only affine. Neither an
+    // unqueued world overlay nor F11's external UI may acquire this owner.
+    constexpr bool QueueOverlayNeedsFiniteHudPlane(
+        RenderScope scope, bool queued, bool external) noexcept
+    {
+        return scope == RenderScope::ScreenOverlay2D && queued && !external;
+    }
+    static_assert(QueueOverlayNeedsFiniteHudPlane(
+        RenderScope::ScreenOverlay2D, true, false));
+    static_assert(!QueueOverlayNeedsFiniteHudPlane(
+        RenderScope::ScreenOverlay2D, false, false));
+    static_assert(!QueueOverlayNeedsFiniteHudPlane(
+        RenderScope::ScreenOverlay2D, true, true));
+    static_assert(!QueueOverlayNeedsFiniteHudPlane(
+        RenderScope::WorldParticle, true, false));
+    static_assert(!QueueOverlayNeedsFiniteHudPlane(
+        RenderScope::ScreenHud, true, false));
+
     inline bool CorroboratesHud(RenderScope scope) noexcept
     {
         // ScreenOverlay2D is intentionally NOT a finite/world-locked HUD.

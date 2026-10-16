@@ -3702,6 +3702,37 @@ namespace OutRunVRStereo
                         state, baseProjection);
             }
 
+            // R26_SAFE HMD baseline: the canonical untagged SpriteNode queue
+            // contributes much of the visible speed/rank/position HUD. R84
+            // previously let these screen pixels bypass the finite gameplay
+            // plane and fall through to per-eye FOV-only XYZRHW corrections.
+            // They then followed headset yaw and ignored common HUD sizing.
+            // A PHYSICAL queued ScreenOverlay2D is admitted only when it is
+            // not the F11 external overlay; unsupported base projection/head
+            // pose fails closed to the original one-draw path.
+            const auto physical = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            if (OutRunVR::GameSemantic::QueueOverlayNeedsFiniteHudPlane(
+                    physical.scope, physical.queued,
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0))
+            {
+                const bool valid = haveBaseProjection &&
+                    R30BuildStageExtensionXyzrhwEyePlane(state, baseProjection);
+                if (Settings::VRTelemetry)
+                {
+                    static thread_local bool loggedValid = false;
+                    static thread_local bool loggedInvalid = false;
+                    bool& reported = valid ? loggedValid : loggedInvalid;
+                    if (!reported)
+                    {
+                        reported = true;
+                        spdlog::info(
+                            "VR R84 GENERIC QUEUE HUD FINITE PLANE: {} (R26-safe restored; same pose for both eyes; F11/particle excluded)",
+                            valid ? "ADMITTED" : "REJECTED_NO_POSE_OR_PROJECTION");
+                    }
+                }
+                return valid;
+            }
+
             // Smoke/sand can redraw a static VB/IB span many times without a
             // single game write. Copy caches already pin those exact revisions;
             // reuse only the depth classifier, NEVER per-draw stereo/RT state.
