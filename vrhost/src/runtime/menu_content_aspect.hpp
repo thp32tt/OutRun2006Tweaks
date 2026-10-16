@@ -207,18 +207,22 @@ namespace OutRunVrMenuAspect
     // over the ENTIRE ultrawide game client (including the car/model list).
     // Cropping to 4:3 loses those authored pixels; projecting the uncropped
     // capture at clientAspect makes its physical VR plane too wide.
-    // Restore the original authored 4:3 PHYSICAL aspect for a completely
-    // sampled, explicitly letterboxed OutRun menu without modifying the UV.
+    // Restore the original authored 4:3 PHYSICAL aspect only if the
+    // captured side matte has been verified independently. An INI flag
+    // describes the requested layout, not the actual captured pixels;
+    // forcing 4:3 for an uncropped 16:9/21:9 frame squeezes full-width
+    // menu and vehicle-selection art into a second smaller theater.
     // A partially captured client cannot be squeezed as a whole because
     // its missing pixels must retain their old fragment/fallback handling.
     // No game HUD, stereo race, F11 or other desktop capture uses this plan.
     inline float PlanUncroppedAuthoredMenuAspect(
         float sampledAspect, float fullClientAspect,
         bool gameConfiguredLetterbox, bool fullyCaptured,
-        bool cropAlreadyApplied, bool useNativeAspect) noexcept
+        bool cropAlreadyApplied, bool useNativeAspect,
+        bool imageMatteVerified = false) noexcept
     {
-        if (!gameConfiguredLetterbox || !fullyCaptured ||
-            cropAlreadyApplied || useNativeAspect ||
+        if (!gameConfiguredLetterbox || !imageMatteVerified ||
+            !fullyCaptured || cropAlreadyApplied || useNativeAspect ||
             !std::isfinite(sampledAspect) ||
             !std::isfinite(fullClientAspect) ||
             sampledAspect < 0.5f || sampledAspect > 5.0f ||

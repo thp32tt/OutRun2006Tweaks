@@ -118,19 +118,29 @@ int main()
         return 46;
 
     // Exact Quest3 A/B failure: a 3440x1440 or 1920x1080 captured
-    // letterboxed game menu looked physically ultrawide with crop OFF.
-    // Preserve ALL original UV pixels, changing only the authored optical
-    // display aspect. Crop ON, nonletterboxed, partially captured clients,
+    // a verified letterbox matte may look physically ultrawide with crop OFF.
+    // Preserve ALL original UV pixels and only normalize aspect with positive
+    // image-matte evidence. Unverified full-width 16:9/21:9 must never be
+    // squashed into a second theater. Crop ON, nonletterboxed, partially captured clients,
     // native 4:3/portrait and explicit rollback must remain unaffected.
     using OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect;
     const float ultraWide = 3440.f / 1440.f;
     const float wide = 1920.f / 1080.f;
     const float fourThree = 4.f / 3.f;
     if (std::fabs(PlanUncroppedAuthoredMenuAspect(
-            ultraWide, ultraWide, true, true, false, false) -
+            ultraWide, ultraWide, true, true, false, false, true) -
             fourThree) > 1e-5f ||
         std::fabs(PlanUncroppedAuthoredMenuAspect(
-            wide, wide, true, true, false, false) - fourThree) > 1e-5f ||
+            wide, wide, true, true, false, false, true) - fourThree) > 1e-5f ||
+        // Regression: an INI-only letterbox must NEVER compress complete
+        // uncropped 16:9 and 21:9 captures into a nested 4:3 VR screen.
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, true, false, false) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            wide, wide, true, true, false, false) != wide ||
+        // Proof alone is insufficient without the user's configured mode.
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, false, true, false, false, true) != ultraWide ||
         PlanUncroppedAuthoredMenuAspect(
             ultraWide, ultraWide, false, true, false, false) != ultraWide ||
         PlanUncroppedAuthoredMenuAspect(

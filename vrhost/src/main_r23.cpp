@@ -1569,8 +1569,13 @@ namespace
         // Both eyes use the same UV and menu projection.
         const bool gameConfiguredLetterbox =
             R23GameMenuIsLetterboxed(c.hwnd_);
+        // A configured letterbox is not a verified pixel matte: car-select
+        // artwork can occupy the side regions even in this mode.
+        // Keep the uncropped menu at its captured physical aspect until a
+        // real frame-matte verifier has supplied positive evidence.
+        constexpr bool imageMatteVerified = false;
         bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(
-            gameConfiguredLetterbox, false);
+            gameConfiguredLetterbox, imageMatteVerified);
         // Roll back physical 4:3 normalization independently of the older
         // crop override, keeping every menu/car-selection pixel available.
         const char* nativeMenuAspect =
@@ -1637,7 +1642,8 @@ namespace
                     static_cast<float>(cr.bottom - cr.top)) <= 1.0f;
             sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(
                 sourceAspect, clientAspect, gameConfiguredLetterbox,
-                completeClient, cropCentered43, useNativeMenuAspect);
+                completeClient, cropCentered43, useNativeMenuAspect,
+                imageMatteVerified);
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
         // projections. Center LOCAL-fixed menu content on the optical ray,

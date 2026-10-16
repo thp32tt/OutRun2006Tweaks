@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00969",
+  "production_id": "CONVERSION-DX9EX-00969",
+  "event_id": "CONVERSION-DX9EX-00969-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00969",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_NEEDS_VALIDATION",
+  "phase": "C5_EXACT_SHA_GATE",
+  "checkpoint": "C5_VALIDATION",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+  "material_result_sha": null,
+  "source_paths": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00969.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep the complete original title/menu and car-selection capture at its physically sampled 4:3/16:9/21:9 aspect on both Quest eyes; prevent an unverified INI setting from squeezing the entire visible game window into a second nested theater.",
+    "scope_boundary": "Change only non-gameplay R23 LOCAL-fixed menu physical aspect eligibility and its portable regression. Keep deliberate manual 4:3 crop, native fallback, captured UV, binocular FOV clipping and all gameplay HUD, ESC/F11, lens, SkyGlow, input/FFB and R26 fallback untouched.",
+    "special_work_evidence": "Source inconsistency: menu code declines an automatic 4:3 UV crop without observed image matte, yet the uncropped physical-aspect path forces 4:3 from the very same unverified configuration flag; this distorts nonempty 16:9/21:9 right-side menu pixels.",
+    "trace_stages": [
+      "OutRun original title and vehicle-selector client renders 4:3-authored sprites and may occupy the whole wider window even if UILetterboxing INI says enabled.",
+      "R23 GetGameUv and PlanCapturedAspect identify actual live complete/partial captured pixels; PlanUncroppedAuthoredMenuAspect now requires independently verified matte before applying 4:3 optical normalization.",
+      "The x64 R23 LOCAL-fixed projection PlanOpticallyCenteredClip uses the unmodified sampled aspect, the common both-eye tangent intersection and the original UV; the manual 4:3 crop stays available without changing race frame/input."
+    ],
+    "subcomponents": [
+      "Preserve both 16:9 and ultrawide complete menu/selector captures unless actual side matte is verified, while allowing verified 4:3 native letterbox optical normalization.",
+      "Retain full original side-region car-selection art, partial capture fragment geometry, explicit user crop, and binocular projection/fallback invariants.",
+      "Extend the compiled host menu smoke with positive verified-matte and negative INI-only 16:9/21:9 regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_full_native_aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Quest LOCAL-fixed original title and car-selector physical display",
+        "expected_behavior": "Both 16:9 and 21:9 intact captured source quads use their actual physical aspect instead of shrinking the full frame to a synthetic 4:3 nested screen unless side matte has been verified."
+      },
+      {
+        "id": "menu_verified_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "INI-only, verified image-matte, manual crop and partial captures",
+        "expected_behavior": "INI-only full-width frames remain native; a positively verified matte may use authored 4:3; missing/partial source, explicit crop/native aspect and gameplay stereo preserve their previous output."
+      },
+      {
+        "id": "menu_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Host smoke, Windows game-host-package, Domain and source gates",
+        "expected_behavior": "Exact final SHA DX9Ex Active Windows game plus host and packaging and all required Domain/Full Source checks succeed without CI skip; Quest3 remains UNTESTED without matching HMD run."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_full_native_aspect": "PENDING_EXACT_SHA",
+    "menu_verified_and_fallback": "PENDING_EXACT_SHA",
+    "menu_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R23 uncropped menu physical aspect derives an automatic 4:3 ratio from the same INI flag explicitly rejected as insufficient evidence for a 4:3 UV crop; this applies a second optical squeeze to a full-width source.",
+    "original_evidence": "The active R23 code invokes ShouldAutoCropVerifiedFourThree(config, false) but then PlanUncroppedAuthoredMenuAspect(...config...) while keeping all original UV pixels, with no independent captured-image matte check.",
+    "source_trace": [
+      "Original game title/selector renders full-width surface even under configured menu letterboxing.",
+      "Game Capture GetGameUv supplies intact wider UV and PlanCapturedAspect computes the sampled native aspect.",
+      "R23 common binocular LOCAL-fixed projection consumes menu aspect returned by PlanUncroppedAuthoredMenuAspect."
+    ],
+    "alternatives_rejected": [
+      "Do not crop full-width car-selection lists, force mono to hide aspect, or edit R84 gameplay HUD/world stereo."
+    ],
+    "eye_ownership": "Menu is projected onto a shared LOCAL-fixed, forward-gaze common OpenXR optical plane for two eyes, not through R84 gameplay per-eye geometry.",
+    "fix_evidence": "Require independently confirmed image-matte proof on the host optical normalization path; unchanged UV and explicit user 4:3 crop remain available.",
+    "negative_test_evidence": "Compile and run portable menu_content_aspect_smoke.cpp for unverified 16:9/21:9 no-squeeze, positive verified matte, disabled/partial/native fallback."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Wait for original 00968 Full Source run not to be interrupted, then fast-forward this material C++ commit; confirm exact SHA DX9Ex Active, Domain, and Full Source gates; finish C6 bookkeeping only after success. HMD Quest3/VDXR UNTESTED."
+}
