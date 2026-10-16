@@ -63,6 +63,12 @@ enum DXGI_FORMAT { DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_B8G8R8A8_UNORM,
     DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
     DXGI_FORMAT_R8G8B8A8_UNORM_SRGB };
 enum D3D11_USAGE { D3D11_USAGE_DEFAULT };
+// Keep this SDK enum visible even when the source's templated context guard
+// is not instantiated by the portable color-format-only regression.
+enum D3D11_DEVICE_CONTEXT_TYPE {
+    D3D11_DEVICE_CONTEXT_IMMEDIATE = 0,
+    D3D11_DEVICE_CONTEXT_DEFERRED = 1
+};
 constexpr unsigned D3D11_BIND_RENDER_TARGET = 0x20u;
 constexpr unsigned D3D11_BIND_SHADER_RESOURCE = 0x8u;
 struct DXGI_SAMPLE_DESC { unsigned Count{}, Quality{}; };
