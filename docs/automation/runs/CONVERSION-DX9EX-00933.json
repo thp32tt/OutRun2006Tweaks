@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "083f458da09b1c2b87c4f9da50607b14ed5c8230",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "direct_shadow_original_wvp": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "stale_queue_and_desktop_fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "exact_sha_integrated_quality": "PENDING_EXACT_SHA_CI"
+    "direct_shadow_original_wvp": "PASS_BUILD",
+    "stale_queue_and_desktop_fallback": "PASS_BUILD",
+    "exact_sha_integrated_quality": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Race-start shadow double image user-visible symptom tracked under DX9EX:SYMPTOM:START_SHADOW; R29 allowed a Z-disabled shadow from R28PerspectiveWorldSemantic alone.",
@@ -88,14 +88,14 @@
     "current_source_repair": "Follow-up real C++ bug: SpriteQueueNodeEpoch remains nonzero after EndSpriteQueueNode; R29 wrongly rejected genuine direct CarBaseShadow original WVP any time after UI queue activity. Admission now uses the live queue-node pointer, not the historical queue generation, with positive after-queue smoke and negative active queue smoke."
   },
   "material_result_sha": "1eac78e0030f8b0470e8e45cbb869ee6d32957d6",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "b9091429c13cff7abb99c2ef32504442c275bcc2",
   "score_delta_this_attempt": 0,
-  "next_action": "Run required exact validation-bearing SHA GitHub Actions on functional source fix; preserve last verified 3b122... as historical only, Quest3 UNTESTED.",
+  "next_action": "C6 exact-SHA CI verified; only Quest3/VDXR runtime optical and FPS acceptance remains NEED_HMD_TEST. Independent 00934 must continue unmodified.",
   "validation_evidence": {
-    "sha": "3b1226561be26ceef34e49a18b8d86a70e41b57d",
+    "sha": "b9091429c13cff7abb99c2ef32504442c275bcc2",
     "exact_sha_github_actions": "SUCCESS",
-    "evidence_source": "Provided exact-SHA GitHub CI SUCCESS in C6 instruction; no rerun performed. Connector combined-status endpoint returned no individual statuses; no run IDs inferred.",
-    "resolved_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "evidence_source": "GitHub authenticated Actions run conclusions: Active, Domain, Full Source Impact and HUD all SUCCESS at exact SHA.",
+    "resolved_prior_hold_reason": "POLICY_FEATURE_SUBCOMPONENTS_MISSING_FIXED",
     "hmd_proof": "NONE"
   },
   "previous_exact_sha_validation": {
@@ -103,5 +103,32 @@
     "automation_validation": "PASS_EXACT_SHA",
     "recorded_c6_sha": "083f458da09b1c2b87c4f9da50607b14ed5c8230",
     "status": "COMPLETE_BUILD_VERIFIED"
+  },
+  "ci_evidence": {
+    "exact_sha": "b9091429c13cff7abb99c2ef32504442c275bcc2",
+    "dx9ex_active": {
+      "run_id": 38845288591,
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38845288591"
+    },
+    "domain_isolation": {
+      "run_id": 38845288621,
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38845288621"
+    },
+    "full_source_impact": {
+      "run_id": 38845288676,
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38845288676"
+    },
+    "hud_inspector": {
+      "run_id": 38845288618,
+      "status": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38845288618"
+    },
+    "windows_x86_r84_and_r26_safe": "SUCCESS",
+    "windows_x64_host": "SUCCESS",
+    "source_smoke": "SUCCESS",
+    "runtime_hmd": "UNTESTED"
   }
 }
