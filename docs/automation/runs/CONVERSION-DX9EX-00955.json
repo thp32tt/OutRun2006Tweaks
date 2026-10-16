@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:CRITICAL:COCKPIT_SCENEEFFECT_CAMERA_RESTORE",
   "feature_class": "CRITICAL_BLOCKER",
   "symptom_id": "DX9EX:SYMPTOM:COCKPIT_SCENEEFFECT_CAMERA_RESTORE",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "f7f06ac6d464e0125ad0ef2623d74457b84545b7",
+  "validation_bearing_result_sha": "f7f06ac6d464e0125ad0ef2623d74457b84545b7",
   "source_paths": [
     "src/hooks_graphics.cpp",
     "src/vr/game/driver_seat_render_pass.hpp"
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "cockpit_effect_world_restore": "PENDING_GATE",
-    "cockpit_nested_fallback": "PENDING_GATE",
-    "cockpit_exact_sha_gate": "PENDING_GATE"
+    "cockpit_effect_world_restore": "PASS_EXACT_SHA",
+    "cockpit_nested_fallback": "PASS_EXACT_SHA",
+    "cockpit_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The post-SceneEffect CalcCameraMatrix_dest call ran before ScopedSceneEffect destruction, causing DriverSeatRenderPass::IsWorldOrCockpitPass to return false and incorrectly rebuilding an unshifted camera after effect submission.",
@@ -81,10 +81,34 @@
     "alternatives_rejected": [
       "No change to 6DoF pose, per-eye XR WVP, glass alpha or SkyGlow is needed to correct the source-verified view restoration order."
     ],
-    "runtime_limit": "No headset or live OutRun runtime test performed; visual outcome and frame pacing remain untested."
+    "runtime_limit": "No headset or live OutRun runtime test performed; visual outcome and frame pacing remain untested.",
+    "original_evidence": "The old Clr_SceneEffect_dest kept ScopedSceneEffect alive around its final CalcCameraMatrix_dest; IsWorldOrCockpitPass() then returned false, suppressing native driver-seat displacement while restoring the world view.",
+    "fix_evidence": "The new RunSceneEffectThenRestoreView isolates native near-plane effect matrix work in ScopedSceneEffect and calls final CalcCameraMatrix_dest after depth restoration. The updated native host smoke uses the production helper and asserts seat camera restoration.",
+    "negative_test_evidence": "The driver_seat_render_pass_smoke covers nested 2-level effect scopes, camera recompute inside/outside the effect, transition/disabled-seat mono fallback. Exact-SHA x64 host, Win32 R84/R26_SAFE builds and other required gates succeeded; no real HMD claim.",
+    "eye_ownership": "Original Clr_SceneEffect camera is temporary; restored cockpit native view feeds the existing R84 physical left/right stereo paths without changing their compositor contract."
   },
   "ci_evidence": {
-    "changed_area_native": "Standalone equivalent C++ scope regression compiled and passed locally (g++ C++17); exact updated repository tests and GitHub required gates pending."
+    "material_result_sha": "f7f06ac6d464e0125ad0ef2623d74457b84545b7",
+    "validation_bearing_result_sha": "f7f06ac6d464e0125ad0ef2623d74457b84545b7",
+    "active": {
+      "run_id": 38899196827,
+      "conclusion": "SUCCESS",
+      "jobs": "policy/full-chain-compile/game/host/package SUCCESS"
+    },
+    "domain": {
+      "run_id": 38899196870,
+      "conclusion": "SUCCESS"
+    },
+    "full_source": {
+      "run_id": 38899196793,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38899196860,
+      "conclusion": "SUCCESS"
+    },
+    "native_cpp_regression": "Updated driver_seat_render_pass_smoke built with the exact x64 host and succeeded in Active Validation",
+    "runtime_hmd": "UNTESTED"
   },
-  "next_action": "Publish one material commit after previous 00954 CI completes; verify exact HEAD required CI, repair true failures under same TASK_ID, record C6 separately."
+  "next_action": "C6 recorded for exact-SHA source/build; do not redispatch or rescore this TASK_ID. Quest3/VDXR runtime visual acceptance remains NEED_HMD_TEST."
 }
