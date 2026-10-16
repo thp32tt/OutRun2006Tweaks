@@ -106,8 +106,12 @@
   },
   "score": {
     "run_key": "CONVERSION-DX11-00801",
-    "score_change": 0,
-    "score_status": "UNSCORED until exact-SHA five-Gate success and independent new functional outcome"
+    "score_change": 1,
+    "score_status": "AWARDED_ONCE_VERIFIED_EXACT_SHA",
+    "scoreboard_previous": 1407,
+    "scoreboard_total": 1408,
+    "scoreboard_commit": "ef6c072d9c78a5792ab2cfa974add1c6ab8b19e9",
+    "note": "Score +1 once for original independent C++ host/eye/packed RGB10 feature and final five exact SHA gates. E003 policy repair and C6 bookkeeping are +0; no retry/rollover duplicate."
   },
   "evidence": {
     "backend_gate_conclusion": "success",
