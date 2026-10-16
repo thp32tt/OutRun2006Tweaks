@@ -2,9 +2,9 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00801",
   "production_id": "CONVERSION-DX11-00801",
-  "event_id": "CONVERSION-DX11-00801-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00801-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "402680659bb5bfe53bc43cdf55a0c119f3e73bb5",
-  "material_result_sha": null,
+  "material_result_sha": "ab29c214ed1713c88ace17235539b02d0ba04e80",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "vrhost/src/runtime/native_direct_stereo_pair.hpp",
@@ -89,7 +89,8 @@
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
       "NATIVE_STEREO_EYE_OUTPUT",
-      "OPENXR_PROJECTION"
+      "OPENXR_PROJECTION",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Source/Windows CI only; matching Quest3/VDXR game/menu/race images untested.",
     "activation_guard_and_fallback": "NativeDrawPathActive remains default-off; original D3D9 Draw/Present/gamepad/FFB/SkyGlow/DX9Ex fallback preserved; DXVK untouched."
@@ -98,10 +99,10 @@
     "C0_RECOVER": "GitHub HEAD 402680659bb5bfe53bc43cdf55a0c119f3e73bb5; 00800 C6 finished, 00799 remains separate in-flight bridge scope.",
     "C1_REVIEW": "Production vrhost CMake builds main_r23.cpp; R23 bootstrap did not reject equal eye handles; R23 hold compared texture interface pointers, not canonical IUnknown; RGB10 source was supported for OpenXR but not decoded by R23 pixel inspector.",
     "C2_IMPLEMENT": "C++ host bootstrap, R23 DirectGPU hold and packed 10-bit game pixel implementation with compiled WARP smoke; no native activation changes.",
-    "C3_VALIDATE": "PENDING exact-SHA five required GitHub Actions Gates on material result commit.",
-    "C4_COMMIT": "Atomic authenticated GitHub material source/test commit (this result SHA).",
+    "C3_VALIDATE": "Repair causal policy-contract failure observed at exact material SHA ab29c214ed1713c88ace17235539b02d0ba04e80: DX11 Fast 38835595871 and Backend Conversion 38835595919 both rejected missing VISIBLE_FRAME_OUTPUT stage. Re-run required exact-SHA gates on this corrected non-skip validation-bearing commit; source material remains ab29c214..., HMD UNTESTED.",
+    "C4_COMMIT": "C++/regression material ab29c214ed1713c88ace17235539b02d0ba04e80; this retry only repairs missing task-path acceptance for the already implemented native OpenXR projection output.",
     "C5_PACKAGE": "NOT_REQUIRED: direct gameplay backend not promoted without HMD.",
-    "C6_STATE": "PENDING exact-SHA Gates; runtime UNTESTED. On success record separate [skip ci] C6 with same validation-bearing source SHA."
+    "C6_STATE": "PENDING corrected exact-SHA gates; RUNTIME_VALIDATION=UNTESTED. Record PASS_EXACT_SHA in a separate [skip ci] checkpoint only after all required applicable gates actually succeed."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00801",
