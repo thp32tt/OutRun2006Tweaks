@@ -26,7 +26,7 @@ assert wired(region, header)
 for original, broken in (
     ("clipped.left == 0 && clipped.top == 0", "true /* always entire surface */"),
     ("static_cast<LONG>(clipped.left)", "rect->left"),
-    ("s.preDrawFills.record(owner,", "false && s.preDrawFills.record(owner,"),
+    ("s.preDrawFills.record(owner,", "s.preDrawFills.omitted_record(owner,"),
     ("coverage == GameNativeSourceMutation::ColorFillClip::Empty", "false"),
 ):
     assert original in region

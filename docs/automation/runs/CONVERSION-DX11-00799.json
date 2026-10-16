@@ -105,7 +105,7 @@
     "C0_RECOVER": "GitHub SSOT ab508834 (00798 separate C6), latest material changes from 00797 pre-Draw full frame; inspect 00799 exact Fast and Backend failed run ids before retry.",
     "C1_REVIEW": "Clipped original game ColorFill wrongly rejected by prior strict in-bounds queue and post-Draw ClearView; confirmed inherited 00797 constexpr regression assumes false for now supported clips.",
     "C2_IMPLEMENT": "New source material b31308951e656705ec7b9ac4add9471fdb9e4add clips canonical D3D9 ColorFill at source/RT upload and preserves bounded pre-Draw/active post-Draw menu-to-race native frames.",
-    "C3_VALIDATE": "Exact b31308951e656705ec7b9ac4add9471fdb9e4add DX11 Fast run 38830783264 and Backend run 38830783179 failed policy --check-latest because 00798 C6 was highest run without strategy. This record repairs latest-task binding; existing 00797 constexpr regression updated without dropping malformed/foreign/overflow negatives. Final new exact-SHA mandatory gates pending.",
+    "C3_VALIDATE": "Exact b31308951e656705ec7b9ac4add9471fdb9e4add DX11 Fast run 38830783264 and Backend run 38830783179 failed policy --check-latest because 00798 C6 was highest run without strategy. This record repairs latest-task binding; existing 00797 constexpr regression updated without dropping malformed/foreign/overflow negatives. Final new exact-SHA mandatory gates pending. Targeted exact 61fc3e3 Fast #38831189620 passed policy and older source regressions but failed 00799 own false-negative mutation: replacement preserved searched substring. New missing-call mutation repairs detector, retained other adversarial checks.",
     "C4_COMMIT": "Material renderer source commit b31308951e656705ec7b9ac4add9471fdb9e4add is immutable; causal original-regression + latest-run strategy/contract repair commit provides the validation-bearing candidate; no CI-skip.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA; real Quest3/VDXR game and HMD remain UNTESTED. No score before complete integrated source/build achievement."
@@ -119,7 +119,13 @@
     ],
     "previous_colorfill_feature": "00797 introduced ordered pre-Draw native ColorFill. This 00799 source extends actual clipped game ColorFill across both pre-Draw and post-Draw renderer paths; no 00797 duplicate claim.",
     "manual_game_or_hmd_observed": false,
-    "updated_legacy_test": "tools/dx11_native_frame_batch_probe.cpp now expects clipped out-of-bounds but valid rectangles, retains foreign/reversed/overflow negatives."
+    "updated_legacy_test": "tools/dx11_native_frame_batch_probe.cpp now expects clipped out-of-bounds but valid rectangles, retains foreign/reversed/overflow negatives.",
+    "fast_second_failure": {
+      "run_id": 38831189620,
+      "job_id": 116750106688,
+      "failed_test": "tools/test_dx11_clipped_color_fill_00799.py: AssertionError: s.preDrawFills.record(owner,",
+      "fix": "negative mutant removes recorded call token, not merely inserts a prefix"
+    }
   },
   "score": {
     "run_key": "CONVERSION-DX11-00799",
