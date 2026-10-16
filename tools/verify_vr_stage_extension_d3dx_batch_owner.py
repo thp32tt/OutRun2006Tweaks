@@ -508,9 +508,267 @@ def check_exact_goal_xyzrhw_plane(renderer: str, semantics: str) -> list[str]:
     return errors
 
 
+
+def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
+    """Validate actual Quest-style Ledger + live D3DX GPU owner, not old TLS spelling.
+
+    Check only each owning callback's body and validate Ledger's method
+    implementation; comments or a declaration of the new class cannot pass.
+    The original pre-refactor verifier below remains available for old code.
+    """
+    errors: list[str] = []
+    def need(conditions: bool, what: str) -> None:
+        if not conditions:
+            errors.append(what)
+    def scope(text: str, start: str, end: str) -> str:
+        a = text.find(start)
+        b = text.find(end, a + len(start)) if a >= 0 else -1
+        return text[a:b] if a >= 0 and b > a else ""
+    start = code.find("class VRProjectedD3DXSpriteIsolationR64 : public Hook")
+    finish = code.find("class VRHudQueueSemanticBridge : public Hook", start)
+    need(start >= 0 and finish > start, "live R64 GPU hook must exist")
+    if start < 0 or finish <= start:
+        return errors
+    h = code[start:finish]
+    pre = code[:start]
+    begin = scope(h, "static HRESULT __stdcall BeginDest(", "static HRESULT __stdcall FlushDest(")
+    flush = scope(h, "static HRESULT __stdcall FlushDest(", "static HRESULT __stdcall EndDest(")
+    end = scope(h, "static HRESULT __stdcall EndDest(", "static void InvalidateForDeviceLifecycle(")
+    lifecycle = scope(h, "static void InvalidateForDeviceLifecycle(", "static bool FlushTracked(")
+    live_flush = scope(h, "static bool FlushTracked(", "\npublic:")
+    direct_stage = scope(h, "static void BeforeDirectStageSource() noexcept", "static void AfterDirectStageSource() noexcept")
+    exit_stage = scope(h, "static void AfterDirectStageSource() noexcept", "static void BeforeDirectGoalSource() noexcept")
+    node = scope(h, "static void BeforeQueueNode(", "static void BeforeQueueEnd() noexcept")
+    queue_end = scope(h, "static void BeforeQueueEnd() noexcept", "\nprivate:")
+    draw = scope(h, "static HRESULT __stdcall DrawDest(", "static DWORD WINAPI InstallThread(")
+    ledger_begin = scope(ledger, "void begin(", "void recordDraw(")
+    ledger_draw = scope(ledger, "void recordDraw(", "void forget(")
+    ledger_forget = scope(ledger, "void forget(", "void onFlushSuccess(")
+    ledger_flush = scope(ledger, "void onFlushSuccess(", "void onFlushFailure(")
+    ledger_fail = scope(ledger, "void onFlushFailure(", "void end(")
+    ledger_end = scope(ledger, "void end(", "void invalidate(")
+    ledger_reset = scope(ledger, "void invalidate(", "bool exactUniformOwner(")
+    stage_predicate = scope(header, "inline constexpr bool CanFlushD3DXDirectStageAtExit(", "    static_assert(")
+    goal_predicate = scope(header, "inline constexpr bool CanFlushD3DXDirectGoalAtExit(", "    static_assert(")
+    need("pendingProducer == ProducerToken::StageExtensionTime" in stage_predicate and
+         "pendingDraws != 0 && homogeneous" in stage_predicate and
+         "currentProducer == pendingProducer" in stage_predicate,
+         "pure +TIME exit predicate exact owner/homogeneity")
+    need("pendingProducer == ProducerToken::GoalTime020" in goal_predicate and
+         "pendingProducer == ProducerToken::GoalTime150" in goal_predicate and
+         "pendingProducer == ProducerToken::ResultProgress" in goal_predicate and
+         "currentProducer == pendingProducer" in goal_predicate,
+         "pure GOAL exit predicate exact source admission")
+    need("vr/game/hud_command_batch.hpp" in code and
+         "inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};" in h,
+         "live R64 uses one thread-local command ledger")
+    need("0x9898E, 0x98A36, 0x98AC6" in pre and
+         "0x989AD, 0x98A10, 0x98A89" in pre and
+         "TagAppendedNodes(StageExtensionBefore" in pre,
+         "six exact +TIME sprite/numeric parents survive")
+    need("FlushD3DXBeforeDirectStageSource();" in pre and
+         "FlushD3DXAtDirectStageSourceExit();" in pre and
+         "StageExtensionDirectDrawOwner.reset();" in pre,
+         "direct +TIME Begin/exit must split and restore owner")
+    need("ProducerToken::ResultProgress" in pre and
+         "ProducerToken::GoalTime020" in pre and
+         "ProducerToken::GoalTime150" in pre and
+         "ProducerToken::OutRunStagePrintf" in pre,
+         "exact GOAL production source edges survive")
+    need("const bool existingBatch =" in begin and
+         "HudBatch.active && self == HudBatch.sprite && IsExactSprite(self)" in begin and
+         "if (FAILED(hr) && existingBatch)" in begin and
+         "return hr;" in begin and "HudBatch.begin(self, SUCCEEDED(hr));" in begin and
+         begin.index("if (FAILED(hr) && existingBatch)") <
+         begin.index("HudBatch.begin(self, SUCCEEDED(hr));"),
+         "failed nested Begin must retain old exact batch")
+    need("sprite = exactSprite;" in ledger_begin and "active = succeeded;" in ledger_begin and
+         "forget();" in ledger_begin and
+         "if (succeeded && generation != UINT64_MAX)" in ledger_begin,
+         "Ledger Begin must clear ownership only after accepted native Begin")
+    need("if (!active)" in ledger_draw and "if (drawCount == 0)" in ledger_draw and
+         "scope = newScope;" in ledger_draw and "producer = newProducer;" in ledger_draw and
+         "else if (scope != newScope || producer != newProducer)" in ledger_draw and
+         "homogeneous = false;" in ledger_draw and "++drawCount;" in ledger_draw and
+         "std::numeric_limits<unsigned>::max" in ledger_draw,
+         "Ledger must quarantine mixed producer and count bounded successful Draws")
+    need("drawCount = 0;" in ledger_forget and "homogeneous = true;" in ledger_forget and
+         "scope = Scope::None;" in ledger_forget and "producer = Producer::None;" in ledger_forget,
+         "Ledger forget must withdraw old source, not silently promote it")
+    need("forget();" in ledger_flush and "boundaryReady = false;" in ledger_flush and
+         "active = false;" in ledger_fail and "boundaryReady = false;" in ledger_fail and
+         "active = false;" in ledger_end and "forget();" in ledger_end and
+         "end();" in ledger_reset and "sprite = nullptr;" in ledger_reset,
+         "Ledger Flush success/failure/End/Reset transition contracts")
+    need("CanRestoreDeferredResultOwner(" in flush and
+         "HudBatch.active, QueueRenderActive(), HudBatch.homogeneous" in flush and
+         "HudBatch.scope, HudBatch.producer" in flush and
+         "ScopedExactProducerSemantic owned(" in flush and
+         "Flush_hk.stdcall<HRESULT>(self)" in flush and
+         "if (SUCCEEDED(hr))" in flush and
+         "HudBatch.onFlushSuccess();" in flush and
+         "HudBatch.onFlushFailure();" in flush,
+         "native Flush must physically submit under saved homogeneous owner")
+    need("CanRestoreDeferredResultOwner(" in end and
+         "ScopedExactProducerSemantic owned(" in end and
+         "End_hk.stdcall<HRESULT>(self)" in end and
+         "HudBatch.end();" in end and "return hr;" in end,
+         "native End must physically submit under owner and retire batch")
+    need("if (!wasTrackedOrExactGameSprite)" in lifecycle and
+         "HudBatch.invalidate();" in lifecycle and
+         "DX9ExD3DXSpriteLifetime::OwnsLifecycle(" in lifecycle and
+         "LostDevice_hk.stdcall<HRESULT>(self)" in lifecycle and
+         "ResetDevice_hk.stdcall<HRESULT>(self)" in lifecycle and
+         lifecycle.count("InvalidateForDeviceLifecycle(ownsBatch);") == 2 and
+         lifecycle.count("return hr;") >= 2,
+         "OnLost/OnReset must invalidate old/live sprite and propagate HRESULT")
+    need("void* liveSprite = *Module::exe_ptr<void*>(0x55B218);" in live_flush and
+         "!HudBatch.active ||" in live_flush and
+         "self, HudBatch.sprite, liveSprite" in live_flush and
+         "if (self && self == HudBatch.sprite && self != liveSprite)" in live_flush and
+         "InvalidateForDeviceLifecycle(true);" in live_flush and
+         "void** vtable = *reinterpret_cast<void***>(self);" in live_flush and
+         live_flush.index("liveSprite =") < live_flush.index("CanFlush(") <
+         live_flush.index("InvalidateForDeviceLifecycle(true)") <
+         live_flush.index("reinterpret_cast<void***>(self)"),
+         "stale D3DX pointer must not be dereferenced before live identity")
+    need("CanDrainDeferredResultBeforeForeignDraw(" in draw and
+         "HudBatch.active, OutRunVR::GameSemantic::QueueRenderActive()" in draw and
+         "HudBatch.homogeneous" in draw and
+         "ScopedExactProducerSemantic outgoingBatch(" in draw and
+         "flushed = FlushTracked(self);" in draw and
+         draw.index("ScopedExactProducerSemantic outgoingBatch(") <
+         draw.index("flushed = FlushTracked(self);") <
+         draw.index("const HRESULT hr = Draw_hk.stdcall"),
+         "foreign Draw must submit previous batch under outgoing owner")
+    need("if (FAILED(hr))" in draw and
+         "if (self && self == HudBatch.sprite)" in draw and
+         "HudBatch.active = false;" in draw and
+         "ForgetBatch();" in draw and
+         draw.index("if (FAILED(hr))") < draw.index("const auto scope = EffectiveScope();") and
+         "HudBatch.recordDraw(scope, source);" in draw and
+         draw.index("const HRESULT hr = Draw_hk.stdcall") <
+         draw.index("HudBatch.recordDraw(scope, source);"),
+         "failed Draw must revoke, accepted Draw must record exact current owner")
+    need("CanFlushD3DXPreQueueStageBatch(" in direct_stage and
+         "false, true, HudBatch.homogeneous" in direct_stage and
+         "HudBatch.scope, HudBatch.producer" in direct_stage and
+         "!FlushTracked(sprite)" in direct_stage,
+         "direct +TIME source entry must split prior exact batch")
+    need("CanFlushD3DXDirectStageAtExit(" in exit_stage and
+         "HudBatch.drawCount, HudBatch.homogeneous" in exit_stage and
+         "if (FlushTracked(sprite))" in exit_stage,
+         "direct +TIME source exit must submit complete proven batch")
+    need("CanDrainDirectResultBeforeFirstQueueNode(" in node and
+         "HudBatch.drawCount, HudBatch.homogeneous" in node and
+         "HudBatch.scope, HudBatch.producer, nextScope, nextProducer" in node and
+         "ScopedExactProducerSemantic outgoingBatch(" in node and
+         "flushed = FlushTracked(firstQueueSprite);" in node and
+         node.index("flushed = FlushTracked(firstQueueSprite);") <
+         node.index("const bool enteringStage"),
+         "first queue node must submit previous direct result under original owner")
+    need("GoalOwner(nextScope, nextProducer)" in node and
+         "nextProducer != CurrentRenderProducerToken()" in node and
+         "HudBatch.boundaryReady = enteringStage || enteringGoal;" in node,
+         "GOAL Stage/Result queue-owner boundary must remain selective")
+    need("HudBatch.boundaryReady && QueueRenderActive()" in queue_end and
+         "HudBatch.drawCount != 0 && HudBatch.homogeneous" in queue_end and
+         "HudBatch.producer == CurrentRenderProducerToken()" in queue_end and
+         "FlushTracked(HudBatch.sprite)" in queue_end,
+         "queue exit must flush only proven exact pending source")
+    need("if (exactStage && CanArmD3DXQueueStageAfterDraw(" in draw and
+         "HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer" in draw and
+         "HudBatch.boundaryReady = true;" in draw and
+         "if (exactStage)\n            return hr;" in draw and
+         "const bool exactGoal = GoalOwner(scope, source) && HudBatch.homogeneous" in draw and
+         "CanDeferD3DXQueueGoalBatch(" in draw and
+         "GoalFlushes.fetch_add(" in draw,
+         "post-draw +TIME batches defer while GOAL exact source retains separate path")
+    need("vtable[8]" in h and "vtable[9]" in h and "vtable[10]" in h and
+         "vtable[11]" in h and "vtable[12]" in h and "vtable[13]" in h and
+         "LostDevice_hk.enable().has_value()" in h and
+         "ResetDevice_hk.enable().has_value()" in h,
+         "all six lifecycle hooks must atomically install")
+    return errors
+
+
+def main_current_ledger(code: str, header: str) -> int:
+    ledger_path = ROOT / "src/vr/game/hud_command_batch.hpp"
+    if not ledger_path.is_file():
+        print("DX9Ex +TIME D3DX FAIL: missing live command ledger")
+        return 1
+    ledger = ledger_path.read_text(encoding="utf-8")
+    renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
+    errors = check_current_ledger(code, header, ledger)
+    errors.extend(check_exact_goal_xyzrhw_plane(renderer, header))
+    if errors:
+        print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
+        return 1
+    # Every mutation must materially modify an existing live source, and
+    # the validator must detect its exact missing safety condition. This
+    # protects against blindly accepting a class name or a dead mock.
+    mutations = [
+        ("begin-does-not-clear", "ledger", "forget();\n            if (succeeded", "// forgot source;\n            if (succeeded"),
+        ("begin-stale", "code", "HudBatch.begin(self, SUCCEEDED(hr));", "HudBatch.end();"),
+        ("nested-begin-wipes", "code", "if (FAILED(hr) && existingBatch)", "if (FAILED(hr) && false)"),
+        ("foreign-draw-steals-owner", "code", "ScopedExactProducerSemantic outgoingBatch(", "ScopedExactProducerSemantic wrongBatch("),
+        ("foreign-batch-no-split", "code", "flushed = FlushTracked(self);", "flushed = false;"),
+        ("mix-becomes-homogeneous", "ledger", "homogeneous = false;", "homogeneous = true;"),
+        ("successful-draw-untracked", "code", "HudBatch.recordDraw(scope, source);", "(void)scope; (void)source;"),
+        ("failed-draw-keeps", "code", "if (self && self == HudBatch.sprite)\n            {\n                HudBatch.active = false;", "if (self && self == HudBatch.sprite)\n            {\n                HudBatch.active = true;"),
+        ("flush-no-revoke", "code", "HudBatch.onFlushSuccess();", "HudBatch.boundaryReady = true;"),
+        ("flush-failure-retains", "code", "HudBatch.onFlushFailure();", "HudBatch.boundaryReady = true;"),
+        ("ledger-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            active = false;", "void onFlushFailure() noexcept\n        {\n            active = true;"),
+        ("ledger-end-retains", "ledger", "void end() noexcept\n        {\n            active = false;", "void end() noexcept\n        {\n            active = true;"),
+        ("reset-no-forget", "code", "HudBatch.invalidate();", "HudBatch.boundaryReady = true;"),
+        ("reset-keeps-sprite", "ledger", "void invalidate() noexcept\n        {\n            end();\n            sprite = nullptr;", "void invalidate() noexcept\n        {\n            end();\n            sprite = exactSprite;"),
+        ("missing-live-pointer", "code", "void* liveSprite = *Module::exe_ptr<void*>(0x55B218);", "void* liveSprite = HudBatch.sprite;"),
+        ("wrong-live-owner", "code", "self, HudBatch.sprite, liveSprite", "self, HudBatch.sprite, self"),
+        ("queue-exit-without-provenance", "code", "HudBatch.producer == CurrentRenderProducerToken()", "true"),
+        ("queue-first-unowned", "code", "flushed = FlushTracked(firstQueueSprite);", "flushed = false;"),
+        ("goal-transition-lost", "code", "HudBatch.boundaryReady = enteringStage || enteringGoal;", "HudBatch.boundaryReady = enteringStage;"),
+        ("source-exit-no-flush", "code", "if (FlushTracked(sprite))", "if (false)"),
+        ("shader-loses-goal-route", "code", "CanDeferD3DXQueueGoalBatch(", "CanDeferD3DXQueueNoneBatch("),
+        ("post-draw-stage-no-boundary", "code", "if (exactStage && CanArmD3DXQueueStageAfterDraw(", "if (false && CanArmD3DXQueueStageAfterDraw("),
+        ("lost-retains-batch", "code", "InvalidateForDeviceLifecycle(ownsBatch);", "(void)ownsBatch;"),
+    ]
+    for name, source, before, after in mutations:
+        orig = {"code": code, "ledger": ledger, "header": header}[source]
+        modified = orig.replace(before, after, 1)
+        if modified == orig:
+            print("DX9Ex +TIME D3DX FAIL: mutation fixture missing: " + name)
+            return 1
+        c = modified if source == "code" else code
+        l = modified if source == "ledger" else ledger
+        h = modified if source == "header" else header
+        mutated_errors = check_current_ledger(c, h, l)
+        if source == "header":
+            mutated_errors.extend(check_exact_goal_xyzrhw_plane(renderer, h))
+        if not mutated_errors:
+            print("DX9Ex +TIME D3DX FAIL: mutation was not detected: " + name)
+            return 1
+    for label, name, token in (
+        ("stage-foreign-owner", "CanFlushD3DXDirectStageAtExit", "StageExtensionTime"),
+        ("goal-foreign-owner", "CanFlushD3DXDirectGoalAtExit", "GoalTime020"),
+        ("goal-progress-source", "CanFlushD3DXDirectGoalAtExit", "ResultProgress")):
+        begin = header.index("inline constexpr bool " + name + "(")
+        end = header.index("    static_assert(", begin)
+        block = header[begin:end]
+        changed = block.replace("pendingProducer == ProducerToken::" + token,
+                                "pendingProducer == ProducerToken::None", 1)
+        if changed == block or not check_current_ledger(code, header[:begin]+changed+header[end:], ledger):
+            print("DX9Ex +TIME D3DX FAIL: exact-owner predicate mutation undetected: " + label)
+            return 1
+    print("DX9Ex +TIME/GOAL QUEST LEDGER PASS: real native lifecycle/physical owner, "
+          + str(len(mutations)) + " destructive mutations, exact original XYZ/RHW contract")
+    return 0
+
+
 def main() -> int:
     code = SOURCE.read_text(encoding="utf-8")
     header = SEMANTICS.read_text(encoding="utf-8")
+    if "HudBatch.begin(self, SUCCEEDED(hr));" in code:
+        return main_current_ledger(code, header)
     errors = check(code, header)
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     errors.extend(check_exact_goal_xyzrhw_plane(renderer, header))
