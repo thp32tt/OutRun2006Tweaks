@@ -745,6 +745,7 @@ void NativeGameStereoSubmission::release_local() noexcept {
     for (auto& eye : eyes_) eye.Reset();
     context_.Reset();
     eyeViews_[0] = eyeViews_[1] = 0;
+    eyeArraySlices_[0] = eyeArraySlices_[1] = 0u;
     frameId_ = poseSequence_ = 0;
     slot_ = OutRunVR::RenderFrameRingSize;
     state_ = State::Idle;
@@ -772,7 +773,7 @@ bool NativeGameStereoSubmission::begin(
 }
 
 bool NativeGameStereoSubmission::source_is_live(
-    ID3D11Texture2D* source) const noexcept
+    ID3D11Texture2D* source, UINT arraySlice) const noexcept
 {
     if (!context_ || !source) return false;
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice, sourceDevice;
@@ -783,8 +784,10 @@ bool NativeGameStereoSubmission::source_is_live(
     D3D11_TEXTURE2D_DESC desc{};
     source->GetDesc(&desc);
     return desc.Width == ring_.width() && desc.Height == ring_.height() &&
-        desc.Format == ring_.format() && desc.MipLevels == 1u &&
-        desc.ArraySize == 1u && desc.SampleDesc.Count != 0u &&
+        desc.Format == ring_.format() && desc.MipLevels != 0u &&
+        desc.ArraySize != 0u && arraySlice < desc.ArraySize &&
+        desc.SampleDesc.Count != 0u &&
+        (desc.SampleDesc.Count == 1u || desc.MipLevels == 1u) &&
         desc.Usage == D3D11_USAGE_DEFAULT && desc.CPUAccessFlags == 0u &&
         native_game_eye_local_render_target_admitted(
             desc.BindFlags, desc.MiscFlags, D3D11_BIND_RENDER_TARGET,
@@ -796,15 +799,16 @@ bool NativeGameStereoSubmission::source_is_live(
 bool NativeGameStereoSubmission::capture_eye(
     std::uint32_t eyeIndex, ID3D11Texture2D* nativeColor,
     std::uint64_t nativeDrawCount, std::uint64_t eyeViewSignature,
-    std::uint32_t sourcePoseSequence) noexcept
+    std::uint32_t sourcePoseSequence, UINT sourceArraySlice) noexcept
 {
     if (state_ != State::Acquired || eyeIndex >= 2u ||
         eyes_[eyeIndex] || !nativeDrawCount || !eyeViewSignature ||
         sourcePoseSequence != poseSequence_ ||
-        !source_is_live(nativeColor))
+        !source_is_live(nativeColor, sourceArraySlice))
         return false;
     eyes_[eyeIndex] = nativeColor;
     eyeViews_[eyeIndex] = eyeViewSignature;
+    eyeArraySlices_[eyeIndex] = sourceArraySlice;
     return true;
 }
 
@@ -1040,8 +1044,8 @@ bool NativeGameStereoSubmission::submit() noexcept
     if (state_ != State::Acquired || !eyes_[0] || !eyes_[1] ||
         eyeViews_[0] == 0u || eyeViews_[1] == 0u ||
         eyeViews_[0] == eyeViews_[1] ||
-        !source_is_live(eyes_[0].Get()) ||
-        !source_is_live(eyes_[1].Get()))
+        !source_is_live(eyes_[0].Get(), eyeArraySlices_[0]) ||
+        !source_is_live(eyes_[1].Get(), eyeArraySlices_[1]))
         return false;
 
     // submit_eye_pair itself checks canonical COM identities, every ring-owned
@@ -1049,7 +1053,8 @@ bool NativeGameStereoSubmission::submit() noexcept
     // It queues BOTH GPU transfers before one producer EVENT. On a partial
     // command/fence failure the ring quarantines its allocation.
     if (!ring_.submit_eye_pair(context_.Get(), slot_, frameId_,
-                               eyes_[0].Get(), eyes_[1].Get()))
+                               eyes_[0].Get(), eyes_[1].Get(),
+                               eyeArraySlices_[0], eyeArraySlices_[1]))
         return false;
     eyes_[0].Reset();
     eyes_[1].Reset();

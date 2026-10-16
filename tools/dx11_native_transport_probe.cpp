@@ -1671,6 +1671,87 @@ int main()
             !directSubmit.attach_host_frame(gameEyeFrame, hostFrame),
             "00819 distinct native game eyes obey exact host ACK");
 
+
+    // 00842: game camera eyes may be captured in different array slices of
+    // one GPU texture with a full mip chain, not only separate allocations.
+    D3D11_TEXTURE2D_DESC arrayDesc = sourceDesc;
+    arrayDesc.MipLevels = 2u;
+    arrayDesc.ArraySize = 2u;
+    ID3D11Texture2D* gameEyeArray = nullptr;
+    ID3D11RenderTargetView* gameArrayViews[2][2]{};
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &arrayDesc, nullptr, &gameEyeArray)) && gameEyeArray,
+            "00842 two-eye game texture-array producer");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        for (UINT mip = 0u; mip < 2u; ++mip) {
+            D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
+            viewDesc.Format = arrayDesc.Format;
+            viewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            viewDesc.Texture2DArray.MipSlice = mip;
+            viewDesc.Texture2DArray.FirstArraySlice = eye;
+            viewDesc.Texture2DArray.ArraySize = 1u;
+            require(SUCCEEDED(d3d.device->CreateRenderTargetView(
+                        gameEyeArray, &viewDesc, &gameArrayViews[eye][mip])),
+                    "00842 game left/right camera array RTV");
+        }
+    }
+    d3d.context->ClearRenderTargetView(gameArrayViews[0][0], red);
+    d3d.context->ClearRenderTargetView(gameArrayViews[1][0], blue);
+    // Deliberately invert lower-mip colors: mistakenly copying mip one
+    // must fail actual GPU pixel comparison, not merely a metadata check.
+    d3d.context->ClearRenderTargetView(gameArrayViews[0][1], blue);
+    d3d.context->ClearRenderTargetView(gameArrayViews[1][1], red);
+    outrun::vr::dx11::NativeGameStereoSubmission arraySubmit(ring);
+    require(arraySubmit.begin(d3d.context, 25u, 35u) &&
+            !arraySubmit.capture_eye(0u, gameEyeArray, 1u, 0xa1u, 35u, 2u) &&
+            arraySubmit.capture_eye(0u, gameEyeArray, 1u, 0xa1u, 35u, 0u) &&
+            arraySubmit.capture_eye(1u, gameEyeArray, 1u, 0xb2u, 35u, 0u) &&
+            !arraySubmit.submit() && arraySubmit.cancel() &&
+            !ring.synchronization_faulted(),
+            "00842 aliased same slice and invalid slice reject before GPU");
+    require(arraySubmit.begin(d3d.context, 26u, 35u) &&
+            arraySubmit.capture_eye(0u, gameEyeArray, 1u, 0xa1u, 35u, 0u) &&
+            arraySubmit.capture_eye(1u, gameEyeArray, 1u, 0xb2u, 35u, 1u) &&
+            arraySubmit.submit() && arraySubmit.in_flight(),
+            "00842 native producer submits two independent GPU array-slice eyes");
+    outrun::vr::dx11::NativeGameStereoPublishedFrame arrayFrame{};
+    bool arrayReady = false;
+    for (int retry = 0; retry < 2000 && !arrayReady; ++retry) {
+        arrayReady = arraySubmit.try_publish(arrayFrame);
+        require(!ring.synchronization_faulted(), "00842 GPU fence healthy");
+        if (!arrayReady) Sleep(1);
+    }
+    require(arrayReady && arrayFrame.eyeViewSignature[0] == 0xa1u &&
+            arrayFrame.eyeViewSignature[1] == 0xb2u &&
+            arrayFrame.sourcePoseSequence == 35u,
+            "00842 exact stereo camera signatures survive GPU publication");
+    for (UINT eye = 0; eye < 2u; ++eye) {
+        d3d.context->CopyResource(readback, ring.eye(arrayFrame.gpu.slot, eye));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0u, D3D11_MAP_READ, 0u, &mapped)),
+                "00842 GPU eye pixel readback");
+        const auto* px = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool distinct = eye == 0u
+            ? px[0] == 255 && px[1] == 0 && px[2] == 0 && px[3] == 255
+            : px[0] == 0 && px[1] == 0 && px[2] == 255 && px[3] == 255;
+        d3d.context->Unmap(readback, 0u);
+        require(distinct, "00842 independent mip-zero L/R GPU pixel identity");
+    }
+    hostFrame.frameId = 26u;
+    hostFrame.sourcePoseSequence = 35u;
+    hostFrame.flags &= ~OutRunVR::RenderFrameDirectGpuTransport;
+    require(arraySubmit.attach_host_frame(arrayFrame, hostFrame) &&
+            (hostFrame.flags & OutRunVR::RenderFrameDirectGpuTransport) &&
+            ring.retire_acknowledged(
+                make_ack(ring.identity(), arrayFrame.gpu.slot, 26u)) &&
+            !arraySubmit.attach_host_frame(arrayFrame, hostFrame),
+            "00842 stereo GPU host handoff and exact ACK retirement");
+    for (UINT eye = 0; eye < 2u; ++eye)
+        for (UINT mip = 0; mip < 2u; ++mip)
+            gameArrayViews[eye][mip]->Release();
+    gameEyeArray->Release();
+
     // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
     // cancellation nor another frame may reuse the ring without hard retire.
     const auto partialDraw = [](
@@ -1682,10 +1763,10 @@ int main()
         return false;
     };
     std::uint32_t partialSlot = 99;
-    require(ring.try_acquire_slot(d3d.context, 25, nullptr, partialSlot) &&
-            !ring.render_eye_pair(d3d.context, partialSlot, 25, partialDraw, nullptr) &&
+    require(ring.try_acquire_slot(d3d.context, 27, nullptr, partialSlot) &&
+            !ring.render_eye_pair(d3d.context, partialSlot, 27, partialDraw, nullptr) &&
             ring.synchronization_faulted() &&
-            !ring.cancel_acquired_slot(partialSlot, 25) &&
+            !ring.cancel_acquired_slot(partialSlot, 27) &&
             !ring.activation_ready(),
             "00812 partial native eye draw quarantines transport until Reset");
 

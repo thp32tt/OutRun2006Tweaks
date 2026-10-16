@@ -325,11 +325,12 @@ namespace outrun::vr::dx11
         std::uint32_t slot,
         std::uint64_t frame_id,
         ID3D11Texture2D* left_source,
-        ID3D11Texture2D* right_source) noexcept
+        ID3D11Texture2D* right_source,
+        UINT left_array_slice, UINT right_array_slice) noexcept
     {
         if (!activation_ready() || same_producer_context(context) == false ||
             slot >= slots_.size() || frame_id == 0 ||
-            !left_source || !right_source || left_source == right_source)
+            !left_source || !right_source)
             return false;
 
         auto& entry = slots_[slot];
@@ -342,8 +343,8 @@ namespace outrun::vr::dx11
                                       D3D11_TEXTURE2D_DESC& desc) noexcept {
             source->GetDesc(&desc);
             if (desc.Width != width_ || desc.Height != height_ ||
-                desc.Format != format_ || desc.MipLevels != 1 ||
-                desc.ArraySize != 1 || desc.SampleDesc.Count == 0 ||
+                desc.Format != format_ || desc.MipLevels == 0 ||
+                desc.ArraySize == 0 || desc.SampleDesc.Count == 0 ||
                 (desc.SampleDesc.Count == 1 && desc.SampleDesc.Quality != 0) ||
                 desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
                 // Accept only a locally owned color target, not a shared handle
@@ -367,6 +368,14 @@ namespace outrun::vr::dx11
         D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{};
         if (!exact_source(left_source, leftDesc) ||
             !exact_source(right_source, rightDesc))
+            return false;
+        // Game-authored left/right cameras can occupy separate full-size
+        // array slices of the SAME D3D11 texture, with a mip chain. Only
+        // mip zero represents the actual full-resolution eye frame.
+        if (left_array_slice >= leftDesc.ArraySize ||
+            right_array_slice >= rightDesc.ArraySize ||
+            (leftDesc.SampleDesc.Count > 1u && leftDesc.MipLevels != 1u) ||
+            (rightDesc.SampleDesc.Count > 1u && rightDesc.MipLevels != 1u))
             return false;
         // ResolveSubresource is only legal for formats the actual producer
         // device advertises as resolvable; check before either eye is written.
@@ -409,21 +418,54 @@ namespace outrun::vr::dx11
                     reinterpret_cast<std::uintptr_t>(identity.Get());
             }
         }
-        if (!native_game_eye_pair_sources_admitted(
+        // Same allocation is stereo only when its two actual physical
+        // camera slices are different. Alias interfaces and source views
+        // of a shared ring output remain forbidden before any GPU write.
+        if (leftIdentity.Get() == rightIdentity.Get()) {
+            if (left_array_slice == right_array_slice) return false;
+            for (const auto identity : owned) {
+                if (!identity || identity ==
+                    reinterpret_cast<std::uintptr_t>(leftIdentity.Get()))
+                    return false;
+            }
+        } else if (!native_game_eye_pair_sources_admitted(
                 reinterpret_cast<std::uintptr_t>(leftIdentity.Get()),
                 reinterpret_cast<std::uintptr_t>(rightIdentity.Get()),
-                owned))
+                owned)) {
             return false;
+        }
         // All rejection paths precede both GPU commands. After this point
         // a failed fence arm must quarantine, not cancel/reissue, the slot:
         // the D3D11 command stream may still write either shared eye.
         entry.gpu_copy_queued = true;
         if (transfer == NativeGameEyeTransfer::Resolve) {
-            context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);
-            context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);
+            if (left_array_slice == 0u && right_array_slice == 0u) {
+                context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);
+                context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);
+            } else {
+                // MSAA arrays have one mip: array slice is the subresource.
+                context->ResolveSubresource(entry.eye[0].Get(), 0u,
+                    left_source, left_array_slice, format_);
+                context->ResolveSubresource(entry.eye[1].Get(), 0u,
+                    right_source, right_array_slice, format_);
+            }
         } else {
-            context->CopyResource(entry.eye[0].Get(), left_source);
-            context->CopyResource(entry.eye[1].Get(), right_source);
+            if (leftDesc.MipLevels == 1u && leftDesc.ArraySize == 1u &&
+                rightDesc.MipLevels == 1u && rightDesc.ArraySize == 1u) {
+                context->CopyResource(entry.eye[0].Get(), left_source);
+                context->CopyResource(entry.eye[1].Get(), right_source);
+            } else {
+                // Keep the game's independent full-resolution mip-zero eye
+                // pixels on GPU; never copy an entire array/mip allocation.
+                context->CopySubresourceRegion(entry.eye[0].Get(), 0u,
+                    0u, 0u, 0u, left_source,
+                    D3D11CalcSubresource(0u, left_array_slice, leftDesc.MipLevels),
+                    nullptr);
+                context->CopySubresourceRegion(entry.eye[1].Get(), 0u,
+                    0u, 0u, 0u, right_source,
+                    D3D11CalcSubresource(0u, right_array_slice, rightDesc.MipLevels),
+                    nullptr);
+            }
         }
         if (!signal_producer_fence(context, slot, frame_id)) {
             // GPU copies/resolves have already been recorded; a failed
