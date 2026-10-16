@@ -6,6 +6,10 @@ semi-transparent alpha and blend factors match the PC-origin Quest evidence.
 Writes a new model copy; never changes the source or any D3D global state.
 """
 import argparse
+import hashlib
+import json
+import os
+import tempfile
 import math
 from pathlib import Path
 import re
@@ -98,16 +102,110 @@ def patch_bytes(payload, name, opacity, selection=None):
         raise ValueError("non-glass data changed")
     return (zlib.compress(modified,9) if packed else bytes(modified)),hits
 
+def sha256(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def sidecars(source):
+    # Sidecars intentionally live alongside the actual user-selected model,
+    # never under game texture override directories or in the mod repository.
+    return (source.with_name(source.name + ".outrun-glass-original.bak"),
+            source.with_name(source.name + ".outrun-glass.json"))
+
+
+def write_atomic(target, data):
+    fd, tmp = tempfile.mkstemp(prefix=target.name + ".", suffix=".tmp", dir=target.parent)
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, target)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+
+
+def verified_original(source):
+    if source.is_symlink() or not source.is_file():
+        raise ValueError("source must be an existing regular non-symlink file")
+    if not re.fullmatch(r"obj_plcar_[a-z0-9_]+_pmt\\.sz", source.name.lower()):
+        raise ValueError("refusing non-player-car model")
+    backup, journal = sidecars(source)
+    if backup.is_symlink() or journal.is_symlink():
+        raise ValueError("unsafe backup/journal symlink")
+    current = source.read_bytes()
+    if backup.exists() != journal.exists():
+        raise ValueError("incomplete earlier operation; preserve backup and inspect manually")
+    if not backup.exists():
+        # Never install if the source is not a known, safely patchable model.
+        find_glass(unpack(current)[0])
+        return current, current, backup, journal, None
+    original = backup.read_bytes()
+    try:
+        record = json.loads(journal.read_text(encoding="utf-8"))
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError("unreadable glass journal") from exc
+    if (record.get("model") != source.name or
+        record.get("original_sha256") != sha256(original) or
+        record.get("installed_sha256") != sha256(current)):
+        raise ValueError("model, original backup or installed model changed; refusing overwrite")
+    # A manual replacement is never treated as an existing patch, even if its
+    # material colors appear identical. Always regenerate from pristine data.
+    find_glass(unpack(original)[0])
+    return original, current, backup, journal, record
+
+
+def install_in_place(source, opacity, selection=None):
+    original, current, backup, journal, record = verified_original(source)
+    modified, hits = patch_bytes(original, source.name, opacity, selection)
+    if record is None:
+        # Only now that the source has passed every signature gate, preserve
+        # its ORIGINAL bytes. Exclusive create refuses clobbering user backups.
+        with backup.open("xb") as f:
+            f.write(original)
+            f.flush()
+            os.fsync(f.fileno())
+    record = {
+        "schema": 1, "model": source.name, "original_sha256": sha256(original),
+        "installed_sha256": sha256(modified), "opacity": opacity,
+        "matched_materials": [(a,b) for a,b,*_ in hits],
+    }
+    if modified != current:
+        write_atomic(source, modified)
+    write_atomic(journal, json.dumps(record, indent=2, sort_keys=True).encode("utf-8"))
+    return hits, backup
+
+
+def restore_in_place(source):
+    original, current, backup, journal, record = verified_original(source)
+    if record is None:
+        raise ValueError("no verified original backup/journal available")
+    if original != current:
+        write_atomic(source, original)
+    record["installed_sha256"] = sha256(original)
+    record["opacity"] = None
+    write_atomic(journal, json.dumps(record, indent=2, sort_keys=True).encode("utf-8"))
+    return backup
+
+
 def main():
     a=argparse.ArgumentParser(description=__doc__)
     a.add_argument("source",type=Path)
-    a.add_argument("output",type=Path)
+    a.add_argument("output",type=Path,nargs="?")
+    mode=a.add_mutually_exclusive_group()
+    mode.add_argument("--in-place",action="store_true",help="apply with original-byte backup and SHA journal")
+    mode.add_argument("--restore",action="store_true",help="restore verified backup of in-place glass edit")
     a.add_argument("--opacity",type=float,default=0.30)
     a.add_argument("--only",action="append",default=[],help="object:material; repeat for verified glass")
     a.add_argument("--dry-run",action="store_true")
     opts=a.parse_args()
-    if opts.source.resolve()==opts.output.resolve() or opts.output.exists():
-        raise ValueError("will not overwrite original/existing output")
+    if opts.in_place or opts.restore:
+        if opts.output is not None:
+            raise ValueError("in-place/restore must not specify an output file")
+    else:
+        if opts.output is None or opts.source.resolve()==opts.output.resolve() or opts.output.exists():
+            raise ValueError("specify a new output file; never overwrite existing model")
     select=None
     if opts.only:
         select=set()
@@ -116,6 +214,23 @@ def main():
             if len(x)!=2 or not all(v.isdigit() for v in x):
                 raise ValueError("invalid --only object:material")
             select.add(tuple(map(int,x)))
+    if opts.restore:
+        if opts.dry_run:
+            verified_original(opts.source)
+            print("restore preview only; no files changed")
+        else:
+            backup=restore_in_place(opts.source)
+            print(f"restored original model; backup preserved: {backup}")
+        return
+    if opts.in_place:
+        if opts.dry_run:
+            original,_,_,_,_=verified_original(opts.source)
+            _,hits=patch_bytes(original,opts.source.name,opts.opacity,select)
+            print(f"validated {len(hits)} candidate materials; no files changed")
+        else:
+            hits,backup=install_in_place(opts.source,opts.opacity,select)
+            print(f"installed glass alpha for {len(hits)} candidate materials; original backup: {backup}")
+        return
     payload,hits=patch_bytes(opts.source.read_bytes(),opts.source.name,opts.opacity,select)
     for obj,mat,ci,_,rgba,blend in hits:
         print(f"glass candidate: object={obj} material={mat} color={ci} alpha={rgba[3]:.4f} blend={blend} -> {opts.opacity:.3f}")

@@ -26,6 +26,9 @@ Assert-True ($cockpit.Environment.OUTRUN_VR_R30_PARTICLE_VB -eq '1') 'G_COCKPIT 
 Assert-True (-not $correctness.Environment.Contains('OUTRUN_VR_R30_PARTICLE_VB')) 'CORRECTNESS must not opt into untested R30 uploads'
 $slotSource = Get-Content (Join-Path $root 'OutRunVR-Slot-Selector.ps1') -Raw
 $runSource = Get-Content (Join-Path $root 'Run-OutRunVRTest.ps1') -Raw
+Assert-True ($slotSource.Contains('quest_cockpit_glass.py')) 'G_COCKPIT must expose original model glass opacity edit'
+Assert-True ($slotSource.Contains('glassSlider')) 'glass opacity GUI slider missing'
+Assert-True ($slotSource.Contains("'--restore'")) 'glass original restoration missing'
 Assert-True ($slotSource.Contains("Profile='COCKPIT_PARTICLES'")) 'G_COCKPIT UI must select the actual experimental runtime profile'
 Assert-True ($runSource.Contains('$env:OUTRUN_VR_R30_PARTICLE_VB = $null')) 'baseline must clear inherited experimental uploads'
 Assert-True ($runSource.Contains('$env:OUTRUN_VR_R30_PARTICLE_VB=$oldParticleGpuUpload')) 'runner must restore prior experimental upload state'

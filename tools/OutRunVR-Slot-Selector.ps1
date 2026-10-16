@@ -195,7 +195,7 @@ $($cfg.Help)
     $y+=58
 }
 # An added R84 row must never overlap diagnostics, help or the collector note.
-$form.ClientSize=[System.Drawing.Size]::new(620, [int]($y+225))
+$form.ClientSize=[System.Drawing.Size]::new(620, [int]($y+330))
 
 $gpuCheck=New-Object System.Windows.Forms.CheckBox
 $gpuCheck.Text='GPU 상세 진단 (타임스탬프 + 투명/깊이 + VR 페이싱 + NVIDIA GPU 사용률)'
@@ -205,20 +205,96 @@ $gpuCheck.Size=New-Object System.Drawing.Size(570,30)
 $gpuCheck.Location=[System.Drawing.Point]::new(35, [int]($y+12))
 $form.Controls.Add($gpuCheck)
 
+
+# Glass opacity adjustment is an explicit ORIGINAL-PC-model file operation,
+# not a game-wide alpha render-state override and not a fake F11 setting.
+$glassLabel=New-Object System.Windows.Forms.Label
+$glassLabel.Text='운전석 유리 불투명도 30% (낮을수록 투명)'
+$glassLabel.AutoSize=$false
+$glassLabel.Size=[System.Drawing.Size]::new(545,22)
+$glassLabel.Location=[System.Drawing.Point]::new(35, [int]($y+47))
+$form.Controls.Add($glassLabel)
+$glassSlider=New-Object System.Windows.Forms.TrackBar
+$glassSlider.Minimum=10
+$glassSlider.Maximum=90
+$glassSlider.TickFrequency=10
+$glassSlider.Value=30
+$glassSlider.Size=[System.Drawing.Size]::new(330,43)
+$glassSlider.Location=[System.Drawing.Point]::new(28, [int]($y+70))
+$glassSlider.Add_ValueChanged({
+    $glassLabel.Text="운전석 유리 불투명도 $($glassSlider.Value)% (낮을수록 투명)"
+})
+$form.Controls.Add($glassSlider)
+$glassPath=New-Object System.Windows.Forms.TextBox
+$glassPath.ReadOnly=$true
+$glassPath.Text='PC 원본 차량 모델 선택 필요 (obj_plcar_*_pmt.sz)'
+$glassPath.Size=[System.Drawing.Size]::new(545,23)
+$glassPath.Location=[System.Drawing.Point]::new(35, [int]($y+126))
+$form.Controls.Add($glassPath)
+
+function Invoke-GlassEdit([string]$Mode) {
+    if(Get-Process -Name OR2006C2C -ErrorAction SilentlyContinue){
+        throw '게임 실행 중에는 모델을 변경할 수 없습니다. 게임을 종료하세요.'
+    }
+    $patcher=Join-Path $root 'quest_cockpit_glass.py'
+    if(-not(Test-Path -LiteralPath $patcher)){throw '이 빌드에는 quest_cockpit_glass.py가 없습니다.'}
+    $python=Get-Command 'python.exe' -ErrorAction SilentlyContinue
+    if(-not $python){$python=Get-Command 'py.exe' -ErrorAction SilentlyContinue}
+    if(-not $python){throw 'Python 3가 필요합니다. Python 설치 후 다시 실행하세요.'}
+    $model=[string]$glassPath.Tag
+    if(-not $model -or -not(Test-Path -LiteralPath $model)){throw 'PC 게임에서 실제 로드하는 PMT 모델 파일을 선택하세요.'}
+    $gameDir=[IO.Path]::GetFullPath($root).TrimEnd([char]'\') + '\'
+    $filePath=[IO.Path]::GetFullPath($model)
+    if(-not $filePath.StartsWith($gameDir,[StringComparison]::OrdinalIgnoreCase)){
+        throw '안전상 게임 폴더 내부의 원본 차량 PMT만 선택할 수 있습니다.'
+    }
+    $flags=if($Mode -eq 'Restore'){@('--restore')}else{@('--in-place','--opacity',([string]::Format([Globalization.CultureInfo]::InvariantCulture,'{0:0.00}',$glassSlider.Value / 100.0)))}
+    $arguments=@($patcher,$model)+$flags
+    $out=& $python.Source @arguments 2>&1
+    if($LASTEXITCODE -ne 0){throw "유리 소재 검사/변경 실패. 원본 그대로 유지하거나 백업을 보존했습니다.`n$($out -join [Environment]::NewLine)"}
+    [System.Windows.Forms.MessageBox]::Show(($out -join [Environment]::NewLine),'운전석 유리 소재')|Out-Null
+}
+$glassChoose=New-Object System.Windows.Forms.Button
+$glassChoose.Text='PC 유리 PMT 선택'
+$glassChoose.Size=[System.Drawing.Size]::new(145,32)
+$glassChoose.Location=[System.Drawing.Point]::new(359, [int]($y+72))
+$glassChoose.Add_Click({
+    $dialog=New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Filter='플레이어 차량 PMT|obj_plcar_*_pmt.sz|모든 파일|*.*'
+    $dialog.InitialDirectory=$root
+    if($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK){
+        $glassPath.Tag=$dialog.FileName
+        $glassPath.Text=$dialog.FileName
+    }
+})
+$form.Controls.Add($glassChoose)
+$glassApply=New-Object System.Windows.Forms.Button
+$glassApply.Text='적용 (원본 자동백업)'
+$glassApply.Size=[System.Drawing.Size]::new(173,32)
+$glassApply.Location=[System.Drawing.Point]::new(358, [int]($y+105))
+$glassApply.Add_Click({try{Invoke-GlassEdit 'Apply'}catch{[System.Windows.Forms.MessageBox]::Show($_.Exception.Message,'PMT 적용 실패')|Out-Null}})
+$form.Controls.Add($glassApply)
+$glassRestore=New-Object System.Windows.Forms.Button
+$glassRestore.Text='유리 원복'
+$glassRestore.Size=[System.Drawing.Size]::new(110,26)
+$glassRestore.Location=[System.Drawing.Point]::new(239, [int]($y+96))
+$glassRestore.Add_Click({try{Invoke-GlassEdit 'Restore'}catch{[System.Windows.Forms.MessageBox]::Show($_.Exception.Message,'PMT 원복 실패')|Out-Null}})
+$form.Controls.Add($glassRestore)
+
 $helpBox=New-Object System.Windows.Forms.TextBox
 $helpBox.Multiline=$true
 $helpBox.ReadOnly=$true
 $helpBox.ScrollBars='Vertical'
 $helpBox.Size=New-Object System.Drawing.Size(550,92)
-$helpBox.Location=[System.Drawing.Point]::new(35, [int]($y+52))
-$helpBox.Text='권장: D PERFORMANCE + GPU 상세 진단 체크 → 물가/모래/건물 동일 구간 측정. 기본 OFF. DX9Ex 전용이며 로그 ZIP 자동 수집. 기존 A/B 옵션은 반투명 SSAA와 반사 해상도 비교에 사용.'
+$helpBox.Location=[System.Drawing.Point]::new(35, [int]($y+166))
+$helpBox.Text='운전석 유리: PC 게임 내 실제 로드되는 obj_plcar_*_pmt.sz 파일을 선택한 경우에만 수정됩니다. 자동 백업/원복 지원. 모델이 압축 아카이브 내부에만 있으면 연결되지 않으며, 해당 파일 확인이 필요합니다. 권장: D PERFORMANCE + GPU 상세 진단 체크 → 물가/모래/건물 동일 구간 측정. 기본 OFF. DX9Ex 전용이며 로그 ZIP 자동 수집. 기존 A/B 옵션은 반투명 SSAA와 반사 해상도 비교에 사용.'
 $form.Controls.Add($helpBox)
 
 $note=New-Object System.Windows.Forms.Label
 $note.Text='게임 종료 후 collector가 자동 실행되어 OutRun2_VR_ANALYZE_<slot>_<profile>_<session>.zip 을 만듭니다.'
 $note.AutoSize=$false
 $note.Size=New-Object System.Drawing.Size(550,40)
-$note.Location=[System.Drawing.Point]::new(35, [int]($y+167))
+$note.Location=[System.Drawing.Point]::new(35, [int]($y+274))
 $form.Controls.Add($note)
 
 [void]$form.ShowDialog()

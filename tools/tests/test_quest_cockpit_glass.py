@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """No proprietary PMTs required: synthetic regression for player-car glass patch."""
 import importlib.util
+import json
 from pathlib import Path
 import struct
 import tempfile
@@ -54,6 +55,44 @@ class GlassTests(unittest.TestCase):
                 m.patch_bytes(orig,"obj_plcar_360sp_pmt.sz",opacity)
         with self.assertRaises((ValueError,zlib.error)):
             m.patch_bytes(b"\x78\x9c","obj_plcar_360sp_pmt.sz",.3)
+    def test_in_place_reapply_restore_and_tamper_guard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            model=Path(tmp)/"obj_plcar_360sp_pmt.sz"
+            original=zlib.compress(fixture())
+            model.write_bytes(original)
+            a,backup=m.install_in_place(model,.20)
+            self.assertEqual(len(a),1)
+            self.assertEqual(backup.read_bytes(),original)
+            self.assertNotEqual(model.read_bytes(),original)
+            _,backup2=m.install_in_place(model,.35)
+            self.assertEqual(backup,backup2)
+            self.assertAlmostEqual(struct.unpack_from("<f",m.unpack(model.read_bytes())[0],580)[0],.35,places=5)
+            self.assertEqual(m.restore_in_place(model),backup)
+            self.assertEqual(model.read_bytes(),original)
+            _,_=m.install_in_place(model,.25)
+            model.write_bytes(model.read_bytes()+b"tampered")
+            with self.assertRaisesRegex(ValueError,"changed"):
+                m.install_in_place(model,.40)
+            with self.assertRaisesRegex(ValueError,"changed"):
+                m.restore_in_place(model)
+            self.assertEqual(backup.read_bytes(),original)
+
+    def test_in_place_rejects_unsafe_models_or_backup_collision(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bad=Path(tmp)/"obj_stage_pmt.sz"
+            bad.write_bytes(fixture())
+            with self.assertRaises(ValueError):
+                m.install_in_place(bad,.30)
+            self.assertEqual(list(Path(tmp).glob("*.bak")),[])
+            model=Path(tmp)/"obj_plcar_360sp_pmt.sz"
+            model.write_bytes(zlib.compress(fixture()))
+            backup,journal=m.sidecars(model)
+            backup.write_bytes(b"existing user backup")
+            with self.assertRaisesRegex(ValueError,"incomplete"):
+                m.install_in_place(model,.30)
+            self.assertFalse(journal.exists())
+            self.assertEqual(backup.read_bytes(),b"existing user backup")
+
     def test_selection_and_recovery(self):
         orig=fixture()
         name="obj_plcar_360sp_pmt.sz"
