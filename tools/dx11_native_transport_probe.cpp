@@ -1376,13 +1376,20 @@ int main()
         // must now convert and sample the correct independent camera slice.
         // A foreign slice or out-of-bounds destination must fail closed.
         // Copying must leave native Draw/DrawIndexed evidence untouched.
+        // Use a disjoint eye rectangle: the existing real-game SRV
+        // postpass is sampled at x=17/49, y=49 and must survive untouched.
+        // Replaying BGRA at the old y=42, x=16/48 overlapped that sample
+        // and falsely failed the previous copy regression.
+        const UINT convertedDestX = eyeIndex == 0u ? 0u : 32u;
         fixture.replayedFormatConvertedArrayCopy[eyeIndex] =
             !encoder.copy_game_surface(
-                fixture.gameConvertedArray, &sourcePatch, destX, 42u, 2u) &&
+                fixture.gameConvertedArray, &sourcePatch,
+                convertedDestX, 42u, 2u) &&
             !encoder.copy_game_surface(
                 fixture.gameConvertedArray, &sourcePatch, 63u, 42u, eyeIndex) &&
             encoder.copy_game_surface(
-                fixture.gameConvertedArray, &sourcePatch, destX, 42u, eyeIndex) &&
+                fixture.gameConvertedArray, &sourcePatch,
+                convertedDestX, 42u, eyeIndex) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
         // A real game MSAA RT must resolve on the GPU before copying just
@@ -1679,7 +1686,7 @@ int main()
         // BGRA source is sampled as colors rather than raw reordered
         // bytes. Left camera is red; right camera green, despite sharing
         // one game-owned GPU array and converting into RGBA eye targets.
-        const UINT convertedX = eyeIndex == 0u ? 18u : 50u;
+        const UINT convertedX = eyeIndex == 0u ? 2u : 34u;
         const auto* convertedPixel =
             pixel + 43u * mapped.RowPitch + convertedX * 4u;
         const bool actualConvertedArrayEye = eyeIndex == 0u
@@ -1706,6 +1713,12 @@ int main()
             !actualPartialClear ||
             !orderedAfterDrawClear) {
             std::cerr << "00829 eye=" << eyeIndex
+                      << " convertedRGBA="
+                      << unsigned(convertedPixel[0]) << ","
+                      << unsigned(convertedPixel[1]) << ","
+                      << unsigned(convertedPixel[2]) << ","
+                      << unsigned(convertedPixel[3])
+                      << " convertedOK=" << actualConvertedArrayEye
                       << " full RGBA=" << unsigned(pixel[0]) << ","
                       << unsigned(pixel[1]) << "," << unsigned(pixel[2]) << ","
                       << unsigned(pixel[3]) << " patch RGBA="
@@ -1741,7 +1754,9 @@ int main()
         d3d.context->Unmap(readback, 0);
         require(distinctColor && scaledGpuPixel && actualPartialClear &&
                 orderedAfterDrawClear && gameSurfaceCopied &&
-                gameShaderIntermediateCopied && gameMsaaResolved,
+                gameShaderIntermediateCopied && gameMsaaResolved &&
+                actualDistinctArrayEye && actualScaledArrayEye &&
+                actualMipZeroCopy && actualConvertedArrayEye,
                 "00835 native L/R Draw, ordered Clear, RT, SRV and GPU MSAA patch resolve");
     }
     hostFrame.frameId = 24u;
