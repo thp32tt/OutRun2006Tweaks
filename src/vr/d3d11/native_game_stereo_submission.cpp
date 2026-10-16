@@ -79,6 +79,12 @@ public:
         context_->IAGetPrimitiveTopology(&savedTopology_);
         context_->VSGetShader(&savedVS_, savedVSClasses_, &savedVSClassCount_);
         context_->PSGetShader(&savedPS_, savedPSClasses_, &savedPSClassCount_);
+        // D3D9 emits VS/PS game geometry, not host GS/tessellation programs.
+        // Save these stages so a shared OpenXR context cannot distort either
+        // native eye's Draw, while preserving the original caller pipeline.
+        context_->GSGetShader(&savedGS_, savedGSClasses_, &savedGSClassCount_);
+        context_->HSGetShader(&savedHS_, savedHSClasses_, &savedHSClassCount_);
+        context_->DSGetShader(&savedDS_, savedDSClasses_, &savedDSClassCount_);
         // Preserve shader inputs for both game camera draws. The first eye
         // can swap or unbind resources; the second must start from the same
         // source game state, including vertex texture fetch and constant data.
@@ -101,7 +107,7 @@ public:
         context_->OMSetBlendState(savedBlend_, savedBlendFactors_, savedSampleMask_);
         context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
         context_->RSSetState(savedRasterizer_);
-        restore_draw_pipeline();
+        restore_draw_pipeline(false);
         context_->RSSetViewports(viewportCount_,
                                  viewportCount_ ? savedViewports_ : nullptr);
         context_->RSSetScissorRects(scissorCount_,
@@ -119,10 +125,19 @@ public:
             if (buffer) { buffer->Release(); buffer = nullptr; }
         if (savedVS_) savedVS_->Release();
         if (savedPS_) savedPS_->Release();
+        if (savedGS_) savedGS_->Release();
+        if (savedHS_) savedHS_->Release();
+        if (savedDS_) savedDS_->Release();
         for (UINT i = 0; i < savedVSClassCount_; ++i)
             if (savedVSClasses_[i]) savedVSClasses_[i]->Release();
         for (UINT i = 0; i < savedPSClassCount_; ++i)
             if (savedPSClasses_[i]) savedPSClasses_[i]->Release();
+        for (UINT i = 0; i < savedGSClassCount_; ++i)
+            if (savedGSClasses_[i]) savedGSClasses_[i]->Release();
+        for (UINT i = 0; i < savedHSClassCount_; ++i)
+            if (savedHSClasses_[i]) savedHSClasses_[i]->Release();
+        for (UINT i = 0; i < savedDSClassCount_; ++i)
+            if (savedDSClasses_[i]) savedDSClasses_[i]->Release();
         // D3D11 Get* adds references to every saved slot, including slots
         // released by a callback. Balance all references after restoring.
         for (auto* p : savedVSResources_) if (p) p->Release();
@@ -142,7 +157,7 @@ public:
         if (!active_ || !target || !depth) return false;
         // The previous eye may have rebound IA/VB/IB/VS/PS. Start each
         // replay from exactly the captured caller state, not eye L residue.
-        restore_draw_pipeline();
+        restore_draw_pipeline(true);
         // The previous eye may also have changed blend, depth/stencil and
         // rasterizer state. Restore BEFORE each independent eye's Draw, not
         // only when exiting back to the desktop D3D9 fallback.
@@ -166,7 +181,7 @@ public:
         return true;
     }
 private:
-    void restore_draw_pipeline() noexcept {
+    void restore_draw_pipeline(bool eyeReplay) noexcept {
         context_->IASetInputLayout(savedInputLayout_);
         context_->IASetVertexBuffers(
             0u, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT,
@@ -176,6 +191,17 @@ private:
         context_->IASetPrimitiveTopology(savedTopology_);
         context_->VSSetShader(savedVS_, savedVSClasses_, savedVSClassCount_);
         context_->PSSetShader(savedPS_, savedPSClasses_, savedPSClassCount_);
+        // Isolate both independent game cameras from inherited host or
+        // previous-eye geometry/tessellation programs. Restore on scope exit.
+        context_->GSSetShader(eyeReplay ? nullptr : savedGS_,
+                              eyeReplay ? nullptr : savedGSClasses_,
+                              eyeReplay ? 0u : savedGSClassCount_);
+        context_->HSSetShader(eyeReplay ? nullptr : savedHS_,
+                              eyeReplay ? nullptr : savedHSClasses_,
+                              eyeReplay ? 0u : savedHSClassCount_);
+        context_->DSSetShader(eyeReplay ? nullptr : savedDS_,
+                              eyeReplay ? nullptr : savedDSClasses_,
+                              eyeReplay ? 0u : savedDSClassCount_);
         context_->VSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedVSResources_);
         context_->PSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedPSResources_);
         context_->VSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedVSSamplers_);
@@ -203,6 +229,9 @@ private:
     D3D11_PRIMITIVE_TOPOLOGY savedTopology_{D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED};
     ID3D11VertexShader* savedVS_{};
     ID3D11PixelShader* savedPS_{};
+    ID3D11GeometryShader* savedGS_{};
+    ID3D11HullShader* savedHS_{};
+    ID3D11DomainShader* savedDS_{};
     ID3D11ShaderResourceView* savedVSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
     ID3D11ShaderResourceView* savedPSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
     ID3D11SamplerState* savedVSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
@@ -211,8 +240,14 @@ private:
     ID3D11Buffer* savedPSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
     ID3D11ClassInstance* savedVSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     ID3D11ClassInstance* savedPSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    ID3D11ClassInstance* savedGSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    ID3D11ClassInstance* savedHSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    ID3D11ClassInstance* savedDSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     UINT savedVSClassCount_{D3D11_SHADER_MAX_INTERFACES};
     UINT savedPSClassCount_{D3D11_SHADER_MAX_INTERFACES};
+    UINT savedGSClassCount_{D3D11_SHADER_MAX_INTERFACES};
+    UINT savedHSClassCount_{D3D11_SHADER_MAX_INTERFACES};
+    UINT savedDSClassCount_{D3D11_SHADER_MAX_INTERFACES};
     D3D11_VIEWPORT savedViewports_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
     D3D11_RECT savedScissors_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
     UINT viewportCount_{}, scissorCount_{};

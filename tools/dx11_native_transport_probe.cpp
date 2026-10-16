@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include <d3d11.h>
+#include <d3dcompiler.h>
 
 #include "vr/d3d11/native_shared_eye_ring.hpp"
 #include "vr/d3d11/native_game_stereo_submission.hpp"
@@ -818,6 +819,28 @@ int main()
     d3d.context->PSSetShaderResources(0u, 1u, &gameSampleView);
     d3d.context->PSSetSamplers(0u, 1u, &gameSampler);
     d3d.context->PSSetConstantBuffers(0u, 1u, &gameConstants);
+    // Exercise a real inherited GS on the shared caller context. D3D9
+    // live geometry must never inherit this shader on either stereo pass.
+    constexpr char gameGeometrySource[] =
+        "struct V { float4 p : SV_Position; };"
+        "[maxvertexcount(3)] void main(triangle V input[3],"
+        " inout TriangleStream<V> output) {"
+        " for (uint i=0; i<3; ++i) output.Append(input[i]);"
+        " output.RestartStrip(); }";
+    ID3DBlob* geometryBytecode = nullptr;
+    require(SUCCEEDED(D3DCompile(
+                gameGeometrySource, sizeof(gameGeometrySource)-1u,
+                "native_eye_game", nullptr, nullptr, "main", "gs_4_0",
+                D3DCOMPILE_ENABLE_STRICTNESS, 0u, &geometryBytecode, nullptr)) &&
+            geometryBytecode, "00827 caller geometry stage compiled");
+    ID3D11GeometryShader* originalGeometryShader = nullptr;
+    require(SUCCEEDED(d3d.device->CreateGeometryShader(
+                geometryBytecode->GetBufferPointer(),
+                geometryBytecode->GetBufferSize(), nullptr,
+                &originalGeometryShader)) && originalGeometryShader,
+            "00827 caller geometry stage created");
+    geometryBytecode->Release();
+    d3d.context->GSSetShader(originalGeometryShader, nullptr, 0u);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
@@ -832,6 +855,7 @@ int main()
         UINT originalStencilRef{};
         const outrun::vr::dx11::NativeGameEyeRasterState* gameRaster{};
         ID3D11RenderTargetView* callerColor{};
+        ID3D11GeometryShader* callerGeometryShader{};
         bool rejectedDetachedDraw[2]{};
         bool rejectedForeignDraw[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
@@ -853,6 +877,7 @@ int main()
     gameRaster.stencilClear[1] = 5u;
     gameEyeFixture.gameRaster = &gameRaster;
     gameEyeFixture.callerColor = originalGameTarget;
+    gameEyeFixture.callerGeometryShader = originalGeometryShader;
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -900,10 +925,15 @@ int main()
         ctx->PSGetShaderResources(0u, 1u, &boundPSResource);
         ctx->PSGetSamplers(0u, 1u, &boundPSSampler);
         ctx->PSGetConstantBuffers(0u, 1u, &boundPSConstants);
+        ID3D11GeometryShader* boundGeometry = nullptr;
+        ctx->GSGetShader(&boundGeometry, nullptr, nullptr);
+        const bool isolatedEyeGeometry = boundGeometry == nullptr;
+        if (boundGeometry) boundGeometry->Release();
         ctx->RSGetState(&boundRaster);
         ctx->OMGetBlendState(&boundBlend, boundBlendFactor, &boundSampleMask);
         ctx->OMGetDepthStencilState(&boundDepthState, &boundStencilRef);
         const bool originalGameShaderInputs =
+            isolatedEyeGeometry &&
             boundPSResource == fixture.originalResource &&
             boundPSSampler == fixture.originalSampler &&
             boundPSConstants == fixture.originalConstants &&
@@ -970,6 +1000,8 @@ int main()
         ctx->PSSetShaderResources(0u, 1u, &nullResource);
         ctx->PSSetSamplers(0u, 1u, &nullSampler);
         ctx->PSSetConstantBuffers(0u, 1u, &nullConstants);
+        // Deliberate shader-stage mutation: the right eye must begin clean.
+        ctx->GSSetShader(fixture.callerGeometryShader, nullptr, 0u);
         // Simulate a real per-eye Draw that rebinds the vertex/index path;
         // the next eye and original desktop must receive their own baseline.
         constexpr UINT eyeStride = 24u, eyeOffset = 8u;
@@ -1067,7 +1099,10 @@ int main()
     d3d.context->PSGetShaderResources(0u, 1u, &restoredResource);
     d3d.context->PSGetSamplers(0u, 1u, &restoredSampler);
     d3d.context->PSGetConstantBuffers(0u, 1u, &restoredConstants);
+    ID3D11GeometryShader* restoredGeometry = nullptr;
+    d3d.context->GSGetShader(&restoredGeometry, nullptr, nullptr);
     const bool restoredGameState =
+        restoredGeometry == originalGeometryShader &&
         restoredResource == gameSampleView &&
         restoredSampler == gameSampler &&
         restoredConstants == gameConstants &&
@@ -1100,6 +1135,7 @@ int main()
     if (restoredResource) restoredResource->Release();
     if (restoredSampler) restoredSampler->Release();
     if (restoredConstants) restoredConstants->Release();
+    if (restoredGeometry) restoredGeometry->Release();
     if (restoredVertexBuffer) restoredVertexBuffer->Release();
     if (restoredIndexBuffer) restoredIndexBuffer->Release();
     if (restoredGameTarget) restoredGameTarget->Release();
@@ -1122,6 +1158,8 @@ int main()
     d3d.context->PSSetShaderResources(0u, 1u, &nullGameResource);
     d3d.context->PSSetSamplers(0u, 1u, &nullGameSampler);
     d3d.context->PSSetConstantBuffers(0u, 1u, &nullGameConstants);
+    d3d.context->GSSetShader(nullptr, nullptr, 0u);
+    originalGeometryShader->Release();
     gameSampleView->Release();
     gameSampleTexture->Release();
     gameSampler->Release();
