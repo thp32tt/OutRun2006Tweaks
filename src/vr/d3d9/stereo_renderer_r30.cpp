@@ -1422,9 +1422,12 @@ namespace OutRunVRStereo
             // its two genuine eye transforms. Preserve those original R9
             // left/right surfaces for OpenXR while stereo is active. Native
             // single-eye pixels are allowed only in the menu/desktop mono mode.
-            outrun::vr::dx11::live_game_frame::before_game_present(
-                device, sourceRect, dirtyRegion,
-                !StereoWanted());
+            {
+                const outrun::vr::dx11::live_game_frame::
+                    ScopedMonoNativePublication monoNativeAdmission{
+                        !StereoWanted() && !FrameHadDuplicatedDraw};
+                outrun::vr::dx11::live_game_frame::before_game_present(device, sourceRect, dirtyRegion);
+            }
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);

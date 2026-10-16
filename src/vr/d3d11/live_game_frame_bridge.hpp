@@ -96,14 +96,22 @@ void observe_game_clear(IDirect3DDevice9* gameDevice, DWORD count,
 
 // Present draws an isolated inset only if native GPU pixels were produced.
 // Failure never propagates to the original game Present.
-// A mono native D3D11 full-frame output is NOT interchangeable with the
-// independent D3D9Ex stereo eye targets. In an active headset/stereo frame,
-// complete native mono diagnostic work but never upload/copy/advertise it as
-// the game backbuffer or an OpenXR stereo source. Original game Draw/Present,
-// the R9/R13 true-stereo producer and input/FFB remain authoritative.
+// This per-thread scoped admission preserves the original before_game_present
+// call contract while the game draws distinct D3D9Ex eyes. R30 wraps only the
+// mono-pixel handoff, not the underlying game Present/input/FFB path. Nested
+// scopes restore their previous admission state on every exit.
+class ScopedMonoNativePublication final {
+public:
+    explicit ScopedMonoNativePublication(bool allow) noexcept;
+    ~ScopedMonoNativePublication() noexcept;
+    ScopedMonoNativePublication(const ScopedMonoNativePublication&) = delete;
+    ScopedMonoNativePublication& operator=(const ScopedMonoNativePublication&) = delete;
+private:
+    bool previous_{};
+};
+
 void before_game_present(IDirect3DDevice9* gameDevice,
-                         const RECT* sourceRect, const RGNDATA* dirtyRegion,
-                         bool allowMonoNativePublication = true) noexcept;
+                         const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept;
 // Called before the original D3D9 Reset; only its owning game device may
 // retire the native frame and associated D3D11 resources.
 void before_game_reset(IDirect3DDevice9* gameDevice) noexcept;

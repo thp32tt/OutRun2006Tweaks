@@ -5428,6 +5428,19 @@ bool diagnostic_enabled() noexcept {
     return optedIn;
 }
 
+// One original game D3D9 Present may enter the native observer with stereo
+// enabled. Never replace the real R9 left eye with a pre-stereo mono D3D11
+// image, even when the diagnostic/native full-frame env opt-in is set.
+thread_local bool monoNativePublicationAllowed = true;
+
+ScopedMonoNativePublication::ScopedMonoNativePublication(bool allow) noexcept
+    : previous_(monoNativePublicationAllowed) {
+    monoNativePublicationAllowed = previous_ && allow;
+}
+ScopedMonoNativePublication::~ScopedMonoNativePublication() noexcept {
+    monoNativePublicationAllowed = previous_;
+}
+
 void set_native_full_game_gpu_sink(NativeFullGameGpuSink sink, void* user) noexcept {
     State& s = state();
     std::lock_guard<std::mutex> lock(s.mutex);
@@ -6233,8 +6246,7 @@ void observe_failed_game_draw(IDirect3DDevice9* game) noexcept {
 }
 
 void before_game_present(IDirect3DDevice9* game,
-                         const RECT* sourceRect, const RGNDATA* dirtyRegion,
-                         bool allowMonoNativePublication) noexcept {
+                         const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
         State& s = state();
@@ -6445,7 +6457,7 @@ void before_game_present(IDirect3DDevice9* game,
         // overwrote the game's true left view just before R13/R32 captured
         // left/right GPU eyes. Fail closed to the original game-owned stereo
         // backbuffer instead of allowing mismatched VR eyes or fabricated IPD.
-        const bool outputWritable = allowMonoNativePublication &&
+        const bool outputWritable = monoNativePublicationAllowed &&
             outputNow.valid() && nativeExtentMatches &&
             (((!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
               (fullMode ? fullPlacement.valid : insetPlacement.valid)) ||
