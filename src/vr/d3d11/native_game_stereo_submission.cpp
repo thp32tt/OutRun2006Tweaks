@@ -195,6 +195,11 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     D3D11_TEXTURE2D_DESC sourceDesc{}, eyeDesc{};
     source->GetDesc(&sourceDesc);
     eyeColor->GetDesc(&eyeDesc);
+    // A game GPU post-pass may copy its RT to a DEFAULT shader-readable
+    // intermediate before the eye compositor samples it. D3D11 GPU copy
+    // accepts either owned RT or SRV texture as source; do not require a
+    // redundant RTV merely for an unscaled, same-format CopySubresourceRegion.
+    // CPU/staging, shared handles and UAV-only textures stay inadmissible.
     constexpr UINT sharedFlags =
         D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
@@ -206,7 +211,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         eyeDesc.SampleDesc.Count != 1u ||
         sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
         sourceDesc.CPUAccessFlags != 0u ||
-        (sourceDesc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u ||
+        (sourceDesc.BindFlags &
+         (D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE)) == 0u ||
         (sourceDesc.MiscFlags & sharedFlags) != 0u ||
         eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;

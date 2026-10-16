@@ -38,7 +38,9 @@ public:
         float depth, std::uint8_t stencil,
         bool clearDepth, bool clearStencil) noexcept;
     // Replay an actual game-authored, unscaled GPU surface copy (for example
-    // an offscreen menu/vehicle post-pass) into THIS bound eye. No D3D9
+    // an offscreen menu/vehicle post-pass) into THIS bound eye. Accept a
+    // game-owned DEFAULT GPU RT or shader-readable intermediate texture.
+    // No D3D9
     // StretchRect scaling/filtering approximation, no other eye/desktop RTV,
     // and no manufactured Draw evidence. Unsupported copies fall back to D3D9.
     [[nodiscard]] bool copy_game_surface(
