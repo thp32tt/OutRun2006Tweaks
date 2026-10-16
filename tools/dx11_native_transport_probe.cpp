@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <type_traits>
+#include <vector>
 
 #include <d3d11.h>
 #include <d3dcompiler.h>
