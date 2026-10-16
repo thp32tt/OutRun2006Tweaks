@@ -2571,11 +2571,17 @@ def check_time_goal_lens_owner(source_r30, source_ui):
         'R28CanRebindVerifiedWorld(',
     ):
         require(token, world_before_hud, 'world effects must retain verified-world gate')
-    require_order(glyph, 'Sumo glyph all-child scope after original put_sprite_ex',
+    # Both mutually exclusive paths must append glyph/mask siblings AFTER
+    # the original put_sprite_ex; the first occurrence of TagAppendedNodes
+    # is now the source-proven B9200 branch, not the legacy default.
+    require_order(glyph, 'GOAL source-owned glyphs after original put_sprite_ex',
                   'tailsBefore', 'Module::exe_ptr(0x2CFE0)',
                   'const int result = original(args, priority);',
-                  'TagAppendedNodes(tailsBefore,',
-                  'RenderScope::ScreenHud',
+                  'if (exactGoalResult)', 'TagAppendedNodes(tailsBefore,',
+                  'ProducerToken::ResultTextB9200')
+    default_glyph = glyph[glyph.index('else\n        {\n            // The untouched +TIME'):]
+    require_order(default_glyph, 'all non-B9200 glyphs retain default ScreenHud',
+                  'TagAppendedNodes(tailsBefore,', 'RenderScope::ScreenHud',
                   'ProducerToken::TextGlyphPutSprite')
     for token in ('Game::SpritePriorityCount', 'TagAppendedNodes(tailsBefore,'):
         require(token, glyph, 'all stage/result +TIME glyph/mask children same HUD')

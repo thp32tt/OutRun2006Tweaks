@@ -458,7 +458,7 @@ def check_exact_goal_xyzrhw_plane(renderer: str, semantics: str) -> list[str]:
         errors.append("GOAL plane admits unsafe non-owned rank draws")
     # B9200 is now safe only after its exact original E8 caller is proven
     # by the existing glyph wrapper; never revive the crashing +5 midhooks.
-    ui = code
+    ui = SOURCE.read_text(encoding="utf-8")
     if ("IsOriginalB9200GoalGlyph()" not in ui or
             "GoalResult::IsOriginalB9200ParentReturn(" not in ui or
             "RtlCaptureStackBackTrace(" not in ui):
