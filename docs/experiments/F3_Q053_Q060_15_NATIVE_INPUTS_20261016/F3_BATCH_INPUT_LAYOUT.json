@@ -1,0 +1,252 @@
+{
+  "schema": "F3_IMAGEGEN_BATCH_LAYOUT_V1",
+  "source_status": "15_NATIVE_PIXEL_EXACT",
+  "instructions": "Return Korean transparent RGBA in identical independent slots",
+  "families": {
+    "Q053_MISSION_YELLOW_NAVY": {
+      "filename": "Q053_MISSION_YELLOW_NAVY_IMAGEGEN_BATCH_INPUT.png",
+      "width": 1751,
+      "height": 909,
+      "sha256": "489623928c4af44933bbdc9e82e9d95e2820ad5a9cc14c222edf8e83aba28a35",
+      "slots": [
+        {
+          "slot": 1,
+          "row": 1,
+          "column": 1,
+          "id": "Q053-HIT_THE_CARS",
+          "en": "HIT THE CARS",
+          "ko_draft": "차량을 들이받아!",
+          "bbox": [
+            45,
+            49,
+            663,
+            205
+          ],
+          "original_sha256": "e38436d884720b8593964e8cdb591ff57ee6976ee5b84901bf2a3a41dff7ff8d"
+        },
+        {
+          "slot": 2,
+          "row": 1,
+          "column": 2,
+          "id": "Q053-DODGE_THE_BOMBS",
+          "en": "DODGE THE BOMBS",
+          "ko_draft": "폭탄을 피해라!",
+          "bbox": [
+            961,
+            45,
+            1706,
+            209
+          ],
+          "original_sha256": "036db8225f65fae92b615235ed47dd1df81fb8f2fbd9f2e67b53972e03ddf8df"
+        },
+        {
+          "slot": 3,
+          "row": 2,
+          "column": 1,
+          "id": "Q053-AVOID_ABDUCTION",
+          "en": "AVOID ABDUCTION",
+          "ko_draft": "납치를 피해라!",
+          "bbox": [
+            45,
+            247,
+            766,
+            403
+          ],
+          "original_sha256": "161524c1c195381694d2497404404d305992dcacd1da3c89bf554bb11e2fb5c4"
+        },
+        {
+          "slot": 4,
+          "row": 2,
+          "column": 2,
+          "id": "Q053-AVOID_METEORS",
+          "en": "AVOID METEORS",
+          "ko_draft": "운석을 피해라!",
+          "bbox": [
+            961,
+            255,
+            1658,
+            394
+          ],
+          "original_sha256": "726633b82e0c06d6ad9b79803344811306fb3645ae2e4d9b7b92f7bc810b36b3"
+        },
+        {
+          "slot": 5,
+          "row": 3,
+          "column": 1,
+          "id": "Q053-DRIBBLE_BEACH_BALL",
+          "en": "DRIBBLE BEACH BALL",
+          "ko_draft": "비치볼을 드리블해!",
+          "bbox": [
+            45,
+            490,
+            897,
+            633
+          ],
+          "original_sha256": "6517c46e7a8fb391f28958360950d673b36bbfc88e85cc981466632d3ce84040"
+        },
+        {
+          "slot": 6,
+          "row": 3,
+          "column": 2,
+          "id": "Q053-PHOTOGRAPH_SIGHTS",
+          "en": "PHOTOGRAPH SIGHTS",
+          "ko_draft": "명소를 촬영해!",
+          "bbox": [
+            961,
+            441,
+            1653,
+            683
+          ],
+          "original_sha256": "0055ec926ccfbef6ed5375d97981a2616977a03b7e6282b6c7c5851d4de75fba"
+        },
+        {
+          "slot": 7,
+          "row": 4,
+          "column": 1,
+          "id": "Q053-HIT_THE_DUCKS",
+          "en": "HIT THE DUCKS",
+          "ko_draft": "오리를 맞혀라!",
+          "bbox": [
+            45,
+            723,
+            557,
+            862
+          ],
+          "original_sha256": "826d573f302819c91a1742849e51d0844e592643b703f84698a8d81fafd60f86"
+        },
+        {
+          "slot": 8,
+          "row": 4,
+          "column": 2,
+          "id": "Q053-SEE_THE_SIGHTS",
+          "en": "SEE THE SIGHTS",
+          "ko_draft": "명소를 구경해!",
+          "bbox": [
+            961,
+            721,
+            1567,
+            864
+          ],
+          "original_sha256": "4033d6ebab96278ca07ece6626b9221eb141a95659481636f9ce1ea4247ed802"
+        }
+      ],
+      "review": "Q053_MISSION_YELLOW_NAVY_IMAGEGEN_BATCH_REVIEW.jpg",
+      "review_sha256": "66fab484b5a8b2dbcb33f366d4ed9b89ee482b879e6bf03edc56040db674ee14"
+    },
+    "Q060_METALLIC_GRADIENT": {
+      "filename": "Q060_METALLIC_GRADIENT_IMAGEGEN_BATCH_INPUT.png",
+      "width": 1399,
+      "height": 1576,
+      "sha256": "35236cb333faac89af255907ee30d96e6de34a9296651bcadf7920f1369f5437",
+      "slots": [
+        {
+          "slot": 1,
+          "row": 1,
+          "column": 1,
+          "id": "Q060-CONTINUE_QUESTION",
+          "en": "CONTINUE QUESTION",
+          "ko_draft": "계속?",
+          "bbox": [
+            42,
+            42,
+            1172,
+            217
+          ],
+          "original_sha256": "934234bf5bbe917626e9ba11d998ebb9724aa668361c836d5a6dbb7186f8f8cd"
+        },
+        {
+          "slot": 2,
+          "row": 2,
+          "column": 1,
+          "id": "Q060-RETRY",
+          "en": "RETRY",
+          "ko_draft": "재시도",
+          "bbox": [
+            42,
+            249,
+            1007,
+            424
+          ],
+          "original_sha256": "63dbbec680cbb37e66df692f45d0120ac579207a4181ace74e98b0c2be2a8f10"
+        },
+        {
+          "slot": 3,
+          "row": 3,
+          "column": 1,
+          "id": "Q060-PLEASE_WAIT",
+          "en": "PLEASE WAIT",
+          "ko_draft": "잠시 대기",
+          "bbox": [
+            42,
+            456,
+            1342,
+            631
+          ],
+          "original_sha256": "534adac5eb8244db371e425e1f7e493bdb541680da8758e9fcce1462d06c8e38"
+        },
+        {
+          "slot": 4,
+          "row": 4,
+          "column": 1,
+          "id": "Q060-TRY_AGAIN_QUESTION",
+          "en": "TRY AGAIN QUESTION",
+          "ko_draft": "다시 시도?",
+          "bbox": [
+            42,
+            663,
+            1357,
+            868
+          ],
+          "original_sha256": "2aa38a28b34e0787a05cd6aa729a5d8c6c3286975949473c2978e5d954352e78"
+        },
+        {
+          "slot": 5,
+          "row": 5,
+          "column": 1,
+          "id": "Q060-STAGE_CLEAR",
+          "en": "STAGE CLEAR",
+          "ko_draft": "스테이지 클리어",
+          "bbox": [
+            42,
+            900,
+            615,
+            1048
+          ],
+          "original_sha256": "a6bebeb5aecc4ed85e69757dca9bc9cfda74fbbc3f26c1e0e2a750a1ac8b5b33"
+        },
+        {
+          "slot": 6,
+          "row": 6,
+          "column": 1,
+          "id": "Q060-PASS",
+          "en": "PASS",
+          "ko_draft": "통과!",
+          "bbox": [
+            42,
+            1080,
+            464,
+            1207
+          ],
+          "original_sha256": "79d04402272c2449e720fc9c0c28fd49b96f446bccbb81d21144be169fde3ced"
+        },
+        {
+          "slot": 7,
+          "row": 7,
+          "column": 1,
+          "id": "Q060-DUMPED_BIG",
+          "en": "DUMPED BIG",
+          "ko_draft": "차였어!",
+          "bbox": [
+            42,
+            1239,
+            1136,
+            1534
+          ],
+          "original_sha256": "0693be21625fd4a165cfcb40b313f28c5bd30d3f5f60979cf4dcd5f8ea00a543"
+        }
+      ],
+      "review": "Q060_METALLIC_GRADIENT_IMAGEGEN_BATCH_REVIEW.jpg",
+      "review_sha256": "0ffe1e5f3b49fc677b2a53f2e9ae29828968e93a933b817e85a580ade0a19877"
+    }
+  }
+}
