@@ -104,9 +104,19 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
 
     bld = r30.split("bool R30BuildScreenSpaceEyeConstants(", 1)[1].split(
         "template <typename ActualDraw>", 1)[0]
-    lens = bld.split(
-        "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)", 1)[1].split(
+    # C993 and exact car shadow share a spatial eye matrix. Their original
+    # raw c64 evidence must still be selected independently.
+    spatial_gate = "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||"
+    lens = bld.split(spatial_gate, 1)[1].split(
         "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1)[0]
+    for marker in (
+        "screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld",
+        "const bool exactShadow =",
+        "? R30HasExactCarBaseShadowRawWvp(rawGameWvp)",
+        ": R30HasExactLensCentreRawWvp(rawGameWvp)",
+        "viewDepth < (exactShadow ? 0.05f : 1.25f)",
+    ):
+        assert marker in lens, "shared eye path lost source-specific proof: " + marker
     for marker in (
         "R30ScreenSpaceKind::ExactLensCentreWorld",
         "GetVertexShaderConstantF(",
@@ -120,7 +130,8 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "const float viewDepth =",
         "const float clipW =",
         "affineError > 0.02f",
-        "viewDepth < 1.25f || viewDepth >= 1000000.0f",
+        "viewDepth < (exactShadow ? 0.05f : 1.25f)",
+        "viewDepth >= 1000000.0f ||",
         "clipW <= 0.05f",
         "R29OwnerMultiplyMatrix(worldView, headInverse)",
         "headPoseSequence != stereo.poseSequence",
@@ -142,7 +153,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     # ahead of C993. Check C993's OWN scoped transform ordering; matching
     # rawUploadedT in the earlier HUD cannot be mistaken for lens execution.
     assert (bld.index("GetVertexShaderConstantF(") <
-        bld.index("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)"))
+        bld.index(spatial_gate))
     assert (lens.index("R30HasExactLensCentreRawWvp(rawGameWvp)") <
         lens.index("R29OwnerTransposeMatrix(rawUploadedT)") <
         lens.index("R29OwnerMultiplyMatrix(stockRawWvp,") <
@@ -259,8 +270,16 @@ def main():
         (2, "R30HasExactLensCentreRawWvp(rawGameWvp)", "true /* non-owned GPU c64 */"),
         (2, "R29OwnerMultiplyMatrix(stockRawWvp,", "R29OwnerMultiplyMatrix(stockWvp,"),
         (2, "affineError > 0.02f", "affineError > 200.0f"),
-        (2, "viewDepth < 1.25f || viewDepth >= 1000000.0f", "viewDepth < 0.0f || viewDepth >= 1000000.0f"),
+        (2, "viewDepth < (exactShadow ? 0.05f : 1.25f)", "viewDepth < 0.0f"),
         (2, "clipW <= 0.05f", "clipW < -1000000.0f"),
+        (2, "screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld;",
+            "screenKind == R30ScreenSpaceKind::ExactLensCentreWorld;"),
+        (2, "? R30HasExactCarBaseShadowRawWvp(rawGameWvp)",
+            "? R30HasExactLensCentreRawWvp(rawGameWvp)"),
+        (2, ": R30HasExactLensCentreRawWvp(rawGameWvp)",
+            ": R30HasExactCarBaseShadowRawWvp(rawGameWvp)"),
+        (2, "viewDepth < (exactShadow ? 0.05f : 1.25f)",
+            "viewDepth < (exactShadow ? 0.05f : 0.0f)"),
         (2, "headPoseSequence != stereo.poseSequence", "false"),
         (2, "R29OwnerMultiplyMatrix(worldView, headInverse)", "R29OwnerMultiplyMatrix(headInverse, worldView)"),
         (2, "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))", "std::memcpy(&rawUploadedT, original, sizeof(rawUploadedT))"),
@@ -305,9 +324,13 @@ def main():
         elif idx == 2 and old in (
             "headPoseSequence != stereo.poseSequence",
             "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))",
+            "screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld;",
+            "? R30HasExactCarBaseShadowRawWvp(rawGameWvp)",
+            ": R30HasExactLensCentreRawWvp(rawGameWvp)",
+            "viewDepth < (exactShadow ? 0.05f : 1.25f)",
         ):
             start = mod[2].index(
-                "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)")
+                "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||")
             end = mod[2].index(
                 "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", start)
             owned = mod[2][start:end]
