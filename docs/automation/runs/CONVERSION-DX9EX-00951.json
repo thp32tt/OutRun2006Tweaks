@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "cd2b9de0981bc2df299d72b811a4b64d59384900",
-  "material_result_sha": null,
+  "material_result_sha": "498ae827a10f06f4a2c4fa1b907a09d8eea723bd",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/overlay/f11_input_routing.hpp",
@@ -46,6 +46,26 @@
       "Windows focus/Alt/system transitions reach original game procedure after ImGui synchronization.",
       "IME START/COMPOSITION/END remains F11-owned; closed-shell gameplay and normal binding-dialog navigation remain unchanged.",
       "Executable portable native ownership matrix and existing source-bound workflow regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_f11_focus_system",
+        "category": "end_to_end_behavior",
+        "behavior_area": "F11 original Win32 input ownership",
+        "expected_behavior": "When ImGui reports handled, legacy F11 release, game focus changes and OS Alt/system commands still enter the original game WndProc."
+      },
+      {
+        "id": "f11_ime_negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "F11 IME and closed gameplay input protection",
+        "expected_behavior": "Visible F11 owns Korean IME START/COMPOSITION/END and ordinary UI keys; hidden F11 and desktop gameplay retain their native input."
+      },
+      {
+        "id": "exact_sha_all_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game and x64 host integration",
+        "expected_behavior": "Native C++ ownership and negative regression pass along with exact-SHA DX9Ex Active, Domain Isolation, Full Source and HUD Inspector Gates."
+      }
     ]
   },
   "acceptance_results": {
@@ -53,5 +73,19 @@
     "f11_ime_negative_fallback": "PENDING",
     "exact_sha_all_gates": "PENDING"
   },
-  "runtime_limit": "No same-SHA Quest3/VDXR game session; visual/input acceptance not claimed."
+  "runtime_limit": "No same-SHA Quest3/VDXR game session; visual/input acceptance not claimed.",
+  "diagnosis": {
+    "root_cause": "Nonzero ImGui_ImplWin32_WndProcHandler return bypassed the original game WndProc even for native F11, focus and Alt/system messages; Korean IME composition begin and end also bypassed F11 input consumption.",
+    "source_trace": [
+      "Original game Win32 procedure receives legacy F11, focus, system and IME messages.",
+      "The F11 routing sends eligible input through the ImGui Win32 handler which can return a nonzero handled result.",
+      "The original game must still receive F11 releases, native focus and Alt/system transitions, while F11 should capture editing IME lifecycle messages."
+    ],
+    "alternatives_rejected": [
+      "No GPU pose or font/raster change is necessary because the defect is in Win32 message control flow rather than R84 rendering or font layout."
+    ],
+    "fix_evidence": "Native Win32 message policy preserves F11, focus and system messages regardless of ImGui handled result and captures IME start/end in visible UI, retaining native FFB/gameplay routing.",
+    "negative_test_evidence": "Existing C++ F11 shell smoke exercises 8 preservation combinations and input negative cases; source-bound verifier checks native hook, IME events and policy mutations.",
+    "runtime_limit": "Quest3/VDXR physical session unavailable; RUNTIME_VALIDATION=UNTESTED."
+  }
 }
