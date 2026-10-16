@@ -109,6 +109,8 @@ def main() -> None:
                 "context_->Draw(vertexCount, startVertex);",
                 "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
                 "ScopedNativeGameEyeOutput output(ctx, invocation.width, invocation.height);",
+                "~ScopedNativeGameEyeOutput() noexcept {",
+                "context_->OMSetRenderTargets(",
                 "NativeGameEyeDrawEncoder encoder(",
                 "ctx, targets[eyeIndex], invocation.depth[eyeIndex],",
                 "invocation.width, invocation.height);",
@@ -127,11 +129,12 @@ def main() -> None:
             # The native GPU StretchRect postpass performs exactly one
             # fullscreen-triangle Draw, but it is NOT a game-authored geometry
             # Draw and must never advance source geometry evidence counters.
-            # Keep it in the same audited file with explicit source/device,
-            # per-eye bounds, native RTV, state isolation and restore checks.
+            # Keep it in this audited file, after the proven scoped eye
+            # output guard, with explicit source/device/eye bounds, GPU
+            # color and full pipeline restore checks.
             postpass = text.partition(
                 "bool NativeGameEyeDrawEncoder::stretch_game_surface("
-            )[2].partition("\n// The D3D9 game")[0]
+            )[2].partition("\nvoid NativeGameStereoSubmission::release_local")[0]
             required_postpass = [
                 "if (!source || !context_ || !eye_targets_bound()) return false;",
                 "eye.Get() == source) return false;",
@@ -139,9 +142,8 @@ def main() -> None:
                 "srcBox.right > sd.Width || srcBox.bottom > sd.Height ||",
                 "static_cast<UINT>(dest.bottom) > targetHeight_) return false;",
                 "(support & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) == 0u ||",
-                "context1->SwapDeviceContextState(",
-                "isolated.Get(), previous.GetAddressOf());",
-                "~Restore() noexcept { context->SwapDeviceContextState(saved, nullptr); }",
+                "ScopedNativeGameEyeOutput restore(context_, targetWidth_, targetHeight_);",
+                "if (!restore.valid()) return false;",
                 "context_->OMSetRenderTargets(1u, &target, nullptr);",
                 "context_->Draw(3u, 0u); // GPU postpass, not game geometry evidence",
             ]
