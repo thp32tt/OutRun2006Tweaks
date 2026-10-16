@@ -1,0 +1,102 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00962",
+  "production_id": "CONVERSION-DX9EX-00962",
+  "event_id": "CONVERSION-DX9EX-00962-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00962",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:RENDER:PARTICLE_FIRST_EYE_GPU_BIND",
+  "symptom_id": "DX9EX:SYMPTOM:PARTICLE_FIRST_EYE_GPU_BIND",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_VALIDATION",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "9b5449402cad8dc186debace5a2f68206ada2e45",
+  "material_result_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/r30_particle_upload_policy.hpp",
+    "src/vr/d3d9/r30_particle_dual_eye_ring.hpp",
+    "vrhost/tests/r30_particle_gpu_fallback_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/r30_particle_upload_policy.hpp",
+    "vrhost/tests/r30_particle_gpu_fallback_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00962.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:RENDER:PARTICLE_FIRST_EYE_GPU_BIND",
+    "symptom_id": "DX9EX:SYMPTOM:PARTICLE_FIRST_EYE_GPU_BIND",
+    "goal": "Restore exact original stereo WorldParticle rendering when an opt-in DynamicVB left-eye stream bind fails before any GPU draw, without double-blending particles after partial GPU submission.",
+    "scope_boundary": "Only opt-in R84 WorldParticle DynamicVB pre-draw SetStreamSource failure; leave water, glass, HUD, flare, generic alpha, FFB, SkyGlow, R26_SAFE and DXVK untouched.",
+    "special_work_evidence": "Source-confirmed critical particle-loss defect: R30ParticleGpuRing.bindEye(0) can return FAILED before the first R29OwnerCallRawDrawPrimitive, but R30TryXyzrhwPrimitiveUP previously propagated the failure rather than E_NOTIMPL to the original UP fallback.",
+    "trace_stages": [
+      "Exact WorldParticle producer through R84 R30ConfigureXyzrhwWorldEffect and guarded alpha/depth eligibility.",
+      "DualEyeGpuRing prepare then bindEye and R30ExecuteXyzrhwStereo physical eye submission, tracking whether driver DrawPrimitive was attempted.",
+      "R30 DrawPrimitiveUPDestR30 E_NOTIMPL lower original DrawPrimitiveUP fallback and guarded OpenXR per-eye completion."
+    ],
+    "subcomponents": [
+      "Mark physicalDrawAttempted before each original GPU driver call, preserving partial-render safety and mono recovery.",
+      "Permit native UP fallback only for GPU bind failure before any eye draw and after stream cleanup, keeping heterogeneous/unproven effects ineligible.",
+      "Run Release/NDEBUG executable C++ regression checking native-up recovery, no duplicated alpha on partial draw, and strict WorldParticle source eligibility."
+    ],
+    "acceptance_items": [
+      {
+        "id": "particle_pre_gpu_bind_fallback",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 opt-in WorldParticle GPU left-eye bind and lower DrawPrimitiveUP",
+        "expected_behavior": "When first eye bind fails before either GPU Draw, return E_NOTIMPL only after successful stream cleanup so the original stereo CPU upload path can render particles."
+      },
+      {
+        "id": "particle_no_duplicate_alpha",
+        "category": "fallback_regression",
+        "behavior_area": "Partial GPU submission, stream cleanup failure, non-particles and Reset",
+        "expected_behavior": "After any physical eye draw attempt block native replay and preserve mono safety, while unknown alpha, water, glass, HUD and non-opt-in particle handling remains unchanged."
+      },
+      {
+        "id": "particle_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 DLL, x64 OpenXR host and portable C++ test, R26_SAFE rollback, package and isolation",
+        "expected_behavior": "Run exact SHA DX9Ex Active, Domain, Full Source Impact and HUD Inspector workflows; Quest3/VDXR runtime acceptance remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "particle_pre_gpu_bind_fallback": "PENDING_EXACT_SHA",
+    "particle_no_duplicate_alpha": "PENDING_EXACT_SHA",
+    "particle_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "At R84 stereo_renderer_r30.cpp the left-eye SetStreamSource failure leaves physical GPU DrawPrimitive uncalled, yet R30TryXyzrhwPrimitiveUP propagated FAILED and DrawPrimitiveUPDestR30 accepted only E_NOTIMPL for original UP fallback.",
+    "source_trace": [
+      "Exact WorldParticle semantic + alpha/depth/stateblock gate selects opt-in DynamicVB path in R30TryXyzrhwPrimitiveUP.",
+      "DynamicVB bindEye(0) calls SetStreamSource and may fail before the raw GPU DrawPrimitive call, while R30ExecuteXyzrhwStereo marks incomplete eye and returns a failed HRESULT.",
+      "R30DrawPrimitiveUPDestR30 invokes its lower R29/original fallback only when the R30 helper returns E_NOTIMPL."
+    ],
+    "root_cause": "GPU ring submission collapsed the before-draw bind failure and after-draw driver failure into one failed HRESULT, so a safe native-UP fallback was excluded and alpha particles could be absent for a dropped eye.",
+    "alternatives_rejected": [
+      "Do not globally retry GPU errors: an already-called driver DrawPrimitive can partially rasterize alpha and replay would double-composite the particle.",
+      "Not the HUD D3DX deferred-batch Begin issue: R84 hooks_uiscaling.cpp already preserves a failed reentrant Begin and existing valid batch."
+    ],
+    "fix_evidence": "Track physicalDrawAttempted before the raw driver call, permit E_NOTIMPL only if no driver raster attempt occurred and stream restoration succeeded, and keep failure -> mono recovery protections intact.",
+    "negative_test_evidence": "Compile/run the native portable smoke in Release with -DNDEBUG to verify true fallback and negative no-double-alpha and strict producer gates; HMD and driver-level failure injection remain unperformed.",
+    "eye_ownership": "The left/right R30ExecuteXyzrhwStereo draw pair owns complete stereo publication, and the existing R29 mono safety suppresses partially drawn right eye after an actual GPU attempt."
+  },
+  "ci_evidence": {
+    "initial_failed_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
+    "initial_failure": "DX9Ex Active policy job run 38923462196: required exact-head run record was missing; no C++ build failure verified",
+    "final_exact_sha": "PENDING",
+    "mandatory_gates": "PENDING"
+  },
+  "next_action": "CI material/record repair under same TASK_ID; then pin final exact SHA and observe required 4 workflows. No Quest3/VDXR run claimed.",
+  "score_delta_this_attempt": 0
+}
