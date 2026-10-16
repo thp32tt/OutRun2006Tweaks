@@ -1418,7 +1418,13 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 R30ApplyStereoSkyGlow(device);
             }
-            outrun::vr::dx11::live_game_frame::before_game_present(device, sourceRect, dirtyRegion);
+            // DX11's full-game mirror observes the source draw before R9 applies
+            // its two genuine eye transforms. Preserve those original R9
+            // left/right surfaces for OpenXR while stereo is active. Native
+            // single-eye pixels are allowed only in the menu/desktop mono mode.
+            outrun::vr::dx11::live_game_frame::before_game_present(
+                device, sourceRect, dirtyRegion,
+                !StereoWanted());
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);

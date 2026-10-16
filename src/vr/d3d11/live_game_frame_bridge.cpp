@@ -6233,7 +6233,8 @@ void observe_failed_game_draw(IDirect3DDevice9* game) noexcept {
 }
 
 void before_game_present(IDirect3DDevice9* game,
-                         const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept {
+                         const RECT* sourceRect, const RGNDATA* dirtyRegion,
+                         bool allowMonoNativePublication) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
         State& s = state();
@@ -6438,7 +6439,14 @@ void before_game_present(IDirect3DDevice9* game,
         // Preserve the inset-only placement for the smaller debug output.
         const auto fullPlacement = presentRegion.full_frame_placement(
             bb.Width, bb.Height, surfaceWidth, surfaceHeight);
-        const bool outputWritable = outputNow.valid() && nativeExtentMatches &&
+        // The native mono color buffer is not the R9 game left eye: the D3D9
+        // stereo pipeline writes two distinct cameras AFTER the native mirror
+        // sampled the original D3D9 game Draw. A mono full-game upload here
+        // overwrote the game's true left view just before R13/R32 captured
+        // left/right GPU eyes. Fail closed to the original game-owned stereo
+        // backbuffer instead of allowing mismatched VR eyes or fabricated IPD.
+        const bool outputWritable = allowMonoNativePublication &&
+            outputNow.valid() && nativeExtentMatches &&
             (((!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
               (fullMode ? fullPlacement.valid : insetPlacement.valid)) ||
              (croppedNativeUpload && fullPlacement.valid) ||
