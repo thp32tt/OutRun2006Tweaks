@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00956",
+  "production_id": "CONVERSION-DX9EX-00956",
+  "event_id": "CONVERSION-DX9EX-00956-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00956",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+  "feature_class": "VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "eca15246ef6511bb41be94c410222b9e2fae43d1",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/lens_centre_eye_pose_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00956.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+    "symptom_id": "DX9EX:SYMPTOM:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+    "goal": "Keep the original CABE projected outer flare discs binocular for finite large common XR tracking origins without double applying HMD orientation, and fail closed for malformed eye input.",
+    "scope_boundary": "Only R84 existing projected-2D FlatPerspectiveEffect origin conversion; unprojected world effects, C993 central sun, GOAL/+TIME, HUD, FFB, SkyGlow, R26_SAFE fallback, DX11 and frozen DXVK retain previous behavior.",
+    "special_work_evidence": "R30PrepareFlatEffectGeometry computed eyeCentre as 0.5f*(floatEye0+floatEye1); finite positive float eye offsets near FLT_MAX overflow their intermediate float sum, yielding nonfinite relativeEye, stereo matrix rejection and the unchanged game mono fallback. Existing LensCentre helper widens before averaging and atomically validates both eyes.",
+    "trace_stages": [
+      "Original CABE Calc3D2D projected outer-disc producer preserves flat screen effect classification.",
+      "R84 R30 flat-effect cache converts latched XR eye origins into relative binocular offsets only for preprojected D3D9 effects.",
+      "R29 eye transforms and per-eye projection submit the original color/alpha/order when valid; unproven inputs retain the original fallback."
+    ],
+    "subcomponents": [
+      "Replace unsafe origin average/subtraction with the existing atomically validated double-intermediate relative-eye helper for projected 2D only.",
+      "Exercise highest finite origins, valid neutral relative eyes, and invalid one-eye fail-closed behavior with native C++ regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "projected_flare_origin",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 CABE original projected outer discs",
+        "expected_behavior": "Both eye translations remain finite and relative even when the common finite XR tracking origin would overflow a float sum."
+      },
+      {
+        "id": "projected_flare_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unprojected effects and malformed tracking",
+        "expected_behavior": "Nonprojected world effects use unchanged absolute eye route; malformed projected input rejects the whole binocular candidate without publishing one corrupted eye."
+      },
+      {
+        "id": "projected_flare_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game/R26_SAFE/x64 host/package/Domain/Full Source gates",
+        "expected_behavior": "The final exact material SHA passes all required GitHub Actions gates without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "projected_flare_origin": "PENDING_GATE",
+    "projected_flare_fallback": "PENDING_GATE",
+    "projected_flare_exact_sha": "PENDING_GATE"
+  },
+  "diagnosis": {
+    "root_cause": "Source-confirmed float addition overflow in R84 projected-effect eyeCentre before per-eye subtraction; a float-safe reusable helper exists in the same R84 TU.",
+    "alternatives_rejected": [
+      "Do not alter lens C993 source/outer-ring semantics, GPU blend/alpha or eye rotation; this repair is confined to projected CABE pose translation. No claim of a reproduced Quest3 frame."
+    ],
+    "runtime_limit": "No Quest3/VDXR or OutRun executable runtime capture in this task; numerical repro does not demonstrate full visual repair."
+  },
+  "ci_evidence": {
+    "changed_area_native": "Native smoke added; source compilation and GitHub required exact-SHA gates pending."
+  },
+  "next_action": "Run exactly one GitHub full required Gate matrix on this validation-bearing SHA, repair actual failures under same TASK_ID, then C6-only bookkeeping at the same immutable SHA; Quest3 optics NEED_HMD_TEST."
+}

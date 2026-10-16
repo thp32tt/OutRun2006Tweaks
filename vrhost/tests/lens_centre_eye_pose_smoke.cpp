@@ -49,5 +49,26 @@ int main()
     if(!OutRunVR::LensCentre::BuildHeadRelativeEyePose(
             offsets,identity,position,rotation) ||
        !Near(rotation[0][3],1) || !Near(rotation[1][3],1)) return 10;
+    // Full-frame projected CABE flare discs share this exact widened
+    // eye-centre conversion. The old float sum overflowed even when each
+    // OpenXR eye origin was finite, losing the entire binocular effect.
+    const float largest = (std::numeric_limits<float>::max)();
+    const float largeOffsets[2][3]{
+        {largest, largest, largest}, {largest, largest, largest}};
+    float projectedRelative[2][3]{
+        {17.f,17.f,17.f}, {19.f,19.f,19.f}};
+    if(!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+           largeOffsets,projectedRelative)) return 11;
+    for(const auto& eye:projectedRelative)
+        for(float v:eye) if(!Near(v,0.f)) return 12;
+    // One corrupt eye must leave both previous eyes unchanged, never
+    // partially publish a transform or inherit a previous stereo origin.
+    const float invalidOffsets[2][3]{
+        {0.f,0.f,0.f},
+        {std::numeric_limits<float>::quiet_NaN(),0.f,0.f}};
+    if(OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+           invalidOffsets,projectedRelative)) return 13;
+    for(const auto& eye:projectedRelative)
+        for(float v:eye) if(!Near(v,0.f)) return 14;
     return 0;
 }

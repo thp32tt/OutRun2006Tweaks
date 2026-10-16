@@ -5928,24 +5928,26 @@ namespace OutRunVRStereo
             // Calc3D2D using the game camera. Reapplying the full HMD
             // orientation would rotate the same screen-space source twice.
             // Retain only each eye's translation relative to the centre.
-            const float eyeCentre[3]{
-                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
-                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
-                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
-            };
+            // CABE's already-projected outer flare discs need only relative
+            // interocular translation. Averaging two finite XR float origins
+            // with a float addition can overflow to Inf and drop BOTH rings
+            // onto the original mono fallback. Reuse the C993 widened,
+            // all-or-nothing origin conversion without changing the world
+            // effect's original absolute-eye orientation/position route.
+            float projectedRelativeEye[2][3]{};
+            if (directProjected2D &&
+                !OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+                    stereo.eyeOffset, projectedRelativeEye))
+                return nullptr;
             const float identityOrientation[4]{0.0f, 0.0f, 0.0f, 1.0f};
             for (int eye = 0; eye < 2; ++eye)
             {
-                const float relativeEye[3]{
-                    stereo.eyeOffset[eye][0] - eyeCentre[0],
-                    stereo.eyeOffset[eye][1] - eyeCentre[1],
-                    stereo.eyeOffset[eye][2] - eyeCentre[2]
-                };
                 const D3DMATRIX eyePose =
                     R29OwnerMatrixFromQuaternionTranslation(
                         directProjected2D ? identityOrientation
                                           : stereo.eyeOrientation[eye],
-                        directProjected2D ? relativeEye : stereo.eyeOffset[eye],
+                        directProjected2D
+                            ? projectedRelativeEye[eye] : stereo.eyeOffset[eye],
                         worldScale);
                 next.eyeInverse[eye] = R29OwnerInverseRigid(eyePose);
                 next.eyeProjection[eye] = R29OwnerProjectionFromFov(
