@@ -10,7 +10,7 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
   "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
-  "status": "SOURCE_INTEGRATION_IN_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -99,7 +99,7 @@
     "C3_VALIDATE": "At validation-bearing exact SHA 9c303e63b6df9e83b8664b12148e06be84bdb9e0, required 5/5 GitHub Actions SUCCESS: Fast #38897552550, Backend #38897552592, Windows Build #38897559461, OpenXR #38897559352, HUD #38897559537. Separate WARP #38896804605 SUCCESS at original material c3290bc7. Not an HMD/game runtime PASS.",
     "C4_COMMIT": "Material C++ feat c3290bc7a83e88aaa2e5a0b7991b99d469a534d5; bounded CI activation gate and latest-run record repair 9c303e63b6df9e83b8664b12148e06be84bdb9e0; C6 JSON bookkeeping only [skip ci], does not change validation-bearing SHA.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "C6 persisted nonterminal SOURCE_INTEGRATION_IN_PROGRESS / PASS_EXACT_SHA 5/5 at 9c303e63. Real R30 menu/car/race game stereo producer callback and Quest3/VDXR runtime remain pending/UNTESTED. No independent feature completion or scoring."
+    "C6_STATE": "C6 PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED at exact validation-bearing SHA 9c303e63b6df9e83b8664b12148e06be84bdb9e0; required GitHub CI 5/5 SUCCESS. This is a verified build checkpoint only, not full native R30 menu/car/race callback integration or Quest3/VDXR runtime acceptance; HMD UNTESTED. No new feature score or validation SHA change."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00825",
