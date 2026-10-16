@@ -1,0 +1,25 @@
+name: Quest PCVR Experimental Core
+on:
+  push:
+    branches:
+      - vr-quest-native-rebuild-20261016
+    paths:
+      - experimental/quest_pcvr/**
+      - .github/workflows/quest-pcvr-experimental.yml
+  workflow_dispatch:
+jobs:
+  compile-test:
+    name: Portable and D3D9 compile (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S experimental/quest_pcvr -B build-quest-pcvr -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build-quest-pcvr --config Release --parallel 2
+      - name: Test
+        run: ctest --test-dir build-quest-pcvr -C Release --output-on-failure
