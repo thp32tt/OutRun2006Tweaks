@@ -32,6 +32,7 @@
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
 #include "../game/render_semantics.hpp"
+#include "../game/car_base_shadow_stereo.hpp"
 #include "../game/projected_rank_stereo.hpp"
 #include "../game/rank_marker_sparse.hpp"
 #include "../game/rank_marker_raw_wvp.hpp"
@@ -2531,6 +2532,7 @@ namespace OutRunVRStereo
             Hud2D,
             FlatPerspectiveEffect,
             ExactLensCentreWorld,
+            ExactCarBaseShadowWorld,
             ProjectedWorldMarker2D
         };
 
@@ -2568,6 +2570,41 @@ namespace OutRunVRStereo
                 sourceScope == RenderScope::WorldBillboard,
                 sourceProducer == ProducerToken::LensFlareCentre,
                 queueNode == nullptr
+            });
+        }
+
+
+        // The original player contact shadow is a DIRECT 3D car matrix draw,
+        // not a generic XYZRHW HUD sprite. Prove the actual game c64 upload
+        // immediately preceding this GPU draw; otherwise preserve native
+        // rendering instead of borrowing a road/vehicle world shader cache.
+        bool R30HasExactCarBaseShadowRawWvp(float original[16]) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            const auto drawCommand = CapturePhysicalDrawCommand();
+            if (!original || !drawCommand.IsDirectCarBaseShadow())
+                return false;
+            std::uint64_t writeSerial = 0, writeDraw = 0;
+            std::uintptr_t writeShader = 0, currentShader = 0;
+            std::uint64_t writeShaderEpoch = 0, currentShaderEpoch = 0;
+            RenderScope sourceScope = RenderScope::None;
+            std::uint64_t queueEpoch = 0;
+            const void* queueNode = nullptr;
+            ProducerToken sourceProducer = ProducerToken::None;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    original, writeSerial, writeDraw,
+                    writeShader, writeShaderEpoch) ||
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    sourceScope, queueEpoch, queueNode, sourceProducer) ||
+                !R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch))
+                return false;
+            return OutRunVR::CarShadowStereo::OwnsDirectGameWvp({
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                R29OwnerTopLevelDrawSerial() + 1u, writeDraw,
+                currentShader, writeShader,
+                currentShaderEpoch, writeShaderEpoch,
+                sourceScope, sourceProducer, queueNode, queueEpoch
             });
         }
 
@@ -2739,6 +2776,18 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::CurrentProjectedMarker();
                 return marker && marker->valid
                     ? R30ScreenSpaceKind::ProjectedWorldMarker2D
+                    : R30ScreenSpaceKind::None;
+            }
+
+            // Player contact shadow must be reconstructed from its OWN
+            // successful original car-world c64. Never classify this producer
+            // by alpha/depth, inherit the previous road WVP or flatten it to
+            // generic XYZRHW HUD; when proof is absent R33 uses native Draw.
+            if (drawCommand.IsDirectCarBaseShadow())
+            {
+                float rawShadow[16]{};
+                return R30HasExactCarBaseShadowRawWvp(rawShadow)
+                    ? R30ScreenSpaceKind::ExactCarBaseShadowWorld
                     : R30ScreenSpaceKind::None;
             }
 
@@ -6253,13 +6302,18 @@ namespace OutRunVRStereo
                 return true;
             }
 
-            if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)
+            if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||
+                screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld)
             {
+                const bool exactShadow =
+                    screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld;
                 // Original GPU c64 was saved in `original` for exact state
                 // restore. It is NOT source-owned game WVP and might already
                 // be head-injected. Keep those values completely separate.
                 float rawGameWvp[16]{};
-                if (!R30HasExactLensCentreRawWvp(rawGameWvp))
+                if (!(exactShadow
+                    ? R30HasExactCarBaseShadowRawWvp(rawGameWvp)
+                    : R30HasExactLensCentreRawWvp(rawGameWvp)))
                     return false;
                 D3DMATRIX rawUploadedT{};
                 std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT));
@@ -6307,7 +6361,8 @@ namespace OutRunVRStereo
                 if (!std::isfinite(affineError) ||
                     !std::isfinite(viewDepth) || !std::isfinite(clipW) ||
                     affineError > 0.02f ||
-                    viewDepth < 1.25f || viewDepth >= 1000000.0f ||
+                    viewDepth < (exactShadow ? 0.05f : 1.25f) ||
+                    viewDepth >= 1000000.0f ||
                     clipW <= 0.05f)
                     return false;
                 const D3DMATRIX headRelative =
@@ -6987,6 +7042,8 @@ namespace OutRunVRStereo
             return R30SupportScreenSpaceKind::FlatPerspectiveEffect;
         case R30ScreenSpaceKind::ExactLensCentreWorld:
             return R30SupportScreenSpaceKind::ExactLensCentreWorld;
+        case R30ScreenSpaceKind::ExactCarBaseShadowWorld:
+            return R30SupportScreenSpaceKind::ExactCarBaseShadowWorld;
         case R30ScreenSpaceKind::ProjectedWorldMarker2D:
             return R30SupportScreenSpaceKind::ProjectedWorldMarker2D;
         default:
@@ -7012,6 +7069,9 @@ namespace OutRunVRStereo
             break;
         case R30SupportScreenSpaceKind::ExactLensCentreWorld:
             lower = R30ScreenSpaceKind::ExactLensCentreWorld;
+            break;
+        case R30SupportScreenSpaceKind::ExactCarBaseShadowWorld:
+            lower = R30ScreenSpaceKind::ExactCarBaseShadowWorld;
             break;
         case R30SupportScreenSpaceKind::ProjectedWorldMarker2D:
             lower = R30ScreenSpaceKind::ProjectedWorldMarker2D;

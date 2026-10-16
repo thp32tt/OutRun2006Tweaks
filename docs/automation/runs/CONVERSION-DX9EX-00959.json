@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00959",
+  "production_id": "CONVERSION-DX9EX-00959",
+  "event_id": "CONVERSION-DX9EX-00959-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00959",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "453f4cbef2074b6fc7af44348b07fcbefad99a77",
+  "material_result_sha": "PENDING_THIS_COMMIT",
+  "validation_bearing_result_sha": "PENDING_THIS_COMMIT",
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/core/r32_review_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/core/r32_review_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_start_shadow_world_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00959.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Render the original player contact shadow from its own exact game world WVP, not generic flattened XYZRHW HUD or previously cached road WVP.",
+    "scope_boundary": "Player direct nonqueued shadow only; original car world geometry, camera, flat menus, FFB, SkyGlow, CABE/C993 lens, stage/GOAL/HUD, R26_SAFE and DXVK unchanged.",
+    "trace_stages": [
+      "Original three CalcPeraShadow PC nullsub callsites -> player matrix -> exact CarBaseShadow world scope",
+      "Game successful original shader c64 plus source/pose/queue/shader/adjacent-draw evidence",
+      "R84 R30 source-proof 3D affine shadow -> per-eye head-local pose/FOV -> R33 physical left/right Draw; original native Draw if missing proof"
+    ],
+    "subcomponents": [
+      "Do not flatten exact contact shadow onto generic HUD XYZRHW",
+      "Reconstruct only proven original-game shadow matrix per-eye",
+      "Safe one-draw original fallback on missing c64, render-state or stereo-resources"
+    ],
+    "acceptance_items": [
+      {
+        "id": "car_shadow_exact_stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original player shadow+per-eye R84 eye-space reprojection",
+        "expected_behavior": "Source-proven raw matrix and pose drive both eyes and preserve car/world depth, including source/pose/shader strict ownership"
+      },
+      {
+        "id": "shadow_native_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Untyped sprites, no shader, queued/failed upload, Reset, menu and other world effects",
+        "expected_behavior": "Unproven shadow preserves native game GPU draw; no unrelated car or road shader, no HUD flatten, R26_SAFE fallback unchanged"
+      },
+      {
+        "id": "shadow_exact_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game, R26_SAFE rollback, x64 host, Active/package, Domain and Full Source / HUD Inspector",
+        "expected_behavior": "Exact validation-bearing commit's required Gates all SUCCESS; physical Quest3/VDXR acceptance separate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "car_shadow_exact_stereo": "PENDING_EXACT_SHA_CI_AND_HMD",
+    "shadow_native_negative": "PENDING_EXACT_SHA_CI",
+    "shadow_exact_gates": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R84 did not give the exact direct car contact shadow a source-proven GPU eye path: generic XYZRHW could flatten it into the HUD plane, while R29 world fast/cached shader could borrow stale road WVP.",
+    "source_trace": "RestoreCarBaseShadow direct game call -> PhysicalDrawCommand -> producer-tagged successful original c64 -> R30 reconstructed original worldView and XR eyes -> R33 physical Draw.",
+    "runtime_limit": "No Quest3/VDXR/real game in this run. Eye visuals and frame timing unverified."
+  },
+  "next_action": "Run exact SHA GitHub Active, Domain, Full Source Impact, HUD Inspector. No Quest3/VDXR runtime evidence."
+}

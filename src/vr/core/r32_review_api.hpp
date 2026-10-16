@@ -91,6 +91,7 @@ namespace OutRunVRStereo
         Hud2D,
         FlatPerspectiveEffect,
         ExactLensCentreWorld,
+        ExactCarBaseShadowWorld,
         ProjectedWorldMarker2D
     };
 

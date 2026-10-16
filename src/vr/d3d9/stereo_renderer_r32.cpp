@@ -1016,6 +1016,8 @@ namespace OutRunVRStereo
             return R32ReviewScreenSpaceKind::FlatPerspectiveEffect;
         case R30SupportScreenSpaceKind::ExactLensCentreWorld:
             return R32ReviewScreenSpaceKind::ExactLensCentreWorld;
+        case R30SupportScreenSpaceKind::ExactCarBaseShadowWorld:
+            return R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld;
         case R30SupportScreenSpaceKind::ProjectedWorldMarker2D:
             return R32ReviewScreenSpaceKind::ProjectedWorldMarker2D;
         default:
@@ -1035,6 +1037,8 @@ namespace OutRunVRStereo
             lower = R30SupportScreenSpaceKind::FlatPerspectiveEffect;
         else if (kind == R32ReviewScreenSpaceKind::ExactLensCentreWorld)
             lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;
+        else if (kind == R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld)
+            lower = R30SupportScreenSpaceKind::ExactCarBaseShadowWorld;
         else if (kind == R32ReviewScreenSpaceKind::ProjectedWorldMarker2D)
             lower = R30SupportScreenSpaceKind::ProjectedWorldMarker2D;
         return lower != R30SupportScreenSpaceKind::None &&

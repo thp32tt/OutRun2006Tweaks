@@ -128,6 +128,68 @@ def model():
         assert effective("WorldParticle", active) == active  # active queue unchanged
 
 
+def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
+    assert "return !IsDirectWorldLensCentre() &&\n                !IsDirectCarBaseShadow();" in semantic
+    assert "static_assert(!PhysicalDrawCommand{RenderScope::WorldParticle" in semantic
+    assert '#include "../game/car_base_shadow_stereo.hpp"' in r30
+    classification = r30.split("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[1].split(
+        "GetRendererProjectionSignature(m34, m44)", 1)[0]
+    assert "if (drawCommand.IsDirectCarBaseShadow())" in classification
+    assert "R30HasExactCarBaseShadowRawWvp(rawShadow)" in classification
+    assert "R30ScreenSpaceKind::ExactCarBaseShadowWorld" in classification
+    proof = r30.split("bool R30HasExactCarBaseShadowRawWvp(", 1)[1].split(
+        "// Exact Calc3D2D rank", 1)[0]
+    for s in ("drawCommand.IsDirectCarBaseShadow()",
+              "GetLastRawGameWvpWrite(", "GetLastGameWvpSemanticProvenance(",
+              "R29OwnerCurrentShaderEpoch(", "OwnsDirectGameWvp({",
+              "GetCurrentLatchedPoseEpoch()", "GetLastGameWvpPoseEpoch()",
+              "R29OwnerTopLevelDrawSerial() + 1u", "sourceScope, sourceProducer, queueNode, queueEpoch"):
+        assert s in proof, s
+    eye = r30.split("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||", 1)[1].split(
+        "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1)[0]
+    for s in ("ExactCarBaseShadowWorld", "R30HasExactCarBaseShadowRawWvp(rawGameWvp)",
+              "R29OwnerMultiplyMatrix(stockRawWvp,", "R29OwnerMultiplyMatrix(worldView, headInverse)",
+              "R29OwnerProjectionFromFov(baseProjection,",
+              "viewDepth < (exactShadow ? 0.05f : 1.25f)"):
+        assert s in eye, s
+    for s in ("ExactCarBaseShadowWorld",):
+        assert s in r32 and s in support and s in review
+    physical = r33.split("R32ReviewOwnedResult R33TryHud(", 1)[1].split(
+        "HRESULT __stdcall DrawPrimitiveDestR33(", 1)[0]
+    for s in ("drawCommand.IsDirectCarBaseShadow()", "directCarShadow ||",
+              "screenKind == R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld",
+              "if (directCarShadow && !provenCarShadowStereo)",
+              "(directCarShadow && !hud.handled)",
+              "return actualDraw();"):
+        assert s in physical, s
+    # Real producer->raw-c64->R84 physical Draw path, not a new token/enum-only
+    # assertion. Mutating any independent source proof or fallback must fail.
+    for before, after in (
+        ("!IsDirectCarBaseShadow();", "true;"),
+        ("R30HasExactCarBaseShadowRawWvp(rawShadow)", "true"),
+        ("OwnsDirectGameWvp({", "false /*bypass*/ && OwnsDirectGameWvp({"),
+        ("(directCarShadow && !hud.handled)", "false"),
+    ):
+        sources = [semantic, r30, r33]
+        owner = next(i for i, source in enumerate(sources) if before in source)
+        altered = sources.copy()
+        altered[owner] = altered[owner].replace(before, after, 1)
+        try:
+            check_r84_shadow_route_shape(*altered, r32, support, review)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError("R84 shadow route mutant escaped: " + before)
+
+
+def check_r84_shadow_route_shape(semantic, r30, r33, r32, support, review):
+    assert "return !IsDirectWorldLensCentre() &&\n                !IsDirectCarBaseShadow();" in semantic
+    assert "R30HasExactCarBaseShadowRawWvp(rawShadow)" in r30
+    assert "return OutRunVR::CarShadowStereo::OwnsDirectGameWvp({" in r30
+    assert "(directCarShadow && !hud.handled)" in r33
+    assert "if (directCarShadow && !provenCarShadowStereo)" in r33
+    assert all("ExactCarBaseShadowWorld" in x for x in (r30, r32, support, review))
+
+
 def main():
     code = SRC.read_text(encoding="utf-8")
     sem = SEM.read_text(encoding="utf-8")
@@ -137,7 +199,13 @@ def main():
     check(code, sem, shadow)
     verify_mutations(code, sem, shadow)
     model()
-    print("car shadow original CALL/world-eye ownership: PASS; 17 negative mutations rejected")
+    r30 = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
+    r32 = (ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp").read_text(encoding="utf-8")
+    r33 = (ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8")
+    support = (ROOT / "src/vr/core/r30_support_api.hpp").read_text(encoding="utf-8")
+    review = (ROOT / "src/vr/core/r32_review_api.hpp").read_text(encoding="utf-8")
+    check_r84_shadow_route(sem, r30, r32, r33, support, review)
+    print("car shadow original CALL/world-eye ownership and R84 physical stereo route: PASS; fail-closed source/eye/native fallback")
 
 
 if __name__ == "__main__":

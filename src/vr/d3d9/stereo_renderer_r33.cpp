@@ -1063,13 +1063,15 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
             const bool directLensCentre =
                 drawCommand.IsDirectWorldLensCentre();
+            const bool directCarShadow =
+                drawCommand.IsDirectCarBaseShadow();
             const bool exactResultHud = drawCommand.IsExactFiniteResultHud();
             if (!resyncAlreadyFlushed)
             {
                 // Raster resync failed before R30 could prove HUD stereo.
                 // An exact +TIME/GOAL producer must keep its original draw,
                 // never borrow R29's preceding road/world source.
-                if (exactResultHud ||
+                if (exactResultHud || directCarShadow ||
                     OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(
                         directLensCentre, resyncAlreadyFlushed))
                 {
@@ -1090,11 +1092,21 @@ namespace OutRunVRStereo
             // bypass both R33 fast world and the R29 cached-WVP fallback.
             const bool provenLensStereo =
                 screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;
+            const bool provenCarShadowStereo =
+                screenKind == R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld;
+            // Shadow stereo requires its independently source-proven car
+            // WVP. A missing source never inherits R29's previous road WVP.
+            if (directCarShadow && !provenCarShadowStereo)
+            {
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
+                return actualDraw();
+            }
             // R30 cannot establish a finite HUD eye plane on this draw.
             // R31's shader+pose cache may still match an earlier road WVP:
             // using that cache for original +TIME/GOAL produces a displaced
             // or doubled result. Fail open to exactly one game draw instead.
-            if (exactResultHud &&
+            if ((exactResultHud || directCarShadow) &&
                 screenKind == R32ReviewScreenSpaceKind::None)
             {
                 if (telemetry)
@@ -1123,7 +1135,8 @@ namespace OutRunVRStereo
                 // HUD classification alone is not proof of physical stereo.
                 // Missing GPU-eye resources, pose or c64 must leave the
                 // exact original +TIME/GOAL path alone, not hand it to R29.
-                if (exactResultHud)
+                if (exactResultHud ||
+                    (directCarShadow && !hud.handled))
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();

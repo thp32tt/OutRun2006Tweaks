@@ -923,7 +923,11 @@ namespace OutRunVR::GameSemantic
         // A missing exact world WVP remains ONE unchanged game draw at R33.
         constexpr bool CanUseGenericXyzrhwStereo() const noexcept
         {
-            return !IsDirectWorldLensCentre();
+            // This is an original world-space player contact shadow, not an
+            // already-projected generic 2D sprite. Never collapse its car
+            // transform onto R30's finite HUD plane before source WVP proof.
+            return !IsDirectWorldLensCentre() &&
+                !IsDirectCarBaseShadow();
         }
 
         constexpr bool IsDirectCarBaseShadow() const noexcept
@@ -948,6 +952,15 @@ namespace OutRunVR::GameSemantic
             return CanReprojectFiniteResultHudPlane(scope, producer);
         }
     };
+
+    static_assert(!PhysicalDrawCommand{RenderScope::WorldParticle,
+        ProducerToken::CarBaseShadow, nullptr, 0, false, 0}
+        .CanUseGenericXyzrhwStereo(),
+        "direct player shadow must keep original world-space geometry");
+    static_assert(PhysicalDrawCommand{RenderScope::ScreenOverlay2D,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .CanUseGenericXyzrhwStereo(),
+        "ordinary original screen sprites remain eligible");
 
     inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept
     {

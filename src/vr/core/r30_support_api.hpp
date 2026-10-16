@@ -33,7 +33,7 @@ namespace OutRunVRStereo
     enum class R30SupportScreenSpaceKind : std::uint8_t
     {
         None, Hud2D, FlatPerspectiveEffect, ExactLensCentreWorld,
-        ProjectedWorldMarker2D
+        ExactCarBaseShadowWorld, ProjectedWorldMarker2D
     };
     R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(
         IDirect3DDevice9* device) noexcept;
