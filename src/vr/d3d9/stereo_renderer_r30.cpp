@@ -2734,39 +2734,13 @@ namespace OutRunVRStereo
                 !ownedLensCentre)
                 return R30ScreenSpaceKind::None;
 
-            // R84 regression guard: an untagged SpriteNode defaults to
-            // ScreenOverlay2D, but that fallback is NOT evidence that a
-            // perspective/3D draw is safe to flatten into the HMD HUD plane.
-            // R30's verified XYZRHW path still handles generic 2D sprites.
-            // ScreenHud is an exact producer-owned semantic, not this fallback.
-            // Classify the original game's projection before accepting any
-            // shader-based screen pass.
-            float m34 = 0.0f;
-            float m44 = 0.0f;
-            if (!OutRunVRRenderer::GetRendererProjectionSignature(m34, m44))
-                return R30ScreenSpaceKind::None;
-
-            const auto projectionClass =
-                OutRunVR::PassPolicy::ClassifyProjectionSignature(m34, m44);
-            if (projectionClass ==
-                OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
-                return (ownedHud || ownedOverlay)
-                    ? R30ScreenSpaceKind::Hud2D
-                    : R30ScreenSpaceKind::None;
-
-            if (projectionClass !=
-                OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
-                return R30ScreenSpaceKind::None;
-
-            // A positively identified HUD producer can use its original-game
-            // raw c64 and finite view-plane transform even with a perspective
-            // projection. A generic ScreenOverlay2D has no equivalent proof:
-            // never treat a queue fallback as a perspective HUD/scene effect.
-            if (ownedHud)
-                return R30ScreenSpaceKind::Hud2D;
-            if (ownedOverlay)
-                return R30ScreenSpaceKind::None;
-
+            // C993 is an exact original-game source, not a generic HUD pass.
+            // Its per-draw raw-c64/call/pose/shader proof must be tested before
+            // the shared projection signature: after a menu or 2D transition
+            // that signature can still describe an earlier pass even while
+            // this producer has already submitted a valid world-space WVP.
+            // The eye builder independently rejects non-spatial game WVPs;
+            // absent proof falls back to ONE unchanged original game draw.
             // A source-owned direct C993 centre is a spatial WorldBillboard,
             // not a generic depth-disabled alpha overlay. Its original game
             // may vary Z/alpha states inside the draw; do not let those states
@@ -2799,6 +2773,40 @@ namespace OutRunVRStereo
                 // previously head-injected live shader constant.
                 return R30ScreenSpaceKind::None;
             }
+
+
+            // R84 regression guard: an untagged SpriteNode defaults to
+            // ScreenOverlay2D, but that fallback is NOT evidence that a
+            // perspective/3D draw is safe to flatten into the HMD HUD plane.
+            // R30's verified XYZRHW path still handles generic 2D sprites.
+            // ScreenHud is an exact producer-owned semantic, not this fallback.
+            // Classify the original game's projection before accepting any
+            // generic shader-based HUD/effect pass (C993 was proven above).
+            float m34 = 0.0f;
+            float m44 = 0.0f;
+            if (!OutRunVRRenderer::GetRendererProjectionSignature(m34, m44))
+                return R30ScreenSpaceKind::None;
+
+            const auto projectionClass =
+                OutRunVR::PassPolicy::ClassifyProjectionSignature(m34, m44);
+            if (projectionClass ==
+                OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
+                return (ownedHud || ownedOverlay)
+                    ? R30ScreenSpaceKind::Hud2D
+                    : R30ScreenSpaceKind::None;
+
+            if (projectionClass !=
+                OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
+                return R30ScreenSpaceKind::None;
+
+            // A positively identified HUD producer can use its original-game
+            // raw c64 and finite view-plane transform even with a perspective
+            // projection. A generic ScreenOverlay2D has no equivalent proof:
+            // never treat a queue fallback as a perspective HUD/scene effect.
+            if (ownedHud)
+                return R30ScreenSpaceKind::Hud2D;
+            if (ownedOverlay)
+                return R30ScreenSpaceKind::None;
 
             // All other tagged overlays/effects retain the conservative
             // alpha/depth heuristic and StateBlock-aware cached state.

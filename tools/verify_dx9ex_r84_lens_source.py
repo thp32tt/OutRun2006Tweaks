@@ -76,6 +76,15 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         route.index("SelectWorldRoute(true, owned)") <
         route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
         route.rindex("return R30ScreenSpaceKind::None;"))
+    # Source-owned C993 must beat the cached/shared orthographic signature,
+    # including when that signature is absent after Reset/menu transitions.
+    assert route.index("if (ownedLensCentre)") < route.index(
+        "GetRendererProjectionSignature(m34, m44)")
+    assert route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") < (
+        route.index("ClassifyProjectionSignature(m34, m44)"))
+    assert route.index("return R30ScreenSpaceKind::None;",
+        route.index("if (ownedLensCentre)")) < route.index(
+        "GetRendererProjectionSignature(m34, m44)")
     # Source-proven C993 classification precedes alpha and depth queries:
     # depth-enabled and non-blended variants must still reach R33 stereo.
     assert (route.index("if (ownedLensCentre)") <

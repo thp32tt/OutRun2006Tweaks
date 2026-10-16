@@ -1,0 +1,99 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00944",
+  "production_id": "CONVERSION-DX9EX-00944",
+  "event_id": "CONVERSION-DX9EX-00944-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00944",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "status": "C5_CI_RUNNING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_REQUIRED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "66a32a567898a80e664be0eaee83df69f7b2c946",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_dx9ex_r84_lens_source.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00944.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Recover the complete exact C993 central sun binocular draw from the original uploaded game WVP even after menu/2D projection signature transitions, while retaining world depth, asymmetric eye optics, original alpha and failure fallback.",
+    "scope_boundary": "Only source-owned non-queued D3A5/C993 object 0x570002 WorldBillboard is eligible for early original-c64 proof. Other CABE flare rings, HUD, title/menus, GOAL/+TIME, effects, SkyGlow, VR input/FFB, DX11/DXVK, R26_SAFE and stereo resources are unchanged.",
+    "trace_stages": [
+      "Original exe 0xD3A5 producer and C993 0x570002 alpha draw acquire direct LensFlareCentre semantics and original c64 shader uploads.",
+      "R84 R30 classifies the exact game-uploaded centre by producer, pose epoch, shader epoch and raw WVP before reading an independent cached/shared projection signature.",
+      "R84 R30 then spatially validates original WVP and builds worldView to head-local per-eye inverse and asymmetric OpenXR FOV; R33 submits left/right, preserving original c64 restoration and native fallback."
+    ],
+    "subcomponents": [
+      "Repair early-return ordering so a stale or unavailable previous projection class cannot veto a fully source-owned central lens WVP before physical eye construction.",
+      "Preserve missing/stale/mixed source rejection and original mono draw while retaining independent CABE halo and HUD/effect projection classification; exercise positive and negative source-order contract in mandatory renderer verifier."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_original_c993_world_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "C993 exact original game WVP to binocular renderer",
+        "expected_behavior": "Owned C993 raw shader WVP enters R84 per-eye world projection before generic cached orthographic signature can reject it."
+      },
+      {
+        "id": "lens_unknown_and_unrelated_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "HUD, non-centre alpha, stale/unowned and reset fallback",
+        "expected_behavior": "Unowned or malformed centre and every generic screen effect keep conservative original draw and projection guards without borrowing a world WVP."
+      },
+      {
+        "id": "lens_exact_sha_windows_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Original x86 game and x64 OpenXR host, R26 rollback, mandatory workflows",
+        "expected_behavior": "Affected verifier plus exact SHA DX9Ex Active Windows game host package, Domain, Full Source and HUD Inspector conclude success."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "lens_original_c993_world_owner": "PENDING_CI",
+    "lens_unknown_and_unrelated_fallback": "PENDING_CI",
+    "lens_exact_sha_windows_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Original game c64 is separately source-owned, but the R84 C993 route was physically placed after early returns using a shared projection signature potentially inherited from a previous orthographic draw or absent after menu/device transition.",
+    "source_evidence": "R30ClassifyScreenSpacePass returned Hud2D/None for global orthographic/unknown or missing projection signature BEFORE entering ownedLensCentre raw WVP proof; R30BuildScreenSpaceEyeConstants independently validates the centre original WVP projection and physical affine/depth.",
+    "original_evidence": "Original 0xD3A5 to 0xC993 object 0x570002 call and exact direct LensFlareCentre / raw shader provenance already present, with the outer CABE discs isolated.",
+    "source_trace": [
+      "C993 D3A5 source sets exact call/pose/shader producer identity without queue node.",
+      "R30 source classifier must resolve exact owned centre before inspecting shared 2D/effect signature while rejecting stale producer proof.",
+      "R30 per-eye builder admits only valid spatial game WVP; R33 actual stereo draw and fallback preserve original renderer/host state."
+    ],
+    "alternatives_rejected": [
+      "Adding another D3A5 or C993 hook is duplicate code: exact original ownership already exists.",
+      "Disabling generic projection classification would admit unrelated roads/HUD; retained for every non-centre draw.",
+      "Treating CI as Quest3 optical evidence is invalid; headset verification remains pending."
+    ],
+    "fix_evidence": "Move full existing C993 raw-c64/telemetry/WorldRoute classification before generic signature early returns, preserving the exact later matrix math, R33 owner and original draw fallback.",
+    "negative_test_evidence": "Existing lens source mutation suite keeps shader/pose/queue/WVP/R33 invalidation guards; added fail-before/pass-after ordering checks force centre proof/early fallback before cached signature admission.",
+    "eye_ownership": "Exact source-owned sun uses original game WVP and current latched head inverse with two head-local eye poses and asymmetric FOV; HMD binocular result UNTESTED."
+  },
+  "ci_evidence": {
+    "exact_sha": null,
+    "dx9ex_active": "PENDING",
+    "domain_isolation": "PENDING",
+    "full_source_impact": "PENDING",
+    "hud_inspector": "PENDING",
+    "hmd_validation": "UNTESTED"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run targeted lens-source mutation and required exact-SHA workflows after attaching the material result. Do not claim Quest3 optical fixed before same-build HMD evidence."
+}
