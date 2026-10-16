@@ -46,6 +46,9 @@ def find_glass(raw):
         if header+52>len(raw):
             raise ValueError("short object header")
         nm,nc=read32(raw,header+44),read32(raw,header+48)
+        # Original PMTs can have material-free transform/LOD helpers.
+        if nm == 0 and nc == 0:
+            continue
         if not (0<nm<1024 and 0<nc<1024):
             raise ValueError("invalid material count")
         if materials+nm*88>len(raw) or colors+nc*72>len(raw):
