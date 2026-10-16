@@ -170,6 +170,7 @@ target_include_directories(outrun-vr-r30-early-rhw-shadow-smoke PRIVATE "${CMAKE
 target_include_directories(outrun-vr-rank-marker-fraction-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 add_executable(outrun-vr-goal-progress-owner-smoke tests/goal_progress_owner_smoke.cpp)
 add_executable(outrun-vr-semantic-tag-hint-smoke tests/semantic_tag_hint_smoke.cpp)
+add_executable(outrun-vr-hud-original-wvp-smoke tests/hud_original_wvp_smoke.cpp)
 # This smoke test compiles the real shared Win32 UI spacing policy from
 # ../src/vr/ui, unlike host-only menu aspect math under vrhost/src.
 target_include_directories(outrun-vr-menu-content-aspect-smoke PRIVATE
@@ -228,6 +229,7 @@ foreach(target
     outrun-vr-r30-shadow-ranges-smoke
     outrun-vr-goal-progress-owner-smoke
     outrun-vr-semantic-tag-hint-smoke
+    outrun-vr-hud-original-wvp-smoke
     outrun-vr-capture-descriptor-smoke
     outrun-vr-r32-policy-smoke
     outrun-vr-frame-pacing-smoke

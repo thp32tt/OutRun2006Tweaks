@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00931",
+  "production_id": "CONVERSION-DX9EX-00931",
+  "event_id": "CONVERSION-DX9EX-00931-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00931",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_MATERIAL_SOURCE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "d81a0af12120f1a73e584ed6748c56549480aded",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/hud_original_wvp_provenance.hpp",
+    "vrhost/tests/hud_original_wvp_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00931.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Prevent original game speed/time/position ScreenHud glyphs from inheriting another producer's shader c64 across all rendered VR eyes, preserving the full gameplay HUD while exposing uncertain c64 sources to the original renderer fallback.",
+    "scope_boundary": "R84 source-owned shader ScreenHud only; preserves fixed-function XYZRHW HUD, menu/F11, projected rank, C993 lens, GOAL/+TIME, R26_SAFE, world, SkyGlow, input/FFB and frozen DXVK.",
+    "special_work_evidence": "R30GetRecentOriginalHudWvp checked raw c64 shader, pose and draw age but never GetLastGameWvpSemanticProvenance; a different SpriteNode sharing the shader could be admitted for eye projection.",
+    "trace_stages": [
+      "Original game tagged HUD speed/time/rank glyph publishes ScreenHud SpriteNode and original GPU SetVertexShaderConstantF write",
+      "R51 records c64 producer identity/queue epoch/node and R84 retrieves it at exact current shader HUD Draw",
+      "R84 original HUD finite eye plane consumes source-validated game c64 for both eyes while live c64 remains the restore source"
+    ],
+    "subcomponents": [
+      "R84 R30 shader HUD original-WVP producer-and-queue admission integrated before finite HUD-plane transform",
+      "Native portable HUD provenance regression integrated as a host CMake smoke target for direct/queued positive, foreign node, stale epoch, untagged and wrong source fallback"
+    ],
+    "acceptance_items": [
+      {
+        "id": "source_owned_hud_eye_projection",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original shader HUD c64 write and R84 both-eye gameplay HUD plane",
+        "expected_behavior": "Only the matching original ScreenHud producer and live queue SpriteNode may authorize a finite stereo HUD matrix."
+      },
+      {
+        "id": "foreign_source_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign shader source, queued replay lifetime, unrelated F11/menu/world and original mono drawing",
+        "expected_behavior": "Wrong producer, world scope, stale queue epoch or different SpriteNode cannot lend WVP to HUD; original draw remains available."
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Native Windows x86 R84/R26_SAFE, x64 host, package, Domain and source-impact protection",
+        "expected_behavior": "The final exact source SHA passes mandatory Actions without skipping gates, with Quest3/VDXR runtime explicitly untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source_owned_hud_eye_projection": "PENDING",
+    "foreign_source_safe_fallback": "PENDING",
+    "exact_sha_required_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "R84 gameplay shader HUD entered perspective finite-plane branch using any recent same-shader, same-pose original game c64 even when its producer was foreign.",
+    "source_trace": [
+      "R51 stores game raw constant and semantic ownership at original SetVertexShaderConstantF write",
+      "R84 R30 obtains raw constant with shader, pose and age, previously omitting stored semantic identity",
+      "R33 submits R30-derived separate left/right constants and restores the original live GPU constant"
+    ],
+    "root_cause": "A shader identity and temporal window do not uniquely identify the HUD SpriteNode that created c64.",
+    "eye_ownership": "Original c64 is used to construct both optical eye matrices; wrong original owner reprojects another object's WVP into the full HUD field.",
+    "alternatives_rejected": [
+      "Do not extend the 12-draw window, reuse already stereo-injected live c64, or globally retag unrelated alpha and world effects."
+    ],
+    "fix_evidence": "Native path now requires matching ScreenHud producer and queue node epoch before the finite stereo HUD plane.",
+    "negative_test_evidence": "Native CMake-registered HUD WVP smoke test checks direct/queued positive, foreign producer, world/overlay, wrong SpriteNode, invalid epoch, untagged source and original direct fallback."
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "After previous task 00930 exact-SHA Actions have completed, fast-forward one material source commit; run mandatory exact-SHA gates once, record RUNTIME_VALIDATION=UNTESTED and C6 separately."
+}

@@ -23,6 +23,7 @@
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "hud_original_wvp_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
 #include "stage_extension_eye_plane.hpp"
 #include "../core/r29_owner_api.hpp"
@@ -2596,16 +2597,22 @@ namespace OutRunVRStereo
         // reprojection. Never feed it into a second HUD world-plane transform.
         bool R30GetRecentOriginalHudWvp(float out[16]) noexcept
         {
-            if (!out ||
-                !OutRunVR::GameSemantic::CorroboratesHud(
-                    OutRunVR::GameSemantic::EffectiveScope()))
+            using namespace OutRunVR::GameSemantic;
+            if (!out || !CorroboratesHud(EffectiveScope()))
                 return false;
             std::uint64_t writeSerial = 0, writeDrawSerial = 0;
             std::uintptr_t writeShader = 0, currentShader = 0;
             std::uint64_t writeEpoch = 0, currentEpoch = 0;
+            RenderScope writtenScope = RenderScope::None;
+            std::uint64_t writtenQueueEpoch = 0;
+            const void* writtenNode = nullptr;
+            ProducerToken writtenProducer = ProducerToken::None;
             if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
                     out, writeSerial, writeDrawSerial,
                     writeShader, writeEpoch) ||
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    writtenScope, writtenQueueEpoch, writtenNode,
+                    writtenProducer) ||
                 !R29OwnerCurrentShaderEpoch(currentShader, currentEpoch) ||
                 !writeShader || writeShader != currentShader ||
                 !writeEpoch || writeEpoch != currentEpoch ||
@@ -2613,9 +2620,18 @@ namespace OutRunVRStereo
                 OutRunVRRenderer::GetCurrentLatchedPoseEpoch() !=
                     OutRunVRRenderer::GetLastGameWvpPoseEpoch())
                 return false;
-            // R26 used a 12-draw original WVP window for direct and queued
-            // HUD glyphs. Longer-lived/stale uploads must keep the lower
-            // fail-closed path, never borrow an unrelated world's c64.
+
+            // Exact HUD glyphs share shader IDs with unrelated scene draws.
+            // Matching shader/pose and a 12-draw age never proves that the
+            // raw game c64 belongs to this HUD SpriteNode. Do not project a
+            // road/rival/prior-glyph WVP onto both eye HUD planes. The caller
+            // retains its conservative original draw when proof is missing.
+            if (!OutRunVR::HudOriginalWvp::OwnsProducer({
+                    EffectiveScope(), writtenScope,
+                    CurrentRenderProducerToken(), writtenProducer,
+                    QueueRenderActive(), CurrentQueueNode(), writtenNode,
+                    CurrentQueueNodeEpoch(), writtenQueueEpoch }))
+                return false;
             const std::uint64_t nextDraw =
                 R29OwnerTopLevelDrawSerial() + 1u;
             return nextDraw > writeDrawSerial &&
