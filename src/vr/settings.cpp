@@ -115,6 +115,8 @@ namespace Settings
 		"Hides only the selected driver robot while DriverSeatView is active. Passenger/girlfriend rendering remains untouched." };
 	Setting<int> VRDriverSeatDriverWorkId{ "VR", "DriverSeatDriverWorkId", 0,
 		"Robot workId suppressed as the player driver in DriverSeatView. Candidate workId/chrset pairs are logged so this can be corrected live from F11 without rebuilding.", Range<int>{ 0, 20 } };
+	Setting<int> VRDriverSeatDriverChrset{ "VR", "DriverSeatDriverChrset", -1,
+		"Optional exact driver character set. -1 preserves old workId-only behavior; use logged chrset to retain a passenger sharing the same workId. Not hand tracking.", Range<int>{ -1, 4095 } };
 	Setting<float> VRWorldScale{ "VR", "WorldScale", 1.0f,
 		"Game-world units per metre of OpenXR head movement.", Range<float>{ 0.1f, 10.0f } };
 	Setting<float> VRStereoDepth{ "VR", "StereoDepth", 1.0f,

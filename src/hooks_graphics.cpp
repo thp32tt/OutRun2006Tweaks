@@ -5,6 +5,7 @@
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
+#include "vr/game/driver_seat_occupant.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
@@ -41,6 +42,7 @@ namespace Settings
 	extern Setting<bool> VRDriverSeatFullCar;
 	extern Setting<bool> VRDriverSeatHideDriver;
 	extern Setting<int> VRDriverSeatDriverWorkId;
+	extern Setting<int> VRDriverSeatDriverChrset;
 	Setting<bool> RestoreXboxBrightness{ "Graphics", "RestoreXboxBrightness", false,
 		"Restores the HDR effect from the Xbox releases, brightening up most areas of the game." };
 
@@ -259,8 +261,12 @@ class VRDriverSeatRenderTest : public Hook
 		if (Active() && robot)
 		{
 			TraceRobotCandidate(robot);
-			if (Settings::VRDriverSeatHideDriver &&
-				static_cast<int>(robot->workId_0) == Settings::VRDriverSeatDriverWorkId.get())
+			if (OutRunVR::DriverSeatOccupant::HideVerifiedDriver(
+				Settings::VRDriverSeatHideDriver,
+				static_cast<int>(robot->workId_0),
+				static_cast<int>(robot->chrset_8),
+				Settings::VRDriverSeatDriverWorkId.get(),
+				Settings::VRDriverSeatDriverChrset.get()))
 			{
 				if (!DriverHiddenLogged)
 				{

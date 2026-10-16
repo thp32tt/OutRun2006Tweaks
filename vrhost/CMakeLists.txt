@@ -283,6 +283,16 @@ add_custom_command(TARGET outrun-vr-driver-seat-pass-smoke POST_BUILD
     COMMENT "Run real cockpit / scene-effect camera ownership regression"
     VERBATIM)
 
+# Native driver workId + optional chrset source selection.
+add_executable(outrun-vr-driver-occupant-smoke
+    tests/driver_seat_occupant_smoke.cpp)
+target_include_directories(outrun-vr-driver-occupant-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-driver-occupant-smoke)
+add_custom_command(TARGET outrun-vr-driver-occupant-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-driver-occupant-smoke>"
+    COMMENT "Run driver vs passenger identity regression"
+    VERBATIM)
 add_executable(outrun-vr-driver-seat-camera-smoke tests/driver_seat_camera_smoke.cpp)
 target_include_directories(outrun-vr-driver-seat-camera-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 add_dependencies(outrun-vr-host outrun-vr-driver-seat-camera-smoke)
@@ -385,6 +395,7 @@ foreach(target
     outrun-vr-menu-content-aspect-smoke
     outrun-vr-stage-edge-cull-smoke
     outrun-vr-driver-seat-camera-smoke
+    outrun-vr-driver-occupant-smoke
     outrun-vr-driver-seat-pass-smoke
     outrun-vr-quest-stereo-cull-smoke
     outrun-vr-reflection-budget-smoke
