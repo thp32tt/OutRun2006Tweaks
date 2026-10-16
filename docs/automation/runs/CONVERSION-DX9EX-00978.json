@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:PERF:REFLECTION_REFRESH_RELOCK",
   "symptom_id": "DX9EX:SYMPTOM:REFLECTION_REFRESH_CHANGE_STUCK_LATE",
   "feature_class": "MEASURED_PERFORMANCE",
-  "status": "IN_PROGRESS",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "834b3d3b047829a5b2fe0705b08564846f1bee42",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "099676d096007155287164bf1ea6294392a0898f",
   "source_paths": [
     "src/vr/game/reflection_frame_budget.hpp",
     "src/hooks_graphics.cpp"
@@ -85,5 +85,12 @@
     "runtime_limit": "Portable source regression and CI are not Quest3/VDXR hardware proof. Real refresh transition, GPU p95/p99 and image quality remain UNTESTED."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run changed-area portable C++ regression and the required final exact-SHA GitHub Actions gates. Record C6 separately only after all Gate results are confirmed; Quest3/VDXR remains UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA bookkeeping complete; no build/CI rerun and no duplicate score. Quest3/VDXR HMD runtime remains UNTESTED; preserve material_result_sha, feature_contract and acceptance_results.",
+  "ci_evidence": {
+    "status": "SUCCESS",
+    "validation_sha": "099676d096007155287164bf1ea6294392a0898f",
+    "validation_bearing_result_sha": "099676d096007155287164bf1ea6294392a0898f",
+    "verification_source": "user_confirmed_exact_sha_github_ci",
+    "summary": "User confirmed SUCCESS for the exact non-skipped validation SHA; recorded C6 result only without source changes, building, or CI reruns."
+  }
 }
