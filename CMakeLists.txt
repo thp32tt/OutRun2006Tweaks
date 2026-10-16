@@ -594,6 +594,8 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d11/live_game_frame_bridge.hpp"
 	"src/vr/d3d11/native_shared_eye_ring.cpp"
 	"src/vr/d3d11/native_shared_eye_ring.hpp"
+	"src/vr/d3d11/native_game_stereo_submission.cpp"
+	"src/vr/d3d11/native_game_stereo_submission.hpp"
 	"src/vr/d3d11/pipeline_translation.cpp"
 	"src/vr/d3d11/pipeline_translation.hpp"
 	"src/vr/d3d11/fixed_function_pipeline.cpp"

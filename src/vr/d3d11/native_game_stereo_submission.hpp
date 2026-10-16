@@ -1,0 +1,65 @@
+#pragma once
+
+#include "native_shared_eye_ring.hpp"
+
+namespace outrun::vr::dx11 {
+
+// Ingress for TWO separately rendered, game-authored native D3D11 eye frames.
+// The legacy full-frame diagnostic bridge exposes only one mono texture;
+// feeding that texture to both eyes here is forbidden. A real game stereo
+// renderer must call capture_eye separately after each native draw pass with
+// its latched eye-view signature and a positive native draw count.
+//
+// One begun frame owns one ring slot until both GPU copies have been enqueued
+// and the producer EVENT is complete. Dropped/partial frames never advertise
+// an OpenXR handle, and the ordinary D3D9/SBS/input path is unaffected.
+class NativeGameStereoSubmission final {
+public:
+    explicit NativeGameStereoSubmission(NativeSharedEyeRing& ring) noexcept
+        : ring_(ring) {}
+    NativeGameStereoSubmission(const NativeGameStereoSubmission&) = delete;
+    NativeGameStereoSubmission& operator=(const NativeGameStereoSubmission&) = delete;
+
+    // Requires an initialized, lifetime-bound ring and the game renderer's
+    // current immediate D3D11 context. sourcePoseSequence binds both eyes
+    // to the same OpenXR pose snapshot without retaining HMD pose pointers.
+    bool begin(ID3D11DeviceContext* context, std::uint64_t frameId,
+               std::uint64_t sourcePoseSequence,
+               const OutRunVR::Core::FrameAck* ack = nullptr) noexcept;
+
+    // Called once per REAL native eye render. eyeViewSignature must identify
+    // the game camera/projection used for that eye, not a synthetic eye index.
+    // Distinct signatures prove that the renderer supplied independent views;
+    // this is not a substitute for game/Quest3 visual parity verification.
+    bool capture_eye(std::uint32_t eyeIndex, ID3D11Texture2D* nativeColor,
+                     std::uint64_t nativeDrawCount,
+                     std::uint64_t eyeViewSignature,
+                     std::uint64_t sourcePoseSequence) noexcept;
+
+    // Copy both genuine game eyes on the producer's single GPU command stream,
+    // then arm its asynchronous fence. Never advertise or ACK on mere enqueue.
+    bool submit() noexcept;
+    bool try_publish(NativeSharedEyePublication& published) noexcept;
+
+    // Safe only before the first GPU copy. After submit the ring owns all
+    // in-flight work; destroy/reset the ring on synchronization failure.
+    bool cancel() noexcept;
+    [[nodiscard]] bool active() const noexcept { return state_ != State::Idle; }
+    [[nodiscard]] bool in_flight() const noexcept { return state_ == State::GpuPending; }
+
+private:
+    enum class State : std::uint8_t { Idle, Acquired, GpuPending };
+    void release_local() noexcept;
+    [[nodiscard]] bool source_is_live(ID3D11Texture2D* source) const noexcept;
+
+    NativeSharedEyeRing& ring_;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> eyes_[2];
+    std::uint64_t eyeViews_[2]{};
+    std::uint64_t frameId_{};
+    std::uint64_t poseSequence_{};
+    std::uint32_t slot_{OutRunVR::RenderFrameRingSize};
+    State state_{State::Idle};
+};
+
+} // namespace outrun::vr::dx11
