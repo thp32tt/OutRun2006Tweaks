@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "c80daece343c3fc2c93d7acb4dc20008d9388bf6",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "0014b47bff3c5adef1b89704168c956cbc404dc1",
+  "validation_bearing_result_sha": "0014b47bff3c5adef1b89704168c956cbc404dc1",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/hud_shader_eye_pose.hpp"
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "hud_canted_shader_pair": "SOURCE_IMPLEMENTED",
-    "hud_mono_fallback": "NATIVE_SMOKE_PENDING",
-    "hud_exact_sha_ci": "PENDING"
+    "hud_canted_shader_pair": "PASS_BUILD",
+    "hud_mono_fallback": "PASS_BUILD",
+    "hud_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The R84 exact ScreenHud shader optical plane used an identity quaternion for both eyes and computed the float tracking centre by summing finite offsets before halving. Unlike adjacent corrected R84 lens/+TIME/rank paths, HUD shader c64 therefore discarded valid OpenXR cant and could reject both eyes on midpoint overflow.",
@@ -84,9 +84,26 @@
     "alternatives_rejected": [
       "The prior rank and +TIME mutations already correct their own canted eye sources and do not reach exact shader gameplay ScreenHud; adjusting menu crop, F11 font atlas or game HUD anchors cannot restore a removed eye quaternion."
     ],
-    "fix_evidence": "R84 HUD c64 source and portable builder changed together, host CI compiled/executed gate pending exact SHA.",
-    "negative_test_evidence": "Release-capable native smoke checks canted and parallel pairs, relative IPD, maximum finite tracking midpoint and untouched outputs on invalid right-eye quaternion, NaN IPD and nonpositive/nonfinite world scale."
+    "fix_evidence": "Real R84 gameplay ScreenHud shader C++ now consumes normalized independently canted OpenXR eye orientations with relative IPD, original-WVP/finite plane/optical scale unchanged. Exact SHA mandatory Active x86 R84/R26_SAFE + x64 host/native smoke/package and Domain/HUD/Full Source all SUCCESS.",
+    "negative_test_evidence": "Release-capable native C++ smoke included in mandatory Windows host build (SUCCESS) covers parallel/canted quaternions, normalized bilateral IPD, finite-extreme origin and atomic rejection of invalid second eye, NaN origin, zero/negative/infinite world scale."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run one exact-SHA DX9Ex Active Windows R84+R26_SAFE/host/package, Domain, HUD and Full Source gate, fix only actual failures in same TASK; Quest3/VDXR remains untested."
+  "next_action": "C6 PASS_EXACT_SHA with material/result identity preserved. Controller can dispatch a separate nonoverlapping DX9Ex feature; Quest3/VDXR optical alignment and FPS remain NEED_HMD_TEST.",
+  "ci_evidence": {
+    "validation_sha": "0014b47bff3c5adef1b89704168c956cbc404dc1",
+    "exact_sha": "PASS",
+    "run_ids": {
+      "DX9Ex Active Validation": 38854694551,
+      "Domain Isolation Guard": 38854694723,
+      "OutRun EXE HUD Inspector CI": 38854694661,
+      "DX9Ex Full Source Impact Review": 38854694562
+    },
+    "conclusions": {
+      "DX9Ex Active Validation": "SUCCESS_5_OF_5",
+      "Domain Isolation Guard": "SUCCESS",
+      "OutRun EXE HUD Inspector CI": "SUCCESS_2_OF_2",
+      "DX9Ex Full Source Impact Review": "SUCCESS_3_OF_3"
+    },
+    "hmd_validation": "UNTESTED"
+  }
 }
