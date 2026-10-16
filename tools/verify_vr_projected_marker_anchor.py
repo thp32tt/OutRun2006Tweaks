@@ -579,10 +579,23 @@ def require_rank_direct_isolation(source: str, helper: str = rank_fraction) -> N
     a = clip.find("const float frozenFractionX = RankMarkerFracX;")
     b = clip.find("const float frozenFractionY = RankMarkerFracY;")
     c = clip.find("Game::put_clip_sprite(")
-    d = clip.find("OutRunVR::RankMarker::RestoreFraction(")
-    e = clip.find("*node, frozenFractionX, frozenFractionY);", d)
+    d = clip.find("OutRunVR::RankMarker::RestoreAppendedRankFractions(")
+    e = clip.find("frozenFractionX, frozenFractionY);", d)
     if min(a,b,c,d,e) < 0 or not (a < b < c < d < e):
-        fail("nested 4th+ rank glyph offsets not snapshotted before call")
+        fail("nested 4th+ rank glyph offsets not snapshotted before live-queue correction")
+    # The helper must walk the CURRENT priority root, prove old/new tail
+    # reachability without touching a detached old tail, and bound all
+    # native kind0/kind1 fractional sibling writes.
+    for required in (
+        "FirstVerifiedAppendedNode(",
+        "root, oldTail, newTail, bound);",
+        "if (!first)",
+        "for (Node* node = first; node && bound != 0; --bound)",
+        "RestoreFraction(*node, dx, dy)",
+        "if (node == newTail)",
+    ):
+        if required not in helper:
+            fail("rank live-root child proof changed: " + required)
     if '#include "vr/game/rank_marker_fraction.hpp"' not in source:
         fail("rank caller not using shared two-layout correction")
     for required in (
@@ -608,8 +621,8 @@ for name, original, replacement in (
     ("rank sprani pending", "Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani", "false,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani"),
     ("rank clip direct", "ProducerToken::RankMarkerClipSprite);", "ProducerToken::RivalMarkerSprani);"),
     ("rival direct", "ProducerToken::RivalMarkerSprani);", "ProducerToken::RankMarkerSprani);"),
-    ("digit producer frozen X", "*node, frozenFractionX, frozenFractionY);", "*node, RankMarkerFracX, frozenFractionY);"),
-    ("digit producer frozen Y", "*node, frozenFractionX, frozenFractionY);", "*node, frozenFractionX, RankMarkerFracY);"),
+    ("digit producer frozen X", "frozenFractionX, frozenFractionY);", "RankMarkerFracX, frozenFractionY);"),
+    ("digit producer frozen Y", "frozenFractionX, frozenFractionY);", "frozenFractionX, RankMarkerFracY);"),
 ):
     changed = ui.replace(original, replacement, 1)
     if changed == ui:
@@ -620,6 +633,22 @@ for name, original, replacement in (
         pass
     else:
         fail("destructive marker owner mutant escaped: " + name)
+
+# Bypass of the live queue proof is a destructive mutation even when
+# the original two-layout fraction arithmetic remains untouched.
+for name, old, new in (
+    ("rank queue proof removed", "FirstVerifiedAppendedNode(", "UnprovenAppendedNode("),
+    ("rank queue bound removed", "node && bound != 0; --bound", "node; --bound"),
+):
+    changed = rank_fraction.replace(old, new, 1)
+    if changed == rank_fraction:
+        fail("rank queue proof mutation setup failed: " + name)
+    try:
+        require_rank_direct_isolation(ui, changed)
+    except SystemExit:
+        pass
+    else:
+        fail("rank queue proof mutation escaped: " + name)
 
 for name, old, new in (
     ("kind0 X", "x = &node.args_10.float24;", "x = &node.args2_58.mtx_14._41;"),
