@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00950",
+  "production_id": "CONVERSION-DX9EX-00950",
+  "event_id": "CONVERSION-DX9EX-00950-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00950",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_REQUIRED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "eb48fdd94719a2e20c5eccdd1836df812ac8b2e7",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/multi_sprite_contain_scale.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/multi_sprite_contain_scale.hpp",
+    "vrhost/tests/menu_custom_quad_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00950.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep all three original native menu/selector 9/11/13 stride multi-sprite GPU quads centered and aspect-correct after a live size change when screen_scale still describes the previous frame.",
+    "scope_boundary": "Native KeepCentered and OnlineArcade front-end UI quads only; original HUD/GOAL/F11/ESC/lens/world/FFB/SkyGlow and DXVK/DX11 unchanged.",
+    "trace_stages": [
+      "Original game UI producer provides four scaled XY vertices in one of three GPU strides.",
+      "Native UI hook bounds requested 4:3 containment to live physical target size.",
+      "Stage and atomically publish all four corners after finite validation, otherwise keep original continuation."
+    ],
+    "subcomponents": [
+      "Physically bound all three native 9/11/13 GPU vertex families.",
+      "Preserve native 4:3/low user scale and original UV/alpha/depth.",
+      "Portable Release C++ regression covering all strides, Reset, ultrawide, portrait and malformed target."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_multisprite_reset",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original menu/selector source multi-sprite",
+        "expected_behavior": "No escaped vertices with cached old 21:9 scale and current 16:9/portrait target."
+      },
+      {
+        "id": "menu_negative_sources",
+        "category": "fallback_regression",
+        "behavior_area": "Native 4:3, gameplay and malformed sources",
+        "expected_behavior": "Unchanged screen-space original/desktop results, four-corner all-or-none."
+      },
+      {
+        "id": "menu_final_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA DX9Ex Windows and host/package/Domain/Full Source",
+        "expected_behavior": "All mandatory gates pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_multisprite_reset": "PENDING_CI",
+    "menu_negative_sources": "PENDING_CI",
+    "menu_final_gate": "PENDING_CI"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run native regression and exact-SHA Active/Domain/Full Source/HUD gates; HMD runtime not tested."
+}

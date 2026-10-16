@@ -1,4 +1,5 @@
 #include "vr/ui/menu_quad_transform.hpp"
+#include "vr/ui/multi_sprite_contain_scale.hpp"
 #include <cmath>
 #include <limits>
 
@@ -85,5 +86,38 @@ int main()
     if(!Near(ProjectX(stale,sx)-ProjectX(stale,0),sx*stale.scaleX) ||
        !Near(ProjectY(stale,sy)-ProjectY(stale,0),sy*stale.scaleY))
         return 9;
+    // Reset repro: old ultrawide game scale versus a new 1600x900 raster.
+    // Verify all native original menu/car-selector vertex stride owners.
+    using OutRunVrUiAspect::BoundedMultiSpriteContainScale;
+    const float bounded=BoundedMultiSpriteContainScale(
+        5.375f,3.0f,1600,900,640,480);
+    if(!Near(bounded,1.875f)) return 10;
+    for(int stride : {9,11,13}) {
+        float vertices[4*13]{};
+        for(int k=0;k<4;++k) {
+            vertices[k*stride]=k%2?640.f*5.375f:0.f;
+            vertices[k*stride+1]=k>=2?480.f*3.f:0.f;
+            vertices[k*stride+2]=123.f;
+        }
+        for(int k=0;k<4;++k) {
+            const float x=vertices[k*stride]/5.375f*bounded+
+                (1600.f-640.f*bounded)*0.5f;
+            const float y=vertices[k*stride+1]/3.f*bounded+
+                (900.f-480.f*bounded)*0.5f;
+            if(x<-0.001f||x>1600.f||y<-0.001f||y>900.f||
+               !Near(vertices[k*stride+2],123.f)) return 11;
+        }
+    }
+    if(!Near(BoundedMultiSpriteContainScale(
+            5.375f,3.f,3440,1440,640,480),3.f)||
+       !Near(BoundedMultiSpriteContainScale(
+            1.f,1.f,1920,1080,640,480),1.f)||
+       !Near(BoundedMultiSpriteContainScale(
+            1.875f,3.33333f,1200,1600,640,480),1.875f)) return 12;
+    if(BoundedMultiSpriteContainScale(3,2,0,1080,640,480)!=0||
+       BoundedMultiSpriteContainScale(3,2,1920,1080,0,480)!=0||
+       BoundedMultiSpriteContainScale(3,2,
+           std::numeric_limits<float>::quiet_NaN(),1080,640,480)!=0)
+        return 13;
     return 0;
 }

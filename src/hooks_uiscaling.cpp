@@ -8,6 +8,7 @@
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
+#include "vr/ui/multi_sprite_contain_scale.hpp"
 
 #include <algorithm>
 #include <array>
@@ -1752,7 +1753,12 @@ class UIScaling : public Hook
 			originalHeight * sy == height)
 			return;
 
-		const float contain = (std::min)(sx, sy);
+		// Original menu screen_scale can remain stale after a live Reset.
+		// The three 9/11/13-stride paths must all fit the live backbuffer.
+		const float contain = OutRunVrUiAspect::BoundedMultiSpriteContainScale(
+			sx, sy, width, height, originalWidth, originalHeight);
+		if (!(contain > 0.0f))
+			return;
 		float transformedX[4]{};
 		float transformedY[4]{};
 		// All-or-nothing: reject a nonfinite vertex or overflow before
