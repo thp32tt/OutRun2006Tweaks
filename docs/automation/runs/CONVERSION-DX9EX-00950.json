@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
-  "status": "C5_CI_RUNNING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_EXACT_SHA_REQUIRED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "eb48fdd94719a2e20c5eccdd1836df812ac8b2e7",
   "material_result_sha": "b10a80c98d929b9c55655f8441f2f5735977193f",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "81854c507f78b8687dabb9f5dc38daa9461c0cf8",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/ui/multi_sprite_contain_scale.hpp"
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "menu_multisprite_reset": "PENDING_CI",
-    "menu_negative_sources": "PENDING_CI",
-    "menu_final_gate": "PENDING_CI"
+    "menu_multisprite_reset": "PASS_EXACT_SHA",
+    "menu_negative_sources": "PASS_EXACT_SHA",
+    "menu_final_gate": "PASS_EXACT_SHA"
   },
   "score_delta_this_attempt": 0,
   "next_action": "Run native regression and exact-SHA Active/Domain/Full Source/HUD gates; HMD runtime not tested.",
@@ -80,6 +80,26 @@
     "first_ci_failure": "Exact MSVC host static analyzer at b10a80c detected C3312 initializer-list header missing in native menu stride test; same-task compiler-input repair committed as da4eb01693980be55a3aa7dfd2d081ff277be371",
     "last_known_repair_sha": "da4eb01693980be55a3aa7dfd2d081ff277be371",
     "final_gate_input": "Source-negative UI verifier now verifies live BoundedMultiSpriteContainScale in all three original 9/11/13 stride producers; HUD Inspector/Active/FullSource/Domain exact-SHA checks required",
-    "runtime_hmd": "UNTESTED"
+    "runtime_hmd": "UNTESTED",
+    "current_validation": "PASS_EXACT_SHA",
+    "exact_sha": "81854c507f78b8687dabb9f5dc38daa9461c0cf8",
+    "dx9ex_active": {
+      "run_id": 38885228610,
+      "status": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38885228633,
+      "status": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38885228548,
+      "status": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38885228772,
+      "status": "SUCCESS"
+    },
+    "gameplay_hmd": "NOT_RUN",
+    "previous_msvc_header_failure": "b10a80c98d failed missing <initializer_list>; same-task repair da4eb016; validated full combined 81854c50"
   }
 }
