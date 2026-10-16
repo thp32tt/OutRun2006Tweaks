@@ -17,8 +17,8 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
 - Guard: 255 archived crops are immutable, matching archived queue + XYXY
   is skipped, old output never overwritten, no source tiles accepted.
 - Schedule: 60 seconds per poll, up to 10 *new verified queued* crops/cycle.
-  Every 600 seconds, the same worker runs `discover.py` over the SHA- and
-  DDS-pixel-proven verified source registry (currently Q051 and Q060).
+  Every 600 seconds, the same worker runs `ocr_recognize.py` over the SHA- and
+  DDS-pixel-proven source registry (currently six sources).
 - Automatic geometry discovery: non-destructive alpha/connected-component
   analysis proposes possible text bboxes in `auto_discovery/Q*_candidates.json`.
   Each proposal is deduplicated against the 255 archived native crops and the
@@ -64,3 +64,6 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
   (N100 must have the locally built `outrun-c-english-ocr:20261017` image).
 - Check: `docker logs --tail 50 outrun-c-original-english-crop`.
   No Portainer stack or existing containers are modified.
+**2026-10-17 performance policy:** the older alpha-only geometry candidate sweep is
+retained for offline diagnostics but no longer runs periodically in production.
+Tesseract supplies phrase text and native coordinates in the same bounded pass.
