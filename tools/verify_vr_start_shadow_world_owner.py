@@ -5,10 +5,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src/hooks_graphics.cpp"
 SEM = ROOT / "src/vr/game/render_semantics.hpp"
+SHADOW = ROOT / "src/vr/game/car_base_shadow_stereo.hpp"
 FLOW = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
 
-def check(code, sem):
+def check(code, sem, shadow):
     block = code.split("class RestoreCarBaseShadow : public Hook", 1)[1].split(
         "RestoreCarBaseShadow RestoreCarBaseShadow::instance;", 1)[0]
     for addr in ("0x69EB4", "0x6AC76", "0x6B766"):
@@ -26,7 +27,10 @@ def check(code, sem):
         "Settings::VREnabled &&\n\t\t\t\t!OutRunVR::GameSemantic::QueueRenderActive()",
         "? OutRunVR::GameSemantic::RenderScope::WorldParticle",
         ": OutRunVR::GameSemantic::RenderScope::None",
-        "a1, a4 * Settings::CarBaseShadowOpacity, 0, -1",
+        "float shadowAlpha = 0.f;",
+        "OutRunVR::CarShadowStereo::ValidScaledAlpha(",
+        "Settings::CarBaseShadowOpacity.get(), shadowAlpha",
+        "a1, shadowAlpha, 0, -1",
         "Game::mxPopMatrix();",
     ):
         assert fragment in block, fragment
@@ -41,9 +45,19 @@ def check(code, sem):
         r"OutRunVR::GameSemantic::ScopedRenderSemantic semantic\(\s*"
         r"OutRunVR::GameSemantic::RenderScope::WorldParticle\s*\);\s*"
         r"Game::DrawObjectAlpha_Internal\(\s*a1,\s*"
-        r"a4\s*\*\s*Settings::CarBaseShadowOpacity,\s*0,\s*-1\);",
+        r"shadowAlpha\s*,\s*0,\s*-1\);",
         block, re.S,
     )
+    assert block.index("ValidScaledAlpha(") < block.index(
+        "Game::mxPushLoadMatrix(&car->matrix_B0);")
+    assert "if (!OutRunVR::CarShadowStereo::ValidScaledAlpha(" in block
+    owned = shadow.split("inline bool ValidScaledAlpha(", 1)[1].split(
+        "struct DirectGameWvpOwner", 1)[0]
+    for token in ("std::isfinite(raw)", "std::isfinite(opacity)",
+                  "opacity <= 0.f", "raw * opacity",
+                  "std::isfinite(candidate)", "out = candidate;"):
+        assert token in owned, token
+
     for fragment in (
         "SpriteQueueDepth == 0", "savedQueueScope_ = CurrentQueueExactScope;",
         "CurrentQueueExactScope = RenderScope::None;",
@@ -58,14 +72,15 @@ def check(code, sem):
         assert fragment in exact, fragment
 
 
-def verify_mutations(code, sem):
+def verify_mutations(code, sem, shadow):
     probes = (
         ("ScopedExactProducerSemantic directWorld(", "ScopedRenderSemantic directWorld("),
         ("!OutRunVR::GameSemantic::QueueRenderActive()", "OutRunVR::GameSemantic::QueueRenderActive()"),
         ("Settings::VREnabled &&\n\t\t\t\t!", "Settings::VREnabled ||\n\t\t\t\t!"),
         ("? OutRunVR::GameSemantic::RenderScope::WorldParticle", "? OutRunVR::GameSemantic::RenderScope::ScreenHud"),
         ("0x69EB4", "0xBBBBB"),
-        ("a1, a4 * Settings::CarBaseShadowOpacity, 0, -1", "a1, a4 * 2.0f, 0, -1"),
+        ("a1, shadowAlpha, 0, -1", "a1, a4, 0, -1"),
+        ("!OutRunVR::CarShadowStereo::ValidScaledAlpha(", "!OutRunVR::CarShadowStereo::InvalidScaledAlpha("),
         ("Game::mxPopMatrix();", "// missing matrix unwind"),
         ("Game::DrawObjectAlpha_Internal(", "Game::IncorrectObjectDraw("),
         ("ScopedRenderSemantic semantic(", "ScopedRenderSemantic escaped("),
@@ -75,7 +90,7 @@ def verify_mutations(code, sem):
     for original, mutant in probes:
         assert original in code, original
         try:
-            check(code.replace(original, mutant, 1), sem)
+            check(code.replace(original, mutant, 1), sem, shadow)
         except (AssertionError, ValueError):
             continue
         raise AssertionError("mutant escaped: " + original)
@@ -85,10 +100,21 @@ def verify_mutations(code, sem):
     ):
         assert original in sem, original
         try:
-            check(code, sem.replace(original, mutant, 1))
+            check(code, sem.replace(original, mutant, 1), shadow)
         except (AssertionError, ValueError):
             continue
         raise AssertionError("semantic mutant escaped: " + original)
+    for original, mutant in (
+        ("if (!std::isfinite(candidate))", "if (false)"),
+        ("out = candidate;", "out = raw;"),
+        ("opacity <= 0.f", "opacity < 0.f"),
+    ):
+        assert original in shadow, original
+        try:
+            check(code, sem, shadow.replace(original, mutant, 1))
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError("unsafe alpha mutant escaped: " + original)
 
 
 def model():
@@ -105,12 +131,13 @@ def model():
 def main():
     code = SRC.read_text(encoding="utf-8")
     sem = SEM.read_text(encoding="utf-8")
+    shadow = SHADOW.read_text(encoding="utf-8")
     flow = FLOW.read_text(encoding="utf-8")
     assert flow.count("tools/verify_vr_start_shadow_world_owner.py") == 2
-    check(code, sem)
-    verify_mutations(code, sem)
+    check(code, sem, shadow)
+    verify_mutations(code, sem, shadow)
     model()
-    print("car shadow original CALL/world-eye ownership: PASS; 12 negative mutations rejected")
+    print("car shadow original CALL/world-eye ownership: PASS; 17 negative mutations rejected")
 
 
 if __name__ == "__main__":
