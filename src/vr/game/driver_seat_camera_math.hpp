@@ -99,6 +99,18 @@ namespace OutRunVR::DriverSeatCamera
             (requested > maximum ? maximum : requested);
     }
 
+    // Separate the original game's camera-mode/transition gate from the
+    // choice of mathematical pose basis. In a vertical loop the smoothed
+    // native view has no horizontal right vector, although matrix_B0 still
+    // supplies a valid car forward/up basis. Rejecting based on a *legacy*
+    // basis before trying the car basis makes the cockpit disappear.
+    inline bool NativeCameraModeEligible(bool enabled, bool gameplayActive,
+        float transitionTime, int nativeMode, int selectedMode) noexcept
+    {
+        return enabled && gameplayActive && nativeMode == selectedMode &&
+            std::isfinite(transitionTime) && transitionTime == 0.0f;
+    }
+
     // Scope contract: cockpit near-plane, player-car model, driver suppression
     // and camera displacement must agree for the *same* native camera frame.
     // Re-evaluate after mode switches; never reuse a cached eligibility bit.
@@ -107,8 +119,8 @@ namespace OutRunVR::DriverSeatCamera
         int nativeMode, int selectedMode, Vec3 position, Vec3 look,
         float forward, float right, float up) noexcept
     {
-        if (!enabled || !gameplayActive || nativeMode != selectedMode ||
-            !std::isfinite(transitionTime) || transitionTime != 0.0f)
+        if (!NativeCameraModeEligible(enabled, gameplayActive, transitionTime,
+                nativeMode, selectedMode))
             return false;
         Vec3 newPosition{}, newLook{};
         return ComputeTranslatedCamera(position, look, forward, right, up,

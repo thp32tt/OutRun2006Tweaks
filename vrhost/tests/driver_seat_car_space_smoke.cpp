@@ -100,5 +100,32 @@ int main() {
             -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
         !usedBody || !near(p.z, -1.35f))
         return 25;
+    // A vertical loop is a true negative for the legacy view's horizontal
+    // right vector. But it is a positive for the car-owned body basis.
+    // The original mode and timer are still independently checked.
+    const Vec3 loopLook{0.f, 10.f, 0.f};
+    const CarAxes loopCar{{0.f, 1.f, 0.f}, {0.f, 0.f, 1.f}};
+    Vec3 loopLegacyP{3.f,4.f,5.f}, loopLegacyL{6.f,7.f,8.f};
+    if (ComputeTranslatedCamera(originalPos, loopLook,
+            -1.35f, -0.32f, 0.65f, loopLegacyP, loopLegacyL))
+        return 26;
+    if (!NativeCameraModeEligible(true, true, 0.f, 1, 1) ||
+        NativeCameraModeEligible(true, true, 0.25f, 1, 1) ||
+        NativeCameraModeEligible(true, true, 0.f, 2, 1) ||
+        NativeCameraModeEligible(false, true, 0.f, 1, 1))
+        return 27;
+    if (!ComputeStableSeatPose(originalPos, loopLook, true, loopCar,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        !usedBody || !near(p.x, -0.32f) ||
+        !near(p.y, -1.35f) || !near(p.z, 0.65f) ||
+        !near(l.y, 8.65f))
+        return 28;
+    // A true invalid body and a vertical native camera still must fail
+    // atomically; never inject a partial stereo pose.
+    p={1.f,2.f,3.f}; l={4.f,5.f,6.f}; usedBody=true;
+    if (ComputeStableSeatPose(originalPos, loopLook, true, invalidBody,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        !near(p.x,1.f) || !near(l.z,6.f) || !usedBody)
+        return 29;
     return 0;
 }

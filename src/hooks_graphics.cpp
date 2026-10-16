@@ -198,21 +198,17 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
     // displace the camera, force a near plane, or hide any occupant.
     if (!camera || !Game::pl_car())
         return false;
-    const auto& pos = camera->cam_pos_F8;
-    const auto& look = camera->look_pos_104;
-    if (!OutRunVR::DriverSeatCamera::CameraAndBodyEligible(
+    // Native scene/mode eligibility is independent of camera-space math.
+    // In a loop the native forward vector can be vertical while the car
+    // matrix still offers a stable seat basis. Check the selected pose once,
+    // and use this SAME result for camera, body, driver and near clip.
+    if (!OutRunVR::DriverSeatCamera::NativeCameraModeEligible(
             Settings::VREnabled && Settings::VRDriverSeatView,
             VRDriverSeatGameplayActive(), camera->cam_mode_timer_364,
             static_cast<int>(camera->cam_mode_34A),
-            Settings::VRDriverSeatNativeMode.get(),
-            {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
-            Settings::VRDriverSeatForward.get(),
-            Settings::VRDriverSeatRight.get(), Settings::VRDriverSeatUp.get()))
+            Settings::VRDriverSeatNativeMode.get()))
         return false;
 
-    // All cockpit render owners must use the same computed world-view pose.
-    // A bad optional body matrix must not drop the entire driver-seat pass:
-    // ComputeStableSeatPose falls back atomically to native camera space.
     D3DVECTOR correctedPosition{}, correctedLook{};
     return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
 }
