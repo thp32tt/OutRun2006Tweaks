@@ -566,7 +566,15 @@ namespace OutRunVRStereo
             // current shader-generation mismatch before this synthetic rebind.
             const auto worldRebindScope =
                 OutRunVR::GameSemantic::EffectiveScope();
+            // The original R29 path respects exact screen/effect ownership:
+            // SkyGlow and generic screen overlays demand zero-disparity even
+            // when the last GPU projection still looks like perspective world.
+            // Never let the R28 fast continuation override that semantic veto.
             const bool allowVerifiedWorldRebind =
+                !OutRunVR::GameSemantic::ForceZeroDisparity(
+                    worldRebindScope) &&
+                worldRebindScope !=
+                    OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D &&
                 worldRebindScope !=
                     OutRunVR::GameSemantic::RenderScope::ScreenHud &&
                 worldRebindScope !=
@@ -628,7 +636,11 @@ namespace OutRunVRStereo
                 return rebound;
             }
 
-            if (OutRunVRRenderer::R28PerspectiveWorldSemantic())
+            // The same semantic ownership gate applies to the no-epoch-change
+            // path. Otherwise a failed R33 HUD/sky eye builder can fall through
+            // and accidentally reproject the previous world WVP for both eyes.
+            if (allowVerifiedWorldRebind &&
+                OutRunVRRenderer::R28PerspectiveWorldSemantic())
             {
                 return R29DirectTwoEye(device,
                     std::forward<StereoR7Draw>(stereoR7Draw),

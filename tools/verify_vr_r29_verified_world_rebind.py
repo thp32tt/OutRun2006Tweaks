@@ -19,6 +19,8 @@ def check(main: str) -> None:
         "const auto worldRebindScope =", "OutRunVR::GameSemantic::EffectiveScope()",
         "RenderScope::ScreenHud", "RenderScope::ScreenOverlay2D",
         "RenderScope::ProjectedScreenEffect2D",
+        "RenderScope::ProjectedWorldMarker2D",
+        "ForceZeroDisparity(",
         "if (allowVerifiedWorldRebind &&", "R28CanRebindVerifiedWorld(",
         "CurrentVertexShaderIdentity.exchange(", "VertexShaderSerial.exchange(",
         "R29DirectTwoEye(", "false, site);",
@@ -29,6 +31,10 @@ def check(main: str) -> None:
     for token in required:
         assert token in block, f"R84 must retain shader-switch owner: {token}"
     assert "OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE" not in block, "comparison-only gate regressed"
+    assert block.count("if (allowVerifiedWorldRebind &&") == 2, (
+        "both shader-rebind and direct perspective routes must veto HUD/SkyGlow")
+    assert "ForceZeroDisparity(\n                    worldRebindScope)" in block, (
+        "sky postprocessing must not be stereo-reprojected as road geometry")
     assert block.index("const bool allowVerifiedWorldRebind") < block.index("if (allowVerifiedWorldRebind &&")
     assert block.index("if (allowVerifiedWorldRebind &&") < block.index("R29DirectTwoEye(")
     assert block.index("CurrentVertexShaderIdentity.compare_exchange_strong(") < block.index("return rebound;")
@@ -43,8 +49,23 @@ for proof in ("R28PerspectiveWorldSemantic()", "FloatArrayNear(current, verified
 assert "currentShader != verifiedShader" in r31 and "currentShaderSerial != verifiedShaderSerial" in r31
 assert "R33TryFastWorld(device" in r33 and "return fallbackToR29();" in r33
 check(r29)
+# A source mutation that skips only the second (same-shader) ownership gate
+# previously survived and routed flat HUD/SkyGlow using a stale world WVP.
+for old_predicate in (
+    "if (allowVerifiedWorldRebind &&\n                OutRunVRRenderer::R28PerspectiveWorldSemantic())",
+    "if (allowVerifiedWorldRebind &&\n                R28CanRebindVerifiedWorld(",
+):
+    assert old_predicate in r29, f"required R29 scoped predicate missing: {old_predicate}"
+    mutant = r29.replace(old_predicate, old_predicate.replace("allowVerifiedWorldRebind &&\n                ", ""), 1)
+    try:
+        check(mutant)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("unscoped shader/perspective world route survived mutation")
 for needle in ("OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE", "RenderScope::ScreenHud",
                "RenderScope::ScreenOverlay2D", "RenderScope::ProjectedScreenEffect2D",
+               "RenderScope::ProjectedWorldMarker2D", "ForceZeroDisparity(",
                "if (allowVerifiedWorldRebind &&", "R28CanRebindVerifiedWorld(",
                "VertexShaderSerial.compare_exchange_strong("):
     changed = r29.replace(needle, "DELETED_FOR_NEGATIVE_TEST", 1)
@@ -57,4 +78,4 @@ for needle in ("OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE", "RenderScope::ScreenH
         pass
     else:
         raise AssertionError(f"negative mutation escaped: {needle}")
-print("PASS R84 world shader-epoch continuation, UI scope veto, R26 proof and R31/R33 fallback guards; Quest3 UNTESTED")
+print("PASS R84 R28 c64/projection/pose world continuation and BOTH HUD/SkyGlow non-world vetoes; Quest3 UNTESTED")
