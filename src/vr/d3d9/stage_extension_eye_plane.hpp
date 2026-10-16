@@ -85,4 +85,52 @@ namespace OutRunVR::StageExtensionPlane
         eyeY = newY;
         return true;
     }
+
+    // D3DX +TIME sprite and numeric glyphs, GOAL progress and result text
+    // share a source pixel and a latched frame pose across both R84 eyes.
+    // Convert pixel -> game NDC ONCE before applying the independently
+    // canted eye projections. A failed eye publishes NEITHER output.
+    inline bool ProjectPixelPair(
+        const float leftClip[16], const float rightClip[16],
+        float sourceX, float sourceY,
+        float viewportX, float viewportY, float viewportWidth,
+        float viewportHeight, float hudScale,
+        float& leftX, float& leftY, float& rightX, float& rightY) noexcept
+    {
+        if (!leftClip || !rightClip || !std::isfinite(sourceX) ||
+            !std::isfinite(sourceY) || !std::isfinite(viewportX) ||
+            !std::isfinite(viewportY) || !std::isfinite(viewportWidth) ||
+            !std::isfinite(viewportHeight) || !std::isfinite(hudScale) ||
+            viewportWidth <= 0.0f || viewportHeight <= 0.0f ||
+            hudScale <= 0.0f)
+            return false;
+
+        const float nx = ((sourceX - viewportX) * 2.0f /
+                          viewportWidth - 1.0f) * hudScale;
+        const float ny = (1.0f - (sourceY - viewportY) * 2.0f /
+                          viewportHeight) * hudScale;
+        const float* eyes[2]{ leftClip, rightClip };
+        float px[2]{}, py[2]{};
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            const float* clip = eyes[eye];
+            const float x = nx * clip[0] + ny * clip[4] + clip[12];
+            const float y = nx * clip[1] + ny * clip[5] + clip[13];
+            const float w = nx * clip[3] + ny * clip[7] + clip[15];
+            if (!std::isfinite(x) || !std::isfinite(y) ||
+                !std::isfinite(w) || w <= 1.0e-5f)
+                return false;
+            px[eye] = viewportX + (x / w + 1.0f) *
+                0.5f * viewportWidth;
+            py[eye] = viewportY + (1.0f - y / w) *
+                0.5f * viewportHeight;
+            if (!std::isfinite(px[eye]) || !std::isfinite(py[eye]))
+                return false;
+        }
+        leftX = px[0];
+        leftY = py[0];
+        rightX = px[1];
+        rightY = py[1];
+        return true;
+    }
 }

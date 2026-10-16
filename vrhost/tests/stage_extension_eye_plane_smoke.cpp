@@ -1,6 +1,7 @@
 #include "../../src/vr/d3d9/stage_extension_eye_plane.hpp"
 #include <cmath>
 #include <limits>
+#include <initializer_list>
 namespace {
 bool Near(float a,float b,float eps=1e-4f) {
     return std::isfinite(a)&&std::isfinite(b)&&std::fabs(a-b)<eps;
@@ -50,5 +51,51 @@ int main() {
           std::numeric_limits<float>::quiet_NaN(),240,
           0,0,640,480,1,x,y)||
        ProjectPixel(identity,320,240,0,0,640,480,-1,x,y))return 11;
+
+    // The original independent-eye GPU route is the reference for full
+    // +TIME sprites, numeric glyphs and GOAL 0-99/result quads. The fused
+    // source-NDC route must agree at the centre and all viewport edges,
+    // including changing desktop size, HUD scale and per-eye cant/skew.
+    using OutRunVR::StageExtensionPlane::ProjectPixelPair;
+    float matrixL[16]{1,0,0,0.045f, 0,1,0,-0.02f,
+                      0,0,1,0, -0.035f,0.01f,0,1};
+    float matrixR[16]{1,0,0,-0.03f, 0,1,0,0.015f,
+                      0,0,1,0, 0.04f,-0.015f,0,1};
+    for (float scale : {0.30f, 0.55f, 1.0f, 1.20f}) {
+        for (const float dims[2] : {{640.f,480.f},{1920.f,1080.f},
+                                     {3440.f,1440.f},{720.f,1280.f}}) {
+            for (float fx : {0.f,0.25f,0.5f,0.75f,1.f}) {
+                for (float fy : {0.f,0.3f,0.5f,1.f}) {
+                    const float sx=73.f+fx*dims[0], sy=41.f+fy*dims[1];
+                    float lrx=0,lry=0,rrx=0,rry=0;
+                    float flx=0,fly=0,frx=0,fry=0;
+                    if (!ProjectPixel(matrixL,sx,sy,73,41,dims[0],dims[1],
+                                      scale,lrx,lry) ||
+                        !ProjectPixel(matrixR,sx,sy,73,41,dims[0],dims[1],
+                                      scale,rrx,rry) ||
+                        !ProjectPixelPair(matrixL,matrixR,sx,sy,73,41,
+                                          dims[0],dims[1],scale,
+                                          flx,fly,frx,fry) ||
+                        !Near(flx,lrx,0.002f) || !Near(fly,lry,0.002f) ||
+                        !Near(frx,rrx,0.002f) || !Near(fry,rry,0.002f))
+                        return 12;
+                }
+            }
+        }
+    }
+    // Reject malformed RIGHT-only projection without changing either
+    // earlier published eye; also reject invalid screen inputs and scale.
+    float badRight[16]{};
+    float oldLx=17,oldLy=19,oldRx=23,oldRy=29;
+    if (ProjectPixelPair(matrixL,badRight,320,240,0,0,640,480,
+                         0.55f,oldLx,oldLy,oldRx,oldRy) ||
+        ProjectPixelPair(matrixL,nullptr,320,240,0,0,640,480,
+                         0.55f,oldLx,oldLy,oldRx,oldRy) ||
+        ProjectPixelPair(matrixL,matrixR,320,240,0,0,0,480,
+                         0.55f,oldLx,oldLy,oldRx,oldRy) ||
+        ProjectPixelPair(matrixL,matrixR,320,240,0,0,640,480,
+                         -1.f,oldLx,oldLy,oldRx,oldRy) ||
+        oldLx!=17 || oldLy!=19 || oldRx!=23 || oldRy!=29)
+        return 13;
     return 0;
 }

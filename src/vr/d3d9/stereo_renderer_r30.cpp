@@ -4898,16 +4898,18 @@ namespace OutRunVRStereo
                             return false;
                         float leftX = 0.0f, leftY = 0.0f;
                         float rightX = 0.0f, rightY = 0.0f;
-                        if (!OutRunVR::StageExtensionPlane::ProjectPixel(
+                        // A pair is published only after both optical
+                        // projections succeed. Reuse one original pixel->NDC
+                        // conversion for the +TIME sprite, numeric glyph and
+                        // GOAL result, rather than decoding it twice per eye.
+                        if (!OutRunVR::StageExtensionPlane::ProjectPixelPair(
                                 reinterpret_cast<const float*>(
                                     &state.stageExtensionClipFromGameNdc[0]),
-                                stagePixel[0], stagePixel[1], x0, y0, width, height,
-                                state.stageExtensionScale, leftX, leftY) ||
-                            !OutRunVR::StageExtensionPlane::ProjectPixel(
                                 reinterpret_cast<const float*>(
                                     &state.stageExtensionClipFromGameNdc[1]),
-                                stagePixel[0], stagePixel[1], x0, y0, width, height,
-                                state.stageExtensionScale, rightX, rightY))
+                                stagePixel[0], stagePixel[1], x0, y0, width,
+                                height, state.stageExtensionScale,
+                                leftX, leftY, rightX, rightY))
                             return false;
                         auto* leftDst = reinterpret_cast<float*>(
                             left.data() + offset);
