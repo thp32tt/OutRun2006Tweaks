@@ -21,3 +21,22 @@ Date: 2026-10-16 KST. APK source: user's local `outrun2.apk`, native ARM64 `libo
 - Car-space feature stays opt-in until HMD verifies seated offset across 360SP/other cars, car pitch/yaw and transitions. Windshield transparency remains unchanged pending positive glass/material ID and per-eye blend-state ownership; do not broadly reduce alpha.
 - Follow mandatory exact SHA Win32 R84 / R26_SAFE / x64 host / Domain / HUD / package validation. HMD `RUNTIME_VALIDATION=UNTESTED` until physical Quest3/VDXR evidence.
 - N100 local analysis files `apk/_analysis_focus/camera_guest_match_20261016.json`, `disasm/camera_view_switch_20261016.asm`, `driver_display_20261016.asm` remain local and are not redistributed.
+
+## Subsequent APK TLS data-flow verification (bounded AArch64 xrefs)
+
+A bounded AArch64 ADRP + TLSDESC relocation resolver was run against the same ARM64 SHA, then each hit was checked against the native disassembly. This upgrades the following findings from mere symbol presence to observed **read/write site linkage** (not yet a complete shader/material trace):
+
+| TLS state | Native producer / consumer | Evidence |
+|---|---|---|
+| `cockpit_render_active` | `PcSceneRenderer::render_frame`, `display_race_car`, `Draw::disp_514c30` | TLS access sites at `0x10cbf58`, `0x10cc7d4`, `0x10c9288`, `0xd610cc` |
+| `cockpit_vehicle_draw` | `display_race_car`, `render_object_405360` / morph / palette | `0x10c929c`, `0x10abd44`, `0x10ac268`, `0x10ac4dc` |
+| `cockpit_occupant_draw` | `Draw::disp_514c30`, node visibility | `0xd610e8`, `0x10aa3f8` |
+| `cockpit_body_correction` | `PcSceneRenderer::render_frame` writes a 64-byte 16-float matrix; `Draw::disp_514c30` reads it | `0x10cc2ac` → `0x10cc2e0–0x10cc2fc` 16 stores, `0xd61124` → matrix FMADD |
+| `cockpit_glass_opacity` | `Flush::draw_404700(pmt_records::DrawEntry, PcPmtResources)`, `GlD3D9Device::flush` | `0x10b99bc`, `0x2fd140` |
+| `cockpit_glass_premultiplied` | Same native `Flush::draw_404700` ↔ `GlD3D9Device::flush` | `0x10b99a8`, `0x2fd15c` |
+
+This establishes a particularly useful pipeline: **original guest draw producer `0x404700` → native `DrawEntry`/PMT resource handling → per-draw opacity/premultiplication state → GLES flush**. The `0x10b99d4` draw loop also materializes 1.0 and 0.25 float constants, but this alone does not establish which texture or windshield draw uses 0.25. It is not safe to apply a global D3D9 alpha multiplier.
+
+**Next exact-code gate for glass:** compare the PC original `Flush::draw_404700` and associated PMT `DrawEntry` / render-state write with the native `0x10b99a8/0x10b99bc` call sites. Recover the specific material/texture/producer identity and blend equation before routing to the R84 R33/R29 per-eye source. Both eyes must use the same identified material identity but independent depth and color targets; restore blend states afterward.
+
+**Scope distinction:** APK matrix correction has an actual 16-float writer/consumer. The opt-in PC `DriverSeatCarSpaceBasis` added earlier uses original `matrix_B0` orientation as an independently implemented *approximation*; it is **not** the exact native matrix writer. Do not claim bitwise parity or full cockpit completion. Raw private disassembly is retained only on N100 under `apk/_analysis_focus/disasm/*_20261016.asm`.
