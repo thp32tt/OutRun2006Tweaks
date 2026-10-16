@@ -1099,7 +1099,10 @@ int main()
     // scaled source overlay AFTER the original TARGET Clear. Later callback
     // postpasses remain independent of the source-ordered command stream.
     for (std::uint32_t eye = 0; eye < 2u; ++eye) {
-        const UINT x = eye == 0u ? 20u : 52u;
+        // Keep source GPU postpasses away from the callback's later x24/x52
+        // manual TARGET rectangle Clears and its stereo camera raster.
+        // The earlier check overlapped those legitimate game writes.
+        const UINT x = eye == 0u ? 40u : 8u;
         auto& copy = partialGameClear.entries[eye][1];
         copy.kind = SourceClear::Kind::SourceCopy;
         copy.afterDrawOrdinal = 4u;
@@ -1751,14 +1754,14 @@ int main()
         // Verify genuine source-ordered GPU Copy THEN GPU Stretch after
         // separate game Draw ordinals. These are native shared-eye pixels,
         // not accepted calls or a left-eye image duplicated to both eyes.
-        const UINT postX = eyeIndex == 0u ? 21u : 53u;
+        const UINT postX = eyeIndex == 0u ? 41u : 9u;
         const auto* copyPixel = pixel + 25u * mapped.RowPitch + postX * 4u;
         const bool chronologicalCopy = eyeIndex == 0u
             ? copyPixel[0] == 0x11u && copyPixel[1] == 0u &&
               copyPixel[2] == 0xccu
             : copyPixel[0] == 0x33u && copyPixel[1] == 0xbbu &&
               copyPixel[2] == 0x22u;
-        const UINT postOverlayX = eyeIndex == 0u ? 23u : 55u;
+        const UINT postOverlayX = eyeIndex == 0u ? 43u : 11u;
         const auto* postPixel =
             pixel + 27u * mapped.RowPitch + postOverlayX * 4u;
         const bool chronologicalStretch = eyeIndex == 0u
