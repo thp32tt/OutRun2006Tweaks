@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C5_VALIDATION_PENDING",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "aed896bcb7b497ba6e46145bfc50e7a8fe024c4d",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "caf961b1b7c22710ca87eaf34ac32e4761a35e35",
+  "validation_bearing_result_sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/ui/menu_matrix_provenance.hpp"
@@ -67,20 +67,55 @@
     ]
   },
   "acceptance_results": {
-    "frontend_single_containment": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "frontend_provenance_fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "frontend_exact_sha_gate": "PENDING"
+    "frontend_single_containment": "PASS_EXACT_SHA",
+    "frontend_provenance_fallback": "PASS_EXACT_SHA",
+    "frontend_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Two real hooks compose frontend containment: D3DXMatrixTransformation2D modifies the original matrix; draw_sprite_custom_matrix_mid maps the matrix-transformed vertices again by BuildPixelMap.",
     "root_cause": "No positive source-matrix provenance was shared between matrix producer and custom-quad consumer, permitting duplicate containment on a copied transformed menu matrix.",
     "alternatives_rejected": [
       "Do not disable all game pixel mapping, change VR optical coverage, crop off car-selection sides or promote gameplay HUD to menu."
-    ]
+    ],
+    "fix_evidence": "Native full/partial/pivoted D3DX output fingerprinted by exact 16-float same-thread mode/viewport matrix provenance, which prevents a second custom sprite quad containment only on matches.",
+    "negative_test_evidence": "Portable native matrix ledger positive/other-mode/reset/foreign/nonfinite/eviction assertions and two existing source verifiers extended to reject conditional fallback bypass mutants. All required exact-SHA GitHub Windows gates PASS.",
+    "runtime_limit": "No actual Quest3/VDXR headset was connected; optical effect and FPS remain unverified."
   },
   "ci_evidence": {
-    "status": "NOT_RUN"
+    "status": "PASS_EXACT_SHA",
+    "validation_sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
+    "required_workflows": [
+      {
+        "workflow": "DX9Ex Active Validation",
+        "run_id": 38973124645,
+        "sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38973124645"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 38973125401,
+        "sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38973125401"
+      },
+      {
+        "workflow": "Domain Isolation Guard",
+        "run_id": 38973124558,
+        "sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38973124558"
+      },
+      {
+        "workflow": "DX9Ex Full Source Impact Review",
+        "run_id": 38973124618,
+        "sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38973124618"
+      }
+    ],
+    "summary": "Exact non-skipped SHA passed Windows DX9Ex R84 game/R26_SAFE/OpenXR host/package, full-chain-compile, HUD Inspector, Domain Isolation and MSVC Source Impact. Initial source verifier failures were repaired under same TASK_ID, not separately scored."
   },
-  "score_delta_this_attempt": 0,
-  "next_action": "Run changed-area native regression and final exact-SHA required GitHub gates. Runtime Quest3/VDXR remains UNTESTED."
+  "score_delta_this_attempt": 1,
+  "next_action": "NEED_HMD_TEST only for user-visible optical acceptance; source build and exact SHA CI verified. Advance controller to next independent DX9Ex feature rather than redo C6."
 }
