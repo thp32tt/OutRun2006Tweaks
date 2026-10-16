@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
+#include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -139,6 +140,26 @@ public:
 };
 UseHiDefCharacters UseHiDefCharacters::instance;
 
+// Keep camera placement and the native car/occupant render pass eligible
+// under the same validated basis, following the standalone Quest's separation
+// of cockpit-active, vehicle and occupant rendering responsibilities.
+static bool VRDriverSeatCameraDelta(const EvWorkCamera* camera, D3DVECTOR& delta) noexcept
+{
+    if (!camera)
+        return false;
+    OutRunVR::DriverSeatCamera::Vec3 translation{};
+    const auto& pos = camera->cam_pos_F8;
+    const auto& look = camera->look_pos_104;
+    if (!OutRunVR::DriverSeatCamera::ComputeTranslation(
+        {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
+        Settings::VRDriverSeatForward.get(),
+        Settings::VRDriverSeatRight.get(),
+        Settings::VRDriverSeatUp.get(), translation))
+        return false;
+    delta = {translation.x, translation.y, translation.z};
+    return true;
+}
+
 // START includes cinematics; only progress 65 is the playable countdown.
 static bool VRDriverSeatGameplayActive() noexcept
 {
@@ -175,8 +196,10 @@ class VRDriverSeatRenderTest : public Hook
 		if (!VRDriverSeatGameplayActive())
 			return false;
 		EvWorkCamera* camera = Game::camera();
+		D3DVECTOR delta{};
 		return camera && camera->cam_mode_timer_364 == 0.0f &&
-			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get();
+			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get() &&
+			VRDriverSeatCameraDelta(camera, delta);
 	}
 
 	static void PlayerCarRenderState_dest(SafetyHookContext& ctx)
@@ -1473,37 +1496,13 @@ class FixZBufferPrecision : public Hook
 		savedPos = camera->cam_pos_F8;
 		savedLook = camera->look_pos_104;
 
-		float fx = savedLook.x - savedPos.x;
-		float fy = savedLook.y - savedPos.y;
-		float fz = savedLook.z - savedPos.z;
-		const float forwardLen = std::sqrt(fx * fx + fy * fy + fz * fz);
-		if (!std::isfinite(forwardLen) || forwardLen < 1.0e-5f)
+		D3DVECTOR delta{};
+		if (!VRDriverSeatCameraDelta(camera, delta))
 			return false;
-		fx /= forwardLen; fy /= forwardLen; fz /= forwardLen;
-
-		// Right = forward x world-up. Rebuild a camera-local up from
-		// right x forward so vertical adjustment follows pitch instead of
-		// translating only on the world Y axis.
-		float rx = -fz;
-		float ry = 0.0f;
-		float rz = fx;
-		const float rightLen = std::sqrt(rx * rx + rz * rz);
-		if (!std::isfinite(rightLen) || rightLen < 1.0e-5f)
-			return false;
-		rx /= rightLen; rz /= rightLen;
-
-		const float ux = ry * fz - rz * fy;
-		const float uy = rz * fx - rx * fz;
-		const float uz = rx * fy - ry * fx;
 
 		const float forward = Settings::VRDriverSeatForward.get();
 		const float right = Settings::VRDriverSeatRight.get();
 		const float up = Settings::VRDriverSeatUp.get();
-		const D3DVECTOR delta{
-			fx * forward + rx * right + ux * up,
-			fy * forward + ry * right + uy * up,
-			fz * forward + rz * right + uz * up
-		};
 
 		camera->cam_pos_F8 = {
 			savedPos.x + delta.x, savedPos.y + delta.y, savedPos.z + delta.z };
@@ -1532,7 +1531,8 @@ class FixZBufferPrecision : public Hook
 		// improve z-buffer precision by increasing znear
 		// game default is 0.1 which reduces precision of far objects massively, causing z-fighting and objects not drawing properly
 
-		if (allow_znear_override)
+		if (allow_znear_override && (Settings::FixZBufferPrecision ||
+            DriverSeatCameraActive(camera)))
 		{
 			// In 6DoF VR the player can move their head through the normal third-
 			// person near plane. Keep the 2D precision fix intact outside VR, but
@@ -1627,7 +1627,10 @@ public:
 
 	bool validate() override
 	{
-		return Settings::FixZBufferPrecision;
+        // DriverSeatView must still install the game camera hook if the
+        // independent desktop Z-precision tweak was disabled in the INI.
+		return Settings::FixZBufferPrecision ||
+            (Settings::VREnabled && Settings::VRDriverSeatView);
 	}
 
 	void declare_settings() override

@@ -180,6 +180,15 @@ add_custom_command(TARGET outrun-vr-lens-eye-pose-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-lens-eye-pose-smoke>"
     COMMENT "Run native C993 canted-eye and fail-closed regression"
     VERBATIM)
+# Real game-side cockpit basis is compiled and executed by the mandatory host gate.
+add_executable(outrun-vr-driver-seat-camera-smoke tests/driver_seat_camera_smoke.cpp)
+target_include_directories(outrun-vr-driver-seat-camera-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-driver-seat-camera-smoke)
+add_custom_command(TARGET outrun-vr-driver-seat-camera-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-driver-seat-camera-smoke>"
+    COMMENT "Run Quest-derived cockpit camera and render eligibility regression"
+    VERBATIM)
+
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
@@ -244,6 +253,7 @@ foreach(target
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-menu-content-aspect-smoke
     outrun-vr-stage-edge-cull-smoke
+    outrun-vr-driver-seat-camera-smoke
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-rank-marker-fraction-smoke
