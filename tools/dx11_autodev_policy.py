@@ -182,8 +182,14 @@ def validate_task(task: dict, policy: dict) -> list[str]:
             partial_eye_stage = (
                 source_stage_build_verified(task)
                 and milestone == "native_stereo_eye_transport"
-                and stages == ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW",
-                               "NATIVE_STEREO_EYE_OUTPUT"]
+                # Do not invent an R30 live game callsite for an isolated
+                # source-ordered GPU-eye stage. Older verified run records
+                # used the legacy prefix; keep their exact-SHA record valid.
+                and stages in (
+                    ["D3D11_NATIVE_DRAW", "NATIVE_STEREO_EYE_OUTPUT"],
+                    ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW",
+                     "NATIVE_STEREO_EYE_OUTPUT"],
+                )
             )
             if not has_full_path and not partial_eye_stage:
                 errors.append("gameplay path must connect real D3D9 callsite through native Draw to visible frame output")

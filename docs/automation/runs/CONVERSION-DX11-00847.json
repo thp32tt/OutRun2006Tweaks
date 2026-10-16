@@ -148,7 +148,10 @@
       "tools/dx11_native_transport_probe.cpp"
     ],
     "visible_frame_acceptance": "Isolated WARP validates native GPU L/R colors; live game/Quest3 observable menu-to-race frame is not yet tested.",
-    "live_game_draw_path": "NativeGameStereoSubmission::render_game_eye_passes native encoder path; actual game R30 callback missing.",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
     "activation_guard_and_fallback": "Native gameplay remains opt-in/fail-closed. Existing original D3D9 Render/Present/input/FFB unmodified.",
     "acceptance_proof": {
       "positive_probe": "Exact source SHA 73b43b6 produced WARP true GPU per-eye after-geometry TARGET Clear pixels plus 5 required GitHub Actions success.",

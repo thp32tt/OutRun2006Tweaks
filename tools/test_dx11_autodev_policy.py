@@ -152,9 +152,10 @@ partial_eye["development_strategy"].update(
     work_class="integration",
     milestone_id="native_stereo_eye_transport",
     gameplay_delivery_target="NATIVE_STEREO_EYE_OUTPUT",
+    # The isolated native eye is real GPU source progress but the missing
+    # R30 live game callback must not be represented as an implemented stage.
     live_game_draw_path=[
-        "LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW",
-        "NATIVE_STEREO_EYE_OUTPUT",
+        "D3D11_NATIVE_DRAW", "NATIVE_STEREO_EYE_OUTPUT",
     ],
 )
 partial_eye.update(
@@ -174,7 +175,11 @@ for label, mutate in (
     ("unobserved HMD PASS", lambda t: t.update(runtime_validation="PASS")),
     ("unearned score", lambda t: t.update(score_change=1)),
     ("missing native GPU eye", lambda t: t["development_strategy"].update(
-        live_game_draw_path=["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW"])),
+        live_game_draw_path=["D3D11_NATIVE_DRAW"])),
+    ("native eye before Draw", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["NATIVE_STEREO_EYE_OUTPUT", "D3D11_NATIVE_DRAW"])),
+    ("invented visible output", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
     ("forged probe", lambda t: t["acceptance_results"].update(
         fallback="PASS_UNTESTED")),
 ):
