@@ -61,5 +61,26 @@ int main()
     }
     if(CapturePhysicalDrawCommand().IsDirectWorldLensCentre())
         return 8;
+    // Quest-inspired separation of source commands from the physical
+    // shadow draw: only a *direct* player car world particle may use
+    // native world WVP. A queued sprite with the same token is not proof.
+    {
+        ScopedExactProducerSemantic shadow(
+            RenderScope::WorldParticle,nullptr,true,
+            ProducerToken::CarBaseShadow);
+        const auto cmd=CapturePhysicalDrawCommand();
+        if (!cmd.IsDirectCarBaseShadow() || cmd.IsSourceProvenHud() ||
+            cmd.IsDirectWorldLensCentre())return 9;
+    }
+    if(CapturePhysicalDrawCommand().IsDirectCarBaseShadow())
+        return 10;
+    int other=0;
+    RegisterSpriteNodeScope(&other,RenderScope::WorldParticle,
+        ProducerToken::CarBaseShadow);
+    BeginSpriteQueueRender();
+    SelectSpriteQueueNode(&other);
+    if(CapturePhysicalDrawCommand().IsDirectCarBaseShadow())
+        return 11;
+    EndSpriteQueueRender();
     return 0;
 }

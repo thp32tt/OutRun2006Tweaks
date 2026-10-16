@@ -2512,9 +2512,8 @@ namespace OutRunVRStereo
         bool R30HasExactLensCentreRawWvp(float original[16]) noexcept
         {
             using namespace OutRunVR::GameSemantic;
-            if (!original || QueueRenderActive() ||
-                EffectiveScope() != RenderScope::WorldBillboard ||
-                CurrentRenderProducerToken() != ProducerToken::LensFlareCentre)
+            const auto drawCommand = CapturePhysicalDrawCommand();
+            if (!original || !drawCommand.IsDirectWorldLensCentre())
                 return false;
             std::uint64_t writeSerial = 0, writeDraw = 0;
             std::uintptr_t writeShader = 0, currentShader = 0;
@@ -2703,7 +2702,9 @@ namespace OutRunVRStereo
             // This exact car/rival rank SpriteNode carries its own original
             // Calc3D2D view-space anchor; it is not generic screen HUD.
             // A missing anchor must never reuse an earlier vehicle's depth.
-            const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+            const auto drawCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const auto scope = drawCommand.scope;
             if (OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(scope))
             {
                 const auto* marker =
@@ -2726,10 +2727,7 @@ namespace OutRunVRStereo
                 scope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
                 OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(scope);
             const bool ownedLensCentre =
-                !OutRunVR::GameSemantic::QueueRenderActive() &&
-                scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+                drawCommand.IsDirectWorldLensCentre();
             if (!ownedHud && !ownedOverlay && !ownedEffect &&
                 !ownedLensCentre)
                 return R30ScreenSpaceKind::None;

@@ -635,7 +635,12 @@ namespace OutRunVRStereo
             // Enabled depth still takes the original R27 probe unchanged.
             const bool r27DepthCandidate =
                 R29Effect.zEnable != D3DZB_FALSE;
-            const auto semanticScope = OutRunVR::GameSemantic::EffectiveScope();
+            // One source/queue ownership snapshot for this physical GPU
+            // draw: the Quest native renderer likewise separates producer
+            // commands from the later world/effect draw submission.
+            const auto drawCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const auto semanticScope = drawCommand.scope;
             const bool forceZeroDisparity =
                 OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope);
             // R27's no-snapshot overload calls R13CaptureDrawTimeEffect
@@ -681,10 +686,7 @@ namespace OutRunVRStereo
             // Other effects, queue nodes, depth/stencil writes and unsafe
             // stereo recovery keep the old conservative path.
             if (fragile && !forceZeroDisparity &&
-                !OutRunVR::GameSemantic::QueueRenderActive() &&
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::CarBaseShadow &&
-                semanticScope == OutRunVR::GameSemantic::RenderScope::WorldParticle &&
+                drawCommand.IsDirectCarBaseShadow() &&
                 R29Effect.zEnable == D3DZB_FALSE &&
                 R29Effect.zWrite == FALSE &&
                 !R29Effect.stencilEnable)
@@ -693,8 +695,8 @@ namespace OutRunVRStereo
                     OutRunVRRenderer::R28PerspectiveWorldSemantic() &&
                     R29HasDirectCarShadowGameWvp();
                 if (OutRunVR::CarShadowStereo::CanUseSpatialShadow(
-                        OutRunVR::GameSemantic::CurrentRenderProducerToken(),
-                        semanticScope, false, originalWvpProven,
+                        drawCommand.producer, drawCommand.scope,
+                        drawCommand.queued, originalWvpProven,
                         true, false, false, false))
                 {
                     fragile = false;

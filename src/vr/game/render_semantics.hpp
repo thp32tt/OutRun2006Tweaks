@@ -891,6 +891,12 @@ namespace OutRunVR::GameSemantic
                 producer == ProducerToken::LensFlareCentre;
         }
 
+        constexpr bool IsDirectCarBaseShadow() const noexcept
+        {
+            return !queued && scope == RenderScope::WorldParticle &&
+                producer == ProducerToken::CarBaseShadow;
+        }
+
         constexpr bool IsSourceProvenHud() const noexcept
         {
             return scope == RenderScope::ScreenHud &&
