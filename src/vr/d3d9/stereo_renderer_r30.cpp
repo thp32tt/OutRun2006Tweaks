@@ -3216,21 +3216,24 @@ namespace OutRunVRStereo
             // origins, rejecting both eyes and restoring a head-locked mono
             // draw. Use the already-shared C993 eye-centre helper: it widens
             // before midpoint and publishes BOTH eyes only on success.
-            float relativeEye[2][3]{};
-            if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
-                    state.stereo.eyeOffset, relativeEye))
-                return false;
-            const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
             const float worldScale =
                 Settings::VRWorldScale * Settings::VRStereoDepth;
-            if (!std::isfinite(worldScale) || worldScale <= 0.0f)
+            float relativeEye[2][3]{};
+            float relativeOrientation[2][4]{};
+            // The original +TIME sprite and numeric glyphs share this R84
+            // GPU-eye plane. Identity eye rotation dropped OpenXR cant; the
+            // common head inverse above already removes shared head motion.
+            // Reject either malformed eye before publishing any new matrices.
+            if (!OutRunVR::StageExtensionPlane::BuildStageEyePoses(
+                    state.stereo.eyeOffset, state.stereo.eyeOrientation,
+                    worldScale, relativeEye, relativeOrientation))
                 return false;
 
             for (int eye = 0; eye < 2; ++eye)
             {
                 const D3DMATRIX eyePose =
                     R29OwnerMatrixFromQuaternionTranslation(
-                        identity, relativeEye[eye], worldScale);
+                        relativeOrientation[eye], relativeEye[eye], worldScale);
                 const D3DMATRIX eyeInverse =
                     R29OwnerInverseRigid(eyePose);
                 const D3DMATRIX eyeProjection =

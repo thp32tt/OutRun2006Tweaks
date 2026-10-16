@@ -180,6 +180,17 @@ add_custom_command(TARGET outrun-vr-lens-eye-pose-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-lens-eye-pose-smoke>"
     COMMENT "Run native C993 canted-eye and fail-closed regression"
     VERBATIM)
+# The R84 exact +TIME/GOAL native GPU-eye pose and projection regression
+# must compile AND execute in the mandatory OpenXR host gate (including Release).
+add_executable(outrun-vr-stage-extension-eye-smoke
+    tests/stage_extension_eye_plane_smoke.cpp)
+target_include_directories(outrun-vr-stage-extension-eye-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-stage-extension-eye-smoke)
+add_custom_command(TARGET outrun-vr-stage-extension-eye-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-stage-extension-eye-smoke>"
+    COMMENT "Run native +TIME/GOAL stereo eye-pose and fallback regression"
+    VERBATIM)
 # Real game-side cockpit basis is compiled and executed by the mandatory host gate.
 add_executable(outrun-vr-driver-seat-camera-smoke tests/driver_seat_camera_smoke.cpp)
 target_include_directories(outrun-vr-driver-seat-camera-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")

@@ -1,0 +1,80 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00937",
+  "production_id": "CONVERSION-DX9EX-00937",
+  "event_id": "CONVERSION-DX9EX-00937-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00937",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "29bddaecc553558ecf31333399a3d73f3f873880",
+  "source_paths": [
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00937.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Restore OpenXR head-local canted per-eye orientation and relative IPD on the shared R84 +TIME sprite/numeric finite HUD plane, while preserving original mono fallback on invalid pose.",
+    "scope_boundary": "Exact StageExtensionTime and shared exact GOAL XYZRHW plane; unchanged unrelated HUD, menu, lens, world, SkyGlow, R26_SAFE, input/FFB, DX11 and DXVK.",
+    "trace_stages": [
+      "Six original 0x989xx +TIME sprite/numeric producers and exact D3DX/queue GPU batch bridge",
+      "R84 R30 builds exact finite HUD plane and applies common head inverse once",
+      "R84 eye matrices now apply individually validated head-local quaternions and relative IPD, with per-eye FOV",
+      "R33 preserves bilateral source-colour, Z, RHW and original fallback"
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_canted_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original +TIME sprite and numeric stereo GPU-plane",
+        "expected_behavior": "Exact shared +TIME stereo transforms keep independently canted OpenXR eye rotations through R84 GPU-eye construction."
+      },
+      {
+        "id": "stage_invalid_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid/recentered/parallel OpenXR eye pose",
+        "expected_behavior": "Native executed positive/negative pose+projection smoke preserves parallel-eye behavior and refuses malformed eye/scales without partial output."
+      },
+      {
+        "id": "stage_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game, explicit R26_SAFE, x64 host, package and Domain/HUD/Full Source",
+        "expected_behavior": "All mandatory exact-SHA CI gates succeed for final validation-bearing source commit."
+      }
+    ],
+    "subcomponents": [
+      "Repair shared R84 exact +TIME sprite/numeric and GOAL finite plane to preserve both head-local eye quaternions, not identity, with original fallbacks.",
+      "Compile and run source-linked canted, parallel, invalid pose/scale, left-right viewport positive and negative C++ regression in mandatory Windows x64 host build."
+    ]
+  },
+  "acceptance_results": {
+    "stage_canted_pair": "SOURCE_IMPLEMENTED",
+    "stage_invalid_fallback": "NATIVE_SMOKE_PENDING",
+    "stage_exact_sha_ci": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R30BuildStageExtensionXyzrhwEyePlane used identity quaternion for both eyes, losing independently canted OpenXR local eye rotations; same downstream GPU plane is used by original six +TIME producers.",
+    "source_evidence": "R84 lens C993 world path already validates stereo.eyeOrientation, but exact +TIME/GOAL path only applied relative IPD and per-eye FOV; shared eye pose helper preserves both with fail-closed output."
+  },
+  "score_delta_this_attempt": 0
+}

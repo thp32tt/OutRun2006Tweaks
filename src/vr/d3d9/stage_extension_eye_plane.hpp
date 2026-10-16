@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include "lens_centre_relative_eye_pose.hpp"
 
 namespace OutRunVR::StageExtensionPlane
 {
@@ -31,6 +32,22 @@ namespace OutRunVR::StageExtensionPlane
         "dense source stays on the verified original path");
     static_assert(!CanUseVerifiedTouchedVertices(0u, 0u, true, true, true),
         "empty or invalid span is never sparsely transformed");
+
+    // Exact +TIME sprites, glyphs and shared GOAL eye-plane use the common
+    // head inverse already supplied by R84; keep only HEAD-LOCAL per-eye
+    // orientation (OpenXR cant) and relative IPD. Validate both or neither.
+    inline bool BuildStageEyePoses(
+        const float (&eyeOffsets)[2][3],
+        const float (&eyeOrientations)[2][4],
+        float worldScale,
+        float (&relativeOffsets)[2][3],
+        float (&relativeOrientations)[2][4]) noexcept
+    {
+        return std::isfinite(worldScale) && worldScale > 0.0f &&
+            OutRunVR::LensCentre::BuildHeadRelativeEyePose(
+                eyeOffsets, eyeOrientations,
+                relativeOffsets, relativeOrientations);
+    }
 
     inline bool ProjectPixel(
         const float clipFromGameNdc[16], float sourceX, float sourceY,
