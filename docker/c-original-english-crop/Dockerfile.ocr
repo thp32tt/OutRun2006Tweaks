@@ -1,0 +1,4 @@
+FROM outrun-kor-c-salvage:20261015
+# OCR is installed at build time. The running C container remains fully offline.
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
+RUN tesseract --version && test -f /usr/share/tesseract-ocr/5/tessdata/eng.traineddata
