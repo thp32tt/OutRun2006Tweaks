@@ -26,7 +26,11 @@ def check(s: str) -> None:
         "FAILED(descHr) || v25.Width == 0 || v25.Height == 0",
         "0.50999999 / (double)v25.Width",
         "0.50999999 / (double)v25.Height",
-        "const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(",
+        "const auto quadMap = precontained",
+        ": OutRunVrMenuQuad::BuildPixelMap(",
+        "precontained = contained && frontEnd &&",
+        "OutRunVrMenuQuad::ContainedMatrices.Contains(",
+        "? OutRunVrMenuQuad::PixelMap{1.f, 1.f, 0.f, 0.f, true}",
         "if (!quadMap.valid)",
         "quad[1] = OutRunVrMenuQuad::ProjectY(quadMap, topLeft.y);",
         "quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);",
@@ -58,11 +62,14 @@ def check(s: str) -> None:
             mid.index("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);") >= mid.index("device->DrawPrimitiveUP"):
         raise AssertionError("Device guard and complete quad publication must precede DrawPrimitiveUP")
     if not (mid.index("FAILED(descHr) || v25.Width == 0 || v25.Height == 0") <
-            mid.index("const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(") <
+            mid.index("const auto quadMap = precontained") <
             mid.index("if (!quadMap.valid)") <
             mid.index("quad[1] = OutRunVrMenuQuad::ProjectY(") <
             mid.index("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);")):
         raise AssertionError("Descriptor and viewport map must be validated before publishing quad")
+    if mid.index("OutRunVrMenuQuad::ContainedMatrices.Contains(") >= mid.index("const auto quadMap = precontained") or \
+       mid.index(": OutRunVrMenuQuad::BuildPixelMap(") >= mid.index("if (!quadMap.valid)"):
+        raise AssertionError("Unproven native quad must retain physical viewport mapping")
     if mid.count("D3DSURFACE_DESC v25{};") != 1 or mid.count("GetLevelDesc(0, &v25)") != 1:
         raise AssertionError("Uninitialized or duplicate texture descriptor query")
     if "float scaleY = Game::screen_scale->y;" in mid:
@@ -81,6 +88,12 @@ mutants = [
     ("if (!quadMap.valid)", "if (quadMap.valid)"),
     ("quad[0x16] = OutRunVrMenuQuad::ProjectY(quadMap, bottomRight.y);",
      "quad[0x16] = bottomRight.y + 0.5f;"),
+    ("precontained = contained && frontEnd &&",
+     "precontained = true &&"),
+    (": OutRunVrMenuQuad::BuildPixelMap(",
+     ": OutRunVrMenuQuad::PixelMap{1.f,1.f,0.f,0.f,true}("),
+    ("? OutRunVrMenuQuad::PixelMap{1.f, 1.f, 0.f, 0.f, true}",
+     "? OutRunVrMenuQuad::PixelMap{0.5f, 1.f, 0.f, 0.f, true}"),
 ]
 for good, bad in mutants:
     corrupt = source.replace(good, bad, 1)
@@ -92,4 +105,4 @@ for good, bad in mutants:
         pass
     else:
         raise AssertionError(f"Unsafe sprite path escaped verifier: {bad}")
-print("DX9Ex custom sprite descriptor/reset invariant: PASS (6 distinct negative mutations)")
+print("DX9Ex custom sprite descriptor/reset invariant: PASS (9 distinct negative mutations)")
