@@ -13,7 +13,9 @@ static void TestHeadsetCadence(double hz)
     const double period = 1.0 / hz;
     for (int i = 0; i < 24; ++i)
         assert(!cadence.Observe(period));
-    assert(!cadence.Observe(period * 1.10)); // jitter is not a missed frame
+    assert(!cadence.Observe(period * (hz == 60.0 ? 1.05 : 1.10))); // nonlate cadence jitter
+    if (hz == 60.0)
+        assert(cadence.Observe(period * 1.10)); // preserve legacy >18ms limit
     if (hz >= 90.0)
         assert(cadence.Observe(period * 1.40)); // missed XR deadline <18 ms
     assert(cadence.Observe(0.022));             // legacy >18 ms protection

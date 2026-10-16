@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00953",
+  "production_id": "CONVERSION-DX9EX-00953",
+  "event_id": "CONVERSION-DX9EX-00953-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00953",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:XR_REFLECTION_BUDGET",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "symptom_id": "DX9EX:SYMPTOM:XR_REFLECTION_FRAME_OVERRUN",
+  "status": "IMPLEMENTED_GATE_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149",
+  "material_result_sha": "435df607920c1c4be4694973eab97d7f4e362051",
+  "source_paths": [
+    "src/vr/game/reflection_frame_budget.hpp",
+    "src/hooks_graphics.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/reflection_frame_budget.hpp",
+    "src/hooks_graphics.cpp",
+    "tools/test_vr_reflection_frame_budget.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00953.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:XR_REFLECTION_BUDGET",
+    "goal": "Preserve the complete original car-reflection appearance at normal VR cadence while reducing cubemap face-submission bursts in actual late 90/120 Hz headset frames with fail-closed original 60 Hz and desktop semantics.",
+    "scope_boundary": "Only original Envmap_FaceCount midhook and R84 car-reflection face budget; DX11, DXVK, original wheel input/FFB, stage culling, HUD, menu, SkyGlow, per-eye optics and native resolution are unchanged.",
+    "special_work_evidence": "Quantitative code-path performance failure: at 120 Hz the deadline is 8.333 ms, but the old fixed 18 ms threshold did not mark a 12 ms frame as late. The preexisting reflection budget permitted up to three cube faces instead of a two-face late cap. This is a deterministic, code-confirmed frame-budget overrun; Quest3/VDXR GPU p95, p99 and net FPS improvement remain unmeasured.",
+    "trace_stages": [
+      "Original PC Envmap_RenderToCubeMap requests cube faces via the original EXE+0x1447E CPU hook.",
+      "R84 VRNormalizeReflectionRate computes QPC inter-frame delta, uses the stable measured cadence to classify late frames, and passes the result to ReflectionFrameBudget::Advance.",
+      "The original D3D9 game renders allocated cube faces before per-eye stereo host composition; physical GPU timing and HMD visual acceptance require later headset measurement."
+    ],
+    "subcomponents": [
+      "Adaptive healthy frame cadence capture and bounded late-frame detection at 60/72/80/90/120 Hz that preserves the original >18ms safety cutoff.",
+      "Preserved original car-reflection face accumulation, frame cap, zero-rate clearing, desktop/VR-off fallback and negative invalid/reset cases.",
+      "Portable compiled C++ positive/negative test plus mandatory exact-SHA Active Windows game/host/package, Domain Isolation, Full Source Impact and HUD Inspector CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "reflect_deadline_cadence",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 original car-reflection frame pacing",
+        "expected_behavior": "A 12ms QPC interval after stable 120Hz VR frames is classified as late and caps the original reflection submission to two cube faces; valid on-time frames preserve original update rate."
+      },
+      {
+        "id": "reflect_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original graphics quality, native desktop and bad clocks",
+        "expected_behavior": "Default VR and desktop zero-rate original reflection semantics survive Reset, invalid elapsed counters, background pauses, 60Hz limit and recovery without introducing HUD, FFB or SkyGlow side effects."
+      },
+      {
+        "id": "reflect_exact_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Windows x86 game, x64 host and source scope",
+        "expected_behavior": "The material result and repaired C++ regression compile and pass four existing required exact-SHA DX9Ex Active, Domain, Full Source Impact and HUD Inspector gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "reflect_deadline_cadence": "LOCAL_CPP_PASS_CI_PENDING",
+    "reflect_safe_fallback": "LOCAL_CPP_PASS_CI_PENDING",
+    "reflect_exact_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The reflection scheduler recognized lateness only when QPC elapsed exceeded 18ms, a 60Hz-era threshold. At 90/120Hz a 12–15ms gap can miss the XR refresh deadline while incorrectly granting the three-face on-time GPU reflection cap.",
+    "source_trace": [
+      "Original Envmap_FaceCount hook receives a 60Hz-normalized reflection face budget request.",
+      "QPC frame delta passes into static lateFrame bool then ReflectionFrameBudget::Advance chooses 3 versus 2 face cap.",
+      "Original D3D9 cubemap face rendering consumes GPU time before the per-eye OpenXR compositor receives the completed game-eye textures."
+    ],
+    "alternatives_rejected": [
+      "Reducing reflection texture resolution or removing reflections would change game quality rather than correct the late-frame limiter.",
+      "Changing SkyGlow, original game timers or global D3D9 Draw/Flush alters unrelated protected original rendering paths.",
+      "Using an unchecked static fixed 120Hz target would falsely classify valid 60/72/80/90Hz HMD or desktop frames."
+    ],
+    "runtime_limit": "Local C++ test reproduces code-path timing and allocation; hardware Quest3/VDXR GPU frame-time, optical quality and actual FPS remain UNTESTED."
+  },
+  "ci_evidence": {
+    "material_sha": "435df607920c1c4be4694973eab97d7f4e362051",
+    "first_exact_ci_failure": "DX9Ex Active policy job 116946380168 failed RUN_RECORD_NOT_FOUND at material SHA; same-task repair includes required feature contract and 60Hz test expectation corrected for preserved >18ms cutoff.",
+    "local_native_cpp_regression": "PASS after 60Hz test expectation repair; Windows/host CI on new exact SHA pending",
+    "runtime_hmd": "UNTESTED"
+  },
+  "next_action": "Run mandatory full exact-SHA gate on this repair-and-feature-contract commit; only record C6 after four required successful checks. HMD needs separate Quest3/VDXR user run."
+}
