@@ -13,7 +13,7 @@
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "COMPLETE_BUILD_VERIFIED",
   "phase": "C6_RESULT",
-  "checkpoint": "C6_BOOKKEEPING_AFTER_ALL_EXACT_SHA_GATES",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -111,7 +111,7 @@
   "material_result_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
   "validation_bearing_result_sha": "cb95cf1ac776e45bcbd695900a86d1b7e75ed7fa",
   "score_delta_this_attempt": 0,
-  "next_action": "BUILD_VERIFIED only. Quest3/VDXR physical A/B must test full menu+car selection at matching exact cb95cf1ac776 source against native aspect rollback, plus R26_SAFE/FFB/SkyGlow and HUD sanity. No automated headset PASS; do not double-score retries/C6.",
+  "next_action": "Quest3/VDXR same-SHA HMD optical menu and vehicle selection runtime test remains required; no CI rerun or additional score for this C6 bookkeeping.",
   "ci_evidence": {
     "validation_bearing_result_sha": "cb95cf1ac776e45bcbd695900a86d1b7e75ed7fa",
     "original_material_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
@@ -136,6 +136,15 @@
     },
     "compile_and_smoke": "OpenXR host job compiled and executed native menu_content_aspect_smoke C++ along with deterministic host regression suite.",
     "c6_bookkeeping_is_not_validation_bearing": true,
-    "runtime_proof": "No matching Quest3/VDXR headset or original game's image trial was executed; optical correctness NEED_HMD_TEST."
+    "runtime_proof": "No matching Quest3/VDXR headset or original game's image trial was executed; optical correctness NEED_HMD_TEST.",
+    "c6_exact_sha_result": {
+      "status": "PASS_EXACT_SHA",
+      "validation_bearing_result_sha": "cb95cf1ac776e45bcbd695900a86d1b7e75ed7fa",
+      "ci_conclusion": "SUCCESS",
+      "basis": "USER_REPORTED_EXACT_SHA_CI_SUCCESS",
+      "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "notes": "C6 bookkeeping only; existing material result and acceptance results preserved; no source change or CI rerun."
+    }
   }
 }
