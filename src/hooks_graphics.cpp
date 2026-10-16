@@ -143,20 +143,22 @@ UseHiDefCharacters UseHiDefCharacters::instance;
 // Keep camera placement and the native car/occupant render pass eligible
 // under the same validated basis, following the standalone Quest's separation
 // of cockpit-active, vehicle and occupant rendering responsibilities.
-static bool VRDriverSeatCameraDelta(const EvWorkCamera* camera, D3DVECTOR& delta) noexcept
+static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
+    D3DVECTOR& translatedPosition, D3DVECTOR& translatedLook) noexcept
 {
     if (!camera)
         return false;
-    OutRunVR::DriverSeatCamera::Vec3 translation{};
+    OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
     const auto& pos = camera->cam_pos_F8;
     const auto& look = camera->look_pos_104;
-    if (!OutRunVR::DriverSeatCamera::ComputeTranslation(
+    if (!OutRunVR::DriverSeatCamera::ComputeTranslatedCamera(
         {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
         Settings::VRDriverSeatForward.get(),
         Settings::VRDriverSeatRight.get(),
-        Settings::VRDriverSeatUp.get(), translation))
+        Settings::VRDriverSeatUp.get(), newPos, newLook))
         return false;
-    delta = {translation.x, translation.y, translation.z};
+    translatedPosition = {newPos.x, newPos.y, newPos.z};
+    translatedLook = {newLook.x, newLook.y, newLook.z};
     return true;
 }
 
@@ -1502,18 +1504,18 @@ class FixZBufferPrecision : public Hook
 		savedPos = camera->cam_pos_F8;
 		savedLook = camera->look_pos_104;
 
-		D3DVECTOR delta{};
-		if (!VRDriverSeatCameraDelta(camera, delta))
+		D3DVECTOR newPos{}, newLook{};
+		if (!VRDriverSeatCameraPose(camera, newPos, newLook))
 			return false;
 
 		const float forward = Settings::VRDriverSeatForward.get();
 		const float right = Settings::VRDriverSeatRight.get();
 		const float up = Settings::VRDriverSeatUp.get();
 
-		camera->cam_pos_F8 = {
-			savedPos.x + delta.x, savedPos.y + delta.y, savedPos.z + delta.z };
-		camera->look_pos_104 = {
-			savedLook.x + delta.x, savedLook.y + delta.y, savedLook.z + delta.z };
+		// One atomic valid camera pose for view-matrix generation. The
+		// original game camera is restored by CalcCameraMatrix_dest.
+		camera->cam_pos_F8 = newPos;
+		camera->look_pos_104 = newLook;
 
 		static float lastForward = 9999.0f, lastRight = 9999.0f, lastUp = 9999.0f;
 		static int lastMode = -1;

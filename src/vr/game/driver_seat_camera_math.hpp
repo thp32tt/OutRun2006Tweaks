@@ -58,6 +58,30 @@ namespace OutRunVR::DriverSeatCamera
         translation = proposed;
         return true;
     }
+
+    // The final absolute seat camera must also be finite. A finite native
+    // position plus finite offset can overflow after arithmetic, leaving a
+    // corrupted view matrix even though the camera passed delta validation.
+    inline bool ComputeTranslatedCamera(Vec3 position, Vec3 look,
+        float forward, float right, float up,
+        Vec3& newPosition, Vec3& newLook) noexcept
+    {
+        Vec3 delta{};
+        if (!ComputeTranslation(position, look, forward, right, up, delta))
+            return false;
+        const Vec3 p{position.x + delta.x, position.y + delta.y,
+                     position.z + delta.z};
+        const Vec3 q{look.x + delta.x, look.y + delta.y,
+                     look.z + delta.z};
+        if (!std::isfinite(p.x) || !std::isfinite(p.y) ||
+            !std::isfinite(p.z) || !std::isfinite(q.x) ||
+            !std::isfinite(q.y) || !std::isfinite(q.z))
+            return false;
+        newPosition = p;
+        newLook = q;
+        return true;
+    }
+
     // Scope contract: cockpit near-plane, player-car model, driver suppression
     // and camera displacement must agree for the *same* native camera frame.
     // Re-evaluate after mode switches; never reuse a cached eligibility bit.
@@ -69,8 +93,9 @@ namespace OutRunVR::DriverSeatCamera
         if (!enabled || !gameplayActive || nativeMode != selectedMode ||
             !std::isfinite(transitionTime) || transitionTime != 0.0f)
             return false;
-        Vec3 ignored{};
-        return ComputeTranslation(position, look, forward, right, up, ignored);
+        Vec3 newPosition{}, newLook{};
+        return ComputeTranslatedCamera(position, look, forward, right, up,
+            newPosition, newLook);
     }
 
 }

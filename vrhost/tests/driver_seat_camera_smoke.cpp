@@ -68,5 +68,26 @@ int main()
     if (!CameraAndBodyEligible(true, true, 0.f, 1, 1,
             nativePos, nativeLook, -1.35f, -0.32f, 0.65f))
         return 8;
+    // Reject overflow on the final absolute seat camera, even with a
+    // finite local offset. Eligibility, car body and near clip must agree.
+    using OutRunVR::DriverSeatCamera::ComputeTranslatedCamera;
+    const float maxf = std::numeric_limits<float>::max();
+    Vec3 posOut{12.f, 13.f, 14.f}, lookOut{15.f, 16.f, 17.f};
+    if (ComputeTranslatedCamera({maxf * 0.5f, 0.f, 0.f},
+            {maxf, 0.f, 0.f}, maxf, 0.f, 0.f, posOut, lookOut))
+        return 9;
+    if (!near(posOut.x, 12.f) || !near(lookOut.z, 17.f))
+        return 10;
+    if (CameraAndBodyEligible(true, true, 0.f, 1, 1,
+            {maxf * 0.5f, 0.f, 0.f}, {maxf, 0.f, 0.f},
+            maxf, 0.f, 0.f))
+        return 11;
+    if (!ComputeTranslatedCamera({0.f, 0.f, 0.f}, {0.f, 0.f, 10.f},
+            -1.35f, -0.32f, 0.65f, posOut, lookOut) ||
+        !near(posOut.x, 0.32f) || !near(posOut.y, 0.65f) ||
+        !near(posOut.z, -1.35f) || !near(lookOut.x, 0.32f) ||
+        !near(lookOut.y, 0.65f) || !near(lookOut.z, 8.65f))
+        return 12;
+
     return 0;
 }
