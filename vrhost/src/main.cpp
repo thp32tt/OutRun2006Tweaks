@@ -1362,7 +1362,17 @@ namespace
             if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue ||
                 leftHandleValue == rightHandleValue || !width || !height || !generation)
             { invalidateDirect(); return false; }
-            const bool same = directLeft_[slot] && directRight_[slot] && directLeftSrv_[slot] && directRightSrv_[slot] && directLeftHandle_[slot] == leftHandleValue && directRightHandle_[slot] == rightHandleValue && directGeneration_[slot] == generation;
+            // A new host OpenXR/D3D11 device invalidates the old cached GPU
+            // opens even when the legacy handle numbers, slot and transport
+            // generation happen to match. Never feed a foreign-device eye
+            // texture to this device's projection context.
+            const bool same = directLeft_[slot] && directRight_[slot] &&
+                directLeftSrv_[slot] && directRightSrv_[slot] &&
+                directLeftHandle_[slot] == leftHandleValue &&
+                directRightHandle_[slot] == rightHandleValue &&
+                directGeneration_[slot] == generation &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(directLeft_[slot], device_) &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(directRight_[slot], device_);
             if (!same)
             {
                 ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]); ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]); invalidateDirect();

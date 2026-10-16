@@ -64,6 +64,25 @@ namespace OutRunVrNativeEyePair
         return distinct;
     }
 
+
+    // A recreated OpenXR/D3D11 device can have the same source size and
+    // DXGI format as the previous session. Descriptor equality is not proof
+    // that a cached game-eye or host hold texture belongs to the current
+    // immediate context. The host must reopen/recreate it before GPU copy.
+    // Keep this templated so restricted descriptor-only test headers need
+    // not provide the complete D3D11 COM interfaces until instantiated.
+    template <typename Texture, typename Device>
+    [[nodiscard]] inline bool TextureOwnedByDevice(
+        Texture* texture, Device* device) noexcept
+    {
+        if (!texture || !device) return false;
+        Device* owner = nullptr;
+        texture->GetDevice(&owner);
+        const bool same = owner != nullptr && owner == device;
+        if (owner) owner->Release();
+        return same;
+    }
+
     // Native game-produced independent L/R eyes may be copied directly into
     // matching OpenXR array slices. Unlike an SBS atlas this is already one
     // complete full-size image per eye, so there is no UV crop or color

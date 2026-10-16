@@ -378,7 +378,11 @@ namespace
         c.directRight_[slot]->GetDesc(&right);
         // Re-check before the actual GPU CopyResource + OpenXR eye projection:
         // a changed transport generation or an aliased eye cannot reach HMD.
-        if (!OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+        if (!OutRunVrNativeEyePair::TextureOwnedByDevice(
+                c.directLeft_[slot], c.device_) ||
+            !OutRunVrNativeEyePair::TextureOwnedByDevice(
+                c.directRight_[slot], c.device_) ||
+            !OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
                 c.directLeft_[slot], c.directRight_[slot], IID_IUnknown) ||
             !OutRunVrNativeEyePair::Compatible(
                 frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex],
@@ -390,6 +394,13 @@ namespace
         const bool recreate =
             !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
             !R23DirectHold.srv[0] || !R23DirectHold.srv[1] ||
+            // Global R23 hold textures survive compositor replacement. Copying
+            // old device resources on a newly constructed OpenXR context is
+            // invalid even if the new game backbuffer has identical geometry.
+            !OutRunVrNativeEyePair::TextureOwnedByDevice(
+                R23DirectHold.eye[0], c.device_) ||
+            !OutRunVrNativeEyePair::TextureOwnedByDevice(
+                R23DirectHold.eye[1], c.device_) ||
             R23DirectHold.width != left.Width ||
             R23DirectHold.height != left.Height ||
             R23DirectHold.mipLevels != left.MipLevels ||
@@ -1183,8 +1194,12 @@ namespace
     {
         return OutRunVrNativeEyePair::ChooseStereoSource(
             c.directFrameValid_ && R23DirectHold.valid,
-            R23DirectHold.srv[0] != nullptr,
-            R23DirectHold.srv[1] != nullptr,
+            R23DirectHold.srv[0] != nullptr &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(
+                    R23DirectHold.eye[0], c.device_),
+            R23DirectHold.srv[1] != nullptr &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(
+                    R23DirectHold.eye[1], c.device_),
             c.stereoSourceValid_, c.stereoSourceSrv_ != nullptr);
     }
 

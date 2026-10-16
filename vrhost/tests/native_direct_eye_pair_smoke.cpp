@@ -123,6 +123,40 @@ int main()
     const bool nullGpuEyeDenied = gpuLeft &&
         !OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
             gpuLeft, static_cast<ID3D11Texture2D*>(nullptr), IID_IUnknown);
+    // Actual WARP device lifetime regression: the R23 host source importer
+    // and global GPU hold may outlive an OpenXR compositor replacement.
+    // Equal descriptors must not allow D3D11 CopyResource across devices.
+    ID3D11Device* replacementDevice = nullptr;
+    ID3D11DeviceContext* replacementContext = nullptr;
+    const HRESULT replacementHr = D3D11CreateDevice(
+        nullptr, D3D_DRIVER_TYPE_WARP, nullptr, 0,
+        nullptr, 0, D3D11_SDK_VERSION,
+        &replacementDevice, nullptr, &replacementContext);
+    ID3D11Texture2D* replacementEye = nullptr;
+    const bool secondDeviceReady =
+        SUCCEEDED(replacementHr) && replacementDevice &&
+        SUCCEEDED(replacementDevice->CreateTexture2D(
+            &left, nullptr, &replacementEye)) && replacementEye;
+    const bool ownershipSafe = secondDeviceReady &&
+        OutRunVrNativeEyePair::TextureOwnedByDevice(gpuLeft, warpDevice) &&
+        OutRunVrNativeEyePair::TextureOwnedByDevice(gpuRight, warpDevice) &&
+        OutRunVrNativeEyePair::TextureOwnedByDevice(
+            replacementEye, replacementDevice) &&
+        !OutRunVrNativeEyePair::TextureOwnedByDevice(
+            gpuLeft, replacementDevice) &&
+        !OutRunVrNativeEyePair::TextureOwnedByDevice(
+            replacementEye, warpDevice) &&
+        !OutRunVrNativeEyePair::TextureOwnedByDevice(
+            static_cast<ID3D11Texture2D*>(nullptr), warpDevice) &&
+        !OutRunVrNativeEyePair::TextureOwnedByDevice(
+            gpuLeft, static_cast<ID3D11Device*>(nullptr));
+    if (replacementEye) replacementEye->Release();
+    if (replacementContext) replacementContext->Release();
+    if (replacementDevice) replacementDevice->Release();
+    if (!require(ownershipSafe,
+                 "host device replacement must reopen both DirectGPU eyes and rebuild stale R23 hold"))
+        return 1;
+
     // The production R23 DirectGPU -> OpenXR path may skip shader blits only
     // for two genuine whole-eye UNORM source images and an exact two-slice
     // XR swapchain destination. Full-size, sRGB and HDR mismatches retain
