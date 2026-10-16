@@ -1,0 +1,114 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00926",
+  "production_id": "CONVERSION-DX9EX-00926",
+  "event_id": "CONVERSION-DX9EX-00926-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00926",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_GATE_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "025b6665967bc8a456713880756ab3b3a571f094",
+  "source_paths": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/menu_content_aspect.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00926.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Correct the full OutRun 2006 VR main/front-menu and vehicle-selection theater physical geometry without cropping authored right-edge car and menu content, while preserving per-eye menu presentation and legacy fallback.",
+    "scope_boundary": "Only R23 LOCAL-fixed non-gameplay captured-menu optical aspect and full game-client validation; no gameplay HUD/F11/ESC, lens, game camera/FFB/SkyGlow, R26_SAFE, DX11, or frozen DXVK changes.",
+    "trace_stages": [
+      "Original native game main-menu and vehicle-selection sprites render on captured desktop client, with letterbox configuration read from the actual game process.",
+      "R23 GetGameUv and native client rectangle capture the complete original menu, then menu-content-aspect computes an authored optical 4:3 physical plane without cropping UV pixels.",
+      "Common intersected OpenXR eye tangents project identical LOCAL-fixed clip geometry for both eyes, with captured-fragment and explicit native-aspect fallbacks preserved."
+    ],
+    "subcomponents": [
+      "Separate the full-client source UV rectangle from its physical menu display aspect: keep all Ferrari/model/list pixels while correcting 21:9 and 16:9 optical width when original letterbox mode is configured.",
+      "Constrain correction to complete, finite, non-portrait source clients, maintain clipped-window fallback and reversible OUTRUN_VR_MENU_NATIVE_ASPECT=1, and guard 4:3/portrait/uncropped configurations.",
+      "Exercise positive and negative menu-aspect cases in the portable C++ menu smoke test, then validate x86 R84, x64 OpenXR host, package, Domain and Full Source on the final exact SHA."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_full_content_optical_aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original game menu and car selector to OpenXR LOCAL-fixed binocular projection",
+        "expected_behavior": "Fully captured 21:9 and 16:9 configured game menus keep every native source pixel while projecting at preserved authored 4:3 physical proportions in both LOCAL-fixed OpenXR eyes."
+      },
+      {
+        "id": "menu_native_and_partial_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original desktop/cropped game client and user selectable native menu plane",
+        "expected_behavior": "Explicit 4:3 center crop, window/output-edge partial capture, native 4:3 or portrait resolution, invalid aspect and no-letterbox menus retain prior behavior; OUTRUN_VR_MENU_NATIVE_ASPECT=1 fully restores previous uncropped display proportions."
+      },
+      {
+        "id": "dx9ex_exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub Actions Windows game/host/full-chain/package and domain/source impact checks",
+        "expected_behavior": "The validation-bearing commit passes existing DX9Ex Active x86 game/R84, x64 OpenXR host, package, R26_SAFE, Domain and applicable Full Source/HUD gates on one exact SHA; no HMD PASS without actual matching Quest3 test."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_full_content_optical_aspect": "SOURCE_IMPLEMENTED",
+    "menu_native_and_partial_fallback": "SOURCE_IMPLEMENTED",
+    "dx9ex_exact_sha_required_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R23 native LOCAL-fixed menu projected a complete uncropped 3440x1440 captured game client using its wide desktop aspect. The source menu's intentionally authored 4:3 visual proportions became optically ultrawide, whereas center-only texture crop discards user-observed car-selection/menu pixels outside that rectangle.",
+    "original_evidence": "Issue #119 Quest3/VDXR A/B capture: default crop OFF shows wide/distorted header and car selection, crop ON cuts authored Ferrari and right-hand list. R23 source used PlanCapturedAspect without distinguishing optical authored aspect for complete uncropped game clients.",
+    "eye_ownership": "R23 constructs a single LOCAL-fixed menu clip from intersected left/right OpenXR FOV tangents and reuses it in both eyes, independent of gameplay stereo draw semantics.",
+    "source_trace": [
+      "vrhost/src/main_r23.cpp R23RenderWorldLockedMenuProjection reads game configured letterbox, GetGameUv and actual GetClientRect and chooses center crop only under explicit override.",
+      "vrhost/src/runtime/menu_content_aspect.hpp PlanUncroppedAuthoredMenuAspect gates optical 4:3 display proportions on complete captured letterboxed game client and reversible native fallback.",
+      "vrhost/src/main_r23.cpp passes corrected sourceAspect only to PlanOpticallyCenteredClip for the shared LOCAL-fixed two-eye geometry, retaining every pixel of original captured UV.",
+      "vrhost/tests/menu_content_aspect_smoke.cpp checks ultrawide/16:9 source and negative crop/partial/4:3/portrait/NaN/explicit-native routes."
+    ],
+    "alternatives_rejected": [
+      "Automatic 4:3 UV crop is rejected because user screenshot proves authored car-preview and menu choice pixels live outside nominal center 4:3.",
+      "Using native desktop 21:9 physical plane leaves the observed horizontally overlarge theater uncorrected; correction is limited to proven complete game client and original letterbox-mode configuration.",
+      "Changing gameplay stereoscopic R29-R33, F11, SkyGlow or game menu timings would not target this host LOCAL-menu optical source mismatch."
+    ],
+    "fix_evidence": "Source implementation commit abb3c45560cf00b57be7fe1b66f1e3998295635f modified actual C++ menu host and aspect helper, plus end-to-end menu aspect smoke positive and negative cases.",
+    "negative_test_evidence": "menu_content_aspect_smoke.cpp rejects correction for no letterbox, partial/unreliable captured client, already cropped mode, native rollback, native 4:3 and portrait, NaN sampled aspect and infinite client aspect.",
+    "runtime_evidence": "No actual Quest3 or VDXR optical/menu test was run; screen proportions, car selection legibility and runtime behavior are not asserted PASS.",
+    "next_hmd_experiment": "On Quest3/VDXR inspect full original main menu and Ferrari car selection on one same-SHA R84 ZIP at 3440x1440 capture and compare native-aspect rollback, then inspect 4:3 native and partially visible desktop window during recenter and resize."
+  },
+  "failed_ci_evidence": {
+    "first_material_gate": {
+      "sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
+      "run_id": 38829694004,
+      "job_id": 116745363643,
+      "result": "policy failure before game/host build",
+      "cause": "Record missing for exact-HEAD CONVERSION-DX9EX-00926",
+      "actual_compiler_test": "NOT_RUN"
+    }
+  },
+  "material_result_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Same TASK_ID CI input repair: add required full-function feature contract to validation-bearing exact SHA, then inspect mandatory Active/Domain/Full Source and applicable HUD status; Quest3 physical optics remains untested.",
+  "ci_evidence": {
+    "candidate_material_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
+    "active_material_attempt": {
+      "run_id": 38829694004,
+      "conclusion": "failure_missing_feature_record_before_compilation"
+    },
+    "exact_sha_requirement": "Must pass all mandatory workflows on final record-bearing result SHA, do not borrow predecessor Green, no HMD inference."
+  }
+}
