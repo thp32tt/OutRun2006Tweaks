@@ -1,0 +1,34 @@
+name: outrun-c-original-english-crop
+
+services:
+  c-english-original-crop:
+    image: outrun-kor-c-salvage:20261015
+    container_name: outrun-c-original-english-crop
+    # Reuse N100's cached Pillow image; override all salvage entrypoints.
+    entrypoint: ["python3", "/app/loop.py"]
+    command: ["--interval-seconds", "60", "--max-per-cycle", "10"]
+    restart: unless-stopped
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 32
+    cpus: 0.35
+    mem_limit: 512m
+    tmpfs:
+      - /tmp:size=64m
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      TZ: Asia/Seoul
+    volumes:
+      - ./loop.py:/app/loop.py:ro
+      - /home/chatgpt-runner2/work/c_original_hd_crop_only_checked_20261016.py:/home/chatgpt-runner2/work/c_original_hd_crop_only_checked_20261016.py:ro
+      - /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012:/home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012:ro
+      - /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json:/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json:ro
+      - /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only:/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only:rw
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "3"
