@@ -399,14 +399,26 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         // Context-state creation has no implicit default feature-level array.
         // Reuse this game-eye device's supported level rather than null/zero.
         const D3D_FEATURE_LEVEL requestedLevel = device->GetFeatureLevel();
+        // Some Win32 game builds do not link a fixed compiler import lib.
+        // Match the proven isolated WARP probe: load the OS compiler only
+        // for first-use shader compilation, never once per game Draw.
+        HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
+        if (!compiler) return false;
+        struct ScopedCompilerModule {
+            HMODULE handle{};
+            ~ScopedCompilerModule() noexcept { if (handle) FreeLibrary(handle); }
+        } compilerLifetime{compiler};
+        const auto compile = reinterpret_cast<decltype(&D3DCompile)>(
+            GetProcAddress(compiler, "D3DCompile"));
+        if (!compile) return false;
         D3D_FEATURE_LEVEL level{};
         if (FAILED(device1->CreateDeviceContextState(
                 0u, &requestedLevel, 1u, D3D11_SDK_VERSION,
                 __uuidof(ID3D11Device), &level, is.GetAddressOf())) ||
-            FAILED(D3DCompile(shader, sizeof(shader)-1u, nullptr,
+            FAILED(compile(shader, sizeof(shader)-1u, nullptr,
                 nullptr, nullptr, "VS", "vs_4_0", 0u, 0u,
                 vc.GetAddressOf(), nullptr)) ||
-            FAILED(D3DCompile(shader, sizeof(shader)-1u, nullptr,
+            FAILED(compile(shader, sizeof(shader)-1u, nullptr,
                 nullptr, nullptr, "PS", "ps_4_0", 0u, 0u,
                 pc.GetAddressOf(), nullptr)) ||
             FAILED(device->CreateVertexShader(vc->GetBufferPointer(),
