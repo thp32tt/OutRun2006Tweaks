@@ -46,6 +46,13 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
   matches, outside the 255/archive/queue, with non-clipped native bbox and
   independently verified full DDS/PNG source; it atomically enqueues them.
   Every OCR crop still receives TEST_ONLY and no runtime PASS.
+- Verified-source coverage expanded: Q051, Q060, Q116, Q161, Q197,
+  Q212 (6 unique original DDS/PNG pairs). Each source is pinned by SHA256,
+  dimensions, and full decoded DDS pixel equality including FLIPY orientation.
+  Q116/Q161 compressed DDS is decoded natively by Pillow, not resized.
+  The four extra verified source PNGs and DDS files are staged only in N100's
+  C-approved original directory; generated/reassembled tiles are not used.
+  Other source groups remain HOLD until their genuine original is verified.
 - OCR remains fallible: items with source/letter ambiguity, wrong/incomplete
   text, clipped alpha/effect or non-text sprites are rejected or HOLD, never
   guessed to force production. See `auto_discovery/Q*_ocr_results.json`.
