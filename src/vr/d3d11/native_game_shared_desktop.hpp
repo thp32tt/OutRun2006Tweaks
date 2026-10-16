@@ -153,7 +153,26 @@ public:
             }
             pending_ = false;
         }
-        context->CopyResource(source_.Get(), source);
+        // Transfer only the pixels that this native menu/car/race Present
+        // will actually reveal. A cropped or single-dirty source otherwise
+        // incurred a full 3440x1440 GPU CopyResource on every frame.
+        // Source/destination are identically sized BGRA textures; source_
+        // pixels outside this region are never exposed by StretchRect.
+        const bool entire = visibleRegion.left == 0 && visibleRegion.top == 0 &&
+            static_cast<std::uint32_t>(visibleRegion.right) == width &&
+            static_cast<std::uint32_t>(visibleRegion.bottom) == height;
+        if (entire) {
+            context->CopyResource(source_.Get(), source);
+        } else {
+            const D3D11_BOX region{
+                static_cast<UINT>(visibleRegion.left),
+                static_cast<UINT>(visibleRegion.top), 0u,
+                static_cast<UINT>(visibleRegion.right),
+                static_cast<UINT>(visibleRegion.bottom), 1u};
+            context->CopySubresourceRegion(
+                source_.Get(), 0u, region.left, region.top, 0u,
+                source, 0u, &region);
+        }
         context->End(fence_.Get());
         context->Flush();
         pending_ = true;
@@ -194,9 +213,6 @@ public:
         // while the source State mutex is held. Copy only pixels the game
         // will show from this Present crop / one proven dirty rectangle.
         // All other D3D9 backbuffer pixels remain the game's own output.
-        const bool entire = visibleRegion.left == 0 && visibleRegion.top == 0 &&
-            static_cast<std::uint32_t>(visibleRegion.right) == width &&
-            static_cast<std::uint32_t>(visibleRegion.bottom) == height;
         const RECT* rect = entire ? nullptr : &visibleRegion;
         return SUCCEEDED(game->StretchRect(
             sharedSurface.Get(), rect, backbuffer, rect, D3DTEXF_NONE));

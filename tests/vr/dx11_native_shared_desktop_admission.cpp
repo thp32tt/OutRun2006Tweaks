@@ -59,6 +59,17 @@ int main() {
     const auto dirty = select(crop,true,true,false,false,false,oneTile);
     assert(dirty.valid && dirty.source.left == 200 &&
            dirty.source.right == 400 && dirty.source.bottom == 300);
+    // CopySubresourceRegion and the subsequent StretchRect share this exact
+    // rect, so the GPU transfer can skip all untouched source/backbuffer pixels.
+    assert((dirty.source.right - dirty.source.left) *
+           (dirty.source.bottom - dirty.source.top) == 40000);
+    assert((cropped.source.right - cropped.source.left) *
+           (cropped.source.bottom - cropped.source.top) < 3440 * 1440);
+    // Contradictory dirty metadata must never authorize a partial GPU copy.
+    assert(!select(crop,false,true,false,false,false,oneTile).valid);
+    assert(!select(crop,false,false,true,false,false,noTile).valid);
+    assert(!select(crop,false,false,false,true,false,noTile).valid);
+    assert(!select(crop,false,false,false,false,true,noTile).valid);
     assert(!select(crop,true,false,false,false,false,oneTile).valid);
     assert(!select(crop,true,true,false,false,false,noTile).valid);
     assert(!select(crop,true,false,false,false,false,noTile).valid);

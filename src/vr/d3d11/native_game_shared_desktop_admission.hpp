@@ -22,7 +22,12 @@ struct NativeSharedDesktopAdmission {
         GameNativePartialDirtySelection partial) noexcept {
         if (!present.full_frame_placement(width,height,width,height).valid)
             return {};
-        if (!hasDirty || fullDirty || cropDirty || partitionCrop)
+        // Dirty coverage flags may only authorize a matching dirty Region.
+        // An unmarked Present is a separate full visible-frame proof.
+        if (!hasDirty)
+            return (oneDirty || fullDirty || cropDirty || partitionCrop)
+                ? NativeSharedDesktopRegion{} : NativeSharedDesktopRegion{present, true};
+        if (fullDirty || cropDirty || partitionCrop)
             return {present, true};
         if (oneDirty && partial.valid &&
             partial.source.full_frame_placement(width,height,width,height).valid &&

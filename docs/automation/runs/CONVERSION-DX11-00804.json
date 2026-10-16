@@ -53,8 +53,8 @@
     ]
   },
   "acceptance_results": {
-    "full-game-x8-desktop": "SOURCE_AND_CI_VERIFIED_RUNTIME_UNTESTED",
-    "exact-source-and-fallback": "SOURCE_AND_CI_VERIFIED_RUNTIME_UNTESTED",
+    "full-game-x8-desktop": "PASS_BUILD",
+    "exact-source-and-fallback": "PASS_BUILD",
     "five-exact-sha-gates": "PASS_EXACT_SHA"
   },
   "development_strategy": {
@@ -80,7 +80,13 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "Source and GitHub CI only; no matching Quest 3 / VDXR or direct gameplay visual proof.",
-    "activation_guard_and_fallback": "NativeDrawPathActive default remains false; original DX9Ex, D3D9 gamepad/FFB, SkyGlow and DXVK freeze unchanged."
+    "activation_guard_and_fallback": "NativeDrawPathActive default remains false; original DX9Ex, D3D9 gamepad/FFB, SkyGlow and DXVK freeze unchanged.",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "pipeline": {
     "C0_RECOVER": "Recovered exact vr-dx11-native-r71 HEAD 2e08cc4d3a10fce6c693af2e8b09b6309a69110f; previous 00803 five CI gates success, no active exact-SHA validation cancellation.",
@@ -125,5 +131,12 @@
         "head_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea"
       }
     }
+  },
+  "ci_record_reconciliation": {
+    "cause": "Both DX11 Fast and Backend Conversion Gate at 00805 material SHA dec11b09e60b195334d09a69aee3558f151f65dd rejected an earlier 00804 C6 record: missing gameplay target/stages and obsolete SOURCE_AND_CI_VERIFIED_RUNTIME_UNTESTED acceptance labels.",
+    "proof": "00804 validation SHA 29fa9ce3dac19e1b7b8318d6ce0208dc201530ea already has five exact-SHA GitHub Actions successes; PASS_BUILD means source/build proof only, not game/Quest3 runtime proof.",
+    "preserve": "Existing 00804 material_result_sha, validation_bearing_result_sha, C6 checkpoint and RUNTIME_VALIDATION=UNTESTED remain unchanged. Scoped GPU desktop continuation is not full mono/LR/OpenXR renderer completion.",
+    "correction_task_id": "CONVERSION-DX11-00805",
+    "score_change": 0
   }
 }
