@@ -76,6 +76,9 @@ Assert-True (Has-Argument $correctness '-DisableDesktopVsync=true') 'CORRECTNESS
 Assert-True ($performance.Environment.OUTRUN_VR_PERFORMANCE_PROFILE -eq '1') 'PERFORMANCE must explicitly opt into performance experiments'
 Assert-True (Has-Argument $correctness '-FrameCadenceTargetHz=0') 'CORRECTNESS must use runtime-selected cadence'
 Assert-True (Has-Argument $performance '-FrameCadenceTargetHz=0') 'PERFORMANCE must use runtime-selected cadence'
+Assert-True (Has-Argument $performance '-CullingUnionFov=false') 'PERFORMANCE must not mutate per-eye projection/culling during visual diagnosis'
+Assert-True (-not (Has-Argument $performance '-CullingUnionFov=true')) 'PERFORMANCE must not silently re-enable experimental union-FOV'
+Assert-True (Has-Argument $performance '-DirectGpuOnly=false') 'PERFORMANCE must retain optional Desktop Dup for isolated diagnostics'
 
 $requiredFiles = @(
     'Select-OutRunVRBackend.ps1',
