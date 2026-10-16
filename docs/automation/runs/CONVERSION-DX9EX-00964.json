@@ -10,7 +10,7 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:COCKPIT:ATOMIC_CAR_DRIVER_HOOKS",
   "symptom_id": "DX9EX:SYMPTOM:HALF_INSTALLED_COCKPIT",
-  "feature_class": "USER_VISIBLE_FAILURE_RECOVERY",
+  "feature_class": "CRITICAL_BLOCKER",
   "status": "IMPLEMENTED_PENDING_CI",
   "phase": "C4_COMMIT",
   "checkpoint": "C4_STATE",
@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "d1a691e2b4d6826a783f3eb2cc60b6bc7c88c4f4",
-  "material_result_sha": null,
+  "material_result_sha": "4536421f2dd0cb970c201adf9a7039d15e10cf8c",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/driver_seat_render_pass.hpp",
@@ -74,13 +74,24 @@
     "atomic_cockpit_exact_sha": "PENDING_EXACT_SHA"
   },
   "diagnosis": {
-    "source": "src/hooks_graphics.cpp::VRDriverSeatRenderTest::apply",
-    "root_cause": "Nontransactional installation of car and driver detours allowed a partially installed car hook even after overall install failed.",
-    "fix": "Move-only transactional pair staging with RAII rollback on either failure."
+    "original_evidence": "At the real player-car native hook registration site, the prior car-state detour was directly committed before attempting driver robot inline detour; both hooks were independent but failure returned false without the car callback being removed.",
+    "source_trace": [
+      "src/hooks_graphics.cpp VRDriverSeatRenderTest::apply installs original player-car rendering midhook to force full geometry.",
+      "The same function subsequently installs original identified-driver robot display inline hook to hide only the selected player driver.",
+      "HookManager receives a combined success Boolean; when second creation fails it can retain the first installed native hook and change body visibility without paired driver suppression."
+    ],
+    "root_cause": "Two independent scoped safetyhook objects were assigned to their final owners before both D3D9-external game detours were successfully installed, making non-atomic rollback of the cockpit render feature possible.",
+    "alternatives_rejected": [
+      "Neither the cockpit camera offset nor original game near-plane ownership is implicated in this installer defect; those callback bodies and settings remain unchanged.",
+      "This does not imply glass, HUD, lens or alpha reconstruction is fixed; it is strictly the native installed/uninstalled hook pair failure."
+    ],
+    "fix_evidence": "Source now uses InstallAtomicCockpitPair to stage two move-only safetyhook return objects, publishes neither until both succeed and relies on the first tentative object's destructor to unhook when second install fails.",
+    "negative_test_evidence": "vrhost/tests/driver_seat_render_pass_smoke.cpp adds executable move-only detour simulation covering failed first install with second never attempted, failed second with first uninstalled, normal dual success and both destructors on scope exit. Test invocation is namespace qualified after C++ linkage fix commit 229d1049.",
+    "source": "src/hooks_graphics.cpp::VRDriverSeatRenderTest::apply"
   },
   "ci_evidence": {
     "result": "PENDING"
   },
-  "next_action": "Execute local changed-area native C++ regression, then same-SHA GitHub Actions Active/Domain/Full Source/HUD. Quest3/VDXR acceptance separate.",
+  "next_action": "Exact-SHA policy now classifies the original source-confirmed half-installed cockpit blocker as CRITICAL_BLOCKER; full Win32 R84 host/packaging/Domain/Full Source/HUD Actions needed. Quest3 runtime UNTESTED.",
   "score_delta_this_attempt": 0
 }
