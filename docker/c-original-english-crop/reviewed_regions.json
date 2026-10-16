@@ -1,0 +1,20 @@
+{
+  "schema": "outrun-discovery-reviewed-regions-v1",
+  "policy": "Only source pixel-provenance checked and visually reviewed English phrases, not generic OCR guesses.",
+  "regions": [
+    {
+      "queue_id": "Q060",
+      "id": "in-suffix-20261017",
+      "english": "IN...",
+      "bbox_xyxy": [
+        1990,
+        127,
+        2300,
+        232
+      ],
+      "visually_reviewed": true,
+      "source_dds_pixel_verified": true,
+      "review_note": "Inspected full source and isolated native crop; physical IN... suffix to KNOCKOUT! IN..., no neighboring word. Check independently as TEST_ONLY."
+    }
+  ]
+}
