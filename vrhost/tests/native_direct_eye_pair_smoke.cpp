@@ -171,18 +171,18 @@ int main()
     // red/green pixels in the XR array instead of sharing a mono slice.
     ID3D11Texture2D* warpXr = nullptr;
     ID3D11Texture2D* warpReadback = nullptr;
-    ID3D11RenderTargetView* leftRtv = nullptr;
-    ID3D11RenderTargetView* rightRtv = nullptr;
+    ID3D11RenderTargetView* nativeLeftRtv = nullptr;
+    ID3D11RenderTargetView* nativeRightRtv = nullptr;
     const bool resourcesReady =
         SUCCEEDED(warpDevice->CreateTexture2D(&xrArray, nullptr, &warpXr)) &&
-        SUCCEEDED(warpDevice->CreateRenderTargetView(gpuLeft, nullptr, &leftRtv)) &&
-        SUCCEEDED(warpDevice->CreateRenderTargetView(gpuRight, nullptr, &rightRtv));
+        SUCCEEDED(warpDevice->CreateRenderTargetView(gpuLeft, nullptr, &nativeLeftRtv)) &&
+        SUCCEEDED(warpDevice->CreateRenderTargetView(gpuRight, nullptr, &nativeRightRtv));
     bool pixelsDistinct = false;
     if (resourcesReady && warpXr) {
         const float red[4]{1.f, 0.f, 0.f, 1.f};
         const float green[4]{0.f, 1.f, 0.f, 1.f};
-        warpContext->ClearRenderTargetView(leftRtv, red);
-        warpContext->ClearRenderTargetView(rightRtv, green);
+        warpContext->ClearRenderTargetView(nativeLeftRtv, red);
+        warpContext->ClearRenderTargetView(nativeRightRtv, green);
         warpContext->CopySubresourceRegion(warpXr, 0u,
             0u, 0u, 0u, gpuLeft, 0u, nullptr);
         warpContext->CopySubresourceRegion(warpXr, 1u,
@@ -217,8 +217,8 @@ int main()
                 secondGreen >= 250u && secondRed <= 5u;
         }
     }
-    if (leftRtv) leftRtv->Release();
-    if (rightRtv) rightRtv->Release();
+    if (nativeLeftRtv) nativeLeftRtv->Release();
+    if (nativeRightRtv) nativeRightRtv->Release();
     if (warpReadback) warpReadback->Release();
     if (warpXr) warpXr->Release();
     if (!require(resourcesReady && pixelsDistinct,
