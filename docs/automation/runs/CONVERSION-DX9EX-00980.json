@@ -2,24 +2,24 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00980",
   "production_id": "CONVERSION-DX9EX-00980",
-  "event_id": "CONVERSION-DX9EX-00980-E002",
+  "event_id": "CONVERSION-DX9EX-00980-E004",
   "event_type": "retry",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "run_key": "CONVERSION-DX9EX-00980",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C2_MATERIAL_COMMITTED",
-  "phase": "C2_IMPLEMENTATION",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ebdfa5659b421be60217f9cfbd6d948fde5a092e",
   "material_result_sha": "395ee073c448d7b20968b01bfe6199ae6802b18e",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "06857c46c4febcb5f4b62e6f8560ddd8bbfeac37",
   "source_paths": [
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/queued_hud_partial_wvp.hpp"
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "hud_split_wvp": "PENDING_EXACT_SHA",
-    "hud_original_fallback": "PENDING_EXACT_SHA",
-    "hud_integrated_gate": "PENDING_EXACT_SHA"
+    "hud_split_wvp": "PASS_EXACT_SHA",
+    "hud_original_fallback": "PASS_EXACT_SHA",
+    "hud_integrated_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Source-level R84 exact ScreenHud partial c64 writes revoke prior original-game WVP because partial reconstruction currently exists only for C993 lens; same exact queued HUD owner can consequently fail stereo HUD projection while the original D3D9 GPU still retains other c64 rows.",
@@ -81,12 +81,46 @@
     "runtime_limit": "Source/portable/CMake/CI checks do not prove physical Quest3 or VDXR binocular HUD acceptance."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run required exact-SHA DX9Ex Active and affected regression gates; retain NEED_HMD_TEST for physical Quest3/VDXR",
+  "next_action": "BUILD_VERIFIED on exact SHA; Quest3/VDXR physical binocular HUD visual acceptance remains NEED_HMD_TEST. Do not rerun identical SHA/C6 or count retry as a separate feature.",
   "last_ci_failure": {
-    "run_id": 38979836162,
-    "head_sha": "395ee073c448d7b20968b01bfe6199ae6802b18e",
+    "run_id": 38980800901,
+    "head_sha": "de7e46b501bd976114b6fc95359c139617f70d11",
     "job": "policy",
-    "cause": "R51 stable white HUD visual feature omitted from feature catalog; verifier correctly rejected missing feature",
-    "repair": "register the exact individual symptom, preserve catalog rejection of unregistered visual features"
+    "cause": "GPU visual verifier aux/owner mutation replaced the new queued HUD target-veto expression, while verify() checked only the later main-WVP veto; surviving negative mutation blocked CI",
+    "repair": "Assert the partial HUD accumulator native-success/auxiliary-target veto independently; preserve existing main WVP owner check and all four destructive mutations."
+  },
+  "previous_ci_failures": [
+    {
+      "run_id": 38979836162,
+      "head_sha": "395ee073c448d7b20968b01bfe6199ae6802b18e",
+      "job": "policy",
+      "cause": "R51 stable white HUD visual feature omitted from feature catalog; verifier correctly rejected missing feature",
+      "repair": "register the exact individual symptom, preserve catalog rejection of unregistered visual features"
+    },
+    {
+      "run_id": 38980800901,
+      "head_sha": "de7e46b501bd976114b6fc95359c139617f70d11",
+      "job": "policy",
+      "cause": "GPU visual verifier aux/owner mutation replaced the new queued HUD target-veto expression, while verify() checked only the later main-WVP veto; surviving negative mutation blocked CI",
+      "repair": "Assert the partial HUD accumulator native-success/auxiliary-target veto independently; preserve existing main WVP owner check and all four destructive mutations."
+    }
+  ],
+  "c6_exact_sha_gate": {
+    "validation_bearing_result_sha": "06857c46c4febcb5f4b62e6f8560ddd8bbfeac37",
+    "dx9ex_active_run_id": 38981068241,
+    "dx9ex_active_jobs": [
+      "policy",
+      "full-chain-compile",
+      "game",
+      "host",
+      "package"
+    ],
+    "dx9ex_active_conclusion": "success",
+    "domain_run_id": 38981068367,
+    "domain_conclusion": "success",
+    "related_material_full_source_run_id": 38979836137,
+    "related_material_hud_inspector_run_id": 38979836071,
+    "related_material_sha": "395ee073c448d7b20968b01bfe6199ae6802b18e",
+    "quest3_vdxr": "UNTESTED"
   }
 }
