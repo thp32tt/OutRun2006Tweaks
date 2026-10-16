@@ -142,11 +142,31 @@ def source_contract(renderer=RENDERER, r30=R30, semantic=SEMANTICS):
     for token in ("EffectiveScope() != RenderScope::SceneEffect",
                   "GetLastRawGameWvpWrite(", "R29OwnerCurrentShaderEpoch(",
                   "GetLastGameWvpPoseEpoch()", "R29OwnerTopLevelDrawSerial() + 1u",
-                  "nextDraw - writeDraw > 12u", "R29OwnerInvertMatrix(",
+                  "SceneEffectWvp::OwnsOriginalWorldWvp({", "R29OwnerInvertMatrix(",
                   "R29OwnerMultiplyMatrix(gameWvp, inverseProjection)",
                   "affineError <= 0.02f", "depth >= 1.25f",
                   "clipW > 0.05f"):
         require(token in helper, "source-owned spatial veto missing: " + token)
+
+    # The original 12-draw age check moved into a pure C++ source-ownership
+    # contract, not deleted. Keep verifying the numerical veto AND the newly
+    # required exact producer/queue/shader/pose identity as a single unit.
+    ownership = (ROOT / "src/vr/game/scene_effect_wvp_provenance.hpp").read_text(
+        encoding="utf-8")
+    for token in ("e.nextDrawSerial - e.writtenDrawSerial > 12u",
+                  "e.writtenScope != RenderScope::SceneEffect",
+                  "e.currentProducer != e.writtenProducer",
+                  "e.currentPoseEpoch != e.writtenPoseEpoch",
+                  "e.currentShader != e.writtenShader",
+                  "e.currentShaderEpoch != e.writtenShaderEpoch",
+                  "e.currentQueueNode == e.writtenQueueNode",
+                  "e.currentQueueEpoch == e.writtenQueueEpoch",
+                  "e.currentQueueNode == nullptr",
+                  "e.writtenQueueNode == nullptr"):
+        require(token in ownership,
+                "SceneEffect source owner or 12-draw negative gate missing: " + token)
+    require('#include "../game/scene_effect_wvp_provenance.hpp"' in r30,
+            "R84 live renderer must compile the proven SceneEffect gate")
 
 
 def classify(m34, m44):
