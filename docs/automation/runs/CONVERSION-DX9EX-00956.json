@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "eca15246ef6511bb41be94c410222b9e2fae43d1",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "78c391bd4e6e06745916cfb1846df8ee27d493f0",
+  "validation_bearing_result_sha": "3bf00140f3c8c3482ea66ef0c338375638b077c1",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
@@ -66,21 +66,51 @@
     ]
   },
   "acceptance_results": {
-    "projected_flare_origin": "PENDING_GATE",
-    "projected_flare_fallback": "PENDING_GATE",
-    "projected_flare_exact_sha": "PENDING_GATE"
+    "projected_flare_origin": "PASS_EXACT_SHA",
+    "projected_flare_fallback": "PASS_EXACT_SHA",
+    "projected_flare_exact_sha": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Source-confirmed float addition overflow in R84 projected-effect eyeCentre before per-eye subtraction; a float-safe reusable helper exists in the same R84 TU.",
     "alternatives_rejected": [
       "Do not alter lens C993 source/outer-ring semantics, GPU blend/alpha or eye rotation; this repair is confined to projected CABE pose translation. No claim of a reproduced Quest3 frame."
     ],
-    "runtime_limit": "No Quest3/VDXR or OutRun executable runtime capture in this task; numerical repro does not demonstrate full visual repair."
+    "runtime_limit": "No OutRun 2006/Quest3/VDXR device render run or observed FPS in this task. Only source correctness and CI are validated; user-visible optics remain NEED_HMD_TEST.",
+    "original_evidence": "The original R30PrepareFlatEffectGeometry source in the projected CABE flat-effect branch averaged stereo.eyeOffset[0] + stereo.eyeOffset[1] in float before halving. Two individually finite large origins can overflow the intermediate sum and prevent constructing both projected eye effects.",
+    "source_trace": [
+      "Original 0xCABE projected outer-disc producer retains the native Calc3D2D 2D world-effect optical classification.",
+      "R84 R30PrepareFlatEffectGeometry computes a relative translation per eye and an identity eye orientation only for already-projected discs; unprojected world draws still use original absolute eye poses.",
+      "R29OwnerMatrixFromQuaternionTranslation / R29OwnerInverseRigid / OpenXR asymmetric per-eye projection consume the coherent relative eyes; unproven projections retain the unchanged game draw."
+    ],
+    "fix_evidence": "The C++ source now uses the existing LensCentre::BuildHeadRelativeEyeOffsets which widens to double before averaging, validates all six finite eye elements and atomically publishes paired translations, only when directProjected2D. Exact-SHA Win32 R84 and R26_SAFE builds and x64 host succeeded.",
+    "negative_test_evidence": "Updated vrhost/tests/lens_centre_eye_pose_smoke.cpp verifies two largest finite float origins produce zero relative eyes without overflow and NaN in one eye rejects and does not partially mutate the pair. Exact-SHA OpenXR host tests and related required gates completed SUCCESS.",
+    "eye_ownership": "The preprojected CABE outer-effect source uses head-relative only eye translation and identity orientation to avoid doubling camera rotation; C993 central-sun WVP and nonprojected world effect absolute eye transforms are untouched."
   },
   "ci_evidence": {
-    "changed_area_native": "Native smoke added; source compilation and GitHub required exact-SHA gates pending.",
-    "policy_failure": "Initial material commit 78c391bd4e6e06745916cfb1846df8ee27d493f0 failed exact-SHA DX9Ex Active policy because this independently traced projected outer-disc symptom was absent from the canonical visual catalog.",
-    "policy_repair": "Register the exact source-backed symptom and use USER_VISIBLE_VISUAL_DEFECT without relaxing catalog restrictions or mandatory CI. This is a repair under the SAME TASK_ID, not an independent functional achievement."
+    "material_result_sha": "78c391bd4e6e06745916cfb1846df8ee27d493f0",
+    "validation_bearing_result_sha": "3bf00140f3c8c3482ea66ef0c338375638b077c1",
+    "active": {
+      "run_id": 38902081181,
+      "conclusion": "SUCCESS",
+      "jobs": "policy/full-chain-compile/game/host/package SUCCESS; R84 and R26_SAFE Win32 included"
+    },
+    "domain": {
+      "run_id": 38902081238,
+      "conclusion": "SUCCESS"
+    },
+    "full_source": {
+      "run_id": 38902081009,
+      "conclusion": "SUCCESS",
+      "jobs": "msvc-analyze-active-game/source-cross-domain/msvc-analyze-openxr-host SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38902081084,
+      "conclusion": "SUCCESS",
+      "jobs": "static-exe-analysis/build-hud-inspector SUCCESS"
+    },
+    "native_cpp_regression": "Changed native lens_centre_eye_pose_smoke is included in exact-SHA host deterministic tests; final build passed. The actual Quest3 visual effect remains untested.",
+    "initial_failure": "Initial material SHA 78c391bd failed feature catalog policy; repaired in same TASK_ID by registering only the traced outer-disc symptom and correcting feature_class. Final validation-bearing 3bf00140 passed all required gates.",
+    "runtime_hmd": "UNTESTED"
   },
-  "next_action": "Run exactly one GitHub full required Gate matrix on this validation-bearing SHA, repair actual failures under same TASK_ID, then C6-only bookkeeping at the same immutable SHA; Quest3 optics NEED_HMD_TEST."
+  "next_action": "C6 PASS_EXACT_SHA recorded. Quest3/VDXR original CABE outer rings still require actual HMD optical test; do not re-run this task for C6 or rescore. Controller should select a separate unfinished feature."
 }
