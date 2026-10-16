@@ -1057,7 +1057,7 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 4u;
+    partialGameClear.count[0] = partialGameClear.count[1] = 5u;
     // Game-origin full Z/stencil Clear after three masked geometry Draws,
     // followed by per-eye HUD TARGET Clears after the remaining geometry.
     // Chronological replay must preserve BOTH independent eye command lists.
@@ -1121,6 +1121,17 @@ int main()
             static_cast<LONG>(x + 6u), 30};
         stretch.linearFilter = false;
         stretch.sourceArraySlice = eye;
+        // A genuine game menu offscreen target can be RTV-only. Native
+        // Stretch already samples a GPU-side copy of this owned target;
+        // the source timeline must admit it without an original SRV flag.
+        auto& rtOnly = partialGameClear.entries[eye][4];
+        rtOnly.kind = SourceClear::Kind::SourceStretch;
+        rtOnly.afterDrawOrdinal = eye == 0u ? 5u : 6u;
+        rtOnly.source = gameSurface;
+        rtOnly.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        rtOnly.destination = eye == 0u
+            ? D3D11_RECT{2, 35, 10, 39}
+            : D3D11_RECT{34, 35, 42, 39};
     }
 
     std::cerr << "R178-DIAG stereo fixture ready\n";
@@ -1769,8 +1780,13 @@ int main()
               postPixel[2] == 0u
             : postPixel[0] == 0u && postPixel[1] == 255u &&
               postPixel[2] == 0u;
-        require(chronologicalCopy && chronologicalStretch,
-                "00849 GPU source Copy/Stretch chronological per-eye pixels");
+        const UINT rtX = eyeIndex == 0u ? 4u : 36u;
+        const auto* rtPixel = pixel + 36u * mapped.RowPitch + rtX * 4u;
+        const bool chronologicalRtOnly = rtPixel[0] == 0u &&
+            rtPixel[1] == 0u && rtPixel[2] == 255u;
+        require(chronologicalCopy && chronologicalStretch &&
+                chronologicalRtOnly,
+                "00849 GPU source Copy/Stretch/RT-only chronological pixels");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
         const UINT arrayX = eyeIndex == 0u ? 18u : 50u;

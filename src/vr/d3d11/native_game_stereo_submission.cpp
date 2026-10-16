@@ -1031,11 +1031,31 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                             return false;
                     } else {
                         const auto& d = event.destination;
-                        if ((desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) == 0u ||
-                            d.left >= d.right || d.top >= d.bottom ||
-                            d.right <= 0 || d.bottom <= 0 ||
-                            d.left >= static_cast<LONG>(ring_.width()) ||
-                            d.top >= static_cast<LONG>(ring_.height()))
+                        // D3D9 game RTs may be RTV-only. The native postpass
+                        // copies mip zero to an SRV; replay admission must
+                        // also permit supported CopyToSampled/ResolveToSampled.
+                        UINT sourceSupport = 0u, eyeSupport = 0u;
+                        if (FAILED(producer->CheckFormatSupport(
+                                desc.Format, &sourceSupport)) ||
+                            FAILED(producer->CheckFormatSupport(
+                                ring_.format(), &eyeSupport)) ||
+                            native_game_stretch_source_transfer(
+                                desc.MipLevels, desc.SampleDesc.Count,
+                                desc.SampleDesc.Quality,
+                                (desc.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u,
+                                (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u,
+                                (sourceSupport &
+                                 D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
+                                (eyeSupport &
+                                 D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
+                                (sourceSupport &
+                                 D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u) ==
+                                NativeGameStretchSourceTransfer::Reject ||
+                            !native_game_stretch_clipped_region(
+                                desc.Width, desc.Height,
+                                b.left, b.top, b.right, b.bottom,
+                                ring_.width(), ring_.height(),
+                                d.left, d.top, d.right, d.bottom).valid)
                             return false;
                     }
                 } else {
