@@ -814,7 +814,9 @@ def verify_visible_menu_fragment(code: str) -> None:
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
         "GetGameClientOutputRect(fullClient);",
         "sourceAspect = authoredAspect;",
-        "gameConfiguredLetterbox, false);",
+        "constexpr bool imageMatteVerified = false;",
+        "gameConfiguredLetterbox, imageMatteVerified);",
+        "completeClient, cropCentered43, useNativeMenuAspect,\n                imageMatteVerified);",
         "constexpr float opticalCoverage = 0.78f;",
         "common, sourceAspect, opticalCoverage);",
         "visibleOffsetX = plan.visibleOffsetX;",
@@ -835,7 +837,10 @@ def verify_visible_menu_fragment(code: str) -> None:
     # that the original game config, not a constant, still owns the branch.
     assert ("const bool gameConfiguredLetterbox =\n"
             "            R23GameMenuIsLetterboxed(c.hwnd_);") in code
-    assert "gameConfiguredLetterbox, false);" in body
+    assert "constexpr bool imageMatteVerified = false;" in body
+    assert "gameConfiguredLetterbox, imageMatteVerified);" in body
+    assert ("completeClient, cropCentered43, useNativeMenuAspect,\n"
+            "                imageMatteVerified);") in body
     assert "sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(" in body
     assert "sourceAspect, clientAspect, gameConfiguredLetterbox," in body
     # Recover the complete authored menu plane for BOTH 4:3 and native
@@ -898,8 +903,14 @@ for old, bad in (
     ("sourceAspect = authoredAspect;", "sourceAspect = plan.aspect;"),
     ("GetGameClientOutputRect(fullClient);",
      "GetClientRect(c.hwnd_, &fullClient);"),
-    ("gameConfiguredLetterbox, false);",
+    ("constexpr bool imageMatteVerified = false;",
+     "constexpr bool imageMatteVerified = true;"),
+    ("gameConfiguredLetterbox, imageMatteVerified);",
      "gameConfiguredLetterbox, true);"),
+    ("completeClient, cropCentered43, useNativeMenuAspect,\n"
+     "                imageMatteVerified);",
+     "completeClient, cropCentered43, useNativeMenuAspect,\n"
+     "                true);"),
     ("R23GameMenuIsLetterboxed(c.hwnd_);",
      "false;"),
     ("sourceAspect, clientAspect, gameConfiguredLetterbox,",
