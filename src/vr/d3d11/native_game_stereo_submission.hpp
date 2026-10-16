@@ -66,6 +66,10 @@ public:
     // supplied immediate context. A partial GPU write quarantines the ring.
     // Draw counts and signatures come from actual renderer callsites, never
     // synthetic eye-index identifiers. The original D3D9 frame is untouched.
+    // The submission binds each ring RTV as OM RT0 with a full-resolution
+    // viewport and scissor, then restores the caller's OM/RS bindings on
+    // success or failure. The callback supplies actual Draw/DrawIndexed and
+    // restores any other shader/IA/SRV state it modifies.
     // The game renderer records each eye on the provided immediate context
     // and reports distinct camera/pose evidence only after its commands.
     // A rejected second eye quarantines the GPU ring; original D3D9 output

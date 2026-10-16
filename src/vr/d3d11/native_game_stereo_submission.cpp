@@ -4,6 +4,69 @@
 
 namespace outrun::vr::dx11 {
 
+
+// The D3D9 game and native OpenXR path may share an immediate D3D11 context.
+// A game eye pass must rasterize into the ring's actual RTV, not whichever
+// desktop/probe target happened to be bound by an earlier native draw. Save
+// and restore the existing OM/viewport/scissor bindings even on a partial
+// callback failure; the ring separately quarantines all potentially queued
+// GPU writes. The callback continues to own its shader/IA/texture state.
+namespace {
+class ScopedNativeGameEyeOutput final {
+public:
+    ScopedNativeGameEyeOutput(ID3D11DeviceContext* context,
+                              std::uint32_t width,
+                              std::uint32_t height) noexcept
+        : context_(context), width_(width), height_(height) {
+        if (!context_ || !width_ || !height_) return;
+        context_->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                     savedTargets_, &savedDepth_);
+        viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
+        context_->RSGetViewports(&viewportCount_, savedViewports_);
+        scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
+        context_->RSGetScissorRects(&scissorCount_, savedScissors_);
+        active_ = true;
+    }
+    ~ScopedNativeGameEyeOutput() noexcept {
+        if (!active_) return;
+        context_->OMSetRenderTargets(
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, savedTargets_, savedDepth_);
+        context_->RSSetViewports(viewportCount_,
+                                 viewportCount_ ? savedViewports_ : nullptr);
+        context_->RSSetScissorRects(scissorCount_,
+                                   scissorCount_ ? savedScissors_ : nullptr);
+        for (auto*& target : savedTargets_) {
+            if (target) { target->Release(); target = nullptr; }
+        }
+        if (savedDepth_) { savedDepth_->Release(); savedDepth_ = nullptr; }
+    }
+    ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
+    ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
+
+    bool bind(ID3D11RenderTargetView* target) noexcept {
+        if (!active_ || !target) return false;
+        const D3D11_VIEWPORT viewport{
+            0.0f, 0.0f, static_cast<float>(width_),
+            static_cast<float>(height_), 0.0f, 1.0f};
+        const D3D11_RECT scissor{
+            0, 0, static_cast<LONG>(width_), static_cast<LONG>(height_)};
+        context_->OMSetRenderTargets(1u, &target, nullptr);
+        context_->RSSetViewports(1u, &viewport);
+        context_->RSSetScissorRects(1u, &scissor);
+        return true;
+    }
+private:
+    ID3D11DeviceContext* context_{};
+    std::uint32_t width_{}, height_{};
+    ID3D11RenderTargetView* savedTargets_[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    ID3D11DepthStencilView* savedDepth_{};
+    D3D11_VIEWPORT savedViewports_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
+    D3D11_RECT savedScissors_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
+    UINT viewportCount_{}, scissorCount_{};
+    bool active_{};
+};
+} // namespace
+
 void NativeGameStereoSubmission::release_local() noexcept {
     for (auto& eye : eyes_) eye.Reset();
     context_.Reset();
@@ -85,7 +148,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         void* user{};
         std::uint32_t poseSequence{};
         NativeGameEyeDrawEvidence eye[2]{};
-    } dispatch{pass, user, sourcePoseSequence, {}};
+        std::uint32_t width{}, height{};
+    } dispatch{pass, user, sourcePoseSequence, {}, ring_.width(), ring_.height()};
 
     // The ring verifies the immediate context and reserves the exact frame
     // before entering this recorder. It marks GPU work as queued first:
@@ -94,9 +158,10 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                            ID3D11RenderTargetView* left,
                            ID3D11RenderTargetView* right) noexcept -> bool {
         auto& invocation = *static_cast<EyePassDispatch*>(opaque);
+        ScopedNativeGameEyeOutput output(ctx, invocation.width, invocation.height);
         ID3D11RenderTargetView* targets[2]{left, right};
         for (std::uint32_t eyeIndex = 0u; eyeIndex < 2u; ++eyeIndex) {
-            if (!targets[eyeIndex] || !invocation.callback(
+            if (!output.bind(targets[eyeIndex]) || !invocation.callback(
                     invocation.user, ctx, targets[eyeIndex], eyeIndex,
                     invocation.eye[eyeIndex]))
                 return false;

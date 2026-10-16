@@ -720,6 +720,20 @@ int main()
             !directSubmit.attach_host_frame(directFrame, hostFrame),
             "00818 ACK invalidates old direct eye publication");
 
+    // 00820: preserve the native game caller's desktop OM/RS bindings while
+    // two actual per-eye RTVs are selected sequentially. Reject accidental
+    // writes into a stale desktop target across the menu/race eye passes.
+    D3D11_VIEWPORT preservedViewport{3.f, 5.f, 32.f, 24.f, 0.f, 1.f};
+    D3D11_RECT preservedScissor{3, 5, 35, 29};
+    ID3D11RenderTargetView* originalGameTarget = leftView;
+    d3d.context->OMSetRenderTargets(1, &originalGameTarget, nullptr);
+    d3d.context->RSSetViewports(1, &preservedViewport);
+    d3d.context->RSSetScissorRects(1, &preservedScissor);
+    struct GameEyeFixture {
+        const float (*colors)[4]{};
+        bool sawBoundEye[2]{};
+    } gameEyeFixture{nativeEyeColors, {}};
+
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
     const auto gameEyePass = [](
@@ -727,20 +741,66 @@ int main()
         ID3D11RenderTargetView* eyeTarget, std::uint32_t eyeIndex,
         outrun::vr::dx11::NativeGameEyeDrawEvidence& evidence) noexcept -> bool {
         if (!ctx || !eyeTarget || eyeIndex >= 2u || !user) return false;
-        const auto* colors = static_cast<const float (*)[4]>(user);
-        ctx->ClearRenderTargetView(eyeTarget, colors[eyeIndex]);
+        auto& fixture = *static_cast<GameEyeFixture*>(user);
+        ID3D11RenderTargetView* boundTarget = nullptr;
+        ID3D11DepthStencilView* boundDepth = nullptr;
+        ctx->OMGetRenderTargets(1, &boundTarget, &boundDepth);
+        UINT viewportCount = 1, scissorCount = 1;
+        D3D11_VIEWPORT viewport{};
+        D3D11_RECT scissor{};
+        ctx->RSGetViewports(&viewportCount, &viewport);
+        ctx->RSGetScissorRects(&scissorCount, &scissor);
+        fixture.sawBoundEye[eyeIndex] =
+            boundTarget == eyeTarget && boundDepth == nullptr &&
+            viewportCount == 1 && viewport.TopLeftX == 0.f &&
+            viewport.TopLeftY == 0.f && viewport.Width == 64.f &&
+            viewport.Height == 64.f &&
+            scissorCount == 1 && scissor.left == 0 &&
+            scissor.top == 0 && scissor.right == 64 && scissor.bottom == 64;
+        if (boundTarget) boundTarget->Release();
+        if (boundDepth) boundDepth->Release();
+        if (!fixture.sawBoundEye[eyeIndex]) return false;
+        ctx->ClearRenderTargetView(eyeTarget, fixture.colors[eyeIndex]);
+        // Game command replay may detach or change OM between eye passes.
+        // The submission must rebind RT0 for the next eye and restore it
+        // to the original desktop state after the second pass.
+        ctx->OMSetRenderTargets(0, nullptr, nullptr);
         evidence.drawCount = 2u + eyeIndex;
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
         evidence.sourcePoseSequence = 33u;
         return true;
     };
     require(directSubmit.begin(d3d.context, 24, 33) &&
-            !directSubmit.render_game_eye_passes(nullptr, eyeUser, 33) &&
-            !directSubmit.render_game_eye_passes(gameEyePass, eyeUser, 32) &&
+            !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
+            !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
             !ring.synchronization_faulted() &&
-            directSubmit.render_game_eye_passes(gameEyePass, eyeUser, 33) &&
-            directSubmit.in_flight() && !directSubmit.cancel(),
-            "00819 native renderer commands from separate eye passes");
+            directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 33) &&
+            directSubmit.in_flight() && !directSubmit.cancel() &&
+            gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1],
+            "00820 native eye callback owns distinct bound full-resolution RT0");
+    ID3D11RenderTargetView* restoredGameTarget = nullptr;
+    d3d.context->OMGetRenderTargets(1, &restoredGameTarget, nullptr);
+    UINT restoredViewportCount = 1, restoredScissorCount = 1;
+    D3D11_VIEWPORT restoredViewport{};
+    D3D11_RECT restoredScissor{};
+    d3d.context->RSGetViewports(&restoredViewportCount, &restoredViewport);
+    d3d.context->RSGetScissorRects(&restoredScissorCount, &restoredScissor);
+    const bool restoredGameState =
+        restoredGameTarget == originalGameTarget &&
+        restoredViewportCount == 1 &&
+        restoredViewport.TopLeftX == preservedViewport.TopLeftX &&
+        restoredViewport.TopLeftY == preservedViewport.TopLeftY &&
+        restoredViewport.Width == preservedViewport.Width &&
+        restoredViewport.Height == preservedViewport.Height &&
+        restoredScissorCount == 1 &&
+        restoredScissor.left == preservedScissor.left &&
+        restoredScissor.top == preservedScissor.top &&
+        restoredScissor.right == preservedScissor.right &&
+        restoredScissor.bottom == preservedScissor.bottom;
+    if (restoredGameTarget) restoredGameTarget->Release();
+    require(restoredGameState,
+            "00820 stereo GPU pass restores desktop OM and raster bounds");
+    d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
     outrun::vr::dx11::NativeGameStereoPublishedFrame gameEyeFrame{};
     bool gameEyeReady = false;
     for (int retry = 0; retry < 2000 && !gameEyeReady; ++retry) {
