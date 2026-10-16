@@ -19,7 +19,19 @@ def between(source: str, begin: str, end: str) -> str:
 
 def verify(hook: str, r30: str, r33: str, budget: str) -> None:
     face = between(hook, "static void FaceCount_dest(", "\npublic:")
-    assert "frameSpike = dt > 0.018;" in face
+    # The original 18-ms safety backstop now lives inside the adaptive
+    # cadence helper. Preserve both the measured-QPC path and conservative
+    # original failure cutoffs, rather than enforcing the retired expression.
+    assert "AdaptiveFrameCadence frameCadence{};" in face
+    assert "frameSpike = frameCadence.Observe(dt);" in face
+    assert "frameCadence.Reset();" in face
+    assert "struct AdaptiveFrameCadence final" in budget
+    assert "constexpr double OriginalLateSeconds = 0.018;" in budget
+    assert "const bool cadenceMiss = healthySamples >= 4 &&" in budget
+    assert "elapsedSeconds > referenceSeconds * 1.20 + 0.0005;" in budget
+    assert "const bool late = elapsedSeconds > OriginalLateSeconds || cadenceMiss;" in budget
+    assert "if (!late && elapsedSeconds >= FastestPlausible &&" in budget
+    assert "if (healthySamples < 4)" in budget
     assert "frameScale60 = frameSpike ? 0.5f" in face
     assert "std::clamp(dt * 60.0, 0.0, 1.0)" in face
     assert "OutRunVR::ReflectionFrameBudget::Advance(" in face
@@ -33,14 +45,22 @@ def verify(hook: str, r30: str, r33: str, budget: str) -> None:
     assert "std::clamp(requested - faces, 0.0, vrNormalized ? 1.0 : 6.0)" in budget
     assert "double(previous) + 6.0 * double(rate) * double(scaled)" in budget
 
-    # The previously problematic 120-Hz 0.5 cadence must NOT be interpreted
-    # as a spike. Only elapsed dt >18ms triggers the two-face recovery cap.
-    for dt, expected in ((1 / 120, 3), (1 / 90, 3),
-                         (1 / 72, 3), (1 / 60, 3),
-                         (0.025, 2), (0.033, 2), (0.25, 2)):
-        spike = dt > 0.018
-        max_faces = 2 if spike else 3
-        assert max_faces == expected
+    # Healthy 60/72/80/90/120-Hz periods retain the on-time face cap,
+    # whereas a measured 12-ms frame misses a learned 120-Hz deadline even
+    # though it falls below the original 18-ms backstop. This mathematical
+    # sanity model complements the separately compiled native C++ regression.
+    for hz in (60, 72, 80, 90, 120):
+        dt = 1.0 / hz
+        assert not (dt > 0.018 or dt > dt * 1.20 + 0.0005)
+    for hz, dt, expected in (
+        (120, 1 / 120, 3), (90, 1 / 90, 3),
+        (72, 1 / 72, 3), (60, 1 / 60, 3),
+        (120, 0.012, 2), (90, 0.015, 2),
+        (60, 0.019, 2), (120, 0.025, 2),
+    ):
+        reference = 1.0 / hz
+        spike = dt > 0.018 or dt > reference * 1.20 + 0.0005
+        assert (2 if spike else 3) == expected
         frame_scale = 0.5 if spike else min(1.0, max(0.0, dt * 60.0))
         assert frame_scale <= 1.0
 
@@ -96,7 +116,8 @@ def main() -> None:
     verify(*original, budget)
     h, t, w = original
     mutations = [
-        (h.replace("frameSpike = dt > 0.018;", "frameSpike = false;", 1), t, w),
+        (h.replace("frameSpike = frameCadence.Observe(dt);", "frameSpike = false;", 1), t, w),
+        (h.replace("frameCadence.Reset();", "/* cadence stale on VR disable */", 1), t, w),
         (h.replace("std::clamp(dt * 60.0, 0.0, 1.0)",
                    "std::clamp(dt * 60.0, 0.0, 2.0)", 1), t, w),
         (h.replace("patch.set(Settings::DisableStageCulling.get());",
@@ -123,6 +144,11 @@ def main() -> None:
     # The extracted Quest-style budget has become live source and must
     # retain the old 60 Hz workload, late-frame cap and bounded debt.
     budget_mutations = [
+        budget.replace("OriginalLateSeconds = 0.018", "OriginalLateSeconds = 0.180", 1),
+        budget.replace("healthySamples >= 4", "healthySamples >= 400", 1),
+        budget.replace("OriginalLateSeconds || cadenceMiss", "OriginalLateSeconds && cadenceMiss", 1),
+        budget.replace("referenceSeconds * 1.20 + 0.0005",
+                       "referenceSeconds * 2.0 + 0.0005", 1),
         budget.replace("lateFrame ? 2 : 3", "lateFrame ? 6 : 6", 1),
         budget.replace("std::clamp(elapsed60, 0.f, 1.f)",
                        "std::clamp(elapsed60, 0.f, 2.f)", 1),
