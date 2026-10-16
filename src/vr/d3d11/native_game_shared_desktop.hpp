@@ -69,11 +69,9 @@ public:
                 return false;
             regions[i] = {rect.left, rect.top, rect.right, rect.bottom};
         }
-        const auto rollbackPlan = regionCount > 1u
-            ? NativeSharedDesktopRollbackPlan::select(
-                width, height, regions.data(), regionCount)
-            : NativeSharedDesktopRollbackPlan{};
-        if (regionCount > 1u && !rollbackPlan.valid) return false;
+        const auto rollbackPlan = NativeSharedDesktopRollbackPlan::select(
+            width, height, regions.data(), regionCount);
+        if (!rollbackPlan.valid) return false;
 
         D3D11_TEXTURE2D_DESC desc{};
         source->GetDesc(&desc);
@@ -246,27 +244,24 @@ public:
         // while the source State mutex is held. Copy only pixels the game
         // will show from this Present crop / one proven dirty rectangle.
         // All other D3D9 backbuffer pixels remain the game's own output.
-        // StretchRect is not atomic across disjoint rectangles. Preserve the
-        // original D3D9 pixels under the union before the first write, so a
-        // failed later tile can restore the game-owned fallback image.
+        // StretchRect is not atomic even for ONE full/cropped game rectangle.
+        // Preserve original D3D9 pixels for every region before any writes,
+        // otherwise a failed first/single blit could corrupt the fallback.
+        // Never back up the union between distant original-game HUD tiles.
         std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>,
                    GameNativeDirtyRegionCoverage::kMaxPartitionRects> backups{};
-        if (regionCount > 1u) {
-            // Snapshot every original tile BEFORE any blit, including regions
-            // overlapping another tile. A distant pair of HUD updates no longer
-            // allocates or copies a huge bounding-box render target each Present.
-            // If creation/copy fails, nothing has touched the game's backbuffer.
-            for (std::uint32_t i = 0u; i < regionCount; ++i) {
-                if (FAILED(game->CreateRenderTarget(
-                        rollbackPlan.tiles[i].width,
-                        rollbackPlan.tiles[i].height,
-                        destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
-                        backups[i].GetAddressOf(), nullptr)) || !backups[i] ||
-                    FAILED(game->StretchRect(
-                        backbuffer, &visibleRegions[i], backups[i].Get(),
-                        nullptr, D3DTEXF_NONE)))
-                    return false;
-            }
+        // Snapshot before either the first single-region or multi-region
+        // publication. Failure here cannot have modified the game backbuffer.
+        for (std::uint32_t i = 0u; i < rollbackPlan.count; ++i) {
+            if (FAILED(game->CreateRenderTarget(
+                    rollbackPlan.tiles[i].width,
+                    rollbackPlan.tiles[i].height,
+                    destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
+                    backups[i].GetAddressOf(), nullptr)) || !backups[i] ||
+                FAILED(game->StretchRect(
+                    backbuffer, &visibleRegions[i], backups[i].Get(),
+                    nullptr, D3DTEXF_NONE)))
+                return false;
         }
         for (std::uint32_t i = 0; i < regionCount; ++i) {
             const RECT* rect = entire ? nullptr : &visibleRegions[i];
@@ -276,7 +271,7 @@ public:
                 // Restore the failed tile AND all earlier writes from original
                 // pre-blit snapshots. Never rewrite untouched gaps in the union.
                 bool restored = true;
-                for (std::uint32_t j = 0u; j <= i && regionCount > 1u; ++j) {
+                for (std::uint32_t j = 0u; j <= i; ++j) {
                     if (FAILED(game->StretchRect(
                             backups[j].Get(), nullptr, backbuffer,
                             &visibleRegions[j], D3DTEXF_NONE)))

@@ -6,9 +6,10 @@
 #include "native_game_present_region.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
-// Multi-dirty desktop publication must preserve the game's original pixels
-// for EACH tile before the first cross-API StretchRect. Backing up the union
-// copies huge unrelated menu/HUD areas when small tiles are far apart.
+// Every game Present publication, including a single full/cropped region,
+// preserves its original D3D9 pixels before the first cross-API StretchRect.
+// A failed driver blit may have written some pixels even on HRESULT failure.
+// Exact tiles avoid copying unrelated HUD pixels between sparse dirty regions.
 struct NativeSharedDesktopRollbackPlan {
     struct Tile { std::uint32_t width = 0u, height = 0u; };
     std::array<Tile, GameNativeDirtyRegionCoverage::kMaxPartitionRects> tiles{};
@@ -21,7 +22,7 @@ struct NativeSharedDesktopRollbackPlan {
         const GameNativePresentRegion* regions,
         std::uint32_t count) noexcept {
         if (!regions || !width || !height || width > 0x7fffffffu ||
-            height > 0x7fffffffu || count < 2u ||
+            height > 0x7fffffffu || count == 0u ||
             count > GameNativeDirtyRegionCoverage::kMaxPartitionRects)
             return {};
         NativeSharedDesktopRollbackPlan result{};

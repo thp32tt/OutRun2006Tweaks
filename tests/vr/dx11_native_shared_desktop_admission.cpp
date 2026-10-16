@@ -1,6 +1,7 @@
 #include "../../src/vr/d3d11/native_game_shared_desktop_admission.hpp"
 #include "../../src/vr/d3d11/native_game_shared_desktop_rollback.hpp"
 #include <cassert>
+#include <array>
 using outrun::vr::dx11::live_game_frame::NativeSharedDesktopAdmission;
 int main() {
     auto allowed = [](bool opt, bool full, bool complete, bool writable,
@@ -132,10 +133,63 @@ int main() {
         {20,30,120,130},{80,100,3441,200}};
     static_assert(!NativeSharedDesktopRollbackPlan::select(
         3440,1440,illegalHud,2u).valid);
+    // One full/cropped frame MUST have a backup: a failed first StretchRect
+    // may partially overwrite the original game Present just like tile two.
+    constexpr auto oneCropBackup = NativeSharedDesktopRollbackPlan::select(
+        3440,1440,&crop,1u);
+    static_assert(oneCropBackup.valid && oneCropBackup.count == 1u);
+    static_assert(oneCropBackup.totalPixels == 3200ull * 1340ull);
+    static_assert(oneCropBackup.tiles[0].width == 3200u &&
+                  oneCropBackup.tiles[0].height == 1340u);
+    constexpr auto wholeBackup = NativeSharedDesktopRollbackPlan::select(
+        3440,1440,&full,1u);
+    static_assert(wholeBackup.valid && wholeBackup.totalPixels == 3440ull * 1440ull);
     static_assert(!NativeSharedDesktopRollbackPlan::select(
-        3440,1440,distantHud,1u).valid);
+        3440,1440,distantHud,0u).valid);
+    constexpr GameNativePresentRegion clippedSingle{-1,0,3440,1440};
+    static_assert(!NativeSharedDesktopRollbackPlan::select(
+        3440,1440,&clippedSingle,1u).valid);
     static_assert(!NativeSharedDesktopRollbackPlan::select(
         3440,1440,nullptr,2u).valid);
+    // Model original D3D9 backbuffer, two native tiles and a driver's
+    // partially failed StretchRect. The saved regions must restore exact
+    // pixels, including when the FIRST and ONLY publication fails.
+    const auto exerciseRollback = [](bool twoRegions, unsigned failIndex) {
+        constexpr unsigned w = 8u, h = 4u;
+        constexpr GameNativePresentRegion spans[2]{{1,1,4,3},{5,0,7,2}};
+        const unsigned count = twoRegions ? 2u : 1u;
+        const auto plan = NativeSharedDesktopRollbackPlan::select(
+            w,h,spans,count);
+        assert(plan.valid && plan.count == count);
+        std::array<int,w*h> pixels{};
+        for (unsigned i = 0; i < pixels.size(); ++i) pixels[i] = int(i + 17);
+        const auto original = pixels;
+        std::array<std::array<int,w*h>,2> snapshots{};
+        // Snapshot every original tile before ANY native GPU desktop write.
+        for (unsigned tile = 0; tile < count; ++tile) {
+            for (int y = spans[tile].top; y < spans[tile].bottom; ++y)
+                for (int x = spans[tile].left; x < spans[tile].right; ++x)
+                    snapshots[tile][unsigned(y)*w + unsigned(x)] =
+                        original[unsigned(y)*w + unsigned(x)];
+        }
+        for (unsigned tile = 0; tile <= failIndex; ++tile) {
+            const auto& rect = spans[tile];
+            for (int y = rect.top; y < rect.bottom; ++y)
+                for (int x = rect.left; x < rect.right; ++x)
+                    pixels[unsigned(y)*w + unsigned(x)] = -1;
+        }
+        for (unsigned tile = 0; tile <= failIndex; ++tile) {
+            const auto& rect = spans[tile];
+            for (int y = rect.top; y < rect.bottom; ++y)
+                for (int x = rect.left; x < rect.right; ++x)
+                    pixels[unsigned(y)*w + unsigned(x)] =
+                        snapshots[tile][unsigned(y)*w + unsigned(x)];
+        }
+        assert(pixels == original); // untouched HUD and failed tile survive
+    };
+    exerciseRollback(false,0u);
+    exerciseRollback(true,0u);
+    exerciseRollback(true,1u);
     const auto malformed = NativeSharedDesktopAdmission::select_region(
         3440,1440,{0,-1,3440,1440},false,false,false,false,false,noTile);
     assert(!malformed.valid);
