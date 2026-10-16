@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:OPENXR_IMAGE_PROJECTION_MENU_RACE_FALLBACK",
   "feature_id": "DX11-OPENXR-IMAGE-PROJECTION-RECOVERY",
-  "status": "VALIDATION_IN_PROGRESS",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "5644bf514a0b890471c54f0e2cae0da7f999a572",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "609de383f1c13461bc755abefbaabb3b9de47ca0",
   "changed_files": [
     "vrhost/src/main.cpp",
     "vrhost/src/main_r23.cpp",
@@ -101,10 +101,10 @@
     "C0_RECOVER": "Read latest authenticated GitHub source and disjoint 00799 run.",
     "C1_REVIEW": "Confirmed unchecked runtime-provided OpenXR swapchain index in game/menu/theater paths.",
     "C2_IMPLEMENT": "Real OpenXR host render routes and compiled source smoke changed in one material batch.",
-    "C3_VALIDATE": "PENDING exact five SHA gates",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact validation-bearing 609de383f1c13461bc755abefbaabb3b9de47ca0 GitHub CI SUCCESS (reported)",
     "C4_COMMIT": "Material commit linked to GitHub parent 5644bf514a0b890471c54f0e2cae0da7f999a572",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING final CI; real Quest3/VDXR UNTESTED"
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; HMD/runtime UNTESTED; no CI rerun"
   },
   "score": {
     "run_key": "CONVERSION-DX11-00800",
