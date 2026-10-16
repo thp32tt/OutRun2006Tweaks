@@ -86,7 +86,15 @@
     "remaining_implementation": [
       "Integrate authentic R30 eye-by-eye captured menu/vehicle/race game Draw/DrawIndexed plus distinct eye camera/shader constant data with native ring callback.",
       "Verify real-game/HMD Quest 3 VDXR stereo, HUD, FFB/input and sustained 72 Hz frame pacing."
-    ]
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "The bounded native per-eye GPU command stream replays real TARGET/Z clear commands after native Draw; the existing D3D9 callsite and diagnostic visible-frame bridge remain guarded. Actual R30 independent menu/vehicle/race scene callback and Quest3 visible output are NOT yet implemented or runtime-verified.",
+    "activation_guard_and_fallback": "Native D3D11 eye replay is opt-in and demands current owned L/R RTV+DSV plus source-verified game operations; invalid/offscreen commands reject without replacing original D3D9/DX9Ex Draw/Present, gamepad, input or FFB. No default renderer/backend promotion."
   },
   "github_actions": {
     "DX11 Fast Structural Checks": {
