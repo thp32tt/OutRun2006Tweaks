@@ -1,0 +1,110 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00819",
+  "production_id": "CONVERSION-DX11-00819",
+  "event_id": "CONVERSION-DX11-00819-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "SOURCE_INTEGRATING",
+  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "automation_validation": "FAILED_PENDING_REPAIR",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": "08a72352b03003506e80a04115aa65aadc2f4616",
+  "validation_bearing_result_sha": null,
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Connect actual OutRun game-authored left and right native D3D11 Draw/DrawIndexed camera passes to the full-resolution generation-owned GPU eye ring and OpenXR consumer with original D3D9Ex input/render fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-game-native-eye-render-calls",
+        "category": "end_to_end_behavior",
+        "behavior_area": "r30_native_game_draw_and_stereo",
+        "expected_behavior": "Genuine menu, car selection and race Draw/DrawIndexed callsites produce independently posed left/right game frames consumed through native GPU RTV and host OpenXR."
+      },
+      {
+        "id": "original-game-and-control-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_input_ffb_and_recovery",
+        "expected_behavior": "Opt-in native eye failures keep original D3D9Ex Draw/Present/input/FFB while Reset and stale GPU ring generations fail closed."
+      },
+      {
+        "id": "same-sha-ci-and-hardware-boundary",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_host_transport_ci",
+        "expected_behavior": "Producer callback/camera identity and GPU fence/ACK tests pass with all mandatory exact-SHA Gates; actual Quest3/menu/race runtime remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-game-native-eye-render-calls": "IN_PROGRESS",
+    "original-game-and-control-fallback": "IN_PROGRESS",
+    "same-sha-ci-and-hardware-boundary": "PENDING_CI"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "integration_path": [
+      "Renderer-provided distinct per-eye GPU RTV callbacks with post-render draw/pose/view evidence, implemented in 00819.",
+      "Still required: connect live stereo R30 actual game Draw/DrawIndexed source and full menu/race replay to the production callback, followed by native OpenXR gameplay submission."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native producer callback and isolated two-eye WARP/test added in material SHA; CI currently pending.",
+      "negative_regression": "Invalid pose/null per-eye callback rejected before GPU writes; partial callback failure causes ring quarantine; original D3D9 fallback unchanged.",
+      "component_integration": "Native game-eye rendering callback to GPU ring fence, immutable published host direct-eye identity and exact ACK."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source producer callback integrated, but actual live game menu/car/race Draw hook is not connected yet; do not declare full game frame or Quest3 image complete.",
+    "activation_guard_and_fallback": "Game native path remains explicit opt-in. D3D9Ex Present/input/FFB is authoritative. DXVK frozen and unmodified.",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_NOT_TERMINAL",
+    "remaining_implementation": [
+      "R30 stereo live game Draw/DrawIndexed camera replay into new independent native eye callbacks",
+      "native L/R full-resolution game Present to OpenXR frame publishing",
+      "real-game screen, gamepad and HMD 72Hz verification"
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "Validated GitHub original b6a0fa50 and C6-only 00818 dbcedf286; different file ownership checked.",
+    "C1_REVIEW": "Existing native stereo ring requires pre-attested view/draw counts and lacks renderer-owned per-eye callback.",
+    "C2_IMPLEMENT": "Added real C++ renderer-owned per-eye callback adapter with GPU ring, exact per-eye evidence and WARP regression.",
+    "C3_VALIDATE": "Initial 08a72352 exact SHA Fast and Backend failed at inherited 00818 run-record policy; other checks ongoing; repaired by adding honest current nonterminal 00819 run record, not rewriting historical C6.",
+    "C4_COMMIT": "Material 08a72352b03003506e80a04115aa65aadc2f4616 (no skip). CI-causal run-record fix separate (no skip).",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "NOT_COMPLETE_SOURCE_PHASE"
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00819",
+    "score_change": 0,
+    "score_status": "NO_NEW_COMPLETE_FEATURE",
+    "note": "A material source subcommit is not a scored complete game-frame renderer; exact CI/HMD and actual game callsite linkage remain incomplete."
+  }
+}
