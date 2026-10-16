@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:F11_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "cd2b9de0981bc2df299d72b811a4b64d59384900",
   "material_result_sha": "498ae827a10f06f4a2c4fa1b907a09d8eea723bd",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "34985c7562f060e7a17edfe10435e31a54d32f90",
   "source_paths": [
     "src/overlay/f11_input_routing.hpp",
     "src/overlay/hooks_overlay.cpp"
@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "native_f11_focus_system": "PENDING",
-    "f11_ime_negative_fallback": "PENDING",
-    "exact_sha_all_gates": "PENDING"
+    "native_f11_focus_system": "PASS_EXACT_SHA",
+    "f11_ime_negative_fallback": "PASS_EXACT_SHA",
+    "exact_sha_all_gates": "PASS_EXACT_SHA"
   },
   "runtime_limit": "No same-SHA Quest3/VDXR game session; visual/input acceptance not claimed.",
   "diagnosis": {
@@ -87,5 +87,28 @@
     "fix_evidence": "Native Win32 message policy preserves F11, focus and system messages regardless of ImGui handled result and captures IME start/end in visible UI, retaining native FFB/gameplay routing.",
     "negative_test_evidence": "Existing C++ F11 shell smoke exercises 8 preservation combinations and input negative cases; source-bound verifier checks native hook, IME events and policy mutations.",
     "runtime_limit": "Quest3/VDXR physical session unavailable; RUNTIME_VALIDATION=UNTESTED."
-  }
+  },
+  "ci_gates": {
+    "DX9Ex Active Validation": {
+      "result": "SUCCESS",
+      "run_id": 38887474367,
+      "head_sha": "34985c7562f060e7a17edfe10435e31a54d32f90"
+    },
+    "Domain Isolation Guard": {
+      "result": "SUCCESS",
+      "run_id": 38887474298,
+      "head_sha": "34985c7562f060e7a17edfe10435e31a54d32f90"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "result": "SUCCESS",
+      "run_id": 38887474319,
+      "head_sha": "34985c7562f060e7a17edfe10435e31a54d32f90"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "result": "SUCCESS",
+      "run_id": 38887474300,
+      "head_sha": "34985c7562f060e7a17edfe10435e31a54d32f90"
+    }
+  },
+  "validation_notes": "All four required GitHub Actions workflows completed SUCCESS on exact SHA 34985c75; no Quest3/VDXR HMD session, so no runtime or visual acceptance."
 }
