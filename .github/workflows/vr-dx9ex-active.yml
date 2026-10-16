@@ -154,6 +154,7 @@ on:
       - 'tools/verify_vr_r32_review_api_seam.py'
       - 'tools/verify_vr_r33_r32_tu_split.py'
       - 'tools/verify_vr_r33_single_classification.py'
+      - 'tools/verify_vr_r33_nonworld_fallback.py'
       - 'tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py'
       - 'tools/verify_vr_r33_telemetry_draw_hotpath.py'
       - 'tools/verify_vr_r33_latched_pose_view.py'
@@ -386,6 +387,7 @@ jobs:
             'tools/verify_vr_r32_review_api_seam.py',
             'tools/verify_vr_r33_r32_tu_split.py',
             'tools/verify_vr_r33_single_classification.py',
+            'tools/verify_vr_r33_nonworld_fallback.py',
             'tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py',
             'tools/verify_vr_r33_telemetry_draw_hotpath.py',
             'tools/verify_vr_r33_latched_pose_view.py',

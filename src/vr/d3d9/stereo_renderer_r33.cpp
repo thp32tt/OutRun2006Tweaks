@@ -1091,6 +1091,15 @@ namespace OutRunVRStereo
                         R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
+                // No stereo eligibility: never let a screen/HUD/SkyGlow
+                // producer fall through to the lower cached world WVP.
+                // The unmodified original draw is the only safe fallback.
+                if (drawCommand.DeniesGenericWorldFallback())
+                {
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
+                    return actualDraw();
+                }
                 return fallbackToR29();
             }
 
@@ -1181,6 +1190,16 @@ namespace OutRunVRStereo
             }
             else
             {
+                // Screen pass classified as None still retains its ORIGINAL
+                // producer scope. In particular, queued ScreenOverlay2D and
+                // SkyGlow otherwise borrowed a coincidentally matching
+                // shader-epoch/pose from R31's previous road WVP.
+                if (drawCommand.DeniesGenericWorldFallback())
+                {
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
+                    return actualDraw();
+                }
                 const auto fast = R33TryFastWorld(device,
                     std::forward<ActualDraw>(actualDraw), site);
                 if (GpuWaterProbe::Enabled() && fast.handled)
@@ -1188,6 +1207,16 @@ namespace OutRunVRStereo
                         GpuWaterProbe::DrawRoute::FastWorld);
                 if (fast.handled)
                     return fast.hr;
+            }
+
+            // A screen classifier may recognize an effect whose R30 eye
+            // builder still rejects due to missing source c64/pose/resources.
+            // An R29 fallback must not turn that screen into road geometry.
+            if (drawCommand.DeniesGenericWorldFallback())
+            {
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
+                return actualDraw();
             }
 
             // Preserve the same lower R29 fail-closed policy when neither

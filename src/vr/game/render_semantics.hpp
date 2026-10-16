@@ -989,6 +989,21 @@ namespace OutRunVR::GameSemantic
                  scope == RenderScope::ProjectedWorldMarker2D);
         }
 
+        // A failed/unknown R30 screen pass is not permission for R31/R29 to
+        // borrow the previous road/vehicle WVP. Exact HUD, generic original
+        // SpriteNode overlay, projected markers, SkyGlow and screen-space
+        // flare effects may use their own proven R30 stereo path, otherwise
+        // preserve ONE original draw. This veto is independent of alpha/Z
+        // state and does not inhibit opaque world, car shadows or particles.
+        constexpr bool DeniesGenericWorldFallback() const noexcept
+        {
+            return scope == RenderScope::ScreenHud ||
+                scope == RenderScope::ScreenOverlay2D ||
+                scope == RenderScope::ProjectedWorldMarker2D ||
+                scope == RenderScope::ProjectedScreenEffect2D ||
+                scope == RenderScope::SkyGlow;
+        }
+
         // +TIME and the exact original GOAL producer family own a finite
         // HUD-plane GPU draw, not the last verified perspective road c64.
         // Only the R30/R33 physically proven HUD stereo route may replace
@@ -999,6 +1014,32 @@ namespace OutRunVR::GameSemantic
             return CanReprojectFiniteResultHudPlane(scope, producer);
         }
     };
+
+    // An ambiguous screen draw can NEVER inherit R31's cached road WVP.
+    static_assert(PhysicalDrawCommand{RenderScope::ScreenHud,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
+    static_assert(PhysicalDrawCommand{RenderScope::ScreenOverlay2D,
+        ProducerToken::None, nullptr, 0, true, 1}
+        .DeniesGenericWorldFallback());
+    static_assert(PhysicalDrawCommand{RenderScope::ProjectedWorldMarker2D,
+        ProducerToken::None, nullptr, 0, true, 1}
+        .DeniesGenericWorldFallback());
+    static_assert(PhysicalDrawCommand{RenderScope::ProjectedScreenEffect2D,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
+    static_assert(PhysicalDrawCommand{RenderScope::SkyGlow,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
+    static_assert(!PhysicalDrawCommand{RenderScope::WorldParticle,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
+    static_assert(!PhysicalDrawCommand{RenderScope::WorldBillboard,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
+    static_assert(!PhysicalDrawCommand{RenderScope::SceneEffect,
+        ProducerToken::None, nullptr, 0, false, 0}
+        .DeniesGenericWorldFallback());
 
     static_assert(!PhysicalDrawCommand{RenderScope::WorldParticle,
         ProducerToken::CarBaseShadow, nullptr, 0, false, 0}
