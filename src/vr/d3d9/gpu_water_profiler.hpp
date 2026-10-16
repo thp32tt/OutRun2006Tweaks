@@ -158,10 +158,14 @@ public:
     }
     bool beforeDraw(IDirect3DDevice9* d,UINT /*primitives*/) noexcept {
         if(!Enabled()||!d) return false;
-        ++logicalDrawCalls_;
-        if(unsupported_||skip_) return false;
+        // A previous device may have failed CreateQuery or filled the ring.
+        // Rebind the diagnostic epoch BEFORE honoring those sticky flags, or a
+        // newly created game device can never enable opt-in measurements.
+        // Count this first logical Draw in the new epoch, not the old one.
         if(game_&&game_!=d) reset();
         game_=d;
+        ++logicalDrawCalls_;
+        if(unsupported_||skip_) return false;
         if(!active_) {
             Slot& s=ring_[next_++%ring_.size()];
             if(s.pending) { ++dropped_; skip_=true; return false; }

@@ -42,6 +42,47 @@ for old,new in [
 ('std::strcmp(v,"1")==0','true'),
 ('if(s.pending) { ++dropped_; skip_=true; return false; }','if(s.pending) { s.pending=false; }')]:
     assert not good(hdr.replace(old,new,1)),old
+# Device replacement must clear stale unsupported/skip/query-clock state before
+# testing it or incrementing the new frame's logical Draw count. This catches
+# an actual old-device measurement lockout without touching rendering.
+start = hdr.index("bool beforeDraw(IDirect3DDevice9* d,")
+end = hdr.index("void afterDraw(bool timed)", start)
+before_draw = hdr[start:end]
+device_guard = "if(game_&&game_!=d) reset();"
+device_bind = "game_=d;"
+count_draw = "++logicalDrawCalls_;"
+sticky_guard = "if(unsupported_||skip_) return false;"
+assert before_draw.index("if(!Enabled()||!d) return false;") < before_draw.index(device_guard)
+assert before_draw.index(device_guard) < before_draw.index(device_bind)
+assert before_draw.index(device_bind) < before_draw.index(count_draw)
+assert before_draw.index(count_draw) < before_draw.index(sticky_guard)
+assert before_draw.index(sticky_guard) < before_draw.index("if(!active_)")
+for broken in (
+    before_draw.replace(device_guard + "\n        " + device_bind,
+                        device_bind + "\n        " + device_guard, 1),
+    before_draw.replace(count_draw + "\n        " + sticky_guard,
+                        sticky_guard + "\n        " + count_draw, 1),
+    before_draw.replace(device_guard, "if(false) reset();", 1),
+    before_draw.replace(sticky_guard, "if(false) return false;", 1),
+):
+    assert broken != before_draw
+    def device_order_ok(value):
+        return (device_guard in value and device_bind in value and
+                count_draw in value and sticky_guard in value and
+                value.index(device_guard) < value.index(device_bind) <
+                value.index(count_draw) < value.index(sticky_guard))
+    assert not device_order_ok(broken), "bad device epoch mutation escaped"
+
+# State-machine regression: an unsupported original device must not prevent
+# first-frame profiling of a new game device (and must count that Draw once).
+game = "old"; unsupported = True; skipped = True; draws = 18
+incoming = "new"
+if game != incoming:
+    game = None; unsupported = skipped = False; draws = 0
+game = incoming
+draws += 1
+assert (game, unsupported, skipped, draws) == ("new", False, False, 1)
+
 print('PASS GPU timing opt-in, nonblocking reads, alpha census, draw/reset/present wiring, 9 mutants')
 
 # End-to-end dispatch histogram coverage: executed by the existing Active GPU gate.
