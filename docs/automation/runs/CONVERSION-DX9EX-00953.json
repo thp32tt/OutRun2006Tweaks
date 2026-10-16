@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:PERF:XR_REFLECTION_BUDGET",
   "feature_class": "MEASURED_PERFORMANCE",
   "symptom_id": "DX9EX:SYMPTOM:XR_REFLECTION_FRAME_OVERRUN",
-  "status": "IMPLEMENTED_GATE_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "reflect_deadline_cadence": "LOCAL_CPP_PASS_CI_PENDING",
-    "reflect_safe_fallback": "LOCAL_CPP_PASS_CI_PENDING",
-    "reflect_exact_ci": "PENDING_CI"
+    "reflect_deadline_cadence": "PASS_EXACT_SHA",
+    "reflect_safe_fallback": "PASS_EXACT_SHA",
+    "reflect_exact_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The reflection scheduler recognized lateness only when QPC elapsed exceeded 18ms, a 60Hz-era threshold. At 90/120Hz a 12–15ms gap can miss the XR refresh deadline while incorrectly granting the three-face on-time GPU reflection cap.",
@@ -103,7 +103,27 @@
     "local_compiled_cpp_regressions": "GCC PASS; Clang PASS; ASan/UBSan PASS",
     "legacy_cutoff_test_repair": "60Hz 10% 18.33ms exceeds original 18ms threshold; test fixed without weakening original safety guard",
     "source_material_sha": "435df607920c1c4be4694973eab97d7f4e362051",
-    "gate_contract": "REQUIRED_ONE_EXACT_SHA: DX9Ex Active, Domain Isolation, Full Source Impact, HUD Inspector"
+    "gate_contract": "REQUIRED_ONE_EXACT_SHA: DX9Ex Active, Domain Isolation, Full Source Impact, HUD Inspector",
+    "exact_sha": "01d0ae2f47ef656fa51bfe8ec09085dce4b960fd",
+    "current_validation": "PASS_EXACT_SHA",
+    "dx9ex_active": {
+      "run_id": 38894151517,
+      "status": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38894151328,
+      "status": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38894151274,
+      "status": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38894151576,
+      "status": "SUCCESS"
+    },
+    "material_source_sha": "435df607920c1c4be4694973eab97d7f4e362051"
   },
-  "next_action": "Use this exact input SHA to validate all required four GitHub Actions; only C6 PASS_EXACT_SHA after full gates. Quest3/VDXR HMD remains UNTESTED."
+  "next_action": "BUILD_VERIFIED; do not rerun same SHA or create score for C6. Quest3/VDXR runtime verification requires independent HMD session. Begin unrelated new source implementation in a new task.",
+  "validation_bearing_result_sha": "01d0ae2f47ef656fa51bfe8ec09085dce4b960fd"
 }
