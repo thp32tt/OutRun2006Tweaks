@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:RENDER:PARTICLE_FIRST_EYE_GPU_BIND",
   "symptom_id": "DX9EX:SYMPTOM:PARTICLE_FIRST_EYE_GPU_BIND",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_VALIDATION",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "9b5449402cad8dc186debace5a2f68206ada2e45",
   "material_result_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "bd5b69dcc2a87506c63e46010bc716350409cfb0",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/r30_particle_upload_policy.hpp",
@@ -94,9 +94,10 @@
   "ci_evidence": {
     "initial_failed_sha": "7af3a47d81ad088f3952f85bc793ab1529e82205",
     "initial_failure": "DX9Ex Active policy job run 38923462196: required exact-head run record was missing; no C++ build failure verified",
-    "final_exact_sha": "PENDING",
-    "mandatory_gates": "PENDING"
+    "final_exact_sha": "bd5b69dcc2a87506c63e46010bc716350409cfb0",
+    "mandatory_gates": "PASS_EXACT_SHA (GitHub CI SUCCESS confirmed by user; not rerun)",
+    "runtime_validation": "UNTESTED"
   },
-  "next_action": "CI material/record repair under same TASK_ID; then pin final exact SHA and observe required 4 workflows. No Quest3/VDXR run claimed.",
+  "next_action": "C6 BUILD_VERIFIED recorded at exact validation-bearing SHA bd5b69dcc2a87506c63e46010bc716350409cfb0; previous material implementation 7af3a47d81ad088f3952f85bc793ab1529e82205 preserved. Quest3/VDXR HMD runtime remains UNTESTED (NEED_HMD_TEST).",
   "score_delta_this_attempt": 0
 }
