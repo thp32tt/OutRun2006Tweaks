@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00952",
+  "production_id": "CONVERSION-DX9EX-00952",
+  "event_id": "CONVERSION-DX9EX-00952-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00952",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "status": "IMPLEMENTED_GATE_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "9b9b267d9580ae2bf41bf243cd26cb8d08868ba2",
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00952.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Preserve the complete ESC pause options-arrow visual and interactive navigation as single stereo UI across immediate original E8 producers, queued SpriteNodes, and delayed D3DXSprite GPU submission.",
+    "scope_boundary": "Only original SMPAUSEMENU option-arrow producer and its deferred GPU batch; generic ScreenHud, game timer, F11, +TIME/GOAL optical plane, original input, FFB, SkyGlow and DXVK/DX11 are unchanged.",
+    "trace_stages": [
+      "Exact original pause-option E8 producer captures option arrow while preserving original game navigation.",
+      "D3DX Sprite Draw can queue a GPU batch after the source exits; the tracked owner must survive through native Flush or End and queue transition.",
+      "R84 x86 game ScreenHud and x64 OpenXR per-eye presentation preserve the original ESC pause vertical placement without borrowing GOAL or world projection."
+    ],
+    "subcomponents": [
+      "Distinct exact pause-option semantic tag for synchronous source draw and every queued sibling, while normal clips remain original.",
+      "D3DX direct/queue boundary drain, physical Flush/End owner restore, negative mixed and foreign batches, original pause-state navigation and fallback.",
+      "Exact SHA Windows x86 R84+R26_SAFE/x64 host/package, Domain, HUD Inspector and Full Source gate before BUILD_VERIFIED."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_arrow_gpu_batch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original paused game option-arrow rendering",
+        "expected_behavior": "The real pause arrow source retains ScreenHud through direct CPU Draw, tagged queued nodes, and physical delayed GPU submission."
+      },
+      {
+        "id": "esc_native_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Generic and nonpaused native UI",
+        "expected_behavior": "Ordinary game HUD, navigation, menu arrows and external F11 never borrow PauseOptionArrow ownership; old native results preserved."
+      },
+      {
+        "id": "esc_exact_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows render and host CI",
+        "expected_behavior": "Final validation-bearing SHA passes DX9Ex Active Windows game/host/package plus Domain, HUD Inspector and Full Source gate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "esc_arrow_gpu_batch": "PENDING_CI",
+    "esc_native_negative": "PENDING_CI",
+    "esc_exact_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Original ESC arrow hook scoped ScreenHud only during CPU producer; D3DX can defer actual GPU rendering and the generic clip token could not identify this exact physical batch, losing source ownership at Flush/End.",
+    "source_trace": [
+      "PauseOptionArrow_putClipSprite exact SMPAUSEMENU call to original put_clip_sprite.",
+      "Game SpriteNode append tagging and D3DXSprite Draw CPU registration.",
+      "Native Flush/End physical GPU draw, R84 ScreenHud stereo per-eye composition."
+    ],
+    "alternatives_rejected": [
+      "Generic ExactScreenHudClipSprite must not enter deferred batch whitelist: it includes unrelated menus and sprites."
+    ],
+    "runtime_limit": "No direct Quest3/VDXR HMD session; visual or interactive acceptance is untested."
+  },
+  "next_action": "Wait for exact-SHA full CI; repair only demonstrated failure, no HMD PASS without headset evidence."
+}

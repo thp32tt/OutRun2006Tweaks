@@ -1533,9 +1533,10 @@ class UIScaling : public Hook
 		return result;
 	}
 
-	static int __cdecl ExactScreenHud_putClipSprite(
+	static int ExactScreenHud_putClipSpriteOwned(
 		int xstnum, int x, int y, uint32_t flags,
-		float priority, uint32_t color)
+		float priority, uint32_t color,
+		OutRunVR::GameSemantic::ProducerToken producer)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
@@ -1549,9 +1550,17 @@ class UIScaling : public Hook
 		// siblings are SCREEN_HUD; tagging only tail_4 left earlier
 		// siblings head-locked by the generic fallback path.
 		TagAppendedNodes(tailsBefore,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer);
 		return result;
+	}
+
+	static int __cdecl ExactScreenHud_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		return ExactScreenHud_putClipSpriteOwned(xstnum, x, y, flags,
+			priority, color,
+			OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
 	}
 
 	// Exact original ESC arrow E8 sources may synchronously submit D3DX
@@ -1566,11 +1575,18 @@ class UIScaling : public Hook
 			*Game::current_mode != GameState::STATE_SMPAUSEMENU)
 			return ExactScreenHud_putClipSprite(
 				xstnum, x, y, flags, priority, color);
-		OutRunVR::GameSemantic::ScopedExactProducerSemantic directArrowOwner(
-			OutRunVR::GameSemantic::RenderScope::ScreenHud, nullptr, true,
-			OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
-		return ExactScreenHud_putClipSprite(
-			xstnum, x, y, flags, priority, color);
+        // Exact pause arrows may defer their physical D3DX GPU draw beyond
+        // this original E8. Never relabel other ScreenHud/menu clips.
+        if (!OutRunVR::GameSemantic::QueueRenderActive())
+            FlushD3DXBeforeDirectGoalSource();
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic directArrowOwner(
+            OutRunVR::GameSemantic::RenderScope::ScreenHud, nullptr, true,
+            OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow);
+        const int result = ExactScreenHud_putClipSpriteOwned(
+            xstnum, x, y, flags, priority, color,
+            OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow);
+        FlushD3DXAtDirectGoalSourceExit();
+        return result;
 	}
 
 	static int __cdecl RivalMarker_sprani(
@@ -2503,8 +2519,10 @@ namespace DX9ExD3DXSpriteLifetime
         return batchActive && !queueActive && homogeneous &&
             pendingDraws != 0u && exactLiveSprite &&
             producer != OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 &&
-            OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
-                scope, producer);
+            (OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
+                 scope, producer) ||
+             (scope == OutRunVR::GameSemantic::RenderScope::ScreenHud &&
+              producer == OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow));
     }
 
     using OutRunVR::GameSemantic::RenderScope;
@@ -2571,6 +2589,12 @@ namespace DX9ExD3DXSpriteLifetime
     static_assert(!CanRestoreDeferredResultOwner(
         true,false,true,2,true,RenderScope::ScreenHud,
         ProducerToken::ResultTextB9200)); // unverified result parent
+    static_assert(CanRestoreDeferredResultOwner(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::PauseOptionArrow));
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::ExactScreenHudClipSprite));
     static_assert(!CanRestoreDeferredResultOwner(
         true,false,true,2,true,RenderScope::WorldBillboard,
         ProducerToken::StageExtensionTime)); // world must remain spatial
@@ -2642,7 +2666,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             (source == ProducerToken::GoalTime020 ||
              source == ProducerToken::GoalTime150 ||
              source == ProducerToken::ResultProgress ||
-             source == ProducerToken::OutRunStagePrintf);
+             source == ProducerToken::OutRunStagePrintf ||
+             source == ProducerToken::PauseOptionArrow);
     }
 
     static void ForgetBatch() noexcept { HudBatch.forget(); }

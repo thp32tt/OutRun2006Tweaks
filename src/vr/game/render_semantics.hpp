@@ -82,6 +82,7 @@ namespace OutRunVR::GameSemantic
         OutRunHudPeripheralText,
         LensFlareCentre, // Exact D3A5 -> C993 central sun, never CABE discs.
         CarBaseShadow, // Direct original player-car contact shadow.
+        PauseOptionArrow, // Exact SMPAUSEMENU arrows, never generic clips.
     };
 
     // The GOAL 0-99% progress, its two exact time helpers and the three
@@ -165,7 +166,8 @@ namespace OutRunVR::GameSemantic
             pendingProducer == ProducerToken::GoalTime020 ||
             pendingProducer == ProducerToken::GoalTime150 ||
             pendingProducer == ProducerToken::ResultProgress ||
-            pendingProducer == ProducerToken::OutRunStagePrintf;
+            pendingProducer == ProducerToken::OutRunStagePrintf ||
+            pendingProducer == ProducerToken::PauseOptionArrow;
         return knownResult &&
             (incomingScope != pendingScope ||
              incomingProducer != pendingProducer);
@@ -333,7 +335,8 @@ namespace OutRunVR::GameSemantic
             (pendingProducer == ProducerToken::GoalTime020 ||
              pendingProducer == ProducerToken::GoalTime150 ||
              pendingProducer == ProducerToken::ResultProgress ||
-             pendingProducer == ProducerToken::OutRunStagePrintf) &&
+             pendingProducer == ProducerToken::OutRunStagePrintf ||
+             pendingProducer == ProducerToken::PauseOptionArrow) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
     }
@@ -399,7 +402,8 @@ namespace OutRunVR::GameSemantic
             (pendingProducer == ProducerToken::GoalTime020 ||
              pendingProducer == ProducerToken::GoalTime150 ||
              pendingProducer == ProducerToken::ResultProgress ||
-             pendingProducer == ProducerToken::OutRunStagePrintf) &&
+             pendingProducer == ProducerToken::OutRunStagePrintf ||
+             pendingProducer == ProducerToken::PauseOptionArrow) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
     }
@@ -447,7 +451,8 @@ namespace OutRunVR::GameSemantic
             (pendingProducer == ProducerToken::GoalTime020 ||
              pendingProducer == ProducerToken::GoalTime150 ||
              pendingProducer == ProducerToken::ResultProgress ||
-             pendingProducer == ProducerToken::OutRunStagePrintf) &&
+             pendingProducer == ProducerToken::OutRunStagePrintf ||
+             pendingProducer == ProducerToken::PauseOptionArrow) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
     }
@@ -555,6 +560,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::DispRankClipSprite: return "DISPRANK_KIND0_CLIP";
         case ProducerToken::LensFlareCentre: return "LENS_FLARE_CENTRE_C993";
         case ProducerToken::CarBaseShadow: return "CAR_BASE_SHADOW_WORLD";
+        case ProducerToken::PauseOptionArrow: return "PAUSE_OPTION_ARROW";
         default: return "NONE";
         }
     }

@@ -222,6 +222,28 @@ int main()
     CurrentQueueExactScope = RenderScope::None;
     CurrentScope = RenderScope::None;
 
+    // ESC option arrows use an exact deferred GPU source across original
+    // direct E8 and queued SpriteNode submissions. Generic HUD/GOAL must
+    // not be reclassified into the pause-menu optical path.
+    constexpr auto pause = ProducerToken::PauseOptionArrow;
+    if (!CanDrainDirectResultBeforeFirstQueueNode(false, true, true, 1u,
+            true, hud, pause, hud, ProducerToken::ExactScreenHudClipSprite) ||
+        !CanArmD3DXQueueGoalAfterDraw(true, true, true, 1u,
+            true, hud, pause, hud, pause) ||
+        !CanDeferD3DXQueueGoalBatch(true, true, true, true, 2u,
+            true, hud, pause, hud, pause) ||
+        !CanFlushD3DXDirectGoalAtExit(false, true, true, 2u,
+            true, hud, pause, hud, pause) ||
+        CanReprojectFiniteResultHudPlane(hud, pause) ||
+        CanFlushD3DXDirectGoalAtExit(false, true, true, 1u,
+            true, hud, ProducerToken::ExactScreenHudClipSprite,
+            hud, ProducerToken::ExactScreenHudClipSprite) ||
+        CanFlushD3DXDirectGoalAtExit(false, true, true, 1u,
+            false, hud, pause, hud, pause) ||
+        CanFlushD3DXDirectGoalAtExit(false, true, true, 1u,
+            true, hud, pause, hud, ProducerToken::GoalTime020))
+        return 16;
+
     // Source-order regression: the exact C993 sun and other world/scene
     // effects must stay eligible for SkyGlow before the HUD cutoff, while
     // both direct +TIME glyphs and generic 2D queue overlays set the cutoff.
