@@ -10,7 +10,7 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
   "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
-  "status": "SOURCE_BUILD_VERIFIED_PARTIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -98,7 +98,7 @@
     "C3_VALIDATE": "Material 5103b37d489dadee5743eae03951888632d23cc3 source WARP/Win32/OpenXR passed; inherited 00819 C6 run-record mismatch fixed by separate 9e1533a02a737d3b2e2d01d5d4a1b499bcd585bb metadata repair. Required exact-SHA GitHub Actions 5/5 SUCCESS: Fast #38882920635, Backend #38882920776, Build #38882926472, OpenXR #38882926455, HUD #38882926437. Native WARP transport previous material #38881637231 SUCCESS; real menu/race/HMD not run.",
     "C4_COMMIT": "Material source 5103b37d489dadee5743eae03951888632d23cc3; validation-bearing causal run-record fix 9e1533a02a737d3b2e2d01d5d4a1b499bcd585bb. Both without CI skip; this C6 result only [skip ci].",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "SOURCE_BUILD_VERIFIED_PARTIAL, PASS_EXACT_SHA 9e1533a02a737d3b2e2d01d5d4a1b499bcd585bb, RUNTIME_VALIDATION=UNTESTED; R30 live game Draw/DrawIndexed stereo and Quest3 validation remain IN_PROGRESS; no completed feature score."
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA at exact validation-bearing SHA 9e1533a02a737d3b2e2d01d5d4a1b499bcd585bb; source-scoped native RTV and OM/RS binding CI 5/5 SUCCESS; C6 bookkeeping [skip ci] only. RUNTIME_VALIDATION=UNTESTED, NEED_HMD_TEST. Full R30 live menu/car/race stereo Draw/DrawIndexed integration and Quest3 gameplay/HMD remain unfinished; feature_contract/acceptance_results unchanged; no new score."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00820",
