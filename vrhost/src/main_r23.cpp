@@ -1174,17 +1174,32 @@ namespace
         return true;
     }
 
+    // The built R23 host uses its own GPU hold eye pair. The legacy
+    // StereoCompositor::HasStereoSource() checks directSnapshot SRVs, which
+    // the R23 commit path deliberately never fills. That drops complete
+    // native game eyes before XR projection. Route by real R23 ownership.
+    [[nodiscard]] OutRunVrNativeEyePair::StereoSourceRoute
+    R23ProductionStereoSource(const StereoCompositor& c) noexcept
+    {
+        return OutRunVrNativeEyePair::ChooseStereoSource(
+            c.directFrameValid_ && R23DirectHold.valid,
+            R23DirectHold.srv[0] != nullptr,
+            R23DirectHold.srv[1] != nullptr,
+            c.stereoSourceValid_, c.stereoSourceSrv_ != nullptr);
+    }
+
     bool R23RenderProjection(StereoCompositor& c,
         const std::array<XrView, 2>& views,
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
         R23Pixels.TryConsume(c.context_);
-        if (!c.HasStereoSource()) return false;
+        const auto sourceRoute = R23ProductionStereoSource(c);
+        if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+            return false;
         UvRect eyes[2]{};
         ID3D11ShaderResourceView* srv[2]{};
         DXGI_FORMAT fmt[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-        if (c.directFrameValid_ && R23DirectHold.valid &&
-            R23DirectHold.srv[0] && R23DirectHold.srv[1])
+        if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu)
         {
             eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
             srv[0] = R23DirectHold.srv[0];
@@ -2730,7 +2745,8 @@ int main(int argc, char** argv)
                     const bool grace =
                         newStereoCommitted ||
                         (matchedStereoValid &&
-                         compositor.HasStereoSource() &&
+                         R23ProductionStereoSource(compositor) !=
+                             OutRunVrNativeEyePair::StereoSourceRoute::None &&
                          projectionNow >= lastStereoMatchMs &&
                          projectionNow - lastStereoMatchMs <= StereoGraceMs);
                     // T0/R47: while Gameplay remains active, never age

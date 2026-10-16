@@ -366,6 +366,26 @@ int main()
                      StereoSourceRoute::None,
                  "missing SBS view must never submit an OpenXR layer"))
         return 1;
+    // The production R23 DirectGPU source is its hold-eye pair, not
+    // main.cpp's legacy directSnapshot SRVs. Exercise the route even when
+    // legacy snapshots do not exist, plus partial-eye SBS recovery.
+    const bool legacyDirectSnapshotsAllocated = false;
+    const bool r23HoldLeft = true, r23HoldRight = true;
+    if (!require(!legacyDirectSnapshotsAllocated &&
+                 ChooseStereoSource(
+                     true, r23HoldLeft, r23HoldRight, false, false) ==
+                     StereoSourceRoute::DirectGpu,
+                 "R23 DirectGPU must not depend on legacy source snapshots") ||
+        !require(ChooseStereoSource(
+                     true, true, false, true, true) ==
+                     StereoSourceRoute::Sbs,
+                 "partial R23 direct hold must use fresh SBS fallback") ||
+        !require(ChooseStereoSource(
+                     true, false, false, false, false) ==
+                     StereoSourceRoute::None,
+                 "absent R23 hold must not submit an OpenXR stereo layer"))
+        return 1;
+
     // New-generation OpenXR eyes must not be blocked by old high IDs.
     using OutRunVrNativeEyePair::PreferNativeDirectFrame;
     using OutRunVrNativeEyePair::DirectFrameAlreadyProcessed;
