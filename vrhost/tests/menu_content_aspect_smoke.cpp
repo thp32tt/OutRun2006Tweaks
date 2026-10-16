@@ -138,6 +138,20 @@ int main()
             ultraWide, ultraWide, true, true, false, false) != ultraWide ||
         PlanUncroppedAuthoredMenuAspect(
             wide, wide, true, true, false, false) != wide ||
+        // A verified matte is still not authority to override partial
+        // captures, deliberate 4:3 crop, native-aspect rollback or valid
+        // already-proportioned captures.
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, false, false, false, true) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, true, true, false, true) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, true, false, true, true) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            fourThree, fourThree, true, true, false, false, true) != fourThree ||
+        PlanUncroppedAuthoredMenuAspect(
+            2496.f / 2688.f, 2496.f / 2688.f,
+            true, true, false, false, true) != 2496.f / 2688.f ||
         // Proof alone is insufficient without the user's configured mode.
         PlanUncroppedAuthoredMenuAspect(
             ultraWide, ultraWide, false, true, false, false, true) != ultraWide ||
@@ -157,6 +171,9 @@ int main()
         !std::isnan(PlanUncroppedAuthoredMenuAspect(
             std::numeric_limits<float>::quiet_NaN(), wide,
             true, true, false, false)) ||
+        !std::isnan(PlanUncroppedAuthoredMenuAspect(
+            std::numeric_limits<float>::quiet_NaN(), wide,
+            true, true, false, false, true)) ||
         PlanUncroppedAuthoredMenuAspect(
             ultraWide, std::numeric_limits<float>::infinity(),
             true, true, false, false) != ultraWide)

@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00969",
   "production_id": "CONVERSION-DX9EX-00969",
-  "event_id": "CONVERSION-DX9EX-00969-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00969-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "run_key": "CONVERSION-DX9EX-00969",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "edce340475cd7c977cb415710871cf6f01bfff29",
-  "material_result_sha": null,
+  "material_result_sha": "c80c970bbea80aceeda19597afee89338a4c8db7",
   "source_paths": [
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "vrhost/src/main_r23.cpp",
@@ -28,7 +28,8 @@
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "vrhost/src/main_r23.cpp",
     "vrhost/tests/menu_content_aspect_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00969.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00969.json",
+    "tools/verify_vr_menu_letterbox_aspect.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
@@ -88,8 +89,18 @@
     "negative_test_evidence": "Compile and run portable menu_content_aspect_smoke.cpp for unverified 16:9/21:9 no-squeeze, positive verified matte, disabled/partial/native fallback."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA"
+    "status": "PENDING_FINAL_EXACT_SHA",
+    "original_failure_run_id": 38949656091,
+    "previous_cxx_implementation_sha": "c80c970bbea80aceeda19597afee89338a4c8db7",
+    "verified_fix_chain": [
+      "fa2b961ff3913cb4f3825e1bd3fb480ad84ac215",
+      "8bf2f78b56ec3b4386b08033cff7299613964efd"
+    ],
+    "previous_active_pass_run_id": 38950201971,
+    "previous_domain_pass_run_id": 38950201980,
+    "previous_full_source_pass_run_id": 38949656067,
+    "strict_note": "Require final identical SHA across DX9Ex Active, Domain Isolation and Full Source; additional same-feature verified matte fallback regression included in final C5 candidate. Do not treat prior split-SHA passes as final C6."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Wait for original 00968 Full Source run not to be interrupted, then fast-forward this material C++ commit; confirm exact SHA DX9Ex Active, Domain, and Full Source gates; finish C6 bookkeeping only after success. HMD Quest3/VDXR UNTESTED."
+  "next_action": "Validate resulting atomic C5 source-and-regression commit exact SHA in all required Actions gates, then [skip ci] C6 record only after 3/3 success. No Quest3 test: RUNTIME_VALIDATION=UNTESTED."
 }
