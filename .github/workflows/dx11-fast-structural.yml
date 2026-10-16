@@ -283,3 +283,6 @@ jobs:
         run: |
           python tools/verify_dx11_source_graph.py
           python tools/verify_dx11_activation_boundary.py
+          # Native L/R partial-depth GPU Draw is a separate non-evidence
+          # submission; keep negative tamper and source-RECT regressions live.
+          python tools/test_dx11_eye_partial_depth_activation.py

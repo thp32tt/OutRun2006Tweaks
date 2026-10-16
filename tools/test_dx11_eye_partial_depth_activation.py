@@ -12,6 +12,10 @@ probe = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
     encoding="utf-8")
 
 assert not audit_native_partial_depth_clear(source, probe), "valid DSV audit failed"
+# The timeline's valid bounded Clear must replay through GPU Draw, while its
+# negative companion must actually lie outside the eye (not an old valid box).
+assert "invalidPartialDepth.entries[1][0].rect = {-1, 1, 4, 4};" in probe
+assert "zRect.kind = SourceClear::Kind::FullDepthStencil;" in probe
 assert len(DRAW_DISPATCH.findall(source)) == 4, "unexpected native Draw dispatch"
 # Removing the OM0 unbind would let a helper write a color RTV instead of
 # replacing only depth/stencil under exactly scoped per-eye provenance.
