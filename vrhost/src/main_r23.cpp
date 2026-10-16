@@ -1244,28 +1244,20 @@ namespace
             return value && std::strcmp(value, "1") == 0;
         }();
         bool directEyeCopied = false;
-        if (nativeEyeCopyOptIn && c.directFrameValid_ && R23DirectHold.valid &&
-            R23DirectHold.eye[0] && R23DirectHold.eye[1] &&
-            image < c.projection_.images.size() &&
+        if (image < c.projection_.images.size() &&
             c.projection_.images[image].texture) {
-            D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{}, xrDesc{};
-            R23DirectHold.eye[0]->GetDesc(&leftDesc);
-            R23DirectHold.eye[1]->GetDesc(&rightDesc);
             ID3D11Texture2D* xrTarget = c.projection_.images[image].texture;
-            xrTarget->GetDesc(&xrDesc);
-            if (OutRunVrNativeEyePair::CopyToStereoSwapchainCompatible(
-                    leftDesc, rightDesc, xrDesc) &&
-                OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
-                    R23DirectHold.eye[0], R23DirectHold.eye[1], IID_IUnknown)) {
-                // A pair of native GPU copies targets two DIFFERENT XR array
-                // slices. The same immediate context orders them before
-                // the R32 producer-ACK fence and xrReleaseSwapchainImage.
-                c.context_->OMSetRenderTargets(0u, nullptr, nullptr);
-                c.context_->CopySubresourceRegion(xrTarget, 0u,
-                    0u, 0u, 0u, R23DirectHold.eye[0], 0u, nullptr);
-                c.context_->CopySubresourceRegion(xrTarget, 1u,
-                    0u, 0u, 0u, R23DirectHold.eye[1], 0u, nullptr);
-                directEyeCopied = true;
+            // Execute the exact GPU two-eye transfer only for the currently
+            // selected native game source. During a device recreation the
+            // fallback may be ClassicSbs even though old direct hold data
+            // still exists; never copy that stale pair into an XR projection.
+            directEyeCopied =
+                OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    c.context_, c.device_, R23DirectHold.eye[0],
+                    R23DirectHold.eye[1], xrTarget, nativeEyeCopyOptIn,
+                    sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
+                    c.directFrameValid_ && R23DirectHold.valid, IID_IUnknown);
+            if (directEyeCopied) {
                 static bool logged = false;
                 if (!logged) {
                     std::cout << "Native DirectGPU L/R -> OpenXR array-slice GPU copy active; Quest3 parity UNTESTED.\\n";

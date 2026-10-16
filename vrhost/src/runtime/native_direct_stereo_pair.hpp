@@ -117,6 +117,52 @@ namespace OutRunVrNativeEyePair
             (projection.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u;
     }
 
+    // Copy native gameplay eyes to the OpenXR array only when the selected
+    // source route, the immediate context, BOTH hold eyes and destination all
+    // belong to the same live D3D11 device. On a classic SBS fallback or XR
+    // device recreation, stale global hold textures may still have perfectly
+    // matching dimensions; copying them would silently replace the selected
+    // game frame. The caller keeps the regular shader path on any rejection.
+    // Templates defer COM type requirements for the portable DXGI tests.
+    template <typename Canonical, typename Context, typename Device,
+              typename Texture, typename InterfaceId>
+    [[nodiscard]] inline bool CopyDirectEyesToStereoArray(
+        Context* context, Device* device, Texture* left, Texture* right,
+        Texture* projection, bool copyOptIn, bool directRoute,
+        bool validatedFrame, const InterfaceId& unknownIid) noexcept
+    {
+        if (!copyOptIn || !directRoute || !validatedFrame ||
+            !context || !device || !left || !right || !projection)
+            return false;
+        Device* contextOwner = nullptr;
+        context->GetDevice(&contextOwner);
+        const bool sameContextDevice =
+            contextOwner != nullptr && contextOwner == device;
+        if (contextOwner) contextOwner->Release();
+        if (!sameContextDevice ||
+            !TextureOwnedByDevice(left, device) ||
+            !TextureOwnedByDevice(right, device) ||
+            !TextureOwnedByDevice(projection, device) ||
+            !DistinctSourceAllocations<Canonical>(
+                left, right, unknownIid))
+            return false;
+        D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{}, xrDesc{};
+        left->GetDesc(&leftDesc);
+        right->GetDesc(&rightDesc);
+        projection->GetDesc(&xrDesc);
+        if (!CopyToStereoSwapchainCompatible(leftDesc, rightDesc, xrDesc))
+            return false;
+
+        // Exact full-resolution L/R game colors, no SBS UV crop. One immediate
+        // command stream owns both XR array slices and the producer ACK fence.
+        context->OMSetRenderTargets(0u, nullptr, nullptr);
+        context->CopySubresourceRegion(
+            projection, 0u, 0u, 0u, 0u, left, 0u, nullptr);
+        context->CopySubresourceRegion(
+            projection, 1u, 0u, 0u, 0u, right, 0u, nullptr);
+        return true;
+    }
+
     // Exact two-eye source admission shared by the real x64 DirectGPU importer
     // and the R23 OpenXR projection staging path. Never treat duplicated
     // handles or incompatible CopyResource shapes as a stereo game frame.

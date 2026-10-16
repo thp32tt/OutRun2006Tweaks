@@ -150,9 +150,6 @@ int main()
             static_cast<ID3D11Texture2D*>(nullptr), warpDevice) &&
         !OutRunVrNativeEyePair::TextureOwnedByDevice(
             gpuLeft, static_cast<ID3D11Device*>(nullptr));
-    if (replacementEye) replacementEye->Release();
-    if (replacementContext) replacementContext->Release();
-    if (replacementDevice) replacementDevice->Release();
     if (!require(ownershipSafe,
                  "host device replacement must reopen both DirectGPU eyes and rebuild stale R23 hold"))
         return 1;
@@ -217,10 +214,37 @@ int main()
         const float green[4]{0.f, 1.f, 0.f, 1.f};
         warpContext->ClearRenderTargetView(nativeLeftRtv, red);
         warpContext->ClearRenderTargetView(nativeRightRtv, green);
-        warpContext->CopySubresourceRegion(warpXr, 0u,
-            0u, 0u, 0u, gpuLeft, 0u, nullptr);
-        warpContext->CopySubresourceRegion(warpXr, 1u,
-            0u, 0u, 0u, gpuRight, 0u, nullptr);
+        const auto copyEyes = [&](ID3D11DeviceContext* context,
+                                  ID3D11Device* device,
+                                  ID3D11Texture2D* l,
+                                  ID3D11Texture2D* r, bool optIn,
+                                  bool directRoute, bool complete) {
+            return OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                context, device, l, r, warpXr, optIn, directRoute,
+                complete, IID_IUnknown);
+        };
+        // A ClassicSbs game fallback must NEVER be overwritten by a previous
+        // native DirectGPU hold pair. Equally sized old-device eyes/context
+        // must not be copied into the new XR swapchain during recreation.
+        const bool copyDenied =
+            !copyEyes(warpContext, warpDevice, gpuLeft, gpuRight,
+                      false, true, true) &&
+            !copyEyes(warpContext, warpDevice, gpuLeft, gpuRight,
+                      true, false, true) &&
+            !copyEyes(warpContext, warpDevice, gpuLeft, gpuRight,
+                      true, true, false) &&
+            !copyEyes(warpContext, warpDevice, replacementEye, gpuRight,
+                      true, true, true) &&
+            !copyEyes(replacementContext, warpDevice, gpuLeft, gpuRight,
+                      true, true, true) &&
+            !copyEyes(warpContext, warpDevice, gpuLeft, gpuLeft,
+                      true, true, true);
+        const bool nativeCopyExecuted =
+            copyEyes(warpContext, warpDevice, gpuLeft, gpuRight,
+                     true, true, true);
+        if (!require(copyDenied && nativeCopyExecuted,
+                     "XR eye copy must honor route, complete frame and exact live device"))
+            return 1;
         auto readDesc = xrArray;
         readDesc.Usage = D3D11_USAGE_STAGING;
         readDesc.BindFlags = 0u;
@@ -259,6 +283,9 @@ int main()
                  "native OpenXR left/right array GPU copies lost independent eye pixels"))
         return 1;
 
+    if (replacementEye) replacementEye->Release();
+    if (replacementContext) replacementContext->Release();
+    if (replacementDevice) replacementDevice->Release();
     if (gpuLeft) gpuLeft->Release();
     if (gpuRight) gpuRight->Release();
     if (warpContext) warpContext->Release();
