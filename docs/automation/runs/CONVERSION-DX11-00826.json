@@ -10,15 +10,15 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
   "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
-  "status": "SOURCE_PHASE_PARTIAL",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "SOURCE_PHASE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "material_result_sha": "044ec501f6acf1b579bd07c9e8a94e63c514247a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "04009dbabfaf344fb3d8941432b5e455fd38fe52",
   "packaging_status": "NOT_REQUIRED",
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.hpp",
@@ -51,9 +51,9 @@
     ]
   },
   "acceptance_results": {
-    "native-eye-rtv-and-state": "SOURCE_CODED_BOUND_RTV_DSV_PER_DRAW_WARP_PENDING",
-    "game-draw-input-fallback": "SOURCE_CODED_DETACHED_AND_FOREIGN_TARGET_FAIL_CLOSED",
-    "native-stereo-host-transport": "PENDING_EXACT_SHA_GATES_REAL_R30_CALLBACK_UNCONNECTED"
+    "native-eye-rtv-and-state": "SOURCE_CODED_WARP_PASS_EXACT_EYE_RTV_DSV_DRAW_EVIDENCE",
+    "game-draw-input-fallback": "SOURCE_CODED_WARP_PASS_OFFSCREEN_DETACHED_FAIL_CLOSED_R30_PENDING",
+    "native-stereo-host-transport": "FULL_EXACT_SHA_5_OF_5_PASS_REAL_R30_SCENE_NOT_CONNECTED"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -86,7 +86,7 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "GPU-target correctness source committed; full R30 native menu/car/race image and Quest3/VDXR unavailable, no production promotion.",
     "activation_guard_and_fallback": "Explicit audited native eye recorder only; no default native route or producer promotion. Existing opt-in/fail-closed D3D9 Draw/Present/input/FFB, fallback and DXVK freeze retained.",
-    "delivery_stage": "SOURCE_COMMIT_PENDING_EXACT_SHA_BUILD_GATES_REAL_R30_PENDING",
+    "delivery_stage": "SOURCE_PHASE_EXACT_SHA_BUILD_VERIFIED_GAME_R30_CALLBACK_UNCONNECTED",
     "remaining_implementation": [
       "Connect game-authored R30/menu/vehicle/race draw/state and independent camera-specific replay callbacks to native D3D11 eye encoder.",
       "Verify end-to-end source graph and complete final Gate, then conduct Quest3/VDXR/gamepad/FFB/HUD and 72Hz measurements."
@@ -96,18 +96,62 @@
     "C0_RECOVER": "GitHub HEAD 43e52924 previous 00825 build Gate 5/5 verified, full R30 eye callback incomplete; no score duplicate.",
     "C1_REVIEW": "WARP native eye callback detached OM yet encoder counted Draw/DrawIndexed as successful stereo eye GPU writes.",
     "C2_IMPLEMENT": "Material C++ commit 044ec501 checked per-eye RTV/DSV at each Draw/DrawIndexed, added explicit rebind and negative/positive WARP callback regression.",
-    "C3_VALIDATE": "First material exact SHA 044ec501 DX11 Fast failed on prior run 00825 terminal record acceptance conflict; create current 00826 nonterminal source record for new exact-SHA gate. Other Gates pending.",
-    "C4_COMMIT": "Source/fixture material commit 044ec501f6acf1b579bd07c9e8a94e63c514247a. New 00826 run metadata is CI repair input, not new material or score.",
+    "C3_VALIDATE": "Exact 04009dbabfaf344fb3d8941432b5e455fd38fe52 5/5 SUCCESS: Fast 38900826908, Backend 38900826892 (validate and smoke), Windows Build 38900831633, OpenXR 38900831520, HUD 38900831504. Native Transport WARP on original material 044ec501 run 38899913847 SUCCESS. HMD/real R30 scene UNTESTED/unfinished.",
+    "C4_COMMIT": "Source material 044ec501; nonterminal run CI integration context be37a19; stronger activation contract 5275eeb; Fast workflow path trigger 04009dba. C6 bookkeeping with [skip ci] follows only after exact-SHA 5/5 Gates.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_FINAL_EXACT_SHA_GATE; HMD UNTESTED; real game R30 native replay remains incomplete."
+    "C6_STATE": "SOURCE_PHASE_BUILD_VERIFIED at 04009dba 5/5 mandatory CI SUCCESS; only OM-scoped live native eye Draw/DrawIndexed correctness, NOT real R30 menu/vehicle/race producer linkage and NOT Quest3/VDXR game/runtime PASS. Same feature remains incomplete, score +0."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00826",
     "score_change": 0,
-    "score_status": "PARTIAL_GAME_SOURCE_INTEGRATION_NO_NEW_FEATURE_AWARD",
+    "score_status": "PARTIAL_SOURCE_BUILD_VERIFIED_NO_NEW_FEATURE_AWARD",
     "note": "Same unfinished native R30 full-game stereo feature; CI record/checkpoint and partial target fix do not earn independent score."
   },
   "material_commits": [
     "044ec501f6acf1b579bd07c9e8a94e63c514247a"
-  ]
+  ],
+  "ci_exact_sha_gates": {
+    "sha": "04009dbabfaf344fb3d8941432b5e455fd38fe52",
+    "required": "5/5 SUCCESS",
+    "result": "SUCCESS",
+    "runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38900826908,
+        "status": "completed",
+        "result": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38900826892,
+        "status": "completed",
+        "result": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 38900831633,
+        "status": "completed",
+        "result": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38900831520,
+        "status": "completed",
+        "result": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38900831504,
+        "status": "completed",
+        "result": "success"
+      }
+    ],
+    "native_transport_warp": {
+      "source_sha": "044ec501f6acf1b579bd07c9e8a94e63c514247a",
+      "run_id": 38899913847,
+      "result": "SUCCESS"
+    },
+    "runtime_claim": "UNTESTED",
+    "feature_scope": "PARTIAL_SOURCE_INTEGRATION_ONLY"
+  }
 }
