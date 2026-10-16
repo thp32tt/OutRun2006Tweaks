@@ -18,6 +18,14 @@ struct NativeGameEyeDrawEvidence {
 struct NativeGameEyeColorSeed {
     std::uint32_t argb[2]{};
 };
+// Real game camera raster and pre-draw Z/stencil state, independently for L/R.
+// Only a captured game source may populate this optional replay payload.
+struct NativeGameEyeRasterState {
+    D3D11_VIEWPORT viewport[2]{};
+    D3D11_RECT scissor[2]{};
+    float depthClear[2]{1.0f, 1.0f};
+    std::uint8_t stencilClear[2]{};
+};
 
 using NativeGameEyePass = bool (*)(
     void* user, ID3D11DeviceContext* context,
@@ -90,7 +98,8 @@ public:
     bool render_game_eye_passes(
         NativeGameEyePass pass, void* user,
         std::uint32_t sourcePoseSequence,
-        const NativeGameEyeColorSeed* fullTargetClear = nullptr) noexcept;
+        const NativeGameEyeColorSeed* fullTargetClear = nullptr,
+        const NativeGameEyeRasterState* gameRaster = nullptr) noexcept;
 
     bool render_direct_eyes(
         NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,

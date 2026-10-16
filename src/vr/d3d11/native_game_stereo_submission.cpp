@@ -1,6 +1,7 @@
 #include "native_game_stereo_submission.hpp"
 #include "native_game_eye_pair_sources.hpp"
 #include <limits>
+#include <cmath>
 
 namespace outrun::vr::dx11 {
 
@@ -94,7 +95,9 @@ public:
     ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
 
     bool bind(ID3D11RenderTargetView* target,
-              ID3D11DepthStencilView* depth) noexcept {
+              ID3D11DepthStencilView* depth,
+              const NativeGameEyeRasterState* raster,
+              std::uint32_t eyeIndex) noexcept {
         if (!active_ || !target || !depth) return false;
         // The previous eye may have rebound IA/VB/IB/VS/PS. Start each
         // replay from exactly the captured caller state, not eye L residue.
@@ -105,11 +108,14 @@ public:
         context_->OMSetBlendState(savedBlend_, savedBlendFactors_, savedSampleMask_);
         context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
         context_->RSSetState(savedRasterizer_);
-        const D3D11_VIEWPORT viewport{
-            0.0f, 0.0f, static_cast<float>(width_),
-            static_cast<float>(height_), 0.0f, 1.0f};
-        const D3D11_RECT scissor{
-            0, 0, static_cast<LONG>(width_), static_cast<LONG>(height_)};
+        const D3D11_VIEWPORT viewport = raster
+            ? raster->viewport[eyeIndex]
+            : D3D11_VIEWPORT{0.0f, 0.0f, static_cast<float>(width_),
+                             static_cast<float>(height_), 0.0f, 1.0f};
+        const D3D11_RECT scissor = raster
+            ? raster->scissor[eyeIndex]
+            : D3D11_RECT{0, 0, static_cast<LONG>(width_),
+                         static_cast<LONG>(height_)};
         // A live road/car/building Draw must receive the depth/stencil surface
         // belonging to THIS eye. A color-only RT0 silently disables native
         // depth testing and allows the later eye to inherit stale depth.
@@ -243,12 +249,39 @@ bool NativeGameStereoSubmission::capture_eye(
 bool NativeGameStereoSubmission::render_game_eye_passes(
     NativeGameEyePass pass, void* user,
     std::uint32_t sourcePoseSequence,
-    const NativeGameEyeColorSeed* fullTargetClear) noexcept
+    const NativeGameEyeColorSeed* fullTargetClear,
+    const NativeGameEyeRasterState* gameRaster) noexcept
 {
     if (state_ != State::Acquired || !context_ || !pass ||
         eyes_[0] || eyes_[1] || sourcePoseSequence == 0u ||
         sourcePoseSequence != poseSequence_)
         return false;
+
+    // Source-supplied eye camera rectangles must be safe before any GPU
+    // recording. Invalid game input remains cancellable and the D3D9 game
+    // frame stays authoritative rather than submitting a partial XR eye.
+    if (gameRaster) {
+        for (std::uint32_t eye = 0; eye < 2u; ++eye) {
+            const auto& v = gameRaster->viewport[eye];
+            const auto& r = gameRaster->scissor[eye];
+            const float z = gameRaster->depthClear[eye];
+            if (!std::isfinite(v.TopLeftX) || !std::isfinite(v.TopLeftY) ||
+                !std::isfinite(v.Width) || !std::isfinite(v.Height) ||
+                !std::isfinite(v.MinDepth) || !std::isfinite(v.MaxDepth) ||
+                v.TopLeftX < 0.0f || v.TopLeftY < 0.0f ||
+                v.Width <= 0.0f || v.Height <= 0.0f ||
+                v.TopLeftX + v.Width > static_cast<float>(ring_.width()) ||
+                v.TopLeftY + v.Height > static_cast<float>(ring_.height()) ||
+                v.MinDepth < 0.0f || v.MinDepth > 1.0f ||
+                v.MaxDepth < 0.0f || v.MaxDepth > 1.0f ||
+                r.left < 0 || r.top < 0 || r.right <= r.left ||
+                r.bottom <= r.top ||
+                r.right > static_cast<LONG>(ring_.width()) ||
+                r.bottom > static_cast<LONG>(ring_.height()) ||
+                !std::isfinite(z) || z < 0.0f || z > 1.0f)
+                return false;
+        }
+    }
 
     // Allocate separate, full-size native depth/stencil attachments BEFORE
     // any GPU recording. A failed allocation keeps the ring cancellable and
@@ -291,9 +324,11 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         std::uint32_t width{}, height{};
         ID3D11DepthStencilView* depth[2]{};
         const NativeGameEyeColorSeed* fullTargetClear{};
+        const NativeGameEyeRasterState* gameRaster{};
     } dispatch{pass, user, sourcePoseSequence, {},
                ring_.width(), ring_.height(),
-               {depthViews[0].Get(), depthViews[1].Get()}, fullTargetClear};
+               {depthViews[0].Get(), depthViews[1].Get()},
+               fullTargetClear, gameRaster};
 
     // The ring verifies the immediate context and reserves the exact frame
     // before entering this recorder. It marks GPU work as queued first:
@@ -306,7 +341,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         ID3D11RenderTargetView* targets[2]{left, right};
         for (std::uint32_t eyeIndex = 0u; eyeIndex < 2u; ++eyeIndex) {
             if (!output.bind(targets[eyeIndex],
-                             invocation.depth[eyeIndex]))
+                             invocation.depth[eyeIndex],
+                             invocation.gameRaster, eyeIndex))
                 return false;
             // The game's verified full-RT Clear is part of scene replay, not
             // optional decoration. Clear this eye's own target before its
@@ -329,7 +365,11 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             // replay. The renderer may then perform the source's own clears.
             ctx->ClearDepthStencilView(
                 invocation.depth[eyeIndex],
-                D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+                D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+                invocation.gameRaster
+                    ? invocation.gameRaster->depthClear[eyeIndex] : 1.0f,
+                invocation.gameRaster
+                    ? invocation.gameRaster->stencilClear[eyeIndex] : 0u);
             if (!invocation.callback(invocation.user, ctx,
                                      targets[eyeIndex], eyeIndex,
                                      invocation.eye[eyeIndex]))

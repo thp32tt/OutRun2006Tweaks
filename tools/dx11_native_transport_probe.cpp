@@ -830,12 +830,25 @@ int main()
         ID3D11RasterizerState* originalRaster{};
         UINT originalSampleMask{};
         UINT originalStencilRef{};
+        const outrun::vr::dx11::NativeGameEyeRasterState* gameRaster{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
                      preservedRaster, preservedMask, preservedStencilRef};
     const outrun::vr::dx11::NativeGameEyeColorSeed fullGameClear{
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
+    outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
+    // Model different actual source-camera crop regions within the two
+    // full-sized GPU eyes; the original desktop raster must be restored.
+    gameRaster.viewport[0] = {0.f, 0.f, 32.f, 64.f, 0.f, 1.f};
+    gameRaster.viewport[1] = {32.f, 0.f, 32.f, 64.f, 0.f, 1.f};
+    gameRaster.scissor[0] = {0, 0, 32, 64};
+    gameRaster.scissor[1] = {32, 0, 64, 64};
+    gameRaster.depthClear[0] = 0.35f;
+    gameRaster.depthClear[1] = 0.65f;
+    gameRaster.stencilClear[0] = 3u;
+    gameRaster.stencilClear[1] = 5u;
+    gameEyeFixture.gameRaster = &gameRaster;
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -916,11 +929,17 @@ int main()
             (eyeDepthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL) != 0 &&
             boundDepth != fixture.eyeDepth[eyeIndex == 0u ? 1u : 0u] &&
             boundDepth != fixture.callerDepth &&
-            viewportCount == 1 && viewport.TopLeftX == 0.f &&
-            viewport.TopLeftY == 0.f && viewport.Width == 64.f &&
-            viewport.Height == 64.f &&
-            scissorCount == 1 && scissor.left == 0 &&
-            scissor.top == 0 && scissor.right == 64 && scissor.bottom == 64;
+            fixture.gameRaster &&
+            viewportCount == 1 &&
+            viewport.TopLeftX == fixture.gameRaster->viewport[eyeIndex].TopLeftX &&
+            viewport.TopLeftY == fixture.gameRaster->viewport[eyeIndex].TopLeftY &&
+            viewport.Width == fixture.gameRaster->viewport[eyeIndex].Width &&
+            viewport.Height == fixture.gameRaster->viewport[eyeIndex].Height &&
+            scissorCount == 1 &&
+            scissor.left == fixture.gameRaster->scissor[eyeIndex].left &&
+            scissor.top == fixture.gameRaster->scissor[eyeIndex].top &&
+            scissor.right == fixture.gameRaster->scissor[eyeIndex].right &&
+            scissor.bottom == fixture.gameRaster->scissor[eyeIndex].bottom;
         if (fixture.sawBoundEye[eyeIndex]) {
             // The callback sees the live per-eye depth attachment and may
             // write its own D3D9-derived Z/stencil commands into THIS eye.
@@ -963,12 +982,18 @@ int main()
         evidence.sourcePoseSequence = 33u;
         return true;
     };
+    auto invalidRaster = gameRaster;
+    invalidRaster.scissor[1].right = 65; // Fail before any GPU commands.
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &invalidRaster) &&
             !ring.synchronization_faulted() &&
             directSubmit.render_game_eye_passes(
-                gameEyePass, &gameEyeFixture, 33, &fullGameClear) &&
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster) &&
             directSubmit.in_flight() && !directSubmit.cancel() &&
             gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1],
             "00820 native eye callback owns distinct bound full-resolution RT0");
