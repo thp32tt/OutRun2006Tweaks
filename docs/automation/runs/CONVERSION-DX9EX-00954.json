@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
-  "status": "VALIDATING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "717d74bd50de7c3e807c2f218d4b9b26ea2ad388",
   "material_result_sha": "b7c517aa86d396a37f18a2c6fb16005fbf058d9d",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/sprite_queue_tail_proof.hpp"
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_b9200_queue": "PENDING_GATE",
-    "goal_rebuild_fallback": "PENDING_GATE",
-    "goal_exact_sha_gates": "PENDING_GATE"
+    "goal_b9200_queue": "PASS_EXACT_SHA",
+    "goal_rebuild_fallback": "PASS_EXACT_SHA",
+    "goal_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "The source maps 19 original B9200 result text call returns; a producer may relink the priority list while emitting sibling result glyphs.",
@@ -94,7 +94,7 @@
     "failed_job_id": 116956601014,
     "failed_gate": "DX9Ex Active Validation policy",
     "failure_reason": "RUN_RECORD_NOT_FOUND",
-    "status": "PENDING_CORRECTED_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
@@ -111,8 +111,40 @@
       "job": "host",
       "conclusion": "SUCCESS"
     },
-    "last_verified_state": "X64_HOST_SUCCESS__POLICY_SUCCESS__DOMAIN_SUCCESS__REMAINING_ACTIVE_FULLSOURCE_PENDING",
-    "exact_four_gate_reason": "Run record changed to include both real failures and explicitly trigger OutRun EXE HUD Inspector at the final integrated SHA; earlier HUD Inspector success on a4e9fc0 is not substituted for a distinct validation-bearing SHA."
+    "last_verified_state": "REQUIRED_FOUR_GATES_ALL_SUCCESS",
+    "exact_four_gate_reason": "Run record changed to include both real failures and explicitly trigger OutRun EXE HUD Inspector at the final integrated SHA; earlier HUD Inspector success on a4e9fc0 is not substituted for a distinct validation-bearing SHA.",
+    "validation_bearing_result_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3",
+    "material_result_sha": "b7c517aa86d396a37f18a2c6fb16005fbf058d9d",
+    "runtime_validation": "UNTESTED",
+    "gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38897492364,
+        "conclusion": "SUCCESS",
+        "jobs": "5/5 SUCCESS",
+        "head_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38897492366,
+        "conclusion": "SUCCESS",
+        "head_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38897492799,
+        "conclusion": "SUCCESS",
+        "jobs": "2/2 SUCCESS",
+        "head_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38897492752,
+        "conclusion": "SUCCESS",
+        "jobs": "3/3 SUCCESS",
+        "head_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3"
+      }
+    ]
   },
-  "next_action": "Complete all mandatory GitHub Actions gate families at this run-record result commit exact SHA; do not reuse older SHA success, and record final SHA in separate C6 [skip ci] bookkeeping only after success. Quest3/VDXR UNTESTED."
+  "next_action": "C6 BUILD_VERIFIED at prior exact SHA; retain original material source b7c517a, no duplicate 00954 dispatch; Quest3/VDXR binocular GOAL result visuals remain UNTESTED."
 }
