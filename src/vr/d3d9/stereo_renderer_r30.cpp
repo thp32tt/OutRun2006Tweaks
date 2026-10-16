@@ -26,6 +26,7 @@
 #include "hud_original_wvp_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
 #include "stage_extension_eye_plane.hpp"
+#include "hud_shader_eye_pose.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
@@ -6082,35 +6083,42 @@ namespace OutRunVRStereo
                 if (!R29OwnerMatrixFinite(commonPlane))
                     return false;
 
-                const float centre[3]{
-                    0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
-                    0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
-                    0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
-                };
-                const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
+                // The original game's ScreenHud shader c64 is now
+                // represented by the finite HUD plane above. The latched
+                // head inverse is applied ONCE below; the OpenXR eye poses
+                // are head-local and may have independent cant. Identity
+                // eye quaternions distorted every shader-owned gauge/glyph
+                // relative to the existing exact +TIME/GOAL XYZRHW plane.
+                // Stage/flare/rank use the same bilateral validity rule.
+                const float worldScale =
+                    Settings::VRWorldScale * Settings::VRStereoDepth;
+                OutRunVR::HudShaderEyes::PosePair relativeEyes{};
+                if (!OutRunVR::HudShaderEyes::Build(
+                        stereo.eyeOffset, stereo.eyeOrientation,
+                        worldScale, relativeEyes))
+                    return false;
+                const D3DMATRIX commonHeadPlane =
+                    R29OwnerMultiplyMatrix(commonPlane, headInverse);
+                if (!R29OwnerMatrixFinite(commonHeadPlane))
+                    return false;
                 for (int eye = 0; eye < 2; ++eye)
                 {
-                    const float relative[3]{
-                        stereo.eyeOffset[eye][0] - centre[0],
-                        stereo.eyeOffset[eye][1] - centre[1],
-                        stereo.eyeOffset[eye][2] - centre[2]
-                    };
                     const D3DMATRIX eyePose =
                         R29OwnerMatrixFromQuaternionTranslation(
-                            identity, relative,
-                            Settings::VRWorldScale *
-                                Settings::VRStereoDepth);
+                            relativeEyes.orientation[eye],
+                            relativeEyes.offset[eye], worldScale);
                     const D3DMATRIX eyeInverse =
                         R29OwnerInverseRigid(eyePose);
                     const D3DMATRIX eyeProjection =
                         R29OwnerProjectionFromFov(
                             baseProjection, stereo.eyeFov[eye]);
+                    if (!R29OwnerMatrixFinite(eyeInverse) ||
+                        !R29OwnerMatrixFinite(eyeProjection))
+                        return false;
                     const D3DMATRIX corrected =
                         R29OwnerMultiplyMatrix(
                             R29OwnerMultiplyMatrix(
-                                R29OwnerMultiplyMatrix(
-                                    commonPlane, headInverse),
-                                eyeInverse),
+                                commonHeadPlane, eyeInverse),
                             eyeProjection);
                     if (!R29OwnerMatrixFinite(corrected))
                         return false;

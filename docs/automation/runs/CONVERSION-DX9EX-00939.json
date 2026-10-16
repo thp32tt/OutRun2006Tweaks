@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00939",
+  "production_id": "CONVERSION-DX9EX-00939",
+  "event_id": "CONVERSION-DX9EX-00939-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00939",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "c80daece343c3fc2c93d7acb4dc20008d9388bf6",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/hud_shader_eye_pose.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/hud_shader_eye_pose.hpp",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/hud_shader_canted_eye_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00939.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Restore binocular alignment of the complete shader-owned gameplay ScreenHud finite optical plane for speed, time, gear and position while preserving native aspect/anchor settings, checked fixed-function +TIME/GOAL ownership, safe mono fallback and gameplay/pause usability.",
+    "scope_boundary": "Only verified R84 exact ScreenHud c64 draws with independent original-game WVP; preserve generic overlay, pixel HUD, world markers, lens, +TIME fixedfn, SkyGlow, D3D9 R26_SAFE rollback, input/FFB and frozen DXVK.",
+    "trace_stages": [
+      "Original OutRun game speed/time/position producer retains explicit ScreenHud semantic and an independently recorded original game c64 WVP.",
+      "R84 R30 ScreenHud shader reconstructs the finite HUD plane from that original WVP and latched head inverse, preserving optical HUD user scale and pause control.",
+      "R84 now validates the complete head-local OpenXR eye pair, retains normalized canted rotations and relative IPD for both independent shader c64 draws, and restores original GPU c64 or falls back when either eye is malformed."
+    ],
+    "subcomponents": [
+      "Implement actual R84 shader finite-HUD optical transform using independently canted bilateral OpenXR eye poses and validated uniform world scale, without touching original source WVP or HUD anchors.",
+      "Integrate Release-executed native C++ shader HUD pose regression for canted/parallel eyes, distant-origin float overflow, invalid pose and invalid world scale within mandatory host compilation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_canted_shader_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Game speed/time/position ScreenHud c64 GPU stereo",
+        "expected_behavior": "Exact original-game HUD shader plane uses normalized head-local individual eye orientation, relative IPD and asymmetric OpenXR FOV in both eyes, preserving original HUD scale and finite depth."
+      },
+      {
+        "id": "hud_mono_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Bad/recentered pose, original desktop and R26 rollback",
+        "expected_behavior": "Atomic eye-pair validation rejects zero or nonfinite quaternion, nonfinite tracking offset and invalid world scale without publishing partial eye state, while shader WVP restoration and lower native fallback remain active."
+      },
+      {
+        "id": "hud_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 x86 game, x64 OpenXR host, packaging and independent domain/HUD source gates",
+        "expected_behavior": "Release compiled and executed native smoke plus all required DX9Ex Active, Domain, HUD Inspector and Full Source Impact workflows succeed on the exact material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_canted_shader_pair": "SOURCE_IMPLEMENTED",
+    "hud_mono_fallback": "NATIVE_SMOKE_PENDING",
+    "hud_exact_sha_ci": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "The R84 exact ScreenHud shader optical plane used an identity quaternion for both eyes and computed the float tracking centre by summing finite offsets before halving. Unlike adjacent corrected R84 lens/+TIME/rank paths, HUD shader c64 therefore discarded valid OpenXR cant and could reject both eyes on midpoint overflow.",
+    "source_evidence": "R30BuildScreenSpaceEyeConstants exactHud branch already reconstructed original c64 and finite depth, but immediately created `identity[4]` and 0.5f*(eye0+eye1), assigning that identity to both R29OwnerMatrixFromQuaternionTranslation calls.",
+    "original_evidence": "The existing R84 GameSemantic::CorroboratesHud scope and R30GetRecentOriginalHudWvp identify original gameplay ScreenHud shader source, while R30HudScaleValue and pause semantic already preserve user-selected layout.",
+    "source_trace": [
+      "Original gameplay HUD producer emits exact ScreenHud semantics and c64 WVP, not a generic menu or game-world draw.",
+      "R84 recovers that game WVP, applies the configured HUD clip scale and reconstructs its fixed -2.50 game-view unit plane.",
+      "The new actual R84 c64 path applies the latched head inverse once, then validated independent head-local OpenXR eye orientations, relative IPD and each asymmetric eye FOV."
+    ],
+    "eye_ownership": "OpenXR eyeOrientation is local to the head; after the single common head inverse only per-eye relative IPD and independent cant remain. Both eye matrices must validate before shader c64 submission; real Quest3 alignment is pending.",
+    "alternatives_rejected": [
+      "The prior rank and +TIME mutations already correct their own canted eye sources and do not reach exact shader gameplay ScreenHud; adjusting menu crop, F11 font atlas or game HUD anchors cannot restore a removed eye quaternion."
+    ],
+    "fix_evidence": "R84 HUD c64 source and portable builder changed together, host CI compiled/executed gate pending exact SHA.",
+    "negative_test_evidence": "Release-capable native smoke checks canted and parallel pairs, relative IPD, maximum finite tracking midpoint and untouched outputs on invalid right-eye quaternion, NaN IPD and nonpositive/nonfinite world scale."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run one exact-SHA DX9Ex Active Windows R84+R26_SAFE/host/package, Domain, HUD and Full Source gate, fix only actual failures in same TASK; Quest3/VDXR remains untested."
+}

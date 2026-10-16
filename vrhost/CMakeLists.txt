@@ -191,6 +191,18 @@ add_custom_command(TARGET outrun-vr-rank-canted-eye-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-rank-canted-eye-smoke>"
     COMMENT "Run R84 rank marker canted-eye and negative pose regression"
     VERBATIM)
+# The full R84 shader ScreenHud plane needs independently canted
+# head-local eye poses, an atomic invalid-pair fallback and intact HUD scale.
+# Compile and execute its actual game-side pure C++ builder in Release host CI.
+add_executable(outrun-vr-hud-shader-eye-smoke
+    tests/hud_shader_canted_eye_smoke.cpp)
+target_include_directories(outrun-vr-hud-shader-eye-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-hud-shader-eye-smoke)
+add_custom_command(TARGET outrun-vr-hud-shader-eye-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-hud-shader-eye-smoke>"
+    COMMENT "Run R84 shader ScreenHud binocular eye-pose and fallback regression"
+    VERBATIM)
 # The R84 exact +TIME/GOAL native GPU-eye pose and projection regression
 # must compile AND execute in the mandatory OpenXR host gate (including Release).
 add_executable(outrun-vr-stage-extension-eye-smoke
