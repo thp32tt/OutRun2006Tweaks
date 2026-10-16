@@ -24,6 +24,19 @@ public:
         context_->OMGetBlendState(&savedBlend_, savedBlendFactors_, &savedSampleMask_);
         context_->OMGetDepthStencilState(&savedDepthState_, &savedStencilRef_);
         context_->RSGetState(&savedRasterizer_);
+        // A game-authored Draw/DrawIndexed callback may replace IA and VS/PS
+        // state for its eye. Restore the original caller bindings before EACH
+        // eye as well as on exit: right-eye replay must not inherit left-eye
+        // vertex streams, topology or shader class interfaces.
+        context_->IAGetInputLayout(&savedInputLayout_);
+        context_->IAGetVertexBuffers(
+            0u, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT,
+            savedVertexBuffers_, savedStrides_, savedOffsets_);
+        context_->IAGetIndexBuffer(&savedIndexBuffer_,
+                                   &savedIndexFormat_, &savedIndexOffset_);
+        context_->IAGetPrimitiveTopology(&savedTopology_);
+        context_->VSGetShader(&savedVS_, savedVSClasses_, &savedVSClassCount_);
+        context_->PSGetShader(&savedPS_, savedPSClasses_, &savedPSClassCount_);
         viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetViewports(&viewportCount_, savedViewports_);
         scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
@@ -37,6 +50,7 @@ public:
         context_->OMSetBlendState(savedBlend_, savedBlendFactors_, savedSampleMask_);
         context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
         context_->RSSetState(savedRasterizer_);
+        restore_draw_pipeline();
         context_->RSSetViewports(viewportCount_,
                                  viewportCount_ ? savedViewports_ : nullptr);
         context_->RSSetScissorRects(scissorCount_,
@@ -48,6 +62,16 @@ public:
         if (savedBlend_) { savedBlend_->Release(); savedBlend_ = nullptr; }
         if (savedDepthState_) { savedDepthState_->Release(); savedDepthState_ = nullptr; }
         if (savedRasterizer_) { savedRasterizer_->Release(); savedRasterizer_ = nullptr; }
+        if (savedInputLayout_) savedInputLayout_->Release();
+        if (savedIndexBuffer_) savedIndexBuffer_->Release();
+        for (auto*& buffer : savedVertexBuffers_)
+            if (buffer) { buffer->Release(); buffer = nullptr; }
+        if (savedVS_) savedVS_->Release();
+        if (savedPS_) savedPS_->Release();
+        for (UINT i = 0; i < savedVSClassCount_; ++i)
+            if (savedVSClasses_[i]) savedVSClasses_[i]->Release();
+        for (UINT i = 0; i < savedPSClassCount_; ++i)
+            if (savedPSClasses_[i]) savedPSClasses_[i]->Release();
     }
     ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
     ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
@@ -55,6 +79,9 @@ public:
     bool bind(ID3D11RenderTargetView* target,
               ID3D11DepthStencilView* depth) noexcept {
         if (!active_ || !target || !depth) return false;
+        // The previous eye may have rebound IA/VB/IB/VS/PS. Start each
+        // replay from exactly the captured caller state, not eye L residue.
+        restore_draw_pipeline();
         const D3D11_VIEWPORT viewport{
             0.0f, 0.0f, static_cast<float>(width_),
             static_cast<float>(height_), 0.0f, 1.0f};
@@ -69,6 +96,17 @@ public:
         return true;
     }
 private:
+    void restore_draw_pipeline() noexcept {
+        context_->IASetInputLayout(savedInputLayout_);
+        context_->IASetVertexBuffers(
+            0u, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT,
+            savedVertexBuffers_, savedStrides_, savedOffsets_);
+        context_->IASetIndexBuffer(
+            savedIndexBuffer_, savedIndexFormat_, savedIndexOffset_);
+        context_->IASetPrimitiveTopology(savedTopology_);
+        context_->VSSetShader(savedVS_, savedVSClasses_, savedVSClassCount_);
+        context_->PSSetShader(savedPS_, savedPSClasses_, savedPSClassCount_);
+    }
     ID3D11DeviceContext* context_{};
     std::uint32_t width_{}, height_{};
     ID3D11RenderTargetView* savedTargets_[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
@@ -79,6 +117,20 @@ private:
     ID3D11DepthStencilState* savedDepthState_{};
     UINT savedStencilRef_{};
     ID3D11RasterizerState* savedRasterizer_{};
+    ID3D11InputLayout* savedInputLayout_{};
+    ID3D11Buffer* savedVertexBuffers_[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT]{};
+    UINT savedStrides_[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT]{};
+    UINT savedOffsets_[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11Buffer* savedIndexBuffer_{};
+    DXGI_FORMAT savedIndexFormat_{DXGI_FORMAT_UNKNOWN};
+    UINT savedIndexOffset_{};
+    D3D11_PRIMITIVE_TOPOLOGY savedTopology_{D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED};
+    ID3D11VertexShader* savedVS_{};
+    ID3D11PixelShader* savedPS_{};
+    ID3D11ClassInstance* savedVSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    ID3D11ClassInstance* savedPSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    UINT savedVSClassCount_{D3D11_SHADER_MAX_INTERFACES};
+    UINT savedPSClassCount_{D3D11_SHADER_MAX_INTERFACES};
     D3D11_VIEWPORT savedViewports_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
     D3D11_RECT savedScissors_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
     UINT viewportCount_{}, scissorCount_{};

@@ -762,11 +762,33 @@ int main()
     d3d.context->RSSetState(preservedRaster);
     d3d.context->OMSetBlendState(nullptr, preservedBlendFactor, preservedMask);
     d3d.context->OMSetDepthStencilState(nullptr, preservedStencilRef);
+    // A real game Draw can leave IA bindings/topology changed for the other
+    // camera; ensure the producer never leaks one eye into the next or back
+    // into the original game's desktop draw pipeline.
+    D3D11_BUFFER_DESC gameBufferDesc{};
+    gameBufferDesc.ByteWidth = 64u;
+    gameBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    gameBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_INDEX_BUFFER;
+    ID3D11Buffer* originalGameBuffer = nullptr;
+    ID3D11Buffer* alternateEyeBuffer = nullptr;
+    require(SUCCEEDED(d3d.device->CreateBuffer(
+                &gameBufferDesc, nullptr, &originalGameBuffer)) &&
+            SUCCEEDED(d3d.device->CreateBuffer(
+                &gameBufferDesc, nullptr, &alternateEyeBuffer)),
+            "00823 original/changed game IA buffers created");
+    constexpr UINT originalStride = 16u, originalOffset = 4u;
+    d3d.context->IASetVertexBuffers(
+        0u, 1u, &originalGameBuffer, &originalStride, &originalOffset);
+    d3d.context->IASetIndexBuffer(originalGameBuffer, DXGI_FORMAT_R16_UINT, 2u);
+    d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
         ID3D11DepthStencilView* callerDepth{};
-    } gameEyeFixture{{}, {}, preservedDepthView};
+        ID3D11Buffer* originalBuffer{};
+        ID3D11Buffer* alternateBuffer{};
+    } gameEyeFixture{{}, {}, preservedDepthView,
+                     originalGameBuffer, alternateEyeBuffer};
     const outrun::vr::dx11::NativeGameEyeColorSeed fullGameClear{
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
 
@@ -794,7 +816,26 @@ int main()
         if (depthResource) depthResource.As(&eyeDepthTexture);
         D3D11_TEXTURE2D_DESC eyeDepthDesc{};
         if (eyeDepthTexture) eyeDepthTexture->GetDesc(&eyeDepthDesc);
-        fixture.sawBoundEye[eyeIndex] =
+        ID3D11Buffer* boundVertexBuffer = nullptr;
+        ID3D11Buffer* boundIndexBuffer = nullptr;
+        UINT boundStride = 0u, boundOffset = 0u, boundIndexOffset = 0u;
+        DXGI_FORMAT boundIndexFormat = DXGI_FORMAT_UNKNOWN;
+        D3D11_PRIMITIVE_TOPOLOGY boundTopology{};
+        ctx->IAGetVertexBuffers(0u, 1u, &boundVertexBuffer,
+                                &boundStride, &boundOffset);
+        ctx->IAGetIndexBuffer(&boundIndexBuffer,
+                              &boundIndexFormat, &boundIndexOffset);
+        ctx->IAGetPrimitiveTopology(&boundTopology);
+        const bool originalGameIA =
+            boundVertexBuffer == fixture.originalBuffer &&
+            boundIndexBuffer == fixture.originalBuffer &&
+            boundStride == 16u && boundOffset == 4u &&
+            boundIndexFormat == DXGI_FORMAT_R16_UINT &&
+            boundIndexOffset == 2u &&
+            boundTopology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        if (boundVertexBuffer) boundVertexBuffer->Release();
+        if (boundIndexBuffer) boundIndexBuffer->Release();
+        fixture.sawBoundEye[eyeIndex] = originalGameIA &&
             boundTarget == eyeTarget && boundDepth != nullptr &&
             depthViewDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT &&
             eyeDepthTexture.Get() != nullptr && eyeDepthDesc.Width == 64 &&
@@ -826,6 +867,14 @@ int main()
         ctx->RSSetState(nullptr);
         ctx->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
         ctx->OMSetDepthStencilState(nullptr, 0u);
+        // Simulate a real per-eye Draw that rebinds the vertex/index path;
+        // the next eye and original desktop must receive their own baseline.
+        constexpr UINT eyeStride = 24u, eyeOffset = 8u;
+        ctx->IASetVertexBuffers(
+            0u, 1u, &fixture.alternateBuffer, &eyeStride, &eyeOffset);
+        ctx->IASetIndexBuffer(
+            fixture.alternateBuffer, DXGI_FORMAT_R32_UINT, 0u);
+        ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
         // Game command replay may detach or change OM between eye passes.
         // The submission must rebind RT0 for the next eye and restore it
         // to the original desktop state after the second pass.
@@ -865,7 +914,23 @@ int main()
     d3d.context->RSGetState(&restoredRaster);
     d3d.context->OMGetBlendState(&restoredBlend, restoredBlendFactor, &restoredMask);
     d3d.context->OMGetDepthStencilState(&restoredDepthState, &restoredStencilRef);
+    ID3D11Buffer* restoredVertexBuffer = nullptr;
+    ID3D11Buffer* restoredIndexBuffer = nullptr;
+    UINT restoredStride = 0u, restoredOffset = 0u, restoredIndexOffset = 0u;
+    DXGI_FORMAT restoredIndexFormat = DXGI_FORMAT_UNKNOWN;
+    D3D11_PRIMITIVE_TOPOLOGY restoredTopology{};
+    d3d.context->IAGetVertexBuffers(0u, 1u, &restoredVertexBuffer,
+                                     &restoredStride, &restoredOffset);
+    d3d.context->IAGetIndexBuffer(&restoredIndexBuffer,
+                                   &restoredIndexFormat, &restoredIndexOffset);
+    d3d.context->IAGetPrimitiveTopology(&restoredTopology);
     const bool restoredGameState =
+        restoredVertexBuffer == originalGameBuffer &&
+        restoredIndexBuffer == originalGameBuffer &&
+        restoredStride == originalStride && restoredOffset == originalOffset &&
+        restoredIndexFormat == DXGI_FORMAT_R16_UINT &&
+        restoredIndexOffset == 2u &&
+        restoredTopology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
         restoredRaster == preservedRaster &&
         restoredBlend == nullptr && restoredDepthState == nullptr &&
         restoredMask == preservedMask &&
@@ -886,6 +951,8 @@ int main()
         restoredScissor.top == preservedScissor.top &&
         restoredScissor.right == preservedScissor.right &&
         restoredScissor.bottom == preservedScissor.bottom;
+    if (restoredVertexBuffer) restoredVertexBuffer->Release();
+    if (restoredIndexBuffer) restoredIndexBuffer->Release();
     if (restoredGameTarget) restoredGameTarget->Release();
     if (restoredGameDepth) restoredGameDepth->Release();
     if (restoredRaster) restoredRaster->Release();
@@ -895,6 +962,13 @@ int main()
             "00821 stereo game draw restores caller color, depth and raster");
     d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
     d3d.context->RSSetState(nullptr);
+    ID3D11Buffer* nullVertexBuffer = nullptr;
+    constexpr UINT resetStride = 0u, resetOffset = 0u;
+    d3d.context->IASetVertexBuffers(
+        0u, 1u, &nullVertexBuffer, &resetStride, &resetOffset);
+    d3d.context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
+    originalGameBuffer->Release();
+    alternateEyeBuffer->Release();
     preservedRaster->Release();
     for (auto*& depth : gameEyeFixture.eyeDepth) {
         if (depth) { depth->Release(); depth = nullptr; }
