@@ -1,4 +1,5 @@
 #include "vr/game/goal_result_parent_provenance.hpp"
+#include "vr/game/sprite_queue_tail_proof.hpp"
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -6,9 +7,49 @@
 // Execute the EXACT production C++ whitelist (not a Python/regex surrogate).
 // A successful native run proves only source-identity arithmetic; physical
 // Quest3/VDXR binocular placement and game-stack unwind remain UNTESTED.
+
+// GOAL text can emit multiple children per parent and may rebuild its list
+// inside put_sprite_ex. This exercises the production queue proof rather
+// than reimplementing the pointer algorithm in a standalone test.
+static bool VerifyOriginalGoalGlyphQueue() noexcept
+{
+    struct Node { Node* next_0 = nullptr; };
+    using OutRunVR::SpriteQueue::FirstVerifiedAppendedNode;
+    Node root{}, old{}, leftGlyph{}, rightGlyph{}, stale{}, foreign{};
+    root.next_0 = &old;
+    old.next_0 = &leftGlyph;
+    leftGlyph.next_0 = &rightGlyph;
+    if (FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 4) !=
+            &leftGlyph ||
+        FirstVerifiedAppendedNode(&root, nullptr, &rightGlyph, 4) !=
+            &old ||
+        FirstVerifiedAppendedNode(&root, &old, &old, 4) ||
+        FirstVerifiedAppendedNode(&root, &old, &foreign, 4) ||
+        FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 2))
+        return false;
+    // If a new GOAL glyph source clears the queue and reuses the root,
+    // the stale old pointer is not dereferenced or used to tag new nodes.
+    root.next_0 = &leftGlyph;
+    if (FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 3) ||
+        FirstVerifiedAppendedNode(&root, &stale, &rightGlyph, 3) ||
+        FirstVerifiedAppendedNode(&root, &leftGlyph, &rightGlyph, 3) !=
+            &rightGlyph ||
+        FirstVerifiedAppendedNode(&root, nullptr, &rightGlyph, 3) !=
+            &leftGlyph)
+        return false;
+    // Neither a missing tail nor a self-referential queue can authorize
+    // tagging unknown sprites. No former node is accessed after a rebuild.
+    if (FirstVerifiedAppendedNode(&root, nullptr, nullptr, 3))
+        return false;
+    leftGlyph.next_0 = &leftGlyph;
+    return FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 3) == nullptr;
+}
+
 int main()
 {
     using namespace OutRunVR::GoalResult;
+    if (!VerifyOriginalGoalGlyphQueue())
+        return 7;
     if (OriginalB9200CallReturns.size() != 19u ||
         !CheckParentReturnProvenance())
         return 1;

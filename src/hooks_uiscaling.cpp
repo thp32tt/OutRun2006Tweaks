@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/hud_command_batch.hpp"
 #include "vr/game/goal_result_parent_provenance.hpp"
+#include "vr/game/sprite_queue_tail_proof.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
@@ -108,18 +109,10 @@ namespace
     constexpr Node* StageFirstAppendedNode(
         Node* root, Node* oldTail, Node* newTail, unsigned bound) noexcept
     {
-        if (!root || !newTail || newTail == oldTail || bound == 0)
-            return nullptr;
-        Node* first = oldTail ? nullptr : root->next_0;
-        for (Node* node = root->next_0;
-             node && bound != 0; node = node->next_0, --bound)
-        {
-            if (node == oldTail)
-                first = node->next_0;
-            if (node == newTail)
-                return first;
-        }
-        return nullptr;
+        // All exact GOAL/rank/+TIME owners share the SAME production queue
+        // reachability proof, including the stack-proven B9200 glyph family.
+        return OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+            root, oldTail, newTail, bound);
     }
 
     struct StageTailFixture { StageTailFixture* next_0 = nullptr; };
@@ -909,6 +902,9 @@ class UIScaling : public Hook
             if (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
                 producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf ||
                 producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
+                // Original B9200 GOAL text can rebuild a priority list:
+                // oldTail->next_0 is not safe unless oldTail is still linked.
+                producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
