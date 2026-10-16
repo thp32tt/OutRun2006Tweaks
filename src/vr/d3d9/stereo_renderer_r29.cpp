@@ -557,8 +557,23 @@ namespace OutRunVRStereo
                 }
             }
 
-#if defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
-            // C1/C2 world-correctness path.
+            // Restore R26/R28's user-verified shader-switch world continuation
+            // in the independently compiled R84 MAIN, not just C1/C2.
+            // Never allow a queued HUD or screen overlay to inherit the last
+            // verified road/car WVP, even when live shader constants match.
+            // R28CanRebindVerifiedWorld independently requires game target,
+            // source perspective, live stock c64, projection, latched pose and
+            // current shader-generation mismatch before this synthetic rebind.
+            const auto worldRebindScope =
+                OutRunVR::GameSemantic::EffectiveScope();
+            const bool allowVerifiedWorldRebind =
+                worldRebindScope !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud &&
+                worldRebindScope !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
+                worldRebindScope !=
+                    OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D;
+            // C1/C2 world-correctness path, now also used by R84.
             //
             // R28's proven path did more than classify the current target as
             // perspective world: when the game changed vertex shader AFTER the
@@ -575,7 +590,8 @@ namespace OutRunVRStereo
             // perspective fast path.
             std::uintptr_t verifiedShaderIdentity = 0;
             std::uint64_t verifiedShaderSerial = 0;
-            if (R28CanRebindVerifiedWorld(
+            if (allowVerifiedWorldRebind &&
+                R28CanRebindVerifiedWorld(
                     device, verifiedShaderIdentity, verifiedShaderSerial))
             {
                 // Do not reuse R28RunWithVerifiedWorldEpoch's E_NOTIMPL
@@ -618,7 +634,6 @@ namespace OutRunVRStereo
                     std::forward<StereoR7Draw>(stereoR7Draw),
                     false, site);
             }
-#endif
 
             bool fragile = true;
             if (!R29FragileEffectCached(device, fragile))
