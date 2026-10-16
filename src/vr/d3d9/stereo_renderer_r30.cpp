@@ -6185,21 +6185,23 @@ namespace OutRunVRStereo
                 // away from the world. Match the R84 exact HUD/CPU-projected
                 // world route: eye-relative IPD only, asymmetric FOV per eye.
                 float relativeEye[2][3]{};
-                if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
-                        stereo.eyeOffset, relativeEye))
+                float relativeOrientation[2][4]{};
+                if (!OutRunVR::LensCentre::BuildHeadRelativeEyePose(
+                        stereo.eyeOffset, stereo.eyeOrientation,
+                        relativeEye, relativeOrientation))
                     return false;
                 const float lensWorldScale =
                     Settings::VRWorldScale * Settings::VRStereoDepth;
                 if (!std::isfinite(lensWorldScale))
                     return false;
-                const float identityOrientation[4]{
-                    0.0f, 0.0f, 0.0f, 1.0f
-                };
+                // OpenXR eyeOrientation is head-local. The common head pose
+                // is already removed by headInverse, so preserve individual
+                // eye cant without re-applying absolute HMD orientation.
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyePose =
                         R29OwnerMatrixFromQuaternionTranslation(
-                            identityOrientation, relativeEye[eye],
+                            relativeOrientation[eye], relativeEye[eye],
                             lensWorldScale);
                     const D3DMATRIX eyeInverse =
                         R29OwnerInverseRigid(eyePose);

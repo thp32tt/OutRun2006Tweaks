@@ -171,6 +171,15 @@ add_custom_command(TARGET outrun-vr-stage-edge-cull-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-stage-edge-cull-smoke>"
     COMMENT "Run native stage edge-cull viewport and fallback regression"
     VERBATIM)
+# The mandatory x64 host CI compiles and executes real C993 game-eye math.
+add_executable(outrun-vr-lens-eye-pose-smoke tests/lens_centre_eye_pose_smoke.cpp)
+target_include_directories(outrun-vr-lens-eye-pose-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-lens-eye-pose-smoke)
+add_custom_command(TARGET outrun-vr-lens-eye-pose-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-lens-eye-pose-smoke>"
+    COMMENT "Run native C993 canted-eye and fail-closed regression"
+    VERBATIM)
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)

@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00936",
+  "production_id": "CONVERSION-DX9EX-00936",
+  "event_id": "CONVERSION-DX9EX-00936-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00936",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_OPTICAL_DEFECT",
+  "status": "PENDING_EXACT_SHA",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "11c08c8a01eba0fbb70e2ba28d75b12bea15167a",
+  "source_paths": [
+    "src/vr/d3d9/lens_centre_relative_eye_pose.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_relative_eye_pose.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/lens_centre_eye_pose_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00936.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "goal": "R84 exact original C993 central sun preserves head-local per-eye OpenXR cant and IPD during world projection, with untouched fallback on invalid pose.",
+    "scope_boundary": "C993 original centre world WVP only, not CABE discs, unrelated world geometry, menu, HUD, SkyGlow, FFB, R26_SAFE or DXVK.",
+    "trace_stages": [
+      "Original EXE C993 producer tags exact 0x570002 centre raw game c64",
+      "R30 decomposes original worldView, applies common headInverse exactly once",
+      "R30 applies eye-specific normalized head-local rotation, relative IPD and FOV to both eyes",
+      "R33 physically submits both eyes and restores original constants, otherwise returns original draw"
+    ],
+    "acceptance_items": [
+      {
+        "id": "c993_eye_cant",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 exact C993 original centre",
+        "expected_behavior": "Two independently canted head-local quaternion eye poses survive actual GPU-eye matrix construction with relative IPD and per-eye FOV."
+      },
+      {
+        "id": "c993_invalid_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid OpenXR orientation/IPD, parallel eyes, resets",
+        "expected_behavior": "Compiled native positive/negative test rejects malformed quaternion/offset without publishing partial eye matrices; existing mono source fallback remains."
+      },
+      {
+        "id": "c993_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Default R84 x86, R26_SAFE fallback, x64 OpenXR host and package",
+        "expected_behavior": "Existing exact-SHA Active, Domain and affected lens/full source tests all pass; no CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "c993_eye_cant": "NATIVE_SMOKE_PASS_HMD_UNTESTED",
+    "c993_invalid_fallback": "NATIVE_SMOKE_PASS",
+    "c993_exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "C993 R84 exact-eye code used identity orientation despite existing head-local stereo.eyeOrientation; preserves translation but removes per-eye cant.",
+    "source_evidence": "LatchedStereo eyeOrientation is sourced from OpenXR eye-local quaternion, whereas effectiveEyeOrientation combines head and eye for other world uses. Do not apply absolute effectiveEyeOrientation here after head inverse.",
+    "native_smoke": "Portable C++17 canted/parallel and invalid-pose source smoke PASS exit 0 locally; CI/HMD not yet run."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check exact-SHA DX9Ex Active and Domain and affected lens source gates; C6 result only after confirmed success. Quest3 real headset remains UNTESTED."
+}
