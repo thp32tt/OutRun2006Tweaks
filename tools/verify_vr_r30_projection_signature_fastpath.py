@@ -8,6 +8,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 HEADER = (ROOT / "src/vr/ipc/protocol.hpp").read_text(encoding="utf-8")
 RENDERER = (ROOT / "src/vr/game/outrun_renderer.cpp").read_text(encoding="utf-8")
 R30 = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
+SEMANTICS = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
 
 
 def require(condition, message):
@@ -15,7 +16,7 @@ def require(condition, message):
         raise AssertionError(message)
 
 
-def source_contract(renderer=RENDERER, r30=R30):
+def source_contract(renderer=RENDERER, r30=R30, semantic=SEMANTICS):
     signature = renderer.split(
         "bool GetRendererProjectionSignature(float& m34, float& m44) noexcept", 1
     )
@@ -44,6 +45,22 @@ def source_contract(renderer=RENDERER, r30=R30):
                   "D3DRS_ALPHATESTENABLE"):
         require(guard in cls, "HUD / fragile effect fallback lost: " + guard)
 
+    # A single immutable physical-draw source now replaces repeated
+    # queue/scope/producer TLS checks; require the exact underlying
+    # LensFlareCentre semantics, not just the wrapper method's name.
+    begin = semantic.find("struct PhysicalDrawCommand final")
+    end = semantic.find("inline PhysicalDrawCommand CapturePhysicalDrawCommand()", begin)
+    require(begin >= 0 and end > begin, "missing original physical draw identity")
+    physical = semantic[begin:end]
+    proof = physical.split("IsDirectWorldLensCentre() const noexcept", 1)
+    require(len(proof) == 2, "missing canonical C993 physical identity")
+    lens_body = proof[1].split("IsDirectCarBaseShadow()", 1)[0]
+    for guard in ("!queued", "scope == RenderScope::WorldBillboard",
+                  "producer == ProducerToken::LensFlareCentre"):
+        require(guard in lens_body, "physical C993 lens must retain " + guard)
+    require("CapturePhysicalDrawCommand()" in cls and
+            "drawCommand.IsDirectWorldLensCentre()" in cls,
+            "R30 must consume the canonical per-primitive C993 snapshot")
     # HMD failure 2026-10-15: the old state-only route promoted unrelated
     # depth-disabled road/sky/particle geometry into an XR HUD plane.
     # R26+HUD's positive game semantics must veto unowned draws BEFORE
@@ -53,7 +70,7 @@ def source_contract(renderer=RENDERER, r30=R30):
         "const bool ownedHud =", "CorroboratesHud(scope)",
         "const bool ownedOverlay =", "CorroboratesScreenOverlay2D(scope)",
         "const bool ownedEffect =", "CorroboratesProjectedScreenEffect(scope)",
-        "const bool ownedLensCentre =", "ProducerToken::LensFlareCentre",
+        "const bool ownedLensCentre =", "drawCommand.IsDirectWorldLensCentre()",
         "if (!ownedHud && !ownedOverlay && !ownedEffect &&",
         "!ownedLensCentre)", "return R30ScreenSpaceKind::None;",
         "marker && marker->valid",
@@ -313,6 +330,27 @@ def negative_mutations():
         pass
     else:
         raise AssertionError("swapped projection classification survived")
+    # Test the separate canonical declaration, not only its call site.
+    physical_start = SEMANTICS.index("struct PhysicalDrawCommand final")
+    physical_end = SEMANTICS.index(
+        "inline PhysicalDrawCommand CapturePhysicalDrawCommand()", physical_start)
+    fragment = SEMANTICS[physical_start:physical_end]
+    for before, after in (
+        ("producer == ProducerToken::LensFlareCentre",
+         "producer == ProducerToken::None"),
+        ("scope == RenderScope::WorldBillboard",
+         "scope == RenderScope::ScreenHud"),
+        ("return !queued && scope",
+         "return queued && scope"),
+    ):
+        require(before in fragment, "missing canonical C993 mutation fixture")
+        mutated = SEMANTICS[:physical_start] + fragment.replace(before, after, 1) + SEMANTICS[physical_end:]
+        try:
+            source_contract(semantic=mutated)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("unproven C993 physical owner mutation survived")
     for label, mutation in (
         ("delete positive HUD owner",
          mutate_classifier("CorroboratesHud(scope)", "false")),
@@ -320,6 +358,9 @@ def negative_mutations():
          mutate_classifier("CorroboratesScreenOverlay2D(scope)", "false")),
         ("remove source-proven centre admission",
          mutate_classifier("if (ownedLensCentre)", "if (false)")),
+        ("claim lens for all physical draws",
+         mutate_classifier("drawCommand.IsDirectWorldLensCentre()",
+                           "true")),
         ("allow unowned centre WVP",
          mutate_classifier("SelectWorldRoute(true, owned)",
                            "SelectWorldRoute(true, true)")),
