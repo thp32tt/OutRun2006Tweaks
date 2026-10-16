@@ -184,7 +184,7 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
 // when source format, dimensions, ownership or resolve support is invalid.
 bool NativeGameEyeDrawEncoder::copy_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
-    UINT destX, UINT destY) noexcept
+    UINT destX, UINT destY, UINT sourceArraySlice) noexcept
 {
     if (!source || !eye_targets_bound() || !targetWidth_ || !targetHeight_)
         return false;
@@ -218,7 +218,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         sourceDesc.Format != eyeDesc.Format ||
         sourceDesc.MipLevels == 0u ||
         (needsResolve && sourceDesc.MipLevels != 1u) ||
-        sourceDesc.ArraySize != 1u ||
+        sourceArraySlice >= sourceDesc.ArraySize ||
         eyeDesc.MipLevels != 1u || eyeDesc.ArraySize != 1u ||
         sourceDesc.SampleDesc.Count == 0u ||
         eyeDesc.SampleDesc.Count != 1u ||
@@ -250,7 +250,10 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         box.bottom - box.top > eyeDesc.Height - destY)
         return false;
 
-    // Both single-sample and multisample paths operate on mip 0 only.
+    // Only mip zero of the caller-proven camera eye slice enters the native
+    // shared RTV. Whole-array CopyResource would mismatch a single-eye target.
+    const UINT sourceSubresource =
+        D3D11CalcSubresource(0u, sourceArraySlice, sourceDesc.MipLevels);
     // Never use CopyResource for a full mip chain into a one-mip XR eye.
     // A full-source MSAA resolve can write directly into the full-size eye.
     // Cropped menu/vehicle postpasses must not overwrite unaffected pixels:
@@ -267,6 +270,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         D3D11_TEXTURE2D_DESC resolvedDesc = sourceDesc;
         resolvedDesc.SampleDesc.Count = 1u;
         resolvedDesc.SampleDesc.Quality = 0u;
+        resolvedDesc.ArraySize = 1u; // only the selected eye's resolved color
         resolvedDesc.BindFlags = 0u; // GPU copy-only, no RTV/SRV/UAV alias
         resolvedDesc.MiscFlags = 0u;
         if (FAILED(owner->CreateTexture2D(
@@ -305,7 +309,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         if (needsResolve) {
             context_->ResolveSubresource(
                 fullResolve ? eyeColor.Get() : resolved.Get(),
-                0u, source, 0u, sourceDesc.Format);
+                0u, source, sourceSubresource, sourceDesc.Format);
             if (!fullResolve) {
                 context_->CopySubresourceRegion(
                     eyeColor.Get(), 0u, destX, destY, 0u,
@@ -313,7 +317,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
             }
         } else {
             context_->CopySubresourceRegion(
-                eyeColor.Get(), 0u, destX, destY, 0u, source, 0u, &box);
+                eyeColor.Get(), 0u, destX, destY, 0u,
+                source, sourceSubresource, &box);
         }
     }
     return eye_targets_bound();

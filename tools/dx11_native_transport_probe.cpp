@@ -942,6 +942,23 @@ int main()
         32u * sizeof(UINT), 0u);
     d3d.context->CopySubresourceRegion(
         mipGameIntermediate, 0u, 0u, 0u, 0u, gameSurface, 0u, nullptr);
+    // Native left and right game postpasses can occupy independent slices
+    // in one GPU array allocation. Each side must keep its own source data.
+    D3D11_TEXTURE2D_DESC eyeArrayDesc = shaderIntermediateDesc;
+    eyeArrayDesc.ArraySize = 2u;
+    eyeArrayDesc.MipLevels = 2u;
+    ID3D11Texture2D* gameEyeArray = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &eyeArrayDesc, nullptr, &gameEyeArray)) && gameEyeArray,
+            "00841 native left/right GPU game array allocated");
+    std::vector<UINT> leftEyePixels(64u * 64u, 0xffcc0011u);
+    std::vector<UINT> rightEyePixels(64u * 64u, 0xff22bb33u);
+    d3d.context->UpdateSubresource(
+        gameEyeArray, D3D11CalcSubresource(0u, 0u, 2u), nullptr,
+        leftEyePixels.data(), 64u * sizeof(UINT), 0u);
+    d3d.context->UpdateSubresource(
+        gameEyeArray, D3D11CalcSubresource(0u, 1u, 2u), nullptr,
+        rightEyePixels.data(), 64u * sizeof(UINT), 0u);
     // A game scene may render to MSAA before a full-frame or cropped menu
     // postpass. The native eye path must GPU-resolve the *actual* RT instead
     // of dropping the pixels or staging the entire eye through system memory.
@@ -997,12 +1014,14 @@ int main()
         ID3D11Texture2D* gameSurface{};
         ID3D11Texture2D* gameShaderIntermediate{};
         ID3D11Texture2D* gameMipIntermediate{};
+        ID3D11Texture2D* gameEyeArray{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
         bool replayedPostDrawMipZeroCopy[2]{};
+        bool replayedDistinctArrayEyeCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
         bool replayedScaledPostpass[2]{};
         bool preservedPostDrawMrt[2]{};
@@ -1034,6 +1053,7 @@ int main()
     gameEyeFixture.gameSurface = gameSurface;
     gameEyeFixture.gameShaderIntermediate = gameShaderIntermediate;
     gameEyeFixture.gameMipIntermediate = mipGameIntermediate;
+    gameEyeFixture.gameEyeArray = gameEyeArray;
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
 
@@ -1318,6 +1338,15 @@ int main()
                 fixture.gameMipIntermediate, &sourcePatch, destX, 32u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Choose exactly one game-authored eye array slice. A foreign slice
+        // is rejected before GPU mutation and never counts as a stereo draw.
+        fixture.replayedDistinctArrayEyeCopy[eyeIndex] =
+            !encoder.copy_game_surface(
+                fixture.gameEyeArray, &sourcePatch, destX, 16u, 2u) &&
+            encoder.copy_game_surface(
+                fixture.gameEyeArray, &sourcePatch, destX, 16u, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         // A real game MSAA RT must resolve on the GPU before copying just
         // the selected menu/vehicle patch, preserving the rest of both eyes.
         fixture.replayedPostDrawMsaaResolve[eyeIndex] =
@@ -1361,6 +1390,7 @@ int main()
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
             !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
+            !fixture.replayedDistinctArrayEyeCopy[eyeIndex] ||
             !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
             !fixture.replayedScaledPostpass[eyeIndex] ||
             !encoder.color_draw_count()) return false;
@@ -1412,6 +1442,8 @@ int main()
             gameEyeFixture.replayedPostDrawShaderCopy[1] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[0] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[1] &&
+            gameEyeFixture.replayedDistinctArrayEyeCopy[0] &&
+            gameEyeFixture.replayedDistinctArrayEyeCopy[1] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[0] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
@@ -1534,6 +1566,7 @@ int main()
     gameSurfaceView->Release();
     gameShaderIntermediate->Release();
     mipGameIntermediate->Release();
+    gameEyeArray->Release();
     gameMultisampleView->Release();
     gameMultisample->Release();
     gameSurface->Release();
@@ -1564,6 +1597,13 @@ int main()
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
+        const UINT arrayX = eyeIndex == 0u ? 18u : 50u;
+        const auto* arrayPixel = pixel + 18u * mapped.RowPitch + arrayX * 4u;
+        const bool actualDistinctArrayEye = eyeIndex == 0u
+            ? arrayPixel[0] == 0x11u && arrayPixel[1] == 0x00u &&
+              arrayPixel[2] == 0xccu
+            : arrayPixel[0] == 0x33u && arrayPixel[1] == 0xbbu &&
+              arrayPixel[2] == 0x22u;
         const UINT mipX = eyeIndex == 0u ? 18u : 50u;
         const auto* mipPixel = pixel + 34u * mapped.RowPitch + mipX * 4u;
         const bool actualMipZeroCopy =
@@ -1578,7 +1618,7 @@ int main()
         const bool orderedAfterDrawClear = eyeIndex == 0u
             ? later[0] == 255u && later[1] == 0u && later[2] == 0u
             : later[0] == 0u && later[1] == 255u && later[2] == 0u;
-        if (!distinctColor || !actualMipZeroCopy ||
+        if (!distinctColor || !actualMipZeroCopy || !actualDistinctArrayEye ||
             !actualPartialClear || !orderedAfterDrawClear) {
             std::cerr << "00829 eye=" << eyeIndex
                       << " full RGBA=" << unsigned(pixel[0]) << ","

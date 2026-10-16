@@ -44,10 +44,13 @@ public:
     // resolves stay entirely on GPU, and bounded source patches use a private
     // resolve texture without overwriting untouched eye pixels. Scaling and
     // filtering remain unsupported, with original D3D9 StretchRect fallback;
+    // A caller-proven array slice can select the independently rendered L/R
+    // GPU surface without duplicating one eye's contents in the other.
     // no foreign desktop RTV and no manufactured Draw evidence.
     [[nodiscard]] bool copy_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
-        UINT destX, UINT destY) noexcept;
+        UINT destX, UINT destY,
+        UINT sourceArraySlice = 0u) noexcept;
     // Per-eye native GPU replay for actual game StretchRect source crops
     // and changed-size destination rectangles (point or linear filter).
     // This never counts as a game-authored geometry draw.
