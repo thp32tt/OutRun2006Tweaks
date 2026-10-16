@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.16)
+project(quest_pcvr_core LANGUAGES CXX)
+
+add_library(quest_pcvr_core STATIC src/vr_core.cpp)
+target_include_directories(quest_pcvr_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_features(quest_pcvr_core PUBLIC cxx_std_17)
+if(MSVC)
+  target_compile_options(quest_pcvr_core PRIVATE /W4)
+else()
+  target_compile_options(quest_pcvr_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+  add_executable(quest_pcvr_core_tests tests/vr_core_tests.cpp)
+  target_link_libraries(quest_pcvr_core_tests PRIVATE quest_pcvr_core)
+  add_test(NAME quest_pcvr_core_tests COMMAND quest_pcvr_core_tests)
+endif()
