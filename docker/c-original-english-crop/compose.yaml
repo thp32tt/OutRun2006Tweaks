@@ -4,6 +4,7 @@ services:
   c-english-original-crop:
     image: outrun-kor-c-salvage:20261015
     container_name: outrun-c-original-english-crop
+    user: "1002:1002"  # N100 source/output owner; no root in container
     # Reuse N100's cached Pillow image; override all salvage entrypoints.
     entrypoint: ["python3", "/app/loop.py"]
     command: ["--interval-seconds", "60", "--max-per-cycle", "10"]
