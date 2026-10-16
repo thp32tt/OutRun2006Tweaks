@@ -21,7 +21,10 @@ def require_safe(source: str) -> None:
         "std::isfinite(centeredX) && std::isfinite(centeredY)",
         "std::isfinite(Game::screen_resolution->y)",
         "std::isfinite(Game::original_resolution.y)",
-        "Game::original_resolution.y * scale) / 2",
+        "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(",
+        "const float xScale = affine.ScaleX(pScaling->x);",
+        "const float centeredY = affine.MapY(pTranslation->y);",
+        "if (affine.valid && std::isfinite(xScale)",
     )
     for needle in required:
         if needle not in s:
@@ -30,7 +33,7 @@ def require_safe(source: str) -> None:
         "pScaling && pTranslation &&",
         "Game::screen_scale && Game::screen_resolution",
         "sx > 1.0e-6f && sy > 1.0e-6f",
-        "pScaling->x / sx",
+        "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(",
         "std::isfinite(centeredX) && std::isfinite(centeredY)",
         "localScaling.x = xScale;",
         "forwardedScaling = &localScaling;",
@@ -63,6 +66,45 @@ def require_safe(source: str) -> None:
 
 
 require_safe(text)
+
+# Source owner introduced by 00961: preserve the physical viewport bound,
+# finite offsets, and separate X/Y ratios for full/nullable/pivoted D3DX paths.
+# Old exact expression assertions on the pre-affine hook are no longer valid.
+frontend_affine = (Path(__file__).resolve().parents[1] /
+                   "src/vr/ui/frontend_affine_contain.hpp").read_text(encoding="utf-8")
+
+def require_frontend_affine(header: str) -> None:
+    for required in (
+        "BoundedMultiSpriteContainScale(",
+        "sx,sy,width,height,srcWidth,srcHeight);",
+        "if(!(contain>0.f))return {};",
+        "const float rx=contain/sx,ry=contain/sy;",
+        "const double ox=(double(width)-double(srcWidth)*contain)*0.5;",
+        "const double oy=(double(height)-double(srcHeight)*contain)*0.5;",
+        "if(!std::isfinite(rx)||!std::isfinite(ry)||",
+        "if(!std::isfinite(x)||!std::isfinite(y))return {};",
+        "return {rx,ry,x,y,true};",
+    ):
+        if required not in header:
+            raise AssertionError("Unbounded or invalid D3DX frontend affine: " + required)
+
+require_frontend_affine(frontend_affine)
+for good, bad in (
+    ("const float rx=contain/sx,ry=contain/sy;",
+     "const float rx=contain/sx,ry=contain/sx;"),
+    ("const double oy=(double(height)-double(srcHeight)*contain)*0.5;",
+     "const double oy=(double(height)-double(srcWidth)*contain)*0.5;"),
+    ("if(!(contain>0.f))return {};", "if(false)return {};"),
+    ("return {rx,ry,x,y,true};", "return {rx,ry,x,y,false};"),
+):
+    assert good in frontend_affine
+    try:
+        require_frontend_affine(frontend_affine.replace(good, bad, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("Frontend affine mutation escaped: " + bad)
+print("DX9Ex frontend full/nullable/pivot physical affine PASS (4 negative controls)")
 
 # The native sprite producer may reuse the SAME vector for several draws.
 # Corrected matrix inputs must be derived from an immutable original on
@@ -208,8 +250,8 @@ menu_quad = (Path(__file__).resolve().parents[1] /
              "src/vr/ui/menu_quad_transform.hpp").read_text()
 require_physical_containment(menu_quad)
 for old, bad in (
-    ("Game::original_resolution.y * scale) / 2",
-     "Game::original_resolution.y * scale) * 0"),
+    ("const float centeredY = affine.MapY(pTranslation->y);",
+     "const float centeredY = affine.MapY(pTranslation->x);"),
     ("quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);",
      "quad[8] = bottomLeft.y + 0.5f;"),
     ("quad[0xF] = OutRunVrMenuQuad::ProjectY(quadMap, topRight.y);",
@@ -463,8 +505,10 @@ def require_partial_menu_vectors(code: str) -> None:
         "Game::screen_scale && Game::screen_resolution",
         "pScaling ? pScaling->x : 1.0f",
         "pTranslation ? pTranslation->x : 0.0f",
-        "nextTx = CenterMultiSpriteAxis(",
-        "nextTy = CenterMultiSpriteAxis(",
+        "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(",
+        "const float nextTx = affine.MapX(inputTx);",
+        "const float nextTy = affine.MapY(inputTy);",
+        "if (affine.valid && std::isfinite(nextSx)",
         "forwardedScaling = (&localScaling);",
         "forwardedTranslation = (&localTranslation);",
     ):
@@ -472,7 +516,7 @@ def require_partial_menu_vectors(code: str) -> None:
     assert "GameState::STATE_GOAL" not in body, "GOAL must not become a menu owner"
     assert "GameState::STATE_RACE" not in body, "Gameplay must not become a menu owner"
     assert body.index("sourceSx > 1.0e-6f") < body.index(
-        "inputSx / sourceSx") < body.index("forwardedScaling = (&localScaling);")
+        "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(") < body.index("forwardedScaling = (&localScaling);")
 
 require_partial_menu_vectors(text)
 for old, bad in (
@@ -481,7 +525,8 @@ for old, bad in (
      "(pScaling == nullptr && pTranslation == nullptr)"),
     ("pScaling ? pScaling->x : 1.0f", "pScaling->x"),
     ("pTranslation ? pTranslation->x : 0.0f", "pTranslation->x"),
-    ("nextTx = CenterMultiSpriteAxis(", "nextTx = inputTx + ("),
+    ("const float nextTx = affine.MapX(inputTx);",
+     "const float nextTx = inputTx;"),
 ):
     # Mutate the exact producer under test. Global replace used to hit
     # frontEndPivot first after 00883 introduced its own state list, making
@@ -517,8 +562,10 @@ def require_pivot_containment(source: str) -> None:
         assert "GameState::" + excluded not in guard, "pivot owner leaked: " + excluded
     for required in (
         "if (frontEndPivot && result && pOut &&",
-        "const float ratioX = contain / sx;",
-        "const float ratioY = contain / sy;",
+        "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(",
+        "const float ratioX = affine.ratioX;",
+        "const float ratioY = affine.ratioY;",
+        "if (affine.valid && std::isfinite(mapped.m11)",
         "const UiMatrix2DRows raw{pOut->_11, pOut->_12,",
         "const auto mapped = ContainUiMatrixRows(",
         "std::isfinite(mapped.m11) && std::isfinite(mapped.m12)",
@@ -538,7 +585,7 @@ def require_pivot_containment(source: str) -> None:
 require_pivot_containment(text)
 for old, bad in (
     ("GameState::STATE_SELECTOR", "GameState::STATE_GOAL"),
-    ("const float ratioY = contain / sy;", "const float ratioY = contain / sx;"),
+    ("const float ratioY = affine.ratioY;", "const float ratioY = affine.ratioX;"),
     ("pOut->_12 = mapped.m12;", "pOut->_12 = mapped.m11;"),
     ("std::isfinite(mapped.tx) && std::isfinite(mapped.ty)",
      "std::isfinite(mapped.tx) || std::isfinite(mapped.ty)"),
