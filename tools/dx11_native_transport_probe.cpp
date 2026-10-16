@@ -1554,7 +1554,10 @@ int main()
     auto invalidDepthClear = partialGameClear;
     invalidDepthClear.entries[1][0].depth = -0.1f;
     auto invalidPartialDepth = partialGameClear;
-    invalidPartialDepth.entries[1][0].rect = {1, 1, 4, 4};
+    // A bounded partial DSV Clear is now supported. Reject a genuinely
+    // invalid negative RECT before any L/R GPU command, not the once-valid
+    // {1,1,4,4} gameplay region used by the old full-only regression.
+    invalidPartialDepth.entries[1][0].rect = {-1, 1, 4, 4};
     auto invalidDepthFlags = partialGameClear;
     invalidDepthFlags.entries[1][0].clearDepth = false;
     invalidDepthFlags.entries[1][0].clearStencil = false;
