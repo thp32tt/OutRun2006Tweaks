@@ -365,10 +365,24 @@ def check(ui, manifest, fraction_header=None):
                     "Game::put_clip_sprite(", "TagAppendedNodes(tailsBefore, scope,")
             if chunk.count("&projectedAnchor") < 2:
                 fail("rank clip direct and sibling anchors must remain identical")
-            if ("OutRunVR::RankMarker::RestoreFraction(" not in chunk or
-                    "*node, frozenFractionX, frozenFractionY);" not in chunk or
+            # The exact original rank producer now uses the same bounded
+            # live-root tail proof as its post-call SpriteNode semantic tags.
+            # Never accept an oldTail->next_0 walk after native producer E8.
+            if ("OutRunVR::RankMarker::RestoreAppendedRankFractions(" not in chunk or
+                    "root, tailsBefore[prio], tailAfter, Game::SpriteNodeMax," not in chunk or
+                    "frozenFractionX, frozenFractionY);" not in chunk or
                     '#include "vr/game/rank_marker_fraction.hpp"' not in ui):
-                fail("4th+ digit siblings lost subpixel restoration")
+                fail("4th+ digit siblings lost proven subpixel restoration")
+            for needle in (
+                "FirstVerifiedAppendedNode(",
+                "root, oldTail, newTail, bound);",
+                "if (!first)",
+                "for (Node* node = first; node && bound != 0; --bound)",
+                "RestoreFraction(*node, dx, dy)",
+                "if (node == newTail)",
+            ):
+                if needle not in fraction_header:
+                    fail("rank fractional queue proof lost: " + needle)
             for needle in (
                 "if (node.kind_C == 0u)",
                 "x = &node.args_10.float24;",
@@ -461,8 +475,16 @@ def test_mutations(ui, manifest):
               ui.replace("const bool projected = !screenHud && projectedAnchor.valid;",
                          "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;", 1))
     must_fail("rank correction call disconnected",
-              ui.replace("OutRunVR::RankMarker::RestoreFraction(",
+              ui.replace("OutRunVR::RankMarker::RestoreAppendedRankFractions(",
                          "OutRunVR::RankMarker::NoRestore(", 1))
+    must_fail("rank queue tail proof bypassed",
+              changed_fraction=fraction.replace(
+                  "FirstVerifiedAppendedNode(",
+                  "UnverifiedAppendedNode(", 1))
+    must_fail("rank sibling traversal bound lost",
+              changed_fraction=fraction.replace(
+                  "node && bound != 0; --bound",
+                  "node; --bound", 1))
     must_fail("rank kind1 X mapped onto old kind0",
               changed_fraction=fraction.replace(
                   "x = &node.args2_58.mtx_14._41;",
