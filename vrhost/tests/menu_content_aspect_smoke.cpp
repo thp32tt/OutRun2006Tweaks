@@ -495,6 +495,20 @@ int main()
             (optical.centerY + 1.0f) * 0.5f *
             (shared.up - shared.down)) > 1e-5f)
         return 8;
+    // HMD 2026-10-17: nested 16:9 menu on VD High/Low must be
+    // adjustable without silently removing the proven 0.78 default.
+    using OutRunVrMenuAspect::ResolveMenuOpticalCoverage;
+    if (std::fabs(ResolveMenuOpticalCoverage(nullptr) - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("") - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("0.78") - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("0.90") - 0.90f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("1.0") - 1.0f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("bad") - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("0.90bad") - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("0.49") - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("1.01") - 0.78f) > 1e-6f ||
+        std::fabs(ResolveMenuOpticalCoverage("NaN") - 0.78f) > 1e-6f)
+        return 62;
     // HMD 2026-10-13: a full-FOV theater is cropped/overlarge.
     // Shrink both axes uniformly while leaving the same optical centre,
     // authored 4:3 physical ratio and existing clip-safety checks.

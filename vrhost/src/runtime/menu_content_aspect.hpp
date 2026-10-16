@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdlib>
 // Opt-in center-content crop for the captured, already-letterboxed 4:3
 // OutRun menu. The LOCAL-fixed two-eye clip must use the SAME resulting
 // content aspect and UV, not the ultrawide desktop aspect with black rails.
@@ -129,6 +130,25 @@ namespace OutRunVrMenuAspect
         float centerX = 0.0f, centerY = 0.0f;
         float halfWidth = 0.0f, halfHeight = 0.0f;
     };
+
+    // The 0.78 HMD default protects users who found a full-FOV theater
+    // excessive. Some VD Low/High captures have a separately smaller inner
+    // 16:9 panel. Allow a bounded per-session A/B without changing the
+    // eye FOV, native captured aspect, UV, game window or stereo world.
+    // Malformed/nonfinite values fail to the proven default, never stretch.
+    inline float ResolveMenuOpticalCoverage(
+        const char* requested) noexcept
+    {
+        constexpr float defaultCoverage = 0.78f;
+        if (!requested || !*requested)
+            return defaultCoverage;
+        char* end = nullptr;
+        const float parsed = std::strtof(requested, &end);
+        if (end == requested || !end || *end != '\0' ||
+            !std::isfinite(parsed) || parsed < 0.50f || parsed > 1.0f)
+            return defaultCoverage;
+        return parsed;
+    }
 
     inline OpticalClipPlan PlanOpticallyCenteredClip(
         const CommonFovTangents& fov, float sourceAspect,

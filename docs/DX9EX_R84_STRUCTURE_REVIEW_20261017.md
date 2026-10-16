@@ -31,3 +31,9 @@
 ## 검증/출시 정책
 
 새 정확 SHA에서 DX9Ex Active (x86 R84/R26_SAFE + x64 host + ZIP/launcher), Domain Guard, HUD Inspector, Full Source CI를 구분해 확인. 같은 소스 HEAD의 실제 Quest 3 실기는 `RUNTIME_VALIDATION=UNTESTED`로 별도 표기. 코드 CI 성공만으로 HUD 정합성이나 sky 정상화로 판정하지 않음.
+
+## 2026-10-17 메뉴 A/B 광학 크기 설정
+
+`vrhost/src/runtime/menu_content_aspect.hpp`의 `ResolveMenuOpticalCoverage`를 통해 `OUTRUN_VR_MENU_OPTICAL_COVERAGE` 환경변수를 추가. 기본값 **0.78 유지**(이전 full-FOV 과대 표시의 실기 기준). 안전한 비교값 0.90 또는 1.00을 선택할 수 있고, 숫자 아닌 입력·범위 밖·NaN은 0.78로 복귀. 원본 메뉴 비율, crop UV, canted 양안 공통 FOV, 게임 월드/HUD 렌더 타깃에는 손대지 않음.
+
+Windows CMD에서 게임 실행 전 `set "OUTRUN_VR_MENU_OPTICAL_COVERAGE=0.90"` 후 `START_DX9EX_TEST.cmd`를 실행하고, 비교는 `set "OUTRUN_VR_MENU_OPTICAL_COVERAGE=0.78"`로 수행. 16:9 내부 패널이 작게 나오는 증상이 단순 optical coverage인지 판단하는 용도이며, 매트/letterbox 원인 확정은 아직 안 됨.
