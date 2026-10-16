@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00977",
+  "production_id": "CONVERSION-DX9EX-00977",
+  "event_id": "CONVERSION-DX9EX-00977-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00977",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C5_VALIDATION_PENDING",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "aed896bcb7b497ba6e46145bfc50e7a8fe024c4d",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/menu_matrix_provenance.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/menu_matrix_provenance.hpp",
+    "tools/tests/test_dx9ex_frontend_affine_contain.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00977.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Avoid an inset or double-letterboxed original title/menu/selector image when its native D3DX matrix already underwent viewport containment and is subsequently copied into the custom-sprite quad renderer.",
+    "scope_boundary": "Exact game D3DX matrix result and consumer only, R84 mainline; preserve uncached quad, Vanilla, HUD, GOAL, SkyGlow, world, input/FFB, R26_SAFE rollback and frozen DXVK.",
+    "trace_stages": [
+      "Original frontend D3DXMatrixTransformation2D scales or translates authored source with live viewport containment.",
+      "Native custom SPRARGS2 consumes the exact copied D3DX matrix and otherwise would apply a second 4:3 output map.",
+      "Same-thread bounded full-matrix plus mode/scaling/viewport provenance switches only matching physical pixel sprites to an identity quad map; no classification changes in R84 eye or host."
+    ],
+    "subcomponents": [
+      "Record successful transformed full/partial/pivoted native D3DX source matrices at the original hook.",
+      "Recognize only exact copied source matrices in the custom-quad physical vertex producer, suppress duplicate contain and preserve all existing negative fallbacks.",
+      "Extend portable C++ positive and foreign-mode/reset/invalid/eviction regressions; require final exact SHA Windows x86 game+x64 host/package and Domain/affected inspections."
+    ],
+    "acceptance_items": [
+      {
+        "id": "frontend_single_containment",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original D3DX menu matrix to custom quad vertex positions",
+        "expected_behavior": "An exact already-contained native menu/selector matrix is mapped to physical output pixels once, avoiding a second inset 4:3 scaling."
+      },
+      {
+        "id": "frontend_provenance_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original unmapped, other-mode, reset-stale and invalid game matrices",
+        "expected_behavior": "Only full exact source provenance admits suppression; all other quad, gameplay HUD and F11 paths retain original pixel transforms."
+      },
+      {
+        "id": "frontend_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Active Windows game/OpenXR host/package and Domain",
+        "expected_behavior": "All required GitHub Actions gates pass for final non-skipped result SHA; Quest3 optical test is independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "frontend_single_containment": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "frontend_provenance_fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "frontend_exact_sha_gate": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Two real hooks compose frontend containment: D3DXMatrixTransformation2D modifies the original matrix; draw_sprite_custom_matrix_mid maps the matrix-transformed vertices again by BuildPixelMap.",
+    "root_cause": "No positive source-matrix provenance was shared between matrix producer and custom-quad consumer, permitting duplicate containment on a copied transformed menu matrix.",
+    "alternatives_rejected": [
+      "Do not disable all game pixel mapping, change VR optical coverage, crop off car-selection sides or promote gameplay HUD to menu."
+    ]
+  },
+  "ci_evidence": {
+    "status": "NOT_RUN"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run changed-area native regression and final exact-SHA required GitHub gates. Runtime Quest3/VDXR remains UNTESTED."
+}

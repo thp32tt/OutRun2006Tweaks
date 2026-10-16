@@ -9,12 +9,14 @@
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
+#include "vr/ui/menu_matrix_provenance.hpp"
 #include "vr/ui/multi_sprite_contain_scale.hpp"
 #include "vr/ui/frontend_affine_contain.hpp"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstring>
 #include <optional>
 
 namespace Settings
@@ -353,6 +355,7 @@ class UIScaling : public Hook
 		D3DXVECTOR2 localTranslation{};
 		D3DXVECTOR2* forwardedScaling = pScaling;
 		D3DXVECTOR2* forwardedTranslation = pTranslation;
+        bool publishedPrecontainedMenuMatrix = false;
 
 
         // Complete 2D composition is required when the game supplies a
@@ -411,6 +414,7 @@ class UIScaling : public Hook
 					localTranslation.y = centeredY;
 					forwardedScaling = &localScaling;
 					forwardedTranslation = &localTranslation;
+                    publishedPrecontainedMenuMatrix = true;
 				}
 			}
 		}
@@ -470,6 +474,7 @@ class UIScaling : public Hook
                     localTranslation.y = nextTy;
                     forwardedScaling = (&localScaling);
                     forwardedTranslation = (&localTranslation);
+                    publishedPrecontainedMenuMatrix = true;
                 }
             }
         }
@@ -517,8 +522,24 @@ class UIScaling : public Hook
                     pOut->_22 = mapped.m22;
                     pOut->_41 = mapped.tx;
                     pOut->_42 = mapped.ty;
+                    publishedPrecontainedMenuMatrix = true;
                 }
             }
+        }
+        // D3DX may have already contained this ORIGINAL front-end matrix.
+        // Mark only a successful game producer result, never a generic HUD
+        // quad, device-reset fallback or unproven/partial transform.
+        if (result && pOut && publishedPrecontainedMenuMatrix &&
+            partialFrontEndMenu && Game::screen_scale &&
+            Game::screen_resolution)
+        {
+            std::array<float, 16> fingerprint{};
+            static_assert(sizeof(fingerprint) == sizeof(D3DMATRIX));
+            std::memcpy(fingerprint.data(), pOut, sizeof(D3DMATRIX));
+            OutRunVrMenuQuad::ContainedMatrices.Remember(
+                fingerprint, static_cast<int>(mode),
+                Game::screen_scale->x, Game::screen_scale->y,
+                Game::screen_resolution->x, Game::screen_resolution->y);
         }
         return result;
 	}
@@ -592,8 +613,28 @@ class UIScaling : public Hook
              *Game::current_mode == GameState::STATE_SELECTOR ||
              *Game::current_mode == GameState::STATE_SELEXIT ||
              *Game::current_mode == GameState::STATE_SELRESET);
-        const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(
-            contained, vanillaFrontEnd, screenScaleX, screenScaleY,
+        // A copied matrix with exact positive D3DX producer provenance is
+        // ALREADY in physical menu pixels. Applying the quad contain again
+        // creates a smaller inset title/selector image in the VR theatre.
+        // Foreign, stale and untransformed custom quads retain R84 mapping.
+        std::array<float, 16> sourceMatrix{};
+        static_assert(sizeof(sourceMatrix) == sizeof(pM));
+        std::memcpy(sourceMatrix.data(), &pM, sizeof(pM));
+        const bool frontEnd = Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_TITLE ||
+             *Game::current_mode == GameState::STATE_MENU ||
+             *Game::current_mode == GameState::STATE_SELECTOR ||
+             *Game::current_mode == GameState::STATE_SELEXIT ||
+             *Game::current_mode == GameState::STATE_SELRESET);
+        const bool precontained = contained && frontEnd &&
+            OutRunVrMenuQuad::ContainedMatrices.Contains(
+                sourceMatrix, static_cast<int>(mode),
+                screenScaleX, screenScaleY,
+                Game::screen_resolution->x, Game::screen_resolution->y);
+        const auto quadMap = precontained
+            ? OutRunVrMenuQuad::PixelMap{1.f, 1.f, 0.f, 0.f, true}
+            : OutRunVrMenuQuad::BuildPixelMap(
+                contained, vanillaFrontEnd, screenScaleX, screenScaleY,
             Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
             Game::screen_resolution ? Game::screen_resolution->y : 0.0f,
             Game::original_resolution.x, Game::original_resolution.y);

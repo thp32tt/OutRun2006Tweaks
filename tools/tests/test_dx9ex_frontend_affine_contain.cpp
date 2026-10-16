@@ -1,5 +1,6 @@
 // Portable C++17 changed-area regression; not DX9/HMD runtime evidence.
 #include "../../src/vr/ui/frontend_affine_contain.hpp"
+#include "../../src/vr/ui/menu_matrix_provenance.hpp"
 #include <cassert>
 #include <cmath>
 #include <limits>
@@ -30,4 +31,28 @@ int main(){
  assert(!BuildFrontEndAffineContain(3,2.25f,0,720,640,480).valid);
  assert(!BuildFrontEndAffineContain(nan,2,1280,720,640,480).valid);
  assert(!BuildFrontEndAffineContain(3,2.25f,1280,720,0,480).valid);
+ // D3DX-contained native 4:3 menu -> physical 16:9 custom sprite:
+ // an exact matrix copy is already in pixels and must not re-letterbox.
+ OutRunVrMenuQuad::ContainedMatrixLedger ledger;
+ std::array<float,16> contained{}; contained[0]=0.75f;
+ contained[5]=1.f; contained[12]=240.f; contained[15]=1.f;
+ assert(ledger.Remember(contained,1,3.f,2.25f,1920,1080));
+ assert(ledger.Contains(contained,1,3.f,2.25f,1920,1080));
+ assert(Near(contained[12]+640*contained[0],720.f));
+ assert(!Near(240.f+(contained[12]+640*contained[0])*2.25f,720.f));
+ // An unrelated quad, second mode, reset viewport, stale source scale,
+ // non-finite matrix and overwritten bounded-ring entry all fail closed.
+ auto raw=contained; raw[12]=0; raw[0]=1.f;
+ assert(!ledger.Contains(raw,1,3.f,2.25f,1920,1080));
+ assert(!ledger.Contains(contained,2,3.f,2.25f,1920,1080));
+ assert(!ledger.Contains(contained,1,3.f,2.25f,1600,900));
+ assert(!ledger.Contains(contained,1,2.f,1.5f,1920,1080));
+ assert(!ledger.Contains(contained,0,3.f,2.25f,1920,1080));
+ auto corrupt=contained;corrupt[6]=std::numeric_limits<float>::quiet_NaN();
+ assert(!ledger.Remember(corrupt,1,3.f,2.25f,1920,1080));
+ assert(!ledger.Contains(corrupt,1,3.f,2.25f,1920,1080));
+ for(int i=0;i<16;++i){auto other=contained;other[12]=300.f+i;
+     assert(ledger.Remember(other,1,3.f,2.25f,1920,1080));}
+ assert(!ledger.Contains(contained,1,3.f,2.25f,1920,1080));
+
 }
