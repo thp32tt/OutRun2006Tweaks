@@ -27,19 +27,19 @@ static int TestCockpitAtomicInstall() {
     int carLive = 0, occupantLive = 0, occupantCalls = 0;
     {
         MockNativeHook car{}, occupant{};
-        if (InstallAtomicCockpitPair(car, occupant,
+        if (OutRunVR::DriverSeatRenderPass::InstallAtomicCockpitPair(car, occupant,
                 [] { return MockNativeHook{}; },
                 [&] { ++occupantCalls; return MockNativeHook{&occupantLive}; }))
             return 13;
         if (carLive || occupantLive || car || occupant || occupantCalls)
             return 14;
-        if (InstallAtomicCockpitPair(car, occupant,
+        if (OutRunVR::DriverSeatRenderPass::InstallAtomicCockpitPair(car, occupant,
                 [&] { return MockNativeHook{&carLive}; },
                 [&] { ++occupantCalls; return MockNativeHook{}; }))
             return 15;
         if (carLive || occupantLive || car || occupant || occupantCalls != 1)
             return 16;
-        if (!InstallAtomicCockpitPair(car, occupant,
+        if (!OutRunVR::DriverSeatRenderPass::InstallAtomicCockpitPair(car, occupant,
                 [&] { return MockNativeHook{&carLive}; },
                 [&] { ++occupantCalls; return MockNativeHook{&occupantLive}; }))
             return 17;
