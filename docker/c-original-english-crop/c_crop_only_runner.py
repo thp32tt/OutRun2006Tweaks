@@ -21,6 +21,50 @@ STATE = BASE / "last_run.json"
 # The only allowed source is independently checked against its pinned complete original PC HD DDS.
 # Additional sources require manual explicit verification and an updated allowlist.
 VERIFIED = {
+ "Q116": {
+ "png": "q116_DIRECT_ORIGINAL_HD.png",
+ "png_sha256": "502920f902cc821250af69b5194f0190394ffeaa5695e7332a82e8c435f11197",
+ "size": [
+  2048,
+  256
+ ],
+ "dds": "q116_E3FD08BE_original_pinned_106cc0cb.dds",
+ "dds_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+ "dds_repo_path": "work/c_salvage_text_roi/source_full_20261012/q116_E3FD08BE_original_pinned_106cc0cb.dds"
+},
+ "Q197": {
+ "png": "q197_DIRECT_ORIGINAL_HD.png",
+ "png_sha256": "5436e6855b92fff6739e68a9774a9d7aadc95c65f012b4e7c098d36f24db5073",
+ "size": [
+  2048,
+  2048
+ ],
+ "dds": "Q197_PINNED_EN_ORIGINAL_20261017.dds",
+ "dds_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+ "dds_repo_path": "work/c_roi_q197_original_20261016/9F060EC1_512x512.dds"
+},
+ "Q161": {
+ "png": "q161_DIRECT_ORIGINAL_HD.png",
+ "png_sha256": "905f9701eea594647f1d00cfc7e1222f7b6fe8f93466f8a0b401e05b18ced13a",
+ "size": [
+  2048,
+  2048
+ ],
+ "dds": "Q161_PINNED_EN_ORIGINAL_20261017.dds",
+ "dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+ "dds_repo_path": "work/c_roi_q060_easy_git_20261016_0533/localization/graphics/role_A/20261011-A236-Q161-THREE-SOURCE-AUTHENTICATED-CLEAN/A236_CANONICAL_ENGLISH_SOURCE_EXACT.dds"
+},
+ "Q212": {
+ "png": "q212_DIRECT_ORIGINAL_HD.png",
+ "png_sha256": "0961cf674a533c77e6ac39cf7ee707d241d8180433be3b39d97cf08664b321de",
+ "size": [
+  2048,
+  2048
+ ],
+ "dds": "Q212_PINNED_EN_ORIGINAL_20261017.dds",
+ "dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+ "dds_repo_path": "work/c_roi_q060_easy_git_20261016_0533/localization/graphics/role_B/20261010-B342-Q212-CANONICAL-SOURCE-PLATE-RECHECK/B342_EXACT_ENGLISH_SOURCE_2048_RGBA32.dds"
+},
  "Q051": {
   "png": "q051_FF2462BB_FLIPY_CHECK_ORIENTATION.png",
   "png_sha256": "2da1b6f01219356ddc6ea925bd8fcd4afd37d9040eb48081a40861cc649da6f0",
@@ -64,11 +108,15 @@ def check_original(task):
   assert im.format=="PNG" and im.mode=="RGBA" and list(im.size)==p["size"]
   whole=im.copy()
  with dds.open("rb") as f:
-  header=f.read(128)
-  payload=f.read()
- if header[:4]!=b"DDS " or len(payload)!=p["size"][0]*p["size"][1]*4:
-  raise ValueError("HOLD_DDS_UNSUPPORTED_FORMAT")
- original=Image.frombytes("RGBA",tuple(p["size"]),payload).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+  if f.read(4)!=b"DDS ":
+   raise ValueError("HOLD_NOT_AN_ORIGINAL_DDS")
+ # The pinned HD original can be RGBA32 or compressed DXT5.
+ # Pillow decodes native DDS without any scaling; all decoded pixels must
+ # exactly equal the independently pinned full English PNG.
+ with Image.open(dds) as image:
+  if image.format!="DDS" or list(image.size)!=p["size"]:
+   raise ValueError("HOLD_ORIGINAL_DDS_DIMENSIONS_OR_FORMAT")
+  original=image.convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
  if ImageChops.difference(whole,original).getbbox() is not None:
   raise ValueError("HOLD_FULL_DDS_PNG_PIXEL_MISMATCH")
  return True
