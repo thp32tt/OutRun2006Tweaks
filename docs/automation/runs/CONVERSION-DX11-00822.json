@@ -1,0 +1,110 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00822",
+  "production_id": "CONVERSION-DX11-00822",
+  "event_id": "CONVERSION-DX11-00822-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": "1630a21770c388467940d7025ca6f79948d5c58b",
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Connect full-resolution native D3D11 per-eye color target binding and original OM/RS restoration to separately posed game-authored Draw/DrawIndexed stereo callbacks, then finish real R30 menu/car/race source replay to OpenXR with input-safe DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-eye-rtv-and-state",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_output_binding",
+        "expected_behavior": "Renderer-owned left and right D3D11 draw passes bind the exact generation-owned per-eye RTV, full-target viewport and scissor, and issue native GPU writes without contaminating desktop RT."
+      },
+      {
+        "id": "game-draw-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_input_ffb_and_recovery",
+        "expected_behavior": "Live game D3D9 Present and gamepad/FFB remain authoritative; original D3D11 OM/RS state is restored on completion and failure; stale/partial GPU submissions never reach OpenXR."
+      },
+      {
+        "id": "native-stereo-host-transport",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_host_transport_ci",
+        "expected_behavior": "Distinct eye GPU outputs pass isolated WARP, exact producer EVENT, snapshot/ACK and five mandatory GitHub Actions checks; real R30 stereo replay, Quest3 visual and performance evidence remain separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-eye-rtv-and-state": "SOURCE_CODED_WARP_PASS_EYE_DEPTH",
+    "game-draw-input-fallback": "SOURCE_CODED_PENDING_REAL_GAME",
+    "native-stereo-host-transport": "WARP_PASS_FULL_GATE_PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "integration_path": [
+      "C2 real C++ native game eye submission now accepts verified D3D9-source full-target ARGB clears independently for L/R, with partial RECT clear excluded from invented full-eye seeds.",
+      "Scoped native GPU pass restores original desktop OM blend/depth/stencil plus RS rasterizer, viewport and scissor after stereo eye recording.",
+      "Isolated WARP probe verifies left/right source color differences and state restoration; real R30 menu/car/race Draw/DrawIndexed replay and Quest3 live runtime remain unfinished."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual C++ material 1630a217 adds optional per-eye source full-RT color clears and strengthens isolated WARP probe of eye colors plus game OM/RS state restoration; exact SHA GitHub CI SUCCESS per C6 input.",
+      "negative_regression": "No fabricated clear for partial-RECT game clears; original D3D9 Draw/Present/gamepad/FFB remains authoritative and native submission restores OM blend/depth/stencil, RS rasterizer and viewport/scissor.",
+      "component_integration": "Game-authored TARGET full color clear -> each generation-owned native D3D11 eye RTV -> independent eye draw callbacks -> existing producer fence/snapshot/ACK, without asserting real live R30 stereo replay."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Scoped per-eye native clear/state source and WARP CI proven; true R30 game-source replay, visible Quest3 frame and performance remain unfinished.",
+    "activation_guard_and_fallback": "Opt-in/fail-closed only. Original D3D9Ex Draw/Present/input/FFB authoritative. DXVK frozen.",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_NOT_TERMINAL",
+    "remaining_implementation": [
+      "Connect real R30 menu/car/race camera-specific Draw/DrawIndexed replay into each native eye GPU callback with complete game-state and partial clear coverage.",
+      "Validate live game capture and actual Quest3/VDXR gameplay, performance, input and FFB; HMD session remains UNTESTED."
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "RUN_RECORD_NOT_FOUND: 00822 JSON absent from target branch and exact validation SHA; rebuilt schema v3 record from prior 00821 same-feature contract and acceptance results, preserving those baseline objects unmodified.",
+    "C1_REVIEW": "00821 lacked source-authored independently seeded full-TARGET eye colors and broader original desktop blend/depth-stencil/rasterizer restoration.",
+    "C2_IMPLEMENT": "Actual 00822 material C++ applies per-eye verified full-target ARGB clears (never partial RECT), restores OM blend/depth/stencil and RS raster state, and extends WARP transport regression.",
+    "C3_VALIDATE": "User confirms CI SUCCESS at exact validation SHA 1630a21770c388467940d7025ca6f79948d5c58b. GitHub separately confirms Build #38888573479, OpenXR #38888573012, HUD #38888573221 completed SUCCESS; no rebuild or rerun for C6. HMD/runtime not performed.",
+    "C4_COMMIT": "Material C++ result 1630a21770c388467940d7025ca6f79948d5c58b; separate bookkeeping-only C6 run-record creation [skip ci], no source modifications.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA at unchanged validation-bearing SHA 1630a21770c388467940d7025ca6f79948d5c58b. HMD RUNTIME_VALIDATION=UNTESTED; full native R30 replay remains incomplete; no new or duplicate score."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00822",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_ONLY",
+    "note": "C6 exact-SHA record recovery only; material result already exists. No new independent result or duplicate scoreboard award."
+  },
+  "validation_bearing_result_sha": "1630a21770c388467940d7025ca6f79948d5c58b"
+}
