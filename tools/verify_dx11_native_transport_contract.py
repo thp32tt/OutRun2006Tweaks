@@ -90,6 +90,31 @@ def verify_eye_pair_submission(body: str) -> None:
             and eyes[2] < eyes[3]
         ):
             raise SystemExit("DX11 MSAA admission/copy/resolve/GPU ownership must precede guarded fence")
+        # 00842 actual game-camera texture arrays: two distinct physical
+        # source slices, not two views of the same eye or stale ring alias.
+        # This is a GPU transfer implementation contract, not fabricated
+        # proof that the live R30 renderer has attached its camera callback.
+        source_guards = (
+            "left_array_slice >= leftDesc.ArraySize",
+            "right_array_slice >= rightDesc.ArraySize",
+            "leftIdentity.Get() == rightIdentity.Get()",
+            "left_array_slice == right_array_slice",
+        )
+        slice_writes = (
+            "context->CopySubresourceRegion(entry.eye[0].Get()",
+            "context->CopySubresourceRegion(entry.eye[1].Get()",
+            "D3D11CalcSubresource(0u, left_array_slice, leftDesc.MipLevels)",
+            "D3D11CalcSubresource(0u, right_array_slice, rightDesc.MipLevels)",
+        )
+        for needle in source_guards + slice_writes:
+            if needle not in body:
+                raise SystemExit("DX11 00842 missing real array-slice mip-zero GPU path: " + needle)
+        for needle in source_guards:
+            if body.index(needle) >= queued:
+                raise SystemExit("DX11 eye source slice and alias admission must precede GPU writes")
+        for needle in slice_writes:
+            if not queued < body.index(needle) < fence:
+                raise SystemExit("DX11 eye array mip-zero copy must precede producer EVENT")
     elif legacy in body:
         if not (
             body.index(legacy) < body.index("entry.gpu_copy_queued = true;")
@@ -374,6 +399,14 @@ def main() -> None:
         encoding="utf-8")
     if "R306 left/right GPU pixel copy identity" not in probe_source:
         raise SystemExit("DX11 R306 two-eye GPU pixel validation missing")
+    for needle in (
+        "00842 aliased same slice and invalid slice reject before GPU",
+        "00842 native producer submits two independent GPU array-slice eyes",
+        "00842 independent mip-zero L/R GPU pixel identity",
+        "00842 stereo GPU host handoff and exact ACK retirement",
+    ):
+        if needle not in probe_source:
+            raise SystemExit("DX11 00842 WARP native game stereo array regression missing: " + needle)
     for needle in [
         "foreign.device->OpenSharedResource(",
         "foreign.context->CopyResource(hostReadback, hostEyes[eyeIndex]);",
