@@ -214,6 +214,17 @@ add_custom_command(TARGET outrun-vr-stage-extension-eye-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-stage-extension-eye-smoke>"
     COMMENT "Run native +TIME/GOAL stereo eye-pose and fallback regression"
     VERBATIM)
+# Source-proven GOAL B9200 E8-return admission is compiled AND executed in
+# the mandatory x64 host gate; no game executable or HMD is required.
+add_executable(outrun-vr-goal-b9200-stack-smoke
+    tests/goal_b9200_stack_provenance_smoke.cpp)
+target_include_directories(outrun-vr-goal-b9200-stack-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-goal-b9200-stack-smoke)
+add_custom_command(TARGET outrun-vr-goal-b9200-stack-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-goal-b9200-stack-smoke>"
+    COMMENT "Run native exact GOAL B9200 E8 return-address/fallback regression"
+    VERBATIM)
 # Real game-side cockpit basis is compiled and executed by the mandatory host gate.
 add_executable(outrun-vr-driver-seat-camera-smoke tests/driver_seat_camera_smoke.cpp)
 target_include_directories(outrun-vr-driver-seat-camera-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
@@ -305,6 +316,7 @@ foreach(target
     outrun-vr-r30-indexed-up-bounds-smoke
     outrun-vr-r30-shadow-ranges-smoke
     outrun-vr-goal-progress-owner-smoke
+    outrun-vr-goal-b9200-stack-smoke
     outrun-vr-semantic-tag-hint-smoke
     outrun-vr-hud-original-wvp-smoke
     outrun-vr-capture-descriptor-smoke
