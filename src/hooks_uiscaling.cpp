@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/hud_command_batch.hpp"
 #include "vr/game/goal_result_parent_provenance.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
@@ -2605,15 +2606,9 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     // scope is NOT sufficient ownership for a deferred GPU Draw. We only
     // isolate +TIME on a known, single-owner active Begin/Draw batch, never
     // reassign an unknown pre-hook/mixed buffer to ScreenHud.
-    inline static thread_local void* TrackedSprite = nullptr;
-    inline static thread_local bool BatchActive = false;
-    inline static thread_local bool PendingHomogeneous = true;
-    inline static thread_local bool StageBoundaryReady = false;
-    inline static thread_local unsigned PendingDraws = 0;
-    inline static thread_local OutRunVR::GameSemantic::RenderScope PendingScope =
-        OutRunVR::GameSemantic::RenderScope::None;
-    inline static thread_local OutRunVR::GameSemantic::ProducerToken PendingProducer =
-        OutRunVR::GameSemantic::ProducerToken::None;
+    // Single coherent Quest-style HUD command ledger. The live original
+    // ID3DXSprite is still authoritative for physical draw/Flush/End.
+    inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};
 
     static bool IsExactSprite(void* self) noexcept
     {
@@ -2644,13 +2639,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
              source == ProducerToken::OutRunStagePrintf);
     }
 
-    static void ForgetBatch() noexcept
-    {
-        PendingDraws = 0;
-        PendingHomogeneous = true;
-        PendingScope = OutRunVR::GameSemantic::RenderScope::None;
-        PendingProducer = OutRunVR::GameSemantic::ProducerToken::None;
-    }
+    static void ForgetBatch() noexcept { HudBatch.forget(); }
 
     static HRESULT __stdcall BeginDest(void* self, DWORD flags)
     {
@@ -2658,16 +2647,13 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // INVALIDCALL; it does NOT close the previous Begin/Draw batch.
         // Keep its exact +TIME/GOAL provenance for the eventual Flush/End.
         const bool existingBatch =
-            BatchActive && self == TrackedSprite && IsExactSprite(self);
+            HudBatch.active && self == HudBatch.sprite && IsExactSprite(self);
         const HRESULT hr = Begin_hk.stdcall<HRESULT>(self, flags);
         if (IsExactSprite(self))
         {
             if (FAILED(hr) && existingBatch)
                 return hr;
-            TrackedSprite = self;
-            BatchActive = SUCCEEDED(hr);
-            StageBoundaryReady = false;
-            ForgetBatch();
+            HudBatch.begin(self, SUCCEEDED(hr));
         }
         return hr;
     }
@@ -2682,19 +2668,19 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // untouched. ScopedExactProducerSemantic restores every prior scope
         // (including a pending marker) even when the game Flush fails.
         const bool restore = DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
-            BatchActive, QueueRenderActive(), PendingHomogeneous,
-            PendingDraws,
+            HudBatch.active, QueueRenderActive(), HudBatch.homogeneous,
+            HudBatch.drawCount,
             DX9ExD3DXSpriteLifetime::CanFlush(
-                self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
-            PendingScope, PendingProducer);
+                self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
+            HudBatch.scope, HudBatch.producer);
         HRESULT hr;
         {
             ScopedExactProducerSemantic owned(
-                restore ? PendingScope : RenderScope::None, nullptr, restore,
-                restore ? PendingProducer : ProducerToken::None);
+                restore ? HudBatch.scope : RenderScope::None, nullptr, restore,
+                restore ? HudBatch.producer : ProducerToken::None);
             hr = Flush_hk.stdcall<HRESULT>(self);
         }
-        if (self == TrackedSprite)
+        if (self == HudBatch.sprite)
         {
             if (SUCCEEDED(hr))
             {
@@ -2702,15 +2688,13 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 // D3DX batch. A queue-exit boundary from the previous +TIME
                 // or GOAL Draw cannot authorize the *next* producer's Draw.
                 // Its first successful exact-owner Draw will re-arm normally.
-                ForgetBatch();
-                StageBoundaryReady = false;
+                HudBatch.onFlushSuccess();
             }
             else
             {
                 // A failed flush is not proof that the old draw buffer was
                 // submitted. Preserve the game HRESULT and cease promotion.
-                BatchActive = false;
-                StageBoundaryReady = false;
+                HudBatch.onFlushFailure();
             }
         }
         return hr;
@@ -2724,23 +2708,21 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // Preserve the exact homogeneous producer only until End returns;
         // the native HRESULT and normal batch teardown are unchanged.
         const bool restore = DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
-            BatchActive, QueueRenderActive(), PendingHomogeneous,
-            PendingDraws,
+            HudBatch.active, QueueRenderActive(), HudBatch.homogeneous,
+            HudBatch.drawCount,
             DX9ExD3DXSpriteLifetime::CanFlush(
-                self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
-            PendingScope, PendingProducer);
+                self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
+            HudBatch.scope, HudBatch.producer);
         HRESULT hr;
         {
             ScopedExactProducerSemantic owned(
-                restore ? PendingScope : RenderScope::None, nullptr, restore,
-                restore ? PendingProducer : ProducerToken::None);
+                restore ? HudBatch.scope : RenderScope::None, nullptr, restore,
+                restore ? HudBatch.producer : ProducerToken::None);
             hr = End_hk.stdcall<HRESULT>(self);
         }
-        if (self == TrackedSprite)
+        if (self == HudBatch.sprite)
         {
-            BatchActive = false;
-            StageBoundaryReady = false;
-            ForgetBatch();
+            HudBatch.end();
         }
         return hr;
     }
@@ -2756,16 +2738,13 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // when 0x55B218 has already become null or a new sprite instance.
         if (!wasTrackedOrExactGameSprite)
             return;
-        BatchActive = false;
-        StageBoundaryReady = false;
-        ForgetBatch();
-        TrackedSprite = nullptr;
+        HudBatch.invalidate();
     }
 
     static HRESULT __stdcall LostDeviceDest(void* self)
     {
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
-            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));
+            self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
         InvalidateForDeviceLifecycle(ownsBatch);
         return hr;
@@ -2774,7 +2753,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     static HRESULT __stdcall ResetDeviceDest(void* self)
     {
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
-            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));
+            self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
         InvalidateForDeviceLifecycle(ownsBatch);
         return hr;
@@ -2782,15 +2761,15 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static bool FlushTracked(void* self) noexcept
     {
-        // Queue-end used to call this with TrackedSprite directly. A silent
+        // Queue-end used to call this with HudBatch.sprite directly. A silent
         // sprite replacement (or global cleared before OnLostDevice) made
         // that old pointer potentially freed: never read its vtable.
         void* liveSprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!BatchActive ||
+        if (!HudBatch.active ||
             !DX9ExD3DXSpriteLifetime::CanFlush(
-                self, TrackedSprite, liveSprite))
+                self, HudBatch.sprite, liveSprite))
         {
-            if (self && self == TrackedSprite && self != liveSprite)
+            if (self && self == HudBatch.sprite && self != liveSprite)
                 InvalidateForDeviceLifecycle(true);
             return false;
         }
@@ -2812,13 +2791,13 @@ public:
         using namespace OutRunVR::GameSemantic;
         if (QueueRenderActive())
             return;
-        StageBoundaryReady = false;
+        HudBatch.boundaryReady = false;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!BatchActive || sprite != TrackedSprite || PendingDraws == 0)
+        if (!HudBatch.active || sprite != HudBatch.sprite || HudBatch.drawCount == 0)
             return;
         if (!CanFlushD3DXPreQueueStageBatch(
-                false, true, PendingHomogeneous,
-                PendingScope, PendingProducer,
+                false, true, HudBatch.homogeneous,
+                HudBatch.scope, HudBatch.producer,
                 EffectiveScope(), CurrentRenderProducerToken()) ||
             !FlushTracked(sprite))
         {
@@ -2837,16 +2816,16 @@ public:
         using namespace OutRunVR::GameSemantic;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!CanFlushD3DXDirectStageAtExit(
-                QueueRenderActive(), BatchActive,
-                sprite != nullptr && sprite == TrackedSprite,
-                PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
+                QueueRenderActive(), HudBatch.active,
+                sprite != nullptr && sprite == HudBatch.sprite,
+                HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
                 EffectiveScope(), CurrentRenderProducerToken()))
             return;
         if (FlushTracked(sprite))
             StageFlushes.fetch_add(1, std::memory_order_relaxed);
         else
         {
-            StageBoundaryReady = false;
+            HudBatch.boundaryReady = false;
             StageFallbacks.fetch_add(1, std::memory_order_relaxed);
         }
     }
@@ -2859,12 +2838,12 @@ public:
         using namespace OutRunVR::GameSemantic;
         if (QueueRenderActive())
             return;
-        StageBoundaryReady = false;
+        HudBatch.boundaryReady = false;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!BatchActive || sprite != TrackedSprite || PendingDraws == 0)
+        if (!HudBatch.active || sprite != HudBatch.sprite || HudBatch.drawCount == 0)
             return;
         if (!CanFlushD3DXPreQueueStageBatch(
-                false, true, PendingHomogeneous, PendingScope, PendingProducer,
+                false, true, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
                 EffectiveScope(), CurrentRenderProducerToken()) ||
             !FlushTracked(sprite))
         {
@@ -2879,17 +2858,17 @@ public:
         using namespace OutRunVR::GameSemantic;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!CanFlushD3DXDirectGoalAtExit(
-                QueueRenderActive(), BatchActive,
-                sprite != nullptr && sprite == TrackedSprite,
-                PendingDraws, PendingHomogeneous, PendingScope,
-                PendingProducer, EffectiveScope(),
+                QueueRenderActive(), HudBatch.active,
+                sprite != nullptr && sprite == HudBatch.sprite,
+                HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope,
+                HudBatch.producer, EffectiveScope(),
                 CurrentRenderProducerToken()))
             return;
         if (FlushTracked(sprite))
             GoalFlushes.fetch_add(1, std::memory_order_relaxed);
         else
         {
-            StageBoundaryReady = false;
+            HudBatch.boundaryReady = false;
             GoalFallbacks.fetch_add(1, std::memory_order_relaxed);
         }
     }
@@ -2912,14 +2891,14 @@ public:
         // Native End remains authoritative for unknown/mixed/failed batches.
         void* firstQueueSprite = *Module::exe_ptr<void*>(0x55B218);
         if (CanDrainDirectResultBeforeFirstQueueNode(
-                QueueRenderActive(), BatchActive,
+                QueueRenderActive(), HudBatch.active,
                 DX9ExD3DXSpriteLifetime::CanFlush(
-                    firstQueueSprite, TrackedSprite, firstQueueSprite),
-                PendingDraws, PendingHomogeneous,
-                PendingScope, PendingProducer, nextScope, nextProducer))
+                    firstQueueSprite, HudBatch.sprite, firstQueueSprite),
+                HudBatch.drawCount, HudBatch.homogeneous,
+                HudBatch.scope, HudBatch.producer, nextScope, nextProducer))
         {
-            const auto outgoingScope = PendingScope;
-            const auto outgoingProducer = PendingProducer;
+            const auto outgoingScope = HudBatch.scope;
+            const auto outgoingProducer = HudBatch.producer;
             const bool wasStage = StageOwner(outgoingScope, outgoingProducer);
             bool flushed = false;
             {
@@ -2937,9 +2916,9 @@ public:
                 // Failed Flush and any lost vtable/live-object proof cannot
                 // authorize a later optical owner. Preserve original End
                 // but withdraw our batch identity until the next Begin.
-                BatchActive = false;
+                HudBatch.active = false;
                 ForgetBatch();
-                StageBoundaryReady = false;
+                HudBatch.boundaryReady = false;
                 (wasStage ? StageFallbacks : GoalFallbacks).fetch_add(
                     1, std::memory_order_relaxed);
             }
@@ -2961,12 +2940,12 @@ public:
             return;
 
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!BatchActive || sprite != TrackedSprite)
+        if (!HudBatch.active || sprite != HudBatch.sprite)
         {
-            StageBoundaryReady = false;
+            HudBatch.boundaryReady = false;
             return;
         }
-        if (PendingDraws != 0)
+        if (HudBatch.drawCount != 0)
         {
             // Before SelectSpriteQueueNode, a homogeneous PRE-QUEUE
             // direct buffer can still be submitted with its OLD scope.
@@ -2979,36 +2958,36 @@ public:
                     // drain a proven prior direct batch under its OLD owner
                     // before selecting the GOAL source, exactly as for +TIME.
                     QueueRenderActive(), enteringStage || enteringGoal,
-                    PendingHomogeneous,
-                    PendingScope, PendingProducer,
+                    HudBatch.homogeneous,
+                    HudBatch.scope, HudBatch.producer,
                     EffectiveScope(), CurrentRenderProducerToken()) ||
                 !FlushTracked(sprite))
             {
-                StageBoundaryReady = false;
+                HudBatch.boundaryReady = false;
                 StageFallbacks.fetch_add(1, std::memory_order_relaxed);
                 return;
             }
             StageFlushes.fetch_add(1, std::memory_order_relaxed);
         }
-        StageBoundaryReady = enteringStage || enteringGoal;
+        HudBatch.boundaryReady = enteringStage || enteringGoal;
     }
 
     static void BeforeQueueEnd() noexcept
     {
         using namespace OutRunVR::GameSemantic;
-        if (StageBoundaryReady && QueueRenderActive() &&
+        if (HudBatch.boundaryReady && QueueRenderActive() &&
             (StageOwner(EffectiveScope(), CurrentRenderProducerToken()) ||
              GoalOwner(EffectiveScope(), CurrentRenderProducerToken())) &&
-            PendingDraws != 0 && PendingHomogeneous &&
-            PendingScope == EffectiveScope() &&
-            PendingProducer == CurrentRenderProducerToken())
+            HudBatch.drawCount != 0 && HudBatch.homogeneous &&
+            HudBatch.scope == EffectiveScope() &&
+            HudBatch.producer == CurrentRenderProducerToken())
         {
-            if (FlushTracked(TrackedSprite))
+            if (FlushTracked(HudBatch.sprite))
                 StageFlushes.fetch_add(1, std::memory_order_relaxed);
             else
                 StageFallbacks.fetch_add(1, std::memory_order_relaxed);
         }
-        StageBoundaryReady = false;
+        HudBatch.boundaryReady = false;
     }
 
 private:
@@ -3021,24 +3000,24 @@ private:
         // incoming Draw. Separate it under its original GPU owner now.
         // Queued, mixed and foreign buffers remain untouched/fail-closed.
         if (DX9ExD3DXSpriteLifetime::CanDrainDeferredResultBeforeForeignDraw(
-                BatchActive, OutRunVR::GameSemantic::QueueRenderActive(),
-                PendingHomogeneous,
-                PendingDraws,
+                HudBatch.active, OutRunVR::GameSemantic::QueueRenderActive(),
+                HudBatch.homogeneous,
+                HudBatch.drawCount,
                 DX9ExD3DXSpriteLifetime::CanFlush(
-                    self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
-                PendingScope, PendingProducer,
+                    self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
+                HudBatch.scope, HudBatch.producer,
                 OutRunVR::GameSemantic::EffectiveScope(),
                 OutRunVR::GameSemantic::CurrentRenderProducerToken()))
         {
-            const bool wasStage = StageOwner(PendingScope, PendingProducer);
+            const bool wasStage = StageOwner(HudBatch.scope, HudBatch.producer);
             // The incoming foreign producer is already the current scope,
             // but FlushTracked physically submits the PREVIOUS +TIME/GOAL
             // triangles. Restore that proven homogeneous GPU-batch owner
             // across the native Flush, including a reentrant FlushDest.
             // The RAII guard restores the incoming producer and pending
             // one-shot token before the new Draw enters D3DX.
-            const auto outgoingScope = PendingScope;
-            const auto outgoingProducer = PendingProducer;
+            const auto outgoingScope = HudBatch.scope;
+            const auto outgoingProducer = HudBatch.producer;
             bool flushed = false;
             {
                 OutRunVR::GameSemantic::ScopedExactProducerSemantic outgoingBatch(
@@ -3052,7 +3031,7 @@ private:
             }
             else
             {
-                StageBoundaryReady = false;
+                HudBatch.boundaryReady = false;
                 (wasStage ? StageFallbacks : GoalFallbacks).fetch_add(
                     1, std::memory_order_relaxed);
             }
@@ -3065,10 +3044,10 @@ private:
             // failed Draw. Its GPU ownership is now unknown: never submit
             // stale +TIME/GOAL provenance under a later queue/source scope.
             // Preserve the game's HRESULT and its original Flush/End path.
-            if (self && self == TrackedSprite)
+            if (self && self == HudBatch.sprite)
             {
-                BatchActive = false;
-                StageBoundaryReady = false;
+                HudBatch.active = false;
+                HudBatch.boundaryReady = false;
                 ForgetBatch();
             }
             return hr;
@@ -3079,21 +3058,8 @@ private:
         using namespace OutRunVR::GameSemantic;
         const auto scope = EffectiveScope();
         const auto source = CurrentRenderProducerToken();
-        if (BatchActive && self == TrackedSprite)
-        {
-            if (PendingDraws == 0)
-            {
-                PendingScope = scope;
-                PendingProducer = source;
-                PendingHomogeneous = true;
-            }
-            else if (PendingScope != scope || PendingProducer != source)
-            {
-                PendingHomogeneous = false;
-            }
-            if (PendingDraws != ~0u)
-                ++PendingDraws;
-        }
+        if (self == HudBatch.sprite)
+            HudBatch.recordDraw(scope, source);
 
         // +TIME is a complete producer batch, not one GPU submission per
         // sprite. The first node/source entry splits the previous producer;
@@ -3103,15 +3069,15 @@ private:
         // D3DX Draw: it both defeats native D3DX texture batching and inserts
         // avoidable driver submissions during the stage transition.
         // A mixed/unknown batch remains on the game's normal End path.
-        const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;
+        const bool exactStage = StageOwner(scope, source) && HudBatch.homogeneous;
         // A new D3DX Begin after SelectSpriteQueueNode resets the previous
         // stage boundary. Only the first successful, clean, exact-owner Draw
         // may re-arm the queue-exit GPU submission (never every Draw Flush).
         if (exactStage && CanArmD3DXQueueStageAfterDraw(
-                QueueRenderActive(), BatchActive, self == TrackedSprite,
-                PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
+                QueueRenderActive(), HudBatch.active, self == HudBatch.sprite,
+                HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
                 scope, source))
-            StageBoundaryReady = true;
+            HudBatch.boundaryReady = true;
         if (exactStage)
             return hr;
 
@@ -3119,20 +3085,20 @@ private:
         // Queued exact GOAL sources are submitted once on owner transition
         // or queue end; uncertain/mixed buffers keep the old fallback.
         const bool queuedStageIsolated =
-            QueueRenderActive() && StageBoundaryReady;
+            QueueRenderActive() && HudBatch.boundaryReady;
         const bool directStageIsolated =
-            !QueueRenderActive() && PendingDraws == 1u;
-        const bool exactGoal = GoalOwner(scope, source) && PendingHomogeneous;
+            !QueueRenderActive() && HudBatch.drawCount == 1u;
+        const bool exactGoal = GoalOwner(scope, source) && HudBatch.homogeneous;
         // D3DX Begin may occur after SelectSpriteQueueNode and clear the
         // earlier queue boundary. The first clean GOAL Draw must rearm it
         // before the existing eager, source-owned GPU Flush. Without this,
         // the 0-99% progress and both GOAL glyph helpers can survive until
         // an unrelated End/batch with no original producer scope.
         if (exactGoal && CanArmD3DXQueueGoalAfterDraw(
-                QueueRenderActive(), BatchActive, self == TrackedSprite,
-                PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
+                QueueRenderActive(), HudBatch.active, self == HudBatch.sprite,
+                HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
                 scope, source))
-            StageBoundaryReady = true;
+            HudBatch.boundaryReady = true;
         // The queued original GOAL progress, both finish-time helpers and
         // three verified Sumo_Printf parents share the same exact GPU owner
         // until the NEXT queue node or queue end. Keep their D3DX Draw batch
@@ -3141,16 +3107,16 @@ private:
         // Direct GOAL continues using the proven per-Draw/parent-exit path;
         // mixed/unarmed batches retain the existing fail-closed fallback.
         if (CanDeferD3DXQueueGoalBatch(
-                QueueRenderActive(), BatchActive,
-                self == TrackedSprite, StageBoundaryReady,
-                PendingDraws, PendingHomogeneous, PendingScope,
-                PendingProducer, scope, source))
+                QueueRenderActive(), HudBatch.active,
+                self == HudBatch.sprite, HudBatch.boundaryReady,
+                HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope,
+                HudBatch.producer, scope, source))
             return hr;
         if ((queuedStageIsolated || directStageIsolated ||
-                (QueueRenderActive() && StageBoundaryReady)) &&
-            BatchActive && self == TrackedSprite &&
+                (QueueRenderActive() && HudBatch.boundaryReady)) &&
+            HudBatch.active && self == HudBatch.sprite &&
             exactGoal &&
-            PendingScope == scope && PendingProducer == source)
+            HudBatch.scope == scope && HudBatch.producer == source)
         {
             if (FlushTracked(self))
             {
@@ -3164,7 +3130,7 @@ private:
             }
             else
             {
-                StageBoundaryReady = false;
+                HudBatch.boundaryReady = false;
                 GoalFallbacks.fetch_add(1, std::memory_order_relaxed);
             }
             return hr;
