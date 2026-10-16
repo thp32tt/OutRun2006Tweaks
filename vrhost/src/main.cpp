@@ -27,6 +27,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/native_direct_stereo_pair.hpp"
 #include "runtime/native_stereo_source_route.hpp"
+#include "runtime/native_xr_swapchain_image.hpp"
 
 namespace
 {
@@ -1514,7 +1515,7 @@ namespace
             }
 
             std::uint32_t image = 0;
-            Acquire(projection_, image);
+            if (!Acquire(projection_, image, 2u)) return false;
             bool ok = RenderTo(projection_.rtvs[image][0], projection_.width, projection_.height,
                 eyes[0], eyeSrv[0], eyeFormat[0]);
             ok = RenderTo(projection_.rtvs[image][1], projection_.width, projection_.height,
@@ -1648,8 +1649,8 @@ namespace
             }
 
             std::uint32_t image = 0;
-            Acquire(projection_, image);
-            bool ok = image < projection_.rtvs.size();
+            if (!Acquire(projection_, image, 2u)) return false;
+            bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
                 float clip[4][4]{};
@@ -1726,7 +1727,7 @@ namespace
             UvRect whole{};
             if (!GetGameUv(whole)) return false;
             std::uint32_t image = 0;
-            Acquire(theater_, image);
+            if (!Acquire(theater_, image, 1u)) return false;
             const bool ok = RenderTo(theater_.rtvs[image][0], theater_.width, theater_.height,
                 whole, sourceSrv_, sourceFormat_);
             Release(theater_);
@@ -2028,8 +2029,17 @@ namespace
             }
         }
 
-        void Acquire(SwapchainSet& s, std::uint32_t& image)
+        // Native game L/R projection and menu need both live RTV slices;
+        // mono theater needs one. Reject absent resources before xrAcquire.
+        bool Acquire(SwapchainSet& s, std::uint32_t& image,
+            std::uint32_t requiredViews)
         {
+            image = 0;
+            if (s.handle == XR_NULL_HANDLE || s.images.empty() ||
+                s.rtvs.size() != s.images.size() ||
+                requiredViews == 0u || requiredViews > s.arraySize ||
+                requiredViews > 2u)
+                return false;
             XrSwapchainImageAcquireInfo ai{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
             LARGE_INTEGER acquireBegin{}, acquireEnd{};
             QueryPerformanceCounter(&acquireBegin);
@@ -2046,6 +2056,17 @@ namespace
             QueryPerformanceCounter(&waitEnd);
             swapchainTimings_.wait.Add(
                 swapchainTimings_.Ms(waitBegin, waitEnd));
+            if (!OutRunVrNativeXrSwapchain::ImageViewsReady(
+                    image, s.images.size(), s.arraySize, s.rtvs,
+                    requiredViews))
+            {
+                // The wait completed: release a malformed acquired image
+                // without indexing its RTV or submitting an invalid XR layer.
+                // Existing game input and the last released layer survive.
+                Release(s);
+                return false;
+            }
+            return true;
         }
 
         void Release(SwapchainSet& s)

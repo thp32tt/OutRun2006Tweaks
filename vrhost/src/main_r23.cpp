@@ -1198,7 +1198,7 @@ namespace
         }
 
         std::uint32_t image = 0;
-        c.Acquire(c.projection_, image);
+        if (!c.Acquire(c.projection_, image, 2u)) return false;
         bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
             c.projection_.height, eyes[0], srv[0], fmt[0]);
         ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
@@ -1284,8 +1284,8 @@ namespace
         }
 
         std::uint32_t image = 0;
-        c.Acquire(c.projection_, image);
-        bool ok = image < c.projection_.rtvs.size();
+        if (!c.Acquire(c.projection_, image, 2u)) return false;
+        bool ok = true;
         for (int eye = 0; eye < 2 && ok; ++eye)
         {
             ok = c.RenderMenuPlaneTo(
@@ -1330,7 +1330,7 @@ namespace
         if (theaterUv.w <= 0.0f)
             return false;
         std::uint32_t image = 0;
-        c.Acquire(c.theater_, image);
+        if (!c.Acquire(c.theater_, image, 1u)) return false;
         const bool ok = c.RenderTo(c.theater_.rtvs[image][0], c.theater_.width,
             c.theater_.height, theaterUv, c.sourceSrv_, c.sourceFormat_);
         if (ok) R23Pixels.ScheduleTheater(c, image);

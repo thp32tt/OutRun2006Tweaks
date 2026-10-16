@@ -1,0 +1,114 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00800",
+  "production_id": "CONVERSION-DX11-00800",
+  "event_id": "CONVERSION-DX11-00800-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:OPENXR_IMAGE_PROJECTION_MENU_RACE_FALLBACK",
+  "feature_id": "DX11-OPENXR-IMAGE-PROJECTION-RECOVERY",
+  "status": "VALIDATION_IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "5644bf514a0b890471c54f0e2cae0da7f999a572",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+    "vrhost/src/runtime/native_xr_swapchain_image.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-OPENXR-IMAGE-PROJECTION-RECOVERY",
+    "goal": "Integrate safe native DirectGPU OpenXR race stereo, world-locked menu/vehicle stereo and mono theater projections against runtime-provided swapchain image indices, preserving original game input and last released projection when image metadata is incomplete.",
+    "acceptance_items": [
+      {
+        "id": "race-stereo-native-image",
+        "category": "end_to_end_behavior",
+        "behavior_area": "NativeDX11_DirectGPU_race_eye_projection",
+        "expected_behavior": "Both left and right GPU RTVs are checked against the waited OpenXR image index before rendering native game stereo."
+      },
+      {
+        "id": "menu-vehicle-theater-transition",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Menu_vehicle_stereo_and_theater_mono_XR",
+        "expected_behavior": "World-locked menu and vehicle render use two-eye validation; theater uses one-eye validation without indexing stale resource arrays."
+      },
+      {
+        "id": "safe-classic-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex_game_present_input_FFB_and_cached_OXR_projection",
+        "expected_behavior": "Invalid image index, array size or missing right eye rejects before GPU draw and releases the waited invalid image; original game path remains intact."
+      },
+      {
+        "id": "five-required-exact-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_Build_OpenXR_HUD",
+        "expected_behavior": "New compiled positive/negative OpenXR smoke and all five GitHub actions run for one exact material SHA with HMD still untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "race-stereo-native-image": "PENDING_CI",
+    "menu-vehicle-theater-transition": "PENDING_CI",
+    "safe-classic-fallback": "PENDING_CI",
+    "five-required-exact-gates": "PENDING_CI"
+  },
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "blocking_evidence": "Production vrhost main.cpp and main_r23.cpp unconditionally indexed swapchain.rtvs[image] after xrAcquireSwapchainImage in native game-eye, world-locked menu and theater rendering, even if runtime-supplied index is out of range or RTV array is incomplete.",
+    "integration_path": [
+      "Game-created D3D9 Draw and DrawIndexed mirrored as native full-resolution D3D11 image and independent eye sources",
+      "OpenXR shared source submitted through host source selection and validated runtime swapchain index/1-or-2-eye RTV allocation",
+      "DirectGPU race projection, stereo menu/vehicle and mono theater route to valid OpenXR layer; original D3D9 Present, controls and cached previous projection survive failure"
+    ],
+    "batch_components": [
+      "Real host C++ OpenXR acquisition and RTV validation",
+      "Production R23 menu, theater and native left/right GPU eye draw integration",
+      "Compiled host C++ native direct eye smoke positive and negative cases"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Host smoke admits in-range two-eye race/menu and single-eye theater RTV indices.",
+      "negative_regression": "Host smoke rejects stale/out-of-range OpenXR indices, mono array on stereo projection, missing second eye, and truncated RTV arrays.",
+      "component_integration": "Native game full-frame DirectGPU OpenXR pair -> waited and bounded swapchain acquisition -> stereo R23 projection or mono theater -> existing HMD cache/DX9Ex input fallback."
+    },
+    "conflict_keys": [
+      "DX11:OPENXR_IMAGE_PROJECTION_MENU_RACE_FALLBACK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT",
+      "OPENXR_PROJECTION"
+    ],
+    "visible_frame_acceptance": "Native OpenXR source route and automated build only; real Quest3/VDXR stereo visuals and performance untested.",
+    "activation_guard_and_fallback": "Existing NativeDrawPathActive opt-in remains disabled by default; D3D9 Draw, Present, gamepad, FFB, SkyGlow, DX9Ex fallback unchanged; DXVK frozen."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read latest authenticated GitHub source and disjoint 00799 run.",
+    "C1_REVIEW": "Confirmed unchecked runtime-provided OpenXR swapchain index in game/menu/theater paths.",
+    "C2_IMPLEMENT": "Real OpenXR host render routes and compiled source smoke changed in one material batch.",
+    "C3_VALIDATE": "PENDING exact five SHA gates",
+    "C4_COMMIT": "Material commit linked to GitHub parent 5644bf514a0b890471c54f0e2cae0da7f999a572",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING final CI; real Quest3/VDXR UNTESTED"
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00800",
+    "score_change": 0,
+    "score_status": "UNSCORED pending material exact-Gate acceptance"
+  }
+}

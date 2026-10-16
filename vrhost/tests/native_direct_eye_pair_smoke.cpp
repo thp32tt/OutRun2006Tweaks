@@ -3,6 +3,7 @@
 #include <iostream>
 #include "runtime/native_direct_stereo_pair.hpp"
 #include "runtime/native_stereo_source_route.hpp"
+#include "runtime/native_xr_swapchain_image.hpp"
 
 int main()
 {
@@ -129,6 +130,32 @@ int main()
                  !OutRunVrNativeEyePair::IsSrgbView(left.Format),
                  "scRGB eyes retain their independent HDR white-scale route"))
         return 1;
+    // Real OpenXR stereo race and world-locked menu require two RTVs;
+    // theater only needs one. Never index an invalid runtime image slot.
+    int leftRtv = 1, rightRtv = 2;
+    std::vector<std::array<int*, 2>> xrTargets{
+        { &leftRtv, &rightRtv }, { &leftRtv, &rightRtv }};
+    using OutRunVrNativeXrSwapchain::ImageViewsReady;
+    if (!require(ImageViewsReady(0u, 2u, 2u, xrTargets, 2u) &&
+                 ImageViewsReady(1u, 2u, 2u, xrTargets, 2u),
+                 "both native/menu XR stereo projections need live views") ||
+        !require(!ImageViewsReady(2u, 2u, 2u, xrTargets, 2u) &&
+                 !ImageViewsReady(1u, 1u, 2u, xrTargets, 2u),
+                 "out-of-range and stale XR indices must fail closed") ||
+        !require(!ImageViewsReady(0u, 2u, 1u, xrTargets, 2u),
+                 "mono swapchain must reject stereo projection"))
+        return 1;
+    xrTargets[1][1] = nullptr;
+    if (!require(!ImageViewsReady(1u, 2u, 2u, xrTargets, 2u),
+                 "partial stereo target cannot reach OpenXR") ||
+        !require(ImageViewsReady(1u, 2u, 1u, xrTargets, 1u),
+                 "valid mono theater image remains renderable"))
+        return 1;
+    xrTargets.pop_back();
+    if (!require(!ImageViewsReady(1u, 2u, 2u, xrTargets, 2u),
+                 "truncated RTV array must never reach D3D11"))
+        return 1;
+
     // The last successfully copied frame wins over the preceding path.
     // Test both transition directions and incomplete native eye snapshots.
     using OutRunVrNativeEyePair::StereoSourceRoute;
