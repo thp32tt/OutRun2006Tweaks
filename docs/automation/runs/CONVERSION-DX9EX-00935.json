@@ -10,10 +10,10 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:CRITICAL:STAGE_EDGE_CULL_INVALID_VIEWPORT",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "VALIDATION_PENDING",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL_RESULT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "2fc40f2e86a2bf552c08aa1eae540cd37715713b",
@@ -87,6 +87,13 @@
     "compilation_regression": "The newly declared stand-alone stage-edge smoke target revealed a missing standard <initializer_list> include in a native g++ C++17 compile; the original mandatory host target did not build the new smoke executable. The repair provides the header and makes exact-SHA host compilation depend on the game-side smoke."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Validation SHA is a same TASK_ID test-compilation causality repair after original material. Run full required exact SHA and record C6 separately only on verified success; HMD UNTESTED.",
-  "material_result_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee"
+  "next_action": "C6 exact-SHA CI SUCCESS reported; physical Quest3/VDXR stage-edge object culling during Reset, resize, 4:3/16:9/21:9 and portrait remains UNTESTED. No automatic HMD PASS.",
+  "material_result_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee",
+  "validation_bearing_result_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee",
+  "ci_evidence": {
+    "exact_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee",
+    "conclusion": "SUCCESS",
+    "source": "user_reported_exact_sha_ci_success",
+    "hmd_test": "NOT_EXECUTED"
+  }
 }
