@@ -16,7 +16,11 @@ struct DirectGameWvpOwner
     std::uint64_t currentShaderEpoch, uploadShaderEpoch;
     GameSemantic::RenderScope uploadScope;
     GameSemantic::ProducerToken uploadProducer;
-    bool uploadedWhileQueued;
+    // A queue node is the live ownership proof. queueEpoch is only a
+    // monotonically increasing diagnostic generation and stays nonzero
+    // after EndSpriteQueueNode; it must not veto subsequent direct draws.
+    const void* uploadedQueueNode;
+    std::uint64_t historicalQueueEpoch;
 };
 
 constexpr bool OwnsDirectGameWvp(const DirectGameWvpOwner& owner) noexcept
@@ -31,7 +35,7 @@ constexpr bool OwnsDirectGameWvp(const DirectGameWvpOwner& owner) noexcept
         owner.currentShaderEpoch == owner.uploadShaderEpoch &&
         owner.uploadScope == GameSemantic::RenderScope::WorldParticle &&
         owner.uploadProducer == GameSemantic::ProducerToken::CarBaseShadow &&
-        !owner.uploadedWhileQueued;
+        owner.uploadedQueueNode == nullptr;
 }
 
 constexpr bool CanUseSpatialShadow(

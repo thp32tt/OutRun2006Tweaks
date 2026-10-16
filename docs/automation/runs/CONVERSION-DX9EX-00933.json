@@ -11,13 +11,13 @@
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "phase": "C6_RESULT",
-  "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "source_parent_sha": "104b9c3b3eb134d2fed2f311625bad0b3fbce87e",
+  "source_parent_sha": "083f458da09b1c2b87c4f9da50607b14ed5c8230",
   "source_paths": [
     "src/vr/game/car_base_shadow_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r29.cpp",
@@ -66,8 +66,8 @@
     ]
   },
   "acceptance_results": {
-    "direct_shadow_original_wvp": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
-    "stale_queue_and_desktop_fallback": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
+    "direct_shadow_original_wvp": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "stale_queue_and_desktop_fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
     "exact_sha_integrated_quality": "PENDING_EXACT_SHA_CI"
   },
   "diagnosis": {
@@ -84,17 +84,24 @@
     ],
     "fix_evidence": "Require original WVP provenance same direct producer, pose epoch, shader epoch, adjacent draw serial and finite data for the R29 spatial exception.",
     "negative_test_evidence": "car_base_shadow_stereo_smoke.cpp includes stale draw/pose/shader/queue/producer/zero negative mutations.",
-    "eye_ownership": "Each eye receives spatial contact-shadow correction only with same original direct producer and WVP lifetime; all unproven writes retain the existing stock-WVP eye path."
+    "eye_ownership": "Each eye receives spatial contact-shadow correction only with same original direct producer and WVP lifetime; all unproven writes retain the existing stock-WVP eye path.",
+    "current_source_repair": "Follow-up real C++ bug: SpriteQueueNodeEpoch remains nonzero after EndSpriteQueueNode; R29 wrongly rejected genuine direct CarBaseShadow original WVP any time after UI queue activity. Admission now uses the live queue-node pointer, not the historical queue generation, with positive after-queue smoke and negative active queue smoke."
   },
   "material_result_sha": "1eac78e0030f8b0470e8e45cbb869ee6d32957d6",
-  "validation_bearing_result_sha": "3b1226561be26ceef34e49a18b8d86a70e41b57d",
+  "validation_bearing_result_sha": null,
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA for exact validation-bearing commit; prior TERMINAL_STATUS_NOT_COMPLETE hold resolved. Await Quest3/VDXR HMD runtime and binocular start-contact-shadow acceptance; RUNTIME_VALIDATION=UNTESTED. Do not rerun CI or award duplicate points.",
+  "next_action": "Run required exact validation-bearing SHA GitHub Actions on functional source fix; preserve last verified 3b122... as historical only, Quest3 UNTESTED.",
   "validation_evidence": {
     "sha": "3b1226561be26ceef34e49a18b8d86a70e41b57d",
     "exact_sha_github_actions": "SUCCESS",
     "evidence_source": "Provided exact-SHA GitHub CI SUCCESS in C6 instruction; no rerun performed. Connector combined-status endpoint returned no individual statuses; no run IDs inferred.",
     "resolved_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
     "hmd_proof": "NONE"
+  },
+  "previous_exact_sha_validation": {
+    "sha": "3b1226561be26ceef34e49a18b8d86a70e41b57d",
+    "automation_validation": "PASS_EXACT_SHA",
+    "recorded_c6_sha": "083f458da09b1c2b87c4f9da50607b14ed5c8230",
+    "status": "COMPLETE_BUILD_VERIFIED"
   }
 }

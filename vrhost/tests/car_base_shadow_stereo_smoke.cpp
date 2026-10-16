@@ -28,7 +28,7 @@ int main()
     }
     const CarShadowStereo::DirectGameWvpOwner source{
         17,17,46,45,0x100,0x100,8,8,
-        world,player,false
+        world,player,nullptr,0
     };
     if (!CarShadowStereo::OwnsDirectGameWvp(source))
     {
@@ -53,7 +53,8 @@ int main()
     if (!rejected(mutation)) return 8;
     mutation = source; mutation.uploadProducer = ProducerToken::LensFlareCentre;
     if (!rejected(mutation)) return 9;
-    mutation = source; mutation.uploadedWhileQueued = true;
+    mutation = source; const int liveNode = 1;
+    mutation.uploadedQueueNode = &liveNode;
     if (!rejected(mutation)) return 10;
     mutation = source; mutation.currentPoseEpoch = 0;
     if (!rejected(mutation)) return 11;
@@ -61,6 +62,10 @@ int main()
     if (!rejected(mutation)) return 12;
     mutation = source; mutation.currentShaderEpoch = 0;
     if (!rejected(mutation)) return 13;
+    // Queue node was already End-ed; the monotonic epoch remains nonzero.
+    // This must still accept the subsequent independent player shadow.
+    mutation = source; mutation.historicalQueueEpoch = 57;
+    if (!CarShadowStereo::OwnsDirectGameWvp(mutation)) return 14;
     std::cout << "R84 contact shadow eye-owner PASS\n";
     return 0;
 }

@@ -419,7 +419,7 @@ namespace OutRunVRStereo
                 currentShader, writeShader,
                 currentShaderEpoch, writeShaderEpoch,
                 writtenScope, writtenProducer,
-                writtenQueueNode != nullptr || writtenQueueEpoch != 0
+                writtenQueueNode, writtenQueueEpoch
             });
         }
 
