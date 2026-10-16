@@ -1,3 +1,9 @@
+## 2026-10-17 사용자 명시 변경 — ChatGPT 예약 대신 C 전용 Docker 원본 영문 크롭
+
+2026-10-16의 전체 한글화 정지 정책 중 **검증된 원본 HD 영어 문구 네이티브 크롭 C 단독 작업만** 독립 N100 Docker에서 재개한다. 기존 A/B/C1/ChatGPT 컨트롤러와 이미지 생성·합성·DDS/VR은 정지 유지. 현재 실행 범위/검증/HOLD 및 중복 방지 규정은 `docs/OUTRUN_C_N100_ORIGINAL_CROP_ONLY_20261016.md`의 2026-10-17 추가 규정과 `docker/c-original-english-crop/README.md`를 따른다. 신규 검증 스펙이 없으면 IDLE이며 자동 문구 발견 성공을 주장하지 않는다.
+
+---
+
 ## 2026-10-17 00:10 KST 사용자 최우선 변경 — C 원본 영문 HD 글자 크롭 예약만 재개
 
 사용자가 **C의 영문 원본 HD 글자/문구 픽셀 크롭만** 반복 자동 작업으로 명시 승인했다. 2026-10-16 전체 자동 중지 규칙은 **이 C 작업에 한해서만** 부분 해제한다. 기존 ChatGPT 예약 작업(`6ad160ee3a2c81918f7afe2b99ad29cd`)을 매시 03분 KST 실행으로 사용하며 별도 타이머를 중복 생성하지 않는다. 255개 기존 추출 결과를 보존하고 SHA·DDS 원본 동등성과 전체 HD 출처가 입증된 신규 영어 문구만 1회당 최대 1개 자른다. 원문 RGB/RGBA 픽셀·좌표·원본 해시 보존, 품질 상태는 TEST_ONLY. 불확실한 입력은 HOLD. 기존 A/B/C1 ImageGen, 브라우저, 포테이너, CLEAN, 확대, 한글 합성, DDS 및 VR은 재개 승인되지 않았다. 상세 정본: [OUTRUN_C_N100_ORIGINAL_CROP_ONLY_20261016.md](OUTRUN_C_N100_ORIGINAL_CROP_ONLY_20261016.md).
