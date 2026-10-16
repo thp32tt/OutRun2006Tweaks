@@ -88,17 +88,19 @@
     "eye_ownership": "One exact original paused state controls both ScreenHud arrow and SpriteQueue overlay shell; two eye pixels share one latched OpenXR frame, independent pause scale and only pause-specific post-projection vertical shift; HMD runtime remains UNTESTED."
   },
   "ci_repair": {
-    "failed_validation_sha": "d23442bbcf034ac072b6b7be65fd6616129c112a",
-    "failed_run_id": 38946101597,
-    "failed_gate": "DX9Ex Active Validation / feature-unit policy",
-    "reason": "The material source commit lacked the same-task canonical feature-contract run file; policy exited before x86/x64 compilation, no game compile failure demonstrated.",
-    "correction": "Restore the exact feature catalog ESC_MENU and whole-source acceptance record in the same task without changing the renderer, test policy or mandatory jobs.",
-    "score_delta": 0
+    "failed_validation_sha": "4d8e9a5998e39cd69de4e2c3e7a05834d71ae9ea",
+    "failed_run_id": 38946511211,
+    "failed_gate": "DX9Ex Active Validation / tools/verify_vr_pause_menu_eye_affine.py",
+    "reason": "Existing destructive mutation replaced first identical local pauseOwned binding from new stage-eye function while independent shader branch remained; global presence check falsely accepted unsafe mutation. The stage-eye binding must have unique name for existing original shader owner negative-oracle sensitivity.",
+    "correction": "Rename only new XYZRHW stage-eye local to stagePauseOwner while preserving old shader pauseOwned exact mutation target and all renderer/host runtime calculations. Do not alter destructive verifier or omit CI.",
+    "score_delta": 0,
+    "previous_failed_validation_sha": "d23442bbcf034ac072b6b7be65fd6616129c112a",
+    "previous_failed_gate": "DX9Ex Active Validation / feature-unit policy"
   },
   "ci_evidence": {
     "result": "PENDING_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Verify immutable exact-SHA Active, Domain, HUD Inspector, Full Source gates, repair only a real failure under this TASK_ID, then record C6. Quest3/VDXR UI acceptance requires separate HMD run."
+  "next_action": "Run mandatory Gate suite on exact post-repair SHA; keep initial material SHA, Quest3/VDXR remains UNTESTED."
 }

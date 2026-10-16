@@ -3363,10 +3363,10 @@ namespace OutRunVRStereo
             // finite-eye route always selected gameplay VRHudScale and lost
             // BOTH independent pause controls before the pixel transform.
             // Keep +TIME, GOAL, gameplay HUD, front-end and F11 bit-identical.
-            const bool pauseOwned = R30IsPauseMenuElement();
-            const float hudScale = pauseOwned
+            const bool stagePauseOwner = R30IsPauseMenuElement();
+            const float hudScale = stagePauseOwner
                 ? R30HudScopeScale() : R30HudScaleValue();
-            const float postEyeVerticalPixels = pauseOwned
+            const float postEyeVerticalPixels = stagePauseOwner
                 ? R30PauseMenuVerticalFraction() *
                     static_cast<float>(state.viewport.Height)
                 : 0.0f;
