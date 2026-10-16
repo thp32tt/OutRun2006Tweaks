@@ -12,19 +12,23 @@
   "feature_class": "MEASURED_PERFORMANCE",
   "status": "VALIDATION_PENDING",
   "phase": "C5_VALIDATE",
-  "checkpoint": "C5_GATE_PENDING",
-  "automation_validation": "FAILED_POLICY_RECORD_MISSING",
+  "checkpoint": "C5_GATE_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "427a83aae7972e935deeae265ba5a16e53d5242f",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
-    "src/vr/d3d9/stage_extension_eye_plane.hpp"
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "src/hooks_uiscaling.cpp"
   ],
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stage_extension_eye_plane.hpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00924.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00924.json",
+    "tools/verify_vr_r30_responsive_hud_anchor.py",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "src/hooks_uiscaling.cpp"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:PERF:SPARSE_STAGE_RESULT_EYE_VERTICES",
@@ -86,15 +90,52 @@
     "next_hmd_experiment": "On user-controlled Quest3/VDXR compare exact R84 build on +TIME and GOAL scenes for eyes/scale/FPS versus known-good build; confirm SkyGlow, normal road/car stereo, FFB and fallback unchanged."
   },
   "failed_ci_evidence": {
-    "run_id": 38825438793,
-    "head_sha": "0b94aa293fc5c31902a52aaaff6cb5d1ae8fe468",
-    "job_id": 116731698986,
-    "step": "Enforce feature-sized DX9Ex autonomous completion",
-    "cause": "Missing docs/automation/runs/CONVERSION-DX9EX-00924.json blocked policy job before x86 game, x64 host and package jobs.",
-    "game_host_package": "SKIPPED_BY_POLICY"
+    "original": {
+      "run_id": 38825438793,
+      "head_sha": "0b94aa293fc5c31902a52aaaff6cb5d1ae8fe468",
+      "job_id": 116731698986,
+      "cause": "Missing exact-HEAD JSON record blocked the policy job before Windows build."
+    },
+    "verifier_then_compiler": {
+      "run_ids": [
+        38825744372,
+        38826020842,
+        38826254234,
+        38826593587
+      ],
+      "cause": "Two source-location verifier assumptions and a real MSVC C3861 unqualified pre-Draw QueueRenderActive call, fixed in existing TASK_ID."
+    },
+    "after_material_repair": {
+      "run_id": 38827403989,
+      "head_sha": "be6c5ed290fa92b35a3689dafbcfbc7316fbfad6",
+      "conclusion": "cancelled",
+      "reason": "pre-job GitHub Actions concurrency, not a source-build pass; GH run cannot be retried (403)."
+    }
   },
   "material_result_sha": "0b94aa293fc5c31902a52aaaff6cb5d1ae8fe468",
   "validation_bearing_result_sha": null,
   "score_delta_this_attempt": 0,
-  "next_action": "Run required GitHub Actions on record-bearing successor SHA; do not claim BUILD_VERIFIED until all required exact-SHA workflows complete. Continue same TASK_ID only for actual failed gates; HMD remains UNTESTED."
+  "next_action": "C5 repair input commit triggers a new DX9Ex Active exact-SHA run after the competing task runner releases the concurrency group, retaining original source material and no rescore. Wait for exact active 5/5, Domain, Full Source 3/3, HUD 2/2 before C6.",
+  "material_repair_sha": "be6c5ed290fa92b35a3689dafbcfbc7316fbfad6",
+  "ci_evidence": {
+    "prior_material_repair_sha": "be6c5ed290fa92b35a3689dafbcfbc7316fbfad6",
+    "domain_isolation": {
+      "run_id": 38827403954,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38827403951,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38827403968,
+      "conclusion": "in_progress"
+    },
+    "dx9ex_active": {
+      "run_id": 38827403989,
+      "conclusion": "cancelled_before_jobs"
+    },
+    "exact_sha_requirement": "All four workflows must be SUCCESS on the future validation-bearing exact SHA; prior SHA successes cannot substitute.",
+    "evidence_scope": "GitHub-only checks; no Quest3/VDXR hardware session."
+  }
 }
