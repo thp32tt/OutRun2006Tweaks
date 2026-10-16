@@ -61,8 +61,9 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
-      "LIVE_D3D9_DRAW",
-      "D3D11_NATIVE_FULLFRAME_OUTPUT",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
       "D3D9EX_GPU_SHARED_DESKTOP_FALLBACK"
     ],
     "integration_path": [
