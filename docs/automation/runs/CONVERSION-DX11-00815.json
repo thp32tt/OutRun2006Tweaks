@@ -1,0 +1,85 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00815",
+  "production_id": "CONVERSION-DX11-00815",
+  "event_id": "CONVERSION-DX11-00815-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "CONVERSION-DX11-00815",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "cc3c8248c0dd5b695f1aad407e77fdc7de62fed7",
+  "validation_bearing_result_sha": "cc3c8248c0dd5b695f1aad407e77fdc7de62fed7",
+  "changed_files": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "full_dx11_renderer_complete": false,
+    "goal": "Keep the selected native DirectGPU two-eye game frame on the live OpenXR D3D11 device when copying left/right eye textures into an XR array; reject stale/foreign-device sources and preserve classic SBS fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-directgpu-xr-eye-copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_openxr_array_slice_game_eye_output",
+        "expected_behavior": "Only an opted-in, validated native DirectGPU source with matching live context and resources copies distinct left/right game eyes into XR array slices 0/1."
+      },
+      {
+        "id": "deny-stale-eyes-and-preserve-sbs",
+        "category": "fallback_regression",
+        "behavior_area": "xr_device_recreation_classic_sbs_fallback",
+        "expected_behavior": "Reject missing, duplicate, wrong-device or wrong-route eye copies; preserve ordinary ClassicSbs shader rendering and original game inputs/FFB."
+      },
+      {
+        "id": "same-sha-ci-regression",
+        "category": "integrated_validation",
+        "behavior_area": "openxr_warp_and_dx11_required_checks",
+        "expected_behavior": "Two-device WARP acceptance/rejection and independent-eye pixel regression included in the exact source commit; required GitHub CI successful at that same SHA without claiming real HMD execution."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-directgpu-xr-eye-copy": "PASS_BUILD",
+    "deny-stale-eyes-and-preserve-sbs": "PASS_BUILD",
+    "same-sha-ci-regression": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Run record absent at validation SHA and current branch HEAD (RUN_RECORD_NOT_FOUND); recovered task metadata and touched files from the material commit, without altering validated source.",
+    "C1_REVIEW": "Reviewed the exact original change: XR GPU eye copies now use shared source-route, current D3D11 device/context/texture identity and stereo shape guards.",
+    "C2_IMPLEMENT": "Previously completed in material source commit cc3c8248c0dd5b695f1aad407e77fdc7de62fed7; no C6 source changes.",
+    "C3_VALIDATE": "User confirms required GitHub CI SUCCESS at exact validation-bearing SHA cc3c8248c0dd5b695f1aad407e77fdc7de62fed7; no CI or build rerun. HMD/Quest 3 runtime UNTESTED.",
+    "C4_COMMIT": "Existing non-skipped material commit cc3c8248c0dd5b695f1aad407e77fdc7de62fed7; this separate [skip ci] bookkeeping file records C6 only.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA for the scoped native XR DirectGPU copy protection; RUNTIME_VALIDATION=UNTESTED and NEED_HMD_TEST."
+  },
+  "evidence": {
+    "exact_sha": "cc3c8248c0dd5b695f1aad407e77fdc7de62fed7",
+    "ci_result": "SUCCESS",
+    "ci_verification_basis": "User confirmed exact-SHA GitHub CI success; no checks were triggered or rerun during C6.",
+    "runtime_evidence": "NONE: Quest3/VDXR/headset and real-game runtime not executed in this C6 step",
+    "recovered_after_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "recovered_fields_basis": "Material commit diff and neighboring schema-v3 records; original 00815 run record was absent, so no pre-existing contract or acceptance fields were overwritten."
+  },
+  "material_source_commits": [
+    "cc3c8248c0dd5b695f1aad407e77fdc7de62fed7"
+  ],
+  "repair_commits": [],
+  "score": {
+    "run_key": "CONVERSION-DX11-00815",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "C6 record restoration, CI status recording and [skip ci] bookkeeping do not produce additional score; preserve any separately recorded material-run credit."
+  }
+}
