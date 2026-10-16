@@ -1,0 +1,151 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00808",
+  "production_id": "CONVERSION-DX11-00808",
+  "event_id": "CONVERSION-DX11-00808-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP",
+  "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "38f408c463627955f39d6c2681e7575fe40acbc7",
+  "material_result_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e",
+  "validation_bearing_result_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e",
+  "changed_files": [
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_rollback.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+    "full_dx11_renderer_complete": false,
+    "goal": "Complete transactional D3D9Ex original-pixel rollback when first or only native GPU shared-desktop StretchRect partially fails during real full-size menu/car/race frame publication.",
+    "acceptance_items": [
+      {
+        "id": "single-full-crop-gpu-backup",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_desktop_fullframe",
+        "expected_behavior": "Snapshot original D3D9Ex pixels for complete and cropped/single-dirty game Presents before any GPU-to-D3D9Ex StretchRect."
+      },
+      {
+        "id": "first-failure-game-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9ex_game_backbuffer_and_input",
+        "expected_behavior": "Restore original game pixels on a failed first, single or later multi-tile StretchRect; preserve untargeted HUD regions, original rendering, gamepad/FFB and default-off activation."
+      },
+      {
+        "id": "five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "All five unchanged GitHub Actions succeed at one exact C++/test material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "single-full-crop-gpu-backup": "PASS_BUILD",
+    "first-failure-game-fallback": "PASS_BUILD",
+    "five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_DRAW",
+      "D3D11_NATIVE_FULLFRAME_OUTPUT",
+      "D3D9EX_GPU_SHARED_DESKTOP_FALLBACK"
+    ],
+    "integration_path": [
+      "Actual game-authored D3D9 Draw -> native D3D11 full-frame BGRA output",
+      "Same-Present full/crop/dirty GPU D3D9Ex StretchRect -> pre-blit original-game tile backups",
+      "First/any write failure -> exact original D3D9Ex pixels restored, with original input/FFB retained"
+    ],
+    "batch_components": [
+      "native_game_shared_desktop.hpp first and single region rollback during real GPU publication",
+      "native_game_shared_desktop_rollback.hpp one-or-multiple-region backup selection",
+      "source-linked portable native shared desktop positive/negative regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Full/cropped single region and multi-region backup plan, first/single/second failure fallback model; exact-SHA required Gates all SUCCESS.",
+      "negative_regression": "Invalid bounds, zero count and unsupported destinations rejected; partial StretchRect failure restores game-owned pixels. Actual driver partial failure not observed.",
+      "component_integration": "Real D3D11 BGRA native game Present GPU handoff uses original D3D9Ex pre-blit snapshots before publication; retains game/render/input fallback."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED only; real Quest3/VDXR game/HMD visual output and gamepad UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive default false, DX9Ex fallback original; DXVK frozen."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read HEAD 38f408c6 and completed 00807 with 5/5 exact-sha gate.",
+    "C1_REVIEW": "Found unbacked first/single StretchRect partial-failure path in native GPU desktop output.",
+    "C2_IMPLEMENT": "Expanded first/full/crop/dirty tile pre-snapshot and failure restoration; added source-linked portable regression.",
+    "C3_VALIDATE": "5/5 mandatory Actions SUCCESS on source 83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e; no HMD/gamepad observed.",
+    "C4_COMMIT": "Non-skip source [AUTO:CONVERSION-DX11-00808] 83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED for this fallback repair; entire DX11 native mono/L/R OpenXR game renderer not claimed complete."
+  },
+  "evidence": {
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38849961434,
+        "conclusion": "success",
+        "head_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e"
+      },
+      "Backend Conversion": {
+        "run_id": 38849961438,
+        "conclusion": "success",
+        "head_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e"
+      },
+      "Windows Build": {
+        "run_id": 38849966498,
+        "conclusion": "success",
+        "head_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e"
+      },
+      "OpenXR": {
+        "run_id": 38849961431,
+        "conclusion": "success",
+        "head_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e"
+      },
+      "HUD Inspector": {
+        "run_id": 38849966366,
+        "conclusion": "success",
+        "head_sha": "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e"
+      }
+    },
+    "extra_workflows": [
+      {
+        "name": "OpenXR VR architecture (additional)",
+        "run_id": 38849966361,
+        "conclusion": "success"
+      },
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 38849961437,
+        "conclusion": "skipped",
+        "required_for_five_gate_acceptance": false
+      }
+    ],
+    "runtime_evidence": "NONE - Quest3/VDXR, in-game menu/car/race and gamepad not run"
+  },
+  "material_source_commits": [
+    "83abb7006b11d61d1708ebcfbc68eda0ab5d1c5e"
+  ],
+  "score": {
+    "run_key": "CONVERSION-DX11-00808",
+    "score_change": 0,
+    "score_status": "NO_INDEPENDENT_FEATURE_COMPLETION_SCORE",
+    "note": "Scoped continuation of existing GPU shared desktop feature, not a separate completed end-to-end DX11 renderer. No score duplication."
+  }
+}
