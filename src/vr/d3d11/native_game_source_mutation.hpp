@@ -27,6 +27,28 @@ struct GameNativeSourceMutation {
         return fullMode && succeeded && gameOwner && canonicalBackbuffer &&
                wholeSurface && activeOrPreDraw && nativeTargetReady;
     }
+    // The real D3D9 ColorFill succeeded before native replay is attempted.
+    // A driver can clip that RECT against its destination surface: replay
+    // only the actual overlapping pixels. Entirely outside valid rectangles
+    // write no pixels and must not break a complete menu/car/race native batch.
+    // Invalid extents or sizes not representable by D3D11_RECT fail closed.
+    enum class ColorFillClip : std::uint8_t { Invalid, Empty, Pixels };
+    struct ColorFillRect { std::int64_t left{}, top{}, right{}, bottom{}; };
+    [[nodiscard]] static constexpr ColorFillClip classify_color_fill_rect(
+        std::int64_t l, std::int64_t t, std::int64_t r, std::int64_t b,
+        std::uint32_t width, std::uint32_t height,
+        ColorFillRect& out) noexcept {
+        out = {};
+        if (!width || !height || width > 0x7fffffffu ||
+            height > 0x7fffffffu || r <= l || b <= t)
+            return ColorFillClip::Invalid;
+        const auto w = static_cast<std::int64_t>(width);
+        const auto h = static_cast<std::int64_t>(height);
+        out = { l > 0 ? l : 0, t > 0 ? t : 0,
+                r < w ? r : w, b < h ? b : h };
+        return out.left < out.right && out.top < out.bottom
+            ? ColorFillClip::Pixels : ColorFillClip::Empty;
+    }
     // A bounded partial ColorFill can be replayed through D3D11.1 ClearView
     // only *after* native Draw has seeded a complete frame. Unknown/outside
     // extents must fail closed rather than clearing unrelated native pixels.
@@ -137,16 +159,23 @@ struct GameNativePreDrawFills {
         std::int64_t right, std::int64_t bottom,
         std::uint32_t width, std::uint32_t height,
         std::uint32_t color) noexcept {
-        if (!currentDevice || !currentBackbuffer || count >= kCapacity ||
-            (count && !belongs_to(currentDevice, currentBackbuffer)) ||
-            !GameNativeSourceMutation::bounded_color_fill_rect(
-                left, top, right, bottom, width, height))
+        if (!currentDevice || !currentBackbuffer ||
+            (count && !belongs_to(currentDevice, currentBackbuffer)))
             return false;
+        GameNativeSourceMutation::ColorFillRect clipped{};
+        const auto coverage = GameNativeSourceMutation::classify_color_fill_rect(
+            left, top, right, bottom, width, height, clipped);
+        if (coverage == GameNativeSourceMutation::ColorFillClip::Invalid)
+            return false;
+        if (coverage == GameNativeSourceMutation::ColorFillClip::Empty)
+            return true; // The original game wrote nothing; consume no tile slot.
+        if (count >= kCapacity) return false;
         if (!count) {
             device = currentDevice;
             backbuffer = currentBackbuffer;
         }
-        entries[count++] = {left, top, right, bottom, color};
+        entries[count++] = {clipped.left, clipped.top, clipped.right,
+                            clipped.bottom, color};
         return true;
     }
 };

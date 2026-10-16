@@ -5732,10 +5732,20 @@ bool preserve_game_color_fill(
             desc.Pool != D3DPOOL_DEFAULT || !desc.Width || !desc.Height ||
             (desc.Format != D3DFMT_A8R8G8B8 &&
              desc.Format != D3DFMT_X8R8G8B8)) return false;
+        GameNativeSourceMutation::ColorFillRect clipped{};
+        const auto coverage = rect
+            ? GameNativeSourceMutation::classify_color_fill_rect(
+                rect->left, rect->top, rect->right, rect->bottom,
+                desc.Width, desc.Height, clipped)
+            : GameNativeSourceMutation::ColorFillClip::Pixels;
+        if (coverage == GameNativeSourceMutation::ColorFillClip::Invalid)
+            return false;
+        // A clipped rectangle may cover the whole game backbuffer; use the
+        // existing full-RT clear path even without D3D11.1 ClearView.
         const bool wholeSurface = !rect ||
-            (rect->left == 0 && rect->top == 0 &&
-             rect->right == static_cast<LONG>(desc.Width) &&
-             rect->bottom == static_cast<LONG>(desc.Height));
+            (coverage == GameNativeSourceMutation::ColorFillClip::Pixels &&
+             clipped.left == 0 && clipped.top == 0 &&
+             clipped.right == desc.Width && clipped.bottom == desc.Height);
         ComPtr<IUnknown> surfaceIdentity;
         if (FAILED(destination->QueryInterface(
                 IID_PPV_ARGS(surfaceIdentity.GetAddressOf()))) ||
@@ -5750,6 +5760,9 @@ bool preserve_game_color_fill(
         const bool targetReady = s.backend.ready() && s.backend.color_rtv() &&
             s.backend.context() && s.nativeWidth == desc.Width &&
             s.nativeHeight == desc.Height;
+        if (rect && coverage == GameNativeSourceMutation::ColorFillClip::Empty)
+            return sameGameBackbuffer && s.sourceGameDevice == owner &&
+                   !s.frameBatch.stopped; // Successful original D3D9 no-op.
         if (!wholeSurface) {
             // Save successful pre-Draw partial fills so the initial native
             // full-resolution scene includes the same menu/vehicle background.
@@ -5771,7 +5784,7 @@ bool preserve_game_color_fill(
                     alreadyDrawn && s.pending && !s.frameBatch.stopped,
                     targetReady,
                     GameNativeSourceMutation::bounded_color_fill_rect(
-                        rect->left, rect->top, rect->right, rect->bottom,
+                        clipped.left, clipped.top, clipped.right, clipped.bottom,
                         desc.Width, desc.Height)))
                 return false;
             ComPtr<ID3D11DeviceContext1> context1;
@@ -5787,7 +5800,8 @@ bool preserve_game_color_fill(
                     float((color >> 24) & 255u) * scale
             };
             const D3D11_RECT nativeRect{
-                rect->left, rect->top, rect->right, rect->bottom};
+                static_cast<LONG>(clipped.left), static_cast<LONG>(clipped.top),
+                static_cast<LONG>(clipped.right), static_cast<LONG>(clipped.bottom)};
             context1->ClearView(s.backend.color_rtv(), rgba, &nativeRect, 1u);
             // A partial ColorFill is not a new whole-frame clear baseline.
             // Keep the original full Clear seed, depth and Draw ordinals.
