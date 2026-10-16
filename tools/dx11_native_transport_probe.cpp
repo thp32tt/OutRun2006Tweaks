@@ -1024,6 +1024,7 @@ int main()
         bool replayedDistinctArrayEyeCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
         bool replayedScaledPostpass[2]{};
+        bool replayedScaledArrayEye[2]{};
         bool preservedPostDrawMrt[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
@@ -1374,6 +1375,22 @@ int main()
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
         std::cerr << "R178-DIAG stretch returned " << eyeIndex << '\n';
+        // Full-size per-camera color can live in a multi-mip GPU array.
+        // The original game StretchRect scales the correct array slice,
+        // never the other camera or an implicit mono mip. Invalid slices
+        // must leave both the eye and draw evidence untouched.
+        const D3D11_RECT scaledArrayDest{
+            static_cast<LONG>(destX), 8,
+            static_cast<LONG>(destX + 12u), 14};
+        fixture.replayedScaledArrayEye[eyeIndex] =
+            !encoder.stretch_game_surface(
+                fixture.gameEyeArray, sourcePatch, scaledArrayDest,
+                false, 2u) &&
+            encoder.stretch_game_surface(
+                fixture.gameEyeArray, sourcePatch, scaledArrayDest,
+                false, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         ID3D11RenderTargetView* afterCopyMrt[2]{};
         ID3D11DepthStencilView* afterCopyDepth = nullptr;
         ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
@@ -1393,6 +1410,7 @@ int main()
             !fixture.replayedDistinctArrayEyeCopy[eyeIndex] ||
             !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
             !fixture.replayedScaledPostpass[eyeIndex] ||
+            !fixture.replayedScaledArrayEye[eyeIndex] ||
             !encoder.color_draw_count()) return false;
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
@@ -1604,6 +1622,19 @@ int main()
               arrayPixel[2] == 0xccu
             : arrayPixel[0] == 0x33u && arrayPixel[1] == 0xbbu &&
               arrayPixel[2] == 0x22u;
+        // Confirm actual D3D11 stretched GPU pixels, not a merely accepted
+        // API call. Camera 0 is solid 0xffcc0011; camera 1 0xff22bb33.
+        // A slice-zero default for BOTH eyes would fail this readback.
+        const UINT scaledArrayX = eyeIndex == 0u ? 19u : 51u;
+        const auto* scaledArrayPixel =
+            pixel + 10u * mapped.RowPitch + scaledArrayX * 4u;
+        const bool actualScaledArrayEye = eyeIndex == 0u
+            ? scaledArrayPixel[0] == 0x11u &&
+              scaledArrayPixel[1] == 0x00u &&
+              scaledArrayPixel[2] == 0xccu
+            : scaledArrayPixel[0] == 0x33u &&
+              scaledArrayPixel[1] == 0xbbu &&
+              scaledArrayPixel[2] == 0x22u;
         const UINT mipX = eyeIndex == 0u ? 18u : 50u;
         const auto* mipPixel = pixel + 34u * mapped.RowPitch + mipX * 4u;
         const bool actualMipZeroCopy =
@@ -1619,7 +1650,8 @@ int main()
             ? later[0] == 255u && later[1] == 0u && later[2] == 0u
             : later[0] == 0u && later[1] == 255u && later[2] == 0u;
         if (!distinctColor || !actualMipZeroCopy || !actualDistinctArrayEye ||
-            !actualPartialClear || !orderedAfterDrawClear) {
+            !actualScaledArrayEye || !actualPartialClear ||
+            !orderedAfterDrawClear) {
             std::cerr << "00829 eye=" << eyeIndex
                       << " full RGBA=" << unsigned(pixel[0]) << ","
                       << unsigned(pixel[1]) << "," << unsigned(pixel[2]) << ","

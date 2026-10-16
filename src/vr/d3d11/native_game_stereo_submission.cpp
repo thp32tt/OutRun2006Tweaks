@@ -540,7 +540,8 @@ private:
 // cannot certify new game geometry Draws and never touches D3D9/FFB/input.
 bool NativeGameEyeDrawEncoder::stretch_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX& srcBox,
-    const D3D11_RECT& dest, bool linearFilter) noexcept {
+    const D3D11_RECT& dest, bool linearFilter,
+    UINT sourceArraySlice) noexcept {
     if (!source || !context_ || !eye_targets_bound()) return false;
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
     eyeTarget_->GetResource(resource.GetAddressOf());
@@ -559,7 +560,8 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
     if (!sd.Width || !sd.Height || sd.Format == DXGI_FORMAT_UNKNOWN ||
         sd.MipLevels == 0u || ed.Format == DXGI_FORMAT_UNKNOWN ||
-        sd.ArraySize != 1u || ed.MipLevels != 1u ||
+        sd.ArraySize == 0u || sourceArraySlice >= sd.ArraySize ||
+        ed.MipLevels != 1u ||
         ed.ArraySize != 1u || sd.SampleDesc.Count == 0u ||
         ed.SampleDesc.Count != 1u || ed.SampleDesc.Quality != 0u ||
         sd.Usage != D3D11_USAGE_DEFAULT ||
@@ -672,15 +674,21 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         constants = std::move(cb);
     }
 
+    // Shader-readable single-slice sources can be sampled in place. A
+    // TEXTURE2DARRAY source is not compatible with the postpass Texture2D
+    // pixel shader: extract only the selected game camera into a one-slice
+    // mip-zero GPU SRV. The shader always samples LOD 0; copying all atlas
+    // mips or the other eye would be incorrect and needlessly expensive.
+    const bool directSingleSlice =
+        transfer == NativeGameStretchSourceTransfer::DirectSample &&
+        sd.ArraySize == 1u;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> sampled;
-    if (transfer == NativeGameStretchSourceTransfer::DirectSample)
+    if (directSingleSlice)
         sampled = source;
     else {
         D3D11_TEXTURE2D_DESC desc = sd;
-        // For multisample RTs resolve mip 0; single-sample RT-only sources
-        // preserve their full mip allocation for legal CopyResource.
-        if (transfer == NativeGameStretchSourceTransfer::ResolveToSampled)
-            desc.MipLevels = 1u;
+        desc.MipLevels = 1u;
+        desc.ArraySize = 1u;
         desc.SampleDesc.Count = 1u;
         desc.SampleDesc.Quality = 0u;
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -702,11 +710,18 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     if (!restore.valid()) return false;
     context_->OMSetRenderTargets(0u, nullptr, nullptr);
     if (sampled.Get() != source) {
+        // Subresource 0 of EACH array slice is the camera's full-sized
+        // color. This also handles multisampled color and multi-mip
+        // RTV-only postpasses without ever copying unrelated eye pixels.
+        const UINT sourceSubresource =
+            D3D11CalcSubresource(0u, sourceArraySlice, sd.MipLevels);
         if (transfer == NativeGameStretchSourceTransfer::ResolveToSampled)
             context_->ResolveSubresource(
-                sampled.Get(), 0u, source, 0u, sd.Format);
-        else if (transfer == NativeGameStretchSourceTransfer::CopyToSampled)
-            context_->CopyResource(sampled.Get(), source);
+                sampled.Get(), 0u, source, sourceSubresource, sd.Format);
+        else
+            context_->CopySubresourceRegion(
+                sampled.Get(), 0u, 0u, 0u, 0u,
+                source, sourceSubresource, nullptr);
     }
     ID3D11RenderTargetView* target = eyeTarget_;
     context_->OMSetRenderTargets(1u, &target, nullptr);
