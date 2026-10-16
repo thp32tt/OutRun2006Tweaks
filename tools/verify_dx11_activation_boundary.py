@@ -79,7 +79,18 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
     missing += ["timeline:" + needle for needle in source_requirements
                 if needle not in source]
     test_requirements = [
-        "partialGameClear.count[0] = partialGameClear.count[1] = 6u;",
+        # The seventh source event is a real game-authored, eye-specific
+        # clipped GPU Copy. Retain the older partial depth/stencil evidence
+        # AND require positive+negative WARP pixel coverage for this new path.
+        "partialGameClear.count[0] = partialGameClear.count[1] = 7u;",
+        "edgeCopy.kind = SourceClear::Kind::SourceCopy;",
+        "edgeCopy.destX = 62u;",
+        "edgeCopy.sourceArraySlice = eye;",
+        "fixture.replayedClippedSurfaceCopy[eyeIndex] =",
+        "fixture.replayedClippedConvertedCopy[eyeIndex] =",
+        "fixture.replayedClippedMsaaResolve[eyeIndex] =",
+        "!encoder.copy_game_surface(",
+        "require(expectedSourceEdge && expectedConvertedEdge &&",
         "zRect.kind = SourceClear::Kind::FullDepthStencil;",
         "fixture.replayedPartialDepthStencil[eyeIndex] =",
         "!encoder.clear_depth_stencil(0.5f, 0u, true, true, &badRect)",
