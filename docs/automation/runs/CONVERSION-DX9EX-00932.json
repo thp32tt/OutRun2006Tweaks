@@ -65,15 +65,15 @@
     ]
   },
   "acceptance_results": {
-    "large_finite_stage_eye_pose": "PASS_SOURCE_AND_NATIVE_SMOKE",
-    "pose_failure_atomic_fallback": "PASS_SOURCE_AND_NATIVE_SMOKE",
-    "final_sha_quality_gates": "PASS_EXACT_SHA"
+    "large_finite_stage_eye_pose": "PENDING",
+    "pose_failure_atomic_fallback": "PENDING",
+    "final_sha_quality_gates": "PENDING"
   },
   "diagnosis": {
     "source_trace": "R30BuildStageExtensionXyzrhwEyePlane: previous float centre pre-add could become infinity; shared LensCentre helper uses widened midpoint and checks both eyes as one transaction.",
     "known_limitation": "This is a deterministic R84 position-safety repair, not evidence that user's visually observed +TIME double image is completely resolved; pending real HMD batch/eye acceptance."
   },
-  "material_result_sha": "202fa4933d5dfbe71dfc744ada96722e5f8b84b2",
+  "material_result_sha": null,
   "validation_bearing_result_sha": "202fa4933d5dfbe71dfc744ada96722e5f8b84b2",
   "score_delta_this_attempt": 0,
   "next_action": "C6 exact SHA PASS for bounded R84 finite +TIME/GOAL eye origin repair. Retain original visual symptom until matching Quest3/VDXR +TIME sprite and digits, GOAL and reset optical test; RUNTIME_VALIDATION=UNTESTED, score +0 until whole feature completed. Do not rerun exact SHA CI.",
