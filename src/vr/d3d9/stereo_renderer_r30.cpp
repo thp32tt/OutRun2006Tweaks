@@ -3684,6 +3684,24 @@ namespace OutRunVRStereo
                         state, baseProjection);
             }
 
+            // 2026-10-17 Quest R84: physical SCREEN_HUD XYZRHW rank/score
+            // was still allowed to fall through the generic RHW-depth test.
+            // A HUD glyph with world-looking RHW then inherited particle
+            // stereo, yielding different size/placement in the two eyes.
+            // R26_SAFE already owns these exact HUD sprites as a finite,
+            // head-recentered plane. Share R84's bilaterally proven result
+            // plane for every source-tagged ScreenHud primitive; this is not
+            // an alpha/depth guess and does not affect unknown sprites,
+            // projected vehicle markers, SceneEffect, smoke or SkyGlow.
+            // The exact +TIME/GOAL path above retains its own producer guard.
+            if (OutRunVR::GameSemantic::CorroboratesHud(
+                    OutRunVR::GameSemantic::EffectiveScope()))
+            {
+                return haveBaseProjection &&
+                    R30BuildStageExtensionXyzrhwEyePlane(
+                        state, baseProjection);
+            }
+
             // Smoke/sand can redraw a static VB/IB span many times without a
             // single game write. Copy caches already pin those exact revisions;
             // reuse only the depth classifier, NEVER per-draw stereo/RT state.
