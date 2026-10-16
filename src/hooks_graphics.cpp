@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
+#include "vr/game/reflection_frame_budget.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -296,7 +297,8 @@ class RestoreCarBaseShadow : public Hook
 	{
 		// These call sites were nullsub_1 calls on PC, so skipping the draw
 		// restores exactly what the game did without the shadow.
-		if (Settings::CarBaseShadowOpacity <= 0.f)
+		if (Settings::CarBaseShadowOpacity <= 0.f ||
+			!std::isfinite(a4))
 			return;
 
 		// The selector also invokes this PC nullsub replacement, but
@@ -1321,16 +1323,15 @@ class ReflectionUpdateRate : public Hook
 			lastCounter = {};
 		}
 
-		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get() * frameScale60;
-		// Do not repay stalled 1024x1024 cube-face work in a catch-up burst.
-		const bool vrNormalized =
-			Settings::VREnabled && Settings::VRNormalizeReflectionRate;
-		const int maxFaces = vrNormalized ? (frameSpike ? 2 : 3) : FacesPerCubemap;
-		const int faces = (std::min)(maxFaces, int(pendingFaces));
-		pendingFaces = std::clamp(pendingFaces - float(faces), 0.0f,
-			vrNormalized ? 1.0f : float(FacesPerCubemap));
-
-		ctx.eax = faces;
+		// Quest-inspired bounded render work: one deterministic budget
+		// preserves original 60 Hz reflection quality while preventing XR
+		// frame misses from triggering a large deferred cubemap redraw.
+		const auto budget = OutRunVR::ReflectionFrameBudget::Advance(
+			pendingFaces, Settings::ReflectionUpdateRate.get(), frameScale60,
+			Settings::VREnabled && Settings::VRNormalizeReflectionRate,
+			frameSpike);
+		pendingFaces = budget.pendingFaces;
+		ctx.eax = budget.faces;
 	}
 
 public:
@@ -1496,9 +1497,10 @@ class FixZBufferPrecision : public Hook
 	}
 
 	static bool ApplyDriverSeatCameraOffset(EvWorkCamera* camera,
-		D3DVECTOR& savedPos, D3DVECTOR& savedLook)
+		D3DVECTOR& savedPos, D3DVECTOR& savedLook,
+		bool driverSeatFrame)
 	{
-		if (!DriverSeatCameraActive(camera))
+		if (!driverSeatFrame)
 			return false;
 
 		savedPos = camera->cam_pos_F8;
@@ -1539,13 +1541,17 @@ class FixZBufferPrecision : public Hook
 		// improve z-buffer precision by increasing znear
 		// game default is 0.1 which reduces precision of far objects massively, causing z-fighting and objects not drawing properly
 
-		if (allow_znear_override && (Settings::FixZBufferPrecision ||
-            DriverSeatCameraActive(camera)))
+		// Snapshot camera eligibility once for near-plane and the native
+		// view-matrix transaction. Repeated checks cost redundant camera
+		// basis construction and can disagree during mode transitions.
+		const bool driverSeatFrame = DriverSeatCameraActive(camera);
+		if (allow_znear_override &&
+			(Settings::FixZBufferPrecision || driverSeatFrame))
 		{
 			// In 6DoF VR the player can move their head through the normal third-
 			// person near plane. Keep the 2D precision fix intact outside VR, but
 			// use the dedicated VR near plane during gameplay/goal rendering.
-			if (DriverSeatCameraActive(camera))
+			if (driverSeatFrame)
 			{
 				// Keep cockpit geometry within 15 cm even during stereo warmup.
 				camera->perspective_znear_BC = std::clamp(
@@ -1585,7 +1591,8 @@ class FixZBufferPrecision : public Hook
 			}
 		}
 		D3DVECTOR savedPos{}, savedLook{};
-		const bool driverSeatOffset = ApplyDriverSeatCameraOffset(camera, savedPos, savedLook);
+		const bool driverSeatOffset = ApplyDriverSeatCameraOffset(
+			camera, savedPos, savedLook, driverSeatFrame);
 		CalcCameraMatrix.call(camera);
 		if (driverSeatOffset)
 		{

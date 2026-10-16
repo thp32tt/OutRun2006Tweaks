@@ -240,6 +240,17 @@ add_custom_command(TARGET outrun-vr-goal-b9200-stack-smoke POST_BUILD
 # Quest-inspired binocular sphere visibility. Cache per-eye tangents once
 # per pose and fail open on invalid XR data. The original game culling hook
 # is unchanged until exact world-space sphere inputs are established.
+# Active C2C reflection-pass work scheduling: preserve 60 Hz rate while
+# avoiding deferred cubemap redraw bursts after a late HMD frame.
+add_executable(outrun-vr-reflection-budget-smoke
+    tests/reflection_frame_budget_smoke.cpp)
+target_include_directories(outrun-vr-reflection-budget-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-reflection-budget-smoke)
+add_custom_command(TARGET outrun-vr-reflection-budget-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-reflection-budget-smoke>"
+    COMMENT "Run original 60 Hz and XR reflection cubemap spike budget regression"
+    VERBATIM)
 add_executable(outrun-vr-quest-stereo-cull-smoke
     tests/quest_stereo_sphere_visibility_smoke.cpp)
 target_include_directories(outrun-vr-quest-stereo-cull-smoke PRIVATE
@@ -353,6 +364,7 @@ foreach(target
     outrun-vr-stage-edge-cull-smoke
     outrun-vr-driver-seat-camera-smoke
     outrun-vr-quest-stereo-cull-smoke
+    outrun-vr-reflection-budget-smoke
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-hud-command-batch-smoke
     outrun-vr-render-command-snapshot-smoke
