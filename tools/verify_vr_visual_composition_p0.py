@@ -550,6 +550,21 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
         require(marker, semantic_source, 'B9200 exact producer identity')
     enter = function_body(ui_source, 'static void ResultTextEnter(')
     leave = function_body(ui_source, 'static void ResultTextLeave(')
+    # B9200 formerly crashed when a +5 midhook overwrote a legal branch
+    # target. Its exact E8-parent source is now recovered INSIDE the existing
+    # 2C808/2C9DB glyph call wrapper, without patching the nineteen CALLs.
+    trace = function_body(ui_source, 'static bool IsOriginalB9200GoalGlyph(')
+    glyph = function_body(ui_source, 'static int __cdecl TextGlyph_putSprite(')
+    for part in ('STATE_GOAL', 'RtlCaptureStackBackTrace(',
+                 'GoalResult::IsOriginalB9200ParentReturn('):
+        require(part, trace, 'safe original GOAL result text stack proof')
+    for part in ('const bool exactGoalResult = IsOriginalB9200GoalGlyph();',
+                 'ScopedExactProducerSemantic', 'ResultTextB9200',
+                 'if (exactGoalResult)', 'ProducerToken::TextGlyphPutSprite'):
+        require(part, glyph, 'B9200 exact glyph source vs unchanged fallback')
+    require('src/vr/game/goal_result_parent_provenance.hpp'
+            .replace('src/', '') in ui_source,
+            ui_source, 'portable B9200 source provenance linked')
     require('ResultTextBefore[p] = root ? root->tail_4 : nullptr;',
             enter, 'exact parent must snapshot full sprite queue')
     require_order(leave, 'result text must tag ALL actual queued siblings',

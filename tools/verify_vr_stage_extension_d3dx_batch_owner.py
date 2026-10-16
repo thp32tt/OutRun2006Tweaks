@@ -450,13 +450,19 @@ def check_exact_goal_xyzrhw_plane(renderer: str, semantics: str) -> list[str]:
     predicate = semantics[semantics.find("inline constexpr bool CanReprojectFiniteResultHudPlane("):
                           semantics.find("    static_assert(CanReprojectFiniteResultHudPlane(")]
     required = ("StageExtensionTime", "GoalTime020", "GoalTime150",
-                "ResultProgress", "OutRunStagePrintf")
+                "ResultProgress", "OutRunStagePrintf", "ResultTextB9200")
     if not all(("producer == ProducerToken::" + token) in predicate for token in required):
         errors.append("exact stage/GOAL source family missing from C++ predicate")
     if ("scope == RenderScope::ScreenHud" not in predicate or
-            "ProducerToken::ResultTextB9200" in predicate or
             "ProducerToken::DispRankClipSprite" in predicate):
-        errors.append("GOAL plane admits unsafe non-owned result/rank draws")
+        errors.append("GOAL plane admits unsafe non-owned rank draws")
+    # B9200 is now safe only after its exact original E8 caller is proven
+    # by the existing glyph wrapper; never revive the crashing +5 midhooks.
+    ui = code
+    if ("IsOriginalB9200GoalGlyph()" not in ui or
+            "GoalResult::IsOriginalB9200ParentReturn(" not in ui or
+            "RtlCaptureStackBackTrace(" not in ui):
+        errors.append("B9200 HUD-plane source lacks exact return-stack proof")
     if ("CanReprojectFiniteResultHudPlane(" not in section or
             "CurrentRenderProducerToken()" not in section or
             "R30BuildStageExtensionXyzrhwEyePlane(" not in section or

@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/goal_result_parent_provenance.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
@@ -1614,6 +1615,27 @@ class UIScaling : public Hook
 		return result;
 	}
 
+    // 2026-10-11 Quest3 dumps proved that hooking any of the nineteen
+    // original GOAL B9200 E8 return sites can corrupt a legal branch target.
+    // Recover the source from its exact return address on the call stack of
+    // the ALREADY installed 0x2C808/0x2C9DB glyph wrapper instead.
+    // Unknown/FPO-unwind-failed frames use the original glyph path.
+    static bool IsOriginalB9200GoalGlyph() noexcept
+    {
+        if (!Settings::VREnabled || !Game::current_mode ||
+            *Game::current_mode != GameState::STATE_GOAL)
+            return false;
+        void* frames[24]{};
+        const USHORT count = RtlCaptureStackBackTrace(
+            0, static_cast<ULONG>(std::size(frames)), frames, nullptr);
+        const auto base = reinterpret_cast<std::uintptr_t>(Module::exe_ptr(0));
+        for (USHORT i = 0; i < count; ++i)
+            if (OutRunVR::GoalResult::IsOriginalB9200ParentReturn(
+                    base, reinterpret_cast<std::uintptr_t>(frames[i])))
+                return true;
+        return false;
+    }
+
 	using TextGlyphPutSpriteFn = int(__cdecl*)(SPRARGS*, float);
 	static int __cdecl TextGlyph_putSprite(SPRARGS* args, float priority)
 	{
@@ -1627,15 +1649,35 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
+        // Source verification happens BEFORE the original game allocates
+        // nodes or submits direct glyphs. A verified B9200 caller must
+        // survive into R84's queued SpriteNode and GPU-eye plane; unrelated
+        // HUD/GOAL helpers keep the old TextGlyphPutSprite provenance.
+        const bool exactGoalResult = IsOriginalB9200GoalGlyph();
+        std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
+            directResultOwner;
+        if (exactGoalResult && !OutRunVR::GameSemantic::QueueRenderActive())
+            directResultOwner.emplace(
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                nullptr, true,
+                OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
 		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
 			Module::exe_ptr(0x2CFE0));
 		const int result = original(args, priority);
-		// Tag all original-produced glyph/mask children as ScreenHud;
-		// otherwise an untagged sibling bypasses the R30 head-recentered
-		// HUD owner and doubles at +TIME / checkpoint / goal/result.
-		TagAppendedNodes(tailsBefore,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite);
+        if (exactGoalResult)
+        {
+            TagAppendedNodes(tailsBefore,
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+        }
+        else
+        {
+            // The untouched +TIME, stage Sumo_Printf, ordinary HUD and
+            // all unknown callers use the exact preexisting sprite route.
+		    TagAppendedNodes(tailsBefore,
+			    OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			    OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite);
+        }
 		return result;
 	}
 

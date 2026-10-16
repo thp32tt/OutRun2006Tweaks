@@ -88,8 +88,11 @@ namespace OutRunVR::GameSemantic
     // verified stage-result printf parents have the SAME physical XYZRHW
     // submission risk as +TIME: the source may finish before D3DX Flush.
     // Admit only their exact producer identities to the recentered finite
-    // binocular HUD plane. The 19 separate B9200 result-text parents have
-    // no proven D3DX batch ownership and deliberately keep the old route.
+    // binocular HUD plane. The B9200 glyph family is now admitted ONLY
+    // when its original E8 return is proven on the 2C808/2C9DB wrapper
+    // stack and propagated onto direct/queued glyph ownership. Unproven
+    // deferred D3DX buffers are deliberately NOT added to the GoalOwner
+    // batch-flush whitelist (they retain the native End fallback).
     inline constexpr bool CanReprojectFiniteResultHudPlane(
         RenderScope scope, ProducerToken producer) noexcept
     {
@@ -98,7 +101,8 @@ namespace OutRunVR::GameSemantic
              producer == ProducerToken::GoalTime020 ||
              producer == ProducerToken::GoalTime150 ||
              producer == ProducerToken::ResultProgress ||
-             producer == ProducerToken::OutRunStagePrintf);
+             producer == ProducerToken::OutRunStagePrintf ||
+             producer == ProducerToken::ResultTextB9200);
     }
 
     static_assert(CanReprojectFiniteResultHudPlane(
@@ -111,8 +115,10 @@ namespace OutRunVR::GameSemantic
         RenderScope::ScreenHud, ProducerToken::ResultProgress));
     static_assert(CanReprojectFiniteResultHudPlane(
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
-    static_assert(!CanReprojectFiniteResultHudPlane(
+    static_assert(CanReprojectFiniteResultHudPlane(
         RenderScope::ScreenHud, ProducerToken::ResultTextB9200));
+    static_assert(!CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenOverlay2D, ProducerToken::ResultTextB9200));
     static_assert(!CanReprojectFiniteResultHudPlane(
         RenderScope::ScreenHud, ProducerToken::DispRankClipSprite));
     static_assert(!CanReprojectFiniteResultHudPlane(
