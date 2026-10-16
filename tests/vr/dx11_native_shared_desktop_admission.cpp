@@ -1,4 +1,5 @@
 #include "../../src/vr/d3d11/native_game_shared_desktop_admission.hpp"
+#include "../../src/vr/d3d11/native_game_shared_desktop_rollback.hpp"
 #include <cassert>
 using outrun::vr::dx11::live_game_frame::NativeSharedDesktopAdmission;
 int main() {
@@ -109,6 +110,32 @@ int main() {
     const auto clipped = GameNativeMultiDirtyUpload::select(
         3440,1440,crop,2,32,200,100,3400,300,outOfCrop,true);
     assert(!selectMulti(clipped).valid);
+    // The GPU desktop rollback retains original game pixels for each
+    // independently proven tile, not a huge bounding rectangle containing
+    // untouched menu/vehicle/race HUD pixels.
+    using outrun::vr::dx11::live_game_frame::NativeSharedDesktopRollbackPlan;
+    constexpr GameNativePresentRegion distantHud[2]{
+        {100,100,200,200},{1800,1000,1900,1100}};
+    constexpr auto backupPlan = NativeSharedDesktopRollbackPlan::select(
+        3440,1440,distantHud,2u);
+    static_assert(backupPlan.valid && backupPlan.count == 2u);
+    static_assert(backupPlan.totalPixels == 20000u);
+    static_assert(backupPlan.tiles[0].width == 100u &&
+                  backupPlan.tiles[1].height == 100u);
+    assert(backupPlan.totalPixels < 1800ull * 1000ull);
+    // Overlapping update tiles are also backed up before any publication.
+    constexpr GameNativePresentRegion overlappingHud[2]{
+        {20,30,120,130},{80,100,160,200}};
+    static_assert(NativeSharedDesktopRollbackPlan::select(
+        3440,1440,overlappingHud,2u).totalPixels == 18000u);
+    constexpr GameNativePresentRegion illegalHud[2]{
+        {20,30,120,130},{80,100,3441,200}};
+    static_assert(!NativeSharedDesktopRollbackPlan::select(
+        3440,1440,illegalHud,2u).valid);
+    static_assert(!NativeSharedDesktopRollbackPlan::select(
+        3440,1440,distantHud,1u).valid);
+    static_assert(!NativeSharedDesktopRollbackPlan::select(
+        3440,1440,nullptr,2u).valid);
     const auto malformed = NativeSharedDesktopAdmission::select_region(
         3440,1440,{0,-1,3440,1440},false,false,false,false,false,noTile);
     assert(!malformed.valid);

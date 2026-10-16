@@ -6,6 +6,7 @@
 #include <wrl/client.h>
 #include <cstdint>
 #include "native_game_shared_desktop_admission.hpp"
+#include "native_game_shared_desktop_rollback.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // One process-local, opt-in, GPU-only game-frame presentation route.
@@ -55,19 +56,24 @@ public:
             regionCount > GameNativeDirtyRegionCoverage::kMaxPartitionRects ||
             width > 0x7fffffffu || height > 0x7fffffffu)
             return false;
-        RECT unionBounds{static_cast<LONG>(width), static_cast<LONG>(height),0,0};
+        // Derive the full list before any GPU command. Multi-dirty copies
+        // take exact tile backups, not the area spanning untouched game HUD.
+        std::array<GameNativePresentRegion,
+                   GameNativeDirtyRegionCoverage::kMaxPartitionRects> regions{};
         for (std::uint32_t i = 0; i < regionCount; ++i) {
-            const RECT& region = visibleRegions[i];
-            if (region.left < 0 || region.top < 0 ||
-                region.right <= region.left || region.bottom <= region.top ||
-                static_cast<std::uint32_t>(region.right) > width ||
-                static_cast<std::uint32_t>(region.bottom) > height)
+            const RECT& rect = visibleRegions[i];
+            if (rect.left < 0 || rect.top < 0 ||
+                rect.right <= rect.left || rect.bottom <= rect.top ||
+                static_cast<std::uint32_t>(rect.right) > width ||
+                static_cast<std::uint32_t>(rect.bottom) > height)
                 return false;
-            if (region.left < unionBounds.left) unionBounds.left = region.left;
-            if (region.top < unionBounds.top) unionBounds.top = region.top;
-            if (region.right > unionBounds.right) unionBounds.right = region.right;
-            if (region.bottom > unionBounds.bottom) unionBounds.bottom = region.bottom;
+            regions[i] = {rect.left, rect.top, rect.right, rect.bottom};
         }
+        const auto rollbackPlan = regionCount > 1u
+            ? NativeSharedDesktopRollbackPlan::select(
+                width, height, regions.data(), regionCount)
+            : NativeSharedDesktopRollbackPlan{};
+        if (regionCount > 1u && !rollbackPlan.valid) return false;
 
         D3D11_TEXTURE2D_DESC desc{};
         source->GetDesc(&desc);
@@ -182,9 +188,9 @@ public:
         // Source/destination are identically sized BGRA textures; source_
         // pixels outside this region are never exposed by StretchRect.
         const bool entire = regionCount == 1u &&
-            unionBounds.left == 0 && unionBounds.top == 0 &&
-            static_cast<std::uint32_t>(unionBounds.right) == width &&
-            static_cast<std::uint32_t>(unionBounds.bottom) == height;
+            visibleRegions[0].left == 0 && visibleRegions[0].top == 0 &&
+            static_cast<std::uint32_t>(visibleRegions[0].right) == width &&
+            static_cast<std::uint32_t>(visibleRegions[0].bottom) == height;
         if (entire) {
             context->CopyResource(source_.Get(), source);
         } else {
@@ -243,25 +249,40 @@ public:
         // StretchRect is not atomic across disjoint rectangles. Preserve the
         // original D3D9 pixels under the union before the first write, so a
         // failed later tile can restore the game-owned fallback image.
-        Microsoft::WRL::ComPtr<IDirect3DSurface9> backup;
+        std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>,
+                   GameNativeDirtyRegionCoverage::kMaxPartitionRects> backups{};
         if (regionCount > 1u) {
-            if (FAILED(game->CreateRenderTarget(
-                    static_cast<UINT>(unionBounds.right - unionBounds.left),
-                    static_cast<UINT>(unionBounds.bottom - unionBounds.top),
-                    destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
-                    backup.GetAddressOf(), nullptr)) || !backup ||
-                FAILED(game->StretchRect(
-                    backbuffer, &unionBounds, backup.Get(), nullptr, D3DTEXF_NONE)))
-                return false;
+            // Snapshot every original tile BEFORE any blit, including regions
+            // overlapping another tile. A distant pair of HUD updates no longer
+            // allocates or copies a huge bounding-box render target each Present.
+            // If creation/copy fails, nothing has touched the game's backbuffer.
+            for (std::uint32_t i = 0u; i < regionCount; ++i) {
+                if (FAILED(game->CreateRenderTarget(
+                        rollbackPlan.tiles[i].width,
+                        rollbackPlan.tiles[i].height,
+                        destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
+                        backups[i].GetAddressOf(), nullptr)) || !backups[i] ||
+                    FAILED(game->StretchRect(
+                        backbuffer, &visibleRegions[i], backups[i].Get(),
+                        nullptr, D3DTEXF_NONE)))
+                    return false;
+            }
         }
         for (std::uint32_t i = 0; i < regionCount; ++i) {
             const RECT* rect = entire ? nullptr : &visibleRegions[i];
             if (FAILED(game->StretchRect(
                     sharedSurface.Get(), rect, backbuffer, rect, D3DTEXF_NONE))) {
-                if (backup && FAILED(game->StretchRect(
-                        backup.Get(), nullptr, backbuffer,
-                        &unionBounds, D3DTEXF_NONE)))
-                    faulted_ = true;
+                // A failing StretchRect can have partially written its own tile.
+                // Restore the failed tile AND all earlier writes from original
+                // pre-blit snapshots. Never rewrite untouched gaps in the union.
+                bool restored = true;
+                for (std::uint32_t j = 0u; j <= i && regionCount > 1u; ++j) {
+                    if (FAILED(game->StretchRect(
+                            backups[j].Get(), nullptr, backbuffer,
+                            &visibleRegions[j], D3DTEXF_NONE)))
+                        restored = false;
+                }
+                if (!restored) faulted_ = true;
                 return false;
             }
         }
