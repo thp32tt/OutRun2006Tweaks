@@ -23,6 +23,8 @@ on:
       - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'src/hooks_framerate.cpp'
       - 'tools/verify_vr_sumo_replay_semantics.py'
+      - 'src/game.hpp' # WinMM SND_LOOP macro must not corrupt original game audio enum under R84.
+      - 'src/vr/d3d9/stereo_renderer_r30.cpp' # Independent R84 compile owns HUD, C993 and player-shadow eye matrices.
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
       - 'src/vr/d3d9/stereo_renderer_r26.cpp'
       - 'src/vr/d3d9/stereo_renderer_r29.cpp'
@@ -78,6 +80,8 @@ on:
       - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'src/hooks_framerate.cpp'
       - 'tools/verify_vr_sumo_replay_semantics.py'
+      - 'src/game.hpp' # WinMM SND_LOOP macro must not corrupt original game audio enum under R84.
+      - 'src/vr/d3d9/stereo_renderer_r30.cpp' # Independent R84 compile owns HUD, C993 and player-shadow eye matrices.
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
       - 'src/vr/d3d9/stereo_renderer_r26.cpp'
       - 'src/vr/d3d9/stereo_renderer_r29.cpp'
