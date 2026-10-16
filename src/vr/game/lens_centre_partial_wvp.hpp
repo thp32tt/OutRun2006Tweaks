@@ -11,12 +11,17 @@ namespace OutRunVR::LensCentre
     {
         float raw[16]{};
         std::uint8_t covered = 0;
+        // A successfully submitted complete game c64 is a valid baseline
+        // for later D3D9 partial row updates in this SAME physical draw.
+        // Incomplete partial assemblies must never inherit earlier rows.
+        bool committedComplete = false;
         std::uint64_t call = 0, pose = 0, shaderEpoch = 0, drawSerial = 0;
         std::uintptr_t shader = 0, device = 0;
 
         constexpr void Reset() noexcept
         {
             covered = 0;
+            committedComplete = false;
             call = pose = shaderEpoch = drawSerial = 0;
             shader = device = 0;
         }
@@ -49,7 +54,7 @@ namespace OutRunVR::LensCentre
             if (covered && (call != currentCall || pose != currentPose ||
                 shader != currentShader || shaderEpoch != currentShaderEpoch ||
                 device != currentDevice || drawSerial != currentDrawSerial ||
-                (covered & incoming) != 0))
+                ((covered & incoming) != 0 && !committedComplete)))
                 Reset();
             if (!covered)
             {
@@ -72,6 +77,16 @@ namespace OutRunVR::LensCentre
                     covered | (1u << (reg - 64)));
             }
             return covered == 0x0Fu;
+        }
+
+        // Called only after the original game device ACCEPTED the complete
+        // source matrix. The assembled rows now mirror real D3D9 c64 state;
+        // a same-draw partial SetVertexShaderConstantF replaces those rows,
+        // rather than invalidating untouched valid rows.
+        constexpr bool CommitComplete() noexcept
+        {
+            committedComplete = covered == 0x0Fu;
+            return committedComplete;
         }
     };
 
@@ -143,6 +158,42 @@ namespace OutRunVR::LensCentre
             stage.raw[0] == 17 && stage.raw[4] == 9 &&
             stage.raw[8] == 13 && stage.raw[12] == 13;
     }
+
+    // The real GPU retains non-overwritten c64 rows. Once a full source-owned
+    // upload succeeded, partial updates in the SAME original C993 submission
+    // must keep the remaining rows; stale/foreign and failed uploads cannot.
+    constexpr bool CommittedFullAcceptsOwnedPartialRows() noexcept
+    {
+        PartialWvpUpload stage{};
+        constexpr float full[16]{
+            1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16};
+        constexpr float newRow[4]{21,22,23,24};
+        if (!stage.Append(64,4,full,8,3,0x40,6,0xA0,51,true) ||
+            !stage.CommitComplete())
+            return false;
+        if (!stage.Append(65,1,newRow,8,3,0x40,6,0xA0,51,true) ||
+            stage.raw[0] != 1 || stage.raw[4] != 21 ||
+            stage.raw[7] != 24 || stage.raw[8] != 9 ||
+            stage.raw[15] != 16)
+            return false;
+        // A later draw cannot reuse the old complete matrix, even with the
+        // same shader and exact centre call identity.
+        if (stage.Append(67,1,newRow,8,3,0x40,6,0xA0,52,true) ||
+            stage.covered != 0x08 || stage.committedComplete)
+            return false;
+        if (stage.CommitComplete())
+            return false;
+        // Failed or foreign writes must discard the partial candidate.
+        if (stage.Append(64,1,newRow,8,3,0x40,6,0xA0,52,false) ||
+            stage.covered != 0)
+            return false;
+        stage.Append(64,4,full,8,3,0x40,6,0xA0,52,true);
+        if (!stage.CommitComplete())
+            return false;
+        return !stage.Append(65,1,newRow,9,3,0x40,6,0xA0,52,true) &&
+            stage.covered == 0x02 && !stage.committedComplete;
+    }
+    static_assert(CommittedFullAcceptsOwnedPartialRows());
     static_assert(RejectsCrossDrawAndOverlappingPartialWvp());
     static_assert(SplitUploadCompletesOwnedWvp());
     static_assert(RejectsMixedAndFailedUploads());

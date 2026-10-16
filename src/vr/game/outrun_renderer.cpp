@@ -1809,7 +1809,10 @@ namespace OutRunVRRenderer
 					// Preserve untouched legacy/full-upload rendering semantics.
 					RecordGameWvpWrite(
 						LensCentrePartialWvp.raw, LensCentrePartialWvp.raw);
-					LensCentrePartialWvp.Reset();
+					// Keep this successfully submitted whole matrix as the
+					// baseline for any later same-C993 same-draw row update.
+					// A new call, shader, device, pose or draw resets it.
+					LensCentrePartialWvp.CommitComplete();
 				}
 				else if (FAILED(result) || !exactCentre)
 					LensCentrePartialWvp.Reset();
@@ -1854,6 +1857,29 @@ namespace OutRunVRRenderer
 					RecordGameWvpWrite(
 						constantData + wvpOffsetRegisters * 4,
 						constantData + wvpOffsetRegisters * 4);
+					// A full c64..c67 game upload is not discarded by a
+					// subsequent single-row D3D9 update in this very same
+					// C993 physical submission. R84 must reconstruct the
+					// complete ORIGINAL matrix, not fall back to mono merely
+					// because the GPU retained three unchanged rows.
+					if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+							OutRunVR::GameSemantic::ProducerToken::LensFlareCentre &&
+						OutRunVR::GameSemantic::CurrentLensCentreCallEpoch != 0 &&
+						!OutRunVR::GameSemantic::QueueRenderActive())
+					{
+						std::uintptr_t shader = 0;
+						std::uint64_t shaderEpoch = 0;
+						if (OutRunVRStereo::GetCurrentShaderEpoch(
+								shader, shaderEpoch) &&
+							LensCentrePartialWvp.Append(
+								64u, 4u,
+								constantData + wvpOffsetRegisters * 4,
+								OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
+								LatchedPoseEpoch, shader, shaderEpoch,
+								reinterpret_cast<std::uintptr_t>(device),
+								OutRunVRStereo::GetTopLevelDrawSerial(), true))
+							LensCentrePartialWvp.CommitComplete();
+					}
 					++SemanticOverlayBypassCalls;
 					if (!FirstSemanticOverlayBypassLogged)
 					{
