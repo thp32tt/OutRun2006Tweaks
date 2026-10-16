@@ -827,12 +827,24 @@ int main()
         " inout TriangleStream<V> output) {"
         " for (uint i=0; i<3; ++i) output.Append(input[i]);"
         " output.RestartStrip(); }";
+    // Test-only shader compiler is loaded explicitly: the Win32 isolated
+    // transport target must not depend on an SDK import-library variant.
+    // Failure remains an explicit WARP regression failure, never a fake PASS.
+    HMODULE compilerModule = LoadLibraryW(L"d3dcompiler_47.dll");
+    require(compilerModule != nullptr,
+            "00827 WARP shader compiler runtime available");
+    const auto compileShader = reinterpret_cast<decltype(&D3DCompile)>(
+        GetProcAddress(compilerModule, "D3DCompile"));
+    require(compileShader != nullptr,
+            "00827 WARP shader compiler entrypoint available");
     ID3DBlob* geometryBytecode = nullptr;
-    require(SUCCEEDED(D3DCompile(
-                gameGeometrySource, sizeof(gameGeometrySource)-1u,
-                "native_eye_game", nullptr, nullptr, "main", "gs_4_0",
-                D3DCOMPILE_ENABLE_STRICTNESS, 0u, &geometryBytecode, nullptr)) &&
-            geometryBytecode, "00827 caller geometry stage compiled");
+    const HRESULT geometryCompileResult = compileShader(
+        gameGeometrySource, sizeof(gameGeometrySource)-1u,
+        "native_eye_game", nullptr, nullptr, "main", "gs_4_0",
+        D3DCOMPILE_ENABLE_STRICTNESS, 0u, &geometryBytecode, nullptr);
+    FreeLibrary(compilerModule);
+    require(SUCCEEDED(geometryCompileResult) && geometryBytecode,
+            "00827 caller geometry stage compiled");
     ID3D11GeometryShader* originalGeometryShader = nullptr;
     require(SUCCEEDED(d3d.device->CreateGeometryShader(
                 geometryBytecode->GetBufferPointer(),

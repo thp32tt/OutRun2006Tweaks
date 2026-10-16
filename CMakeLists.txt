@@ -1014,7 +1014,6 @@ target_include_directories(dx11_native_transport_probe PUBLIC
 )
 
 target_link_libraries(dx11_native_transport_probe PUBLIC
-    d3dcompiler.lib
     d3d11.lib
     dxgi.lib
     dxguid.lib
