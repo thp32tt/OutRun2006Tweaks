@@ -582,6 +582,13 @@ class WndprocHook : public Hook
 		const bool focusTransition =
 			msg == WM_KILLFOCUS || msg == WM_SETFOCUS ||
 			msg == WM_ACTIVATEAPP || msg == WM_ACTIVATE;
+		// Forward system input into ImGui for key-state cleanup, but never
+		// treat its return value as permission to suppress the game's WndProc
+		// or Windows' native Alt/F11/focus transitions.
+		const bool systemMessage =
+			msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP ||
+			msg == WM_SYSCHAR || msg == WM_SYSDEADCHAR ||
+			msg == WM_SYSCOMMAND;
 		const bool mouseMessage =
 			(msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) ||
 			msg == WM_SETCURSOR;
@@ -591,7 +598,8 @@ class WndprocHook : public Hook
 		const bool keyboardMessage =
 			msg == WM_KEYDOWN || msg == WM_KEYUP ||
 			msg == WM_CHAR || msg == WM_DEADCHAR ||
-			msg == WM_IME_CHAR || msg == WM_IME_COMPOSITION;
+			msg == WM_IME_CHAR || msg == WM_IME_COMPOSITION ||
+			msg == WM_IME_STARTCOMPOSITION || msg == WM_IME_ENDCOMPOSITION;
 		const bool notificationMouseCapture =
 			overlayInited && mouseMessage && ImGui::GetCurrentContext() &&
 			ImGui::GetIO().WantCaptureMouse;
@@ -599,9 +607,15 @@ class WndprocHook : public Hook
 			OutRunF11Input::ShouldForwardToImGui(
 				overlayActive, Overlay::IsBindingDialogActive,
 				legacyF11Key, focusTransition, notificationMouseCapture);
-		if (overlayInited && forwardImGui &&
-			ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
-			return 1;
+		if (overlayInited && forwardImGui && ImGui::GetCurrentContext())
+		{
+			const LRESULT imguiResult =
+				ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam);
+			if (imguiResult &&
+				!OutRunF11Input::MustPreserveOriginalWin32Path(
+					legacyF11Key, focusTransition, systemMessage))
+				return 1;
+		}
 
 		// ImGui's event handler returns 0 for many valid keyboard/pointer
 		// messages after queuing them. While F11 (or the binding dialog) owns

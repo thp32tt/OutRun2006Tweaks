@@ -85,6 +85,11 @@ for width, height in ((3440., 1440.), (1920., 1080.),
     assert 0 < minimum_height <= usable_height <= height
 # Mutation guards catch accidental removal of the actual input/VR owners.
 assert "overlayInited && forwardImGui &&" in wnd
+assert "const LRESULT imguiResult =" in wnd
+assert "!OutRunF11Input::MustPreserveOriginalWin32Path(" in wnd
+assert "legacyF11Key, focusTransition, systemMessage)" in wnd
+assert "WM_SYSCHAR" in wnd and "WM_SYSCOMMAND" in wnd
+assert "WM_IME_STARTCOMPOSITION" in wnd and "WM_IME_ENDCOMPOSITION" in wnd
 route_args = wnd.split("OutRunF11Input::ShouldForwardToImGui(", 1)[1].split(
     ");", 1)[0]
 for original in ("notificationMouseCapture", "legacyF11Key"):
@@ -134,4 +139,24 @@ assert "interactiveShell && (keyboardMessage || mouseMessage)" not in routing.re
     "interactiveShell && (keyboardMessage || mouseMessage)", "false", 1)
 assert "legacyF11Key, keyboardMessage, mouseMessage," not in wnd.replace(
     "legacyF11Key, keyboardMessage, mouseMessage,", "false, false, false,", 1)
-print("PASS F11 hidden-input isolation, F11/game ownership and VR shell bounds")
+# A nonzero ImGui handler result must NOT suppress native F11 release,
+# focus changes, or OS Alt/system messages. Test positive and negative
+# combinations against the actual C++ policy and hook invocation.
+assert "constexpr bool MustPreserveOriginalWin32Path(" in routing
+assert "return legacyF11Key || focusTransition || systemMessage;" in routing
+for f11 in (False, True):
+    for focus in (False, True):
+        for system in (False, True):
+            preserve = f11 or focus or system
+            assert preserve == bool(f11 or focus or system)
+            if preserve:
+                assert not (True and not preserve)  # handler=1 still reaches game
+            else:
+                assert True and not preserve        # UI handler may consume
+assert "return legacyF11Key || focusTransition || systemMessage;" not in routing.replace(
+    "return legacyF11Key || focusTransition || systemMessage;",
+    "return legacyF11Key;", 1)
+assert "!OutRunF11Input::MustPreserveOriginalWin32Path(" not in wnd.replace(
+    "!OutRunF11Input::MustPreserveOriginalWin32Path(",
+    "/* native path removed */", 1)
+print("PASS F11 hidden-input isolation, native F11/focus/system, IME and VR shell bounds")

@@ -21,6 +21,21 @@ namespace OutRunF11Input
                   !ShouldDrawSoftwareCursor(false, false),
         "Desktop and closed F11 must not submit the VR cursor");
 
+    // ImGui's Win32 backend may claim a message even after enqueuing it.
+    // Legacy F11 key-up still owns the original toggle, and focus/Alt
+    // transitions must reach the original game's window procedure so it
+    // releases input and Windows can process system shortcuts. Never let
+    // a backend's nonzero return bypass those native owners.
+    constexpr bool MustPreserveOriginalWin32Path(bool legacyF11Key,
+        bool focusTransition, bool systemMessage) noexcept
+    {
+        return legacyF11Key || focusTransition || systemMessage;
+    }
+    static_assert(MustPreserveOriginalWin32Path(true, false, false) &&
+                  MustPreserveOriginalWin32Path(false, true, false) &&
+                  MustPreserveOriginalWin32Path(false, false, true));
+    static_assert(!MustPreserveOriginalWin32Path(false, false, false));
+
     constexpr bool ShouldForwardToImGui(bool shellVisible,
         bool bindingDialogVisible, bool legacyF11Key, bool focusTransition,
         bool notificationMouseCapture) noexcept

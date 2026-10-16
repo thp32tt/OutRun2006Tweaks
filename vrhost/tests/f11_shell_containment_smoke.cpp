@@ -1,4 +1,5 @@
 #include "overlay/f11_responsive_fit.hpp"
+#include "overlay/f11_input_routing.hpp"
 #include <limits>
 using OutRunF11ResponsiveFit::WindowRect;
 using OutRunF11ResponsiveFit::ContainWindow;
@@ -31,5 +32,20 @@ int main()
             std::numeric_limits<float>::infinity(),100).valid) return 5;
     const auto native=ContainWindow({0,0,640,480},{12,20,400,300},600,440);
     if (!native.valid || native.moved || native.resized) return 6;
+    // Real native WndProc event ownership: ImGui may return nonzero for
+    // release, focus and Alt shortcuts, but original game/OS must still
+    // receive all three. Other consumed ImGui UI input stays in the shell.
+    using OutRunF11Input::MustPreserveOriginalWin32Path;
+    for (int legacy = 0; legacy <= 1; ++legacy)
+        for (int focus = 0; focus <= 1; ++focus)
+            for (int system = 0; system <= 1; ++system)
+                if (MustPreserveOriginalWin32Path(legacy, focus, system) !=
+                    (legacy || focus || system)) return 7;
+    if (!OutRunF11Input::ShouldConsumeFromGame(
+            true, false, false, true, false, false) ||
+        OutRunF11Input::ShouldConsumeFromGame(
+            true, false, true, true, false, false) ||
+        !OutRunF11Input::ShouldForwardToImGui(
+            false, false, true, false, false)) return 8;
     return 0;
 }

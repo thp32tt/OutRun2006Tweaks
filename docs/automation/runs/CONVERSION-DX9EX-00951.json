@@ -1,0 +1,57 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00951",
+  "production_id": "CONVERSION-DX9EX-00951",
+  "event_id": "CONVERSION-DX9EX-00951-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00951",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "cd2b9de0981bc2df299d72b811a4b64d59384900",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/overlay/f11_input_routing.hpp",
+    "src/overlay/hooks_overlay.cpp"
+  ],
+  "changed_files": [
+    "src/overlay/f11_input_routing.hpp",
+    "src/overlay/hooks_overlay.cpp",
+    "vrhost/tests/f11_shell_containment_smoke.cpp",
+    "tools/verify_vr_f11_wndproc_shell.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00951.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Keep original F11 release toggle, game focus cleanup and Windows Alt/system keys working when ImGui reports a consumed Win32 event, while F11 owns ordinary controls and Korean IME composition in stereo Quest gameplay.",
+    "scope_boundary": "Original WndProc bridge and F11-only input routing; do not change game UI geometry, font atlas, VR eye transforms, FFB, world, SkyGlow, DX11, DXVK or native desktop input.",
+    "trace_stages": [
+      "Game window receives original F11, focus, OS system and IME messages.",
+      "ImGui Win32 backend queues eligible input and may return nonzero.",
+      "Only UI-owned ordinary input is consumed; F11/focus/system proceed to original game WndProc even when ImGui reports handled."
+    ],
+    "subcomponents": [
+      "Original F11 key-up path and release transitions are never dropped by backend return.",
+      "Windows focus/Alt/system transitions reach original game procedure after ImGui synchronization.",
+      "IME START/COMPOSITION/END remains F11-owned; closed-shell gameplay and normal binding-dialog navigation remain unchanged.",
+      "Executable portable native ownership matrix and existing source-bound workflow regression."
+    ]
+  },
+  "acceptance_results": {
+    "native_f11_focus_system": "PENDING",
+    "f11_ime_negative_fallback": "PENDING",
+    "exact_sha_all_gates": "PENDING"
+  },
+  "runtime_limit": "No same-SHA Quest3/VDXR game session; visual/input acceptance not claimed."
+}
