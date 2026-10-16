@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00925",
+  "production_id": "CONVERSION-DX9EX-00925",
+  "event_id": "CONVERSION-DX9EX-00925-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00925",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R33:VIEWPORT_SURFACE_GENERATION_LEASE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_GATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e6f51dd5539dbcc091d7a477ed2be2e858802099",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r33_full_target_viewport.py"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r33_full_target_viewport.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00925.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:R33:VIEWPORT_SURFACE_GENERATION_LEASE",
+    "goal": "Prevent wrong full-target viewport skips when an R84 stereo right-eye or saved game render target is recreated at the same COM address across frames or during device loss.",
+    "scope_boundary": "Only R33 per-frame target-extent metadata leases in DX9Ex independent R84; no changes to game HUD semantics, actual viewport geometry, DX11, DXVK, R26_SAFE, original input, FFB, or SkyGlow.",
+    "special_work_evidence": "Source-confirmed functional hazard: R33's cached GetDesc width/height was keyed only by borrowed IDirect3DSurface9 pointer and reset only on Reset/rollback; same-pointer surface recreation in another frame could reuse wrong extents and skip a required SetViewport. This corrects a stereo state restoration and rendering safety blocker, not a measured FPS gain or proven Quest3 symptom.",
+    "trace_stages": [
+      "R84 game device draws per-eye with R33TargetResetViewportMatches or R33SavedTargetResetViewportMatches after target switches; a full-target metadata cache makes ordinary per-draw SetViewport redundant.",
+      "At the native Present return or device-lost cooperative-state branch, R33 now expires both borrowed surface extent identities so an address reused during resize cannot carry its previous dimensions.",
+      "The next per-eye draw re-queries GetDesc for new target extents and skips SetViewport only if its actual current full viewport is an exact match, with normal mono/fail-closed and right-eye restore intact."
+    ],
+    "subcomponents": [
+      "Invalidate both original RT0 and right-eye viewport extent leases at native frame boundary, not per draw, preserving within-frame hot-path savings.",
+      "Invalidate both target leases immediately on D3DERR_DEVICELOST or D3DERR_DEVICENOTRESET, including paths that bypass the normal Present postamble.",
+      "Add targeted negative regression for both invalidation paths and same-address resized target; retain existing viewport/stereo/restore assertions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "r33_per_frame_extent_reprobe",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 right-eye and game original render-target GetDesc extent validation",
+        "expected_behavior": "Each new frame starts with invalid right-eye and original-target extent leases, re-probes current surface size once per target and elides redundant SetViewport only within the proven current-frame full-target extent."
+      },
+      {
+        "id": "device_loss_and_com_address_reuse",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9Ex device loss, same-address resize, and conservative original SetViewport fallback",
+        "expected_behavior": "Both cached COM addresses expire on lost/notreset or normal Present; a 2496x2688 cached surface may not authorize a 2048x2160 recreated surface or bypass a viewport mismatch, while existing mono/restore paths stay unchanged."
+      },
+      {
+        "id": "exact_sha_gates_and_runtime_split",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 and R26_SAFE, x64 OpenXR host, package and isolation/inspector CI gates",
+        "expected_behavior": "All mandatory Actions complete successfully on one record-bearing exact result SHA, with runtime Quest3/VDXR left UNTESTED until physical verification."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "r33_per_frame_extent_reprobe": "SOURCE_IMPLEMENTED",
+    "device_loss_and_com_address_reuse": "SOURCE_IMPLEMENTED",
+    "exact_sha_gates_and_runtime_split": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R33 cached right-eye and original target extents by borrowed COM address over multiple Present frames, clearing only on Reset or rollback; recreated same-address surfaces could be mistakenly assumed to have prior dimensions.",
+    "original_evidence": "R33TargetResetViewportMatches and R33SavedTargetResetViewportMatches both reuse their cached width/height when surface pointer matches; PresentDestR33 previously did not clear those viewport identities after the frame, nor in device-lost fast bypass.",
+    "eye_ownership": "Both per-eye right render-target switch and original game render-target viewport restoration are protected by separate frame-local caches, and both leases expire together so a stale surface address cannot skip viewport correction.",
+    "source_trace": [
+      "src/vr/d3d9/stereo_renderer_r33.cpp: R33TargetResetViewportMatches snapshots right eye GetDesc only when extent lease invalid.",
+      "src/vr/d3d9/stereo_renderer_r33.cpp: R33SavedTargetResetViewportMatches snaps original game RT0 GetDesc independently.",
+      "src/vr/d3d9/stereo_renderer_r33.cpp: PresentDestR33 now clears both caches after normal Present and in device loss bypass.",
+      "tools/verify_vr_r33_full_target_viewport.py: existing viewport restore assertions plus same-pointer reuse model and loss/normal invalidation predicates."
+    ],
+    "alternatives_rejected": [
+      "Never clear on every draw: it forces two extra driver GetDesc calls on a hot path with thousands of stereo draws, regressing frame pacing; invalidate once at the actual Present/loss boundary instead.",
+      "Pointer equality cannot prove resource-generation identity across target recreation; preserve the conservative explicit SetViewport when full dimensions do not match."
+    ],
+    "fix_evidence": "Material source commit 660ce0110ae449a1fa6888b9af03b5972d561c1c changes both renderer lifecycle and same-pointer negative regression; not a HUD-only metadata change.",
+    "negative_test_evidence": "verify_vr_r33_full_target_viewport.py asserts both normal Present and lost-device invalidation and models stale same-pointer 2496x2688 vs 2048x2160 mismatch, retaining existing inset/Z/restore negative tests.",
+    "runtime_evidence": "No Quest3/VDXR or real game display test performed in this automation; visual correctness and FPS improvement not claimed.",
+    "next_hmd_experiment": "Quest3/VDXR exact-source build: resize/recenter between portrait extents and full-screen, inspect right/left viewport edges, restored UI, road and car stereo, lens/GOAL, and track frame timing compared to control."
+  },
+  "material_result_sha": "660ce0110ae449a1fa6888b9af03b5972d561c1c",
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Run the existing required full exact-SHA DX9Ex Active, Domain, Full Source Impact and EXE HUD Inspector gates on the record-bearing successor; mark BUILD_VERIFIED only on confirmed exact-SHA success. No duplicate score or HMD PASS."
+}
