@@ -7,6 +7,7 @@
 #include <cstdint>
 #include "native_game_shared_desktop_admission.hpp"
 #include "native_game_shared_desktop_rollback.hpp"
+#include "native_game_shared_desktop_backup.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // One process-local, opt-in, GPU-only game-frame presentation route.
@@ -20,6 +21,9 @@ public:
     NativeSharedDesktopBridge& operator=(const NativeSharedDesktopBridge&) = delete;
 
     void reset() noexcept {
+        // D3D9 DEFAULT-pool backups cannot survive Reset/owner/transport changes.
+        for (auto& backup : backups_) backup.Reset();
+        for (auto& key : backupKeys_) key = {};
         source_.Reset();
         fence_.Reset();
         shared9_.Reset();
@@ -248,18 +252,33 @@ public:
         // Preserve original D3D9 pixels for every region before any writes,
         // otherwise a failed first/single blit could corrupt the fallback.
         // Never back up the union between distant original-game HUD tiles.
-        std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>,
-                   GameNativeDirtyRegionCoverage::kMaxPartitionRects> backups{};
-        // Snapshot before either the first single-region or multi-region
-        // publication. Failure here cannot have modified the game backbuffer.
+        // Keep bounded original-game rollback render targets across steady
+        // Presents instead of allocating up to 32 DEFAULT-pool surfaces per
+        // frame. Their contents are NEVER reused: snapshot all visible tiles
+        // again before any GPU/native StretchRect changes the backbuffer.
+        // Generation, owning D3D9Ex device, format and exact tile size fence
+        // reuse across Reset, car/menu resolution changes and new sources.
+        const auto ownerToken =
+            reinterpret_cast<std::uintptr_t>(game9Ex_.Get());
         for (std::uint32_t i = 0u; i < rollbackPlan.count; ++i) {
-            if (FAILED(game->CreateRenderTarget(
-                    rollbackPlan.tiles[i].width,
-                    rollbackPlan.tiles[i].height,
-                    destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
-                    backups[i].GetAddressOf(), nullptr)) || !backups[i] ||
-                FAILED(game->StretchRect(
-                    backbuffer, &visibleRegions[i], backups[i].Get(),
+            const NativeSharedDesktopBackupKey required{
+                rollbackPlan.tiles[i].width,
+                rollbackPlan.tiles[i].height,
+                static_cast<std::uint32_t>(destination.Format),
+                generation_, ownerToken};
+            auto& backup = backups_[i];
+            if (!backup || !backupKeys_[i].reusable_for(required)) {
+                backup.Reset();
+                backupKeys_[i] = {};
+                if (FAILED(game->CreateRenderTarget(
+                        required.width, required.height,
+                        destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
+                        backup.GetAddressOf(), nullptr)) || !backup)
+                    return false;
+                backupKeys_[i] = required;
+            }
+            if (FAILED(game->StretchRect(
+                    backbuffer, &visibleRegions[i], backup.Get(),
                     nullptr, D3DTEXF_NONE)))
                 return false;
         }
@@ -273,7 +292,7 @@ public:
                 bool restored = true;
                 for (std::uint32_t j = 0u; j <= i; ++j) {
                     if (FAILED(game->StretchRect(
-                            backups[j].Get(), nullptr, backbuffer,
+                            backups_[j].Get(), nullptr, backbuffer,
                             &visibleRegions[j], D3DTEXF_NONE)))
                         restored = false;
                 }
@@ -284,6 +303,12 @@ public:
         return true;
     }
 private:
+    // Bounded by the same admitted dirty-region tile count as the rollback
+    // plan. Snapshots are rewritten every frame; only GPU allocations persist.
+    std::array<Microsoft::WRL::ComPtr<IDirect3DSurface9>,
+               GameNativeDirtyRegionCoverage::kMaxPartitionRects> backups_{};
+    std::array<NativeSharedDesktopBackupKey,
+               GameNativeDirtyRegionCoverage::kMaxPartitionRects> backupKeys_{};
     Microsoft::WRL::ComPtr<ID3D11Texture2D> source_;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> shared9_;
     Microsoft::WRL::ComPtr<ID3D11Query> fence_;

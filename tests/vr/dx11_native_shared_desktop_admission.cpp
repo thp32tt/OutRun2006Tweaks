@@ -1,5 +1,6 @@
 #include "../../src/vr/d3d11/native_game_shared_desktop_admission.hpp"
 #include "../../src/vr/d3d11/native_game_shared_desktop_rollback.hpp"
+#include "../../src/vr/d3d11/native_game_shared_desktop_backup.hpp"
 #include <cassert>
 #include <array>
 using outrun::vr::dx11::live_game_frame::NativeSharedDesktopAdmission;
@@ -124,6 +125,24 @@ int main() {
     static_assert(backupPlan.tiles[0].width == 100u &&
                   backupPlan.tiles[1].height == 100u);
     assert(backupPlan.totalPixels < 1800ull * 1000ull);
+    // Allocation reuse reduces repeat D3D9Ex CreateRenderTarget work during
+    // sustained GPU native full-frame menu/car/race Presents, but re-snapshots
+    // each new original-game backbuffer before any native pixel mutation.
+    using outrun::vr::dx11::live_game_frame::NativeSharedDesktopBackupKey;
+    constexpr NativeSharedDesktopBackupKey initialBackup{100,100,21u,9u,0x1234u};
+    static_assert(initialBackup.valid());
+    static_assert(initialBackup.reusable_for(initialBackup));
+    // Moving a HUD tile without changing its allocation shape is reusable.
+    constexpr NativeSharedDesktopBackupKey movedTile{100,100,21u,9u,0x1234u};
+    static_assert(initialBackup.reusable_for(movedTile));
+    static_assert(!initialBackup.reusable_for({101,100,21u,9u,0x1234u}));
+    static_assert(!initialBackup.reusable_for({100,101,21u,9u,0x1234u}));
+    static_assert(!initialBackup.reusable_for({100,100,22u,9u,0x1234u}));
+    static_assert(!initialBackup.reusable_for({100,100,21u,10u,0x1234u}));
+    static_assert(!initialBackup.reusable_for({100,100,21u,9u,0x5678u}));
+    static_assert(!initialBackup.reusable_for({0,100,21u,9u,0x1234u}));
+    static_assert(!NativeSharedDesktopBackupKey{}.reusable_for(initialBackup));
+
     // Overlapping update tiles are also backed up before any publication.
     constexpr GameNativePresentRegion overlappingHud[2]{
         {20,30,120,130},{80,100,160,200}};
