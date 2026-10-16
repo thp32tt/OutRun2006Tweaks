@@ -70,5 +70,28 @@ int main()
            invalidOffsets,projectedRelative)) return 13;
     for(const auto& eye:projectedRelative)
         for(float v:eye) if(!Near(v,0.f)) return 14;
+    // The R84 CPU-projected smoke/skid/world-effects path reuses this
+    // shared bilateral origin helper for both full-world and affine eyes.
+    const float worldEffectsEyes[2][3]{
+        {1024.f-0.03125f,4096.f-0.125f,-2048.f-0.0625f},
+        {1024.f+0.03125f,4096.f+0.125f,-2048.f+0.0625f}};
+    float worldEffectsRelative[2][3]{{71,72,73},{74,75,76}};
+    if(!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+           worldEffectsEyes,worldEffectsRelative)) return 15;
+    for(int axis=0; axis<3; ++axis)
+        if(!Near(worldEffectsRelative[0][axis],
+                 -worldEffectsRelative[1][axis])) return 16;
+    if(!Near(worldEffectsRelative[0][0],-0.03125f) ||
+       !Near(worldEffectsRelative[1][1],0.125f) ||
+       !Near(worldEffectsRelative[0][2],-0.0625f)) return 17;
+    // The same production helper rejects a corrupt right eye atomically;
+    // neither world-effect eye can inherit the last frame's valid IPD.
+    float malformedWorldEffects[2][3]{
+        {0.f,0.f,0.f}, {0.f,0.f,
+        std::numeric_limits<float>::infinity()}};
+    if(OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+           malformedWorldEffects,worldEffectsRelative)) return 18;
+    if(!Near(worldEffectsRelative[0][0],-0.03125f) ||
+       !Near(worldEffectsRelative[1][1],0.125f)) return 19;
     return 0;
 }

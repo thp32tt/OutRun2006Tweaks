@@ -15,6 +15,18 @@ WF = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
 
 def verify_source(source):
+    # R84's CPU-projected smoke/skid geometry must share ONE finite
+    # two-eye origin for full-world and affine fallback. The old float
+    # midpoint could overflow even though both xrLocateViews eyes were valid.
+    for required in (
+        "float headRelativeEyes[2][3]{};",
+        "BuildHeadRelativeEyeOffsets(\n                    state.stereo.eyeOffset, headRelativeEyes)",
+        "identityOrientation, headRelativeEyes[eye],",
+        "const float localX = headRelativeEyes[eye][0];",
+        "const float localY = headRelativeEyes[eye][1];",
+    ):
+        assert required in source, "R84 stereo origin contract lost: " + required
+    assert "0.5f * (state.stereo.eyeOffset[0][" not in source
     start = source.index("bool R30TransformWorldAffineStereo(")
     # This helper precedes the shared seeding and per-eye fallback code.
     # Bound its single-walk assertions to the helper itself, not every

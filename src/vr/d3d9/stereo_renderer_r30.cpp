@@ -3881,14 +3881,15 @@ namespace OutRunVRStereo
                 return false;
             state.fullWorldReprojection = true;
 
-            const float center[3]{
-                0.5f * (state.stereo.eyeOffset[0][0] +
-                        state.stereo.eyeOffset[1][0]),
-                0.5f * (state.stereo.eyeOffset[0][1] +
-                        state.stereo.eyeOffset[1][1]),
-                0.5f * (state.stereo.eyeOffset[0][2] +
-                        state.stereo.eyeOffset[1][2])
-            };
+            // CPU-projected XYZRHW world effects share the exact same
+            // head-relative two-eye origin as the C993/CABE optics. Even two
+            // individually finite XR locations can overflow a float sum.
+            // Reject malformed eyes together before publishing either
+            // transform; do not change the original camera, eye FOV or scale.
+            float headRelativeEyes[2][3]{};
+            if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+                    state.stereo.eyeOffset, headRelativeEyes))
+                return false;
             const float zero[3]{};
 
             for (int eye = 0; eye < 2; ++eye)
@@ -3904,17 +3905,13 @@ namespace OutRunVRStereo
                 // away from the road. Apply only the eye pose relative to the
                 // common head centre; the asymmetric eye projection still owns
                 // the final FOV.
-                const float relativeEye[3]{
-                    state.stereo.eyeOffset[eye][0] - center[0],
-                    state.stereo.eyeOffset[eye][1] - center[1],
-                    state.stereo.eyeOffset[eye][2] - center[2]
-                };
+
                 const float identityOrientation[4]{
                     0.0f, 0.0f, 0.0f, 1.0f
                 };
                 const D3DMATRIX eyePose =
                     R29OwnerMatrixFromQuaternionTranslation(
-                        identityOrientation, relativeEye,
+                        identityOrientation, headRelativeEyes[eye],
                         Settings::VRWorldScale * Settings::VRStereoDepth);
                 state.eyeInverse[eye] = R29OwnerInverseRigid(eyePose);
                 state.eyeProjection[eye] =
@@ -3929,15 +3926,11 @@ namespace OutRunVRStereo
                 // clip reconstruction is unsafe. Its parallax uses the old
                 // centered IPD estimate, but both eyes are forced to choose the
                 // same fallback mode by R30TransformXyzrhwStereo().
-                const float rel[3]{
-                    state.stereo.eyeOffset[eye][0] - center[0],
-                    state.stereo.eyeOffset[eye][1] - center[1],
-                    state.stereo.eyeOffset[eye][2] - center[2]
-                };
-                // The source camera already owns common head rotation, so the
-                // conservative affine fallback also uses head-relative IPD only.
-                const float localX = rel[0];
-                const float localY = rel[1];
+                // The full-world and finite-affine fallbacks must use the
+                // same published two-eye IPD, not two independently rounded
+                // or partially invalid origin calculations.
+                const float localX = headRelativeEyes[eye][0];
+                const float localY = headRelativeEyes[eye][1];
 
                 const D3DMATRIX& eyeProjection = state.eyeProjection[eye];
                 state.worldScaleX[eye] =
