@@ -221,13 +221,37 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         box.bottom - box.top > eyeDesc.Height - destY)
         return false;
 
-    // The destination must not remain OM-bound while the immediate context
-    // records the GPU copy; rebind precisely this eye's original DSV+RTV.
-    context_->OMSetRenderTargets(0u, nullptr, nullptr);
-    context_->CopySubresourceRegion(
-        eyeColor.Get(), 0u, destX, destY, 0u, source, 0u, &box);
-    ID3D11RenderTargetView* target = eyeTarget_;
-    context_->OMSetRenderTargets(1u, &target, eyeDepth_);
+    // The game may have additional color MRT attachments (e.g. deferred
+    // vehicle/HUD output) beside this eye's RT0. A one-RTV rebind after the
+    // copy silently discards RT1..RT7 and breaks the next real game Draw.
+    // Preserve the complete OM set, including its exact depth attachment,
+    // while temporarily unbinding both copy source and destination.
+    struct ScopedCopyOutputMerger final {
+        ID3D11DeviceContext* context{};
+        ID3D11RenderTargetView* renderTargets[
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+        ID3D11DepthStencilView* depth{};
+        explicit ScopedCopyOutputMerger(ID3D11DeviceContext* ctx) noexcept
+            : context(ctx) {
+            context->OMGetRenderTargets(
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                renderTargets, &depth);
+        }
+        ~ScopedCopyOutputMerger() noexcept {
+            context->OMSetRenderTargets(
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                renderTargets, depth);
+            for (auto* target : renderTargets)
+                if (target) target->Release();
+            if (depth) depth->Release();
+        }
+    };
+    {
+        ScopedCopyOutputMerger restore{context_};
+        context_->OMSetRenderTargets(0u, nullptr, nullptr);
+        context_->CopySubresourceRegion(
+            eyeColor.Get(), 0u, destX, destY, 0u, source, 0u, &box);
+    }
     return eye_targets_bound();
 }
 

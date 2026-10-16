@@ -939,8 +939,10 @@ int main()
         bool rejectedInvalidClear[2]{};
         bool replayedMidSceneClear[2]{};
         ID3D11Texture2D* gameSurface{};
+        ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
+        bool preservedPostDrawMrt[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -967,6 +969,7 @@ int main()
     gameEyeFixture.callerGeometryShader = originalGeometryShader;
     gameEyeFixture.gamePixelShader = gamePixelShader;
     gameEyeFixture.gameSurface = gameSurface;
+    gameEyeFixture.gameSurfaceView = gameSurfaceView;
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -1217,11 +1220,27 @@ int main()
                 fixture.gameSurface, &sourcePatch, 61u, 38u);
         const auto beforeCopyDraws = encoder.draw_count();
         const auto beforeCopyColorDraws = encoder.color_draw_count();
+        // A real game can bind its offscreen intermediate as MRT1 while the
+        // eye remains RTV0. Source must be unbound for CopySubresourceRegion,
+        // and both MRT slots plus the eye DSV must survive the GPU operation.
+        ID3D11RenderTargetView* beforeCopyMrt[2]{
+            eyeTarget, fixture.gameSurfaceView};
+        ctx->OMSetRenderTargets(2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex]);
         fixture.replayedPostDrawSurfaceCopy[eyeIndex] =
             encoder.copy_game_surface(
                 fixture.gameSurface, &sourcePatch, destX, 38u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        ID3D11RenderTargetView* afterCopyMrt[2]{};
+        ID3D11DepthStencilView* afterCopyDepth = nullptr;
+        ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
+        fixture.preservedPostDrawMrt[eyeIndex] =
+            afterCopyMrt[0] == eyeTarget &&
+            afterCopyMrt[1] == fixture.gameSurfaceView &&
+            afterCopyDepth == fixture.eyeDepth[eyeIndex];
+        for (auto* target : afterCopyMrt)
+            if (target) target->Release();
+        if (afterCopyDepth) afterCopyDepth->Release();
         if (!fixture.rejectedInvalidClear[eyeIndex] ||
             !fixture.replayedMidSceneClear[eyeIndex] ||
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
@@ -1270,7 +1289,9 @@ int main()
             gameEyeFixture.rejectedInvalidSurfaceCopy[0] &&
             gameEyeFixture.rejectedInvalidSurfaceCopy[1] &&
             gameEyeFixture.replayedPostDrawSurfaceCopy[0] &&
-            gameEyeFixture.replayedPostDrawSurfaceCopy[1],
+            gameEyeFixture.replayedPostDrawSurfaceCopy[1] &&
+            gameEyeFixture.preservedPostDrawMrt[0] &&
+            gameEyeFixture.preservedPostDrawMrt[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
