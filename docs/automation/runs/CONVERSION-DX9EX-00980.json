@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00980",
+  "production_id": "CONVERSION-DX9EX-00980",
+  "event_id": "CONVERSION-DX9EX-00980-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00980",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C2_MATERIAL_COMMITTED",
+  "phase": "C2_IMPLEMENTATION",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "ebdfa5659b421be60217f9cfbd6d948fde5a092e",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/queued_hud_partial_wvp.hpp"
+  ],
+  "changed_files": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/queued_hud_partial_wvp.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00980.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Restore exact R84 queued gameplay HUD shader c64 original-game WVP across successful split/partial native D3D9 uploads so world-locked two-eye HUD reconstruction does not lose its matrix while keeping protected 3D and original GPU behavior.",
+    "scope_boundary": "Only original source-tagged, current SpriteNode ScreenHud c64..c67 writes on the eligible D3D9 game target; C993 lens, R26_SAFE, world/SceneEffect/SkyGlow, native input/FFB and frozen DXVK remain unchanged.",
+    "special_work_evidence": "Code-proven: OutRun renderer invalidates the previous original c64 record on any overlapping game upload; when a partial HUD upload does not fully contain c64-c67, the existing branch only assembles source rows for direct C993 lens. R84 screen HUD rejects unproven originals and falls back to native shader on partial HUD calls.",
+    "trace_stages": [
+      "Original OutRun exact source queues a ScreenHud SpriteNode with producer token and node epoch.",
+      "Native SetVertexShaderConstantF can update fewer than all four c64..c67 registers and D3D9 retains unwritten rows.",
+      "The game injector reassembles only successful same-node/epoch/shader/device/pose/draw original HUD rows; no stereo-injected GPU c64 is used as source.",
+      "R84 R30GetRecentOriginalHudWvp checks producer/shader/epoch and builds binocular finite HUD eye plane on the exact original source; unrelated paths retain fallback."
+    ],
+    "subcomponents": [
+      "Add exact queued HUD accumulator independent of lens central-dot source; handle split writes and full-then-partial updates with native-success and Reset/Present/EndScene boundaries.",
+      "Wire both full and partial native C64 submissions through original game hook while keeping auxiliary targets and unrelated world writes isolated.",
+      "Compile-time real C++ regression assertions for split and committed-native-row math, foreign node/producer, cross-draw, world rejection and lost/reset frame; final exact-SHA original GitHub mandatory gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_split_wvp",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Game original queued ScreenHud producer to R84 shader c64 optical eye plane",
+        "expected_behavior": "Exact queued native split C64 writes form original owned 4-row WVP, including subsequent same-draw partial rows, before GPU per-eye shader submission."
+      },
+      {
+        "id": "hud_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign source, shader, pose, device, draw and frame validation",
+        "expected_behavior": "Untargeted direct UI, no queue, world/lens/SkyGlow, foreign SpriteNode, failed uploads, new physical draws, and Reset/Present cannot donate stale shader WVP or alter native draw/FFB."
+      },
+      {
+        "id": "hud_integrated_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Active R84 Windows x86 game, x64 host, R26_SAFE rollback and package",
+        "expected_behavior": "Non-skipped final exact SHA GitHub DX9Ex Active/Domain/HUD/Full Source and affected native tests all pass before build-verified claim; Quest3/VDXR optics remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_split_wvp": "PENDING_EXACT_SHA",
+    "hud_original_fallback": "PENDING_EXACT_SHA",
+    "hud_integrated_gate": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Source-level R84 exact ScreenHud partial c64 writes revoke prior original-game WVP because partial reconstruction currently exists only for C993 lens; same exact queued HUD owner can consequently fail stereo HUD projection while the original D3D9 GPU still retains other c64 rows.",
+    "alternatives_rejected": [
+      "Do not read live c64 after a stereo eye rewrite as if it were original game WVP.",
+      "Do not widen to all alpha/FVF, SceneEffect, or direct unowned game draw classes; no runtime optical fix is asserted."
+    ],
+    "runtime_limit": "Source/portable/CMake/CI checks do not prove physical Quest3 or VDXR binocular HUD acceptance."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run exact SHA required GitHub Actions; if pending or failed retain original task and material SHA; user Quest3/VDXR runtime remains UNTESTED."
+}

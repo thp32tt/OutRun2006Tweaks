@@ -21,6 +21,7 @@
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/lens_centre_partial_wvp.hpp"
+#include "vr/game/queued_hud_partial_wvp.hpp"
 #include "../core/r23_target_owner_api.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
@@ -177,6 +178,9 @@ namespace OutRunVRRenderer
 		// Only the exact, direct C993 owner may assemble split original c64 writes.
 		// Never seed it from a prior game matrix or stereo-injected GPU state.
 		thread_local OutRunVR::LensCentre::PartialWvpUpload LensCentrePartialWvp{};
+		// The exact queued ScreenHud may publish the game WVP as several native
+		// c64..c67 writes. Keep its source rows independent of the C993 flare.
+		thread_local OutRunVR::HudQueuedWvp::Upload HudQueuedPartialWvp{};
 		std::uint64_t LastGameWvpWriteSerial = 0;
 		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
 		std::uint64_t LastGameWvpPoseEpoch = 0;
@@ -1738,6 +1742,7 @@ namespace OutRunVRRenderer
 			RestoreCullingCamera();
 			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
 			LensCentrePartialWvp.Reset(); // never span a scene boundary
+			HudQueuedPartialWvp.Reset(); // a queued HUD owner cannot cross scenes
 
 			std::uint32_t publishedFlags = FrameTelemetryFlags;
 			if (SUCCEEDED(result))
@@ -1776,6 +1781,49 @@ namespace OutRunVRRenderer
 			// protected by InternalStereoPass above and must not disarm the marker.
 			InvalidateVerifiedWvp();
 			InvalidateGameWvpWrite();
+
+			// D3D9 preserves unmodified c64 rows across successful partial
+			// writes. R84's finite shader HUD eye-plane, however, can only use
+			// an ORIGINAL game WVP with the same SpriteNode/producer, shader,
+			// pose and physical draw. Do not borrow the live (possibly stereo
+			// injected) GPU constant. This is exact queued ScreenHud only:
+			// direct unknown UI, SkyGlow, lens/scene effects and world render
+			// still follow their established independent paths.
+			auto TrackQueuedHudWvp = [&](UINT first, UINT count,
+				const float* nativeRows, HRESULT nativeResult,
+				bool alreadyRecordedComplete) noexcept
+			{
+				using namespace OutRunVR::GameSemantic;
+				if (FAILED(nativeResult) ||
+					!OutRunVRStereo::R23GameWvpTargetEligible())
+				{
+					HudQueuedPartialWvp.Reset();
+					return;
+				}
+				std::uintptr_t shader = 0;
+				std::uint64_t shaderEpoch = 0;
+				if (!OutRunVRStereo::GetCurrentShaderEpoch(shader, shaderEpoch))
+				{
+					HudQueuedPartialWvp.Reset();
+					return;
+				}
+				if (HudQueuedPartialWvp.Append(first, count, nativeRows,
+					QueueRenderActive(), EffectiveScope(),
+					CurrentRenderProducerToken(), CurrentQueueNode(),
+					CurrentQueueNodeEpoch(), LatchedPoseEpoch,
+					shader, shaderEpoch,
+					reinterpret_cast<std::uintptr_t>(device),
+					OutRunVRStereo::GetTopLevelDrawSerial()))
+				{
+					// A complete native upload was already recorded by the
+					// existing semantic-overlay branch; partial writes must
+					// explicitly publish the newly reassembled source matrix.
+					if (!alreadyRecordedComplete)
+						RecordGameWvpWrite(HudQueuedPartialWvp.rows.raw,
+							HudQueuedPartialWvp.rows.raw);
+					HudQueuedPartialWvp.rows.CommitComplete();
+				}
+			};
 			if (!UploadContainsOutRunWvp(startRegister, vector4fCount))
 			{
 				// A split original C993 WVP previously lost source ownership:
@@ -1816,6 +1864,8 @@ namespace OutRunVRRenderer
 				}
 				else if (FAILED(result) || !exactCentre)
 					LensCentrePartialWvp.Reset();
+				TrackQueuedHudWvp(startRegister, vector4fCount,
+					constantData, result, false);
 				return result;
 			}
 			LensCentrePartialWvp.Reset();
@@ -1826,6 +1876,7 @@ namespace OutRunVRRenderer
 			// write supersedes a verified main-eye matrix.
 			if (!OutRunVRStereo::R23GameWvpTargetEligible())
 			{
+				HudQueuedPartialWvp.Reset();
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
 			}
@@ -1888,9 +1939,14 @@ namespace OutRunVRRenderer
 							"VR R51 HUD OWNER: queue overlay c64 kept raw; renderer head injection bypassed so R30 owns exactly one HUD/world-billboard transform");
 					}
 				}
+				TrackQueuedHudWvp(startRegister, vector4fCount,
+					constantData, result, SUCCEEDED(result));
 				return result;
 			}
 
+			// The subsequent game world write supersedes a queued HUD
+			// original source even if the GPU shader stays bound.
+			HudQueuedPartialWvp.Reset();
 			// Avoid a 4 KiB local stack frame on every c64-containing upload.
 			// TLS keeps independent buffers across game render threads. The
 			// original call consumes these constants synchronously.
@@ -2044,6 +2100,7 @@ namespace OutRunVRRenderer
 		PresentPoseLocked = false;
 		InvalidateVerifiedWvp();
 		LensCentrePartialWvp.Reset();
+		HudQueuedPartialWvp.Reset();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		WaitForNextCadenceRequest();
@@ -2059,6 +2116,7 @@ namespace OutRunVRRenderer
 		CloseCadenceHostProcess();
 		PresentPoseLocked = false;
 		LensCentrePartialWvp.Reset();
+		HudQueuedPartialWvp.Reset();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		ResetFrameState();
