@@ -1225,7 +1225,7 @@ int main()
         const UINT patchX = eyeIndex == 0u ? 6u : 44u;
         const auto* patch = pixel + 6u * mapped.RowPitch + patchX * 4u;
         const bool actualPartialClear = eyeIndex == 0u
-            ? patch[0] == 0u && patch[1] == 0u && patch[2] == 255u
+            ? patch[0] == 255u && patch[1] == 0u && patch[2] == 0u
             : patch[0] == 0u && patch[1] == 255u && patch[2] == 0u;
         if (!distinctColor || !actualPartialClear) {
             std::cerr << "00829 eye=" << eyeIndex
