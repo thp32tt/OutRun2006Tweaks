@@ -781,14 +781,59 @@ int main()
         0u, 1u, &originalGameBuffer, &originalStride, &originalOffset);
     d3d.context->IASetIndexBuffer(originalGameBuffer, DXGI_FORMAT_R16_UINT, 2u);
     d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    // The game binds scene textures, samplers, and shader constants before
+    // eye replay. Left-eye changes must not bleed into the right eye or back
+    // into the original game context.
+    D3D11_TEXTURE2D_DESC gameSampleDesc{};
+    gameSampleDesc.Width = 2u;
+    gameSampleDesc.Height = 2u;
+    gameSampleDesc.MipLevels = 1u;
+    gameSampleDesc.ArraySize = 1u;
+    gameSampleDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    gameSampleDesc.SampleDesc.Count = 1u;
+    gameSampleDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    ID3D11Texture2D* gameSampleTexture = nullptr;
+    ID3D11ShaderResourceView* gameSampleView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &gameSampleDesc, nullptr, &gameSampleTexture)) &&
+            SUCCEEDED(d3d.device->CreateShaderResourceView(
+                gameSampleTexture, nullptr, &gameSampleView)),
+            "00823 game shader-resource input created");
+    D3D11_SAMPLER_DESC gameSamplerDesc{};
+    gameSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    gameSamplerDesc.AddressU = gameSamplerDesc.AddressV =
+        gameSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    gameSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    ID3D11SamplerState* gameSampler = nullptr;
+    require(SUCCEEDED(d3d.device->CreateSamplerState(
+                &gameSamplerDesc, &gameSampler)),
+            "00823 game sampler created");
+    D3D11_BUFFER_DESC gameConstantsDesc{};
+    gameConstantsDesc.ByteWidth = 64u;
+    gameConstantsDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    ID3D11Buffer* gameConstants = nullptr;
+    require(SUCCEEDED(d3d.device->CreateBuffer(
+                &gameConstantsDesc, nullptr, &gameConstants)),
+            "00823 game shader constants created");
+    d3d.context->PSSetShaderResources(0u, 1u, &gameSampleView);
+    d3d.context->PSSetSamplers(0u, 1u, &gameSampler);
+    d3d.context->PSSetConstantBuffers(0u, 1u, &gameConstants);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
         ID3D11DepthStencilView* callerDepth{};
         ID3D11Buffer* originalBuffer{};
         ID3D11Buffer* alternateBuffer{};
+        ID3D11ShaderResourceView* originalResource{};
+        ID3D11SamplerState* originalSampler{};
+        ID3D11Buffer* originalConstants{};
+        ID3D11RasterizerState* originalRaster{};
+        UINT originalSampleMask{};
+        UINT originalStencilRef{};
     } gameEyeFixture{{}, {}, preservedDepthView,
-                     originalGameBuffer, alternateEyeBuffer};
+                     originalGameBuffer, alternateEyeBuffer,
+                     gameSampleView, gameSampler, gameConstants,
+                     preservedRaster, preservedMask, preservedStencilRef};
     const outrun::vr::dx11::NativeGameEyeColorSeed fullGameClear{
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
 
@@ -826,6 +871,34 @@ int main()
         ctx->IAGetIndexBuffer(&boundIndexBuffer,
                               &boundIndexFormat, &boundIndexOffset);
         ctx->IAGetPrimitiveTopology(&boundTopology);
+        ID3D11ShaderResourceView* boundPSResource = nullptr;
+        ID3D11SamplerState* boundPSSampler = nullptr;
+        ID3D11Buffer* boundPSConstants = nullptr;
+        ID3D11RasterizerState* boundRaster = nullptr;
+        ID3D11BlendState* boundBlend = nullptr;
+        ID3D11DepthStencilState* boundDepthState = nullptr;
+        FLOAT boundBlendFactor[4]{};
+        UINT boundSampleMask = 0u, boundStencilRef = 0u;
+        ctx->PSGetShaderResources(0u, 1u, &boundPSResource);
+        ctx->PSGetSamplers(0u, 1u, &boundPSSampler);
+        ctx->PSGetConstantBuffers(0u, 1u, &boundPSConstants);
+        ctx->RSGetState(&boundRaster);
+        ctx->OMGetBlendState(&boundBlend, boundBlendFactor, &boundSampleMask);
+        ctx->OMGetDepthStencilState(&boundDepthState, &boundStencilRef);
+        const bool originalGameShaderInputs =
+            boundPSResource == fixture.originalResource &&
+            boundPSSampler == fixture.originalSampler &&
+            boundPSConstants == fixture.originalConstants &&
+            boundRaster == fixture.originalRaster &&
+            boundBlend == nullptr && boundDepthState == nullptr &&
+            boundSampleMask == fixture.originalSampleMask &&
+            boundStencilRef == fixture.originalStencilRef;
+        if (boundPSResource) boundPSResource->Release();
+        if (boundPSSampler) boundPSSampler->Release();
+        if (boundPSConstants) boundPSConstants->Release();
+        if (boundRaster) boundRaster->Release();
+        if (boundBlend) boundBlend->Release();
+        if (boundDepthState) boundDepthState->Release();
         const bool originalGameIA =
             boundVertexBuffer == fixture.originalBuffer &&
             boundIndexBuffer == fixture.originalBuffer &&
@@ -836,7 +909,7 @@ int main()
         if (boundVertexBuffer) boundVertexBuffer->Release();
         if (boundIndexBuffer) boundIndexBuffer->Release();
         fixture.sawBoundEye[eyeIndex] = originalGameIA &&
-            boundTarget == eyeTarget && boundDepth != nullptr &&
+            originalGameShaderInputs && boundTarget == eyeTarget && boundDepth != nullptr &&
             depthViewDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT &&
             eyeDepthTexture.Get() != nullptr && eyeDepthDesc.Width == 64 &&
             eyeDepthDesc.Height == 64 &&
@@ -867,6 +940,12 @@ int main()
         ctx->RSSetState(nullptr);
         ctx->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
         ctx->OMSetDepthStencilState(nullptr, 0u);
+        ID3D11ShaderResourceView* nullResource = nullptr;
+        ID3D11SamplerState* nullSampler = nullptr;
+        ID3D11Buffer* nullConstants = nullptr;
+        ctx->PSSetShaderResources(0u, 1u, &nullResource);
+        ctx->PSSetSamplers(0u, 1u, &nullSampler);
+        ctx->PSSetConstantBuffers(0u, 1u, &nullConstants);
         // Simulate a real per-eye Draw that rebinds the vertex/index path;
         // the next eye and original desktop must receive their own baseline.
         constexpr UINT eyeStride = 24u, eyeOffset = 8u;
@@ -924,7 +1003,16 @@ int main()
     d3d.context->IAGetIndexBuffer(&restoredIndexBuffer,
                                    &restoredIndexFormat, &restoredIndexOffset);
     d3d.context->IAGetPrimitiveTopology(&restoredTopology);
+    ID3D11ShaderResourceView* restoredResource = nullptr;
+    ID3D11SamplerState* restoredSampler = nullptr;
+    ID3D11Buffer* restoredConstants = nullptr;
+    d3d.context->PSGetShaderResources(0u, 1u, &restoredResource);
+    d3d.context->PSGetSamplers(0u, 1u, &restoredSampler);
+    d3d.context->PSGetConstantBuffers(0u, 1u, &restoredConstants);
     const bool restoredGameState =
+        restoredResource == gameSampleView &&
+        restoredSampler == gameSampler &&
+        restoredConstants == gameConstants &&
         restoredVertexBuffer == originalGameBuffer &&
         restoredIndexBuffer == originalGameBuffer &&
         restoredStride == originalStride && restoredOffset == originalOffset &&
@@ -951,6 +1039,9 @@ int main()
         restoredScissor.top == preservedScissor.top &&
         restoredScissor.right == preservedScissor.right &&
         restoredScissor.bottom == preservedScissor.bottom;
+    if (restoredResource) restoredResource->Release();
+    if (restoredSampler) restoredSampler->Release();
+    if (restoredConstants) restoredConstants->Release();
     if (restoredVertexBuffer) restoredVertexBuffer->Release();
     if (restoredIndexBuffer) restoredIndexBuffer->Release();
     if (restoredGameTarget) restoredGameTarget->Release();
@@ -967,6 +1058,16 @@ int main()
     d3d.context->IASetVertexBuffers(
         0u, 1u, &nullVertexBuffer, &resetStride, &resetOffset);
     d3d.context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
+    ID3D11ShaderResourceView* nullGameResource = nullptr;
+    ID3D11SamplerState* nullGameSampler = nullptr;
+    ID3D11Buffer* nullGameConstants = nullptr;
+    d3d.context->PSSetShaderResources(0u, 1u, &nullGameResource);
+    d3d.context->PSSetSamplers(0u, 1u, &nullGameSampler);
+    d3d.context->PSSetConstantBuffers(0u, 1u, &nullGameConstants);
+    gameSampleView->Release();
+    gameSampleTexture->Release();
+    gameSampler->Release();
+    gameConstants->Release();
     originalGameBuffer->Release();
     alternateEyeBuffer->Release();
     preservedRaster->Release();

@@ -37,6 +37,15 @@ public:
         context_->IAGetPrimitiveTopology(&savedTopology_);
         context_->VSGetShader(&savedVS_, savedVSClasses_, &savedVSClassCount_);
         context_->PSGetShader(&savedPS_, savedPSClasses_, &savedPSClassCount_);
+        // Preserve shader inputs for both game camera draws. The first eye
+        // can swap or unbind resources; the second must start from the same
+        // source game state, including vertex texture fetch and constant data.
+        context_->VSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedVSResources_);
+        context_->PSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedPSResources_);
+        context_->VSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedVSSamplers_);
+        context_->PSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedPSSamplers_);
+        context_->VSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedVSConstants_);
+        context_->PSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedPSConstants_);
         viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetViewports(&viewportCount_, savedViewports_);
         scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
@@ -72,6 +81,14 @@ public:
             if (savedVSClasses_[i]) savedVSClasses_[i]->Release();
         for (UINT i = 0; i < savedPSClassCount_; ++i)
             if (savedPSClasses_[i]) savedPSClasses_[i]->Release();
+        // D3D11 Get* adds references to every saved slot, including slots
+        // released by a callback. Balance all references after restoring.
+        for (auto* p : savedVSResources_) if (p) p->Release();
+        for (auto* p : savedPSResources_) if (p) p->Release();
+        for (auto* p : savedVSSamplers_) if (p) p->Release();
+        for (auto* p : savedPSSamplers_) if (p) p->Release();
+        for (auto* p : savedVSConstants_) if (p) p->Release();
+        for (auto* p : savedPSConstants_) if (p) p->Release();
     }
     ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
     ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
@@ -82,6 +99,12 @@ public:
         // The previous eye may have rebound IA/VB/IB/VS/PS. Start each
         // replay from exactly the captured caller state, not eye L residue.
         restore_draw_pipeline();
+        // The previous eye may also have changed blend, depth/stencil and
+        // rasterizer state. Restore BEFORE each independent eye's Draw, not
+        // only when exiting back to the desktop D3D9 fallback.
+        context_->OMSetBlendState(savedBlend_, savedBlendFactors_, savedSampleMask_);
+        context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
+        context_->RSSetState(savedRasterizer_);
         const D3D11_VIEWPORT viewport{
             0.0f, 0.0f, static_cast<float>(width_),
             static_cast<float>(height_), 0.0f, 1.0f};
@@ -106,6 +129,12 @@ private:
         context_->IASetPrimitiveTopology(savedTopology_);
         context_->VSSetShader(savedVS_, savedVSClasses_, savedVSClassCount_);
         context_->PSSetShader(savedPS_, savedPSClasses_, savedPSClassCount_);
+        context_->VSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedVSResources_);
+        context_->PSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedPSResources_);
+        context_->VSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedVSSamplers_);
+        context_->PSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedPSSamplers_);
+        context_->VSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedVSConstants_);
+        context_->PSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedPSConstants_);
     }
     ID3D11DeviceContext* context_{};
     std::uint32_t width_{}, height_{};
@@ -127,6 +156,12 @@ private:
     D3D11_PRIMITIVE_TOPOLOGY savedTopology_{D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED};
     ID3D11VertexShader* savedVS_{};
     ID3D11PixelShader* savedPS_{};
+    ID3D11ShaderResourceView* savedVSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11ShaderResourceView* savedPSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11SamplerState* savedVSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
+    ID3D11SamplerState* savedPSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
+    ID3D11Buffer* savedVSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
+    ID3D11Buffer* savedPSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
     ID3D11ClassInstance* savedVSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     ID3D11ClassInstance* savedPSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     UINT savedVSClassCount_{D3D11_SHADER_MAX_INTERFACES};
