@@ -1311,6 +1311,7 @@ class ReflectionUpdateRate : public Hook
 		static float pendingFaces = 0.0f;
 		static LARGE_INTEGER lastCounter{};
 		static LARGE_INTEGER frequency{};
+		static OutRunVR::ReflectionFrameBudget::AdaptiveFrameCadence frameCadence{};
 
 		float frameScale60 = 1.0f;
 		bool frameSpike = false;
@@ -1326,7 +1327,10 @@ class ReflectionUpdateRate : public Hook
 				const double dt = static_cast<double>(now.QuadPart - lastCounter.QuadPart) /
 					static_cast<double>(frequency.QuadPart);
 				// Avoid a long pause/load screen producing a one-frame cubemap spike.
-				frameSpike = dt > 0.018;
+				// At 120 Hz an over-budget frame can still be well below 18 ms.
+				// Use the observed healthy headset cadence as an additional
+				// late-frame criterion; preserve the old >18-ms protection.
+				frameSpike = frameCadence.Observe(dt);
 				frameScale60 = frameSpike ? 0.5f :
 					static_cast<float>(std::clamp(dt * 60.0, 0.0, 1.0));
 			}
@@ -1335,6 +1339,7 @@ class ReflectionUpdateRate : public Hook
 		else
 		{
 			lastCounter = {};
+			frameCadence.Reset();
 		}
 
 		// Quest-inspired bounded render work: one deterministic budget

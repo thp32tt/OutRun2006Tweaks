@@ -5,6 +5,57 @@
 
 namespace OutRunVR::ReflectionFrameBudget
 {
+    // QPC inter-frame cadence, independent of the nominal 60-Hz reflection
+    // update rate. A fixed 18-ms cutoff misses 90/120-Hz headset overruns:
+    // a 12-ms frame is late at 120 Hz even though it is below 18 ms.
+    // Only healthy, plausible intervals teach the tracker; a stutter, pause,
+    // invalid counter or loading gap never increases the reference period.
+    // This affects only the existing late-frame reflection face budget.
+    struct AdaptiveFrameCadence final
+    {
+        double referenceSeconds = 0.0;
+        unsigned healthySamples = 0;
+
+        void Reset() noexcept
+        {
+            referenceSeconds = 0.0;
+            healthySamples = 0;
+        }
+
+        bool Observe(double elapsedSeconds) noexcept
+        {
+            if (!std::isfinite(elapsedSeconds) || elapsedSeconds <= 0.0)
+            {
+                Reset();
+                return false;
+            }
+
+            constexpr double OriginalLateSeconds = 0.018;
+            constexpr double FastestPlausible = 1.0 / 150.0;
+            constexpr double SlowestPlausible = 1.0 / 55.0;
+            const bool cadenceMiss = healthySamples >= 4 &&
+                elapsedSeconds > referenceSeconds * 1.20 + 0.0005;
+            const bool late = elapsedSeconds > OriginalLateSeconds || cadenceMiss;
+
+            // Learn real 72/80/90/120-Hz submissions (and 60-Hz desktop)
+            // without requiring the user to force a specific headset rate.
+            // Fast recovery follows a newly faster eye cadence; gradual
+            // upward adaptation tolerates normal clock jitter without
+            // learning an actual GPU-late frame as the new target.
+            if (!late && elapsedSeconds >= FastestPlausible &&
+                elapsedSeconds <= SlowestPlausible)
+            {
+                if (healthySamples == 0 || elapsedSeconds < referenceSeconds)
+                    referenceSeconds = elapsedSeconds;
+                else
+                    referenceSeconds += (elapsedSeconds - referenceSeconds) * 0.02;
+                if (healthySamples < 4)
+                    ++healthySamples;
+            }
+            return late;
+        }
+    };
+
     struct StepResult
     {
         float pendingFaces = 0.f;
