@@ -271,6 +271,18 @@ add_custom_command(TARGET outrun-vr-quest-stereo-cull-smoke POST_BUILD
     COMMENT "Run Quest-inspired per-eye geometric visibility regression"
     VERBATIM)
 
+# The game rebuilds scene-effect matrices outside the real cockpit
+# render pass. Ensure the near-plane/vehicle scope is never leaked.
+add_executable(outrun-vr-driver-seat-pass-smoke
+    tests/driver_seat_render_pass_smoke.cpp)
+target_include_directories(outrun-vr-driver-seat-pass-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-driver-seat-pass-smoke)
+add_custom_command(TARGET outrun-vr-driver-seat-pass-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-driver-seat-pass-smoke>"
+    COMMENT "Run real cockpit / scene-effect camera ownership regression"
+    VERBATIM)
+
 add_executable(outrun-vr-driver-seat-camera-smoke tests/driver_seat_camera_smoke.cpp)
 target_include_directories(outrun-vr-driver-seat-camera-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 add_dependencies(outrun-vr-host outrun-vr-driver-seat-camera-smoke)
@@ -373,6 +385,7 @@ foreach(target
     outrun-vr-menu-content-aspect-smoke
     outrun-vr-stage-edge-cull-smoke
     outrun-vr-driver-seat-camera-smoke
+    outrun-vr-driver-seat-pass-smoke
     outrun-vr-quest-stereo-cull-smoke
     outrun-vr-reflection-budget-smoke
     outrun-vr-pause-eye-affine-smoke

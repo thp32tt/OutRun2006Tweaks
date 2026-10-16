@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
+#include "vr/game/driver_seat_render_pass.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
@@ -179,6 +180,8 @@ static bool VRDriverSeatGameplayActive() noexcept
 
 static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
 {
+    if (!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass())
+        return false;
     if (!camera)
         return false;
     const auto& pos = camera->cam_pos_F8;
@@ -1612,6 +1615,10 @@ class FixZBufferPrecision : public Hook
 		// must not re-enable the gameplay near-plane override mid-pass.
 		const bool previousAllowZnearOverride = FixZBufferPrecision::allow_znear_override;
 		FixZBufferPrecision::allow_znear_override = false;
+		// Includes BOTH CalcCameraMatrix calls as well as Clr_SceneEffect:
+		// render effects use the native short near-plane, while only real
+		// world/vehicle passes may move the VR camera into the driver seat.
+		OutRunVR::DriverSeatRenderPass::ScopedSceneEffect seatPass{};
 
 		EvWorkCamera* camera = Module::exe_ptr<EvWorkCamera>(0x39FE10);
 
