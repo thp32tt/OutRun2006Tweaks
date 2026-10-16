@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "menu_full_native_aspect": "PENDING_EXACT_SHA",
-    "menu_verified_and_fallback": "PENDING_EXACT_SHA",
-    "menu_exact_sha_gates": "PENDING_EXACT_SHA"
+    "menu_full_native_aspect": "PASS_EXACT_SHA",
+    "menu_verified_and_fallback": "PASS_EXACT_SHA",
+    "menu_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R23 uncropped menu physical aspect derives an automatic 4:3 ratio from the same INI flag explicitly rejected as insufficient evidence for a 4:3 UV crop; this applies a second optical squeeze to a full-width source.",
@@ -99,28 +99,46 @@
     "previous_active_pass_run_id": 38950201971,
     "previous_domain_pass_run_id": 38950201980,
     "previous_full_source_pass_run_id": 38949656067,
-    "strict_note": "Require final identical SHA across DX9Ex Active, Domain Isolation and Full Source; additional same-feature verified matte fallback regression included in final C5 candidate. Do not treat prior split-SHA passes as final C6.",
-    "validation_bearing_result_sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+    "strict_note": "Final exact SHA now has all 4/4 required SUCCESS. Previous split-SHA gate passes retained only as historical repair context.",
+    "validation_bearing_result_sha": "1de5f7ab37bec28a9f00c4f12f2adfbc2f14d4ce",
     "confirmed_exact_sha_runs": [
       {
         "name": "DX9Ex Active Validation",
-        "run_id": 38950201971,
-        "sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+        "run_id": 38951323842,
         "status": "SUCCESS",
-        "jobs": "policy, full-chain-compile, game, host, package: SUCCESS"
+        "sha": "1de5f7ab37bec28a9f00c4f12f2adfbc2f14d4ce",
+        "jobs": "policy, game, full-chain-compile, host, package: 5/5 SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38951323842"
       },
       {
         "name": "Domain Isolation Guard",
-        "run_id": 38950201980,
-        "sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+        "run_id": 38951323866,
         "status": "SUCCESS",
-        "jobs": "domain-isolation: SUCCESS"
+        "sha": "1de5f7ab37bec28a9f00c4f12f2adfbc2f14d4ce",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38951323866"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38951323922,
+        "status": "SUCCESS",
+        "sha": "1de5f7ab37bec28a9f00c4f12f2adfbc2f14d4ce",
+        "jobs": "source-cross-domain, msvc-analyze-openxr-host, msvc-analyze-active-game: 3/3 SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38951323922"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38951323845,
+        "status": "SUCCESS",
+        "sha": "1de5f7ab37bec28a9f00c4f12f2adfbc2f14d4ce",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38951323845"
       }
     ],
-    "verification_limit": "The Full Source Impact Review did not have a run associated with this exact SHA in GitHub Actions; previous source gate evidence remains preserved and must not be relabeled exact-SHA success."
+    "verification_limit": "Four required GitHub Actions workflows passed on identical final source+regression SHA. Quest3/VDXR runtime optics remain UNTESTED.",
+    "result": "PASS_EXACT_SHA_4_OF_4_REQUIRED",
+    "material_result_sha": "c80c970bbea80aceeda19597afee89338a4c8db7"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 bookkeeping recorded without altering validation-bearing SHA; mandatory exact-SHA DX9Ex Active and Domain guards succeeded. Full Source Impact did not trigger for this SHA; do not assert third exact-SHA gate pass. Quest3/VDXR visual/runtime validation remains UNTESTED and NEED_HMD_TEST.",
-  "validation_bearing_result_sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+  "next_action": "C6 BUILD_VERIFIED on final exact SHA. Quest3/VDXR game/menu/selector binocular visual acceptance remains NEED_HMD_TEST; start other independent feature under a different TASK_ID.",
+  "validation_bearing_result_sha": "1de5f7ab37bec28a9f00c4f12f2adfbc2f14d4ce",
   "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
