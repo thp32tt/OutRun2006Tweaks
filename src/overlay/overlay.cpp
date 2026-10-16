@@ -154,6 +154,9 @@ void Overlay::render_shell()
 	static float previousDensity = 1.0f;
 	static bool previousVrShell = false;
 	static bool havePreviousLayout = false;
+    static ImVec2 observedVrPosition{};
+    static ImVec2 observedVrSize{};
+    static bool haveObservedVrShell = false;
 	const bool leavingVr = havePreviousLayout && previousVrShell && !externalVrShell;
 	const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;
 	// Only the XR shell owns forced reflow. The native desktop window is
@@ -212,6 +215,28 @@ void Overlay::render_shell()
 		);
 	}
 
+
+    // Size constraints alone do not constrain a manually dragged origin.
+    // Run before ImGui::Begin so the visible tabs and pointer hitboxes agree.
+    if (externalVrShell && !layoutChanged && haveObservedVrShell)
+    {
+        const auto correction = OutRunF11ResponsiveFit::ContainWindow(
+            {content.x, content.y, content.width, content.height},
+            {observedVrPosition.x, observedVrPosition.y,
+                observedVrSize.x, observedVrSize.y},
+            maxWidth, maxHeight);
+        if (correction.valid && (correction.moved || correction.resized))
+        {
+            if (correction.resized)
+                ImGui::SetNextWindowSize(
+                    ImVec2(correction.rect.width, correction.rect.height),
+                    ImGuiCond_Always);
+            ImGui::SetNextWindowPos(
+                ImVec2(correction.rect.x, correction.rect.y),
+                ImGuiCond_Always);
+        }
+    }
+
 	// Enlarging a font atlas alone leaves keyboard/mouse hit targets and
 	// frame padding tiny at Quest3 eye density. Scale ONLY the F11 shell's
 	// controls, not notifications, game HUD, desktop style or world passes.
@@ -247,6 +272,22 @@ void Overlay::render_shell()
 	// Tab contents scroll in a child of their own, so the tab bar stays at the top rather than
 	// sliding out of view with them.
 	const bool shellOpen = ImGui::Begin("OutRun2006Tweaks", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+    // Remember live XR geometry after Begin, preserving manual drag/resize.
+    // Never copy this temporary headset rectangle into native desktop state.
+    if (externalVrShell)
+    {
+        const ImVec2 p = ImGui::GetWindowPos();
+        const ImVec2 s = ImGui::GetWindowSize();
+        if (std::isfinite(p.x) && std::isfinite(p.y) &&
+            std::isfinite(s.x) && std::isfinite(s.y) &&
+            s.x > 0.f && s.y > 0.f)
+        {
+            observedVrPosition = p;
+            observedVrSize = s;
+            haveObservedVrShell = true;
+        }
+    }
 	// Capture the final desktop ImGui rectangle, including any user drag or
 	// manual resize. Never capture the temporary XR-centred rectangle.
 	if (!externalVrShell)

@@ -14,6 +14,42 @@ namespace OutRunF11ResponsiveFit
         float styleDensity = 1.0f;
     };
 
+
+    // Observe the actual ImGui window after Begin, and clamp an escaped VR
+    // drag/resize BEFORE the next Begin. This keeps drawing and hitboxes aligned.
+    struct WindowRect { float x=0.f, y=0.f, width=0.f, height=0.f; };
+    struct WindowCorrection
+    {
+        WindowRect rect{};
+        bool valid=false, moved=false, resized=false;
+    };
+    inline WindowCorrection ContainWindow(const WindowRect& viewport,
+        const WindowRect& observed, float maxWidth, float maxHeight) noexcept
+    {
+        const auto finiteRect = [](const WindowRect& r) noexcept {
+            return std::isfinite(r.x) && std::isfinite(r.y) &&
+                std::isfinite(r.width) && std::isfinite(r.height) &&
+                r.width > 0.0f && r.height > 0.0f;
+        };
+        if (!finiteRect(viewport) || !finiteRect(observed) ||
+            !std::isfinite(maxWidth) || !std::isfinite(maxHeight) ||
+            maxWidth <= 0.f || maxHeight <= 0.f)
+            return {};
+        const float width = (std::min)(observed.width,
+            (std::min)(viewport.width, maxWidth));
+        const float height = (std::min)(observed.height,
+            (std::min)(viewport.height, maxHeight));
+        const float maxX = viewport.x + viewport.width - width;
+        const float maxY = viewport.y + viewport.height - height;
+        if (!std::isfinite(maxX) || !std::isfinite(maxY))
+            return {};
+        const float x = std::clamp(observed.x, viewport.x, maxX);
+        const float y = std::clamp(observed.y, viewport.y, maxY);
+        return {{x,y,width,height}, true,
+            x != observed.x || y != observed.y,
+            width != observed.width || height != observed.height};
+    }
+
     inline Budget Compute(float availableWidth, float availableHeight,
         float requestedDensity) noexcept
     {

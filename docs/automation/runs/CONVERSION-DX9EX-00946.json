@@ -1,0 +1,101 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00946",
+  "production_id": "CONVERSION-DX9EX-00946",
+  "event_id": "CONVERSION-DX9EX-00946-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00946",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_REQUIRED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "737a33a67474e731a87baf40eb5e0ab009d94906",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/overlay/f11_responsive_fit.hpp",
+    "src/overlay/overlay.cpp"
+  ],
+  "changed_files": [
+    "src/overlay/f11_responsive_fit.hpp",
+    "src/overlay/overlay.cpp",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/f11_shell_containment_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00946.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Restore the entire user-visible Quest3 F11 interactive window after manual drag and resize outside the physical mirror, keeping tab heading and input hit regions accessible through DX9Ex Reset and viewport size transitions without disturbing desktop window history.",
+    "scope_boundary": "Only VR external ImGui F11 shell position and geometry after manual drag/resize; game HUD, original menu, GOAL, SkyGlow, input/FFB, DXVK and R26 rollback remain unaffected.",
+    "trace_stages": [
+      "Original F11 Win32 toggle opens the external ImGui settings shell after graphics current backbuffer size.",
+      "Actual ImGui window origin and size after Begin retain the manual drag/resize state.",
+      "Next-frame XR-only correction happens before ImGui Begin and DrawData are submitted into the same D3D9 backbuffer consumed by stereo eyes."
+    ],
+    "subcomponents": [
+      "Correct out-of-viewport drag origin and oversized live window dimensions without recentering any valid manual placement.",
+      "Capture physical ImGui rect and test negative/portrait/ultrawide/reset/desktop isolation through a native C++ executable in the host release gate."
+    ],
+    "acceptance_items": [
+      {
+        "id": "f11_draggable_hitbox",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native VR F11 tab and interactive hitbox",
+        "expected_behavior": "Recover visible draggable origin and entire sized window inside the current published viewport."
+      },
+      {
+        "id": "f11_desktop_and_reset_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop geometry, native UI and zero-size reset",
+        "expected_behavior": "Never alter on-screen VR drag, original desktop placement, or construct geometry from NaN/zero viewport."
+      },
+      {
+        "id": "f11_exact_sha_host_game",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game and x64 OpenXR host release gates",
+        "expected_behavior": "Native C++ smoke plus DX9Ex Active, Domain, Full Source, and affected HUD Inspector succeed at final exact SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "f11_draggable_hitbox": "PENDING_CI",
+    "f11_desktop_and_reset_fallback": "PENDING_CI",
+    "f11_exact_sha_host_game": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "ImGui::SetNextWindowSizeConstraints bounds the size but not an already dragged F11 window origin; only layoutChanged recenters it, so a steady-frame drag can leave both the title bar and native mouse targets outside the mirror.",
+    "source_evidence": "Overlay::render_shell stores desktop geometry but had no XR actual-window geometry check or corrective SetNextWindowPos path after manual dragging; layoutChanged depends on viewport/density changes only.",
+    "original_evidence": "Original external ImGui F11 routes independently of the original game's HUD and gameplay menus; no game producer offsets are altered.",
+    "source_trace": [
+      "Win32 F11 toggle and input owner precede ImGui NewFrame.",
+      "F11 ImGui Begin provides actual user-controlled window rect after drag/resize.",
+      "Next VR frame corrects offscreen bounds before ImGui DrawData goes through existing backbuffer stereo presentation."
+    ],
+    "alternatives_rejected": [
+      "Changing the original 4:3 game menu bars does not repair the external F11 ImGui draggable origin.",
+      "Always recentering would destroy valid manual placement and desktop persistence."
+    ],
+    "fix_evidence": "Scoped helper clamps finite viewport rect, overlay observes post-Begin and corrects next VR pre-Begin only when escaped; font atlas and input path remain unchanged.",
+    "negative_test_evidence": "Native host regression: on-screen drag, offscreen negative origin, giant resize, 21:9 right/bottom, zero/NaN/Infinity, original 4:3 no movement.",
+    "eye_ownership": "F11 is rendered into D3D9 backbuffer before current stereo composition; per-eye R84 matrices and host swapchain are not modified."
+  },
+  "ci_evidence": {
+    "exact_sha": null,
+    "dx9ex_active": "PENDING",
+    "domain_isolation": "PENDING",
+    "full_source_impact": "PENDING",
+    "hud_inspector": "PENDING",
+    "runtime_hmd": "UNTESTED"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify final exact SHA for R84 game/host/Active/Domain/Full Source/HUD CI; then separate bookkeeping C6. Quest3+VDXR HMD visual/input tests remain UNTESTED."
+}

@@ -157,6 +157,16 @@ add_executable(outrun-vr-direct-ring-skip-ack-smoke tests/test_direct_ring_skip_
 add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_upload_smoke.cpp)
 add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
 target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
+# F11 VR shell native position/size and reset fallback executable regression.
+add_executable(outrun-vr-f11-shell-containment-smoke
+    tests/f11_shell_containment_smoke.cpp)
+target_include_directories(outrun-vr-f11-shell-containment-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-f11-shell-containment-smoke)
+add_custom_command(TARGET outrun-vr-f11-shell-containment-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-f11-shell-containment-smoke>"
+    COMMENT "Run native XR F11 drag/resize and reset fallback regressions"
+    VERBATIM)
 add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smoke.cpp)
 # Contained menu/custom-sprite mapping must honor live viewport bounds
 # when the original game's scale cache lags a D3D9Ex Reset/resize.
