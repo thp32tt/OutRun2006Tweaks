@@ -851,7 +851,11 @@ int main()
                 geometryBytecode->GetBufferSize(), nullptr,
                 &originalGeometryShader)) && originalGeometryShader,
             "00827 caller geometry stage created");
+    // ID3DBlob's COM vtable lives in d3dcompiler_47.dll. Unloading the
+    // module before using and releasing the blob crashes the Win32 WARP
+    // process (0xC0000005); keep it loaded through the final Release.
     geometryBytecode->Release();
+    FreeLibrary(compilerModule);
     d3d.context->GSSetShader(originalGeometryShader, nullptr, 0u);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
