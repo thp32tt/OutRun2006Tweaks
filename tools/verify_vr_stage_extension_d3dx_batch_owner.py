@@ -101,6 +101,21 @@ def check(code: str, header: str) -> list[str]:
     need("BatchActive, OutRunVR::GameSemantic::QueueRenderActive()," in early_draw and
          "PendingHomogeneous," in early_draw,
          "pre-draw deferred owner handoff must call qualified queue state")
+    # Physically submitting the outgoing homogeneous +TIME/GOAL batch
+    # from an incoming foreign Draw MUST rebind the saved producer. Merely
+    # remembering the old token for telemetry still draws under the new
+    # GameSemantic scope and can create a duplicate/head-locked overlay.
+    outgoing = early_draw[early_draw.find("const bool wasStage = StageOwner("):]
+    need("const auto outgoingScope = PendingScope;" in outgoing and
+         "const auto outgoingProducer = PendingProducer;" in outgoing and
+         "ScopedExactProducerSemantic outgoingBatch(" in outgoing and
+         "outgoingScope, nullptr, true, outgoingProducer);" in outgoing and
+         outgoing.find("ScopedExactProducerSemantic outgoingBatch(") <
+         outgoing.find("flushed = FlushTracked(self);") <
+         outgoing.find("if (flushed)") and
+         "PendingHomogeneous" in early_draw and
+         "CanDrainDeferredResultBeforeForeignDraw(" in early_draw,
+         "foreign D3DX Draw must submit old +TIME/GOAL GPU triangles under saved producer")
     need("const bool existingBatch =" in begin_path and
          "BatchActive && self == TrackedSprite && IsExactSprite(self)" in begin_path and
          "if (FAILED(hr) && existingBatch)\n                return hr;" in begin_path and
@@ -460,6 +475,11 @@ def main() -> int:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
     mutations = {
+        "foreign-draw-loses-outgoing-gpu-owner":
+            code.replace(
+                "OutRunVR::GameSemantic::ScopedExactProducerSemantic outgoingBatch(\n"
+                "                    outgoingScope, nullptr, true, outgoingProducer);",
+                "// the foreign incoming producer now owns the old GPU Draw", 1),
         "missing-direct-exit-flush":
             code.replace("        FlushD3DXAtDirectStageSourceExit();",
                          "        // delayed source batch ignored", 1),

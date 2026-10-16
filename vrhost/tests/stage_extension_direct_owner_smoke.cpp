@@ -96,6 +96,55 @@ int main()
         exactExit(false, true, true, 2, true, hud,
                   ProducerToken::GoalTime020, hud, stage))
         return 6;
+    // The next foreign D3DX Draw can implicitly submit the previous
+    // +TIME/GOAL texture batch. Its physical Flush must temporarily use
+    // the outgoing ScreenHud producer and restore the incoming game's
+    // world/overlay cursor and pending one-shot scope afterwards.
+    CurrentScope = RenderScope::ScreenOverlay2D;
+    CurrentQueueExactScope = RenderScope::None;
+    CurrentDirectExactProducer = ProducerToken::None;
+    NextDrawScope = RenderScope::WorldParticle;
+    for (const ProducerToken prior : {
+             ProducerToken::StageExtensionTime, ProducerToken::GoalTime020,
+             ProducerToken::GoalTime150, ProducerToken::ResultProgress })
+    {
+        {
+            ScopedExactProducerSemantic outgoingBatch(
+                RenderScope::ScreenHud, nullptr, true, prior);
+            if (EffectiveScope() != RenderScope::ScreenHud ||
+                CurrentRenderProducerToken() != prior ||
+                ConsumeForDraw() != RenderScope::ScreenHud)
+                return 8;
+        }
+        if (CurrentScope != RenderScope::ScreenOverlay2D ||
+            CurrentRenderProducerToken() != ProducerToken::None ||
+            CurrentQueueExactScope != RenderScope::None ||
+            NextDrawScope != RenderScope::WorldParticle)
+            return 9;
+    }
+    NextDrawScope = RenderScope::None;
+    // A live queue remains authoritative: direct outgoing owner rebinding
+    // must neither steal the queue's +TIME tag nor its drawing cursor.
+    SpriteQueueDepth = 1;
+    CurrentScope = RenderScope::ScreenHud;
+    CurrentQueueExactScope = RenderScope::ScreenHud;
+    CurrentSpriteQueueProducer = ProducerToken::StageExtensionTime;
+    {
+        ScopedExactProducerSemantic outgoingBatch(
+            RenderScope::ScreenHud, nullptr, true,
+            ProducerToken::GoalTime020);
+        if (CurrentRenderProducerToken() !=
+                ProducerToken::StageExtensionTime ||
+            EffectiveScope() != RenderScope::ScreenHud)
+            return 10;
+    }
+    if (CurrentRenderProducerToken() != ProducerToken::StageExtensionTime)
+        return 11;
+    SpriteQueueDepth = 0;
+    CurrentSpriteQueueProducer = ProducerToken::None;
+    CurrentQueueExactScope = RenderScope::None;
+    CurrentScope = RenderScope::None;
+
     // Source-order regression: the exact C993 sun and other world/scene
     // effects must stay eligible for SkyGlow before the HUD cutoff, while
     // both direct +TIME glyphs and generic 2D queue overlays set the cutoff.

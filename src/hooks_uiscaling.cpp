@@ -2948,7 +2948,21 @@ private:
                 OutRunVR::GameSemantic::CurrentRenderProducerToken()))
         {
             const bool wasStage = StageOwner(PendingScope, PendingProducer);
-            if (FlushTracked(self))
+            // The incoming foreign producer is already the current scope,
+            // but FlushTracked physically submits the PREVIOUS +TIME/GOAL
+            // triangles. Restore that proven homogeneous GPU-batch owner
+            // across the native Flush, including a reentrant FlushDest.
+            // The RAII guard restores the incoming producer and pending
+            // one-shot token before the new Draw enters D3DX.
+            const auto outgoingScope = PendingScope;
+            const auto outgoingProducer = PendingProducer;
+            bool flushed = false;
+            {
+                OutRunVR::GameSemantic::ScopedExactProducerSemantic outgoingBatch(
+                    outgoingScope, nullptr, true, outgoingProducer);
+                flushed = FlushTracked(self);
+            }
+            if (flushed)
             {
                 (wasStage ? StageFlushes : GoalFlushes).fetch_add(
                     1, std::memory_order_relaxed);
