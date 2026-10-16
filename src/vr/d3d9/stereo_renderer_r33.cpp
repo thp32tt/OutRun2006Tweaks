@@ -1073,8 +1073,17 @@ namespace OutRunVRStereo
                 // Raster resync failed before R30 could prove HUD stereo.
                 // An exact +TIME/GOAL producer must keep its original draw,
                 // never borrow R29's preceding road/world source.
-                if (exactResultHud || sourceScreenRequiresProof ||
-                    directCarShadow ||
+                // Preserve the older exact-result/shadow/lens native draw
+                // oracle unchanged. Other original-game source HUD and
+                // queued rank markers now have an independent, equally
+                // source-proven veto rather than weakening that safety gate.
+                if (sourceScreenRequiresProof && !exactResultHud)
+                {
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
+                    return actualDraw();
+                }
+                if (exactResultHud || directCarShadow ||
                     OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(
                         directLensCentre, resyncAlreadyFlushed))
                 {
@@ -1111,8 +1120,14 @@ namespace OutRunVRStereo
             // R31's shader+pose cache may still match an earlier road WVP:
             // using that cache for original +TIME/GOAL produces a displaced
             // or doubled result. Fail open to exactly one game draw instead.
-            if ((exactResultHud || sourceScreenRequiresProof ||
-                 directCarShadow) &&
+            if (sourceScreenRequiresProof && !exactResultHud &&
+                screenKind == R32ReviewScreenSpaceKind::None)
+            {
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
+                return actualDraw();
+            }
+            if ((exactResultHud || directCarShadow) &&
                 screenKind == R32ReviewScreenSpaceKind::None)
             {
                 if (telemetry)
@@ -1141,7 +1156,13 @@ namespace OutRunVRStereo
                 // HUD classification alone is not proof of physical stereo.
                 // Missing GPU-eye resources, pose or c64 must leave the
                 // exact original +TIME/GOAL path alone, not hand it to R29.
-                if (exactResultHud || sourceScreenRequiresProof ||
+                if (sourceScreenRequiresProof && !exactResultHud)
+                {
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
+                    return actualDraw();
+                }
+                if (exactResultHud ||
                     (directCarShadow && !hud.handled))
                 {
                     if (telemetry)

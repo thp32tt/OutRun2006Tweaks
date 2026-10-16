@@ -79,6 +79,11 @@
     "failed_gate": "DX9Ex Active Validation policy / verify_vr_feature_unit_policy.py",
     "failure": "Visual feature ID was not in the existing feature catalog, and feature_contract.trace_stages was absent; source C++ did not fail to compile.",
     "correction": "Bind this source-identified HUD regression to DX9EX:VIS:HUD_GAMEPLAY and document original producer -> R33 physical Draw -> R30 two-eye/host stages without changing verifier or reducing any Gate.",
-    "score_delta": 0
-  }
+    "score_delta": 0,
+    "previous_failed_validation_sha": "c88f7317409e42d4eb37812a98c6a512ef098eac",
+    "previous_failed_gate": "DX9Ex Active Validation / tools/verify_vr_r33_single_classification.py",
+    "latest_correction": "Repair actual R33 source branch structure to preserve pre-existing exact-result/shadow/lens oracle, and keep the new producer-proven ScreenHud and queued rank original-draw fallback independent at unready raster, unclassified and unhandled GPU eye-plan boundaries. Keep destructive checker intact."
+  },
+  "material_repair_source_path": "src/vr/d3d9/stereo_renderer_r33.cpp",
+  "source_repair_parent_sha": "c88f7317409e42d4eb37812a98c6a512ef098eac"
 }
