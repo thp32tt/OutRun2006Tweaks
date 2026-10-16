@@ -2,7 +2,7 @@ name: outrun-c-original-english-crop
 
 services:
   c-english-original-crop:
-    image: outrun-kor-c-salvage:20261015
+    image: outrun-c-english-ocr:20261017
     container_name: outrun-c-original-english-crop
     user: "1002:1002"  # N100 source/output owner; no root in container
     # Reuse N100's cached Pillow image; override all salvage entrypoints.
@@ -15,7 +15,7 @@ services:
     security_opt: ["no-new-privileges:true"]
     pids_limit: 32
     cpus: 0.35
-    mem_limit: 512m
+    mem_limit: 768m
     tmpfs:
       - /tmp:size=64m
     environment:
@@ -24,6 +24,8 @@ services:
       TZ: Asia/Seoul
     volumes:
       - ./loop.py:/app/loop.py:ro
+      - ./discover.py:/app/discover.py:ro
+      - ./ocr_recognize.py:/app/ocr_recognize.py:ro
       - /home/chatgpt-runner2/work/c_original_hd_crop_only_checked_20261016.py:/home/chatgpt-runner2/work/c_original_hd_crop_only_checked_20261016.py:ro
       - /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012:/home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012:ro
       - /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json:/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json:ro
