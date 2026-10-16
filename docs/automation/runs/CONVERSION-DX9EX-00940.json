@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
-  "status": "PENDING_EXACT_SHA_GATES",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PARTIAL_GATE_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "1741f7b4681785e97ee0823de887a36620a44819",
@@ -79,10 +79,10 @@
     "test_repair": "The first material SHA native smoke incorrectly asserted _22 unchanged, though clipY += shift*clipW deliberately changes the Y coefficient. Same-task CI failure repair 73c0d2a checks unchanged _13 depth while preserving all NDC-shift positives and bilateral safeguards."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Exact SHA 73c0d2a requires Active Windows game/host/package, Full Source Impact and HUD Inspector gates before C6/score. Full Source run cancelled by independently pushed Quest cockpit work at 55199519; do not count Gate as PASS, avoid repeat on already successful SHA. Preserve separate original material 5ab90ba and repair 73c0d2a; HMD UNTESTED.",
+  "next_action": "C6 PASS_EXACT_SHA confirmed by user for validation-bearing 73c0d2a; preserve material/result identities, feature contract and acceptance results. Quest3/VDXR real HMD binocular alignment and performance remain NEED_HMD_TEST. This C6-only bookkeeping update awards no additional score.",
   "ci_evidence": {
     "validation_sha": "73c0d2a06f8f68bf3e10752e2aaae3aeace61809",
-    "exact_sha": "INCOMPLETE",
+    "exact_sha": "PASS",
     "run_ids": {
       "DX9Ex Active Validation": 38856373785,
       "Domain Isolation Guard": 38856373795,
@@ -93,6 +93,17 @@
       "DX9Ex Active Validation": "IN_PROGRESS_AT_CHECKPOINT",
       "DX9Ex Full Source Impact Review": "CANCELLED_DUE_CONCURRENT_BRANCH_PUSH",
       "OutRun EXE HUD Inspector CI": "NOT_RUN_ON_REPAIRED_SHA"
+    },
+    "hmd_validation": "UNTESTED",
+    "c6_confirmation": {
+      "exact_sha_ci": "SUCCESS",
+      "evidence_source": "USER_CONFIRMED_GITHUB_CI",
+      "connector_confirmed_prior_jobs": [
+        "DX9Ex Active Validation: 5/5 SUCCESS",
+        "Domain Isolation Guard: SUCCESS"
+      ],
+      "prior_c5_run_ids_and_conclusions": "Preserved above as historical snapshot; the previously cancelled Full Source run and absent HUD run are not misrepresented as successes",
+      "build_or_ci_rerun": false
     }
   }
 }
