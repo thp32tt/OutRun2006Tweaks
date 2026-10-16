@@ -3,6 +3,12 @@
 #include <cstring>
 #include <d3d11.h>
 
+// Portable descriptor-only CI stubs intentionally omit COM render-view types.
+// Forward declarations keep the uninstantiated native-copy template parsable;
+// full COM interfaces are required only at the actual D3D11/WARP callsite.
+struct ID3D11RenderTargetView;
+struct ID3D11DepthStencilView;
+
 namespace OutRunVrNativeEyePair
 {
     // A typed *_SRGB SRV is automatically decoded to linear RGB by D3D11
@@ -163,19 +169,24 @@ namespace OutRunVrNativeEyePair
         // RT1..RT7. Never leave the host pointing at no render target.
         struct ScopedOutputMerger final {
             Context* immediate{};
-            ID3D11RenderTargetView* targets[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+            // D3D11 specifies eight OM RTV slots; the descriptor-only
+            // test header intentionally does not provide that SDK macro.
+            enum : unsigned { kRtvSlots = 8u };
+            ID3D11RenderTargetView* targets[kRtvSlots]{};
             ID3D11DepthStencilView* depth{};
             explicit ScopedOutputMerger(Context* current) noexcept
                 : immediate(current) {
-                immediate->OMGetRenderTargets(
-                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth);
+                immediate->OMGetRenderTargets(kRtvSlots, targets, &depth);
             }
             ~ScopedOutputMerger() noexcept {
-                immediate->OMSetRenderTargets(
-                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, depth);
-                for (auto*& target : targets)
-                    if (target) { target->Release(); target = nullptr; }
-                if (depth) { depth->Release(); depth = nullptr; }
+                immediate->OMSetRenderTargets(kRtvSlots, targets, depth);
+                // COM Release is deferred to template instantiation, where
+                // full D3D11 interfaces are available.
+                const auto release = [](auto*& view) noexcept {
+                    if (view) { view->Release(); view = nullptr; }
+                };
+                for (auto*& target : targets) release(target);
+                release(depth);
             }
             ScopedOutputMerger(const ScopedOutputMerger&) = delete;
             ScopedOutputMerger& operator=(const ScopedOutputMerger&) = delete;
