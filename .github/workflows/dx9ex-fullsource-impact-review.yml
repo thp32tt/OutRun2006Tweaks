@@ -9,6 +9,7 @@ on:
       - 'tools/verify_vr_fullsource_impact.py'
       - 'tools/verify_dx9ex_r84_mainline.py'
       - 'tools/verify_dx9ex_r84_lens_source.py' # C993 exact physical draw provenance gate depends on this verifier.
+      - 'tools/verify_vr_r33_single_classification.py' # Exact result HUD native fallback and negative mutation gate.
       - 'tools/verify_vr_ui_matrix_safety.py'
       - 'tools/verify_vr_custom_sprite_descriptor.py' # Changed UI mutation checks must validate the same exact game SHA.
       - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
