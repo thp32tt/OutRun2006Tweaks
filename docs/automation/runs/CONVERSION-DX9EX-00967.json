@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IN_PROGRESS",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ccaf48f08281451463c9efe2f7a056c67ac138de",
   "material_result_sha": "1925d36ba763243df0dc218a9bbabf5d545872a2",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "a30e719478fdf7c48c6995a3beb0dd906d06bda2",
   "source_paths": [
     "src/vr/game/sprite_queue_tail_proof.hpp",
     "vrhost/tests/stage_extension_direct_owner_smoke.cpp"
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_sprite_and_glyph_first_append": "PENDING_EXACT_SHA",
-    "stage_queue_stale_tail_fallback": "PENDING_EXACT_SHA",
-    "stage_integrated_exact_sha": "PENDING_EXACT_SHA"
+    "stage_sprite_and_glyph_first_append": "PASS_EXACT_SHA",
+    "stage_queue_stale_tail_fallback": "PASS_EXACT_SHA",
+    "stage_integrated_exact_sha": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Native SpriteQueue tail_4 starts at the root itself for an empty priority queue; +TIME can be the first exact source to append sprites and numeric glyphs to that list in a frame.",
@@ -87,12 +87,43 @@
     "eye_ownership": "The existing source-owned stage HUD is eligible for R84 binocular routing only with proven physical SpriteNode identity; otherwise preserve the native draw, not a cached world WVP. Same-SHA Quest3/VDXR stereo observation has not been performed."
   },
   "ci_evidence": {
-    "status": "FAILED_PRIOR_SHA",
-    "failed_run_id": 38942143704,
-    "failed_sha": "8f1c3c23b18b496f9256aa83cde28ab20d0aca87",
-    "failed_job": "DX9Ex Active Validation / policy",
-    "failure": "verify_vr_feature_unit_policy.py --check-head rejected the missing task JSON before Windows game/host/package jobs could execute.",
-    "source_build": "NOT_RUN_ON_FAILED_SHA"
+    "result": "PASS_EXACT_SHA_3_OF_3_REQUIRED",
+    "material_result_sha": "1925d36ba763243df0dc218a9bbabf5d545872a2",
+    "validation_bearing_result_sha": "a30e719478fdf7c48c6995a3beb0dd906d06bda2",
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38943337926,
+        "status": "SUCCESS",
+        "sha": "a30e719478fdf7c48c6995a3beb0dd906d06bda2",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38943337926",
+        "jobs": "policy, Win32 R26_SAFE game, x64 host + smoke, Win32 R84 independent full-chain, package all SUCCESS"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38943338069,
+        "status": "SUCCESS",
+        "sha": "a30e719478fdf7c48c6995a3beb0dd906d06bda2",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38943338069"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38943337737,
+        "status": "SUCCESS",
+        "sha": "a30e719478fdf7c48c6995a3beb0dd906d06bda2",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38943337737",
+        "jobs": "source-cross-domain, msvc-analyze-openxr-host and msvc-analyze-active-game all SUCCESS"
+      }
+    ],
+    "additional_context": {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38942855884,
+      "status": "SUCCESS",
+      "sha": "3beea0c15bc8ba7aaa8be6b7b560bb9e747a6973",
+      "note": "Earlier exact-SHA full-source/tag metadata run; not claimed as a30e SHA gate because workflow path filters did not dispatch it on the host test-only correction."
+    },
+    "runtime_validation": "UNTESTED",
+    "note": "A30e has three required same-SHA gate workflows SUCCESS. No headset execution; no game visual performance or optics acceptance claimed."
   },
   "ci_repair": {
     "failed_validation_sha": "8f1c3c23b18b496f9256aa83cde28ab20d0aca87",
@@ -100,8 +131,13 @@
     "failed_gate": "DX9Ex Active Validation policy",
     "reason": "Exact-head feature contract record missing; not a C++ compiler failure.",
     "correction": "Add same-task canonical +TIME feature contract and pending result without weakening CI policy. Preserve the prior material C++ source SHA and require a new exact-SHA full gate for this updated validation input.",
-    "score_delta": 0
+    "score_delta": 0,
+    "previous_failed_validation_sha": "3beea0c15bc8ba7aaa8be6b7b560bb9e747a6973",
+    "previous_failed_gate": "DX9Ex Active Validation host / MSVC",
+    "previous_failure": "C2672 template argument deduction for untyped nullptr in stage_extension_direct_owner_smoke.cpp; live source and negative tests unchanged.",
+    "latest_correction": "Two nullptr arguments in source-level host regression explicitly typed as static_cast<Node*>(nullptr) under same TASK_ID in a30e719; exact-SHA Active/Domain/Full Source all SUCCESS."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Observe exact-SHA Windows DX9Ex Active plus required Domain/Full Source/HUD gates for the new record commit; record CI evidence separately after all gates succeed. HMD validation stays UNTESTED."
+  "next_action": "BUILD_VERIFIED at immutable a30e719; Quest3/VDXR +TIME sprite/glyph binocular, GOAL and FPS acceptance still NEED_HMD_TEST. Later unrelated branch HEAD is not this feature validation-bearing SHA.",
+  "source_test_compile_repair_sha": "a30e719478fdf7c48c6995a3beb0dd906d06bda2"
 }
