@@ -8,9 +8,9 @@
   "run_key": "CONVERSION-DX9EX-00949",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "feature_id": "DX9EX:VIS:RESULT_HUD_FALLBACK",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME_GOAL_DUPLICATION",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "status": "IMPLEMENTED_PENDING_CI",
   "phase": "C5_VALIDATE",
   "checkpoint": "C5_EXACT_SHA_REQUIRED",
@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "f99ade29c4a193e31dc3bee0bca15818bb8314a6",
-  "material_result_sha": null,
+  "material_result_sha": "01be9810d0f71c64b8debbb6aba051bbe710c39c",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
@@ -31,10 +31,10 @@
     "docs/automation/runs/CONVERSION-DX9EX-00949.json"
   ],
   "feature_contract": {
-    "feature_id": "DX9EX:VIS:RESULT_HUD_FALLBACK",
-    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME_GOAL_DUPLICATION",
-    "goal": "When R84 cannot prove two-eye +TIME/GOAL original HUD GPU submission, preserve precisely one original game draw instead of applying a previous perspective-world shader/WVP or borrowing R29 road geometry.",
-    "scope_boundary": "Exact source-proven ScreenHud +TIME/GOAL GPU commands in R33 only; validated physical two-eye R84 HUD remains unchanged; rank markers, C993, car/road/SkyGlow, original input/FFB, desktop fallback, DX11 and DXVK unchanged.",
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Repair +TIME extension sprite and numeric glyph physical GPU routing across direct D3DX Flush, queued game SpriteNode and missing/failed stereo classification. Ensure +TIME never borrows the previous road/world shader matrix when the finite HUD eye plane cannot be proven; preserve GOAL behavior as the shared-path negative regression.",
+    "scope_boundary": "The original +TIME exact ScreenHud source and its R33 fallback boundary; GOAL shares the underlying physical dispatcher and is covered only to prevent a behavior regression. No changes to GOAL producer identification, successful binocular HUD draws, original roads/cars/rank/C993/SkyGlow, desktop/input/FFB, DXVK or DX11.",
     "trace_stages": [
       "Original stage extension or GOAL E8 helper tags direct D3DXSprite Draw/Flush or original SpriteNode with an exact producer token.",
       "Physical R33 GPU draw snapshots effective scope and source before any world or HUD classification; R30 chooses finite stereo HUD only when c64, pose and game render state are proven.",
@@ -76,8 +76,24 @@
     "fix_evidence": "Restrict all three R33 fallback exits for CanReprojectFiniteResultHudPlane exact source family to the original draw, leaving the successful R33TryHud binocular path untouched.",
     "negative_test_evidence": "Extend render_command_snapshot_smoke with original direct and queued physical GPU producer captures for all six exact result families and negative markers, lens, generic overlay, world source.",
     "runtime_limit": "Without Quest3/VDXR no conclusion that on-device double-image symptom is resolved; actual game visual behavior UNTESTED.",
-    "eye_ownership": "Physical two-eye R33 success remains authoritative; absent proof, the game draws once, never coerced into a cached world eye WVP."
+    "eye_ownership": "Physical two-eye R33 success remains authoritative; absent proof, the game draws once, never coerced into a cached world eye WVP.",
+    "original_evidence": "Original OutRun 2006 +TIME stage extension E8 source hooks in hooks_uiscaling.cpp tag sprites/numeric D3DX or the original SpriteNode with StageExtensionTime; GPU draw is actually issued later at Flush/End or queue replay. When R30 R84 cannot classify this draw as finite stereo HUD, R33Dispatch previously selected R31 fast-world or R29 fallback, potentially borrowing the prior road WVP.",
+    "source_trace": [
+      "Native stage extension sprite E8/printf glyph hooks create exact StageExtensionTime ScreenHud tag for original D3DX Draw or SpriteNode.",
+      "R33GuardStereoRasterState snapshots physical draw producer, R30ClassifyScreenSpace chooses finite two-eye HUD and R33TryHud performs actual left/right Draw after c64 eye matrices.",
+      "When GPU-eye proof is absent or unhandled, R33 must keep exactly one original game draw rather than invoking cached R31FastWorld or R29 generic fallback."
+    ],
+    "alternatives_rejected": [
+      "Do not make all alpha sprites into finite ScreenHud: only original explicit StageExtensionTime and shared exact result producers have trustworthy E8 identity. Do not modify road/vehicle WVP or blindly force a two-eye copy when target, pose or shader proof is missing."
+    ]
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Verify exact validation-bearing SHA across mandatory CI. Record C6 separately only after full exact-SHA SUCCESS. HMD gameplay remains UNTESTED."
+  "next_action": "Registered +TIME feature record repaired after exact 01be9810 DX9Ex Active policy failure; rerun mandatory gates on the NEW exact record-bearing SHA without independently scoring this C5 repair. Quest3/VDXR remains UNTESTED.",
+  "ci_evidence": {
+    "source_material_sha": "01be9810d0f71c64b8debbb6aba051bbe710c39c",
+    "previous_exact_sha": "01be9810d0f71c64b8debbb6aba051bbe710c39c",
+    "previous_dx9ex_active_policy_failure": "Unregistered umbrella feature ID for single visible symptom in policy job 116908789122; corrected to canonical EXTENDED_TIME under the same TASK_ID.",
+    "current_validation": "PENDING_FINAL_EXACT_SHA",
+    "runtime_hmd": "UNTESTED"
+  }
 }
