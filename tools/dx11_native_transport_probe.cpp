@@ -1058,8 +1058,10 @@ int main()
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
     partialGameClear.count[0] = partialGameClear.count[1] = 1u;
-    partialGameClear.entries[0][0] = {{4, 4, 12, 12}, 0xffff0000u};
-    partialGameClear.entries[1][0] = {{40, 4, 48, 12}, 0xff00ff00u};
+    // Source TARGET Clears happened after three masked/depth geometry Draws
+    // and the remaining two left / three right visible Draws.
+    partialGameClear.entries[0][0] = {{4, 4, 12, 12}, 0xffff0000u, 5u};
+    partialGameClear.entries[1][0] = {{40, 4, 48, 12}, 0xff00ff00u, 6u};
     // Model different actual source-camera crop regions within the two
     // full-sized GPU eyes; the original desktop raster must be restored.
     gameRaster.viewport[0] = {0.f, 0.f, 32.f, 64.f, 0.f, 1.f};
@@ -1472,6 +1474,9 @@ int main()
     invalidRaster.scissor[1].right = 65; // Fail before any GPU commands.
     auto invalidPartialClear = partialGameClear;
     invalidPartialClear.entries[1][0].rect.right = 65; // No partial GPU work.
+    auto invalidClearOrder = partialGameClear;
+    invalidClearOrder.count[1] = 2u;
+    invalidClearOrder.entries[1][1] = {{48, 6, 52, 10}, 0xff0000ffu, 1u};
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -1481,6 +1486,9 @@ int main()
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster, &invalidPartialClear) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidClearOrder) &&
             !ring.synchronization_faulted() &&
             directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
@@ -1667,6 +1675,13 @@ int main()
         const bool distinctColor = eyeIndex == 0u
             ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
+        // Check genuine GPU pixels from the AFTER-draw TARGET rectangles.
+        const UINT clearX = eyeIndex == 0u ? 6u : 42u;
+        const auto* clearPixel = pixel + 6u * mapped.RowPitch + clearX * 4u;
+        require(eyeIndex == 0u
+            ? clearPixel[0] == 255u && clearPixel[1] == 0u && clearPixel[2] == 0u
+            : clearPixel[0] == 0u && clearPixel[1] == 255u && clearPixel[2] == 0u,
+            "00847 GPU game TARGET Clear after genuine left/right Draw stream");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
         const UINT arrayX = eyeIndex == 0u ? 18u : 50u;

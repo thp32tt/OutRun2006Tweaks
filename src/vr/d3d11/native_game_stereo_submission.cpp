@@ -108,11 +108,39 @@ bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
     return eye_output_bound();
 }
 
+void NativeGameEyeDrawEncoder::set_source_clear_timeline(
+    const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept {
+    sourceClears_ = (clears && eye < 2u) ? clears : nullptr;
+    sourceClearEye_ = eye;
+    sourceClearCursor_ = 0u;
+}
+
+bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
+    if (!sourceClears_) return true;
+    const auto count = sourceClears_->count[sourceClearEye_];
+    if (count > NativeGameEyePartialTargetClear::kMaxRectsPerEye) return false;
+    while (sourceClearCursor_ < count) {
+        const auto& clear = sourceClears_->entries[sourceClearEye_][sourceClearCursor_];
+        if (clear.afterDrawOrdinal > drawCount_) return true;
+        if (clear.afterDrawOrdinal < drawCount_ ||
+            !clear_target_argb(clear.argb, &clear.rect)) return false;
+        ++sourceClearCursor_;
+    }
+    return true;
+}
+
+bool NativeGameEyeDrawEncoder::finish_source_clear_timeline() noexcept {
+    return replay_due_source_clears() &&
+        (!sourceClears_ ||
+         sourceClearCursor_ == sourceClears_->count[sourceClearEye_]);
+}
+
 bool NativeGameEyeDrawEncoder::draw(
     UINT vertexCount, UINT startVertex) noexcept {
     if (!vertexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
+    if (!replay_due_source_clears()) return false;
     const bool colorWritable = eye_color_writable();
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
@@ -125,6 +153,7 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
     if (!indexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
+    if (!replay_due_source_clears()) return false;
     const bool colorWritable = eye_color_writable();
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
@@ -922,7 +951,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                 if (rect.left < 0 || rect.top < 0 ||
                     rect.right <= rect.left || rect.bottom <= rect.top ||
                     rect.right > static_cast<LONG>(ring_.width()) ||
-                    rect.bottom > static_cast<LONG>(ring_.height()))
+                    rect.bottom > static_cast<LONG>(ring_.height()) ||
+                    (i != 0u && clears.entries[eye][i].afterDrawOrdinal <
+                        clears.entries[eye][i - 1u].afterDrawOrdinal))
                     return false;
             }
         }
@@ -975,12 +1006,10 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         const NativeGameEyeColorSeed* fullTargetClear{};
         const NativeGameEyeRasterState* gameRaster{};
         const NativeGameEyePartialTargetClear* partialTargetClear{};
-        ID3D11DeviceContext1* rectClearContext{};
     } dispatch{pass, user, sourcePoseSequence, {},
                ring_.width(), ring_.height(),
                {depthViews[0].Get(), depthViews[1].Get()},
-               fullTargetClear, gameRaster, partialTargetClear,
-               rectClearContext.Get()};
+               fullTargetClear, gameRaster, partialTargetClear};
 
     // The ring verifies the immediate context and reserves the exact frame
     // before entering this recorder. It marks GPU work as queued first:
@@ -1012,24 +1041,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     static_cast<float>((argb >> 24) & 0xffu) * normalize};
                 ctx->ClearRenderTargetView(targets[eyeIndex], rgba);
             }
-            // D3D9 menu/HUD partial clears must follow the full TARGET
-            // Clear in source order. A per-eye rectangle changes only its
-            // captured pixels; never erase the rest of the native game eye.
-            if (invocation.partialTargetClear) {
-                const auto& clears = *invocation.partialTargetClear;
-                constexpr float normalize = 1.0f / 255.0f;
-                for (std::uint32_t i = 0u; i < clears.count[eyeIndex]; ++i) {
-                    const auto& clear = clears.entries[eyeIndex][i];
-                    const auto argb = clear.argb;
-                    const float rgba[4]{
-                        static_cast<float>((argb >> 16) & 0xffu) * normalize,
-                        static_cast<float>((argb >> 8) & 0xffu) * normalize,
-                        static_cast<float>(argb & 0xffu) * normalize,
-                        static_cast<float>((argb >> 24) & 0xffu) * normalize};
-                    invocation.rectClearContext->ClearView(
-                        targets[eyeIndex], rgba, &clear.rect, 1u);
-                }
-            }
+            // Replay the captured game Clear timeline inside Draw/DrawIndexed,
+            // not as pre-draw seeds which overwrite out-of-order scene pixels.
             // Native D3D11 depth/stencil are private per frame AND per eye;
             // initialize both planes before the game's Draw/DrawIndexed
             // replay. The renderer may then perform the source's own clears.
@@ -1043,9 +1056,12 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             NativeGameEyeDrawEncoder encoder(
                 ctx, targets[eyeIndex], invocation.depth[eyeIndex],
                 invocation.width, invocation.height);
+            encoder.set_source_clear_timeline(
+                invocation.partialTargetClear, eyeIndex);
             if (!invocation.callback(invocation.user, ctx,
                                      targets[eyeIndex], eyeIndex,
-                                     invocation.eye[eyeIndex], encoder))
+                                     invocation.eye[eyeIndex], encoder) ||
+                !encoder.finish_source_clear_timeline())
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
             if (!encoder.draw_count() || !encoder.color_draw_count() ||

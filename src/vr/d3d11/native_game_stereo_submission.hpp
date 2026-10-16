@@ -4,6 +4,8 @@
 
 namespace outrun::vr::dx11 {
 
+struct NativeGameEyePartialTargetClear;
+
 // Renderer-side source evidence must be recorded AFTER this eye's native game
 // D3D11 draw commands, rather than fabricated at frame submission time.
 // Submit real D3D11 game-eye geometry commands on the immediate context.
@@ -61,6 +63,11 @@ public:
         ID3D11Texture2D* source, const D3D11_BOX& sourceRegion,
         const D3D11_RECT& destination, bool linearFilter,
         UINT sourceArraySlice = 0u) noexcept;
+    // Game-origin TARGET rectangles are ordered after N actual per-eye geometry Draws.
+    // A zero ordinal retains original pre-geometry Clear behavior.
+    void set_source_clear_timeline(
+        const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept;
+    [[nodiscard]] bool finish_source_clear_timeline() noexcept;
     [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
     // Depth-only and color-masked game Draws still execute and contribute to
     // the command stream, but cannot by themselves certify a visible XR eye.
@@ -69,12 +76,15 @@ private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
+    [[nodiscard]] bool replay_due_source_clears() noexcept;
     ID3D11DeviceContext* context_{};
     ID3D11RenderTargetView* eyeTarget_{};
     ID3D11DepthStencilView* eyeDepth_{};
     UINT targetWidth_{}, targetHeight_{};
     std::uint64_t drawCount_{};
     std::uint64_t colorDrawCount_{};
+    const NativeGameEyePartialTargetClear* sourceClears_{};
+    std::uint32_t sourceClearEye_{}, sourceClearCursor_{};
 };
 
 struct NativeGameEyeDrawEvidence {
@@ -100,6 +110,7 @@ struct NativeGameEyePartialTargetClear {
     struct Entry {
         D3D11_RECT rect{};
         std::uint32_t argb{};
+        std::uint64_t afterDrawOrdinal{}; // original game geometry Draws before Clear
     };
     std::uint32_t count[2]{};
     Entry entries[2][kMaxRectsPerEye]{};
