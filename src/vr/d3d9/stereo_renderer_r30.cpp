@@ -31,6 +31,7 @@
 #include "../game/render_semantics.hpp"
 #include "../game/projected_rank_stereo.hpp"
 #include "../game/rank_marker_sparse.hpp"
+#include "../game/rank_marker_raw_wvp.hpp"
 #include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
@@ -2538,6 +2539,55 @@ namespace OutRunVRStereo
                 sourceScope == RenderScope::WorldBillboard,
                 sourceProducer == ProducerToken::LensFlareCentre,
                 queueNode == nullptr
+            });
+        }
+
+        // Exact Calc3D2D rank glyph shader submission can inherit a c64
+        // already modified for a previous stereo eye. For the original game
+        // matrix, require the same producer, SpriteNode, pose, shader and
+        // top-level draw. Live c64 is still captured for GPU restoration.
+        bool R30GetOwnedRankRawWvp(float out[16]) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            if (!out || !CorroboratesProjectedWorldMarker(EffectiveScope()) ||
+                !CurrentProjectedMarker())
+                return false;
+            const auto producer = CurrentRenderProducerToken();
+            const auto isRank = [](ProducerToken p) noexcept {
+                return p == ProducerToken::RankMarkerSprani ||
+                    p == ProducerToken::RankMarkerClipSprite ||
+                    p == ProducerToken::RivalMarkerSprani;
+            };
+            if (!isRank(producer))
+                return false;
+            std::uint64_t writeSerial=0, writeDraw=0, writeShaderEpoch=0;
+            std::uintptr_t writeShader=0, currentShader=0;
+            std::uint64_t currentShaderEpoch=0, writeQueueEpoch=0;
+            RenderScope writtenScope=RenderScope::None;
+            const void* writtenNode=nullptr;
+            ProducerToken writtenProducer=ProducerToken::None;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    out, writeSerial, writeDraw, writeShader, writeShaderEpoch) ||
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    writtenScope, writeQueueEpoch, writtenNode, writtenProducer) ||
+                !R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch))
+                return false;
+            const bool sameQueueOwner = QueueRenderActive()
+                ? (CurrentQueueNode() != nullptr &&
+                   CurrentQueueNode() == writtenNode &&
+                   CurrentQueueNodeEpoch() != 0 &&
+                   CurrentQueueNodeEpoch() == writeQueueEpoch)
+                : writtenNode == nullptr;
+            return OutRunVR::RankMarker::OwnsRawGameWvp({
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                R29OwnerTopLevelDrawSerial() + 1u, writeDraw,
+                currentShader, writeShader,
+                currentShaderEpoch, writeShaderEpoch,
+                isRank(producer),
+                writtenScope == RenderScope::ProjectedWorldMarker2D &&
+                    writtenProducer == producer,
+                sameQueueOwner
             });
         }
 
@@ -5887,6 +5937,16 @@ namespace OutRunVRStereo
 
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, original, sizeof(uploadedT));
+            // On exact rank shader draws, use the original game c64 for
+            // marker placement if its provenance is independently proven.
+            // Keep `original` as the actual live GPU c64 for restoration
+            // after the eye draws. Unknown producers use the prior path.
+            if (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                float ownedRankRaw[16]{};
+                if (R30GetOwnedRankRawWvp(ownedRankRaw))
+                    std::memcpy(&uploadedT, ownedRankRaw, sizeof(uploadedT));
+            }
             const D3DMATRIX stockWvp = R29OwnerTransposeMatrix(uploadedT);
             if (!R29OwnerMatrixFinite(stockWvp))
                 return false;

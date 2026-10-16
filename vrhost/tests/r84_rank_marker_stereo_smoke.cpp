@@ -8,6 +8,7 @@ using OutRunVR::RankMarker::RemapScreenPoint;
 static bool eq(float a,float b) { return std::fabs(a-b)<0.001f; }
 
 #include "../../src/vr/game/rank_marker_sparse.hpp"
+#include "../../src/vr/game/rank_marker_raw_wvp.hpp"
 #include <vector>
 // A sparse VB/IB list must produce the same referenced rank sprite positions
 // as a dense scan. Invalid masks, reset/unknown decoders and nonindexed
@@ -66,6 +67,17 @@ static void CheckSparseRankCopyPlan()
 int main()
 {
     CheckSparseRankCopyPlan();
+    using OutRunVR::RankMarker::OwnsRawGameWvp;
+    using OutRunVR::RankMarker::RawWvpEvidence;
+    const RawWvpEvidence owned{13,13,180,178,0x1234,0x1234,9,9,true,true,true};
+    assert(OwnsRawGameWvp(owned));
+    auto rejected = owned;
+    rejected.sameQueueOwner = false; assert(!OwnsRawGameWvp(rejected));
+    rejected = owned; rejected.exactUploadedRank = false; assert(!OwnsRawGameWvp(rejected));
+    rejected = owned; rejected.writtenPose = 12; assert(!OwnsRawGameWvp(rejected));
+    rejected = owned; rejected.writtenShaderEpoch = 8; assert(!OwnsRawGameWvp(rejected));
+    rejected = owned; rejected.writtenDraw = 180; assert(!OwnsRawGameWvp(rejected));
+    rejected = owned; rejected.nextDraw = 193; assert(!OwnsRawGameWvp(rejected));
     StereoNdcShift s{};
     s.baseX=0.25f; s.baseY=-0.2f;
     s.deltaX[0]=-0.06f; s.deltaX[1]=0.06f;

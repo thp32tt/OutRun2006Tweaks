@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00930",
+  "production_id": "CONVERSION-DX9EX-00930",
+  "event_id": "CONVERSION-DX9EX-00930-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00930",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "feature_class": "VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "87e8523ba0bbec6f0f1545c3a7c8018d5c6a16e2",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/rank_marker_raw_wvp.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/rank_marker_raw_wvp.hpp",
+    "vrhost/tests/r84_rank_marker_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00930.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "goal": "Keep exact Calc3D2D car and rival rank-marker shader glyphs attached to their own vehicle in both eyes by using the original game's rank-owned WVP rather than a potentially stereo-injected live c64, without changing other HUD or fixed-function markers.",
+    "scope_boundary": "R84 normal shader-backed projected rank sprites only; leave R26_SAFE rollback, XYZRHW rank path, menu/HUD, lens/SkyGlow, original input/FFB and frozen DXVK unchanged.",
+    "special_work_evidence": "R84 R30BuildScreenSpaceEyeConstants obtains GetVertexShaderConstantF from the live game device; the same hook may have uploaded a previous eye's modified c64. Exact game raw c64 and semantic provenance already exist but were not used on the projected-rank shader path.",
+    "trace_stages": [
+      "EXE Calc3D2D vehicle/rival producer tags an exact ProjectedWorldMarker2D SpriteNode",
+      "Original game SetVertexShaderConstantF records raw c64 source shader, producer, queue node and pose",
+      "R84 shader rank draw compares original game write ownership to current marker and uses original c64 only if matching, preserving live GPU c64 for restore",
+      "Both eyes apply existing vehicle anchor delta, X/Y screen shape and original result fallback"
+    ],
+    "subcomponents": [
+      "rank_marker_raw_wvp.hpp portable provenance predicate with positive/negative cases",
+      "stereo_renderer_r30.cpp exact queue/pose/shader provenance and original-c64 rank optical transform",
+      "r84_rank_marker_stereo_smoke.cpp regression for queue mismatch, pose/recenter, shader epoch and stale draw"
+    ],
+    "acceptance_items": [
+      {
+        "id": "owned_game_wvp_rank_stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "EXE projected rank producer to R84 shader per-eye rendering",
+        "expected_behavior": "Source-owned raw WVP is used for both eye calculations, while live GPU shader constants remain intact for the original restore."
+      },
+      {
+        "id": "stale_foreign_rank_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Wrong SpriteNode, shader epoch, stale pose or draw, unrelated HUD/F11 and R26 safe",
+        "expected_behavior": "Never admit foreign/stale game WVP as a car anchor; fallback to preexisting R84 branch without rewriting unrelated UI."
+      },
+      {
+        "id": "exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game + R26_SAFE + x64 host/package, Domain Isolation, Full Source Impact/HUD gate",
+        "expected_behavior": "All required GitHub Actions succeed for the same validation-bearing source SHA; Quest3/VDXR runtime remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "owned_game_wvp_rank_stereo": "PENDING",
+    "stale_foreign_rank_fallback": "PENDING",
+    "exact_sha_required_gates": "PENDING"
+  },
+  "diagnosis": "Source-confirmed potential rank shader c64 provenance defect; no new HMD reproduction is claimed. A valid owned raw game WVP is used only when all identity gates prove it; other live paths remain unchanged.",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "failed_ci_evidence": [],
+  "next_action": "Check exact-SHA DX9Ex Active, Domain, Full Source Impact and affected HUD gates; fix any real failures under the same TASK_ID. No headset PASS until Quest3 VDXR test."
+}
