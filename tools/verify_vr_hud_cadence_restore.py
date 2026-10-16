@@ -131,17 +131,33 @@ if "ScreenHud" in rival_body or "ScreenOverlay2D" in rival_body:
     fail("rival marker wrapper must remain spatial and exact-only")
 
 glyph_body = function_body(uiscale, "static int __cdecl TextGlyph_putSprite(")
-glyph_markers = [
-    "tailsBefore",
-    "Module::exe_ptr(0x2CFE0)",
-    "original(args, priority)",
-    "TagAppendedNodes(tailsBefore,",
-    "OutRunVR::GameSemantic::RenderScope::ScreenHud",
-    "OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite",
-]
-glyph_pos = [glyph_body.find(m) for m in glyph_markers]
-if min(glyph_pos) < 0 or glyph_pos != sorted(glyph_pos):
-    fail("exact Sumo_Printf result glyph producer must tag all appended nodes as ScreenHud")
+# The previous one-branch order check mistook the new exact B9200 branch
+# for the ordinary Sumo_Printf fallback. Prove each mutually exclusive
+# source-to-queue route after put_sprite_ex independently, not by matching
+# whichever TagAppendedNodes occurs first.
+original_markers = ["tailsBefore", "Module::exe_ptr(0x2CFE0)",
+                    "original(args, priority)"]
+original_pos = [glyph_body.find(m) for m in original_markers]
+if min(original_pos) < 0 or original_pos != sorted(original_pos):
+    fail("result glyph must capture priority tails then call original put_sprite_ex")
+try:
+    begin_exact = glyph_body.index("if (exactGoalResult)\n        {\n            TagAppendedNodes")
+    begin_default = glyph_body.index("else\n        {\n            // The untouched +TIME")
+except ValueError:
+    fail("B9200 result glyph exact/legacy branch missing")
+if begin_exact <= original_pos[-1] or begin_default <= begin_exact:
+    fail("GOAL B9200 result ownership must follow the original glyph")
+for name, section, producer in (
+    ("exact B9200", glyph_body[begin_exact:begin_default],
+     "OutRunVR::GameSemantic::ProducerToken::ResultTextB9200"),
+    ("legacy Sumo_Printf", glyph_body[begin_default:],
+     "OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite"),
+):
+    markers = ["TagAppendedNodes(tailsBefore,",
+               "OutRunVR::GameSemantic::RenderScope::ScreenHud", producer]
+    positions = [section.find(m) for m in markers]
+    if min(positions) < 0 or positions != sorted(positions):
+        fail(name + " glyph children must retain their own ScreenHud source")
 
 right_clip = function_body(uiscale, "static int __cdecl ExactScreenHudRight_putClipSprite(")
 if "AddSpriteSpacing(&x, false);" not in right_clip or "ExactScreenHud_putClipSprite(" not in right_clip:

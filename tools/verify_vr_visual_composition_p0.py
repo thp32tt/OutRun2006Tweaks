@@ -2574,10 +2574,13 @@ def check_time_goal_lens_owner(source_r30, source_ui):
     # Both mutually exclusive paths must append glyph/mask siblings AFTER
     # the original put_sprite_ex; the first occurrence of TagAppendedNodes
     # is now the source-proven B9200 branch, not the legacy default.
-    require_order(glyph, 'GOAL source-owned glyphs after original put_sprite_ex',
+    require_order(glyph, 'all GOAL glyphs must originate after put_sprite_ex',
                   'tailsBefore', 'Module::exe_ptr(0x2CFE0)',
-                  'const int result = original(args, priority);',
-                  'if (exactGoalResult)', 'TagAppendedNodes(tailsBefore,',
+                  'const int result = original(args, priority);')
+    b9200_glyph = glyph[
+        glyph.index('if (exactGoalResult)\n        {\n            TagAppendedNodes'):        glyph.index('else\n        {\n            // The untouched +TIME')]
+    require_order(b9200_glyph, 'original B9200 stack-owned GOAL glyphs',
+                  'TagAppendedNodes(tailsBefore,', 'RenderScope::ScreenHud',
                   'ProducerToken::ResultTextB9200')
     default_glyph = glyph[glyph.index('else\n        {\n            // The untouched +TIME'):]
     require_order(default_glyph, 'all non-B9200 glyphs retain default ScreenHud',
