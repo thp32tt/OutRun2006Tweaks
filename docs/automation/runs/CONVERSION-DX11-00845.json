@@ -1,0 +1,124 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00845",
+  "production_id": "CONVERSION-DX11-00845",
+  "event_id": "CONVERSION-DX11-00845-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_STRETCHRECT_CROP_TEXEL_CLAMP",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "NATIVE_GAME_STRETCHRECT_ATLAS_CROP_UV_CLAMP_BUILD_VERIFIED_R30_LIVE_CALLBACK_REMAINS",
+  "material_result_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+  "validation_bearing_result_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+  "source_material_commits": [
+    "01543c400f4cdecb2feeadbc44c9f65a32b586eb"
+  ],
+  "validation_repair_commits": [],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "C6 bookkeeping of the existing DX11-00845 material result and its exact-SHA CI only. No additional feature completion or AI score is counted.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stretch_source.hpp",
+    "tools/dx11_native_stretch_source_00839.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "full_dx11_renderer_complete": false,
+    "goal": "Constrain live native D3D11 GPU StretchRect shader filtering to game-authored source crop texel centers for each left/right eye, preventing adjacent source atlas texel bleed in menu, vehicle and race postpasses without altering legacy input/FFB fallback. R30 camera callback and Quest3 runtime remain incomplete.",
+    "acceptance_items": [
+      {
+        "id": "game-crop-clamped-gpu-postpass",
+        "category": "integration_behavior",
+        "behavior_area": "native_game_eye_gpu_stretchrect",
+        "expected_behavior": "Real native game-eye HLSL UV sampling clamps cropped point/linear input to the first and last permitted texel centers."
+      },
+      {
+        "id": "crop-box-portable-regression",
+        "category": "regression",
+        "behavior_area": "uv_crop_region_bounds",
+        "expected_behavior": "Portable checks cover crop region packing, one-texel boxes and invalid or out-of-range dimensions."
+      },
+      {
+        "id": "legacy-fallback-unchanged",
+        "category": "fallback_regression",
+        "behavior_area": "original_dx9ex_input_ffb",
+        "expected_behavior": "The material change is limited to the DX11 game-eye crop shader helper and its portable regression, leaving original DX9Ex, input and FFB fallback unmodified."
+      },
+      {
+        "id": "exact-sha-ci-gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_build_backend_openxr_hud_warp",
+        "expected_behavior": "Mandatory structural, backend, Windows build, OpenXR, HUD, and isolated WARP GitHub Actions all succeed at one validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-crop-clamped-gpu-postpass": "PASS_MATERIAL_SHADER_UV_TEXEL_CLAMP_REVIEWED",
+    "crop-box-portable-regression": "PASS_PORTABLE_REGRESSION_PRESENT_AND_EXACT_SHA_GATES",
+    "legacy-fallback-unchanged": "PASS_SOURCE_DIFF_LEGACY_PATHS_UNMODIFIED",
+    "exact-sha-ci-gates": "PASS_EXACT_SHA_5_REQUIRED_PLUS_NATIVE_WARP"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38968057365,
+      "head_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38968057335,
+      "head_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+      "conclusion": "success"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38968066157,
+      "head_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38968066449,
+      "head_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38968066283,
+      "head_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38968057506,
+      "head_sha": "01543c400f4cdecb2feeadbc44c9f65a32b586eb",
+      "conclusion": "success"
+    }
+  },
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "known_blockers": [
+    "OutRun R30 full independently-posed left/right game camera Draw/DrawIndexed callback to native stereo eyes and host OpenXR remains unfinished; no full native renderer completion claimed.",
+    "Quest3/VDXR real-game stereo, input/FFB, HUD and performance not physically exercised. RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "resume_cursor": "Continue original R30 independent L/R game-authored callback integration and HMD runtime validation separately. Do not repeat verified 00845 crop-bound fix or the exact-SHA CI; retain DX9Ex/input/FFB fallback.",
+  "pipeline": {
+    "C0_RECOVER": "MATERIAL_SHA_FOUND_RUN_RECORD_NOT_FOUND",
+    "C1_REVIEW": "VERIFIED_MATERIAL_COMMIT_AND_SIX_EXACT_SHA_CI_SUCCESSES",
+    "C2_IMPLEMENT": [
+      "01543c400f4cdecb2feeadbc44c9f65a32b586eb"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_REQUIRED_PLUS_NATIVE_WARP",
+    "C4_COMMIT": [
+      "01543c400f4cdecb2feeadbc44c9f65a32b586eb"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_SEPARATE_SKIP_CI_BOOKKEEPING"
+  }
+}
