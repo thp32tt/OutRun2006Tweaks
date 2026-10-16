@@ -38,7 +38,8 @@ public:
     // A real D3D9 game Z/stencil Clear can occur between geometry commands.
     [[nodiscard]] bool clear_depth_stencil(
         float depth, std::uint8_t stencil,
-        bool clearDepth, bool clearStencil) noexcept;
+        bool clearDepth, bool clearStencil,
+        const D3D11_RECT* region = nullptr) noexcept;
     // Replay an actual game-authored, unscaled GPU surface copy (for example
     // an offscreen menu/vehicle post-pass) into THIS bound eye. Accept a
     // game-owned DEFAULT GPU RT or shader-readable intermediate texture.
@@ -131,6 +132,10 @@ struct NativeGameEyePartialTargetClear {
     std::uint32_t count[2]{};
     Entry entries[2][kMaxRectsPerEye]{};
 };
+// Depth/stencil events accept an empty rect for full-eye Clear or a captured
+// bounded game rectangle. The latter is rasterized into only the requested
+// depth/stencil pixels (D3D11 ClearDepthStencilView is always whole-view).
+// No synthetic source Clear or geometry draw-count increment is permitted.
 // Real game camera raster and pre-draw Z/stencil state, independently for L/R.
 // Only a captured game source may populate this optional replay payload.
 struct NativeGameEyeRasterState {

@@ -10,6 +10,12 @@
 #include <utility>
 
 namespace outrun::vr::dx11 {
+namespace {
+[[nodiscard]] bool raster_partial_eye_depth_clear(
+    ID3D11DeviceContext*, ID3D11DepthStencilView*,
+    std::uint32_t, std::uint32_t, const D3D11_RECT&,
+    float, std::uint8_t, bool, bool) noexcept;
+}
 
 // Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
 // A callback may unbind OM to render a menu texture; counting that Draw
@@ -127,8 +133,11 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             if (!clear_target_argb(clear.argb, &clear.rect)) return false;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
+            const bool partial = clear.rect.left || clear.rect.top ||
+                clear.rect.right || clear.rect.bottom;
             if (!clear_depth_stencil(clear.depth, clear.stencil,
-                                     clear.clearDepth, clear.clearStencil))
+                                     clear.clearDepth, clear.clearStencil,
+                                     partial ? &clear.rect : nullptr))
                 return false;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceCopy) {
@@ -213,11 +222,22 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
 
 bool NativeGameEyeDrawEncoder::clear_depth_stencil(
     float depth, std::uint8_t stencil,
-    bool clearDepth, bool clearStencil) noexcept {
+    bool clearDepth, bool clearStencil, const D3D11_RECT* region) noexcept {
     if (!eye_targets_bound() || (!clearDepth && !clearStencil) ||
         (clearDepth && (!std::isfinite(depth) ||
                         depth < 0.0f || depth > 1.0f)))
         return false;
+    if (region) {
+        if (region->left < 0 || region->top < 0 ||
+            region->right <= region->left ||
+            region->bottom <= region->top ||
+            static_cast<std::uint32_t>(region->right) > targetWidth_ ||
+            static_cast<std::uint32_t>(region->bottom) > targetHeight_)
+            return false;
+        return raster_partial_eye_depth_clear(
+            context_, eyeDepth_, targetWidth_, targetHeight_, *region,
+            depth, stencil, clearDepth, clearStencil);
+    }
     const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
                        (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
     context_->ClearDepthStencilView(eyeDepth_, flags,
@@ -620,6 +640,142 @@ private:
     UINT viewportCount_{}, scissorCount_{};
     bool active_{};
 };
+
+// D3D11 ClearDepthStencilView ignores rectangles. Replay an original game's
+// bounded Z/stencil Clear with a depth-only draw: a one-viewport triangle
+// writes SV_Depth and/or REPLACE stencil without touching either eye color.
+// This is GPU scene-state work, NOT a game-authored geometry Draw. The scoped
+// pipeline also restores the original MRTs, shaders, IA and raster state.
+[[nodiscard]] bool raster_partial_eye_depth_clear(
+    ID3D11DeviceContext* context, ID3D11DepthStencilView* depthView,
+    std::uint32_t width, std::uint32_t height, const D3D11_RECT& rect,
+    float depth, std::uint8_t stencil,
+    bool clearDepth, bool clearStencil) noexcept {
+    if (!context || !depthView || !width || !height ||
+        (!clearDepth && !clearStencil) ||
+        rect.left < 0 || rect.top < 0 ||
+        rect.right <= rect.left || rect.bottom <= rect.top ||
+        static_cast<std::uint32_t>(rect.right) > width ||
+        static_cast<std::uint32_t>(rect.bottom) > height ||
+        (clearDepth && (!std::isfinite(depth) || depth < 0.f || depth > 1.f)))
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    context->GetDevice(device.GetAddressOf());
+    if (!device) return false;
+
+    // Shared immutable shader/state, one mutable CB and one immediate-context
+    // submission at a time. Rebuild on device recreation/Reset.
+    static std::mutex mutex;
+    static Microsoft::WRL::ComPtr<ID3D11Device> cachedDevice;
+    static Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex;
+    static Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel;
+    static Microsoft::WRL::ComPtr<ID3D11Buffer> constants;
+    static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> states[3];
+    std::lock_guard<std::mutex> lock(mutex);
+    if (cachedDevice.Get() != device.Get()) {
+        cachedDevice = device;
+        vertex.Reset();
+        pixel.Reset();
+        constants.Reset();
+        for (auto& state : states) state.Reset();
+    }
+    if (!vertex || !pixel || !constants) {
+        constexpr char shader[] = R"(
+            cbuffer GameDepth : register(b0) { float4 value; };
+            struct Vertex { float4 pos : SV_POSITION; };
+            Vertex VS(uint id : SV_VertexID) {
+                Vertex v;
+                float2 uv = float2((id << 1) & 2, id & 2);
+                v.pos = float4(uv * float2(2, -2) + float2(-1, 1), 0, 1);
+                return v;
+            }
+            float PS(Vertex v) : SV_Depth { return value.x; })";
+        HMODULE module = LoadLibraryW(L"d3dcompiler_47.dll");
+        if (!module) return false;
+        struct ModuleLifetime {
+            HMODULE handle;
+            ~ModuleLifetime() noexcept { if (handle) FreeLibrary(handle); }
+        } compiler{module};
+        // Blob COM Release must precede FreeLibrary for d3dcompiler_47.
+        Microsoft::WRL::ComPtr<ID3DBlob> vsBlob, psBlob;
+        const auto compile = reinterpret_cast<decltype(&D3DCompile)>(
+            GetProcAddress(module, "D3DCompile"));
+        if (!compile ||
+            FAILED(compile(shader, sizeof(shader) - 1u, nullptr,
+                nullptr, nullptr, "VS", "vs_4_0", 0u, 0u,
+                vsBlob.GetAddressOf(), nullptr)) ||
+            FAILED(compile(shader, sizeof(shader) - 1u, nullptr,
+                nullptr, nullptr, "PS", "ps_4_0", 0u, 0u,
+                psBlob.GetAddressOf(), nullptr)))
+            return false;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> v;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> p;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> cb;
+        if (FAILED(device->CreateVertexShader(
+                vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+                nullptr, v.GetAddressOf())) ||
+            FAILED(device->CreatePixelShader(
+                psBlob->GetBufferPointer(), psBlob->GetBufferSize(),
+                nullptr, p.GetAddressOf())))
+            return false;
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = 16u;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        if (FAILED(device->CreateBuffer(&desc, nullptr, cb.GetAddressOf())))
+            return false;
+        vertex = std::move(v);
+        pixel = std::move(p);
+        constants = std::move(cb);
+    }
+    const unsigned mode = clearDepth ? (clearStencil ? 2u : 0u) : 1u;
+    if (!states[mode]) {
+        D3D11_DEPTH_STENCIL_DESC desc{};
+        desc.DepthEnable = clearDepth ? TRUE : FALSE;
+        desc.DepthWriteMask = clearDepth
+            ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+        desc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+        desc.StencilEnable = clearStencil ? TRUE : FALSE;
+        desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+        desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+        desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+        desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+        desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+        desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+        desc.BackFace = desc.FrontFace;
+        if (FAILED(device->CreateDepthStencilState(
+                &desc, states[mode].GetAddressOf())))
+            return false;
+    }
+    ScopedNativeGameEyeOutput saved(context, width, height);
+    if (!saved.valid()) return false;
+    const float values[4]{clearDepth ? depth : 1.f, 0.f, 0.f, 0.f};
+    context->UpdateSubresource(constants.Get(), 0u, nullptr, values, 0u, 0u);
+    context->OMSetRenderTargets(0u, nullptr, depthView);
+    context->OMSetDepthStencilState(states[mode].Get(), stencil);
+    context->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+    context->RSSetState(nullptr); // disable inherited game scissor
+    const D3D11_VIEWPORT viewport{
+        static_cast<float>(rect.left), static_cast<float>(rect.top),
+        static_cast<float>(rect.right - rect.left),
+        static_cast<float>(rect.bottom - rect.top), 0.f, 1.f};
+    context->RSSetViewports(1u, &viewport);
+    context->IASetInputLayout(nullptr);
+    ID3D11Buffer* emptyVB = nullptr;
+    const UINT zero = 0u;
+    context->IASetVertexBuffers(0u, 1u, &emptyVB, &zero, &zero);
+    context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context->VSSetShader(vertex.Get(), nullptr, 0u);
+    context->PSSetShader(pixel.Get(), nullptr, 0u);
+    context->GSSetShader(nullptr, nullptr, 0u);
+    context->HSSetShader(nullptr, nullptr, 0u);
+    context->DSSetShader(nullptr, nullptr, 0u);
+    ID3D11Buffer* cb = constants.Get();
+    context->PSSetConstantBuffers(0u, 1u, &cb);
+    context->Draw(3u, 0u);
+    return true;
+}
 } // namespace
 
 // A real game post-process StretchRect is not a CopySubresourceRegion: the
@@ -983,14 +1139,23 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     hasRects = true;
                 } else if (event.kind ==
                            NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
-                    // D3D11 has no portable partial depth/stencil Clear. A
-                    // captured RECT cannot silently become a whole-eye erase.
+                    // Empty RECT means whole DSV. Otherwise rasterize only
+                    // the original game's bounded Z/stencil clear pixels.
+                    // Reject malformed coordinates BEFORE either eye queues
+                    // GPU work, retaining the original D3D9 fallback.
                     const auto& rect = event.rect;
-                    if (rect.left || rect.top || rect.right || rect.bottom ||
-                        (!event.clearDepth && !event.clearStencil) ||
+                    const bool partial = rect.left || rect.top ||
+                        rect.right || rect.bottom;
+                    if ((!event.clearDepth && !event.clearStencil) ||
                         (event.clearDepth &&
                          (!std::isfinite(event.depth) ||
-                          event.depth < 0.0f || event.depth > 1.0f)))
+                          event.depth < 0.0f || event.depth > 1.0f)) ||
+                        (partial &&
+                         (rect.left < 0 || rect.top < 0 ||
+                          rect.right <= rect.left ||
+                          rect.bottom <= rect.top ||
+                          rect.right > static_cast<LONG>(ring_.width()) ||
+                          rect.bottom > static_cast<LONG>(ring_.height()))))
                         return false;
                 } else if (event.kind ==
                                NativeGameEyePartialTargetClear::Kind::SourceCopy ||

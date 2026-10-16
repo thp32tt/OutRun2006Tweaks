@@ -1032,6 +1032,7 @@ int main()
         bool rejectedForeignClear[2]{};
         bool rejectedInvalidClear[2]{};
         bool replayedMidSceneClear[2]{};
+        bool replayedPartialDepthStencil[2]{};
         ID3D11Texture2D* gameSurface{};
         ID3D11Texture2D* gameShaderIntermediate{};
         ID3D11Texture2D* gameMipIntermediate{};
@@ -1057,7 +1058,7 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 5u;
+    partialGameClear.count[0] = partialGameClear.count[1] = 6u;
     // Game-origin full Z/stencil Clear after three masked geometry Draws,
     // followed by per-eye HUD TARGET Clears after the remaining geometry.
     // Chronological replay must preserve BOTH independent eye command lists.
@@ -1132,6 +1133,18 @@ int main()
         rtOnly.destination = eye == 0u
             ? D3D11_RECT{2, 35, 10, 39}
             : D3D11_RECT{34, 35, 42, 39};
+        // Interleave a genuine bounded game depth+stencil clear AFTER its
+        // two GPU postpasses, without creating an extra source Draw.
+        auto& zRect = partialGameClear.entries[eye][5];
+        zRect.kind = SourceClear::Kind::FullDepthStencil;
+        zRect.afterDrawOrdinal = eye == 0u ? 5u : 6u;
+        zRect.rect = eye == 0u
+            ? D3D11_RECT{12, 44, 20, 52}
+            : D3D11_RECT{44, 44, 52, 52};
+        zRect.depth = eye == 0u ? 0.22f : 0.78f;
+        zRect.stencil = static_cast<std::uint8_t>(eye + 13u);
+        zRect.clearDepth = true;
+        zRect.clearStencil = true;
     }
 
     std::cerr << "R178-DIAG stereo fixture ready\n";
@@ -1360,7 +1373,8 @@ int main()
         fixture.rejectedInvalidClear[eyeIndex] =
             !encoder.clear_target_argb(0xffffffffu, &badRect) &&
             !encoder.clear_depth_stencil(-0.5f, 0u, true, false) &&
-            !encoder.clear_depth_stencil(0.5f, 0u, false, false);
+            !encoder.clear_depth_stencil(0.5f, 0u, false, false) &&
+            !encoder.clear_depth_stencil(0.5f, 0u, true, true, &badRect);
         const LONG patchLeft = eyeIndex == 0u ? 24 : 52;
         const D3D11_RECT afterDrawPatch{patchLeft, 24, patchLeft + 6, 30};
         const auto issuedDraws = encoder.draw_count();
@@ -1372,6 +1386,16 @@ int main()
                 eyeIndex == 0u ? 0.30f : 0.70f,
                 static_cast<std::uint8_t>(eyeIndex + 7u), true, true) &&
             encoder.draw_count() == issuedDraws;
+        const D3D11_RECT zOnly{eyeIndex == 0u ? 8 : 40, 48,
+                               eyeIndex == 0u ? 14 : 46, 54};
+        const auto beforePartial = encoder.draw_count();
+        fixture.replayedPartialDepthStencil[eyeIndex] =
+            encoder.clear_depth_stencil(0.41f, 0u, true, false, &zOnly) &&
+            encoder.clear_depth_stencil(
+                1.0f, static_cast<std::uint8_t>(eyeIndex + 19u),
+                false, true, &zOnly) &&
+            encoder.draw_count() == beforePartial &&
+            encoder.color_draw_count() > 0u;
         // Replay a same-device game post-process COPY after real eye Draws.
         // Negative cases must leave OM/depth state and both eyes unchanged.
         const D3D11_BOX sourcePatch{0u, 0u, 0u, 8u, 8u, 1u};
@@ -1505,6 +1529,7 @@ int main()
         if (afterCopyDepth) afterCopyDepth->Release();
         if (!fixture.rejectedInvalidClear[eyeIndex] ||
             !fixture.replayedMidSceneClear[eyeIndex] ||
+            !fixture.replayedPartialDepthStencil[eyeIndex] ||
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
@@ -1591,6 +1616,8 @@ int main()
             gameEyeFixture.rejectedInvalidClear[1] &&
             gameEyeFixture.replayedMidSceneClear[0] &&
             gameEyeFixture.replayedMidSceneClear[1] &&
+            gameEyeFixture.replayedPartialDepthStencil[0] &&
+            gameEyeFixture.replayedPartialDepthStencil[1] &&
             gameEyeFixture.rejectedInvalidSurfaceCopy[0] &&
             gameEyeFixture.rejectedInvalidSurfaceCopy[1] &&
             gameEyeFixture.replayedPostDrawSurfaceCopy[0] &&
