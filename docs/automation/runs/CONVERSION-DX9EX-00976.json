@@ -17,7 +17,7 @@
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "source_parent_sha": "undefined",
+  "source_parent_sha": "cb8597ab17d2e9f6c08ace800679f6ce58712433",
   "material_result_sha": "dee5d8d412b8fddef34bbb08b4dbc888afb9fe3d",
   "validation_bearing_result_sha": "fcf1b860155c126a39c8cc547037c140d76d7b1d",
   "source_paths": [
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "centre_same_draw_wvp": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA",
-    "centre_provenance_fail_closed": "SOURCE_STATIC_ASSERT_PENDING_CI",
-    "centre_exact_sha_pipeline": "PENDING"
+    "centre_same_draw_wvp": "PASS_BUILD",
+    "centre_provenance_fail_closed": "PASS_BUILD",
+    "centre_exact_sha_pipeline": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original D3D9 SetVertexShaderConstantF retains earlier c64 rows across later successful partial writes. Existing R84 C993 staging reset a complete matrix immediately and would not retain native untouched rows for a same-physical-draw source update.",
@@ -96,5 +96,37 @@
     "no_new_independent_feature_or_score": true
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA bookkeeping complete for the validated DX9Ex Active game, host, full-chain, package and passing domain/HUD gates; Full Source Impact Review static analyzer was still running at C6 record time. No CI rerun or added score. Quest3/VDXR runtime remains UNTESTED."
+  "next_action": "R84 lens centre source BUILD_VERIFIED; require matching Quest3/VDXR central-dot optics test before runtime PASS. Do not rerun identical CI or rescore this retry.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "fcf1b860155c126a39c8cc547037c140d76d7b1d",
+    "DX9Ex Active Validation": {
+      "run_id": 38970484438,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "Domain Isolation Guard": {
+      "run_id": 38970484512,
+      "conclusion": "SUCCESS"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38970484502,
+      "conclusion": "SUCCESS"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 38970484547,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game"
+      ]
+    }
+  },
+  "automation_validation_reason": "Exact validation-bearing SHA fcf1b860 passed DX9Ex Active including Win32 R84, R26_SAFE, x64 host, full-chain and package; Domain Isolation, HUD Inspector and Full Source Impact all SUCCESS. C6 bookkeeping does not change original material result SHA or certify Quest3 optics."
 }
