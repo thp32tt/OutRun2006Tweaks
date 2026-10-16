@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "1b62d975abf92c3e6e4243e1a7f67e37838892c9",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "27289c2d684e9944cc0dca0b30a3c59a9b1ecdb0",
+  "validation_bearing_result_sha": "27289c2d684e9944cc0dca0b30a3c59a9b1ecdb0",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp"
   ],
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "rank_eye_cant": "SOURCE_IMPLEMENTED",
-    "rank_pose_fallback": "NATIVE_SMOKE_PENDING",
-    "rank_exact_sha_ci": "PENDING"
+    "rank_eye_cant": "PASS_BUILD",
+    "rank_pose_fallback": "PASS_BUILD",
+    "rank_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R30BuildProjectedRankDelta discarded stereo.eyeOrientation by hardcoding identity quaternion for both vehicle/rival eyes.",
@@ -82,9 +82,26 @@
     "alternatives_rejected": [
       "Original producer tagging, marker queue anchor and raw WVP provenance are already present and unchanged; confirmed missing cant is in common projection math, not source tag hooks."
     ],
-    "fix_evidence": "Changed R84 C++ projection plus executed host gate native rank regression; GitHub exact-SHA pending.",
-    "negative_test_evidence": "Portable Release-capable test includes canted/parallel/invalid right-eye quaternions, nonfinite IPD, multiple viewport aspects and moving marker offset; GitHub exact-SHA pending."
+    "fix_evidence": "Material and validation-bearing exact SHA 27289c2d684e9944cc0dca0b30a3c59a9b1ecdb0 changes actual R84 rank Calc3D2D projected-eye C++ math shared by shader-c64 and XYZRHW and integrates compiled Release-capable native C++ regression in mandatory x64 host build. Exact SHA Active/Domain/HUD/Full Source workflows all SUCCESS.",
+    "negative_test_evidence": "Executed Windows x64 host-build native C++ smoke for independently canted/parallel eye quaternions, malformed second eye, nonfinite IPD, 4:3/16:9/21:9 marker motion and invalid viewport. GitHub Active host job SUCCESS at exact SHA."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Finish one full exact-SHA Active, Domain, HUD and Full Source verification; C6 [skip ci] separately only after SUCCESS. Quest3/VDXR untested."
+  "next_action": "C6 exact-SHA BUILD_VERIFIED for rank marker eye-cant C++ code. Quest3/VDXR actual moving-car/rival marker binocular acceptance and performance remain NEED_HMD_TEST; preserve raw WVP and original render fallback.",
+  "ci_evidence": {
+    "validation_sha": "27289c2d684e9944cc0dca0b30a3c59a9b1ecdb0",
+    "exact_sha": "PASS",
+    "run_ids": {
+      "DX9Ex Active Validation": 38853372194,
+      "Domain Isolation Guard": 38853372214,
+      "OutRun EXE HUD Inspector CI": 38853372158,
+      "DX9Ex Full Source Impact Review": 38853372117
+    },
+    "conclusions": {
+      "DX9Ex Active Validation": "SUCCESS_5_OF_5",
+      "Domain Isolation Guard": "SUCCESS",
+      "OutRun EXE HUD Inspector CI": "SUCCESS_2_OF_2",
+      "DX9Ex Full Source Impact Review": "SUCCESS_3_OF_3"
+    },
+    "hmd_validation": "UNTESTED"
+  }
 }
