@@ -3337,6 +3337,10 @@ namespace OutRunVRStereo
         {
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device) return;
+            // The real R9/R13 renderer already draws two independent eye
+            // views. A native MONO mirror cannot replace them; avoid another
+            // per-Draw CPU shadow capture and redundant D3D11 GPU workload.
+            if (StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
             // Successful zero-count game draws have no VB/IB/UP bytes to
             // snapshot. Record their exact native source slot before D3D9
@@ -3394,6 +3398,10 @@ namespace OutRunVRStereo
         {
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device) return;
+            // The real R9/R13 renderer already draws two independent eye
+            // views. A native MONO mirror cannot replace them; avoid another
+            // per-Draw CPU shadow capture and redundant D3D11 GPU workload.
+            if (StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
             // Successful zero-count game draws have no VB/IB/UP bytes to
             // snapshot. Record their exact native source slot before D3D9
@@ -3527,6 +3535,10 @@ namespace OutRunVRStereo
         {
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device) return;
+            // The real R9/R13 renderer already draws two independent eye
+            // views. A native MONO mirror cannot replace them; avoid another
+            // per-Draw CPU shadow capture and redundant D3D11 GPU workload.
+            if (StereoWanted()) return;
             R30NativeGameSourceGuard nativeSource{device};
             // Successful zero-count game draws have no VB/IB/UP bytes to
             // snapshot. Record their exact native source slot before D3D9
@@ -3666,9 +3678,11 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
-            if (outrun::vr::dx11::live_game_frame::diagnostic_enabled())
-                outrun::vr::dx11::live_game_frame::observe_linear(
+            if (outrun::vr::dx11::live_game_frame::diagnostic_enabled()) {
+                if (!StereoWanted())
+                    outrun::vr::dx11::live_game_frame::observe_linear(
                     device, type, primitiveCount, data, stride);
+            }
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL) {
