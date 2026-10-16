@@ -45,7 +45,7 @@ int main()
                 if (!Near(YNdc(shifted,v), YNdc(m,v)+shift))
                     return 1;
             // No optical scaling, depth, W or X should be modified.
-            if (shifted._11 != m._11 || shifted._22 != m._22 ||
+            if (shifted._11 != m._11 || shifted._13 != m._13 ||
                 shifted._14 != m._14 || shifted._34 != m._34 ||
                 shifted._44 != m._44)
                 return 2;
