@@ -9,7 +9,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_EYE_GAME_MSAA_GPU_RESOLVE",
-  "feature_id": null,
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -34,7 +34,7 @@
     "tools/dx11_native_transport_probe.cpp"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
     "goal": "Replay authentic MSAA source-owned game color render-target pixels into native D3D11 left/right stereo eyes through GPU resolves, including bounded cropped postpasses, without modifying D3D9 rendering/input fallback or claiming full R30 live stereo runtime readiness.",
     "full_dx11_renderer_complete": false,
     "acceptance_items": [
@@ -116,5 +116,41 @@
     "C4_COMMIT": "36eeaa173c241f9522ac88354b9575811df89f8d",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_RESULT": "PASS_EXACT_SHA; recovered missing run JSON only with [skip ci]; R30 per-eye live game camera/draw hookup remains pending; Quest3 HMD runtime UNTESTED; score +0."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Resolve game-authored native MSAA color target GPU pixels into distinct owned D3D11 stereo eye render-target resources without CPU roundtrips.",
+      "Replay bounded actual menu or vehicle source GPU postpass into L/R eye outputs while keeping original D3D9 draw and input/FFB paths unchanged.",
+      "Validate the two eye GPU pixel outputs, unsupported sample/format/bounds fallback and full exact-SHA GitHub Actions separately from HMD runtime."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source SHA 36eeaa173c241f9522ac88354b9575811df89f8d: actual full and partial MSAA GPU resolves with Native Transport WARP #38932451969 SUCCESS; same exact-SHA 5 mandatory GitHub gates SUCCESS.",
+      "negative_regression": "MSAA source format, sample count and rectangle rejection, same-device ownership, independent L/R eye target, MRT/DSV restore, original D3D9 gamepad/FFB and DX9Ex fallback preserved in original source and WARP probes.",
+      "component_integration": "NativeGameEyeDrawEncoder::copy_game_surface resolves a game-authored MSAA color target into separate NativeSharedEyeRing L/R eye pixels with GPU-backed copies; R30 camera hookup and Quest3 runtime remain pending."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_GAME_MSAA_GPU_RESOLVE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "DX11 native eye GPU resolve source and WARP pixel correctness only; exact matching R30 menu/vehicle/race Quest3 visual output is NOT validated.",
+    "activation_guard_and_fallback": "No production native draw-path activation; same-device MSAA source and eye ownership, format/extent checks, negative WARP cases and unchanged original DX9Ex Draw/Present/input/FFB fallback.",
+    "remaining_implementation": [
+      "Authentic R30 per-eye camera, VS/PS constants and menu-to-race native stereo Draw connection remain pending",
+      "Matching Quest3/VDXR live-game full-frame stereo and input verification remains UNTESTED"
+    ]
   }
 }

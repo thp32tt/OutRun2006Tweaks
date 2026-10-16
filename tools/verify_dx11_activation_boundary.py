@@ -124,9 +124,36 @@ def main() -> None:
                 "ring_.render_eye_pair(context_.Get(), slot_, frameId_,",
                 "context_->OMSetRenderTargets(1u, &target, depth);",
             ]
+            # The native GPU StretchRect postpass performs exactly one
+            # fullscreen-triangle Draw, but it is NOT a game-authored geometry
+            # Draw and must never advance source geometry evidence counters.
+            # Keep it in the same audited file with explicit source/device,
+            # per-eye bounds, native RTV, state isolation and restore checks.
+            postpass = text.partition(
+                "bool NativeGameEyeDrawEncoder::stretch_game_surface("
+            )[2].partition("\n// The D3D9 game")[0]
+            required_postpass = [
+                "if (!source || !context_ || !eye_targets_bound()) return false;",
+                "eye.Get() == source) return false;",
+                "if (!device || device.Get() != owner.Get()) return false;",
+                "srcBox.right > sd.Width || srcBox.bottom > sd.Height ||",
+                "static_cast<UINT>(dest.bottom) > targetHeight_) return false;",
+                "(support & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) == 0u ||",
+                "context1->SwapDeviceContextState(",
+                "isolated.Get(), previous.GetAddressOf());",
+                "~Restore() noexcept { context->SwapDeviceContextState(saved, nullptr); }",
+                "context_->OMSetRenderTargets(1u, &target, nullptr);",
+                "context_->Draw(3u, 0u); // GPU postpass, not game geometry evidence",
+            ]
             missing = [token for token in required_eye_contract if token not in text]
+            missing += ["postpass:" + token for token in required_postpass
+                        if token not in postpass]
+            postpass_draws = DRAW_DISPATCH.findall(postpass)
+            if (not postpass or postpass_draws != ["->Draw("] or
+                    "drawCount_++" in postpass or "colorDrawCount_++" in postpass):
+                missing.append("postpass must issue one bounded non-evidence Draw")
             dispatches = [match.group(0).replace(" ", "") for match in matches]
-            if missing or dispatches != ["->Draw(", "->DrawIndexed("]:
+            if missing or dispatches != ["->Draw(", "->DrawIndexed(", "->Draw("]:
                 violations.append(
                     f"{path.relative_to(ROOT)}: unauthorized native eye Draw "
                     f"dispatch or missing frame/pose/output/evidence guard: "
