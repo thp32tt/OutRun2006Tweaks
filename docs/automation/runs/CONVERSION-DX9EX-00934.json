@@ -2,14 +2,14 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00934",
   "production_id": "CONVERSION-DX9EX-00934",
-  "event_id": "CONVERSION-DX9EX-00934-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX9EX-00934-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "run_key": "CONVERSION-DX9EX-00934",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "feature_id": "DX9EX:VIS:FRONTEND_MENU_ASPECT",
-  "symptom_id": "DX9EX:SYMPTOM:FRONTEND_MENU_ASPECT",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "IMPLEMENTED_CI_PENDING",
   "phase": "C5_VALIDATE",
@@ -30,8 +30,8 @@
     "docs/automation/runs/CONVERSION-DX9EX-00934.json"
   ],
   "feature_contract": {
-    "feature_id": "DX9EX:VIS:FRONTEND_MENU_ASPECT",
-    "symptom_id": "DX9EX:SYMPTOM:FRONTEND_MENU_ASPECT",
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
     "goal": "Correct whole original title/menu/vehicle-selection custom sprite quad mapping from game D3DX source vertices through 4:3/16:9/21:9/portrait screen-space staging. Vanilla front-end intentionally stretches X independently; keep all other protected UI and 4:3 containment.",
     "scope_boundary": "Exact original draw_sprite_custom_matrix 2D screen projection only. No world R84 shader/camera, HUD/GOAL, SkyGlow, input/FFB, R26_SAFE, DX11 or DXVK changes.",
     "trace_stages": [
@@ -59,18 +59,26 @@
         "behavior_area": "R84 Windows game/host/package, R26_SAFE, Domain, Full Source and HUD Inspector",
         "expected_behavior": "Required GitHub Actions entire exact SHA suite passes; Quest3 evidence remains separate."
       }
+    ],
+    "subcomponents": [
+      "Original title, main-menu and car-selection custom SPRARGS2 source vertices keep distinct Vanilla horizontal stretch and contained 4:3 coordinates across native/wide/portrait sizes.",
+      "All four post-D3DX custom quad corners use one finite pixel affine while preserving gameplay/GOAL fallback, source UV/color and reset handling."
     ]
   },
   "acceptance_results": {
-    "menu_custom_quad_all_corners": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
-    "protected_gameplay_reset": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
+    "menu_custom_quad_all_corners": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PASS",
+    "protected_gameplay_reset": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PASS",
     "exact_sha_integrated_quality": "PENDING_EXACT_SHA_CI"
   },
   "diagnosis": {
     "original_evidence": "Existing Vanilla custom-sprite X corner writes use screenScaleY, including on the 3440x1440 21:9 front end where game's intended native horizontal scale is 5.375 instead of 3.0.",
     "root_cause": "Screen-space custom-quad X/Y were conflated in the uncontained branch, even when Vanilla explicitly requests stretched native UI.",
-    "negative_test_evidence": "Changed-area C++ portable native smoke checks all four dimensions, gameplay fallback and invalid/reset inputs."
+    "negative_test_evidence": "Changed-area C++ portable native smoke checks all four dimensions, gameplay fallback and invalid/reset inputs.",
+    "policy_gate_failure": "Run 38845682094 policy job 116796020745 failed because visual feature ID was unregistered and feature_contract lacked 2 substantive subcomponents; no game/host/package compile was attempted.",
+    "repaired_by_retry": "CONVERSION-DX9EX-00934-E003"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Await same-SHA mandatory GitHub Gate without re-running already successful unrelated SHA. Need Quest3/VDXR to mark optical PASS."
+  "next_action": "Retry required GitHub Actions Gates on the new exact validation-bearing SHA, without CI-skip or duplicate rerun of the failed SHA. Quest3/VDXR remains untested.",
+  "material_result_sha": "7d849ef7d1ace6cd7c8f3dc440211919d971e779",
+  "validation_bearing_result_sha": null
 }
