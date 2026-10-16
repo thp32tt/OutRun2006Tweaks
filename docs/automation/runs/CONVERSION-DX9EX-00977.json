@@ -82,7 +82,7 @@
     "runtime_limit": "No actual Quest3/VDXR headset was connected; optical effect and FPS remain unverified."
   },
   "ci_evidence": {
-    "status": "PASS_EXACT_SHA",
+    "status": "SUCCESS",
     "validation_sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
     "required_workflows": [
       {
@@ -114,8 +114,10 @@
         "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38973124618"
       }
     ],
-    "summary": "Exact non-skipped SHA passed Windows DX9Ex R84 game/R26_SAFE/OpenXR host/package, full-chain-compile, HUD Inspector, Domain Isolation and MSVC Source Impact. Initial source verifier failures were repaired under same TASK_ID, not separately scored."
+    "summary": "Exact non-skipped SHA passed Windows DX9Ex R84 game/R26_SAFE/OpenXR host/package, full-chain-compile, HUD Inspector, Domain Isolation and MSVC Source Impact. Initial source verifier failures were repaired under same TASK_ID, not separately scored.",
+    "validation_bearing_result_sha": "583a5f75c10a044fa7f16698526468d5640b5c07",
+    "verification_source": "user_confirmed_exact_sha_github_ci"
   },
   "score_delta_this_attempt": 1,
-  "next_action": "NEED_HMD_TEST only for user-visible optical acceptance; source build and exact SHA CI verified. Advance controller to next independent DX9Ex feature rather than redo C6."
+  "next_action": "C6 PASS_EXACT_SHA bookkeeping complete; do not rerun CI or award duplicate points. Quest3/VDXR HMD runtime remains UNTESTED; original acceptance_results preserved."
 }
