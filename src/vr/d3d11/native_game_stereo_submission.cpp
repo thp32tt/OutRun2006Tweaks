@@ -367,7 +367,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     // Serialize the cache and immediate-context state handoff across users.
     static std::mutex mutex;
     static Microsoft::WRL::ComPtr<ID3D11Device> cachedDevice;
-    static Microsoft::WRL::ComPtr<ID3D11DeviceContextState> isolated;
+    static Microsoft::WRL::ComPtr<ID3DDeviceContextState> isolated;
     static Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
     static Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
     static Microsoft::WRL::ComPtr<ID3D11SamplerState> point, linear;
@@ -391,7 +391,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
                     uvRegion.xy + v.uv * uvRegion.zw, 0);
             })";
         Microsoft::WRL::ComPtr<ID3DBlob> vc, pc;
-        Microsoft::WRL::ComPtr<ID3D11DeviceContextState> is;
+        Microsoft::WRL::ComPtr<ID3DDeviceContextState> is;
         Microsoft::WRL::ComPtr<ID3D11VertexShader> v;
         Microsoft::WRL::ComPtr<ID3D11PixelShader> p;
         Microsoft::WRL::ComPtr<ID3D11SamplerState> s0, s1;
@@ -455,12 +455,12 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     // Context-state swap snapshots ALL graphics bindings: MRT0..7, DSV,
     // shaders, class instances, IA buffers, samplers, blend, raster and Z.
     // The original D3D9 fallback and the next native eye draw are untouched.
-    Microsoft::WRL::ComPtr<ID3D11DeviceContextState> previous;
+    Microsoft::WRL::ComPtr<ID3DDeviceContextState> previous;
     context1->SwapDeviceContextState(
         isolated.Get(), previous.GetAddressOf());
     struct Restore {
         ID3D11DeviceContext1* context{};
-        ID3D11DeviceContextState* saved{};
+        ID3DDeviceContextState* saved{};
         ~Restore() noexcept { context->SwapDeviceContextState(saved, nullptr); }
     } restore{context1.Get(), previous.Get()};
     context_->OMSetRenderTargets(0u, nullptr, nullptr);
