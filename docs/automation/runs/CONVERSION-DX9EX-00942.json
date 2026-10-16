@@ -65,14 +65,53 @@
     ]
   },
   "acceptance_results": {
-    "stage_first_queue_gpu_owner": "PENDING_CI",
-    "unknown_mixed_goal_fallback": "PENDING_CI",
-    "r84_exact_sha_gates": "PENDING_CI"
+    "stage_first_queue_gpu_owner": "PASS_EXACT_SHA",
+    "unknown_mixed_goal_fallback": "PASS_EXACT_SHA",
+    "r84_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "BeforeQueueNode only considered a transition when an existing queue owner was already active or the incoming node was an exact stage/GOAL source. A direct result batch still outstanding at the first unrelated queue node had no outgoing queue owner, so native D3DX implicit Flush could later submit under the newly selected producer.",
     "source_evidence": "R64 BeforeQueueNode is called before SelectSpriteQueueNode. QueueRenderActive is false for the first node, while tracked PendingScope/PendingProducer can still describe an original direct result Draw. The original pre-queue predicate admitted even an unknown None/None owner.",
     "fix_evidence": "R64 first-queue path checks exact live sprite identity, homogeneous nonzero batch and exact source token, flushes with ScopedExactProducerSemantic(saved scope/token) before queue switch, and quarantines failed Flush. Unknown None owner excluded in pre-queue guard.",
-    "runtime_limit": "Original game and Quest3 VDXR headset not exercised in this execution. Automatic checks and build verification do not prove a single binocular +TIME."
+    "runtime_limit": "Original game and Quest3 VDXR headset not exercised in this execution. Automatic checks and build verification do not prove a single binocular +TIME.",
+    "original_evidence": "The original +TIME source family uses three exact sprani and three numeric CALL boundaries; ID3DXSprite::Draw may queue physical GPU work until Flush/End after a direct E8 caller has returned.",
+    "source_trace": [
+      "Original six +TIME E8 producers enter StageExtensionTime/ScreenHud and stamp direct and queued SpriteNodes with explicit semantic ownership.",
+      "R64 tracks original Begin/Draw and saved homogeneous source in pendingScope/pendingProducer, bridging D3DX deferred GPU submission to source select and flush hooks.",
+      "Before the first foreign SpriteNode is made current, exact pending source ownership is restored around physical D3DX Flush; R84 independently compiled R30 projects verified result HUD sprites for both XR eyes."
+    ],
+    "alternatives_rejected": [
+      "Do not globally flush every D3DX Draw because that would mix texture batches, damage performance and grant unrelated scene draws ScreenHud authority.",
+      "Do not infer B9200, rank, world or SkyGlow owner from alpha/FVF alone; unproven, stale or mixed batches retain native submission."
+    ],
+    "negative_test_evidence": "The verifier and native C++ stage_extension_direct_owner_smoke exercise unowned None/None, untracked, mixed, zero draw, lost sprite, B9200 and same-producer negatives; exact SHA Active policy, host, R84 and R26 game, package all passed.",
+    "eye_ownership": "A source-proven ScreenHud result crosses GPU submission with original producer intact; R84 R30 retains per-eye XR head-relative finite-plane logic. HMD optical acceptance is not asserted."
+  },
+  "ci_evidence": {
+    "validation_bearing_sha": "64edd75493531f8d3f01d946434bec22dee7d4b8",
+    "active": {
+      "run_id": 38861170851,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38861170851",
+      "result": "SUCCESS",
+      "jobs": "policy,host,game,full-chain-compile,package = 5/5 SUCCESS"
+    },
+    "domain": {
+      "run_id": 38861170806,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38861170806",
+      "result": "SUCCESS"
+    },
+    "full_source": {
+      "run_id": 38861170863,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38861170863",
+      "result": "SUCCESS",
+      "jobs": "msvc-analyze-active-game,source-cross-domain,msvc-analyze-openxr-host = 3/3 SUCCESS"
+    },
+    "hud_inspector_source_equivalent": {
+      "run_id": 38860650777,
+      "sha": "d5b7457ba7ea3b1a933175d0453439795c34c05e",
+      "result": "SUCCESS",
+      "note": "Earlier SHA with identical runtime C++ source; NOT an exact-SHA Inspector run on validation-bearing commit."
+    },
+    "runtime": "UNTESTED"
   }
 }
