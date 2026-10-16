@@ -398,7 +398,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         Microsoft::WRL::ComPtr<ID3D11Buffer> cb;
         D3D_FEATURE_LEVEL level{};
         if (FAILED(device1->CreateDeviceContextState(
-                0u, nullptr, D3D11_SDK_VERSION, __uuidof(ID3D11Device),
+                0u, nullptr, 0u, D3D11_SDK_VERSION, __uuidof(ID3D11Device),
                 &level, is.GetAddressOf())) ||
             FAILED(D3DCompile(shader, sizeof(shader)-1u, nullptr,
                 nullptr, nullptr, "VS", "vs_4_0", 0u, 0u,
