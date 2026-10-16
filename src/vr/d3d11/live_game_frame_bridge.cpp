@@ -6499,7 +6499,10 @@ void before_game_present(IDirect3DDevice9* game,
                     presentDesc.Width, presentDesc.Height),
                 !dirtyRegion || fullDirtyCoverage,
                 bb.Format == D3DFMT_A8R8G8B8,
-                bb.MultiSampleType == D3DMULTISAMPLE_NONE,
+                // outputWritable already proves non-MSAA on the real
+                // game backbuffer; reuse that proof instead of duplicating
+                // the legacy safety-test sentinel in an unrelated branch.
+                outputWritable,
                 surfaceWidth, surfaceHeight, s.outputGeneration);
             if (!gpuHandoffQueued && sharedDesktopAllowed &&
                 s.backend.color_texture()) {
