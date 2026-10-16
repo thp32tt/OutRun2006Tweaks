@@ -19,7 +19,7 @@
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "6c6838b1f74eda28b46d17736b13f4a0453c9c8e",
   "material_result_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
-  "validation_bearing_result_sha": "b8088fc14156ccad2034ccd288926959607f5690",
+  "validation_bearing_result_sha": "c30b275c9d5b6d8e1e6de7f8777ee9846a308090",
   "source_paths": [
     "src/vr/game/projected_rank_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp"
@@ -88,17 +88,34 @@
     "eye_ownership": "Only exact RankMarker/Rival projectedWorldMarker R84 path writes two-eye scratch after complete pair. Native mono fallback remains on rejection; no quest headset acceptance claimed."
   },
   "ci_evidence": {
-    "exact_sha": "b8088fc14156ccad2034ccd288926959607f5690",
-    "dx9ex_active": "SUCCESS_USER_CONFIRMED",
-    "domain_isolation": "SUCCESS_USER_CONFIRMED",
-    "full_source_impact": "SUCCESS_USER_CONFIRMED",
-    "hud_inspector": "SUCCESS_USER_CONFIRMED",
+    "exact_sha": "c30b275c9d5b6d8e1e6de7f8777ee9846a308090",
+    "dx9ex_active": {
+      "run_id": 38876029553,
+      "status": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38876029625,
+      "status": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38876029568,
+      "status": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38876029563,
+      "status": "SUCCESS"
+    },
     "runtime_hmd": "UNTESTED",
-    "previous_source_only_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
-    "previous_active_policy_failure": "RUN_RECORD_MISSING",
-    "conclusion": "SUCCESS",
-    "source": "User-confirmed GitHub CI SUCCESS for exact validation-bearing SHA; C6-only bookkeeping, no rerun"
+    "original_source_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
+    "prior_record_bearing_sha": "b8088fc14156ccad2034ccd288926959607f5690",
+    "prior_full_source_run": {
+      "run_id": 38875429027,
+      "status": "CANCELLED_CONCURRENCY",
+      "not_eligible_for_pass": true
+    },
+    "validation_tree": "c30b275c includes original rank material; subsequent independent Quest worker changes included; exact head gates checked by GitHub API",
+    "source_provenance": "Authenticated GitHub Actions run read at C6 correction; old unverified USER_CONFIRMED record superseded"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 recorded PASS_EXACT_SHA at b8088fc14156ccad2034ccd288926959607f5690; prior TERMINAL_STATUS_NOT_COMPLETE hold resolved. Quest3/VDXR HMD runtime validation remains UNTESTED; do not rerun CI or double-score this task."
+  "next_action": "BUILD_VERIFIED on successor exact SHA; Quest3/VDXR physical rank, recenter, 4th+/NaviPub visual acceptance remain NEED_HMD_TEST. Other independently authored pending branch heads must validate separately."
 }
