@@ -84,7 +84,7 @@ $requiredFiles = @(
     'OutRunVR-Backend-Selector.ps1'
 )
 $text = @{}
-$parseTargets = @('OutRunVR-TestProfiles.ps1') + $requiredFiles
+$parseTargets = @('OutRunVR-TestProfiles.ps1','OutRunVR-Slot-Selector.ps1') + $requiredFiles
 foreach($name in $parseTargets) {
     $p = Join-Path $root $name
     Assert-True (Test-Path $p) "missing test tool: $name"
