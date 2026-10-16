@@ -605,22 +605,22 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
                 return image.SampleLevel(texSampler,
                     uvRegion.xy + v.uv * uvRegion.zw, 0);
             })";
-        Microsoft::WRL::ComPtr<ID3DBlob> vc, pc;
-        Microsoft::WRL::ComPtr<ID3D11VertexShader> v;
-        Microsoft::WRL::ComPtr<ID3D11PixelShader> p;
-        Microsoft::WRL::ComPtr<ID3D11SamplerState> s0, s1;
-        Microsoft::WRL::ComPtr<ID3D11Buffer> cb;
-        // Context-state creation has no implicit default feature-level array.
-        // Reuse this game-eye device's supported level rather than null/zero.
-        // Some Win32 game builds do not link a fixed compiler import lib.
-        // Match the proven isolated WARP probe: load the OS compiler only
-        // for first-use shader compilation, never once per game Draw.
+        // Load before allocating compiler-owned ID3DBlob interfaces.
+        // The COM blob vtables live in d3dcompiler_47.dll: their Release()
+        // must run BEFORE FreeLibrary, including failure/early-return paths.
+        // Earlier the module guard was declared after the blobs, which
+        // unloaded the DLL first and crashed Win32 WARP at first StretchRect.
         HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
         if (!compiler) return false;
         struct ScopedCompilerModule {
             HMODULE handle{};
             ~ScopedCompilerModule() noexcept { if (handle) FreeLibrary(handle); }
         } compilerLifetime{compiler};
+        Microsoft::WRL::ComPtr<ID3DBlob> vc, pc;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> v;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> p;
+        Microsoft::WRL::ComPtr<ID3D11SamplerState> s0, s1;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> cb;
         const auto compile = reinterpret_cast<decltype(&D3DCompile)>(
             GetProcAddress(compiler, "D3DCompile"));
         if (!compile) return false;
