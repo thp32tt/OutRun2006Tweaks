@@ -747,12 +747,28 @@ int main()
     d3d.context->OMSetRenderTargets(1, &originalGameTarget, preservedDepthView);
     d3d.context->RSSetViewports(1, &preservedViewport);
     d3d.context->RSSetScissorRects(1, &preservedScissor);
+    D3D11_RASTERIZER_DESC preservedRasterDesc{};
+    preservedRasterDesc.FillMode = D3D11_FILL_SOLID;
+    preservedRasterDesc.CullMode = D3D11_CULL_NONE;
+    preservedRasterDesc.DepthClipEnable = TRUE;
+    preservedRasterDesc.ScissorEnable = TRUE;
+    ID3D11RasterizerState* preservedRaster = nullptr;
+    require(SUCCEEDED(d3d.device->CreateRasterizerState(
+                &preservedRasterDesc, &preservedRaster)),
+            "00822 original game raster state created");
+    const FLOAT preservedBlendFactor[4]{0.125f, 0.25f, 0.5f, 0.75f};
+    constexpr UINT preservedMask = 0xff01ff01u;
+    constexpr UINT preservedStencilRef = 11u;
+    d3d.context->RSSetState(preservedRaster);
+    d3d.context->OMSetBlendState(nullptr, preservedBlendFactor, preservedMask);
+    d3d.context->OMSetDepthStencilState(nullptr, preservedStencilRef);
     struct GameEyeFixture {
-        const float (*colors)[4]{};
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
         ID3D11DepthStencilView* callerDepth{};
-    } gameEyeFixture{nativeEyeColors, {}, {}, preservedDepthView};
+    } gameEyeFixture{{}, {}, preservedDepthView};
+    const outrun::vr::dx11::NativeGameEyeColorSeed fullGameClear{
+        {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -804,7 +820,12 @@ int main()
         if (boundTarget) boundTarget->Release();
         if (boundDepth) boundDepth->Release();
         if (!fixture.sawBoundEye[eyeIndex]) return false;
-        ctx->ClearRenderTargetView(eyeTarget, fixture.colors[eyeIndex]);
+        // The verified game full-TARGET Clear already wrote this eye's color.
+        // Change the scene's OM/RS state as a live Draw would: the producer
+        // must restore caller raster/depth/blend state after both eye passes.
+        ctx->RSSetState(nullptr);
+        ctx->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+        ctx->OMSetDepthStencilState(nullptr, 0u);
         // Game command replay may detach or change OM between eye passes.
         // The submission must rebind RT0 for the next eye and restore it
         // to the original desktop state after the second pass.
@@ -818,7 +839,8 @@ int main()
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
             !ring.synchronization_faulted() &&
-            directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 33) &&
+            directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear) &&
             directSubmit.in_flight() && !directSubmit.cancel() &&
             gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1],
             "00820 native eye callback owns distinct bound full-resolution RT0");
@@ -835,7 +857,23 @@ int main()
     D3D11_RECT restoredScissor{};
     d3d.context->RSGetViewports(&restoredViewportCount, &restoredViewport);
     d3d.context->RSGetScissorRects(&restoredScissorCount, &restoredScissor);
+    ID3D11RasterizerState* restoredRaster = nullptr;
+    ID3D11BlendState* restoredBlend = nullptr;
+    ID3D11DepthStencilState* restoredDepthState = nullptr;
+    FLOAT restoredBlendFactor[4]{};
+    UINT restoredMask = 0u, restoredStencilRef = 0u;
+    d3d.context->RSGetState(&restoredRaster);
+    d3d.context->OMGetBlendState(&restoredBlend, restoredBlendFactor, &restoredMask);
+    d3d.context->OMGetDepthStencilState(&restoredDepthState, &restoredStencilRef);
     const bool restoredGameState =
+        restoredRaster == preservedRaster &&
+        restoredBlend == nullptr && restoredDepthState == nullptr &&
+        restoredMask == preservedMask &&
+        restoredStencilRef == preservedStencilRef &&
+        restoredBlendFactor[0] == preservedBlendFactor[0] &&
+        restoredBlendFactor[1] == preservedBlendFactor[1] &&
+        restoredBlendFactor[2] == preservedBlendFactor[2] &&
+        restoredBlendFactor[3] == preservedBlendFactor[3] &&
         restoredGameTarget == originalGameTarget &&
         restoredGameDepth == preservedDepthView &&
         restoredViewportCount == 1 &&
@@ -850,9 +888,14 @@ int main()
         restoredScissor.bottom == preservedScissor.bottom;
     if (restoredGameTarget) restoredGameTarget->Release();
     if (restoredGameDepth) restoredGameDepth->Release();
+    if (restoredRaster) restoredRaster->Release();
+    if (restoredBlend) restoredBlend->Release();
+    if (restoredDepthState) restoredDepthState->Release();
     require(restoredGameState,
             "00821 stereo game draw restores caller color, depth and raster");
     d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
+    d3d.context->RSSetState(nullptr);
+    preservedRaster->Release();
     for (auto*& depth : gameEyeFixture.eyeDepth) {
         if (depth) { depth->Release(); depth = nullptr; }
     }

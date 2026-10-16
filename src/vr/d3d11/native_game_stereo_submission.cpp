@@ -21,6 +21,9 @@ public:
         if (!context_ || !width_ || !height_) return;
         context_->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
                                      savedTargets_, &savedDepth_);
+        context_->OMGetBlendState(&savedBlend_, savedBlendFactors_, &savedSampleMask_);
+        context_->OMGetDepthStencilState(&savedDepthState_, &savedStencilRef_);
+        context_->RSGetState(&savedRasterizer_);
         viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetViewports(&viewportCount_, savedViewports_);
         scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
@@ -31,6 +34,9 @@ public:
         if (!active_) return;
         context_->OMSetRenderTargets(
             D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, savedTargets_, savedDepth_);
+        context_->OMSetBlendState(savedBlend_, savedBlendFactors_, savedSampleMask_);
+        context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
+        context_->RSSetState(savedRasterizer_);
         context_->RSSetViewports(viewportCount_,
                                  viewportCount_ ? savedViewports_ : nullptr);
         context_->RSSetScissorRects(scissorCount_,
@@ -39,6 +45,9 @@ public:
             if (target) { target->Release(); target = nullptr; }
         }
         if (savedDepth_) { savedDepth_->Release(); savedDepth_ = nullptr; }
+        if (savedBlend_) { savedBlend_->Release(); savedBlend_ = nullptr; }
+        if (savedDepthState_) { savedDepthState_->Release(); savedDepthState_ = nullptr; }
+        if (savedRasterizer_) { savedRasterizer_->Release(); savedRasterizer_ = nullptr; }
     }
     ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
     ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
@@ -64,6 +73,12 @@ private:
     std::uint32_t width_{}, height_{};
     ID3D11RenderTargetView* savedTargets_[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
     ID3D11DepthStencilView* savedDepth_{};
+    ID3D11BlendState* savedBlend_{};
+    FLOAT savedBlendFactors_[4]{};
+    UINT savedSampleMask_{};
+    ID3D11DepthStencilState* savedDepthState_{};
+    UINT savedStencilRef_{};
+    ID3D11RasterizerState* savedRasterizer_{};
     D3D11_VIEWPORT savedViewports_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
     D3D11_RECT savedScissors_[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
     UINT viewportCount_{}, scissorCount_{};
@@ -140,7 +155,8 @@ bool NativeGameStereoSubmission::capture_eye(
 
 bool NativeGameStereoSubmission::render_game_eye_passes(
     NativeGameEyePass pass, void* user,
-    std::uint32_t sourcePoseSequence) noexcept
+    std::uint32_t sourcePoseSequence,
+    const NativeGameEyeColorSeed* fullTargetClear) noexcept
 {
     if (state_ != State::Acquired || !context_ || !pass ||
         eyes_[0] || eyes_[1] || sourcePoseSequence == 0u ||
@@ -187,9 +203,10 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         NativeGameEyeDrawEvidence eye[2]{};
         std::uint32_t width{}, height{};
         ID3D11DepthStencilView* depth[2]{};
+        const NativeGameEyeColorSeed* fullTargetClear{};
     } dispatch{pass, user, sourcePoseSequence, {},
                ring_.width(), ring_.height(),
-               {depthViews[0].Get(), depthViews[1].Get()}};
+               {depthViews[0].Get(), depthViews[1].Get()}, fullTargetClear};
 
     // The ring verifies the immediate context and reserves the exact frame
     // before entering this recorder. It marks GPU work as queued first:
@@ -204,6 +221,22 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             if (!output.bind(targets[eyeIndex],
                              invocation.depth[eyeIndex]))
                 return false;
+            // The game's verified full-RT Clear is part of scene replay, not
+            // optional decoration. Clear this eye's own target before its
+            // native Draw/DrawIndexed; otherwise a reused ACK'd ring slot
+            // exposes stale menu/car/race pixels where the next draw has holes.
+            // Do not synthesize a color seed when the game cleared only a RECT.
+            if (invocation.fullTargetClear) {
+                const std::uint32_t argb =
+                    invocation.fullTargetClear->argb[eyeIndex];
+                constexpr float normalize = 1.0f / 255.0f;
+                const float rgba[4]{
+                    static_cast<float>((argb >> 16) & 0xffu) * normalize,
+                    static_cast<float>((argb >> 8) & 0xffu) * normalize,
+                    static_cast<float>(argb & 0xffu) * normalize,
+                    static_cast<float>((argb >> 24) & 0xffu) * normalize};
+                ctx->ClearRenderTargetView(targets[eyeIndex], rgba);
+            }
             // Native D3D11 depth/stencil are private per frame AND per eye;
             // initialize both planes before the game's Draw/DrawIndexed
             // replay. The renderer may then perform the source's own clears.

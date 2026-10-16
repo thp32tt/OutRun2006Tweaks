@@ -11,6 +11,14 @@ struct NativeGameEyeDrawEvidence {
     std::uint64_t viewSignature{};
     std::uint32_t sourcePoseSequence{};
 };
+// A verified game-authored full-RT TARGET Clear can initialize the native
+// shared L/R eye color buffers before the corresponding game Draw replay.
+// ARGB values must come from each eye's actual D3D9 Clear, never a synthetic
+// background or the previous frame. Partial RECT clears belong to the callback.
+struct NativeGameEyeColorSeed {
+    std::uint32_t argb[2]{};
+};
+
 using NativeGameEyePass = bool (*)(
     void* user, ID3D11DeviceContext* context,
     ID3D11RenderTargetView* eyeTarget, std::uint32_t eyeIndex,
@@ -69,6 +77,8 @@ public:
     // The submission binds each ring RTV as OM RT0 with a full-resolution
     // viewport and scissor and owns distinct full-sized D24S8 per-eye depth
     // surfaces, then restores the caller's OM/RS bindings on success/failure.
+    // An optional verified source full-TARGET clear seeds BOTH eye colors;
+    // otherwise the callback owns every color pixel (no fabricated clear).
     // The callback replays game-specific depth clears and depth/blend states;
     // default native Z/stencil initial state is 1.0 / 0 at each eye start.
     // The callback supplies actual Draw/DrawIndexed and
@@ -79,7 +89,8 @@ public:
     // and input/FFB continue without a synthesized mono-to-stereo copy.
     bool render_game_eye_passes(
         NativeGameEyePass pass, void* user,
-        std::uint32_t sourcePoseSequence) noexcept;
+        std::uint32_t sourcePoseSequence,
+        const NativeGameEyeColorSeed* fullTargetClear = nullptr) noexcept;
 
     bool render_direct_eyes(
         NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,
