@@ -80,6 +80,40 @@ static_assert(!ShouldRefreshMenuLetterboxConfig(
 
 int main()
 {
+    // Exact Quest3 A/B failure: a 3440x1440 or 1920x1080 captured
+    // letterboxed game menu looked physically ultrawide with crop OFF.
+    // Preserve ALL original UV pixels, changing only the authored optical
+    // display aspect. Crop ON, nonletterboxed, partially captured clients,
+    // native 4:3/portrait and explicit rollback must remain unaffected.
+    using OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect;
+    const float ultraWide = 3440.f / 1440.f;
+    const float wide = 1920.f / 1080.f;
+    const float fourThree = 4.f / 3.f;
+    if (std::fabs(PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, true, false, false) -
+            fourThree) > 1e-5f ||
+        std::fabs(PlanUncroppedAuthoredMenuAspect(
+            wide, wide, true, true, false, false) - fourThree) > 1e-5f ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, false, true, false, false) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, false, false, false) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, true, true, false) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, ultraWide, true, true, false, true) != ultraWide ||
+        PlanUncroppedAuthoredMenuAspect(
+            fourThree, fourThree, true, true, false, false) != fourThree ||
+        PlanUncroppedAuthoredMenuAspect(
+            2496.f / 2688.f, 2496.f / 2688.f,
+            true, true, false, false) != 2496.f / 2688.f ||
+        !std::isnan(PlanUncroppedAuthoredMenuAspect(
+            std::numeric_limits<float>::quiet_NaN(), wide,
+            true, true, false, false)) ||
+        PlanUncroppedAuthoredMenuAspect(
+            ultraWide, std::numeric_limits<float>::infinity(),
+            true, true, false, false) != ultraWide)
+        return 41;
     using OutRunVrMenuAspect::PlanCapturedAspect;
     constexpr float desktopAspect = 3440.0f / 1440.0f;
     // Fully visible 21:9 and 4:3 mirrors keep exact source proportions.

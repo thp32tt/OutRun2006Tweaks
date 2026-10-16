@@ -203,6 +203,34 @@ namespace OutRunVrMenuAspect
         return static_cast<float>(aspect);
     }
 
+    // Quest3 menu/car-select: some original 4:3 OutRun UI is rasterized
+    // over the ENTIRE ultrawide game client (including the car/model list).
+    // Cropping to 4:3 loses those authored pixels; projecting the uncropped
+    // capture at clientAspect makes its physical VR plane too wide.
+    // Restore the original authored 4:3 PHYSICAL aspect for a completely
+    // sampled, explicitly letterboxed OutRun menu without modifying the UV.
+    // A partially captured client cannot be squeezed as a whole because
+    // its missing pixels must retain their old fragment/fallback handling.
+    // No game HUD, stereo race, F11 or other desktop capture uses this plan.
+    inline float PlanUncroppedAuthoredMenuAspect(
+        float sampledAspect, float fullClientAspect,
+        bool gameConfiguredLetterbox, bool fullyCaptured,
+        bool cropAlreadyApplied, bool useNativeAspect) noexcept
+    {
+        if (!gameConfiguredLetterbox || !fullyCaptured ||
+            cropAlreadyApplied || useNativeAspect ||
+            !std::isfinite(sampledAspect) ||
+            !std::isfinite(fullClientAspect) ||
+            sampledAspect < 0.5f || sampledAspect > 5.0f ||
+            fullClientAspect < 0.5f || fullClientAspect > 5.0f)
+            return sampledAspect;
+        // Never manufacture an aspect correction for portrait/native 4:3:
+        // those sources are already proportioned and must stay untouched.
+        constexpr float authoredFourThree = 4.0f / 3.0f;
+        return fullClientAspect > authoredFourThree + 0.01f
+            ? authoredFourThree : sampledAspect;
+    }
+
     constexpr CropPlan PlanCenteredContent(
         float sourceAspect, float intendedAspect) noexcept
     {

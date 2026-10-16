@@ -1567,8 +1567,16 @@ namespace
         // OUTRUN_VR_MENU_CENTER_4_3=1 explicitly opts into the historical
         // centre crop; =0 forces the uncut complete-client view.
         // Both eyes use the same UV and menu projection.
+        const bool gameConfiguredLetterbox =
+            R23GameMenuIsLetterboxed(c.hwnd_);
         bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(
-            R23GameMenuIsLetterboxed(c.hwnd_), false);
+            gameConfiguredLetterbox, false);
+        // Roll back physical 4:3 normalization independently of the older
+        // crop override, keeping every menu/car-selection pixel available.
+        const char* nativeMenuAspect =
+            std::getenv("OUTRUN_VR_MENU_NATIVE_ASPECT");
+        const bool useNativeMenuAspect = nativeMenuAspect &&
+            std::strcmp(nativeMenuAspect, "1") == 0;
         if (const char* overrideValue =
                 std::getenv("OUTRUN_VR_MENU_CENTER_4_3"))
         {
@@ -1609,6 +1617,27 @@ namespace
             visibleOffsetY = plan.visibleOffsetY;
             visibleWidthScale = plan.visibleWidthScale;
             visibleHeightScale = plan.visibleHeightScale;
+        }
+        else
+        {
+            // Only the COMPLETE game client may be optically remapped.
+            // The UV is deliberately unmodified: full-width car previews,
+            // right-side choices and other non-matte sprites stay visible.
+            // Clipped desktop windows retain existing fragment/fallback
+            // geometry rather than being zoomed as a complete 4:3 image.
+            const float sampledPixelsWide =
+                static_cast<float>(c.sourceWidth_) * whole.w;
+            const float sampledPixelsTall =
+                static_cast<float>(c.sourceHeight_) * whole.h;
+            const bool completeClient =
+                cr.right > cr.left && cr.bottom > cr.top &&
+                std::fabs(sampledPixelsWide -
+                    static_cast<float>(cr.right - cr.left)) <= 1.0f &&
+                std::fabs(sampledPixelsTall -
+                    static_cast<float>(cr.bottom - cr.top)) <= 1.0f;
+            sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(
+                sourceAspect, clientAspect, gameConfiguredLetterbox,
+                completeClient, cropCentered43, useNativeMenuAspect);
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
         // projections. Center LOCAL-fixed menu content on the optical ray,
