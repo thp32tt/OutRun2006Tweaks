@@ -10,15 +10,15 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_GAME_SM3_VS_PS_MATERIALIZATION",
   "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
-  "status": "SOURCE_PHASE_PARTIAL",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "SOURCE_PHASE_PARTIAL_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "0a89ae4b7ee2528da4e1d3ff03b72f0c102c13fd",
+  "validation_bearing_result_sha": "3a89365bd32c0fdf0aacc89be395db2f91c9e9f4",
   "packaging_status": "NOT_REQUIRED",
   "changed_files": [
     "src/vr/d3d11/native_backend.cpp",
@@ -52,9 +52,9 @@
     ]
   },
   "acceptance_results": {
-    "sm3-arithmetic-source": "SOURCE_CODED_14_ARITHMETIC_OPCODE_FAMILIES_CI_PENDING",
-    "source-safety-fallback": "SOURCE_CODED_TARGETED_REGRESSION_PENDING",
-    "exact-sha-ci": "PENDING_EXACT_SHA"
+    "sm3-arithmetic-source": "BUILD_VERIFIED_PORTABLE_NATIVE_SOURCE_AND_GAME_SM3_TRANSLATOR_HMD_UNTESTED",
+    "source-safety-fallback": "BUILD_VERIFIED_FAIL_CLOSED_WRONG_ARITY_AND_UNKNOWN_OPCODE_TESTS_INPUT_FFB_RUNTIME_UNTESTED",
+    "exact-sha-ci": "PASS_EXACT_SHA_5_OF_5"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -72,7 +72,7 @@
       "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
     ],
     "acceptance_proof": {
-      "positive_probe": "Shared native HLSL shader materializer extended from 9 to 14 arithmetic/comparison opcode families plus masked writes and wrong-operand negative checks, exact-SHA CI pending.",
+      "positive_probe": "SM3 MOV/ADD/SUB/MUL/MAD/DP3/DP4/MIN/MAX/ABS/FRC/SLT/SGE/CMP share native VS/PS HLSL emitter and native C++ regression; final GitHub exact SHA 5/5 SUCCESS.",
       "negative_regression": "Constant, predication, uninitialized temp, unsupported modifiers/opcodes rejected; D3D9/input/FFB/owner and DXVK untouched.",
       "component_integration": "SM3 game shader bytes -> parsed register arithmetic -> HLSL VS/PS -> D3DCompiler DXBC materialization; full R30 menu/car/race native L/R binding incomplete."
     },
@@ -82,7 +82,7 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "Shader translation is only a prerequisite, NOT yet a gameplay scene source callback or Quest3 PASS.",
     "activation_guard_and_fallback": "No default native routing or OpenXR producer promotion; D3D9 original and DX9Ex fallback remain authoritative.",
-    "delivery_stage": "SOURCE_PHASE_PARTIAL_SM3_ARITHMETIC_COMPARE_EXTENSION_CI_PENDING",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_SM3_ARITHMETIC_COMPARE_EXTENSION_BUILD_VERIFIED_R30_SCENE_CALLBACK_PENDING",
     "remaining_implementation": [
       "Bind actual game shader constants and textures in the R30 native scene replay before shader-bearing Draw.",
       "Finish game-authored independent L/R R30 callback into NativeGameStereoSubmission and final real HMD tests."
@@ -98,9 +98,53 @@
     "C0_RECOVER": "Backend run 38907890682 at 9474fdb failed DX11 policy: run record lacks required live_game_draw_path; compile not reached.",
     "C1_REVIEW": "SM3 translator was missing common ABS/FRC/SLT/SGE/CMP instructions; R30 menu/race to eye replay still unconnected.",
     "C2_IMPLEMENT": "Material source batch: extend actual native SM3 shader translator/codegen and portable positive/negative regression, restore truthful planned live-game callsite path.",
-    "C3_VALIDATE": "Focus codegen regression and exact-SHA five mandatory CI gates pending; no HMD claimed.",
-    "C4_COMMIT": "Material result to be identified by GitHub exact commit.",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "SOURCE_PHASE_PARTIAL; GATES PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "C3_VALIDATE": "PASS_EXACT_SHA 3a89365b: 5/5 required workflows SUCCESS, portable source regression and Win32/OpenXR host compile. No actual game/HMD session.",
+    "C4_COMMIT": "Original feature material 9474fdb8; material extension 0a89ae4b; causal strict source-graph verifier repair 3a89365b (validation-bearing).",
+    "C5_PACKAGE": "NOT_REQUIRED; no HMD playable claim.",
+    "C6_STATE": "PASS_EXACT_SHA build verified for partial native SM3 source prerequisite; full game R30 menu/vehicle/race callback, native L/R OpenXR image integration remain unfinished; HMD/gamepad runtime UNTESTED."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00828",
+    "score_change": 0,
+    "score_status": "PARTIAL_SOURCE_INTEGRATION_NO_NEW_FEATURE_AWARD",
+    "note": "Same unfinished DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR feature; exact SHA build verification not a second completed renderer feature."
+  },
+  "material_commits": [
+    "9474fdb8f9862571c010c5217c590817422f4dac",
+    "0a89ae4b7ee2528da4e1d3ff03b72f0c102c13fd"
+  ],
+  "ci_exact_sha_gates": {
+    "sha": "3a89365bd32c0fdf0aacc89be395db2f91c9e9f4",
+    "required": "5/5",
+    "result": "PASS_EXACT_SHA",
+    "runs": [
+      {
+        "name": "DX11 Fast",
+        "id": 38909023368,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion",
+        "id": 38909023275,
+        "conclusion": "success"
+      },
+      {
+        "name": "Windows Build",
+        "id": 38909031131,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR",
+        "id": 38909031813,
+        "conclusion": "success"
+      },
+      {
+        "name": "HUD Inspector",
+        "id": 38909031489,
+        "conclusion": "success"
+      }
+    ],
+    "runtime_claim": "UNTESTED",
+    "note": "The optional VR PC Fast Test Build was SKIPPED and is not one of the required five."
   }
 }
