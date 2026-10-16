@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IN_PROGRESS",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e388e6c03cc4a64f9de7a4d43a5d99a0e4346af1",
   "material_result_sha": "a10f30c2f16bb2cddfd40d472e33368cb78640fd",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -69,11 +69,11 @@
     ]
   },
   "acceptance_results": {
-    "screen_hud_fail_closed": "PENDING_EXACT_SHA",
-    "rank_marker_and_world_negative": "PENDING_EXACT_SHA",
-    "integrated_exact_sha_gates": "PENDING_EXACT_SHA"
+    "screen_hud_fail_closed": "PASS_EXACT_SHA",
+    "rank_marker_and_world_negative": "PASS_EXACT_SHA",
+    "integrated_exact_sha_gates": "PASS_EXACT_SHA"
   },
-  "score_delta_this_attempt": 0,
+  "score_delta_this_attempt": 1,
   "ci_repair": {
     "failed_validation_sha": "a10f30c2f16bb2cddfd40d472e33368cb78640fd",
     "failed_gate": "DX9Ex Active Validation policy / verify_vr_feature_unit_policy.py",
@@ -85,5 +85,62 @@
     "latest_correction": "Repair actual R33 source branch structure to preserve pre-existing exact-result/shadow/lens oracle, and keep the new producer-proven ScreenHud and queued rank original-draw fallback independent at unready raster, unclassified and unhandled GPU eye-plan boundaries. Keep destructive checker intact."
   },
   "material_repair_source_path": "src/vr/d3d9/stereo_renderer_r33.cpp",
-  "source_repair_parent_sha": "c88f7317409e42d4eb37812a98c6a512ef098eac"
+  "source_repair_parent_sha": "c88f7317409e42d4eb37812a98c6a512ef098eac",
+  "material_source_repair_sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
+  "diagnosis": {
+    "original_evidence": "R84 R33Dispatch previously fenced only exact +TIME/GOAL and car shadow against an unready raster or R30 None/unhandled screen classifier; other original-game ScreenHud and queued ProjectedWorldMarker2D rank producers could fall into R29 cached road WVP despite source identity being available.",
+    "source_trace": [
+      "Original 6th/6, speed/time/rank screen HUD producers supply explicit RenderScope::ScreenHud and source ProducerToken at their game callback and sprite/D3DX submission.",
+      "PhysicalDrawCommand snapshots producer, queue epoch and scope at the R33 physical Draw; NeedsScreenStereoOrOriginal accepts only source-owned ScreenHud or queued projected rank commands.",
+      "R33Dispatch asks R30 classifier and eye WVP builder for source-owned two-eye projection; when raster resync fails, screen classification is None or HUD stereo cannot be handled, this exact source keeps one original Draw rather than inheriting previous R29 road c64.",
+      "R84/R26_SAFE native game output then reaches the existing x64 OpenXR host per-eye presentation unmodified for successful world and source-proven screen paths."
+    ],
+    "root_cause": "The R84 HUD reject paths were narrow: +TIME/GOAL and direct shadow had a native-draw source gate but distinct 6th/6 and rank commands, even when source identified, could be reinterpreted as the cached prior world WVP by R29 after R30 eye-plane proof failed.",
+    "alternatives_rejected": [
+      "Reject global alpha/depth-only HUD promotion and mutable shader WVP fallback; neither proves original HUD source nor binocular eye ownership.",
+      "Do not disable SkyGlow, world stereo, R26_SAFE, lens C993, legacy controller/FFB or renderer Device Reset to conceal the artifact."
+    ],
+    "fix_evidence": "Initial material a10f30c adds PhysicalDrawCommand source-owned HUD/queue predicate, R33 native-draw fallback at three GPU proof boundaries and executable positive/negative tests. Source Gate repair 499b81e keeps original exact +TIME/GOAL/shadow/C993 fallback as a separate branch rather than weakening existing destructive oracle.",
+    "negative_test_evidence": "vrhost/tests/render_command_snapshot_smoke.cpp tests exact DispRank HUD, +TIME HUD and queued car rank against anonymous HUD, false/unqueued rank, generic overlay, SkyGlow and world source negatives. Exact-SHA DX9Ex Active host and R84 independently linked x86 source tests, original R26_SAFE/game/package, HUD inspector and MSVC analyzer all SUCCESS.",
+    "eye_ownership": "R30 proven HUD or queued projected marker keeps normal R33 binocular ownership. If proof is missing, the native game's original source draw is retained once rather than treating the last road/car world c64 as this screen source; hardware Quest3 output not tested.",
+    "source": "src/vr/d3d9/stereo_renderer_r33.cpp::R33Dispatch; src/vr/game/render_semantics.hpp::PhysicalDrawCommand"
+  },
+  "ci_evidence": {
+    "result": "PASS_EXACT_SHA_4_OF_4",
+    "material_result_sha": "a10f30c2f16bb2cddfd40d472e33368cb78640fd",
+    "validation_bearing_result_sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38939693212,
+        "status": "SUCCESS",
+        "sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38939693212"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38939693340,
+        "status": "SUCCESS",
+        "sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38939693340"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38939693136,
+        "status": "SUCCESS",
+        "sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38939693136"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38939693239,
+        "status": "SUCCESS",
+        "sha": "499b81e23a15834faf5f84c9f50318214c4154a8",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38939693239"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "note": "Four independent exact-499b81e GitHub Gates SUCCESS: DX9Ex Active R84 independently linked, R26_SAFE Win32 game, x64 host smoke, package; Domain, HUD Inspector, Full Source MSVC game+host analysis."
+  },
+  "next_action": "BUILD_VERIFIED for 00966 at immutable validation-bearing 499b81e; future Quest3/VDXR test required for visual PASS. Newer unrelated R29 owner commit must not be counted as part of 00966."
 }
