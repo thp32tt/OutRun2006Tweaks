@@ -441,6 +441,30 @@ def main() -> None:
     ):
         raise SystemExit("DX11 WARP probe must not hide a missing producer Flush")
 
+    # 00846: the actual WARP GPU probe must exercise the new game-authored
+    # partially-offscreen StretchRect as a positive case, reject a rectangle
+    # wholly outside the eye, and preserve Draw/DrawIndexed evidence counts.
+    # This is not a replacement for GPU pixel or runtime validation.
+    gpu_stretch_test = probe_cpp.partition(
+        "const D3D11_RECT scaledDest{"
+    )[2].partition("// Full-size per-camera color")[0]
+    expected_stretch_proofs = [
+        "const D3D11_RECT clippedDest{",
+        "const D3D11_RECT badDest{65, 58, 77, 63};",
+        "fixture.gameSurface, sourcePatch, badDest, false) &&",
+        "fixture.gameSurface, sourcePatch, clippedDest, true) &&",
+        "encoder.draw_count() == beforeCopyDraws &&",
+        "encoder.color_draw_count() == beforeCopyColorDraws;",
+    ]
+    if not gpu_stretch_test or any(
+        token not in gpu_stretch_test for token in expected_stretch_proofs
+    ):
+        raise SystemExit(
+            "DX11 00846 GPU StretchRect WARP clipped-positive/"
+            "fully-offscreen-negative/no-geometry-evidence regression missing"
+        )
+    print("DX11 00846 clipped GPU StretchRect WARP regression contract: OK")
+
     # R178: the acquired slot must remain quarantined after invalidation.
     # This path does not query a GPU fence, so an invalidated generation
     # cannot safely cancel and reuse it.
