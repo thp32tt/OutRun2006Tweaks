@@ -26,6 +26,7 @@ namespace OutRunVR::TexturePacks
         std::string name_;
         int slot_ = 0;
         std::uint64_t next_ = 0;
+        int lastGameTextureIndex_ = -1;
         bool selected_ = false;
 
     public:
@@ -39,11 +40,32 @@ namespace OutRunVR::TexturePacks
             name_.assign(incoming.data(), incoming.size());
             slot_ = slot;
             next_ = 0;
+            lastGameTextureIndex_ = -1;
             selected_ = true;
             return true;
         }
 
         std::uint64_t NextIndex() noexcept { return next_++; }
+
+        // LoadXstsetSprite may repeat the identical filename/slot while a
+        // UI/car-selector pack is loading; that is NOT by itself a restart.
+        // Instead use the game's actual per-pack texture number. Returning
+        // to its first texture after a later one proves a new load pass, even
+        // when the mutable XST filename and slot are unchanged. Otherwise
+        // stale indexed DDS ordinals can resolve a different car/UI sprite.
+        // Ignore invalid numbers and ordinary backward seeks inside a pass;
+        // scene XMT packs keep their original independent sequence.
+        std::uint64_t NextIndexForGameTexture(int gameTextureIndex) noexcept
+        {
+            if (selected_ && gameTextureIndex >= 0)
+            {
+                if (lastGameTextureIndex_ > gameTextureIndex &&
+                    gameTextureIndex <= 1)
+                    next_ = 0;
+                lastGameTextureIndex_ = gameTextureIndex;
+            }
+            return NextIndex();
+        }
         const std::string& Name() const noexcept { return name_; }
     };
 }

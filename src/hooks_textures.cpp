@@ -1045,7 +1045,9 @@ class TextureReplacement : public Hook
 
 		std::string ddsName = std::format("{:X}_{}x{}.dds", hash, width, height);
 		const std::uint64_t ordinal = isUITexture
-			? UiTextureCursor.NextIndex() : SceneTextureCursor.NextIndex();
+			? UiTextureCursor.NextIndexForGameTexture(
+                *Module::exe_ptr<int>(0x55B25C))
+            : SceneTextureCursor.NextIndex();
 		std::string ddsNameIndexed = std::format("{}_{}", ordinal, ddsName);
 
 		if (allowReplacement)

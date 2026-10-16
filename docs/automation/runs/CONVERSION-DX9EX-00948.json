@@ -1,0 +1,79 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00948",
+  "production_id": "CONVERSION-DX9EX-00948",
+  "event_id": "CONVERSION-DX9EX-00948-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00948",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_CI",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "28537180dd6ee3f9fb33bdcf220a93644f96828c",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/texture_pack_cursor.hpp",
+    "src/hooks_textures.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/texture_pack_cursor.hpp",
+    "src/hooks_textures.cpp",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/texture_pack_cursor_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00948.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Keep indexed original UI/car-selector XST DDS mapping stable when the same slot/filename is reloaded after the native game DDS texture counter restarts, preserving opaque source textures and original game rendering.",
+    "scope_boundary": "Game-side UI texture pack ordinal only; scene XMT, source DDS pixels/alpha, native texture allocation/fallback, DX9Ex R84 world/stereo, desktop input/FFB, SkyGlow, R26_SAFE and frozen DXVK unchanged.",
+    "trace_stages": [
+      "Original LoadXstsetSprite identifies pack filename and game slot (0x55B218 unrelated).",
+      "Original 0x55B25C per-pack texture number is read at HandleTexture just before indexed DDS name construction.",
+      "R84 native x86 texture hook selects replacement path by indexed ordinal/hash, then native D3DX or custom DDS allocation builds the original game sprite texture."
+    ],
+    "acceptance_items": [
+      {
+        "id": "xst_same_slot_reload",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Car selection XST indexed DDS replacement",
+        "expected_behavior": "Continue ordinal on repeated same-pack callbacks; restart at zero only when a previously advancing original native per-pack index rewinds to its first texture."
+      },
+      {
+        "id": "xst_negative_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop and scene texture loading",
+        "expected_behavior": "Different slot/text restarts, in-pass seeks/invalid indices do not restart; original scene-XMT and native DDS fallback remain unchanged."
+      },
+      {
+        "id": "xst_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 game, x64 host and package",
+        "expected_behavior": "New portable native-index regression runs with the x64 host build and required exact-SHA DX9Ex Active, Domain, Full Source Impact, affected HUD Inspector gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "xst_same_slot_reload": "PENDING_CI",
+    "xst_negative_and_fallback": "PENDING_CI",
+    "xst_exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Cursor::Select deliberately treats repeated identical XST filename+slot as the same loading stream but NextIndex() never observes the game's native texture index restarting. Returning to the same car selection screen can therefore keep allocating indexed replacement names from the previous pass.",
+    "source_evidence": "src/hooks_textures.cpp LoadXstsetSprite_dest uses XST path+slot only; HandleTexture calls UiTextureCursor.NextIndex() while original game DDS number at 0x55B25C is already available for sprite_scales.",
+    "fix_evidence": "Detect a native XST per-pack texture index rewind to 0/1 after a larger observed index and restart indexed DDS ordinals once; preserve same-pack item reentries and scene-XMT cursor.",
+    "negative_test_evidence": "Portable game-header smoke checks repeated same pack callbacks, native index seek, native rewind, mutable filename, new slot and independent scene sequence.",
+    "runtime_limit": "Source-confirmed ordinal behavior only; user's vehicle selection white image/root cause not proven without Quest3/VDXR or game screen."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run existing mandatory exact-SHA GitHub Actions on material result; no completion/score/HMD correctness until confirmed."
+}

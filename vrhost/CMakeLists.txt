@@ -301,6 +301,18 @@ add_custom_command(TARGET outrun-vr-driver-seat-camera-smoke POST_BUILD
     COMMENT "Run Quest-derived cockpit camera and render eligibility regression"
     VERBATIM)
 
+# Original UI/car-selector XST pack re-open with unchanged filename/slot
+# must restart indexed DDS ordinals only on a native texture-counter rewind.
+add_executable(outrun-vr-texture-pack-cursor-smoke
+    tests/texture_pack_cursor_smoke.cpp)
+target_include_directories(outrun-vr-texture-pack-cursor-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-texture-pack-cursor-smoke)
+add_custom_command(TARGET outrun-vr-texture-pack-cursor-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-texture-pack-cursor-smoke>"
+    COMMENT "Run same-XST UI/car-selector indexed DDS restart regression"
+    VERBATIM)
+
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 # ESC shader arrows and XYZRHW shell share an NDC-constant signed Y move.
 # Exercise actual game-side clip matrix math during mandatory Release host CI.
