@@ -19,6 +19,7 @@
 #endif
 // Needed by independent R30 TU as well as textual R29/R30 owner.
 #include "r30_indexed_up_bounds.hpp"
+#include "r30_particle_dual_eye_ring.hpp"
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
@@ -35,6 +36,7 @@
 #include "../game/rank_marker_sparse.hpp"
 #include "../game/rank_marker_raw_wvp.hpp"
 #include <cstring>
+#include <cstdlib>
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
 #include "pause_menu_eye_affine.hpp"
@@ -124,6 +126,20 @@ namespace OutRunVRStereo
         SafetyHookInline R30DrawIndexedPrimitiveR29Hook{};
         SafetyHookInline R30DrawPrimitiveUPR29Hook{};
         SafetyHookInline R30DrawIndexedPrimitiveUPR29Hook{};
+
+        // Independent Quest-inspired DX9Ex opt-in. R30 already computes
+        // BOTH stereo XYZRHW vertex arrays; batch only their GPU upload.
+        // Never assume all alpha draws are particles or reuse mono vertices.
+        R30ParticleUpload::DualEyeGpuRing R30ParticleGpuRing{};
+        bool R30ParticleGpuUploadEnabled() noexcept
+        {
+            static const bool on = []() noexcept {
+                const char* value = std::getenv("OUTRUN_VR_R30_PARTICLE_VB");
+                return value && std::strcmp(value, "1") == 0;
+            }();
+            return on;
+        }
+
 
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R30InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
@@ -1716,6 +1732,12 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
+            // DEFAULT-pool GPU particle ring cannot survive D3D9 Reset.
+            // GPU draw lease and Reset share the same interleave fence.
+            {
+                std::lock_guard<std::mutex> lock(R30ParticleGpuRing.mutex());
+                R30ParticleGpuRing.invalidate();
+            }
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             R30FlatEffectGeometry = {};
@@ -5278,6 +5300,69 @@ namespace OutRunVRStereo
             {
                 R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
+            }
+
+            // Candidate optimization: only the EXACT WorldParticle semantic
+            // is eligible, with a proven alpha/depth snapshot, conservative
+            // size limits and an explicit environment opt-in. Glass, water
+            // surface, lens flare, HUD and unknown alpha stay on the original
+            // DrawPrimitiveUP path; there is no quality/resolution change.
+            if (R30ParticleGpuUploadEnabled())
+            {
+                R29OwnerEffectTelemetrySnapshot effect{};
+                const bool reliableEffect =
+                    R29OwnerTryGetEffectTelemetrySnapshot(effect);
+                const R30ParticleUpload::Gate gate{
+                    true,
+                    OutRunVR::GameSemantic::EffectiveScope() ==
+                        OutRunVR::GameSemantic::RenderScope::WorldParticle,
+                    state.worldEffect,
+                    reliableEffect,
+                    effect.alphaBlend != FALSE,
+                    effect.zWrite != FALSE,
+                    false,
+                    OutRunVR::State::StateBlockTracker::Recording(),
+                    stride, vertexCount
+                };
+                if (R30ParticleUpload::Eligible(gate))
+                {
+                    // The lock spans both physical draws and prevents an
+                    // interleaved logical batch from DISCARDing eye 1's data.
+                    std::unique_lock<std::mutex> gpuLock(
+                        R30ParticleGpuRing.mutex(), std::try_to_lock);
+                    if (gpuLock.owns_lock() &&
+                        R30ParticleGpuRing.prepare(
+                            device, scratch.left.data(),
+                            scratch.right.data(), vertexCount, stride))
+                    {
+                        auto physicalEye = [&](unsigned eye) {
+                            R30ScopedInternalPass guard;
+                            const HRESULT bind =
+                                R30ParticleGpuRing.bindEye(eye);
+                            if (FAILED(bind)) return bind;
+                            return R29OwnerCallRawDrawPrimitive(
+                                device, type, 0u, primitiveCount);
+                        };
+                        const HRESULT gpuHr = R30ExecuteXyzrhwStereo(
+                            device, state,
+                            [&]() { return physicalEye(0); },
+                            [&]() { return physicalEye(1); },
+                            "R30/WorldParticle-DynamicVB");
+                        // Native DrawPrimitiveUP leaves stream-0 NULL. No
+                        // caller-visible D3D9 stream state may leak.
+                        if (!R30ParticleGpuRing.finishUp())
+                        {
+                            R29OwnerMarkRightDrawFailed();
+                            R29OwnerNoteRestoreFailure(
+                                "R30 WorldParticle GPU stream restore");
+                            R29OwnerArmMonoSafety();
+                            return FAILED(gpuHr) ? gpuHr : E_FAIL;
+                        }
+                        // E_NOTIMPL must never become a fallback AFTER GPU
+                        // raster may have been submitted.
+                        return gpuHr == E_NOTIMPL ? E_FAIL : gpuHr;
+                    }
+                }
             }
 
             auto leftDraw = [&]() {
