@@ -26,7 +26,10 @@ namespace OutRunVR::DriverSeatCamera
         if (!finite(position) || !finite(look) ||
             !finite(axes.forward) || !finite(axes.up) ||
             !std::isfinite(forwardOffset) || !std::isfinite(rightOffset) ||
-            !std::isfinite(upOffset))
+            !std::isfinite(upOffset) ||
+            std::fabs(forwardOffset) > 10.0f ||
+            std::fabs(rightOffset) > 10.0f ||
+            std::fabs(upOffset) > 10.0f)
             return false;
 
         const auto norm = [&](Vec3 v, Vec3& n) noexcept {
