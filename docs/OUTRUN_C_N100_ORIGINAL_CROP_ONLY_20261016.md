@@ -1,3 +1,16 @@
+## 2026-10-17 00:18 KST 사용자 변경 — C 영문 크롭 Docker 자동화 허용
+
+ChatGPT 시간당 예약 실행 대신 **독립 N100 Docker 컨테이너의 폴링 워커만 허용**한다. 2026-10-16 비활성화 지시는 A/B/C1/브라우저/ImageGen/한글 합성 및 기존 한글화 컨트롤러에 그대로 적용한다. 신규 C 전용 컨테이너만 재시작 가능하며 다른 Portainer 스택을 재배포하지 않는다.
+
+- 정본: `docker/c-original-english-crop/{compose.yaml,loop.py,README.md}`.
+- N100 독립 컨테이너: `outrun-c-original-english-crop`; 60초마다 신규 검증 큐 검사, 1회 최대 10건, 리소스 제한, network=none, 원본 RO.
+- `MASTER_CROP_MANIFEST_255.json`에 이미 있는 255개 및 기존 output은 중복 크롭 금지.
+- 기존 runner는 Q060만 verified allowlist에 보유한다. 다른 자산 추가 시 원본 DDS/전체 PNG 픽셀 동등성, 문구/좌표 육안 검증 이후에만 allowlist와 queue_specs를 추가한다.
+- **단순 주기 실행은 새로운 영문 문구의 자동 발견이나 OCR을 의미하지 않는다**. 신규 검증 스펙 없을 때는 IDLE; 그 결과를 신규 산출물로 보고하거나 점수 중복 가산하지 않는다.
+- 현 승인 범위는 C 전용 네이티브 원본 크롭, TEST_ONLY 산출물뿐이다. 사용자 별도 승인 없는 이미지생성·확대·CLEAN·DDS·게임 패치는 금지.
+
+---
+
 ## 2026-10-17 00:10 KST — C English-only native crop automation REAUTHORIZED (newer user instruction)
 
 The user has explicitly authorized restarting **only** automatic C extraction of original English lettering/phrase ROIs. This supersedes the October 16 *no C scheduling* instruction for this narrow function only. The existing ChatGPT automation `OutRun 영문 HD 크롭 자동화` (task ID `6ad160ee3a2c81918f7afe2b99ad29cd`) is enabled on an hourly cadence at minute 03 KST; it must not create a second scheduler/timer. Every invocation must seek at most one **new** genuine complete-original HD English phrase crop. Check existing `MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json` (255 existing) and the standalone C queue and output IDs first. A simple repeat of a completed queue item is not progress.
