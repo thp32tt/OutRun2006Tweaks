@@ -1,0 +1,129 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00799",
+  "production_id": "CONVERSION-DX11-00799",
+  "event_id": "CONVERSION-DX11-00799-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_CLIPPED_COLORFILL_NATIVE_FRAME",
+  "feature_id": "DX11-LIVE-CLIPPED-COLORFILL-GAME-FRAME",
+  "status": "VALIDATION_IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "ab508834d648d294e1d2d94638ca8fcb185a38a4",
+  "material_result_sha": "b31308951e656705ec7b9ac4add9471fdb9e4add",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_clipped_color_fill_00799.cpp",
+    "tools/test_dx11_clipped_color_fill_00799.py",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-CLIPPED-COLORFILL-GAME-FRAME",
+    "goal": "Keep real OutRun menu, vehicle selection and race full-size native DX11 game frames contiguous when successful original D3D9 ColorFill rectangles cross physical backbuffer edges, with correct ordered pre-Draw seed, live post-Draw ClearView and original input/render fallback.",
+    "acceptance_items": [
+      {
+        "id": "clipped-predraw-native-frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_original_ColorFill_and_D3D11_first_native_Draw",
+        "expected_behavior": "Real successful original D3D9 ColorFill is clipped to exact canonical backbuffer before bounded ordered pre-Draw native RTV tiles; fully outside writes create no tiles."
+      },
+      {
+        "id": "live-postdraw-clearview-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D11_live_Draw_or_Indexed_game_RT_clear",
+        "expected_behavior": "A partially overlapping ColorFill uses clipped D3D11.1 ClearView; full-surface clip chooses whole native RTV Clear while preserving game Draw order and current-Present output."
+      },
+      {
+        "id": "invalid-owner-and-original-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex_game_Draw_Present_input_FFB_Reset",
+        "expected_behavior": "Unknown/malformed rectangles, foreign backbuffer or failed owner checks do not permit native writes; original D3D9 HRESULT/render/input/FFB and frozen DXVK remain untouched."
+      },
+      {
+        "id": "five-exact-sha-mandatory-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_Build_OpenXR_HUD",
+        "expected_behavior": "Changed-source C++ positive/negative regression and the five mandatory GitHub Actions gates must succeed on one exact validation-bearing commit; Quest3/VDXR visual test remains separate."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Original game D3D9 Clear and ColorFill hooks establish device-owned full-size backbuffer and ordered ColorFill rect provenance",
+      "Clip successful pre-Draw game tile rectangles against exact backbuffer; replay them as D3D11.1 ClearView before real game Draw/DrawIndexed",
+      "Clip post-Draw ColorFill with original D3D9 HRESULT and canonical RT ownership; preserve native color target through live D3D11 Draw and D3D9 same-Present publication",
+      "Reject invalid owner, malformed extents, unsupported D3D11.1 and other unmirrored paths while preserving original DX9Ex/gamepad/FFB"
+    ],
+    "batch_components": [
+      "C++ game-native ColorFill clipping and pre-Draw source tile queue in native_game_source_mutation.hpp",
+      "C++ live game bridge pre-Draw and post-Draw native D3D11.1 RTV ClearView/whole RT presentation",
+      "Portable C++ functional/negative tests plus existing pre-Draw native frame batch regression and DX11 Fast registration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable constexpr native ColorFill source tile tests cover left/right/top/bottom clipping, whole-backbuffer normalized fill, queue order, real native Draw ClearView source path.",
+      "negative_regression": "Foreign producer identity, reversed/empty source rect, missing canonical surface, unsafe resource dimensions, capacity overflow and unsupported D3D11.1 leave original D3D9 path authoritative.",
+      "component_integration": "D3D9 successful ColorFill hook -> canonical backbuffer clipped tile queue -> D3D11 native live Draw/Indexed RTV ClearView -> same-Present full-size output -> original D3D9 input fallback."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_CLIPPED_COLORFILL_NATIVE_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "FULL_GAME_CLEAR",
+      "D3D9_COLORFILL",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Native source/code and exact SHA Windows/Linux Actions only; real OutRun menus, vehicle and race pixels/Quest3 depth and 72Hz remain UNTESTED.",
+    "activation_guard_and_fallback": "Explicit opt-in diagnostic-only, native feature dormant by default; no original D3D9 Draw/Present HRESULT, gamepad, FFB or SkyGlow replacement; DX9Ex fallback unaffected; DXVK frozen."
+  },
+  "acceptance_results": {
+    "clipped-predraw-native-frame": "PENDING_CI",
+    "live-postdraw-clearview-continuity": "PENDING_CI",
+    "invalid-owner-and-original-fallback": "PENDING_CI",
+    "five-exact-sha-mandatory-gates": "PENDING_CI"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub SSOT ab508834 (00798 separate C6), latest material changes from 00797 pre-Draw full frame; inspect 00799 exact Fast and Backend failed run ids before retry.",
+    "C1_REVIEW": "Clipped original game ColorFill wrongly rejected by prior strict in-bounds queue and post-Draw ClearView; confirmed inherited 00797 constexpr regression assumes false for now supported clips.",
+    "C2_IMPLEMENT": "New source material b31308951e656705ec7b9ac4add9471fdb9e4add clips canonical D3D9 ColorFill at source/RT upload and preserves bounded pre-Draw/active post-Draw menu-to-race native frames.",
+    "C3_VALIDATE": "Exact b31308951e656705ec7b9ac4add9471fdb9e4add DX11 Fast run 38830783264 and Backend run 38830783179 failed policy --check-latest because 00798 C6 was highest run without strategy. This record repairs latest-task binding; existing 00797 constexpr regression updated without dropping malformed/foreign/overflow negatives. Final new exact-SHA mandatory gates pending.",
+    "C4_COMMIT": "Material renderer source commit b31308951e656705ec7b9ac4add9471fdb9e4add is immutable; causal original-regression + latest-run strategy/contract repair commit provides the validation-bearing candidate; no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA; real Quest3/VDXR game and HMD remain UNTESTED. No score before complete integrated source/build achievement."
+  },
+  "evidence": {
+    "initial_material_commit": "b31308951e656705ec7b9ac4add9471fdb9e4add",
+    "root_cause_of_initial_ci_failure": "Both DX11 Fast #38830783264 and Backend #38830783179 failed task acceptance because 00799 file did not exist and latest was 00798 C6 with no development_strategy.",
+    "failed_gate_ids": [
+      38830783264,
+      38830783179
+    ],
+    "previous_colorfill_feature": "00797 introduced ordered pre-Draw native ColorFill. This 00799 source extends actual clipped game ColorFill across both pre-Draw and post-Draw renderer paths; no 00797 duplicate claim.",
+    "manual_game_or_hmd_observed": false,
+    "updated_legacy_test": "tools/dx11_native_frame_batch_probe.cpp now expects clipped out-of-bounds but valid rectangles, retains foreign/reversed/overflow negatives."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00799",
+    "score_change": 0,
+    "score_status": "PENDING source/CI acceptance; no credit for CI repairs, same-feature predecessor overlap or metadata."
+  }
+}

@@ -16,14 +16,20 @@ constexpr bool native_predraw_color_fill_regression() {
         queue.entries[1].left != 8 ||
         queue.entries[1].argb != 0xffabcdefu)
         return false;
-    // A foreign game device/backbuffer, an invalid tile, or a failed batch
-    // cannot masquerade as a complete pre-Draw native menu/race image.
+    // Clipped native tiles now reproduce successful original D3D9 ColorFill,
+    // including boundaries outside the physical game backbuffer. Preserve
+    // foreign-owner, reversed extent and capacity-overflow rejection.
     if (queue.record(22, 101, 1, 1, 3, 3, 640, 480, 0) ||
         queue.record(11, 102, 1, 1, 3, 3, 640, 480, 0) ||
-        queue.record(11, 101, -1, 0, 3, 3, 640, 480, 0) ||
-        queue.record(11, 101, 1, 1, 641, 3, 640, 480, 0) ||
-        queue.count != 2u) return false;
-    for (std::uint32_t i = 2; i < GameNativePreDrawFills::kCapacity; ++i)
+        !queue.record(11, 101, -1, 0, 3, 3, 640, 480, 0) ||
+        !queue.record(11, 101, 1, 1, 641, 3, 640, 480, 0) ||
+        queue.count != 4u ||
+        queue.entries[2].left != 0 ||
+        queue.entries[3].right != 640 ||
+        queue.record(11, 101, 10, 10, 10, 12, 640, 480, 0) ||
+        queue.record(11, 101, 9, 8, 8, 12, 640, 480, 0))
+        return false;
+    for (std::uint32_t i = 4; i < GameNativePreDrawFills::kCapacity; ++i)
         if (!queue.record(11, 101, 1, 1, 3, 3, 640, 480, i))
             return false;
     if (queue.count != GameNativePreDrawFills::kCapacity ||
