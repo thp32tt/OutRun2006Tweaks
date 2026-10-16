@@ -20,6 +20,28 @@ namespace OutRunVrNativeEyePair
                format == DXGI_FORMAT_R16G16B16A16_FLOAT ||
                IsSrgbView(format);
     }
+    // The shared handle numbers may differ while both opens refer to the same
+    // D3D11 allocation. Compare canonical COM identities *after* opening, not
+    // the handle values, before copying a supposedly stereo game frame.
+    // This is a secondary host-side check: only native producer provenance
+    // may establish independent left/right game renders.
+    [[nodiscard]] inline bool DistinctSourceAllocations(
+        ID3D11Texture2D* left, ID3D11Texture2D* right) noexcept
+    {
+        if (!left || !right || left == right) return false;
+        IUnknown* leftIdentity = nullptr;
+        IUnknown* rightIdentity = nullptr;
+        const HRESULT leftResult = left->QueryInterface(
+            IID_IUnknown, reinterpret_cast<void**>(&leftIdentity));
+        const HRESULT rightResult = right->QueryInterface(
+            IID_IUnknown, reinterpret_cast<void**>(&rightIdentity));
+        const bool distinct = SUCCEEDED(leftResult) && SUCCEEDED(rightResult) &&
+            leftIdentity && rightIdentity && leftIdentity != rightIdentity;
+        if (leftIdentity) leftIdentity->Release();
+        if (rightIdentity) rightIdentity->Release();
+        return distinct;
+    }
+
     // Exact two-eye source admission shared by the real x64 DirectGPU importer
     // and the R23 OpenXR projection staging path. Never treat duplicated
     // handles or incompatible CopyResource shapes as a stereo game frame.

@@ -157,6 +157,7 @@ add_executable(outrun-vr-native-direct-eye-smoke tests/native_direct_eye_pair_sm
 target_include_directories(outrun-vr-native-direct-eye-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/src")
 target_compile_definitions(outrun-vr-native-direct-eye-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_link_libraries(outrun-vr-native-direct-eye-smoke PRIVATE d3d11)
 
 add_executable(outrun-vr-direct-ack-identity-smoke tests/direct_ack_identity_smoke.cpp)
 target_include_directories(outrun-vr-direct-ack-identity-smoke PRIVATE

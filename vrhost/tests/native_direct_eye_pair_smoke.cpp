@@ -34,6 +34,38 @@ int main()
         !require(!accepts(0x110u, 0x220u, 0u),
                  "stale/zero generation must fail"))
         return 1;
+    // Exercise the actual x64 DirectGPU importer resource-identity gate with
+    // genuine D3D11 texture objects, not only made-up handle integers.
+    ID3D11Device* warpDevice = nullptr;
+    ID3D11DeviceContext* warpContext = nullptr;
+    const HRESULT deviceHr = D3D11CreateDevice(
+        nullptr, D3D_DRIVER_TYPE_WARP, nullptr, 0,
+        nullptr, 0, D3D11_SDK_VERSION,
+        &warpDevice, nullptr, &warpContext);
+    if (!require(SUCCEEDED(deviceHr) && warpDevice != nullptr,
+                 "WARP eye resource identity validation device unavailable"))
+        return 1;
+    ID3D11Texture2D* gpuLeft = nullptr;
+    ID3D11Texture2D* gpuRight = nullptr;
+    const bool created =
+        SUCCEEDED(warpDevice->CreateTexture2D(&left, nullptr, &gpuLeft)) &&
+        SUCCEEDED(warpDevice->CreateTexture2D(&right, nullptr, &gpuRight));
+    const bool distinctGpuPair = created &&
+        OutRunVrNativeEyePair::DistinctSourceAllocations(gpuLeft, gpuRight);
+    const bool duplicateGpuEyeDenied = gpuLeft &&
+        !OutRunVrNativeEyePair::DistinctSourceAllocations(gpuLeft, gpuLeft);
+    const bool nullGpuEyeDenied = gpuLeft &&
+        !OutRunVrNativeEyePair::DistinctSourceAllocations(gpuLeft, nullptr);
+    if (gpuLeft) gpuLeft->Release();
+    if (gpuRight) gpuRight->Release();
+    if (warpContext) warpContext->Release();
+    warpDevice->Release();
+    if (!require(distinctGpuPair,
+                 "two independent live D3D11 game eyes must reach OpenXR") ||
+        !require(duplicateGpuEyeDenied && nullGpuEyeDenied,
+                 "duplicated or absent real GPU eye must keep SBS fallback"))
+        return 1;
+
     right.Width = 97;
     if (!require(!accepts(0x110u, 0x220u, 1u),
                  "mismatched eyes must not enter OpenXR projection"))

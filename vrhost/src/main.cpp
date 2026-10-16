@@ -1386,7 +1386,11 @@ namespace
             D3D11_TEXTURE2D_DESC nativeLeft{}, nativeRight{};
             directLeft_[slot]->GetDesc(&nativeLeft);
             directRight_[slot]->GetDesc(&nativeRight);
-            if (directLeft_[slot] == directRight_[slot] ||
+            // Different legacy shared handle values are not proof of two
+            // distinct GPU allocations. Fail closed before R23's direct
+            // OpenXR hold-texture copies or legacy same-frame snapshots.
+            if (!OutRunVrNativeEyePair::DistinctSourceAllocations(
+                    directLeft_[slot], directRight_[slot]) ||
                 !OutRunVrNativeEyePair::Compatible(
                     leftHandleValue, rightHandleValue, generation,
                     width, height, nativeLeft, nativeRight))
