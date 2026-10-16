@@ -575,13 +575,27 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "ProducerToken::GoalTime150" in pre and
          "ProducerToken::OutRunStagePrintf" in pre,
          "exact GOAL production source edges survive")
-    need("const bool existingBatch =" in begin and
-         "HudBatch.active && self == HudBatch.sprite && IsExactSprite(self)" in begin and
-         "if (FAILED(hr) && existingBatch)" in begin and
-         "return hr;" in begin and "HudBatch.begin(self, SUCCEEDED(hr));" in begin and
-         begin.index("if (FAILED(hr) && existingBatch)") <
-         begin.index("HudBatch.begin(self, SUCCEEDED(hr));"),
-         "failed nested Begin must retain old exact batch")
+    need("HudBatch.onBeginResult(" in begin and
+         "self, SUCCEEDED(hr), hr == D3DERR_INVALIDCALL);" in begin and
+         "else if (self && self == HudBatch.sprite)" in begin and
+         "HudBatch.invalidate();" in begin and
+         "return hr;" in begin and
+         begin.find("HudBatch.onBeginResult(") <
+         begin.find("else if (self && self == HudBatch.sprite)"),
+         "only native nested INVALIDCALL keeps the exact live D3DX batch")
+    # Check the actual Ledger failure transition, not only a renamed game
+    # hook. DEVICELOST/other Begin failures must revoke old +TIME/GOAL
+    # GPU owner, while the same-sprite nested INVALIDCALL is lossless.
+    need("void onBeginResult(" in ledger_begin and
+         "if (succeeded)" in ledger_begin and
+         "begin(exactSprite, true);" in ledger_begin and
+         "if (reentrantInvalidCall && active && exactSprite != nullptr &&" in ledger_begin and
+         "sprite == exactSprite)" in ledger_begin and
+         "invalidate();" in ledger_begin and
+         ledger_begin.find("begin(exactSprite, true);") <
+         ledger_begin.find("if (reentrantInvalidCall && active") <
+         ledger_begin.find("invalidate();"),
+         "Ledger must quarantine failed device Begin and preserve only nested INVALIDCALL")
     need("sprite = exactSprite;" in ledger_begin and "active = succeeded;" in ledger_begin and
          "forget();" in ledger_begin and
          "if (succeeded && generation != UINT64_MAX)" in ledger_begin,
@@ -709,8 +723,20 @@ def main_current_ledger(code: str, header: str) -> int:
     # protects against blindly accepting a class name or a dead mock.
     mutations = [
         ("begin-does-not-clear", "ledger", "forget();\n            if (succeeded", "// forgot source;\n            if (succeeded"),
-        ("begin-stale", "code", "HudBatch.begin(self, SUCCEEDED(hr));", "HudBatch.end();"),
-        ("nested-begin-wipes", "code", "if (FAILED(hr) && existingBatch)", "if (FAILED(hr) && false)"),
+        ("begin-stale", "code", "HudBatch.onBeginResult(", "HudBatch.end(); // "),
+        ("nested-begin-wipes", "ledger",
+         "if (reentrantInvalidCall && active && exactSprite != nullptr &&",
+         "if (false && active && exactSprite != nullptr &&"),
+        ("device-error-promoted-to-nested", "code", "hr == D3DERR_INVALIDCALL", "FAILED(hr)"),
+        ("foreign-begin-keeps-owner", "code",
+         "else if (self && self == HudBatch.sprite)",
+         "else if (self && false)"),
+        ("foreign-nested-retains-owner", "ledger",
+         "sprite == exactSprite)",
+         "sprite != exactSprite)"),
+        ("failed-begin-revocation-removed", "ledger",
+         "            invalidate();\n        }\n\n        // CPU-side Draw",
+         "            return;\n        }\n\n        // CPU-side Draw"),
         ("foreign-draw-steals-owner", "code", "ScopedExactProducerSemantic outgoingBatch(", "ScopedExactProducerSemantic wrongBatch("),
         ("foreign-batch-no-split", "code", "flushed = FlushTracked(self);", "flushed = false;"),
         ("mix-becomes-homogeneous", "ledger", "homogeneous = false;", "homogeneous = true;"),
@@ -767,7 +793,11 @@ def main_current_ledger(code: str, header: str) -> int:
 def main() -> int:
     code = SOURCE.read_text(encoding="utf-8")
     header = SEMANTICS.read_text(encoding="utf-8")
-    if "HudBatch.begin(self, SUCCEEDED(hr));" in code:
+    # The live R84 game now calls Ledger::onBeginResult rather than the old
+    # inline HudBatch.begin spelling. Dispatch by the actual installed ledger
+    # type, so a source lifecycle fix cannot silently invoke the retired
+    # pre-ledger verifier and skip all modern destructive mutations.
+    if "inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};" in code:
         return main_current_ledger(code, header)
     errors = check(code, header)
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
