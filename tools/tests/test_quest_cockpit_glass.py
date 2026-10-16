@@ -40,7 +40,7 @@ class GlassTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             m.patch_bytes(orig,"obj_stage_pmt.sz",.3)
         corrupted=bytearray(orig)
-        struct.pack_into("<I",corrupted,160+2*88+4,0x5400)
+        struct.pack_into("<I",corrupted,160+2*88+4,0x1400)
         with self.assertRaises(ValueError):
             m.patch_bytes(corrupted,"obj_plcar_360sp_pmt.sz",.3)
         shared=bytearray(orig)
