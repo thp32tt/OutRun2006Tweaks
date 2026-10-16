@@ -158,6 +158,17 @@ add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_uplo
 add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
 target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smoke.cpp)
+# Contained menu/custom-sprite mapping must honor live viewport bounds
+# when the original game's scale cache lags a D3D9Ex Reset/resize.
+# Compile AND execute native source geometry in mandatory host Release CI.
+add_executable(outrun-vr-menu-custom-quad-smoke tests/menu_custom_quad_smoke.cpp)
+target_include_directories(outrun-vr-menu-custom-quad-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-menu-custom-quad-smoke)
+add_custom_command(TARGET outrun-vr-menu-custom-quad-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-menu-custom-quad-smoke>"
+    COMMENT "Run native menu custom quad reset/21:9/portrait containment regression"
+    VERBATIM)
 # Build the real game CalcBall3D2D correction without a Windows game or HMD.
 add_executable(outrun-vr-stage-edge-cull-smoke tests/stage_edge_cull_smoke.cpp)
 target_include_directories(outrun-vr-stage-edge-cull-smoke PRIVATE

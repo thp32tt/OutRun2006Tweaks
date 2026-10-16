@@ -29,11 +29,27 @@ namespace OutRunVrMenuQuad
             screenWidth <= 0.0f || screenHeight <= 0.0f ||
             sourceWidth <= 0.0f || sourceHeight <= 0.0f)
             return {};
-        const float scale = screenScaleX < screenScaleY
+        // Containment is a physical output contract, not only the game's
+        // cached screen_scale. During a size/reset transition screen_scale
+        // can still describe the old backbuffer while the new source extent
+        // is already published. Never let an authored menu/custom sprite
+        // overflow the new viewport or crop the right car-selector artwork.
+        // Respect deliberately smaller game scales; cap only oversize ones.
+        const float physicalX = screenWidth / sourceWidth;
+        const float physicalY = screenHeight / sourceHeight;
+        if (!std::isfinite(physicalX) || !std::isfinite(physicalY) ||
+            physicalX <= 0.0f || physicalY <= 0.0f)
+            return {};
+        const float gameScale = screenScaleX < screenScaleY
             ? screenScaleX : screenScaleY;
+        const float physicalScale = physicalX < physicalY
+            ? physicalX : physicalY;
+        const float scale = gameScale < physicalScale
+            ? gameScale : physicalScale;
         const float offsetX = (screenWidth - sourceWidth * scale) * 0.5f;
         const float offsetY = (screenHeight - sourceHeight * scale) * 0.5f;
-        if (!std::isfinite(offsetX) || !std::isfinite(offsetY))
+        if (!std::isfinite(offsetX) || !std::isfinite(offsetY) ||
+            !std::isfinite(scale) || scale <= 0.0f)
             return {};
         return {scale, scale, offsetX, offsetY, true};
     }
