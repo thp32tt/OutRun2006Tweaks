@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00929",
+  "production_id": "CONVERSION-DX9EX-00929",
+  "event_id": "CONVERSION-DX9EX-00929-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "run_key": "CONVERSION-DX9EX-00929",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:CRITICAL:XR_PRESENT_ACK_BOUNDARY",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_POLICY_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "51fc0d7ff45123d94a2f8757cc1db48e152aac31",
+  "source_paths": [
+    "vrhost/src/runtime/cadence_presented_wait.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/runtime/cadence_presented_wait.hpp",
+    "vrhost/tests/cadence_presented_wait_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00929.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:CRITICAL:XR_PRESENT_ACK_BOUNDARY",
+    "goal": "Accept a sequence-matched real game-present acknowledgment even when the frame producer publishes at the OpenXR host's absolute wait deadline; reject unrelated old-frame wakeups without extending the XR frame budget.",
+    "scope_boundary": "Only the native R23 OpenXR host's exact game-present acknowledgement cadence wait and its portable regression; do not alter rendered eye geometry, R84/R26 game DLLs, FFB, original input, SkyGlow, DX11, or frozen DXVK.",
+    "special_work_evidence": "Reproducible deterministic native C++ smoke: an exact ACK becomes visible only on the third shared-state read after the stale event consumes the remaining frame budget. Prior implementation returned false immediately at deadline and dropped an already-presented matching frame.",
+    "trace_stages": [
+      "Actual OutRun D3D9 game-frame producer publishes the shared sequence-validated presented request completion before the OpenXR host eye submission.",
+      "R23 OpenXR host receives auto-reset cadence event, calls sequence-matching shared-state reader, and consumes an absolute remaining frame wait budget via CadenceWait::AwaitPresented.",
+      "At the deadline a final immediate sequence read accepts only the exact completed request; stale wakeups and nonmatching frames still time out with no extra blocking wait or frame-budget reset."
+    ],
+    "subcomponents": [
+      "Native vrhost/src/runtime/cadence_presented_wait.hpp changes the absolute-deadline return path to one final sequence-validated request check without renewing the deadline.",
+      "Native vrhost/tests/cadence_presented_wait_smoke.cpp exercises a deterministic stale wake followed by exact deadline ACK and a negative no-ACK timeout while preserving existing stale/ready/error cases.",
+      "All real host OpenXR call sites continue to use the original WaitEvent semantics, shared request identity and absolute budget; no D3D9 DLL, FFB or fallbacks are rewritten."
+    ],
+    "acceptance_items": [
+      {
+        "id": "exact_ack_on_deadline",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native game-present IPC sequence to OpenXR host per-frame cadence decision",
+        "expected_behavior": "A real matching presented sequence published between the prior shared-state read and final deadline clock check must be accepted immediately, avoiding a false lost-frame timeout."
+      },
+      {
+        "id": "reject_stale_and_budget_overrun",
+        "category": "fallback_regression",
+        "behavior_area": "Stale auto-reset event, failed wait and nonmatching request under absolute deadline",
+        "expected_behavior": "An unrelated completion never counts as a new game frame; total blocking wait respects the original fixed frame budget, with deterministic stale/deadline negative native C++ smoke coverage."
+      },
+      {
+        "id": "required_dx9ex_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 game, Win64 OpenXR host, R26_SAFE fallback, package, Domain and Full Source validation",
+        "expected_behavior": "DX9Ex Active policy, game, host, full-chain and package with all applicable Domain, Full Source and HUD Inspector checks must succeed on the same validation-bearing exact SHA, and Quest3 optical testing remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "exact_ack_on_deadline": "PENDING",
+    "reject_stale_and_budget_overrun": "PENDING",
+    "required_dx9ex_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "CadenceWait::AwaitPresented correctly rechecked exact shared request identity after auto-reset wake, but its now >= deadline guard returned false immediately after a prior nonmatching read. A real game-present completion could arrive between those reads and be mistaken for a frame timeout.",
+    "original_evidence": "Existing native game request ACK uses shared sequence matching and an absolute OpenXR wait budget; commit c5bc48ab adds a fail-before/pass-after deterministic third-read boundary case, plus a never-matching timeout case.",
+    "source_trace": [
+      "R23 x64 OpenXR host invokes AwaitPresented for the current game-present sequence, ignoring stale auto-reset event signals.",
+      "vrhost/src/runtime/cadence_presented_wait.hpp checks matches, then reads the clock; the previous deadline path skipped any final shared-state verification.",
+      "Current exact deadline path returns matches() for that sequence only, preserving the existing deadline and fallback without extra WaitEvent calls."
+    ],
+    "alternatives_rejected": [
+      "Do not increase OpenXR wait budget or spin through another loop; this hides the false loss with additional latency.",
+      "Do not trust auto-reset event alone; a previous game frame may trigger the same event and corrupt the current request identity.",
+      "Do not globally modify eye rendering, D3D9 Reset/FFB, SkyGlow, or frozen DXVK for this bounded host cadence race."
+    ],
+    "negative_test_evidence": "Native cadence_presented_wait_smoke.cpp has a deterministic fail-before third read on exact deadline and verifies no extra wake/block for a never-matching request; existing cases reject stale events and check early-ready/failed-wait.",
+    "fix_evidence": "Existing material C++ commit c5bc48ab04ce01677eb803a1cad46ef9bc16d116 changes the real host deadline branch and extends native regression; exact-SHA automated build validation is pending after required run-record repair.",
+    "runtime_evidence": "Actual OutRun game and Quest3/VDXR were not run; no visual/performance improvement claimed without matching headset measurements.",
+    "next_hmd_experiment": "Check exact R84 build through real Quest3/VDXR frame pacing and duplicate/headlock HUD while gaming, compare timed-out/matched frames, p95/p99 stalls and input/FFB stability against control."
+  },
+  "material_result_sha": "c5bc48ab04ce01677eb803a1cad46ef9bc16d116",
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "failed_ci_evidence": {
+    "initial_material_sha": "c5bc48ab04ce01677eb803a1cad46ef9bc16d116",
+    "active_run_id": 38836796903,
+    "policy_job_id": 116767626327,
+    "cause": "Required per-TASK feature contract JSON absent at exact SHA; policy failed before Windows game/host/package",
+    "ci_result": "FAIL_POLICY_ONLY"
+  },
+  "next_action": "Validate source+record on the next exact SHA with unchanged DX9Ex Active, Domain, Full Source and applicable HUD Inspector; issue separate C6 bookkeeping only after all mandatory gates succeed. No duplicate score."
+}
