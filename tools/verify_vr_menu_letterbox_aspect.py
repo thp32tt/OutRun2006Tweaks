@@ -814,7 +814,6 @@ def verify_visible_menu_fragment(code: str) -> None:
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
         "GetGameClientOutputRect(fullClient);",
         "sourceAspect = authoredAspect;",
-        "constexpr bool imageMatteVerified = false;",
         "gameConfiguredLetterbox, imageMatteVerified);",
         "completeClient, cropCentered43, useNativeMenuAspect,\n                imageMatteVerified);",
         "constexpr float opticalCoverage = 0.78f;",
@@ -837,7 +836,9 @@ def verify_visible_menu_fragment(code: str) -> None:
     # that the original game config, not a constant, still owns the branch.
     assert ("const bool gameConfiguredLetterbox =\n"
             "            R23GameMenuIsLetterboxed(c.hwnd_);") in code
-    assert "constexpr bool imageMatteVerified = false;" in body
+    prelude = code.split("const bool gameConfiguredLetterbox =", 1)[1].split(
+        "bool cropCentered43 =", 1)[0]
+    assert "constexpr bool imageMatteVerified = false;" in prelude
     assert "gameConfiguredLetterbox, imageMatteVerified);" in body
     assert ("completeClient, cropCentered43, useNativeMenuAspect,\n"
             "                imageMatteVerified);") in body
