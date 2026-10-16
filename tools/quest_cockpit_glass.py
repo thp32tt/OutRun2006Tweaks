@@ -129,7 +129,7 @@ def write_atomic(target, data):
 def verified_original(source):
     if source.is_symlink() or not source.is_file():
         raise ValueError("source must be an existing regular non-symlink file")
-    if not re.fullmatch(r"obj_plcar_[a-z0-9_]+_pmt\\.sz", source.name.lower()):
+    if not re.fullmatch(r"obj_plcar_[a-z0-9_]+_pmt\.sz", source.name.lower()):
         raise ValueError("refusing non-player-car model")
     backup, journal = sidecars(source)
     if backup.is_symlink() or journal.is_symlink():
