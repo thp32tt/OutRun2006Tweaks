@@ -159,11 +159,49 @@ for label, mutated in (
         pass
     else:
         raise SystemExit('P0 exact queue owner mutation survived: ' + label)
+def verify_r29_exact_draw_scope(r29_source, semantic_source):
+    # R29 now samples the canonical GPU command identity once instead of
+    # re-reading EffectiveScope + producer + queue depth individually.
+    # The immutable snapshot MUST still derive from the exact queue owner.
+    capture = function_body(
+        semantic_source, 'inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept')
+    for token in ('EffectiveScope()', 'CurrentRenderProducerToken()',
+                  'CurrentQueueNode()', 'CurrentQueueNodeEpoch()',
+                  'QueueRenderActive()'):
+        require(token, capture, 'R29 immutable draw snapshot exact queued provenance')
+    require('OutRunVR::GameSemantic::CapturePhysicalDrawCommand()', r29_source,
+            'R29 must sample canonical physical Draw')
+    require('const auto semanticScope = drawCommand.scope;', r29_source,
+            'R29 must use captured exact queue scope')
+    require('drawCommand.IsDirectCarBaseShadow()', r29_source,
+            'player car shadow must remain original nonqueued world draw')
+
 for name, source in (('R26 early world-rebind', r26),
-                     ('R29 world helper', r29),
                      ('R30 HUD/XYZRHW draw', r30)):
     require('OutRunVR::GameSemantic::EffectiveScope()', source,
             name + ' must use exact queued scope')
+verify_r29_exact_draw_scope(r29, sem)
+for label, altered_r29, altered_sem in (
+    ('R29 reads generic scope', r29.replace(
+        'const auto semanticScope = drawCommand.scope;',
+        'const auto semanticScope = RenderScope::ScreenHud;', 1), sem),
+    ('R29 bypasses physical draw snapshot', r29.replace(
+        'OutRunVR::GameSemantic::CapturePhysicalDrawCommand()',
+        'OutRunVR::GameSemantic::PhysicalDrawCommand{}', 1), sem),
+    ('R29 confuses direct vs queued shadow', r29.replace(
+        'drawCommand.IsDirectCarBaseShadow()', 'true', 1), sem),
+    ('capture overwrites original scope', r29, sem.replace(
+        'return { EffectiveScope(), CurrentRenderProducerToken(),',
+        'return { RenderScope::ScreenHud, CurrentRenderProducerToken(),', 1)),
+):
+    if altered_r29 == r29 and altered_sem == sem:
+        raise SystemExit('P0 R29 exact scope mutation target missing: ' + label)
+    try:
+        verify_r29_exact_draw_scope(altered_r29, altered_sem)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 R29 exact scope mutation escaped: ' + label)
 
 # The two E8-sourced GOAL time helpers share a ScreenHud render policy
 # but must be distinguishable in source->queue->c64->draw telemetry. The
