@@ -21,6 +21,14 @@ def verify(g, r, u, s, f):
     assert wvp.index("UploadContainsOutRunWvp(") < a
     assert wvp.index("const auto semanticScope =") > a
     assert wvp.index("TryPrepareOutRunWvp(") > a
+    # The R84 queued HUD source accumulator is a separate owner from
+    # the later whole-WVP backbuffer guard. Both must reject auxiliary
+    # targets, including successful partial native c64 writes.
+    queued = wvp.split("auto TrackQueuedHudWvp =", 1)[1].split(
+        "if (!UploadContainsOutRunWvp(", 1)[0]
+    assert ("if (FAILED(nativeResult) ||\n"
+            "\t\t\t\t\t!OutRunVRStereo::R23GameWvpTargetEligible())") in queued
+    assert "HudQueuedPartialWvp.Reset();" in queued
     b = wvp[a:wvp.index("// R51 ownership split:", a)]
     assert "OutRunVRStereo::R23GameWvpTargetEligible()" in b
     assert "SetVertexShaderConstantFHook.stdcall<HRESULT>(" in b
@@ -56,7 +64,7 @@ assert "bool R23GameWvpTargetEligible() noexcept" in r23
 assert "return TargetIsBackBuffer() && !AnyAuxRenderTargetActive();" in r23
 verify(g, r, u, s, f)
 for name, gg, rr in (
-    ("aux/owner", g, r.replace("!OutRunVRStereo::R23GameWvpTargetEligible()", "false", 1)),
+    # Mutate the newly added HUD partial owner guard, not the later whole-WVP guard.
     # Keep this mutation pinned to the actual early-return owner branch,
     # not the independent exact C993 split-WVP gating expression.
     ("target owner", g, r.replace("if (!OutRunVRStereo::R23GameWvpTargetEligible())",
