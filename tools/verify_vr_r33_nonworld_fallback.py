@@ -53,7 +53,15 @@ assert "if (ownedOverlay)" in r30 and "return R30ScreenSpaceKind::None;" in r30
 assert "R31BuildFastWorldConstants(" in r31
 for needle in ("ScreenHud","ScreenOverlay2D","ProjectedWorldMarker2D",
                "ProjectedScreenEffect2D","SkyGlow"):
-    mutant = sem.replace("scope == RenderScope::" + needle, "false /* mutation */", 1)
+    # Mutate this method only: other independent semantic helpers also
+    # contain ScreenHud / ScreenOverlay2D checks and must remain unchanged.
+    marker = "constexpr bool DeniesGenericWorldFallback() const noexcept"
+    before, owner = sem.split(marker, 1)
+    owner_start, owner_tail = owner.split("\n        }", 1)
+    source_token = "scope == RenderScope::" + needle
+    assert source_token in owner_start
+    mutant = before + marker + owner_start.replace(
+        source_token, "false /* mutation */", 1) + "\n        }" + owner_tail
     try: check_sem(mutant)
     except AssertionError: pass
     else: raise AssertionError(f"semantic veto removal escaped: {needle}")
