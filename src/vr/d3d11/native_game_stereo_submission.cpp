@@ -5,6 +5,29 @@
 
 namespace outrun::vr::dx11 {
 
+// Only the renderer's real D3D11 Draw/DrawIndexed calls count as native eye
+// source evidence. This recorder is scoped to one eye and one immediate
+// context, so the second eye cannot inherit an invented draw count.
+bool NativeGameEyeDrawEncoder::draw(
+    UINT vertexCount, UINT startVertex) noexcept {
+    if (!context_ || !vertexCount ||
+        drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
+        return false;
+    context_->Draw(vertexCount, startVertex);
+    ++drawCount_;
+    return true;
+}
+
+bool NativeGameEyeDrawEncoder::draw_indexed(
+    UINT indexCount, UINT startIndex, INT baseVertex) noexcept {
+    if (!context_ || !indexCount ||
+        drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
+        return false;
+    context_->DrawIndexed(indexCount, startIndex, baseVertex);
+    ++drawCount_;
+    return true;
+}
+
 
 // The D3D9 game and native OpenXR path may share an immediate D3D11 context.
 // A game eye pass must rasterize into the ring's actual RTV, not whichever
@@ -370,12 +393,15 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     ? invocation.gameRaster->depthClear[eyeIndex] : 1.0f,
                 invocation.gameRaster
                     ? invocation.gameRaster->stencilClear[eyeIndex] : 0u);
+            NativeGameEyeDrawEncoder encoder(ctx);
             if (!invocation.callback(invocation.user, ctx,
                                      targets[eyeIndex], eyeIndex,
-                                     invocation.eye[eyeIndex]))
+                                     invocation.eye[eyeIndex], encoder))
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
-            if (!evidence.drawCount || !evidence.viewSignature ||
+            if (!encoder.draw_count() ||
+                evidence.drawCount != encoder.draw_count() ||
+                !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||
                 (eyeIndex == 1u &&
                  evidence.viewSignature == invocation.eye[0].viewSignature))

@@ -855,7 +855,8 @@ int main()
     const auto gameEyePass = [](
         void* user, ID3D11DeviceContext* ctx,
         ID3D11RenderTargetView* eyeTarget, std::uint32_t eyeIndex,
-        outrun::vr::dx11::NativeGameEyeDrawEvidence& evidence) noexcept -> bool {
+        outrun::vr::dx11::NativeGameEyeDrawEvidence& evidence,
+        outrun::vr::dx11::NativeGameEyeDrawEncoder& encoder) noexcept -> bool {
         if (!ctx || !eyeTarget || eyeIndex >= 2u || !user) return false;
         auto& fixture = *static_cast<GameEyeFixture*>(user);
         ID3D11RenderTargetView* boundTarget = nullptr;
@@ -977,7 +978,17 @@ int main()
         // The submission must rebind RT0 for the next eye and restore it
         // to the original desktop state after the second pass.
         ctx->OMSetRenderTargets(0, nullptr, nullptr);
-        evidence.drawCount = 2u + eyeIndex;
+        // Use the actual immediate D3D11 draw APIs through the per-eye
+        // recorder, not a fabricated positive evidence counter. The saved
+        // game IA/VS/PS state is restored independently for both eye passes.
+        // This WARP fixture does not assert real-game shader/pixel parity.
+        for (UINT drawOrdinal = 0u; drawOrdinal < 2u + eyeIndex; ++drawOrdinal) {
+            const bool issued = (drawOrdinal & 1u)
+                ? encoder.draw_indexed(3u, 0u, 0)
+                : encoder.draw(3u, 0u);
+            if (!issued) return false;
+        }
+        evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
         evidence.sourcePoseSequence = 33u;
         return true;
@@ -996,7 +1007,7 @@ int main()
                 &gameRaster) &&
             directSubmit.in_flight() && !directSubmit.cancel() &&
             gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1],
-            "00820 native eye callback owns distinct bound full-resolution RT0");
+            "00825 native eye recorder issues both Draw and DrawIndexed in distinct full-resolution RT0s");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != preservedDepthView &&

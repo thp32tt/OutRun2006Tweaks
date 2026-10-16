@@ -6,7 +6,28 @@ namespace outrun::vr::dx11 {
 
 // Renderer-side source evidence must be recorded AFTER this eye's native game
 // D3D11 draw commands, rather than fabricated at frame submission time.
+// Submit real D3D11 game-eye geometry commands on the immediate context.
+// The per-eye callback cannot certify stereo from a self-reported count:
+// only commands issued through this recorder contribute to drawCount.
+// A successful API issue is not proof of a visible Quest3 pixel.
+class NativeGameEyeDrawEncoder final {
+public:
+    explicit NativeGameEyeDrawEncoder(ID3D11DeviceContext* context) noexcept
+        : context_(context) {}
+    NativeGameEyeDrawEncoder(const NativeGameEyeDrawEncoder&) = delete;
+    NativeGameEyeDrawEncoder& operator=(const NativeGameEyeDrawEncoder&) = delete;
+
+    [[nodiscard]] bool draw(UINT vertexCount, UINT startVertex) noexcept;
+    [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,
+                                    INT baseVertex) noexcept;
+    [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
+private:
+    ID3D11DeviceContext* context_{};
+    std::uint64_t drawCount_{};
+};
+
 struct NativeGameEyeDrawEvidence {
+    // Must match the encoder's actual Draw/DrawIndexed call count exactly.
     std::uint64_t drawCount{};
     std::uint64_t viewSignature{};
     std::uint32_t sourcePoseSequence{};
@@ -30,7 +51,8 @@ struct NativeGameEyeRasterState {
 using NativeGameEyePass = bool (*)(
     void* user, ID3D11DeviceContext* context,
     ID3D11RenderTargetView* eyeTarget, std::uint32_t eyeIndex,
-    NativeGameEyeDrawEvidence& evidence) noexcept;
+    NativeGameEyeDrawEvidence& evidence,
+    NativeGameEyeDrawEncoder& encoder) noexcept;
 
 struct NativeGameStereoPublishedFrame {
     NativeSharedEyePublication gpu{};
@@ -87,6 +109,9 @@ public:
     // surfaces, then restores the caller's OM/RS bindings on success/failure.
     // An optional verified source full-TARGET clear seeds BOTH eye colors;
     // otherwise the callback owns every color pixel (no fabricated clear).
+    // The callback MUST issue its game Draw/DrawIndexed via encoder and
+    // return its exact encoder.draw_count() as evidence.drawCount. Claiming a
+    // positive draw count without issuing GPU geometry is rejected.
     // The callback replays game-specific depth clears and depth/blend states;
     // default native Z/stencil initial state is 1.0 / 0 at each eye start.
     // The callback supplies actual Draw/DrawIndexed and
