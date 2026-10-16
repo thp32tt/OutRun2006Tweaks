@@ -10,20 +10,28 @@ ROOT = Path(__file__).resolve().parents[1]
 H = ROOT / "src/hooks_graphics.cpp"
 R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
 R33 = ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp"
+BUDGET = ROOT / "src/vr/game/reflection_frame_budget.hpp"
 
 
 def between(source: str, begin: str, end: str) -> str:
     return source.split(begin, 1)[1].split(end, 1)[0]
 
 
-def verify(hook: str, r30: str, r33: str) -> None:
+def verify(hook: str, r30: str, r33: str, budget: str) -> None:
     face = between(hook, "static void FaceCount_dest(", "\npublic:")
     assert "frameSpike = dt > 0.018;" in face
     assert "frameScale60 = frameSpike ? 0.5f" in face
     assert "std::clamp(dt * 60.0, 0.0, 1.0)" in face
-    assert "const int maxFaces = vrNormalized ? (frameSpike ? 2 : 3) : FacesPerCubemap;" in face
-    assert "pendingFaces = std::clamp(pendingFaces - float(faces), 0.0f," in face
-    assert "vrNormalized ? 1.0f : float(FacesPerCubemap)" in face
+    assert "OutRunVR::ReflectionFrameBudget::Advance(" in face
+    assert "Settings::ReflectionUpdateRate.get(), frameScale60," in face
+    assert "Settings::VREnabled && Settings::VRNormalizeReflectionRate" in face
+    assert "pendingFaces = budget.pendingFaces;" in face
+    assert "ctx.eax = budget.faces;" in face
+    assert "const int limit = vrNormalized ? (lateFrame ? 2 : 3) : 6;" in budget
+    assert "std::clamp(elapsed60, 0.f, 1.f)" in budget
+    assert "std::clamp(requestedRate, 0.f, 1.f)" in budget
+    assert "std::clamp(requested - faces, 0.0, vrNormalized ? 1.0 : 6.0)" in budget
+    assert "double(previous) + 6.0 * double(rate) * double(scaled)" in budget
 
     # The previously problematic 120-Hz 0.5 cadence must NOT be interpreted
     # as a spike. Only elapsed dt >18ms triggers the two-face recovery cap.
@@ -84,11 +92,11 @@ def verify(hook: str, r30: str, r33: str) -> None:
 def main() -> None:
     original = (H.read_text(encoding="utf-8"), R30.read_text(encoding="utf-8"),
                 R33.read_text(encoding="utf-8"))
-    verify(*original)
+    budget = BUDGET.read_text(encoding="utf-8")
+    verify(*original, budget)
     h, t, w = original
     mutations = [
         (h.replace("frameSpike = dt > 0.018;", "frameSpike = false;", 1), t, w),
-        (h.replace("frameSpike ? 2 : 3", "frameSpike ? 6 : 6", 1), t, w),
         (h.replace("std::clamp(dt * 60.0, 0.0, 1.0)",
                    "std::clamp(dt * 60.0, 0.0, 2.0)", 1), t, w),
         (h.replace("patch.set(Settings::DisableStageCulling.get());",
@@ -108,11 +116,30 @@ def main() -> None:
     for i, altered in enumerate(mutations, 1):
         assert altered != original, f"mutation {i} missed"
         try:
-            verify(*altered)
+            verify(*altered, budget)
         except (AssertionError, IndexError, ValueError):
             continue
         raise AssertionError(f"dense-scene mutation {i} survived")
-    print(f"PASS DX9Ex dense-scene five-area regression, {len(mutations)} destructive mutations; RUNTIME_VALIDATION=UNTESTED")
+    # The extracted Quest-style budget has become live source and must
+    # retain the old 60 Hz workload, late-frame cap and bounded debt.
+    budget_mutations = [
+        budget.replace("lateFrame ? 2 : 3", "lateFrame ? 6 : 6", 1),
+        budget.replace("std::clamp(elapsed60, 0.f, 1.f)",
+                       "std::clamp(elapsed60, 0.f, 2.f)", 1),
+        budget.replace("std::clamp(requestedRate, 0.f, 1.f)",
+                       "std::clamp(requestedRate, 0.f, 2.f)", 1),
+        budget.replace("vrNormalized ? 1.0 : 6.0", "vrNormalized ? 6.0 : 6.0", 1),
+        budget.replace("double(previous) + 6.0 * double(rate)",
+                       "double(previous) + 12.0 * double(rate)", 1),
+    ]
+    for i, altered in enumerate(budget_mutations, 1):
+        assert altered != budget, f"reflection budget mutation {i} missed"
+        try:
+            verify(*original, altered)
+        except (AssertionError, IndexError, ValueError):
+            continue
+        raise AssertionError(f"reflection budget mutation {i} survived")
+    print(f"PASS DX9Ex dense-scene five-area regression, {len(mutations)+len(budget_mutations)} destructive mutations; RUNTIME_VALIDATION=UNTESTED")
 
 
 if __name__ == "__main__":
