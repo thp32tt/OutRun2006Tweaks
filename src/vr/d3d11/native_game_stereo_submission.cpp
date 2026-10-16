@@ -4,6 +4,9 @@
 #include <cmath>
 #include <algorithm>
 #include <d3d11_1.h>
+#include <d3dcompiler.h>
+#include <mutex>
+#include <utility>
 
 namespace outrun::vr::dx11 {
 
@@ -305,6 +308,199 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         }
     }
     return eye_targets_bound();
+}
+
+
+// A real game post-process StretchRect is not a CopySubresourceRegion: the
+// source and destination spans can differ. Rasterize the genuine GPU color
+// through point/linear filtering in a bounded eye viewport. This operation
+// cannot certify new game geometry Draws and never touches D3D9/FFB/input.
+bool NativeGameEyeDrawEncoder::stretch_game_surface(
+    ID3D11Texture2D* source, const D3D11_BOX& srcBox,
+    const D3D11_RECT& dest, bool linearFilter) noexcept {
+    if (!source || !context_ || !eye_targets_bound()) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    eyeTarget_->GetResource(resource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> eye;
+    if (!resource || FAILED(resource.As(&eye)) || !eye ||
+        eye.Get() == source) return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> device, owner;
+    context_->GetDevice(device.GetAddressOf());
+    source->GetDevice(owner.GetAddressOf());
+    if (!device || device.Get() != owner.Get()) return false;
+    D3D11_TEXTURE2D_DESC sd{}, ed{};
+    source->GetDesc(&sd);
+    eye->GetDesc(&ed);
+    constexpr UINT shared = D3D11_RESOURCE_MISC_SHARED |
+        D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+        D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+    if (!sd.Width || !sd.Height || sd.Format == DXGI_FORMAT_UNKNOWN ||
+        sd.Format != ed.Format || sd.MipLevels != 1u ||
+        sd.ArraySize != 1u || ed.MipLevels != 1u ||
+        ed.ArraySize != 1u || sd.SampleDesc.Count == 0u ||
+        ed.SampleDesc.Count != 1u || sd.Usage != D3D11_USAGE_DEFAULT ||
+        sd.CPUAccessFlags != 0u || (sd.MiscFlags & shared) != 0u ||
+        (sd.BindFlags & (D3D11_BIND_RENDER_TARGET |
+                         D3D11_BIND_SHADER_RESOURCE)) == 0u ||
+        ed.Width != targetWidth_ || ed.Height != targetHeight_ ||
+        srcBox.front != 0u || srcBox.back != 1u ||
+        srcBox.left >= srcBox.right || srcBox.top >= srcBox.bottom ||
+        srcBox.right > sd.Width || srcBox.bottom > sd.Height ||
+        dest.left < 0 || dest.top < 0 || dest.right <= dest.left ||
+        dest.bottom <= dest.top ||
+        static_cast<UINT>(dest.right) > targetWidth_ ||
+        static_cast<UINT>(dest.bottom) > targetHeight_) return false;
+    UINT support = 0u;
+    if (FAILED(device->CheckFormatSupport(sd.Format, &support)) ||
+        (support & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) == 0u ||
+        (support & D3D11_FORMAT_SUPPORT_RENDER_TARGET) == 0u ||
+        (sd.SampleDesc.Count > 1u &&
+         ((sd.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u ||
+          (support & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device1> device1;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext1> context1;
+    if (FAILED(device.As(&device1)) || FAILED(context_->QueryInterface(
+            IID_PPV_ARGS(context1.GetAddressOf())))) return false;
+    // Compile once per D3D11 device, never once per Draw/menu postpass.
+    // Serialize the cache and immediate-context state handoff across users.
+    static std::mutex mutex;
+    static Microsoft::WRL::ComPtr<ID3D11Device> cachedDevice;
+    static Microsoft::WRL::ComPtr<ID3D11DeviceContextState> isolated;
+    static Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
+    static Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
+    static Microsoft::WRL::ComPtr<ID3D11SamplerState> point, linear;
+    static Microsoft::WRL::ComPtr<ID3D11Buffer> constants;
+    std::lock_guard<std::mutex> lock(mutex);
+    if (cachedDevice.Get() != device.Get() || !isolated || !vs ||
+        !ps || !point || !linear || !constants) {
+        constexpr char shader[] = R"(
+            cbuffer Region : register(b0) { float4 uvRegion; };
+            Texture2D image : register(t0);
+            SamplerState texSampler : register(s0);
+            struct Varying { float4 position : SV_POSITION; float2 uv : TEXCOORD0; };
+            Varying VS(uint i : SV_VertexID) {
+                Varying v;
+                v.uv = float2((i << 1) & 2, i & 2);
+                v.position = float4(v.uv * float2(2,-2) + float2(-1,1), 0, 1);
+                return v;
+            }
+            float4 PS(Varying v) : SV_TARGET {
+                return image.SampleLevel(texSampler,
+                    uvRegion.xy + v.uv * uvRegion.zw, 0);
+            })";
+        Microsoft::WRL::ComPtr<ID3DBlob> vc, pc;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContextState> is;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> v;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> p;
+        Microsoft::WRL::ComPtr<ID3D11SamplerState> s0, s1;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> cb;
+        D3D_FEATURE_LEVEL level{};
+        if (FAILED(device1->CreateDeviceContextState(
+                0u, nullptr, D3D11_SDK_VERSION, __uuidof(ID3D11Device),
+                &level, is.GetAddressOf())) ||
+            FAILED(D3DCompile(shader, sizeof(shader)-1u, nullptr,
+                nullptr, nullptr, "VS", "vs_4_0", 0u, 0u,
+                vc.GetAddressOf(), nullptr)) ||
+            FAILED(D3DCompile(shader, sizeof(shader)-1u, nullptr,
+                nullptr, nullptr, "PS", "ps_4_0", 0u, 0u,
+                pc.GetAddressOf(), nullptr)) ||
+            FAILED(device->CreateVertexShader(vc->GetBufferPointer(),
+                vc->GetBufferSize(), nullptr, v.GetAddressOf())) ||
+            FAILED(device->CreatePixelShader(pc->GetBufferPointer(),
+                pc->GetBufferSize(), nullptr, p.GetAddressOf())))
+            return false;
+        D3D11_SAMPLER_DESC sample{};
+        sample.AddressU = sample.AddressV = sample.AddressW =
+            D3D11_TEXTURE_ADDRESS_CLAMP;
+        sample.MaxLOD = D3D11_FLOAT32_MAX;
+        sample.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+        if (FAILED(device->CreateSamplerState(&sample, s0.GetAddressOf())))
+            return false;
+        sample.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+        if (FAILED(device->CreateSamplerState(&sample, s1.GetAddressOf())))
+            return false;
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = sizeof(float) * 4u;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        if (FAILED(device->CreateBuffer(&desc, nullptr, cb.GetAddressOf())))
+            return false;
+        cachedDevice = device;
+        isolated = std::move(is);
+        vs = std::move(v);
+        ps = std::move(p);
+        point = std::move(s0);
+        linear = std::move(s1);
+        constants = std::move(cb);
+    }
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> sampled;
+    if (sd.SampleDesc.Count == 1u &&
+        (sd.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u)
+        sampled = source;
+    else {
+        D3D11_TEXTURE2D_DESC desc = sd;
+        desc.SampleDesc.Count = 1u;
+        desc.SampleDesc.Quality = 0u;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        desc.MiscFlags = 0u;
+        if (FAILED(device->CreateTexture2D(
+                &desc, nullptr, sampled.GetAddressOf()))) return false;
+    }
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+    if (FAILED(device->CreateShaderResourceView(
+            sampled.Get(), nullptr, srv.GetAddressOf()))) return false;
+    // Context-state swap snapshots ALL graphics bindings: MRT0..7, DSV,
+    // shaders, class instances, IA buffers, samplers, blend, raster and Z.
+    // The original D3D9 fallback and the next native eye draw are untouched.
+    Microsoft::WRL::ComPtr<ID3D11DeviceContextState> previous;
+    context1->SwapDeviceContextState(
+        isolated.Get(), previous.GetAddressOf());
+    struct Restore {
+        ID3D11DeviceContext1* context{};
+        ID3D11DeviceContextState* saved{};
+        ~Restore() noexcept { context->SwapDeviceContextState(saved, nullptr); }
+    } restore{context1.Get(), previous.Get()};
+    context_->OMSetRenderTargets(0u, nullptr, nullptr);
+    if (sampled.Get() != source) {
+        if (sd.SampleDesc.Count > 1u)
+            context_->ResolveSubresource(
+                sampled.Get(), 0u, source, 0u, sd.Format);
+        else context_->CopyResource(sampled.Get(), source);
+    }
+    ID3D11RenderTargetView* target = eyeTarget_;
+    context_->OMSetRenderTargets(1u, &target, nullptr);
+    const D3D11_VIEWPORT viewport{
+        float(dest.left), float(dest.top),
+        float(dest.right - dest.left), float(dest.bottom - dest.top),
+        0.f, 1.f};
+    context_->RSSetViewports(1u, &viewport);
+    context_->RSSetState(nullptr);
+    context_->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+    context_->OMSetDepthStencilState(nullptr, 0u);
+    const float uv[4]{
+        float(srcBox.left) / float(sd.Width),
+        float(srcBox.top) / float(sd.Height),
+        float(srcBox.right - srcBox.left) / float(sd.Width),
+        float(srcBox.bottom - srcBox.top) / float(sd.Height)};
+    context_->UpdateSubresource(constants.Get(), 0u, nullptr, uv, 0u, 0u);
+    ID3D11Buffer* cb = constants.Get();
+    ID3D11ShaderResourceView* view = srv.Get();
+    ID3D11SamplerState* sample = linearFilter ? linear.Get() : point.Get();
+    context_->IASetInputLayout(nullptr);
+    context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context_->VSSetShader(vs.Get(), nullptr, 0u);
+    context_->PSSetShader(ps.Get(), nullptr, 0u);
+    context_->GSSetShader(nullptr, nullptr, 0u);
+    context_->HSSetShader(nullptr, nullptr, 0u);
+    context_->DSSetShader(nullptr, nullptr, 0u);
+    context_->PSSetConstantBuffers(0u, 1u, &cb);
+    context_->PSSetShaderResources(0u, 1u, &view);
+    context_->PSSetSamplers(0u, 1u, &sample);
+    context_->Draw(3u, 0u); // GPU postpass, not game geometry evidence
+    return true;
 }
 
 // The D3D9 game and native OpenXR path may share an immediate D3D11 context.

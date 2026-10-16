@@ -985,6 +985,7 @@ int main()
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
+        bool replayedScaledPostpass[2]{};
         bool preservedPostDrawMrt[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
@@ -1294,6 +1295,24 @@ int main()
                 fixture.gameMultisample, &sourcePatch, destX, 54u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // A real game StretchRect scales 8x8 GPU pixels into a 12x5
+        // menu/vehicle eye region, not a CPU/desktop intermediate.
+        const D3D11_RECT scaledDest{
+            static_cast<LONG>(destX), 58,
+            static_cast<LONG>(destX + 12u), 63};
+        const D3D11_RECT badDest{
+            static_cast<LONG>(destX), 58, 65, 63};
+        fixture.replayedScaledPostpass[eyeIndex] =
+            !encoder.stretch_game_surface(
+                nullptr, sourcePatch, scaledDest, false) &&
+            !encoder.stretch_game_surface(
+                fixture.gameSurface, invalidSourcePatch, scaledDest, false) &&
+            !encoder.stretch_game_surface(
+                fixture.gameSurface, sourcePatch, badDest, false) &&
+            encoder.stretch_game_surface(
+                fixture.gameSurface, sourcePatch, scaledDest, true) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         ID3D11RenderTargetView* afterCopyMrt[2]{};
         ID3D11DepthStencilView* afterCopyDepth = nullptr;
         ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
@@ -1310,6 +1329,7 @@ int main()
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
             !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
+            !fixture.replayedScaledPostpass[eyeIndex] ||
             !encoder.color_draw_count()) return false;
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
@@ -1545,8 +1565,13 @@ int main()
         const bool gameMsaaResolved =
             msaaResolved[0] == 255u && msaaResolved[1] == 0u &&
             msaaResolved[2] == 255u && msaaResolved[3] == 255u;
+        const auto* scaled = pixel + 60u * mapped.RowPitch +
+            (eyeIndex == 0u ? 20u : 52u) * 4u;
+        const bool scaledGpuPixel =
+            scaled[0] == 0u && scaled[1] == 0u &&
+            scaled[2] == 255u && scaled[3] == 255u;
         d3d.context->Unmap(readback, 0);
-        require(distinctColor && actualPartialClear &&
+        require(distinctColor && scaledGpuPixel && actualPartialClear &&
                 orderedAfterDrawClear && gameSurfaceCopied &&
                 gameShaderIntermediateCopied && gameMsaaResolved,
                 "00835 native L/R Draw, ordered Clear, RT, SRV and GPU MSAA patch resolve");
