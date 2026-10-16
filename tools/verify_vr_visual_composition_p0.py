@@ -167,7 +167,8 @@ def verify_r29_exact_draw_scope(r29_source, semantic_source):
         semantic_source, 'inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept')
     for token in ('EffectiveScope()', 'CurrentRenderProducerToken()',
                   'CurrentQueueNode()', 'CurrentQueueNodeEpoch()',
-                  'QueueRenderActive()'):
+                  'QueueRenderActive()', 'CurrentLensCentreCallEpoch',
+                  'ExactLensCentreDrawOwnsSemantic()'):
         require(token, capture, 'R29 immutable draw snapshot exact queued provenance')
     require('OutRunVR::GameSemantic::CapturePhysicalDrawCommand()', r29_source,
             'R29 must sample canonical physical Draw')
@@ -191,8 +192,8 @@ for label, altered_r29, altered_sem in (
     ('R29 confuses direct vs queued shadow', r29.replace(
         'drawCommand.IsDirectCarBaseShadow()', 'true', 1), sem),
     ('capture overwrites original scope', r29, sem.replace(
-        'return { EffectiveScope(), CurrentRenderProducerToken(),',
-        'return { RenderScope::ScreenHud, CurrentRenderProducerToken(),', 1)),
+        'return { EffectiveScope(), producer,',
+        'return { RenderScope::ScreenHud, producer,', 1)),
 ):
     if altered_r29 == r29 and altered_sem == sem:
         raise SystemExit('P0 R29 exact scope mutation target missing: ' + label)
