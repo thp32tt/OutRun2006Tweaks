@@ -926,6 +926,21 @@ int main()
             gameShaderIntermediate,
             "00834 native game shader-readable GPU intermediate created");
     d3d.context->CopyResource(gameShaderIntermediate, gameSurface);
+    // Menu and vehicle render passes can retain smaller atlas mips while
+    // their actual game-authored full-resolution color lives in mip 0.
+    D3D11_TEXTURE2D_DESC mipGameDesc = shaderIntermediateDesc;
+    mipGameDesc.MipLevels = 3u;
+    ID3D11Texture2D* mipGameIntermediate = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &mipGameDesc, nullptr, &mipGameIntermediate)) &&
+            mipGameIntermediate,
+            "00841 game-owned mipmapped GPU postpass source created");
+    std::vector<UINT> greenMip(32u * 32u, 0xff00ff00u);
+    d3d.context->UpdateSubresource(
+        mipGameIntermediate, 1u, nullptr, greenMip.data(),
+        32u * sizeof(UINT), 0u);
+    d3d.context->CopySubresourceRegion(
+        mipGameIntermediate, 0u, 0u, 0u, 0u, gameSurface, 0u, nullptr);
     // A game scene may render to MSAA before a full-frame or cropped menu
     // postpass. The native eye path must GPU-resolve the *actual* RT instead
     // of dropping the pixels or staging the entire eye through system memory.
@@ -980,11 +995,13 @@ int main()
         bool replayedMidSceneClear[2]{};
         ID3D11Texture2D* gameSurface{};
         ID3D11Texture2D* gameShaderIntermediate{};
+        ID3D11Texture2D* gameMipIntermediate{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
+        bool replayedPostDrawMipZeroCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
         bool replayedScaledPostpass[2]{};
         bool preservedPostDrawMrt[2]{};
@@ -1015,6 +1032,7 @@ int main()
     gameEyeFixture.gamePixelShader = gamePixelShader;
     gameEyeFixture.gameSurface = gameSurface;
     gameEyeFixture.gameShaderIntermediate = gameShaderIntermediate;
+    gameEyeFixture.gameMipIntermediate = mipGameIntermediate;
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
 
@@ -1291,6 +1309,14 @@ int main()
                 fixture.gameShaderIntermediate, &sourcePatch, destX, 48u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Copy the real mip-0 full-resolution game pixels from a multi-mip
+        // GPU postpass. Do not accidentally use the green mip-1 or increase
+        // the native Draw evidence; preserve RT0, MRT1 and both eye Z owners.
+        fixture.replayedPostDrawMipZeroCopy[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameMipIntermediate, &sourcePatch, destX, 32u) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         // A real game MSAA RT must resolve on the GPU before copying just
         // the selected menu/vehicle patch, preserving the rest of both eyes.
         fixture.replayedPostDrawMsaaResolve[eyeIndex] =
@@ -1333,6 +1359,7 @@ int main()
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
+            !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
             !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
             !fixture.replayedScaledPostpass[eyeIndex] ||
             !encoder.color_draw_count()) return false;
@@ -1382,6 +1409,8 @@ int main()
             gameEyeFixture.replayedPostDrawSurfaceCopy[1] &&
             gameEyeFixture.replayedPostDrawShaderCopy[0] &&
             gameEyeFixture.replayedPostDrawShaderCopy[1] &&
+            gameEyeFixture.replayedPostDrawMipZeroCopy[0] &&
+            gameEyeFixture.replayedPostDrawMipZeroCopy[1] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[0] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
@@ -1503,6 +1532,7 @@ int main()
     preservedDepthTexture->Release();
     gameSurfaceView->Release();
     gameShaderIntermediate->Release();
+    mipGameIntermediate->Release();
     gameMultisampleView->Release();
     gameMultisample->Release();
     gameSurface->Release();
@@ -1531,6 +1561,12 @@ int main()
         const bool distinctColor = eyeIndex == 0u
             ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
+        // Mip 1 was deliberately green, but the unscaled eye transfer must
+        // preserve blue mip-0 pixels in both independent GPU eye targets.
+        const UINT mipX = eyeIndex == 0u ? 18u : 50u;
+        const auto* mipPixel = pixel + 34u * mapped.RowPitch + mipX * 4u;
+        const bool actualMipZeroCopy =
+            mipPixel[0] == 0u && mipPixel[1] == 0u && mipPixel[2] == 255u;
         const UINT patchX = eyeIndex == 0u ? 6u : 44u;
         const auto* patch = pixel + 6u * mapped.RowPitch + patchX * 4u;
         const bool actualPartialClear = eyeIndex == 0u
@@ -1541,7 +1577,8 @@ int main()
         const bool orderedAfterDrawClear = eyeIndex == 0u
             ? later[0] == 255u && later[1] == 0u && later[2] == 0u
             : later[0] == 0u && later[1] == 255u && later[2] == 0u;
-        if (!distinctColor || !actualPartialClear || !orderedAfterDrawClear) {
+        if (!distinctColor || !actualMipZeroCopy ||
+            !actualPartialClear || !orderedAfterDrawClear) {
             std::cerr << "00829 eye=" << eyeIndex
                       << " full RGBA=" << unsigned(pixel[0]) << ","
                       << unsigned(pixel[1]) << "," << unsigned(pixel[2]) << ","

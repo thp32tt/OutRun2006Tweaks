@@ -209,9 +209,16 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     constexpr UINT sharedFlags =
         D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+    // A menu/vehicle render pass can place its full-size game color in mip 0
+    // of a GPU-only texture with a complete mip chain. CopySubresourceRegion
+    // selects subresource 0 below; it does NOT copy the smaller mip levels.
+    // MSAA sources still require exactly one mip and an explicit GPU resolve.
+    const bool needsResolve = sourceDesc.SampleDesc.Count > 1u;
     if (sourceDesc.Format == DXGI_FORMAT_UNKNOWN ||
         sourceDesc.Format != eyeDesc.Format ||
-        sourceDesc.MipLevels != 1u || sourceDesc.ArraySize != 1u ||
+        sourceDesc.MipLevels == 0u ||
+        (needsResolve && sourceDesc.MipLevels != 1u) ||
+        sourceDesc.ArraySize != 1u ||
         eyeDesc.MipLevels != 1u || eyeDesc.ArraySize != 1u ||
         sourceDesc.SampleDesc.Count == 0u ||
         eyeDesc.SampleDesc.Count != 1u ||
@@ -222,7 +229,6 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         (sourceDesc.MiscFlags & sharedFlags) != 0u ||
         eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;
-    const bool needsResolve = sourceDesc.SampleDesc.Count > 1u;
     if (needsResolve) {
         // The only supported multisample source is a GPU color render
         // target. D3D11 cannot resolve a depth surface or an arbitrary
@@ -244,6 +250,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         box.bottom - box.top > eyeDesc.Height - destY)
         return false;
 
+    // Both single-sample and multisample paths operate on mip 0 only.
+    // Never use CopyResource for a full mip chain into a one-mip XR eye.
     // A full-source MSAA resolve can write directly into the full-size eye.
     // Cropped menu/vehicle postpasses must not overwrite unaffected pixels:
     // resolve the original full source to an owned, GPU-only intermediate,
