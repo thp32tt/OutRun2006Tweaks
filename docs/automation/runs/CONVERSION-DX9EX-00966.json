@@ -8,9 +8,9 @@
   "run_key": "CONVERSION-DX9EX-00966",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "feature_id": "DX9EX:R84:SCREEN_SOURCE_ORIGINAL_FALLBACK",
-  "symptom_id": "DX9EX:SYMPTOM:HUD_RANK_STALE_WORLD_WVP",
-  "feature_class": "VISUAL_DEFECT",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "IN_PROGRESS",
   "phase": "C5_VALIDATE",
   "checkpoint": "C5_PENDING_EXACT_SHA",
@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e388e6c03cc4a64f9de7a4d43a5d99a0e4346af1",
-  "material_result_sha": null,
+  "material_result_sha": "a10f30c2f16bb2cddfd40d472e33368cb78640fd",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
@@ -32,10 +32,10 @@
     "docs/automation/runs/CONVERSION-DX9EX-00966.json"
   ],
   "feature_contract": {
-    "feature_id": "DX9EX:R84:SCREEN_SOURCE_ORIGINAL_FALLBACK",
-    "symptom_id": "DX9EX:SYMPTOM:HUD_RANK_STALE_WORLD_WVP",
-    "goal": "Prevent original source-proven game HUD and queued projected rank SpriteNodes from inheriting stale world WVP in R84 when R30 eye-plane proof fails; preserve binocular path on success and original native draw on failure.",
-    "scope_boundary": "R84 R33 fail-closed screen source classification and portable physical draw command smoke. No R26 fallback, world, input, FFB, SkyGlow or DXVK changes.",
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Protect the complete source-identified gameplay HUD group (6th/6, timer, speed/rank/gear) from inheriting an unrelated R29 road WVP when R84 R30 cannot prove its physical eye-plane ownership; preserve R33 binocular rendering whenever proof succeeds, original rendering on failure, and independently source-anchored rank/world negative cases.",
+    "scope_boundary": "One HUD-gameplay failed-screen-ownership rendering defect on R84 R33 and original physical source semantics. Queued projected rank is only the separately anchored negative/fallback safety case. Excludes F11/ESC/menu layout, GOAL logic, R26_SAFE, SkyGlow/world, FFB/input, DX11 and DXVK.",
     "special_work_evidence": "R33's prior fail-closed branches covered only +TIME/GOAL but not other exact ScreenHud producers or tagged rank SpriteNodes, leaving their failed R30 classification able to fall into R29 cached road WVP.",
     "subcomponents": [
       "Source-proven HUD/queued rank eligibility at original draw command",
@@ -61,6 +61,11 @@
         "behavior_area": "R84 Win32, R26_SAFE fallback, x64 host, package, Domain and impacted review",
         "expected_behavior": "All mandatory exact SHA GitHub Actions pass; Quest3/VDXR validation remains UNTESTED."
       }
+    ],
+    "trace_stages": [
+      "Original game HUD sprite/DispRank/6th/6 callsites and ScreenHud producer identity enter RenderSemantic physical command capture before queue or direct D3DX submission.",
+      "R84 R33 consumes source-owned SpriteNode or direct HUD identity and asks R30 classifier and eye WVP builder to establish the specific physical GPU draw ownership.",
+      "R33 valid stereo draws in both eyes when R30 proof succeeds; when original HUD or independently queued projected marker proof fails, the native original draw is retained without R29 road world WVP; x64 OpenXR host composes the eye output."
     ]
   },
   "acceptance_results": {
@@ -68,5 +73,12 @@
     "rank_marker_and_world_negative": "PENDING_EXACT_SHA",
     "integrated_exact_sha_gates": "PENDING_EXACT_SHA"
   },
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "ci_repair": {
+    "failed_validation_sha": "a10f30c2f16bb2cddfd40d472e33368cb78640fd",
+    "failed_gate": "DX9Ex Active Validation policy / verify_vr_feature_unit_policy.py",
+    "failure": "Visual feature ID was not in the existing feature catalog, and feature_contract.trace_stages was absent; source C++ did not fail to compile.",
+    "correction": "Bind this source-identified HUD regression to DX9EX:VIS:HUD_GAMEPLAY and document original producer -> R33 physical Draw -> R30 two-eye/host stages without changing verifier or reducing any Gate.",
+    "score_delta": 0
+  }
 }
