@@ -102,7 +102,14 @@ def source_contract(renderer=RENDERER, r30=R30):
     # The 2026-10-16 HMD capture displayed a black horizon and eye-dependent
     # world/HUD overlap. Queue fallback ScreenOverlay2D is not permission to
     # reinterpret a perspective world draw as Hud2D.
+    # Exact original C993's independent raw c64 must win over a potentially
+    # previous-pass cached 2D projection. Generic HUD/overlay remains gated.
     projection_gate = cls.index("ClassifyProjectionSignature(m34, m44)")
+    require(cls.index("if (ownedLensCentre)") <
+            cls.index("R30HasExactLensCentreRawWvp(originalGameWvp)") <
+            cls.index("GetRendererProjectionSignature(m34, m44)") <
+            projection_gate,
+            "original C993 c64 evidence must precede shared projection veto")
     require(cls.index("if (ownedHud)") > projection_gate,
             "exact HUD must not bypass projection signature sanity")
     require(cls.index("if (ownedOverlay)") > projection_gate,
@@ -165,6 +172,11 @@ def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
     centre = scope == "WorldBillboard" and not queued
     if not (hud or overlay or effect or centre):
         return "none"
+    if centre:
+        # Exact C993's original-c64 and spatial WVP proof are independent
+        # of the previous shared projection signature; all missing proof
+        # and queued/non-C993 sources retain native conservative fallback.
+        return "centre" if exact_centre_owned else "none"
     if projection == "orthographic":
         return "hud" if hud or overlay else "none"
     if projection != "perspective":
@@ -173,12 +185,10 @@ def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
         return "hud"
     if overlay:
         return "none"
-    if centre and exact_centre_owned:
-        return "centre"
     if effect and scope == "SceneEffect" and spatial_scene_wvp:
         return "none"
     if not z_enabled and (alpha_blend or alpha_test):
-        return "none" if centre else "flat"
+        return "flat"
     return "none"
 
 
@@ -213,8 +223,14 @@ def effect_scope_model_cases():
                         alpha_test, "WorldBillboard", False, False) == "none",
                         "unowned billboard must keep R29 fallback")
                 require(classify_effect_route("orthographic", depth, blend,
-                        alpha_test, "WorldBillboard", False, True) == "none",
-                        "exact producer cannot convert orthographic UI")
+                        alpha_test, "WorldBillboard", False, True) == "centre",
+                        "source-owned C993 must survive a stale 2D signature")
+                require(classify_effect_route("unknown", depth, blend,
+                        alpha_test, "WorldBillboard", False, True) == "centre",
+                        "source-owned C993 must survive an unavailable signature")
+                require(classify_effect_route("orthographic", depth, blend,
+                        alpha_test, "WorldBillboard", False, False) == "none",
+                        "unowned C993 must never borrow the preceding UI projection")
     for scope in ("WorldParticle", "WorldBillboard",
                   "ProjectedScreenEffect2D", "ScreenHud", "ScreenOverlay2D"):
         require(classify_effect_route("perspective", True, True, False, scope)

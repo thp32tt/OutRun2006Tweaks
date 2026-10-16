@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "66a32a567898a80e664be0eaee83df69f7b2c946",
-  "material_result_sha": null,
+  "material_result_sha": "3e44ecd798f83fb48c954c280b60479fcded09c4",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp"
@@ -26,6 +26,7 @@
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_dx9ex_r84_lens_source.py",
+    "tools/verify_vr_r30_projection_signature_fastpath.py",
     "docs/automation/runs/CONVERSION-DX9EX-00944.json"
   ],
   "feature_contract": {
@@ -83,7 +84,7 @@
       "Treating CI as Quest3 optical evidence is invalid; headset verification remains pending."
     ],
     "fix_evidence": "Move full existing C993 raw-c64/telemetry/WorldRoute classification before generic signature early returns, preserving the exact later matrix math, R33 owner and original draw fallback.",
-    "negative_test_evidence": "Existing lens source mutation suite keeps shader/pose/queue/WVP/R33 invalidation guards; added fail-before/pass-after ordering checks force centre proof/early fallback before cached signature admission.",
+    "negative_test_evidence": "Existing lens source mutation suite keeps shader/pose/queue/WVP/R33 invalidation guards; added fail-before/pass-after ordering checks force centre proof/early fallback before cached signature admission. The source-shared-projection fastpath model now tests source-owned C993 with stale/unknown cached projection and negative non-C993 paths.",
     "eye_ownership": "Exact source-owned sun uses original game WVP and current latched head inverse with two head-local eye poses and asymmetric FOV; HMD binocular result UNTESTED."
   },
   "ci_evidence": {
@@ -95,5 +96,5 @@
     "hmd_validation": "UNTESTED"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run targeted lens-source mutation and required exact-SHA workflows after attaching the material result. Do not claim Quest3 optical fixed before same-build HMD evidence."
+  "next_action": "Validation-bearing CI commit aligns the existing projection classification regression with source-proven C993 before shared signature; required exact SHA gates pending. HMD remains untested."
 }
