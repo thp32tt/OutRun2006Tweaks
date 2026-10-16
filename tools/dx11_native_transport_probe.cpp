@@ -1057,7 +1057,7 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 2u;
+    partialGameClear.count[0] = partialGameClear.count[1] = 4u;
     // Game-origin full Z/stencil Clear after three masked geometry Draws,
     // followed by per-eye HUD TARGET Clears after the remaining geometry.
     // Chronological replay must preserve BOTH independent eye command lists.
@@ -1071,8 +1071,8 @@ int main()
         depthEvent.clearDepth = true;
         depthEvent.clearStencil = true;
     }
-    partialGameClear.entries[0][1] = {{4, 4, 12, 12}, 0xffff0000u, 5u};
-    partialGameClear.entries[1][1] = {{40, 4, 48, 12}, 0xff00ff00u, 6u};
+    partialGameClear.entries[0][2] = {{4, 4, 12, 12}, 0xffff0000u, 5u};
+    partialGameClear.entries[1][2] = {{40, 4, 48, 12}, 0xff00ff00u, 6u};
     // Model different actual source-camera crop regions within the two
     // full-sized GPU eyes; the original desktop raster must be restored.
     gameRaster.viewport[0] = {0.f, 0.f, 32.f, 64.f, 0.f, 1.f};
@@ -1094,6 +1094,31 @@ int main()
     gameEyeFixture.gameConvertedArray = gameConvertedArray;
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
+    // Two game-created GPU postpasses run between the REAL eye Draw calls:
+    // an unscaled per-camera array-slice copy followed by a format-converting
+    // scaled source overlay AFTER the original TARGET Clear. Later callback
+    // postpasses remain independent of the source-ordered command stream.
+    for (std::uint32_t eye = 0; eye < 2u; ++eye) {
+        const UINT x = eye == 0u ? 20u : 52u;
+        auto& copy = partialGameClear.entries[eye][1];
+        copy.kind = SourceClear::Kind::SourceCopy;
+        copy.afterDrawOrdinal = 4u;
+        copy.source = gameEyeArray;
+        copy.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        copy.destX = x;
+        copy.destY = 24u;
+        copy.sourceArraySlice = eye;
+        auto& stretch = partialGameClear.entries[eye][3];
+        stretch.kind = SourceClear::Kind::SourceStretch;
+        stretch.afterDrawOrdinal = eye == 0u ? 5u : 6u;
+        stretch.source = gameConvertedArray;
+        stretch.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        stretch.destination = {
+            static_cast<LONG>(x + 2u), 26,
+            static_cast<LONG>(x + 6u), 30};
+        stretch.linearFilter = false;
+        stretch.sourceArraySlice = eye;
+    }
 
     std::cerr << "R178-DIAG stereo fixture ready\n";
     // 00819: the renderer callback itself emits independent eye GPU work
@@ -1484,7 +1509,7 @@ int main()
     auto invalidRaster = gameRaster;
     invalidRaster.scissor[1].right = 65; // Fail before any GPU commands.
     auto invalidPartialClear = partialGameClear;
-    invalidPartialClear.entries[1][1].rect.right = 65; // No partial GPU work.
+    invalidPartialClear.entries[1][2].rect.right = 65; // No partial GPU work.
     auto invalidClearOrder = partialGameClear;
     invalidClearOrder.entries[1][1].afterDrawOrdinal = 1u;
     auto invalidDepthClear = partialGameClear;
@@ -1494,6 +1519,12 @@ int main()
     auto invalidDepthFlags = partialGameClear;
     invalidDepthFlags.entries[1][0].clearDepth = false;
     invalidDepthFlags.entries[1][0].clearStencil = false;
+    auto invalidSourceSlice = partialGameClear;
+    invalidSourceSlice.entries[1][1].sourceArraySlice = 2u;
+    auto invalidStretchSource = partialGameClear;
+    invalidStretchSource.entries[1][3].source = nullptr;
+    auto invalidStretchBounds = partialGameClear;
+    invalidStretchBounds.entries[1][3].destination = {65, 26, 71, 30};
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -1515,6 +1546,15 @@ int main()
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster, &invalidDepthFlags) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidSourceSlice) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidStretchSource) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidStretchBounds) &&
             !ring.synchronization_faulted() &&
             directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
@@ -1708,6 +1748,26 @@ int main()
             ? clearPixel[0] == 255u && clearPixel[1] == 0u && clearPixel[2] == 0u
             : clearPixel[0] == 0u && clearPixel[1] == 255u && clearPixel[2] == 0u,
             "00847 GPU game TARGET Clear after genuine left/right Draw stream");
+        // Verify genuine source-ordered GPU Copy THEN GPU Stretch after
+        // separate game Draw ordinals. These are native shared-eye pixels,
+        // not accepted calls or a left-eye image duplicated to both eyes.
+        const UINT postX = eyeIndex == 0u ? 21u : 53u;
+        const auto* copyPixel = pixel + 25u * mapped.RowPitch + postX * 4u;
+        const bool chronologicalCopy = eyeIndex == 0u
+            ? copyPixel[0] == 0x11u && copyPixel[1] == 0u &&
+              copyPixel[2] == 0xccu
+            : copyPixel[0] == 0x33u && copyPixel[1] == 0xbbu &&
+              copyPixel[2] == 0x22u;
+        const UINT postOverlayX = eyeIndex == 0u ? 23u : 55u;
+        const auto* postPixel =
+            pixel + 27u * mapped.RowPitch + postOverlayX * 4u;
+        const bool chronologicalStretch = eyeIndex == 0u
+            ? postPixel[0] == 255u && postPixel[1] == 0u &&
+              postPixel[2] == 0u
+            : postPixel[0] == 0u && postPixel[1] == 255u &&
+              postPixel[2] == 0u;
+        require(chronologicalCopy && chronologicalStretch,
+                "00849 GPU source Copy/Stretch chronological per-eye pixels");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
         const UINT arrayX = eyeIndex == 0u ? 18u : 50u;

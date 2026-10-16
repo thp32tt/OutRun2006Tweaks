@@ -63,8 +63,8 @@ public:
         ID3D11Texture2D* source, const D3D11_BOX& sourceRegion,
         const D3D11_RECT& destination, bool linearFilter,
         UINT sourceArraySlice = 0u) noexcept;
-    // Game-origin TARGET rectangles and full depth/stencil Clears are replayed
-    // together after N real per-eye Draw/DrawIndexed calls in source order.
+    // Game-origin TARGET/depth Clears and GPU Copy/Stretch postpasses are
+    // replayed together after N real per-eye Draw/DrawIndexed calls in order.
     // A zero ordinal retains original pre-geometry Clear behavior.
     void set_source_clear_timeline(
         const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept;
@@ -101,14 +101,15 @@ struct NativeGameEyeDrawEvidence {
 struct NativeGameEyeColorSeed {
     std::uint32_t argb[2]{};
 };
-// Actual D3D9 game Clears can occur BETWEEN source geometry draws. Keep
-// TARGET rectangle and full Z/stencil events in ONE chronological per-eye
-// stream: two independently sorted lists would reorder mixed game Clears.
-// This is source-authored command replay, never synthesized draw evidence.
-// Partial depth/stencil Clears are unsupported and must fail closed.
+// Actual D3D9 game Clears and GPU intermediate postpasses can occur BETWEEN
+// source geometry draws. Keep TARGET, Z/stencil, Copy and Stretch events
+// in ONE original per-eye timeline: replaying separately would overwrite
+// earlier HUD/menu pixels or restore an older intermediate after a Clear.
+// This is source-authored GPU command replay, not synthetic Draw evidence.
+// Unsupported source resources/partial depth clears fail closed.
 struct NativeGameEyePartialTargetClear {
     static constexpr std::uint32_t kMaxRectsPerEye = 8u;
-    enum class Kind : std::uint8_t { TargetRect, FullDepthStencil };
+    enum class Kind : std::uint8_t { TargetRect, FullDepthStencil, SourceCopy, SourceStretch };
     struct Entry {
         D3D11_RECT rect{};
         std::uint32_t argb{};
@@ -118,6 +119,14 @@ struct NativeGameEyePartialTargetClear {
         std::uint8_t stencil{};
         bool clearDepth{};
         bool clearStencil{};
+        // SourceCopy uses an unscaled subresource 0 region/destination offset;
+        // SourceStretch uses the original game crop/destination and filter.
+        // Source references are borrowed only for synchronous producer replay.
+        ID3D11Texture2D* source{};
+        D3D11_BOX sourceBox{};
+        D3D11_RECT destination{};
+        UINT destX{}, destY{}, sourceArraySlice{};
+        bool linearFilter{};
     };
     std::uint32_t count[2]{};
     Entry entries[2][kMaxRectsPerEye]{};

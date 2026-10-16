@@ -130,6 +130,18 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             if (!clear_depth_stencil(clear.depth, clear.stencil,
                                      clear.clearDepth, clear.clearStencil))
                 return false;
+        } else if (clear.kind ==
+                   NativeGameEyePartialTargetClear::Kind::SourceCopy) {
+            if (!copy_game_surface(clear.source, &clear.sourceBox,
+                                   clear.destX, clear.destY,
+                                   clear.sourceArraySlice))
+                return false;
+        } else if (clear.kind ==
+                   NativeGameEyePartialTargetClear::Kind::SourceStretch) {
+            if (!stretch_game_surface(clear.source, clear.sourceBox,
+                                      clear.destination, clear.linearFilter,
+                                      clear.sourceArraySlice))
+                return false;
         } else {
             return false; // Reject unrecognized source commands, never fabricate a Clear.
         }
@@ -980,6 +992,52 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                          (!std::isfinite(event.depth) ||
                           event.depth < 0.0f || event.depth > 1.0f)))
                         return false;
+                } else if (event.kind ==
+                               NativeGameEyePartialTargetClear::Kind::SourceCopy ||
+                           event.kind ==
+                               NativeGameEyePartialTargetClear::Kind::SourceStretch) {
+                    // Reject malformed/foreign GPU intermediates in BOTH eyes
+                    // before the first eye can enqueue any command. The
+                    // encoder performs the full format/alias admission at use.
+                    if (!event.source) return false;
+                    Microsoft::WRL::ComPtr<ID3D11Device> producer, sourceOwner;
+                    context_->GetDevice(producer.GetAddressOf());
+                    event.source->GetDevice(sourceOwner.GetAddressOf());
+                    D3D11_TEXTURE2D_DESC desc{};
+                    event.source->GetDesc(&desc);
+                    const auto& b = event.sourceBox;
+                    constexpr UINT sharedMask =
+                        D3D11_RESOURCE_MISC_SHARED |
+                        D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+                        D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+                    if (!producer || producer.Get() != sourceOwner.Get() ||
+                        desc.Usage != D3D11_USAGE_DEFAULT ||
+                        desc.CPUAccessFlags != 0u ||
+                        (desc.MiscFlags & sharedMask) != 0u ||
+                        event.sourceArraySlice >= desc.ArraySize ||
+                        desc.MipLevels == 0u ||
+                        (desc.BindFlags &
+                         (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET)) == 0u ||
+                        b.front != 0u || b.back != 1u ||
+                        b.left >= b.right || b.top >= b.bottom ||
+                        b.right > desc.Width || b.bottom > desc.Height)
+                        return false;
+                    if (event.kind ==
+                        NativeGameEyePartialTargetClear::Kind::SourceCopy) {
+                        if (event.destX > ring_.width() ||
+                            event.destY > ring_.height() ||
+                            b.right - b.left > ring_.width() - event.destX ||
+                            b.bottom - b.top > ring_.height() - event.destY)
+                            return false;
+                    } else {
+                        const auto& d = event.destination;
+                        if ((desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) == 0u ||
+                            d.left >= d.right || d.top >= d.bottom ||
+                            d.right <= 0 || d.bottom <= 0 ||
+                            d.left >= static_cast<LONG>(ring_.width()) ||
+                            d.top >= static_cast<LONG>(ring_.height()))
+                            return false;
+                    }
                 } else {
                     return false;
                 }
