@@ -61,9 +61,10 @@ int main() {
                       0,0,1,0, -0.035f,0.01f,0,1};
     float matrixR[16]{1,0,0,-0.03f, 0,1,0,0.015f,
                       0,0,1,0, 0.04f,-0.015f,0,1};
+    const float viewports[][2]{{640.f,480.f},{1920.f,1080.f},
+                               {3440.f,1440.f},{720.f,1280.f}};
     for (float scale : {0.30f, 0.55f, 1.0f, 1.20f}) {
-        for (const float dims[2] : {{640.f,480.f},{1920.f,1080.f},
-                                     {3440.f,1440.f},{720.f,1280.f}}) {
+        for (const auto& dims : viewports) {
             for (float fx : {0.f,0.25f,0.5f,0.75f,1.f}) {
                 for (float fy : {0.f,0.3f,0.5f,1.f}) {
                     const float sx=73.f+fx*dims[0], sy=41.f+fy*dims[1];

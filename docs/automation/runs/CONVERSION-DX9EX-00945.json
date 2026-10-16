@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "60277ad3360182558a8e13606c2552973196b12a",
-  "material_result_sha": null,
+  "material_result_sha": "9cb10824f15b596998e545544430c307eb854536",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/stage_extension_eye_plane.hpp",
@@ -74,7 +74,7 @@
     "root_cause": "R84 stage/goal XYZRHW path ran equivalent viewport source pixel->game NDC arithmetic twice for independent-eye projection, increasing per-sprite CPU work even though both eye matrices belong to the same latched pose. It was not a confirmed cause of prior binocular duplication.",
     "source_evidence": "R30TransformXyzrhwStereo previously called ProjectPixel(left) and ProjectPixel(right) for each selected +TIME/GOAL vertex; sourceX/sourceY, viewport and HUD scale are identical across eyes.",
     "fix_evidence": "Paired portable projection moves source->NDC before per-eye matrix loop; never publishes left eye without right-eye acceptance; R30 calls it once per vertex.",
-    "negative_test_evidence": "Native stage_extension_eye_plane_smoke compares the original two-call output against one paired call across four HUD scales, four screen shapes and twenty source positions; tests missing/w=0 right eye and invalid viewport/scale; no HMD evidence.",
+    "negative_test_evidence": "Native stage_extension_eye_plane_smoke compares the original two-call output against one paired call across four HUD scales, four screen shapes and twenty source positions; tests missing/w=0 right eye and invalid viewport/scale; no HMD evidence. Local GCC rejected a range-for initializer of raw array elements; repaired by using an explicit fixed array of viewport pairs in this same task.",
     "performance_note": "Source operation count reduced in this changed hot-path, but no measured hardware FPS improvement is asserted."
   },
   "ci_evidence": {
