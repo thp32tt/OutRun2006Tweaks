@@ -1404,8 +1404,12 @@ int main()
         const D3D11_RECT scaledDest{
             static_cast<LONG>(destX), 58,
             static_cast<LONG>(destX + 12u), 63};
-        const D3D11_RECT badDest{
-            static_cast<LONG>(destX), 58, 65, 63};
+        // A partially offscreen game StretchRect is now valid: the native
+        // eye viewport and sampled UVs are cropped together. Fully offscreen
+        // destination is still rejected without producing draw evidence.
+        const D3D11_RECT clippedDest{
+            static_cast<LONG>(destX), 63, 65, 67};
+        const D3D11_RECT badDest{65, 58, 77, 63};
         std::cerr << "R178-DIAG stretch begin " << eyeIndex << '\n';
         fixture.replayedScaledPostpass[eyeIndex] =
             !encoder.stretch_game_surface(
@@ -1416,6 +1420,8 @@ int main()
                 fixture.gameSurface, sourcePatch, badDest, false) &&
             encoder.stretch_game_surface(
                 fixture.gameSurface, sourcePatch, scaledDest, true) &&
+            encoder.stretch_game_surface(
+                fixture.gameSurface, sourcePatch, clippedDest, true) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
         std::cerr << "R178-DIAG stretch returned " << eyeIndex << '\n';
