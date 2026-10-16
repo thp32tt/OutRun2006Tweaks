@@ -25,10 +25,10 @@ int main()
             return 90; // empty-list sentinel must expose first +TIME node
         if (FirstVerifiedAppendedNode(&root, &root, &secondGlyph, 1u) ||
             FirstVerifiedAppendedNode(&root, &root, &stale, 2u) ||
-            FirstVerifiedAppendedNode(&root, nullptr, &root, 2u) ||
+            FirstVerifiedAppendedNode(&root, static_cast<Node*>(nullptr), &root, 2u) ||
             FirstVerifiedAppendedNode(&root, &root, &root, 2u))
             return 91; // truncated, stale and sentinel-as-data fail closed
-        if (FirstVerifiedAppendedNode(&root, nullptr, &secondGlyph, 2u)
+        if (FirstVerifiedAppendedNode(&root, static_cast<Node*>(nullptr), &secondGlyph, 2u)
                 != &firstGlyph ||
             FirstVerifiedAppendedNode(&root, &firstGlyph, &secondGlyph, 2u)
                 != &secondGlyph)
