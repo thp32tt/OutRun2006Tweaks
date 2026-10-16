@@ -64,6 +64,35 @@ bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
     return true;
 }
 
+// An OM-bound eye with valid raster coverage is not a color frame when
+// menu/vehicle/race draws update Z only, suppress every sample, or have no
+// shader capable of writing target 0. Preserve these GPU draws as depth
+// history while requiring at least one color-capable draw per published eye.
+bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
+    if (!context_) return false;
+    ID3D11BlendState* blend = nullptr;
+    FLOAT blendFactors[4]{};
+    UINT sampleMask = 0u;
+    context_->OMGetBlendState(&blend, blendFactors, &sampleMask);
+    bool writable = sampleMask != 0u;
+    if (blend) {
+        D3D11_BLEND_DESC desc{};
+        blend->GetDesc(&desc);
+        writable = writable &&
+            (desc.RenderTarget[0].RenderTargetWriteMask &
+             D3D11_COLOR_WRITE_ENABLE_ALL) != 0u;
+        blend->Release();
+    }
+    ID3D11VertexShader* vertex = nullptr;
+    ID3D11PixelShader* pixel = nullptr;
+    context_->VSGetShader(&vertex, nullptr, nullptr);
+    context_->PSGetShader(&pixel, nullptr, nullptr);
+    const bool hasShaders = vertex != nullptr && pixel != nullptr;
+    if (vertex) vertex->Release();
+    if (pixel) pixel->Release();
+    return writable && hasShaders;
+}
+
 bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
     if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
     ID3D11RenderTargetView* target = eyeTarget_;
@@ -76,8 +105,10 @@ bool NativeGameEyeDrawEncoder::draw(
     if (!vertexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
+    const bool colorWritable = eye_color_writable();
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
+    if (colorWritable) ++colorDrawCount_;
     return true;
 }
 
@@ -86,8 +117,10 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
     if (!indexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
+    const bool colorWritable = eye_color_writable();
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
+    if (colorWritable) ++colorDrawCount_;
     return true;
 }
 
@@ -547,7 +580,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                                      invocation.eye[eyeIndex], encoder))
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
-            if (!encoder.draw_count() ||
+            if (!encoder.draw_count() || !encoder.color_draw_count() ||
                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||

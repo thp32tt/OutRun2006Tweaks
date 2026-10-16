@@ -855,7 +855,46 @@ int main()
     // module before using and releasing the blob crashes the Win32 WARP
     // process (0xC0000005); keep it loaded through the final Release.
     geometryBytecode->Release();
+    // Draw/DrawIndexed color evidence needs real bound vertex and pixel
+    // shaders. An absent PS must still execute depth-only work, but may not
+    // certify the native XR frame. Keep D3DCompiler loaded through each blob.
+    constexpr char gameVertexSource[] =
+        "float4 main(uint id : SV_VertexID) : SV_Position {"
+        " float2 p = id == 0 ? float2(-0.99,-0.99) :"
+        " (id == 1 ? float2(-0.98,-0.99) : float2(-0.99,-0.98));"
+        " return float4(p,0,1); }";
+    constexpr char gamePixelSource[] =
+        "float4 main() : SV_Target { return float4(1,1,1,1); }";
+    ID3DBlob* vertexBytecode = nullptr;
+    ID3DBlob* pixelBytecode = nullptr;
+    require(SUCCEEDED(compileShader(
+                gameVertexSource, sizeof(gameVertexSource) - 1u,
+                "native_eye_game", nullptr, nullptr, "main", "vs_4_0",
+                D3DCOMPILE_ENABLE_STRICTNESS, 0u,
+                &vertexBytecode, nullptr)) && vertexBytecode,
+            "00830 native color vertex shader compiles");
+    require(SUCCEEDED(compileShader(
+                gamePixelSource, sizeof(gamePixelSource) - 1u,
+                "native_eye_game", nullptr, nullptr, "main", "ps_4_0",
+                D3DCOMPILE_ENABLE_STRICTNESS, 0u,
+                &pixelBytecode, nullptr)) && pixelBytecode,
+            "00830 native color pixel shader compiles");
+    ID3D11VertexShader* gameVertexShader = nullptr;
+    ID3D11PixelShader* gamePixelShader = nullptr;
+    require(SUCCEEDED(d3d.device->CreateVertexShader(
+                vertexBytecode->GetBufferPointer(),
+                vertexBytecode->GetBufferSize(), nullptr, &gameVertexShader)) &&
+            gameVertexShader &&
+            SUCCEEDED(d3d.device->CreatePixelShader(
+                pixelBytecode->GetBufferPointer(),
+                pixelBytecode->GetBufferSize(), nullptr, &gamePixelShader)) &&
+            gamePixelShader,
+            "00830 native game VS and PS created");
+    vertexBytecode->Release();
+    pixelBytecode->Release();
     FreeLibrary(compilerModule);
+    d3d.context->VSSetShader(gameVertexShader, nullptr, 0u);
+    d3d.context->PSSetShader(gamePixelShader, nullptr, 0u);
     d3d.context->GSSetShader(originalGeometryShader, nullptr, 0u);
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
@@ -872,10 +911,12 @@ int main()
         const outrun::vr::dx11::NativeGameEyeRasterState* gameRaster{};
         ID3D11RenderTargetView* callerColor{};
         ID3D11GeometryShader* callerGeometryShader{};
+        ID3D11PixelShader* gamePixelShader{};
         bool rejectedDetachedDraw[2]{};
         bool rejectedForeignDraw[2]{};
         bool rejectedOffscreenViewport[2]{};
         bool rejectedOffscreenScissor[2]{};
+        bool rejectedNoColorOutput[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -900,6 +941,7 @@ int main()
     gameEyeFixture.gameRaster = &gameRaster;
     gameEyeFixture.callerColor = originalGameTarget;
     gameEyeFixture.callerGeometryShader = originalGeometryShader;
+    gameEyeFixture.gamePixelShader = gamePixelShader;
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -1067,6 +1109,44 @@ int main()
             !fixture.rejectedForeignDraw[eyeIndex] ||
             !encoder.bind_eye_output())
             return false;
+        // Depth-only commands remain in the real GPU stream and in the Draw
+        // evidence ordinal, but cannot publish an empty native color eye.
+        const auto maskedBaseline = encoder.draw_count();
+        ctx->OMSetBlendState(nullptr, nullptr, 0u);
+        const bool zeroSample = encoder.draw(3u, 0u) &&
+            encoder.draw_count() == maskedBaseline + 1u &&
+            encoder.color_draw_count() == 0u;
+        ctx->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+        D3D11_BLEND_DESC maskedDesc{};
+        maskedDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+        maskedDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+        maskedDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+        maskedDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+        maskedDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+        maskedDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        maskedDesc.RenderTarget[0].RenderTargetWriteMask = 0u;
+        ID3D11Device* ownerDevice = nullptr;
+        ID3D11BlendState* maskedBlend = nullptr;
+        ctx->GetDevice(&ownerDevice);
+        const bool maskedCreated = ownerDevice &&
+            SUCCEEDED(ownerDevice->CreateBlendState(&maskedDesc, &maskedBlend)) &&
+            maskedBlend != nullptr;
+        if (ownerDevice) ownerDevice->Release();
+        if (!maskedCreated) return false;
+        ctx->OMSetBlendState(maskedBlend, nullptr, 0xffffffffu);
+        const bool zeroWrite = encoder.draw_indexed(3u, 0u, 0) &&
+            encoder.draw_count() == maskedBaseline + 2u &&
+            encoder.color_draw_count() == 0u;
+        ctx->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+        maskedBlend->Release();
+        ctx->PSSetShader(nullptr, nullptr, 0u);
+        const bool unshaded = encoder.draw(3u, 0u) &&
+            encoder.draw_count() == maskedBaseline + 3u &&
+            encoder.color_draw_count() == 0u;
+        ctx->PSSetShader(fixture.gamePixelShader, nullptr, 0u);
+        fixture.rejectedNoColorOutput[eyeIndex] =
+            zeroSample && zeroWrite && unshaded;
+        if (!fixture.rejectedNoColorOutput[eyeIndex]) return false;
         // Use the actual immediate D3D11 draw APIs through the per-eye
         // recorder with both correct eye OM bindings restored. The saved
         // game IA/VS/PS state is restored independently for both eye passes.
@@ -1077,6 +1157,7 @@ int main()
                 : encoder.draw(3u, 0u);
             if (!issued) return false;
         }
+        if (!encoder.color_draw_count()) return false;
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
         evidence.sourcePoseSequence = 33u;
@@ -1108,7 +1189,9 @@ int main()
             gameEyeFixture.rejectedOffscreenViewport[0] &&
             gameEyeFixture.rejectedOffscreenViewport[1] &&
             gameEyeFixture.rejectedOffscreenScissor[0] &&
-            gameEyeFixture.rejectedOffscreenScissor[1],
+            gameEyeFixture.rejectedOffscreenScissor[1] &&
+            gameEyeFixture.rejectedNoColorOutput[0] &&
+            gameEyeFixture.rejectedNoColorOutput[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
@@ -1207,6 +1290,10 @@ int main()
     d3d.context->PSSetSamplers(0u, 1u, &nullGameSampler);
     d3d.context->PSSetConstantBuffers(0u, 1u, &nullGameConstants);
     d3d.context->GSSetShader(nullptr, nullptr, 0u);
+    d3d.context->VSSetShader(nullptr, nullptr, 0u);
+    d3d.context->PSSetShader(nullptr, nullptr, 0u);
+    gameVertexShader->Release();
+    gamePixelShader->Release();
     originalGeometryShader->Release();
     gameSampleView->Release();
     gameSampleTexture->Release();

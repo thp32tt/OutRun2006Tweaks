@@ -29,13 +29,18 @@ public:
     [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,
                                     INT baseVertex) noexcept;
     [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
+    // Depth-only and color-masked game Draws still execute and contribute to
+    // the command stream, but cannot by themselves certify a visible XR eye.
+    [[nodiscard]] std::uint64_t color_draw_count() const noexcept { return colorDrawCount_; }
 private:
     [[nodiscard]] bool eye_output_bound() const noexcept;
+    [[nodiscard]] bool eye_color_writable() const noexcept;
     ID3D11DeviceContext* context_{};
     ID3D11RenderTargetView* eyeTarget_{};
     ID3D11DepthStencilView* eyeDepth_{};
     UINT targetWidth_{}, targetHeight_{};
     std::uint64_t drawCount_{};
+    std::uint64_t colorDrawCount_{};
 };
 
 struct NativeGameEyeDrawEvidence {
