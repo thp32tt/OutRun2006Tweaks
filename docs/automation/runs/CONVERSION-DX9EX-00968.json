@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_NEEDS_VALIDATION",
-  "phase": "C5_EXACT_SHA_GATE",
-  "checkpoint": "C5_VALIDATION",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "7581c9df7aa3a3c5e5337df90c1b896825e140e7",
@@ -98,9 +98,46 @@
     "previous_failed_gate": "DX9Ex Active Validation / tools/verify_vr_pause_menu_eye_affine.py"
   },
   "ci_evidence": {
-    "result": "PENDING_EXACT_SHA",
-    "runtime_validation": "UNTESTED"
+    "result": "PASS_EXACT_SHA_3_OF_3_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "material_result_sha": "d23442bbcf034ac072b6b7be65fd6616129c112a",
+    "validation_bearing_result_sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38947319910,
+        "status": "SUCCESS",
+        "sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38947319910",
+        "jobs": "policy, full-chain-compile, host, game, package all SUCCESS"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38947319831,
+        "status": "SUCCESS",
+        "sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38947319831"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38947319845,
+        "status": "SUCCESS",
+        "sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38947319845",
+        "jobs": "source-cross-domain, msvc-analyze-openxr-host, msvc-analyze-active-game all SUCCESS"
+      }
+    ],
+    "additional_context": {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38947319847,
+      "status": "SUCCESS",
+      "sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38947319847"
+    },
+    "note": "The three required exact-SHA CI workflows succeeded. No HMD runtime test was performed; binocular ESC optics, original input and visual acceptance remain NEED_HMD_TEST."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check full exact-SHA R84/R26_SAFE game, x64 host executable regression, package, Domain, HUD Inspector, Full Source MSVC gate after test compilation repair."
+  "next_action": "BUILD_VERIFIED at immutable edce340475cd7c977cb415710871cf6f01bfff29; Quest3/VDXR native ESC shell and arrow binocular optical alignment, scale and vertical offset plus original menu input/hitbox behavior still NEED_HMD_TEST. Do not infer runtime visual success from CI.",
+  "validation_bearing_result_sha": "edce340475cd7c977cb415710871cf6f01bfff29",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
