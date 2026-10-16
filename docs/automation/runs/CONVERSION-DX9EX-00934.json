@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "b9091429c13cff7abb99c2ef32504442c275bcc2",
@@ -78,7 +78,7 @@
     "repaired_by_retry": "CONVERSION-DX9EX-00934-E003"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Retry required GitHub Actions Gates on the new exact validation-bearing SHA, without CI-skip or duplicate rerun of the failed SHA. Quest3/VDXR remains untested.",
+  "next_action": "C6 exact-SHA GitHub CI SUCCESS verified; Quest3/VDXR HMD runtime optical/FPS acceptance remains NEED_HMD_TEST. No source changes or further CI rerun required.",
   "material_result_sha": "7d849ef7d1ace6cd7c8f3dc440211919d971e779",
-  "validation_bearing_result_sha": null
+  "validation_bearing_result_sha": "efc0d52c73b2e9833b33ddbd8c271f49e030dc4e"
 }
