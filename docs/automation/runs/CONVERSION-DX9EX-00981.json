@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00981",
+  "production_id": "CONVERSION-DX9EX-00981",
+  "event_id": "CONVERSION-DX9EX-00981-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00981",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C5_EXACT_SHA_GATE",
+  "checkpoint": "C5_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "64b353d3d2901b5ba52c2e3bdbc26a5134924293",
+  "material_result_sha": "31657097d6e8591dfb11ddbb58ee5256297086ae",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/menu_capture_snapshot.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/menu_capture_snapshot.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep the complete main-menu and vehicle-selection captured picture at the correct physical aspect and optical position across Virtual Desktop Low/High resolution, window movement and mono recovery.",
+    "scope_boundary": "Only the x64 OpenXR host's captured game-client UV, menu projection and mono-theater fragment geometry; do not change gameplay eye RTs, D3D9 draw owners, input, FFB, SkyGlow, R26_SAFE or DXVK.",
+    "special_work_evidence": "The host sampled game-client Win32 coordinates independently in GetGameUv, menu placement and theater recovery. A resize/output move between samples could pair a previous UV with a current client extent, distorting menu image aspect or fragment location.",
+    "trace_stages": [
+      "Original OutRun frontend and vehicle selection are rasterized to the game client window and sampled through DXGI Desktop Duplication.",
+      "GetGameUv now captures the native HWND-to-output rectangle and derives both physical UV extent and same-sample rectangle for the host compositor.",
+      "R23 menu and mono-theater projection consume exactly the same captured source rectangle for aspect, placement and partial-window fragment without a second HWND query.",
+      "OpenXR left and right menu views share optical placement and sampled pixels while gameplay stereo/FFB and the original raster are unaffected."
+    ],
+    "subcomponents": [
+      "Provide a bounded standalone C++17 captured-client geometry operation that handles window clipping, invisibility and complete-source policy without second read.",
+      "Wire the snapshot through main client capture, game frontend projection and mono recovery theater so physical image scaling, UV and partial clipping share one source.",
+      "Extend portable host smoke regression for 16:9/21:9, low/high resolutions, clipped/off-output windows, reset-invalid dimensions and exact-source fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_capture_and_optics",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Game frontend native window to DXGI capture and bilateral OpenXR menu projection",
+        "expected_behavior": "Every frame presents the menu and car-selection capture in an aspect-correct centered optical plane using a single consistent physical source rectangle."
+      },
+      {
+        "id": "partial_and_protected_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Partially visible window, mono recovery, desktop and original rendering isolation",
+        "expected_behavior": "Clipped captures retain original pixel aspect and placement; fully off-screen and invalid windows reject instead of borrowing stale UVs, while game render, input, SkyGlow and DXVK remain unchanged."
+      },
+      {
+        "id": "exact_gate_and_runtime_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 game and R84/R26_SAFE package, x64 OpenXR host, Domain and Full Source CI",
+        "expected_behavior": "Required GitHub Actions pass for exact final validation-bearing SHA and portable menu smoke regression, with Quest3/VDXR binocular acceptance recorded separately as untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_capture_and_optics": "PENDING_HMD",
+    "partial_and_protected_fallback": "PENDING_EXACT_SHA",
+    "exact_gate_and_runtime_separation": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Multiple independent GetClientRect and ClientToScreen queries produced temporally unrelated capture UV and menu/theater aspect/fragment geometry during VD resolution changes or output/window moves.",
+    "source_trace": [
+      "GetGameUv in vrhost/src/main.cpp sampled one HWND geometry and converted to Desktop Duplication UV.",
+      "R23RenderWorldLockedMenuProjection used separate GetClientRect and GetGameClientOutputRect queries for aspect and fragment after UV acquisition.",
+      "R23RenderTheater likewise obtained an independent client/output rectangle for clipped mono recovery after source UV had already been selected."
+    ],
+    "alternatives_rejected": [
+      "Do not fix by hardcoded 4:3 optical scaling, unverified matte cropping, new global HUD zoom or changing normal 3D stereo draw paths."
+    ],
+    "runtime_limit": "No real Quest3/VDXR runtime was performed; the deterministic geometry correction is not a headset visual PASS."
+  },
+  "last_ci_failure": {
+    "run_id": 38982246013,
+    "head_sha": "31657097d6e8591dfb11ddbb58ee5256297086ae",
+    "job": "policy",
+    "cause": "Whole-function verifier requires docs/automation/runs/CONVERSION-DX9EX-00981.json on any source commit with this marker; missing run record aborted the active Gate before game/host compile.",
+    "repair": "Publish same-task feature contract without disabling policy or CI; rerun required Gate on new exact commit SHA."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Complete required exact-SHA x86 R84 game/x64 host/package, Domain and Full Source validations; Quest3/VDXR optical acceptance remains UNTESTED."
+}
