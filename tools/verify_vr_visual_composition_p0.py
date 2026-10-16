@@ -2577,12 +2577,18 @@ def check_time_goal_lens_owner(source_r30, source_ui):
     require_order(glyph, 'all GOAL glyphs must originate after put_sprite_ex',
                   'tailsBefore', 'Module::exe_ptr(0x2CFE0)',
                   'const int result = original(args, priority);')
-    b9200_glyph = glyph[
-        glyph.index('if (exactGoalResult)\n        {\n            TagAppendedNodes'):        glyph.index('else\n        {\n            // The untouched +TIME')]
+    # Mutation tests intentionally delete glyph tags and/or source branches.
+    # A damaged branch is a negative test failure (SystemExit), never a
+    # spurious Python ValueError masking that the guard detected the defect.
+    exact_begin = glyph.find('if (exactGoalResult)\n        {\n            TagAppendedNodes')
+    default_begin = glyph.find('else\n        {\n            // The untouched +TIME')
+    if exact_begin < 0 or default_begin <= exact_begin:
+        raise SystemExit('GOAL source-specific glyph branch missing or reordered')
+    b9200_glyph = glyph[exact_begin:default_begin]
     require_order(b9200_glyph, 'original B9200 stack-owned GOAL glyphs',
                   'TagAppendedNodes(tailsBefore,', 'RenderScope::ScreenHud',
                   'ProducerToken::ResultTextB9200')
-    default_glyph = glyph[glyph.index('else\n        {\n            // The untouched +TIME'):]
+    default_glyph = glyph[default_begin:]
     require_order(default_glyph, 'all non-B9200 glyphs retain default ScreenHud',
                   'TagAppendedNodes(tailsBefore,', 'RenderScope::ScreenHud',
                   'ProducerToken::TextGlyphPutSprite')
