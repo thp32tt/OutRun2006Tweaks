@@ -82,12 +82,15 @@
       "Changing SkyGlow, original game timers or global D3D9 Draw/Flush alters unrelated protected original rendering paths.",
       "Using an unchecked static fixed 120Hz target would falsely classify valid 60/72/80/90Hz HMD or desktop frames."
     ],
-    "runtime_limit": "Local C++ test reproduces code-path timing and allocation; hardware Quest3/VDXR GPU frame-time, optical quality and actual FPS remain UNTESTED."
+    "runtime_limit": "Local C++ test reproduces code-path timing and allocation; hardware Quest3/VDXR GPU frame-time, optical quality and actual FPS remain UNTESTED.",
+    "original_evidence": "The original game Envmap_FaceCount at EXE+0x1447E used a fixed >18-ms late-frame test; a 12-ms QPC interval misses 120-Hz cadence (8.33-ms), yet previously allowed the three-face on-time cap. Source/deterministic evidence only; no Quest3/VDXR hardware timing.",
+    "fix_evidence": "Actual R84 game hook + adaptive cadence C++ implementation at material SHA 435df607 with portable native regression; same-task 2902da19 repaired 60-Hz threshold test and 1c92890c updated the dense-scene source guard to preserve original safety and detect 90/120-Hz misses.",
+    "negative_test_evidence": "Native C++ test covers 60/72/80/90/120-Hz healthy/late timing, invalid QPC, loading gap, normal/disabled face budget, and desktop fallback. The exact-SHA DX9Ex Active policy checks destructive mutations of disabled adaptive detection, lost cadence Reset, removed 18-ms fallback, missed-sample gate, and unbounded face debt."
   },
   "ci_evidence": {
     "material_sha": "435df607920c1c4be4694973eab97d7f4e362051",
     "first_exact_ci_failure": "DX9Ex Active policy job 116946380168 failed RUN_RECORD_NOT_FOUND at material SHA; same-task repair includes required feature contract and 60Hz test expectation corrected for preserved >18ms cutoff.",
-    "local_native_cpp_regression": "PASS after 60Hz test expectation repair; Windows/host CI on new exact SHA pending",
+    "local_native_cpp_regression": "PASS with 60-Hz original cutoff correction; four exact-SHA GitHub Actions required gates SUCCESS on 01d0ae2f.",
     "runtime_hmd": "UNTESTED",
     "first_gate_policy_failure": {
       "sha": "435df607920c1c4be4694973eab97d7f4e362051",
@@ -122,7 +125,8 @@
       "run_id": 38894151576,
       "status": "SUCCESS"
     },
-    "material_source_sha": "435df607920c1c4be4694973eab97d7f4e362051"
+    "material_source_sha": "435df607920c1c4be4694973eab97d7f4e362051",
+    "c6_terminal_diagnosis_contract": "REPAIRED_NON_SOURCE_BOOKKEEPING"
   },
   "next_action": "BUILD_VERIFIED; do not rerun same SHA or create score for C6. Quest3/VDXR runtime verification requires independent HMD session. Begin unrelated new source implementation in a new task.",
   "validation_bearing_result_sha": "01d0ae2f47ef656fa51bfe8ec09085dce4b960fd"
