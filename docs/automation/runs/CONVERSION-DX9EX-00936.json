@@ -9,7 +9,7 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
-  "feature_class": "USER_VISIBLE_OPTICAL_DEFECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "PENDING_EXACT_SHA",
   "phase": "C4_COMMIT",
   "checkpoint": "C4_MATERIAL",
@@ -59,18 +59,26 @@
         "behavior_area": "Default R84 x86, R26_SAFE fallback, x64 OpenXR host and package",
         "expected_behavior": "Existing exact-SHA Active, Domain and affected lens/full source tests all pass; no CI skip."
       }
+    ],
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "subcomponents": [
+      "Restore both independently normalized OpenXR head-local eye orientations in the exact C993 R84 worldView → headInverse → eyeInverse → per-eye projection chain, keeping the existing relative IPD translation and leaving unrelated flare discs and world draw ownership untouched.",
+      "Validate both eyes and publish no partial pose on malformed quaternion/IPD; retain R33 mono source draw fallback and build plus run a native C++ positive/negative regression as a required host dependency."
     ]
   },
   "acceptance_results": {
     "c993_eye_cant": "NATIVE_SMOKE_PASS_HMD_UNTESTED",
     "c993_invalid_fallback": "NATIVE_SMOKE_PASS",
-    "c993_exact_sha_gate": "PENDING_EXACT_SHA"
+    "c993_exact_sha_gate": "PENDING_REPAIRED_SHA"
   },
   "diagnosis": {
     "root_cause": "C993 R84 exact-eye code used identity orientation despite existing head-local stereo.eyeOrientation; preserves translation but removes per-eye cant.",
     "source_evidence": "LatchedStereo eyeOrientation is sourced from OpenXR eye-local quaternion, whereas effectiveEyeOrientation combines head and eye for other world uses. Do not apply absolute effectiveEyeOrientation here after head inverse.",
-    "native_smoke": "Portable C++17 canted/parallel and invalid-pose source smoke PASS exit 0 locally; CI/HMD not yet run."
+    "native_smoke": "Portable C++17 canted/parallel and invalid-pose source smoke PASS exit 0 locally; CI/HMD not yet run.",
+    "policy_gate_failure": "First validation SHA 5ee0c7088a928c8f5f215e7d0e23dee6acedfb1e DX9Ex Active #38850348546 policy job 116809960470 failed before compiling because record omitted canonical symptom_id, feature_contract.symptom_id and two substantive subcomponents; feature_class was incorrect. Source code unchanged in this cause-specific policy contract repair.",
+    "repaired_under_same_task_id": "CONVERSION-DX9EX-00936"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check exact-SHA DX9Ex Active and Domain and affected lens source gates; C6 result only after confirmed success. Quest3 real headset remains UNTESTED."
+  "next_action": "Verify corrected exact-SHA policy, R84/R26 game/host/package, Domain, HUD and Full Source gates. Runtime Quest3 remains UNTESTED.",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE"
 }
