@@ -149,6 +149,7 @@ assert not validate_task(build_verified, p), validate_task(build_verified, p)
 # rather than rewriting it as an unearned feature-completion claim.
 partial_eye = copy.deepcopy(build_verified)
 partial_eye["development_strategy"].update(
+    work_class="integration",
     milestone_id="native_stereo_eye_transport",
     gameplay_delivery_target="NATIVE_STEREO_EYE_OUTPUT",
     live_game_draw_path=[
