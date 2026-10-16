@@ -1511,7 +1511,7 @@ require_order(
 )
 for label, body in (
     ('4th+ multi-digit car mark', rank_clip),
-    ('menu/result clip', function_body(ui, 'static int __cdecl ExactScreenHud_putClipSprite(')),
+    ('menu/result clip', function_body(ui, 'static int ExactScreenHud_putClipSpriteOwned(')),
 ):
     require('TagAppendedNodes(tailsBefore,', body,
             label + ' must tag every emitted sprite sibling')
@@ -1571,7 +1571,7 @@ for drop in ('RankMarkerExactCalcEdge = true;',
 def verify_marker_owner(source):
     rank_body = function_body(source, 'static int __cdecl RankMarkerSub_dest(')
     digit_body = function_body(source, 'static int __cdecl RankMarker_putClipSprite(')
-    menu_body = function_body(source, 'static int __cdecl ExactScreenHud_putClipSprite(')
+    menu_body = function_body(source, 'static int ExactScreenHud_putClipSpriteOwned(')
     rival_body = function_body(source, 'static int __cdecl RivalMarker_sprani(')
     calc_body = function_body(source, 'static void Calc3D2D_dest(')
     require('RankMarkerProjectedInfo = {};', rank_body,
@@ -1596,7 +1596,7 @@ for label, token in (
     targets = {
         'stale rank car': 'static int __cdecl RankMarkerSub_dest(',
         'missing 4th+ digit children': 'static int __cdecl RankMarker_putClipSprite(',
-        'missing menu arrow children': 'static int __cdecl ExactScreenHud_putClipSprite(',
+        'missing menu arrow children': 'static int ExactScreenHud_putClipSpriteOwned(',
         'stale rival car': 'static int __cdecl RivalMarker_sprani(',
     }
     target = targets[label]
