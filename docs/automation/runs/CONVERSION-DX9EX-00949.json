@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_EXACT_SHA_REQUIRED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "f99ade29c4a193e31dc3bee0bca15818bb8314a6",
   "material_result_sha": "01be9810d0f71c64b8debbb6aba051bbe710c39c",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "1db7d01b4fa36441c0949ac8e0db68b1960e0733",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "result_gpu_fallback_one_original_draw": "PENDING_CI",
-    "result_gpu_fallback_negative_sources": "PENDING_CI",
-    "result_gpu_exact_sha_gate": "PENDING_CI"
+    "result_gpu_fallback_one_original_draw": "PASS_EXACT_SHA",
+    "result_gpu_fallback_negative_sources": "PASS_EXACT_SHA",
+    "result_gpu_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R33 classified HUD failure (`None`) entered R33TryFastWorld and an unhandled classified HUD returned to the R29 fallback, allowing a source-tagged +TIME/GOAL physical GPU command to be treated as perspective road/world despite missing HUD stereo ownership.",
@@ -88,12 +88,31 @@
     ]
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Registered +TIME feature record repaired after exact 01be9810 DX9Ex Active policy failure; rerun mandatory gates on the NEW exact record-bearing SHA without independently scoring this C5 repair. Quest3/VDXR remains UNTESTED.",
+  "next_action": "C6 exact-SHA 4/4 GitHub mandatory gates SUCCESS; BUILD_VERIFIED. Await user-run Quest3/VDXR +TIME visual/host/FPS acceptance. Do not redispatch or award a duplicate score for this retry.",
   "ci_evidence": {
     "source_material_sha": "01be9810d0f71c64b8debbb6aba051bbe710c39c",
     "previous_exact_sha": "01be9810d0f71c64b8debbb6aba051bbe710c39c",
     "previous_dx9ex_active_policy_failure": "Unregistered umbrella feature ID for single visible symptom in policy job 116908789122; corrected to canonical EXTENDED_TIME under the same TASK_ID.",
-    "current_validation": "PENDING_FINAL_EXACT_SHA",
-    "runtime_hmd": "UNTESTED"
+    "current_validation": "PASS_EXACT_SHA",
+    "runtime_hmd": "UNTESTED",
+    "exact_sha": "1db7d01b4fa36441c0949ac8e0db68b1960e0733",
+    "dx9ex_active": {
+      "run_id": 38882626142,
+      "status": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38882626162,
+      "status": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38882626236,
+      "status": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38882626128,
+      "status": "SUCCESS"
+    },
+    "gameplay_hmd": "NOT_RUN",
+    "validated_source_chain": "01be9810 gameplay + e2220343 feature record + 8a8f40cc guard repair + 1db7d01 workflow routing; all exact 1db7d01 mandatory checks SUCCESS"
   }
 }
