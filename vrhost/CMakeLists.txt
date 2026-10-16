@@ -294,6 +294,19 @@ add_custom_command(TARGET outrun-vr-driver-seat-pass-smoke POST_BUILD
     COMMENT "Run real cockpit / scene-effect camera ownership regression"
     VERBATIM)
 
+# The APK has an independent body-correction state; the original PC game
+# already owns a car local->world matrix. Exercise optional, fail-closed
+# car-rotation-aligned seat offset on the host with actual Release execution.
+add_executable(outrun-vr-driver-seat-car-space-smoke
+    tests/driver_seat_car_space_smoke.cpp)
+target_include_directories(outrun-vr-driver-seat-car-space-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-driver-seat-car-space-smoke)
+add_custom_command(TARGET outrun-vr-driver-seat-car-space-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-driver-seat-car-space-smoke>"
+    COMMENT "Run car-body-aware cockpit camera correction regression"
+    VERBATIM)
+
 # Native driver workId + optional chrset source selection.
 add_executable(outrun-vr-driver-occupant-smoke
     tests/driver_seat_occupant_smoke.cpp)

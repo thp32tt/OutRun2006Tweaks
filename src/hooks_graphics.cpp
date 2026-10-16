@@ -5,6 +5,7 @@
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/game/pmt_node_culling_contract.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
+#include "vr/game/driver_seat_car_space.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
@@ -37,6 +38,7 @@ namespace Settings
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRDriverSeatView;
+	extern Setting<bool> VRDriverSeatCarSpaceBasis;
 	extern Setting<int> VRDriverSeatNativeMode;
 	extern Setting<float> VRDriverSeatForward;
 	extern Setting<float> VRDriverSeatRight;
@@ -157,7 +159,21 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
     const auto& pos = camera->cam_pos_F8;
     const auto& look = camera->look_pos_104;
-    if (!OutRunVR::DriverSeatCamera::ComputeTranslatedCamera(
+    const auto player = Game::pl_car();
+    if (Settings::VRDriverSeatCarSpaceBasis)
+    {
+        if (!player)
+            return false;
+        const auto& m = player->matrix_B0;
+        if (!OutRunVR::DriverSeatCamera::ComputeCarSpaceTranslatedCamera(
+                {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
+                {{m._31, m._32, m._33}, {m._21, m._22, m._23}},
+                Settings::VRDriverSeatForward.get(),
+                Settings::VRDriverSeatRight.get(),
+                Settings::VRDriverSeatUp.get(), newPos, newLook))
+            return false;
+    }
+    else if (!OutRunVR::DriverSeatCamera::ComputeTranslatedCamera(
         {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
         Settings::VRDriverSeatForward.get(),
         Settings::VRDriverSeatRight.get(),
@@ -192,14 +208,24 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
         return false;
     const auto& pos = camera->cam_pos_F8;
     const auto& look = camera->look_pos_104;
-    return OutRunVR::DriverSeatCamera::CameraAndBodyEligible(
-        Settings::VREnabled && Settings::VRDriverSeatView,
-        VRDriverSeatGameplayActive(), camera->cam_mode_timer_364,
-        static_cast<int>(camera->cam_mode_34A),
-        Settings::VRDriverSeatNativeMode.get(),
-        {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
-        Settings::VRDriverSeatForward.get(),
-        Settings::VRDriverSeatRight.get(), Settings::VRDriverSeatUp.get());
+    if (!OutRunVR::DriverSeatCamera::CameraAndBodyEligible(
+            Settings::VREnabled && Settings::VRDriverSeatView,
+            VRDriverSeatGameplayActive(), camera->cam_mode_timer_364,
+            static_cast<int>(camera->cam_mode_34A),
+            Settings::VRDriverSeatNativeMode.get(),
+            {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
+            Settings::VRDriverSeatForward.get(),
+            Settings::VRDriverSeatRight.get(), Settings::VRDriverSeatUp.get()))
+        return false;
+
+    // When car-space correction is requested, eligibility of camera, car,
+    // driver and cockpit near-plane must agree even on degenerate matrices.
+    if (Settings::VRDriverSeatCarSpaceBasis)
+    {
+        D3DVECTOR correctedPosition{}, correctedLook{};
+        return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
+    }
+    return true;
 }
 
 class VRDriverSeatRenderTest : public Hook
