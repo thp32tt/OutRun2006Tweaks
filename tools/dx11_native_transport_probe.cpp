@@ -1677,10 +1677,10 @@ int main()
     D3D11_TEXTURE2D_DESC arrayDesc = sourceDesc;
     arrayDesc.MipLevels = 2u;
     arrayDesc.ArraySize = 2u;
-    ID3D11Texture2D* gameEyeArray = nullptr;
+    ID3D11Texture2D* gameEyeArray842 = nullptr;
     ID3D11RenderTargetView* gameArrayViews[2][2]{};
     require(SUCCEEDED(d3d.device->CreateTexture2D(
-                &arrayDesc, nullptr, &gameEyeArray)) && gameEyeArray,
+                &arrayDesc, nullptr, &gameEyeArray842)) && gameEyeArray842,
             "00842 two-eye game texture-array producer");
     for (UINT eye = 0u; eye < 2u; ++eye) {
         for (UINT mip = 0u; mip < 2u; ++mip) {
@@ -1691,7 +1691,7 @@ int main()
             viewDesc.Texture2DArray.FirstArraySlice = eye;
             viewDesc.Texture2DArray.ArraySize = 1u;
             require(SUCCEEDED(d3d.device->CreateRenderTargetView(
-                        gameEyeArray, &viewDesc, &gameArrayViews[eye][mip])),
+                        gameEyeArray842, &viewDesc, &gameArrayViews[eye][mip])),
                     "00842 game left/right camera array RTV");
         }
     }
@@ -1703,15 +1703,15 @@ int main()
     d3d.context->ClearRenderTargetView(gameArrayViews[1][1], red);
     outrun::vr::dx11::NativeGameStereoSubmission arraySubmit(ring);
     require(arraySubmit.begin(d3d.context, 25u, 35u) &&
-            !arraySubmit.capture_eye(0u, gameEyeArray, 1u, 0xa1u, 35u, 2u) &&
-            arraySubmit.capture_eye(0u, gameEyeArray, 1u, 0xa1u, 35u, 0u) &&
-            arraySubmit.capture_eye(1u, gameEyeArray, 1u, 0xb2u, 35u, 0u) &&
+            !arraySubmit.capture_eye(0u, gameEyeArray842, 1u, 0xa1u, 35u, 2u) &&
+            arraySubmit.capture_eye(0u, gameEyeArray842, 1u, 0xa1u, 35u, 0u) &&
+            arraySubmit.capture_eye(1u, gameEyeArray842, 1u, 0xb2u, 35u, 0u) &&
             !arraySubmit.submit() && arraySubmit.cancel() &&
             !ring.synchronization_faulted(),
             "00842 aliased same slice and invalid slice reject before GPU");
     require(arraySubmit.begin(d3d.context, 26u, 35u) &&
-            arraySubmit.capture_eye(0u, gameEyeArray, 1u, 0xa1u, 35u, 0u) &&
-            arraySubmit.capture_eye(1u, gameEyeArray, 1u, 0xb2u, 35u, 1u) &&
+            arraySubmit.capture_eye(0u, gameEyeArray842, 1u, 0xa1u, 35u, 0u) &&
+            arraySubmit.capture_eye(1u, gameEyeArray842, 1u, 0xb2u, 35u, 1u) &&
             arraySubmit.submit() && arraySubmit.in_flight(),
             "00842 native producer submits two independent GPU array-slice eyes");
     outrun::vr::dx11::NativeGameStereoPublishedFrame arrayFrame{};
@@ -1750,7 +1750,7 @@ int main()
     for (UINT eye = 0; eye < 2u; ++eye)
         for (UINT mip = 0; mip < 2u; ++mip)
             gameArrayViews[eye][mip]->Release();
-    gameEyeArray->Release();
+    gameEyeArray842->Release();
 
     // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
     // cancellation nor another frame may reuse the ring without hard retire.
