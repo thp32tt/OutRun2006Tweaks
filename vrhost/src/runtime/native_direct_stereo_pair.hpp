@@ -132,7 +132,10 @@ namespace OutRunVrNativeEyePair
         bool validatedFrame, const InterfaceId& unknownIid) noexcept
     {
         if (!copyOptIn || !directRoute || !validatedFrame ||
-            !context || !device || !left || !right || !projection)
+            !context || !device || !left || !right || !projection ||
+            // Only the active immediate GPU command stream can carry the
+            // native gameplay eye pair to the current OpenXR frame.
+            context->GetType() != decltype(context->GetType()){})
             return false;
         Device* contextOwner = nullptr;
         context->GetDevice(&contextOwner);
@@ -153,8 +156,35 @@ namespace OutRunVrNativeEyePair
         if (!CopyToStereoSwapchainCompatible(leftDesc, rightDesc, xrDesc))
             return false;
 
+        // A live game/menu compositor may have an OM target and multiple
+        // MRTs bound when the native XR eye pair is selected. Both sources
+        // must be unbound for the GPU copy, but the next game/HUD pass must
+        // get EXACTLY its previous RTV/DSV attachments back, including
+        // RT1..RT7. Never leave the host pointing at no render target.
+        struct ScopedOutputMerger final {
+            Context* immediate{};
+            ID3D11RenderTargetView* targets[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+            ID3D11DepthStencilView* depth{};
+            explicit ScopedOutputMerger(Context* current) noexcept
+                : immediate(current) {
+                immediate->OMGetRenderTargets(
+                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth);
+            }
+            ~ScopedOutputMerger() noexcept {
+                immediate->OMSetRenderTargets(
+                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, depth);
+                for (auto*& target : targets)
+                    if (target) { target->Release(); target = nullptr; }
+                if (depth) { depth->Release(); depth = nullptr; }
+            }
+            ScopedOutputMerger(const ScopedOutputMerger&) = delete;
+            ScopedOutputMerger& operator=(const ScopedOutputMerger&) = delete;
+        } savedOutput(context);
+
         // Exact full-resolution L/R game colors, no SBS UV crop. One immediate
         // command stream owns both XR array slices and the producer ACK fence.
+        // OM restoration is scoped to BOTH GPU copies, including failure-free
+        // completion: the source switch must not destroy the next HUD target.
         context->OMSetRenderTargets(0u, nullptr, nullptr);
         context->CopySubresourceRegion(
             projection, 0u, 0u, 0u, 0u, left, 0u, nullptr);

@@ -288,13 +288,51 @@ int main()
         if (!require(sourceSwitchSafe,
                      "legacy XR native-eye route must not overwrite a later SBS frame"))
             return 1;
+        // Exercise the real OpenXR direct-copy path with TWO host output
+        // targets already bound. The native transfer must preserve both MRT
+        // slots for subsequent menu/HUD rendering, not leave OM unbound.
+        ID3D11RenderTargetView* originalTargets[2]{nativeLeftRtv, nativeRightRtv};
+        warpContext->OMSetRenderTargets(2u, originalTargets, nullptr);
+        ID3D11DeviceContext* deferred = nullptr;
+        const bool deferredAvailable =
+            SUCCEEDED(warpDevice->CreateDeferredContext(0u, &deferred)) &&
+            deferred != nullptr;
+        const bool deferredDenied = !deferredAvailable ||
+            !copyEyes(deferred, warpDevice, holdLeft, holdRight,
+                      true, true, true);
+        if (deferred) deferred->Release();
         const bool nativeCopyExecuted =
             copyEyes(warpContext, warpDevice, holdLeft, holdRight,
                      true,
                      selectedNative == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
                      true);
-        if (!require(copyDenied && nativeCopyExecuted,
-                     "XR eye copy must honor route, complete frame and exact live device"))
+        ID3D11RenderTargetView* observedTargets[2]{};
+        ID3D11DepthStencilView* observedDepth = nullptr;
+        warpContext->OMGetRenderTargets(2u, observedTargets, &observedDepth);
+        const bool mrtRestored =
+            observedTargets[0] == nativeLeftRtv &&
+            observedTargets[1] == nativeRightRtv &&
+            observedDepth == nullptr;
+        for (auto*& view : observedTargets)
+            if (view) { view->Release(); view = nullptr; }
+        if (observedDepth) observedDepth->Release();
+        // A source switch rejecting a stale native pair must likewise leave
+        // the active output render targets unchanged for the SBS shader path.
+        const bool fallbackDenied =
+            !copyEyes(warpContext, warpDevice, holdLeft, holdRight,
+                      true, false, true);
+        warpContext->OMGetRenderTargets(2u, observedTargets, &observedDepth);
+        const bool fallbackMrtPreserved =
+            observedTargets[0] == nativeLeftRtv &&
+            observedTargets[1] == nativeRightRtv &&
+            observedDepth == nullptr;
+        for (auto*& view : observedTargets)
+            if (view) { view->Release(); view = nullptr; }
+        if (observedDepth) observedDepth->Release();
+        warpContext->OMSetRenderTargets(0u, nullptr, nullptr);
+        if (!require(copyDenied && deferredDenied && nativeCopyExecuted &&
+                     mrtRestored && fallbackDenied && fallbackMrtPreserved,
+                     "XR native stereo GPU copy must preserve full OM/MRT state and reject deferred or SBS sources"))
             return 1;
         auto readDesc = xrArray;
         readDesc.Usage = D3D11_USAGE_STAGING;
