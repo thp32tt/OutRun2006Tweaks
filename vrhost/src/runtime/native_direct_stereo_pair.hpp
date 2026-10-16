@@ -163,6 +163,77 @@ namespace OutRunVrNativeEyePair
         return true;
     }
 
+
+    // The x64 compositor's real DirectGPU route copies independently rendered
+    // game eyes into persistent host holds. Before queuing either CopyResource,
+    // prove the immediate context, both game sources and BOTH reused holds
+    // belong to one live device and are four distinct GPU allocations.
+    // A rejected pair queues NO commands, so a classic SBS fallback can run.
+    template <typename Canonical, typename Context, typename Device,
+              typename Texture, typename InterfaceId>
+    [[nodiscard]] inline bool CopyDirectEyesToHold(
+        Context* context, Device* device, Texture* holdLeft, Texture* holdRight,
+        Texture* sourceLeft, Texture* sourceRight,
+        const InterfaceId& unknownIid) noexcept
+    {
+        if (!context || !device || !holdLeft || !holdRight ||
+            !sourceLeft || !sourceRight ||
+            context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
+            return false;
+        Device* contextOwner = nullptr;
+        context->GetDevice(&contextOwner);
+        const bool current = contextOwner && contextOwner == device;
+        if (contextOwner) contextOwner->Release();
+        if (!current ||
+            !TextureOwnedByDevice(holdLeft, device) ||
+            !TextureOwnedByDevice(holdRight, device) ||
+            !TextureOwnedByDevice(sourceLeft, device) ||
+            !TextureOwnedByDevice(sourceRight, device))
+            return false;
+        // Canonical COM identity catches aliasing even when different
+        // texture interface pointers or legacy shared handles are supplied.
+        Texture* textures[4]{holdLeft, holdRight, sourceLeft, sourceRight};
+        for (unsigned a = 0; a < 4; ++a)
+            for (unsigned c = a + 1; c < 4; ++c)
+                if (!DistinctSourceAllocations<Canonical>(
+                        textures[a], textures[c], unknownIid))
+                    return false;
+
+        D3D11_TEXTURE2D_DESC holdL{}, holdR{}, gameL{}, gameR{};
+        holdLeft->GetDesc(&holdL);
+        holdRight->GetDesc(&holdR);
+        sourceLeft->GetDesc(&gameL);
+        sourceRight->GetDesc(&gameR);
+        const auto gameEye = [](const D3D11_TEXTURE2D_DESC& desc) noexcept {
+            return desc.Width && desc.Height &&
+                desc.MipLevels == 1u && desc.ArraySize == 1u &&
+                desc.SampleDesc.Count == 1u &&
+                desc.SampleDesc.Quality == 0u &&
+                desc.Usage == D3D11_USAGE_DEFAULT &&
+                desc.CPUAccessFlags == 0u &&
+                (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u &&
+                IsSupportedSourceFormat(desc.Format);
+        };
+        const auto holdMatches = [&](const D3D11_TEXTURE2D_DESC& h) noexcept {
+            return h.Width == gameL.Width && h.Height == gameL.Height &&
+                h.Format == gameL.Format && h.MipLevels == 1u &&
+                h.ArraySize == 1u && h.SampleDesc.Count == 1u &&
+                h.SampleDesc.Quality == 0u &&
+                h.Usage == D3D11_USAGE_DEFAULT &&
+                h.CPUAccessFlags == 0u && h.MiscFlags == 0u &&
+                (h.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u;
+        };
+        if (!gameEye(gameL) || !gameEye(gameR) ||
+            gameL.Width != gameR.Width || gameL.Height != gameR.Height ||
+            gameL.Format != gameR.Format ||
+            !holdMatches(holdL) || !holdMatches(holdR))
+            return false;
+
+        context->CopyResource(holdLeft, sourceLeft);
+        context->CopyResource(holdRight, sourceRight);
+        return true;
+    }
+
     // Exact two-eye source admission shared by the real x64 DirectGPU importer
     // and the R23 OpenXR projection staging path. Never treat duplicated
     // handles or incompatible CopyResource shapes as a stereo game frame.

@@ -201,11 +201,15 @@ int main()
     // production R23 source route. Verify eye 0 and eye 1 retain independent
     // red/green pixels in the XR array instead of sharing a mono slice.
     ID3D11Texture2D* warpXr = nullptr;
+    ID3D11Texture2D* holdLeft = nullptr;
+    ID3D11Texture2D* holdRight = nullptr;
     ID3D11Texture2D* warpReadback = nullptr;
     ID3D11RenderTargetView* nativeLeftRtv = nullptr;
     ID3D11RenderTargetView* nativeRightRtv = nullptr;
     const bool resourcesReady =
         SUCCEEDED(warpDevice->CreateTexture2D(&xrArray, nullptr, &warpXr)) &&
+        SUCCEEDED(warpDevice->CreateTexture2D(&left, nullptr, &holdLeft)) &&
+        SUCCEEDED(warpDevice->CreateTexture2D(&right, nullptr, &holdRight)) &&
         SUCCEEDED(warpDevice->CreateRenderTargetView(gpuLeft, nullptr, &nativeLeftRtv)) &&
         SUCCEEDED(warpDevice->CreateRenderTargetView(gpuRight, nullptr, &nativeRightRtv));
     bool pixelsDistinct = false;
@@ -223,6 +227,34 @@ int main()
                 context, device, l, r, warpXr, optIn, directRoute,
                 complete, IID_IUnknown);
         };
+        // Exercise the actual R23/legacy host GPU hold-copy function before
+        // the XR projection. A foreign-device eye/context, aliased eye or
+        // destination that is not a separate allocation must reject BEFORE
+        // either GPU CopyResource; otherwise stale racing/menu eyes leak in.
+        const auto stageEyes = [&](ID3D11DeviceContext* context,
+                ID3D11Device* device, ID3D11Texture2D* leftTarget,
+                ID3D11Texture2D* rightTarget, ID3D11Texture2D* gameLeft,
+                ID3D11Texture2D* gameRight) {
+            return OutRunVrNativeEyePair::CopyDirectEyesToHold<IUnknown>(
+                context, device, leftTarget, rightTarget, gameLeft,
+                gameRight, IID_IUnknown);
+        };
+        const bool holdRejected =
+            !stageEyes(replacementContext, warpDevice, holdLeft, holdRight,
+                       gpuLeft, gpuRight) &&
+            !stageEyes(warpContext, warpDevice, holdLeft, holdRight,
+                       replacementEye, gpuRight) &&
+            !stageEyes(warpContext, warpDevice, holdLeft, holdRight,
+                       gpuLeft, gpuLeft) &&
+            !stageEyes(warpContext, warpDevice, gpuLeft, holdRight,
+                       gpuLeft, gpuRight) &&
+            !stageEyes(warpContext, warpDevice, holdLeft, holdLeft,
+                       gpuLeft, gpuRight);
+        const bool holdCopied = stageEyes(warpContext, warpDevice,
+            holdLeft, holdRight, gpuLeft, gpuRight);
+        if (!require(holdRejected && holdCopied,
+                     "live GPU hold copy must preserve distinct stereo and device provenance"))
+            return 1;
         // A ClassicSbs game fallback must NEVER be overwritten by a previous
         // native DirectGPU hold pair. Equally sized old-device eyes/context
         // must not be copied into the new XR swapchain during recreation.
@@ -240,7 +272,7 @@ int main()
             !copyEyes(warpContext, warpDevice, gpuLeft, gpuLeft,
                       true, true, true);
         const bool nativeCopyExecuted =
-            copyEyes(warpContext, warpDevice, gpuLeft, gpuRight,
+            copyEyes(warpContext, warpDevice, holdLeft, holdRight,
                      true, true, true);
         if (!require(copyDenied && nativeCopyExecuted,
                      "XR eye copy must honor route, complete frame and exact live device"))
@@ -278,6 +310,8 @@ int main()
     if (nativeLeftRtv) nativeLeftRtv->Release();
     if (nativeRightRtv) nativeRightRtv->Release();
     if (warpReadback) warpReadback->Release();
+    if (holdLeft) holdLeft->Release();
+    if (holdRight) holdRight->Release();
     if (warpXr) warpXr->Release();
     if (!require(resourcesReady && pixelsDistinct,
                  "native OpenXR left/right array GPU copies lost independent eye pixels"))

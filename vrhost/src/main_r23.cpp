@@ -438,8 +438,14 @@ namespace
         // Immediate-context ordering guarantees that both copies execute before
         // the following projection draw samples this host-owned pair. The R32
         // EVENT fence then covers the copy + projection work before producer ACK.
-        c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
-        c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        if (!OutRunVrNativeEyePair::CopyDirectEyesToHold<IUnknown>(
+                c.context_, c.device_, R23DirectHold.eye[0],
+                R23DirectHold.eye[1], c.directLeft_[slot],
+                c.directRight_[slot], IID_IUnknown))
+        {
+            R23InvalidateDirectHold();
+            return false;
+        }
         R23DirectHold.frameId = frame.frameId;
         R23DirectHold.generation = generation;
         R23DirectHold.valid = true;
