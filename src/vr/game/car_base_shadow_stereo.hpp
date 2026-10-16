@@ -1,5 +1,6 @@
 #pragma once
 #include "render_semantics.hpp"
+#include <cmath>
 
 // Exact player contact-shadow producer and independent original world WVP
 // proof are both required before overriding the conservative alpha route.
@@ -8,6 +9,20 @@
 // same perspective projection. Fence the real game upload to its original
 // nonqueued producer, latched pose, shader epoch and immediate GPU draw.
 namespace OutRunVR::CarShadowStereo {
+// Original game alpha is not necessarily clamped to [0,1]. Preserve the
+// game's value/sign, but never pass a NaN/Inf to D3D9 shader state. Stage
+// the result before entering the shadow matrix and GPU render-state scope.
+inline bool ValidScaledAlpha(float raw, float opacity, float& out) noexcept
+{
+    if (!std::isfinite(raw) || !std::isfinite(opacity) || opacity <= 0.f)
+        return false;
+    const float candidate = raw * opacity;
+    if (!std::isfinite(candidate))
+        return false;
+    out = candidate;
+    return true;
+}
+
 struct DirectGameWvpOwner
 {
     std::uint64_t currentPoseEpoch, uploadedPoseEpoch;

@@ -1,5 +1,6 @@
 #include "vr/game/car_base_shadow_stereo.hpp"
 #include <iostream>
+#include <limits>
 using namespace OutRunVR;
 int main()
 {
@@ -66,6 +67,20 @@ int main()
     // This must still accept the subsequent independent player shadow.
     mutation = source; mutation.historicalQueueEpoch = 57;
     if (!CarShadowStereo::OwnsDirectGameWvp(mutation)) return 14;
+    // Huge but finite game alpha multiplied by a finite preset may exceed
+    // FLT_MAX; preserving it would corrupt the whole translucent eye pass.
+    float scaled = 777.f;
+    if (CarShadowStereo::ValidScaledAlpha(1.f,0.f,scaled) ||
+        CarShadowStereo::ValidScaledAlpha(1.f,-1.f,scaled) ||
+        CarShadowStereo::ValidScaledAlpha(
+            std::numeric_limits<float>::quiet_NaN(),1.f,scaled) ||
+        CarShadowStereo::ValidScaledAlpha(
+            std::numeric_limits<float>::max(),2.f,scaled) ||
+        scaled != 777.f)
+        return 15;
+    if (!CarShadowStereo::ValidScaledAlpha(.3f,.5f,scaled) ||
+        scaled < .149f || scaled > .151f)
+        return 16;
     std::cout << "R84 contact shadow eye-owner PASS\n";
     return 0;
 }

@@ -7,6 +7,7 @@
 #include "vr/game/driver_seat_render_pass.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
+#include "vr/game/car_base_shadow_stereo.hpp"
 #include "vr/runtime_eligibility.hpp"
 #include <algorithm>
 #include <iostream>
@@ -309,6 +310,10 @@ class RestoreCarBaseShadow : public Hook
 		if (Settings::CarBaseShadowOpacity <= 0.f ||
 			!std::isfinite(a4))
 			return;
+        float shadowAlpha = 0.f;
+        if (!OutRunVR::CarShadowStereo::ValidScaledAlpha(
+                a4, Settings::CarBaseShadowOpacity.get(), shadowAlpha))
+            return;
 
 		// The selector also invokes this PC nullsub replacement, but
 		// pl_car() there is not the selected model (or may be null).
@@ -342,7 +347,7 @@ class RestoreCarBaseShadow : public Hook
 			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
 				OutRunVR::GameSemantic::RenderScope::WorldParticle);
 			Game::DrawObjectAlpha_Internal(
-				a1, a4 * Settings::CarBaseShadowOpacity, 0, -1);
+				a1, shadowAlpha, 0, -1);
 		}
 		Game::mxPopMatrix();
 	}

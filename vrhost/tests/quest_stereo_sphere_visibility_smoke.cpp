@@ -40,5 +40,29 @@ int main()
         return 9;
     if (!Build(-.7f, .6f, -.6f, .7f, .05f, 200.f, f[0]))
         return 10;
+    // True native stereo head translation (2 eye origins) rather than
+    // the old single 4:3 game camera or screen X/Y projection.
+    std::array<EyeBasis,2> eyes{};
+    eyes[0].origin={-.032f,0.f,0.f};
+    eyes[1].origin={.032f,0.f,0.f};
+    if (!EitherEyeWorldVisible(f,eyes,{0.f,0.f,5.f},.3f))
+        return 11;
+    if (EitherEyeWorldVisible(f,eyes,{100.f,0.f,5.f},.3f))
+        return 12;
+    EyeSpaceSphere projected{};
+    if (!ToEyeSpace(eyes[1],{.032f,0.f,5.f},projected) ||
+        std::fabs(projected.right)>1e-4f ||
+        std::fabs(projected.depth-5.f)>1e-4f)
+        return 13;
+    // A broken view matrix (including flipped eye handedness) must
+    // *retain* stage geometry until another coherent XR pose arrives.
+    eyes[1].right={-1.f,0.f,0.f};
+    if (ToEyeSpace(eyes[1],{0.f,0.f,5.f},projected))
+        return 14;
+    if (!EitherEyeWorldVisible(f,eyes,{100.f,0.f,5.f},.3f))
+        return 15;
+    eyes[1]=EyeBasis{};
+    if (!EitherEyeWorldVisible(f,eyes,{0.f,0.f,5.f},.3f))
+        return 16;
     return 0;
 }
