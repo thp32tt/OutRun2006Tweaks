@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:CRITICAL:WORLD_EFFECT_EYE_ORIGIN_OVERFLOW",
   "feature_class": "CRITICAL_BLOCKER",
   "symptom_id": "DX9EX:SYMPTOM:WORLD_EFFECT_EYE_ORIGIN_OVERFLOW",
-  "status": "C5_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_WAIT_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "692f6ee55b1d3d54d6803e4136a2fb380e16c662",
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "world_effect_bilateral_origin": "PENDING_EXACT_SHA",
-    "world_effect_affine_fallback": "PENDING_EXACT_SHA",
-    "world_effect_exact_sha_gate": "PENDING_EXACT_SHA"
+    "world_effect_bilateral_origin": "PASS_EXACT_SHA",
+    "world_effect_affine_fallback": "PASS_EXACT_SHA",
+    "world_effect_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Source at the inherited R84 world geometry state used float center[3] = .5f*(eyeOffset[0]+eyeOffset[1]) and rebuilt independent relative arrays for full-world and affine paths.",
@@ -84,19 +84,44 @@
       "Do not remove dense-scene objects, disable alpha effects, globally flatten world particles or change HMD projection/world scale to conceal failure; leave C993/CABE and existing world owners unchanged."
     ],
     "fix_evidence": "R84 actual C++ source replaced overflowing midpoint, both per-eye uses and fallback duplication with the preexisting stable BuildHeadRelativeEyeOffsets numerical owner.",
-    "negative_test_evidence": "Extended native C++ zero-centered, wide-origin and invalid-eye preservation regression plus structural world-affine source assertion; mandatory CI pending.",
+    "negative_test_evidence": "Native C++ wide nonzero XR-origin/atomic invalid-eye tests succeeded in exact-SHA DX9Ex Active x64 host build; world-affine source invariant and positive/negative fallback regressions passed mandatory exact-SHA policy/host/game and affected inspections.",
     "runtime_limit": "Quest3/VDXR was not connected and no measured FPS or binocular optical gameplay result is claimed."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "required_gates": [
-      "DX9Ex Active Validation",
-      "Domain Isolation Guard",
-      "DX9Ex Full Source Impact Review",
-      "OutRun EXE HUD Inspector CI"
-    ],
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "aece2882bda3b950b7fde72ee89c96976d011cf0",
+    "original_material_sha": "f5d25c1b1ab0c4f3aa0e56b6cca2fb9c8ff40c0e",
+    "required_gates": {
+      "DX9Ex Active Validation": {
+        "run_id": 38962111242,
+        "head_sha": "aece2882bda3b950b7fde72ee89c96976d011cf0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38962111242"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 38962111273,
+        "head_sha": "aece2882bda3b950b7fde72ee89c96976d011cf0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38962111273"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 38962111201,
+        "head_sha": "aece2882bda3b950b7fde72ee89c96976d011cf0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38962111201"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38962111268,
+        "head_sha": "aece2882bda3b950b7fde72ee89c96976d011cf0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38962111268"
+      }
+    },
+    "host_and_game_package": "BUILD_VERIFIED",
     "runtime_hmd": "UNTESTED"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run exact GitHub Actions once against final validation-bearing SHA; repair only actual failed gate under same TASK_ID; C6 bookkeeping after all mandatory gates pass; HMD remains UNTESTED."
+  "next_action": "Exact-SHA mandatory GitHub Actions 4/4 SUCCESS; source and smoke BUILD_VERIFIED. Quest3/VDXR runtime acceptance NEED_HMD_TEST; do not rerun existing completed CI or rescore C6.",
+  "validation_bearing_result_sha": "aece2882bda3b950b7fde72ee89c96976d011cf0",
+  "notes": "C6-only bookkeeping on a separate [skip ci] commit: the validation-bearing SHA remains aece2882bda3b950b7fde72ee89c96976d011cf0 and material_result_sha remains f5d25c1b1ab0c4f3aa0e56b6cca2fb9c8ff40c0e. No HMD/game runtime performed."
 }
