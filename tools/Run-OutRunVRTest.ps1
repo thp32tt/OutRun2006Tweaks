@@ -111,7 +111,7 @@ $backendMismatch=(-not $state) -or (-not $state.Backend) -or ([string]$state.Bac
 
 if($stale -or $matrixMismatch -or $profileMismatch -or $backendMismatch){
     & $selector -Backend $backend -TestProfile $TestProfile -VariantId $variant
-    if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'Failed to prepare current test session.'}
+    if (-not $?) { throw 'Failed to prepare current test session.' }
     $state=Get-Content $current -Raw|ConvertFrom-Json
 }
 
@@ -628,7 +628,7 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
 }
 
 & $collector
-if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+if (-not $?) { throw 'VR log collector failed after game exit.' }
 if($xrHostFailure){
     Write-Warning 'OpenXR host failure: see OUTRUNVR_LAUNCH_ERROR.txt and DX9EX_LAUNCH_HEALTH.txt in session logs.'
     try {
