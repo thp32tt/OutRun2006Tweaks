@@ -159,25 +159,17 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
     const auto& pos = camera->cam_pos_F8;
     const auto& look = camera->look_pos_104;
-    const auto player = Game::pl_car();
-    if (Settings::VRDriverSeatCarSpaceBasis)
-    {
-        if (!player)
-            return false;
-        const auto& m = player->matrix_B0;
-        if (!OutRunVR::DriverSeatCamera::ComputeCarSpaceTranslatedCamera(
-                {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
-                {{m._31, m._32, m._33}, {m._21, m._22, m._23}},
-                Settings::VRDriverSeatForward.get(),
-                Settings::VRDriverSeatRight.get(),
-                Settings::VRDriverSeatUp.get(), newPos, newLook))
-            return false;
-    }
-    else if (!OutRunVR::DriverSeatCamera::ComputeTranslatedCamera(
-        {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
-        Settings::VRDriverSeatForward.get(),
-        Settings::VRDriverSeatRight.get(),
-        Settings::VRDriverSeatUp.get(), newPos, newLook))
+    const auto* player = Game::pl_car();
+    if (!player)
+        return false;
+    const auto& m = player->matrix_B0;
+    if (!OutRunVR::DriverSeatCamera::ComputeStableSeatPose(
+            {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
+            Settings::VRDriverSeatCarSpaceBasis,
+            {{m._31, m._32, m._33}, {m._21, m._22, m._23}},
+            Settings::VRDriverSeatForward.get(),
+            Settings::VRDriverSeatRight.get(),
+            Settings::VRDriverSeatUp.get(), newPos, newLook))
         return false;
     translatedPosition = {newPos.x, newPos.y, newPos.z};
     translatedLook = {newLook.x, newLook.y, newLook.z};
@@ -218,14 +210,11 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
             Settings::VRDriverSeatRight.get(), Settings::VRDriverSeatUp.get()))
         return false;
 
-    // When car-space correction is requested, eligibility of camera, car,
-    // driver and cockpit near-plane must agree even on degenerate matrices.
-    if (Settings::VRDriverSeatCarSpaceBasis)
-    {
-        D3DVECTOR correctedPosition{}, correctedLook{};
-        return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
-    }
-    return true;
+    // All cockpit render owners must use the same computed world-view pose.
+    // A bad optional body matrix must not drop the entire driver-seat pass:
+    // ComputeStableSeatPose falls back atomically to native camera space.
+    D3DVECTOR correctedPosition{}, correctedLook{};
+    return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
 }
 
 class VRDriverSeatRenderTest : public Hook

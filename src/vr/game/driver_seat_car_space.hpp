@@ -93,4 +93,36 @@ namespace OutRunVR::DriverSeatCamera
         outLook = newLook;
         return true;
     }
+
+    // Real vehicles can briefly expose a stale/sideways body basis during
+    // camera transitions, respawn, collision and render interpolation.
+    // Failing the whole cockpit test drops the car/passenger/near-plane
+    // together for that frame, visibly flashing back into bumper view.
+    // Keep the same owner by falling back to the *existing* validated
+    // native-camera offset; never continue with partial car-space output.
+    // Quest's cockpit body correction is scoped separately from the
+    // original game's camera, so this is safer than using a stale matrix.
+    inline bool ComputeStableSeatPose(
+        Vec3 position, Vec3 look, bool preferCarSpace, CarAxes axes,
+        float forwardOffset, float rightOffset, float upOffset,
+        Vec3& outPosition, Vec3& outLook,
+        bool* usedCarSpace = nullptr) noexcept
+    {
+        Vec3 candidatePosition{}, candidateLook{};
+        const bool bodyAccepted = preferCarSpace &&
+            ComputeCarSpaceTranslatedCamera(position, look, axes,
+                forwardOffset, rightOffset, upOffset,
+                candidatePosition, candidateLook);
+        if (!bodyAccepted &&
+            !ComputeTranslatedCamera(position, look, forwardOffset,
+                rightOffset, upOffset, candidatePosition, candidateLook))
+            return false;
+
+        // Atomic pair: failure leaves both destination vectors untouched.
+        outPosition = candidatePosition;
+        outLook = candidateLook;
+        if (usedCarSpace)
+            *usedCarSpace = bodyAccepted;
+        return true;
+    }
 }

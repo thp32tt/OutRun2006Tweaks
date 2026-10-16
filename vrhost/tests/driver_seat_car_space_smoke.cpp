@@ -57,5 +57,48 @@ int main() {
           forwardZ, -1.35f, -0.32f, 0.65f, p, l) ||
         !near(p.x, 0.32f))
         return 6;
+    // Real game can expose an invalid/sideways/stale vehicle matrix for a
+    // single frame. Keep the cockpit camera+player body+passenger coherent.
+    // This MUST use native-camera coordinates, never stale car-space output.
+    bool usedBody = true;
+    const CarAxes invalidBody{{0.f, 0.f, 0.f}, {0.f, 1.f, 0.f}};
+    if (!ComputeStableSeatPose(originalPos, originalLook, true, invalidBody,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        usedBody || !near(p.x, 0.32f) || !near(p.y, 0.65f) ||
+        !near(p.z, -1.35f) || !near(l.z, 8.65f))
+        return 20;
+    // Sideways body orientation likewise keeps the *native* seat view.
+    if (!ComputeStableSeatPose(originalPos, originalLook, true, yaw90,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        usedBody || !near(p.x, 0.32f) || !near(p.z, -1.35f))
+        return 21;
+    // A valid and car-aligned body transform must take priority over the
+    // current smoothed native view (car pitches while camera is level).
+    const CarAxes pitched{{0.f, 0.6f, 0.8f}, {0.f, 0.8f, -0.6f}};
+    if (!ComputeStableSeatPose(originalPos, originalLook, true, pitched,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        !usedBody || near(p.y, 0.65f) || near(p.z, -1.35f))
+        return 22;
+    // A disabled experiment must preserve the normal camera offset even if
+    // valid body information is available.
+    if (!ComputeStableSeatPose(originalPos, originalLook, false, pitched,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        usedBody || !near(p.y, 0.65f) || !near(p.z, -1.35f))
+        return 23;
+    const Vec3 sentinelP{7.f, 8.f, 9.f}, sentinelL{10.f, 11.f, 12.f};
+    p=sentinelP; l=sentinelL; usedBody=true;
+    // Neither candidate accepts a degenerate native camera / NaN offset.
+    if (ComputeStableSeatPose(originalPos, originalPos, true, invalidBody,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        ComputeStableSeatPose(originalPos, originalLook, true, forwardZ,
+            nan, -0.32f, 0.65f, p, l, &usedBody) ||
+        !near(p.x, sentinelP.x) || !near(p.z, sentinelP.z) ||
+        !near(l.x, sentinelL.x) || !near(l.z, sentinelL.z) ||
+        !usedBody)
+        return 24;
+    if (!ComputeStableSeatPose(originalPos, originalLook, true, forwardZ,
+            -1.35f, -0.32f, 0.65f, p, l, &usedBody) ||
+        !usedBody || !near(p.z, -1.35f))
+        return 25;
     return 0;
 }
