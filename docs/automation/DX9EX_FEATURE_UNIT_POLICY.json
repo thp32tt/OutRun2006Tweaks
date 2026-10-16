@@ -29,6 +29,24 @@
   "previous_umbrella_feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
   "feature_catalog": [
     {
+        "id": "WHITE_HUD_DIPLOPIA",
+        "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+        "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+        "title": "원본 HUD 양안 중복·헤드락",
+        "priority": 126,
+        "goal": "Repair queued source-owned native shader ScreenHud WVP for both stereoscopic eyes independently of HUD layout scaling and unrelated world optics.",
+        "trace_stages": [
+            "Original OutRun SpriteNode ScreenHud source and source producer token",
+            "Native D3D9 queued split/partial c64..c67 submission, R84 shader owner and valid draw/pose epoch",
+            "Left/right OpenXR eye HUD reprojection and host composition"
+        ],
+        "acceptance_scenarios": [
+            "Native split and partial rows retain only successful same-source, same-draw original HUD WVP for per-eye projection",
+            "Foreign node, producer, shader, frame, world, lens, SkyGlow, input, FFB and R26_SAFE cannot inject stale HUD matrices",
+            "Exact SHA required Windows x86 R84 game, x64 host, package, Domain and affected regressions pass; runtime Quest3 separately verified"
+        ]
+    },
+    {
       "id": "HUD_GAMEPLAY",
       "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
       "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",

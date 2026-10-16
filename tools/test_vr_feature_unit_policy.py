@@ -16,6 +16,14 @@ for label, change in (
     change(bad)
     assert validate_source_first_override(bad), "DX9Ex source-first guard failed: " + label
 features = {x["id"]: x for x in p["feature_catalog"]}
+# Run 38979836162: preserve WHITE_HUD_DIPLOPIA as a separate catalogued
+# source/eye-ownership defect; gameplay HUD layout is not an alias.
+white_hud = features["WHITE_HUD_DIPLOPIA"]
+assert white_hud["feature_id"] == "DX9EX:VIS:WHITE_HUD_DIPLOPIA"
+assert white_hud["symptom_id"] == "VR-R51-WHITE-HUD-DIPLOPIA-001"
+assert white_hud["feature_id"] != features["HUD_GAMEPLAY"]["feature_id"]
+assert white_hud["symptom_id"] != features["HUD_GAMEPLAY"]["symptom_id"]
+
 assert {"HUD_GAMEPLAY", "F11_MENU", "ESC_MENU", "MAIN_MENU",
         "LENS_FLARE_CENTRE", "EXTENDED_TIME", "GOAL_PROGRESS"}.issubset(features)
 

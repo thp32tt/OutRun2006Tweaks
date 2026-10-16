@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00980",
   "production_id": "CONVERSION-DX9EX-00980",
-  "event_id": "CONVERSION-DX9EX-00980-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00980-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
   "run_key": "CONVERSION-DX9EX-00980",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ebdfa5659b421be60217f9cfbd6d948fde5a092e",
-  "material_result_sha": null,
+  "material_result_sha": "395ee073c448d7b20968b01bfe6199ae6802b18e",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/outrun_renderer.cpp",
@@ -81,5 +81,12 @@
     "runtime_limit": "Source/portable/CMake/CI checks do not prove physical Quest3 or VDXR binocular HUD acceptance."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run exact SHA required GitHub Actions; if pending or failed retain original task and material SHA; user Quest3/VDXR runtime remains UNTESTED."
+  "next_action": "Run required exact-SHA DX9Ex Active and affected regression gates; retain NEED_HMD_TEST for physical Quest3/VDXR",
+  "last_ci_failure": {
+    "run_id": 38979836162,
+    "head_sha": "395ee073c448d7b20968b01bfe6199ae6802b18e",
+    "job": "policy",
+    "cause": "R51 stable white HUD visual feature omitted from feature catalog; verifier correctly rejected missing feature",
+    "repair": "register the exact individual symptom, preserve catalog rejection of unregistered visual features"
+  }
 }
