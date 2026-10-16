@@ -26,7 +26,8 @@
     "vrhost/src/main_r23.cpp",
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "vrhost/tests/menu_content_aspect_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00926.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00926.json",
+    "tools/verify_vr_menu_letterbox_aspect.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
@@ -97,18 +98,30 @@
       "result": "policy failure before game/host build",
       "cause": "Record missing for exact-HEAD CONVERSION-DX9EX-00926",
       "actual_compiler_test": "NOT_RUN"
+    },
+    "second_recorded_gate": {
+      "sha": "794328813d47828037dba7458e14f83045dd89cb",
+      "run_id": 38829989160,
+      "job_id": 116746307288,
+      "result": "policy failure before game/host build",
+      "cause": "Old verify_vr_menu_letterbox_aspect.py requires pre-binding original R23GameMenuIsLetterboxed(c.hwnd_), false); call literal. New implementation binds equivalent config to gameConfiguredLetterbox once and consumes it for both crop and projection.",
+      "actual_compiler_test": "NOT_RUN"
     }
   },
   "material_result_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
   "validation_bearing_result_sha": null,
   "score_delta_this_attempt": 0,
-  "next_action": "Same TASK_ID CI input repair: add required full-function feature contract to validation-bearing exact SHA, then inspect mandatory Active/Domain/Full Source and applicable HUD status; Quest3 physical optics remains untested.",
+  "next_action": "Re-run mandatory exact-SHA Gate on same material feature after test-only causal repair: source-owned menu configuration binding, native/no-crop fallback, and three destructive mutations required. No material re-score; physical HMD remains UNTESTED.",
   "ci_evidence": {
     "candidate_material_sha": "abb3c45560cf00b57be7fe1b66f1e3998295635f",
     "active_material_attempt": {
       "run_id": 38829694004,
       "conclusion": "failure_missing_feature_record_before_compilation"
     },
-    "exact_sha_requirement": "Must pass all mandatory workflows on final record-bearing result SHA, do not borrow predecessor Green, no HMD inference."
+    "exact_sha_requirement": "Must pass all mandatory workflows on final record-bearing result SHA, do not borrow predecessor Green, no HMD inference.",
+    "second_recorded_attempt": {
+      "run_id": 38829989160,
+      "conclusion": "failed_obsolete_menu_call_scanner"
+    }
   }
 }

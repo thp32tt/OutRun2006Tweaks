@@ -814,7 +814,7 @@ def verify_visible_menu_fragment(code: str) -> None:
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
         "GetGameClientOutputRect(fullClient);",
         "sourceAspect = authoredAspect;",
-        "R23GameMenuIsLetterboxed(c.hwnd_), false);",
+        "gameConfiguredLetterbox, false);",
         "constexpr float opticalCoverage = 0.78f;",
         "common, sourceAspect, opticalCoverage);",
         "visibleOffsetX = plan.visibleOffsetX;",
@@ -830,6 +830,14 @@ def verify_visible_menu_fragment(code: str) -> None:
     ]
     for token in required:
         assert token in body, token
+    # The source call is now bound once to a cached configured-letterbox
+    # boolean consumed by both physical-aspect and crop decisions. Verify
+    # that the original game config, not a constant, still owns the branch.
+    assert ("const bool gameConfiguredLetterbox =\n"
+            "            R23GameMenuIsLetterboxed(c.hwnd_);") in code
+    assert "gameConfiguredLetterbox, false);" in body
+    assert "sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(" in body
+    assert "sourceAspect, clientAspect, gameConfiguredLetterbox," in body
     # Recover the complete authored menu plane for BOTH 4:3 and native
     # unletterboxed 16:9/21:9. A source crop behind if(cropCentered43)
     # silently reintroduces the native-menu edge zoom.
@@ -890,8 +898,12 @@ for old, bad in (
     ("sourceAspect = authoredAspect;", "sourceAspect = plan.aspect;"),
     ("GetGameClientOutputRect(fullClient);",
      "GetClientRect(c.hwnd_, &fullClient);"),
-    ("R23GameMenuIsLetterboxed(c.hwnd_), false);",
-     "R23GameMenuIsLetterboxed(c.hwnd_), true);"),
+    ("gameConfiguredLetterbox, false);",
+     "gameConfiguredLetterbox, true);"),
+    ("R23GameMenuIsLetterboxed(c.hwnd_);",
+     "false;"),
+    ("sourceAspect, clientAspect, gameConfiguredLetterbox,",
+     "sourceAspect, clientAspect, false,"),
     ("constexpr float opticalCoverage = 0.78f;",
      "constexpr float opticalCoverage = 1.0f;"),
     ("common, sourceAspect, opticalCoverage);",
