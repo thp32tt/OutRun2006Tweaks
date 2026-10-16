@@ -10,16 +10,16 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:R23_XR_HOST_DEVICE_RECREATE_EYE_LIFETIME",
   "feature_id": "DX11-R23-XR-DEVICE-RECREATE-EYE-LIFETIME",
-  "status": "SOURCE_IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b",
+  "validation_bearing_result_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b",
   "changed_files": [
     "vrhost/src/runtime/native_direct_stereo_pair.hpp",
     "vrhost/src/main.cpp",
@@ -52,9 +52,9 @@
     ]
   },
   "acceptance_results": {
-    "reopen-native-game-eye-pair": "PENDING_CI",
-    "recreate-xr-hold-and-safe-sbs": "PENDING_CI",
-    "real-warp-owner-and-exact-ci": "PENDING_CI"
+    "reopen-native-game-eye-pair": "PASS_BUILD",
+    "recreate-xr-hold-and-safe-sbs": "PASS_BUILD",
+    "real-warp-owner-and-exact-ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -91,12 +91,51 @@
     "C0_RECOVER": "Verified live DX11 HEAD caf4ae58 and prior 00813 C6 exact-SHA source completion.",
     "C1_REVIEW": "Detected surviving R23 global hold and per-slot DirectGPU caches using same dimensions/handles without checking their owning D3D11 device after compositor recreation.",
     "C2_IMPLEMENT": "Native x64 source and OpenXR hold lifetime integrated across current-device checks; two WARP devices exercise old/new ownership failure.",
-    "C3_VALIDATE": "PENDING exact-SHA mandatory GitHub Actions; HMD/gamepad not run.",
-    "C4_COMMIT": "Source implementation and regression included with this commit; material SHA captured from GitHub parent/marker.",
+    "C3_VALIDATE": "Exact material SHA 4a8282539d4fcddf8d98f4af8783de501ecd8d8b: DX11 Fast, Backend Conversion, Windows Build, OpenXR VR architecture, HUD Inspector all SUCCESS. OpenXR host-x64 WARP two-device ownership/fallback smoke SUCCESS. HMD/Quest3/VDXR/gamepad real runtime UNTESTED.",
+    "C4_COMMIT": "Material C++/WARP source+test commit 4a8282539d4fcddf8d98f4af8783de501ecd8d8b [AUTO:CONVERSION-DX11-00814] owns exact-SHA final five mandatory Gates. This C6 result is a separate bookkeeping [skip ci] commit; does not alter validated source.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING exact-SHA gates"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA. RUNTIME_VALIDATION=UNTESTED; NEED_HMD_TEST. Full DX11 renderer/gameplay not yet asserted as complete."
   },
   "evidence": {
-    "runtime_evidence": "NONE: Quest3/VDXR/game/menu/race not run"
+    "runtime_evidence": "NONE: Quest3/VDXR/game/menu/race not run",
+    "exact_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b",
+    "exact_sha_gate_results": {
+      "DX11 Fast Structural Checks": {
+        "run_id": 38864222402,
+        "conclusion": "success",
+        "associated_commit_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b"
+      },
+      "Backend Conversion Gate": {
+        "run_id": 38864222501,
+        "conclusion": "success",
+        "associated_commit_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b"
+      },
+      "Build": {
+        "run_id": 38864226360,
+        "conclusion": "success",
+        "associated_commit_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38864222449,
+        "conclusion": "success",
+        "associated_commit_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38864226385,
+        "conclusion": "success",
+        "associated_commit_sha": "4a8282539d4fcddf8d98f4af8783de501ecd8d8b"
+      }
+    },
+    "openxr_host_x64_job": "SUCCESS in OpenXR architecture workflow 38864222449; native_direct_eye_pair_smoke exercises two WARP devices"
+  },
+  "material_source_commits": [
+    "4a8282539d4fcddf8d98f4af8783de501ecd8d8b"
+  ],
+  "repair_commits": [],
+  "score": {
+    "run_key": "CONVERSION-DX11-00814",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "C6 bookkeeping is zero points; any new feature credit must be applied once using the ai-dev-lab scoreboard SSOT and same RUN_KEY."
   }
 }
