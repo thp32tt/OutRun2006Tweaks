@@ -369,7 +369,8 @@ arrow_scope = code[arrow_begin:pause_begin]
 for marker in ("RenderScope::ScreenHud",
                "CurrentRenderProducerToken()",
                "OutRunVrPauseEye::ExactArrowOwner(",
-               "ProducerToken::ExactScreenHudClipSprite"):
+               "ProducerToken::ExactScreenHudClipSprite",
+               "ProducerToken::PauseOptionArrow"):
     assert marker in arrow_scope, marker
 assert "CurrentSpriteQueueProducer ==" not in arrow_scope
 # An active queued node wins over the exact direct E8 caller; on a
@@ -399,6 +400,8 @@ for original, corrupt in (
     ("RenderScope::ScreenHud", "RenderScope::WorldBillboard"),
     ("ProducerToken::ExactScreenHudClipSprite",
      "ProducerToken::ResultProgress"),
+    ("ProducerToken::PauseOptionArrow",
+     "ProducerToken::ResultProgress"),
 ):
     mutant = arrow_scope.replace(original, corrupt, 1)
     assert original not in mutant
@@ -411,11 +414,23 @@ arrow_hook = producer[producer.index("static int __cdecl PauseOptionArrow_putCli
 for token in ("GameState::STATE_SMPAUSEMENU",
               "ScopedExactProducerSemantic directArrowOwner(",
               "RenderScope::ScreenHud, nullptr, true,",
-              "ProducerToken::ExactScreenHudClipSprite",
-              "return ExactScreenHud_putClipSprite("):
+              "ProducerToken::PauseOptionArrow",
+              "FlushD3DXBeforeDirectGoalSource()",
+              "FlushD3DXAtDirectGoalSourceExit()",
+              "ExactScreenHud_putClipSpriteOwned("):
     assert token in arrow_hook, token
-assert arrow_hook.index("ScopedExactProducerSemantic directArrowOwner(") < \
-       arrow_hook.rfind("return ExactScreenHud_putClipSprite(")
+assert arrow_hook.index("FlushD3DXBeforeDirectGoalSource()") < \
+       arrow_hook.index("ScopedExactProducerSemantic directArrowOwner(") < \
+       arrow_hook.index("ExactScreenHud_putClipSpriteOwned(") < \
+       arrow_hook.index("FlushD3DXAtDirectGoalSourceExit()")
+assert "ProducerToken::ExactScreenHudClipSprite" not in arrow_hook
+# The normal clip entrypoint must keep its original token and cannot gain
+# the direct pause-specific D3DX flush authority.
+normal_clips = producer[producer.index("static int __cdecl ExactScreenHud_putClipSprite("):
+                        producer.index("// Exact original ESC arrow",
+                                       producer.index("static int __cdecl ExactScreenHud_putClipSprite("))]
+assert "ProducerToken::ExactScreenHudClipSprite" in normal_clips
+assert "FlushD3DXBeforeDirectGoalSource" not in normal_clips
 
 pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
 pause_func = code[code.index("bool R30IsPauseMenuElement() noexcept"):pause_end]

@@ -1873,8 +1873,14 @@ namespace OutRunVRStereo
             return OutRunVrPauseEye::ExactArrowOwner(
                 OutRunVR::GameSemantic::EffectiveScope() ==
                     OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
+                // Exact paused-game E8 arrows now have a dedicated token
+                // that survives D3DX Draw/Flush/End. Retain the previous
+                // generic exact clip admission for other paused option UI
+                // while the game-state and ScreenHud gates remain mandatory.
+                (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                     OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow ||
+                 OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                     OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite));
         }
 
         // The source game draws the ESC shell as generic overlay and its
