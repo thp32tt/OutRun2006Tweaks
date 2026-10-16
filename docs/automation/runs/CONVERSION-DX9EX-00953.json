@@ -88,7 +88,22 @@
     "material_sha": "435df607920c1c4be4694973eab97d7f4e362051",
     "first_exact_ci_failure": "DX9Ex Active policy job 116946380168 failed RUN_RECORD_NOT_FOUND at material SHA; same-task repair includes required feature contract and 60Hz test expectation corrected for preserved >18ms cutoff.",
     "local_native_cpp_regression": "PASS after 60Hz test expectation repair; Windows/host CI on new exact SHA pending",
-    "runtime_hmd": "UNTESTED"
+    "runtime_hmd": "UNTESTED",
+    "first_gate_policy_failure": {
+      "sha": "435df607920c1c4be4694973eab97d7f4e362051",
+      "run_id": 38892453756,
+      "reason": "RUN_RECORD_NOT_FOUND"
+    },
+    "second_gate_policy_failure": {
+      "sha": "2902da19abcc293cee78aa4cfae6bc5330e347be",
+      "run_id": 38893211627,
+      "reason": "stale exact source expression in dense-scene checker; original 18ms safety now in adaptive cadence helper"
+    },
+    "same_task_guard_repair_sha": "1c92890c05d8377452e268c0af3004a9fb9731c8",
+    "local_compiled_cpp_regressions": "GCC PASS; Clang PASS; ASan/UBSan PASS",
+    "legacy_cutoff_test_repair": "60Hz 10% 18.33ms exceeds original 18ms threshold; test fixed without weakening original safety guard",
+    "source_material_sha": "435df607920c1c4be4694973eab97d7f4e362051",
+    "gate_contract": "REQUIRED_ONE_EXACT_SHA: DX9Ex Active, Domain Isolation, Full Source Impact, HUD Inspector"
   },
-  "next_action": "Run mandatory full exact-SHA gate on this repair-and-feature-contract commit; only record C6 after four required successful checks. HMD needs separate Quest3/VDXR user run."
+  "next_action": "Use this exact input SHA to validate all required four GitHub Actions; only C6 PASS_EXACT_SHA after full gates. Quest3/VDXR HMD remains UNTESTED."
 }
