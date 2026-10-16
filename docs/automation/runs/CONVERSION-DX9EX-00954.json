@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00954",
+  "production_id": "CONVERSION-DX9EX-00954",
+  "event_id": "CONVERSION-DX9EX-00954-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00954",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "status": "VALIDATING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "717d74bd50de7c3e807c2f218d4b9b26ea2ad388",
+  "material_result_sha": "b7c517aa86d396a37f18a2c6fb16005fbf058d9d",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/sprite_queue_tail_proof.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/sprite_queue_tail_proof.hpp",
+    "vrhost/tests/goal_b9200_stack_provenance_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00954.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve all original GOAL B9200 multi-glyph sprites and result/progress text through priority-list rebuilds without adopting foreign or detached SpriteNodes, while retaining the correct screen stereo replay ownership.",
+    "scope_boundary": "Only original GOAL B9200/result progress queue-producer provenance and shared safe tagging of exact GOAL/+TIME/rank producers; protected lens flare, vehicle ranks, normal HUD, FFB, SkyGlow, DX11 and frozen DXVK remain unchanged.",
+    "trace_stages": [
+      "Original FUN_004BA9D0 and stack-proven B9200 GOAL text source emit multiple sibling glyph SpriteNodes.",
+      "Exact UI producer captures before priority tails and proves old/new reachability from the live queue root before tagging siblings.",
+      "Registered sprite semantic reaches Sumo/fixed-function replay then R84 per-eye composition and x64 OpenXR host presentation."
+    ],
+    "subcomponents": [
+      "GOAL B9200 source identity enters the exact-producer queue-proof path and rejects detached old tails after original list reconstruction.",
+      "Bounded shared sprite traversal tags all legitimate appended glyph siblings but rejects foreign tails, shortened queues and cyclic lists.",
+      "Native positive/negative multi-glyph C++ test and exact-SHA Windows game, host, package, Domain, HUD Inspector and Full Source Impact gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_b9200_queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GOAL B9200 producer and multi-glyph queue",
+        "expected_behavior": "Every correctly appended GOAL source glyph and progress sprite can retain source identity without dereferencing a detached pre-producer tail."
+      },
+      {
+        "id": "goal_rebuild_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Rebuilt sprite lists and original fallback",
+        "expected_behavior": "Replaced tails, foreign nodes, bound overflow and cycles refuse tagging while original draws and adjacent native HUD/SkyGlow remain available."
+      },
+      {
+        "id": "goal_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA game host package and source safety",
+        "expected_behavior": "Validation-bearing SHA passes mandatory DX9Ex Active Windows x86 game/x64 host/package, Domain, HUD Inspector and Full Source Impact checks."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_b9200_queue": "PENDING_GATE",
+    "goal_rebuild_fallback": "PENDING_GATE",
+    "goal_exact_sha_gates": "PENDING_GATE"
+  },
+  "diagnosis": {
+    "original_evidence": "The source maps 19 original B9200 result text call returns; a producer may relink the priority list while emitting sibling result glyphs.",
+    "source_trace": [
+      "Original GOAL/result B9200 game glyph producer calls UI hook with exact semantic identity.",
+      "TagAppendedNodes compares captured queue tail to live post-producer priority tail and traverses current SpriteNodes.",
+      "Registered queue render semantics feed downstream sprite Draw replay and stereoscopic game/host composition."
+    ],
+    "root_cause": "The old queue appender could dereference a stale oldTail->next_0 after the original GOAL source rebuilt the priority list, losing or misattributing sibling glyph ownership.",
+    "alternatives_rejected": [
+      "Hooking the original EXE callsite or suppressing GOAL sprites would change original game behavior and was not selected.",
+      "Tagging all HUD nodes regardless of producer would contaminate unrelated world and UI rendering."
+    ],
+    "fix_evidence": "Material source commit b7c517aa86d396a37f18a2c6fb16005fbf058d9d introduces bounded live-root reachability proof and adds exact B9200 producer to protected branch; source and test exist in that commit, but the first full CI was blocked by missing run record.",
+    "negative_test_evidence": "Native goal_b9200_stack_provenance_smoke.cpp exercises detached old tail, mismatched new tail, bounded list, cyclic chain and multiple original glyph siblings. Exact CI compilation/execution remains pending.",
+    "eye_ownership": "Exact B9200 result semantic is attached to queue sprites before R84 per-eye replay, without converting unrelated world nodes to head-locked ScreenHud.",
+    "first_gate_failure": "DX9Ex Active run 38895791855, exact material SHA b7c517aa86d396a37f18a2c6fb16005fbf058d9d, policy job 116956601014 failed RUN_RECORD_NOT_FOUND before game/host compilation."
+  },
+  "ci_evidence": {
+    "material_sha": "b7c517aa86d396a37f18a2c6fb16005fbf058d9d",
+    "failed_run_id": 38895791855,
+    "failed_job_id": 116956601014,
+    "failed_gate": "DX9Ex Active Validation policy",
+    "failure_reason": "RUN_RECORD_NOT_FOUND",
+    "status": "PENDING_CORRECTED_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ]
+  },
+  "next_action": "Run the required GitHub Actions on repaired exact result SHA; mark BUILD_VERIFIED only after every mandatory gate succeeds. Quest3/VDXR runtime remains UNTESTED."
+}
