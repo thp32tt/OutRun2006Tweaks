@@ -1,0 +1,108 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00823",
+  "production_id": "CONVERSION-DX11-00823",
+  "event_id": "CONVERSION-DX11-00823-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "SOURCE_INTEGRATION_IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "FULL_EXACT_SHA_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": "dc7356fc3b459b2555399a8bdbe966770987e404",
+  "validation_bearing_result_sha": null,
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Connect full-resolution native D3D11 per-eye color target binding and original OM/RS restoration to separately posed game-authored Draw/DrawIndexed stereo callbacks, then finish real R30 menu/car/race source replay to OpenXR with input-safe DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-eye-rtv-and-state",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_output_binding",
+        "expected_behavior": "Renderer-owned left and right D3D11 draw passes bind the exact generation-owned per-eye RTV, full-target viewport and scissor, and issue native GPU writes without contaminating desktop RT."
+      },
+      {
+        "id": "game-draw-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_input_ffb_and_recovery",
+        "expected_behavior": "Live game D3D9 Present and gamepad/FFB remain authoritative; original D3D11 OM/RS state is restored on completion and failure; stale/partial GPU submissions never reach OpenXR."
+      },
+      {
+        "id": "native-stereo-host-transport",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_host_transport_ci",
+        "expected_behavior": "Distinct eye GPU outputs pass isolated WARP, exact producer EVENT, snapshot/ACK and five mandatory GitHub Actions checks; real R30 stereo replay, Quest3 visual and performance evidence remain separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-eye-rtv-and-state": "SOURCE_CODED_WARP_PASS_EYE_DEPTH",
+    "game-draw-input-fallback": "SOURCE_CODED_PENDING_REAL_GAME",
+    "native-stereo-host-transport": "WARP_PASS_FULL_GATE_PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "integration_path": [
+      "C2 snapshots actual native game D3D11 IA input layout, all 32 bound vertex-stream slots, index buffer/format/offset, topology, and VS/PS shader/class-interface bindings before each real stereo game eye render callback.",
+      "Native L/R callback isolation restores source IA/VS/PS before each eye and on all scope exits, retaining existing OM/RS and per-eye RTV/DSV lifetime and producer GPU EVENT/host ACK.",
+      "Changed component WARP transport regression mutates input stream/index/topology during each per-eye callback, verifies original state entering both passes and after submission; true R30 menu/car/race stereo replay remains unfinished."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00823 actual C++ material dc7356fc adds native eye IA/VS/PS snapshot and restoration, with WARP regression for separate callback input stream mutations; mandatory exact-SHA checks pending.",
+      "negative_regression": "Original D3D9Ex Draw/Present/gamepad/FFB unaffected; native eye state restored after callbacks, including partial failure via scope RAII, with unchanged opt-in and DXVK freeze.",
+      "component_integration": "Real-native game callback -> per-eye D3D11 IA/VS/PS source state -> generation-owned L/R full-sized RTV+DSV -> producer EVENT, snapshot and ACK. True R30 stereo callback connection still unfinished."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "C++ stereo native IA/VS/PS scope isolated and WARP regression authored; no assertion of real R30 game scene replay/Quest3 proof.",
+    "activation_guard_and_fallback": "Opt-in/fail-closed only. Original D3D9Ex Draw/Present/input/FFB authoritative. DXVK frozen.",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_NOT_TERMINAL",
+    "remaining_implementation": [
+      "Wire real R30 menu/vehicle/race game camera Draw/DrawIndexed replay into the independent native per-eye GPU callbacks including source resources and per-eye source clears.",
+      "After complete source integration verify final same-SHA mandatory Gate, then real Quest3/VDXR menu/car/race/gamepad/FFB and frame pacing."
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "Retrieved GitHub HEAD 343de8d5, 00822 C6 exact-SHA and feature owner; DX11 branch only.",
+    "C1_REVIEW": "Native L/R GPU callbacks restored OM/RS but not IA streams, index buffer, input topology or VS/PS shaders. The first exact material SHA failed policy checks because older 00822 marked terminal while full-source acceptance remained partial; do not mutate its verified SHA.",
+    "C2_IMPLEMENT": "Actual C++ native game eye pipeline RAII snapshot/restore and per-eye IA reset plus WARP transport regression on two original game IA path mutations.",
+    "C3_VALIDATE": "Source material dc7356fc triggered GitHub Actions; DX11 Fast / Backend initial runs failed prior 00822 status/acceptance metadata, not compiled source. Added truthful nonterminal 00823 run record as the minimal cause-specific Gate repair without weakening acceptance policy; final exact-SHA all five checks pending.",
+    "C4_COMMIT": "Source implementation material dc7356fc3b459b2555399a8bdbe966770987e404; separate 00823 run-record repair commit is bookkeeping, not additional source feature.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_FINAL_CI; original D3D9Ex source remains authoritative, no real HMD session."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00823",
+    "score_change": 0,
+    "score_status": "SOURCE_PARTIAL_AND_GATE_PENDING",
+    "note": "No duplicate score or claim of full native menu-to-race gameplay completion."
+  }
+}
