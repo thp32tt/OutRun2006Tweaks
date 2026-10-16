@@ -111,4 +111,24 @@ namespace OutRunVrPauseEye
         result.valid = true;
         return result;
     }
+    // ESC's XYZRHW shell applies user vertical positioning AFTER
+    // perspective/eye mapping. Its shader-backed arrows must use the same
+    // screen-space operation: clipY += shift * clipW. Moving a HUD plane in
+    // game space before head/eye projection makes it drift when the HMD
+    // rotates or asymmetric per-eye FOV changes. Preserve every matrix field
+    // except clip Y coefficients and fail neutral for invalid settings.
+    template <class Matrix>
+    inline Matrix ApplyPostProjectionVerticalShift(
+        const Matrix& projected, float ndcShift) noexcept
+    {
+        if (!std::isfinite(ndcShift) || ndcShift == 0.0f)
+            return projected;
+        Matrix aligned = projected;
+        aligned._12 += ndcShift * projected._14;
+        aligned._22 += ndcShift * projected._24;
+        aligned._32 += ndcShift * projected._34;
+        aligned._42 += ndcShift * projected._44;
+        return aligned;
+    }
+
 }

@@ -224,6 +224,16 @@ add_custom_command(TARGET outrun-vr-driver-seat-camera-smoke POST_BUILD
     VERBATIM)
 
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
+# ESC shader arrows and XYZRHW shell share an NDC-constant signed Y move.
+# Exercise actual game-side clip matrix math during mandatory Release host CI.
+add_executable(outrun-vr-pause-clip-shift-smoke tests/pause_menu_clip_shift_smoke.cpp)
+target_include_directories(outrun-vr-pause-clip-shift-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-pause-clip-shift-smoke)
+add_custom_command(TARGET outrun-vr-pause-clip-shift-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-pause-clip-shift-smoke>"
+    COMMENT "Run native R84 pause shader/XYZRHW eye clip translation regression"
+    VERBATIM)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
 add_executable(outrun-vr-r30-early-rhw-shadow-smoke tests/r30_early_rhw_shadow_smoke.cpp)

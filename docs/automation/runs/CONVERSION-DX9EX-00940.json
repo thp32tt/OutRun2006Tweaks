@@ -1,0 +1,82 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00940",
+  "production_id": "CONVERSION-DX9EX-00940",
+  "event_id": "CONVERSION-DX9EX-00940-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00940",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "status": "VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "1741f7b4681785e97ee0823de887a36620a44819",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/pause_menu_eye_affine.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/pause_menu_clip_shift_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00940.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Keep the complete ESC pause shell and shader-backed exact arrows vertically co-registered in both OpenXR eyes when the pause menu moves up/down, even under headset rotation and asymmetric eye projection.",
+    "scope_boundary": "Only exact paused ESC shader ScreenHud owner uses the post-projection signed vertical correction. Preserve native XYZRHW shell transform, GOAL/+TIME, regular HUD, F11, main menu, SkyGlow, input/FFB and R26_SAFE.",
+    "trace_stages": [
+      "Original ESC source produces ScreenOverlay2D XYZRHW shell and exact ScreenHud clip-arrow sprites.",
+      "R84 source pause viewport moves XYZRHW pixels by a screen-space shift but formerly moved shader clip Y before headInverse/eyeInverse/asymmetric eye projection.",
+      "R84 shader now applies the exact matching NDC shift after each eye projection, preserving separately canted eye matrices and state restoration."
+    ],
+    "subcomponents": [
+      "Correct complete ESC shader path to align with already-correct pause XYZRHW screen-space vertical movement.",
+      "Add native Release-executed numerical regression for both asymmetric-eye projection matrices, headset-relative orientation terms, signed menu sliders, zero and NaN fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_shader_shell_vertical_registration",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ESC pause menu option arrow and shell stereo alignment",
+        "expected_behavior": "The exact pause shader owner moves by a fixed signed fraction of viewport height after each eye projection. XYZRHW shell remains independently aligned."
+      },
+      {
+        "id": "esc_nonpause_optical_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Ordinary HUD, GOAL/+TIME, main menu, F11, R26_SAFE",
+        "expected_behavior": "Non-pause owners retain original shader projection; invalid shift is a neutral no-op, with untouched original restore/desktop fallback."
+      },
+      {
+        "id": "esc_exact_sha_build",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game/host/rollback/package, independent domain/HUD/full-source CI",
+        "expected_behavior": "Native numerical C++ smoke and all required workflows pass on final exact material commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "esc_shader_shell_vertical_registration": "PENDING_CI",
+    "esc_nonpause_optical_isolation": "PENDING_CI",
+    "esc_exact_sha_build": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "ESC shader HUD plane previously encoded VRPauseMenuVerticalOffset into HUD clip matrix BEFORE head inverse, individual eye inverse and asymmetric projection, while its sibling XYZRHW pause shell applies a fixed screen-space pixel shift AFTER eye transform.",
+    "source_evidence": "R30BuildScreenSpaceEyeConstants assigned hudScale._42=pauseClipShift, whereas R30 XYZRHW pauseBiasY added height*VRPauseMenuVerticalOffset in eye pixel space.",
+    "fix_evidence": "Apply source-signed NDC shift to final per-eye shader projection by clipY += NDCshift * clipW; unchanged main optical plane and source scale.",
+    "negative_test_evidence": "Portable numerical C++ native test covers two distinct perspective eye matrices, signed offset, neutral/NaN, and invariant X/W/depth."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check exact-SHA DX9Ex Active, Domain Isolation, HUD Inspector and Full Source gates once. Quest3/VDXR ESC visual alignment and original input remain UNTESTED."
+}

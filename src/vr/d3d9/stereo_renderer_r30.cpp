@@ -6062,7 +6062,9 @@ namespace OutRunVRStereo
                     exactPauseShaderOwner, R30PauseMenuVerticalFraction());
                 hudScale._11 = userScale;
                 hudScale._22 = userScale;
-                hudScale._42 = pauseClipShift;
+                // Apply ESC's signed vertical shift after each eye's final
+                // projection, exactly like the XYZRHW pause shell. A clip
+                // translation here is incorrectly rotated with head pose.
                 const D3DMATRIX scaledClip =
                     R29OwnerMultiplyMatrix(hudWvp, hudScale);
                 constexpr float HudPlaneZ = -2.50f;
@@ -6120,10 +6122,20 @@ namespace OutRunVRStereo
                             R29OwnerMultiplyMatrix(
                                 commonHeadPlane, eyeInverse),
                             eyeProjection);
-                    if (!R29OwnerMatrixFinite(corrected))
+                    // Only the original ESC/pause exact shader arrow owner
+                    // receives this final screen-space offset. This preserves
+                    // a common pixel move for both asymmetrical XR eyes,
+                    // independent of head yaw or optical projection. GOAL,
+                    // +TIME, gameplay HUD and F11 stay bit-identical.
+                    const D3DMATRIX aligned =
+                        exactPauseShaderOwner
+                        ? OutRunVrPauseEye::ApplyPostProjectionVerticalShift(
+                            corrected, pauseClipShift)
+                        : corrected;
+                    if (!R29OwnerMatrixFinite(aligned))
                         return false;
                     const D3DMATRIX correctedT =
-                        R29OwnerTransposeMatrix(corrected);
+                        R29OwnerTransposeMatrix(aligned);
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
                 }
