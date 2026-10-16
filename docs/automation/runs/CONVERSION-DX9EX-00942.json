@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00942",
+  "production_id": "CONVERSION-DX9EX-00942",
+  "event_id": "CONVERSION-DX9EX-00942-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00942",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "d03aa51d1fb72b39437643f1257afa596b07b5fa",
+  "material_result_sha": "ff4f68d73a6e5269a82a818df0f94c2dc8af71bf",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve stage +TIME original sprite and numeric glyph binocular GPU ownership from each exact E8 source through direct ID3DXSprite batch registration, the first selected sprite queue node, and R84 final eye projection.",
+    "scope_boundary": "Only the five source-proven D3DX +TIME/GOAL result producer tokens on an unchanged live sprite may be drained before an unrelated first queue node. Never promote unknown, mixed, failed, stale, unverified B9200, rank, road or SkyGlow sources; preserve original D3DX End and game behavior.",
+    "trace_stages": [
+      "Six original game 0x989xx +TIME E8 calls assign StageExtensionTime/ScreenHud to direct numeric glyphs and queued stage sprites; existing GOAL exact-token producer paths remain separately tagged.",
+      "ID3DXSprite::Draw may batch triangles until Flush/End. When the next canonical queue begins, the first 0x2D762 node arrives before QueueRenderActive is set, so previous transition admission based on an outgoing active queue missed a preceding direct result owner.",
+      "R64 now checks a live matched Begin/Draw sprite and homogeneous exact result producer, rebinds the saved producer across the old batch GPU Flush before selecting the first new node, and keeps the R84 ScreenHud finite per-eye plane unchanged."
+    ],
+    "subcomponents": [
+      "Extend the actual R64 before-first-queue GPU submission path with exact saved-producer restoration and failure quarantine, including GOAL neighbour protection without changing other backend/FFB/SkyGlow behaviors.",
+      "Prevent unknown None/None GPU batch admission at direct-to-queue transitions and add compile-time exact-token positive and mixed/unknown/B9200/reset/same-owner negative regression contracts plus source-path verification."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_first_queue_gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Stage +TIME sprite and numeric direct-to-queued GPU submission",
+        "expected_behavior": "A pending exact homogeneous StageExtensionTime ID3DXSprite buffer is physically flushed under its saved source before a foreign first SpriteNode can submit it; same-owner batching is retained."
+      },
+      {
+        "id": "unknown_mixed_goal_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Failed, mixed, unknown, B9200, GOAL, rank and normal native D3DX ownership",
+        "expected_behavior": "Stale sprite, failed Begin/Draw/Flush, mixed/None batches and unverified B9200 do not inherit the +TIME plane or force a foreign Flush; exact GOAL tokens retain separately guarded paths."
+      },
+      {
+        "id": "r84_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game, R26_SAFE fallback, x64 OpenXR host and full source integration",
+        "expected_behavior": "The final validation-bearing exact SHA must pass DX9Ex Active game/host/package policy, Domain Isolation, Full Source Impact and affected HUD/EXE Inspector gates while HMD remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_first_queue_gpu_owner": "PENDING_CI",
+    "unknown_mixed_goal_fallback": "PENDING_CI",
+    "r84_exact_sha_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "BeforeQueueNode only considered a transition when an existing queue owner was already active or the incoming node was an exact stage/GOAL source. A direct result batch still outstanding at the first unrelated queue node had no outgoing queue owner, so native D3DX implicit Flush could later submit under the newly selected producer.",
+    "source_evidence": "R64 BeforeQueueNode is called before SelectSpriteQueueNode. QueueRenderActive is false for the first node, while tracked PendingScope/PendingProducer can still describe an original direct result Draw. The original pre-queue predicate admitted even an unknown None/None owner.",
+    "fix_evidence": "R64 first-queue path checks exact live sprite identity, homogeneous nonzero batch and exact source token, flushes with ScopedExactProducerSemantic(saved scope/token) before queue switch, and quarantines failed Flush. Unknown None owner excluded in pre-queue guard.",
+    "runtime_limit": "Original game and Quest3 VDXR headset not exercised in this execution. Automatic checks and build verification do not prove a single binocular +TIME."
+  }
+}
