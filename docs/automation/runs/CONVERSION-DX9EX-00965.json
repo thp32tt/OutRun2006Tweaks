@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00965",
+  "production_id": "CONVERSION-DX9EX-00965",
+  "event_id": "CONVERSION-DX9EX-00965-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00965",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R84:SCENE_EFFECT_WVP_PROVENANCE",
+  "symptom_id": "DX9EX:SYMPTOM:SCENE_EFFECT_FOREIGN_WVP",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IN_PROGRESS",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "23c1fd9acd739eb17fad3c79d97e36dec26154e5",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/scene_effect_wvp_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/scene_effect_wvp_provenance_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/scene_effect_wvp_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/scene_effect_wvp_provenance_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00965.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:R84:SCENE_EFFECT_WVP_PROVENANCE",
+    "symptom_id": "DX9EX:SYMPTOM:SCENE_EFFECT_FOREIGN_WVP",
+    "goal": "Preserve complete original-game spatial SceneEffect stereo ownership in R84 by rejecting stale road and vehicle shader matrices that happen to share the same c64 shader, pose, and recent draw window.",
+    "scope_boundary": "R84 original SceneEffect c64 source-to-world classification only. Preserve existing lens C993/outer, HUD, time, shadows, SkyGlow, native FFB/input and independent R26_SAFE.",
+    "special_work_evidence": "R84 R30SpatialSceneEffectNeedsWorldRouting checked recent original c64, shader and pose but never checked its original producer or SpriteNode, so a previous road/vehicle draw could be falsely classified as a current world-space SceneEffect.",
+    "trace_stages": [
+      "Clr_SceneEffect game callback identifies current physical SceneEffect source",
+      "Original R23 c64 recording stores source scope, producer, SpriteNode and pose per write",
+      "R84 R30 classification verifies writer identity before world-effect versus screen-plane eye routing"
+    ],
+    "subcomponents": [
+      "Direct source proof for original c64 scope, producer, draw window and shader and pose epochs",
+      "Queued source proof for same original SpriteNode and epoch versus foreign reused shader matrices",
+      "Portable C++ behavior regression run as dependency of the real x64 host build"
+    ],
+    "acceptance_items": [
+      {
+        "id": "scene_effect_direct_and_queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original SceneEffect direct/queued physical game GPU draws",
+        "expected_behavior": "The world-space SceneEffect source must own original c64 through the current producer, node, shader, pose and draw boundary."
+      },
+      {
+        "id": "scene_effect_foreign_world_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign road/vehicle WVP, stale queue, HUD and other source alpha",
+        "expected_behavior": "Unrelated shader-matched road/vehicle matrices and stale HUD/queue sources never authorize spatial SceneEffect world routing."
+      },
+      {
+        "id": "scene_effect_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 and R26_SAFE Windows, OpenXR host/package, Domain and HUD gates",
+        "expected_behavior": "All exact SHA required GitHub Actions and changed-area smoke must succeed before claiming BUILD_VERIFIED; runtime headset remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "scene_effect_direct_and_queue": "LOCAL_SMOKE_PASS",
+    "scene_effect_foreign_world_fallback": "LOCAL_SMOKE_PASS",
+    "scene_effect_integrated_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R84 SceneEffect spatial routing trusted raw game c64 on shader/pose/12-draw recency alone, ignoring recorded original writer scope and queued producer.",
+    "source_trace": [
+      "hooks_graphics.cpp Clr_SceneEffect source hook tags original game SceneEffect pass",
+      "outrun_renderer.cpp RecordGameWvpWrite caches WVP and source/queue identity",
+      "stereo_renderer_r30.cpp R30SpatialSceneEffectNeedsWorldRouting used first without second"
+    ],
+    "alternatives_rejected": [
+      "Global alpha promotion or lens hook changes cannot solve stale original c64 provenance without risking HUD/world regression."
+    ],
+    "runtime_limit": "No same-SHA Quest3 or in-game stereo optical test performed."
+  },
+  "score_delta_this_attempt": 0
+}

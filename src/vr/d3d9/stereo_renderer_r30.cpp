@@ -32,6 +32,7 @@
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
 #include "../game/render_semantics.hpp"
+#include "../game/scene_effect_wvp_provenance.hpp"
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/projected_rank_stereo.hpp"
 #include "../game/rank_marker_sparse.hpp"
@@ -2718,17 +2719,29 @@ namespace OutRunVRStereo
             std::uint64_t writeSerial = 0, writeDraw = 0;
             std::uintptr_t writeShader = 0, currentShader = 0;
             std::uint64_t writeEpoch = 0, currentEpoch = 0;
+            RenderScope writtenScope = RenderScope::None;
+            std::uint64_t writtenQueueEpoch = 0;
+            const void* writtenQueueNode = nullptr;
+            ProducerToken writtenProducer = ProducerToken::None;
             if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
                     raw, writeSerial, writeDraw, writeShader, writeEpoch) ||
-                !R29OwnerCurrentShaderEpoch(currentShader, currentEpoch) ||
-                !writeShader || writeShader != currentShader ||
-                !writeEpoch || writeEpoch != currentEpoch ||
-                !OutRunVRRenderer::GetCurrentLatchedPoseEpoch() ||
-                OutRunVRRenderer::GetLastGameWvpPoseEpoch() !=
-                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch())
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    writtenScope, writtenQueueEpoch,
+                    writtenQueueNode, writtenProducer) ||
+                !R29OwnerCurrentShaderEpoch(currentShader, currentEpoch))
                 return false;
-            const auto nextDraw = R29OwnerTopLevelDrawSerial() + 1u;
-            if (nextDraw <= writeDraw || nextDraw - writeDraw > 12u)
+            // Source and physical queue identity are mandatory: a previous
+            // road/vehicle c64 can pass the old shader/pose/12-draw check.
+            const auto drawCommand = CapturePhysicalDrawCommand();
+            if (!OutRunVR::SceneEffectWvp::OwnsOriginalWorldWvp({
+                    drawCommand.scope, writtenScope,
+                    drawCommand.producer, writtenProducer,
+                    drawCommand.queued, drawCommand.queueNode, writtenQueueNode,
+                    drawCommand.queueEpoch, writtenQueueEpoch,
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                    currentShader, writeShader, currentEpoch, writeEpoch,
+                    R29OwnerTopLevelDrawSerial() + 1u, writeDraw }))
                 return false;
             float baseRaw[16]{};
             if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))

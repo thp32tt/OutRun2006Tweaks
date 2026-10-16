@@ -367,6 +367,16 @@ add_custom_command(TARGET outrun-vr-hud-command-batch-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-hud-command-batch-smoke>"
     COMMENT "Run native HUD command batch transaction, mixed-owner, and Reset regression"
     VERBATIM)
+# Original-game SceneEffect WVP ownership is compiled and checked by host CI.
+add_executable(outrun-vr-scene-effect-wvp-smoke
+    tests/scene_effect_wvp_provenance_smoke.cpp)
+target_include_directories(outrun-vr-scene-effect-wvp-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-scene-effect-wvp-smoke)
+add_custom_command(TARGET outrun-vr-scene-effect-wvp-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-scene-effect-wvp-smoke>"
+    COMMENT "Run SceneEffect original c64/producer and queue negative regressions"
+    VERBATIM)
 # Opt-in WorldParticle DynamicVB: no original-UP retry after physical GPU
 # submission, but preserve native alpha particles if first-eye binding fails.
 add_executable(outrun-vr-r30-particle-gpu-fallback-smoke
