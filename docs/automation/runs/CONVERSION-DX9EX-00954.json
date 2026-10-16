@@ -84,7 +84,7 @@
       "Tagging all HUD nodes regardless of producer would contaminate unrelated world and UI rendering."
     ],
     "fix_evidence": "Material source commit b7c517aa86d396a37f18a2c6fb16005fbf058d9d introduces bounded live-root reachability proof and adds exact B9200 producer to protected branch; source and test exist in that commit, but the first full CI was blocked by missing run record.",
-    "negative_test_evidence": "Native goal_b9200_stack_provenance_smoke.cpp exercises detached old tail, mismatched new tail, bounded list, cyclic chain and multiple original glyph siblings. Exact CI compilation/execution remains pending.",
+    "negative_test_evidence": "Native goal_b9200_stack_provenance_smoke.cpp exercises detached old tail, mismatched new tail, bounded list, cyclic chain and multiple original glyph siblings. Exact CI compilation/execution remains pending. MSVC C2672 template nullptr deduction repaired under same TASK_ID at dea0183027a29d2892c65519b029bbcce789cbe7; x64 host job on that exact SHA SUCCESS.",
     "eye_ownership": "Exact B9200 result semantic is attached to queue sprites before R84 per-eye replay, without converting unrelated world nodes to head-locked ScreenHud.",
     "first_gate_failure": "DX9Ex Active run 38895791855, exact material SHA b7c517aa86d396a37f18a2c6fb16005fbf058d9d, policy job 116956601014 failed RUN_RECORD_NOT_FOUND before game/host compilation."
   },
@@ -100,7 +100,19 @@
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
-    ]
+    ],
+    "c2672_failing_sha": "a4e9fc077b4051084a7b78eeb3428cf8d6bdc819",
+    "c2672_failed_host_job_id": 116958221288,
+    "compiler_failure": "MSVC error C2672 in goal_b9200_stack_provenance_smoke.cpp: nullptr arguments could not deduce template Node; original game source unaffected.",
+    "native_test_compile_repair_sha": "dea0183027a29d2892c65519b029bbcce789cbe7",
+    "repaired_host_gate": {
+      "run_id": 38896808701,
+      "sha": "dea0183027a29d2892c65519b029bbcce789cbe7",
+      "job": "host",
+      "conclusion": "SUCCESS"
+    },
+    "last_verified_state": "X64_HOST_SUCCESS__POLICY_SUCCESS__DOMAIN_SUCCESS__REMAINING_ACTIVE_FULLSOURCE_PENDING",
+    "exact_four_gate_reason": "Run record changed to include both real failures and explicitly trigger OutRun EXE HUD Inspector at the final integrated SHA; earlier HUD Inspector success on a4e9fc0 is not substituted for a distinct validation-bearing SHA."
   },
-  "next_action": "Run the required GitHub Actions on repaired exact result SHA; mark BUILD_VERIFIED only after every mandatory gate succeeds. Quest3/VDXR runtime remains UNTESTED."
+  "next_action": "Complete all mandatory GitHub Actions gate families at this run-record result commit exact SHA; do not reuse older SHA success, and record final SHA in separate C6 [skip ci] bookkeeping only after success. Quest3/VDXR UNTESTED."
 }
