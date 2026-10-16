@@ -94,6 +94,13 @@ def check(code: str, header: str) -> list[str]:
     draw_pos = hook.find("static HRESULT __stdcall DrawDest(")
     install_pos = hook.find("static DWORD WINAPI InstallThread(", draw_pos)
     draw_path = hook[draw_pos:install_pos] if draw_pos >= 0 else ""
+    # A D3DX internal Draw may flush before local producer scope lookup. The
+    # early queue status call must resolve its actual GameSemantic namespace
+    # in an independently compiled R84 source translation unit.
+    early_draw = draw_path.split("const HRESULT hr = Draw_hk.stdcall", 1)[0]
+    need("BatchActive, OutRunVR::GameSemantic::QueueRenderActive()," in early_draw and
+         "PendingHomogeneous," in early_draw,
+         "pre-draw deferred owner handoff must call qualified queue state")
     need("const bool existingBatch =" in begin_path and
          "BatchActive && self == TrackedSprite && IsExactSprite(self)" in begin_path and
          "if (FAILED(hr) && existingBatch)\n                return hr;" in begin_path and

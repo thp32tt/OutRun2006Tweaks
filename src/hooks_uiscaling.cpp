@@ -2938,7 +2938,8 @@ private:
         // incoming Draw. Separate it under its original GPU owner now.
         // Queued, mixed and foreign buffers remain untouched/fail-closed.
         if (DX9ExD3DXSpriteLifetime::CanDrainDeferredResultBeforeForeignDraw(
-                BatchActive, QueueRenderActive(), PendingHomogeneous,
+                BatchActive, OutRunVR::GameSemantic::QueueRenderActive(),
+                PendingHomogeneous,
                 PendingDraws,
                 DX9ExD3DXSpriteLifetime::CanFlush(
                     self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
