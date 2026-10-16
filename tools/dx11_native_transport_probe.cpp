@@ -726,13 +726,33 @@ int main()
     D3D11_VIEWPORT preservedViewport{3.f, 5.f, 32.f, 24.f, 0.f, 1.f};
     D3D11_RECT preservedScissor{3, 5, 35, 29};
     ID3D11RenderTargetView* originalGameTarget = leftView;
-    d3d.context->OMSetRenderTargets(1, &originalGameTarget, nullptr);
+    // Keep a real caller-owned DSV bound to prove that a two-eye native game
+    // replay restores both RT0 and the original desktop depth attachment.
+    D3D11_TEXTURE2D_DESC preservedDepthDesc{};
+    preservedDepthDesc.Width = 64;
+    preservedDepthDesc.Height = 64;
+    preservedDepthDesc.MipLevels = 1;
+    preservedDepthDesc.ArraySize = 1;
+    preservedDepthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    preservedDepthDesc.SampleDesc.Count = 1;
+    preservedDepthDesc.Usage = D3D11_USAGE_DEFAULT;
+    preservedDepthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    ID3D11Texture2D* preservedDepthTexture = nullptr;
+    ID3D11DepthStencilView* preservedDepthView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &preservedDepthDesc, nullptr, &preservedDepthTexture)) &&
+            SUCCEEDED(d3d.device->CreateDepthStencilView(
+                preservedDepthTexture, nullptr, &preservedDepthView)),
+            "00821 caller desktop DSV fixture created");
+    d3d.context->OMSetRenderTargets(1, &originalGameTarget, preservedDepthView);
     d3d.context->RSSetViewports(1, &preservedViewport);
     d3d.context->RSSetScissorRects(1, &preservedScissor);
     struct GameEyeFixture {
         const float (*colors)[4]{};
         bool sawBoundEye[2]{};
-    } gameEyeFixture{nativeEyeColors, {}};
+        ID3D11DepthStencilView* eyeDepth[2]{};
+        ID3D11DepthStencilView* callerDepth{};
+    } gameEyeFixture{nativeEyeColors, {}, {}, preservedDepthView};
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -750,13 +770,37 @@ int main()
         D3D11_RECT scissor{};
         ctx->RSGetViewports(&viewportCount, &viewport);
         ctx->RSGetScissorRects(&scissorCount, &scissor);
+        D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc{};
+        if (boundDepth) boundDepth->GetDesc(&depthViewDesc);
+        Microsoft::WRL::ComPtr<ID3D11Resource> depthResource;
+        if (boundDepth) boundDepth->GetResource(depthResource.GetAddressOf());
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> eyeDepthTexture;
+        if (depthResource) depthResource.As(&eyeDepthTexture);
+        D3D11_TEXTURE2D_DESC eyeDepthDesc{};
+        if (eyeDepthTexture) eyeDepthTexture->GetDesc(&eyeDepthDesc);
         fixture.sawBoundEye[eyeIndex] =
-            boundTarget == eyeTarget && boundDepth == nullptr &&
+            boundTarget == eyeTarget && boundDepth != nullptr &&
+            depthViewDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT &&
+            eyeDepthTexture.Get() != nullptr && eyeDepthDesc.Width == 64 &&
+            eyeDepthDesc.Height == 64 &&
+            (eyeDepthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL) != 0 &&
+            boundDepth != fixture.eyeDepth[eyeIndex == 0u ? 1u : 0u] &&
+            boundDepth != fixture.callerDepth &&
             viewportCount == 1 && viewport.TopLeftX == 0.f &&
             viewport.TopLeftY == 0.f && viewport.Width == 64.f &&
             viewport.Height == 64.f &&
             scissorCount == 1 && scissor.left == 0 &&
             scissor.top == 0 && scissor.right == 64 && scissor.bottom == 64;
+        if (fixture.sawBoundEye[eyeIndex]) {
+            // The callback sees the live per-eye depth attachment and may
+            // write its own D3D9-derived Z/stencil commands into THIS eye.
+            fixture.eyeDepth[eyeIndex] = boundDepth;
+            fixture.eyeDepth[eyeIndex]->AddRef();
+            ctx->ClearDepthStencilView(boundDepth,
+                D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+                eyeIndex == 0u ? 0.25f : 0.75f,
+                static_cast<UINT8>(eyeIndex + 1u));
+        }
         if (boundTarget) boundTarget->Release();
         if (boundDepth) boundDepth->Release();
         if (!fixture.sawBoundEye[eyeIndex]) return false;
@@ -778,8 +822,14 @@ int main()
             directSubmit.in_flight() && !directSubmit.cancel() &&
             gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1],
             "00820 native eye callback owns distinct bound full-resolution RT0");
+    require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
+            gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
+            gameEyeFixture.eyeDepth[0] != preservedDepthView &&
+            gameEyeFixture.eyeDepth[1] != preservedDepthView,
+            "00821 eye GPU commands own distinct Z/stencil attachments");
     ID3D11RenderTargetView* restoredGameTarget = nullptr;
-    d3d.context->OMGetRenderTargets(1, &restoredGameTarget, nullptr);
+    ID3D11DepthStencilView* restoredGameDepth = nullptr;
+    d3d.context->OMGetRenderTargets(1, &restoredGameTarget, &restoredGameDepth);
     UINT restoredViewportCount = 1, restoredScissorCount = 1;
     D3D11_VIEWPORT restoredViewport{};
     D3D11_RECT restoredScissor{};
@@ -787,6 +837,7 @@ int main()
     d3d.context->RSGetScissorRects(&restoredScissorCount, &restoredScissor);
     const bool restoredGameState =
         restoredGameTarget == originalGameTarget &&
+        restoredGameDepth == preservedDepthView &&
         restoredViewportCount == 1 &&
         restoredViewport.TopLeftX == preservedViewport.TopLeftX &&
         restoredViewport.TopLeftY == preservedViewport.TopLeftY &&
@@ -798,9 +849,15 @@ int main()
         restoredScissor.right == preservedScissor.right &&
         restoredScissor.bottom == preservedScissor.bottom;
     if (restoredGameTarget) restoredGameTarget->Release();
+    if (restoredGameDepth) restoredGameDepth->Release();
     require(restoredGameState,
-            "00820 stereo GPU pass restores desktop OM and raster bounds");
+            "00821 stereo game draw restores caller color, depth and raster");
     d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
+    for (auto*& depth : gameEyeFixture.eyeDepth) {
+        if (depth) { depth->Release(); depth = nullptr; }
+    }
+    preservedDepthView->Release();
+    preservedDepthTexture->Release();
     outrun::vr::dx11::NativeGameStereoPublishedFrame gameEyeFrame{};
     bool gameEyeReady = false;
     for (int retry = 0; retry < 2000 && !gameEyeReady; ++retry) {

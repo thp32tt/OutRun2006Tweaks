@@ -67,8 +67,11 @@ public:
     // Draw counts and signatures come from actual renderer callsites, never
     // synthetic eye-index identifiers. The original D3D9 frame is untouched.
     // The submission binds each ring RTV as OM RT0 with a full-resolution
-    // viewport and scissor, then restores the caller's OM/RS bindings on
-    // success or failure. The callback supplies actual Draw/DrawIndexed and
+    // viewport and scissor and owns distinct full-sized D24S8 per-eye depth
+    // surfaces, then restores the caller's OM/RS bindings on success/failure.
+    // The callback replays game-specific depth clears and depth/blend states;
+    // default native Z/stencil initial state is 1.0 / 0 at each eye start.
+    // The callback supplies actual Draw/DrawIndexed and
     // restores any other shader/IA/SRV state it modifies.
     // The game renderer records each eye on the provided immediate context
     // and reports distinct camera/pose evidence only after its commands.

@@ -43,14 +43,18 @@ public:
     ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
     ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
 
-    bool bind(ID3D11RenderTargetView* target) noexcept {
-        if (!active_ || !target) return false;
+    bool bind(ID3D11RenderTargetView* target,
+              ID3D11DepthStencilView* depth) noexcept {
+        if (!active_ || !target || !depth) return false;
         const D3D11_VIEWPORT viewport{
             0.0f, 0.0f, static_cast<float>(width_),
             static_cast<float>(height_), 0.0f, 1.0f};
         const D3D11_RECT scissor{
             0, 0, static_cast<LONG>(width_), static_cast<LONG>(height_)};
-        context_->OMSetRenderTargets(1u, &target, nullptr);
+        // A live road/car/building Draw must receive the depth/stencil surface
+        // belonging to THIS eye. A color-only RT0 silently disables native
+        // depth testing and allows the later eye to inherit stale depth.
+        context_->OMSetRenderTargets(1u, &target, depth);
         context_->RSSetViewports(1u, &viewport);
         context_->RSSetScissorRects(1u, &scissor);
         return true;
@@ -143,13 +147,49 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         sourcePoseSequence != poseSequence_)
         return false;
 
+    // Allocate separate, full-size native depth/stencil attachments BEFORE
+    // any GPU recording. A failed allocation keeps the ring cancellable and
+    // cannot expose a color-only race frame to the OpenXR consumer.
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    context_->GetDevice(device.GetAddressOf());
+    if (!device || !ring_.width() || !ring_.height()) return false;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTextures[2];
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthViews[2];
+    for (std::uint32_t eye = 0; eye < 2u; ++eye) {
+        ID3D11Texture2D* color = ring_.eye(slot_, eye);
+        if (!color) return false;
+        D3D11_TEXTURE2D_DESC colorDesc{};
+        color->GetDesc(&colorDesc);
+        if (colorDesc.Width != ring_.width() ||
+            colorDesc.Height != ring_.height() ||
+            colorDesc.SampleDesc.Count == 0u)
+            return false;
+        D3D11_TEXTURE2D_DESC depthDesc{};
+        depthDesc.Width = colorDesc.Width;
+        depthDesc.Height = colorDesc.Height;
+        depthDesc.MipLevels = 1u;
+        depthDesc.ArraySize = 1u;
+        depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        depthDesc.SampleDesc = colorDesc.SampleDesc;
+        depthDesc.Usage = D3D11_USAGE_DEFAULT;
+        depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        if (FAILED(device->CreateTexture2D(
+                &depthDesc, nullptr, depthTextures[eye].GetAddressOf())) ||
+            FAILED(device->CreateDepthStencilView(
+                depthTextures[eye].Get(), nullptr,
+                depthViews[eye].GetAddressOf())))
+            return false;
+    }
     struct EyePassDispatch {
         NativeGameEyePass callback{};
         void* user{};
         std::uint32_t poseSequence{};
         NativeGameEyeDrawEvidence eye[2]{};
         std::uint32_t width{}, height{};
-    } dispatch{pass, user, sourcePoseSequence, {}, ring_.width(), ring_.height()};
+        ID3D11DepthStencilView* depth[2]{};
+    } dispatch{pass, user, sourcePoseSequence, {},
+               ring_.width(), ring_.height(),
+               {depthViews[0].Get(), depthViews[1].Get()}};
 
     // The ring verifies the immediate context and reserves the exact frame
     // before entering this recorder. It marks GPU work as queued first:
@@ -161,9 +201,18 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         ScopedNativeGameEyeOutput output(ctx, invocation.width, invocation.height);
         ID3D11RenderTargetView* targets[2]{left, right};
         for (std::uint32_t eyeIndex = 0u; eyeIndex < 2u; ++eyeIndex) {
-            if (!output.bind(targets[eyeIndex]) || !invocation.callback(
-                    invocation.user, ctx, targets[eyeIndex], eyeIndex,
-                    invocation.eye[eyeIndex]))
+            if (!output.bind(targets[eyeIndex],
+                             invocation.depth[eyeIndex]))
+                return false;
+            // Native D3D11 depth/stencil are private per frame AND per eye;
+            // initialize both planes before the game's Draw/DrawIndexed
+            // replay. The renderer may then perform the source's own clears.
+            ctx->ClearDepthStencilView(
+                invocation.depth[eyeIndex],
+                D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
+            if (!invocation.callback(invocation.user, ctx,
+                                     targets[eyeIndex], eyeIndex,
+                                     invocation.eye[eyeIndex]))
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
             if (!evidence.drawCount || !evidence.viewSignature ||
