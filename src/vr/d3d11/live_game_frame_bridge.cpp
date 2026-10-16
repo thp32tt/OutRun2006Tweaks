@@ -6498,7 +6498,10 @@ void before_game_present(IDirect3DDevice9* game,
                 !presentRegion.partial_backbuffer_source(
                     presentDesc.Width, presentDesc.Height),
                 !dirtyRegion || fullDirtyCoverage,
-                bb.Format == D3DFMT_A8R8G8B8,
+                NativeSharedDesktopAdmission::destination_compatible(
+                    static_cast<std::uint32_t>(bb.Format),
+                    static_cast<std::uint32_t>(D3DFMT_A8R8G8B8),
+                    static_cast<std::uint32_t>(D3DFMT_X8R8G8B8)),
                 // outputWritable already proves non-MSAA on the real
                 // game backbuffer; reuse that proof instead of duplicating
                 // the legacy safety-test sentinel in an unrelated branch.

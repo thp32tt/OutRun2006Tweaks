@@ -5,6 +5,7 @@
 #include <dxgi.h>
 #include <wrl/client.h>
 #include <cstdint>
+#include "native_game_shared_desktop_admission.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // One process-local, opt-in, GPU-only game-frame presentation route.
@@ -50,6 +51,28 @@ public:
         Microsoft::WRL::ComPtr<ID3D11Device> actualDevice;
         context->GetDevice(actualDevice.GetAddressOf());
         if (!actualDevice || actualDevice.Get() != device)
+            return false;
+        // D3D11 CopyResource silently fails validation for a texture created
+        // on another device. Never signal/publish uninitialized shared pixels
+        // as a successful menu/car/race frame.
+        Microsoft::WRL::ComPtr<ID3D11Device> sourceOwner;
+        source->GetDevice(sourceOwner.GetAddressOf());
+        if (!sourceOwner || sourceOwner.Get() != device)
+            return false;
+
+        // Confirm the real game destination independently of the Present
+        // caller's admission proof. The shared D3D9Ex import is A8R8G8B8,
+        // while an X8R8G8B8 backbuffer discards alpha on StretchRect. If a
+        // driver refuses this conversion, the original D3D9 image remains
+        // the fallback because only SUCCEEDED(StretchRect) returns true.
+        D3DSURFACE_DESC destination{};
+        if (FAILED(backbuffer->GetDesc(&destination)) ||
+            destination.Width != width || destination.Height != height ||
+            destination.MultiSampleType != D3DMULTISAMPLE_NONE ||
+            !NativeSharedDesktopAdmission::destination_compatible(
+                static_cast<std::uint32_t>(destination.Format),
+                static_cast<std::uint32_t>(D3DFMT_A8R8G8B8),
+                static_cast<std::uint32_t>(D3DFMT_X8R8G8B8)))
             return false;
 
         // A change in the producer, destination device, extent or

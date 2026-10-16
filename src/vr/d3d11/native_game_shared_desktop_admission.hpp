@@ -6,6 +6,14 @@ namespace outrun::vr::dx11::live_game_frame {
 // source and destination frame. Cropped/menu dirty updates stay on the
 // original D3D9 or independently verified CPU tile-upload path.
 struct NativeSharedDesktopAdmission {
+    // BGRA8 native shared memory is imported on D3D9Ex as A8R8G8B8.
+    // Both A8 and X8 game backbuffers have identical RGB channel storage:
+    // D3D9 StretchRect drops alpha for X8, and a failed format conversion
+    // returns to the original game-owned Draw/Present without CPU readback.
+    [[nodiscard]] static constexpr bool destination_compatible(
+        std::uint32_t actual, std::uint32_t argb, std::uint32_t xrgb) noexcept {
+        return actual == argb || actual == xrgb;
+    }
     [[nodiscard]] static constexpr bool allowed(
         bool optIn, bool full, bool complete, bool writable,
         bool sameOwner, bool fullSourceRegion, bool completeDirty,
