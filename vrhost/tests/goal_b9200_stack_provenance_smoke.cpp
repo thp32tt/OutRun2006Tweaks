@@ -19,30 +19,30 @@ static bool VerifyOriginalGoalGlyphQueue() noexcept
     root.next_0 = &old;
     old.next_0 = &leftGlyph;
     leftGlyph.next_0 = &rightGlyph;
-    if (FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 4) !=
+    if (FirstVerifiedAppendedNode<Node>(&root, &old, &rightGlyph, 4) !=
             &leftGlyph ||
-        FirstVerifiedAppendedNode(&root, nullptr, &rightGlyph, 4) !=
+        FirstVerifiedAppendedNode<Node>(&root, nullptr, &rightGlyph, 4) !=
             &old ||
-        FirstVerifiedAppendedNode(&root, &old, &old, 4) ||
-        FirstVerifiedAppendedNode(&root, &old, &foreign, 4) ||
-        FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 2))
+        FirstVerifiedAppendedNode<Node>(&root, &old, &old, 4) ||
+        FirstVerifiedAppendedNode<Node>(&root, &old, &foreign, 4) ||
+        FirstVerifiedAppendedNode<Node>(&root, &old, &rightGlyph, 2))
         return false;
     // If a new GOAL glyph source clears the queue and reuses the root,
     // the stale old pointer is not dereferenced or used to tag new nodes.
     root.next_0 = &leftGlyph;
-    if (FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 3) ||
-        FirstVerifiedAppendedNode(&root, &stale, &rightGlyph, 3) ||
-        FirstVerifiedAppendedNode(&root, &leftGlyph, &rightGlyph, 3) !=
+    if (FirstVerifiedAppendedNode<Node>(&root, &old, &rightGlyph, 3) ||
+        FirstVerifiedAppendedNode<Node>(&root, &stale, &rightGlyph, 3) ||
+        FirstVerifiedAppendedNode<Node>(&root, &leftGlyph, &rightGlyph, 3) !=
             &rightGlyph ||
-        FirstVerifiedAppendedNode(&root, nullptr, &rightGlyph, 3) !=
+        FirstVerifiedAppendedNode<Node>(&root, nullptr, &rightGlyph, 3) !=
             &leftGlyph)
         return false;
     // Neither a missing tail nor a self-referential queue can authorize
     // tagging unknown sprites. No former node is accessed after a rebuild.
-    if (FirstVerifiedAppendedNode(&root, nullptr, nullptr, 3))
+    if (FirstVerifiedAppendedNode<Node>(&root, nullptr, nullptr, 3))
         return false;
     leftGlyph.next_0 = &leftGlyph;
-    return FirstVerifiedAppendedNode(&root, &old, &rightGlyph, 3) == nullptr;
+    return FirstVerifiedAppendedNode<Node>(&root, &old, &rightGlyph, 3) == nullptr;
 }
 
 int main()
