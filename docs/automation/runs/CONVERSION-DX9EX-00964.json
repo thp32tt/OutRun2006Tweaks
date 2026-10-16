@@ -90,43 +90,35 @@
     "source": "src/hooks_graphics.cpp::VRDriverSeatRenderTest::apply"
   },
   "ci_evidence": {
-    "result": "PASS_EXACT_SHA_4_OF_4",
-    "material_result_sha": "4536421f2dd0cb970c201adf9a7039d15e10cf8c",
-    "source_test_repair_sha": "229d1049c0ba5a6ff1eb86b3b5357a02dd00e4a8",
-    "validation_bearing_result_sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
-    "mandatory_gates": [
+    "result": "PASS_EXACT_SHA",
+    "validation_sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
+    "required_workflows": [
       {
         "name": "DX9Ex Active Validation",
         "run_id": 38932001171,
-        "status": "SUCCESS",
-        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
-        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001171"
+        "conclusion": "success"
       },
       {
         "name": "Domain Isolation Guard",
         "run_id": 38932001547,
-        "status": "SUCCESS",
-        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
-        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001547"
+        "conclusion": "success"
       },
       {
         "name": "DX9Ex Full Source Impact Review",
         "run_id": 38932001429,
-        "status": "SUCCESS",
-        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
-        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001429"
+        "conclusion": "success"
       },
       {
         "name": "OutRun EXE HUD Inspector CI",
         "run_id": 38932001389,
-        "status": "SUCCESS",
-        "sha": "2aefd3356492281136cd72f2785f4ff86cfaa051",
-        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38932001389"
+        "conclusion": "success"
       }
     ],
-    "runtime_validation": "UNTESTED",
-    "note": "Executable cockpit RAII smoke is included in DX9Ex Active x64 host build; final Win32 R84/R26_SAFE and package compile verified by Active; independent Domain/HUD/Full Source all exact-SHA SUCCESS."
+    "optional_skipped_workflows": [
+      "VR Evening Unified Test Build",
+      "VR PC Fast Test Build"
+    ]
   },
-  "next_action": "BUILD_VERIFIED on exact immutable SHA; only Quest3/VDXR HMD visual acceptance remains NEED_HMD_TEST. Preserve original material SHA and do not rescore C6/retry.",
+  "next_action": "C6 PASS_EXACT_SHA recorded. Build verified for exact source-bearing SHA; Quest3/VDXR HMD runtime validation remains UNTESTED.",
   "score_delta_this_attempt": 1
 }
