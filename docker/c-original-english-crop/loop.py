@@ -19,6 +19,8 @@ sys.path.insert(0, str(BASE))
 sys.path.insert(0, "/home/chatgpt-runner2/work")
 import c_crop_only_runner as verified_runner
 import c_original_hd_crop_only_checked_20261016 as crop_helper
+sys.path.insert(0, str(BASE / 'docker'))
+import discover
 
 STOP = False
 
@@ -131,8 +133,17 @@ def main():
                           "RUNTIME_VALIDATION":"UNTESTED"}),flush=True)
         last_summary = None
         heartbeat = 0.0
+        last_discovery = -1000000.0
         while not STOP:
             try:
+                now=time.monotonic()
+                if now-last_discovery >= 600:
+                    last_discovery=now
+                    try:
+                        discovery=discover.run(verified_runner.VERIFIED, verified_runner.check_original)
+                        write_audit(discovery)
+                    except Exception as e:
+                        write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
                 summary = process_batch(args.max_per_cycle)
                 if summary != last_summary or summary["completed"] or time.monotonic()-heartbeat>1800:
                     print(json.dumps({"timestamp":stamp(),**summary}),flush=True)
