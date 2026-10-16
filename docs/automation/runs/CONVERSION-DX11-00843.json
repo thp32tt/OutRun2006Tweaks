@@ -130,6 +130,26 @@
       "tools/dx11_native_transport_probe.cpp"
     ],
     "activation_guard_and_fallback": "No native gameplay activation or HMD success implied; DX9Ex D3D9 fallback and original input/FFB remain authoritative.",
-    "full_gate_plan": "one_validation_bearing_exact_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "Live D3D9 game camera Draw/DrawIndexed produces source-owned color texture-array postpass",
+      "Native D3D11 game-eye callback samples selected source array slice at mip zero and scales into real left/right eye GPU targets",
+      "Native stereo eye transport retains source pose and independent camera identity for eventual OpenXR handoff; R30 complete callback and HMD integration remain incomplete"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build-verifiable independent L/R native D3D11 GPU eye pixels only; R30 live camera callsite and actual game-visible OpenXR/HMD output are not claimed complete, runtime UNTESTED.",
+    "acceptance_proof": {
+      "positive_probe": "Exact material SHA 5144b27f99ff23b649412221d78f0ac7932fbe8f passed isolated WARP left/right scaled array mip-zero GPU pixel probes and all five GitHub required checks as recorded in github_actions.",
+      "negative_regression": "WARP invalid source slice rejection, native draw evidence preservation and legacy D3D9/FFB fallback remained verified; no Quest3 runtime test.",
+      "component_integration": "src/vr/d3d11/native_game_stereo_submission.cpp/.hpp plus tools/dx11_native_transport_probe.cpp connect game GPU texture-array slices through selected native D3D11 eye target and preserve native stereo producer identity."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_SCALED_CAMERA_ARRAY_POSTPASS_MIP0",
+      "DX11:EYE_XR_HANDOFF"
+    ]
   }
 }
