@@ -10,7 +10,7 @@ namespace outrun::vr::dx11 {
 // Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
 // A callback may unbind OM to render a menu texture; counting that Draw
 // would publish an unchanged/stale XR eye although the GPU issued commands.
-bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
+bool NativeGameEyeDrawEncoder::eye_targets_bound() const noexcept {
     if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
     ID3D11RenderTargetView* actualTarget = nullptr;
     ID3D11DepthStencilView* actualDepth = nullptr;
@@ -18,7 +18,11 @@ bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
     const bool matches = actualTarget == eyeTarget_ && actualDepth == eyeDepth_;
     if (actualTarget) actualTarget->Release();
     if (actualDepth) actualDepth->Release();
-    if (!matches || !targetWidth_ || !targetHeight_) return false;
+    return matches;
+}
+
+bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
+    if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
 
     // A correct OM eye target with an off-eye viewport still produces no
     // game pixels. It must not count as a real stereo source Draw.
@@ -124,6 +128,48 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
     return true;
 }
 
+bool NativeGameEyeDrawEncoder::clear_target_argb(
+    std::uint32_t argb, const D3D11_RECT* region) noexcept {
+    // D3D9 TARGET Clear ignores viewport/scissor; target identity matters.
+    // An offscreen menu RT must never be mistaken for the owned OpenXR eye.
+    if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
+    if (region) {
+        if (region->left < 0 || region->top < 0 ||
+            region->right <= region->left ||
+            region->bottom <= region->top ||
+            static_cast<std::uint32_t>(region->right) > targetWidth_ ||
+            static_cast<std::uint32_t>(region->bottom) > targetHeight_ ||
+            FAILED(context_->QueryInterface(
+                IID_PPV_ARGS(rectContext.GetAddressOf()))) || !rectContext)
+            return false;
+    }
+    constexpr float kByte = 1.0f / 255.0f;
+    const float rgba[4]{
+        static_cast<float>((argb >> 16) & 0xffu) * kByte,
+        static_cast<float>((argb >> 8) & 0xffu) * kByte,
+        static_cast<float>(argb & 0xffu) * kByte,
+        static_cast<float>((argb >> 24) & 0xffu) * kByte};
+    if (region)
+        rectContext->ClearView(eyeTarget_, rgba, region, 1u);
+    else
+        context_->ClearRenderTargetView(eyeTarget_, rgba);
+    return true;
+}
+
+bool NativeGameEyeDrawEncoder::clear_depth_stencil(
+    float depth, std::uint8_t stencil,
+    bool clearDepth, bool clearStencil) noexcept {
+    if (!eye_targets_bound() || (!clearDepth && !clearStencil) ||
+        (clearDepth && (!std::isfinite(depth) ||
+                        depth < 0.0f || depth > 1.0f)))
+        return false;
+    const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
+                       (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
+    context_->ClearDepthStencilView(eyeDepth_, flags,
+                                    clearDepth ? depth : 1.0f, stencil);
+    return true;
+}
 
 // The D3D9 game and native OpenXR path may share an immediate D3D11 context.
 // A game eye pass must rasterize into the ring's actual RTV, not whichever

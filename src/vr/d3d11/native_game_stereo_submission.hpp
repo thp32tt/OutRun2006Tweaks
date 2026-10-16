@@ -28,11 +28,21 @@ public:
     [[nodiscard]] bool draw(UINT vertexCount, UINT startVertex) noexcept;
     [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,
                                     INT baseVertex) noexcept;
+    // Replay a game-authored TARGET Clear at its exact position between
+    // menu/vehicle/race eye Draws, never as fabricated draw evidence. Partial
+    // clears require D3D11.1 ClearView (no implicit full-eye fallback).
+    [[nodiscard]] bool clear_target_argb(
+        std::uint32_t argb, const D3D11_RECT* region = nullptr) noexcept;
+    // A real D3D9 game Z/stencil Clear can occur between geometry commands.
+    [[nodiscard]] bool clear_depth_stencil(
+        float depth, std::uint8_t stencil,
+        bool clearDepth, bool clearStencil) noexcept;
     [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
     // Depth-only and color-masked game Draws still execute and contribute to
     // the command stream, but cannot by themselves certify a visible XR eye.
     [[nodiscard]] std::uint64_t color_draw_count() const noexcept { return colorDrawCount_; }
 private:
+    [[nodiscard]] bool eye_targets_bound() const noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
     ID3D11DeviceContext* context_{};

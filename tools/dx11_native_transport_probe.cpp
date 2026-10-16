@@ -917,6 +917,9 @@ int main()
         bool rejectedOffscreenViewport[2]{};
         bool rejectedOffscreenScissor[2]{};
         bool rejectedNoColorOutput[2]{};
+        bool rejectedForeignClear[2]{};
+        bool rejectedInvalidClear[2]{};
+        bool replayedMidSceneClear[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -1099,6 +1102,9 @@ int main()
         // write an XR eye and must not count toward a completed stereo pair.
         fixture.rejectedDetachedDraw[eyeIndex] =
             !encoder.draw(3u, 0u) && encoder.draw_count() == 0u;
+        fixture.rejectedForeignClear[eyeIndex] =
+            !encoder.clear_target_argb(0xff123456u) &&
+            !encoder.clear_depth_stencil(0.25f, 3u, true, true);
         ctx->OMSetRenderTargets(
             1u, &fixture.callerColor, fixture.callerDepth);
         // A game offscreen/desktop Draw is equally ineligible. Rebind the
@@ -1107,6 +1113,7 @@ int main()
             !encoder.draw_indexed(3u, 0u, 0) && encoder.draw_count() == 0u;
         if (!fixture.rejectedDetachedDraw[eyeIndex] ||
             !fixture.rejectedForeignDraw[eyeIndex] ||
+            !fixture.rejectedForeignClear[eyeIndex] ||
             !encoder.bind_eye_output())
             return false;
         // Depth-only commands remain in the real GPU stream and in the Draw
@@ -1157,7 +1164,27 @@ int main()
                 : encoder.draw(3u, 0u);
             if (!issued) return false;
         }
-        if (!encoder.color_draw_count()) return false;
+        // A game menu/HUD can Clear a TARGET rectangle AFTER real geometry.
+        // Validate ordered eye pixels, selected Z/stencil and no phantom draw.
+        const D3D11_RECT badRect{63, 24, 68, 30};
+        fixture.rejectedInvalidClear[eyeIndex] =
+            !encoder.clear_target_argb(0xffffffffu, &badRect) &&
+            !encoder.clear_depth_stencil(-0.5f, 0u, true, false) &&
+            !encoder.clear_depth_stencil(0.5f, 0u, false, false);
+        const LONG patchLeft = eyeIndex == 0u ? 24 : 52;
+        const D3D11_RECT afterDrawPatch{patchLeft, 24, patchLeft + 6, 30};
+        const auto issuedDraws = encoder.draw_count();
+        fixture.replayedMidSceneClear[eyeIndex] =
+            encoder.clear_target_argb(
+                eyeIndex == 0u ? 0xffff0000u : 0xff00ff00u,
+                &afterDrawPatch) &&
+            encoder.clear_depth_stencil(
+                eyeIndex == 0u ? 0.30f : 0.70f,
+                static_cast<std::uint8_t>(eyeIndex + 7u), true, true) &&
+            encoder.draw_count() == issuedDraws;
+        if (!fixture.rejectedInvalidClear[eyeIndex] ||
+            !fixture.replayedMidSceneClear[eyeIndex] ||
+            !encoder.color_draw_count()) return false;
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
         evidence.sourcePoseSequence = 33u;
@@ -1191,7 +1218,13 @@ int main()
             gameEyeFixture.rejectedOffscreenScissor[0] &&
             gameEyeFixture.rejectedOffscreenScissor[1] &&
             gameEyeFixture.rejectedNoColorOutput[0] &&
-            gameEyeFixture.rejectedNoColorOutput[1],
+            gameEyeFixture.rejectedNoColorOutput[1] &&
+            gameEyeFixture.rejectedForeignClear[0] &&
+            gameEyeFixture.rejectedForeignClear[1] &&
+            gameEyeFixture.rejectedInvalidClear[0] &&
+            gameEyeFixture.rejectedInvalidClear[1] &&
+            gameEyeFixture.replayedMidSceneClear[0] &&
+            gameEyeFixture.replayedMidSceneClear[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
@@ -1337,18 +1370,28 @@ int main()
         const bool actualPartialClear = eyeIndex == 0u
             ? patch[0] == 255u && patch[1] == 0u && patch[2] == 0u
             : patch[0] == 0u && patch[1] == 255u && patch[2] == 0u;
-        if (!distinctColor || !actualPartialClear) {
+        const UINT laterX = eyeIndex == 0u ? 26u : 54u;
+        const auto* later = pixel + 26u * mapped.RowPitch + laterX * 4u;
+        const bool orderedAfterDrawClear = eyeIndex == 0u
+            ? later[0] == 255u && later[1] == 0u && later[2] == 0u
+            : later[0] == 0u && later[1] == 255u && later[2] == 0u;
+        if (!distinctColor || !actualPartialClear || !orderedAfterDrawClear) {
             std::cerr << "00829 eye=" << eyeIndex
                       << " full RGBA=" << unsigned(pixel[0]) << ","
                       << unsigned(pixel[1]) << "," << unsigned(pixel[2]) << ","
                       << unsigned(pixel[3]) << " patch RGBA="
                       << unsigned(patch[0]) << "," << unsigned(patch[1]) << ","
                       << unsigned(patch[2]) << "," << unsigned(patch[3])
+                      << " after-Draw RGBA="
+                      << unsigned(later[0]) << ","
+                      << unsigned(later[1]) << ","
+                      << unsigned(later[2]) << ","
+                      << unsigned(later[3])
                       << " rowPitch=" << mapped.RowPitch << '\n';
         }
         d3d.context->Unmap(readback, 0);
-        require(distinctColor && actualPartialClear,
-                "00829 native L/R TARGET partial clears retain untouched pixels");
+        require(distinctColor && actualPartialClear && orderedAfterDrawClear,
+                "00832 native L/R Draw then source TARGET RECT clear preserves ordered pixels");
     }
     hostFrame.frameId = 24u;
     hostFrame.sourcePoseSequence = 33u;
