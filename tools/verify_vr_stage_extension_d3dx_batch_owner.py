@@ -261,6 +261,39 @@ def check(code: str, header: str) -> list[str]:
          "pendingScope == outgoingScope" in header and
          "pendingProducer == outgoingProducer" in header,
          "pre-queue predicate must reject mixed or stale source")
+
+    # The first SpriteNode is not yet QueueRenderActive. Prove the live
+    # implementation drains a preceding *direct* result under its saved
+    # source before entering that new node, never under the new producer.
+    queue_start = hook.find("static void BeforeQueueNode(")
+    queue_end = hook.find("static void BeforeQueueEnd(", queue_start)
+    first_queue = hook[queue_start:queue_end] if (
+        0 <= queue_start < queue_end) else ""
+    exact_first = predicate("CanDrainDirectResultBeforeFirstQueueNode")
+    need("if (CanDrainDirectResultBeforeFirstQueueNode(" in first_queue and
+         "QueueRenderActive(), BatchActive," in first_queue and
+         "DX9ExD3DXSpriteLifetime::CanFlush(" in first_queue and
+         "PendingDraws, PendingHomogeneous," in first_queue and
+         "PendingScope, PendingProducer, nextScope, nextProducer" in first_queue and
+         "ScopedExactProducerSemantic outgoingBatch(" in first_queue and
+         "flushed = FlushTracked(firstQueueSprite);" in first_queue and
+         first_queue.index("flushed = FlushTracked(firstQueueSprite);") <
+         first_queue.index("const bool enteringStage") and
+         "BatchActive = false;" in first_queue and
+         "ForgetBatch();" in first_queue,
+         "first queue node must submit previous direct result under saved exact GPU owner")
+    need("!batchActive || !exactLiveSprite" in exact_first and
+         "!homogeneous || pendingDraws == 0u" in exact_first and
+         "pendingScope != RenderScope::ScreenHud" in exact_first and
+         "incomingProducer != pendingProducer" in exact_first and
+         "ProducerToken::ResultTextB9200" not in exact_first and
+         all("pendingProducer == ProducerToken::" + token in exact_first
+             for token in ("StageExtensionTime", "GoalTime020", "GoalTime150",
+                           "ResultProgress", "OutRunStagePrintf")),
+         "first queue transition must exclude untracked, mixed, B9200 or same-owner buffers")
+    need("pendingScope != RenderScope::None" in header and
+         "pendingProducer != ProducerToken::None" in header,
+         "pre-queue transition may not flush an unknown None/None batch")
     need("PeekSpriteNodeScope(nextNode, RenderScope::None, &nextProducer)" in hook and
          "StageOwner(nextScope, nextProducer)" in hook,
          "next node must have exact +TIME tag before promotion")

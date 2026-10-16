@@ -2905,6 +2905,47 @@ public:
         ProducerToken nextProducer = ProducerToken::None;
         const auto nextScope =
             PeekSpriteNodeScope(nextNode, RenderScope::None, &nextProducer);
+
+        // A direct numeric +TIME/GOAL D3DX Draw may still be outstanding
+        // when the very first unrelated queued SpriteNode is selected.
+        // Here QueueRenderActive() is false, so the existing outgoing queue
+        // transition check cannot see the earlier source. Submit that
+        // *proven* batch with its saved owner before changing queue context.
+        // Native End remains authoritative for unknown/mixed/failed batches.
+        void* firstQueueSprite = *Module::exe_ptr<void*>(0x55B218);
+        if (CanDrainDirectResultBeforeFirstQueueNode(
+                QueueRenderActive(), BatchActive,
+                DX9ExD3DXSpriteLifetime::CanFlush(
+                    firstQueueSprite, TrackedSprite, firstQueueSprite),
+                PendingDraws, PendingHomogeneous,
+                PendingScope, PendingProducer, nextScope, nextProducer))
+        {
+            const auto outgoingScope = PendingScope;
+            const auto outgoingProducer = PendingProducer;
+            const bool wasStage = StageOwner(outgoingScope, outgoingProducer);
+            bool flushed = false;
+            {
+                ScopedExactProducerSemantic outgoingBatch(
+                    outgoingScope, nullptr, true, outgoingProducer);
+                flushed = FlushTracked(firstQueueSprite);
+            }
+            if (flushed)
+            {
+                (wasStage ? StageFlushes : GoalFlushes).fetch_add(
+                    1, std::memory_order_relaxed);
+            }
+            else
+            {
+                // Failed Flush and any lost vtable/live-object proof cannot
+                // authorize a later optical owner. Preserve original End
+                // but withdraw our batch identity until the next Begin.
+                BatchActive = false;
+                ForgetBatch();
+                StageBoundaryReady = false;
+                (wasStage ? StageFallbacks : GoalFallbacks).fetch_add(
+                    1, std::memory_order_relaxed);
+            }
+        }
         const bool enteringStage = StageOwner(nextScope, nextProducer);
         const bool leavingStage = QueueRenderActive() &&
             StageOwner(EffectiveScope(), CurrentRenderProducerToken());

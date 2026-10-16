@@ -137,9 +137,105 @@ namespace OutRunVR::GameSemantic
         RenderScope outgoingScope, ProducerToken outgoingProducer) noexcept
     {
         return homogeneous && (wasQueueActive || enteringExactStage) &&
+            pendingScope != RenderScope::None &&
+            pendingProducer != ProducerToken::None &&
             pendingScope == outgoingScope &&
             pendingProducer == outgoingProducer;
     }
+
+    // The source E8 can return before its registered D3DX triangles reach
+    // the GPU. On the very FIRST SpriteNode, QueueRenderActive is still false
+    // and there is no outgoing queue owner to compare. An unrelated incoming
+    // node must not implicitly submit that earlier +TIME/GOAL batch under
+    // its own producer. Drain only an already tracked homogeneous result
+    // batch on the same live ID3DXSprite, before selecting the next node.
+    // Do not drain unknown, mixed, reset or B9200-unproved result glyphs.
+    inline constexpr bool CanDrainDirectResultBeforeFirstQueueNode(
+        bool queueAlreadyActive, bool batchActive, bool exactLiveSprite,
+        unsigned pendingDraws, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope incomingScope, ProducerToken incomingProducer) noexcept
+    {
+        if (queueAlreadyActive || !batchActive || !exactLiveSprite ||
+            !homogeneous || pendingDraws == 0u ||
+            pendingScope != RenderScope::ScreenHud)
+            return false;
+        const bool knownResult =
+            pendingProducer == ProducerToken::StageExtensionTime ||
+            pendingProducer == ProducerToken::GoalTime020 ||
+            pendingProducer == ProducerToken::GoalTime150 ||
+            pendingProducer == ProducerToken::ResultProgress ||
+            pendingProducer == ProducerToken::OutRunStagePrintf;
+        return knownResult &&
+            (incomingScope != pendingScope ||
+             incomingProducer != pendingProducer);
+    }
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 3, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150,
+        RenderScope::None, ProducerToken::None));
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
+        RenderScope::None, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, false, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, false, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 0, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, false,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200,
+        RenderScope::None, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::None,
+        RenderScope::None, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, true,
+        RenderScope::WorldBillboard, ProducerToken::StageExtensionTime,
+        RenderScope::None, ProducerToken::None));
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
+        false, true, true, RenderScope::None, ProducerToken::None,
+        RenderScope::None, ProducerToken::None));
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
+        true, false, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(CanFlushD3DXPreQueueStageBatch(
+        true, false, true, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime));
 
     // A source-scope exit is the last safe GPU submission boundary for
     // deferred numeric +TIME sprites. Reject prior/foreign/mixed batches:
