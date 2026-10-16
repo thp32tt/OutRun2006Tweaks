@@ -1,9 +1,52 @@
 #include "../../src/vr/game/render_semantics.hpp"
+#include "../../src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
 #include <iostream>
+#include <cmath>
+#include <limits>
 
 int main()
 {
     using namespace OutRunVR::GameSemantic;
+    // R84 +TIME/GOAL shared eye-plane: symmetric IPD is preserved, even
+    // when the game receives very large but still finite tracking origins.
+    // Before this source repair, float(left+right) overflowed to infinity,
+    // making the finite result HUD-plane fail and fall back to mono/headlock.
+    const float normal[2][3]{
+        {-0.032f, 0.4f, -1.2f}, {0.032f, 0.4f, -1.2f}
+    };
+    float relative[2][3]{};
+    if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+            normal, relative) ||
+        std::fabs(relative[0][0] + 0.032f) > 1.0e-6f ||
+        std::fabs(relative[1][0] - 0.032f) > 1.0e-6f ||
+        std::fabs(relative[0][1]) > 1.0e-6f ||
+        std::fabs(relative[1][2]) > 1.0e-6f)
+        return 12;
+    const float large = (std::numeric_limits<float>::max)();
+    const float distant[2][3]{
+        {large, large, large}, {large, large, large}
+    };
+    if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+            distant, relative))
+        return 13;
+    for (int eye = 0; eye < 2; ++eye)
+        for (int axis = 0; axis < 3; ++axis)
+            if (!std::isfinite(relative[eye][axis]) ||
+                relative[eye][axis] != 0.0f)
+                return 14;
+    // A poisoned right-eye pose must never partially overwrite the last
+    // stable stereo pair, nor authorize a new GPU-eye projection.
+    float invalid[2][3]{
+        {0.0f, 0.0f, 0.0f},
+        {0.06f, std::numeric_limits<float>::quiet_NaN(), 0.0f}
+    };
+    if (OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+            invalid, relative))
+        return 15;
+    for (int eye = 0; eye < 2; ++eye)
+        for (int axis = 0; axis < 3; ++axis)
+            if (relative[eye][axis] != 0.0f)
+                return 16;
     // A queued world Draw may be armed before the original +TIME parent.
     CurrentScope = RenderScope::SceneEffect;
     CurrentQueueExactScope = RenderScope::WorldBillboard;

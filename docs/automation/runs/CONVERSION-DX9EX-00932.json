@@ -1,0 +1,80 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00932",
+  "production_id": "CONVERSION-DX9EX-00932",
+  "event_id": "CONVERSION-DX9EX-00932-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00932",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "36dd165ef43a7789efad7c059cc8a35e08ddf98d",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00932.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve the entire +TIME/GOAL/result finite stereo HUD plane under valid large tracking origins and fail closed atomically on nonfinite eye pose while retaining the existing six original +TIME sprite/numeric producers and deferred D3DX ownership.",
+    "scope_boundary": "R84 +TIME/GOAL/result shared XYZRHW finite eye plane only; unchanged original sprite/number E8 and D3DX batch, HUD/F11/menu, lens CABE, R26_SAFE, FFB/input, SkyGlow, DXVK frozen.",
+    "special_work_evidence": "At R84 R30BuildStageExtensionXyzrhwEyePlane, float addition of two finite same-sign OpenXR eye positions can overflow before midpoint; this forces BuildStageExtension to fail and the +TIME/GOAL exact source to revert to original mono/headlocked Draw despite valid poses.",
+    "trace_stages": [
+      "EXE +TIME original three sprani and three numeric callers tag exact direct or SpriteNode ownership",
+      "D3DX Batch/End physical draw retains exact StageExtensionTime/Goal producer for shader and XYZRHW routes",
+      "R30 builds one pose-epoch bounded relative eye plane using widened midpoint for both eyes and preserves old original fallback on invalid pose",
+      "R33 preserves physical left/right drawing and state restoration of R84 CURRENT_FOCUS"
+    ],
+    "subcomponents": [
+      "R30 +TIME/GOAL finite eye-plane origin midpoint and atomic per-eye positioning",
+      "Native stage extension smoke checks normal IPD, finite extreme tracking positions and poisoned eye pose negative fallback"
+    ],
+    "acceptance_items": [
+      {
+        "id": "large_finite_stage_eye_pose",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 +TIME sprite/numeric and GOAL/result finite eye projection",
+        "expected_behavior": "A finite large common tracking origin does not overflow midpoint and needlessly demote the exact HUD source to mono."
+      },
+      {
+        "id": "pose_failure_atomic_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Stage/GOAL right-eye invalid pose, original GPU restore, R26_SAFE and other visuals",
+        "expected_behavior": "Both eye offsets remain untouched on malformed XR input; preserved fail-closed original draw and unrelated renderer ownership."
+      },
+      {
+        "id": "final_sha_quality_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 full game+host package, R26_SAFE rollback, Domain and affected Full Source Impact",
+        "expected_behavior": "Required GitHub Actions pass exact source SHA, separately from Quest3/VDXR runtime acceptance."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "large_finite_stage_eye_pose": "PENDING",
+    "pose_failure_atomic_fallback": "PENDING",
+    "final_sha_quality_gates": "PENDING"
+  },
+  "diagnosis": {
+    "source_trace": "R30BuildStageExtensionXyzrhwEyePlane: previous float centre pre-add could become infinity; shared LensCentre helper uses widened midpoint and checks both eyes as one transaction.",
+    "known_limitation": "This is a deterministic R84 position-safety repair, not evidence that user's visually observed +TIME double image is completely resolved; pending real HMD batch/eye acceptance."
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify source change on exact SHA GitHub Actions; only C6 after required gates pass. Quest3/VDXR HMD remains UNTESTED and +TIME symptom is not optically closed."
+}

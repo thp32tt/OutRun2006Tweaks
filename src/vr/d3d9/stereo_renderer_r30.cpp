@@ -3210,14 +3210,16 @@ namespace OutRunVRStereo
             if (!R29OwnerMatrixFinite(headPlane))
                 return false;
 
-            const float centre[3]{
-                0.5f * (state.stereo.eyeOffset[0][0] +
-                        state.stereo.eyeOffset[1][0]),
-                0.5f * (state.stereo.eyeOffset[0][1] +
-                        state.stereo.eyeOffset[1][1]),
-                0.5f * (state.stereo.eyeOffset[0][2] +
-                        state.stereo.eyeOffset[1][2])
-            };
+            // +TIME sprite and numeric glyphs, GOAL percent/time and stage
+            // result text all share this exact per-eye plane. The old float
+            // (left+right)*0.5 could overflow for two otherwise finite eye
+            // origins, rejecting both eyes and restoring a head-locked mono
+            // draw. Use the already-shared C993 eye-centre helper: it widens
+            // before midpoint and publishes BOTH eyes only on success.
+            float relativeEye[2][3]{};
+            if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+                    state.stereo.eyeOffset, relativeEye))
+                return false;
             const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
             const float worldScale =
                 Settings::VRWorldScale * Settings::VRStereoDepth;
@@ -3226,14 +3228,9 @@ namespace OutRunVRStereo
 
             for (int eye = 0; eye < 2; ++eye)
             {
-                const float relative[3]{
-                    state.stereo.eyeOffset[eye][0] - centre[0],
-                    state.stereo.eyeOffset[eye][1] - centre[1],
-                    state.stereo.eyeOffset[eye][2] - centre[2]
-                };
                 const D3DMATRIX eyePose =
                     R29OwnerMatrixFromQuaternionTranslation(
-                        identity, relative, worldScale);
+                        identity, relativeEye[eye], worldScale);
                 const D3DMATRIX eyeInverse =
                     R29OwnerInverseRigid(eyePose);
                 const D3DMATRIX eyeProjection =
