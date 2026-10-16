@@ -1,0 +1,409 @@
+{
+  "schema": "outrun-f3-source-two-family-v1",
+  "task_id": "OUTRUN-KR-Q053-Q060-F3-20261016",
+  "mode": "STATIC_MANUAL_PREPARATION_NO_DOCKER",
+  "planned_assets": 15,
+  "translation": "DRAFT_UNAPPROVED_VERIFY_WITH_TRANSLATION_SSOT",
+  "families": {
+    "Q053_MISSION_YELLOW_NAVY": {
+      "source_readable_png_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "source_dds": {
+        "dds": "q053_verified_original_568D3696_1024x1024.dds",
+        "format": "DXT5",
+        "mip_count": 13,
+        "dds_size": [
+          4096,
+          4096
+        ],
+        "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813"
+      },
+      "rows": [
+        {
+          "asset_id": "Q053-HIT_THE_CARS",
+          "en": "HIT THE CARS",
+          "ko_draft": "차량을 들이받아!",
+          "native_crop": "068_Q053_HIT_THE_CARS_EN_NATIVE.png",
+          "sha256": "e38436d884720b8593964e8cdb591ff57ee6976ee5b84901bf2a3a41dff7ff8d",
+          "bbox_readable_xyxy": [
+            455,
+            2003,
+            1073,
+            2159
+          ],
+          "size": [
+            618,
+            156
+          ],
+          "alpha_nonzero": 31086,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-DODGE_THE_BOMBS",
+          "en": "DODGE THE BOMBS",
+          "ko_draft": "폭탄을 피해라!",
+          "native_crop": "069_Q053_DODGE_THE_BOMBS_EN_NATIVE.png",
+          "sha256": "036db8225f65fae92b615235ed47dd1df81fb8f2fbd9f2e67b53972e03ddf8df",
+          "bbox_readable_xyxy": [
+            1090,
+            2003,
+            1835,
+            2167
+          ],
+          "size": [
+            745,
+            164
+          ],
+          "alpha_nonzero": 45709,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-AVOID_ABDUCTION",
+          "en": "AVOID ABDUCTION",
+          "ko_draft": "납치를 피해라!",
+          "native_crop": "071_Q053_AVOID_ABDUCTION_EN_NATIVE.png",
+          "sha256": "161524c1c195381694d2497404404d305992dcacd1da3c89bf554bb11e2fb5c4",
+          "bbox_readable_xyxy": [
+            2748,
+            2003,
+            3469,
+            2159
+          ],
+          "size": [
+            721,
+            156
+          ],
+          "alpha_nonzero": 38137,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-AVOID_METEORS",
+          "en": "AVOID METEORS",
+          "ko_draft": "운석을 피해라!",
+          "native_crop": "072_Q053_AVOID_METEORS_EN_NATIVE.png",
+          "sha256": "726633b82e0c06d6ad9b79803344811306fb3645ae2e4d9b7b92f7bc810b36b3",
+          "bbox_readable_xyxy": [
+            1642,
+            2265,
+            2339,
+            2404
+          ],
+          "size": [
+            697,
+            139
+          ],
+          "alpha_nonzero": 61070,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-DRIBBLE_BEACH_BALL",
+          "en": "DRIBBLE BEACH BALL",
+          "ko_draft": "비치볼을 드리블해!",
+          "native_crop": "073_Q053_DRIBBLE_BEACH_BALL_EN_NATIVE.png",
+          "sha256": "6517c46e7a8fb391f28958360950d673b36bbfc88e85cc981466632d3ce84040",
+          "bbox_readable_xyxy": [
+            2236,
+            2265,
+            3088,
+            2408
+          ],
+          "size": [
+            852,
+            143
+          ],
+          "alpha_nonzero": 71583,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-PHOTOGRAPH_SIGHTS",
+          "en": "PHOTOGRAPH SIGHTS",
+          "ko_draft": "명소를 촬영해!",
+          "native_crop": "074_Q053_PHOTOGRAPH_SIGHTS_EN_NATIVE.png",
+          "sha256": "0055ec926ccfbef6ed5375d97981a2616977a03b7e6282b6c7c5851d4de75fba",
+          "bbox_readable_xyxy": [
+            3097,
+            2261,
+            3789,
+            2503
+          ],
+          "size": [
+            692,
+            242
+          ],
+          "alpha_nonzero": 66622,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-HIT_THE_DUCKS",
+          "en": "HIT THE DUCKS",
+          "ko_draft": "오리를 맞혀라!",
+          "native_crop": "075_Q053_HIT_THE_DUCKS_EN_NATIVE.png",
+          "sha256": "826d573f302819c91a1742849e51d0844e592643b703f84698a8d81fafd60f86",
+          "bbox_readable_xyxy": [
+            3088,
+            3158,
+            3600,
+            3297
+          ],
+          "size": [
+            512,
+            139
+          ],
+          "alpha_nonzero": 28525,
+          "alpha_border_touched": false,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q053-SEE_THE_SIGHTS",
+          "en": "SEE THE SIGHTS",
+          "ko_draft": "명소를 구경해!",
+          "native_crop": "076_Q053_SEE_THE_SIGHTS_EN_NATIVE.png",
+          "sha256": "4033d6ebab96278ca07ece6626b9221eb141a95659481636f9ce1ea4247ed802",
+          "bbox_readable_xyxy": [
+            3105,
+            3281,
+            3711,
+            3424
+          ],
+          "size": [
+            606,
+            143
+          ],
+          "alpha_nonzero": 43863,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        }
+      ],
+      "source_sheet": "Q053_MISSION_YELLOW_NAVY_EN_NATIVE_REFERENCE.jpg",
+      "source_sheet_sha256": "6a8ced303d2d30d61689480842b5be4ffe09dd5dbbf0db77326a6a2003c18577",
+      "native_bundle_sha256": "afd5a9824e5c9c84fc1f8370f6345047015bb1bc0aabfe1c8f95b865b0224acd"
+    },
+    "Q060_METALLIC_GRADIENT": {
+      "source_readable_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "source_dds": {
+        "dds": "Q060_A064FDFC_GITHUB_PINNED_ORIGINAL_20261016.dds",
+        "format": "RGBA32",
+        "mip_count": 1,
+        "dds_size": [
+          4096,
+          2048
+        ],
+        "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc"
+      },
+      "rows": [
+        {
+          "asset_id": "Q060-CONTINUE_QUESTION",
+          "en": "CONTINUE QUESTION",
+          "ko_draft": "계속?",
+          "native_crop": "007_Q060_CONTINUE_QUESTION_EN_NATIVE.png",
+          "sha256": "934234bf5bbe917626e9ba11d998ebb9724aa668361c836d5a6dbb7186f8f8cd",
+          "bbox_readable_xyxy": [
+            0,
+            615,
+            1130,
+            790
+          ],
+          "size": [
+            1130,
+            175
+          ],
+          "alpha_nonzero": 127272,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q060-RETRY",
+          "en": "RETRY",
+          "ko_draft": "재시도",
+          "native_crop": "008_Q060_RETRY_EN_NATIVE.png",
+          "sha256": "63dbbec680cbb37e66df692f45d0120ac579207a4181ace74e98b0c2be2a8f10",
+          "bbox_readable_xyxy": [
+            1145,
+            615,
+            2110,
+            790
+          ],
+          "size": [
+            965,
+            175
+          ],
+          "alpha_nonzero": 69536,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q060-PLEASE_WAIT",
+          "en": "PLEASE WAIT",
+          "ko_draft": "잠시 대기",
+          "native_crop": "009_Q060_PLEASE_WAIT_EN_NATIVE.png",
+          "sha256": "534adac5eb8244db371e425e1f7e493bdb541680da8758e9fcce1462d06c8e38",
+          "bbox_readable_xyxy": [
+            2370,
+            615,
+            3670,
+            790
+          ],
+          "size": [
+            1300,
+            175
+          ],
+          "alpha_nonzero": 128120,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q060-TRY_AGAIN_QUESTION",
+          "en": "TRY AGAIN QUESTION",
+          "ko_draft": "다시 시도?",
+          "native_crop": "010_Q060_TRY_AGAIN_QUESTION_EN_NATIVE.png",
+          "sha256": "2aa38a28b34e0787a05cd6aa729a5d8c6c3286975949473c2978e5d954352e78",
+          "bbox_readable_xyxy": [
+            0,
+            785,
+            1315,
+            990
+          ],
+          "size": [
+            1315,
+            205
+          ],
+          "alpha_nonzero": 155641,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q060-STAGE_CLEAR",
+          "en": "STAGE CLEAR",
+          "ko_draft": "스테이지 클리어",
+          "native_crop": "112_Q060_STAGE_CLEAR_EN_NATIVE.png",
+          "sha256": "a6bebeb5aecc4ed85e69757dca9bc9cfda74fbbc3f26c1e0e2a750a1ac8b5b33",
+          "bbox_readable_xyxy": [
+            3404,
+            360,
+            3977,
+            508
+          ],
+          "size": [
+            573,
+            148
+          ],
+          "alpha_nonzero": 52118,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q060-PASS",
+          "en": "PASS",
+          "ko_draft": "통과!",
+          "native_crop": "113_Q060_PASS_EN_NATIVE.png",
+          "sha256": "79d04402272c2449e720fc9c0c28fd49b96f446bccbb81d21144be169fde3ced",
+          "bbox_readable_xyxy": [
+            3670,
+            537,
+            4092,
+            664
+          ],
+          "size": [
+            422,
+            127
+          ],
+          "alpha_nonzero": 21003,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        },
+        {
+          "asset_id": "Q060-DUMPED_BIG",
+          "en": "DUMPED BIG",
+          "ko_draft": "차였어!",
+          "native_crop": "121_Q060_DUMPED_BIG_EN_NATIVE.png",
+          "sha256": "0693be21625fd4a165cfcb40b313f28c5bd30d3f5f60979cf4dcd5f8ea00a543",
+          "bbox_readable_xyxy": [
+            2527,
+            1237,
+            3621,
+            1532
+          ],
+          "size": [
+            1094,
+            295
+          ],
+          "alpha_nonzero": 201943,
+          "alpha_border_touched": true,
+          "background_art_mixed": "UNKNOWN_REVIEW_REQUIRED",
+          "translation_approved": false,
+          "sprite": "NOT_GENERATED",
+          "clean": "NOT_RUN",
+          "dds": "NOT_RUN"
+        }
+      ],
+      "source_sheet": "Q060_METALLIC_GRADIENT_EN_NATIVE_REFERENCE.jpg",
+      "source_sheet_sha256": "d16f0165d13f96419ef4b9c60591d89c822606c9fd24602964414305f15ea81f",
+      "native_bundle_sha256": "564474cd869e512d9f7f5d023c1539e45e99fe89d5f63daa8a3ae2ac6ecafcd9"
+    }
+  },
+  "F3_STATIC": "NOT_RUN",
+  "CLEAN": "NOT_RUN",
+  "DDS": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
