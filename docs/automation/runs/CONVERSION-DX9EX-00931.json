@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATION_PENDING",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_MATERIAL_SOURCE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "d81a0af12120f1a73e584ed6748c56549480aded",
@@ -87,7 +87,7 @@
     "negative_test_evidence": "Native CMake-registered HUD WVP smoke test checks direct/queued positive, foreign producer, world/overlay, wrong SpriteNode, invalid epoch, untagged source and original direct fallback."
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "30e63525eb9b9e6a71fef8d4b4f579b4e2c39686",
   "score_delta_this_attempt": 0,
-  "next_action": "After previous task 00930 exact-SHA Actions have completed, fast-forward one material source commit; run mandatory exact-SHA gates once, record RUNTIME_VALIDATION=UNTESTED and C6 separately."
+  "next_action": "C6 PASS_EXACT_SHA recorded for validation-bearing source SHA; do not rerun CI, modify source or duplicate score. Quest3/VDXR HMD runtime validation remains UNTESTED."
 }
