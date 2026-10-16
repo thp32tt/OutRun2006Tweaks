@@ -1653,16 +1653,29 @@ class UIScaling : public Hook
         // survive into R84's queued SpriteNode and GPU-eye plane; unrelated
         // HUD/GOAL helpers keep the old TextGlyphPutSprite provenance.
         const bool exactGoalResult = IsOriginalB9200GoalGlyph();
+        const bool directGoalResult = exactGoalResult &&
+            !OutRunVR::GameSemantic::QueueRenderActive();
         std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
             directResultOwner;
-        if (exactGoalResult && !OutRunVR::GameSemantic::QueueRenderActive())
+        if (directGoalResult)
+        {
+            // Preserve the PREVIOUS proven D3DX owner before the exact
+            // original B9200 GOAL text glyph enters its own GPU batch.
+            // Neither unverified callers nor the unsafe +5 E8 midhooks
+            // gain ownership of world/GOAL sprites from this handoff.
+            FlushD3DXBeforeDirectGoalSource();
             directResultOwner.emplace(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true,
                 OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+        }
 		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
 			Module::exe_ptr(0x2CFE0));
 		const int result = original(args, priority);
+        // D3DX Draw may defer its physical draw beyond this caller; only
+        // the live, homogeneous original B9200 source may flush here.
+        if (directGoalResult)
+            FlushD3DXAtDirectGoalSourceExit();
         if (exactGoalResult)
         {
             TagAppendedNodes(tailsBefore,
@@ -2642,10 +2655,11 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             source == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
     }
 
-    // GOAL finish-time helpers, progress sprites and the three verified
-    // Sumo_Printf result parents enqueue D3DX triangles beyond their E8.
-    // Scope only those existing hooked sources, never arbitrary white/alpha
-    // draws or the unsafe nineteen B9200 result return-hook family.
+    // GOAL helpers, progress, Sumo_Printf and exact B9200 glyph-wrapper
+    // sources enqueue D3DX triangles beyond their original caller. Only
+    // stack-proven B9200 glyph tags gain queued GPU ownership; the unsafe
+    // nineteen original +5 midhooks stay disabled. Untagged/foreign/mixed
+    // batches retain the native renderer submission path.
     static bool GoalOwner(
         OutRunVR::GameSemantic::RenderScope scope,
         OutRunVR::GameSemantic::ProducerToken source) noexcept
@@ -2656,6 +2670,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
              source == ProducerToken::GoalTime150 ||
              source == ProducerToken::ResultProgress ||
              source == ProducerToken::OutRunStagePrintf ||
+             source == ProducerToken::ResultTextB9200 ||
              source == ProducerToken::PauseOptionArrow);
     }
 

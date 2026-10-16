@@ -62,7 +62,8 @@ static bool CheckQueuedGoalBatch()
             ProducerToken::ResultProgress,
             ProducerToken::GoalTime020,
             ProducerToken::GoalTime150,
-            ProducerToken::OutRunStagePrintf})
+            ProducerToken::OutRunStagePrintf,
+            ProducerToken::ResultTextB9200})
     {
         // 1..N sibling D3DX Draws stay in ONE proven owner batch.
         for (unsigned draws = 1; draws < 9; ++draws)
@@ -105,8 +106,46 @@ static bool CheckQueuedGoalBatch()
             RenderScope::WorldBillboard, ProducerToken::GoalTime020);
 }
 
+static bool CheckVerifiedB9200GpuOwnership()
+{
+    using namespace OutRunVR::GameSemantic;
+    constexpr auto hud = RenderScope::ScreenHud;
+    constexpr auto b9200 = ProducerToken::ResultTextB9200;
+    // Only the existing exact original-B9200 stack-return discriminator
+    // creates this token. Prove the direct source-exit and queued GPU-batch
+    // policies accept it without promoting foreign/mixed/untagged Draws.
+    return CanFlushD3DXDirectGoalAtExit(
+               false, true, true, 3, true, hud, b9200, hud, b9200) &&
+        CanArmD3DXQueueGoalAfterDraw(
+               true, true, true, 1, true, hud, b9200, hud, b9200) &&
+        CanDeferD3DXQueueGoalBatch(
+               true, true, true, true, 3, true, hud, b9200, hud, b9200) &&
+        !CanFlushD3DXDirectGoalAtExit(
+               false, true, true, 3, false, hud, b9200, hud, b9200) &&
+        !CanFlushD3DXDirectGoalAtExit(
+               false, true, true, 3, true, hud, b9200,
+               hud, ProducerToken::GoalTime020) &&
+        !CanFlushD3DXDirectGoalAtExit(
+               true, true, true, 3, true, hud, b9200, hud, b9200) &&
+        !CanArmD3DXQueueGoalAfterDraw(
+               true, true, true, 2, true, hud, b9200, hud, b9200) &&
+        !CanDeferD3DXQueueGoalBatch(
+               true, true, true, true, 3, false, hud, b9200, hud, b9200) &&
+        !CanDeferD3DXQueueGoalBatch(
+               true, true, true, true, 3, true, hud, b9200,
+               hud, ProducerToken::ResultProgress) &&
+        !CanDeferD3DXQueueGoalBatch(
+               true, true, true, true, 3, true,
+               RenderScope::ScreenOverlay2D, b9200,
+               RenderScope::ScreenOverlay2D, b9200) &&
+        !CanDrainDirectResultBeforeFirstQueueNode(
+               false, true, true, 2, true, hud, b9200,
+               RenderScope::None, ProducerToken::None);
+}
+
 int main()
 {
+    if (!CheckVerifiedB9200GpuOwnership()) return 6;
     if (!CheckStagePrintfBatch()) return 4;
     if (!CheckQueuedGoalBatch()) return 5;
     if (!CheckDirectGoal(ProducerToken::ResultProgress) ||

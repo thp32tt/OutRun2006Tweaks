@@ -336,6 +336,7 @@ namespace OutRunVR::GameSemantic
              pendingProducer == ProducerToken::GoalTime150 ||
              pendingProducer == ProducerToken::ResultProgress ||
              pendingProducer == ProducerToken::OutRunStagePrintf ||
+             pendingProducer == ProducerToken::ResultTextB9200 ||
              pendingProducer == ProducerToken::PauseOptionArrow) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
@@ -353,6 +354,9 @@ namespace OutRunVR::GameSemantic
     static_assert(CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
+    static_assert(CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200));
     static_assert(!CanArmD3DXQueueGoalAfterDraw(true, true, true, 1, true,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
         RenderScope::ScreenHud, ProducerToken::ResultProgress));
@@ -403,6 +407,7 @@ namespace OutRunVR::GameSemantic
              pendingProducer == ProducerToken::GoalTime150 ||
              pendingProducer == ProducerToken::ResultProgress ||
              pendingProducer == ProducerToken::OutRunStagePrintf ||
+             pendingProducer == ProducerToken::ResultTextB9200 ||
              pendingProducer == ProducerToken::PauseOptionArrow) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
@@ -420,6 +425,9 @@ namespace OutRunVR::GameSemantic
     static_assert(CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
+    static_assert(CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200));
     static_assert(!CanDeferD3DXQueueGoalBatch(false, true, true, true, 2, true,
         RenderScope::ScreenHud, ProducerToken::ResultProgress,
         RenderScope::ScreenHud, ProducerToken::ResultProgress));
@@ -452,6 +460,7 @@ namespace OutRunVR::GameSemantic
              pendingProducer == ProducerToken::GoalTime150 ||
              pendingProducer == ProducerToken::ResultProgress ||
              pendingProducer == ProducerToken::OutRunStagePrintf ||
+             pendingProducer == ProducerToken::ResultTextB9200 ||
              pendingProducer == ProducerToken::PauseOptionArrow) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
@@ -469,6 +478,12 @@ namespace OutRunVR::GameSemantic
     static_assert(CanFlushD3DXDirectGoalAtExit(false, true, true, 2, true,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
+    static_assert(CanFlushD3DXDirectGoalAtExit(false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
     static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 2, false,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
