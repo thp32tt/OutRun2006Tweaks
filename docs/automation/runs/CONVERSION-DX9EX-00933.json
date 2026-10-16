@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "104b9c3b3eb134d2fed2f311625bad0b3fbce87e",
@@ -87,7 +87,14 @@
     "eye_ownership": "Each eye receives spatial contact-shadow correction only with same original direct producer and WVP lifetime; all unproven writes retain the existing stock-WVP eye path."
   },
   "material_result_sha": "1eac78e0030f8b0470e8e45cbb869ee6d32957d6",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "3b1226561be26ceef34e49a18b8d86a70e41b57d",
   "score_delta_this_attempt": 0,
-  "next_action": "Repair exact-HEAD policy-record omission under same TASK_ID; run mandatory final exact-SHA CI on validation-bearing repair commit, then separate C6 bookkeeping only after PASS. HMD remains UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA for exact validation-bearing commit; prior TERMINAL_STATUS_NOT_COMPLETE hold resolved. Await Quest3/VDXR HMD runtime and binocular start-contact-shadow acceptance; RUNTIME_VALIDATION=UNTESTED. Do not rerun CI or award duplicate points.",
+  "validation_evidence": {
+    "sha": "3b1226561be26ceef34e49a18b8d86a70e41b57d",
+    "exact_sha_github_actions": "SUCCESS",
+    "evidence_source": "Provided exact-SHA GitHub CI SUCCESS in C6 instruction; no rerun performed. Connector combined-status endpoint returned no individual statuses; no run IDs inferred.",
+    "resolved_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "hmd_proof": "NONE"
+  }
 }
