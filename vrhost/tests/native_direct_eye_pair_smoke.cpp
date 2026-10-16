@@ -51,11 +51,14 @@ int main()
         SUCCEEDED(warpDevice->CreateTexture2D(&left, nullptr, &gpuLeft)) &&
         SUCCEEDED(warpDevice->CreateTexture2D(&right, nullptr, &gpuRight));
     const bool distinctGpuPair = created &&
-        OutRunVrNativeEyePair::DistinctSourceAllocations(gpuLeft, gpuRight);
+        OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+            gpuLeft, gpuRight, IID_IUnknown);
     const bool duplicateGpuEyeDenied = gpuLeft &&
-        !OutRunVrNativeEyePair::DistinctSourceAllocations(gpuLeft, gpuLeft);
+        !OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+            gpuLeft, gpuLeft, IID_IUnknown);
     const bool nullGpuEyeDenied = gpuLeft &&
-        !OutRunVrNativeEyePair::DistinctSourceAllocations(gpuLeft, nullptr);
+        !OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+            gpuLeft, static_cast<ID3D11Texture2D*>(nullptr), IID_IUnknown);
     if (gpuLeft) gpuLeft->Release();
     if (gpuRight) gpuRight->Release();
     if (warpContext) warpContext->Release();

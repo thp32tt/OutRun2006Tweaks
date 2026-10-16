@@ -25,17 +25,21 @@ namespace OutRunVrNativeEyePair
     // the handle values, before copying a supposedly stereo game frame.
     // This is a secondary host-side check: only native producer provenance
     // may establish independent left/right game renders.
+    // Existing portable sRGB/descriptor regressions compile this header with
+    // restricted DXGI descriptors. Defer COM type checking until the actual
+    // D3D11 host or WARP resource-identity test instantiates this function.
+    template <typename Canonical, typename Texture, typename InterfaceId>
     [[nodiscard]] inline bool DistinctSourceAllocations(
-        ID3D11Texture2D* left, ID3D11Texture2D* right) noexcept
+        Texture* left, Texture* right, const InterfaceId& unknownIid) noexcept
     {
         if (!left || !right || left == right) return false;
-        IUnknown* leftIdentity = nullptr;
-        IUnknown* rightIdentity = nullptr;
-        const HRESULT leftResult = left->QueryInterface(
-            IID_IUnknown, reinterpret_cast<void**>(&leftIdentity));
-        const HRESULT rightResult = right->QueryInterface(
-            IID_IUnknown, reinterpret_cast<void**>(&rightIdentity));
-        const bool distinct = SUCCEEDED(leftResult) && SUCCEEDED(rightResult) &&
+        Canonical* leftIdentity = nullptr;
+        Canonical* rightIdentity = nullptr;
+        const auto leftResult = left->QueryInterface(
+            unknownIid, reinterpret_cast<void**>(&leftIdentity));
+        const auto rightResult = right->QueryInterface(
+            unknownIid, reinterpret_cast<void**>(&rightIdentity));
+        const bool distinct = leftResult >= 0 && rightResult >= 0 &&
             leftIdentity && rightIdentity && leftIdentity != rightIdentity;
         if (leftIdentity) leftIdentity->Release();
         if (rightIdentity) rightIdentity->Release();

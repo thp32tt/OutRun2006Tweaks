@@ -1389,8 +1389,8 @@ namespace
             // Different legacy shared handle values are not proof of two
             // distinct GPU allocations. Fail closed before R23's direct
             // OpenXR hold-texture copies or legacy same-frame snapshots.
-            if (!OutRunVrNativeEyePair::DistinctSourceAllocations(
-                    directLeft_[slot], directRight_[slot]) ||
+            if (!OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+                    directLeft_[slot], directRight_[slot], IID_IUnknown) ||
                 !OutRunVrNativeEyePair::Compatible(
                     leftHandleValue, rightHandleValue, generation,
                     width, height, nativeLeft, nativeRight))
