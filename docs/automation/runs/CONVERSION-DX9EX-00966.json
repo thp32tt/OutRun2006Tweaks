@@ -69,11 +69,11 @@
     ]
   },
   "acceptance_results": {
-    "screen_hud_fail_closed": "PASS_EXACT_SHA",
-    "rank_marker_and_world_negative": "PASS_EXACT_SHA",
-    "integrated_exact_sha_gates": "PASS_EXACT_SHA"
+    "screen_hud_fail_closed": "PENDING_EXACT_SHA",
+    "rank_marker_and_world_negative": "PENDING_EXACT_SHA",
+    "integrated_exact_sha_gates": "PENDING_EXACT_SHA"
   },
-  "score_delta_this_attempt": 1,
+  "score_delta_this_attempt": 0,
   "ci_repair": {
     "failed_validation_sha": "a10f30c2f16bb2cddfd40d472e33368cb78640fd",
     "failed_gate": "DX9Ex Active Validation policy / verify_vr_feature_unit_policy.py",
