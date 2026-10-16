@@ -133,6 +133,41 @@ int main()
             !c.IsExactFiniteResultHud()) return 13;
         EndSpriteQueueRender();
     }
+    // R84 whole-screen fallback contract: producer-proven ordinary HUD
+    // (6th/6, timer/rank/gear) and queued projected car markers cannot use
+    // the previous road WVP on a missing/failed R30 eye-plane submission.
+    // Generic overlays and real road/vehicle sources still reach R29.
+    const PhysicalDrawCommand rankedHud{
+        RenderScope::ScreenHud, ProducerToken::DispRankClipSprite};
+    const PhysicalDrawCommand resultHud{
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime};
+    const PhysicalDrawCommand rankMarker{
+        RenderScope::ProjectedWorldMarker2D,
+        ProducerToken::RankMarkerSprani, &marker, 11, true};
+    const PhysicalDrawCommand unprovedMarker{
+        RenderScope::ProjectedWorldMarker2D,
+        ProducerToken::None, &marker, 11, true};
+    const PhysicalDrawCommand unqueuedMarker{
+        RenderScope::ProjectedWorldMarker2D,
+        ProducerToken::RankMarkerSprani};
+    const PhysicalDrawCommand genericHud{
+        RenderScope::ScreenHud, ProducerToken::None};
+    const PhysicalDrawCommand externalUi{
+        RenderScope::ScreenOverlay2D, ProducerToken::None};
+    const PhysicalDrawCommand worldVehicle{
+        RenderScope::WorldParticle, ProducerToken::None};
+    const PhysicalDrawCommand sky{
+        RenderScope::SkyGlow, ProducerToken::None};
+    if (!rankedHud.NeedsScreenStereoOrOriginal() ||
+        !resultHud.NeedsScreenStereoOrOriginal() ||
+        !rankMarker.NeedsScreenStereoOrOriginal() ||
+        unprovedMarker.NeedsScreenStereoOrOriginal() ||
+        unqueuedMarker.NeedsScreenStereoOrOriginal() ||
+        genericHud.NeedsScreenStereoOrOriginal() ||
+        externalUi.NeedsScreenStereoOrOriginal() ||
+        worldVehicle.NeedsScreenStereoOrOriginal() ||
+        sky.NeedsScreenStereoOrOriginal()) return 26;
+
     // Unknown or wrong-scope tokens, rank markers, world shadows and the
     // original D3A5 sun retain their existing world/marking routes.
     CurrentScope=RenderScope::ScreenHud;

@@ -1,0 +1,72 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00966",
+  "production_id": "CONVERSION-DX9EX-00966",
+  "event_id": "CONVERSION-DX9EX-00966-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00966",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R84:SCREEN_SOURCE_ORIGINAL_FALLBACK",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_RANK_STALE_WORLD_WVP",
+  "feature_class": "VISUAL_DEFECT",
+  "status": "IN_PROGRESS",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e388e6c03cc4a64f9de7a4d43a5d99a0e4346af1",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/render_command_snapshot_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/render_command_snapshot_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00966.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:R84:SCREEN_SOURCE_ORIGINAL_FALLBACK",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_RANK_STALE_WORLD_WVP",
+    "goal": "Prevent original source-proven game HUD and queued projected rank SpriteNodes from inheriting stale world WVP in R84 when R30 eye-plane proof fails; preserve binocular path on success and original native draw on failure.",
+    "scope_boundary": "R84 R33 fail-closed screen source classification and portable physical draw command smoke. No R26 fallback, world, input, FFB, SkyGlow or DXVK changes.",
+    "special_work_evidence": "R33's prior fail-closed branches covered only +TIME/GOAL but not other exact ScreenHud producers or tagged rank SpriteNodes, leaving their failed R30 classification able to fall into R29 cached road WVP.",
+    "subcomponents": [
+      "Source-proven HUD/queued rank eligibility at original draw command",
+      "R33 missing raster or eye proof preserves exactly one original physical draw",
+      "Release host source-level positive and negative physical command regression"
+    ],
+    "acceptance_items": [
+      {
+        "id": "screen_hud_fail_closed",
+        "category": "end_to_end_behavior",
+        "behavior_area": "6th/6 and time/rank/gear exact ScreenHud on missing R30 proof",
+        "expected_behavior": "Preserve original native draw instead of reinterpreting previous world shader c64, while retaining binocular R33 HUD if proven."
+      },
+      {
+        "id": "rank_marker_and_world_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Queued projected rank marker vs untagged overlay/world/lens/SkyGlow",
+        "expected_behavior": "Only queued producer-owned rank falls back to original draw; unrelated original source routes unchanged."
+      },
+      {
+        "id": "integrated_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32, R26_SAFE fallback, x64 host, package, Domain and impacted review",
+        "expected_behavior": "All mandatory exact SHA GitHub Actions pass; Quest3/VDXR validation remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "screen_hud_fail_closed": "PENDING_EXACT_SHA",
+    "rank_marker_and_world_negative": "PENDING_EXACT_SHA",
+    "integrated_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "score_delta_this_attempt": 0
+}

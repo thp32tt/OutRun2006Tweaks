@@ -942,6 +942,19 @@ namespace OutRunVR::GameSemantic
                 producer != ProducerToken::None;
         }
 
+        // R84 physical dispatch must never route *source-identified screen*
+        // commands into R29's verified road/vehicle WVP when R30 could not
+        // establish binocular HUD/marker ownership. Direct exact HUD and
+        // queued projected rank glyphs keep their ONE native original draw.
+        // Generic overlays, untagged sprites and actual world draws still
+        // use the original R29 decision; a token by itself grants nothing.
+        constexpr bool NeedsScreenStereoOrOriginal() const noexcept
+        {
+            return IsSourceProvenHud() ||
+                (queued && producer != ProducerToken::None &&
+                 scope == RenderScope::ProjectedWorldMarker2D);
+        }
+
         // +TIME and the exact original GOAL producer family own a finite
         // HUD-plane GPU draw, not the last verified perspective road c64.
         // Only the R30/R33 physically proven HUD stereo route may replace

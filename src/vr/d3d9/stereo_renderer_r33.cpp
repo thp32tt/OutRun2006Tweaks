@@ -1066,12 +1066,15 @@ namespace OutRunVRStereo
             const bool directCarShadow =
                 drawCommand.IsDirectCarBaseShadow();
             const bool exactResultHud = drawCommand.IsExactFiniteResultHud();
+            const bool sourceScreenRequiresProof =
+                drawCommand.NeedsScreenStereoOrOriginal();
             if (!resyncAlreadyFlushed)
             {
                 // Raster resync failed before R30 could prove HUD stereo.
                 // An exact +TIME/GOAL producer must keep its original draw,
                 // never borrow R29's preceding road/world source.
-                if (exactResultHud || directCarShadow ||
+                if (exactResultHud || sourceScreenRequiresProof ||
+                    directCarShadow ||
                     OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(
                         directLensCentre, resyncAlreadyFlushed))
                 {
@@ -1102,11 +1105,14 @@ namespace OutRunVRStereo
                     R32ReviewNoteDispatchFallback();
                 return actualDraw();
             }
-            // R30 cannot establish a finite HUD eye plane on this draw.
+            // R30 cannot establish a source-owned HUD/marker eye plane.
+            // Even an ordinary 6th/6 or anchored rank SpriteNode must not
+            // borrow R31's previous road WVP when this proof is missing.
             // R31's shader+pose cache may still match an earlier road WVP:
             // using that cache for original +TIME/GOAL produces a displaced
             // or doubled result. Fail open to exactly one game draw instead.
-            if ((exactResultHud || directCarShadow) &&
+            if ((exactResultHud || sourceScreenRequiresProof ||
+                 directCarShadow) &&
                 screenKind == R32ReviewScreenSpaceKind::None)
             {
                 if (telemetry)
@@ -1135,7 +1141,7 @@ namespace OutRunVRStereo
                 // HUD classification alone is not proof of physical stereo.
                 // Missing GPU-eye resources, pose or c64 must leave the
                 // exact original +TIME/GOAL path alone, not hand it to R29.
-                if (exactResultHud ||
+                if (exactResultHud || sourceScreenRequiresProof ||
                     (directCarShadow && !hud.handled))
                 {
                     if (telemetry)
