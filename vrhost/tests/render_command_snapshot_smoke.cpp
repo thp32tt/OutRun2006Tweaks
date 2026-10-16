@@ -166,5 +166,62 @@ int main()
     CurrentScope=RenderScope::SceneEffect;
     if(CapturePhysicalDrawCommand().IsExactFiniteResultHud())
         return 18;
+    // R84 physical R33::ConsumeForDraw used to eat TIME RECORD's pending
+    // one-shot when the independent exact +TIME queue rendered first. The
+    // queued draw looked correctly tagged to R30, but the *next* original
+    // TIME RECORD glyph silently lost its ScreenHud scope. Check both GPU
+    // commands, not just the immediate queue classification.
+    CurrentScope = RenderScope::SceneEffect;
+    NextDrawScope = RenderScope::None;
+    ArmNextDraw(RenderScope::ScreenHud);
+    int extensionNode = 0;
+    RegisterSpriteNodeScope(&extensionNode, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime);
+    BeginSpriteQueueRender();
+    SelectSpriteQueueNode(&extensionNode);
+    if (ConsumeForDraw() != RenderScope::ScreenHud ||
+        NextDrawScope != RenderScope::ScreenHud ||
+        !CapturePhysicalDrawCommand().IsExactFiniteResultHud()) return 19;
+    EndSpriteQueueRender();
+    if (ConsumeForDraw() != RenderScope::ScreenHud ||
+        NextDrawScope != RenderScope::None) return 20;
+
+    // A physical projected-car glyph must preserve its own world anchor
+    // and leave any previously armed unrelated direct text owner intact.
+    ArmNextDraw(RenderScope::ScreenHud);
+    int rankNode = 0;
+    ProjectedMarkerInfo rankAnchor{true, 0.25f, -0.5f, 19.0f};
+    RegisterSpriteNodeScope(&rankNode,
+        RenderScope::ProjectedWorldMarker2D,
+        ProducerToken::RankMarkerSprani, &rankAnchor);
+    BeginSpriteQueueRender();
+    SelectSpriteQueueNode(&rankNode);
+    if (ConsumeForDraw() != RenderScope::ProjectedWorldMarker2D ||
+        NextDrawScope != RenderScope::ScreenHud ||
+        CapturePhysicalDrawCommand().scope !=
+            RenderScope::ProjectedWorldMarker2D ||
+        !CurrentProjectedMarker()) return 21;
+    EndSpriteQueueRender();
+    if (ConsumeForDraw() != RenderScope::ScreenHud) return 22;
+
+    // No exact SpriteNode tag: preserve original one-shot behavior for
+    // unclassified native clips and unchanged TIME RECORD call patterns.
+    ArmNextDraw(RenderScope::ScreenHud);
+    int genericNode = 0;
+    BeginSpriteQueueRender();
+    SelectSpriteQueueNode(&genericNode);
+    if (ConsumeForDraw() != RenderScope::ScreenHud ||
+        NextDrawScope != RenderScope::None) return 23;
+    EndSpriteQueueRender();
+
+    // External F11 must neither consume the game token nor acquire its HUD.
+    ArmNextDraw(RenderScope::ScreenHud);
+    {
+        ScopedExternalOverlaySemantic overlay(RenderScope::ScreenOverlay2D);
+        if (ConsumeForDraw() != RenderScope::ScreenOverlay2D ||
+            NextDrawScope != RenderScope::ScreenHud) return 24;
+    }
+    if (ConsumeForDraw() != RenderScope::ScreenHud ||
+        NextDrawScope != RenderScope::None) return 25;
     return 0;
 }

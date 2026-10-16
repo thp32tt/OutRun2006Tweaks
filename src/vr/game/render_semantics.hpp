@@ -632,6 +632,18 @@ namespace OutRunVR::GameSemantic
         // pending token after this original draw completes.
         if (ExactLensCentreDrawOwnsSemantic())
             return RenderScope::WorldBillboard;
+        // R84 physical DrawPrimitive consumes one-shot scopes here, before
+        // R33/R30 classify the selected original SpriteNode. An earlier
+        // TIME RECORD/screen-text one-shot must not be consumed by a distinct
+        // producer-owned +TIME, GOAL, pause, rank or world queue node. The
+        // exact tag already identifies the entire node's native GPU route;
+        // preserve the pending token for its own later, non-queued draw.
+        // Untagged queue nodes retain the original one-shot fallback.
+        if (SpriteQueueDepth != 0 &&
+            (CurrentQueueExactScope == RenderScope::ScreenHud ||
+             CurrentQueueExactScope == RenderScope::WorldBillboard ||
+             CurrentQueueExactScope == RenderScope::ProjectedWorldMarker2D))
+            return CurrentQueueExactScope;
         if (NextDrawScope != RenderScope::None)
         {
             const RenderScope scope = NextDrawScope;

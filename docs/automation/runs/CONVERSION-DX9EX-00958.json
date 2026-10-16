@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00958",
+  "production_id": "CONVERSION-DX9EX-00958",
+  "event_id": "CONVERSION-DX9EX-00958-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00958",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "3bf4ca82869cdd5aab7517bd593fda4a8cd5d6ee",
+  "material_result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_COMMIT",
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/render_command_snapshot_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00958.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep original stage +TIME/GOAL tagged SpriteNode physical GPU draws independent of a previously armed TIME RECORD one-shot HUD draw, and preserve that pending native text owner for its actual later draw.",
+    "scope_boundary": "Only source-proven queued ScreenHud/WorldBillboard/projected-rank ConsumeForDraw priority; ordinary untagged game UI, F11 overlay, C993 central lens, SkyGlow, FFB, input, DX11, frozen DXVK and native R26_SAFE fallback unchanged.",
+    "trace_stages": [
+      "Original TIME RECORD source arms next direct ScreenHud via TimeRecord_AdjustPositionAndHud.",
+      "Unrelated exact +TIME/GOAL SpriteNode or car-rank node selects its own source and physical GPU draw through R33's ConsumeForDraw.",
+      "The exact queue owner now retains priority without consuming the unrelated pending next-draw scope, allowing the original later text GPU primitive to consume its own HUD token exactly once."
+    ],
+    "subcomponents": [
+      "Preserve the entire producer-owned queue semantic for every physical draw of a verified ScreenHud/world/marker SpriteNode while deferring unrelated one-shot direct text tokens.",
+      "Run native positive and negative command snapshot regression for exact queued +TIME, car-rank, original untagged queue behavior, later direct TIME RECORD, and external F11 overlay."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_queued_owner_preservation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original stage +TIME/GOAL source and later native TIME RECORD GPU primitive",
+        "expected_behavior": "Source-tagged queue command retains its ScreenHud/marker projection and does not steal a prior pending direct text token; the later native direct draw still consumes its one-shot ScreenHud."
+      },
+      {
+        "id": "stage_queue_negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "R84 queue, rank, F11, untagged original UI and R26_SAFE rollback",
+        "expected_behavior": "Selected exact car marker keeps its anchor, an untagged queue retains legacy one-shot semantics, and external F11 cannot consume game tokens."
+      },
+      {
+        "id": "stage_queue_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 game, R26_SAFE rollback, x64 host, package and source-owner regressions",
+        "expected_behavior": "Exact material SHA passes DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector without CI-skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_queued_owner_preservation": "PENDING_CI",
+    "stage_queue_negative_fallback": "PENDING_CI",
+    "stage_queue_exact_sha_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "ConsumeForDraw unconditionally drained NextDrawScope before consulting the live exact SpriteNode scope. TimeRecord_AdjustPositionAndHud arms a direct ScreenHud one-shot, so an intervening independently tagged +TIME/GOAL/rank node could consume it despite exact queue classification.",
+    "source_trace": [
+      "hooks_uiscaling.cpp TimeRecord_AdjustPositionAndHud arms NextDrawScope ScreenHud",
+      "render_semantics.hpp SelectSpriteQueueNode selects exact scope but previous ConsumeForDraw drained unrelated NextDrawScope first",
+      "R84 stereo_renderer_r33.cpp R33GuardStereoRasterState invokes ConsumeForDraw at every physical game primitive before scoped classification"
+    ],
+    "runtime_limit": "Source-level semantic-owner failure and native regressions only. No Quest3/VDXR/game optical evidence."
+  },
+  "next_action": "CI on new exact material result SHA must pass four mandatory gates before C6. Do not claim HMD visuals until matching Quest3/VDXR test."
+}
