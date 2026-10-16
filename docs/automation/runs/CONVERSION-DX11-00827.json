@@ -76,7 +76,7 @@
       "CMakeLists.txt"
     ],
     "acceptance_proof": {
-      "positive_probe": "Material 03a50e0 real C++ eye-stage save/isolate/restore. First WARP link failure LNK2019 at 03a50; dynamic compiler 706ab2 linked but crashed 0xC0000005 on premature DLL unload; this commit repairs COM object lifetime. Final WARP/PASS exact SHA pending.",
+      "positive_probe": "Real C++ stage isolation material 03a50e0, test DLL lifetime causal repair applied. No WARP/Quest3 PASS inferred; final exact SHA Gates pending.",
       "negative_regression": "D3D9 gamepad/FFB/Present fallback unchanged; no XR producer promotion, no DXVK edits.",
       "component_integration": "Renderer-owned eye callback IA/VS/PS + scoped GPU shader-stage isolation -> native Draw/DrawIndexed -> distinct ring-owned L/R RTV/DSV -> producer fence/host publication; game R30 live stereo source callback still pending."
     },
@@ -96,7 +96,7 @@
     "C0_RECOVER": "GitHub HEAD f8acb46 before implementation; 00826 exact SHA 04009dba 5/5 Gate passed. Existing stereo R30 source replay unfinished.",
     "C1_REVIEW": "Shared D3D11 context restores IA/VS/PS per eye but inherited GS/HS/DS can reinterpret native geometry and left-eye shader state can contaminate right eye.",
     "C2_IMPLEMENT": "Material commit 03a50e0: real C++ native GS/HS/DS stage isolation/restoration and WARP geometry-shader callback mutation regression.",
-    "C3_VALIDATE": "03a50e0 WARP failed LNK2019 D3DCompile despite generated CMake; 706ab2d test-only runtime loader compiled but WARP process exited 0xC0000005 because FreeLibrary preceded ID3DBlob use. This commit repairs lifetime and enables exact-SHA Fast via run record. Required Gates pending.",
+    "C3_VALIDATE": "WARP material 03a50e0 LNK2019; 706ab2a linked but crashed 0xC0000005 from unloading compiler DLL before bytecode COM vtable use. First repair 17056c7 inserted later FreeLibrary but retained premature unload; this causal patch removes the early call and retains only post-Release unload. Exact five GitHub Gates and WARP are PENDING.",
     "C4_COMMIT": "Source material 03a50e0; test/build failures corrected under same TASK_ID. No CI-skip on gate-bearing commit.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA_GATE; full R30 native menu/car/race connection incomplete; HMD UNTESTED."

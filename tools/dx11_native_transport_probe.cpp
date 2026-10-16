@@ -842,7 +842,7 @@ int main()
         gameGeometrySource, sizeof(gameGeometrySource)-1u,
         "native_eye_game", nullptr, nullptr, "main", "gs_4_0",
         D3DCOMPILE_ENABLE_STRICTNESS, 0u, &geometryBytecode, nullptr);
-    FreeLibrary(compilerModule);
+    // Keep compiler loaded until ID3DBlob is consumed and released below.
     require(SUCCEEDED(geometryCompileResult) && geometryBytecode,
             "00827 caller geometry stage compiled");
     ID3D11GeometryShader* originalGeometryShader = nullptr;
