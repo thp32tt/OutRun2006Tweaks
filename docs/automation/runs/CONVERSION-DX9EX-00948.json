@@ -18,7 +18,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "28537180dd6ee3f9fb33bdcf220a93644f96828c",
-  "material_result_sha": null,
+  "material_result_sha": "2e5f32ec701be3ddf9ff7da10dcd4ef8a3bc7880",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/texture_pack_cursor.hpp",
@@ -60,6 +60,10 @@
         "behavior_area": "Windows x86 game, x64 host and package",
         "expected_behavior": "New portable native-index regression runs with the x64 host build and required exact-SHA DX9Ex Active, Domain, Full Source Impact, affected HUD Inspector gates."
       }
+    ],
+    "subcomponents": [
+      "Repair the complete live UI/car-selector XST source callback through exact original per-pack native texture index handling while maintaining repeated filename/slot callback identity and clean ordinal restart on native stream rewind.",
+      "Wire the live x86 game DDS replacement ordinal selector to the original game texture number and native x64 host executable positive/negative regression for repeated pack callbacks, reload, changed slot and independent scene-XMT decoding."
     ]
   },
   "acceptance_results": {
@@ -72,8 +76,26 @@
     "source_evidence": "src/hooks_textures.cpp LoadXstsetSprite_dest uses XST path+slot only; HandleTexture calls UiTextureCursor.NextIndex() while original game DDS number at 0x55B25C is already available for sprite_scales.",
     "fix_evidence": "Detect a native XST per-pack texture index rewind to 0/1 after a larger observed index and restart indexed DDS ordinals once; preserve same-pack item reentries and scene-XMT cursor.",
     "negative_test_evidence": "Portable game-header smoke checks repeated same pack callbacks, native index seek, native rewind, mutable filename, new slot and independent scene sequence.",
-    "runtime_limit": "Source-confirmed ordinal behavior only; user's vehicle selection white image/root cause not proven without Quest3/VDXR or game screen."
+    "runtime_limit": "Source-confirmed ordinal behavior only; user's vehicle selection white image/root cause not proven without Quest3/VDXR or game screen.",
+    "original_evidence": "Original OutRun 2006 engine LoadXstsetSprite_dest callback obtains XST filename from ECX and game slot from EAX; source-native texture number at game VA-relative 0x55B25C is already read for indexed sprite scale lookup in the texture replacement hook. This preserves original UI DDS producer rather than adding an EXE binary patch.",
+    "source_trace": [
+      "Original car selector returns into LoadXstsetSprite_dest, which assigns XST filename and slot to UiTextureCursor and preserves filename contents despite game buffer reuse.",
+      "HandleTexture hashes the original DDS, queries native game 0x55B25C per-pack index, maps replacement ordinal/filename, and delegates optional replacement to original D3DX or fast DDS allocator.",
+      "Actual game UI texture is later bound as game sprite input; no new stereo projection, alpha policy or texture pixel conversion introduced by this cursor correction."
+    ],
+    "alternatives_rejected": [
+      "Do not reset on every LoadXstsetSprite callback: the same pack can legitimately call repeatedly while scanning sequential DDS entries; doing so would map all selection sprites to ordinal zero.",
+      "Do not reset scene-XMT independent cursor or alter D3D9 DDS decode/sRGB/alpha: those paths are outside the source-confirmed original UI indexed-name mismatch."
+    ],
+    "eye_ownership": "Native vehicle selection image source identity is corrected before D3D9 managed texture allocation; existing R84 per-eye menu/scene compositor retains physical GPU-eye ownership without any eye projection or world WVP change."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run existing mandatory exact-SHA GitHub Actions on material result; no completion/score/HMD correctness until confirmed."
+  "next_action": "Revalidate all mandatory native Win32 game and x64 host/package Active, Domain, Full Source Impact and HUD Inspector jobs at the CI-repair-bearing exact SHA. Previous result failed only DX9Ex feature subcomponents record completeness; preserve material SHA, do not count this metadata repair as separate feature.",
+  "ci_evidence": {
+    "source_material_sha": "2e5f32ec701be3ddf9ff7da10dcd4ef8a3bc7880",
+    "previous_exact_sha": "2e5f32ec701be3ddf9ff7da10dcd4ef8a3bc7880",
+    "previous_dx9ex_active_policy_failure": "missing feature_contract.subcomponents (policy job 116899332657)",
+    "current_validation": "PENDING_FINAL_EXACT_SHA",
+    "runtime_hmd": "UNTESTED"
+  }
 }
