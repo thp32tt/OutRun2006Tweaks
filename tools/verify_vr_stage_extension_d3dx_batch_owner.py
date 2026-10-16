@@ -269,7 +269,11 @@ def check(code: str, header: str) -> list[str]:
     queue_end = hook.find("static void BeforeQueueEnd(", queue_start)
     first_queue = hook[queue_start:queue_end] if (
         0 <= queue_start < queue_end) else ""
-    exact_first = predicate("CanDrainDirectResultBeforeFirstQueueNode")
+    first_guard_begin = header.find(
+        "inline constexpr bool CanDrainDirectResultBeforeFirstQueueNode(")
+    first_guard_end = header.find("    static_assert(", first_guard_begin)
+    exact_first = header[first_guard_begin:first_guard_end] if (
+        first_guard_begin >= 0 and first_guard_end > first_guard_begin) else ""
     need("if (CanDrainDirectResultBeforeFirstQueueNode(" in first_queue and
          "QueueRenderActive(), BatchActive," in first_queue and
          "DX9ExD3DXSpriteLifetime::CanFlush(" in first_queue and
