@@ -129,18 +129,54 @@ for good, bad in (
 def require_portrait_center(code):
     sprite = code.split("static void __cdecl draw_sprite_custom_matrix_mid(", 1)[1].split(
         "// Adjust positions of sprites in 3d space", 1)[0]
-    for token in (
+    # The previous verticalCenter expression was replaced by a single
+    # physically bounded source->viewport affine. Pin all four X/Y vertices
+    # instead: otherwise a stale game screen_scale after Reset clips the
+    # original menu/car-selector artwork even though the other axis is safe.
+    required = (
         "!std::isfinite(Game::screen_resolution->y)",
         "!std::isfinite(Game::original_resolution.y)",
-        "const float verticalCenter =",
-        "Game::original_resolution.y * scaleY) / 2",
-        "quad[1] = scaleY * topLeft.y + verticalCenter + 0.5;",
-        "quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
-        "quad[0xF] = scaleY * topRight.y + verticalCenter + 0.5;",
-        "quad[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;",
-    ):
+        "const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(",
+        "if (!quadMap.valid)",
+        "quad[1] = OutRunVrMenuQuad::ProjectY(quadMap, topLeft.y);",
+        "quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);",
+        "quad[0xF] = OutRunVrMenuQuad::ProjectY(quadMap, topRight.y);",
+        "quad[0x16] = OutRunVrMenuQuad::ProjectY(quadMap, bottomRight.y);",
+        "quad[0] = OutRunVrMenuQuad::ProjectX(quadMap, topLeft.x);",
+        "quad[7] = OutRunVrMenuQuad::ProjectX(quadMap, bottomLeft.x);",
+        "quad[0xE] = OutRunVrMenuQuad::ProjectX(quadMap, topRight.x);",
+        "quad[0x15] = OutRunVrMenuQuad::ProjectX(quadMap, bottomRight.x);",
+    )
+    for token in required:
         if token not in sprite:
             raise AssertionError(token)
+    if sprite.index("const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(") > (
+            sprite.index("quad[1] = OutRunVrMenuQuad::ProjectY(")):
+        raise AssertionError("quad map must precede all transformed corners")
+
+
+def require_physical_containment(header):
+    body = header.split("inline PixelMap BuildPixelMap(", 1)[1].split(
+        "inline float ProjectX(", 1)[0]
+    required = (
+        "if (!contained)",
+        "const float physicalX = screenWidth / sourceWidth;",
+        "const float physicalY = screenHeight / sourceHeight;",
+        "!std::isfinite(physicalX) || !std::isfinite(physicalY)",
+        "const float gameScale = screenScaleX < screenScaleY",
+        "const float physicalScale = physicalX < physicalY",
+        "const float scale = gameScale < physicalScale",
+        "(screenWidth - sourceWidth * scale) * 0.5f",
+        "(screenHeight - sourceHeight * scale) * 0.5f",
+        "return {scale, scale, offsetX, offsetY, true};",
+    )
+    for token in required:
+        if token not in body:
+            raise AssertionError("Live viewport containment missing: " + token)
+    if not (body.index("const float physicalX") <
+            body.index("const float scale = gameScale") <
+            body.index("return {scale, scale, offsetX, offsetY, true};")):
+        raise AssertionError("UI containment must use bounded scale")
 
 
 require_portrait_center(text)
@@ -165,13 +201,21 @@ for good, bad in mutants:
         pass
     else:
         raise AssertionError("Escaped regression: " + bad)
+# Source scale caching and viewport geometry must be tested together,
+# including negative mutations of the new both-axis affine, not just an
+# obsolete vertical-centre formula.
+menu_quad = (Path(__file__).resolve().parents[1] /
+             "src/vr/ui/menu_quad_transform.hpp").read_text()
+require_physical_containment(menu_quad)
 for old, bad in (
     ("Game::original_resolution.y * scale) / 2",
      "Game::original_resolution.y * scale) * 0"),
-    ("Game::original_resolution.y * scaleY) / 2",
-     "Game::original_resolution.y * scaleY) * 0"),
-    ("quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
-     "quad[8] = scaleY * bottomLeft.y + 0.5;"),
+    ("quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);",
+     "quad[8] = bottomLeft.y + 0.5f;"),
+    ("quad[0xF] = OutRunVrMenuQuad::ProjectY(quadMap, topRight.y);",
+     "quad[0xF] = OutRunVrMenuQuad::ProjectX(quadMap, topRight.y);"),
+    ("quad[0] = OutRunVrMenuQuad::ProjectX(quadMap, topLeft.x);",
+     "quad[0] = topLeft.x + 0.5f;"),
 ):
     assert old in text
     broken = text.replace(old, bad, 1)
@@ -181,7 +225,23 @@ for old, bad in (
     except AssertionError:
         pass
     else:
-        raise AssertionError("Portrait Y regression not detected")
+        raise AssertionError("Quad XY containment mutation survived: " + bad)
+for old, bad in (
+    ("const float physicalY = screenHeight / sourceHeight;",
+     "const float physicalY = screenHeight / sourceWidth;"),
+    ("const float physicalScale = physicalX < physicalY",
+     "const float physicalScale = physicalX > physicalY"),
+    ("const float scale = gameScale < physicalScale",
+     "const float scale = gameScale > physicalScale"),
+):
+    assert old in menu_quad
+    try:
+        require_physical_containment(menu_quad.replace(old, bad, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("Physical viewport cap mutation survived: " + bad)
+
 # Regression: OutRun can retain and reuse the same source matrix values
 # across menu -> car selection -> pause -> menu, even if the desktop mirror
 # changes aspect between calls. Only the caller's raw source (not our prior
