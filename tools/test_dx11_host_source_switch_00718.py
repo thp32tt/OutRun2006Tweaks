@@ -9,6 +9,8 @@ workflow = (root/".github/workflows/dx11-fast-structural.yml").read_text()
 
 def wired(source, logic):
     direct = source.split("bool CommitDirectStereoSource(",1)[1].split(
+        "void DiscardUnmatchedStereoSource()",1)[0]
+    invalidator = source.split("void DiscardUnmatchedStereoSource()",1)[1].split(
         "bool DirectTransportReady()",1)[0]
     sbs = source.split("bool CommitStereoSource()",1)[1].split(
         "OutRunVrNativeEyePair::StereoSourceRoute StereoSource()",1)[0]
@@ -18,6 +20,11 @@ def wired(source, logic):
         "bool RenderProjection(",1)[0]
     return (all(x in direct for x in (
         "stereoSourceValid_ = false;", "directFrameValid_=true")) and
+        all(x in invalidator for x in (
+            "directFrameValid_ = false;", "directTransportReady_ = false;",
+            "stereoSourceValid_ = false;")) and
+        "OutRunVrNativeEyePair::SameStereoFrameIdentity(before,after)" in source and
+        "compositor.DiscardUnmatchedStereoSource();" in source and
         all(x in sbs for x in (
             "context_->CopyResource(stereoSource_, source_);",
             "directFrameValid_ = false;",
@@ -45,8 +52,18 @@ def remove_from_routine(source, begin, end, token):
     return prefix + begin + section.replace(token, "/* removed */", 1) + end + suffix
 
 for begin, end, token in (
-    ("bool CommitDirectStereoSource(", "bool DirectTransportReady()",
+    ("bool CommitDirectStereoSource(", "void DiscardUnmatchedStereoSource()",
      "stereoSourceValid_ = false;"),
+    ("void DiscardUnmatchedStereoSource()", "bool DirectTransportReady()",
+     "directFrameValid_ = false;"),
+    ("void DiscardUnmatchedStereoSource()", "bool DirectTransportReady()",
+     "directTransportReady_ = false;"),
+    ("void DiscardUnmatchedStereoSource()", "bool DirectTransportReady()",
+     "stereoSourceValid_ = false;"),
+    ("else if(sourceReady||directFrame)", "const bool grace=",
+     "compositor.DiscardUnmatchedStereoSource();"),
+    ("const bool same=renderFrames.Read(after)", "if(sourceReady&&same)",
+     "OutRunVrNativeEyePair::SameStereoFrameIdentity(before,after)"),
     ("bool CommitStereoSource()", "OutRunVrNativeEyePair::StereoSourceRoute StereoSource()",
      "directFrameValid_ = false;"),
     ("bool CommitStereoSource()", "OutRunVrNativeEyePair::StereoSourceRoute StereoSource()",
