@@ -1227,6 +1227,15 @@ int main()
         const bool actualPartialClear = eyeIndex == 0u
             ? patch[0] == 0u && patch[1] == 0u && patch[2] == 255u
             : patch[0] == 0u && patch[1] == 255u && patch[2] == 0u;
+        if (!distinctColor || !actualPartialClear) {
+            std::cerr << "00829 eye=" << eyeIndex
+                      << " full RGBA=" << unsigned(pixel[0]) << ","
+                      << unsigned(pixel[1]) << "," << unsigned(pixel[2]) << ","
+                      << unsigned(pixel[3]) << " patch RGBA="
+                      << unsigned(patch[0]) << "," << unsigned(patch[1]) << ","
+                      << unsigned(patch[2]) << "," << unsigned(patch[3])
+                      << " rowPitch=" << mapped.RowPitch << '\n';
+        }
         d3d.context->Unmap(readback, 0);
         require(distinctColor && actualPartialClear,
                 "00829 native L/R TARGET partial clears retain untouched pixels");
