@@ -97,12 +97,20 @@ def main() -> None:
             required_eye_contract = [
                 "bool NativeGameEyeDrawEncoder::draw(",
                 "bool NativeGameEyeDrawEncoder::draw_indexed(",
-                "if (!context_ || !vertexCount ||",
-                "if (!context_ || !indexCount ||",
+                # Count only Draw/DrawIndexed submitted into the exact
+                # per-eye output (not an unbound or desktop OM target).
+                "if (!vertexCount || !eye_output_bound() ||",
+                "if (!indexCount || !eye_output_bound() ||",
+                "bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept",
+                "context_->OMGetRenderTargets(1u, &actualTarget, &actualDepth);",
+                "actualTarget == eyeTarget_ && actualDepth == eyeDepth_",
+                "bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept",
+                "context_->OMSetRenderTargets(1u, &target, eyeDepth_);",
                 "context_->Draw(vertexCount, startVertex);",
                 "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
                 "ScopedNativeGameEyeOutput output(ctx, invocation.width, invocation.height);",
-                "NativeGameEyeDrawEncoder encoder(ctx);",
+                "NativeGameEyeDrawEncoder encoder(",
+                "ctx, targets[eyeIndex], invocation.depth[eyeIndex]);",
                 "evidence.drawCount != encoder.draw_count() ||",
                 "sourcePoseSequence != poseSequence_",
                 "ring_.render_eye_pair(context_.Get(), slot_, frameId_,",
