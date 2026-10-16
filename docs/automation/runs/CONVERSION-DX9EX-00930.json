@@ -2,17 +2,17 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00930",
   "production_id": "CONVERSION-DX9EX-00930",
-  "event_id": "CONVERSION-DX9EX-00930-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX9EX-00930-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "run_key": "CONVERSION-DX9EX-00930",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
-  "feature_class": "VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
   "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
+  "checkpoint": "C5_POLICY_CONTRACT_REPAIR",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -62,7 +62,8 @@
         "behavior_area": "R84 game + R26_SAFE + x64 host/package, Domain Isolation, Full Source Impact/HUD gate",
         "expected_behavior": "All required GitHub Actions succeed for the same validation-bearing source SHA; Quest3/VDXR runtime remains untested."
       }
-    ]
+    ],
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS"
   },
   "acceptance_results": {
     "owned_game_wvp_rank_stereo": "PENDING",
@@ -70,9 +71,18 @@
     "exact_sha_required_gates": "PENDING"
   },
   "diagnosis": "Source-confirmed potential rank shader c64 provenance defect; no new HMD reproduction is claimed. A valid owned raw game WVP is used only when all identity gates prove it; other live paths remain unchanged.",
-  "material_result_sha": null,
+  "material_result_sha": "37c25558119ea7379110b0560147312a265e0165",
   "validation_bearing_result_sha": null,
   "score_delta_this_attempt": 0,
-  "failed_ci_evidence": [],
-  "next_action": "Check exact-SHA DX9Ex Active, Domain, Full Source Impact and affected HUD gates; fix any real failures under the same TASK_ID. No headset PASS until Quest3 VDXR test."
+  "failed_ci_evidence": [
+    {
+      "run_id": 38838675410,
+      "head_sha": "37c25558119ea7379110b0560147312a265e0165",
+      "job_id": 116773446815,
+      "step": "Enforce feature-sized DX9Ex autonomous completion",
+      "root_cause": "Record omitted the canonical rank-marker symptom_id on both levels and used VISUAL_DEFECT instead of USER_VISIBLE_VISUAL_DEFECT; feature catalog validator rejected it before any game/host compile."
+    }
+  ],
+  "next_action": "Run exact-SHA existing DX9Ex Active, Domain Isolation, HUD Inspector and Full Source Impact mandatory gates on the corrected record commit; preserve original R84 rank WVP material source and Quest3 UNTESTED.",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS"
 }
