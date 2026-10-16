@@ -952,8 +952,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     rect.right <= rect.left || rect.bottom <= rect.top ||
                     rect.right > static_cast<LONG>(ring_.width()) ||
                     rect.bottom > static_cast<LONG>(ring_.height()) ||
-                    (i != 0u && clears.entries[eye][i].afterDrawOrdinal <
-                        clears.entries[eye][i - 1u].afterDrawOrdinal))
+                    (i != 0u && partialTargetClear->entries[eye][i].afterDrawOrdinal <
+                        partialTargetClear->entries[eye][i - 1u].afterDrawOrdinal))
                     return false;
             }
         }
