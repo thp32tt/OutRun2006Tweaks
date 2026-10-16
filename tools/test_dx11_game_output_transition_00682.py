@@ -25,7 +25,10 @@ def connected(code):
         and "const bool complete = fullMode" in present
         and "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in present
         and ": s.frameBatch.publishable(s.pending);" in present
-        and present.count("if (complete && outputWritable &&") == 2
+        and present.count("if (complete && outputWritable &&") == 1
+        and "if (!gpuHandoffQueued && complete && outputWritable &&" in present
+        and "GameNativeGpuHandoff::may_offer(" in present
+        and "s.gpuFrameSink(s.gpuFrameSinkUser, frame)" in present
         and "game->CreateOffscreenPlainSurface(" in present
         and "game->UpdateSurface(" in present
         and "s.outputGeneration = 0u;" in reset
@@ -37,7 +40,10 @@ for label, token in (
     ("lost GPU stamp", "next.provenance.outputGeneration = s.outputGeneration;"),
     ("foreign D3D9 surface", "s.insetSurfaceDevice != presentDevice"),
     ("unsafe D3D9 UpdateSurface", "s.insetSurfaceDevice == presentDevice"),
-    ("unsupported output", "if (complete && outputWritable &&"),
+    ("unsupported GPU-fallback output", "if (!gpuHandoffQueued && complete && outputWritable &&"),
+    ("unsupported inset output", "if (complete && outputWritable &&"),
+    ("missing GPU producer dispatch", "s.gpuFrameSink(s.gpuFrameSinkUser, frame)"),
+    ("missing GPU provenance gate", "GameNativeGpuHandoff::may_offer("),
     ("incomplete full game", "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)"),
 ):
     mutated = src.replace(token, "/* missing output ownership */", 1)
@@ -91,10 +97,21 @@ with TemporaryDirectory(prefix="dx11-00682-") as temporary:
         ("format-unknown", hdr.replace(
             "format != 0u", "format == 0u"), False),
     )
+    # Compile and execute the actual new portable GPU producer regression,
+    # not only a substring acceptance test of the production call site.
+    gpu_test = root/"tests/vr/dx11_native_game_gpu_handoff.cpp"
+    gpu_exe = d/"native-gpu-handoff"
+    gpu_build = subprocess.run(
+        [compiler, "-std=c++17", "-O2", "-Wall", "-Wextra", "-Werror",
+         "-pedantic", str(gpu_test), "-o", str(gpu_exe)],
+        capture_output=True, text=True)
+    assert gpu_build.returncode == 0, gpu_build.stderr
+    assert subprocess.run([str(gpu_exe)]).returncode == 0
+
     for label, text, expected in cases:
         assert label == "valid" or text != hdr, label
         (d/"native_game_readback_provenance.hpp").write_text(text)
         result = subprocess.run(cmd, capture_output=True, text=True)
         assert (result.returncode == 0) == expected, (label, result.stderr)
         if expected: assert subprocess.run([str(d/"probe")]).returncode == 0
-print("PASS: output generation, D3D9 upload ownership, 6 bridge + 5 C++ mutations")
+print("PASS: output generation, native GPU handoff, D3D9 fallback, 9 bridge + 5 C++ mutations")
