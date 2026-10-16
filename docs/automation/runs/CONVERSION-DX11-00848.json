@@ -1,0 +1,168 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00848",
+  "production_id": "CONVERSION-DX11-00848",
+  "event_id": "CONVERSION-DX11-00848-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_SOURCE_ORDERED_COLOR_DEPTH_CLEAR",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "NATIVE_EYE_COLOR_AND_DEPTH_CLEAR_TIMELINE_BUILD_VERIFIED_REAL_R30_CAMERA_TO_OPENXR_INCOMPLETE",
+  "material_result_sha": "1544600d431e5b8e2f843888455daa30f768542b",
+  "validation_bearing_result_sha": "e1a1483e769e07c76ba3090a86804cbda3c178e1",
+  "source_material_commits": [
+    "1544600d431e5b8e2f843888455daa30f768542b"
+  ],
+  "validation_repair_commits": [
+    "e1a1483e769e07c76ba3090a86804cbda3c178e1"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "Source-ordered native L/R eye color and Z/stencil clear replay is build/WARP verified, but live R30 source camera to complete Quest3/OpenXR game-frame feature is unfinished. No independent feature completion or new AI score.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00847.json",
+    "tools/dx11_autodev_policy.py",
+    "tools/test_dx11_autodev_policy.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Integrate original per-eye D3D9 game TARGET and full Z/stencil Clears in actual native L/R Draw/DrawIndexed chronological GPU source command replay while preserving fallback, then continue unfinished R30 live camera to OpenXR connection.",
+    "acceptance_items": [
+      {
+        "id": "source-ordered-native-eye-clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_eye_draw_color_and_depth",
+        "expected_behavior": "Genuine L/R GPU eye geometry replays D3D9-authored TARGET rect and full Z/stencil clear in one captured afterDrawOrdinal timeline for each eye."
+      },
+      {
+        "id": "malformed-clears-fail-closed",
+        "category": "fallback_regression",
+        "behavior_area": "source_order_preflight_and_legacy_fallback",
+        "expected_behavior": "Invalid depth, partial Z/stencil region, absent clear flag, descending ordinal or out-of-bounds color rect are rejected before the native GPU submit, preserving original D3D9 Draw/Present and input."
+      },
+      {
+        "id": "per-eye-warp-gpu-evidence",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_eye_gpu_warp_transport",
+        "expected_behavior": "Isolated WARP transport compiles, renders two independently colored source eye frames, verifies GPU pixels and bounded producer EVENT/ACK behavior."
+      },
+      {
+        "id": "legacy-paths-preserved",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_input_ffb",
+        "expected_behavior": "Change set leaves R30 original D3D9 Draw, Present, gamepad, FFB, SkyGlow and DXVK source untouched and native path remains opt-in."
+      },
+      {
+        "id": "exact-sha-github-actions",
+        "category": "integrated_validation",
+        "behavior_area": "native_game_win32_backend_openxr_hud",
+        "expected_behavior": "The five mandatory GitHub Actions workflows all conclude success at the same validation-bearing SHA, with HMD runtime still untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source-ordered-native-eye-clear": "PASS_CXX_SOURCE_AND_WARP_GPU",
+    "malformed-clears-fail-closed": "PASS_WARP_NEGATIVE_INPUT_REGRESSIONS",
+    "per-eye-warp-gpu-evidence": "PASS_SOURCE_SHA_WARP_GPU_TRANSPORT",
+    "legacy-paths-preserved": "PASS_SOURCE_DIFF_PATHS_UNMODIFIED",
+    "exact-sha-github-actions": "PASS_EXACT_SHA_5_REQUIRED"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38976697754,
+      "head_sha": "e1a1483e769e07c76ba3090a86804cbda3c178e1",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38976697719,
+      "head_sha": "e1a1483e769e07c76ba3090a86804cbda3c178e1",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 38976705168,
+      "head_sha": "e1a1483e769e07c76ba3090a86804cbda3c178e1",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38976705037,
+      "head_sha": "e1a1483e769e07c76ba3090a86804cbda3c178e1",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38976705036,
+      "head_sha": "e1a1483e769e07c76ba3090a86804cbda3c178e1",
+      "conclusion": "success"
+    }
+  },
+  "source_warp_gate": {
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38976409315,
+      "head_sha": "1544600d431e5b8e2f843888455daa30f768542b",
+      "conclusion": "success"
+    }
+  },
+  "previous_hold_reason": "PREVIOUS_00847_C6_SOURCE_PATH_FORMAT_POLICY_MISMATCH_REPAIRED_SAME_00848",
+  "known_blockers": [
+    "R30 live game-authored stereo camera Draw/DrawIndexed callback is not connected to native L/R eye submission and OpenXR host transport; whole-game stereo output is not complete.",
+    "No matching real OutRun game menu/vehicle/race and Quest3/VDXR/HMD performance evidence; RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "resume_cursor": "Continue existing DX11 full-game native eye source integration: wire R30 real L/R camera view and Draw/DrawIndexed to GPU eye ring and OpenXR producer/consumer metadata/fence/ACK. Do not repeat 00848 WARP Clear implementation or SHA gates; preserve DX9Ex input/FFB fallback and DXVK freeze.",
+  "pipeline": {
+    "C0_RECOVER": "LATEST_BRANCH_HEAD_847_C6_RECONCILED",
+    "C1_REVIEW": "CONFIRMED_ORDERED_TARGET_AND_DEPTH_CLEAR_SOURCE_GAP",
+    "C2_IMPLEMENT": [
+      "1544600d431e5b8e2f843888455daa30f768542b"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_FIVE_MANDATORY_WARP_PASS_MATERIAL_SHA",
+    "C4_COMMIT": [
+      "1544600d431e5b8e2f843888455daa30f768542b",
+      "e1a1483e769e07c76ba3090a86804cbda3c178e1"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_SEPARATE_BOOKKEEPING_SKIP_CI"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_SOURCE_ORDERED_COLOR_DEPTH_CLEAR"
+    ],
+    "integration_path": [
+      "Real GPU per-eye source encoder issues D3D11 Draw/DrawIndexed and replays actual D3D9 game TARGET and full-depth/stencil Clears at each captured draw ordinal",
+      "NativeSharedEyeRing submits independent full-size left/right GPU eye textures with event-fenced publication, while live game R30 callback to host OpenXR is still unfinished"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "visible_frame_acceptance": "Isolated WARP validates game-origin source ordered GPU eye pixels. Real R30 menu/vehicle/race frame and Quest3 output not observed.",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "activation_guard_and_fallback": "Native gameplay remains opt-in/fail-closed; original D3D9 Draw/Present, gamepad and FFB paths untouched.",
+    "acceptance_proof": {
+      "positive_probe": "Material SHA 1544600 isolated WARP produced independent L/R GPU pixels with chronological Clear playback and producer EVENT/ACK; all 5 mandatory Gate success at exact repair SHA e1a1483.",
+      "negative_regression": "WARP rejects depth out of [0,1], unsupported partial depth, no clear flags and invalid target rectangle/chronological order before any native eye GPU publication.",
+      "component_integration": "C++ NativeGameEyeDrawEncoder source timeline and NativeGameStereoSubmission preflight dispatch integrated with full-size native L/R transport and GPU WARP pixel check. Live R30 callback remains TODO."
+    },
+    "full_gate_plan": "one_validation_bearing_sha"
+  }
+}
