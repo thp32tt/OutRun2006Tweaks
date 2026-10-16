@@ -10,6 +10,7 @@
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
 #include "vr/ui/multi_sprite_contain_scale.hpp"
+#include "vr/ui/frontend_affine_contain.hpp"
 
 #include <algorithm>
 #include <array>
@@ -390,18 +391,16 @@ class UIScaling : public Hook
                 std::isfinite(Game::original_resolution.x) &&
                 std::isfinite(Game::original_resolution.y))
 			{
-				const float scale = min(sx, sy);
-				const float xScale = (pScaling->x / sx) * scale;
-				const float yScale = (pScaling->y / sy) * scale;
-				const float centeredX =
-				    (pTranslation->x / sx) * scale +
-				    (Game::screen_resolution->x -
-				     Game::original_resolution.x * scale) / 2;
-				const float centeredY = (pTranslation->y / sy) * scale +
-                    (Game::screen_resolution->y -
-                     Game::original_resolution.y * scale) / 2;
-				// Complete the finite check before mutating any in/out argument.
-				if (std::isfinite(xScale) && std::isfinite(yScale) &&
+				const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(
+                    sx, sy, Game::screen_resolution->x,
+                    Game::screen_resolution->y, Game::original_resolution.x,
+                    Game::original_resolution.y);
+				const float xScale = affine.ScaleX(pScaling->x);
+				const float yScale = affine.ScaleY(pScaling->y);
+				const float centeredX = affine.MapX(pTranslation->x);
+                const float centeredY = affine.MapY(pTranslation->y);
+                // Complete the finite check before mutating any in/out argument.
+				if (affine.valid && std::isfinite(xScale) && std::isfinite(yScale) &&
 				    std::isfinite(centeredX) && std::isfinite(centeredY))
 				{
 					// Publish both derived vectors only after every component is
@@ -455,14 +454,14 @@ class UIScaling : public Hook
                 std::isfinite(inputSx) && std::isfinite(inputSy) &&
                 std::isfinite(inputTx) && std::isfinite(inputTy))
             {
-                const float contain = (std::min)(sourceSx, sourceSy);
-                const float nextSx = inputSx / sourceSx * contain;
-                const float nextSy = inputSy / sourceSy * contain;
-                const float nextTx = CenterMultiSpriteAxis(
-                    inputTx, sourceSx, contain, dstWidth, srcWidth);
-                const float nextTy = CenterMultiSpriteAxis(
-                    inputTy, sourceSy, contain, dstHeight, srcHeight);
-                if (std::isfinite(nextSx) && std::isfinite(nextSy) &&
+                const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(
+                    sourceSx, sourceSy, dstWidth, dstHeight,
+                    srcWidth, srcHeight);
+                const float nextSx = affine.ScaleX(inputSx);
+                const float nextSy = affine.ScaleY(inputSy);
+                const float nextTx = affine.MapX(inputTx);
+                const float nextTy = affine.MapY(inputTy);
+                if (affine.valid && std::isfinite(nextSx) && std::isfinite(nextSy) &&
                     std::isfinite(nextTx) && std::isfinite(nextTy))
                 {
                     localScaling.x = nextSx;
@@ -494,18 +493,19 @@ class UIScaling : public Hook
                 width > 0.0f && height > 0.0f &&
                 sourceWidth > 0.0f && sourceHeight > 0.0f)
             {
-                const float contain = (std::min)(sx, sy);
-                const float ratioX = contain / sx;
-                const float ratioY = contain / sy;
-                const float offsetX = (width - sourceWidth * contain) * 0.5f;
-                const float offsetY = (height - sourceHeight * contain) * 0.5f;
+                const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(
+                    sx, sy, width, height, sourceWidth, sourceHeight);
+                const float ratioX = affine.ratioX;
+                const float ratioY = affine.ratioY;
+                const float offsetX = affine.offsetX;
+                const float offsetY = affine.offsetY;
                 const UiMatrix2DRows raw{pOut->_11, pOut->_12,
                     pOut->_21, pOut->_22, pOut->_41, pOut->_42};
                 const auto mapped = ContainUiMatrixRows(
                     raw, ratioX, ratioY, offsetX, offsetY);
                 // Publish the entire corrected sprite matrix atomically;
                 // unknown/projective or non-finite states retain the original.
-                if (std::isfinite(mapped.m11) && std::isfinite(mapped.m12) &&
+                if (affine.valid && std::isfinite(mapped.m11) && std::isfinite(mapped.m12) &&
                     std::isfinite(mapped.m21) && std::isfinite(mapped.m22) &&
                     std::isfinite(mapped.tx) && std::isfinite(mapped.ty) &&
                     pOut->_44 == 1.0f && pOut->_14 == 0.0f &&
