@@ -30,10 +30,10 @@ def check(text, head=hdr):
     require("SceneTextureCursor.Select(XmtFileName, 0)" in text,
             "xmt object index must not reset the pack cursor")
     require(re.search(
-            r"UiTextureCursor\\.NextIndexForGameTexture\\(\\s*\\*Module::exe_ptr<int>\\(0x55B25C\\)\\s*\\)\\s*:\\s*SceneTextureCursor\\.NextIndex\\(\\);",
+            r"UiTextureCursor\.NextIndexForGameTexture\(\s*\*Module::exe_ptr<int>\(0x55B25C\)\s*\)\s*:\s*SceneTextureCursor\.NextIndex\(\);",
             text) is not None,
             "game native XST index must drive UI DDS ordinal; scene XMT keeps its own cursor")
-    require(re.search(r"if \\(lastGameTextureIndex_ > gameTextureIndex &&\\s*gameTextureIndex <= 1\\)\\s*next_\\s*=\\s*0;", head) is not None
+    require(re.search(r"if \(lastGameTextureIndex_ > gameTextureIndex &&\s*gameTextureIndex <= 1\)\s*next_\s*=\s*0;", head) is not None
             and "lastGameTextureIndex_ = gameTextureIndex;" in head,
             "same-pack native index rewind must reset the ordinal and track last seen index")
     require("CurrentXmtsetFilename = SceneTextureCursor.Name()" in text,

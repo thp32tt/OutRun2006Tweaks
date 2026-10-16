@@ -7,11 +7,11 @@
 
 // Always evaluate the cursor transitions in Release/NDEBUG CI builds.
 // <cassert> would discard both checks AND side-effectful index calls.
-#define CHECK(expr) do { \\
-    if (!(expr)) { \\
-        std::fprintf(stderr, "texture_pack_cursor_smoke:%d: %s failed\\n", __LINE__, #expr); \\
-        return EXIT_FAILURE; \\
-    } \\
+#define CHECK(expr) do { \
+    if (!(expr)) { \
+        std::fprintf(stderr, "texture_pack_cursor_smoke:%d: %s failed\\n", __LINE__, #expr); \
+        return EXIT_FAILURE; \
+    } \
 } while (false)
 
 int main()
