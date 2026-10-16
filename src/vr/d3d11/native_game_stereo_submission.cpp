@@ -644,7 +644,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     if (cachedDevice.Get() != device.Get() || !vs ||
         !ps || !point || !linear || !constants) {
         constexpr char shader[] = R"(
-            cbuffer Region : register(b0) { float4 uvRegion; };
+            cbuffer Region : register(b0) { float4 uvRegion; float4 uvClamp; };
             Texture2D image : register(t0);
             SamplerState texSampler : register(s0);
             struct Varying { float4 position : SV_POSITION; float2 uv : TEXCOORD0; };
@@ -655,8 +655,9 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
                 return v;
             }
             float4 PS(Varying v) : SV_TARGET {
+                float2 requestedUv = uvRegion.xy + v.uv * uvRegion.zw;
                 return image.SampleLevel(texSampler,
-                    uvRegion.xy + v.uv * uvRegion.zw, 0);
+                    clamp(requestedUv, uvClamp.xy, uvClamp.zw), 0);
             })";
         // Load before allocating compiler-owned ID3DBlob interfaces.
         // The COM blob vtables live in d3dcompiler_47.dll: their Release()
@@ -699,7 +700,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         if (FAILED(device->CreateSamplerState(&sample, s1.GetAddressOf())))
             return false;
         D3D11_BUFFER_DESC desc{};
-        desc.ByteWidth = sizeof(float) * 4u;
+        desc.ByteWidth = sizeof(float) * 8u;
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         if (FAILED(device->CreateBuffer(&desc, nullptr, cb.GetAddressOf())))
@@ -771,12 +772,14 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     context_->RSSetState(nullptr);
     context_->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
     context_->OMSetDepthStencilState(nullptr, 0u);
-    const float uv[4]{
-        float(srcBox.left) / float(sd.Width),
-        float(srcBox.top) / float(sd.Height),
-        float(srcBox.right - srcBox.left) / float(sd.Width),
-        float(srcBox.bottom - srcBox.top) / float(sd.Height)};
-    context_->UpdateSubresource(constants.Get(), 0u, nullptr, uv, 0u, 0u);
+    // The shader's bilinear footprint must stay within the original
+    // game crop, including 1-texel menu glyphs and adjacent car atlas tiles.
+    const auto uv = native_game_stretch_uv_region(
+        sd.Width, sd.Height, srcBox.left, srcBox.top,
+        srcBox.right, srcBox.bottom);
+    if (!uv.valid) return false;
+    context_->UpdateSubresource(
+        constants.Get(), 0u, nullptr, uv.constants.data(), 0u, 0u);
     ID3D11Buffer* cb = constants.Get();
     ID3D11ShaderResourceView* view = srv.Get();
     ID3D11SamplerState* sample = linearFilter ? linear.Get() : point.Get();

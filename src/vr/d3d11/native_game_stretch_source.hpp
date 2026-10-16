@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <array>
 
 namespace outrun::vr::dx11 {
 
@@ -35,5 +36,27 @@ native_game_stretch_source_transfer(
     return sourceShaderResource
         ? NativeGameStretchSourceTransfer::DirectSample
         : NativeGameStretchSourceTransfer::CopyToSampled;
+}
+// Region packing for the real menu/vehicle/race GPU postpass HLSL.
+ // A cropped StretchRect samples only texels inside the game-authored box:
+ // linear filtering at the first/last destination pixel must not bleed
+ // neighbouring images from the source texture atlas.
+struct NativeGameStretchUvRegion {
+    std::array<float, 8> constants{}; // uvRegion.xyzw, uvClamp.xyzw
+    bool valid{};
+};
+[[nodiscard]] constexpr NativeGameStretchUvRegion native_game_stretch_uv_region(
+    std::uint32_t width, std::uint32_t height,
+    std::uint32_t left, std::uint32_t top,
+    std::uint32_t right, std::uint32_t bottom) noexcept {
+    if (!width || !height || left >= right || top >= bottom ||
+        right > width || bottom > height) return {};
+    const float invW = 1.0f / static_cast<float>(width);
+    const float invH = 1.0f / static_cast<float>(height);
+    return {{
+        float(left) * invW, float(top) * invH,
+        float(right - left) * invW, float(bottom - top) * invH,
+        (float(left) + 0.5f) * invW, (float(top) + 0.5f) * invH,
+        (float(right) - 0.5f) * invW, (float(bottom) - 0.5f) * invH}, true};
 }
 } // namespace outrun::vr::dx11
