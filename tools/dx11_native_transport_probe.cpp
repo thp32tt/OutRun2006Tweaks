@@ -720,6 +720,67 @@ int main()
             !directSubmit.attach_host_frame(directFrame, hostFrame),
             "00818 ACK invalidates old direct eye publication");
 
+    // 00819: the renderer callback itself emits independent eye GPU work
+    // and returns per-eye draw/pose/view evidence after command recording.
+    const auto gameEyePass = [](
+        void* user, ID3D11DeviceContext* ctx,
+        ID3D11RenderTargetView* eyeTarget, std::uint32_t eyeIndex,
+        outrun::vr::dx11::NativeGameEyeDrawEvidence& evidence) noexcept -> bool {
+        if (!ctx || !eyeTarget || eyeIndex >= 2u || !user) return false;
+        const auto* colors = static_cast<const float (*)[4]>(user);
+        ctx->ClearRenderTargetView(eyeTarget, colors[eyeIndex]);
+        evidence.drawCount = 2u + eyeIndex;
+        evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
+        evidence.sourcePoseSequence = 33u;
+        return true;
+    };
+    require(directSubmit.begin(d3d.context, 24, 33) &&
+            !directSubmit.render_game_eye_passes(nullptr, eyeUser, 33) &&
+            !directSubmit.render_game_eye_passes(gameEyePass, eyeUser, 32) &&
+            !ring.synchronization_faulted() &&
+            directSubmit.render_game_eye_passes(gameEyePass, eyeUser, 33) &&
+            directSubmit.in_flight() && !directSubmit.cancel(),
+            "00819 native renderer commands from separate eye passes");
+    outrun::vr::dx11::NativeGameStereoPublishedFrame gameEyeFrame{};
+    bool gameEyeReady = false;
+    for (int retry = 0; retry < 2000 && !gameEyeReady; ++retry) {
+        gameEyeReady = directSubmit.try_publish(gameEyeFrame);
+        require(!ring.synchronization_faulted(),
+                "00819 per-eye native renderer producer EVENT valid");
+        if (!gameEyeReady) Sleep(1);
+    }
+    require(gameEyeReady &&
+            gameEyeFrame.sourcePoseSequence == 33u &&
+            gameEyeFrame.eyeViewSignature[0] == 0x303u &&
+            gameEyeFrame.eyeViewSignature[1] == 0x404u &&
+            ring.validate_publication_snapshot(gameEyeFrame.gpu),
+            "00819 per-eye post-render camera identity persists through fence");
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2u; ++eyeIndex) {
+        d3d.context->CopyResource(readback,
+            ring.eye(gameEyeFrame.gpu.slot, eyeIndex));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0, D3D11_MAP_READ, 0, &mapped)),
+                "00819 distinct native game eye readback");
+        const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool distinctColor = eyeIndex == 0u
+            ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
+            : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
+        d3d.context->Unmap(readback, 0);
+        require(distinctColor, "00819 each eye callback wrote its own GPU RTV");
+    }
+    hostFrame.frameId = 24u;
+    hostFrame.sourcePoseSequence = 33u;
+    hostFrame.flags &= ~OutRunVR::RenderFrameDirectGpuTransport;
+    require(directSubmit.attach_host_frame(gameEyeFrame, hostFrame) &&
+            (hostFrame.flags & OutRunVR::RenderFrameDirectGpuTransport) &&
+            hostFrame.reserved[OutRunVR::RenderFrameDirectSlotIndex] ==
+                gameEyeFrame.gpu.slot &&
+            ring.retire_acknowledged(
+                make_ack(ring.identity(), gameEyeFrame.gpu.slot, 24u)) &&
+            !directSubmit.attach_host_frame(gameEyeFrame, hostFrame),
+            "00819 distinct native game eyes obey exact host ACK");
+
     // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
     // cancellation nor another frame may reuse the ring without hard retire.
     const auto partialDraw = [](
@@ -731,10 +792,10 @@ int main()
         return false;
     };
     std::uint32_t partialSlot = 99;
-    require(ring.try_acquire_slot(d3d.context, 24, nullptr, partialSlot) &&
-            !ring.render_eye_pair(d3d.context, partialSlot, 24, partialDraw, nullptr) &&
+    require(ring.try_acquire_slot(d3d.context, 25, nullptr, partialSlot) &&
+            !ring.render_eye_pair(d3d.context, partialSlot, 25, partialDraw, nullptr) &&
             ring.synchronization_faulted() &&
-            !ring.cancel_acquired_slot(partialSlot, 24) &&
+            !ring.cancel_acquired_slot(partialSlot, 25) &&
             !ring.activation_ready(),
             "00812 partial native eye draw quarantines transport until Reset");
 

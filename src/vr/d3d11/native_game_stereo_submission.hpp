@@ -4,6 +4,18 @@
 
 namespace outrun::vr::dx11 {
 
+// Renderer-side source evidence must be recorded AFTER this eye's native game
+// D3D11 draw commands, rather than fabricated at frame submission time.
+struct NativeGameEyeDrawEvidence {
+    std::uint64_t drawCount{};
+    std::uint64_t viewSignature{};
+    std::uint32_t sourcePoseSequence{};
+};
+using NativeGameEyePass = bool (*)(
+    void* user, ID3D11DeviceContext* context,
+    ID3D11RenderTargetView* eyeTarget, std::uint32_t eyeIndex,
+    NativeGameEyeDrawEvidence& evidence) noexcept;
+
 struct NativeGameStereoPublishedFrame {
     NativeSharedEyePublication gpu{};
     // The exact pose snapshot and two camera-view signatures which produced
@@ -54,6 +66,14 @@ public:
     // supplied immediate context. A partial GPU write quarantines the ring.
     // Draw counts and signatures come from actual renderer callsites, never
     // synthetic eye-index identifiers. The original D3D9 frame is untouched.
+    // The game renderer records each eye on the provided immediate context
+    // and reports distinct camera/pose evidence only after its commands.
+    // A rejected second eye quarantines the GPU ring; original D3D9 output
+    // and input/FFB continue without a synthesized mono-to-stereo copy.
+    bool render_game_eye_passes(
+        NativeGameEyePass pass, void* user,
+        std::uint32_t sourcePoseSequence) noexcept;
+
     bool render_direct_eyes(
         NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,
         std::uint64_t leftDrawCount, std::uint64_t rightDrawCount,

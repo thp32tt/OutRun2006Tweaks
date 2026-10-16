@@ -71,6 +71,54 @@ bool NativeGameStereoSubmission::capture_eye(
     return true;
 }
 
+bool NativeGameStereoSubmission::render_game_eye_passes(
+    NativeGameEyePass pass, void* user,
+    std::uint32_t sourcePoseSequence) noexcept
+{
+    if (state_ != State::Acquired || !context_ || !pass ||
+        eyes_[0] || eyes_[1] || sourcePoseSequence == 0u ||
+        sourcePoseSequence != poseSequence_)
+        return false;
+
+    struct EyePassDispatch {
+        NativeGameEyePass callback{};
+        void* user{};
+        std::uint32_t poseSequence{};
+        NativeGameEyeDrawEvidence eye[2]{};
+    } dispatch{pass, user, sourcePoseSequence, {}};
+
+    // The ring verifies the immediate context and reserves the exact frame
+    // before entering this recorder. It marks GPU work as queued first:
+    // partial render failures require hard retirement, never slot recycling.
+    const auto record = [](void* opaque, ID3D11DeviceContext* ctx,
+                           ID3D11RenderTargetView* left,
+                           ID3D11RenderTargetView* right) noexcept -> bool {
+        auto& invocation = *static_cast<EyePassDispatch*>(opaque);
+        ID3D11RenderTargetView* targets[2]{left, right};
+        for (std::uint32_t eyeIndex = 0u; eyeIndex < 2u; ++eyeIndex) {
+            if (!targets[eyeIndex] || !invocation.callback(
+                    invocation.user, ctx, targets[eyeIndex], eyeIndex,
+                    invocation.eye[eyeIndex]))
+                return false;
+            const auto& evidence = invocation.eye[eyeIndex];
+            if (!evidence.drawCount || !evidence.viewSignature ||
+                evidence.sourcePoseSequence != invocation.poseSequence ||
+                (eyeIndex == 1u &&
+                 evidence.viewSignature == invocation.eye[0].viewSignature))
+                return false;
+        }
+        return true;
+    };
+    if (!ring_.render_eye_pair(context_.Get(), slot_, frameId_,
+                               record, &dispatch))
+        return false;
+
+    eyeViews_[0] = dispatch.eye[0].viewSignature;
+    eyeViews_[1] = dispatch.eye[1].viewSignature;
+    state_ = State::GpuPending;
+    return true;
+}
+
 bool NativeGameStereoSubmission::render_direct_eyes(
     NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,
     std::uint64_t leftDrawCount, std::uint64_t rightDrawCount,
