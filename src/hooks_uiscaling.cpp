@@ -5,6 +5,7 @@
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
+#include "vr/ui/menu_quad_transform.hpp"
 
 #include <algorithm>
 #include <array>
@@ -582,20 +583,26 @@ class UIScaling : public Hook
 		D3DXVECTOR4 topRight{ 0 };
 		D3DXVECTOR4 bottomRight{ 0 };
 
-		float scaleY = screenScaleY;
-
-		// Multiply by the smallest scale factor
-		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
-			scaleY = min(screenScaleX, screenScaleY);
-
-        // The 4:3 UI must be vertically contained on a portrait XR target.
-        // 2496x2688 / 640x480 gives a symmetric 408 px Y letterbox.
-        const float verticalCenter =
-            (mode == ScalingMode::KeepCentered ||
-             mode == ScalingMode::OnlineArcade)
-            ? (Game::screen_resolution->y -
-               Game::original_resolution.y * scaleY) / 2
-            : 0.0f;
+        // Apply one aspect map to all four source-transformed corners.
+        // Vanilla front-end X has its own scale; preserve the historical
+        // gameplay/GOAL fallback and existing 4:3 contained menu modes.
+        const bool contained =
+            mode == ScalingMode::KeepCentered ||
+            mode == ScalingMode::OnlineArcade;
+        const bool vanillaFrontEnd =
+            mode == ScalingMode::Vanilla && Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_TITLE ||
+             *Game::current_mode == GameState::STATE_MENU ||
+             *Game::current_mode == GameState::STATE_SELECTOR ||
+             *Game::current_mode == GameState::STATE_SELEXIT ||
+             *Game::current_mode == GameState::STATE_SELRESET);
+        const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(
+            contained, vanillaFrontEnd, screenScaleX, screenScaleY,
+            Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
+            Game::screen_resolution ? Game::screen_resolution->y : 0.0f,
+            Game::original_resolution.x, Game::original_resolution.y);
+        if (!quadMap.valid)
+            return;
 
 		// TopLeft
 		vec.x = a1->TopLeft_54.x;
@@ -604,7 +611,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topLeft, &vec, &pM);
 
-		quad[1] = scaleY * topLeft.y + verticalCenter + 0.5;
+		quad[1] = OutRunVrMenuQuad::ProjectY(quadMap, topLeft.y);
 		quad[2] = topLeft.z;
 		quad[3] = 1.0;
 		quad[4] = a1->color_4;
@@ -618,7 +625,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomLeft, &vec, &pM);
 
-		quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;
+		quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);
 		quad[9] = bottomLeft.z;
 		quad[0xA] = 1.0;
 		quad[0xB] = a1->color_4;
@@ -632,7 +639,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topRight, &vec, &pM);
 
-		quad[0xF] = scaleY * topRight.y + verticalCenter + 0.5;
+		quad[0xF] = OutRunVrMenuQuad::ProjectY(quadMap, topRight.y);
 		quad[0x10] = topRight.z;
 		quad[0x11] = 1.0;
 		quad[0x12] = a1->color_4;
@@ -646,35 +653,17 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomRight, &vec, &pM);
 
-		quad[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;
+		quad[0x16] = OutRunVrMenuQuad::ProjectY(quadMap, bottomRight.y);
 		quad[0x17] = bottomRight.z;
 		quad[0x18] = 1.0;
 		quad[0x19] = a1->color_4;
 		quad[0x1A] = -v21 + a1->bottom_8C;
 		quad[0x1B] = v22 + a1->right_90;
 
-		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
-		{
-			float add = (Game::screen_resolution->x - (Game::original_resolution.x * scaleY)) / 2;
-
-			quad[0] = (scaleY * topLeft.x) + add;
-			quad[7] = (scaleY * bottomLeft.x) + add;
-			quad[0xE] = (scaleY * topRight.x) + add;
-			quad[0x15] = (scaleY * bottomRight.x) + add;
-		}
-		else // if (mode == Mode::Vanilla)
-		{
-			quad[0] = (screenScaleY * topLeft.x);
-			quad[7] = (screenScaleY * bottomLeft.x);
-			quad[0xE] = (screenScaleY * topRight.x);
-			quad[0x15] = (screenScaleY * bottomRight.x);
-		}
-
-		// Game seems to add these, half-pixel offset?
-		quad[0] += 0.5f;
-		quad[7] += 0.5f;
-		quad[0xE] += 0.5f;
-		quad[0x15] += 0.5f;
+        quad[0] = OutRunVrMenuQuad::ProjectX(quadMap, topLeft.x);
+        quad[7] = OutRunVrMenuQuad::ProjectX(quadMap, bottomLeft.x);
+        quad[0xE] = OutRunVrMenuQuad::ProjectX(quadMap, topRight.x);
+        quad[0x15] = OutRunVrMenuQuad::ProjectX(quadMap, bottomRight.x);
 
 		// Validate every transformed vertex/UV before publishing anything.
 		// Keep packed diffuse color bits as-is: its float representation may

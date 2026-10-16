@@ -1,5 +1,6 @@
 #include "runtime/menu_content_aspect.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
+#include "vr/ui/menu_quad_transform.hpp"
 #include <cmath>
 #include <limits>
 
@@ -80,6 +81,42 @@ static_assert(!ShouldRefreshMenuLetterboxConfig(
 
 int main()
 {
+    // Original 2D game sprite corners: native 4:3, 16:9, 21:9, VDXR
+    // portrait and protected non-front-end fallback all remain separated.
+    using OutRunVrMenuQuad::BuildPixelMap;
+    using OutRunVrMenuQuad::ProjectX;
+    using OutRunVrMenuQuad::ProjectY;
+    const auto q43 = BuildPixelMap(true,false,2,2,1280,960,640,480);
+    const auto q169 = BuildPixelMap(true,false,3,2.25f,1920,1080,640,480);
+    const auto q219 = BuildPixelMap(true,false,5.375f,3,3440,1440,640,480);
+    const auto qPortrait = BuildPixelMap(true,false,3.9f,5.6f,2496,2688,640,480);
+    const auto qVanilla = BuildPixelMap(false,true,5.375f,3,3440,1440,640,480);
+    const auto qGameplay = BuildPixelMap(false,false,5.375f,3,3440,1440,640,480);
+    auto nearQuad = [](float a,float b) { return std::fabs(a-b) < 1.e-4f; };
+    if (!q43.valid || !q169.valid || !q219.valid ||
+        !qPortrait.valid || !qVanilla.valid || !qGameplay.valid ||
+        !nearQuad(ProjectX(q43,0),0.5f) ||
+        !nearQuad(ProjectX(q43,640),1280.5f) ||
+        !nearQuad(ProjectY(q43,480),960.5f) ||
+        !nearQuad(ProjectX(q169,0),240.5f) ||
+        !nearQuad(ProjectX(q169,640),1680.5f) ||
+        !nearQuad(ProjectY(q169,480),1080.5f) ||
+        !nearQuad(ProjectX(q219,0),760.5f) ||
+        !nearQuad(ProjectX(q219,640),2680.5f) ||
+        !nearQuad(ProjectY(q219,480),1440.5f) ||
+        !nearQuad(ProjectX(qPortrait,640),2496.5f) ||
+        !nearQuad(ProjectY(qPortrait,0),408.5f) ||
+        !nearQuad(ProjectY(qPortrait,480),2280.5f) ||
+        !nearQuad(ProjectX(qVanilla,640),3440.5f) ||
+        !nearQuad(ProjectY(qVanilla,480),1440.5f) ||
+        !nearQuad(ProjectX(qGameplay,640),1920.5f) ||
+        BuildPixelMap(true,false,3,2.25f,0,1080,640,480).valid ||
+        BuildPixelMap(true,false,3,2.25f,1920,1080,-640,480).valid ||
+        BuildPixelMap(false,true,
+            std::numeric_limits<float>::quiet_NaN(),3,3440,1440,640,480).valid ||
+        BuildPixelMap(false,true,5.375f,0,3440,1440,640,480).valid)
+        return 46;
+
     // Exact Quest3 A/B failure: a 3440x1440 or 1920x1080 captured
     // letterboxed game menu looked physically ultrawide with crop OFF.
     // Preserve ALL original UV pixels, changing only the authored optical

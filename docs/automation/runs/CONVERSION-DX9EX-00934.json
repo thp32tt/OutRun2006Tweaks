@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00934",
+  "production_id": "CONVERSION-DX9EX-00934",
+  "event_id": "CONVERSION-DX9EX-00934-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00934",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:FRONTEND_MENU_ASPECT",
+  "symptom_id": "DX9EX:SYMPTOM:FRONTEND_MENU_ASPECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "b9091429c13cff7abb99c2ef32504442c275bcc2",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/menu_quad_transform.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/menu_quad_transform.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00934.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:FRONTEND_MENU_ASPECT",
+    "symptom_id": "DX9EX:SYMPTOM:FRONTEND_MENU_ASPECT",
+    "goal": "Correct whole original title/menu/vehicle-selection custom sprite quad mapping from game D3DX source vertices through 4:3/16:9/21:9/portrait screen-space staging. Vanilla front-end intentionally stretches X independently; keep all other protected UI and 4:3 containment.",
+    "scope_boundary": "Exact original draw_sprite_custom_matrix 2D screen projection only. No world R84 shader/camera, HUD/GOAL, SkyGlow, input/FFB, R26_SAFE, DX11 or DXVK changes.",
+    "trace_stages": [
+      "Game custom SPRARGS2 and D3DX original matrix transforms each corner",
+      "Mode/current game state selects Vanilla title/menu/selector X stretch versus canonical containment",
+      "All four source corners map with one finite affine before D3D9 DrawPrimitiveUP",
+      "R84 R33 and OpenXR host keep existing no-modification stereo composition"
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_custom_quad_all_corners",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original title/menu/vehicle-selection 2D sprites",
+        "expected_behavior": "All four transformed corners use correct axis scale in Vanilla; 4:3 contain, 16:9/21:9 and portrait maps preserved."
+      },
+      {
+        "id": "protected_gameplay_reset",
+        "category": "fallback_regression",
+        "behavior_area": "Gameplay, GOAL, F11, unsupported UI settings and device reset",
+        "expected_behavior": "Non-menu custom quad keeps prior X scale; invalid axes/dimensions publish no partial vertices; render state unchanged."
+      },
+      {
+        "id": "exact_sha_integrated_quality",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows game/host/package, R26_SAFE, Domain, Full Source and HUD Inspector",
+        "expected_behavior": "Required GitHub Actions entire exact SHA suite passes; Quest3 evidence remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_custom_quad_all_corners": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
+    "protected_gameplay_reset": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
+    "exact_sha_integrated_quality": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Existing Vanilla custom-sprite X corner writes use screenScaleY, including on the 3440x1440 21:9 front end where game's intended native horizontal scale is 5.375 instead of 3.0.",
+    "root_cause": "Screen-space custom-quad X/Y were conflated in the uncontained branch, even when Vanilla explicitly requests stretched native UI.",
+    "negative_test_evidence": "Changed-area C++ portable native smoke checks all four dimensions, gameplay fallback and invalid/reset inputs."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Await same-SHA mandatory GitHub Gate without re-running already successful unrelated SHA. Need Quest3/VDXR to mark optical PASS."
+}
