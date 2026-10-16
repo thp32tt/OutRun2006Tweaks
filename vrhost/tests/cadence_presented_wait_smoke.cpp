@@ -57,6 +57,37 @@ int main()
         [&] { return now; });
     if (!boundaryMatch || reads != 2) return 4;
 
-    std::cout << "cadence-presented-wait PASS: stale/timeout/already-ready/boundary\n";
+    // A stale event may wake us just before the absolute deadline while the
+    // exact request is published between the shared-state and clock reads.
+    // The old fast timeout returned false without checking that publication.
+    now = 400;
+    reads = 0;
+    waits = 0;
+    const bool exactDeadlineMatch = AwaitPresented(8,
+        [&] { return ++reads == 3; },
+        [&](std::uint32_t remaining) {
+            ++waits;
+            if (remaining != 8) return false;
+            now += 8;
+            return true; // stale event, not proof of this request
+        },
+        [&] { return now; });
+    if (!exactDeadlineMatch || reads != 3 || waits != 1) return 5;
+
+    // A nonmatching request must still time out within its original budget.
+    now = 500;
+    reads = 0;
+    waits = 0;
+    const bool noDeadlineMatch = AwaitPresented(6,
+        [&] { ++reads; return false; },
+        [&](std::uint32_t remaining) {
+            ++waits;
+            now += remaining;
+            return true;
+        },
+        [&] { return now; });
+    if (noDeadlineMatch || reads != 3 || waits != 1 || now != 506) return 6;
+
+    std::cout << "cadence-presented-wait PASS: stale/timeout/already-ready/boundary/exact-deadline\\n";
     return 0;
 }

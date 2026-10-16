@@ -20,7 +20,13 @@ namespace OutRunVR::CadenceWait
                 return true;
             const std::uint64_t now = clockMs();
             if (now >= deadline)
-                return false;
+            {
+                // The producer can publish this exact request between the
+                // preceding shared-state read and the deadline clock read.
+                // A final sequence-validated read avoids dropping an already
+                // completed game frame without extending the XR budget.
+                return matches();
+            }
             const auto remaining = static_cast<std::uint32_t>(deadline - now);
             // WAIT_TIMEOUT or WAIT_FAILED must not spin. A last shared-state
             // read still accepts a publication racing the wait boundary.
