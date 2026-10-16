@@ -435,6 +435,42 @@ namespace outrun::vr::dx11
         return true;
     }
 
+    // Native game stereo can render two independent camera views directly
+    // into the two shared color attachments. Publication still uses the SAME
+    // EVENT fence and exact lifetime/slot/ACK path as source-eye GPU copies.
+    bool NativeSharedEyeRing::render_eye_pair(
+        ID3D11DeviceContext* context,
+        std::uint32_t slot,
+        std::uint64_t frame_id,
+        NativeEyeDrawRecorder recorder,
+        void* user) noexcept
+    {
+        if (!activation_ready() || !same_producer_context(context) ||
+            slot >= slots_.size() || frame_id == 0 || !recorder)
+            return false;
+
+        auto& entry = slots_[slot];
+        if (entry.state != SharedEyeSlotState::Acquired ||
+            entry.frame_id != frame_id || entry.gpu_copy_queued ||
+            !entry.eye[0] || !entry.eye[1] ||
+            !entry.rtv[0] || !entry.rtv[1] || !entry.producer_fence)
+            return false;
+
+        // Once handed to the real Draw recorder, even its failure may have
+        // queued GPU commands. Never permit cancel/reuse across a partially
+        // rendered pair or publish a single eye with stale pixels.
+        entry.gpu_copy_queued = true;
+        if (!recorder(user, context, entry.rtv[0].Get(), entry.rtv[1].Get())) {
+            synchronization_faulted_ = true;
+            return false;
+        }
+        if (!signal_producer_fence(context, slot, frame_id)) {
+            synchronization_faulted_ = true;
+            return false;
+        }
+        return true;
+    }
+
     bool NativeSharedEyeRing::signal_producer_fence(
         ID3D11DeviceContext* context,
         std::uint32_t slot,

@@ -569,6 +569,88 @@ int main()
     msaaRight->Release();
     msaaLeft->Release();
 
+    // 00812: real native Draw recorders can render directly to two ring RTs.
+    // This is a distinct per-eye GPU producer path, not duplicated mono,
+    // and uses the same completion fence + host-visible shared handles.
+    const auto nativeDraw = [](
+        void* user, ID3D11DeviceContext* context,
+        ID3D11RenderTargetView* left, ID3D11RenderTargetView* right) noexcept -> bool
+    {
+        if (!user || !context || !left || !right || left == right)
+            return false;
+        const auto* colors = static_cast<const float (*)[4]>(user);
+        context->ClearRenderTargetView(left, colors[0]);
+        context->ClearRenderTargetView(right, colors[1]);
+        return true;
+    };
+    const float nativeEyeColors[2][4] = {
+        {0.f, 1.f, 1.f, 1.f}, // left cyan
+        {1.f, 1.f, 0.f, 1.f}  // right yellow
+    };
+    std::uint32_t directSlot = 99;
+    require(ring.try_acquire_slot(d3d.context, 22, nullptr, directSlot) &&
+            !ring.render_eye_pair(
+                foreign.context, directSlot, 22, nativeDraw,
+                const_cast<float (*)[4]>(nativeEyeColors)) &&
+            !ring.render_eye_pair(
+                d3d.context, directSlot, 22, nullptr, nullptr) &&
+            !ring.render_eye_pair(
+                d3d.context, directSlot, 23, nativeDraw,
+                const_cast<float (*)[4]>(nativeEyeColors)) &&
+            ring.slot_state(directSlot) == SharedEyeSlotState::Acquired &&
+            !ring.synchronization_faulted(),
+            "00812 direct native eye GPU writer rejects foreign/empty/wrong frame");
+    require(ring.render_eye_pair(
+                d3d.context, directSlot, 22, nativeDraw,
+                const_cast<float (*)[4]>(nativeEyeColors)) &&
+            ring.slot_state(directSlot) == SharedEyeSlotState::ProducerPending &&
+            !ring.cancel_acquired_slot(directSlot, 22),
+            "00812 both real native eyes recorded before fence; no pending reuse");
+    publish_bounded(ring, d3d.context, directSlot, 22);
+    NativeSharedEyePublication directPublication{};
+    require(ring.snapshot_published_frame(
+                directSlot, 22, directPublication) &&
+            ring.validate_publication_snapshot(directPublication),
+            "00812 independently rendered game eyes publish only after EVENT");
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
+    {
+        d3d.context->CopyResource(readback, ring.eye(directSlot, eyeIndex));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0, D3D11_MAP_READ, 0, &mapped)),
+                "00812 rendered eye GPU readback");
+        const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool match = eyeIndex == 0
+            ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255 &&
+              pixel[3] == 255
+            : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0 &&
+              pixel[3] == 255;
+        d3d.context->Unmap(readback, 0);
+        require(match, "00812 direct GPU per-eye pixels retained, not mono");
+    }
+    require(ring.retire_acknowledged(
+                make_ack(ring.identity(), directSlot, 22)) &&
+            !ring.validate_publication_snapshot(directPublication),
+            "00812 exact OpenXR host ACK retires directly rendered native eyes");
+
+    // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
+    // cancellation nor another frame may reuse the ring without hard retire.
+    const auto partialDraw = [](
+        void*, ID3D11DeviceContext* context,
+        ID3D11RenderTargetView* left, ID3D11RenderTargetView*) noexcept -> bool
+    {
+        const float partial[4] = {1.f, 0.f, 0.f, 1.f};
+        context->ClearRenderTargetView(left, partial);
+        return false;
+    };
+    std::uint32_t partialSlot = 99;
+    require(ring.try_acquire_slot(d3d.context, 23, nullptr, partialSlot) &&
+            !ring.render_eye_pair(d3d.context, partialSlot, 23, partialDraw, nullptr) &&
+            ring.synchronization_faulted() &&
+            !ring.cancel_acquired_slot(partialSlot, 23) &&
+            !ring.activation_ready(),
+            "00812 partial native eye draw quarantines transport until Reset");
+
     readback->Release();
     foreignSource->Release();
     wrongSizeSource->Release();

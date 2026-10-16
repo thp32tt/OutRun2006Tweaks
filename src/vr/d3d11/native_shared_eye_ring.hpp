@@ -110,6 +110,23 @@ namespace outrun::vr::dx11
             ID3D11Texture2D* left_source,
             ID3D11Texture2D* right_source) noexcept;
 
+        // The native game renderer can draw two genuine, independently posed
+        // views directly into the shared ring RTs, avoiding the extra GPU
+        // CopyResource/Resolve of the source-eye handoff. The recorder must
+        // issue BOTH eyes' graphics commands synchronously on this immediate
+        // context and restore any changed pipeline state before returning.
+        // A failed/partial draw quarantines the ring: GPU writes may already
+        // be queued, so neither eye can be cancelled or recycled.
+        using NativeEyeDrawRecorder = bool (*)(
+            void* user, ID3D11DeviceContext* context,
+            ID3D11RenderTargetView* left, ID3D11RenderTargetView* right) noexcept;
+        bool render_eye_pair(
+            ID3D11DeviceContext* context,
+            std::uint32_t slot,
+            std::uint64_t frame_id,
+            NativeEyeDrawRecorder recorder,
+            void* user) noexcept;
+
         bool signal_producer_fence(
             ID3D11DeviceContext* context,
             std::uint32_t slot,
