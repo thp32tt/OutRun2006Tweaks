@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
-  "status": "C5_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "3bf4ca82869cdd5aab7517bd593fda4a8cd5d6ee",
   "material_result_sha": "b76fb352f670b5209d7b7604fe078dbe88b65d0f",
-  "validation_bearing_result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "243947ad519b4021594e1f2b31ae6f033fff3ba6",
   "source_paths": [
     "src/vr/game/render_semantics.hpp"
   ],
@@ -64,9 +64,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_queued_owner_preservation": "PENDING_CI",
-    "stage_queue_negative_fallback": "PENDING_CI",
-    "stage_queue_exact_sha_gates": "PENDING_CI"
+    "stage_queued_owner_preservation": "PASS_EXACT_SHA",
+    "stage_queue_negative_fallback": "PASS_EXACT_SHA",
+    "stage_queue_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "ConsumeForDraw unconditionally drained NextDrawScope before consulting the live exact SpriteNode scope. TimeRecord_AdjustPositionAndHud arms a direct ScreenHud one-shot, so an intervening independently tagged +TIME/GOAL/rank node could consume it despite exact queue classification.",
@@ -78,5 +78,29 @@
     "runtime_limit": "Source-level semantic-owner failure and native regressions only. No Quest3/VDXR/game optical evidence.",
     "ci_repair": "The source-level queue guard referenced SpriteQueueDepth before its later inline declaration (MSVC C2065). Relocate the existing variable declaration above ConsumeForDraw without changing its storage or state lifetime; preserve original material SHA."
   },
-  "next_action": "Build-source repair must be validated under the new exact SHA; prior b76fb352 host CI C2065 is FAIL and not counted."
+  "next_action": "C6 BUILD_VERIFIED at exact validation-bearing 243947ad (mandatory 4/4 GitHub CI PASS), material implementation b76fb352 and source declaration repair 243947ad preserved; Quest3/VDXR +TIME/TIME RECORD optics NEED_HMD_TEST; no HMD performance or visual PASS asserted. No duplicate score from this bookkeeping commit.",
+  "ci_evidence": {
+    "exact_sha": "243947ad519b4021594e1f2b31ae6f033fff3ba6",
+    "github_actions": {
+      "dx9ex_active": {
+        "run_id": 38909648846,
+        "conclusion": "SUCCESS"
+      },
+      "domain_isolation": {
+        "run_id": 38909649689,
+        "conclusion": "SUCCESS"
+      },
+      "full_source_impact": {
+        "run_id": 38909649075,
+        "conclusion": "SUCCESS"
+      },
+      "hud_inspector": {
+        "run_id": 38909649028,
+        "conclusion": "SUCCESS"
+      }
+    },
+    "gate_count": "4/4",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_delta_this_attempt": 0
 }
