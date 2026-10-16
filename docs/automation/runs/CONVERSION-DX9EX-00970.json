@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "a336aa05242bcfb16797707862549a0eecc94d7c",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
+  "validation_bearing_result_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
   "source_paths": [
     "src/vr/game/rank_marker_raw_wvp.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "rank_shader_both_eyes": "PENDING_EXACT_SHA",
-    "rank_original_fallback": "PENDING_EXACT_SHA",
-    "rank_sha_ci": "PENDING_EXACT_SHA"
+    "rank_shader_both_eyes": "PASS_BUILD",
+    "rank_original_fallback": "PASS_BUILD",
+    "rank_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R84 R30BuildScreenSpaceEyeConstants at prior HEAD used `if (R30GetOwnedRankRawWvp(ownedRankRaw)) memcpy(uploadedT, ownedRankRaw)`; false proof left live GPU GetVertexShaderConstantF c64 to be reprojected for car/rival marker.",
@@ -88,6 +88,36 @@
     "negative_test_evidence": "Executable portable rank test runs no-owner, malformed NaN/infinity, and prior live-eye pollution rejection with unchanged destination; existing rank owner positive/negative and XYZRHW tests remain."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA"
-  }
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
+    "required_gates": {
+      "DX9Ex Active Validation": {
+        "run_id": 38953037146,
+        "head_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38953037146"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 38953037199,
+        "head_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38953037199"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 38953037285,
+        "head_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38953037285"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38953037385,
+        "head_sha": "270ed2bde31cc20304d23cbe6e71e70d7cebb8d0",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38953037385"
+      }
+    },
+    "host_and_game_package": "BUILD_VERIFIED",
+    "note": "Compiled and CI accepted at this exact material SHA; HMD optical acceptance separately UNTESTED"
+  },
+  "notes": "C6 build verification only; matching Quest3/VDXR optical regression is still NEED_HMD_TEST. Source/feature score attributed once to original material SHA."
 }
