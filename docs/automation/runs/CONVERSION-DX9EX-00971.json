@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C5_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "4c96529038506b752e422180bc5c6466f09f2103",
-  "material_result_sha": "PENDING_THIS_COMMIT",
-  "validation_bearing_result_sha": "PENDING_THIS_COMMIT",
+  "material_result_sha": "0864f1f2e110b7c3452fdf90694e28e54b44c21f",
+  "validation_bearing_result_sha": "4a7c58333d768c3a21cb9322090df7805e158bd5",
   "source_paths": [
     "src/hooks_textures.cpp",
     "src/vr/game/dds_alpha_mask_policy.hpp",
@@ -30,7 +30,8 @@
     "src/vr/game/dds_alpha_mask_policy.hpp",
     "vrhost/tests/dds_alpha_mask_smoke.cpp",
     "vrhost/CMakeLists.txt",
-    "docs/automation/runs/CONVERSION-DX9EX-00971.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00971.json",
+    "tools/verify_vr_hud_dds_loader.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
@@ -69,9 +70,9 @@
     ]
   },
   "acceptance_results": {
-    "opaque_rgb_and_swizzled_selector": "PENDING_EXACT_SHA_CI",
-    "real_alpha_fallback": "PENDING_EXACT_SHA_CI",
-    "exact_sha_integrated": "PENDING_EXACT_SHA_CI"
+    "opaque_rgb_and_swizzled_selector": "PASS_EXACT_SHA",
+    "real_alpha_fallback": "PASS_EXACT_SHA",
+    "exact_sha_integrated": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The DDS fast pixel-mask decoder selected D3DFMT_A8R8G8B8 or A8B8G8R8 when only the high-byte mask matched, without requiring DDPF_ALPHAPIXELS. An RGB-only opaque sprite retaining a stale FF high-byte mask could thus read undefined/zero high bytes as alpha.",
@@ -81,5 +82,40 @@
     "runtime_limit": "Classification bug established from source; actual affected DDS from user's car-selection pack not yet collected, no HMD/Quest3 visual test."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check exact material SHA required Windows/host/package/Domain/Full Source/HUD gates, update C6 bookkeeping only after all succeed; Quest3 still untested."
+  "next_action": "Feature build/CI complete; HMD optical acceptance remains NEED_HMD_TEST. Controller may assign another independent unfinished source feature without retrying this SHA.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "4a7c58333d768c3a21cb9322090df7805e158bd5",
+    "original_material_sha": "0864f1f2e110b7c3452fdf90694e28e54b44c21f",
+    "first_ci_failure": "0864f1f2e110b7c3452fdf90694e28e54b44c21f HUD Inspector DDS negative mutation checker matched a duplicate new format return; source path and verification negative probes were repaired under same TASK_ID at 4a7c58333d768c3a21cb9322090df7805e158bd5, no checks removed.",
+    "required_gates": {
+      "DX9Ex Active Validation": {
+        "run_id": 38956486512,
+        "head_sha": "4a7c58333d768c3a21cb9322090df7805e158bd5",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38956486512"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 38956486549,
+        "head_sha": "4a7c58333d768c3a21cb9322090df7805e158bd5",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38956486549"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 38956486532,
+        "head_sha": "4a7c58333d768c3a21cb9322090df7805e158bd5",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38956486532"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38956486524,
+        "head_sha": "4a7c58333d768c3a21cb9322090df7805e158bd5",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38956486524"
+      }
+    },
+    "host_and_game_package": "BUILD_VERIFIED",
+    "runtime_hmd": "UNTESTED"
+  },
+  "notes": "R84/R26_SAFE Win32 game, x64 host deterministic smoke, packaging, static/isolated domain/HUD all exact-SHA CI success; Quest3/VDXR runtime remains untested. C6 [skip ci] bookkeeping not a new result SHA and creates no independent score."
 }
