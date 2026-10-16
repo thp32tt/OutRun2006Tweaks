@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00974",
+  "production_id": "CONVERSION-DX9EX-00974",
+  "event_id": "CONVERSION-DX9EX-00974-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00974",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "phase": "C2_SOURCE_IMPLEMENTED",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_GITHUB_GATES",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "a10062cbb5bf9adca1d9a1d3092e9186434ea1a3",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_textures.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00974.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Prevent vehicle-selection and menu DDS sprites from being interpreted as the wrong GPU pixel layout when stale FourCC metadata, conflicting RGB flags or unsupported cube/volume payload reaches the game's fast texture allocator; preserve known opaque and alpha UI, sprite resources, and the native D3DX/untouched original asset fallback.",
+    "scope_boundary": "Original D3D9 2D DDS texture-load path only: source pixel-format intent and layout admission before fast GPU allocation. Do not modify textures on disk, scene material rendering, R84 stereo projection, DX9Ex fallback renderer, SkyGlow, input/FFB, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original vehicle-selection and game UI DDS header enters the hooked D3DXCreateTextureFromFileInMemory and replacement loader with a potentially unused FourCC field.",
+      "Fast allocator now distinguishes explicitly flagged DXT1/3/5 compression from RGB24, RGB32 opaque/alpha and rejects contradictory format or cube/volume DDS payload before allocating D3D9 resources.",
+      "Supported 2D UI uploads continue original per-row swizzle/opaque expansion and GPU texture creation; rejected headers use existing native D3DX decoder and optional replacement original-texture retry while R84 and OpenXR render those resources normally."
+    ],
+    "subcomponents": [
+      "Correct real runtime DDS FourCC-versus-RGB classification to avoid misreading car-select pixels as compressed data while preserving both native alpha and X8 layouts.",
+      "Reject unsupported 3D DDS cube/volume payloads at the fast GPU constructor boundary and retain the existing unmodified D3DX fallback and original UI texture retry.",
+      "Embed source-compiled positive/negative format intent tests for valid RGB24/32, valid DXT1/3/5, ambiguous headers and missing flags."
+    ],
+    "acceptance_items": [
+      {
+        "id": "dds_2d_game_ui_format",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9 vehicle-selection/menu source DDS pixel-format classification and fast texture upload",
+        "expected_behavior": "Only flagged DXT layouts decode as compressed; RGB24/32, native alpha and opaque X8 retain the correct existing GPU upload path even with stale unused FourCC bytes."
+      },
+      {
+        "id": "dds_native_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original game DDS trampoline and optional UI-replacement recovery",
+        "expected_behavior": "Ambiguous compression flags, absent RGB declaration, unsupported FourCC, cube/volume textures and failed GPU allocation retain original native D3DX and optional original-file retry; no unrelated renderer or stereo changes."
+      },
+      {
+        "id": "dds_exact_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA R84 Win32 primary DLL, R26_SAFE fallback, x64 host and mandatory GitHub Action validation",
+        "expected_behavior": "The validation-bearing real-source SHA passes DX9Ex Active Validation, Domain Isolation and affected Full Source Impact/HUD Inspector jobs with HMD results separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "dds_2d_game_ui_format": "IMPLEMENTED_PENDING_CI",
+    "dds_native_original_fallback": "IMPLEMENTED_PENDING_CI",
+    "dds_exact_sha_integrated_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Existing GetD3DFormatFromPixelFormat read dwFourCC unconditionally and accepted 16/24-bit RGB bit masks without verifying the header's explicit DDPF_RGB declaration. The fast texture path previously accepted cube/volume headers as 2D.",
+    "root_cause": "The fast allocator selected its GPU format using fields that are not semantically valid unless their DDS pixel flags/caps declare them, allowing false DXT or invalid 2D texture classification before D3D9 CreateTexture.",
+    "source_trace": [
+      "DDS selected through original game's optional UI replacement D3DX hook",
+      "Pixel format and 2D caps validated by GetD3DFormatFromPixelFormat and fast allocation path",
+      "Native D3DX on unsupported metadata, original texture retry, R84 game UI GPU resource binding"
+    ],
+    "eye_ownership": "Original texture resource remains shared by the already-existing R84 stereo compositor; this change does not reclassify eye ownership or claim optical HMD success.",
+    "alternatives_rejected": [
+      "No broad shader, alpha-state, UI layout, HUD or stereo owner reassignment is permitted to conceal malformed DDS metadata."
+    ],
+    "runtime_limit": "No Quest3/VDXR HMD test performed. Only metadata-driven upload failure is source-confirmed; whether the user's remaining white selection sprites have this header is unproven."
+  }
+}

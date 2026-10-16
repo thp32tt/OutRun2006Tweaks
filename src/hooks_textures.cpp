@@ -66,14 +66,26 @@ struct DDS_FILE
 #define DDS_RGBA 0x41
 #define DDS_RGB 0x40
 
-inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
+// The DDS FourCC field is only authoritative when DDPF_FOURCC says so.
+// RGB car-select replacements may retain stale bytes there; interpreting
+// those as DXT blocks instead of 24/32-bit UI pixels corrupts the upload.
+// Ambiguous flags and unrecognized FourCC stay on the native D3DX fallback.
+inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 {
+	if ((format.dwFlags & DDPF_FOURCC) != 0)
+	{
+		if ((format.dwFlags & DDPF_RGB) != 0)
+			return D3DFMT_UNKNOWN;
+		if (format.dwFourCC == FOURCC_DXT1) return D3DFMT_DXT1;
+		if (format.dwFourCC == FOURCC_DXT3) return D3DFMT_DXT3;
+		if (format.dwFourCC == FOURCC_DXT5) return D3DFMT_DXT5;
+		return D3DFMT_UNKNOWN;
+	}
+	if ((format.dwFlags & DDPF_RGB) == 0)
+		return D3DFMT_UNKNOWN;
 	const auto rgb32Intent = OutRunVR::DdsAlphaMask::Classify(
 		format.dwFlags, format.dwRGBBitCount, format.dwRGBAlphaBitMask);
 	using OutRunVR::DdsAlphaMask::Rgb32Intent;
-	if (format.dwFourCC == FOURCC_DXT1) return D3DFMT_DXT1;
-	if (format.dwFourCC == FOURCC_DXT3) return D3DFMT_DXT3;
-	if (format.dwFourCC == FOURCC_DXT5) return D3DFMT_DXT5;
 
 	if (format.dwRGBBitCount == 16 &&
 		format.dwRBitMask == 0x00000f00 &&
@@ -157,6 +169,60 @@ inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 
 	return D3DFMT_UNKNOWN;
 }
+
+// Executed at compile time by the real Win32 game source, not a test-only
+// copy of the decoder. The FOURCC/RGB discrepancy used to decode opaque
+// vehicle-selection/menu DDS as compressed DXT despite DDPF_RGB ownership.
+constexpr bool VerifyDdsPixelIntentAndNativeFallback() noexcept
+{
+	DDPIXELFORMAT f{};
+	f.dwSize = sizeof(DDPIXELFORMAT);
+	f.dwRGBBitCount = 32;
+	f.dwRBitMask = 0x00ff0000;
+	f.dwGBitMask = 0x0000ff00;
+	f.dwBBitMask = 0x000000ff;
+	f.dwFlags = DDPF_RGB;
+	f.dwFourCC = FOURCC_DXT1; // stale/unused field must not win
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_X8R8G8B8)
+		return false;
+	f.dwFourCC = 0;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_X8R8G8B8)
+		return false;
+	f.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+	f.dwRGBAlphaBitMask = 0xff000000;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_A8R8G8B8)
+		return false; // valid alpha must not be changed to opaque
+	f.dwFlags = DDPF_FOURCC;
+	f.dwFourCC = FOURCC_DXT1;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_DXT1)
+		return false;
+	f.dwFourCC = FOURCC_DXT3;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_DXT3)
+		return false;
+	f.dwFourCC = FOURCC_DXT5;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_DXT5)
+		return false;
+	f.dwFourCC = 0x12345678u;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_UNKNOWN)
+		return false; // unsupported compression -> native D3DX
+	f.dwFlags = DDPF_FOURCC | DDPF_RGB;
+	f.dwFourCC = FOURCC_DXT1;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_UNKNOWN)
+		return false; // conflicting metadata -> native D3DX
+	f.dwFlags = 0;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_UNKNOWN)
+		return false;
+	f.dwFlags = DDPF_RGB;
+	f.dwFourCC = 0;
+	f.dwRGBBitCount = 24;
+	f.dwRGBAlphaBitMask = 0;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_R8G8B8)
+		return false; // existing BGR24 -> opaque X8 uploader
+	f.dwFlags = 0;
+	return GetD3DFormatFromPixelFormat(f) == D3DFMT_UNKNOWN;
+}
+static_assert(VerifyDdsPixelIntentAndNativeFallback(),
+	"R84 fast DDS UI loader must honor declared DXT/RGB and fail to native");
 
 size_t D3DXGetFormatSize(D3DFORMAT fmt, size_t width = 1, size_t height = 1)
 {
@@ -266,6 +332,13 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (header->magic != DDS_MAGIC ||
 		header->data.dwSize != sizeof(DDSURFACEDESC2) ||
 		header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT))
+		return E_FAIL;
+	// The fast path creates one ordinary 2D texture. A DDS cube/volume
+	// payload has a different face/slice layout, so do not accept its first
+	// face as a vehicle/menu sprite or a scene texture by accident.
+	// The existing D3DX trampoline handles this unsupported layout.
+	if ((header->data.ddsCaps.dwCaps2 &
+		(DDSCAPS2_CUBEMAP | DDSCAPS2_VOLUME)) != 0)
 		return E_FAIL;
 
 	// Raw DDS rows are packed at the file's intrinsic dimensions. The fast
