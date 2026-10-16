@@ -1534,10 +1534,34 @@ namespace
 
             std::uint32_t image = 0;
             if (!Acquire(projection_, image, 2u)) return false;
-            bool ok = RenderTo(projection_.rtvs[image][0], projection_.width, projection_.height,
-                eyes[0], eyeSrv[0], eyeFormat[0]);
-            ok = RenderTo(projection_.rtvs[image][1], projection_.width, projection_.height,
-                eyes[1], eyeSrv[1], eyeFormat[1]) && ok;
+            // The legacy compositor is also a real DirectGPU consumer. Reuse
+            // the R23 verified whole-eye -> XR array GPU route when the
+            // selected game frame is a complete native L/R pair. Never
+            // promote a stale hold, classic SBS atlas, scaled target or
+            // different color transfer. Their original shader projection
+            // remains authoritative; D3D9 game input/FFB is untouched.
+            static const bool nativeEyeCopyOptIn = [] {
+                const char* value = std::getenv("OUTRUN_VR_NATIVE_XR_EYE_COPY");
+                return value && std::strcmp(value, "1") == 0;
+            }();
+            bool directEyeCopied = false;
+            if (image < projection_.images.size() &&
+                projection_.images[image].texture) {
+                directEyeCopied =
+                    OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                        context_, device_, directSnapshotLeft_,
+                        directSnapshotRight_, projection_.images[image].texture,
+                        nativeEyeCopyOptIn,
+                        sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
+                        directFrameValid_ && directTransportReady_, IID_IUnknown);
+            }
+            bool ok = directEyeCopied;
+            if (!directEyeCopied) {
+                ok = RenderTo(projection_.rtvs[image][0], projection_.width,
+                    projection_.height, eyes[0], eyeSrv[0], eyeFormat[0]);
+                ok = RenderTo(projection_.rtvs[image][1], projection_.width,
+                    projection_.height, eyes[1], eyeSrv[1], eyeFormat[1]) && ok;
+            }
             Release(projection_);
             if (!ok) return false;
 

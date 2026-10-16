@@ -271,9 +271,28 @@ int main()
                       true, true, true) &&
             !copyEyes(warpContext, warpDevice, gpuLeft, gpuLeft,
                       true, true, true);
+        // The legacy compositor and R23 use the same real GPU copy
+        // implementation. A stale previously valid native pair must not
+        // override a newly selected ClassicSbs game/menu frame.
+        const auto selectedNative = OutRunVrNativeEyePair::ChooseStereoSource(
+            true, true, true, false, false);
+        const auto restoredSbs = OutRunVrNativeEyePair::ChooseStereoSource(
+            false, true, true, true, true);
+        const bool sourceSwitchSafe =
+            selectedNative == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu &&
+            restoredSbs == OutRunVrNativeEyePair::StereoSourceRoute::Sbs &&
+            !copyEyes(warpContext, warpDevice, holdLeft, holdRight,
+                      true,
+                      restoredSbs == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
+                      true);
+        if (!require(sourceSwitchSafe,
+                     "legacy XR native-eye route must not overwrite a later SBS frame"))
+            return 1;
         const bool nativeCopyExecuted =
             copyEyes(warpContext, warpDevice, holdLeft, holdRight,
-                     true, true, true);
+                     true,
+                     selectedNative == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
+                     true);
         if (!require(copyDenied && nativeCopyExecuted,
                      "XR eye copy must honor route, complete frame and exact live device"))
             return 1;
