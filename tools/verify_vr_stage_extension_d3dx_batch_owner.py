@@ -204,14 +204,14 @@ def check(code: str, header: str) -> list[str]:
     flush = hook[flush_start:flush_end] if (
         flush_start >= 0 and flush_end > flush_start) else ""
     read_live = "void* liveSprite = *Module::exe_ptr<void*>(0x55B218);"
-    predicate = "!DX9ExD3DXSpriteLifetime::CanFlush("
+    flush_identity_predicate = "!DX9ExD3DXSpriteLifetime::CanFlush("
     invalidate_stale = "if (self && self == TrackedSprite && self != liveSprite)"
     dereference = "void** vtable = *reinterpret_cast<void***>(self);"
     need(read_live in flush and "if (!BatchActive ||" in flush and
-         predicate in flush and "self, TrackedSprite, liveSprite)" in flush and
+         flush_identity_predicate in flush and "self, TrackedSprite, liveSprite)" in flush and
          invalidate_stale in flush and "InvalidateForDeviceLifecycle(true);" in flush and
          "return false;" in flush and dereference in flush and
-         flush.find(read_live) < flush.find(predicate) <
+         flush.find(read_live) < flush.find(flush_identity_predicate) <
          flush.find(invalidate_stale) < flush.find(dereference) and
          flush.find("return false;") < flush.find(dereference),
          "FlushTracked must prevent stale vtable dereference and forget replaced D3DX batch")
