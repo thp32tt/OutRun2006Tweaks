@@ -187,9 +187,11 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert bypass in dispatch, "mono/aux must bypass classification"
     assert dispatch.index("StateBlockTracker::Recording()") < dispatch.index(bypass)
     assert dispatch.index(bypass) < dispatch.index("R32ReviewClassifyScreenSpacePass(device)")
-    # An unflushed original C993 centre has no stereo raster proof. It must
-    # bypass generic R29 cached-world reprojection, unlike ordinary mono,
-    # auxiliary, noncentre and outer CABE draws, which keep the R29 fallback.
+    # Unflushed original C993 or an independently source-proven +TIME/GOAL
+    # finite-HUD command has no stereo raster proof. Both must bypass generic
+    # R29 cached-world reprojection, unlike ordinary mono, auxiliary, other
+    # screen overlays and outer CABE draws, which retain the R29 fallback.
+    # This is restricted by the captured physical producer, not alpha/FVF.
     early = dispatch.split(bypass, 1)[1].split(
         "// Classify exactly once", 1
     )[0]
@@ -198,13 +200,29 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert "directLensCentre, resyncAlreadyFlushed)" in early, (
         "early raster helper must require both exact producer and raster state"
     )
-    assert re.search(r"if\s*\(" + re.escape(centre) +
+    assert dispatch.count(
+        "const bool exactResultHud = drawCommand.IsExactFiniteResultHud();"
+    ) == 1, "exact HUD must come from captured physical source"
+    assert re.search(r"if\s*\(\s*exactResultHud\s*\|\|\s*" +
+                     re.escape(centre) +
                      r".*?\)\s*\{\s*if\s*\(telemetry\)\s*"
                      r"R32ReviewNoteDispatchFallback\(\);\s*"
                      r"return actualDraw\(\);\s*\}\s*"
                      r"return fallbackToR29\(\);", early, re.S), (
-        "only exact C993 may use raw original before R29 fallback"
+        "only exact C993 or source-proven result HUD may bypass R29"
     )
+    # Three physical-source fences are required: raster not ready, no
+    # screen HUD classification, and classified-but-unhandled GPU stereo.
+    # All three must keep the native Draw; an uncertain source never enters
+    # the cached R31 fast-world or generic R29 substitution paths.
+    assert re.search(r"if\s*\(exactResultHud\s*&&\s*"
+                     r"screenKind\s*==\s*R32ReviewScreenSpaceKind::None\)",
+                     dispatch), "unclassified exact result was sent to world"
+    assert re.search(r"if\s*\(hud.handled\)\s*return hud.hr;\s*"
+                     r".*?if\s*\(exactResultHud\)\s*\{\s*"
+                     r"if\s*\(telemetry\)\s*R32ReviewNoteDispatchFallback\(\);\s*"
+                     r"return actualDraw\(\);",
+                     dispatch, re.S), "unhandled result HUD leaked to R29"
     assert dispatch.rfind("return fallbackToR29();") > dispatch.index(
         "R33TryFastWorld(device,"), "stereo fallback must use identical R29 policy"
 
@@ -218,17 +236,23 @@ def mutate_dispatch(src: str, before: str, after: str) -> str:
 
 
 def negative_mono_aux_fastpath(src: str) -> None:
-    # Keep original R29 fallback, and reject any loss of direct C993 identity
-    # or substitution of the raw call for all mono/aux draws.
+    # Keep original R29 fallback, reject loss of direct C993 identity or
+    # exact source-proven HUD identity, and reject raw bypass for every draw.
     bypass = "if (!resyncAlreadyFlushed)\n            {"
-    exact = "if (OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync("
+    exact = ("if (exactResultHud ||\n"
+             "                    OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(")
     early_raw = ("return actualDraw();\n"
                  "                }\n"
                  "                return fallbackToR29();")
     cases = [
         (bypass, "if (false)\n            {"),
         (bypass, "if (resyncAlreadyFlushed)\n            {"),
-        (exact, "if (false && OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync("),
+        (exact, "if (false ||\n"
+                "                    OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync("),
+        ("const bool exactResultHud = drawCommand.IsExactFiniteResultHud();",
+         "const bool exactResultHud = true;"),
+        ("const bool exactResultHud = drawCommand.IsExactFiniteResultHud();",
+         "const bool exactResultHud = false;"),
         ("directLensCentre, resyncAlreadyFlushed)",
          "false, resyncAlreadyFlushed)"),
         (early_raw, "return actualDraw();\n"
