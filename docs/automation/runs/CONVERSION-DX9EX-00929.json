@@ -10,10 +10,10 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:CRITICAL:XR_PRESENT_ACK_BOUNDARY",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_POLICY_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "51fc0d7ff45123d94a2f8757cc1db48e152aac31",
@@ -85,7 +85,7 @@
     "next_hmd_experiment": "Check exact R84 build through real Quest3/VDXR frame pacing and duplicate/headlock HUD while gaming, compare timed-out/matched frames, p95/p99 stalls and input/FFB stability against control."
   },
   "material_result_sha": "c5bc48ab04ce01677eb803a1cad46ef9bc16d116",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "1594c0ec3a82f624538ad1a85671c8ef909d81a8",
   "score_delta_this_attempt": 0,
   "failed_ci_evidence": {
     "initial_material_sha": "c5bc48ab04ce01677eb803a1cad46ef9bc16d116",
@@ -94,5 +94,14 @@
     "cause": "Required per-TASK feature contract JSON absent at exact SHA; policy failed before Windows game/host/package",
     "ci_result": "FAIL_POLICY_ONLY"
   },
-  "next_action": "Validate source+record on the next exact SHA with unchanged DX9Ex Active, Domain, Full Source and applicable HUD Inspector; issue separate C6 bookkeeping only after all mandatory gates succeed. No duplicate score."
+  "next_action": "C6 exact-SHA build verification recorded; no CI rerun, source modification or duplicate score. Actual Quest3/VDXR HMD test remains pending; RUNTIME_VALIDATION=UNTESTED.",
+  "c6_exact_sha_result": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "1594c0ec3a82f624538ad1a85671c8ef909d81a8",
+    "ci_conclusion": "SUCCESS",
+    "ci_evidence_basis": "USER_CONFIRMED_EXACT_SHA_SUCCESS",
+    "prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "runtime_validation": "UNTESTED",
+    "notes": "Separate [skip ci] C6 bookkeeping only. Existing material_result_sha, feature_contract and acceptance_results unchanged; no build, new tests, or score increment."
+  }
 }
