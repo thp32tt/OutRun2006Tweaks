@@ -81,3 +81,34 @@ for w,h in ((640,480),(1920,1080),(3440,1440),(2496,2688)):
         (0,0,w,h,0.,1.,w,h,True,False)):
         assert not can_skip_restore(bind,reliable,x,y,sw,sh,minz,maxz,rw,rh)
 print("R33 restore-side viewport guarded world/HUD path: PASS")
+
+# A recycled COM surface address can carry a *different* extent after
+# Present, with no intervening classic Reset. Right-eye and saved-RT
+# optimizations both require a fresh GetDesc on the next frame. During
+# a frame they must retain the single-query hot-path lease.
+present = src.split("HRESULT __stdcall PresentDestR33(", 1)[1].split(
+    "void R33RollbackHooks()", 1)[0]
+normal_present = present.split("const HRESULT hr = R32ReviewRunPresentTelemetry(", 1)[1]
+lost_present = present.split("if (cooperative == D3DERR_DEVICELOST ||", 1)[1].split(
+    "return R32ReviewCallRawPresent(", 1)[0]
+for tok in ("R33RightViewport = {};", "R33SavedViewport = {};"):
+    assert tok in normal_present, "normal Present must expire viewport identity"
+    assert tok in lost_present, "lost device must expire viewport identity"
+assert normal_present.index("R33RightViewport = {};") < normal_present.index(
+    "GpuWaterProbe::instance().afterPresent(device)")
+# Simulate same-address recycling: the previously valid 2496x2688
+# identity must not authorize a 2048x2160 target's 2496x2688 viewport.
+saved_surface = 0x77
+observed = (saved_surface, 2496, 2688)
+def cached_match(entry, surface, x, y, w, h, minz, maxz):
+    return (entry is not None and entry[0] == surface
+            and can_skip(x, y, w, h, minz, maxz, entry[1], entry[2]))
+assert cached_match(observed, saved_surface, 0, 0, 2496, 2688, 0, 1)
+# At the next Present the published C++ lease is cleared before a new
+# metadata GetDesc, independently for both the right and saved targets.
+observed = None
+assert not cached_match(observed, saved_surface, 0, 0, 2496, 2688, 0, 1)
+observed = (saved_surface, 2048, 2160)
+assert not cached_match(observed, saved_surface, 0, 0, 2496, 2688, 0, 1)
+assert cached_match(observed, saved_surface, 0, 0, 2048, 2160, 0, 1)
+print("R33 per-frame viewport extent lease / same-address resize: PASS")

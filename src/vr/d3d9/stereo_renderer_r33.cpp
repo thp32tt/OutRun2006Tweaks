@@ -1425,6 +1425,11 @@ namespace OutRunVRStereo
                 {
                     ++R33LostDeviceBypasses;
                     GpuWaterProbe::instance().reset();
+                    // A lost device may retire stereo surfaces before the
+                    // original Reset hook runs. A recycled COM address must
+                    // never inherit a prior frame's full-target viewport.
+                    R33RightViewport = {};
+                    R33SavedViewport = {};
                     R33ResetReplayBlocked.store(
                         true, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
@@ -1456,6 +1461,13 @@ namespace OutRunVRStereo
                 });
             if (device && R32ReviewIsGameDevice(device))
             {
+                // These are frame-local leases, not permanent COM identities:
+                // resize/rebuild can recycle the same surface address without
+                // a classic Reset. Re-probe each next frame (at most two
+                // metadata GetDesc calls per frame, never per stereo draw).
+                // Keep the current frame's fast viewport-elision intact.
+                R33RightViewport = {};
+                R33SavedViewport = {};
                 if (GpuWaterProbe::Enabled())
                     GpuWaterProbe::instance().afterPresent(device);
                 R33LogPerfWindow();
