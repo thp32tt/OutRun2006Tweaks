@@ -12,14 +12,14 @@
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "IMPLEMENTING",
-  "phase": "C2_SOURCE_IMPLEMENTATION",
-  "checkpoint": "C2_D3DX_BEGIN_FAILURE_OWNER_FENCE",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATION_PARTIAL",
+  "checkpoint": "C5_PARTIAL_EXACT_SHA_GATES",
+  "automation_validation": "PARTIAL_EXACT_SHA_GATES",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "91c25917e6f0c48d0775989467d16a6b11274798",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "072232d3e06eec83bfc69ce6457ee4407c3216ca",
+  "validation_bearing_result_sha": "07076d719cf48131969b098abbb27db8d10a3242",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/hud_command_batch.hpp",
@@ -69,8 +69,8 @@
   },
   "acceptance_results": {
     "stage_original_sprite_numeric_owner": "PARTIAL_SOURCE_IMPLEMENTED",
-    "stage_device_failure_fallback": "IMPLEMENTED_PENDING_CI",
-    "stage_exact_sha_full_gates": "PENDING_EXACT_SHA_CI"
+    "stage_device_failure_fallback": "PASS_EXACT_SHA_HOST_SMOKE",
+    "stage_exact_sha_full_gates": "PENDING_TWO_EXACT_SHA_GATES"
   },
   "diagnosis": {
     "original_evidence": "The currently selected R84 package compiles source hooks_uiscaling.cpp::BeginDest. An existing same-object active batch was retained on ANY FAILED(hr), even if the underlying Begin returned device loss rather than nested INVALIDCALL.",
@@ -87,5 +87,36 @@
     "runtime_limit": "No new Quest3/VDXR screenshots or game test; this proves a source lifecycle hazard, not full resolution of the previously user-observed +TIME optical duplication."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Validate exact material SHA with required GitHub Actions, then continue whole +TIME sprite/numeric actual GPU ownership and per-eye visual acceptance in the same feature without claiming HMD success."
+  "next_action": "Trigger DX9Ex Full Source Impact Review and OutRun EXE HUD Inspector CI on validation-bearing SHA 07076d71 (workflow_dispatch or an authorized source-bearing retry if a real defect is discovered); after both exact-SHA SUCCESS update C6 only. Do not rerun already PASS exact SHA DX9Ex Active/Domain. Continue entire +TIME visual producer-to-physical-eye acceptance and require Quest3/VDXR before runtime success.",
+  "automation_validation_reason": "DX9Ex Active and Domain SUCCESS on exact 07076d71, but required Full Source Impact Review and HUD Inspector were triggered only for material parent 072232d3, not for final validation-bearing 07076d71. No CI PASS_EXACT_SHA or entire +TIME/HMD DONE can be asserted.",
+  "ci_failure_repair_sha": "07076d719cf48131969b098abbb27db8d10a3242",
+  "original_material_source_sha": "072232d3e06eec83bfc69ce6457ee4407c3216ca",
+  "automation_validation_evidence": {
+    "DX9Ex Active Validation": {
+      "run_id": 38968246444,
+      "head_sha": "07076d719cf48131969b098abbb27db8d10a3242",
+      "conclusion": "SUCCESS",
+      "exact_sha": true
+    },
+    "Domain Isolation Guard": {
+      "run_id": 38968246582,
+      "head_sha": "07076d719cf48131969b098abbb27db8d10a3242",
+      "conclusion": "SUCCESS",
+      "exact_sha": true
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 38967951855,
+      "head_sha": "072232d3e06eec83bfc69ce6457ee4407c3216ca",
+      "conclusion": "SUCCESS",
+      "exact_sha": false
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38967951724,
+      "head_sha": "072232d3e06eec83bfc69ce6457ee4407c3216ca",
+      "conclusion": "SUCCESS",
+      "exact_sha": false
+    },
+    "host_and_game_package": "BUILD_VERIFIED_ON_07076D71",
+    "quest3_vdxr_runtime": "UNTESTED"
+  }
 }
