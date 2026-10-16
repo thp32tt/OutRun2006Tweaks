@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00961",
+  "production_id": "CONVERSION-DX9EX-00961",
+  "event_id": "CONVERSION-DX9EX-00961-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00961",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "27c0ba19a71df1c8db9108e4fe7a1dbba1fe82d6",
+  "material_result_sha": "fc7b0337ef311f9ea75dd14916d8e0efce5cc138",
+  "validation_bearing_result_sha": "PENDING_THIS_COMMIT",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/multi_sprite_contain_scale.hpp",
+    "src/vr/ui/frontend_affine_contain.hpp",
+    "src/vr/ui/menu_quad_transform.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/ui/frontend_affine_contain.hpp",
+    "tools/tests/test_dx9ex_frontend_affine_contain.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00961.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep all original D3DX title/menu/car-selector sprites within the actual current D3D9 backbuffer after resizing/Reset, using one physically bounded affine for full, partial, and pivoted input matrix paths.",
+    "scope_boundary": "Only contained OnlineArcade and KeepCentered front-end D3DXMatrixTransformation2D paths, no original sprite geometry replacement, no gameplay ScreenHud, GOAL, stage +TIME, F11, SkyGlow, DXVK, R26_SAFE, or native input/FFB changes.",
+    "trace_stages": [
+      "Original game menu/car-selector D3DXMatrixTransformation2D full, nullable and pivoted call producers use potentially stale screen_scale after Reset.",
+      "Existing R84 original custom sprite quad already caps scale against actual screen_resolution; the newly shared affine helper applies that identical physical cap to D3DX menu matrices before game GPU drawing.",
+      "Live R84 original D3D9 draw and subsequent OpenXR per-eye presentation can now receive source menu geometry bounded to actual backbuffer, with negative invalid-size fallback retaining original D3DX return and vectors."
+    ],
+    "subcomponents": [
+      "Bound the original complete and nullable-vector scale/translation producers with the actual live backbuffer; do not mutate original vectors.",
+      "Bound the original pivoted/rotation-only post-D3DX affine while preserving matrix projective, finite and HRESULT fallback gates.",
+      "Add C++ numerical positive/negative regression for 4:3, 16:9, 21:9, portrait, Reset with stale game scales and device-loss invalid dimensions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "frontend_all_affine_paths",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original menu/car-selector full, nullable and pivoted sprites through R84 GPU",
+        "expected_behavior": "Screen-space corners preserve authored 4:3 geometry and never exceed the actual current backbuffer after resize even with stale original game screen_scale."
+      },
+      {
+        "id": "frontend_native_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Vanilla, gameplay HUD/GOAL/F11 and Reset invalid-extent original input behavior",
+        "expected_behavior": "Invalid dimensions fall back without changing original inputs or HRESULT, while existing unrelated game scene, menus and rollback output remain unchanged."
+      },
+      {
+        "id": "frontend_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 x86 game, R26_SAFE x86 rollback, x64 OpenXR host, package, Domain and applicable UI checks",
+        "expected_behavior": "All mandatory exact-SHA GitHub Windows Active, Domain, Full Source and HUD Inspector gates pass before accepting Build Verified; Quest3/VDXR correctness remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "frontend_all_affine_paths": "PENDING_EXACT_SHA_CI_AND_HMD",
+    "frontend_native_negative": "PENDING_EXACT_SHA_CI",
+    "frontend_exact_sha_gate": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The D3DXMatrixTransformation2D full, partial and pivoted menu matrix paths still trusted the original game's cached screen_scale after Reset, despite custom-sprite and quad paths already bounding their scale by screen_resolution. A stale 1920x1080 scale on a resized 1280x720 backbuffer maps 640x480 content to 1440x1080 and clips right/bottom artwork.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp D3DXMatrixTransformation2D_dest dispatches three contained front-end input forms into native D3DX.",
+      "src/vr/ui/multi_sprite_contain_scale.hpp validates source/target extents and computes the existing physically bounded containment minimum.",
+      "src/vr/ui/frontend_affine_contain.hpp builds a common bounded ratio/offset while hooks_uiscaling.cpp applies it before original game draw. No R84 per-eye stereo shader is changed."
+    ],
+    "alternatives_rejected": [
+      "Updating only menu_quad_transform.hpp would not affect D3DXMatrixTransformation2D's independent full/partial/pivot submission path; globally resizing VR HudScale would affect unrelated ScreenHud, not correct this source."
+    ],
+    "eye_ownership": "The source sprites remain on the existing game R84 UI stereo path; no new stereo owner is granted. Per-eye physical Quest3/VDXR optical output is not observed.",
+    "runtime_limit": "Source-level numerical and GitHub build validation only. No direct game/Quest3/VDXR visual or frame pacing evidence."
+  },
+  "next_action": "Repair real exact-SHA CI failures under same TASK_ID, then C6 PASS_EXACT_SHA only on matching successful required gates. Quest3/VDXR menu/car-selector crop negative tests remain needed.",
+  "score_delta_this_attempt": 0
+}
