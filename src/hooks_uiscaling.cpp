@@ -604,6 +604,19 @@ class UIScaling : public Hook
         if (!quadMap.valid)
             return;
 
+        // Preserve the original source Y letterbox at all four corners.
+        // This fix is intentionally limited to Vanilla front-end X scaling.
+        float scaleY = screenScaleY;
+        if (mode == ScalingMode::KeepCentered ||
+            mode == ScalingMode::OnlineArcade)
+            scaleY = min(screenScaleX, screenScaleY);
+        const float verticalCenter =
+            (mode == ScalingMode::KeepCentered ||
+             mode == ScalingMode::OnlineArcade)
+            ? (Game::screen_resolution->y -
+               Game::original_resolution.y * scaleY) / 2
+            : 0.0f;
+
 		// TopLeft
 		vec.x = a1->TopLeft_54.x;
 		vec.y = a1->TopLeft_54.y;
@@ -611,7 +624,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topLeft, &vec, &pM);
 
-		quad[1] = OutRunVrMenuQuad::ProjectY(quadMap, topLeft.y);
+		quad[1] = scaleY * topLeft.y + verticalCenter + 0.5;
 		quad[2] = topLeft.z;
 		quad[3] = 1.0;
 		quad[4] = a1->color_4;
@@ -625,7 +638,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomLeft, &vec, &pM);
 
-		quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);
+		quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;
 		quad[9] = bottomLeft.z;
 		quad[0xA] = 1.0;
 		quad[0xB] = a1->color_4;
@@ -639,7 +652,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topRight, &vec, &pM);
 
-		quad[0xF] = OutRunVrMenuQuad::ProjectY(quadMap, topRight.y);
+		quad[0xF] = scaleY * topRight.y + verticalCenter + 0.5;
 		quad[0x10] = topRight.z;
 		quad[0x11] = 1.0;
 		quad[0x12] = a1->color_4;
@@ -653,7 +666,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomRight, &vec, &pM);
 
-		quad[0x16] = OutRunVrMenuQuad::ProjectY(quadMap, bottomRight.y);
+		quad[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;
 		quad[0x17] = bottomRight.z;
 		quad[0x18] = 1.0;
 		quad[0x19] = a1->color_4;
