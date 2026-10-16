@@ -52,9 +52,9 @@
     ]
   },
   "acceptance_results": {
-    "native-eye-color-provenance": "PASS_WARP_GAME_EYE_REPLAY_NATIVE_DRAW_COLOR_EVIDENCE_R30_CALLBACK_PENDING",
-    "source-fallback-isolation": "PASS_BUILD_AND_STATIC_NO_D3D9_INPUT_FFB_OR_DXVK_SOURCE_WRITES_RUNTIME_UNTESTED",
-    "exact-sha-native-gates": "PASS_EXACT_SHA_5_OF_5_PLUS_NATIVE_TRANSPORT_WARP"
+    "native-eye-color-provenance": "PASS_BUILD",
+    "source-fallback-isolation": "PASS_BUILD",
+    "exact-sha-native-gates": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -89,7 +89,9 @@
     "remaining_implementation": [
       "Bind real R30 game menu/vehicle/race scene journals to distinct native eye callbacks with actual constants and textures.",
       "Verify DX11-native gamepad/menu-to-race frame output on Quest3/VDXR; HMD runtime remains UNTESTED."
-    ]
+    ],
+    "visible_frame_acceptance": "WARP confirms distinct native L/R color-capable D3D11 Draw/DrawIndexed eye output with negative coverage/PS/RT masking; actual R30 menu, vehicle-selection and race source callback is still pending, and no live gameplay/HMD frame is claimed.",
+    "activation_guard_and_fallback": "Native OpenXR eye publication remains fail-closed without color evidence; opt-in and original D3D9/DX9Ex renderer, input and FFB paths are preserved; runtime/Quest3 not tested."
   },
   "pipeline": {
     "C0_RECOVER": "GitHub HEAD 28c887822aa3; 00829 bound-eye OM/viewport/scissor source was already committed and CI SUCCESS; no R30 callback to OpenXR source yet.",
@@ -141,5 +143,10 @@
     "score_change": 0,
     "score_status": "PARTIAL_SOURCE_INTEGRATION_NO_NEW_FEATURE_AWARD",
     "note": "Unfinished parent DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR feature, no duplicate award for partial shader/eye admission implementation or C6 bookkeeping."
+  },
+  "acceptance_evidence": {
+    "native-eye-color-provenance": "PASS_WARP_GAME_EYE_REPLAY_NATIVE_DRAW_COLOR_EVIDENCE_R30_CALLBACK_PENDING",
+    "source-fallback-isolation": "PASS_BUILD_AND_STATIC_NO_D3D9_INPUT_FFB_OR_DXVK_SOURCE_WRITES_RUNTIME_UNTESTED",
+    "exact-sha-native-gates": "PASS_EXACT_SHA_5_OF_5_PLUS_NATIVE_TRANSPORT_WARP"
   }
 }
