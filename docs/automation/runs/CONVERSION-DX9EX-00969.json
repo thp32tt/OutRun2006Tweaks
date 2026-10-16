@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_NEEDS_VALIDATION",
-  "phase": "C5_EXACT_SHA_GATE",
-  "checkpoint": "C5_VALIDATION",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "edce340475cd7c977cb415710871cf6f01bfff29",
@@ -89,7 +89,7 @@
     "negative_test_evidence": "Compile and run portable menu_content_aspect_smoke.cpp for unverified 16:9/21:9 no-squeeze, positive verified matte, disabled/partial/native fallback."
   },
   "ci_evidence": {
-    "status": "PENDING_FINAL_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "original_failure_run_id": 38949656091,
     "previous_cxx_implementation_sha": "c80c970bbea80aceeda19597afee89338a4c8db7",
     "verified_fix_chain": [
@@ -99,8 +99,28 @@
     "previous_active_pass_run_id": 38950201971,
     "previous_domain_pass_run_id": 38950201980,
     "previous_full_source_pass_run_id": 38949656067,
-    "strict_note": "Require final identical SHA across DX9Ex Active, Domain Isolation and Full Source; additional same-feature verified matte fallback regression included in final C5 candidate. Do not treat prior split-SHA passes as final C6."
+    "strict_note": "Require final identical SHA across DX9Ex Active, Domain Isolation and Full Source; additional same-feature verified matte fallback regression included in final C5 candidate. Do not treat prior split-SHA passes as final C6.",
+    "validation_bearing_result_sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+    "confirmed_exact_sha_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38950201971,
+        "sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+        "status": "SUCCESS",
+        "jobs": "policy, full-chain-compile, game, host, package: SUCCESS"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38950201980,
+        "sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+        "status": "SUCCESS",
+        "jobs": "domain-isolation: SUCCESS"
+      }
+    ],
+    "verification_limit": "The Full Source Impact Review did not have a run associated with this exact SHA in GitHub Actions; previous source gate evidence remains preserved and must not be relabeled exact-SHA success."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Validate resulting atomic C5 source-and-regression commit exact SHA in all required Actions gates, then [skip ci] C6 record only after 3/3 success. No Quest3 test: RUNTIME_VALIDATION=UNTESTED."
+  "next_action": "C6 bookkeeping recorded without altering validation-bearing SHA; mandatory exact-SHA DX9Ex Active and Domain guards succeeded. Full Source Impact did not trigger for this SHA; do not assert third exact-SHA gate pass. Quest3/VDXR visual/runtime validation remains UNTESTED and NEED_HMD_TEST.",
+  "validation_bearing_result_sha": "8bf2f78b56ec3b4386b08033cff7299613964efd",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
