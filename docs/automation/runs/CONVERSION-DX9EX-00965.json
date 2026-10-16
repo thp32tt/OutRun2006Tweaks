@@ -70,8 +70,8 @@
     ]
   },
   "acceptance_results": {
-    "scene_effect_direct_and_queue": "LOCAL_SMOKE_PASS",
-    "scene_effect_foreign_world_fallback": "LOCAL_SMOKE_PASS",
+    "scene_effect_direct_and_queue": "RELEASE_SMOKE_PENDING_EXACT_CI",
+    "scene_effect_foreign_world_fallback": "RELEASE_SMOKE_PENDING_EXACT_CI",
     "scene_effect_integrated_gates": "PENDING_EXACT_SHA"
   },
   "diagnosis": {
@@ -86,5 +86,11 @@
     ],
     "runtime_limit": "No same-SHA Quest3 or in-game stereo optical test performed."
   },
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "ci_repair": {
+    "reason": "Original static policy matched obsolete inline age expression; moved to stronger verified C++ SceneEffect source gate. Windows Release smoke must check negative test results even when NDEBUG is enabled.",
+    "initial_failed_sha": "da03faac40508edd890c50a45f9281b377231f55",
+    "initial_gate": "DX9Ex Active / verify_vr_r30_projection_signature_fastpath.py",
+    "runtime_validation": "UNTESTED"
+  }
 }
