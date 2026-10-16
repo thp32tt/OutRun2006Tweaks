@@ -2496,8 +2496,14 @@ namespace DX9ExD3DXSpriteLifetime
         OutRunVR::GameSemantic::RenderScope scope,
         OutRunVR::GameSemantic::ProducerToken producer) noexcept
     {
+        // Source-proven B9200 glyphs may use R84's finite eye plane only
+        // DURING their actual direct/queued GPU owner. Their independent
+        // D3DXSprite deferred-batch/Flush lifetime was never proven; do not
+        // restore that owner after the original glyph call exits. Keep the
+        // existing negative C++ static_assert for this exact source.
         return batchActive && !queueActive && homogeneous &&
             pendingDraws != 0u && exactLiveSprite &&
+            producer != OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 &&
             OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
                 scope, producer);
     }
