@@ -9,7 +9,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
   "work_key": "CONVERSION-DX11-00815",
-  "feature_id": null,
+  "feature_id": "DX11-R23-NATIVE-DIRECTGPU-XR-EYE-PAIR-COPY",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -26,7 +26,7 @@
     "vrhost/tests/native_direct_eye_pair_smoke.cpp"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11-R23-NATIVE-DIRECTGPU-XR-EYE-PAIR-COPY",
     "full_dx11_renderer_complete": false,
     "goal": "Keep the selected native DirectGPU two-eye game frame on the live OpenXR D3D11 device when copying left/right eye textures into an XR array; reject stale/foreign-device sources and preserve classic SBS fallback.",
     "acceptance_items": [
@@ -81,5 +81,35 @@
     "score_change": 0,
     "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
     "note": "C6 record restoration, CI status recording and [skip ci] bookkeeping do not produce additional score; preserve any separately recorded material-run credit."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "Real D3D9 game Draw/DrawIndexed outputs independent native left and right game textures which x64 DirectGPU host selects from the current shared ring.",
+      "Live OpenXR compositor verifies both DirectGPU sources, current host D3D11 device/context, and XR array slices before copying distinct native game eyes, with ClassicSbs fallback."
+    ],
+    "batch_components": [
+      "vrhost/src/main_r23.cpp",
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact material SHA cc3c8248c0dd5b695f1aad407e77fdc7de62fed7 validated two-device WARP tests of distinct native left/right DirectGPU pixel copies into OpenXR array slices.",
+      "negative_regression": "Missing/stale/foreign-device resources and invalid source route reject the native eye copy; original ClassicSbs, D3D9 game rendering, gamepad and FFB remain unchanged.",
+      "component_integration": "main_r23.cpp native XR array projection integrates the D3D11 owner identity and eye-pair source checks from native_direct_stereo_pair.hpp, tested in native_direct_eye_pair_smoke.cpp."
+    },
+    "conflict_keys": [
+      "DX11:R23_NATIVE_DIRECTGPU_XR_EYE_PAIR_COPY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Previously established compile/WARP and exact-SHA CI correctness for host DirectGPU left/right XR array conversion. Actual menu/car/race rendering and Quest3/VDXR runtime remain UNTESTED.",
+    "activation_guard_and_fallback": "Native DirectGPU eye copy is opt-in with device/texture/source validity checks, ClassicSbs and original D3D9 gameplay/FFB fallback, no DXVK changes."
   }
 }
