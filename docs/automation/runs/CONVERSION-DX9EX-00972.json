@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C5_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "7627bbbd7a72274feec023f68880939fe86bac52",
   "material_result_sha": "2340ab7969f4b934ea7f968d9f052214cbb82583",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp",
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "b9200_direct_original_gpu_owner": "PENDING_EXACT_SHA",
-    "b9200_queue_and_native_fallback": "PENDING_EXACT_SHA",
-    "b9200_exact_sha_ci": "PENDING_EXACT_SHA"
+    "b9200_direct_original_gpu_owner": "PASS_EXACT_SHA",
+    "b9200_queue_and_native_fallback": "PASS_EXACT_SHA",
+    "b9200_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "At previous current R84 source the exact B9200 glyph wrapper captured a direct `ScopedExactProducerSemantic` but, unlike the other GOAL producer wrappers, did not protect or submit any deferred ID3DXSprite batch before the exact source RAII ended. Its queued SpriteNode token was excluded from D3DX queue GOAL owner recognition.",
@@ -97,14 +97,39 @@
   },
   "score_delta_this_attempt": 0,
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "material_result_sha": "2340ab7969f4b934ea7f968d9f052214cbb82583",
-    "required_gates": [
-      "DX9Ex Active Validation",
-      "Domain Isolation Guard",
-      "DX9Ex Full Source Impact Review",
-      "OutRun EXE HUD Inspector CI"
-    ]
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
+    "original_material_sha": "2340ab7969f4b934ea7f968d9f052214cbb82583",
+    "source_record_repair_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
+    "required_gates": {
+      "DX9Ex Active Validation": {
+        "run_id": 38959360902,
+        "head_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38959360902"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 38959360936,
+        "head_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38959360936"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 38959360971,
+        "head_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38959360971"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38959360961,
+        "head_sha": "d5181d14c87ae44057f372be6f113c5ae68b4188",
+        "status": "SUCCESS",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38959360961"
+      }
+    },
+    "host_and_game_package": "BUILD_VERIFIED",
+    "runtime_hmd": "UNTESTED"
   },
-  "next_action": "Validate final exact SHA through all mandatory GitHub Actions, repair any genuine same-task failures before C6; matching Quest3/VDXR HMD evidence separately required."
+  "next_action": "C6 BUILD_VERIFIED at exact SHA; Quest3/VDXR optical testing remains NEED_HMD_TEST. Do not rescore or rerun exact successful GitHub CI. Dispatch further development under a new independent task/feature.",
+  "notes": "C6 bookkeeping only on separately validated original material commit; C6 commit [skip ci] does not replace validation-bearing SHA or create new score. User hardware/Quest3 still UNTESTED."
 }
