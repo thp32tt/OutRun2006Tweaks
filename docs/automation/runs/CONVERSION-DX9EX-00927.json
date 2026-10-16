@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00927",
+  "production_id": "CONVERSION-DX9EX-00927",
+  "event_id": "CONVERSION-DX9EX-00927-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00927",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "18b2395b9a9b14693de062276f5686f431d550ba",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/lens_centre_relative_eye_pose.hpp",
+    "vrhost/tests/core_math_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00927.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Maintain a single, spatially anchored original C993 centre lens flare through real R84 shader provenance, latched head/camera inverse and two asymmetric OpenXR eyes without reapplying the absolute HMD pose; preserve the original direct game draw and surrounding flare rings under uncertain stereo conditions.",
+    "scope_boundary": "R84 exact direct WorldBillboard C993 centre only, after original spatial WVP admission. Do not modify CABE outer discs, +TIME, HUD, CPU sprite positioning, R26_SAFE, SkyGlow, original input/FFB, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original OutRun D3A5/C993 centre world billboard emits the exact source-owned c64 original WVP and exact draw semantic.",
+      "R84 R30 validates call, shader, draw and latched pose, reconstructs worldView from original WVP and removes the current common head pose once.",
+      "Use the real relative IPD of both OpenXR eyes and their asymmetric FOV projections, restore original c64 and honor R33 source-fail-preserve route."
+    ],
+    "subcomponents": [
+      "Replace absolute per-eye camera rotation/position in the C993 spatial world reconstruction with head-relative symmetric interocular offsets, keeping each eye projection asymmetric and preserving baseline world depth.",
+      "Validate finite atomic two-eye offsets under recenter/common translation and reject NaN/Inf pose without publishing a partial stereo result; preserve existing proof-based original-draw fallback.",
+      "Run changed-component Release/NDEBUG portable C++ regression plus complete R84 Windows game/host/package and unchanged Domain/Full Source/HUD CI gates at the final exact SHA."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_head_pose_not_doubled",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact C993 spatial source WVP to two OpenXR eye shader constants",
+        "expected_behavior": "C993 remains world-attached after one head inverse and relative IPD eye transforms, without a second absolute head orientation; the original c64 source and original draw are preserved when unproven."
+      },
+      {
+        "id": "centre_pose_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "XR recenter, finite translation and invalid pose/default game fallback",
+        "expected_behavior": "Portable C++ regression proves common-translation invariance, preserved symmetric IPD, equal-eye mono, and atomic rejection of NaN/Inf eye poses; non-C993 and R26_SAFE are not changed."
+      },
+      {
+        "id": "dx9ex_exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game, x64 host, release selector/package, Domain and Full Source CI",
+        "expected_behavior": "Existing DX9Ex Active 5/5, Domain, Full Source 3/3 and applicable HUD Inspector pass at one exact validation-bearing source SHA. Quest3 optics separately NEED_HMD_TEST."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "centre_head_pose_not_doubled": "PENDING_HMD_OPTICS",
+    "centre_pose_input_fallback": "PASS_PORTABLE_CXX17",
+    "dx9ex_exact_sha_required_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "C993 R30 source-owned spatial WorldBillboard removes latched common HMD head motion using headInverse, but then passes absolute stereo.eyeOrientation/eyeOffset into eyePose; the two independent transforms can double head yaw/translation compared with established R84 head-relative HUD and CPU world paths.",
+    "original_evidence": "User reports duplicated/headlocked centre dot while outer 0xCABE discs are distinct; prior exact C993 producer and raw-c64 protections were already integrated in tasks 00912/00920. This is a source-confirmed pose-convention mismatch, not yet an HMD-proven cause.",
+    "eye_ownership": "Only R30ScreenSpaceKind::ExactLensCentreWorld uses this specific headInverse plus absolute OpenXR eyePose branch. C993 direct shader c64 is retained for later restore, and R33 preserves original if the upper exact transform fails.",
+    "source_trace": [
+      "hooks_graphics.cpp D3A5/C993 scopes LensFlareCentre, distinct from outer discs 0xCABE.",
+      "stereo_renderer_r30.cpp requires call/pose/shader/raw-c64/WorldBillboard proof, recovers worldView and multiplies by headInverse.",
+      "lens_centre_relative_eye_pose.hpp computes finite interocular relative offsets for eye inverses before asymmetric FOV and final original game fallback."
+    ],
+    "alternatives_rejected": [
+      "Duplicate centre hook, all-alpha HUD route, artificial depth flattening, missing source WVP and a blanket 128-draw age widening are not used; previous exact source admission remains intact."
+    ],
+    "negative_test_evidence": "core_math_smoke runs Release-safe C++ checks for identical and translated HMD eyes, zero IPD, invalid NaN/Inf and atomic no-publish on reject.",
+    "runtime_evidence": "No headset/game session in this task; actual optical correction remains unproven.",
+    "next_hmd_experiment": "Quest3/VDXR on exact R84 package: compare central sun at head yaw/translation and recenter against outer discs, confirm no headlock/double dot and stable SkyGlow; toggle mono and R26_SAFE control."
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Check final exact SHA required Actions; then C6 source-vs-bookkeeping separation. No new score while revisiting same centre-lens symptom without HMD acceptance; Quest3 optics remain untested.",
+  "local_validation": "C++17 Release-style changed-area helper compiled and ran before GitHub material commit; full existing host core_math_smoke remains for CI."
+}

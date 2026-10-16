@@ -1,5 +1,6 @@
 #include "vr/core/matrix.hpp"
 #include "vr/core/stereo_world_scale.hpp"
+#include "vr/d3d9/lens_centre_relative_eye_pose.hpp"
 #include "vr/input/rumble_amplitude.hpp"
 
 #include <cmath>
@@ -210,6 +211,51 @@ int main()
         !Near(EffectiveStereoWorldScale(2.0f, 1.5f), 3.0f) ||
         !Near(EffectiveStereoWorldScale(1.0f, 0.0f), 0.0f))
         return 34;
+
+    // R84 C993 centre lens must not repeat the absolute HMD eye pose after
+    // the original WVP's common head inverse. The eye pair keeps IPD and
+    // remains invariant under common translation and recenter.
+    using OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets;
+    const float centreBase[2][3]{
+        {-0.032f, 0.0f, 0.0f}, {0.032f, 0.0f, 0.0f}
+    };
+    const float centreTranslated[2][3]{
+        {9.968f, -6.0f, 4.0f}, {10.032f, -6.0f, 4.0f}
+    };
+    float baseIpd[2][3]{}, translatedIpd[2][3]{};
+    if (!BuildHeadRelativeEyeOffsets(centreBase, baseIpd) ||
+        !BuildHeadRelativeEyeOffsets(centreTranslated, translatedIpd))
+        return 35;
+    for (int eye = 0; eye < 2; ++eye)
+        for (int axis = 0; axis < 3; ++axis)
+            if (!Near(baseIpd[eye][axis], translatedIpd[eye][axis]))
+                return 36;
+    if (!Near(baseIpd[0][0], -0.032f) ||
+        !Near(baseIpd[1][0], 0.032f) ||
+        !Near(baseIpd[0][1], 0.0f) ||
+        !Near(baseIpd[1][2], 0.0f))
+        return 37;
+    const float identical[2][3]{
+        {1.0f, 2.0f, 3.0f}, {1.0f, 2.0f, 3.0f}
+    };
+    if (!BuildHeadRelativeEyeOffsets(identical, translatedIpd))
+        return 38;
+    for (const auto& eye : translatedIpd)
+        for (const float value : eye)
+            if (!Near(value, 0.0f))
+                return 39;
+    const float badEye[2][3]{
+        {0.0f, 0.0f, 0.0f}, {nan, 0.0f, 0.0f}
+    };
+    translatedIpd[0][0] = 77.0f;
+    if (BuildHeadRelativeEyeOffsets(badEye, translatedIpd) ||
+        translatedIpd[0][0] != 77.0f)
+        return 40;
+    const float infiniteEye[2][3]{
+        {0.0f, 0.0f, 0.0f}, {0.0f, posInf, 0.0f}
+    };
+    if (BuildHeadRelativeEyeOffsets(infiniteEye, translatedIpd))
+        return 41;
 
     return 0;
 }

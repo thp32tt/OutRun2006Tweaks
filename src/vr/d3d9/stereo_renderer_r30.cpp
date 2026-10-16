@@ -23,6 +23,7 @@
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "lens_centre_relative_eye_pose.hpp"
 #include "stage_extension_eye_plane.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
@@ -6104,14 +6105,29 @@ namespace OutRunVRStereo
                     R29OwnerMultiplyMatrix(worldView, headInverse);
                 if (!R29OwnerMatrixFinite(headRelative))
                     return false;
+                // The stock C993 view was reconstructed from the original
+                // game's WVP; headInverse already removes the latched common
+                // HMD motion. Applying absolute xrLocateViews eye poses here
+                // repeats head yaw/translation and pulls the centre flare
+                // away from the world. Match the R84 exact HUD/CPU-projected
+                // world route: eye-relative IPD only, asymmetric FOV per eye.
+                float relativeEye[2][3]{};
+                if (!OutRunVR::LensCentre::BuildHeadRelativeEyeOffsets(
+                        stereo.eyeOffset, relativeEye))
+                    return false;
+                const float lensWorldScale =
+                    Settings::VRWorldScale * Settings::VRStereoDepth;
+                if (!std::isfinite(lensWorldScale))
+                    return false;
+                const float identityOrientation[4]{
+                    0.0f, 0.0f, 0.0f, 1.0f
+                };
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX eyePose =
                         R29OwnerMatrixFromQuaternionTranslation(
-                            stereo.eyeOrientation[eye],
-                            stereo.eyeOffset[eye],
-                            Settings::VRWorldScale *
-                                Settings::VRStereoDepth);
+                            identityOrientation, relativeEye[eye],
+                            lensWorldScale);
                     const D3DMATRIX eyeInverse =
                         R29OwnerInverseRigid(eyePose);
                     const D3DMATRIX eyeProjection =
