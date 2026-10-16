@@ -14,8 +14,10 @@ class NativeGameEyeDrawEncoder final {
 public:
     explicit NativeGameEyeDrawEncoder(
         ID3D11DeviceContext* context, ID3D11RenderTargetView* eyeTarget,
-        ID3D11DepthStencilView* eyeDepth) noexcept
-        : context_(context), eyeTarget_(eyeTarget), eyeDepth_(eyeDepth) {}
+        ID3D11DepthStencilView* eyeDepth,
+        UINT targetWidth, UINT targetHeight) noexcept
+        : context_(context), eyeTarget_(eyeTarget), eyeDepth_(eyeDepth),
+          targetWidth_(targetWidth), targetHeight_(targetHeight) {}
     NativeGameEyeDrawEncoder(const NativeGameEyeDrawEncoder&) = delete;
     NativeGameEyeDrawEncoder& operator=(const NativeGameEyeDrawEncoder&) = delete;
 
@@ -32,6 +34,7 @@ private:
     ID3D11DeviceContext* context_{};
     ID3D11RenderTargetView* eyeTarget_{};
     ID3D11DepthStencilView* eyeDepth_{};
+    UINT targetWidth_{}, targetHeight_{};
     std::uint64_t drawCount_{};
 };
 

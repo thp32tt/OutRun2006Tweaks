@@ -2,6 +2,7 @@
 #include "native_game_eye_pair_sources.hpp"
 #include <limits>
 #include <cmath>
+#include <algorithm>
 #include <d3d11_1.h>
 
 namespace outrun::vr::dx11 {
@@ -17,7 +18,50 @@ bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
     const bool matches = actualTarget == eyeTarget_ && actualDepth == eyeDepth_;
     if (actualTarget) actualTarget->Release();
     if (actualDepth) actualDepth->Release();
-    return matches;
+    if (!matches || !targetWidth_ || !targetHeight_) return false;
+
+    // A correct OM eye target with an off-eye viewport still produces no
+    // game pixels. It must not count as a real stereo source Draw.
+    UINT viewportCount = 1u;
+    D3D11_VIEWPORT view{};
+    context_->RSGetViewports(&viewportCount, &view);
+    if (viewportCount != 1u || !std::isfinite(view.TopLeftX) ||
+        !std::isfinite(view.TopLeftY) || !std::isfinite(view.Width) ||
+        !std::isfinite(view.Height) || view.Width <= 0.0f ||
+        view.Height <= 0.0f || view.TopLeftX >= float(targetWidth_) ||
+        view.TopLeftY >= float(targetHeight_) ||
+        view.TopLeftX + view.Width <= 0.0f ||
+        view.TopLeftY + view.Height <= 0.0f)
+        return false;
+
+    // D3D9 HUD/menu scissoring can move completely outside the current eye.
+    // A hardware-successful Draw with no visible raster coverage is not
+    // evidence for an XR eye, even when OM still points to its ring RTV/DSV.
+    ID3D11RasterizerState* rasterizer = nullptr;
+    context_->RSGetState(&rasterizer);
+    bool scissorEnabled = false;
+    if (rasterizer) {
+        D3D11_RASTERIZER_DESC desc{};
+        rasterizer->GetDesc(&desc);
+        scissorEnabled = desc.ScissorEnable != FALSE;
+        rasterizer->Release();
+    }
+    if (scissorEnabled) {
+        UINT count = 1u;
+        D3D11_RECT rect{};
+        context_->RSGetScissorRects(&count, &rect);
+        const float left = (std::max)(0.0f, view.TopLeftX);
+        const float top = (std::max)(0.0f, view.TopLeftY);
+        const float right = (std::min)(float(targetWidth_),
+                                       view.TopLeftX + view.Width);
+        const float bottom = (std::min)(float(targetHeight_),
+                                        view.TopLeftY + view.Height);
+        if (count != 1u || float(rect.right) <= left ||
+            float(rect.bottom) <= top || float(rect.left) >= right ||
+            float(rect.top) >= bottom)
+            return false;
+    }
+    return true;
 }
 
 bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
@@ -496,7 +540,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                 invocation.gameRaster
                     ? invocation.gameRaster->stencilClear[eyeIndex] : 0u);
             NativeGameEyeDrawEncoder encoder(
-                ctx, targets[eyeIndex], invocation.depth[eyeIndex]);
+                ctx, targets[eyeIndex], invocation.depth[eyeIndex],
+                invocation.width, invocation.height);
             if (!invocation.callback(invocation.user, ctx,
                                      targets[eyeIndex], eyeIndex,
                                      invocation.eye[eyeIndex], encoder))

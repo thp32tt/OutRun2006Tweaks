@@ -874,6 +874,8 @@ int main()
         ID3D11GeometryShader* callerGeometryShader{};
         bool rejectedDetachedDraw[2]{};
         bool rejectedForeignDraw[2]{};
+        bool rejectedOffscreenViewport[2]{};
+        bool rejectedOffscreenScissor[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -1005,9 +1007,26 @@ int main()
                 eyeIndex == 0u ? 0.25f : 0.75f,
                 static_cast<UINT8>(eyeIndex + 1u));
         }
+        // Even with the right OM eye targets, empty viewport/scissor GPU
+        // coverage must not certify a native left/right game frame.
+        const D3D11_VIEWPORT invisibleViewport{
+            64.f, 0.f, 16.f, 16.f, 0.f, 1.f};
+        ctx->RSSetViewports(1u, &invisibleViewport);
+        fixture.rejectedOffscreenViewport[eyeIndex] =
+            !encoder.draw(3u, 0u) && encoder.draw_count() == 0u;
+        ctx->RSSetViewports(1u, &viewport);
+        const D3D11_RECT invisibleScissor{64, 0, 80, 16};
+        ctx->RSSetState(fixture.originalRaster); // ScissorEnable=TRUE.
+        ctx->RSSetScissorRects(1u, &invisibleScissor);
+        fixture.rejectedOffscreenScissor[eyeIndex] =
+            !encoder.draw_indexed(3u, 0u, 0) && encoder.draw_count() == 0u;
+        ctx->RSSetScissorRects(1u, &scissor);
+
         if (boundTarget) boundTarget->Release();
         if (boundDepth) boundDepth->Release();
-        if (!fixture.sawBoundEye[eyeIndex]) return false;
+        if (!fixture.sawBoundEye[eyeIndex] ||
+            !fixture.rejectedOffscreenViewport[eyeIndex] ||
+            !fixture.rejectedOffscreenScissor[eyeIndex]) return false;
         // The verified game full-TARGET Clear already wrote this eye's color.
         // Change the scene's OM/RS state as a live Draw would: the producer
         // must restore caller raster/depth/blend state after both eye passes.
@@ -1085,7 +1104,11 @@ int main()
             gameEyeFixture.rejectedDetachedDraw[0] &&
             gameEyeFixture.rejectedDetachedDraw[1] &&
             gameEyeFixture.rejectedForeignDraw[0] &&
-            gameEyeFixture.rejectedForeignDraw[1],
+            gameEyeFixture.rejectedForeignDraw[1] &&
+            gameEyeFixture.rejectedOffscreenViewport[0] &&
+            gameEyeFixture.rejectedOffscreenViewport[1] &&
+            gameEyeFixture.rejectedOffscreenScissor[0] &&
+            gameEyeFixture.rejectedOffscreenScissor[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
