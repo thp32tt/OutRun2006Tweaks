@@ -133,7 +133,10 @@ class Meter {
 public:
     // Record only while the opt-in profiler is enabled, one route per
     // top-level logical Draw, without GPU queries or COM calls here.
-    void noteRoute(DrawRoute route) noexcept {
+    void noteRoute(IDirect3DDevice9* device, DrawRoute route) noexcept {
+        // Only attribute routes to the owning game device/timestamp epoch.
+        // Auxiliary D3D9 devices must not pollute the game Draw histogram.
+        if (!device || device != game_) return;
         const std::size_t i=static_cast<std::size_t>(route);
         if(i<routeCounts_.size()) ++routeCounts_[i];
     }

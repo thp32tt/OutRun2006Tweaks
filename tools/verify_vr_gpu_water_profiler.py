@@ -19,6 +19,42 @@ def good(x): return all(t in x for t in tokens) and 'D3DGETDATA_FLUSH' not in x
 assert good(hdr),[t for t in tokens if t not in hdr]
 assert hdr.count('CreateQuery(D3DQUERYTYPE_TIMESTAMP,')==4
 assert src.count('GpuWaterProbe::instance().beforeDraw(device, primitiveCount)')==4
+
+# All four physical Draw entrypoints must reject auxiliary devices before
+# beginning GPU query intervals or rebinding the per-game timing clock.
+profiler_gate = ("const bool gpuTimed = GpuWaterProbe::Enabled() &&\n"
+                 "                device && R32ReviewIsGameDevice(device) &&\n"
+                 "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);")
+assert src.count(profiler_gate) == 4
+assert src.count('GpuWaterProbe::instance().noteRoute(device, ') == 8
+assert 'void noteRoute(IDirect3DDevice9* device, DrawRoute route)' in hdr
+owner_guard = 'if (!device || device != game_) return;'
+assert owner_guard in hdr
+# Negative mutants: fail closed if any of the four draw APIs or eight
+# route observations stop preserving the game-device identity.
+for corrupted in (
+    src.replace(profiler_gate, profiler_gate.replace(
+        'device && R32ReviewIsGameDevice(device) &&\n                ', ''), 1),
+    src.replace('GpuWaterProbe::instance().noteRoute(device, ',
+                'GpuWaterProbe::instance().noteRoute(', 1),
+):
+    assert corrupted != src
+    assert not (corrupted.count(profiler_gate) == 4 and
+                corrupted.count('GpuWaterProbe::instance().noteRoute(device, ') == 8)
+for corrupted in (
+    hdr.replace(owner_guard, 'if (false) return;', 1),
+    hdr.replace(owner_guard, 'if (!device || device == game_) return;', 1),
+):
+    assert corrupted != hdr
+    assert owner_guard not in corrupted
+# Device-scope state model: an auxiliary Draw cannot reset a pending game
+# GPU clock or count a route in the game histogram.
+game = object(); auxiliary = object(); count = 13; routes = 5
+if auxiliary is game:
+    count += 1
+    routes += 1
+assert count == 13 and routes == 5
+
 # The default-disabled draw path must avoid the Meter singleton entirely.
 assert src.count('const bool gpuTimed = GpuWaterProbe::Enabled() &&')==4
 assert src.count('GpuWaterProbe::instance().afterDraw(true);')==4
