@@ -88,19 +88,19 @@
     "eye_ownership": "One exact original paused state controls both ScreenHud arrow and SpriteQueue overlay shell; two eye pixels share one latched OpenXR frame, independent pause scale and only pause-specific post-projection vertical shift; HMD runtime remains UNTESTED."
   },
   "ci_repair": {
-    "failed_validation_sha": "4d8e9a5998e39cd69de4e2c3e7a05834d71ae9ea",
-    "failed_run_id": 38946511211,
-    "failed_gate": "DX9Ex Active Validation / tools/verify_vr_pause_menu_eye_affine.py",
-    "reason": "Existing destructive mutation replaced first identical local pauseOwned binding from new stage-eye function while independent shader branch remained; global presence check falsely accepted unsafe mutation. The stage-eye binding must have unique name for existing original shader owner negative-oracle sensitivity.",
-    "correction": "Rename only new XYZRHW stage-eye local to stagePauseOwner while preserving old shader pauseOwned exact mutation target and all renderer/host runtime calculations. Do not alter destructive verifier or omit CI.",
+    "failed_validation_sha": "cfc2c8c649ea8097c3c619f1a4719ccddefe6065",
+    "failed_run_id": 38946791090,
+    "failed_gate": "DX9Ex Active Validation / host MSVC stage-extension-eye-smoke",
+    "reason": "Host MSVC C2040/C2446/C3863: new scalar badRight collided with original float badRight[16]; C2065: a temporary flx from an earlier nested loop was referenced outside scope. No game renderer build failure established.",
+    "correction": "Rename isolated invalid-shift test floats, remove out-of-scope flx comparison and assert two-eye projected X ordering plus each independently shifted eye's Y against captured pre-shift values. Keep all feature and negative tests.",
     "score_delta": 0,
-    "previous_failed_validation_sha": "d23442bbcf034ac072b6b7be65fd6616129c112a",
-    "previous_failed_gate": "DX9Ex Active Validation / feature-unit policy"
+    "previous_failed_validation_sha": "4d8e9a5998e39cd69de4e2c3e7a05834d71ae9ea",
+    "previous_failed_gate": "DX9Ex Active Validation / tools/verify_vr_pause_menu_eye_affine.py"
   },
   "ci_evidence": {
     "result": "PENDING_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run mandatory Gate suite on exact post-repair SHA; keep initial material SHA, Quest3/VDXR remains UNTESTED."
+  "next_action": "Check full exact-SHA R84/R26_SAFE game, x64 host executable regression, package, Domain, HUD Inspector, Full Source MSVC gate after test compilation repair."
 }
