@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
-  "status": "VALIDATION_PENDING",
+  "status": "PENDING_EXACT_SHA_GATES",
   "phase": "C5_VALIDATE",
   "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PARTIAL_GATE_PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "1741f7b4681785e97ee0823de887a36620a44819",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "5ab90ba1fd78807d8e0ea2cf29fc85ead46aed6d",
+  "validation_bearing_result_sha": "73c0d2a06f8f68bf3e10752e2aaae3aeace61809",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/pause_menu_eye_affine.hpp"
@@ -75,8 +75,24 @@
     "root_cause": "ESC shader HUD plane previously encoded VRPauseMenuVerticalOffset into HUD clip matrix BEFORE head inverse, individual eye inverse and asymmetric projection, while its sibling XYZRHW pause shell applies a fixed screen-space pixel shift AFTER eye transform.",
     "source_evidence": "R30BuildScreenSpaceEyeConstants assigned hudScale._42=pauseClipShift, whereas R30 XYZRHW pauseBiasY added height*VRPauseMenuVerticalOffset in eye pixel space.",
     "fix_evidence": "Apply source-signed NDC shift to final per-eye shader projection by clipY += NDCshift * clipW; unchanged main optical plane and source scale.",
-    "negative_test_evidence": "Portable numerical C++ native test covers two distinct perspective eye matrices, signed offset, neutral/NaN, and invariant X/W/depth."
+    "negative_test_evidence": "Portable numerical C++ native test covers two distinct perspective eye matrices, signed offset, neutral/NaN, and invariant X/W/depth.",
+    "test_repair": "The first material SHA native smoke incorrectly asserted _22 unchanged, though clipY += shift*clipW deliberately changes the Y coefficient. Same-task CI failure repair 73c0d2a checks unchanged _13 depth while preserving all NDC-shift positives and bilateral safeguards."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check exact-SHA DX9Ex Active, Domain Isolation, HUD Inspector and Full Source gates once. Quest3/VDXR ESC visual alignment and original input remain UNTESTED."
+  "next_action": "Exact SHA 73c0d2a requires Active Windows game/host/package, Full Source Impact and HUD Inspector gates before C6/score. Full Source run cancelled by independently pushed Quest cockpit work at 55199519; do not count Gate as PASS, avoid repeat on already successful SHA. Preserve separate original material 5ab90ba and repair 73c0d2a; HMD UNTESTED.",
+  "ci_evidence": {
+    "validation_sha": "73c0d2a06f8f68bf3e10752e2aaae3aeace61809",
+    "exact_sha": "INCOMPLETE",
+    "run_ids": {
+      "DX9Ex Active Validation": 38856373785,
+      "Domain Isolation Guard": 38856373795,
+      "DX9Ex Full Source Impact Review": 38856373811
+    },
+    "conclusions": {
+      "Domain Isolation Guard": "SUCCESS",
+      "DX9Ex Active Validation": "IN_PROGRESS_AT_CHECKPOINT",
+      "DX9Ex Full Source Impact Review": "CANCELLED_DUE_CONCURRENT_BRANCH_PUSH",
+      "OutRun EXE HUD Inspector CI": "NOT_RUN_ON_REPAIRED_SHA"
+    }
+  }
 }
