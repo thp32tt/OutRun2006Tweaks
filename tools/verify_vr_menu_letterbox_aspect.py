@@ -812,7 +812,7 @@ def verify_visible_menu_fragment(code: str) -> None:
         "whole.h = previousHeight * plan.height;",
         "const float authoredAspect =",
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
-        "GetGameClientOutputRect(fullClient);",
+        "const RECT& fullClient = capturedClient;",
         "sourceAspect = authoredAspect;",
         "gameConfiguredLetterbox, imageMatteVerified);",
         "completeClient, cropCentered43, useNativeMenuAspect,\n                imageMatteVerified);",
@@ -832,6 +832,11 @@ def verify_visible_menu_fragment(code: str) -> None:
     ]
     for token in required:
         assert token in body, token
+    # Reject a secondary HWND read that could diverge from the UV snapshot.
+    # Both physical client extents and capture UV must originate in one call.
+    assert "RECT capturedClient{};\n        if (!c.GetGameUv(whole, false, &capturedClient)) return false;" in code
+    assert "GetClientRect(c.hwnd_, &cr)" not in body
+    assert "GetGameClientOutputRect(fullClient);" not in body
     # The source call is now bound once to a cached configured-letterbox
     # boolean consumed by both physical-aspect and crop decisions. Verify
     # that the original game config, not a constant, still owns the branch.
@@ -851,7 +856,7 @@ def verify_visible_menu_fragment(code: str) -> None:
     assert body.index("const float authoredAspect =") < body.index(
         "PlanVisibleCenteredContent(") < body.index("if (plan.crop)")
     assert "if (cropCentered43)" not in body.split("PlanVisibleCenteredContent(", 1)[0]
-    assert body.index("GetGameClientOutputRect(fullClient);") < body.index(
+    assert body.index("const RECT& fullClient = capturedClient;") < body.index(
         "PlanVisibleCenteredContent(")
     assert body.index("sourceAspect = authoredAspect;") < body.index(
         "PlanOpticallyCenteredClip(")
@@ -903,8 +908,8 @@ for old, bad in (
     ("cropCentered43 ? 4.0f / 3.0f : clientAspect;",
      "cropCentered43 ? clientAspect : 4.0f / 3.0f;"),
     ("sourceAspect = authoredAspect;", "sourceAspect = plan.aspect;"),
-    ("GetGameClientOutputRect(fullClient);",
-     "GetClientRect(c.hwnd_, &fullClient);"),
+    ("const RECT& fullClient = capturedClient;",
+     "RECT fullClient{}; c.GetGameClientOutputRect(fullClient);"),
     ("constexpr bool imageMatteVerified = false;",
      "constexpr bool imageMatteVerified = true;"),
     ("gameConfiguredLetterbox, imageMatteVerified);",
