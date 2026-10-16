@@ -1,0 +1,110 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00972",
+  "production_id": "CONVERSION-DX9EX-00972",
+  "event_id": "CONVERSION-DX9EX-00972-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00972",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "7627bbbd7a72274feec023f68880939fe86bac52",
+  "material_result_sha": "2340ab7969f4b934ea7f968d9f052214cbb82583",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00972.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve the complete physical binocular GPU ownership of source-proven original B9200 GOAL progress and record text during both immediate D3DXSprite glyph submission and deferred queued sprite batches; prevent a previous world's or later unrelated sprite's owner from producing doubled/head-following stage and record time.",
+    "scope_boundary": "Only B9200 text proven by the exact 19 original GOAL parent call returns in the existing safe glyph-wrapper stack discriminator, and its direct/queued R84 D3DX GPU submission. Do not change game clock, +TIME source callers, generic HUD, lens/outer discs, SkyGlow/world, R26_SAFE, original input/FFB, DX11, or DXVK. Unsafe original E8+5 parent midhooks remain disabled.",
+    "trace_stages": [
+      "Original 19 B9200 GOAL E8 parent returns are stack-verified from the already-installed 0x2C808/0x2C9DB TextGlyph_putSprite safe wrapper before exact SpriteNode tag or direct source scope is created.",
+      "The preexisting ID3DXSprite Draw/Flush/End bridge now sees exact B9200 direct source entrance and exit plus queued SpriteNode owner, protects outgoing homogeneous batches before incoming glyphs and restores exact queued homogeneous ownership through GPU submission.",
+      "R84 R30 finite GOAL XYZRHW eye-plane and R33 exact direct/queued physical fallback submit the appropriate original game text under both-eye OpenXR host, or preserve original native Draw for missing/foreign/mixed proof."
+    ],
+    "subcomponents": [
+      "Split previous same-live homogeneous GPU batch before exact B9200 source and flush verified direct glyph draws while original stack-proven semantic scope remains live.",
+      "Admit only source-tagged homogeneous queued B9200 glyph batches into first-draw rearm and original queue GPU boundaries, preserving existing no-proof/mixed/reset/foreign fail-closed routes.",
+      "Execute positive and negative C++ GOAL source/queued batch tests, with exact Windows R84/R26_SAFE game, x64 host/package, Domain and source review gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "b9200_direct_original_gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original 19 GOAL result/record text and direct D3DX Sprite GPU submission",
+        "expected_behavior": "Only an exact original GOAL B9200 stack-proven glyph establishes ScreenHud, flushes its previous proven owner before entry and its own homogeneous GPU batch before direct scope exit."
+      },
+      {
+        "id": "b9200_queue_and_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Queued result SpriteNode and unrelated/mixed/unknown D3DX original game rendering",
+        "expected_behavior": "Exact B9200 queue batches preserve one original producer through first Draw and queue transitions; stale, mixed, untagged, foreign, prior-first-queue or failed GPU batches do not gain new ownership, preserving native Draw and R26_SAFE."
+      },
+      {
+        "id": "b9200_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 mainline and R26_SAFE DLL, x64 OpenXR host, package and regression CI",
+        "expected_behavior": "DX9Ex Active Validation, Domain Isolation, Full Source Impact Review and HUD Inspector all PASS at one final non-skip exact result SHA, with Quest3 hardware separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "b9200_direct_original_gpu_owner": "PENDING_EXACT_SHA",
+    "b9200_queue_and_native_fallback": "PENDING_EXACT_SHA",
+    "b9200_exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "At previous current R84 source the exact B9200 glyph wrapper captured a direct `ScopedExactProducerSemantic` but, unlike the other GOAL producer wrappers, did not protect or submit any deferred ID3DXSprite batch before the exact source RAII ended. Its queued SpriteNode token was excluded from D3DX queue GOAL owner recognition.",
+    "root_cause": "Source-scope lifetime can end at the return of original GOAL glyph producer before physically submitted D3DXSprite Draw/Flush/End, and queued B9200 tagged sprites lacked a corresponding homogeneous GPU batch boundary.",
+    "source_trace": [
+      "Safe 0x2C808/0x2C9DB glyph wrapper establishes B9200 original E8 stack return proof and exact ScreenHud producer at TextGlyph_putSprite, then tags all appended SpriteNodes.",
+      "VRProjectedD3DXSpriteIsolationR64 maintains tracked live D3DX sprite, exact scope and producer for Draw, Flush, End, first QueueNode and QueueEnd; the B9200 token previously was rejected at GoalOwner and direct source never invoked flush bridge.",
+      "R84 render_semantics direct/queued goal predicates now recognize only exact B9200 producer; stereo_renderer_r30.cpp has an existing GOAL finite XYZRHW eye-plane and R33 owns the physical stereo draw or conservative native fallback."
+    ],
+    "eye_ownership": "Only successful source-owned physical GPU GOAL draws are eligible for the existing R84 bilateral finite eye-plane; original game physical Draw remains the fallback if either eye or source proof fails.",
+    "alternatives_rejected": [
+      "Do not reinsert unsafe B9200 E8+5 midhooks that previously crashed at 0x97C5F, globally flush D3DX sprites, relabel all white alpha UI glyphs or alter GOAL timers and SkyGlow."
+    ],
+    "fix_evidence": "C++ original B9200 source now brackets exact direct D3DX gpu submission, R64 identifies exact B9200 queued owner and 3 physical GPU batch predicates accept only homogeneous original ScreenHud producer.",
+    "negative_test_evidence": "Executable vrhost/tests/goal_progress_owner_smoke.cpp includes wrong producer, mixed buffer, queue during direct source, already multiple Draws, non-ScreenHud and pre-first-queue B9200 rejection. CI validation still pending.",
+    "runtime_limit": "No Quest3 or VDXR actual gameplay, stereo result or GPU frame timing test was run; optical acceptance remains unproven."
+  },
+  "ci_repair": {
+    "initial_failed_validation_sha": "2340ab7969f4b934ea7f968d9f052214cbb82583",
+    "initial_failed_gate": "DX9Ex Active Validation / policy / verify_vr_feature_unit_policy.py --check-head",
+    "failure": "Exact HEAD policy failed because CONVERSION-DX9EX-00972.json run record did not yet exist; no game source compilation or HMD failure was established.",
+    "correction": "Add one same TASK_ID/source feature contract with pending exact-SHA acceptance; preserve original material_result_sha and all mandatory CI checks without CI-skip or separate score.",
+    "score_delta": 0
+  },
+  "score_delta_this_attempt": 0,
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_result_sha": "2340ab7969f4b934ea7f968d9f052214cbb82583",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ]
+  },
+  "next_action": "Validate final exact SHA through all mandatory GitHub Actions, repair any genuine same-task failures before C6; matching Quest3/VDXR HMD evidence separately required."
+}
