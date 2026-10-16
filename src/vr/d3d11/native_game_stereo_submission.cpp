@@ -1,5 +1,6 @@
 #include "native_game_stereo_submission.hpp"
 #include "native_game_eye_pair_sources.hpp"
+#include "native_game_stretch_source.hpp"
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -544,10 +545,11 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
     if (!sd.Width || !sd.Height || sd.Format == DXGI_FORMAT_UNKNOWN ||
-        sd.Format != ed.Format || sd.MipLevels != 1u ||
+        sd.MipLevels == 0u || ed.Format == DXGI_FORMAT_UNKNOWN ||
         sd.ArraySize != 1u || ed.MipLevels != 1u ||
         ed.ArraySize != 1u || sd.SampleDesc.Count == 0u ||
-        ed.SampleDesc.Count != 1u || sd.Usage != D3D11_USAGE_DEFAULT ||
+        ed.SampleDesc.Count != 1u || ed.SampleDesc.Quality != 0u ||
+        sd.Usage != D3D11_USAGE_DEFAULT ||
         sd.CPUAccessFlags != 0u || (sd.MiscFlags & shared) != 0u ||
         (sd.BindFlags & (D3D11_BIND_RENDER_TARGET |
                          D3D11_BIND_SHADER_RESOURCE)) == 0u ||
@@ -559,13 +561,22 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         dest.bottom <= dest.top ||
         static_cast<UINT>(dest.right) > targetWidth_ ||
         static_cast<UINT>(dest.bottom) > targetHeight_) return false;
-    UINT support = 0u;
-    if (FAILED(device->CheckFormatSupport(sd.Format, &support)) ||
-        (support & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) == 0u ||
-        (support & D3D11_FORMAT_SUPPORT_RENDER_TARGET) == 0u ||
-        (sd.SampleDesc.Count > 1u &&
-         ((sd.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u ||
-          (support & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)))
+    // D3D11 postpass sampling converts the real game source into the eye's
+    // render-target format; unlike GPU CopyResource, a filtered StretchRect
+    // does not require identical DXGI formats. Menu/car offscreen RTs often
+    // use a different format or have a full mip chain. Sample mip zero only.
+    UINT sourceSupport = 0u, eyeSupport = 0u;
+    if (FAILED(device->CheckFormatSupport(sd.Format, &sourceSupport)) ||
+        FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))
+        return false;
+    const auto transfer = native_game_stretch_source_transfer(
+        sd.MipLevels, sd.SampleDesc.Count, sd.SampleDesc.Quality,
+        (sd.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u,
+        (sd.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u,
+        (sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
+        (eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
+        (sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u);
+    if (transfer == NativeGameStretchSourceTransfer::Reject)
         return false;
 
     // Compile once per D3D11 device, never once per Draw/menu postpass.
@@ -649,11 +660,14 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     }
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> sampled;
-    if (sd.SampleDesc.Count == 1u &&
-        (sd.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u)
+    if (transfer == NativeGameStretchSourceTransfer::DirectSample)
         sampled = source;
     else {
         D3D11_TEXTURE2D_DESC desc = sd;
+        // For multisample RTs resolve mip 0; single-sample RT-only sources
+        // preserve their full mip allocation for legal CopyResource.
+        if (transfer == NativeGameStretchSourceTransfer::ResolveToSampled)
+            desc.MipLevels = 1u;
         desc.SampleDesc.Count = 1u;
         desc.SampleDesc.Quality = 0u;
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -675,10 +689,11 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     if (!restore.valid()) return false;
     context_->OMSetRenderTargets(0u, nullptr, nullptr);
     if (sampled.Get() != source) {
-        if (sd.SampleDesc.Count > 1u)
+        if (transfer == NativeGameStretchSourceTransfer::ResolveToSampled)
             context_->ResolveSubresource(
                 sampled.Get(), 0u, source, 0u, sd.Format);
-        else context_->CopyResource(sampled.Get(), source);
+        else if (transfer == NativeGameStretchSourceTransfer::CopyToSampled)
+            context_->CopyResource(sampled.Get(), source);
     }
     ID3D11RenderTargetView* target = eyeTarget_;
     context_->OMSetRenderTargets(1u, &target, nullptr);
