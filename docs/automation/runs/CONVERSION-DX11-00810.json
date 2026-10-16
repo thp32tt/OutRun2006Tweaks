@@ -9,7 +9,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_SHARED_DESKTOP_BACKUP_CACHE",
-  "feature_id": null,
+  "feature_id": "DX11-NATIVE-SHARED-DESKTOP-BACKUP-CACHE",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -26,14 +26,14 @@
     "tests/vr/dx11_native_shared_desktop_admission.cpp"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11-NATIVE-SHARED-DESKTOP-BACKUP-CACHE",
     "recovery_basis": "Reconstructed from validated material commit because original run record was absent (RUN_RECORD_NOT_FOUND); no prior feature contract could be read.",
     "full_dx11_renderer_complete": false,
     "goal": "Reuse bounded D3D9Ex game-backbuffer rollback render targets across native game Presents without reusing old pixels or permitting device/generation/format/extent-invalid backups.",
     "acceptance_items": [
       {
         "id": "same-generation-backup-allocation-reuse",
-        "category": "performance",
+        "category": "end_to_end_behavior",
         "behavior_area": "native_game_shared_desktop",
         "expected_behavior": "Reuse exact-size rollback GPU allocations for steady game/menu/race Presents when owner, generation, format and tile dimensions match."
       },
@@ -101,5 +101,35 @@
     "score_change": 0,
     "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
     "note": "C6 recording of already-existing material and CI; never score this same implementation twice."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "Already integrated real OutRun game native Draw/DrawIndexed generates a full-size DX11 color frame and offers guarded GPU desktop presentation",
+      "Same-generation, same-owner D3D9Ex GPU rollback backup allocations snapshot original game pixels on EACH Present and restore after a failed native StretchRect"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_shared_desktop.hpp GPU presentation and rollback surface lifetime",
+      "src/vr/d3d11/native_game_shared_desktop_backup.hpp reuse contract",
+      "tests/vr/dx11_native_shared_desktop_admission.cpp positive and negative rollback regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Previously verified d354ff1556a6e723469dcc191d23c6b39fd31fec reuses one D3D9Ex backup surface only when device, format, size and generation match.",
+      "negative_regression": "Previously verified failure rollback restores original game pixels and rejected generation, owner, format or extent does not reuse a stale surface.",
+      "component_integration": "Actual 00810 GPU shared desktop path and local regression had exact SHA full required GitHub Actions SUCCESS; this restores metadata fields only without changing that historic validation identity."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_SHARED_DESKTOP_BACKUP_CACHE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Original 00810 BUILD_VERIFIED for bounded GPU rollback allocation, without any claimed Quest3 or game-observed output.",
+    "activation_guard_and_fallback": "The shared-desktop route stays opt-in; failed GPU native presentation restores original D3D9Ex backbuffer and original gamepad/FFB."
   }
 }
