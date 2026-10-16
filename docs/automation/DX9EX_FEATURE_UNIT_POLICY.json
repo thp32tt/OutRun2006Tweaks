@@ -211,6 +211,25 @@
         "prove source-cause correction with mutation/negative regression",
         "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
       ]
+    },
+    {
+      "id": "PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+      "feature_id": "DX9EX:VIS:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+      "symptom_id": "DX9EX:SYMPTOM:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
+      "title": "CABE 투영 렌즈 바깥광: 유효 XR 원점에서 양안 투영 보존",
+      "priority": 113,
+      "goal": "Restore projected CABE outer lens-disc stereo projection with finite large relative XR eye origins, preserving native visual fallback, C993 centre and other world effects.",
+      "trace_stages": [
+        "original CABE effect producer and its already-projected Calc3D2D sprite geometry",
+        "R84 R30 FlatPerspectiveEffect cache and R29 source-relative head/eye transforms",
+        "per-eye projection through original alpha/depth submission and OpenXR host"
+      ],
+      "acceptance_scenarios": [
+        "finite large common XR eye origin does not overflow average; both eye projected discs remain eligible",
+        "invalid one-eye origin rejects both optical candidates without mutating original world or C993 path",
+        "exact-SHA DX9Ex R84 game/R26_SAFE/x64 host/package, Domain and Full Source/HUD Gates; Quest3 separately"
+      ],
+      "development_scope": "Only CABE projected outer-disc relative eye origin; independent from C993 central flare repair."
     }
   ],
   "diagnosis_required_for_terminal": {

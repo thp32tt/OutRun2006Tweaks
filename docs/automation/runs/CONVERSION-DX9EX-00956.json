@@ -9,7 +9,7 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
-  "feature_class": "VISUAL_DEFECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:PROJECTED_FLARE_OUTER_EYE_ORIGIN",
   "status": "IMPLEMENTED_PENDING_CI",
   "phase": "C3_VALIDATE",
@@ -78,7 +78,9 @@
     "runtime_limit": "No Quest3/VDXR or OutRun executable runtime capture in this task; numerical repro does not demonstrate full visual repair."
   },
   "ci_evidence": {
-    "changed_area_native": "Native smoke added; source compilation and GitHub required exact-SHA gates pending."
+    "changed_area_native": "Native smoke added; source compilation and GitHub required exact-SHA gates pending.",
+    "policy_failure": "Initial material commit 78c391bd4e6e06745916cfb1846df8ee27d493f0 failed exact-SHA DX9Ex Active policy because this independently traced projected outer-disc symptom was absent from the canonical visual catalog.",
+    "policy_repair": "Register the exact source-backed symptom and use USER_VISIBLE_VISUAL_DEFECT without relaxing catalog restrictions or mandatory CI. This is a repair under the SAME TASK_ID, not an independent functional achievement."
   },
   "next_action": "Run exactly one GitHub full required Gate matrix on this validation-bearing SHA, repair actual failures under same TASK_ID, then C6-only bookkeeping at the same immutable SHA; Quest3 optics NEED_HMD_TEST."
 }
