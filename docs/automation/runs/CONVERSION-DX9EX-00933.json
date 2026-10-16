@@ -59,6 +59,10 @@
         "behavior_area": "R84 game/x64 host/R26_SAFE rollback/Domain/source guards",
         "expected_behavior": "Required exact-SHA DX9Ex Active, Domain, source impact and changed-area native smoke pass without CI-skip."
       }
+    ],
+    "subcomponents": [
+      "Original CalcPeraShadow producer and game c64 upload must match CarBaseShadow, direct nonqueued shader identity, pose epoch and adjacent draw lifetime",
+      "R29 two-eye contact shadow decision must require that provenance and retain original stock-WVP stereo/mono path for stale, queued, mismatched or nonfinite source"
     ]
   },
   "acceptance_results": {
@@ -68,17 +72,22 @@
   },
   "diagnosis": {
     "original_evidence": "Race-start shadow double image user-visible symptom tracked under DX9EX:SYMPTOM:START_SHADOW; R29 allowed a Z-disabled shadow from R28PerspectiveWorldSemantic alone.",
-    "source_trace": "hooks_graphics RestoreCarBaseShadow direct producer -> outrun_renderer original c64 provenance -> R29 effect stereo decision -> R84 R30/R33/host eye paths",
+    "source_trace": [
+      "Original CalcPeraShadow hook marks CarBaseShadow WorldParticle around DrawObjectAlpha_Internal",
+      "Game c64 raw-WVP write provenance carries upload producer, queue owner, shader epoch, pose epoch and top-level draw serial",
+      "R29 selects spatial shadow only when direct original game WVP ownership is current; R84 R30/R33 and host preserve conservative per-eye fallback"
+    ],
     "root_cause": "R29PerspectiveWorldSemantic tests target/projection class but does not prove game c64 was uploaded by CarBaseShadow for this draw.",
     "alternatives_rejected": [
       "Do not globally alter alpha/depth policy or force mono; R13 and R29 protected fallback paths must remain",
       "Do not alter original game selector shadow when source model transform is unknown"
     ],
     "fix_evidence": "Require original WVP provenance same direct producer, pose epoch, shader epoch, adjacent draw serial and finite data for the R29 spatial exception.",
-    "negative_test_evidence": "car_base_shadow_stereo_smoke.cpp includes stale draw/pose/shader/queue/producer/zero negative mutations."
+    "negative_test_evidence": "car_base_shadow_stereo_smoke.cpp includes stale draw/pose/shader/queue/producer/zero negative mutations.",
+    "eye_ownership": "Each eye receives spatial contact-shadow correction only with same original direct producer and WVP lifetime; all unproven writes retain the existing stock-WVP eye path."
   },
-  "material_result_sha": null,
+  "material_result_sha": "1eac78e0030f8b0470e8e45cbb869ee6d32957d6",
   "validation_bearing_result_sha": null,
   "score_delta_this_attempt": 0,
-  "next_action": "Verify exact source SHA in required GitHub Actions, repair any true failure under same task and then C6 separately; Quest3/VDXR runtime remains UNTESTED."
+  "next_action": "Repair exact-HEAD policy-record omission under same TASK_ID; run mandatory final exact-SHA CI on validation-bearing repair commit, then separate C6 bookkeeping only after PASS. HMD remains UNTESTED."
 }
