@@ -1,3 +1,11 @@
+## 2026-10-17 00:10 KST — C English-only native crop automation REAUTHORIZED (newer user instruction)
+
+The user has explicitly authorized restarting **only** automatic C extraction of original English lettering/phrase ROIs. This supersedes the October 16 *no C scheduling* instruction for this narrow function only. The existing ChatGPT automation `OutRun 영문 HD 크롭 자동화` (task ID `6ad160ee3a2c81918f7afe2b99ad29cd`) is enabled on an hourly cadence at minute 03 KST; it must not create a second scheduler/timer. Every invocation must seek at most one **new** genuine complete-original HD English phrase crop. Check existing `MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json` (255 existing) and the standalone C queue and output IDs first. A simple repeat of a completed queue item is not progress.
+
+Admit additional sources only after source original-DDS provenance, SHA256, full-frame dimensions, orientation and actual text ROI boundaries are verified. English-only native pixels and original background/effects are preserved without alpha removal, rescaling, masks, CLEAN, Korean, composites, DDS editing or ImageGen. One new phrase => exactly one separate `english_original_native_crop.png` and SHA/coords-bearing `crop_manifest.json`, `CROP_TEST_ONLY_REVIEW_REQUIRED`; uncertain items => HOLD (without guessing). Previously completed crops and A/B state are immutable. Original 986 tiles/reassemblies are excluded. Legacy A/B/C1/other image production controllers, Portainer auto dispatch and VR remain stopped. This authorization applies to the **ChatGPT task-only C worker**, not to restarting any Docker container. The user can stop this task separately without affecting A/B.
+
+---
+
 # OutRun 2006 C — N100 original HD English crop only (2026-10-16)
 
 ## Latest user override and emergency pause
