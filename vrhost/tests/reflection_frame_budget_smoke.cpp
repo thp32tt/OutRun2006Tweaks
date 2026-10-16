@@ -33,5 +33,15 @@ int main()
     // Desktop vanilla mode: no XR frame budget cap.
     a=Advance(0.f,1.f,1.f,false,false);
     if(a.faces!=6)return 9;
+    a=Advance(5.f,0.f,100.f,true,true);
+    if(a.faces!=0 || a.pendingFaces!=0.f)return 10;
+    a=Advance(0.8f,0.f,1.f,false,false);
+    if(a.faces!=0 || a.pendingFaces!=0.f)return 11;
+    a=Advance(0.8f,-1.f,1.f,true,false);
+    if(a.faces!=0 || a.pendingFaces!=0.f)return 12;
+    a=Advance(0.8f,std::numeric_limits<float>::quiet_NaN(),1.f,true,false);
+    if(a.faces!=0 || a.pendingFaces!=0.f)return 13;
+    a=Advance(a.pendingFaces,.5f,1.f,true,false);
+    if(a.faces!=3 || a.pendingFaces!=0.f)return 14;
     return 0;
 }

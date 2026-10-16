@@ -1564,14 +1564,18 @@ class FixZBufferPrecision : public Hook
 			{
 				// Keep cockpit geometry within 15 cm even during stereo warmup.
 				camera->perspective_znear_BC = std::clamp(
-					Settings::VRNearPlane.get(), 0.05f, 0.15f);
+					OutRunVR::DriverSeatCamera::SafeNearPlane(
+						Settings::VRNearPlane.get(), 0.05f, 0.15f),
+					0.05f, 0.15f);
 			}
 			else if (Settings::VRPositionalTracking &&
 				Settings::VRStereo &&
 				OutRunVR::RuntimeEligibility::MayInjectStereo() &&
 				VRDriverSeatGameplayActive())
 			{
-				camera->perspective_znear_BC = Settings::VRNearPlane.get();
+				camera->perspective_znear_BC =
+						OutRunVR::DriverSeatCamera::SafeNearPlane(
+							Settings::VRNearPlane.get(), 0.03f, 0.50f);
 			}
 			// only set znear to 1 if...
 			else

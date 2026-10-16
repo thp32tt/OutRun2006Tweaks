@@ -82,6 +82,23 @@ namespace OutRunVR::DriverSeatCamera
         return true;
     }
 
+    // Validate the actual user-selected depth plane before native 6DoF
+    // cockpit and SceneEffect projection. std::clamp does not sanitize NaN.
+    inline float SafeNearPlane(float requested, float minimum,
+        float maximum, float fallback = 0.10f) noexcept
+    {
+        if (!std::isfinite(requested) || !std::isfinite(minimum) ||
+            !std::isfinite(maximum) || !std::isfinite(fallback) ||
+            !(minimum > 0.f) || !(maximum >= minimum))
+            return 0.10f;
+        const float boundedFallback = fallback < minimum ? minimum :
+            (fallback > maximum ? maximum : fallback);
+        if (!(requested > 0.f))
+            return boundedFallback;
+        return requested < minimum ? minimum :
+            (requested > maximum ? maximum : requested);
+    }
+
     // Scope contract: cockpit near-plane, player-car model, driver suppression
     // and camera displacement must agree for the *same* native camera frame.
     // Re-evaluate after mode switches; never reuse a cached eligibility bit.

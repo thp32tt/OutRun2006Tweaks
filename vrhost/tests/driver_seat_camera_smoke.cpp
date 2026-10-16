@@ -89,5 +89,19 @@ int main()
         !near(lookOut.y, 0.65f) || !near(lookOut.z, 8.65f))
         return 12;
 
+    using OutRunVR::DriverSeatCamera::SafeNearPlane;
+    // A NaN hot-edited INI near-plane previously poisoned both stereo
+    // projection matrices; reject it and recover on the next valid frame.
+    if (!near(SafeNearPlane(0.1f,0.05f,0.15f),0.1f) ||
+        !near(SafeNearPlane(0.01f,0.05f,0.15f),0.05f) ||
+        !near(SafeNearPlane(0.35f,0.05f,0.15f),0.15f) ||
+        !near(SafeNearPlane(nan,0.05f,0.15f),0.10f) ||
+        !near(SafeNearPlane(inf,0.05f,0.15f),0.10f) ||
+        !near(SafeNearPlane(-inf,0.05f,0.15f),0.10f) ||
+        !near(SafeNearPlane(0.f,0.05f,0.15f),0.10f) ||
+        !near(SafeNearPlane(nan,0.03f,0.50f),0.10f))
+        return 13;
+    if (!near(SafeNearPlane(0.08f,0.05f,0.15f),0.08f))
+        return 14;
     return 0;
 }

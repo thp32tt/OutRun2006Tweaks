@@ -76,6 +76,9 @@ namespace OutRunVR::HudCommandBatch
         {
             active = false;
             boundaryReady = false;
+            // A failed GPU batch cannot retain the previous +TIME/GOAL
+            // source, even in subsequent diagnostics or recovery callbacks.
+            forget();
         }
 
         void end() noexcept

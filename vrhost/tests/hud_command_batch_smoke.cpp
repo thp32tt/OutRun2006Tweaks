@@ -34,7 +34,9 @@ int main()
     if (l.producer != ProducerToken::ResultTextB9200)
         return 6;
     l.onFlushFailure();
-    if (l.active || l.exactUniformOwner())
+    if (l.active || l.exactUniformOwner() || l.drawCount != 0 ||
+        l.scope != RenderScope::None ||
+        l.producer != ProducerToken::None || !l.homogeneous)
         return 7;
     l.begin(&spriteB,true);
     if (l.generation != 2 || l.sprite != &spriteB ||

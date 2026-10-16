@@ -27,6 +27,12 @@ namespace OutRunVR::ReflectionFrameBudget
         if (!std::isfinite(elapsed60))
             elapsed60 = 0.f;
         const float rate = std::clamp(requestedRate, 0.f, 1.f);
+        // Disabling cubemap updates invalidates deferred face debt from the
+        // previous enabled period; otherwise stale expensive GPU faces
+        // continue running after a live INI toggle or menu transition.
+        if (rate == 0.f)
+            return {0.f, 0};
+
         const float scaled = vrNormalized
             ? (lateFrame ? 0.5f : std::clamp(elapsed60, 0.f, 1.f))
             : 1.f;
