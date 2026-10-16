@@ -145,6 +145,12 @@
     "remaining_implementation": [
       "Existing 00836 native GPU scaled postpass WARP access violation must be repaired by owning workstream.",
       "Native R30 per-eye camera game Draw/DrawIndexed integration and real Quest3 HMD gameplay visual tests remain outstanding."
-    ]
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "live_game_draw_path_scope": "Target source-graph integration dependency, not completed runtime proof; 00837 contributes only the DirectGPU x64 host MRT/DSV hold stage. Native producer stretch WARP probe remains failed under 00836 ownership."
   }
 }
