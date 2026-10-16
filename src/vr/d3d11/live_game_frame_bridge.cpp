@@ -6496,10 +6496,15 @@ void before_game_present(IDirect3DDevice9* game,
                 presentDesc.Width, presentDesc.Height, presentRegion,
                 dirtyRegion != nullptr, oneBoundedDirtyRect, fullDirtyCoverage,
                 cropDirtyCoverage, partitionCropCoverage, partialDirty);
+            const auto sharedMultiDesktop = NativeSharedDesktopAdmission::select_multi_regions(
+                presentDesc.Width, presentDesc.Height, presentRegion,
+                dirtyRegion != nullptr, fullDirtyCoverage, cropDirtyCoverage,
+                partitionCropCoverage, multiDirty);
             const bool sharedDesktopAllowed = NativeSharedDesktopAdmission::allowed(
                 env_shared_desktop_opt_in(), fullMode, complete, outputWritable,
                 s.sourceGameDevice == presentDevice,
-                sharedDesktopRegion.valid, sharedDesktopRegion.valid,
+                sharedDesktopRegion.valid || sharedMultiDesktop.valid,
+                sharedDesktopRegion.valid || sharedMultiDesktop.valid,
                 NativeSharedDesktopAdmission::destination_compatible(
                     static_cast<std::uint32_t>(bb.Format),
                     static_cast<std::uint32_t>(D3DFMT_A8R8G8B8),
@@ -6512,14 +6517,30 @@ void before_game_present(IDirect3DDevice9* game,
             if (!gpuHandoffQueued && sharedDesktopAllowed &&
                 s.backend.color_texture()) {
                 const NativeOutputUploadScope outputUploadScope{};
-                const auto& region = sharedDesktopRegion.source;
-                const RECT visibleRect{
-                    static_cast<LONG>(region.left), static_cast<LONG>(region.top),
-                    static_cast<LONG>(region.right), static_cast<LONG>(region.bottom)};
-                gpuHandoffQueued = s.sharedDesktop.try_present(
-                    game, presentBackbuffer.Get(), s.backend.device(), ctx,
-                    s.backend.color_texture(), surfaceWidth, surfaceHeight,
-                    s.outputGeneration, visibleRect);
+                if (sharedMultiDesktop.valid) {
+                    RECT gpuTiles[GameNativeDirtyRegionCoverage::kMaxPartitionRects]{};
+                    for (std::uint32_t i = 0; i < sharedMultiDesktop.count; ++i) {
+                        const auto& tile = sharedMultiDesktop.regions[i];
+                        gpuTiles[i] = {
+                            static_cast<LONG>(tile.left),
+                            static_cast<LONG>(tile.top),
+                            static_cast<LONG>(tile.right),
+                            static_cast<LONG>(tile.bottom)};
+                    }
+                    gpuHandoffQueued = s.sharedDesktop.try_present_regions(
+                        game, presentBackbuffer.Get(), s.backend.device(), ctx,
+                        s.backend.color_texture(), surfaceWidth, surfaceHeight,
+                        s.outputGeneration, gpuTiles, sharedMultiDesktop.count);
+                } else {
+                    const auto& region = sharedDesktopRegion.source;
+                    const RECT visibleRect{
+                        static_cast<LONG>(region.left), static_cast<LONG>(region.top),
+                        static_cast<LONG>(region.right), static_cast<LONG>(region.bottom)};
+                    gpuHandoffQueued = s.sharedDesktop.try_present(
+                        game, presentBackbuffer.Get(), s.backend.device(), ctx,
+                        s.backend.color_texture(), surfaceWidth, surfaceHeight,
+                        s.outputGeneration, visibleRect);
+                }
             }
             // Full-resolution publication must be sampled before THIS D3D9
             // Present, not uploaded one or two frames later. Retire older GPU

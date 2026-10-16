@@ -75,6 +75,40 @@ int main() {
     assert(!select(crop,true,false,false,false,false,noTile).valid);
     const GameNativePartialDirtySelection foreign{{10,10,400,300},true};
     assert(!select(crop,true,true,false,false,false,foreign).valid);
+    // Multi-rectangle menu/race update must preserve disjoint game pixels
+    // inside the bounding rectangle. Reject fake union bounds, tiles outside
+    // the Present crop and incomplete/contradictory coverage.
+    using outrun::vr::dx11::live_game_frame::GameNativeDirtyRectangle;
+    using outrun::vr::dx11::live_game_frame::GameNativeMultiDirtyUpload;
+    constexpr GameNativeDirtyRectangle tiles[2]{
+        {200,100,400,300},{500,100,700,300}};
+    constexpr auto provenMulti = GameNativeMultiDirtyUpload::select(
+        3440,1440,crop,2,32,200,100,700,300,tiles,true);
+    static_assert(provenMulti.valid && provenMulti.count == 2);
+    auto selectMulti = [&](auto candidate, bool dirty = true,
+                           bool complete = false) {
+        return NativeSharedDesktopAdmission::select_multi_regions(
+            3440,1440,crop,dirty,complete,false,false,candidate);
+    };
+    const auto multi = selectMulti(provenMulti);
+    assert(multi.valid && multi.count == 2);
+    assert(multi.regions[0].right == 400 && multi.regions[1].left == 500);
+    assert(!selectMulti(provenMulti,false).valid);
+    assert(!selectMulti(provenMulti,true,true).valid);
+    auto outside = provenMulti;
+    outside.regions[1].right = 3400;
+    assert(!selectMulti(outside).valid);
+    auto wrongBounds = provenMulti;
+    wrongBounds.uploadBounds.right = 800;
+    assert(!selectMulti(wrongBounds).valid);
+    auto missing = provenMulti;
+    missing.count = 1;
+    assert(!selectMulti(missing).valid);
+    constexpr GameNativeDirtyRectangle outOfCrop[2]{
+        {200,100,400,300},{3300,100,3400,300}};
+    const auto clipped = GameNativeMultiDirtyUpload::select(
+        3440,1440,crop,2,32,200,100,3400,300,outOfCrop,true);
+    assert(!selectMulti(clipped).valid);
     const auto malformed = NativeSharedDesktopAdmission::select_region(
         3440,1440,{0,-1,3440,1440},false,false,false,false,false,noTile);
     assert(!malformed.valid);

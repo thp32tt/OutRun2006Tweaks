@@ -36,15 +36,38 @@ public:
         ID3D11Texture2D* source, std::uint32_t width,
         std::uint32_t height, std::uint64_t generation,
         const RECT& visibleRegion) noexcept {
+        return try_present_regions(game, backbuffer, device, context, source,
+                                   width, height, generation, &visibleRegion, 1u);
+    }
+
+    // Multi-dirty menu/car/race Presents copy the exact GPU-rendered tiles
+    // rather than CPU readback or their bounding box (which contains original
+    // D3D9-authored pixels). The D3D9 writes are rolled back if any blit fails.
+    [[nodiscard]] bool try_present_regions(
+        IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
+        ID3D11Device* device, ID3D11DeviceContext* context,
+        ID3D11Texture2D* source, std::uint32_t width,
+        std::uint32_t height, std::uint64_t generation,
+        const RECT* visibleRegions, std::uint32_t regionCount) noexcept {
         if (!game || !backbuffer || !device || !context || !source ||
-            !width || !height || !generation ||
-            width > 0x7fffffffu || height > 0x7fffffffu ||
-            visibleRegion.left < 0 || visibleRegion.top < 0 ||
-            visibleRegion.right <= visibleRegion.left ||
-            visibleRegion.bottom <= visibleRegion.top ||
-            static_cast<std::uint32_t>(visibleRegion.right) > width ||
-            static_cast<std::uint32_t>(visibleRegion.bottom) > height)
+            !width || !height || !generation || !visibleRegions ||
+            !regionCount ||
+            regionCount > GameNativeDirtyRegionCoverage::kMaxPartitionRects ||
+            width > 0x7fffffffu || height > 0x7fffffffu)
             return false;
+        RECT unionBounds{static_cast<LONG>(width), static_cast<LONG>(height),0,0};
+        for (std::uint32_t i = 0; i < regionCount; ++i) {
+            const RECT& region = visibleRegions[i];
+            if (region.left < 0 || region.top < 0 ||
+                region.right <= region.left || region.bottom <= region.top ||
+                static_cast<std::uint32_t>(region.right) > width ||
+                static_cast<std::uint32_t>(region.bottom) > height)
+                return false;
+            if (region.left < unionBounds.left) unionBounds.left = region.left;
+            if (region.top < unionBounds.top) unionBounds.top = region.top;
+            if (region.right > unionBounds.right) unionBounds.right = region.right;
+            if (region.bottom > unionBounds.bottom) unionBounds.bottom = region.bottom;
+        }
 
         D3D11_TEXTURE2D_DESC desc{};
         source->GetDesc(&desc);
@@ -158,20 +181,24 @@ public:
         // incurred a full 3440x1440 GPU CopyResource on every frame.
         // Source/destination are identically sized BGRA textures; source_
         // pixels outside this region are never exposed by StretchRect.
-        const bool entire = visibleRegion.left == 0 && visibleRegion.top == 0 &&
-            static_cast<std::uint32_t>(visibleRegion.right) == width &&
-            static_cast<std::uint32_t>(visibleRegion.bottom) == height;
+        const bool entire = regionCount == 1u &&
+            unionBounds.left == 0 && unionBounds.top == 0 &&
+            static_cast<std::uint32_t>(unionBounds.right) == width &&
+            static_cast<std::uint32_t>(unionBounds.bottom) == height;
         if (entire) {
             context->CopyResource(source_.Get(), source);
         } else {
-            const D3D11_BOX region{
-                static_cast<UINT>(visibleRegion.left),
-                static_cast<UINT>(visibleRegion.top), 0u,
-                static_cast<UINT>(visibleRegion.right),
-                static_cast<UINT>(visibleRegion.bottom), 1u};
-            context->CopySubresourceRegion(
-                source_.Get(), 0u, region.left, region.top, 0u,
-                source, 0u, &region);
+            for (std::uint32_t i = 0; i < regionCount; ++i) {
+                const RECT& tile = visibleRegions[i];
+                const D3D11_BOX region{
+                    static_cast<UINT>(tile.left),
+                    static_cast<UINT>(tile.top), 0u,
+                    static_cast<UINT>(tile.right),
+                    static_cast<UINT>(tile.bottom), 1u};
+                context->CopySubresourceRegion(
+                    source_.Get(), 0u, region.left, region.top, 0u,
+                    source, 0u, &region);
+            }
         }
         context->End(fence_.Get());
         context->Flush();
@@ -213,9 +240,32 @@ public:
         // while the source State mutex is held. Copy only pixels the game
         // will show from this Present crop / one proven dirty rectangle.
         // All other D3D9 backbuffer pixels remain the game's own output.
-        const RECT* rect = entire ? nullptr : &visibleRegion;
-        return SUCCEEDED(game->StretchRect(
-            sharedSurface.Get(), rect, backbuffer, rect, D3DTEXF_NONE));
+        // StretchRect is not atomic across disjoint rectangles. Preserve the
+        // original D3D9 pixels under the union before the first write, so a
+        // failed later tile can restore the game-owned fallback image.
+        Microsoft::WRL::ComPtr<IDirect3DSurface9> backup;
+        if (regionCount > 1u) {
+            if (FAILED(game->CreateRenderTarget(
+                    static_cast<UINT>(unionBounds.right - unionBounds.left),
+                    static_cast<UINT>(unionBounds.bottom - unionBounds.top),
+                    destination.Format, D3DMULTISAMPLE_NONE, 0u, FALSE,
+                    backup.GetAddressOf(), nullptr)) || !backup ||
+                FAILED(game->StretchRect(
+                    backbuffer, &unionBounds, backup.Get(), nullptr, D3DTEXF_NONE)))
+                return false;
+        }
+        for (std::uint32_t i = 0; i < regionCount; ++i) {
+            const RECT* rect = entire ? nullptr : &visibleRegions[i];
+            if (FAILED(game->StretchRect(
+                    sharedSurface.Get(), rect, backbuffer, rect, D3DTEXF_NONE))) {
+                if (backup && FAILED(game->StretchRect(
+                        backup.Get(), nullptr, backbuffer,
+                        &unionBounds, D3DTEXF_NONE)))
+                    faulted_ = true;
+                return false;
+            }
+        }
+        return true;
     }
 private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> source_;

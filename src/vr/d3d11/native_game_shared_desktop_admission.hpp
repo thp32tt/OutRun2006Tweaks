@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "native_game_partial_dirty_upload.hpp"
+#include "native_game_multi_dirty_upload.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // A GPU-only D3D11->D3D9Ex backbuffer transfer must cover the actual
@@ -10,7 +11,50 @@ struct NativeSharedDesktopRegion {
     GameNativePresentRegion source{};
     bool valid = false;
 };
+struct NativeSharedDesktopMultiRegion {
+    std::array<GameNativePresentRegion,
+               GameNativeDirtyRegionCoverage::kMaxPartitionRects> regions{};
+    std::uint32_t count = 0u;
+    bool valid = false;
+};
 struct NativeSharedDesktopAdmission {
+    // The CPU multi-dirty path already proves every game Present rectangle
+    // and its union bounds. Admit the same bounded tiles for a GPU-only
+    // handoff, but never allow holes to become a bounding-box overwrite.
+    [[nodiscard]] static constexpr NativeSharedDesktopMultiRegion select_multi_regions(
+        std::uint32_t width, std::uint32_t height,
+        GameNativePresentRegion present, bool hasDirty, bool fullDirty,
+        bool cropDirty, bool partitionCrop, GameNativeMultiDirtySelection multi) noexcept {
+        if (!hasDirty || fullDirty || cropDirty || partitionCrop ||
+            !present.full_frame_placement(width,height,width,height).valid ||
+            !multi.valid || multi.count < 2u ||
+            multi.count > GameNativeDirtyRegionCoverage::kMaxPartitionRects)
+            return {};
+        std::int64_t left = present.right, top = present.bottom;
+        std::int64_t right = present.left, bottom = present.top;
+        for (std::uint32_t i = 0; i < multi.count; ++i) {
+            const auto& r = multi.regions[i];
+            if (r.left < present.left || r.top < present.top ||
+                r.right > present.right || r.bottom > present.bottom ||
+                r.left >= r.right || r.top >= r.bottom)
+                return {};
+            if (r.left < left) left = r.left;
+            if (r.top < top) top = r.top;
+            if (r.right > right) right = r.right;
+            if (r.bottom > bottom) bottom = r.bottom;
+        }
+        if (multi.uploadBounds.left != left ||
+            multi.uploadBounds.top != top ||
+            multi.uploadBounds.right != right ||
+            multi.uploadBounds.bottom != bottom)
+            return {};
+        NativeSharedDesktopMultiRegion out{};
+        out.regions = multi.regions;
+        out.count = multi.count;
+        out.valid = true;
+        return out;
+    }
+
     // A full native game GPU frame can update one precise visible region
     // without touching game-owned backbuffer pixels outside that rectangle.
     // Whole/partitioned dirty regions covering the visible crop collapse to
