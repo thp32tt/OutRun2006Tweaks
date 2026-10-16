@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00955",
+  "production_id": "CONVERSION-DX9EX-00955",
+  "event_id": "CONVERSION-DX9EX-00955-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00955",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:CRITICAL:COCKPIT_SCENEEFFECT_CAMERA_RESTORE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "symptom_id": "DX9EX:SYMPTOM:COCKPIT_SCENEEFFECT_CAMERA_RESTORE",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "0eb88e9cd7e6b559325132df21033d3282e832a3",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_graphics.cpp",
+    "src/vr/game/driver_seat_render_pass.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_graphics.cpp",
+    "src/vr/game/driver_seat_render_pass.hpp",
+    "vrhost/tests/driver_seat_render_pass_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00955.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:CRITICAL:COCKPIT_SCENEEFFECT_CAMERA_RESTORE",
+    "symptom_id": "DX9EX:SYMPTOM:COCKPIT_SCENEEFFECT_CAMERA_RESTORE",
+    "goal": "Restore the driver-seat world camera after every game SceneEffect call without carrying the temporary near-plane effect camera into the next cockpit or player-car draw.",
+    "scope_boundary": "Only native driver-seat/SceneEffect view restoration; original input/FFB, HUD, sun/lens/SkyGlow, world particles, DX11 and frozen DXVK remain unmodified.",
+    "special_work_evidence": "The source rebuilds the post-effect camera while ScopedSceneEffect still has positive depth. This vetoes driver-seat eligibility despite gameplay, vehicle and native camera being valid, overwriting the intended seat-relative view.",
+    "trace_stages": [
+      "Native gameplay camera and verified player car choose the selected driver-seat view.",
+      "Original Clr_SceneEffect changes the near plane and rebuilds camera matrices for effect drawing.",
+      "After original effect submission, world/cockpit view restoration rebuilds a seat-eligible matrix for R84 game draws and OpenXR stereo."
+    ],
+    "subcomponents": [
+      "End the SceneEffect depth and semantic scope before restoring the previous camera near plane and recalculating the native world view.",
+      "Preserve nested effect suppression, disabled seat/transition fallback, and independently test the actual scope handoff with native C++ smoke."
+    ],
+    "acceptance_items": [
+      {
+        "id": "cockpit_effect_world_restore",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Cockpit camera after an original SceneEffect render",
+        "expected_behavior": "While the effect uses the native camera, the subsequent world view is recalculated with the seat displacement after the scene pass closes."
+      },
+      {
+        "id": "cockpit_nested_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Nested effects and native camera transitions",
+        "expected_behavior": "Nested scene effects do not re-enable the seat prematurely; disabled or transitioning seat keeps original game camera and no FX/HUD scopes leak."
+      },
+      {
+        "id": "cockpit_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Native x86 renderer plus OpenXR host and DX9Ex rollback",
+        "expected_behavior": "The exact validation-bearing source SHA passes R84 game, R26_SAFE fallback, host, package, Domain and impacted Full Source/Inspector gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "cockpit_effect_world_restore": "PENDING_GATE",
+    "cockpit_nested_fallback": "PENDING_GATE",
+    "cockpit_exact_sha_gate": "PENDING_GATE"
+  },
+  "diagnosis": {
+    "root_cause": "The post-SceneEffect CalcCameraMatrix_dest call ran before ScopedSceneEffect destruction, causing DriverSeatRenderPass::IsWorldOrCockpitPass to return false and incorrectly rebuilding an unshifted camera after effect submission.",
+    "source_trace": [
+      "VRDriverSeatCameraEligible gates physical camera displacement on SceneEffectDepth==0.",
+      "Clr_SceneEffect_dest temporarily sets near plane to 0.05 and calls the original game effect producer.",
+      "Its final CalcCameraMatrix_dest previously ran while the SceneEffect depth still blocked the seat, leaving an unshifted world matrix."
+    ],
+    "alternatives_rejected": [
+      "No change to 6DoF pose, per-eye XR WVP, glass alpha or SkyGlow is needed to correct the source-verified view restoration order."
+    ],
+    "runtime_limit": "No headset or live OutRun runtime test performed; visual outcome and frame pacing remain untested."
+  },
+  "ci_evidence": {
+    "changed_area_native": "Standalone equivalent C++ scope regression compiled and passed locally (g++ C++17); exact updated repository tests and GitHub required gates pending."
+  },
+  "next_action": "Publish one material commit after previous 00954 CI completes; verify exact HEAD required CI, repair true failures under same TASK_ID, record C6 separately."
+}

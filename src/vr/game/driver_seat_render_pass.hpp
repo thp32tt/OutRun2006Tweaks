@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <utility>
 
 namespace OutRunVR::DriverSeatRenderPass
 {
@@ -26,5 +27,20 @@ namespace OutRunVR::DriverSeatRenderPass
     inline bool UseCockpitForCamera(bool verifiedNativeCamera) noexcept
     {
         return verifiedNativeCamera && IsWorldOrCockpitPass();
+    }
+
+    // The game's Clr_SceneEffect callback rebuilds the native near-plane
+    // camera for its particles. Restore the world/cockpit camera only AFTER
+    // the temporary scene-effect guard has expired. Nested callbacks retain
+    // the outer guard, so they cannot re-enable a seat inside another effect.
+    template <typename RenderEffect, typename RestoreWorldCamera>
+    inline void RunSceneEffectThenRestoreView(
+        RenderEffect&& renderEffect, RestoreWorldCamera&& restoreWorldCamera)
+    {
+        {
+            ScopedSceneEffect effect{};
+            std::forward<RenderEffect>(renderEffect)();
+        }
+        std::forward<RestoreWorldCamera>(restoreWorldCamera)();
     }
 }

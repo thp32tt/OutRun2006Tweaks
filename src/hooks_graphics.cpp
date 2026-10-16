@@ -1645,26 +1645,28 @@ class FixZBufferPrecision : public Hook
 		// Includes BOTH CalcCameraMatrix calls as well as Clr_SceneEffect:
 		// render effects use the native short near-plane, while only real
 		// world/vehicle passes may move the VR camera into the driver seat.
-		OutRunVR::DriverSeatRenderPass::ScopedSceneEffect seatPass{};
-
+		// SceneEffect owns its short near-plane camera only until the original
+		// effect GPU submission returns. Rebuild the *world* view after the
+		// scope closes so a real driver-seat view cannot be replaced by the
+		// temporary unshifted effect camera between world/car draws.
 		EvWorkCamera* camera = Module::exe_ptr<EvWorkCamera>(0x39FE10);
-
-		float prev = camera->perspective_znear_BC;
-
-		// apply vanilla znear
-		camera->perspective_znear_BC = 0.05f; // game default = 0.1, but that causes lens flare to slightly clip, 0.05 allows it to fade properly
-		CalcCameraMatrix_dest(camera);
-
-		{
-			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
-				OutRunVR::GameSemantic::RenderScope::SceneEffect);
-			Clr_SceneEffect.call(a1);
-		}
-
-		// restore orig znear
-		camera->perspective_znear_BC = prev;
-		CalcCameraMatrix_dest(camera);
-
+		const float prev = camera->perspective_znear_BC;
+		OutRunVR::DriverSeatRenderPass::RunSceneEffectThenRestoreView(
+			[&]() {
+				camera->perspective_znear_BC = 0.05f;
+				CalcCameraMatrix_dest(camera);
+				{
+					OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+						OutRunVR::GameSemantic::RenderScope::SceneEffect);
+					Clr_SceneEffect.call(a1);
+				}
+			},
+			[&]() {
+				// The original effect has finished; the normal view-matrix owner
+				// may now apply the validated native cockpit displacement once.
+				camera->perspective_znear_BC = prev;
+				CalcCameraMatrix_dest(camera);
+			});
 		FixZBufferPrecision::allow_znear_override = previousAllowZnearOverride;
 	}
 
