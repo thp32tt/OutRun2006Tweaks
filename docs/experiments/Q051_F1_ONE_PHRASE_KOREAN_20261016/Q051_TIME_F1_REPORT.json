@@ -1,0 +1,61 @@
+{
+  "schema": "outrun-q051-f1-one-phrase-v1",
+  "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "clean_dds_sha256": "7c1a81b1570ffc910d71ea25d05819d93c8ed0a80be7d2c0437fce6b43fbdd43",
+  "user_supplied_generated_korean_sheet": "54.png (local ChatGPT attachment)",
+  "extracted_sprite_input_sha256": "91ba2ec11302f468d1bf2a900fd35c6803d9852c9db1ba87c044c9916a67e474",
+  "extracted_sprite_was_reduced_to_32_color_palette": "QUALITY_TRADEOFF_TEST_ONLY",
+  "source_translation": "TIME",
+  "korean": "시간",
+  "source_glyph_bbox_readable_xyxy": [
+    1627,
+    634,
+    1836,
+    709
+  ],
+  "safe_bbox_readable_xyxy": [
+    1629,
+    636,
+    1834,
+    707
+  ],
+  "source_label_bbox_readable_xyxy": [
+    1595,
+    608,
+    1845,
+    727
+  ],
+  "sprite_original_size": [
+    296,
+    124
+  ],
+  "sprite_scaled_to": [
+    169,
+    71
+  ],
+  "scale_factor": 0.5725806451612904,
+  "sprite_paste_readable_xy": [
+    1647,
+    636
+  ],
+  "sprite_layer_alpha_positive_px": 10123,
+  "dds_changed_pixel_count_vs_full_source": 14156,
+  "outside_text_source_roi_protected_pixels_exact": true,
+  "saved_DDS_redecode_visible_pixel_and_alpha_exact": true,
+  "transparent_RGB_is_retained_from_CLEAN_not_forced_to_zero": true,
+  "raw_direction_restored": true,
+  "source_header_preserved": true,
+  "mip_count": 1,
+  "DDS_FORMAT": "RGBA32_UNCOMPRESSED",
+  "artifacts": {
+    "Q051_TIME_KO_F1_TEST_ONLY.dds": "4f07654689e93bfb65cdd0ca710490e7ecbc0e40f31f3109f7adceb442f2a956",
+    "Q051_TIME_F1_KO_COMPARE_TEST_ONLY.png": "181e182ccee4850ced130330d5feb81f219ee6de45fa9b709740b92f05108192",
+    "Q051_TIME_F1_KO_RGBA_LAYER_TEST_ONLY.png": "f8331ff4ed1ae499d114a1039b91083115214223fcf20ded7d9a9eb3470dbd1f"
+  },
+  "F1_STATIC": "PASS_CANDIDATE",
+  "runtime_validation": "WAIVED_BY_USER_FOR_THIS_TEST_UNTESTED_NOT_PASS",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "approval": "TEST_ONLY_NOT_GAME_RELEASE",
+  "no_live_container_or_original_modified": true
+}
