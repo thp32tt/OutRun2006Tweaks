@@ -1516,7 +1516,9 @@ namespace
             UvRect eyes[2]{};
             ID3D11ShaderResourceView* eyeSrv[2]{};
             DXGI_FORMAT eyeFormat[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-            if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu)
+            const bool selectedDirectPair =
+                sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu;
+            if (selectedDirectPair)
             {
                 eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
                 eyeSrv[0] = directSnapshotLeftSrv_; eyeSrv[1] = directSnapshotRightSrv_;
@@ -1552,7 +1554,7 @@ namespace
                         context_, device_, directSnapshotLeft_,
                         directSnapshotRight_, projection_.images[image].texture,
                         nativeEyeCopyOptIn,
-                        sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu,
+                        selectedDirectPair,
                         directFrameValid_ && directTransportReady_, IID_IUnknown);
             }
             bool ok = directEyeCopied;
