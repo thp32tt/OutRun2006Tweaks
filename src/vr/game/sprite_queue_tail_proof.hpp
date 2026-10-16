@@ -11,9 +11,15 @@ namespace OutRunVR::SpriteQueue
     constexpr Node* FirstVerifiedAppendedNode(
         Node* root, Node* oldTail, Node* newTail, unsigned bound) noexcept
     {
-        if (!root || !newTail || newTail == oldTail || bound == 0)
+        if (!root || !newTail || newTail == root ||
+            newTail == oldTail || bound == 0)
             return nullptr;
-        Node* first = oldTail ? nullptr : root->next_0;
+        // An empty priority-list root is its own tail_4 sentinel.
+        // Exact +TIME/GOAL/rank producers can be the first writers to that
+        // priority in a frame; do not lose their whole newly queued batch.
+        // Still prove the NEW tail is in the live bounded chain before
+        // tagging anything, including when the old tail is the root.
+        Node* first = (!oldTail || oldTail == root) ? root->next_0 : nullptr;
         for (Node* node = root->next_0;
              node && bound != 0; node = node->next_0, --bound)
         {

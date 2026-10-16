@@ -7,6 +7,35 @@
 int main()
 {
     using namespace OutRunVR::GameSemantic;
+    // The real sprite priority head uses itself as tail_4 when empty.
+    // When +TIME is the first exact producer in that priority, retain ALL
+    // of its appended sprite and numeric nodes, not just later siblings.
+    // These exact-source tags are consumed by the live R84 HUD-eye route.
+    {
+        struct Node { Node* next_0 = nullptr; };
+        Node root{}, firstGlyph{}, secondGlyph{}, stale{};
+        root.next_0 = &firstGlyph;
+        firstGlyph.next_0 = &secondGlyph;
+        using OutRunVR::SpriteQueue::FirstVerifiedAppendedNode;
+        if (FirstVerifiedAppendedNode(&root, &root, &secondGlyph, 2u)
+                != &firstGlyph ||
+            FirstVerifiedAppendedNode(&root, &root, &firstGlyph, 2u)
+                != &firstGlyph)
+            return 90; // empty-list sentinel must expose first +TIME node
+        if (FirstVerifiedAppendedNode(&root, &root, &secondGlyph, 1u) ||
+            FirstVerifiedAppendedNode(&root, &root, &stale, 2u) ||
+            FirstVerifiedAppendedNode(&root, nullptr, &root, 2u) ||
+            FirstVerifiedAppendedNode(&root, &root, &root, 2u))
+            return 91; // truncated, stale and sentinel-as-data fail closed
+        if (FirstVerifiedAppendedNode(&root, nullptr, &secondGlyph, 2u)
+                != &firstGlyph ||
+            FirstVerifiedAppendedNode(&root, &firstGlyph, &secondGlyph, 2u)
+                != &secondGlyph)
+            return 92; // empty-null and normal nonempty paths unchanged
+        root.next_0 = &secondGlyph;
+        if (FirstVerifiedAppendedNode(&root, &firstGlyph, &secondGlyph, 2u))
+            return 93; // detached prior tail must not tag foreign queue
+    }
     // R84 +TIME/GOAL shared eye-plane: symmetric IPD is preserved, even
     // when the game receives very large but still finite tracking origins.
     // Before this source repair, float(left+right) overflowed to infinity,
