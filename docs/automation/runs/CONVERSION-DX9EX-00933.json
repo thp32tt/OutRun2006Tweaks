@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00933",
+  "production_id": "CONVERSION-DX9EX-00933",
+  "event_id": "CONVERSION-DX9EX-00933-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00933",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "104b9c3b3eb134d2fed2f311625bad0b3fbce87e",
+  "source_paths": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00933.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Keep the race-start original car contact shadow spatial only when the same direct game producer owns its c64 WVP, pose, shader and draw; prevent unrelated world matrices from creating detached or doubled shadow layers in R84.",
+    "scope_boundary": "Only exact R84 CarBaseShadow direct alpha draw and matching WVP source. Original shader/FFB/input, SkyGlow, HUD, lens, R26_SAFE, DX11 and frozen DXVK unchanged.",
+    "trace_stages": [
+      "Original CalcPeraShadow hook tags direct CarBaseShadow/WorldParticle around DrawObjectAlpha_Internal",
+      "Game c64 source records producer, queue ownership, shader epoch, pose and top-level draw serial",
+      "R29 compares original game WVP ownership before admitting alpha contact shadow as spatial two-eye; otherwise original stock-WVP route",
+      "R84 R30/R33 and OpenXR host preserve existing submission/recovery gates"
+    ],
+    "acceptance_items": [
+      {
+        "id": "direct_shadow_original_wvp",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Direct player contact-shadow game source and R84 spatial stereo",
+        "expected_behavior": "Only current direct CarBaseShadow WVP can admit spatial alpha shadow. Perspective from other producers is insufficient."
+      },
+      {
+        "id": "stale_queue_and_desktop_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Queue, state/pose/shader change and old mono/recovery/desktop modes",
+        "expected_behavior": "Stale/mismatched/queued/nonfinite WVP keeps original stock-WVP conservative path; no game-shadow geometry suppression."
+      },
+      {
+        "id": "exact_sha_integrated_quality",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game/x64 host/R26_SAFE rollback/Domain/source guards",
+        "expected_behavior": "Required exact-SHA DX9Ex Active, Domain, source impact and changed-area native smoke pass without CI-skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "direct_shadow_original_wvp": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
+    "stale_queue_and_desktop_fallback": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PENDING",
+    "exact_sha_integrated_quality": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Race-start shadow double image user-visible symptom tracked under DX9EX:SYMPTOM:START_SHADOW; R29 allowed a Z-disabled shadow from R28PerspectiveWorldSemantic alone.",
+    "source_trace": "hooks_graphics RestoreCarBaseShadow direct producer -> outrun_renderer original c64 provenance -> R29 effect stereo decision -> R84 R30/R33/host eye paths",
+    "root_cause": "R29PerspectiveWorldSemantic tests target/projection class but does not prove game c64 was uploaded by CarBaseShadow for this draw.",
+    "alternatives_rejected": [
+      "Do not globally alter alpha/depth policy or force mono; R13 and R29 protected fallback paths must remain",
+      "Do not alter original game selector shadow when source model transform is unknown"
+    ],
+    "fix_evidence": "Require original WVP provenance same direct producer, pose epoch, shader epoch, adjacent draw serial and finite data for the R29 spatial exception.",
+    "negative_test_evidence": "car_base_shadow_stereo_smoke.cpp includes stale draw/pose/shader/queue/producer/zero negative mutations."
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify exact source SHA in required GitHub Actions, repair any true failure under same task and then C6 separately; Quest3/VDXR runtime remains UNTESTED."
+}

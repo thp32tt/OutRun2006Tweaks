@@ -24,6 +24,15 @@ namespace OutRunVRRenderer
     void R29InvalidateRawWvpGeneration() noexcept;
     void R29InvalidateRendererStateAfterExternalRestore() noexcept;
     OutRunVR::RuntimeEligibility::InstallState R29RendererState() noexcept;
+    std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
+    std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
+    bool GetLastRawGameWvpWrite(float outConstants[16],
+        std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+        std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
+    bool GetLastGameWvpSemanticProvenance(
+        OutRunVR::GameSemantic::RenderScope& semanticScope,
+        std::uint64_t& queueNodeEpoch, const void*& queueNode,
+        OutRunVR::GameSemantic::ProducerToken& producerToken) noexcept;
 }
 
 namespace OutRunVRStereo
@@ -374,6 +383,46 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Require original-game shader constants from THIS direct shadow
+        // producer. A perspective projection alone can belong to the road,
+        // an earlier vehicle, or an unrelated alpha effect; such a draw must
+        // retain R29's safe stock-WVP two-eye route instead of an orphaned
+        // head-transformed shadow.
+        bool R29HasDirectCarShadowGameWvp() noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            float rawWvp[16]{};
+            std::uint64_t writeSerial = 0, writeDraw = 0;
+            std::uintptr_t writeShader = 0, currentShader = 0;
+            std::uint64_t writeShaderEpoch = 0, currentShaderEpoch = 0;
+            RenderScope writtenScope = RenderScope::None;
+            std::uint64_t writtenQueueEpoch = 0;
+            const void* writtenQueueNode = nullptr;
+            ProducerToken writtenProducer = ProducerToken::None;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    rawWvp, writeSerial, writeDraw,
+                    writeShader, writeShaderEpoch) ||
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    writtenScope, writtenQueueEpoch,
+                    writtenQueueNode, writtenProducer) ||
+                !OutRunVRStereo::GetCurrentShaderEpoch(
+                    currentShader, currentShaderEpoch))
+                return false;
+            for (const float value : rawWvp)
+                if (!std::isfinite(value))
+                    return false;
+
+            return OutRunVR::CarShadowStereo::OwnsDirectGameWvp({
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                TopLevelDrawSerial() + 1u, writeDraw,
+                currentShader, writeShader,
+                currentShaderEpoch, writeShaderEpoch,
+                writtenScope, writtenProducer,
+                writtenQueueNode != nullptr || writtenQueueEpoch != 0
+            });
+        }
+
         bool R29StableStereoBase(IDirect3DDevice9* device) noexcept
         {
             if (!IsGameDevice(device) || InternalStereoPass ||
@@ -641,7 +690,8 @@ namespace OutRunVRStereo
                 !R29Effect.stencilEnable)
             {
                 const bool originalWvpProven =
-                    OutRunVRRenderer::R28PerspectiveWorldSemantic();
+                    OutRunVRRenderer::R28PerspectiveWorldSemantic() &&
+                    R29HasDirectCarShadowGameWvp();
                 if (OutRunVR::CarShadowStereo::CanUseSpatialShadow(
                         OutRunVR::GameSemantic::CurrentRenderProducerToken(),
                         semanticScope, false, originalWvpProven,
