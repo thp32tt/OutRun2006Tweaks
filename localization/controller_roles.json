@@ -2,12 +2,12 @@
   "schema_version": 2,
   "branch": "korean-localization-recovery-20260928",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-  "active_policy": "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md",
+  "active_policy": "docs/OUTRUN_C_N100_ORIGINAL_CROP_ONLY_20261016.md",
   "command_map": {
     "A": "OutRun 한글화 A 실행",
     "B": "OutRun 한글화 B 실행",
     "C1": "OutRun 한글화 C1 실행",
-    "C": "OutRun 한글화 C 복구 실행"
+    "C": "OutRun C 원본 HD 영문 크롭 Docker (브라우저 탭 비사용)"
   },
   "controller_tab_order": [
     "A",
@@ -42,61 +42,46 @@
       "batch_min": 4,
       "batch_max": 8,
       "allow_smaller_batch_when_fewer_pending": true,
-      "docker_slot": "C",
       "producer_sources": [
         "A",
         "B"
       ],
       "image_generation_enabled": false,
-      "new_dds_production_enabled": false
+      "new_dds_production_enabled": false,
+      "runtime_status": "PAUSED_NO_SEND"
     },
     "C": {
-      "mode": "scheduled_offline_after_manual_deploy_no_imagegen",
-      "purpose": "salvage_existing_A_B_PNG_lettering_PSD_first_clean_plate_native_composite_test_DDS",
+      "mode": "N100_STANDALONE_DOCKER_NATIVE_ORIGINAL_ENGLISH_CROP_ONLY",
+      "docker_slot": "C",
+      "container_name": "outrun-c-original-english-crop",
+      "docker_compose_project": "outrun-c-original-english-crop",
+      "docker_compose_service": "c-english-original-crop",
+      "compose_path": "docker/c-original-english-crop/compose.yaml",
+      "runner": "docker/c-original-english-crop/loop.py",
+      "source_root": "work/c_salvage_text_roi/source_full_20261012",
+      "archive_manifest": "work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json",
+      "queue_source": "work/c_salvage_text_roi/c_original_hd_crop_only/queue_specs",
+      "output_root": "work/c_salvage_text_roi/c_original_hd_crop_only/outputs",
+      "verification_runner": "work/c_salvage_text_roi/c_original_hd_crop_only/c_crop_only_runner.py",
+      "frequency_seconds": 60,
+      "max_new_crops_per_cycle": 10,
       "browser_tab_required": false,
-      "independent_qa_owner": "C1",
+      "chatgpt_scheduler_required": false,
       "image_generation_enabled": false,
-      "paid_api_fallback": false,
-      "new_dds_production_enabled": true,
-      "output_scope": "separate_C_volume_PROPOSALS_C_DDS_TEST_ONLY_not_official_promoted",
-      "upstream_read_only": [
-        "A",
-        "B"
-      ],
-      "queue_source": "localization/graphics/asset_queue.csv",
-      "policy": "docs/OUTRUN_C_SALVAGE_SLOT_20261015.md",
-      "review_order": [
-        "source_and_psd_lock",
-        "korean_letter_only",
-        "independent_clean_plate",
-        "native_composite",
-        "source_codec_DDS_test",
-        "C1_independent_QA",
-        "C3_if_required",
-        "user_ingame"
-      ],
-      "schedule": "30_MINUTE_POLL_AFTER_MANUAL_PORTAINER_DEPLOY",
-      "data_source": "GitHub/local_staged_files_only; no live Portainer volume mutation",
-      "runtime_status": "GITHUB_CODE_STAGED_NOT_DEPLOYED",
-      "runtime_validation": "UNTESTED",
-      "worker": "tools/localization/c_salvage_worker.py",
-      "dockerfile": "docker/localization-production/Dockerfile.c-salvage",
-      "manual_portainer_compose_override": "docker/localization-production/portainer-git-c-salvage.override.yml",
-      "input_scope": "read_only_existing_ab_generated_pngs",
-      "offline_auto_work": {
-        "enabled_only_after_manual_deploy": true,
-        "interval_seconds": 1800,
-        "max_new_images_per_cycle": 10,
-        "psd_catalog": "localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json",
-        "transparent_letter_proposal": true,
-        "opaque_requires_manual_text_mask": true,
-        "compose_only_with_reviewed_sha_pinned_recipe": true,
-        "reviewed_bundle_directory": "/data/c-salvage/bundles",
-        "psd_missing_fallback": "canonical_HD_DDS_exact_mask_or_HOLD",
-        "idempotent_image_sha": true,
-        "reserved_QA_role": "C1",
-        "native_imagegen_calls": 0
-      }
+      "Korean_lettering_enabled": false,
+      "clean_plate_enabled": false,
+      "dds_write_enabled": false,
+      "new_dds_production_enabled": false,
+      "legacy_salvage_enabled": false,
+      "A_B_C1_dispatch_enabled": false,
+      "accepted_inputs": "SHA_PINNED_FULL_ORIGINAL_HD_ENGLISH_PNG_DDS_PIXEL_EQUIVALENT_AND_REVIEWED_NATIVE_XYXY_ONLY",
+      "historic_986_tiles_allowed": false,
+      "archived_255_immutable": true,
+      "automatic_unknown_ROI_discovery": false,
+      "runtime_status": "N100_STANDALONE_DOCKER_RUNNING_VERIFIED_20261017_0100_KST",
+      "output_status": "CROP_TEST_ONLY_REVIEW_REQUIRED",
+      "RUNTIME_VALIDATION": "UNTESTED",
+      "deployment": "ALREADY_RUNNING_AS_SEPARATE_N100_COMPOSE_NO_ADDITIONAL_DEPLOY"
     }
   },
   "legacy_C2": {
@@ -116,7 +101,7 @@
   "RUNTIME_VALIDATION": "UNTESTED_unless_game_run",
   "approval_veto": "Do not forge historic C2 PASS; migrate legacy evidence code explicitly before official promotion",
   "historical_signoffs": "C2/C3 records preserved not new work",
-  "controller_mode": "A_B_native_ChatGPT_ImageGen_C1_batch_QA_no_C2",
+  "controller_mode": "A_B_C1_PAUSED_C_N100_OFFLINE_ORIGINAL_ENGLISH_CROP_ONLY",
   "source_refresh": "Always read latest HEAD/contract/HD policy/queue and verify remote HEAD",
   "work_steal": {
     "enabled": false
@@ -125,7 +110,7 @@
   "deployment": {
     "mode": "MANUAL_ONLY",
     "auto_deploy": false,
-    "stage_auto_send": true,
+    "stage_auto_send": false,
     "runtime_status": "NOT_DEPLOYED_BY_THIS_CHANGE",
     "activation_requires": [
       "manual_operator_deploy"
@@ -135,7 +120,9 @@
       "source_attachment_to_output_smoke",
       "explicit_minute_to_role_dispatch_verified",
       "C2_tab_absent"
-    ]
+    ],
+    "C_offline": "N100_STANDALONE_DOCKER_RUNNING",
+    "A_B_C1": "PAUSED_DO_NOT_REDEPLOY"
   },
   "schedule_dispatch": {
     "timezone": "Asia/Seoul",
@@ -146,7 +133,9 @@
       "40": "C1"
     },
     "round_robin_compatible": false,
-    "runtime_adapter_status": "UNVERIFIED"
+    "runtime_adapter_status": "UNVERIFIED",
+    "runtime_dispatch_enabled": false,
+    "C_offline": "N100_STANDALONE_DOCKER_60S_POLL_NOT_BROWSER_MINUTE_DISPATCH"
   },
   "imagegen": {
     "backend": "chatgpt_native",
@@ -161,5 +150,15 @@
     "automatic_pipeline_status": "E2E_UNVERIFIED"
   },
   "policy_review_record": "localization/policy_reviews/OUTRUN-HD-IMAGEGEN-POLICY-MANUAL-20261012-1333.json",
-  "policy_review_record_C": "docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md"
+  "policy_review_record_C": "docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md",
+  "operational_slot_assignment": {
+    "effective_date": "2026-10-17",
+    "authority": "USER_C_SLOT_DOCKER_CROP_ASSIGNMENT",
+    "C": "N100:outrun-c-original-english-crop/c-english-original-crop",
+    "C_execution": "independent_external_docker_worker_not_third_ChatGPT_tab",
+    "existing_Portainer_stack": "outrun-kor",
+    "Portainer_A_B_C1": "PAUSED_AUTO_SEND_FALSE_NO_REDEPLOY",
+    "conflict_protection": "NO_SECOND_C_INSTANCE_NO_BROWSER_C_DISPATCH",
+    "pending_limitation": "NEW_ROI_SPECS_NOT_AUTO_DISCOVERED"
+  }
 }
