@@ -1,0 +1,102 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00973",
+  "production_id": "CONVERSION-DX9EX-00973",
+  "event_id": "CONVERSION-DX9EX-00973-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00973",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:CRITICAL:WORLD_EFFECT_EYE_ORIGIN_OVERFLOW",
+  "feature_class": "CRITICAL_BLOCKER",
+  "symptom_id": "DX9EX:SYMPTOM:WORLD_EFFECT_EYE_ORIGIN_OVERFLOW",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_WAIT_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "692f6ee55b1d3d54d6803e4136a2fb380e16c662",
+  "material_result_sha": "f5d25c1b1ab0c4f3aa0e56b6cca2fb9c8ff40c0e",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/lens_centre_eye_pose_smoke.cpp",
+    "tools/verify_vr_r30_world_affine_dual_eye.py"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/lens_centre_eye_pose_smoke.cpp",
+    "tools/verify_vr_r30_world_affine_dual_eye.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00973.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:CRITICAL:WORLD_EFFECT_EYE_ORIGIN_OVERFLOW",
+    "goal": "Preserve stereo CPU-projected world-effect geometry and its fallback for two individually finite OpenXR eye origins, including high-magnitude recentered XR origins that previously overflowed R84's float midpoint and invalidated both effect eyes.",
+    "scope_boundary": "R84 R30 CPU-projected smoke/skid/world-effect XYZRHW full-world plus affine eye origin only; no change to center-flare C993 semantics, existing GOAL/HUD/font, base camera, normal world, SkyGlow, original input/FFB, R26_SAFE, DX11 or frozen DXVK.",
+    "special_work_evidence": "Exact source-proven overflow: 0.5f*(eyeOffset[0]+eyeOffset[1]) evaluates to Inf for two finite FLT_MAX inputs; R84 full-world eyeInverse and conservative affine were computed from the same unbounded float midpoint. Same finite inputs are handled by the already-shipped double-intermediate BuildHeadRelativeEyeOffsets helper.",
+    "trace_stages": [
+      "OpenXR xrLocateViews reports two finite eyeOffsets; R84 frame snapshot copies positions without world-effect-specific clamping.",
+      "R30 CPU-projected world-effect geometry builds full-world eye inverse and separate conservative affine fallback from a common XR midpoint.",
+      "R84 GPU transforms are submitted per eye through the existing R30/R32/R33 draw owner and OpenXR stereo composition; invalid inputs return without partially publishing either eye."
+    ],
+    "subcomponents": [
+      "Replace unsafe scalar float midpoint and duplicate per-eye differences in actual R84 R30 world geometry state with a validated atomic head-relative 2-eye origin helper used by both reprojection and affine fallback.",
+      "Extend native host lens/eye-origin C++ positive/negative checks at nonzero wide origins and nonfinite opposite eye; assert producer source route in existing canonical world-affine verification so reintroduced float midpoint is rejected.",
+      "Keep exact Windows R84 game/R26_SAFE rollback plus OpenXR x64 host/package/Domain/source-impact CI for final non-skipped result SHA; keep Quest3 verification separate."
+    ],
+    "acceptance_items": [
+      {
+        "id": "world_effect_bilateral_origin",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 CPU-projected world-effect full-world eye geometry",
+        "expected_behavior": "Finite XR eye positions produce finite centered stereo eye translations, including where float midpoint overflows, with common game camera and two independent per-eye FOV matrices unchanged."
+      },
+      {
+        "id": "world_effect_affine_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "R84 XYZRHW world effect affine and invalid-eye fallback",
+        "expected_behavior": "Conservative affine parallax uses the same prevalidated two-eye relative origin, a corrupt eye rejects both together and original scene/HUD/FFB/rollback remain unchanged."
+      },
+      {
+        "id": "world_effect_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Active R84 and R26_SAFE game, OpenXR host, package and regressions",
+        "expected_behavior": "Mandatory GitHub DX9Ex Active, Domain Isolation and affected Full Source/HUD Inspector gates succeed on one exact non-skip commit; Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "world_effect_bilateral_origin": "PENDING_EXACT_SHA",
+    "world_effect_affine_fallback": "PENDING_EXACT_SHA",
+    "world_effect_exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Source at the inherited R84 world geometry state used float center[3] = .5f*(eyeOffset[0]+eyeOffset[1]) and rebuilt independent relative arrays for full-world and affine paths.",
+    "root_cause": "Two individually finite XR eye translations can overflow their intermediate float sum; even less extreme wide eye origins risk cancellation or bilateral disagreement when calculations are duplicated.",
+    "source_trace": [
+      "OpenXR stereo.eyeOffset enters R84 per-frame XYZRHW world geometry state snapshot.",
+      "One newly validated two-eye headRelativeEyes array now feeds the actual full-world R29 matrix constructor and affine parallax localX/localY paths.",
+      "R33 physical GPU remains the original draw owner; source test and same-SHA Windows CI exercise production compiled dependency and native C++ fallback without claiming actual HMD acceptance."
+    ],
+    "eye_ownership": "Both stereo eyes receive symmetric IPD-relative positions from one atomic validated output; do not publish one eye if the other origin is NaN/Inf.",
+    "alternatives_rejected": [
+      "Do not remove dense-scene objects, disable alpha effects, globally flatten world particles or change HMD projection/world scale to conceal failure; leave C993/CABE and existing world owners unchanged."
+    ],
+    "fix_evidence": "R84 actual C++ source replaced overflowing midpoint, both per-eye uses and fallback duplication with the preexisting stable BuildHeadRelativeEyeOffsets numerical owner.",
+    "negative_test_evidence": "Extended native C++ zero-centered, wide-origin and invalid-eye preservation regression plus structural world-affine source assertion; mandatory CI pending.",
+    "runtime_limit": "Quest3/VDXR was not connected and no measured FPS or binocular optical gameplay result is claimed."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "runtime_hmd": "UNTESTED"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run exact GitHub Actions once against final validation-bearing SHA; repair only actual failed gate under same TASK_ID; C6 bookkeeping after all mandatory gates pass; HMD remains UNTESTED."
+}
