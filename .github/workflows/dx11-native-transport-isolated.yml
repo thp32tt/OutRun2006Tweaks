@@ -8,6 +8,10 @@ on:
       - src/vr/d3d11/native_shared_eye_ring.cpp
       - src/vr/d3d11/native_shared_eye_ring.hpp
       - tools/dx11_native_transport_probe.cpp
+      - src/vr/d3d11/native_game_stereo_submission.cpp
+      - src/vr/d3d11/native_game_stereo_submission.hpp
+      # cmkr regenerates CMakeLists from this authoritative source manifest.
+      - cmake.toml
       - tools/verify_dx11_native_transport_contract.py
       - .github/workflows/dx11-native-transport-isolated.yml
   workflow_dispatch:

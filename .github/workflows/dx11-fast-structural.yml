@@ -13,6 +13,9 @@ on:
       - 'vrhost/src/runtime/native_direct_stereo_pair.hpp'
       - 'vrhost/tests/native_direct_eye_pair_smoke.cpp'
       - 'tools/dx11_autodev_policy.py'
+      # The isolated native stereo game producer is linked from the cmkr
+      # manifest, not the generated CMakeLists.txt checked into the tree.
+      - 'cmake.toml'
       # Native stereo producer contract repairs must trigger a fresh exact-SHA Fast Gate.
       - 'tools/verify_dx11_native_transport_contract.py'
       - 'tools/test_dx11_*.py'

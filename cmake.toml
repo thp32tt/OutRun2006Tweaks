@@ -474,7 +474,8 @@ link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]
 type = "executable"
 sources = [
     "tools/dx11_native_transport_probe.cpp",
-    "src/vr/d3d11/native_shared_eye_ring.cpp"
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp"
 ]
 include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
