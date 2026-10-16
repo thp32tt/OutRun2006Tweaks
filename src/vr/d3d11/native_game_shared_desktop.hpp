@@ -34,9 +34,16 @@ public:
         IDirect3DDevice9* game, IDirect3DSurface9* backbuffer,
         ID3D11Device* device, ID3D11DeviceContext* context,
         ID3D11Texture2D* source, std::uint32_t width,
-        std::uint32_t height, std::uint64_t generation) noexcept {
+        std::uint32_t height, std::uint64_t generation,
+        const RECT& visibleRegion) noexcept {
         if (!game || !backbuffer || !device || !context || !source ||
-            !width || !height || !generation)
+            !width || !height || !generation ||
+            width > 0x7fffffffu || height > 0x7fffffffu ||
+            visibleRegion.left < 0 || visibleRegion.top < 0 ||
+            visibleRegion.right <= visibleRegion.left ||
+            visibleRegion.bottom <= visibleRegion.top ||
+            static_cast<std::uint32_t>(visibleRegion.right) > width ||
+            static_cast<std::uint32_t>(visibleRegion.bottom) > height)
             return false;
 
         D3D11_TEXTURE2D_DESC desc{};
@@ -184,9 +191,15 @@ public:
                 0, sharedSurface.GetAddressOf())) || !sharedSurface)
             return false;
         // The caller suppresses its own StretchRect surface-mutation hook
-        // while the source State mutex is held.
+        // while the source State mutex is held. Copy only pixels the game
+        // will show from this Present crop / one proven dirty rectangle.
+        // All other D3D9 backbuffer pixels remain the game's own output.
+        const bool entire = visibleRegion.left == 0 && visibleRegion.top == 0 &&
+            static_cast<std::uint32_t>(visibleRegion.right) == width &&
+            static_cast<std::uint32_t>(visibleRegion.bottom) == height;
+        const RECT* rect = entire ? nullptr : &visibleRegion;
         return SUCCEEDED(game->StretchRect(
-            sharedSurface.Get(), nullptr, backbuffer, nullptr, D3DTEXF_NONE));
+            sharedSurface.Get(), rect, backbuffer, rect, D3DTEXF_NONE));
     }
 private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> source_;

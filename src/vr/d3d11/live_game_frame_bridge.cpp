@@ -6492,12 +6492,14 @@ void before_game_present(IDirect3DDevice9* game,
             // fences or StretchRect keep the original game/CPU path intact.
             // Stereo XR remains separately provenance-gated (never copy mono
             // to both eyes).
+            const auto sharedDesktopRegion = NativeSharedDesktopAdmission::select_region(
+                presentDesc.Width, presentDesc.Height, presentRegion,
+                dirtyRegion != nullptr, oneBoundedDirtyRect, fullDirtyCoverage,
+                cropDirtyCoverage, partitionCropCoverage, partialDirty);
             const bool sharedDesktopAllowed = NativeSharedDesktopAdmission::allowed(
                 env_shared_desktop_opt_in(), fullMode, complete, outputWritable,
                 s.sourceGameDevice == presentDevice,
-                !presentRegion.partial_backbuffer_source(
-                    presentDesc.Width, presentDesc.Height),
-                !dirtyRegion || fullDirtyCoverage,
+                sharedDesktopRegion.valid, sharedDesktopRegion.valid,
                 NativeSharedDesktopAdmission::destination_compatible(
                     static_cast<std::uint32_t>(bb.Format),
                     static_cast<std::uint32_t>(D3DFMT_A8R8G8B8),
@@ -6510,10 +6512,14 @@ void before_game_present(IDirect3DDevice9* game,
             if (!gpuHandoffQueued && sharedDesktopAllowed &&
                 s.backend.color_texture()) {
                 const NativeOutputUploadScope outputUploadScope{};
+                const auto& region = sharedDesktopRegion.source;
+                const RECT visibleRect{
+                    static_cast<LONG>(region.left), static_cast<LONG>(region.top),
+                    static_cast<LONG>(region.right), static_cast<LONG>(region.bottom)};
                 gpuHandoffQueued = s.sharedDesktop.try_present(
                     game, presentBackbuffer.Get(), s.backend.device(), ctx,
                     s.backend.color_texture(), surfaceWidth, surfaceHeight,
-                    s.outputGeneration);
+                    s.outputGeneration, visibleRect);
             }
             // Full-resolution publication must be sampled before THIS D3D9
             // Present, not uploaded one or two frames later. Retire older GPU

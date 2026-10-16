@@ -21,8 +21,8 @@ int main() {
     assert(!allowed(true,true,true,true,true,true,true,
                     NativeSharedDesktopAdmission::destination_compatible(23u,a8,x8),
                     true,3440,1440,3));
-    // Strictly fail closed for normal gameplay/fallback, unsupported scene
-    // draws, cropped menu Presents, partial dirty updates and non-BGRA/MSAA.
+    // Strictly fail closed for default-off gameplay/fallback, unsupported
+    // scene draws, unknown dirty regions and non-BGRA/MSAA.
     for (unsigned mask = 0; mask < 9; ++mask) {
         bool f[9]{true,true,true,true,true,true,true,true,true};
         f[mask] = false;
@@ -32,4 +32,39 @@ int main() {
     assert(!allowed(true,true,true,true,true,true,true,true,true,0,1440,3));
     assert(!allowed(true,true,true,true,true,true,true,true,true,3440,0,3));
     assert(!allowed(true,true,true,true,true,true,true,true,true,3440,1440,0));
+    // Exact game Present source crop: GPU StretchRect updates the cropped
+    // area only, not the rest of the original D3D9 menu/race backbuffer.
+    using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
+    using outrun::vr::dx11::live_game_frame::GameNativePartialDirtySelection;
+    constexpr GameNativePresentRegion full{0,0,3440,1440};
+    constexpr GameNativePresentRegion crop{100,50,3300,1390};
+    constexpr GameNativePresentRegion tile{200,100,400,300};
+    constexpr GameNativePartialDirtySelection noTile{};
+    constexpr GameNativePartialDirtySelection oneTile{tile,true};
+    auto select = [](GameNativePresentRegion visible, bool hasDirty,
+                     bool oneDirty, bool fullDirty, bool cropDirty,
+                     bool partitionCrop, GameNativePartialDirtySelection partial) {
+        return NativeSharedDesktopAdmission::select_region(
+            3440,1440,visible,hasDirty,oneDirty,fullDirty,cropDirty,
+            partitionCrop,partial);
+    };
+    const auto whole = select(full,false,false,false,false,false,noTile);
+    assert(whole.valid && whole.source.right == 3440 && whole.source.bottom == 1440);
+    const auto cropped = select(crop,false,false,false,false,false,noTile);
+    assert(cropped.valid && cropped.source.left == 100 && cropped.source.top == 50);
+    const auto completeCrop = select(crop,true,true,false,true,false,noTile);
+    assert(completeCrop.valid && completeCrop.source.right == 3300);
+    assert(select(crop,true,false,true,false,false,noTile).valid);
+    assert(select(crop,true,false,false,false,true,noTile).valid);
+    const auto dirty = select(crop,true,true,false,false,false,oneTile);
+    assert(dirty.valid && dirty.source.left == 200 &&
+           dirty.source.right == 400 && dirty.source.bottom == 300);
+    assert(!select(crop,true,false,false,false,false,oneTile).valid);
+    assert(!select(crop,true,true,false,false,false,noTile).valid);
+    assert(!select(crop,true,false,false,false,false,noTile).valid);
+    const GameNativePartialDirtySelection foreign{{10,10,400,300},true};
+    assert(!select(crop,true,true,false,false,false,foreign).valid);
+    const auto malformed = NativeSharedDesktopAdmission::select_region(
+        3440,1440,{0,-1,3440,1440},false,false,false,false,false,noTile);
+    assert(!malformed.valid);
 }
