@@ -737,6 +737,12 @@ struct s_chrset_info // not actual name
 };
 static_assert(sizeof(s_chrset_info) == 0x10);
 
+// WinMM's SND_LOOP is an unrelated 0x0008 PlaySound flag. The original
+// game SOUND_CMD enum uses SND_LOOP=0x0800; never let Windows' macro
+// replace this enumerator with a numeric token in the independent R84 TU.
+#ifdef SND_LOOP
+#undef SND_LOOP
+#endif
 enum SOUND_CMD
 {
 	/* 0x0800 */ SND_LOOP = (1 << 11),

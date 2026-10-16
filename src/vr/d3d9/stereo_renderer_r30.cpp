@@ -131,7 +131,7 @@ namespace OutRunVRStereo
         // Independent Quest-inspired DX9Ex opt-in. R30 already computes
         // BOTH stereo XYZRHW vertex arrays; batch only their GPU upload.
         // Never assume all alpha draws are particles or reuse mono vertices.
-        R30ParticleUpload::DualEyeGpuRing R30ParticleGpuRing{};
+        OutRunVR::R30ParticleUpload::DualEyeGpuRing R30ParticleGpuRing{};
         bool R30ParticleGpuUploadEnabled() noexcept
         {
             static const bool on = []() noexcept {
@@ -5361,7 +5361,7 @@ namespace OutRunVRStereo
                 R29OwnerEffectTelemetrySnapshot effect{};
                 const bool reliableEffect =
                     R29OwnerTryGetEffectTelemetrySnapshot(effect);
-                const R30ParticleUpload::Gate gate{
+                const OutRunVR::R30ParticleUpload::Gate gate{
                     true,
                     OutRunVR::GameSemantic::EffectiveScope() ==
                         OutRunVR::GameSemantic::RenderScope::WorldParticle,
@@ -5373,7 +5373,7 @@ namespace OutRunVRStereo
                     OutRunVR::State::StateBlockTracker::Recording(),
                     stride, vertexCount
                 };
-                if (R30ParticleUpload::Eligible(gate))
+                if (OutRunVR::R30ParticleUpload::Eligible(gate))
                 {
                     // The lock spans both physical draws and prevents an
                     // interleaved logical batch from DISCARDing eye 1's data.
