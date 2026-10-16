@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_EXACT_SHA_REQUIRED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "6c6838b1f74eda28b46d17736b13f4a0453c9c8e",
   "material_result_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "b8088fc14156ccad2034ccd288926959607f5690",
   "source_paths": [
     "src/vr/game/projected_rank_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp"
@@ -88,15 +88,17 @@
     "eye_ownership": "Only exact RankMarker/Rival projectedWorldMarker R84 path writes two-eye scratch after complete pair. Native mono fallback remains on rejection; no quest headset acceptance claimed."
   },
   "ci_evidence": {
-    "exact_sha": null,
-    "dx9ex_active": "PENDING_RECORD_REPAIR",
-    "domain_isolation": "PENDING",
-    "full_source_impact": "PENDING",
-    "hud_inspector": "PENDING",
+    "exact_sha": "b8088fc14156ccad2034ccd288926959607f5690",
+    "dx9ex_active": "SUCCESS_USER_CONFIRMED",
+    "domain_isolation": "SUCCESS_USER_CONFIRMED",
+    "full_source_impact": "SUCCESS_USER_CONFIRMED",
+    "hud_inspector": "SUCCESS_USER_CONFIRMED",
     "runtime_hmd": "UNTESTED",
     "previous_source_only_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
-    "previous_active_policy_failure": "RUN_RECORD_MISSING"
+    "previous_active_policy_failure": "RUN_RECORD_MISSING",
+    "conclusion": "SUCCESS",
+    "source": "User-confirmed GitHub CI SUCCESS for exact validation-bearing SHA; C6-only bookkeeping, no rerun"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run mandatory Gate matrix for final record-bearing SHA, repair actual failure only, C6 separate after exact SHA PASS; Quest3/VDXR marker optical verification remains UNTESTED."
+  "next_action": "C6 recorded PASS_EXACT_SHA at b8088fc14156ccad2034ccd288926959607f5690; prior TERMINAL_STATUS_NOT_COMPLETE hold resolved. Quest3/VDXR HMD runtime validation remains UNTESTED; do not rerun CI or double-score this task."
 }
