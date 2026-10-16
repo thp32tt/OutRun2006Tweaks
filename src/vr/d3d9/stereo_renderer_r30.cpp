@@ -4736,21 +4736,23 @@ namespace OutRunVRStereo
                     static_cast<const std::uint8_t*>(source) + off);
                 if (!std::isfinite(src[2]) || !std::isfinite(src[3]))
                     return false;
+                // The exact car anchor is binocular: validate BOTH XR
+                // positions before modifying either physical-eye scratch.
+                float x[2]{}, y[2]{};
+                if (!OutRunVR::RankMarker::RemapScreenPair(
+                        src[0], src[1],
+                        static_cast<float>(vp.X),
+                        static_cast<float>(vp.Y),
+                        static_cast<float>(vp.Width),
+                        static_cast<float>(vp.Height),
+                        scale, state.projectedRank, x, y))
+                    return false;
                 for (int eye = 0; eye < 2; ++eye)
                 {
-                    float x = 0.0f, y = 0.0f;
-                    if (!OutRunVR::RankMarker::RemapScreenPoint(
-                            src[0], src[1],
-                            static_cast<float>(vp.X),
-                            static_cast<float>(vp.Y),
-                            static_cast<float>(vp.Width),
-                            static_cast<float>(vp.Height),
-                            scale, state.projectedRank, eye, x, y))
-                        return false;
                     auto* dst = reinterpret_cast<float*>(
                         (eye == 0 ? left.data() : right.data()) + off);
-                    dst[0] = x;
-                    dst[1] = y;
+                    dst[0] = x[eye];
+                    dst[1] = y[eye];
                 }
             }
             return true;

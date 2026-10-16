@@ -99,4 +99,31 @@ int main()
     s.deltaY[1]=std::numeric_limits<float>::quiet_NaN();
     assert(!RemapScreenPoint(400,200,0,0,640,480,1,s,1,rx,ry));
     assert(RemapScreenPoint(400,200,0,0,640,480,1,s,0,lx,ly));
+
+    // Both eyes must be staged atomically: a rejected right-eye FOV
+    // cannot publish a left-eye rank update before the safe mono fallback.
+    float pairX[2]{ 71.0f, 72.0f }, pairY[2]{ 73.0f, 74.0f };
+    s.deltaY[1] = std::numeric_limits<float>::quiet_NaN();
+    assert(!OutRunVR::RankMarker::RemapScreenPair(
+        400,200,0,0,640,480,1,s,pairX,pairY));
+    assert(pairX[0] == 71 && pairX[1] == 72 &&
+        pairY[0] == 73 && pairY[1] == 74);
+    s.deltaY[1] = -0.03f;
+    assert(OutRunVR::RankMarker::RemapScreenPair(
+        400,200,0,0,640,480,1,s,pairX,pairY));
+    assert(eq(pairX[0],380.8f) && eq(pairX[1],419.2f));
+    assert(eq(pairY[0],192.8f) && eq(pairY[1],207.2f));
+    // A finite huge viewport produces finite rank XY: the former float
+    // (ndc+1)*width intermediate overflowed before the final half-scale.
+    constexpr float huge = 3.0e38f;
+    assert(OutRunVR::RankMarker::RemapScreenPair(
+        huge,120,0,0,huge,480,1,s,pairX,pairY));
+    assert(std::isfinite(pairX[0]) && std::isfinite(pairX[1]));
+    // On invalid Reset dimensions, retain both eye buffers unchanged.
+    const float snapshotX[2]{ pairX[0], pairX[1] };
+    const float snapshotY[2]{ pairY[0], pairY[1] };
+    assert(!OutRunVR::RankMarker::RemapScreenPair(
+        400,200,0,0,0,480,1,s,pairX,pairY));
+    assert(pairX[0] == snapshotX[0] && pairX[1] == snapshotX[1] &&
+        pairY[0] == snapshotY[0] && pairY[1] == snapshotY[1]);
 }
