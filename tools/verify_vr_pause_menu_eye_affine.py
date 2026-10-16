@@ -7,26 +7,33 @@ source = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-
 helper = (ROOT / "src/vr/d3d9/pause_menu_eye_affine.hpp").read_text(encoding="utf-8")
 tests = (ROOT / "vrhost/tests/pause_menu_eye_affine_smoke.cpp").read_text(encoding="utf-8")
 
+def require(condition: bool, context: str = "ESC source invariant") -> None:
+    # Never rely on Python's 'assert': -O/PYTHONOPTIMIZE must not bypass
+    # the production gate or turn negative-mutation checks into false PASS.
+    if not condition:
+        raise AssertionError(context)
+
+
 def check(s: str, h: str) -> None:
-    assert '#include "pause_menu_eye_affine.hpp"' in s
-    assert 'ExternalOverlaySemanticDepth == 0' in s
-    assert 'GameState::STATE_SMPAUSEMENU' in s
-    assert 'R30IsPauseMenuExactArrow()' in s
+    require('#include "pause_menu_eye_affine.hpp"' in s)
+    require('ExternalOverlaySemanticDepth == 0' in s)
+    require('GameState::STATE_SMPAUSEMENU' in s)
+    require('R30IsPauseMenuExactArrow()' in s)
     arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuElement()')]
-    assert 'OutRunVrPauseEye::ExactArrowOwner(' in arrow
+    require('OutRunVrPauseEye::ExactArrowOwner(' in arrow)
     # R84 accepts both the newly isolated exact pause-arrow producer and
     # already-owned generic paused UI. Mutating either producer lookup to a
     # queue-only lookup must fail: synchronous native E8 calls also render.
-    assert arrow.count('GameSemantic::CurrentRenderProducerToken() ==') == 2
-    assert 'ProducerToken::PauseOptionArrow' in arrow
-    assert 'ProducerToken::ExactScreenHudClipSprite' in arrow
-    assert 'GameSemantic::CurrentQueueProducerToken()' not in arrow
-    assert 'CurrentSpriteQueueProducer ==' not in arrow
-    assert 'constexpr bool ExactArrowOwner(bool screenHud, bool exactProducer)' in h
-    assert 'return screenHud && exactProducer;' in h
-    assert 'ExactArrowOwner(true, true)' in tests
-    assert 'ExactArrowOwner(true, false)' in tests
-    assert s.count('R30PauseMenuVerticalAffine(') == 4
+    require(arrow.count('GameSemantic::CurrentRenderProducerToken() ==') == 2)
+    require('ProducerToken::PauseOptionArrow' in arrow)
+    require('ProducerToken::ExactScreenHudClipSprite' in arrow)
+    require('GameSemantic::CurrentQueueProducerToken()' not in arrow)
+    require('CurrentSpriteQueueProducer ==' not in arrow)
+    require('constexpr bool ExactArrowOwner(bool screenHud, bool exactProducer)' in h)
+    require('return screenHud && exactProducer;' in h)
+    require('ExactArrowOwner(true, true)' in tests)
+    require('ExactArrowOwner(true, false)' in tests)
+    require(s.count('R30PauseMenuVerticalAffine(') == 4)
     for required in (
         'hudScaleY * pauseVertical.scale[eye] * ndcY',
         'eyeScaleY[0] * src[1] + eyeBiasY[0]',
@@ -37,49 +44,49 @@ def check(s: str, h: str) -> None:
         'leftDst[1] = transformedLeftY;',
         'rightDst[1] = transformedRightY;',
     ):
-        assert required in s, required
+        require(required in s, required)
     # Asymmetric horizontal eye FOV must not detach the shader shell from
     # XYZRHW arrows; ordinary HUD/F11 remain on their old shader scale.
-    assert 'const bool pauseOwned = R30IsPauseMenuElement();' in s
-    assert 'clipCorrection._11 = OutRunVrPauseEye::ShaderHorizontalScale(' in s
-    assert 'hudScaleX, eyeScale[eye], pauseOwned);' in s
-    assert 'inline float ShaderHorizontalScale(' in h
-    assert 'return pauseOwned ? commonScale * eyeFovScale : commonScale;' in h
-    assert 'ShaderHorizontalScale(' in tests and 'xyzrhwNdc' in tests
-    assert 'const float o = -sum[eye] / span[eye];' in h
-    assert 'span[eye] <= 0.05f || span[eye] > 10.0f' in h
-    assert 'return {};' in h
-    assert 'failOne.valid' in tests and 'extreme.valid' in tests
+    require('const bool pauseOwned = R30IsPauseMenuElement();' in s)
+    require('clipCorrection._11 = OutRunVrPauseEye::ShaderHorizontalScale(' in s)
+    require('hudScaleX, eyeScale[eye], pauseOwned);' in s)
+    require('inline float ShaderHorizontalScale(' in h)
+    require('return pauseOwned ? commonScale * eyeFovScale : commonScale;' in h)
+    require('ShaderHorizontalScale(' in tests and 'xyzrhwNdc' in tests)
+    require('const float o = -sum[eye] / span[eye];' in h)
+    require('span[eye] <= 0.05f || span[eye] > 10.0f' in h)
+    require('return {};' in h)
+    require('failOne.valid' in tests and 'extreme.valid' in tests)
     # Full ESC optical-size ownership is independent of gameplay HUD and F11.
-    assert 'inline float ResponsiveUserScale(' in h
-    assert '0.55f + (bounded - 0.55f) * (0.70f / 0.45f)' in h
-    assert '1.25f + (bounded - 1.0f) * 0.50f' in h
-    assert 'const float readable = OutRunVrPauseEye::ResponsiveUserScale(' not in s
-    assert 'return std::clamp(requested, 0.55f, 1.50f);' in s
-    assert 'return shoulder + headroom * excess / (headroom + excess);' in h
-    assert 'const float smallOptical = ResponsiveMenuScale(' in tests
-    assert 'defaultOptical < largeOptical && largeOptical < 2.25f' in tests
-    assert 'inline float ResponsiveMenuScale(' in h
-    assert 'menuScale * std::sqrt(boundedAspect)' in h
-    assert 'constexpr float shoulder = 1.95f;' in h
-    assert 'const bool pauseResponsive = R30IsPauseMenuElement() &&' in s
-    assert 'if (!std::isfinite(requested) || requested <= 0.0f)' in s
-    assert 'std::isfinite(Settings::VRPauseMenuScale.get()) &&' in s
-    assert 'Settings::VRPauseMenuScale.get() > 0.0f;' in s
-    assert 'R30HudContain.pauseResponsive == pauseResponsive' in s
-    assert 'R30HudContain.pauseResponsive = pauseResponsive;' in s
+    require('inline float ResponsiveUserScale(' in h)
+    require('0.55f + (bounded - 0.55f) * (0.70f / 0.45f)' in h)
+    require('1.25f + (bounded - 1.0f) * 0.50f' in h)
+    require('const float readable = OutRunVrPauseEye::ResponsiveUserScale(' not in s)
+    require('return std::clamp(requested, 0.55f, 1.50f);' in s)
+    require('return shoulder + headroom * excess / (headroom + excess);' in h)
+    require('const float smallOptical = ResponsiveMenuScale(' in tests)
+    require('defaultOptical < largeOptical && largeOptical < 2.25f' in tests)
+    require('inline float ResponsiveMenuScale(' in h)
+    require('menuScale * std::sqrt(boundedAspect)' in h)
+    require('constexpr float shoulder = 1.95f;' in h)
+    require('const bool pauseResponsive = R30IsPauseMenuElement() &&' in s)
+    require('if (!std::isfinite(requested) || requested <= 0.0f)' in s)
+    require('std::isfinite(Settings::VRPauseMenuScale.get()) &&' in s)
+    require('Settings::VRPauseMenuScale.get() > 0.0f;' in s)
+    require('R30HudContain.pauseResponsive == pauseResponsive' in s)
+    require('R30HudContain.pauseResponsive = pauseResponsive;' in s)
     # User's R84 HMD regression: do not multiply pause size twice in XR.
-    assert 'OutRunVrPauseEye::ResponsiveMenuScale(' not in s
-    assert 'const float opticalScale = userScale;' in s
-    assert 'scaleX = opticalScale;' in s
-    assert 'scaleY = opticalScale / sourceOverTarget;' in s
-    assert 'scaleX = opticalScale * sourceOverTarget;' in s
-    assert 'scaleY = opticalScale;' in s
-    assert 'const float questScale = ResponsiveMenuScale(' in tests
-    assert 'ResponsiveMenuScale(1.25f, factor, false)' in tests
+    require('OutRunVrPauseEye::ResponsiveMenuScale(' not in s)
+    require('const float opticalScale = userScale;' in s)
+    require('scaleX = opticalScale;' in s)
+    require('scaleY = opticalScale / sourceOverTarget;' in s)
+    require('scaleX = opticalScale * sourceOverTarget;' in s)
+    require('scaleY = opticalScale;' in s)
+    require('const float questScale = ResponsiveMenuScale(' in tests)
+    require('ResponsiveMenuScale(1.25f, factor, false)' in tests)
 
 check(source, helper)
-for mutant in (
+for mutant_index, mutant in enumerate((
     source.replace('GameSemantic::CurrentRenderProducerToken() ==',
                    'GameSemantic::CurrentQueueProducerToken() ==', 1),
     source.replace('return OutRunVrPauseEye::ExactArrowOwner(',
@@ -116,12 +123,12 @@ for mutant in (
                    'const float opticalScale = OutRunVrPauseEye::ResponsiveMenuScale(userScale, sourceOverTarget, pauseResponsive);', 1),
     source.replace('scaleY = opticalScale / sourceOverTarget;',
                    'scaleY = opticalScale;', 1),
-):
+)):
     try:
         check(mutant, helper)
     except AssertionError:
         continue
-    raise AssertionError("unsafe ESC mutation escaped verification")
+    raise AssertionError(f"unsafe ESC mutation #{mutant_index} escaped verification")
 for bad_helper in (
     helper.replace('pauseOwned ? commonScale * eyeFovScale : commonScale',
                    'commonScale'),
