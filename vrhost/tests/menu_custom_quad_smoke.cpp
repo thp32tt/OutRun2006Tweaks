@@ -2,6 +2,7 @@
 #include "vr/ui/multi_sprite_contain_scale.hpp"
 #include <cmath>
 #include <limits>
+#include <initializer_list>
 
 // Native, Release-executed game-header regression. The authored custom quad
 // must fit the real backbuffer even if cached screen_scale is stale after a
