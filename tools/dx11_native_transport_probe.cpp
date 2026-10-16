@@ -831,6 +831,9 @@ int main()
         UINT originalSampleMask{};
         UINT originalStencilRef{};
         const outrun::vr::dx11::NativeGameEyeRasterState* gameRaster{};
+        ID3D11RenderTargetView* callerColor{};
+        bool rejectedDetachedDraw[2]{};
+        bool rejectedForeignDraw[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -849,6 +852,7 @@ int main()
     gameRaster.stencilClear[0] = 3u;
     gameRaster.stencilClear[1] = 5u;
     gameEyeFixture.gameRaster = &gameRaster;
+    gameEyeFixture.callerColor = originalGameTarget;
 
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
@@ -978,8 +982,22 @@ int main()
         // The submission must rebind RT0 for the next eye and restore it
         // to the original desktop state after the second pass.
         ctx->OMSetRenderTargets(0, nullptr, nullptr);
+        // Regression: an API Draw with no OM color/depth target does not
+        // write an XR eye and must not count toward a completed stereo pair.
+        fixture.rejectedDetachedDraw[eyeIndex] =
+            !encoder.draw(3u, 0u) && encoder.draw_count() == 0u;
+        ctx->OMSetRenderTargets(
+            1u, &fixture.callerColor, fixture.callerDepth);
+        // A game offscreen/desktop Draw is equally ineligible. Rebind the
+        // ring-owned eye RTV+DSV explicitly before real geometry replay.
+        fixture.rejectedForeignDraw[eyeIndex] =
+            !encoder.draw_indexed(3u, 0u, 0) && encoder.draw_count() == 0u;
+        if (!fixture.rejectedDetachedDraw[eyeIndex] ||
+            !fixture.rejectedForeignDraw[eyeIndex] ||
+            !encoder.bind_eye_output())
+            return false;
         // Use the actual immediate D3D11 draw APIs through the per-eye
-        // recorder, not a fabricated positive evidence counter. The saved
+        // recorder with both correct eye OM bindings restored. The saved
         // game IA/VS/PS state is restored independently for both eye passes.
         // This WARP fixture does not assert real-game shader/pixel parity.
         for (UINT drawOrdinal = 0u; drawOrdinal < 2u + eyeIndex; ++drawOrdinal) {
@@ -1006,8 +1024,12 @@ int main()
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster) &&
             directSubmit.in_flight() && !directSubmit.cancel() &&
-            gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1],
-            "00825 native eye recorder issues both Draw and DrawIndexed in distinct full-resolution RT0s");
+            gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1] &&
+            gameEyeFixture.rejectedDetachedDraw[0] &&
+            gameEyeFixture.rejectedDetachedDraw[1] &&
+            gameEyeFixture.rejectedForeignDraw[0] &&
+            gameEyeFixture.rejectedForeignDraw[1],
+            "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != preservedDepthView &&

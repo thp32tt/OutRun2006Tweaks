@@ -12,17 +12,26 @@ namespace outrun::vr::dx11 {
 // A successful API issue is not proof of a visible Quest3 pixel.
 class NativeGameEyeDrawEncoder final {
 public:
-    explicit NativeGameEyeDrawEncoder(ID3D11DeviceContext* context) noexcept
-        : context_(context) {}
+    explicit NativeGameEyeDrawEncoder(
+        ID3D11DeviceContext* context, ID3D11RenderTargetView* eyeTarget,
+        ID3D11DepthStencilView* eyeDepth) noexcept
+        : context_(context), eyeTarget_(eyeTarget), eyeDepth_(eyeDepth) {}
     NativeGameEyeDrawEncoder(const NativeGameEyeDrawEncoder&) = delete;
     NativeGameEyeDrawEncoder& operator=(const NativeGameEyeDrawEncoder&) = delete;
 
+    // A game callback may temporarily switch OM to a menu texture or detach
+    // RT0. Explicitly restore the owned eye color+depth target before issuing
+    // the next real game Draw; never certify an offscreen/desktop Draw as XR.
+    [[nodiscard]] bool bind_eye_output() noexcept;
     [[nodiscard]] bool draw(UINT vertexCount, UINT startVertex) noexcept;
     [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,
                                     INT baseVertex) noexcept;
     [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
 private:
+    [[nodiscard]] bool eye_output_bound() const noexcept;
     ID3D11DeviceContext* context_{};
+    ID3D11RenderTargetView* eyeTarget_{};
+    ID3D11DepthStencilView* eyeDepth_{};
     std::uint64_t drawCount_{};
 };
 

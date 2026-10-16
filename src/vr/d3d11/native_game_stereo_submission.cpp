@@ -5,12 +5,30 @@
 
 namespace outrun::vr::dx11 {
 
-// Only the renderer's real D3D11 Draw/DrawIndexed calls count as native eye
-// source evidence. This recorder is scoped to one eye and one immediate
-// context, so the second eye cannot inherit an invented draw count.
+// Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
+// A callback may unbind OM to render a menu texture; counting that Draw
+// would publish an unchanged/stale XR eye although the GPU issued commands.
+bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
+    if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
+    ID3D11RenderTargetView* actualTarget = nullptr;
+    ID3D11DepthStencilView* actualDepth = nullptr;
+    context_->OMGetRenderTargets(1u, &actualTarget, &actualDepth);
+    const bool matches = actualTarget == eyeTarget_ && actualDepth == eyeDepth_;
+    if (actualTarget) actualTarget->Release();
+    if (actualDepth) actualDepth->Release();
+    return matches;
+}
+
+bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
+    if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
+    ID3D11RenderTargetView* target = eyeTarget_;
+    context_->OMSetRenderTargets(1u, &target, eyeDepth_);
+    return eye_output_bound();
+}
+
 bool NativeGameEyeDrawEncoder::draw(
     UINT vertexCount, UINT startVertex) noexcept {
-    if (!context_ || !vertexCount ||
+    if (!vertexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     context_->Draw(vertexCount, startVertex);
@@ -20,7 +38,7 @@ bool NativeGameEyeDrawEncoder::draw(
 
 bool NativeGameEyeDrawEncoder::draw_indexed(
     UINT indexCount, UINT startIndex, INT baseVertex) noexcept {
-    if (!context_ || !indexCount ||
+    if (!indexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
@@ -393,7 +411,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     ? invocation.gameRaster->depthClear[eyeIndex] : 1.0f,
                 invocation.gameRaster
                     ? invocation.gameRaster->stencilClear[eyeIndex] : 0u);
-            NativeGameEyeDrawEncoder encoder(ctx);
+            NativeGameEyeDrawEncoder encoder(
+                ctx, targets[eyeIndex], invocation.depth[eyeIndex]);
             if (!invocation.callback(invocation.user, ctx,
                                      targets[eyeIndex], eyeIndex,
                                      invocation.eye[eyeIndex], encoder))
