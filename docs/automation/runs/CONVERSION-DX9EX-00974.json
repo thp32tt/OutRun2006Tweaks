@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C2_SOURCE_IMPLEMENTED",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_GITHUB_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "a10062cbb5bf9adca1d9a1d3092e9186434ea1a3",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d8c282e34044bf88be9088f26549f6f3e80b0332",
   "source_paths": [
     "src/hooks_textures.cpp"
   ],
@@ -81,5 +81,15 @@
       "No broad shader, alpha-state, UI layout, HUD or stereo owner reassignment is permitted to conceal malformed DDS metadata."
     ],
     "runtime_limit": "No Quest3/VDXR HMD test performed. Only metadata-driven upload failure is source-confirmed; whether the user's remaining white selection sprites have this header is unproven."
-  }
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "d8c282e34044bf88be9088f26549f6f3e80b0332",
+    "reported_outcome": "SUCCESS",
+    "evidence_basis": "User-confirmed exact-SHA GitHub CI; no CI rerun during C6 bookkeeping",
+    "runtime_hmd": "UNTESTED"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "C6 BUILD_VERIFIED recorded for exact validation SHA; runtime Quest3/VDXR HMD remains UNTESTED. Do not rerun CI or add points for C6 bookkeeping.",
+  "notes": "Resolved C6 hold reason TERMINAL_STATUS_NOT_COMPLETE via [skip ci] record-only commit. Existing material_result_sha and feature_contract/acceptance_results preserved exactly; no source edits or runtime HMD test."
 }
