@@ -1,6 +1,7 @@
 #include "native_backend.hpp"
 
 #include "pipeline_translation.hpp"
+#include "native_sm3_arithmetic_codegen.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
@@ -259,14 +260,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_DCL_MOV_HLSL_MATERIALIZER_V1";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V2";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_DCL_MOV_DXBC_PROVENANCE_V1";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_MASK_SWIZZLE_PROVENANCE_V2";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -331,163 +332,220 @@ bool build_r283_sm3_mov_shader_source(
         const auto registers =
             decode_programmable_shader_register_semantics(decode);
         const auto interfaceSemantics =
-            decode_programmable_shader_interface_semantics(
-                decode, registers);
-        if (!decode.exact() ||
-            !registers.exact() ||
+            decode_programmable_shader_interface_semantics(decode, registers);
+        if (!decode.exact() || !registers.exact() ||
             !interfaceSemantics.exact())
             return false;
 
-        std::vector<ProgrammableShaderInterfaceSemantic> inputs;
-        std::vector<ProgrammableShaderInterfaceSemantic> outputs;
+        std::vector<ProgrammableShaderInterfaceSemantic> inputs, outputs;
         for (const auto& semantic : interfaceSemantics.semantics) {
             if (semantic.writeMask != D3DSP_WRITEMASK_ALL)
                 return false;
-            if (semantic.input)
-                inputs.push_back(semantic);
-            else if (semantic.output)
-                outputs.push_back(semantic);
-            else
-                return false;
+            if (semantic.input) inputs.push_back(semantic);
+            else if (semantic.output) outputs.push_back(semantic);
+            else return false;
         }
-
-        if (inputs.empty() || inputs.size() > 8u)
+        if (inputs.empty() || inputs.size() > 8u ||
+            (vertexStage && (outputs.empty() || outputs.size() > 8u)) ||
+            (!vertexStage && !outputs.empty()))
             return false;
-        if (vertexStage) {
-            if (outputs.empty() || outputs.size() > 8u)
-                return false;
-        } else if (!outputs.empty() || inputs.size() != 1u) {
-            return false;
-        }
 
-        struct MovBinding {
+        struct Operation {
+            NativeSm3ArithmeticOpcode opcode{};
+            D3DSHADER_PARAM_REGISTER_TYPE destinationType{};
             UINT destinationRegister{};
-            UINT sourceRegister{};
+            unsigned destinationMask{};
+            unsigned sourceCount{};
+            std::array<std::string, 3> sources{};
         };
-        std::vector<MovBinding> moves;
+        std::vector<Operation> operations;
+        std::array<unsigned, 32> tempWritten{};
+        std::array<bool, 32> tempUsed{};
+        std::array<unsigned, 16> outputWritten{};
+        constexpr UINT kMaxOps = 512u;
+        // No constants or dynamic indexing are fabricated here: real game
+        // Set*ShaderConstantF and sampler bindings must be connected before
+        // programs requiring them can become native Draw candidates.
         for (const auto& instruction : decode.instructions) {
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL))
                 continue;
-            if (instruction.opcode != static_cast<DWORD>(D3DSIO_MOV) ||
-                instruction.operandTokens.size() != 2u)
+            NativeSm3ArithmeticOpcode opcode{};
+            unsigned sourceCount = 0u;
+            switch (instruction.opcode) {
+            case D3DSIO_MOV:
+                opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 1u; break;
+            case D3DSIO_ADD:
+                opcode = NativeSm3ArithmeticOpcode::Add; sourceCount = 2u; break;
+            case D3DSIO_SUB:
+                opcode = NativeSm3ArithmeticOpcode::Subtract; sourceCount = 2u; break;
+            case D3DSIO_MUL:
+                opcode = NativeSm3ArithmeticOpcode::Multiply; sourceCount = 2u; break;
+            case D3DSIO_MAD:
+                opcode = NativeSm3ArithmeticOpcode::MultiplyAdd; sourceCount = 3u; break;
+            case D3DSIO_DP3:
+                opcode = NativeSm3ArithmeticOpcode::Dot3; sourceCount = 2u; break;
+            case D3DSIO_DP4:
+                opcode = NativeSm3ArithmeticOpcode::Dot4; sourceCount = 2u; break;
+            case D3DSIO_MIN:
+                opcode = NativeSm3ArithmeticOpcode::Minimum; sourceCount = 2u; break;
+            case D3DSIO_MAX:
+                opcode = NativeSm3ArithmeticOpcode::Maximum; sourceCount = 2u; break;
+            default:
                 return false;
-
+            }
+            // Predication, co-issue and unknown opcode-control flags are NOT
+            // interchangeable with unguarded HLSL arithmetic.
+            if (operations.size() >= kMaxOps ||
+                (instruction.instructionToken & 0xf0000000u) != 0u ||
+                instruction.operandTokens.size() != sourceCount + 1u)
+                return false;
             const DWORD destination = instruction.operandTokens[0];
-            const DWORD source = instruction.operandTokens[1];
-            if ((destination & 0x80000000u) == 0u ||
-                (source & 0x80000000u) == 0u ||
-                (destination & D3DSP_WRITEMASK_ALL) != D3DSP_WRITEMASK_ALL ||
+            const unsigned mask =
+                static_cast<unsigned>((destination & D3DSP_WRITEMASK_ALL) >> 16u);
+            if ((destination & 0x80000000u) == 0u || mask == 0u ||
                 (destination & D3DSP_DSTMOD_MASK) != 0u ||
                 (destination & D3DSP_DSTSHIFT_MASK) != 0u ||
-                (destination & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
-                (source & D3DSP_SWIZZLE_MASK) != D3DSP_NOSWIZZLE ||
-                (source & D3DSP_SRCMOD_MASK) != 0u ||
-                (source & D3DSHADER_ADDRESSMODE_MASK) != 0u)
+                (destination & D3DSHADER_ADDRESSMODE_MASK) != 0u)
                 return false;
-
-            const auto destinationType =
-                r283_decode_register_type(destination);
-            const auto sourceType = r283_decode_register_type(source);
-            const UINT destinationRegister =
-                static_cast<UINT>(destination & D3DSP_REGNUM_MASK);
-            const UINT sourceRegister =
-                static_cast<UINT>(source & D3DSP_REGNUM_MASK);
-            if (sourceType != D3DSPR_INPUT)
-                return false;
-
-            bool sourceDeclared = false;
-            for (const auto& semantic : inputs) {
-                if (semantic.registerType == D3DSPR_INPUT &&
-                    semantic.registerIndex == sourceRegister) {
-                    sourceDeclared = true;
-                    break;
-                }
-            }
-            if (!sourceDeclared)
-                return false;
-
-            if (vertexStage) {
-                if (destinationType != D3DSPR_OUTPUT)
+            Operation op{};
+            op.opcode = opcode;
+            op.destinationType = r283_decode_register_type(destination);
+            op.destinationRegister = static_cast<UINT>(
+                destination & D3DSP_REGNUM_MASK);
+            op.destinationMask = mask;
+            op.sourceCount = sourceCount;
+            if (op.destinationType == D3DSPR_TEMP) {
+                if (op.destinationRegister >= tempWritten.size())
                     return false;
-                bool destinationDeclared = false;
-                for (const auto& semantic : outputs) {
-                    if (semantic.registerType == D3DSPR_OUTPUT &&
-                        semantic.registerIndex == destinationRegister) {
-                        destinationDeclared = true;
-                        break;
-                    }
-                }
-                if (!destinationDeclared)
+                tempUsed[op.destinationRegister] = true;
+            } else if (vertexStage &&
+                       op.destinationType == D3DSPR_OUTPUT) {
+                if (op.destinationRegister >= outputWritten.size())
                     return false;
-                for (const auto& existing : moves) {
-                    if (existing.destinationRegister == destinationRegister)
-                        return false;
-                }
+                bool declared = false;
+                for (const auto& s : outputs)
+                    if (s.registerType == D3DSPR_OUTPUT &&
+                        s.registerIndex == op.destinationRegister)
+                        declared = true;
+                if (!declared) return false;
+            } else if (!vertexStage &&
+                       op.destinationType == D3DSPR_COLOROUT &&
+                       op.destinationRegister == 0u) {
+                // Pixel color output is an implicit SM3 register.
             } else {
-                if (destinationType != D3DSPR_COLOROUT ||
-                    destinationRegister != 0u ||
-                    !moves.empty())
-                    return false;
-            }
-            moves.push_back({ destinationRegister, sourceRegister });
-        }
-
-        if (vertexStage) {
-            if (moves.size() != outputs.size())
                 return false;
-            for (const auto& semantic : outputs) {
-                bool assigned = false;
-                for (const auto& move : moves) {
-                    if (move.destinationRegister == semantic.registerIndex) {
-                        assigned = true;
-                        break;
-                    }
-                }
-                if (!assigned)
-                    return false;
             }
-        } else if (moves.size() != 1u) {
+
+            for (unsigned i = 0; i < sourceCount; ++i) {
+                const DWORD token = instruction.operandTokens[i + 1u];
+                if ((token & 0x80000000u) == 0u ||
+                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u)
+                    return false;
+                const auto kind = r283_decode_register_type(token);
+                const UINT reg = static_cast<UINT>(token & D3DSP_REGNUM_MASK);
+                const unsigned swizzle =
+                    static_cast<unsigned>((token & D3DSP_SWIZZLE_MASK) >> 16u);
+                const unsigned modifier =
+                    static_cast<unsigned>((token & D3DSP_SRCMOD_MASK) >>
+                                          D3DSP_SRCMOD_SHIFT);
+                if (modifier != D3DSPSM_NONE && modifier != D3DSPSM_NEG)
+                    return false;
+                std::string value;
+                if (kind == D3DSPR_INPUT) {
+                    bool declared = false;
+                    for (const auto& s : inputs)
+                        if (s.registerType == D3DSPR_INPUT &&
+                            s.registerIndex == reg)
+                            declared = true;
+                    if (!declared) return false;
+                    value = "input.r" + std::to_string(reg);
+                } else if (kind == D3DSPR_TEMP) {
+                    if (reg >= tempWritten.size()) return false;
+                    // Any source swizzle can select a not-yet-written lane.
+                    // Reject that shader rather than reading fabricated zero.
+                    for (unsigned component = 0; component < 4u; ++component) {
+                        const unsigned readLane =
+                            (swizzle >> (component * 2u)) & 3u;
+                        if ((tempWritten[reg] & (1u << readLane)) == 0u)
+                            return false;
+                    }
+                    value = "r283_t" + std::to_string(reg);
+                    tempUsed[reg] = true;
+                } else {
+                    return false;
+                }
+                static constexpr char lanes[] = "xyzw";
+                value += ".";
+                for (unsigned component = 0; component < 4u; ++component)
+                    value += lanes[(swizzle >> (component * 2u)) & 3u];
+                if (modifier == D3DSPSM_NEG) value = "-(" + value + ")";
+                op.sources[i] = std::move(value);
+            }
+
+            if (op.destinationType == D3DSPR_TEMP)
+                tempWritten[op.destinationRegister] |= mask;
+            else if (op.destinationType == D3DSPR_OUTPUT)
+                outputWritten[op.destinationRegister] |= mask;
+            else
+                outputWritten[0] |= mask;
+            operations.push_back(std::move(op));
+        }
+        if (operations.empty()) return false;
+        if (vertexStage) {
+            for (const auto& output : outputs)
+                if (output.registerType != D3DSPR_OUTPUT ||
+                    output.registerIndex >= outputWritten.size() ||
+                    outputWritten[output.registerIndex] != 0x0fu)
+                    return false;
+        } else if (outputWritten[0] != 0x0fu) {
             return false;
         }
 
         translated = "struct R283Input {\n";
         for (const auto& semantic : inputs) {
             std::string label;
-            if (!r283_hlsl_semantic(
-                    semantic, vertexStage, false, label))
+            if (!r283_hlsl_semantic(semantic, vertexStage, false, label))
                 return false;
             translated += "    float4 r" +
                 std::to_string(semantic.registerIndex) +
                 " : " + label + ";\n";
         }
         translated += "};\n";
-
         if (vertexStage) {
             translated += "struct R283Output {\n";
             for (const auto& semantic : outputs) {
                 std::string label;
-                if (!r283_hlsl_semantic(
-                        semantic, true, true, label))
+                if (!r283_hlsl_semantic(semantic, true, true, label))
                     return false;
                 translated += "    float4 r" +
                     std::to_string(semantic.registerIndex) +
                     " : " + label + ";\n";
             }
-            translated += "};\n";
-            translated += "R283Output main(R283Input input) {\n";
-            translated += "    R283Output output = (R283Output)0;\n";
-            for (const auto& move : moves) {
-                translated += "    output.r" +
-                    std::to_string(move.destinationRegister) +
-                    " = input.r" + std::to_string(move.sourceRegister) +
-                    ";\n";
-            }
-            translated += "    return output;\n}\n";
+            translated += "};\nR283Output main(R283Input input) {\n"
+                          "    R283Output output = (R283Output)0;\n";
         } else {
-            translated += "float4 main(R283Input input) : SV_Target0 {\n";
-            translated += "    return input.r" +
-                std::to_string(moves.front().sourceRegister) + ";\n}\n";
+            translated += "float4 main(R283Input input) : SV_Target0 {\n"
+                          "    float4 r283_color = float4(0, 0, 0, 0);\n";
         }
+        for (UINT reg = 0u; reg < tempUsed.size(); ++reg)
+            if (tempUsed[reg])
+                translated += "    float4 r283_t" + std::to_string(reg) +
+                              " = float4(0, 0, 0, 0);\n";
+        for (std::size_t i = 0u; i < operations.size(); ++i) {
+            const auto& op = operations[i];
+            std::string dest;
+            if (op.destinationType == D3DSPR_TEMP)
+                dest = "r283_t" + std::to_string(op.destinationRegister);
+            else if (op.destinationType == D3DSPR_OUTPUT)
+                dest = "output.r" + std::to_string(op.destinationRegister);
+            else dest = "r283_color";
+            if (!append_native_sm3_arithmetic(
+                    translated, op.opcode, dest, op.destinationMask,
+                    op.sources, op.sourceCount, static_cast<unsigned>(i)))
+                return false;
+        }
+        translated += vertexStage ? "    return output;\n}\n"
+                                  : "    return r283_color;\n}\n";
         return !translated.empty();
     } catch (...) {
         translated.clear();

@@ -1,0 +1,90 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00828",
+  "production_id": "CONVERSION-DX11-00828",
+  "event_id": "CONVERSION-DX11-00828-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_SM3_VS_PS_MATERIALIZATION",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "SOURCE_PHASE_PARTIAL",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Extend real D3D9 SM3 VS/PS source-to-D3D11 HLSL materialization across arithmetic instruction families and register temporaries to unblock real menu/vehicle/race native Draw shader replay before independent R30 L/R scene attachment.",
+    "acceptance_items": [
+      {
+        "id": "sm3-arithmetic-source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_shader_source",
+        "expected_behavior": "Game-authored SM3 MOV/ADD/SUB/MUL/MAD/DP3/DP4/MIN/MAX, temp registers, swizzles and lane masks emit supported VS/PS HLSL and compile to DXBC, not an unsupported-mode success."
+      },
+      {
+        "id": "source-safety-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_original_input_ffb",
+        "expected_behavior": "Uninitialized temp lanes, constant references without binding, unsupported modifiers/opcodes fail closed to unchanged D3D9 Draw/Present/input and DX9Ex fallback."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_native_build_ci",
+        "expected_behavior": "Native materializer C++ build and portable arithmetic regression plus mandatory exact-SHA CI; game/HMD parity separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "sm3-arithmetic-source": "SOURCE_CODED_BUILD_PENDING",
+    "source-safety-fallback": "SOURCE_CODED_TARGETED_REGRESSION_PENDING",
+    "exact-sha-ci": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Actual game D3D9 SM3 parser and semantic decode validates source registers and per-component read-before-write before admitting arithmetic shaders.",
+      "C++ HLSL arithmetic emitter feeds the existing D3DCompiler VS/PS bytecode materializer and exact-identity semantic receipts; rejected shaders preserve original D3D9 game frame.",
+      "Portable compiled arithmetic probe and full unchanged build/transport/OpenXR/HUD/Backend exact-SHA Gates validate source checkpoint; R30 camera scene journal hookup still unfinished."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+      "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ arithmetic emitter supports nine SM3 instruction families with temp and masked output; GitHub CI pending.",
+      "negative_regression": "Constant, predication, uninitialized temp, unsupported modifiers/opcodes rejected; D3D9/input/FFB/owner and DXVK untouched.",
+      "component_integration": "SM3 game shader bytes -> parsed register arithmetic -> HLSL VS/PS -> D3DCompiler DXBC materialization; full R30 menu/car/race native L/R binding incomplete."
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_SM3_VS_PS_MATERIALIZATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Shader translation is only a prerequisite, NOT yet a gameplay scene source callback or Quest3 PASS.",
+    "activation_guard_and_fallback": "No default native routing or OpenXR producer promotion; D3D9 original and DX9Ex fallback remain authoritative.",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_SM3_ARITHMETIC_WARP_PENDING",
+    "remaining_implementation": [
+      "Bind actual game shader constants and textures in the R30 native scene replay before shader-bearing Draw.",
+      "Finish game-authored independent L/R R30 callback into NativeGameStereoSubmission and final real HMD tests."
+    ]
+  }
+}
