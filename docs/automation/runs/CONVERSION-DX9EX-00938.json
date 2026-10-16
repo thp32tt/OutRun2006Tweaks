@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00938",
+  "production_id": "CONVERSION-DX9EX-00938",
+  "event_id": "CONVERSION-DX9EX-00938-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00938",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "1b62d975abf92c3e6e4243e1a7f67e37838892c9",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/rank_marker_canted_eye_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00938.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep moving vehicle and rival Calc3D2D marker anchored to the corresponding car in both independently canted OpenXR eyes through common R84 GPU-eye delta; preserve original drawing on invalid pose.",
+    "scope_boundary": "Exact R84 projected rank marker pose and eye delta shared by rank shader-c64 and XYZRHW; no change to generic HUD, GOAL, +TIME, flare, SkyGlow, input, FFB, rollback or other backends.",
+    "trace_stages": [
+      "Original Calc3D2D vehicle/rival view-space anchors are retained by exact rank SpriteNode producer and queue semantics.",
+      "R84 R30BuildProjectedRankDelta removes common head inverse, then must retain the independently canted head-local OpenXR orientations and relative IPD.",
+      "Exact rank XYZRHW vertex and shader-c64 paths both consume the corrected R84 eye NDC shift, with unchanged original-draw fallback."
+    ],
+    "subcomponents": [
+      "Restore canted bilateral eye pose and relative IPD in real R84 shared vehicle/rival marker source builder.",
+      "Execute portable C++ canted/parallel/invalid-pose and moving rank marker screen-coordinate regression as part of mandatory Windows host build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_eye_cant",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Moving vehicle/rival rank shader-c64 and XYZRHW source",
+        "expected_behavior": "Both native GPU paths use the R30 shared corrected eye NDC shift including normalized head-local eye cant and relative IPD."
+      },
+      {
+        "id": "rank_pose_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid/recentered OpenXR eye pose and original draw",
+        "expected_behavior": "Executable native checks reject malformed second-eye pose and offsets atomically while retaining parallel-eye and original fallback."
+      },
+      {
+        "id": "rank_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game, x64 host, explicit R26_SAFE, package and Domain/HUD/Full Source",
+        "expected_behavior": "All mandatory GitHub Actions required Gates succeed at one exact validation-bearing material commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_eye_cant": "SOURCE_IMPLEMENTED",
+    "rank_pose_fallback": "NATIVE_SMOKE_PENDING",
+    "rank_exact_sha_ci": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "R30BuildProjectedRankDelta discarded stereo.eyeOrientation by hardcoding identity quaternion for both vehicle/rival eyes.",
+    "source_evidence": "Shared exact rank source retained original Calc3D2D view anchor and head inverse, but both GPU rank paths used identity eye rotations.",
+    "original_evidence": "Original Calc3D2D rank/vehicle producer and existing rank SpriteNode/queue ProjectedMarkerInfo carry one game-view-space car anchor into R84.",
+    "source_trace": [
+      "Original per-car Calc3D2D supplies view marker and SpriteNode producer semantics.",
+      "R84 R30BuildProjectedRankDelta constructs projected eye deltas and previously discarded eye quaternions.",
+      "R84 shader-c64 and XYZRHW both reuse the same delta while original draw survives false return."
+    ],
+    "eye_ownership": "R84 keeps game-view car anchor, removes common HMD head pose once, then validates each head-local OpenXR quaternion and relative IPD before applying asymmetric eye FOV.",
+    "alternatives_rejected": [
+      "Original producer tagging, marker queue anchor and raw WVP provenance are already present and unchanged; confirmed missing cant is in common projection math, not source tag hooks."
+    ],
+    "fix_evidence": "Changed R84 C++ projection plus executed host gate native rank regression; GitHub exact-SHA pending.",
+    "negative_test_evidence": "Portable Release-capable test includes canted/parallel/invalid right-eye quaternions, nonfinite IPD, multiple viewport aspects and moving marker offset; GitHub exact-SHA pending."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Finish one full exact-SHA Active, Domain, HUD and Full Source verification; C6 [skip ci] separately only after SUCCESS. Quest3/VDXR untested."
+}

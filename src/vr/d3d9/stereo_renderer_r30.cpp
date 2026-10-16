@@ -3019,23 +3019,25 @@ namespace OutRunVRStereo
             if (!R29OwnerMatrixFinite(headInverse))
                 return false;
 
-            const float center[3]{
-                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
-                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
-                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
-            };
-            const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
+            // Calc3D2D marker anchors are in game-view space. After the
+            // latched head inverse, restore the independently canted OpenXR
+            // HEAD-LOCAL eye rotations alongside relative IPD. The common
+            // projection feeds BOTH rank shader-c64 and XYZRHW draws.
+            // Invalid either-eye input leaves the original mono Draw intact.
+            const float worldScale =
+                Settings::VRWorldScale * Settings::VRStereoDepth;
+            float relative[2][3]{};
+            float relativeOrientation[2][4]{};
+            if (!std::isfinite(worldScale) || worldScale <= 0.0f ||
+                !OutRunVR::LensCentre::BuildHeadRelativeEyePose(
+                    stereo.eyeOffset, stereo.eyeOrientation,
+                    relative, relativeOrientation))
+                return false;
             for (int eye = 0; eye < 2; ++eye)
             {
-                const float relative[3]{
-                    stereo.eyeOffset[eye][0] - center[0],
-                    stereo.eyeOffset[eye][1] - center[1],
-                    stereo.eyeOffset[eye][2] - center[2]
-                };
                 const D3DMATRIX eyePose =
                     R29OwnerMatrixFromQuaternionTranslation(
-                        identity, relative,
-                        Settings::VRWorldScale * Settings::VRStereoDepth);
+                        relativeOrientation[eye], relative[eye], worldScale);
                 const D3DMATRIX eyeTransform = R29OwnerMultiplyMatrix(
                     R29OwnerMultiplyMatrix(
                         headInverse, R29OwnerInverseRigid(eyePose)),

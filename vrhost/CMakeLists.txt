@@ -180,6 +180,17 @@ add_custom_command(TARGET outrun-vr-lens-eye-pose-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-lens-eye-pose-smoke>"
     COMMENT "Run native C993 canted-eye and fail-closed regression"
     VERBATIM)
+# Rank/rival Calc3D2D shader-c64 and XYZRHW share eye cant and IPD.
+# Build AND execute portable positive/negative C++ in mandatory host CI.
+add_executable(outrun-vr-rank-canted-eye-smoke
+    tests/rank_marker_canted_eye_smoke.cpp)
+target_include_directories(outrun-vr-rank-canted-eye-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-rank-canted-eye-smoke)
+add_custom_command(TARGET outrun-vr-rank-canted-eye-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-rank-canted-eye-smoke>"
+    COMMENT "Run R84 rank marker canted-eye and negative pose regression"
+    VERBATIM)
 # The R84 exact +TIME/GOAL native GPU-eye pose and projection regression
 # must compile AND execute in the mandatory OpenXR host gate (including Release).
 add_executable(outrun-vr-stage-extension-eye-smoke
