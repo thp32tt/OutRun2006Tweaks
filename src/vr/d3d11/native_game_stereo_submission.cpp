@@ -113,6 +113,64 @@ bool NativeGameStereoSubmission::try_publish(
     return true;
 }
 
+
+bool NativeGameStereoSubmission::attach_host_frame(
+    const NativeGameStereoPublishedFrame& source,
+    OutRunVR::SharedRenderFrameState& gameFrame) const noexcept
+{
+    const auto& published = source.gpu;
+    constexpr std::uint32_t completeFlags =
+        OutRunVR::RenderFrameStereoComplete |
+        OutRunVR::RenderFrameWorldStereo |
+        OutRunVR::RenderFrameDrawDuplicated |
+        OutRunVR::RenderFrameEffectivePoseValid;
+    const auto left = reinterpret_cast<std::uintptr_t>(published.left_handle);
+    const auto right = reinterpret_cast<std::uintptr_t>(published.right_handle);
+    // The game DLL and Frame.v1 shared-handle words are 32-bit. Reject a
+    // truncated Win64-style handle instead of shipping an invalid OpenXR eye.
+    if (!ring_.validate_publication_snapshot(published) ||
+        !source.sourcePoseSequence ||
+        !source.eyeViewSignature[0] || !source.eyeViewSignature[1] ||
+        source.eyeViewSignature[0] == source.eyeViewSignature[1] ||
+        !left || !right || left == right ||
+        left > (std::numeric_limits<std::uint32_t>::max)() ||
+        right > (std::numeric_limits<std::uint32_t>::max)() ||
+        !published.width || !published.height ||
+        published.frame_id == 0u ||
+        published.frame_id > (std::numeric_limits<std::uint32_t>::max)() ||
+        published.slot >= OutRunVR::RenderFrameRingSize ||
+        gameFrame.clientPid != published.identity.producerPid ||
+        gameFrame.reserved[OutRunVR::RenderFrameRunGenerationIndex] !=
+            published.identity.runGeneration ||
+        gameFrame.frameId != published.frame_id ||
+        gameFrame.sourcePoseSequence != source.sourcePoseSequence ||
+        gameFrame.state != OutRunVR::StereoSbsActive ||
+        gameFrame.presentQpc <= 0 ||
+        (gameFrame.flags & completeFlags) != completeFlags ||
+        (gameFrame.flags & OutRunVR::RenderFramePresentInFlight) != 0u)
+        return false;
+
+    // Do not forge any stereo completion, render-state or camera-pose flags.
+    // They must already come from the real game Draw/DrawIndexed producer.
+    // Match the host's direct eye texture dimensions, which can differ from
+    // the 2D desktop backbuffer while in headset-native resolution.
+    gameFrame.backbufferWidth = published.width;
+    gameFrame.backbufferHeight = published.height;
+    gameFrame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex] =
+        static_cast<std::uint32_t>(left);
+    gameFrame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex] =
+        static_cast<std::uint32_t>(right);
+    gameFrame.reserved[OutRunVR::RenderFrameDirectWidthIndex] = published.width;
+    gameFrame.reserved[OutRunVR::RenderFrameDirectHeightIndex] = published.height;
+    gameFrame.reserved[OutRunVR::RenderFrameDirectFormatIndex] =
+        static_cast<std::uint32_t>(published.format);
+    gameFrame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] =
+        published.identity.generation;
+    gameFrame.reserved[OutRunVR::RenderFrameDirectSlotIndex] = published.slot;
+    gameFrame.flags |= OutRunVR::RenderFrameDirectGpuTransport;
+    return true;
+}
+
 bool NativeGameStereoSubmission::cancel() noexcept
 {
     if (state_ == State::Idle) return true;

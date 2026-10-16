@@ -53,6 +53,14 @@ public:
     // Safe only before the first GPU copy. After submit the ring owns all
     // in-flight work; destroy/reset the ring on synchronization failure.
     bool cancel() noexcept;
+
+    // Build the game frame's actual DirectGPU host handoff ONLY after two
+    // distinct game eye renders and the producer GPU EVENT completed. The
+    // caller owns the Frame.v1 ring's seqlock publication; this edits a local
+    // candidate and does not publish partially written shared memory.
+    [[nodiscard]] bool attach_host_frame(
+        const NativeGameStereoPublishedFrame& source,
+        OutRunVR::SharedRenderFrameState& gameFrame) const noexcept;
     [[nodiscard]] bool active() const noexcept { return state_ != State::Idle; }
     [[nodiscard]] bool in_flight() const noexcept { return state_ == State::GpuPending; }
 
