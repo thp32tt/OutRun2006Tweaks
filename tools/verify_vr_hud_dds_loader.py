@@ -21,7 +21,12 @@ def body(text,marker):
     raise ValueError("unmatched C++ braces: "+marker)
 
 def verify(text):
-    fmt=body(text,"inline D3DFORMAT GetD3DFormatFromPixelFormat(")
+    # Inspect the actual runtime decoder with or without constexpr; either
+    # spelling is a valid function, and both must meet identical strict guards.
+    fmt_marker=("inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat("
+                if "inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat(" in text
+                else "inline D3DFORMAT GetD3DFormatFromPixelFormat(")
+    fmt=body(text,fmt_marker)
     loader=body(text,"HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(")
     handle=body(text,"static void HandleTexture(")
     guards=[
@@ -66,6 +71,23 @@ def verify(text):
         (handle,"file && size >= sizeof(DDS_FILE)","replacement header bounds"),
         (handle,"firstMipSize <= size - sizeof(DDS_FILE)","replacement first mip source bounds"),
     ]
+    # Reject historical inactive FourCC, unflagged RGB and 3D DDS payload
+    # regressions as well as the existing row-pitch/opaque-alpha contracts.
+    format_guards=[
+        (fmt,"if ((format.dwFlags & DDPF_FOURCC) != 0)","compressed DDS requires declared FourCC"),
+        (fmt,"if ((format.dwFlags & DDPF_RGB) != 0)","conflicting FourCC/RGB header is not fast-decoded"),
+        (fmt,"if ((format.dwFlags & DDPF_RGB) == 0)","unflagged RGB bit masks cannot select fast RGB"),
+        (loader,"(DDSCAPS2_CUBEMAP | DDSCAPS2_VOLUME)","3D DDS faces/slices fall back to D3DX"),
+        (text,"static_assert(VerifyDdsPixelIntentAndNativeFallback()","compiled positive/negative DDS metadata regression retained"),
+    ]
+    for region,needle,label in format_guards:
+        if needle not in region:
+            raise ValueError(label)
+    if (fmt.index("if ((format.dwFlags & DDPF_FOURCC) != 0)") >
+            fmt.index("format.dwFourCC == FOURCC_DXT1") or
+        fmt.index("if ((format.dwFlags & DDPF_RGB) == 0)") >
+            fmt.index("format.dwRGBBitCount == 16")):
+        raise ValueError("DDS format declaration guards must precede field use")
     # Both 24-bit opaque BGR rows and 32-bit XRGB must preserve their own
     # row pitch, channel order and explicit opaque target format.
     if ("static_assert(OpaqueBgr24Pixel(0x11, 0x22, 0x33) == 0xFF332211u" not in text or
@@ -268,6 +290,11 @@ def verify(text):
 
 def negatives(text):
     needles=[
+        "if ((format.dwFlags & DDPF_FOURCC) != 0)",
+        "if ((format.dwFlags & DDPF_RGB) != 0)",
+        "if ((format.dwFlags & DDPF_RGB) == 0)",
+        "(DDSCAPS2_CUBEMAP | DDSCAPS2_VOLUME)",
+        "static_assert(VerifyDdsPixelIntentAndNativeFallback()",
         "if (dataSize < sizeof(DDS_FILE))",
         "if (!ppTexture)",
         "if (!pDevice || !pData)",
