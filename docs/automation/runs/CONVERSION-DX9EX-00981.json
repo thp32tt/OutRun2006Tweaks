@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C5_EXACT_SHA_GATE",
-  "checkpoint": "C5_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "64b353d3d2901b5ba52c2e3bdbc26a5134924293",
   "material_result_sha": "31657097d6e8591dfb11ddbb58ee5256297086ae",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d4fdbd99554c9686579560073d79d885f917ba37",
   "source_paths": [
     "vrhost/src/main.cpp",
     "vrhost/src/main_r23.cpp",
@@ -70,9 +70,9 @@
     ]
   },
   "acceptance_results": {
-    "menu_capture_and_optics": "PENDING_HMD",
-    "partial_and_protected_fallback": "PENDING_EXACT_SHA",
-    "exact_gate_and_runtime_separation": "PENDING_EXACT_SHA"
+    "menu_capture_and_optics": "PASS_EXACT_SHA",
+    "partial_and_protected_fallback": "PASS_EXACT_SHA",
+    "exact_gate_and_runtime_separation": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Multiple independent GetClientRect and ClientToScreen queries produced temporally unrelated capture UV and menu/theater aspect/fragment geometry during VD resolution changes or output/window moves.",
@@ -84,15 +84,79 @@
     "alternatives_rejected": [
       "Do not fix by hardcoded 4:3 optical scaling, unverified matte cropping, new global HUD zoom or changing normal 3D stereo draw paths."
     ],
-    "runtime_limit": "No real Quest3/VDXR runtime was performed; the deterministic geometry correction is not a headset visual PASS."
+    "runtime_limit": "No real Quest3/VDXR runtime was performed; the deterministic geometry correction is not a headset visual PASS.",
+    "original_evidence": "Original OutRun frontend, vehicle selection and recovery theater raster originate in the actual Win32 game client; Desktop Duplication GetGameUv previously sampled a different native Win32 window/output rectangle than the later optical host layout on resize or output move.",
+    "eye_ownership": "Both LOCAL-fixed OpenXR menu projection eyes consume the same captured source texture, UV, authored aspect and clipping rectangle. The mono theater fallback uses that same captured rectangle; gameplay stereo eye ownership remains independent.",
+    "fix_evidence": "Source-bearing 31657097d6e8591dfb11ddbb58ee5256297086ae adds bounded C++ ClipClient geometry and passes one physical GetClientRect/ClientToScreen output rectangle from GetGameUv through menu and mono-theater projection. Its portable compile-time clipping fixtures are included in the OpenXR host smoke test.",
+    "negative_test_evidence": "Host smoke fixtures cover complete low/high capture, left/right clipped output, off-output, invalid dimensions; the original menu verifier retains fifteen destructive geometry/aspect mutations, including a strict negative against restoring a second GetGameClientOutputRect read. Corrected same-task verifier is bound to validation SHA d4fdbd99554c9686579560073d79d885f917ba37."
   },
   "last_ci_failure": {
     "run_id": 38982246013,
     "head_sha": "31657097d6e8591dfb11ddbb58ee5256297086ae",
     "job": "policy",
     "cause": "Whole-function verifier requires docs/automation/runs/CONVERSION-DX9EX-00981.json on any source commit with this marker; missing run record aborted the active Gate before game/host compile.",
-    "repair": "Publish same-task feature contract without disabling policy or CI; rerun required Gate on new exact commit SHA."
+    "repair": "Publish same-task feature contract without disabling policy or CI; rerun required Gate on new exact commit SHA.",
+    "corrected_verifier_failure": {
+      "run_id": 38982438950,
+      "head_sha": "603abaaf59987c2313b3856c9ecb88e7c9683c65",
+      "job": "policy",
+      "cause": "Old menu regression expected a second GetGameClientOutputRect read and rejected the corrected single-snapshot capture.",
+      "repair_sha": "d4fdbd99554c9686579560073d79d885f917ba37",
+      "repair": "Require capturedClient input and assert absence of repeated HWND read; retain negative geometry and forbidden second-read mutations."
+    }
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Complete required exact-SHA x86 R84 game/x64 host/package, Domain and Full Source validations; Quest3/VDXR optical acceptance remains UNTESTED."
+  "next_action": "BUILD_VERIFIED C6 for exact Windows Active+Domain SHA; Quest3/VDXR same-binary optical MAIN_MENU acceptance remains NEED_HMD_TEST. Do not count bookkeeping as new development or rerun identical PASS SHA.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "d4fdbd99554c9686579560073d79d885f917ba37",
+    "dx9ex_active": {
+      "run_id": 38982599280,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38982599216,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38982245980,
+      "source_sha": "31657097d6e8591dfb11ddbb58ee5256297086ae",
+      "conclusion": "success",
+      "note": "Material source SHA reviewed; separate source-identical 603aba... record SHA run is still in progress. Not an exact-d4 Full Source result."
+    },
+    "hud_inspector": {
+      "run_id": 38982438914,
+      "source_sha": "603abaaf59987c2313b3856c9ecb88e7c9683c65",
+      "conclusion": "success",
+      "note": "Source tree same as d4; final d4 differs only in menu contract negative verifier."
+    },
+    "quest3_vdxr": "UNTESTED"
+  },
+  "c6_exact_sha_gate": {
+    "validation_bearing_result_sha": "d4fdbd99554c9686579560073d79d885f917ba37",
+    "dx9ex_active_run_id": 38982599280,
+    "dx9ex_active_conclusion": "success",
+    "dx9ex_active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_run_id": 38982599216,
+    "domain_conclusion": "success",
+    "source_review_material_sha": "31657097d6e8591dfb11ddbb58ee5256297086ae",
+    "source_review_run_id": 38982245980,
+    "source_review_conclusion": "success",
+    "hud_inspector_source_sha": "603abaaf59987c2313b3856c9ecb88e7c9683c65",
+    "hud_inspector_run_id": 38982438914,
+    "hud_inspector_conclusion": "success",
+    "quest3_vdxr": "UNTESTED"
+  }
 }
