@@ -1521,7 +1521,8 @@ namespace
         R23Pixels.TryConsume(c.context_);
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
-        if (!c.GetGameUv(whole)) return false;
+        RECT capturedClient{};
+        if (!c.GetGameUv(whole, false, &capturedClient)) return false;
 
         // Issue #119: intersect the two eyes' tangent-plane FOV extents.
         // Mean eye edges can extend outside one real eye frustum and clip
@@ -1542,13 +1543,12 @@ namespace
         commonFov.angleRight = std::atan(common.right);
         commonFov.angleDown = std::atan(common.down);
         commonFov.angleUp = std::atan(common.up);
-        RECT cr{};
-        GetClientRect(c.hwnd_, &cr);
-        const float clientAspect = (cr.bottom > cr.top &&
-            cr.right > cr.left)
-            ? static_cast<float>(cr.right - cr.left) /
-                static_cast<float>(cr.bottom - cr.top)
-            : 16.0f / 9.0f;
+        const float clientWidth =
+            static_cast<float>(capturedClient.right - capturedClient.left);
+        const float clientHeight =
+            static_cast<float>(capturedClient.bottom - capturedClient.top);
+        const float clientAspect = clientWidth > 0.0f && clientHeight > 0.0f
+            ? clientWidth / clientHeight : 16.0f / 9.0f;
         // GetGameUv() can clip an off-desktop window to the real capture
         // image. Use the sampled texture region's physical aspect for the
         // LOCAL-fixed menu, not the now-larger unclipped GetClientRect().
@@ -1594,8 +1594,8 @@ namespace
         // is the reference optical plane. A partially off-output vanilla
         // window otherwise zooms/recentres title and car-selection pixels.
         // Both paths use one validated original client/UV intersection.
-        RECT fullClient{};
-        c.GetGameClientOutputRect(fullClient);
+        // One physical HWND snapshot owns UV, output rect and authored aspect.
+        const RECT& fullClient = capturedClient;
         const float authoredAspect =
             cropCentered43 ? 4.0f / 3.0f : clientAspect;
         const auto plan = OutRunVrMenuAspect::PlanVisibleCenteredContent(
@@ -1635,11 +1635,9 @@ namespace
             const float sampledPixelsTall =
                 static_cast<float>(c.sourceHeight_) * whole.h;
             const bool completeClient =
-                cr.right > cr.left && cr.bottom > cr.top &&
-                std::fabs(sampledPixelsWide -
-                    static_cast<float>(cr.right - cr.left)) <= 1.0f &&
-                std::fabs(sampledPixelsTall -
-                    static_cast<float>(cr.bottom - cr.top)) <= 1.0f;
+                clientWidth > 0.0f && clientHeight > 0.0f &&
+                std::fabs(sampledPixelsWide - clientWidth) <= 1.0f &&
+                std::fabs(sampledPixelsTall - clientHeight) <= 1.0f;
             sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(
                 sourceAspect, clientAspect, gameConfiguredLetterbox,
                 completeClient, cropCentered43, useNativeMenuAspect,
@@ -1773,7 +1771,9 @@ namespace
         R23Pixels.TryConsume(c.context_);
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
-        if (!c.GetGameUv(whole)) return false;
+        RECT capturedTheaterClient{};
+        if (!c.GetGameUv(whole, false, &capturedTheaterClient))
+            return false;
         UvRect theaterUv = whole;
         if (sourceIsSbs)
             theaterUv.w *= 0.5f;
@@ -1795,11 +1795,12 @@ namespace
         quad.subImage.imageRect.offset = { 0, 0 };
         quad.subImage.imageRect.extent = {
             static_cast<int32_t>(c.theater_.width), static_cast<int32_t>(c.theater_.height) };
-        RECT cr{};
-        GetClientRect(c.hwnd_, &cr);
-        const float aspect = (cr.bottom > cr.top)
-            ? (static_cast<float>(cr.right - cr.left) /
-                static_cast<float>(cr.bottom - cr.top)) *
+        const float theaterWidth = static_cast<float>(
+            capturedTheaterClient.right - capturedTheaterClient.left);
+        const float theaterHeight = static_cast<float>(
+            capturedTheaterClient.bottom - capturedTheaterClient.top);
+        const float aspect = theaterWidth > 0.0f && theaterHeight > 0.0f
+            ? theaterWidth / theaterHeight *
                 (sourceIsSbs ? 0.5f : 1.0f)
             : 16.f / 9.f;
         quad.size.width = 2.f;
@@ -1815,8 +1816,7 @@ namespace
         // fallback is unchanged.
         if (!sourceIsSbs)
         {
-            RECT clientOnOutput{};
-            c.GetGameClientOutputRect(clientOnOutput);
+            const RECT& clientOnOutput = capturedTheaterClient;
             const auto fragment =
                 OutRunVrMenuAspect::PlanVisibleMonoTheaterFragment(
                     static_cast<float>(clientOnOutput.left),

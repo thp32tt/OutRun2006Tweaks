@@ -29,6 +29,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/projection_blit_upload.hpp"
 #include "runtime/menu_projection_pair.hpp"
+#include "runtime/menu_capture_snapshot.hpp"
 #include "runtime/projection_pair_pipeline.hpp"
 
 namespace
@@ -2137,47 +2138,33 @@ namespace
                 right > left && bottom > top;
         }
 
-        bool GetGameUv(UvRect& uv, bool requireFullyVisible = false)
+        bool GetGameUv(UvRect& uv, bool requireFullyVisible = false,
+            RECT* capturedClient = nullptr)
         {
+            if (capturedClient) *capturedClient = {};
             if (!sourceWidth_ || !sourceHeight_ || !IsWindow(hwnd_))
                 return false;
-
             RECT client{};
-            if (!GetClientRect(hwnd_, &client))
-                return false;
+            if (!GetClientRect(hwnd_, &client)) return false;
             POINT tl{ client.left, client.top };
             POINT br{ client.right, client.bottom };
-            if (!ClientToScreen(hwnd_, &tl) ||
-                !ClientToScreen(hwnd_, &br))
+            if (!ClientToScreen(hwnd_, &tl) || !ClientToScreen(hwnd_, &br))
                 return false;
-
-            const long leftPx = tl.x - outputDesktop_.left;
-            const long topPx = tl.y - outputDesktop_.top;
-            const long rightPx = br.x - outputDesktop_.left;
-            const long bottomPx = br.y - outputDesktop_.top;
-            const bool fullyVisible =
-                leftPx >= 0 && topPx >= 0 &&
-                rightPx <= static_cast<long>(sourceWidth_) &&
-                bottomPx <= static_cast<long>(sourceHeight_) &&
-                rightPx > leftPx && bottomPx > topPx;
-            if (requireFullyVisible && !fullyVisible)
+            // Capture the physical client rect ONCE. Re-reading it after UV
+            // creation can mix pre/post-resize dimensions into the menu plane.
+            const long left = tl.x - outputDesktop_.left;
+            const long top = tl.y - outputDesktop_.top;
+            const long right = br.x - outputDesktop_.left;
+            const long bottom = br.y - outputDesktop_.top;
+            const auto plan = OutRunVrMenuCapture::ClipClient(
+                left, top, right, bottom, sourceWidth_, sourceHeight_);
+            if (!plan.visible || (requireFullyVisible && !plan.fullyVisible))
                 return false;
-
-            const float l =
-                static_cast<float>(leftPx) / sourceWidth_;
-            const float t =
-                static_cast<float>(topPx) / sourceHeight_;
-            const float r =
-                static_cast<float>(rightPx) / sourceWidth_;
-            const float b =
-                static_cast<float>(bottomPx) / sourceHeight_;
-            uv.x = std::clamp(l, 0.f, 1.f);
-            uv.y = std::clamp(t, 0.f, 1.f);
-            const float rr = std::clamp(r, 0.f, 1.f);
-            const float bb = std::clamp(b, 0.f, 1.f);
-            uv.w = rr - uv.x;
-            uv.h = bb - uv.y;
-            return uv.w > 0.01f && uv.h > 0.01f;
+            uv.x = plan.x; uv.y = plan.y;
+            uv.w = plan.width; uv.h = plan.height;
+            if (capturedClient)
+                *capturedClient = {left, top, right, bottom};
+            return true;
         }
 
         bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,

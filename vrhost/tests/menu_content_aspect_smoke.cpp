@@ -1,4 +1,5 @@
 #include "runtime/menu_content_aspect.hpp"
+#include "runtime/menu_capture_snapshot.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
 #include <cmath>
@@ -16,6 +17,24 @@ static_assert(ContainedSidePaddingPixels(2496.f, 640.f, 3.9f, 5.4f) == 0.f);
 static_assert(ContainedSidePaddingPixels(0.f, 640.f, 1.f, 1.f) == 0.f);
 static_assert(ContainedSidePaddingPixels(1024.f, 640.f, 2.f, 2.f) == 0.f);
 
+// Full and clipped captures use a coherent physical rectangle through
+// VD Low/High resize, output changes and mono fallback; never combine a
+// new client aspect with the previous capture's UV.
+using OutRunVrMenuCapture::ClipClient;
+constexpr auto captureLow = ClipClient(240,120,1520,840,1920,1080);
+constexpr auto captureHigh = ClipClient(240,120,2160,1200,2560,1440);
+constexpr auto clippedLeft = ClipClient(-240,120,1040,840,1920,1080);
+constexpr auto clippedRight = ClipClient(1750,120,2150,840,1920,1080);
+static_assert(captureLow.visible && captureLow.fullyVisible &&
+    captureHigh.visible && captureHigh.fullyVisible);
+static_assert(captureLow.width > .666f && captureLow.width < .667f);
+static_assert(captureHigh.width > .749f && captureHigh.width < .751f);
+static_assert(clippedLeft.visible && !clippedLeft.fullyVisible &&
+    clippedLeft.x == 0.f && clippedLeft.width > .54f);
+static_assert(clippedRight.visible && !clippedRight.fullyVisible &&
+    clippedRight.x > .91f && clippedRight.width < .09f);
+static_assert(!ClipClient(-2400,120,-200,840,1920,1080).visible);
+static_assert(!ClipClient(0,0,1920,1080,1920,0).visible);
 using OutRunVrMenuAspect::PlanCenteredContent;
 using OutRunVrMenuAspect::ShouldCropConfiguredMenu;
 using OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree;
