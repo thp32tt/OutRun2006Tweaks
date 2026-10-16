@@ -32,6 +32,13 @@ function Get-OutRunVRTestProfile {
         '-CullingUnionFov=false'
     )
 
+    # Keep diagnostics comparing scene work without silently changing the
+    # per-eye culling projection. 2026-10-17 Quest user sessions launched
+    # PERFORMANCE with union-FOV enabled and had severe binocular corruption.
+    # This is a bounded safety revert, not proof that union-FOV caused it.
+    $performanceVr = @($commonVr | Where-Object {
+        $_ -notmatch '^-CullingUnionFov='
+    }) + @('-CullingUnionFov=false')
     switch ($Name) {
         'CONTROL' {
             return [ordered]@{
@@ -272,7 +279,7 @@ function Get-OutRunVRTestProfile {
                     '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
                     '-DisableDesktopVsync=true'
-                ) + $commonVr
+                ) + $performanceVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='PERFORMANCE'
                     OUTRUN_VR_PERFORMANCE_PROFILE='1'
