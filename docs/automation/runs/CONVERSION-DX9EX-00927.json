@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATION_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "18b2395b9a9b14693de062276f5686f431d550ba",
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "centre_head_pose_not_doubled": "PENDING_HMD_OPTICS",
-    "centre_pose_input_fallback": "PASS_PORTABLE_CXX17",
-    "dx9ex_exact_sha_required_gates": "PENDING_EXACT_SHA"
+    "centre_head_pose_not_doubled": "PASS_EXACT_SHA",
+    "centre_pose_input_fallback": "PASS_EXACT_SHA",
+    "dx9ex_exact_sha_required_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "C993 R30 source-owned spatial WorldBillboard removes latched common HMD head motion using headInverse, but then passes absolute stereo.eyeOrientation/eyeOffset into eyePose; the two independent transforms can double head yaw/translation compared with established R84 head-relative HUD and CPU world paths.",
@@ -82,12 +82,47 @@
       "Duplicate centre hook, all-alpha HUD route, artificial depth flattening, missing source WVP and a blanket 128-draw age widening are not used; previous exact source admission remains intact."
     ],
     "negative_test_evidence": "core_math_smoke runs Release-safe C++ checks for identical and translated HMD eyes, zero IPD, invalid NaN/Inf and atomic no-publish on reject.",
-    "runtime_evidence": "No headset/game session in this task; actual optical correction remains unproven.",
-    "next_hmd_experiment": "Quest3/VDXR on exact R84 package: compare central sun at head yaw/translation and recenter against outer discs, confirm no headlock/double dot and stable SkyGlow; toggle mono and R26_SAFE control."
+    "runtime_evidence": "HMD game not run. Accepted above results mean exact-sha source and test coverage PASS, not demonstrated single/scene-attached lens effect in Quest3.",
+    "next_hmd_experiment": "Quest3/VDXR on exact R84 package: compare central sun at head yaw/translation and recenter against outer discs, confirm no headlock/double dot and stable SkyGlow; toggle mono and R26_SAFE control.",
+    "fix_evidence": "Actual R84 mainline C993 head-relative IPD C++ implementation on material SHA be83e3f4ca8deca55de3f335cd92ee5dea45852f; x64 host core-math NDEBUG smoke, x86 game, R84 full-chain, package, Domain, Full Source and Inspector all exact-SHA SUCCESS."
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "be83e3f4ca8deca55de3f335cd92ee5dea45852f",
+  "validation_bearing_result_sha": "be83e3f4ca8deca55de3f335cd92ee5dea45852f",
   "score_delta_this_attempt": 0,
-  "next_action": "Check final exact SHA required Actions; then C6 source-vs-bookkeeping separation. No new score while revisiting same centre-lens symptom without HMD acceptance; Quest3 optics remain untested.",
-  "local_validation": "C++17 Release-style changed-area helper compiled and ran before GitHub material commit; full existing host core_math_smoke remains for CI."
+  "next_action": "No duplicate CI or score; perform same-SHA Quest3/VDXR centred sun, recenter, head yaw, outer flare rings, SkyGlow and R26_SAFE control before runtime PASS.",
+  "local_validation": "C++17 Release-style changed-area helper compiled and ran before GitHub material commit; full existing host core_math_smoke remains for CI.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "be83e3f4ca8deca55de3f335cd92ee5dea45852f",
+    "material_result_sha": "be83e3f4ca8deca55de3f335cd92ee5dea45852f",
+    "dx9ex_active": {
+      "run_id": 38832201748,
+      "conclusion": "success",
+      "jobs": "policy/host/full-chain-compile/game/package 5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38832201756,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38832201875,
+      "conclusion": "success",
+      "jobs": "msvc-analyze-openxr-host/msvc-analyze-active-game/source-cross-domain 3/3"
+    },
+    "hud_inspector": {
+      "run_id": 38832201751,
+      "conclusion": "success",
+      "jobs": "static-exe-analysis/build-hud-inspector 2/2"
+    },
+    "automated_scope": "Build/portable math and source-policy gates only; original game binocular optics not observed.",
+    "runtime_proof": "No matching Quest3/VDXR visual testing. RUNTIME_VALIDATION=UNTESTED.",
+    "c6_bookkeeping_is_not_validation_bearing": true,
+    "source_result_is_existing_feature_continuation": true
+  },
+  "c6_exact_sha_result": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "be83e3f4ca8deca55de3f335cd92ee5dea45852f",
+    "ci_conclusion": "SUCCESS",
+    "runtime_validation": "UNTESTED",
+    "notes": "Bookkeeping [skip ci] after exact-SHA Gate; original code material=result bearing commit unchanged; feature remains NEED_HMD_TEST, no extra score."
+  }
 }
