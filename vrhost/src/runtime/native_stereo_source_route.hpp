@@ -13,6 +13,22 @@ namespace OutRunVrNativeEyePair
             static_cast<std::int32_t>(newer - older) > 0;
     }
 
+    // Before choosing the newest R41 DirectGPU frame or ACKing its older
+    // siblings, prove the complete stereo frame/pose contract. An incomplete
+    // newer Present must not suppress a complete earlier menu/race frame.
+    [[nodiscard]] constexpr bool NativeDirectFrameSelectable(
+        std::uint32_t frame, std::uint32_t generation,
+        std::uint32_t slot, std::uint32_t ringSize,
+        std::uint32_t poseSequence, std::uint32_t flags,
+        std::uint32_t requiredFlags, bool stereoActive,
+        bool presentInFlight, bool directTransport) noexcept
+    {
+        return frame != 0u && generation != 0u &&
+            slot < ringSize && poseSequence != 0u &&
+            stereoActive && !presentInFlight && directTransport &&
+            (flags & requiredFlags) == requiredFlags;
+    }
+
     [[nodiscard]] constexpr bool PreferNativeDirectFrame(
         std::uint32_t candidateGeneration, std::uint32_t candidateFrame,
         std::int64_t candidatePresentQpc,

@@ -2335,6 +2335,22 @@ int main(int argc, char** argv)
                     // being sampled by D3D11 are immediately per-slot ACKed so
                     // the producer can recycle them; the selected frame keeps
                     // R32's GPU EVENT completion ACK.
+                    constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
+                        OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
+                        OutRunVR::RenderFrameEffectivePoseValid;
+                    const auto completeDirectFrame =
+                        [&](const OutRunVR::SharedRenderFrameState& frame) noexcept {
+                            return OutRunVrNativeEyePair::NativeDirectFrameSelectable(
+                                frame.frameId,
+                                frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex],
+                                frame.reserved[OutRunVR::RenderFrameDirectSlotIndex],
+                                OutRunVR::RenderFrameRingSize,
+                                frame.sourcePoseSequence, frame.flags, need,
+                                frame.state == OutRunVR::StereoSbsActive,
+                                (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0u,
+                                (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0u);
+                        };
+
                     if (directTransportOnly)
                     {
                         std::array<OutRunVR::SharedRenderFrameState,
@@ -2353,10 +2369,9 @@ int main(int argc, char** argv)
                                 const auto& frame = history[i];
                                 const std::uint32_t generation =
                                     frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                if (!frame.frameId || !generation ||
-                                    frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                // Do not elect a newer frame whose game eye
+                                // pair or latched pose is incomplete.
+                                if (!completeDirectFrame(frame))
                                     continue;
                                 if (!haveCurrentGeneration ||
                                     OutRunVrNativeEyePair::PreferNativeDirectFrame(
@@ -2374,20 +2389,13 @@ int main(int argc, char** argv)
                             for (std::size_t i = 0; i < historyCount; ++i)
                             {
                                 const auto& frame = history[i];
-                                const std::uint32_t slot =
-                                    frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
                                 const std::uint32_t generation =
                                     frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                if (!frame.frameId ||
+                                if (!completeDirectFrame(frame) ||
                                     OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
                                         generation, frame.frameId,
                                         lastProcessedDirectGeneration,
                                         lastProcessedStereoFrame) ||
-                                    frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
-                                    slot >= OutRunVR::RenderFrameRingSize ||
-                                    generation == 0 ||
                                     !haveCurrentGeneration ||
                                     generation != currentGeneration)
                                     continue;
@@ -2412,16 +2420,15 @@ int main(int argc, char** argv)
                                         frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
                                     const std::uint32_t generation =
                                         frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                    if (!frame.frameId ||
+                                    // Only older fully published stereo frames
+                                    // may be skipped/ACKed without a host copy.
+                                    // Unfinished newer frames remain un-ACKed.
+                                    if (!completeDirectFrame(frame) ||
                                         frame.frameId == selectedDirect.frameId ||
                                         OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(
                                             generation, frame.frameId,
                                             lastProcessedDirectGeneration,
                                             lastProcessedStereoFrame) ||
-                                        frame.state != OutRunVR::StereoSbsActive ||
-                                        (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                        (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
-                                        slot >= OutRunVR::RenderFrameRingSize ||
                                         generation != currentGeneration)
                                         continue;
 
@@ -2466,9 +2473,6 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    constexpr std::uint32_t need = OutRunVR::RenderFrameStereoComplete |
-                        OutRunVR::RenderFrameWorldStereo | OutRunVR::RenderFrameDrawDuplicated |
-                        OutRunVR::RenderFrameEffectivePoseValid;
                     const bool beforeAlreadyProcessed = have &&
                         ((before.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0
                             ? OutRunVrNativeEyePair::DirectFrameAlreadyProcessed(

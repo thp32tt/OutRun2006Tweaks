@@ -35,6 +35,69 @@ int main()
         !require(!accepts(0x110u, 0x220u, 0u),
                  "stale/zero generation must fail"))
         return 1;
+    // R41: a partially written newest Present must not hide the last
+    // complete left/right game frame or ACK any unproven shared eye slot.
+    using OutRunVrNativeEyePair::NativeDirectFrameSelectable;
+    using OutRunVrNativeEyePair::PreferNativeDirectFrame;
+    constexpr std::uint32_t required = 0x0fu;
+    const auto eligible = [&](std::uint32_t frame, std::uint32_t flags,
+                              std::uint32_t pose, bool inFlight,
+                              std::uint32_t slot = 0u) {
+        return NativeDirectFrameSelectable(frame, 3u, slot, 4u, pose,
+                                           flags, required, true, inFlight, true);
+    };
+    if (!require(eligible(40u, required, 17u, false),
+                 "complete gameplay DirectGPU frame must remain eligible") ||
+        !require(!eligible(41u, required & ~0x04u, 18u, false),
+                 "newest frame missing eye-pair proof must not preempt OpenXR") ||
+        !require(!eligible(42u, required, 0u, false),
+                 "missing latched pose must not preempt a valid game frame") ||
+        !require(!eligible(42u, required, 18u, true),
+                 "present in flight cannot be selected or ACKed") ||
+        !require(!eligible(42u, required, 18u, false, 4u),
+                 "invalid ring slot cannot be ACKed") ||
+        !require(!NativeDirectFrameSelectable(
+                     42u, 0u, 0u, 4u, 18u, required, required,
+                     true, false, true),
+                 "unknown generation must not displace prior DirectGPU eyes") ||
+        !require(!NativeDirectFrameSelectable(
+                     42u, 3u, 0u, 4u, 18u, required, required,
+                     true, false, false),
+                 "ordinary SBS source cannot enter the native ring"))
+        return 1;
+    struct DirectSelectionFixture {
+        std::uint32_t frame, flags, pose, slot;
+        std::int64_t qpc;
+    };
+    const std::array<DirectSelectionFixture, 3> history{{
+        {39u, required, 17u, 0u, 3900},
+        {40u, required, 18u, 1u, 4000},
+        {41u, required & ~0x01u, 19u, 2u, 4100}
+    }};
+    std::uint32_t chosen = 0u;
+    std::int64_t chosenQpc = 0;
+    for (const auto& candidate : history) {
+        if (!eligible(candidate.frame, candidate.flags, candidate.pose,
+                      false, candidate.slot))
+            continue;
+        if (!chosen || PreferNativeDirectFrame(
+                3u, candidate.frame, candidate.qpc, 3u, chosen, chosenQpc)) {
+            chosen = candidate.frame;
+            chosenQpc = candidate.qpc;
+        }
+    }
+    if (!require(chosen == 40u,
+                 "select last complete game-eye pair despite incomplete newer frame"))
+        return 1;
+    for (const auto& candidate : history) {
+        const bool skipAck = eligible(candidate.frame, candidate.flags,
+                                      candidate.pose, false, candidate.slot) &&
+            candidate.frame != chosen && candidate.frame < chosen;
+        if (!require(skipAck == (candidate.frame == 39u),
+                     "only older proven GPU eyes may be skipped and ACKed"))
+            return 1;
+    }
+
     // Exercise the actual x64 DirectGPU importer resource-identity gate with
     // genuine D3D11 texture objects, not only made-up handle integers.
     ID3D11Device* warpDevice = nullptr;
