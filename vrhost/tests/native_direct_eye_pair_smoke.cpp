@@ -123,6 +123,108 @@ int main()
     const bool nullGpuEyeDenied = gpuLeft &&
         !OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
             gpuLeft, static_cast<ID3D11Texture2D*>(nullptr), IID_IUnknown);
+    // The production R23 DirectGPU -> OpenXR path may skip shader blits only
+    // for two genuine whole-eye UNORM source images and an exact two-slice
+    // XR swapchain destination. Full-size, sRGB and HDR mismatches retain
+    // the legacy color-correct shader projection.
+    auto xrArray = left;
+    xrArray.ArraySize = 2;
+    const auto copyEligible = [&](const D3D11_TEXTURE2D_DESC& xr) {
+        return OutRunVrNativeEyePair::CopyToStereoSwapchainCompatible(
+            left, right, xr);
+    };
+    if (!require(copyEligible(xrArray),
+                 "native L/R whole-eye array copy should be available") ||
+        !require(!copyEligible(left),
+                 "single-slice compositor cannot receive two native eyes"))
+        return 1;
+    auto wrongXr = xrArray;
+    wrongXr.Width += 1;
+    if (!require(!copyEligible(wrongXr),
+                 "scaling native eyes requires the shader projection"))
+        return 1;
+    wrongXr = xrArray;
+    wrongXr.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    if (!require(!copyEligible(wrongXr),
+                 "HDR transfer must retain the existing blit"))
+        return 1;
+    wrongXr = xrArray;
+    wrongXr.SampleDesc.Count = 4;
+    if (!require(!copyEligible(wrongXr),
+                 "multisample OpenXR swapchain requires a different transfer"))
+        return 1;
+    left.Format = right.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    wrongXr = xrArray;
+    wrongXr.Format = left.Format;
+    if (!require(!copyEligible(wrongXr),
+                 "typed sRGB source must keep shader color-space semantics"))
+        return 1;
+    left.Format = right.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    right.Width = left.Width + 1u;
+    if (!require(!copyEligible(xrArray),
+                 "different L/R dimensions must keep the safe fallback"))
+        return 1;
+    right = left;
+
+    // WARP executes the same two GPU CopySubresourceRegion calls as the
+    // production R23 source route. Verify eye 0 and eye 1 retain independent
+    // red/green pixels in the XR array instead of sharing a mono slice.
+    ID3D11Texture2D* warpXr = nullptr;
+    ID3D11Texture2D* warpReadback = nullptr;
+    ID3D11RenderTargetView* leftRtv = nullptr;
+    ID3D11RenderTargetView* rightRtv = nullptr;
+    const bool resourcesReady =
+        SUCCEEDED(warpDevice->CreateTexture2D(&xrArray, nullptr, &warpXr)) &&
+        SUCCEEDED(warpDevice->CreateRenderTargetView(gpuLeft, nullptr, &leftRtv)) &&
+        SUCCEEDED(warpDevice->CreateRenderTargetView(gpuRight, nullptr, &rightRtv));
+    bool pixelsDistinct = false;
+    if (resourcesReady && warpXr) {
+        const float red[4]{1.f, 0.f, 0.f, 1.f};
+        const float green[4]{0.f, 1.f, 0.f, 1.f};
+        warpContext->ClearRenderTargetView(leftRtv, red);
+        warpContext->ClearRenderTargetView(rightRtv, green);
+        warpContext->CopySubresourceRegion(warpXr, 0u,
+            0u, 0u, 0u, gpuLeft, 0u, nullptr);
+        warpContext->CopySubresourceRegion(warpXr, 1u,
+            0u, 0u, 0u, gpuRight, 0u, nullptr);
+        auto readDesc = xrArray;
+        readDesc.Usage = D3D11_USAGE_STAGING;
+        readDesc.BindFlags = 0u;
+        readDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        readDesc.MiscFlags = 0u;
+        if (SUCCEEDED(warpDevice->CreateTexture2D(
+                &readDesc, nullptr, &warpReadback)) && warpReadback) {
+            warpContext->CopyResource(warpReadback, warpXr);
+            D3D11_MAPPED_SUBRESOURCE first{}, second{};
+            const bool gotFirst = SUCCEEDED(warpContext->Map(
+                warpReadback, 0u, D3D11_MAP_READ, 0u, &first));
+            std::uint8_t firstRed = 0u, firstGreen = 0u;
+            if (gotFirst && first.pData) {
+                const auto* pixel = static_cast<const std::uint8_t*>(first.pData);
+                firstRed = pixel[2]; firstGreen = pixel[1];
+            }
+            if (gotFirst) warpContext->Unmap(warpReadback, 0u);
+            const bool gotSecond = SUCCEEDED(warpContext->Map(
+                warpReadback, 1u, D3D11_MAP_READ, 0u, &second));
+            std::uint8_t secondRed = 0u, secondGreen = 0u;
+            if (gotSecond && second.pData) {
+                const auto* pixel = static_cast<const std::uint8_t*>(second.pData);
+                secondRed = pixel[2]; secondGreen = pixel[1];
+            }
+            if (gotSecond) warpContext->Unmap(warpReadback, 1u);
+            pixelsDistinct = gotFirst && gotSecond &&
+                firstRed >= 250u && firstGreen <= 5u &&
+                secondGreen >= 250u && secondRed <= 5u;
+        }
+    }
+    if (leftRtv) leftRtv->Release();
+    if (rightRtv) rightRtv->Release();
+    if (warpReadback) warpReadback->Release();
+    if (warpXr) warpXr->Release();
+    if (!require(resourcesReady && pixelsDistinct,
+                 "native OpenXR left/right array GPU copies lost independent eye pixels"))
+        return 1;
+
     if (gpuLeft) gpuLeft->Release();
     if (gpuRight) gpuRight->Release();
     if (warpContext) warpContext->Release();

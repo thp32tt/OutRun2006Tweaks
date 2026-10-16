@@ -64,6 +64,40 @@ namespace OutRunVrNativeEyePair
         return distinct;
     }
 
+    // Native game-produced independent L/R eyes may be copied directly into
+    // matching OpenXR array slices. Unlike an SBS atlas this is already one
+    // complete full-size image per eye, so there is no UV crop or color
+    // conversion to perform. Keep the shader path for every other case.
+    [[nodiscard]] inline bool CopyToStereoSwapchainCompatible(
+        const D3D11_TEXTURE2D_DESC& left,
+        const D3D11_TEXTURE2D_DESC& right,
+        const D3D11_TEXTURE2D_DESC& projection) noexcept
+    {
+        const bool exactColor =
+            left.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+            left.Format == DXGI_FORMAT_R8G8B8A8_UNORM;
+        const auto source = [&](const D3D11_TEXTURE2D_DESC& d) noexcept {
+            return d.Width != 0u && d.Height != 0u &&
+                d.Width == left.Width && d.Height == left.Height &&
+                d.Format == left.Format && d.MipLevels == 1u &&
+                d.ArraySize == 1u && d.SampleDesc.Count == 1u &&
+                d.SampleDesc.Quality == 0u &&
+                d.Usage == D3D11_USAGE_DEFAULT && d.CPUAccessFlags == 0u &&
+                d.MiscFlags == 0u &&
+                (d.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u;
+        };
+        return exactColor && source(left) && source(right) &&
+            projection.Width == left.Width &&
+            projection.Height == left.Height &&
+            projection.Format == left.Format &&
+            projection.ArraySize == 2u && projection.MipLevels == 1u &&
+            projection.SampleDesc.Count == 1u &&
+            projection.SampleDesc.Quality == 0u &&
+            projection.Usage == D3D11_USAGE_DEFAULT &&
+            projection.CPUAccessFlags == 0u &&
+            (projection.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u;
+    }
+
     // Exact two-eye source admission shared by the real x64 DirectGPU importer
     // and the R23 OpenXR projection staging path. Never treat duplicated
     // handles or incompatible CopyResource shapes as a stereo game frame.

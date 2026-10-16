@@ -1203,10 +1203,55 @@ namespace
 
         std::uint32_t image = 0;
         if (!c.Acquire(c.projection_, image, 2u)) return false;
-        bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
-            c.projection_.height, eyes[0], srv[0], fmt[0]);
-        ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
-            c.projection_.height, eyes[1], srv[1], fmt[1]) && ok;
+        // Explicit opt-in: transport-proven native L/R game frames can bypass
+        // a second full-screen shader blit when the XR array has the EXACT
+        // extent/UNORM color space. DirectGPU identities were validated at
+        // import and the hold pair is owned by this same D3D11 device.
+        // Never reinterpret HDR/sRGB, resample an unmatched size, or turn
+        // the classic SBS texture into duplicated mono VR eyes.
+        static const bool nativeEyeCopyOptIn = [] {
+            const char* value = std::getenv("OUTRUN_VR_NATIVE_XR_EYE_COPY");
+            return value && std::strcmp(value, "1") == 0;
+        }();
+        bool directEyeCopied = false;
+        if (nativeEyeCopyOptIn && c.directFrameValid_ && R23DirectHold.valid &&
+            R23DirectHold.eye[0] && R23DirectHold.eye[1] &&
+            image < c.projection_.images.size() &&
+            c.projection_.images[image].texture) {
+            D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{}, xrDesc{};
+            R23DirectHold.eye[0]->GetDesc(&leftDesc);
+            R23DirectHold.eye[1]->GetDesc(&rightDesc);
+            ID3D11Texture2D* xrTarget = c.projection_.images[image].texture;
+            xrTarget->GetDesc(&xrDesc);
+            if (OutRunVrNativeEyePair::CopyToStereoSwapchainCompatible(
+                    leftDesc, rightDesc, xrDesc) &&
+                OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+                    R23DirectHold.eye[0], R23DirectHold.eye[1], IID_IUnknown)) {
+                // A pair of native GPU copies targets two DIFFERENT XR array
+                // slices. The same immediate context orders them before
+                // the R32 producer-ACK fence and xrReleaseSwapchainImage.
+                c.context_->OMSetRenderTargets(0u, nullptr, nullptr);
+                c.context_->CopySubresourceRegion(xrTarget, 0u,
+                    0u, 0u, 0u, R23DirectHold.eye[0], 0u, nullptr);
+                c.context_->CopySubresourceRegion(xrTarget, 1u,
+                    0u, 0u, 0u, R23DirectHold.eye[1], 0u, nullptr);
+                directEyeCopied = true;
+                static bool logged = false;
+                if (!logged) {
+                    std::cout << "Native DirectGPU L/R -> OpenXR array-slice GPU copy active; Quest3 parity UNTESTED.\\n";
+                    logged = true;
+                }
+            }
+        }
+        // Default path and every unsupported native frame keep the original
+        // shader color-space conversion, stereo SBS and original game inputs.
+        bool ok = directEyeCopied;
+        if (!directEyeCopied) {
+            ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
+                c.projection_.height, eyes[0], srv[0], fmt[0]);
+            ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
+                c.projection_.height, eyes[1], srv[1], fmt[1]) && ok;
+        }
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
         if (!ok) return false;
