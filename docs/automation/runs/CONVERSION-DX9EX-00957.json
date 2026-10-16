@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
-  "status": "C5_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e378ced1302e8859c85d64f11ab59534c6f95786",
   "material_result_sha": "07e367b395c75009fe3fba66840f6cd005e77195",
-  "validation_bearing_result_sha": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "1cd20a7afb0a40d8ec81da4c9fee47c448b59485",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/rank_marker_fraction.hpp"
@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "rank_sibling_producer": "PENDING_CI",
-    "rank_rebuild_fallback": "PENDING_CI",
-    "rank_exact_sha_gates": "PENDING_CI"
+    "rank_sibling_producer": "PASS_EXACT_SHA",
+    "rank_rebuild_fallback": "PASS_EXACT_SHA",
+    "rank_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "RankMarker_putClipSprite's fractional sibling walk was a separate unsafe copy of the old queue logic and dereferenced tailsBefore[prio]->next_0 before proving that historical tail was still attached to the current live root.",
@@ -87,10 +87,35 @@
     "eye_ownership": "Existing projected rank eye transform and StereoNdcShift remain unchanged; this fix restores original per-car pre-stereo glyph positions only for current live exact-source siblings.",
     "runtime_limit": "No actual Quest3, VDXR or OutRun game runtime executed; corrected source ownership and build do not confirm binocular visuals."
   },
-  "next_action": "Check exact-SHA Windows CI gates for this material source commit, fix any real failure under this TASK_ID only, then C6 record separately. HMD remains UNTESTED.",
+  "next_action": "C6 PASS_EXACT_SHA recorded. Do not redispatch or rescore same TASK_ID. Quest3/VDXR projected moving-car rank-marker optical acceptance remains NEED_HMD_TEST.",
   "ci_repair": {
     "initial_material_sha": "07e367b395c75009fe3fba66840f6cd005e77195",
     "prior_verifier_repair_sha": "c7de8fd468a2c56bc1f08b7bf2b60ecd6f8ed48b",
     "reason": "Exact rank producer now calls a proven live-root sibling helper rather than RestoreFraction directly. Required HUD Inspector and Active architecture verifiers assumed the old call signature. Update strict positive/negative guards, preserve all gates and run native rank regression in Release/NDEBUG."
+  },
+  "ci_evidence": {
+    "material_result_sha": "07e367b395c75009fe3fba66840f6cd005e77195",
+    "validation_bearing_result_sha": "1cd20a7afb0a40d8ec81da4c9fee47c448b59485",
+    "active": {
+      "run_id": 38904725705,
+      "conclusion": "SUCCESS",
+      "jobs": "policy, default Win32 R84 full-chain, Win32 R26_SAFE rollback, x64 host/native regressions, production package all SUCCESS"
+    },
+    "domain": {
+      "run_id": 38904725286,
+      "conclusion": "SUCCESS"
+    },
+    "full_source": {
+      "run_id": 38904725603,
+      "conclusion": "SUCCESS",
+      "jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38904725686,
+      "conclusion": "SUCCESS",
+      "jobs": "static-exe-analysis, build-hud-inspector SUCCESS"
+    },
+    "native_cpp_regression": "Production RestoreAppendedRankFractions tested with NDEBUG-safe RANK_CHECK for live kind0/kind1 siblings, detached/foreign/cyclic/short queues, malformed offsets/kinds; host build/tests SUCCESS",
+    "runtime_hmd": "UNTESTED"
   }
 }
