@@ -26,8 +26,16 @@ def check(s: str) -> None:
         "FAILED(descHr) || v25.Width == 0 || v25.Height == 0",
         "0.50999999 / (double)v25.Width",
         "0.50999999 / (double)v25.Height",
-        "float scaleY = screenScaleY;",
-        "scaleY = min(screenScaleX, screenScaleY);",
+        "const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(",
+        "if (!quadMap.valid)",
+        "quad[1] = OutRunVrMenuQuad::ProjectY(quadMap, topLeft.y);",
+        "quad[8] = OutRunVrMenuQuad::ProjectY(quadMap, bottomLeft.y);",
+        "quad[0xF] = OutRunVrMenuQuad::ProjectY(quadMap, topRight.y);",
+        "quad[0x16] = OutRunVrMenuQuad::ProjectY(quadMap, bottomRight.y);",
+        "quad[0] = OutRunVrMenuQuad::ProjectX(quadMap, topLeft.x);",
+        "quad[7] = OutRunVrMenuQuad::ProjectX(quadMap, bottomLeft.x);",
+        "quad[0xE] = OutRunVrMenuQuad::ProjectX(quadMap, topRight.x);",
+        "quad[0x15] = OutRunVrMenuQuad::ProjectX(quadMap, bottomRight.x);",
         "auto* device = Game::D3DDevice();",
         "if (!device)",
         "std::copy(quad.begin(), quad.end(), g_spriteVertexStream);",
@@ -49,6 +57,12 @@ def check(s: str) -> None:
     if mid.index("if (!device)") >= mid.index("device->DrawPrimitiveUP") or \
             mid.index("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);") >= mid.index("device->DrawPrimitiveUP"):
         raise AssertionError("Device guard and complete quad publication must precede DrawPrimitiveUP")
+    if not (mid.index("FAILED(descHr) || v25.Width == 0 || v25.Height == 0") <
+            mid.index("const auto quadMap = OutRunVrMenuQuad::BuildPixelMap(") <
+            mid.index("if (!quadMap.valid)") <
+            mid.index("quad[1] = OutRunVrMenuQuad::ProjectY(") <
+            mid.index("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);")):
+        raise AssertionError("Descriptor and viewport map must be validated before publishing quad")
     if mid.count("D3DSURFACE_DESC v25{};") != 1 or mid.count("GetLevelDesc(0, &v25)") != 1:
         raise AssertionError("Uninitialized or duplicate texture descriptor query")
     if "float scaleY = Game::screen_scale->y;" in mid:
@@ -64,6 +78,9 @@ mutants = [
     ("FAILED(descHr) || v25.Width == 0 || v25.Height == 0",
      "FAILED(descHr) && v25.Width == 0 && v25.Height == 0"),
     ("D3DSURFACE_DESC v25{};", "D3DSURFACE_DESC v25;"),
+    ("if (!quadMap.valid)", "if (quadMap.valid)"),
+    ("quad[0x16] = OutRunVrMenuQuad::ProjectY(quadMap, bottomRight.y);",
+     "quad[0x16] = bottomRight.y + 0.5f;"),
 ]
 for good, bad in mutants:
     corrupt = source.replace(good, bad, 1)
@@ -75,4 +92,4 @@ for good, bad in mutants:
         pass
     else:
         raise AssertionError(f"Unsafe sprite path escaped verifier: {bad}")
-print("DX9Ex custom sprite descriptor/reset invariant: PASS (4 distinct negative mutations)")
+print("DX9Ex custom sprite descriptor/reset invariant: PASS (6 distinct negative mutations)")
