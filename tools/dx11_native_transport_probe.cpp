@@ -111,6 +111,7 @@ namespace
 
 int main()
 {
+    std::cerr << "R178-DIAG main started\n";
     DevicePair d3d = create_warp_device();
     DevicePair foreign = create_warp_device();
 
@@ -1017,6 +1018,7 @@ int main()
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
 
+    std::cerr << "R178-DIAG stereo fixture ready\n";
     // 00819: the renderer callback itself emits independent eye GPU work
     // and returns per-eye draw/pose/view evidence after command recording.
     const auto gameEyePass = [](
@@ -1025,6 +1027,7 @@ int main()
         outrun::vr::dx11::NativeGameEyeDrawEvidence& evidence,
         outrun::vr::dx11::NativeGameEyeDrawEncoder& encoder) noexcept -> bool {
         if (!ctx || !eyeTarget || eyeIndex >= 2u || !user) return false;
+        std::cerr << "R178-DIAG eye callback " << eyeIndex << '\n';
         auto& fixture = *static_cast<GameEyeFixture*>(user);
         ID3D11RenderTargetView* boundTarget = nullptr;
         ID3D11DepthStencilView* boundDepth = nullptr;
@@ -1302,6 +1305,7 @@ int main()
             static_cast<LONG>(destX + 12u), 63};
         const D3D11_RECT badDest{
             static_cast<LONG>(destX), 58, 65, 63};
+        std::cerr << "R178-DIAG stretch begin " << eyeIndex << '\n';
         fixture.replayedScaledPostpass[eyeIndex] =
             !encoder.stretch_game_surface(
                 nullptr, sourcePatch, scaledDest, false) &&
@@ -1313,6 +1317,7 @@ int main()
                 fixture.gameSurface, sourcePatch, scaledDest, true) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        std::cerr << "R178-DIAG stretch returned " << eyeIndex << '\n';
         ID3D11RenderTargetView* afterCopyMrt[2]{};
         ID3D11DepthStencilView* afterCopyDepth = nullptr;
         ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
