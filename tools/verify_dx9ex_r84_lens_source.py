@@ -29,14 +29,13 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "return GetTopLevelDrawSerial();" in r29
     assert '#include "lens_centre_source_provenance.hpp"' in r30
     # Isolate C993 before the subsequent rank-marker source owner.  Rank
-    # also uses QueueRenderActive(), shader/pose and draw-epoch predicates;
-    # those cannot prove that the independent lens producer kept its guards.
+    # also uses shader/pose and draw-epoch predicates; those cannot prove
+    # that the independent lens producer kept its guards.
     owned = r30.split("bool R30HasExactLensCentreRawWvp(", 1)[1].split(
         "bool R30GetOwnedRankRawWvp(", 1)[0]
     for marker in (
-        "if (!original || QueueRenderActive() ||",
-        "EffectiveScope() != RenderScope::WorldBillboard",
-        "CurrentRenderProducerToken() != ProducerToken::LensFlareCentre",
+        "const auto drawCommand = CapturePhysicalDrawCommand();",
+        "if (!original || !drawCommand.IsDirectWorldLensCentre())",
         "GetLastRawGameWvpWrite(",
         "GetLastGameWvpSemanticProvenance(",
         "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
@@ -54,13 +53,13 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     route = r30.split("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[1].split(
         "// Only the OpenXR pose/FOV signature affects this affine.", 1)[0]
     for marker in (
-        "!OutRunVR::GameSemantic::QueueRenderActive()",
-        "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",
-        "CurrentRenderProducerToken() ==",
+        "const auto drawCommand =",
+        "OutRunVR::GameSemantic::CapturePhysicalDrawCommand();",
+        "const auto scope = drawCommand.scope;",
+        "drawCommand.IsDirectWorldLensCentre();",
         # This exact original producer is established by ownedLensCentre
         # outside the old depth-off-only raster branch.
         "const bool ownedLensCentre =",
-        "ProducerToken::LensFlareCentre;",
         "if (ownedLensCentre)",
         "R30HasExactLensCentreRawWvp(originalGameWvp)",
         "OutRunVR::LensCentre::SelectWorldRoute(true, owned)",
@@ -213,6 +212,20 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "--ExactLensCentreGpuDrawDepth;",
     ):
         assert marker in semantic, "exact C993 scope lifecycle lost: " + marker
+    # The immutable command is only valid for this direct, nonqueued world
+    # producer; keep its derivation tied to the canonical queue-aware scope.
+    lens_command = semantic.split(
+        "constexpr bool IsDirectWorldLensCentre() const noexcept", 1)[1].split(
+        "constexpr bool IsDirectCarBaseShadow()", 1)[0]
+    for marker in ("!queued && scope == RenderScope::WorldBillboard",
+                   "producer == ProducerToken::LensFlareCentre"):
+        assert marker in lens_command, "exact C993 draw-command guard lost: " + marker
+    capture = semantic.split(
+        "inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept", 1)[1].split(
+        "// A direct original-game source CALL", 1)[0]
+    for marker in ("QueueRenderActive()", "EffectiveScope()",
+                   "CurrentRenderProducerToken()", "CurrentQueueNode()"):
+        assert marker in capture, "C993 physical command provenance lost: " + marker
     effective = semantic.split("inline RenderScope EffectiveScope()", 1)[1].split(
         "inline void ArmNextDraw", 1)[0]
     producer = semantic.split("inline ProducerToken CurrentRenderProducerToken()", 1)[1].split(
@@ -232,7 +245,8 @@ def main():
     mutants = [
         (0, "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;", "// removed facade"),
         (1, "return GetTopLevelDrawSerial();", "return 0;"),
-        (2, "QueueRenderActive()", "false"),
+        (2, "!drawCommand.IsDirectWorldLensCentre()", "false"),
+        (2, "drawCommand.IsDirectWorldLensCentre();", "false;"),
         (2, "sourceProducer == ProducerToken::LensFlareCentre", "true"),
         (2, "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)", "true"),
         (2, "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),", "0,"),
@@ -257,6 +271,10 @@ def main():
         (7, "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld", "screenKind == R32ReviewScreenSpaceKind::Hud2D"),
         (8, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
         (9, "ScopedExactLensCentreGpuDraw centreGpuOwner(", "/*lost owner*/ centreGpuOwner("),
+        (10, "!queued && scope == RenderScope::WorldBillboard",
+             "scope == RenderScope::WorldBillboard"),
+        (10, "producer == ProducerToken::LensFlareCentre",
+             "producer == ProducerToken::None"),
         (10, "if (ExactLensCentreDrawOwnsSemantic())", "if (false)"),
         (10, "return ProducerToken::LensFlareCentre;", "return ProducerToken::None;"),
         (10, "if (SpriteQueueDepth != 0)", "if (false)"),
@@ -270,7 +288,7 @@ def main():
         # Whole-file first-occurrence replacement can mutate that HUD
         # instead, falsely reporting that a broken lens guard survived.
         if idx == 2 and old in (
-            "QueueRenderActive()",
+            "!drawCommand.IsDirectWorldLensCentre()",
             "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
             "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),",
             "R29OwnerTopLevelDrawSerial() + 1u",
