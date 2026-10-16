@@ -33,6 +33,8 @@
 #include "native_game_source_mutation.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_gpu_handoff.hpp"
+#include "native_game_shared_desktop.hpp"
+#include "native_game_shared_desktop_admission.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
 #include "native_game_readback_provenance.hpp"
@@ -1232,6 +1234,7 @@ struct State {
     // D3D9 SYSTEMMEM uploads are dimension-owned independently of their format.
     UINT insetSurfaceWidth = 0u, insetSurfaceHeight = 0u;
     bool pending = false;
+    NativeSharedDesktopBridge sharedDesktop;
     NativeFullGameGpuSink gpuFrameSink = nullptr;
     void* gpuFrameSinkUser = nullptr;
     GameNativeFrameBatch frameBatch{}; // Opt-in native only, original D3D9/input preserved.
@@ -1261,6 +1264,12 @@ bool env_full_game_opt_in() noexcept {
     wchar_t value[8]{};
     return env_opt_in() &&
         GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME", value, 8) == 1 &&
+        value[0] == L'1';
+}
+bool env_shared_desktop_opt_in() noexcept {
+    wchar_t value[8]{};
+    return env_full_game_opt_in() &&
+        GetEnvironmentVariableW(L"OUTRUN_DX11_GPU_SHARED_DESKTOP", value, 8) == 1 &&
         value[0] == L'1';
 }
 bool env_batch_opt_in() noexcept {
@@ -6405,6 +6414,7 @@ void before_game_present(IDirect3DDevice9* game,
             // changed while the device, dimensions and format stayed identical.
             // Retire the previous upload surface and advance the GPU generation.
             s.previousOutput = outputNow;
+            s.sharedDesktop.reset();
             s.insetSurface.Reset();
             s.insetFormat = D3DFMT_UNKNOWN;
             s.insetSurfaceDevice = 0u;
@@ -6475,6 +6485,29 @@ void before_game_present(IDirect3DDevice9* game,
                     ctx, s.backend.color_texture(), surfaceWidth, surfaceHeight,
                     s.presents, s.sourceDrawsThisFrame, s.outputGeneration};
                 gpuHandoffQueued = s.gpuFrameSink(s.gpuFrameSinkUser, frame);
+            }
+            // Optional real GPU-only desktop presentation, without staging
+            // D3D11 pixels through system memory. Require an actual D3D9Ex
+            // game device and complete source coverage; failed imports, GPU
+            // fences or StretchRect keep the original game/CPU path intact.
+            // Stereo XR remains separately provenance-gated (never copy mono
+            // to both eyes).
+            const bool sharedDesktopAllowed = NativeSharedDesktopAdmission::allowed(
+                env_shared_desktop_opt_in(), fullMode, complete, outputWritable,
+                s.sourceGameDevice == presentDevice,
+                !presentRegion.partial_backbuffer_source(
+                    presentDesc.Width, presentDesc.Height),
+                !dirtyRegion || fullDirtyCoverage,
+                bb.Format == D3DFMT_A8R8G8B8,
+                bb.MultiSampleType == D3DMULTISAMPLE_NONE,
+                surfaceWidth, surfaceHeight, s.outputGeneration);
+            if (!gpuHandoffQueued && sharedDesktopAllowed &&
+                s.backend.color_texture()) {
+                const NativeOutputUploadScope outputUploadScope{};
+                gpuHandoffQueued = s.sharedDesktop.try_present(
+                    game, presentBackbuffer.Get(), s.backend.device(), ctx,
+                    s.backend.color_texture(), surfaceWidth, surfaceHeight,
+                    s.outputGeneration);
             }
             // Full-resolution publication must be sampled before THIS D3D9
             // Present, not uploaded one or two frames later. Retire older GPU
@@ -6975,6 +7008,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.sourceModeKnown = false;
     s.sourceGameDevice = 0u;
     s.probeSlot = 0;
+    s.sharedDesktop.reset();
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
         item.mapPending = false;
