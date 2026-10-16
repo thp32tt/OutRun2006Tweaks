@@ -6208,15 +6208,22 @@ namespace OutRunVRStereo
 
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, original, sizeof(uploadedT));
-            // On exact rank shader draws, use the original game c64 for
-            // marker placement if its provenance is independently proven.
-            // Keep `original` as the actual live GPU c64 for restoration
-            // after the eye draws. Unknown producers use the prior path.
+            // A projected car/rival glyph is never allowed to inherit
+            // a previous world/eye shader's live c64. The captured `original`
+            // remains ONLY the GPU-restoration value; exact game-upload,
+            // SpriteNode, shader and pose proof is required before either
+            // eye's rank WVP is prepared. On missing proof R33 renders one
+            // original native draw without consulting R29's world cache.
             if (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
             {
                 float ownedRankRaw[16]{};
-                if (R30GetOwnedRankRawWvp(ownedRankRaw))
-                    std::memcpy(&uploadedT, ownedRankRaw, sizeof(uploadedT));
+                const bool sourceOwned =
+                    R30GetOwnedRankRawWvp(ownedRankRaw);
+                float selectedRankRaw[16]{};
+                if (!OutRunVR::RankMarker::SelectOriginalRankWvpForStereo(
+                        sourceOwned, ownedRankRaw, selectedRankRaw))
+                    return false;
+                std::memcpy(&uploadedT, selectedRankRaw, sizeof(uploadedT));
             }
             const D3DMATRIX stockWvp = R29OwnerTransposeMatrix(uploadedT);
             if (!R29OwnerMatrixFinite(stockWvp))

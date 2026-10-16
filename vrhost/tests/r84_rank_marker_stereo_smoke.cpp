@@ -64,8 +64,44 @@ static void CheckSparseRankCopyPlan()
         1024, &denseMask, &dense, dense.size()).enabled);
 }
 
+// Execute under Windows Release/NDEBUG: these checks are not assert-only.
+// Unproved c64 must not borrow a prior road/rival eye, and nonfinite raw
+// originals must not partially publish a projected shader rank matrix.
+static bool CheckRankShaderSourceFailClosed()
+{
+    using OutRunVR::RankMarker::SelectOriginalRankWvpForStereo;
+    float originalGame[16]{}, selected[16]{}, oldLiveEye[16]{};
+    for (unsigned i = 0; i < 16; ++i)
+    {
+        originalGame[i] = i % 5u == 0 ? 1.0f : 0.0f;
+        selected[i] = 77.0f;
+        oldLiveEye[i] = -99.0f;
+    }
+    if (SelectOriginalRankWvpForStereo(false, originalGame, selected))
+        return false;
+    for (float v : selected) if (v != 77.0f) return false;
+    originalGame[6] = std::numeric_limits<float>::quiet_NaN();
+    if (SelectOriginalRankWvpForStereo(true, originalGame, selected))
+        return false;
+    for (float v : selected) if (v != 77.0f) return false;
+    originalGame[6] = std::numeric_limits<float>::infinity();
+    if (SelectOriginalRankWvpForStereo(true, originalGame, selected))
+        return false;
+    for (float v : selected) if (v != 77.0f) return false;
+    originalGame[6] = 0.0f;
+    if (!SelectOriginalRankWvpForStereo(true, originalGame, selected))
+        return false;
+    for (unsigned i = 0; i < 16; ++i)
+        if (selected[i] != originalGame[i] ||
+            selected[i] == oldLiveEye[i])
+            return false;
+    return true;
+}
+
 int main()
 {
+    if (!CheckRankShaderSourceFailClosed())
+        return 2;
     CheckSparseRankCopyPlan();
     using OutRunVR::RankMarker::OwnsRawGameWvp;
     using OutRunVR::RankMarker::RawWvpEvidence;

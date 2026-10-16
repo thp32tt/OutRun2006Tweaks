@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00970",
+  "production_id": "CONVERSION-DX9EX-00970",
+  "event_id": "CONVERSION-DX9EX-00970-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00970",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "a336aa05242bcfb16797707862549a0eecc94d7c",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/rank_marker_raw_wvp.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/r84_rank_marker_stereo_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/rank_marker_raw_wvp.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/r84_rank_marker_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00970.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Correct projected car and rival rank markers' complete binocular shader-WVP source ownership, so head/eye-injected WVP from a prior car, road or viewport draw cannot displace the marker from its exact moving vehicle.",
+    "scope_boundary": "Only R84 shader-side projected rank/rival WVP and exact-ownership fallback are modified. Keep the existing original Calc3D2D per-car SpriteNode anchor, R84 XYZRHW path, NaviPub, world/GOAL/+TIME/lens/SkyGlow, original input and FFB, R26_SAFE, DX11 and frozen DXVK unchanged.",
+    "special_work_evidence": "Previously R30 conditionally overwrote the live GetVertexShaderConstantF c64 with a proven raw game c64. Failure to prove source ownership silently left stale head/eye-adjusted GPU c64 in the binocular rank builder; this contradicted R30GetOwnedRankRawWvp's source-gating intent.",
+    "trace_stages": [
+      "Original Calc3D2D source projects one car/rival anchor and associates the correct SpriteNode's stable producer, queue epoch and saved view-space vehicle coordinates.",
+      "The original game c64 write is captured in the R23/R29 owner; R30GetOwnedRankRawWvp validates current physical SpriteNode, shader identity/epoch, pose and bounded draw age.",
+      "R30BuildScreenSpaceEyeConstants now selects only finite exactly proved original game rank WVP to compose both XR eye matrices; failed shader rank eligibility returns before GPU submission and R33 preserves one native original draw rather than using cached road/world WVP."
+    ],
+    "subcomponents": [
+      "Fix both rank and rival shader exact source WVP selection with one original-game matrix and correct two-eye scope, never fall back to a prior stereo-injected live shader matrix.",
+      "Preserve the native one-draw fallback when queue/shader/pose/raw WVP proof is missing or nonfinite, and keep the independent XYZRHW rank-anchor and other HUD/world paths unchanged.",
+      "Extend executable C++ rank regressions with positive exact owner and negative no owner, NaN, infinity and stale-live-eye scenarios, including Windows Release builds."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_shader_both_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original car/rival SpriteNode shader rank source and final two-eye optical matrices",
+        "expected_behavior": "Both eye rank shader matrices derive only from one exact source-owned raw game c64. The previous injected live GPU c64 is retained solely for GPU-state restore."
+      },
+      {
+        "id": "rank_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unowned/nonfinite rank, wrong SpriteNode/pose/shader and protected XYZRHW/desktop paths",
+        "expected_behavior": "Unproved source never publishes partially modified rank stereo or borrows R29 world WVP; queued exact marker retains a native game draw while NaviPub, XYZRHW, road, SkyGlow and FFB remain untouched."
+      },
+      {
+        "id": "rank_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84/R26_SAFE game and x64 OpenXR host, active packaging, Domain and source regression",
+        "expected_behavior": "Final exact-SHA GitHub DX9Ex Active, Domain Isolation, affected Full Source/HUD gates PASS without CI skip; Quest3/VDXR correctness requires separate actual HMD evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_shader_both_eyes": "PENDING_EXACT_SHA",
+    "rank_original_fallback": "PENDING_EXACT_SHA",
+    "rank_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "R84 R30BuildScreenSpaceEyeConstants at prior HEAD used `if (R30GetOwnedRankRawWvp(ownedRankRaw)) memcpy(uploadedT, ownedRankRaw)`; false proof left live GPU GetVertexShaderConstantF c64 to be reprojected for car/rival marker.",
+    "root_cause": "A best-effort raw game shader WVP override allowed a previous eye/world shader's injected live c64 to substitute as the original rank WVP when physical SpriteNode provenance failed.",
+    "source_trace": [
+      "Game Calc3D2D records individual vehicle view-space rank anchors and exact original SpriteNode producer.",
+      "R23/R29 tracks raw shader c64; R30GetOwnedRankRawWvp rejects mismatched queue, shader epoch, pose or draw identity.",
+      "R30 rank shader eye builder now fails closed unless source-owned finite original c64 is present; R33 native queued marker fallback remains authoritative."
+    ],
+    "alternatives_rejected": [
+      "Do not blindly copy live GPU c64 as original rank WVP, flatten markers to mono head-locked HUD, change source alpha/state, or rebuild protected XYZRHW original rank path."
+    ],
+    "fix_evidence": "R30 now requires original raw c64 before stereo; shared C++ selection validates all 16 components before atomic copy, while captured live c64 remains for hardware restore only.",
+    "negative_test_evidence": "Executable portable rank test runs no-owner, malformed NaN/infinity, and prior live-eye pollution rejection with unchanged destination; existing rank owner positive/negative and XYZRHW tests remain."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA"
+  }
+}
