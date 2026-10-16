@@ -9,7 +9,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_GAME_STRETCHRECT_CROP_TEXEL_CLAMP",
-  "feature_id": null,
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -34,13 +34,13 @@
     "tools/dx11_native_stretch_source_00839.cpp"
   ],
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
     "full_dx11_renderer_complete": false,
     "goal": "Constrain live native D3D11 GPU StretchRect shader filtering to game-authored source crop texel centers for each left/right eye, preventing adjacent source atlas texel bleed in menu, vehicle and race postpasses without altering legacy input/FFB fallback. R30 camera callback and Quest3 runtime remain incomplete.",
     "acceptance_items": [
       {
         "id": "game-crop-clamped-gpu-postpass",
-        "category": "integration_behavior",
+        "category": "end_to_end_behavior",
         "behavior_area": "native_game_eye_gpu_stretchrect",
         "expected_behavior": "Real native game-eye HLSL UV sampling clamps cropped point/linear input to the first and last permitted texel centers."
       },
@@ -120,5 +120,37 @@
     ],
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PASS_EXACT_SHA_SEPARATE_SKIP_CI_BOOKKEEPING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Actual game-authored D3D9 camera StretchRect source crop and device texture arrive at NativeGameEyeDrawEncoder GPU postpass",
+      "Native D3D11 shader confines sample UV to first/last cropped source texel centers while filling a guarded eye region and preserving OM",
+      "Native per-eye GPU output remains available to the separately unfinished R30 live camera callback and host OpenXR handoff"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stretch_source.hpp",
+      "tools/dx11_native_stretch_source_00839.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "At source SHA 01543c40 the GPU crop-clamp shader path, portable atlas UV source regression and six recorded exact-SHA CI checks succeeded.",
+      "negative_regression": "The source UV constructor rejects invalid zero/out-of-bounds boxes and clamps first/last atlas texel; DX9Ex, legacy input, FFB and DXVK were not altered.",
+      "component_integration": "NativeGameEyeDrawEncoder::stretch_game_surface passes live game crop constants into the D3D11 SRV pixel sampler and guarded stereo eye output with per-call OM restoration."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STRETCHRECT_CROP_TEXEL_CLAMP",
+      "DX11:EYE_XR_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "GPU eye source crop behavior is source/build verified, but full R30 native gameplay to OpenXR output and Quest3/VDXR frame validation remain unfinished.",
+    "activation_guard_and_fallback": "NativeDrawPathActive stays disabled by default. Unsupported source or missing eye ownership falls back to original D3D9/DX9Ex render path, input and FFB."
   }
 }

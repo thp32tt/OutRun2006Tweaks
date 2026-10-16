@@ -139,8 +139,17 @@ def main() -> None:
                 "if (!source || !context_ || !eye_targets_bound()) return false;",
                 "eye.Get() == source) return false;",
                 "if (!device || device.Get() != owner.Get()) return false;",
-                "srcBox.right > sd.Width || srcBox.bottom > sd.Height ||",
-                "static_cast<UINT>(dest.bottom) > targetHeight_) return false;",
+                # Legacy code rejected every partially-offscreen destination.
+                # The real game now clips the viewport AND adjusts source UVs;
+                # rejecting the old guard is not permission to bypass bounds.
+                "srcBox.right > sd.Width || srcBox.bottom > sd.Height) return false;",
+                "const auto clipped = native_game_stretch_clipped_region(",
+                "dest.left, dest.top, dest.right, dest.bottom);",
+                "if (!clipped.valid) return false;",
+                "float(clipped.left), float(clipped.top),",
+                "float(clipped.right - clipped.left),",
+                "float(clipped.bottom - clipped.top), 0.f, 1.f",
+                "clipped.uv.constants.data()",
                 "FAILED(device->CheckFormatSupport(sd.Format, &sourceSupport)) ||",
                 "FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))",
                 "(sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,",
@@ -152,6 +161,36 @@ def main() -> None:
                 "context_->OMSetRenderTargets(1u, &target, nullptr);",
                 "context_->Draw(3u, 0u); // GPU postpass, not game geometry evidence",
             ]
+            # Source-side bound checks must remain real: the helper rejects
+            # bad source crop, offscreen/empty destinations, integer overflow
+            # and sub-pixel UV collapse before this audited GPU Draw.
+            stretch_helper = require_text(
+                DX11 / "native_game_stretch_source.hpp",
+                [
+                    "right > width || bottom > height) return {};",
+                    "targetWidth > static_cast<std::uint32_t>(",
+                    "destRight <= destLeft || destBottom <= destTop)",
+                    "if (x0 >= x1 || y0 >= y1) return {};",
+                    "if (!(u1 > u0 && v1 > v0)) return {};",
+                    "result.uv.constants[0] += u0 * uv.constants[2];",
+                    "result.uv.constants[1] += v0 * uv.constants[3];",
+                    "result.uv.constants[2] *= u1 - u0;",
+                    "result.uv.constants[3] *= v1 - v0;",
+                ],
+                "DX11 clipped GPU StretchRect source/UV safety",
+            )
+            stretch_regression = require_text(
+                ROOT / "tools" / "dx11_native_stretch_source_00839.cpp",
+                [
+                    "constexpr auto cropped = native_game_stretch_clipped_region(",
+                    "constexpr auto otherEdge = native_game_stretch_clipped_region(",
+                    "static_assert(!native_game_stretch_clipped_region(",
+                ],
+                "DX11 clipped GPU StretchRect positive/negative regression",
+            )
+            # Kept separate from evidence counters: neither helper nor probe
+            # is permitted to authorize a new game-geometry Draw.
+            del stretch_helper, stretch_regression
             missing = [token for token in required_eye_contract if token not in text]
             missing += ["postpass:" + token for token in required_postpass
                         if token not in postpass]
