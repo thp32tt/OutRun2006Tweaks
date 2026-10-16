@@ -176,9 +176,12 @@ namespace OutRunVrNativeEyePair
         Texture* sourceLeft, Texture* sourceRight,
         const InterfaceId& unknownIid) noexcept
     {
+        // D3D11_DEVICE_CONTEXT_IMMEDIATE is the zero-valued context type.
+        // Use its dependent GetType() return type so this template also parses
+        // with descriptor-only D3D11 stubs before a real context is instantiated.
         if (!context || !device || !holdLeft || !holdRight ||
             !sourceLeft || !sourceRight ||
-            context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
+            context->GetType() != decltype(context->GetType()){})
             return false;
         Device* contextOwner = nullptr;
         context->GetDevice(&contextOwner);
