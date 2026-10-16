@@ -53,14 +53,29 @@ int main()
     // The exact D3A5→C993 owner must remain direct, never promoted by
     // generic screen HUD or queued caller-derived source information.
     CurrentScope=RenderScope::WorldBillboard;
+    CurrentLensCentreCallEpoch=41;
     {
         ScopedExactLensCentreGpuDraw lens(true);
         auto cmd=CapturePhysicalDrawCommand();
         if(!cmd.IsDirectWorldLensCentre() ||
-           cmd.IsSourceProvenHud() || cmd.queueNode) return 7;
+           cmd.IsSourceProvenHud() || cmd.queueNode ||
+           cmd.lensCentreCallEpoch!=41) return 7;
+        // A later nested source mutation must not rewrite the already captured
+        // physical primitive identity.
+        CurrentLensCentreCallEpoch=42;
+        if(cmd.lensCentreCallEpoch!=41) return 8;
     }
-    if(CapturePhysicalDrawCommand().IsDirectWorldLensCentre())
-        return 8;
+    CurrentLensCentreCallEpoch=0;
+    if(CapturePhysicalDrawCommand().IsDirectWorldLensCentre() ||
+       CapturePhysicalDrawCommand().lensCentreCallEpoch!=0)
+        return 9;
+    {
+        // Producer/scope alone are insufficient: without a D3A5 call epoch
+        // there is no source-owned central sun to reproject.
+        ScopedExactLensCentreGpuDraw lens(true);
+        if(CapturePhysicalDrawCommand().IsDirectWorldLensCentre())
+            return 10;
+    }
     // Quest-inspired separation of source commands from the physical
     // shadow draw: only a *direct* player car world particle may use
     // native world WVP. A queued sprite with the same token is not proof.
@@ -70,17 +85,17 @@ int main()
             ProducerToken::CarBaseShadow);
         const auto cmd=CapturePhysicalDrawCommand();
         if (!cmd.IsDirectCarBaseShadow() || cmd.IsSourceProvenHud() ||
-            cmd.IsDirectWorldLensCentre())return 9;
+            cmd.IsDirectWorldLensCentre())return 11;
     }
     if(CapturePhysicalDrawCommand().IsDirectCarBaseShadow())
-        return 10;
+        return 12;
     int other=0;
     RegisterSpriteNodeScope(&other,RenderScope::WorldParticle,
         ProducerToken::CarBaseShadow);
     BeginSpriteQueueRender();
     SelectSpriteQueueNode(&other);
     if(CapturePhysicalDrawCommand().IsDirectCarBaseShadow())
-        return 11;
+        return 13;
     EndSpriteQueueRender();
 
     // R84 physical GPU dispatch: if R30 cannot prove the finite HUD eye

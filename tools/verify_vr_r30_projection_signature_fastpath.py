@@ -56,7 +56,8 @@ def source_contract(renderer=RENDERER, r30=R30, semantic=SEMANTICS):
     require(len(proof) == 2, "missing canonical C993 physical identity")
     lens_body = proof[1].split("IsDirectCarBaseShadow()", 1)[0]
     for guard in ("!queued", "scope == RenderScope::WorldBillboard",
-                  "producer == ProducerToken::LensFlareCentre"):
+                  "producer == ProducerToken::LensFlareCentre",
+                  "lensCentreCallEpoch != 0"):
         require(guard in lens_body, "physical C993 lens must retain " + guard)
     require("CapturePhysicalDrawCommand()" in cls and
             "drawCommand.IsDirectWorldLensCentre()" in cls,

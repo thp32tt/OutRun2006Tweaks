@@ -2530,7 +2530,7 @@ namespace OutRunVRStereo
                 !R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch))
                 return false;
             return OutRunVR::LensCentre::OwnsRawWvp({
-                CurrentLensCentreCallEpoch,
+                drawCommand.lensCentreCallEpoch,
                 OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch(),
                 OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
                 OutRunVRRenderer::GetLastGameWvpPoseEpoch(),

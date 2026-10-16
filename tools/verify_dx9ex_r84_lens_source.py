@@ -39,7 +39,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "GetLastRawGameWvpWrite(",
         "GetLastGameWvpSemanticProvenance(",
         "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
-        "CurrentLensCentreCallEpoch",
+        "drawCommand.lensCentreCallEpoch",
         "GetLastGameWvpLensCentreCallEpoch()",
         "GetCurrentLatchedPoseEpoch()",
         "GetLastGameWvpPoseEpoch(),",
@@ -218,13 +218,15 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "constexpr bool IsDirectWorldLensCentre() const noexcept", 1)[1].split(
         "constexpr bool IsDirectCarBaseShadow()", 1)[0]
     for marker in ("!queued && scope == RenderScope::WorldBillboard",
-                   "producer == ProducerToken::LensFlareCentre"):
+                   "producer == ProducerToken::LensFlareCentre",
+                   "lensCentreCallEpoch != 0"):
         assert marker in lens_command, "exact C993 draw-command guard lost: " + marker
     capture = semantic.split(
         "inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept", 1)[1].split(
         "// A direct original-game source CALL", 1)[0]
     for marker in ("QueueRenderActive()", "EffectiveScope()",
-                   "CurrentRenderProducerToken()", "CurrentQueueNode()"):
+                   "CurrentRenderProducerToken()", "CurrentQueueNode()",
+                   "CurrentLensCentreCallEpoch", "ExactLensCentreDrawOwnsSemantic()"):
         assert marker in capture, "C993 physical command provenance lost: " + marker
     effective = semantic.split("inline RenderScope EffectiveScope()", 1)[1].split(
         "inline void ArmNextDraw", 1)[0]

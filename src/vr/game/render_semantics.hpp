@@ -884,11 +884,16 @@ namespace OutRunVR::GameSemantic
         const void* queueNode = nullptr;
         std::uint64_t queueEpoch = 0;
         bool queued = false;
+        // Exact D3A5 parent invocation captured at the same physical GPU
+        // primitive boundary as scope/producer.  Never consult mutable TLS
+        // later and accidentally correlate C993 with another sun invocation.
+        std::uint64_t lensCentreCallEpoch = 0;
 
         constexpr bool IsDirectWorldLensCentre() const noexcept
         {
             return !queued && scope == RenderScope::WorldBillboard &&
-                producer == ProducerToken::LensFlareCentre;
+                producer == ProducerToken::LensFlareCentre &&
+                lensCentreCallEpoch != 0;
         }
 
         constexpr bool IsDirectCarBaseShadow() const noexcept
@@ -917,10 +922,15 @@ namespace OutRunVR::GameSemantic
     inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept
     {
         const bool isQueued = QueueRenderActive();
-        return { EffectiveScope(), CurrentRenderProducerToken(),
+        const ProducerToken producer = CurrentRenderProducerToken();
+        const bool exactLensCentre = !isQueued &&
+            producer == ProducerToken::LensFlareCentre &&
+            ExactLensCentreDrawOwnsSemantic();
+        return { EffectiveScope(), producer,
             isQueued ? CurrentQueueNode() : nullptr,
             isQueued ? CurrentQueueNodeEpoch() : 0,
-            isQueued };
+            isQueued,
+            exactLensCentre ? CurrentLensCentreCallEpoch : 0 };
     }
 
     // A direct original-game source CALL may rasterize before it appends any
