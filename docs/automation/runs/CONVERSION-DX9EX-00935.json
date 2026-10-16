@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_edge_cull_valid_aspect": "PENDING_BUILD",
-    "stage_edge_cull_reset_fallback": "PENDING_BUILD",
-    "stage_edge_cull_full_integration": "PENDING_EXACT_SHA"
+    "stage_edge_cull_valid_aspect": "PASS_BUILD",
+    "stage_edge_cull_reset_fallback": "PASS_BUILD",
+    "stage_edge_cull_full_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Game ScreenEdgeCullFix directly dereferenced Game::screen_resolution and divided by source height without checking valid Reset/VR resize transition values; it overwrote a3->f0 and a3->f1 independently before validating finite results.",
@@ -81,19 +81,53 @@
       "Do not globally disable stage culling or widen VR FOV without a proven source camera/visibility mapping.",
       "Do not modify the R84 renderer or reduce native DX9Ex quality; this specific defect occurs before game 3D draw and must preserve all correct old mappings."
     ],
-    "fix_evidence": "Actual source CalcBall3D2D now takes a fully validated pure finite projection result and changes original sphere only if both corrected coordinates pass; portable native smoke adds valid and poisoned viewport cases.",
+    "fix_evidence": "Actual source CalcBall3D2D now takes a fully validated pure finite projection result and changes original sphere only if both corrected coordinates pass; portable native smoke adds valid and poisoned viewport cases. Final validation-bearing 53a021bb9679f7f32ed68154d185361eb78543f5 builds game, R84 full-chain, host plus executed stage-edge C++ smoke, release package, Domain, Full Source and HUD Inspector all exact SHA SUCCESS.",
     "negative_test_evidence": "Negative cases zero/negative height, NaN, Inf, sphere overflow and source aspect overflow reject without valid update. Tested missing <initializer_list> fails g++ -std=c++17 with required header diagnostic; host dependency now compiles corrected test in the existing mandatory Windows Gate.",
     "eye_ownership": "This original game culling sphere feeds the shared source visibility before R84 projects world content separately for both eyes; this fix does not modify binocular c64 matrices or host projection.",
     "compilation_regression": "The newly declared stand-alone stage-edge smoke target revealed a missing standard <initializer_list> include in a native g++ C++17 compile; the original mandatory host target did not build the new smoke executable. The repair provides the header and makes exact-SHA host compilation depend on the game-side smoke."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 exact-SHA CI SUCCESS reported; physical Quest3/VDXR stage-edge object culling during Reset, resize, 4:3/16:9/21:9 and portrait remains UNTESTED. No automatic HMD PASS.",
+  "next_action": "C6 PASS_EXACT_SHA on final source+native-smoke repair commit 53a021bb; DO NOT rerun or score retries. Quest3/VDXR Reset, staged visibility and building flicker acceptance requires matching HMD, RUNTIME_VALIDATION=UNTESTED.",
   "material_result_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee",
-  "validation_bearing_result_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee",
+  "validation_bearing_result_sha": "53a021bb9679f7f32ed68154d185361eb78543f5",
   "ci_evidence": {
-    "exact_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee",
+    "exact_sha": "53a021bb9679f7f32ed68154d185361eb78543f5",
     "conclusion": "SUCCESS",
-    "source": "user_reported_exact_sha_ci_success",
-    "hmd_test": "NOT_EXECUTED"
+    "source": "GitHub Actions exact validation-bearing SHA, independently verified",
+    "checks": {
+      "dx9ex_active": {
+        "run_id": 38849255428,
+        "success_jobs": [
+          "policy",
+          "full-chain-compile",
+          "host",
+          "game",
+          "package"
+        ]
+      },
+      "domain_isolation": {
+        "run_id": 38849254910,
+        "success_jobs": [
+          "domain-isolation"
+        ]
+      },
+      "full_source_impact": {
+        "run_id": 38849254811,
+        "success_jobs": [
+          "source-cross-domain",
+          "msvc-analyze-active-game",
+          "msvc-analyze-openxr-host"
+        ]
+      },
+      "hud_inspector": {
+        "run_id": 38849254943,
+        "success_jobs": [
+          "static-exe-analysis",
+          "build-hud-inspector"
+        ]
+      }
+    },
+    "runtime_hmd_test": "NOT_EXECUTED",
+    "original_material_sha": "1758fba6bc69f17ba04042377aa53da2531f3eee"
   }
 }
