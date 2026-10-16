@@ -558,6 +558,36 @@ int main()
                  "absent R23 hold must not submit an OpenXR stereo layer"))
         return 1;
 
+    // Native game menu and theater presentation use the GPU hold eyes.
+    // A missing desktop capture must not block a verified complete pair.
+    using OutRunVrNativeEyePair::ChooseFlatPresentationSource;
+    using OutRunVrNativeEyePair::FlatPresentationNeedsSbsCrop;
+    if (!require(ChooseFlatPresentationSource(
+                     ChooseStereoSource(true,true,true,false,false), false) ==
+                     StereoSourceRoute::DirectGpu,
+                 "native menu must render with no desktop sourceSrv") ||
+        !require(ChooseFlatPresentationSource(
+                     ChooseStereoSource(true,true,true,true,true), true) ==
+                     StereoSourceRoute::DirectGpu,
+                 "native menu must not regress to stale SBS desktop") ||
+        !require(ChooseFlatPresentationSource(
+                     ChooseStereoSource(true,false,true,false,false), false) ==
+                     StereoSourceRoute::None,
+                 "partial native eye must fail closed for menu") ||
+        !require(ChooseFlatPresentationSource(StereoSourceRoute::None, true) ==
+                     StereoSourceRoute::Sbs,
+                 "classic mono menu fallback must remain active") ||
+        !require(ChooseFlatPresentationSource(StereoSourceRoute::Sbs, false) ==
+                     StereoSourceRoute::None,
+                 "missing classic texture cannot render stale menu") ||
+        !require(!FlatPresentationNeedsSbsCrop(StereoSourceRoute::DirectGpu, true),
+                 "native theater full eye must never crop as SBS") ||
+        !require(FlatPresentationNeedsSbsCrop(StereoSourceRoute::Sbs, true),
+                 "classic SBS theater must still crop") ||
+        !require(!FlatPresentationNeedsSbsCrop(StereoSourceRoute::Sbs, false),
+                 "classic mono theater must keep full width"))
+        return 1;
+
     // New-generation OpenXR eyes must not be blocked by old high IDs.
     using OutRunVrNativeEyePair::PreferNativeDirectFrame;
     using OutRunVrNativeEyePair::DirectFrameAlreadyProcessed;

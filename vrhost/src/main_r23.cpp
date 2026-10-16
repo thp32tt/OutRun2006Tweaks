@@ -1305,9 +1305,16 @@ namespace
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
         R23Pixels.TryConsume(c.context_);
-        if (!c.haveFrame_ || !c.sourceSrv_) return false;
-        UvRect whole{};
-        if (!c.GetGameUv(whole)) return false;
+        // Native menu/race DirectGPU source does not require D3D9 readback.
+        // Selection checks both committed eye holds against the live device.
+        const auto flatRoute = OutRunVrNativeEyePair::ChooseFlatPresentationSource(
+            R23ProductionStereoSource(c), c.haveFrame_ && c.sourceSrv_);
+        if (flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+            return false;
+        const bool nativePair =
+            flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu;
+        UvRect whole{0.f, 0.f, 1.f, 1.f};
+        if (!nativePair && !c.GetGameUv(whole)) return false;
 
         XrFovf commonFov{};
         commonFov.angleLeft = 0.5f *
@@ -1331,10 +1338,13 @@ namespace
 
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
-        const float sourceAspect = (cr.bottom > cr.top)
-            ? static_cast<float>(cr.right - cr.left) /
-                static_cast<float>(cr.bottom - cr.top)
-            : 16.0f / 9.0f;
+        const float sourceAspect = nativePair
+            ? static_cast<float>(R23DirectHold.width) /
+                static_cast<float>(R23DirectHold.height)
+            : (cr.bottom > cr.top)
+                ? static_cast<float>(cr.right - cr.left) /
+                    static_cast<float>(cr.bottom - cr.top)
+                : 16.0f / 9.0f;
         const float fovAspect = spanX / spanY;
         if (!std::isfinite(sourceAspect) || !std::isfinite(fovAspect) ||
             sourceAspect <= 0.1f || fovAspect <= 0.1f)
@@ -1368,7 +1378,9 @@ namespace
             ok = c.RenderMenuPlaneTo(
                 c.projection_.rtvs[image][eye],
                 c.projection_.width, c.projection_.height,
-                whole, c.sourceSrv_, c.sourceFormat_, clip);
+                whole,
+                nativePair ? R23DirectHold.srv[eye] : c.sourceSrv_,
+                nativePair ? R23DirectHold.format : c.sourceFormat_, clip);
         }
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
@@ -1398,18 +1410,27 @@ namespace
         bool sourceIsSbs)
     {
         R23Pixels.TryConsume(c.context_);
-        if (!c.haveFrame_ || !c.sourceSrv_) return false;
-        UvRect whole{};
-        if (!c.GetGameUv(whole)) return false;
+        const auto flatRoute = OutRunVrNativeEyePair::ChooseFlatPresentationSource(
+            R23ProductionStereoSource(c), c.haveFrame_ && c.sourceSrv_);
+        if (flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+            return false;
+        const bool nativePair =
+            flatRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu;
+        UvRect whole{0.f, 0.f, 1.f, 1.f};
+        if (!nativePair && !c.GetGameUv(whole)) return false;
         UvRect theaterUv = whole;
-        if (sourceIsSbs)
+        const bool cropSbs = OutRunVrNativeEyePair::FlatPresentationNeedsSbsCrop(
+            flatRoute, sourceIsSbs);
+        if (cropSbs)
             theaterUv.w *= 0.5f;
         if (theaterUv.w <= 0.0f)
             return false;
         std::uint32_t image = 0;
         if (!c.Acquire(c.theater_, image, 1u)) return false;
         const bool ok = c.RenderTo(c.theater_.rtvs[image][0], c.theater_.width,
-            c.theater_.height, theaterUv, c.sourceSrv_, c.sourceFormat_);
+            c.theater_.height, theaterUv,
+            nativePair ? R23DirectHold.srv[0] : c.sourceSrv_,
+            nativePair ? R23DirectHold.format : c.sourceFormat_);
         if (ok) R23Pixels.ScheduleTheater(c, image);
         c.Release(c.theater_);
         if (!ok || !c.EnsureTheaterAnchor(viewSpace, localSpace, displayTime)) return false;
@@ -1424,11 +1445,14 @@ namespace
             static_cast<int32_t>(c.theater_.width), static_cast<int32_t>(c.theater_.height) };
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
-        const float aspect = (cr.bottom > cr.top)
-            ? (static_cast<float>(cr.right - cr.left) /
-                static_cast<float>(cr.bottom - cr.top)) *
-                (sourceIsSbs ? 0.5f : 1.0f)
-            : 16.f / 9.f;
+        const float aspect = nativePair
+            ? static_cast<float>(R23DirectHold.width) /
+                static_cast<float>(R23DirectHold.height)
+            : (cr.bottom > cr.top)
+                ? (static_cast<float>(cr.right - cr.left) /
+                    static_cast<float>(cr.bottom - cr.top)) *
+                    (cropSbs ? 0.5f : 1.0f)
+                : 16.f / 9.f;
         quad.size.width = 2.f;
         quad.size.height = 2.f / aspect;
         return true;

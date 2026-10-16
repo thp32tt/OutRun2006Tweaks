@@ -77,6 +77,26 @@ namespace OutRunVrNativeEyePair
         return StereoSourceRoute::None;
     }
 
+    // A native DirectGPU-only game/menu frame may lack a desktop capture.
+    // Flat XR projection and theater may use its two verified GPU hold eyes.
+    // Classic mono/SBS requires a separately valid current desktop frame.
+    [[nodiscard]] constexpr StereoSourceRoute ChooseFlatPresentationSource(
+        StereoSourceRoute committedStereo, bool classicFrameReady) noexcept
+    {
+        if (committedStereo == StereoSourceRoute::DirectGpu)
+            return StereoSourceRoute::DirectGpu;
+        return classicFrameReady ? StereoSourceRoute::Sbs
+                                 : StereoSourceRoute::None;
+    }
+
+    // Native eyes are full-frame, NOT halves of an SBS texture. Theater is
+    // intentionally mono, while a world-locked menu retains independent eyes.
+    [[nodiscard]] constexpr bool FlatPresentationNeedsSbsCrop(
+        StereoSourceRoute selected, bool classicSourceIsSbs) noexcept
+    {
+        return selected == StereoSourceRoute::Sbs && classicSourceIsSbs;
+    }
+
     // The source may change while GPU eyes are copied. Verify the second
     // seqlock snapshot matches the exact producer, texture pair AND eye pose
     // before pairing new game pixels with OpenXR views / acknowledging a slot.
