@@ -76,4 +76,47 @@ namespace OutRunVrNativeEyePair
             return StereoSourceRoute::Sbs;
         return StereoSourceRoute::None;
     }
+
+    // The source may change while GPU eyes are copied. Verify the second
+    // seqlock snapshot matches the exact producer, texture pair AND eye pose
+    // before pairing new game pixels with OpenXR views / acknowledging a slot.
+    template <typename Frame>
+    [[nodiscard]] bool SameStereoFrameIdentity(
+        const Frame& before, const Frame& after) noexcept
+    {
+        if (before.magic != after.magic ||
+            before.protocolVersion != after.protocolVersion ||
+            before.structSize != after.structSize ||
+            before.clientPid != after.clientPid ||
+            before.state != after.state ||
+            before.frameId != after.frameId ||
+            before.sourcePoseSequence != after.sourcePoseSequence ||
+            before.presentationMode != after.presentationMode ||
+            before.flags != after.flags ||
+            before.failureReason != after.failureReason ||
+            before.backbufferWidth != after.backbufferWidth ||
+            before.backbufferHeight != after.backbufferHeight ||
+            before.presentQpc != after.presentQpc)
+            return false;
+        // Frame.v2 reserved[0..6]: DirectGPU handles, extent, format,
+        // generation, slot; [7..9]: producer build identity. An SBS -> GPU
+        // transition must never inherit the previous frame's eye textures.
+        for (std::uint32_t i = 0; i < 10u; ++i)
+            if (before.reserved[i] != after.reserved[i]) return false;
+        for (std::uint32_t eye = 0; eye < 2u; ++eye)
+        {
+            for (std::uint32_t i = 0; i < 4u; ++i)
+                if (before.eye[eye].orientation[i] != after.eye[eye].orientation[i])
+                    return false;
+            for (std::uint32_t i = 0; i < 3u; ++i)
+                if (before.eye[eye].position[i] != after.eye[eye].position[i])
+                    return false;
+            const auto& a = before.eye[eye].fov;
+            const auto& b = after.eye[eye].fov;
+            if (a.angleLeft != b.angleLeft || a.angleRight != b.angleRight ||
+                a.angleUp != b.angleUp || a.angleDown != b.angleDown)
+                return false;
+        }
+        return true;
+    }
 }
