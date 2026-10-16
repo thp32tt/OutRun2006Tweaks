@@ -1941,15 +1941,63 @@ require('RenderScope::WorldParticle', graphics, 'car shadow world ownership')
 # The three upstream call sites converge on this exact world-space producer.
 # Prevent a head-following/duplicated shadow caused by an expired semantic
 # scope even when both text tokens still exist elsewhere in the source file.
-shadow_draw = function_body(graphics, 'static void __cdecl CalcPeraShadow(')
-if not re.search(
-    r'OutRunVR::GameSemantic::ScopedRenderSemantic\s+semantic\(\s*'
-    r'OutRunVR::GameSemantic::RenderScope::WorldParticle\s*\);\s*'
-    r'Game::DrawObjectAlpha_Internal\(\s*a1,\s*'
-    r'a4\s*\*\s*Settings::CarBaseShadowOpacity,\s*0,\s*-1\);',
-    shadow_draw, re.S,
-):
-    raise SystemExit('P0 visual composition drift: car shadow draw escaped world-scoped RAII owner')
+def verify_contact_shadow_alpha(game_source, helper_source):
+    body = function_body(game_source, 'static void __cdecl CalcPeraShadow(')
+    helper = function_body(helper_source, 'inline bool ValidScaledAlpha(')
+    # Keep the three original game producer sites, and prove that the
+    # multiplication is checked BEFORE matrix push and GPU submission.
+    guard = re.search(
+        r'float\s+shadowAlpha\s*=\s*0\.f;\s*'
+        r'if\s*\(\s*!OutRunVR::CarShadowStereo::ValidScaledAlpha\(\s*'
+        r'a4\s*,\s*Settings::CarBaseShadowOpacity\.get\(\)\s*,\s*'
+        r'shadowAlpha\s*\)\s*\)\s*return\s*;', body, re.S)
+    if not guard:
+        raise SystemExit('P0 car shadow: finite scaled-alpha check must reject before GPU draw')
+    for term in ('std::isfinite(raw)', 'std::isfinite(opacity)',
+                 'opacity <= 0.f', 'raw * opacity',
+                 'std::isfinite(candidate)', 'out = candidate;'):
+        require(term, helper, 'contact-shadow finite GPU alpha source')
+    if not (guard.end() < body.index('Game::mxPushLoadMatrix(')
+            < body.index('ScopedRenderSemantic semantic(')
+            < body.index('Game::DrawObjectAlpha_Internal(')):
+        raise SystemExit('P0 car shadow: finite alpha and world ownership order drift')
+    if not re.search(
+        r'OutRunVR::GameSemantic::ScopedRenderSemantic\s+semantic\(\s*'
+        r'OutRunVR::GameSemantic::RenderScope::WorldParticle\s*\);\s*'
+        r'Game::DrawObjectAlpha_Internal\(\s*a1\s*,\s*shadowAlpha\s*,'
+        r'\s*0\s*,\s*-1\s*\);',body,re.S):
+        raise SystemExit('P0 car shadow: drawing under source-proven world RAII scope failed')
+    return body, helper
+
+shadow_alpha_source = read('src/vr/game/car_base_shadow_stereo.hpp')
+shadow_draw, shadow_alpha_impl = verify_contact_shadow_alpha(
+    graphics, shadow_alpha_source)
+# Preserve the negative contracts: unsafe bypass, old raw multiplier and
+# a missing finite test must each fail the SAME checker.
+mutations = (
+    ('no original game alpha check',
+     graphics.replace('!OutRunVR::CarShadowStereo::ValidScaledAlpha(',
+                      '!OutRunVR::CarShadowStereo::InvalidScaledAlpha(',1),
+     shadow_alpha_source),
+    ('unscoped shadow GPU draw',
+     graphics.replace('a1, shadowAlpha, 0, -1);',
+                      'a1, a4, 0, -1);',1),
+     shadow_alpha_source),
+    ('shadow invalid output accepted',
+     graphics,
+     shadow_alpha_source.replace('if (!std::isfinite(candidate))',
+                                 'if (false)',1)),
+)
+for tag, mutated_game, mutated_helper in mutations:
+    if mutated_game == graphics and mutated_helper == shadow_alpha_source:
+        raise SystemExit('P0 car-shadow mutation fixture missing: ' + tag)
+    try:
+        verify_contact_shadow_alpha(mutated_game, mutated_helper)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 car-shadow mutation escaped: ' + tag)
+
 for contract_id, rva in (
     ('VR-EXE-CAR-BASE-SHADOW-DISPCAR-CALL', '0x00069EB4'),
     ('VR-EXE-CAR-BASE-SHADOW-O2SP-SELECT-CALL', '0x0006AC76'),
