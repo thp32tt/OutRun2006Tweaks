@@ -609,11 +609,12 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         ed.Width != targetWidth_ || ed.Height != targetHeight_ ||
         srcBox.front != 0u || srcBox.back != 1u ||
         srcBox.left >= srcBox.right || srcBox.top >= srcBox.bottom ||
-        srcBox.right > sd.Width || srcBox.bottom > sd.Height ||
-        dest.left < 0 || dest.top < 0 || dest.right <= dest.left ||
-        dest.bottom <= dest.top ||
-        static_cast<UINT>(dest.right) > targetWidth_ ||
-        static_cast<UINT>(dest.bottom) > targetHeight_) return false;
+        srcBox.right > sd.Width || srcBox.bottom > sd.Height) return false;
+    const auto clipped = native_game_stretch_clipped_region(
+        sd.Width, sd.Height, srcBox.left, srcBox.top,
+        srcBox.right, srcBox.bottom, targetWidth_, targetHeight_,
+        dest.left, dest.top, dest.right, dest.bottom);
+    if (!clipped.valid) return false;
     // D3D11 postpass sampling converts the real game source into the eye's
     // render-target format; unlike GPU CopyResource, a filtered StretchRect
     // does not require identical DXGI formats. Menu/car offscreen RTs often
@@ -764,22 +765,21 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     }
     ID3D11RenderTargetView* target = eyeTarget_;
     context_->OMSetRenderTargets(1u, &target, nullptr);
+    // A game StretchRect can begin offscreen during menu/car transitions.
+    // Clip the actual eye viewport, not just its origin; the adjusted
+    // constants preserve the source pixel each surviving output pixel maps to.
     const D3D11_VIEWPORT viewport{
-        float(dest.left), float(dest.top),
-        float(dest.right - dest.left), float(dest.bottom - dest.top),
-        0.f, 1.f};
+        float(clipped.left), float(clipped.top),
+        float(clipped.right - clipped.left),
+        float(clipped.bottom - clipped.top), 0.f, 1.f};
     context_->RSSetViewports(1u, &viewport);
     context_->RSSetState(nullptr);
     context_->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
     context_->OMSetDepthStencilState(nullptr, 0u);
     // The shader's bilinear footprint must stay within the original
     // game crop, including 1-texel menu glyphs and adjacent car atlas tiles.
-    const auto uv = native_game_stretch_uv_region(
-        sd.Width, sd.Height, srcBox.left, srcBox.top,
-        srcBox.right, srcBox.bottom);
-    if (!uv.valid) return false;
     context_->UpdateSubresource(
-        constants.Get(), 0u, nullptr, uv.constants.data(), 0u, 0u);
+        constants.Get(), 0u, nullptr, clipped.uv.constants.data(), 0u, 0u);
     ID3D11Buffer* cb = constants.Get();
     ID3D11ShaderResourceView* view = srv.Get();
     ID3D11SamplerState* sample = linearFilter ? linear.Get() : point.Get();

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <limits>
 
 namespace outrun::vr::dx11 {
 
@@ -58,5 +59,66 @@ struct NativeGameStretchUvRegion {
         float(right - left) * invW, float(bottom - top) * invH,
         (float(left) + 0.5f) * invW, (float(top) + 0.5f) * invH,
         (float(right) - 0.5f) * invW, (float(bottom) - 0.5f) * invH}, true};
+}
+
+ 
+// Translate a game-authored StretchRect which crosses the native eye edges.
+// D3D11 viewports may not use negative top-left coordinates. Clipping ONLY
+// the viewport without advancing the source UV incorrectly stretches a
+// partial menu/car/race sprite across the remaining pixels. Retain the
+// original destination-to-source affine and the source crop's texel clamp.
+struct NativeGameStretchClippedRegion {
+    std::uint32_t left{}, top{}, right{}, bottom{};
+    NativeGameStretchUvRegion uv{};
+    bool valid{};
+};
+[[nodiscard]] constexpr NativeGameStretchClippedRegion
+native_game_stretch_clipped_region(
+    std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+    std::uint32_t srcLeft, std::uint32_t srcTop,
+    std::uint32_t srcRight, std::uint32_t srcBottom,
+    std::uint32_t targetWidth, std::uint32_t targetHeight,
+    std::int32_t destLeft, std::int32_t destTop,
+    std::int32_t destRight, std::int32_t destBottom) noexcept
+{
+    const auto uv = native_game_stretch_uv_region(
+        sourceWidth, sourceHeight, srcLeft, srcTop, srcRight, srcBottom);
+    if (!uv.valid || !targetWidth || !targetHeight ||
+        targetWidth > static_cast<std::uint32_t>(
+            (std::numeric_limits<std::int32_t>::max)()) ||
+        targetHeight > static_cast<std::uint32_t>(
+            (std::numeric_limits<std::int32_t>::max)()) ||
+        destRight <= destLeft || destBottom <= destTop)
+        return {};
+    const std::int64_t x0 = destLeft < 0 ? 0 : destLeft;
+    const std::int64_t y0 = destTop < 0 ? 0 : destTop;
+    const std::int64_t x1 = destRight > static_cast<std::int64_t>(targetWidth)
+        ? targetWidth : destRight;
+    const std::int64_t y1 = destBottom > static_cast<std::int64_t>(targetHeight)
+        ? targetHeight : destBottom;
+    if (x0 >= x1 || y0 >= y1) return {};
+    const float invWidth = 1.0f /
+        static_cast<float>(static_cast<std::int64_t>(destRight) - destLeft);
+    const float invHeight = 1.0f /
+        static_cast<float>(static_cast<std::int64_t>(destBottom) - destTop);
+    const float u0 = static_cast<float>(x0 - destLeft) * invWidth;
+    const float u1 = static_cast<float>(x1 - destLeft) * invWidth;
+    const float v0 = static_cast<float>(y0 - destTop) * invHeight;
+    const float v1 = static_cast<float>(y1 - destTop) * invHeight;
+    // Very large source rectangles can collapse sub-pixel spans in float;
+    // fail closed instead of issuing a zero-width UV mapping.
+    if (!(u1 > u0 && v1 > v0)) return {};
+    NativeGameStretchClippedRegion result{};
+    result.left = static_cast<std::uint32_t>(x0);
+    result.top = static_cast<std::uint32_t>(y0);
+    result.right = static_cast<std::uint32_t>(x1);
+    result.bottom = static_cast<std::uint32_t>(y1);
+    result.uv = uv;
+    result.uv.constants[0] += u0 * uv.constants[2];
+    result.uv.constants[1] += v0 * uv.constants[3];
+    result.uv.constants[2] *= u1 - u0;
+    result.uv.constants[3] *= v1 - v0;
+    result.valid = true;
+    return result;
 }
 } // namespace outrun::vr::dx11

@@ -54,5 +54,48 @@ int main() {
     static_assert(!native_game_stretch_uv_region(0u,4u,0u,0u,1u,1u).valid);
     static_assert(!native_game_stretch_uv_region(4u,4u,2u,2u,2u,3u).valid);
     static_assert(!native_game_stretch_uv_region(4u,4u,2u,2u,5u,3u).valid);
-    std::cout << "game-authored GPU stretch source routes and cropped UV clamping PASS\n";
+    // Real native GPU StretchRect clips destination geometry while keeping
+    // the original game-authored texture-to-screen mapping (no edge zoom).
+    using outrun::vr::dx11::native_game_stretch_clipped_region;
+    constexpr auto cropped = native_game_stretch_clipped_region(
+        8, 4, 2, 1, 6, 3, 4, 4, -2, 1, 6, 5);
+    static_assert(cropped.valid && cropped.left == 0 &&
+                  cropped.top == 1 && cropped.right == 4 &&
+                  cropped.bottom == 4);
+    static_assert(cropped.uv.constants[0] == .375f &&
+                  cropped.uv.constants[1] == .25f &&
+                  cropped.uv.constants[2] == .25f &&
+                  cropped.uv.constants[3] == .375f);
+    static_assert(cropped.uv.constants[4] == .3125f &&
+                  cropped.uv.constants[6] == .6875f);
+    // Top/right crop moves V start and shortens U, without altering
+    // the source atlas clamp shared by linear and point filtering.
+    constexpr auto otherEdge = native_game_stretch_clipped_region(
+        8, 4, 2, 0, 6, 4, 4, 4, 1, -2, 5, 2);
+    static_assert(otherEdge.valid && otherEdge.left == 1 &&
+                  otherEdge.top == 0 && otherEdge.right == 4 &&
+                  otherEdge.bottom == 2);
+    static_assert(otherEdge.uv.constants[0] == .25f &&
+                  otherEdge.uv.constants[1] == .5f &&
+                  otherEdge.uv.constants[2] == .375f &&
+                  otherEdge.uv.constants[3] == .5f);
+    // Fully contained rectangles still use identical original UVs.
+    constexpr auto whole = native_game_stretch_clipped_region(
+        8, 4, 2, 1, 5, 3, 10, 10, 1, 2, 5, 6);
+    static_assert(whole.valid && whole.uv.constants[0] == atlas.constants[0] &&
+                  whole.uv.constants[1] == atlas.constants[1] &&
+                  whole.uv.constants[2] == atlas.constants[2] &&
+                  whole.uv.constants[3] == atlas.constants[3]);
+    // No uncovered eye writes or invalid destination/source extents.
+    static_assert(!native_game_stretch_clipped_region(
+        8, 4, 2, 1, 6, 3, 4, 4, -9, 1, -5, 3).valid);
+    static_assert(!native_game_stretch_clipped_region(
+        8, 4, 2, 1, 6, 3, 4, 4, 1, 5, 3, 7).valid);
+    static_assert(!native_game_stretch_clipped_region(
+        8, 4, 2, 1, 6, 3, 4, 4, 2, 1, 2, 3).valid);
+    static_assert(!native_game_stretch_clipped_region(
+        8, 4, 7, 1, 9, 3, 4, 4, 1, 1, 3, 3).valid);
+    static_assert(!native_game_stretch_clipped_region(
+        8, 4, 2, 1, 6, 3, 0, 4, 1, 1, 3, 3).valid);
+    std::cout << "game-authored GPU stretch source routes, clipped destination and cropped UV PASS\n";
 }
