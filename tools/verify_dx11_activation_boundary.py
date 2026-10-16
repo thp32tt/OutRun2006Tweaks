@@ -110,7 +110,15 @@ def main() -> None:
                 "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
                 "ScopedNativeGameEyeOutput output(ctx, invocation.width, invocation.height);",
                 "NativeGameEyeDrawEncoder encoder(",
-                "ctx, targets[eyeIndex], invocation.depth[eyeIndex]);",
+                "ctx, targets[eyeIndex], invocation.depth[eyeIndex],",
+                "invocation.width, invocation.height);",
+                # A bound eye RTV cannot prove a visible pixel if its
+                # viewport or enabled scissor is entirely off-target.
+                "context_->RSGetViewports(&viewportCount, &view);",
+                "viewportCount != 1u || !std::isfinite(view.TopLeftX)",
+                "context_->RSGetState(&rasterizer);",
+                "scissorEnabled = desc.ScissorEnable != FALSE;",
+                "context_->RSGetScissorRects(&count, &rect);",
                 "evidence.drawCount != encoder.draw_count() ||",
                 "sourcePoseSequence != poseSequence_",
                 "ring_.render_eye_pair(context_.Get(), slot_, frameId_,",
