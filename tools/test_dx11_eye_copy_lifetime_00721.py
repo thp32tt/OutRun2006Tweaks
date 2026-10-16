@@ -3,7 +3,10 @@
 from pathlib import Path
 import subprocess
 import tempfile
-from verify_dx11_native_transport_contract import verify_eye_pair_submission
+from verify_dx11_native_transport_contract import (
+    verify_eye_pair_submission,
+    verify_direct_eye_render,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 ring = (ROOT / "src/vr/d3d11/native_shared_eye_ring.cpp").read_text(encoding="utf-8")
@@ -12,7 +15,7 @@ probe = ROOT / "tools/dx11_eye_copy_lifetime_probe_00721.cpp"
 
 def linked(source: str, header: str) -> bool:
     copy_start = source.find("bool NativeSharedEyeRing::submit_eye_pair(")
-    copy_end = source.find("bool NativeSharedEyeRing::signal_producer_fence(", copy_start)
+    copy_end = source.find("bool NativeSharedEyeRing::render_eye_pair(", copy_start)
     cancel_start = source.find("bool NativeSharedEyeRing::cancel_acquired_slot(")
     cancel_end = source.find("bool NativeSharedEyeRing::submit_eye_pair(", cancel_start)
     reset_start = source.find("void NativeSharedEyeRing::reset_slot_lifetime(")
@@ -40,7 +43,7 @@ assert linked(ring, slot), "native stereo GPU command or cancellation link missi
 # The mandatory Backend Conversion verifier must accept the guarded EVENT
 # producer and reject destructive changes to GPU ownership/fence semantics.
 submit = ring[ring.index("bool NativeSharedEyeRing::submit_eye_pair("):
-              ring.index("bool NativeSharedEyeRing::signal_producer_fence(")]
+              ring.index("bool NativeSharedEyeRing::render_eye_pair(")]
 verify_eye_pair_submission(submit)
 for label, before, after in [
     ("missing GPU-queued ownership", "entry.gpu_copy_queued = true;", "/* unsafe */"),
@@ -56,6 +59,27 @@ for label, before, after in [
         pass
     else:
         raise AssertionError("native transport verifier accepted unsafe mutant: " + label)
+# New native Draw producer must preserve the exact same GPU ownership and
+# fail-closed transport guarantees, not borrow unrelated copy-path tokens.
+direct = ring[ring.index("bool NativeSharedEyeRing::render_eye_pair("):
+              ring.index("bool NativeSharedEyeRing::signal_producer_fence(")]
+verify_direct_eye_render(direct)
+for label, old, new in [
+    ("direct missing ownership", "entry.gpu_copy_queued = true;", "/* unsafe */"),
+    ("direct eye aliased", "entry.rtv[1].Get()", "entry.rtv[0].Get()"),
+    ("direct missing callback quarantine", "synchronization_faulted_ = true;", "/* unsafe */"),
+    ("direct wrong EVENT polarity",
+     "if (!signal_producer_fence(context, slot, frame_id))",
+     "if (signal_producer_fence(context, slot, frame_id))"),
+]:
+    assert old in direct, label
+    try:
+        verify_direct_eye_render(direct.replace(old, new, 1))
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError("direct native-eye verifier accepted unsafe mutant: " + label)
+
 # Destructive regression: dropping the cancellation veto or GPU-queued mark
 # must fail the checker, not merely compile an unused helper.
 assert not linked(ring.replace("!native_game_eye_copy_cancelable(entry.gpu_copy_queued)", "false"), slot)

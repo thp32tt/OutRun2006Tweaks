@@ -101,6 +101,49 @@ def verify_eye_pair_submission(body: str) -> None:
     else:
         raise SystemExit("DX11 stereo source validation missing or obsolete signature")
 
+
+def verify_direct_eye_render(body: str) -> None:
+    """Verify direct native left/right Draw recording cannot publish or
+    recycle a partial pair when callback work or EVENT arming fails.
+    """
+    required = [
+        "!activation_ready()",
+        "!same_producer_context(context)",
+        "!recorder",
+        "entry.state != SharedEyeSlotState::Acquired",
+        "entry.frame_id != frame_id",
+        "entry.gpu_copy_queued",
+        "!entry.rtv[0] || !entry.rtv[1] || !entry.producer_fence",
+        "entry.gpu_copy_queued = true;",
+        "recorder(user, context, entry.rtv[0].Get(), entry.rtv[1].Get())",
+        "if (!signal_producer_fence(context, slot, frame_id))",
+    ]
+    for needle in required:
+        if needle not in body:
+            raise SystemExit("DX11 direct native game-eye GPU producer missing: " + needle)
+    queued = body.index("entry.gpu_copy_queued = true;")
+    recorded = body.index("recorder(user, context, entry.rtv[0].Get(), entry.rtv[1].Get())")
+    signal = body.index("if (!signal_producer_fence(context, slot, frame_id))")
+    if not queued < recorded < signal:
+        raise SystemExit("DX11 direct eye draw must reserve GPU ownership before both draws")
+    if len(re.findall(r"synchronization_faulted_\s*=\s*true;", body)) != 2:
+        raise SystemExit("DX11 direct eye recorder and EVENT failures must BOTH quarantine")
+    if not re.search(
+        r"if\s*\(!recorder\(user, context, entry\.rtv\[0\]\.Get\(\),"
+        r" entry\.rtv\[1\]\.Get\(\)\)\)\s*\{"
+        r"\s*synchronization_faulted_ = true;\s*return false;\s*\}",
+        body,
+    ):
+        raise SystemExit("DX11 direct eye partial render must quarantine")
+    if not re.search(
+        r"if\s*\(!signal_producer_fence\(context, slot, frame_id\)\)\s*\{"
+        r"\s*synchronization_faulted_ = true;\s*return false;\s*\}",
+        body,
+    ):
+        raise SystemExit("DX11 direct eye producer EVENT failure must quarantine")
+    if "reset_slot_lifetime(entry)" in body:
+        raise SystemExit("DX11 direct native GPU recorder must never reuse partial eyes")
+
 def main() -> None:
     transport = require(
         "src/vr/core/transport.hpp",
@@ -298,14 +341,35 @@ def main() -> None:
             raise SystemExit(
                 f"DX11 R118 publication validation missing stale-snapshot evidence: {needle}"
             )
-    if ring_cpp.count("!same_producer_context(context)") != 4 or \
-            "same_producer_context(context) == false" not in ring_cpp:
-        raise SystemExit("DX11 native ring must check all five context-bearing paths")
-    eye_copy_start = ring_cpp.find("bool NativeSharedEyeRing::submit_eye_pair(")
-    signal_start = ring_cpp.find("bool NativeSharedEyeRing::signal_producer_fence(", eye_copy_start)
-    if eye_copy_start < 0 or signal_start <= eye_copy_start:
-        raise SystemExit("DX11 producer stereo GPU transfer path not connected")
-    verify_eye_pair_submission(ring_cpp[eye_copy_start:signal_start])
+    # Both native production paths must validate the exact immediate owner:
+    # the copy/resolve source and the direct two-eye Draw recorder. Do not
+    # depend on a frozen string count that omits new context-bearing methods.
+    contexts = (
+        ("refresh_unpublished_fence", "try_acquire_slot"),
+        ("try_acquire_slot", "cancel_acquired_slot"),
+        ("submit_eye_pair", "render_eye_pair"),
+        ("render_eye_pair", "signal_producer_fence"),
+        ("signal_producer_fence", "publish_if_fence_complete"),
+        ("publish_if_fence_complete", "snapshot_published_frame"),
+    )
+    for before, after in contexts:
+        start = ring_cpp.find("NativeSharedEyeRing::" + before + "(")
+        end = ring_cpp.find("NativeSharedEyeRing::" + after + "(", start)
+        if start < 0 or end <= start:
+            raise SystemExit("DX11 native ring context owner boundary missing: " + before)
+        body = ring_cpp[start:end]
+        if before == "submit_eye_pair":
+            if "same_producer_context(context) == false" not in body:
+                raise SystemExit("DX11 copy/resolve must verify immediate device context")
+        elif "!same_producer_context(context)" not in body:
+            raise SystemExit("DX11 producer context owner guard missing: " + before)
+    copy_start = ring_cpp.find("bool NativeSharedEyeRing::submit_eye_pair(")
+    direct_start = ring_cpp.find("bool NativeSharedEyeRing::render_eye_pair(", copy_start)
+    signal_start = ring_cpp.find("bool NativeSharedEyeRing::signal_producer_fence(", direct_start)
+    if copy_start < 0 or direct_start <= copy_start or signal_start <= direct_start:
+        raise SystemExit("DX11 both native stereo GPU producer paths must be connected")
+    verify_eye_pair_submission(ring_cpp[copy_start:direct_start])
+    verify_direct_eye_render(ring_cpp[direct_start:signal_start])
     probe_source = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
         encoding="utf-8")
     if "R306 left/right GPU pixel copy identity" not in probe_source:
