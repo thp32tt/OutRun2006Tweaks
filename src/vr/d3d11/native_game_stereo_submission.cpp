@@ -122,8 +122,17 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
     while (sourceClearCursor_ < count) {
         const auto& clear = sourceClears_->entries[sourceClearEye_][sourceClearCursor_];
         if (clear.afterDrawOrdinal > drawCount_) return true;
-        if (clear.afterDrawOrdinal < drawCount_ ||
-            !clear_target_argb(clear.argb, &clear.rect)) return false;
+        if (clear.afterDrawOrdinal < drawCount_) return false;
+        if (clear.kind == NativeGameEyePartialTargetClear::Kind::TargetRect) {
+            if (!clear_target_argb(clear.argb, &clear.rect)) return false;
+        } else if (clear.kind ==
+                   NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
+            if (!clear_depth_stencil(clear.depth, clear.stencil,
+                                     clear.clearDepth, clear.clearStencil))
+                return false;
+        } else {
+            return false; // Reject unrecognized source commands, never fabricate a Clear.
+        }
         ++sourceClearCursor_;
     }
     return true;
@@ -945,16 +954,35 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             const std::uint32_t count = partialTargetClear->count[eye];
             if (count > NativeGameEyePartialTargetClear::kMaxRectsPerEye)
                 return false;
-            hasRects = hasRects || count != 0u;
             for (std::uint32_t i = 0u; i < count; ++i) {
-                const auto& rect = partialTargetClear->entries[eye][i].rect;
-                if (rect.left < 0 || rect.top < 0 ||
-                    rect.right <= rect.left || rect.bottom <= rect.top ||
-                    rect.right > static_cast<LONG>(ring_.width()) ||
-                    rect.bottom > static_cast<LONG>(ring_.height()) ||
-                    (i != 0u && partialTargetClear->entries[eye][i].afterDrawOrdinal <
-                        partialTargetClear->entries[eye][i - 1u].afterDrawOrdinal))
+                const auto& event = partialTargetClear->entries[eye][i];
+                if (i != 0u &&
+                    event.afterDrawOrdinal <
+                        partialTargetClear->entries[eye][i - 1u].afterDrawOrdinal)
                     return false;
+                if (event.kind ==
+                    NativeGameEyePartialTargetClear::Kind::TargetRect) {
+                    const auto& rect = event.rect;
+                    if (rect.left < 0 || rect.top < 0 ||
+                        rect.right <= rect.left || rect.bottom <= rect.top ||
+                        rect.right > static_cast<LONG>(ring_.width()) ||
+                        rect.bottom > static_cast<LONG>(ring_.height()))
+                        return false;
+                    hasRects = true;
+                } else if (event.kind ==
+                           NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
+                    // D3D11 has no portable partial depth/stencil Clear. A
+                    // captured RECT cannot silently become a whole-eye erase.
+                    const auto& rect = event.rect;
+                    if (rect.left || rect.top || rect.right || rect.bottom ||
+                        (!event.clearDepth && !event.clearStencil) ||
+                        (event.clearDepth &&
+                         (!std::isfinite(event.depth) ||
+                          event.depth < 0.0f || event.depth > 1.0f)))
+                        return false;
+                } else {
+                    return false;
+                }
             }
         }
         if (hasRects &&

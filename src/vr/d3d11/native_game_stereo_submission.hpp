@@ -63,7 +63,8 @@ public:
         ID3D11Texture2D* source, const D3D11_BOX& sourceRegion,
         const D3D11_RECT& destination, bool linearFilter,
         UINT sourceArraySlice = 0u) noexcept;
-    // Game-origin TARGET rectangles are ordered after N actual per-eye geometry Draws.
+    // Game-origin TARGET rectangles and full depth/stencil Clears are replayed
+    // together after N real per-eye Draw/DrawIndexed calls in source order.
     // A zero ordinal retains original pre-geometry Clear behavior.
     void set_source_clear_timeline(
         const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept;
@@ -100,17 +101,23 @@ struct NativeGameEyeDrawEvidence {
 struct NativeGameEyeColorSeed {
     std::uint32_t argb[2]{};
 };
-// D3D9 can clear bounded menu/vehicle HUD rectangles after its full-screen
-// TARGET Clear. Replay actual per-eye rectangles in their captured order,
-// never extend a partial Clear over a reused shared eye texture. Callers must
-// only provide source-verified D3D9 TARGET clears, with a full Clear (when
-// present) preceding these entries. Uncovered pixels belong to game Draws.
+// Actual D3D9 game Clears can occur BETWEEN source geometry draws. Keep
+// TARGET rectangle and full Z/stencil events in ONE chronological per-eye
+// stream: two independently sorted lists would reorder mixed game Clears.
+// This is source-authored command replay, never synthesized draw evidence.
+// Partial depth/stencil Clears are unsupported and must fail closed.
 struct NativeGameEyePartialTargetClear {
     static constexpr std::uint32_t kMaxRectsPerEye = 8u;
+    enum class Kind : std::uint8_t { TargetRect, FullDepthStencil };
     struct Entry {
         D3D11_RECT rect{};
         std::uint32_t argb{};
-        std::uint64_t afterDrawOrdinal{}; // original game geometry Draws before Clear
+        std::uint64_t afterDrawOrdinal{}; // source geometry Draws before Clear
+        Kind kind{Kind::TargetRect};
+        float depth{1.0f};
+        std::uint8_t stencil{};
+        bool clearDepth{};
+        bool clearStencil{};
     };
     std::uint32_t count[2]{};
     Entry entries[2][kMaxRectsPerEye]{};

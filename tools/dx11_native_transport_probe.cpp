@@ -1057,11 +1057,22 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 1u;
-    // Source TARGET Clears happened after three masked/depth geometry Draws
-    // and the remaining two left / three right visible Draws.
-    partialGameClear.entries[0][0] = {{4, 4, 12, 12}, 0xffff0000u, 5u};
-    partialGameClear.entries[1][0] = {{40, 4, 48, 12}, 0xff00ff00u, 6u};
+    partialGameClear.count[0] = partialGameClear.count[1] = 2u;
+    // Game-origin full Z/stencil Clear after three masked geometry Draws,
+    // followed by per-eye HUD TARGET Clears after the remaining geometry.
+    // Chronological replay must preserve BOTH independent eye command lists.
+    using SourceClear = outrun::vr::dx11::NativeGameEyePartialTargetClear;
+    for (std::uint32_t eye = 0u; eye < 2u; ++eye) {
+        auto& depthEvent = partialGameClear.entries[eye][0];
+        depthEvent.afterDrawOrdinal = 3u;
+        depthEvent.kind = SourceClear::Kind::FullDepthStencil;
+        depthEvent.depth = eye == 0u ? 0.2f : 0.8f;
+        depthEvent.stencil = static_cast<std::uint8_t>(eye + 11u);
+        depthEvent.clearDepth = true;
+        depthEvent.clearStencil = true;
+    }
+    partialGameClear.entries[0][1] = {{4, 4, 12, 12}, 0xffff0000u, 5u};
+    partialGameClear.entries[1][1] = {{40, 4, 48, 12}, 0xff00ff00u, 6u};
     // Model different actual source-camera crop regions within the two
     // full-sized GPU eyes; the original desktop raster must be restored.
     gameRaster.viewport[0] = {0.f, 0.f, 32.f, 64.f, 0.f, 1.f};
@@ -1473,10 +1484,16 @@ int main()
     auto invalidRaster = gameRaster;
     invalidRaster.scissor[1].right = 65; // Fail before any GPU commands.
     auto invalidPartialClear = partialGameClear;
-    invalidPartialClear.entries[1][0].rect.right = 65; // No partial GPU work.
+    invalidPartialClear.entries[1][1].rect.right = 65; // No partial GPU work.
     auto invalidClearOrder = partialGameClear;
-    invalidClearOrder.count[1] = 2u;
-    invalidClearOrder.entries[1][1] = {{48, 6, 52, 10}, 0xff0000ffu, 1u};
+    invalidClearOrder.entries[1][1].afterDrawOrdinal = 1u;
+    auto invalidDepthClear = partialGameClear;
+    invalidDepthClear.entries[1][0].depth = -0.1f;
+    auto invalidPartialDepth = partialGameClear;
+    invalidPartialDepth.entries[1][0].rect = {1, 1, 4, 4};
+    auto invalidDepthFlags = partialGameClear;
+    invalidDepthFlags.entries[1][0].clearDepth = false;
+    invalidDepthFlags.entries[1][0].clearStencil = false;
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -1489,6 +1506,15 @@ int main()
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster, &invalidClearOrder) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidDepthClear) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidPartialDepth) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidDepthFlags) &&
             !ring.synchronization_faulted() &&
             directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
