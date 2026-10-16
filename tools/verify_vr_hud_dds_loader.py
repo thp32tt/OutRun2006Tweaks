@@ -91,6 +91,29 @@ def verify(text):
         (loader,"dstRow[p + 2] = srcRow[p];","reverse channel swap"),
         (loader,"dstRow[p + 3] = srcRow[p + 3];","opaque X byte retained and A8 alpha preserved"),
     ]
+    # The masked RGB-only branch is a separate *live* format path.
+    # Old X8 zero-mask checks alone cannot validate it. Require declared
+    # alpha intent on both native and swizzled 32-bit A8 admission sites.
+    if fmt.count("rgb32Intent == Rgb32Intent::Alpha") != 2:
+        raise ValueError("both declared alpha format branches must verify DDS flags")
+    masked_opaque = fmt.split("if (rgb32Intent == Rgb32Intent::Opaque &&", 1)
+    if len(masked_opaque) != 2:
+        raise ValueError("stale high-byte mask RGB-only branch missing")
+    masked_opaque = masked_opaque[1].split("// Opaque 32-bit DDS", 1)[0]
+    for required in (
+        "format.dwRGBAlphaBitMask == 0xff000000u",
+        "format.dwRBitMask == 0x00ff0000",
+        "format.dwRBitMask == 0x000000ff",
+        "resolvedFormat = D3DFMT_X8R8G8B8;",
+        "resolvedFormat = D3DFMT_X8B8G8R8;",
+        "if (resolvedFormat != D3DFMT_UNKNOWN)",
+        "return resolvedFormat;",
+    ):
+        if required not in masked_opaque:
+            raise ValueError("RGB-only masked DDS branch lacks " + required)
+    if "const auto rgb32Intent = OutRunVR::DdsAlphaMask::Classify(" not in fmt or (
+        "format.dwFlags, format.dwRGBBitCount, format.dwRGBAlphaBitMask" not in fmt):
+        raise ValueError("DDS masks must be interpreted with actual alpha declaration")
     for region,needle,label in guards + xrgb_checks:
         if needle not in region:
             raise ValueError(label+" not verified")
@@ -290,6 +313,15 @@ def negatives(text):
         "original.restoreOriginal();",
         "pDevice, original.data, original.bytes, D3DX_DEFAULT",
         "const HRESULT originalResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
+        # New live RGB-only high-byte-mask handling; mutations must break
+        # the verified source path, not only the older zero-mask path.
+        "format.dwFlags, format.dwRGBBitCount, format.dwRGBAlphaBitMask",
+        "rgb32Intent == Rgb32Intent::Alpha",
+        "rgb32Intent == Rgb32Intent::Opaque",
+        "format.dwRGBAlphaBitMask == 0xff000000u",
+        "resolvedFormat = D3DFMT_X8R8G8B8;",
+        "resolvedFormat = D3DFMT_X8B8G8R8;",
+        "if (resolvedFormat != D3DFMT_UNKNOWN)",
         "format.dwRGBAlphaBitMask == 0)",
         "return D3DFMT_X8R8G8B8;",
         "return D3DFMT_X8B8G8R8;",

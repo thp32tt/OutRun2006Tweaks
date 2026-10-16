@@ -109,14 +109,17 @@ inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 	if (rgb32Intent == Rgb32Intent::Opaque &&
 		format.dwRGBAlphaBitMask == 0xff000000u)
 	{
+		D3DFORMAT resolvedFormat = D3DFMT_UNKNOWN;
 		if (format.dwRBitMask == 0x00ff0000 &&
 			format.dwGBitMask == 0x0000ff00 &&
 			format.dwBBitMask == 0x000000ff)
-			return D3DFMT_X8R8G8B8;
-		if (format.dwRBitMask == 0x000000ff &&
+			resolvedFormat = D3DFMT_X8R8G8B8;
+		else if (format.dwRBitMask == 0x000000ff &&
 			format.dwGBitMask == 0x0000ff00 &&
 			format.dwBBitMask == 0x00ff0000)
-			return D3DFMT_X8B8G8R8;
+			resolvedFormat = D3DFMT_X8B8G8R8;
+		if (resolvedFormat != D3DFMT_UNKNOWN)
+			return resolvedFormat;
 	}
 
 	// Opaque 32-bit DDS menus and car-selection sprites carry RGB without
