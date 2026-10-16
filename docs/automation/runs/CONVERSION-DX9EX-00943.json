@@ -2,102 +2,98 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00943",
   "production_id": "CONVERSION-DX9EX-00943",
-  "event_id": "CONVERSION-DX9EX-00943-E003",
-  "event_type": "retry",
-  "attempt": 2,
+  "event_id": "CONVERSION-DX9EX-00943-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
   "run_key": "CONVERSION-DX9EX-00943",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
-  "status": "VALIDATING",
+  "status": "C5_CI_RUNNING",
   "phase": "C5_VALIDATE",
-  "checkpoint": "C5_EXACT_SHA_PENDING",
+  "checkpoint": "C5_EXACT_SHA_REQUIRED",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "83a2724cde821839c62276b8d4b1ec8a1b156531",
   "material_result_sha": "c53a28e76bd3c0d27af92cf3d7354df0b8e2c4f5",
-  "validation_bearing_result_sha": null,
   "source_paths": [
-    "src/hooks_uiscaling.cpp",
-    "src/vr/ui/menu_quad_transform.hpp"
+    "src/vr/ui/menu_quad_transform.hpp",
+    "src/hooks_uiscaling.cpp"
   ],
   "changed_files": [
-    "src/hooks_uiscaling.cpp",
     "src/vr/ui/menu_quad_transform.hpp",
+    "src/hooks_uiscaling.cpp",
     "vrhost/CMakeLists.txt",
-    "vrhost/tests/menu_custom_quad_smoke.cpp"
+    "vrhost/tests/menu_custom_quad_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00943.json"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
     "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
-    "goal": "Preserve the complete main-menu and vehicle-selector artwork's intended source aspect and all four transformed quad corners through 4:3, 16:9, 21:9, portrait and stale-size DX9Ex reset transitions without clipping the visual content.",
-    "scope_boundary": "Only eligible contained original title/front-end and vehicle-selection custom sprite quads receive the live physical viewport cap and single affine. Preserve Vanilla anisotropic X, unrelated HUD, GOAL/+TIME, input and FFB, SkyGlow, R26_SAFE, DX11 and frozen DXVK.",
+    "goal": "Keep the complete original title/menu/car-selection custom-sprite quad physically inside the currently published viewport after an old scale survives D3D9Ex Reset, while preserving source art aspect and four-corner affine registration.",
+    "scope_boundary": "Only KeepCentered/OnlineArcade contained original custom sprite quad mapping is viewport-capped; Vanilla desktop, original game HUD, F11, ESC, GOAL/+TIME, SkyGlow, R26_SAFE rollback, DX11/DXVK and input/FFB remain unmodified.",
     "trace_stages": [
-      "Original main menu and vehicle-selector D3DX-authored sprite corners are transformed into four source-space top-left/top-right/bottom-left/bottom-right vertices by the UIScaling producer.",
-      "The custom quad containment mapping used cached screen_scale, which can lag the live screen dimensions across D3D9Ex Reset and previously risked oversized vertices or asymmetric corner transforms.",
-      "Live viewport-constrained OutRunVrMenuQuad::BuildPixelMap produces a single bounded uniform affine shared by all four corners before the unchanged game D3D9 sprite draw and R84 per-eye host composition."
+      "Original OutRun title/menu/car-selector custom sprites publish four already transformed corner positions and an independent cached screen_scale after D3DX source vertex transformation.",
+      "R84 shared hooks_uiscaling custom sprite producer builds a single source-space affine map; previously the X/Y corner coordinates had separately calculated scale and vertical-centering despite one contained quad.",
+      "New R84 source map bounds the four X/Y corners by the live D3D9 destination viewport rather than stale cached screen_scale, leaving untouched D3D9 depth, alpha, original GPU DrawPrimitiveUP and OpenXR compositor surfaces."
     ],
     "subcomponents": [
-      "Cap both cached X and Y source scales against current physical viewport and source extents, reject nonfinite/invalid geometry, and map all four custom quad corners with one coherent X/Y affine in the real game UIScaling source.",
-      "Build and execute native host-side C++ regression of the real source header for aspect-ratio, portrait, stale-size Reset, smaller authored scale, Vanilla desktop anisotropic and invalid/negative geometry without changing protected stereo or original input paths."
+      "Bound contained custom-sprite physical scale to the minimum of positive finite cached source scales and current screen/source width and height ratios; preserve intentional smaller UI zoom.",
+      "Route all four original custom-quad Y vertices through the same PixelMap as existing X vertices, and execute native 4:3/16:9/21:9/portrait/Reset-scale mismatch regression in mandatory Windows x64 host build."
     ],
     "acceptance_items": [
       {
-        "id": "menu_contained_all_corner_geometry",
+        "id": "menu_quad_live_viewport_containment",
         "category": "end_to_end_behavior",
-        "behavior_area": "Main menu and vehicle-select original sprite-to-screen geometry",
-        "expected_behavior": "At 4:3, 16:9, 21:9, portrait and stale-size Reset, all four source quad corners retain one centered uniform affine bounded by the actual new viewport with complete car-selection art."
+        "behavior_area": "Title/menu/car-select original custom sprite visibility and 4-corner geometry",
+        "expected_behavior": "Contain the authored custom sprite in the physically published viewport even if cached screen scale is too large; all X/Y corners share one centred affine without distortion."
       },
       {
-        "id": "menu_vanilla_reset_fallback",
+        "id": "original_vanilla_and_runtime_fallback",
         "category": "fallback_regression",
-        "behavior_area": "Vanilla and negative invalid-size input plus unrelated effects",
-        "expected_behavior": "Original uncontained Vanilla anisotropic X and native sprite behavior stay intact; invalid or nonfinite containment dimensions fail closed without touching FFB, SkyGlow, HUD, GOAL or R26_SAFE."
+        "behavior_area": "Vanilla original desktop, gameplay HUD and bad/reset source inputs",
+        "expected_behavior": "Preserve original Vanilla anisotropic X and unchanged uncontained Y, deliberately smaller scales, and reject zero, nonfinite or impossible contained dimensions without altering FFB, SkyGlow, GOAL or DXVK."
       },
       {
-        "id": "menu_integrated_exact_sha",
+        "id": "main_menu_exact_sha_build",
         "category": "integrated_validation",
-        "behavior_area": "Native C++ smoke, Windows R84 game, R26 safe fallback, x64 host and CI package",
-        "expected_behavior": "The final validation-bearing exact SHA must execute custom quad native smoke and pass DX9Ex Active policy/game/host/package, Domain Isolation and affected Full Source/HUD workflows; HMD is separately UNTESTED."
+        "behavior_area": "Native Windows R84/R26 rollback + x64 OpenXR host smoke, package and domain/source CI",
+        "expected_behavior": "Release-executed native menu quad smoke and mandatory DX9Ex Active, Domain Isolation, Full Source Impact and affected HUD Inspector jobs pass on the exact validation-bearing commit."
       }
     ]
   },
   "acceptance_results": {
-    "menu_contained_all_corner_geometry": "PENDING_CI",
-    "menu_vanilla_reset_fallback": "PENDING_CI",
-    "menu_integrated_exact_sha": "PENDING_CI"
+    "menu_quad_live_viewport_containment": "PENDING_CI",
+    "original_vanilla_and_runtime_fallback": "PENDING_CI",
+    "main_menu_exact_sha_build": "PENDING_CI"
   },
   "diagnosis": {
-    "original_evidence": "The original UIScaling custom sprite quad emits four transformed D3DX corners and consumes game screen_scale, while live D3D9Ex Reset can change physical output dimensions ahead of that cached value.",
+    "root_cause": "The contained source custom quad X transform used BuildPixelMap's cached gameScale while Y recalculated scale/centering independently; when screen_scale is left larger than the published current viewport after D3D9Ex Reset, the old quad extends beyond visible menu and car-selection source bounds.",
+    "source_evidence": "The existing hooks_uiscaling.cpp assigned all four X with ProjectX(quadMap), but four Y vertices used an independent scaleY and verticalCenter from screen_scale; BuildPixelMap contained branch never capped gameScale by destination width/source width and height/source height.",
+    "original_evidence": "Original game title/menu/selector and custom-sprite corner producers remain canonical, with original DrawPrimitiveUP, UV/depth/color and D3DX vertex transformed positions unmodified.",
     "source_trace": [
-      "Original D3DX sprite dimensions and source corner transforms are read in src/hooks_uiscaling.cpp at the game's custom quad producer.",
-      "src/vr/ui/menu_quad_transform.hpp computes a live physical viewport cap from screen extent divided by source extent, then returns one centered bounded PixelMap for four X/Y vertices.",
-      "R84 independent mainline game uses the original sprite draw with identical 4-corner geometry; x64 host native smoke exercises the same game header before OpenXR eye presentation."
+      "The original title/menu/selector game custom sprite source provides four corners transformed by its own D3DX matrix and cached original resolution.",
+      "The R84 custom sprite hook constructs PixelMap with both game scale and current backbuffer extent and now projects all eight X/Y corner coordinates consistently.",
+      "The D3D9 original DrawPrimitiveUP still submits exactly one four-vertex quad; the OpenXR host inherits original per-eye presentation, not an artificially moved world render."
     ],
-    "root_cause": "Cached screen_scale can reflect the old backbuffer after Reset even while the new output extent is smaller, causing overflowing/cropped menu and vehicle-select quads when placement relies only on stale game scale.",
+    "eye_ownership": "This correction is a contained original game UI geometry/viewport contract upstream of the same original D3D9 GPU draw; binocular user acceptance requires matching Quest3/VDXR visual confirmation.",
     "alternatives_rejected": [
-      "Do not stretch only the X axis, patch individual quad vertices independently, or change global HUD/screen-space scaling, since these would skew artwork or regress accepted desktop and scene geometry."
+      "GOAL/+TIME deferred-batch ownership cannot repair physically cropped original car-selector art in a contained resize transition.",
+      "Adding a second generic XR crop or modifying all mono world/HUD draws would risk unrelated healthy stereo and does not fix inconsistent original four-corner geometry."
     ],
-    "fix_evidence": "Material C++ result c53a28e adds physical viewport cap and one affine across all four corners, with native executable smoke in mandatory x64 host dependency.",
-    "negative_test_evidence": "The native menu_custom_quad_smoke.cpp includes smaller intentional game scale, Vanilla anisotropic fallback, zero/NaN/tiny source dimensions, stale 1920-to-1600 output and arbitrary transformed corner deltas.",
-    "eye_ownership": "Only original eligible contained 2D front-end sprite geometry is modified before existing R84 stereo/host; new code does not assert physical Quest3 binocular outcome.",
-    "runtime_limit": "No game/Quest3/VDXR hardware test was executed; final optical and reset behavior remains untested."
-  },
-  "ci_evidence": {
-    "failed_run": {
-      "run_id": 38863233710,
-      "sha": "c53a28e76bd3c0d27af92cf3d7354df0b8e2c4f5",
-      "job": "policy",
-      "reason": "Missing docs/automation/runs/CONVERSION-DX9EX-00943.json; game,host,package skipped"
-    },
-    "validation_bearing_sha": null,
-    "exact_sha": "PENDING",
-    "conclusions": {},
-    "runtime": "UNTESTED"
+    "fix_evidence": "Physical screen/source scale caps the previously unbounded contained cached scaling, and the original quad now uses ProjectY(quadMap) for each of the four corners just as it already used ProjectX.",
+    "negative_test_evidence": "New native Release smoke covers old-size-to-new-size scale mismatch, square/portrait 4:3/16:9/21:9 positions, smaller scale preservation, Vanilla desktop, invalid/NaN/tiny inputs and transformed corners."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Resolve missing feature record under the same material result, then run complete mandatory exact-SHA GitHub gates. Do not double-score; only the original C++ material implementation can count after verified validation."
+  "next_action": "C5 exact-SHA integration underway. Initial material-only commit was blocked in pre-build feature policy due to absent required run record; same-task error repair adds record without weakening gate or touching game C++ again. Quest3/VDXR runtime remains UNTESTED.",
+  "ci_evidence": {
+    "initial_material_sha": "c53a28e76bd3c0d27af92cf3d7354df0b8e2c4f5",
+    "initial_failed_run_id": 38863233710,
+    "initial_failure_class": "FEATURE_RUN_RECORD_MISSING_ONLY_BEFORE_GAME_BUILD",
+    "exact_sha": "PENDING",
+    "hmd_validation": "UNTESTED"
+  }
 }
