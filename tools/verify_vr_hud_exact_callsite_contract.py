@@ -265,26 +265,43 @@ def check(ui, manifest, fraction_header=None):
     # exactly the same ScreenHud/producer token while the game's original
     # function and later TagAppendedNodes still execute once.
     pause_clip = function_body(ui, "static int __cdecl PauseOptionArrow_putClipSprite(")
-    if (pause_clip.count("return ExactScreenHud_putClipSprite(") != 2 or
+    if (pause_clip.count("return ExactScreenHud_putClipSprite(") != 1 or
         "if (!Settings::VREnabled || !Game::current_mode ||" not in pause_clip or
         "*Game::current_mode != GameState::STATE_SMPAUSEMENU)" not in pause_clip or
         "ScopedExactProducerSemantic directArrowOwner(" not in pause_clip or
         "RenderScope::ScreenHud, nullptr, true," not in pause_clip or
-        "ProducerToken::ExactScreenHudClipSprite" not in pause_clip or
-        "Game::put_clip_sprite(" in pause_clip):
+        pause_clip.count("ProducerToken::PauseOptionArrow") != 2 or
+        "Game::put_clip_sprite(" in pause_clip or
+        "QueueRenderActive()" not in pause_clip):
         fail("ESC option arrows lost exact direct producer and queued sibling path")
     ordered(pause_clip, "ESC original E8 direct call ownership ordering",
+            "return ExactScreenHud_putClipSprite(",
+            "FlushD3DXBeforeDirectGoalSource();",
             "ScopedExactProducerSemantic directArrowOwner(",
-            "ProducerToken::ExactScreenHudClipSprite);")
-    if pause_clip.rfind("return ExactScreenHud_putClipSprite(") < pause_clip.find("ScopedExactProducerSemantic directArrowOwner("):
-        fail("ESC direct source original dispatch no longer scoped")
-    exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
-    ordered(exact_clip, "exact clip HUD sibling tagging",
+            "ProducerToken::PauseOptionArrow);",
+            "const int result = ExactScreenHud_putClipSpriteOwned(",
+            "FlushD3DXAtDirectGoalSourceExit();",
+            "return result;")
+    if ("ProducerToken::PauseOptionArrow);" not in pause_clip or
+            "RenderScope::WorldBillboard" in pause_clip):
+        fail("ESC direct producer must not borrow generic/world ownership")
+
+    # Exact queue snapshot, game E8, and all-sibling tags are in the shared
+    # owned function; generic and pause wrappers have separate token inputs.
+    exact_owned = function_body(ui, "static int ExactScreenHud_putClipSpriteOwned(")
+    ordered(exact_owned, "exact clip HUD sibling tagging",
             "tailsBefore", "const int result = Game::put_clip_sprite(",
             "TagAppendedNodes(tailsBefore,")
-    if ("RenderScope::ScreenHud" not in exact_clip or
-            "ProducerToken::ExactScreenHudClipSprite" not in exact_clip):
+    if ("Game::SpritePriorityCount" not in exact_owned or
+            "RenderScope::ScreenHud, producer" not in exact_owned or
+            "RenderScope::WorldBillboard" in exact_owned):
         fail("exact clip HUD lost all-node ScreenHud tagging")
+    exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
+    ordered(exact_clip, "generic clip HUD token forwarding",
+            "return ExactScreenHud_putClipSpriteOwned(",
+            "ProducerToken::ExactScreenHudClipSprite")
+    if "PauseOptionArrow" in exact_clip:
+        fail("generic HUD inherited exact pause optical token")
     glyph = function_body(ui, "static int __cdecl TextGlyph_putSprite(")
     ordered(glyph, "stage/result Sumo_Printf glyph group tags all nodes",
             "tailsBefore", "const int result = original(args, priority);",
@@ -429,8 +446,8 @@ def test_mutations(ui, manifest):
               ui.replace("*Game::current_mode != GameState::STATE_SMPAUSEMENU)",
                          "*Game::current_mode != GameState::STATE_GAME)", 1))
     must_fail("ESC immediate option arrow token erased",
-              ui.replace("ProducerToken::ExactScreenHudClipSprite);\n\t\treturn ExactScreenHud_putClipSprite(",
-                         "ProducerToken::None);\n\t\treturn ExactScreenHud_putClipSprite(", 1))
+              ui.replace("OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow);\n        const int result",
+                         "OutRunVR::GameSemantic::ProducerToken::None);\n        const int result", 1))
     must_fail("4th place hooked as HUD", ui.replace("Module::exe_ptr(addr), RankMarker_putClipSprite,",
                                                    "Module::exe_ptr(addr), ExactScreenHud_putClipSprite,", 1))
     must_fail("glyph token drift", ui.replace("ProducerToken::TextGlyphPutSprite",
