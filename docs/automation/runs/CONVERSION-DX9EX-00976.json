@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING",
-  "phase": "C5_EXACT_SHA_CI",
-  "checkpoint": "C5_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "undefined",
   "material_result_sha": "dee5d8d412b8fddef34bbb08b4dbc888afb9fe3d",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "fcf1b860155c126a39c8cc547037c140d76d7b1d",
   "source_paths": [
     "src/vr/game/lens_centre_partial_wvp.hpp",
     "src/vr/game/outrun_renderer.cpp"
@@ -96,5 +96,5 @@
     "no_new_independent_feature_or_score": true
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Allow required exact-SHA workflows to complete on the new record-bearing commit; on success record C6 separately without rerunning PASS or changing original material SHA. Quest3/VDXR stays UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA bookkeeping complete for the validated DX9Ex Active game, host, full-chain, package and passing domain/HUD gates; Full Source Impact Review static analyzer was still running at C6 record time. No CI rerun or added score. Quest3/VDXR runtime remains UNTESTED."
 }
