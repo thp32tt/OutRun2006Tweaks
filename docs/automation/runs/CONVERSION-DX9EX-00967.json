@@ -1,0 +1,107 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00967",
+  "production_id": "CONVERSION-DX9EX-00967",
+  "event_id": "CONVERSION-DX9EX-00967-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00967",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IN_PROGRESS",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "ccaf48f08281451463c9efe2f7a056c67ac138de",
+  "material_result_sha": "1925d36ba763243df0dc218a9bbabf5d545872a2",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/sprite_queue_tail_proof.hpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/sprite_queue_tail_proof.hpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00967.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep the entire original +TIME stage-extension HUD visible in the intended binocular eye route when its sprite and numeric glyph nodes are the first producers appended to an empty real-game SpriteQueue priority chain; reject stale tail provenance without changing the ordinary timer or GOAL behavior.",
+    "scope_boundary": "This feature repairs root-sentinel tail provenance for exact +TIME sprite and numeric glyph batches only; it does not alter GOAL timing, generic gameplay HUD, lens discs, world stereo, SkyGlow, FFB/input, R26_SAFE, DX11, or the frozen DXVK backend.",
+    "special_work_evidence": "The native game empty priority-list uses the root sentinel as tail_4. The pre-fix FirstVerifiedAppendedNode treated any non-null old tail as a real node, returning null when +TIME first populated that list; later queued siblings were incorrectly privileged over the first exact source.",
+    "trace_stages": [
+      "Original executable +TIME sprite producers at 0x9898E/0x98A36/0x98AC6 and numeric print at 0x989AD/0x98A10/0x98A89 enter the exact stage extension semantic owner.",
+      "The original SpriteQueue priority root initially points tail_4 at itself; FirstVerifiedAppendedNode now walks the live bounded root-next chain to prove new tail identity and recover the first exact append, preserving sprite and glyph producer identity through deferred queue submission.",
+      "R84 stage extension physical HUD Draw consumes source-confirmed SpriteNodes for bilateral eye-plane rendering; unsafe stale, truncated, detached, and sentinel-as-data tails fail closed to original game rendering and the existing x64 OpenXR composition remains unchanged."
+    ],
+    "subcomponents": [
+      "Prove the game priority-list empty tail root sentinel as a valid before-tail rather than a detached live sprite.",
+      "Retain both first queued stage sprite and numeric glyph nodes while rejecting stale, truncated and disconnected queue-chain cases.",
+      "Compile and execute the host source-level positive/negative tail regression with direct header dependency, preserving R84 eye dispatch and native fallbacks."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_sprite_and_glyph_first_append",
+        "category": "end_to_end_behavior",
+        "behavior_area": "First +TIME sprite plus numeric print in an empty priority SpriteQueue",
+        "expected_behavior": "Both sprite and numeric glyph exact-source nodes remain discoverable and eligible for the existing R84 stereo eye layer when root was the pre-append tail."
+      },
+      {
+        "id": "stage_queue_stale_tail_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Stale/new-tail outside root chain and insufficient traversal bound; game or HUD foreign nodes",
+        "expected_behavior": "Truncated, detached, sentinel-as-data and stale queue provenance fail closed without tagging unrelated nodes, mutating time logic or suppressing standard world/GOAL rendering."
+      },
+      {
+        "id": "stage_integrated_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Active R84/R26_SAFE Windows game, x64 host, package, Domain and impacted inspector/source review",
+        "expected_behavior": "All required exact-SHA GitHub Actions and source-level regression succeed before BUILD_VERIFIED; Quest3/VDXR remains UNTESTED until tested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_sprite_and_glyph_first_append": "PENDING_EXACT_SHA",
+    "stage_queue_stale_tail_fallback": "PENDING_EXACT_SHA",
+    "stage_integrated_exact_sha": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Native SpriteQueue tail_4 starts at the root itself for an empty priority queue; +TIME can be the first exact source to append sprites and numeric glyphs to that list in a frame.",
+    "source_trace": [
+      "Game UI producer StageExtensionSpraniCalls/StageExtensionPrintCalls emits stage +TIME sprite and numeric glyph identities via the original stage source hooks.",
+      "src/vr/game/sprite_queue_tail_proof.hpp FirstVerifiedAppendedNode observes root, old tail, new tail and bounded live next_0 chain at deferred sprite queue handoff.",
+      "R84 stereo stage HUD consumer receives only proven SpriteNode source tags and keeps original rendering when proof fails before OpenXR host composition."
+    ],
+    "root_cause": "The first exact stage +TIME priority-list producer was silently missed because the prior code assumed every non-null oldTail was an existing data node, ignoring the empty-list root-as-tail sentinel.",
+    "alternatives_rejected": [
+      "Do not flush all delayed D3DX batches, force a stereo promotion without queue proof, alter game timer/GOAL logic, or disable unrelated SkyGlow and lens effects."
+    ],
+    "fix_evidence": "Material source commit 1925d36ba763243df0dc218a9bbabf5d545872a2 makes root sentinel handling explicit and refuses root as a new data tail. Follow-up 8f1c3c23b18b496f9256aa83cde28ab20d0aca87 adds the missing test include for the actual helper.",
+    "negative_test_evidence": "vrhost/tests/stage_extension_direct_owner_smoke.cpp returns distinct failures for bounded traversal shorter than new tail, stale new tail, sentinel-as-data, and detached old tail; also verifies both empty-root and ordinary nonempty priority append.",
+    "eye_ownership": "The existing source-owned stage HUD is eligible for R84 binocular routing only with proven physical SpriteNode identity; otherwise preserve the native draw, not a cached world WVP. Same-SHA Quest3/VDXR stereo observation has not been performed."
+  },
+  "ci_evidence": {
+    "status": "FAILED_PRIOR_SHA",
+    "failed_run_id": 38942143704,
+    "failed_sha": "8f1c3c23b18b496f9256aa83cde28ab20d0aca87",
+    "failed_job": "DX9Ex Active Validation / policy",
+    "failure": "verify_vr_feature_unit_policy.py --check-head rejected the missing task JSON before Windows game/host/package jobs could execute.",
+    "source_build": "NOT_RUN_ON_FAILED_SHA"
+  },
+  "ci_repair": {
+    "failed_validation_sha": "8f1c3c23b18b496f9256aa83cde28ab20d0aca87",
+    "failed_run_id": 38942143704,
+    "failed_gate": "DX9Ex Active Validation policy",
+    "reason": "Exact-head feature contract record missing; not a C++ compiler failure.",
+    "correction": "Add same-task canonical +TIME feature contract and pending result without weakening CI policy. Preserve the prior material C++ source SHA and require a new exact-SHA full gate for this updated validation input.",
+    "score_delta": 0
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Observe exact-SHA Windows DX9Ex Active plus required Domain/Full Source/HUD gates for the new record commit; record CI evidence separately after all gates succeed. HMD validation stays UNTESTED."
+}
