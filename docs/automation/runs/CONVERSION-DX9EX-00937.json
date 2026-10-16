@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "29bddaecc553558ecf31333399a3d73f3f873880",
@@ -29,8 +29,8 @@
     "vrhost/CMakeLists.txt",
     "docs/automation/runs/CONVERSION-DX9EX-00937.json"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "09f9bdfc9a3018259ec189ae89b481dc7eb95489",
+  "validation_bearing_result_sha": "09f9bdfc9a3018259ec189ae89b481dc7eb95489",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:EXTENDED_TIME",
     "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
@@ -68,13 +68,44 @@
     ]
   },
   "acceptance_results": {
-    "stage_canted_pair": "SOURCE_IMPLEMENTED",
-    "stage_invalid_fallback": "NATIVE_SMOKE_PENDING",
-    "stage_exact_sha_ci": "PENDING"
+    "stage_canted_pair": "PASS_BUILD",
+    "stage_invalid_fallback": "PASS_BUILD",
+    "stage_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R84 R30BuildStageExtensionXyzrhwEyePlane used identity quaternion for both eyes, losing independently canted OpenXR local eye rotations; same downstream GPU plane is used by original six +TIME producers.",
-    "source_evidence": "R84 lens C993 world path already validates stereo.eyeOrientation, but exact +TIME/GOAL path only applied relative IPD and per-eye FOV; shared eye pose helper preserves both with fail-closed output."
+    "source_evidence": "R84 lens C993 world path already validates stereo.eyeOrientation, but exact +TIME/GOAL path only applied relative IPD and per-eye FOV; shared eye pose helper preserves both with fail-closed output.",
+    "original_evidence": "Original OutRun EXE six 0x9898E/0x98A36/0x98AC6 sprite plus 0x989AD/0x98A10/0x98A89 numeric extension-time E8 producers enter exact StageExtensionTime/ScreenHud and share GPU XYZRHW R84 finite eye plane.",
+    "source_trace": [
+      "Original six StageExtensionTime original E8 calls tag immediate or queued SpriteNodes, and D3DXSprite CPU Draw batches carry exact homogeneous HUD ownership through GPU Flush/End.",
+      "R84 stereo_renderer_r30.cpp R30BuildStageExtensionXyzrhwEyePlane constructs finite -2.50 source HUD plane, removes common HMD head pose once, and previously discarded per-eye orientation using identity quaternion.",
+      "R84 now validates head-local stereo.eyeOrientation[0,1] and relative IPD through StageExtensionPlane::BuildStageEyePoses before composing each eyeInverse and asymmetric FOV, then R33 submits independently or falls back to source Draw."
+    ],
+    "eye_ownership": "Both eyes share the exact source finite -2.50 HUD plane and common head inverse, but use independent validated head-local OpenXR cant quaternions, relative IPD translations and asymmetric eye FOV; an invalid eye fails closed before enabling bilateral reprojection.",
+    "alternatives_rejected": [
+      "Incorrect missing +TIME call-site hooks were excluded because all six original sprite/numeric E8 sources and the D3DX deferred/queue semantic lifetime bridge were already present and retained unchanged.",
+      "Incorrect use of absolute world/head eye pose was excluded: R30 already removes the common head inverse, so only normalized head-local eye quaternions and relative IPD may be added, not absolute head motion."
+    ],
+    "fix_evidence": "Material SHA 09f9bdfc9a3018259ec189ae89b481dc7eb95489 changes actual R84 stereo_renderer_r30.cpp, stage_extension_eye_plane.hpp and portable native stage_extension_eye_plane_smoke.cpp, wired to execute during mandatory host build; all final exact-SHA Active/Domain/HUD/Full Source GitHub workflows succeeded.",
+    "negative_test_evidence": "Mandatory x64 host build runs non-assert C++ smoke covering independently canted eyes, parallel stereo, malformed second-eye quaternion, NaN IPD, zero/infinite world scale and degenerate XYZRHW viewport/projection. Atomic helper must not alter previously published bilateral pose on failure; Windows host job SUCCESS."
   },
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "ci_evidence": {
+    "validation_sha": "09f9bdfc9a3018259ec189ae89b481dc7eb95489",
+    "exact_sha": "PASS",
+    "run_ids": {
+      "DX9Ex Active Validation": 38851987239,
+      "Domain Isolation Guard": 38851987184,
+      "OutRun EXE HUD Inspector CI": 38851987240,
+      "DX9Ex Full Source Impact Review": 38851987408
+    },
+    "conclusions": {
+      "DX9Ex Active Validation": "SUCCESS_5_OF_5",
+      "Domain Isolation Guard": "SUCCESS",
+      "OutRun EXE HUD Inspector CI": "SUCCESS_2_OF_2",
+      "DX9Ex Full Source Impact Review": "SUCCESS_3_OF_3"
+    },
+    "hmd_validation": "UNTESTED"
+  },
+  "next_action": "C6 build verification complete for material/validation-bearing 09f9bdfc. Await user Quest3/VDXR runtime +TIME sprite/numeric binocular-single and GOAL stability test; no auto backend or release acceptance claim."
 }
