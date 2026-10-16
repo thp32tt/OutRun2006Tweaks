@@ -1,0 +1,102 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00947",
+  "production_id": "CONVERSION-DX9EX-00947",
+  "event_id": "CONVERSION-DX9EX-00947-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00947",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_REQUIRED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "6c6838b1f74eda28b46d17736b13f4a0453c9c8e",
+  "material_result_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/projected_rank_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/projected_rank_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/r84_rank_marker_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00947.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Preserve original vehicle-specific Calc3D2D projected rank marker attachment through complete R84 binocular XYZRHW GPU-eye conversion, with no partial left-eye writes or invalid right-eye outputs during Reset, recenter or asymmetric OpenXR projection.",
+    "scope_boundary": "Only exact R84 vehicle/rival rank projected-eye coordinate mapping. Preserve source SpriteNode identity, NaviPub screen ranks, c64/WVP shader ownership, Z/RHW/UV, GOAL, SkyGlow, desktop game input/FFB, R26 rollback and frozen DXVK.",
+    "trace_stages": [
+      "Original per-vehicle Calc3D2D producer supplies each projected rank SpriteNode and its bounded game-view anchor.",
+      "R30 transforms each exact world-marker XYZRHW vertex into two GPU-eye scratch buffers while keeping source Z/RHW/UV and exact producer classification.",
+      "Two-eye XR FOV/pose projection and host stereo consume only a fully valid binocular coordinate pair; rejected Reset/invalid-eye input keeps native fallback."
+    ],
+    "subcomponents": [
+      "Implement finite double-intermediate bilateral rank viewport math with atomic publication of both XR eye positions.",
+      "Integrate the shared pair transform into the R84 physical-eye renderer vertex path and execute portable positive/negative rank smoke including invalid second-eye/Reset."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_both_eyes_at_once",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact moving-vehicle GPU-eye rank mapping",
+        "expected_behavior": "R84 source driver passes validated paired projections to both scratch eye buffers and preserves original source vertex Z/RHW, UV and game marker classification."
+      },
+      {
+        "id": "rank_reset_and_invalid_eye",
+        "category": "fallback_regression",
+        "behavior_area": "XR lifecycle and desktop fallback",
+        "expected_behavior": "NaN second eye, zero viewport or oversized finite viewport cannot commit only one eye and do not touch the original game rank/FFB fallback."
+      },
+      {
+        "id": "rank_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Native Win32 game x64 host and regression package",
+        "expected_behavior": "Existing rank marker native smoke, Windows x86 game and x64 host build, R84 Active, Domain, Full Source Impact and affected inspector gate are verified at the last validation-bearing exact SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_both_eyes_at_once": "PENDING_CI",
+    "rank_reset_and_invalid_eye": "PENDING_CI",
+    "rank_exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R84 rank GPU-eye loop committed eye0 XY before validating eye1; separate float NDC computations could overflow finite viewport intermediates. Scratch writes on rejected second eye were not transactional, even when eventual result returned false.",
+    "source_evidence": "Source: src/vr/d3d9/stereo_renderer_r30.cpp R30TransformProjectedRankXyzrhwStereo previously assigned dst[0]/dst[1] in an eye loop. src/vr/game/projected_rank_stereo.hpp computed float (mapped+1)*viewport before the final half multiplication.",
+    "original_evidence": "Existing original-executable Calc3D2D exact vehicle/rival rank producer and SpriteNode queue token are reused; this change introduces no EXE RVA or extra original hook.",
+    "source_trace": [
+      "Original 0xBAEE2 Calc3D2D producer registers per-car view anchor via hooks_uiscaling.cpp.",
+      "R30BuildProjectedRankDelta supplies exact shared latched eye shifts to R30TransformProjectedRankXyzrhwStereo.",
+      "Paired finite projection publishes left/right XY together before R29 physical stereo submission, retaining original Z/RHW/UV."
+    ],
+    "alternatives_rejected": [
+      "Globally turning all XYZRHW/HUD geometry into world ranks would break actual game UI, so change only the corroborated exact projected-world rank branch.",
+      "Repeated HMD shader constant rescans do not resolve the deterministic partial-output arithmetic path."
+    ],
+    "fix_evidence": "Shared RemapScreenPair validates both eyes before output publication and computes double intermediate NDC; R30 calls it once per source vertex then writes both eye coordinates.",
+    "negative_test_evidence": "Existing native vrhost/tests/r84_rank_marker_stereo_smoke.cpp adds NaN right-eye atomic fallback, zero viewport Reset no-write, large finite projection and left/right asymmetry cases.",
+    "eye_ownership": "Only exact RankMarker/Rival projectedWorldMarker R84 path writes two-eye scratch after complete pair. Native mono fallback remains on rejection; no quest headset acceptance claimed."
+  },
+  "ci_evidence": {
+    "exact_sha": null,
+    "dx9ex_active": "PENDING_RECORD_REPAIR",
+    "domain_isolation": "PENDING",
+    "full_source_impact": "PENDING",
+    "hud_inspector": "PENDING",
+    "runtime_hmd": "UNTESTED",
+    "previous_source_only_sha": "96dc8d4c479586499e2ba578d20c1d0c905196e0",
+    "previous_active_policy_failure": "RUN_RECORD_MISSING"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run mandatory Gate matrix for final record-bearing SHA, repair actual failure only, C6 separate after exact SHA PASS; Quest3/VDXR marker optical verification remains UNTESTED."
+}
