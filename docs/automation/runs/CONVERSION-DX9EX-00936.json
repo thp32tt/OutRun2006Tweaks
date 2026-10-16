@@ -10,10 +10,10 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "PENDING_EXACT_SHA",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "11c08c8a01eba0fbb70e2ba28d75b12bea15167a",
@@ -29,7 +29,7 @@
     "docs/automation/runs/CONVERSION-DX9EX-00936.json"
   ],
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "7bd726e43b57655a801006370786f2aba968e107",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
     "goal": "R84 exact original C993 central sun preserves head-local per-eye OpenXR cant and IPD during world projection, with untouched fallback on invalid pose.",
@@ -79,6 +79,6 @@
     "repaired_under_same_task_id": "CONVERSION-DX9EX-00936"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Verify corrected exact-SHA policy, R84/R26 game/host/package, Domain, HUD and Full Source gates. Runtime Quest3 remains UNTESTED.",
+  "next_action": "C6 PASS_EXACT_SHA recorded for validated commit 7bd726e43b57655a801006370786f2aba968e107. Quest3/VDXR runtime HMD test remains UNTESTED; no source change or CI rerun.",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE"
 }
