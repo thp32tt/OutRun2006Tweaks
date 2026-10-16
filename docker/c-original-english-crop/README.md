@@ -38,8 +38,22 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
   No legacy 986 tile or reassembly is eligible.
 - Evidence: `docker_last_run.json`, `docker_run_audit.jsonl`,
   `docker_holds/*.json`; every result remains `TEST_ONLY`.
-- Docker restart: `unless-stopped`; network none, cpu 0.35 and memory 512 MB.
+- OCR engine: Tesseract 5 with English traineddata bundled in a dedicated
+  `outrun-c-english-ocr:20261017` image (built via `Dockerfile.ocr`).
+  OCR runs locally/offline in the C container every 600 seconds and takes
+  the 16+ reviewed English transcriptions as a strict phrase allowlist.
+  `ocr_recognize.py` automatically accepts only high-confidence exact English
+  matches, outside the 255/archive/queue, with non-clipped native bbox and
+  independently verified full DDS/PNG source; it atomically enqueues them.
+  Every OCR crop still receives TEST_ONLY and no runtime PASS.
+- OCR remains fallible: items with source/letter ambiguity, wrong/incomplete
+  text, clipped alpha/effect or non-text sprites are rejected or HOLD, never
+  guessed to force production. See `auto_discovery/Q*_ocr_results.json`.
+- Predeployment OCR probe: Q051/Q060 genuine DDS verified, 9 official phrase
+  matches, 8 already cropped excluded, 1 border-overlap held, 0 new queues.
+  The older manually reviewed `IN...` smoke crop is separate from OCR.
+- Docker restart: `unless-stopped`; network none, cpu 0.35 and memory 768 MB.
 - Deploy from this directory with `docker compose -f compose.yaml up -d`
-  (N100 must have the cached `outrun-kor-c-salvage:20261015` image).
+  (N100 must have the locally built `outrun-c-english-ocr:20261017` image).
 - Check: `docker logs --tail 50 outrun-c-original-english-crop`.
   No Portainer stack or existing containers are modified.
