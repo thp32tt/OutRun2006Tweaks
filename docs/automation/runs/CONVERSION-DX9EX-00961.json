@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C5_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "27c0ba19a71df1c8db9108e4fe7a1dbba1fe82d6",
   "material_result_sha": "fc7b0337ef311f9ea75dd14916d8e0efce5cc138",
-  "validation_bearing_result_sha": "PENDING_THIS_COMMIT",
+  "validation_bearing_result_sha": "99b42748b0ca065e580e9306c35c59e31244fcf7",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/ui/multi_sprite_contain_scale.hpp",
@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "frontend_all_affine_paths": "PENDING_EXACT_SHA_CI_AND_HMD",
-    "frontend_native_negative": "PENDING_EXACT_SHA_CI",
-    "frontend_exact_sha_gate": "PENDING_EXACT_SHA_CI"
+    "frontend_all_affine_paths": "PASS_EXACT_SHA",
+    "frontend_native_negative": "PASS_EXACT_SHA",
+    "frontend_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The D3DXMatrixTransformation2D full, partial and pivoted menu matrix paths still trusted the original game's cached screen_scale after Reset, despite custom-sprite and quad paths already bounding their scale by screen_resolution. A stale 1920x1080 scale on a resized 1280x720 backbuffer maps 640x480 content to 1440x1080 and clips right/bottom artwork.",
@@ -84,8 +84,41 @@
       "Updating only menu_quad_transform.hpp would not affect D3DXMatrixTransformation2D's independent full/partial/pivot submission path; globally resizing VR HudScale would affect unrelated ScreenHud, not correct this source."
     ],
     "eye_ownership": "The source sprites remain on the existing game R84 UI stereo path; no new stereo owner is granted. Per-eye physical Quest3/VDXR optical output is not observed.",
-    "runtime_limit": "Source-level numerical and GitHub build validation only. No direct game/Quest3/VDXR visual or frame pacing evidence."
+    "runtime_limit": "Source-level numerical and GitHub build validation only. No direct game/Quest3/VDXR visual or frame pacing evidence.",
+    "original_evidence": "Original game D3DXMatrixTransformation2D full/partial/pivoted menu sources in hooks_uiscaling.cpp used min(original screen_scale.x,y) while the original game device can publish a newer backbuffer resolution during Reset; exact source math reproduced 1920x1080 cached scale against a 1280x720 live backbuffer overflowing both axes. No physical HMD claim.",
+    "fix_evidence": "C++ material commit fc7b0337ef311f9ea75dd14916d8e0efce5cc138 reuses the existing live-backbuffer-bounded custom sprite containment scale in shared frontend_affine_contain.hpp for all three real D3DX menu/car-selector matrix variants. Exact validation input 99b42748b0ca065e580e9306c35c59e31244fcf7 passes four mandatory GitHub Actions gates with R84/R26_SAFE Windows builds, host and package.",
+    "negative_test_evidence": "Updated tools/verify_vr_ui_matrix_safety.py checks full, nullable and pivoted D3DX owners, physical viewport cap and negative mutations. Portable GCC and Clang equivalent-source numerical checks pass 4:3, 16:9, ultrawide, portrait, stale Resize and invalid extents. GitHub HUD Inspector and DX9Ex Active passed exact SHA; no Quest3/VDXR optical or FPS data."
   },
-  "next_action": "Repair real exact-SHA CI failures under same TASK_ID, then C6 PASS_EXACT_SHA only on matching successful required gates. Quest3/VDXR menu/car-selector crop negative tests remain needed.",
-  "score_delta_this_attempt": 0
+  "next_action": "C6 BUILD_VERIFIED at exact validation-bearing SHA 99b42748b0ca065e580e9306c35c59e31244fcf7 (mandatory GitHub Actions 4/4 SUCCESS). Material implementation fc7b0337ef311f9ea75dd14916d8e0efce5cc138 retained. Quest3/VDXR optical menu/car-selector and Reset behavior NEED_HMD_TEST; no real game or Quest runtime PASS.",
+  "score_delta_this_attempt": 0,
+  "ci_evidence": {
+    "exact_sha": "99b42748b0ca065e580e9306c35c59e31244fcf7",
+    "github_actions": {
+      "dx9ex_active": {
+        "run_id": 38920552982,
+        "conclusion": "SUCCESS"
+      },
+      "domain_isolation": {
+        "run_id": 38920552963,
+        "conclusion": "SUCCESS"
+      },
+      "full_source_impact": {
+        "run_id": 38920556747,
+        "conclusion": "SUCCESS"
+      },
+      "hud_inspector": {
+        "run_id": 38920557168,
+        "conclusion": "SUCCESS"
+      }
+    },
+    "gate_count": "4/4",
+    "build_components": [
+      "Win32 R84 MAIN game",
+      "Win32 R26_SAFE fallback game",
+      "x64 OpenXR host",
+      "Full-chain Win32 compile",
+      "DX9Ex package"
+    ],
+    "runtime_validation": "UNTESTED"
+  }
 }
