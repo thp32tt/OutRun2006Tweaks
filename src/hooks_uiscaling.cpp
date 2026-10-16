@@ -1486,21 +1486,14 @@ class UIScaling : public Hook
 			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
 			if (!root || !tailAfter || tailAfter == tailsBefore[prio])
 				continue;
-			SpriteNode* node = tailsBefore[prio]
-				? tailsBefore[prio]->next_0 : root->next_0;
-			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
-			{
-				// The exact rank clip producer can expand to kind-0
-				// SPRARGS or kind-1 SPRARGS2 siblings. Both need the
-				// same Calc3D2D subpixel remainder, but kind-1
-				// positions live in the affine quad's translation.
-				// Unknown/nonfinite layouts remain untouched.
-				OutRunVR::RankMarker::RestoreFraction(
-					*node, frozenFractionX, frozenFractionY);
-				if (node == tailAfter)
-					break;
-				node = node->next_0;
-			}
+			// The original clip producer can rebuild this priority list.
+			// The old tail is a snapshot, NOT owned memory: prove it is
+			// still reachable from the live root before touching siblings.
+			// Restore every proven kind-0/1 child's original Calc3D2D
+			// fraction, then register the SAME live children below.
+			OutRunVR::RankMarker::RestoreAppendedRankFractions(
+				root, tailsBefore[prio], tailAfter, Game::SpriteNodeMax,
+				frozenFractionX, frozenFractionY);
 		}
 		TagAppendedNodes(tailsBefore, scope,
 			OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,

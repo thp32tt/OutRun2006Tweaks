@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include "sprite_queue_tail_proof.hpp"
 
 namespace OutRunVR::RankMarker
 {
@@ -41,4 +42,31 @@ namespace OutRunVR::RankMarker
         *y = nextY;
         return true;
     }
+    // The original 4th+ place rank clip CALL may rebuild its SpriteNode
+    // priority list while producing several glyph siblings. Its captured
+    // tail is borrowed, and can be detached/freed before the CALL returns.
+    // Prove both old and new tails belong to the *current* queue first,
+    // then apply the same native Calc3D2D fraction to every proven sibling.
+    // The subsequent exact-source semantic registration uses the identical
+    // queue proof; no foreign sprite receives a rank displacement.
+    template <typename Node>
+    unsigned RestoreAppendedRankFractions(Node* root, Node* oldTail,
+        Node* newTail, unsigned bound, float dx, float dy) noexcept
+    {
+        Node* first = OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+            root, oldTail, newTail, bound);
+        if (!first)
+            return 0u;
+        unsigned restored = 0;
+        for (Node* node = first; node && bound != 0; --bound)
+        {
+            if (RestoreFraction(*node, dx, dy))
+                ++restored;
+            if (node == newTail)
+                break;
+            node = node->next_0;
+        }
+        return restored;
+    }
+
 }

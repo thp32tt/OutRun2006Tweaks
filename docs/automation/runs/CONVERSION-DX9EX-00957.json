@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00957",
+  "production_id": "CONVERSION-DX9EX-00957",
+  "event_id": "CONVERSION-DX9EX-00957-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00957",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "status": "C5_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e378ced1302e8859c85d64f11ab59534c6f95786",
+  "material_result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_COMMIT",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/rank_marker_fraction.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/rank_marker_fraction.hpp",
+    "vrhost/tests/rank_marker_fraction_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00957.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep every original 4th-and-higher projected car-rank glyph attached to its actual car after producer-owned queue rebuilds without dereferencing freed tails, including kind-0 and kind-1 affine siblings.",
+    "scope_boundary": "Only RankMarkerClipSprite original Calc3D2D fractional-position recovery. NaviPub/other HUD, GOAL/+TIME, ordinary game input/FFB, SkyGlow, lens, R84 stereo transforms, DX11 and frozen DXVK are unchanged.",
+    "special_work_evidence": "RankMarker_putClipSprite directly dereferenced captured tailsBefore[prio]->next_0 after calling the original sprite producer; that E8 can rebuild and detach the priority-list tail, while TagAppendedNodes already uses a bounded live-root proof.",
+    "trace_stages": [
+      "Original per-car Calc3D2D fractional anchor is captured before the exact put_clip_sprite CALL.",
+      "Original rank clip producer appends mixed kind-0/1 glyphs; live queue proof bounds their fractional displacement and exact source tags.",
+      "R84 per-eye projected rank screen positions replay the proven SpriteNode source identity to OpenXR host with existing native fallback."
+    ],
+    "subcomponents": [
+      "Replace every unsafe 4th-and-higher rank sibling old-tail dereference with one production queue reachability proof that covers the complete producer queue.",
+      "Apply fractional recovery to all proven original kind-0 and kind-1 glyph siblings, while rejecting detached tails, foreign/short/cyclic queues, malformed offsets and unknown node layouts with native C++ positive/negative tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_sibling_producer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original car-ranked multi-glyph queued sprite positioning",
+        "expected_behavior": "All live original kind-0 and kind-1 rank glyph siblings inherit the exact per-car Calc3D2D fractional anchor before existing R84 stereo submission."
+      },
+      {
+        "id": "rank_rebuild_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Rebuilt priority lists and unrelated HUD safety",
+        "expected_behavior": "A detached old tail, unrelated new tail, insufficient traversal bound, unknown glyph kind or malformed fraction never displaces an unrelated sprite or reads detached storage."
+      },
+      {
+        "id": "rank_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game/R26_SAFE rollback/x64 host package and isolated source gates",
+        "expected_behavior": "Exact validation-bearing result SHA passes DX9Ex Active game/host/package, Domain Isolation, Full Source Impact and HUD Inspector required checks without CI-skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_sibling_producer": "PENDING_CI",
+    "rank_rebuild_fallback": "PENDING_CI",
+    "rank_exact_sha_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "RankMarker_putClipSprite's fractional sibling walk was a separate unsafe copy of the old queue logic and dereferenced tailsBefore[prio]->next_0 before proving that historical tail was still attached to the current live root.",
+    "original_evidence": "Unlike TagAppendedNodes, rank fraction restoration directly uses captured oldTail->next_0 after original Game::put_clip_sprite, which can reconstruct the live queue. Detached pointers can be freed or foreign-reused.",
+    "source_trace": [
+      "RankMarker Calc3D2D stores the vehicle's local fractional remainder before the native exact ClipSprite E8.",
+      "The original E8 may relink root/tail and emit multiple kind-0 and kind-1 sibling glyphs before the hook resumes.",
+      "Restored SpriteNode world-anchor fractions and exact semantic tags feed the already-active R84 per-eye projected marker, not a generic HUD overlay."
+    ],
+    "alternatives_rejected": [
+      "Adjusting raw rank WVP or eye projection would not fix the stale pointer access in the source producer, and would risk protected world/NaviPub routes."
+    ],
+    "eye_ownership": "Existing projected rank eye transform and StereoNdcShift remain unchanged; this fix restores original per-car pre-stereo glyph positions only for current live exact-source siblings.",
+    "runtime_limit": "No actual Quest3, VDXR or OutRun game runtime executed; corrected source ownership and build do not confirm binocular visuals."
+  },
+  "next_action": "Check exact-SHA Windows CI gates for this material source commit, fix any real failure under this TASK_ID only, then C6 record separately. HMD remains UNTESTED."
+}
