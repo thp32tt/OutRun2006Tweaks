@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00936",
   "production_id": "CONVERSION-DX9EX-00936",
-  "event_id": "CONVERSION-DX9EX-00936-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX9EX-00936-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "run_key": "CONVERSION-DX9EX-00936",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -28,7 +28,7 @@
     "vrhost/tests/lens_centre_eye_pose_smoke.cpp",
     "docs/automation/runs/CONVERSION-DX9EX-00936.json"
   ],
-  "material_result_sha": null,
+  "material_result_sha": "5ee0c7088a928c8f5f215e7d0e23dee6acedfb1e",
   "validation_bearing_result_sha": "7bd726e43b57655a801006370786f2aba968e107",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -67,18 +67,53 @@
     ]
   },
   "acceptance_results": {
-    "c993_eye_cant": "NATIVE_SMOKE_PASS_HMD_UNTESTED",
-    "c993_invalid_fallback": "NATIVE_SMOKE_PASS",
-    "c993_exact_sha_gate": "PENDING_REPAIRED_SHA"
+    "c993_eye_cant": "PASS",
+    "c993_invalid_fallback": "PASS",
+    "c993_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "C993 R84 exact-eye code used identity orientation despite existing head-local stereo.eyeOrientation; preserves translation but removes per-eye cant.",
     "source_evidence": "LatchedStereo eyeOrientation is sourced from OpenXR eye-local quaternion, whereas effectiveEyeOrientation combines head and eye for other world uses. Do not apply absolute effectiveEyeOrientation here after head inverse.",
     "native_smoke": "Portable C++17 canted/parallel and invalid-pose source smoke PASS exit 0 locally; CI/HMD not yet run.",
     "policy_gate_failure": "First validation SHA 5ee0c7088a928c8f5f215e7d0e23dee6acedfb1e DX9Ex Active #38850348546 policy job 116809960470 failed before compiling because record omitted canonical symptom_id, feature_contract.symptom_id and two substantive subcomponents; feature_class was incorrect. Source code unchanged in this cause-specific policy contract repair.",
-    "repaired_under_same_task_id": "CONVERSION-DX9EX-00936"
+    "repaired_under_same_task_id": "CONVERSION-DX9EX-00936",
+    "original_evidence": "Original EXE C993 producer-tagged scene-centre flare 0x570002 world WVP c64 path is limited to central flare, distinct from CABE outer discs and SkyGlow.",
+    "source_trace": [
+      "Original EXE producer supplies tagged C993 central scene world-view-projection constants consumed by R30.",
+      "R30 decomposes source worldView and removes the common head inverse exactly once before composing head-local per-eye eyeInverse and asymmetrical FOV.",
+      "R33 dispatches independent left/right eye draws using those matrices and otherwise preserves original game source draw."
+    ],
+    "alternatives_rejected": [
+      "Identity orientation destroys independently canted OpenXR eye rotations even when relative IPD translation is valid.",
+      "Using effective absolute eye orientation after headInverse would apply HMD head pose twice; the new pose is head-local only."
+    ],
+    "eye_ownership": "C993 scope uses head-local eyeOrientation after shared headInverse, per-eye translation and FOV; R33 owns actual independent eye submissions.",
+    "fix_evidence": "Original material 5ee0c7088a928c8f5f215e7d0e23dee6acedfb1e adds BuildHeadRelativeEyePose and hooks both C993 eye quaternions in R30, plus native host smoke; validation-bearing 7bd726e43b57655a801006370786f2aba968e107 repairs only canonical run contract.",
+    "negative_test_evidence": "Required x64 host native lens_centre_eye_pose_smoke.cpp tests canted/parallel positive eyes, quaternion normalization, zero/NaN eye quaternions, invalid infinite eye offsets and atomic unchanged output on failure; exact host Gate SUCCESS."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA recorded for validated commit 7bd726e43b57655a801006370786f2aba968e107. Quest3/VDXR runtime HMD test remains UNTESTED; no source change or CI rerun.",
-  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE"
+  "next_action": "BUILD_VERIFIED exact-SHA CI complete; Quest3/VDXR optical acceptance, central dot binocular alignment and protected outer discs/SkyGlow require matching real hardware test. No further CI or score for C6 bookkeeping.",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "ci_evidence": {
+    "validation_bearing_sha": "7bd726e43b57655a801006370786f2aba968e107",
+    "dx9ex_active": {
+      "run_id": 38850507175,
+      "conclusion": "success",
+      "jobs": "5/5 including policy, x86 game, R84 full chain, x64 host and package"
+    },
+    "domain_isolation": {
+      "run_id": 38850507457,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38850507235,
+      "conclusion": "success",
+      "jobs": "2/2"
+    },
+    "full_source_impact": {
+      "run_id": 38850507239,
+      "conclusion": "success",
+      "jobs": "3/3"
+    }
+  }
 }
