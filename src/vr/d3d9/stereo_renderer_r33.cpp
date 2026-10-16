@@ -1057,12 +1057,12 @@ namespace OutRunVRStereo
             // world route has no authority to reproject this exact producer.
             // Preserve ONE unmodified original draw in that case; the normal
             // ready raster path below still attempts exact binocular stereo.
+            // Capture the producer->GPU sink owner once per physical
+            // primitive; never re-infer it from render-state or alpha.
+            const auto drawCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
             const bool directLensCentre =
-                !OutRunVR::GameSemantic::QueueRenderActive() &&
-                OutRunVR::GameSemantic::EffectiveScope() ==
-                    OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+                drawCommand.IsDirectWorldLensCentre();
             if (!resyncAlreadyFlushed)
             {
                 if (OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(

@@ -872,6 +872,41 @@ namespace OutRunVR::GameSemantic
         return SpriteQueueDepth != 0;
     }
 
+    // Immutable source-side identity for ONE physical GPU primitive.
+    // The R33 raster dispatcher samples the current original-game scope,
+    // producer and queue epoch once. No ownership is inferred from alpha,
+    // texture, FVF, or primitive size. A deferred D3DX batch can enter this
+    // scope only through ScopedExactProducerSemantic at its real Flush/End.
+    struct PhysicalDrawCommand final
+    {
+        RenderScope scope = RenderScope::None;
+        ProducerToken producer = ProducerToken::None;
+        const void* queueNode = nullptr;
+        std::uint64_t queueEpoch = 0;
+        bool queued = false;
+
+        constexpr bool IsDirectWorldLensCentre() const noexcept
+        {
+            return !queued && scope == RenderScope::WorldBillboard &&
+                producer == ProducerToken::LensFlareCentre;
+        }
+
+        constexpr bool IsSourceProvenHud() const noexcept
+        {
+            return scope == RenderScope::ScreenHud &&
+                producer != ProducerToken::None;
+        }
+    };
+
+    inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept
+    {
+        const bool isQueued = QueueRenderActive();
+        return { EffectiveScope(), CurrentRenderProducerToken(),
+            isQueued ? CurrentQueueNode() : nullptr,
+            isQueued ? CurrentQueueNodeEpoch() : 0,
+            isQueued };
+    }
+
     // A direct original-game source CALL may rasterize before it appends any
     // SpriteNode. ScopedRenderSemantic alone changes CurrentScope, but the
     // previously selected queue node still wins EffectiveScope() and its old

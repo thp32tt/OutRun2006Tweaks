@@ -270,6 +270,16 @@ add_custom_command(TARGET outrun-vr-pause-clip-shift-smoke POST_BUILD
     COMMENT "Run native R84 pause shader/XYZRHW eye clip translation regression"
     VERBATIM)
 # Quest-style native HUD command batch: owned by the live D3DXSprite hook.
+# Source-token/callsite→R33 physical draw immutable identity regression.
+add_executable(outrun-vr-render-command-snapshot-smoke
+    tests/render_command_snapshot_smoke.cpp)
+target_include_directories(outrun-vr-render-command-snapshot-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-render-command-snapshot-smoke)
+add_custom_command(TARGET outrun-vr-render-command-snapshot-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-render-command-snapshot-smoke>"
+    COMMENT "Run source-to-physical-GPU command snapshot and nested queue regression"
+    VERBATIM)
 add_executable(outrun-vr-hud-command-batch-smoke tests/hud_command_batch_smoke.cpp)
 target_include_directories(outrun-vr-hud-command-batch-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src")
@@ -345,6 +355,7 @@ foreach(target
     outrun-vr-quest-stereo-cull-smoke
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-hud-command-batch-smoke
+    outrun-vr-render-command-snapshot-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-rank-marker-fraction-smoke
     outrun-vr-r30-early-rhw-shadow-smoke
