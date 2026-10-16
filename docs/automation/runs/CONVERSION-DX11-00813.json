@@ -10,16 +10,16 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:R23_NATIVE_XR_PROJECTION_SOURCE_ROUTE",
   "feature_id": "DX11-R23-NATIVE-XR-PROJECTION-ROUTE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_GATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "material_result_sha": "cfd634c3829501be3eda4797409e1c27e5848b73",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "1d7c744785347db6c48cc06746df01b58303196e",
   "changed_files": [
     "vrhost/src/main_r23.cpp",
     "vrhost/tests/native_direct_eye_pair_smoke.cpp"
@@ -50,9 +50,9 @@
     ]
   },
   "acceptance_results": {
-    "r23-direct-game-eye-projection": "PENDING_BUILD",
-    "sbs-fallback-and-grace": "PENDING_BUILD",
-    "cohesive-exact-sha-ci": "PENDING_EXACT_SHA"
+    "r23-direct-game-eye-projection": "PASS_BUILD",
+    "sbs-fallback-and-grace": "PASS_BUILD",
+    "cohesive-exact-sha-ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -87,20 +87,56 @@
     "C0_RECOVER": "Checked live DX11 branch HEAD, actual host executable main_r23.cpp, existing direct eye ring and latest 00812 gate history.",
     "C1_REVIEW": "Observed real R23 host DirectGPU hold resources differ from legacy main.cpp directSnapshot resources; legacy source gate blocked genuine native OpenXR projection.",
     "C2_IMPLEMENT": "Replaced legacy HasStereoSource admission and grace checks with R23 DirectGPU hold vs SBS source choice in production C++; added native eye/no-legacy/partial-pair smoke assertions.",
-    "C3_VALIDATE": "SOURCE_IMPLEMENTED; exact-SHA CI pending. First material SHA Backend Gate failed on prior 00812 record being incorrectly selected as the latest run record; adding actual 00813 contract without changing completed 00812 record.",
-    "C4_COMMIT": "Material C++ source cfd634c3829501be3eda4797409e1c27e5848b73 [AUTO:CONVERSION-DX11-00813]; this separate run-contract CI-causal repair commit is not an additional feature.",
+    "C3_VALIDATE": "First material SHA backend failed due inherited 00812 policy latest-record mismatch. Separate causal CI repair created full 00813 source/feature contract. Final exact SHA 1d7c744785347db6c48cc06746df01b58303196e DX11 Fast, Backend, Windows Build, OpenXR host and HUD Inspector all SUCCESS; host x64 native eye smoke SUCCESS. Real game/Quest3/VDXR not executed.",
+    "C4_COMMIT": "Material C++ cfd634c3829501be3eda4797409e1c27e5848b73 [AUTO:CONVERSION-DX11-00813], final validation-bearing CI repair 1d7c744785347db6c48cc06746df01b58303196e [AUTO:CONVERSION-DX11-00813] (not an extra feature); C6 bookkeeping is separately [skip ci].",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING; do not mark complete before exact-SHA Gate."
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA. Real HMD/menu/car/race/gamepad: UNTESTED. No backend promotion or HMD pass."
   },
   "evidence": {
     "material_commit_sha": "cfd634c3829501be3eda4797409e1c27e5848b73",
     "first_material_backend_gate_run_id": 38861818506,
     "first_material_backend_gate_status": "FAIL_HISTORIC_00812_LATEST_POLICY_RECORD",
-    "runtime_evidence": "NONE - no Quest3/VDXR/HMD or original game process"
+    "runtime_evidence": "NONE: no game/HMD/Quest3/VDXR execution",
+    "exact_sha": "1d7c744785347db6c48cc06746df01b58303196e",
+    "exact_sha_gate_results": {
+      "DX11 Fast Structural Checks": {
+        "run_id": 38862259401,
+        "conclusion": "success",
+        "associated_commit_sha": "1d7c744785347db6c48cc06746df01b58303196e"
+      },
+      "Backend Conversion Gate": {
+        "run_id": 38862256631,
+        "conclusion": "success",
+        "associated_commit_sha": "1d7c744785347db6c48cc06746df01b58303196e"
+      },
+      "Build": {
+        "run_id": 38862262703,
+        "conclusion": "success",
+        "associated_commit_sha": "1d7c744785347db6c48cc06746df01b58303196e"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38862263096,
+        "conclusion": "success",
+        "associated_commit_sha": "1d7c744785347db6c48cc06746df01b58303196e"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38862262655,
+        "conclusion": "success",
+        "associated_commit_sha": "1d7c744785347db6c48cc06746df01b58303196e"
+      }
+    },
+    "openxr_host_x64_job": "SUCCESS in exact-SHA OpenXR VR architecture workflow 38862263096"
   },
   "score": {
     "run_key": "CONVERSION-DX11-00813",
     "score_change": 0,
-    "score_status": "PENDING_VALIDATED_NEW_FEATURE; no bookkeeping score"
-  }
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "This C6 [skip ci] record is not a new feature; any independently verified source feature award uses the ai-dev-lab SSOT once, with RUN_KEY CONVERSION-DX11-00813."
+  },
+  "material_source_commits": [
+    "cfd634c3829501be3eda4797409e1c27e5848b73"
+  ],
+  "repair_commits": [
+    "1d7c744785347db6c48cc06746df01b58303196e"
+  ]
 }
