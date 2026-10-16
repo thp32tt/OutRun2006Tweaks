@@ -144,6 +144,43 @@ build_verified["acceptance_results"]["end2end"] = "PASS_BUILD"
 build_verified["acceptance_results"]["fallback"] = "PASS_BUILD"
 build_verified["runtime_validation"] = "UNTESTED"
 assert not validate_task(build_verified, p), validate_task(build_verified, p)
+# 00839 is a confirmed passed native-eye GPU source stage, not the fully
+# connected R30/menu/race renderer. Preserve its detailed PASS evidence
+# rather than rewriting it as an unearned feature-completion claim.
+partial_eye = copy.deepcopy(build_verified)
+partial_eye["development_strategy"].update(
+    milestone_id="native_stereo_eye_transport",
+    gameplay_delivery_target="NATIVE_STEREO_EYE_OUTPUT",
+    live_game_draw_path=[
+        "LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW",
+        "NATIVE_STEREO_EYE_OUTPUT",
+    ],
+)
+partial_eye.update(
+    full_dx11_renderer_complete=False,
+    score_change=0,
+    acceptance_results={
+        "end2end": "PASS_SOURCE_AND_LOCAL_CXX_REGRESSION_10_OF_10",
+        "fallback": "PASS_STATIC_AND_WARP_NEGATIVE_REGRESSION",
+        "gates": "PASS_EXACT_SHA_5_OF_5",
+    },
+)
+assert not validate_task(partial_eye, p), validate_task(partial_eye, p)
+for label, mutate in (
+    ("false final renderer", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("unverified exact SHA", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+    ("no exact SHA", lambda t: t.update(validation_bearing_result_sha=None)),
+    ("unobserved HMD PASS", lambda t: t.update(runtime_validation="PASS")),
+    ("unearned score", lambda t: t.update(score_change=1)),
+    ("missing native GPU eye", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW"])),
+    ("forged probe", lambda t: t["acceptance_results"].update(
+        fallback="PASS_UNTESTED")),
+):
+    bad = copy.deepcopy(partial_eye)
+    mutate(bad)
+    assert validate_task(bad, p), "partial source-stage negative admitted: " + label
+
 unverified_build = copy.deepcopy(build_verified)
 unverified_build["acceptance_results"]["fallback"] = "UNTESTED"
 assert validate_task(unverified_build, p), "unknown fallback improperly completed"

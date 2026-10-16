@@ -80,6 +80,33 @@ def validate_policy(policy: dict) -> list[str]:
     return errors
 
 
+def verified_build_acceptance(value: object) -> bool:
+    """Detailed positive build probes are not a substitute for an exact-SHA Gate."""
+    if value in ("PASS", "PASS_BUILD", "PASS_EXACT_SHA"):
+        return True
+    if not isinstance(value, str) or not re.fullmatch(
+        r"PASS_[A-Z0-9]+(?:_[A-Z0-9]+)+", value
+    ):
+        return False
+    return not any(
+        negative in value.split("_")
+        for negative in ("UNTESTED", "UNKNOWN", "PENDING", "FAIL", "FAILED", "SKIP", "BLOCKED")
+    )
+
+
+def source_stage_build_verified(task: dict) -> bool:
+    """Successful bounded DX11 source stages are not full gameplay completion."""
+    return (
+        task.get("status") == "COMPLETE_BUILD_VERIFIED"
+        and task.get("full_dx11_renderer_complete") is False
+        and task.get("automation_validation") == "PASS_EXACT_SHA"
+        and task.get("runtime_validation") == "UNTESTED"
+        and task.get("score_change", 0) == 0
+        and isinstance(task.get("validation_bearing_result_sha"), str)
+        and re.fullmatch(r"[0-9a-f]{40}", task["validation_bearing_result_sha"]) is not None
+    )
+
+
 def validate_task(task: dict, policy: dict) -> list[str]:
     identity = task.get("task_id", "")
     found = re.fullmatch(r"CONVERSION-DX11-(\d{5})", identity)
@@ -142,7 +169,23 @@ def validate_task(task: dict, policy: dict) -> list[str]:
         elif delivery in {"FIRST_GAME_DRAW_FRAME", "FULL_RESOLUTION_GAME_FRAME", "MENU_TO_RACE_NATIVE_FRAME", "NATIVE_STEREO_EYE_OUTPUT"}:
             stages = strategy.get("live_game_draw_path")
             expected = ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"]
-            if not isinstance(stages, list) or any(stage not in stages for stage in expected) or [stages.index(stage) for stage in expected] != sorted(stages.index(stage) for stage in expected):
+            has_full_path = (
+                isinstance(stages, list)
+                and all(stage in stages for stage in expected)
+                and [stages.index(stage) for stage in expected] ==
+                    sorted(stages.index(stage) for stage in expected)
+            )
+            # An exact-SHA built but explicitly UNFINISHED source stage can
+            # terminate at a native stereo GPU eye. Do not pretend that the
+            # missing R30 camera game-draw callsite reached visible OpenXR.
+            # Full renderer completion still requires the full ordered path.
+            partial_eye_stage = (
+                source_stage_build_verified(task)
+                and milestone == "native_stereo_eye_transport"
+                and stages == ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW",
+                               "NATIVE_STEREO_EYE_OUTPUT"]
+            )
+            if not has_full_path and not partial_eye_stage:
                 errors.append("gameplay path must connect real D3D9 callsite through native Draw to visible frame output")
             for field in ("visible_frame_acceptance", "activation_guard_and_fallback"):
                 if not isinstance(strategy.get(field), str) or not strategy[field].strip():
@@ -192,7 +235,7 @@ def validate_task(task: dict, policy: dict) -> list[str]:
             terminal = str(task.get("status") or "").upper().startswith(("COMPLETE", "DONE", "PASS"))
             if terminal:
                 results = task.get("acceptance_results")
-                if not isinstance(results, dict) or any(results.get(i) not in ("PASS", "PASS_BUILD", "PASS_EXACT_SHA") for i in ids):
+                if not isinstance(results, dict) or any(not verified_build_acceptance(results.get(i)) for i in ids):
                     errors.append("terminal feature requires all acceptance items PASS")
                 if task.get("automation_validation") not in ("PASS", "PASS_EXACT_SHA"):
                     errors.append("terminal feature requires exact-SHA automation PASS")
@@ -236,7 +279,7 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                 if status.startswith(("COMPLETE", "PASS")):
                     results = task.get("acceptance_results") or {}
                     if not isinstance(results, dict) or any(
-                        results.get(item_id) not in {"PASS", "PASS_BUILD", "PASS_EXACT_SHA"} for item_id in ids
+                        not verified_build_acceptance(results.get(item_id)) for item_id in ids
                     ):
                         errors.append("complete feature has unverified acceptance items")
                     sha = task.get("validation_bearing_result_sha")
