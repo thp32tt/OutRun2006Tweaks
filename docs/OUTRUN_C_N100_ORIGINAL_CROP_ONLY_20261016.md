@@ -1,3 +1,16 @@
+## 2026-10-17 — 영문 OCR 자동 인식과 자동 크롭 추가 승인
+
+사용자가 수동 영역 검토 병목 제거를 위해 OCR까지 명시적으로 추가 지시했다. C 전용 N100 Docker 컨테이너만 수정/재기동했고 기존 A/B/C1/VR 동작과 ChatGPT 예약 작업은 중지 유지한다.
+
+- `docker/c-original-english-crop/Dockerfile.ocr`: Tesseract 5 영문 엔진의 빌드 타임 설치, 실행 중 네트워크 비활성.
+- `ocr_recognize.py`: 10분마다 실제 검증된 원본 전체 HD PNG를 OCR 처리. 인식 문구가 공식 `transcriptions.jsonl`의 실제 영문 문구와 정확히 일치하며 높은 OCR 확신도, 원본·DDS SHA/디코딩 픽셀 일치, 기존 255건 및 새 출력 중복/효과 잘림 검사 통과 시에만 자동 큐 등록. 검증되지 않은 이미지/문구/잘린 효과는 `HOLD`, OCR 후보는 `TEST_ONLY`; 자동으로 검수 PASS 또는 실기기 검증 처리 금지.
+- 기존 60초 큐 처리와 연계해 신규 큐의 영문 원본 네이티브 크롭만 생성. 레거시 타일, 합성, 배경제거, 한글화, DDS 변경, 게임 패치 금지.
+- N100 직접 픽셀 검증을 거친 DDS+PNG 6자산 Q051, Q060, Q116, Q161, Q197, Q212까지 VERIFIED 확장. Q116/Q161은 Pillow 원본 DDS 압축 해제 결과와 PNG 픽셀 일치 증명. 나머지는 출처 증명이 있을 때만 추가한다.
+- 초기 OCR 실행 실측: Q051/Q060 대상 9건 문구 OCR 일치, 과거 완료 8건 중복 제외, 경계 위험 1건 HOLD, 신규 0건. 감지된 문구가 적거나 불확실하면 강제 추출 금지. 처리 내역 `auto_discovery/*_ocr_results.json`, `docker_run_audit.jsonl` 저장.
+- 기존 255건 / 기존 새 크롭 보존, 기존 A/B 상태 변경 금지.
+
+---
+
 ## 2026-10-17 — 사용자 추가 지시: Docker 자동 영문 영역 탐색
 
 기존 C-only 컨테이너에 `docker/c-original-english-crop/discover.py`를 추가했다.
