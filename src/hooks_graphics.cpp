@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
+#include "vr/game/pmt_node_culling_contract.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
@@ -1454,7 +1455,7 @@ ScreenEdgeCullFix ScreenEdgeCullFix::instance;
 
 class DisableStageCulling : public Hook
 {
-	const static int CalcCulling_PatchAddr = 0x501F;
+	inline static bool SignatureMismatchLogged = false;
 
 public:
 	std::string_view description() override
@@ -1469,10 +1470,29 @@ public:
 
 	bool apply() override
 	{
-		// Patch "if (CheckCulling(...))" -> no-op
-		static TogglePatch patch(Module::exe_ptr(CalcCulling_PatchAddr), { 0x90, 0x90 });
-		// The original 4:3 stage visibility test may cull buildings and lamps
-		// across wide stereo FOV and head motion. Honour this setting in VR.
+		// PC walk_404d10 calls render_node_visible_404b00 at RVA 0x5015,
+		// then executes TEST EAX,EAX at 0x501D and JE at 0x501F.
+		// Quest exports the same logical PMT traversal names. Validate that
+		// exact result gate before changing the branch: an address-only NOP on
+		// a foreign executable/mod would silently corrupt stage traversal.
+		auto* gate = Module::exe_ptr<std::uint8_t>(
+			OutRunVR::PmtNodeCull::ResultTestRva);
+		if (!OutRunVR::PmtNodeCull::ResultGateBytesCompatible(
+				gate, OutRunVR::PmtNodeCull::OriginalResultGate.size()))
+		{
+			if (!SignatureMismatchLogged)
+			{
+				SignatureMismatchLogged = true;
+				spdlog::error(
+					"DisableStageCulling: PMT node-visible gate signature mismatch at EXE+0x{:X}; refusing branch patch",
+					static_cast<unsigned>(OutRunVR::PmtNodeCull::ResultTestRva));
+			}
+			return false;
+		}
+
+		static TogglePatch patch(
+			Module::exe_ptr(OutRunVR::PmtNodeCull::DisableBranchRva),
+			{ 0x90, 0x90 });
 		patch.set(Settings::DisableStageCulling.get());
 		return true;
 	}

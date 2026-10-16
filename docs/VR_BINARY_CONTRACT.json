@@ -1567,6 +1567,52 @@
       ],
       "signatureLength": 5,
       "disassemblyWindow": 48
+    },
+    {
+      "id": "VR-EXE-PMT-NODE-VISIBLE-404B00",
+      "rva": "0x00004B00",
+      "signatureLength": 16,
+      "disassemblyWindow": 64,
+      "expectedBytes": "83ec10a164b5890055568b74241c5750",
+      "purpose": "Canonical PMT node visibility function matched to Quest render_node_visible_404b00; transforms node center/radius through live matrix state before returning visibility.",
+      "sourceBindings": [
+        {
+          "path": "src/vr/game/pmt_node_culling_contract.hpp",
+          "needle": "RenderNodeVisibleRva = 0x00004B00u"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-PMT-NODE-VISIBLE-WALK-CALL",
+      "rva": "0x00005015",
+      "signatureLength": 8,
+      "disassemblyWindow": 32,
+      "expectedBytes": "e8e6faffff83c408",
+      "purpose": "Canonical walk_404d10 direct call into PMT node visibility immediately before the result gate.",
+      "sourceBindings": [
+        {
+          "path": "src/vr/game/pmt_node_culling_contract.hpp",
+          "needle": "WalkNodeVisibleCallRva = 0x00005015u"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-PMT-NODE-VISIBLE-RESULT-GATE",
+      "rva": "0x0000501D",
+      "signatureLength": 4,
+      "disassemblyWindow": 32,
+      "expectedBytes": "85c07472",
+      "purpose": "Canonical TEST EAX,EAX; JE result gate for PMT node visibility. DisableStageCulling may only NOP the two-byte JE after validating this surrounding signature.",
+      "sourceBindings": [
+        {
+          "path": "src/vr/game/pmt_node_culling_contract.hpp",
+          "needle": "ResultTestRva = 0x0000501Du"
+        },
+        {
+          "path": "src/hooks_graphics.cpp",
+          "needle": "PMT node-visible gate signature mismatch"
+        }
+      ]
     }
   ]
 }

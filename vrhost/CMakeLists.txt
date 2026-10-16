@@ -192,6 +192,17 @@ add_custom_command(TARGET outrun-vr-stage-edge-cull-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-stage-edge-cull-smoke>"
     COMMENT "Run native stage edge-cull viewport and fallback regression"
     VERBATIM)
+# Canonical PMT stage-culling gate recovered by cross-decompiling the original
+# x86 executable against Quest render_node_visible_404b00 / walk_404d10.
+add_executable(outrun-vr-pmt-node-cull-contract-smoke
+    tests/pmt_node_culling_contract_smoke.cpp)
+target_include_directories(outrun-vr-pmt-node-cull-contract-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-pmt-node-cull-contract-smoke)
+add_custom_command(TARGET outrun-vr-pmt-node-cull-contract-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-pmt-node-cull-contract-smoke>"
+    COMMENT "Run canonical PMT node-visible gate and patch-compatibility regression"
+    VERBATIM)
 # The mandatory x64 host CI compiles and executes real C993 game-eye math.
 add_executable(outrun-vr-lens-eye-pose-smoke tests/lens_centre_eye_pose_smoke.cpp)
 target_include_directories(outrun-vr-lens-eye-pose-smoke PRIVATE
