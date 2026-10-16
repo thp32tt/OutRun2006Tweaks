@@ -83,9 +83,40 @@ def main() -> None:
 
     violations: list[str] = []
     approved_diagnostic = DX11 / "live_game_frame_bridge.cpp"
+    audited_eye_recorder = DX11 / "native_game_stereo_submission.cpp"
     for path in activation_sources:
         text = path.read_text(encoding="utf-8")
         matches = list(DRAW_DISPATCH.finditer(text))
+        if path == audited_eye_recorder and matches:
+            # This is a second narrowly reviewed rendering surface, NOT a
+            # blanket DX11 activation exemption. Only the two renderer-owned
+            # GPU draw emitters are permitted. Their callback must be scoped
+            # by exact frame/pose ring ownership, independent L/R RTV+DSV and
+            # a count matched to issued commands before publication. The
+            # normal D3D9 Draw/Present/input/FFB path stays authoritative.
+            required_eye_contract = [
+                "bool NativeGameEyeDrawEncoder::draw(",
+                "bool NativeGameEyeDrawEncoder::draw_indexed(",
+                "if (!context_ || !vertexCount ||",
+                "if (!context_ || !indexCount ||",
+                "context_->Draw(vertexCount, startVertex);",
+                "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
+                "ScopedNativeGameEyeOutput output(ctx, invocation.width, invocation.height);",
+                "NativeGameEyeDrawEncoder encoder(ctx);",
+                "evidence.drawCount != encoder.draw_count() ||",
+                "sourcePoseSequence != poseSequence_",
+                "ring_.render_eye_pair(context_.Get(), slot_, frameId_,",
+                "context_->OMSetRenderTargets(1u, &target, depth);",
+            ]
+            missing = [token for token in required_eye_contract if token not in text]
+            dispatches = [match.group(0).replace(" ", "") for match in matches]
+            if missing or dispatches != ["->Draw(", "->DrawIndexed("]:
+                violations.append(
+                    f"{path.relative_to(ROOT)}: unauthorized native eye Draw "
+                    f"dispatch or missing frame/pose/output/evidence guard: "
+                    f"missing={missing}, calls={dispatches}"
+                )
+            continue
         if path == approved_diagnostic and matches:
             # This is a deliberate, separately audited activation—not an
             # exemption for arbitrary D3D11 Draw or main gameplay promotion.
