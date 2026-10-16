@@ -48,6 +48,20 @@ struct NativeGameEyeDrawEvidence {
 struct NativeGameEyeColorSeed {
     std::uint32_t argb[2]{};
 };
+// D3D9 can clear bounded menu/vehicle HUD rectangles after its full-screen
+// TARGET Clear. Replay actual per-eye rectangles in their captured order,
+// never extend a partial Clear over a reused shared eye texture. Callers must
+// only provide source-verified D3D9 TARGET clears, with a full Clear (when
+// present) preceding these entries. Uncovered pixels belong to game Draws.
+struct NativeGameEyePartialTargetClear {
+    static constexpr std::uint32_t kMaxRectsPerEye = 8u;
+    struct Entry {
+        D3D11_RECT rect{};
+        std::uint32_t argb{};
+    };
+    std::uint32_t count[2]{};
+    Entry entries[2][kMaxRectsPerEye]{};
+};
 // Real game camera raster and pre-draw Z/stencil state, independently for L/R.
 // Only a captured game source may populate this optional replay payload.
 struct NativeGameEyeRasterState {
@@ -133,7 +147,8 @@ public:
         NativeGameEyePass pass, void* user,
         std::uint32_t sourcePoseSequence,
         const NativeGameEyeColorSeed* fullTargetClear = nullptr,
-        const NativeGameEyeRasterState* gameRaster = nullptr) noexcept;
+        const NativeGameEyeRasterState* gameRaster = nullptr,
+        const NativeGameEyePartialTargetClear* partialTargetClear = nullptr) noexcept;
 
     bool render_direct_eyes(
         NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,

@@ -2,6 +2,7 @@
 #include "native_game_eye_pair_sources.hpp"
 #include <limits>
 #include <cmath>
+#include <d3d11_1.h>
 
 namespace outrun::vr::dx11 {
 
@@ -326,7 +327,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
     NativeGameEyePass pass, void* user,
     std::uint32_t sourcePoseSequence,
     const NativeGameEyeColorSeed* fullTargetClear,
-    const NativeGameEyeRasterState* gameRaster) noexcept
+    const NativeGameEyeRasterState* gameRaster,
+    const NativeGameEyePartialTargetClear* partialTargetClear) noexcept
 {
     if (state_ != State::Acquired || !context_ || !pass ||
         eyes_[0] || eyes_[1] || sourcePoseSequence == 0u ||
@@ -357,6 +359,32 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                 !std::isfinite(z) || z < 0.0f || z > 1.0f)
                 return false;
         }
+    }
+
+    // Partial TARGET clears need the D3D11.1 rectangle-aware ClearView.
+    // Validate BOTH eyes and obtain the interface before any GPU write. No
+    // silent whole-RT fallback is allowed for an unsupported game Clear.
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectClearContext;
+    if (partialTargetClear) {
+        bool hasRects = false;
+        for (std::uint32_t eye = 0u; eye < 2u; ++eye) {
+            const std::uint32_t count = partialTargetClear->count[eye];
+            if (count > NativeGameEyePartialTargetClear::kMaxRectsPerEye)
+                return false;
+            hasRects = hasRects || count != 0u;
+            for (std::uint32_t i = 0u; i < count; ++i) {
+                const auto& rect = partialTargetClear->entries[eye][i].rect;
+                if (rect.left < 0 || rect.top < 0 ||
+                    rect.right <= rect.left || rect.bottom <= rect.top ||
+                    rect.right > static_cast<LONG>(ring_.width()) ||
+                    rect.bottom > static_cast<LONG>(ring_.height()))
+                    return false;
+            }
+        }
+        if (hasRects &&
+            FAILED(context_->QueryInterface(
+                IID_PPV_ARGS(rectClearContext.GetAddressOf()))))
+            return false;
     }
 
     // Allocate separate, full-size native depth/stencil attachments BEFORE
@@ -401,10 +429,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         ID3D11DepthStencilView* depth[2]{};
         const NativeGameEyeColorSeed* fullTargetClear{};
         const NativeGameEyeRasterState* gameRaster{};
+        const NativeGameEyePartialTargetClear* partialTargetClear{};
+        ID3D11DeviceContext1* rectClearContext{};
     } dispatch{pass, user, sourcePoseSequence, {},
                ring_.width(), ring_.height(),
                {depthViews[0].Get(), depthViews[1].Get()},
-               fullTargetClear, gameRaster};
+               fullTargetClear, gameRaster, partialTargetClear,
+               rectClearContext.Get()};
 
     // The ring verifies the immediate context and reserves the exact frame
     // before entering this recorder. It marks GPU work as queued first:
@@ -435,6 +466,24 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     static_cast<float>(argb & 0xffu) * normalize,
                     static_cast<float>((argb >> 24) & 0xffu) * normalize};
                 ctx->ClearRenderTargetView(targets[eyeIndex], rgba);
+            }
+            // D3D9 menu/HUD partial clears must follow the full TARGET
+            // Clear in source order. A per-eye rectangle changes only its
+            // captured pixels; never erase the rest of the native game eye.
+            if (invocation.partialTargetClear) {
+                const auto& clears = *invocation.partialTargetClear;
+                constexpr float normalize = 1.0f / 255.0f;
+                for (std::uint32_t i = 0u; i < clears.count[eyeIndex]; ++i) {
+                    const auto& clear = clears.entries[eyeIndex][i];
+                    const auto argb = clear.argb;
+                    const float rgba[4]{
+                        static_cast<float>((argb >> 16) & 0xffu) * normalize,
+                        static_cast<float>((argb >> 8) & 0xffu) * normalize,
+                        static_cast<float>(argb & 0xffu) * normalize,
+                        static_cast<float>((argb >> 24) & 0xffu) * normalize};
+                    invocation.rectClearContext->ClearView(
+                        targets[eyeIndex], rgba, &clear.rect, 1u);
+                }
             }
             // Native D3D11 depth/stencil are private per frame AND per eye;
             // initialize both planes before the game's Draw/DrawIndexed

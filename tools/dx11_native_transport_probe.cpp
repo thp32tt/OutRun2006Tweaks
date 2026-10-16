@@ -881,6 +881,10 @@ int main()
     const outrun::vr::dx11::NativeGameEyeColorSeed fullGameClear{
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
+    outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
+    partialGameClear.count[0] = partialGameClear.count[1] = 1u;
+    partialGameClear.entries[0][0] = {{4, 4, 12, 12}, 0xffff0000u};
+    partialGameClear.entries[1][0] = {{40, 4, 48, 12}, 0xff00ff00u};
     // Model different actual source-camera crop regions within the two
     // full-sized GPU eyes; the original desktop raster must be restored.
     gameRaster.viewport[0] = {0.f, 0.f, 32.f, 64.f, 0.f, 1.f};
@@ -1061,16 +1065,21 @@ int main()
     };
     auto invalidRaster = gameRaster;
     invalidRaster.scissor[1].right = 65; // Fail before any GPU commands.
+    auto invalidPartialClear = partialGameClear;
+    invalidPartialClear.entries[1][0].rect.right = 65; // No partial GPU work.
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &invalidRaster) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidPartialClear) &&
             !ring.synchronization_faulted() &&
             directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
-                &gameRaster) &&
+                &gameRaster, &partialGameClear) &&
             directSubmit.in_flight() && !directSubmit.cancel() &&
             gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1] &&
             gameEyeFixture.rejectedDetachedDraw[0] &&
@@ -1213,8 +1222,14 @@ int main()
         const bool distinctColor = eyeIndex == 0u
             ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
+        const UINT patchX = eyeIndex == 0u ? 6u : 44u;
+        const auto* patch = pixel + 6u * mapped.RowPitch + patchX * 4u;
+        const bool actualPartialClear = eyeIndex == 0u
+            ? patch[0] == 0u && patch[1] == 0u && patch[2] == 255u
+            : patch[0] == 0u && patch[1] == 255u && patch[2] == 0u;
         d3d.context->Unmap(readback, 0);
-        require(distinctColor, "00819 each eye callback wrote its own GPU RTV");
+        require(distinctColor && actualPartialClear,
+                "00829 native L/R TARGET partial clears retain untouched pixels");
     }
     hostFrame.frameId = 24u;
     hostFrame.sourcePoseSequence = 33u;
