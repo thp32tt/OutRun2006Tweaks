@@ -29,11 +29,15 @@ int main()
     e=direct;e.writtenDrawSerial=91;if (!check(e,false)) return 11;
     e=direct;e.currentQueueNode=&e;if (!check(e,false)) return 12;
     e=direct;e.writtenQueueNode=&e;if (!check(e,false)) return 13;
-    int a=0,b=0;
-    e=direct;e.queued=true;e.currentQueueNode=&a;e.writtenQueueNode=&a;
+    // Static distinct storage prevents /O2 from coalescing two unobserved
+    // automatic int locals before the pointer-identity negative assertion.
+    // The physical-node mismatch must remain an executable Release veto.
+    static int firstQueueNode=11, secondQueueNode=22;
+    e=direct;e.queued=true;e.currentQueueNode=&firstQueueNode;
+    e.writtenQueueNode=&firstQueueNode;
     e.currentQueueEpoch=6;e.writtenQueueEpoch=6;if (!check(e,true)) return 14;
-    e.writtenQueueNode=&b;if (!check(e,false)) return 15;
-    e.writtenQueueNode=&a;e.writtenQueueEpoch=5;if (!check(e,false)) return 16;
+    e.writtenQueueNode=&secondQueueNode;if (!check(e,false)) return 15;
+    e.writtenQueueNode=&firstQueueNode;e.writtenQueueEpoch=5;if (!check(e,false)) return 16;
     e.writtenQueueEpoch=6;e.currentQueueEpoch=0;if (!check(e,false)) return 17;
     e=direct;e.currentQueueEpoch=50;e.writtenQueueEpoch=49;if (!check(e,true)) return 18;
     return 0;

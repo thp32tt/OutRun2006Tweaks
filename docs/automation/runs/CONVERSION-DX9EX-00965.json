@@ -70,8 +70,8 @@
     ]
   },
   "acceptance_results": {
-    "scene_effect_direct_and_queue": "RELEASE_SMOKE_PENDING_EXACT_CI",
-    "scene_effect_foreign_world_fallback": "RELEASE_SMOKE_PENDING_EXACT_CI",
+    "scene_effect_direct_and_queue": "CI_RECHECK_PENDING",
+    "scene_effect_foreign_world_fallback": "CI_RECHECK_PENDING",
     "scene_effect_integrated_gates": "PENDING_EXACT_SHA"
   },
   "diagnosis": {
@@ -91,6 +91,10 @@
     "reason": "Original static policy matched obsolete inline age expression; moved to stronger verified C++ SceneEffect source gate. Windows Release smoke must check negative test results even when NDEBUG is enabled.",
     "initial_failed_sha": "da03faac40508edd890c50a45f9281b377231f55",
     "initial_gate": "DX9Ex Active / verify_vr_r30_projection_signature_fastpath.py",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "second_failed_sha": "77ad514020ca37eaa198c6d9ad7455707219c39b",
+    "second_failed_gate": "DX9Ex Full Source Impact Review / msvc-analyze-openxr-host",
+    "second_failure": "Release SceneEffect source provenance smoke returned exit 15 in pointer-distinction negative case; static storage prevents MSVC /O2 local address coalescing without relaxing assertions.",
+    "second_repair": "Use two distinct static int queue nodes and preserve all 18 executable negative/positive checks."
   }
 }
