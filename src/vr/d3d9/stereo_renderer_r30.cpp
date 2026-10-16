@@ -3040,6 +3040,9 @@ namespace OutRunVRStereo
             // Never enable this on generic ScreenOverlay2D or smoke/world.
             bool stageExtensionEyePlane = false;
             float stageExtensionScale = 1.0f;
+            // The paused ESC shell and its exact arrows use an independent
+            // post-projection vertical slider, not the +TIME/GOAL plane.
+            float stageExtensionPostEyeVerticalPixels = 0.0f;
             D3DMATRIX stageExtensionClipFromGameNdc[2]{};
             OutRunVR::RankMarker::StereoNdcShift projectedRank{};
         };
@@ -3355,10 +3358,23 @@ namespace OutRunVRStereo
                 state.stageExtensionClipFromGameNdc[eye] = result;
             }
 
-            const float hudScale = R30HudScaleValue();
-            if (!std::isfinite(hudScale) || hudScale <= 0.0f)
+            // The exact ESC arrow ScreenHud and the paused SpriteQueue
+            // ScreenOverlay2D shell converge here. Previously this common
+            // finite-eye route always selected gameplay VRHudScale and lost
+            // BOTH independent pause controls before the pixel transform.
+            // Keep +TIME, GOAL, gameplay HUD, front-end and F11 bit-identical.
+            const bool pauseOwned = R30IsPauseMenuElement();
+            const float hudScale = pauseOwned
+                ? R30HudScopeScale() : R30HudScaleValue();
+            const float postEyeVerticalPixels = pauseOwned
+                ? R30PauseMenuVerticalFraction() *
+                    static_cast<float>(state.viewport.Height)
+                : 0.0f;
+            if (!std::isfinite(hudScale) || hudScale <= 0.0f ||
+                !std::isfinite(postEyeVerticalPixels))
                 return false;
             state.stageExtensionScale = hudScale;
+            state.stageExtensionPostEyeVerticalPixels = postEyeVerticalPixels;
             state.stageExtensionEyePlane = true;
             return true;
         }
@@ -5056,7 +5072,11 @@ namespace OutRunVRStereo
                                     &state.stageExtensionClipFromGameNdc[1]),
                                 stagePixel[0], stagePixel[1], x0, y0, width,
                                 height, state.stageExtensionScale,
-                                leftX, leftY, rightX, rightY))
+                                leftX, leftY, rightX, rightY) ||
+                            !OutRunVR::StageExtensionPlane::
+                                ApplyPostEyeVerticalShiftPair(
+                                    state.stageExtensionPostEyeVerticalPixels,
+                                    leftY, rightY))
                             return false;
                         auto* leftDst = reinterpret_cast<float*>(
                             left.data() + offset);

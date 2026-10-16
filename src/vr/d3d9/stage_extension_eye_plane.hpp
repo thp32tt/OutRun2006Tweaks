@@ -86,6 +86,33 @@ namespace OutRunVR::StageExtensionPlane
         return true;
     }
 
+    // Apply the ESC pause slider AFTER binocular projection, just like the
+    // shader-backed option arrows. Never mix a partially adjusted left eye
+    // with an unadjusted right eye, or let malformed viewport math publish.
+    // All other HUD, GOAL and +TIME paths pass zero and remain unchanged.
+    inline bool ApplyPostEyeVerticalShiftPair(
+        float shiftPixels, float& leftY, float& rightY) noexcept
+    {
+        if (!std::isfinite(shiftPixels) ||
+            !std::isfinite(leftY) || !std::isfinite(rightY))
+            return false;
+        const double shiftedLeft =
+            static_cast<double>(leftY) + shiftPixels;
+        const double shiftedRight =
+            static_cast<double>(rightY) + shiftPixels;
+        if (!std::isfinite(shiftedLeft) ||
+            !std::isfinite(shiftedRight))
+            return false;
+        const float candidateLeft = static_cast<float>(shiftedLeft);
+        const float candidateRight = static_cast<float>(shiftedRight);
+        if (!std::isfinite(candidateLeft) ||
+            !std::isfinite(candidateRight))
+            return false;
+        leftY = candidateLeft;
+        rightY = candidateRight;
+        return true;
+    }
+
     // D3DX +TIME sprite and numeric glyphs, GOAL progress and result text
     // share a source pixel and a latched frame pose across both R84 eyes.
     // Convert pixel -> game NDC ONCE before applying the independently

@@ -98,5 +98,41 @@ int main() {
                          -1.f,oldLx,oldLy,oldRx,oldRy) ||
         oldLx!=17 || oldLy!=19 || oldRx!=23 || oldRy!=29)
         return 13;
+    // R84 paused ESC shell (queued ScreenOverlay2D) and exact option
+    // arrows (ScreenHud) share one optical plane but use the independent
+    // pause slider/offset. The +TIME/GOAL path supplies zero shift.
+    using OutRunVR::StageExtensionPlane::ApplyPostEyeVerticalShiftPair;
+    float pauseLeftY=240.f, pauseRightY=250.f;
+    if(!ApplyPostEyeVerticalShiftPair(48.f,pauseLeftY,pauseRightY)||
+       !Near(pauseLeftY,288.f)||!Near(pauseRightY,298.f))
+        return 14;
+    // Negative pause offset and independent optical scale also preserve
+    // pre-projection bilateral geometry (only post-eye Y is translated).
+    if(!ApplyPostEyeVerticalShiftPair(-24.f,pauseLeftY,pauseRightY)||
+       !Near(pauseLeftY,264.f)||!Near(pauseRightY,274.f))
+        return 15;
+    if(!ApplyPostEyeVerticalShiftPair(0.f,pauseLeftY,pauseRightY)||
+       !Near(pauseLeftY,264.f)||!Near(pauseRightY,274.f))
+        return 16;
+    float badLeft=11.f,badRight=13.f;
+    if(ApplyPostEyeVerticalShiftPair(
+           std::numeric_limits<float>::infinity(),badLeft,badRight) ||
+       badLeft!=11.f || badRight!=13.f)
+        return 17;
+    badLeft=std::numeric_limits<float>::max();
+    badRight=13.f;
+    if(ApplyPostEyeVerticalShiftPair(
+           std::numeric_limits<float>::max(),badLeft,badRight) ||
+       badLeft!=std::numeric_limits<float>::max() || badRight!=13.f)
+        return 18;
+    // The same native viewport and two eye matrices must still project
+    // differently before the pause-only shared vertical shift.
+    float pauseLx=0.f,pauseLy=0.f,pauseRx=0.f,pauseRy=0.f;
+    if(!ProjectPixelPair(matrixL,matrixR,320,240,0,0,640,480,
+                         0.85f,pauseLx,pauseLy,pauseRx,pauseRy) ||
+       !ApplyPostEyeVerticalShiftPair(48.f,pauseLy,pauseRy) ||
+       !Near(pauseLx,flx,1000.f) || !std::isfinite(pauseRx) ||
+       !std::isfinite(pauseLy) || !std::isfinite(pauseRy))
+        return 19;
     return 0;
 }
