@@ -99,19 +99,52 @@ rival = re.search(
 if not rival or int(rival.group(1), 16) != 0xBB796:
     fail("exact gameplay rival-marker producer must remain 0xBB796")
 
-screen_hud = function_body(uiscale, "static int __cdecl ExactScreenHud_putClipSprite(")
+# The real sprite queue snapshot/tag moved to the shared owned implementation.
+# Verify the original call still sits between the queue snapshot and the
+# ScreenHud tag, and that each wrapper supplies ONLY its own producer token.
+# Matching all three in the forwarding wrapper itself would miss the native
+# Draw -> queued siblings ordering and incorrectly reject the refactor.
+screen_hud_owned = function_body(uiscale, "static int ExactScreenHud_putClipSpriteOwned(")
 screen_markers = [
     "tailsBefore",
     "Game::put_clip_sprite(",
     "TagAppendedNodes(tailsBefore,",
-    "OutRunVR::GameSemantic::RenderScope::ScreenHud",
-    "OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite",
+    "OutRunVR::GameSemantic::RenderScope::ScreenHud, producer",
 ]
-screen_pos = [screen_hud.find(m) for m in screen_markers]
+screen_pos = [screen_hud_owned.find(m) for m in screen_markers]
 if min(screen_pos) < 0 or screen_pos != sorted(screen_pos):
-    fail("exact clip-sprite ScreenHud registration ordering changed")
-if "WorldBillboard" in screen_hud or "ScreenOverlay2D" in screen_hud:
-    fail("exact ScreenHud clip wrapper must not broaden ownership")
+    fail("exact clip-sprite ScreenHud owned queue registration ordering changed")
+if "WorldBillboard" in screen_hud_owned or "ScreenOverlay2D" in screen_hud_owned:
+    fail("exact ScreenHud clip owner must not broaden spatial scope")
+screen_hud = function_body(uiscale, "static int __cdecl ExactScreenHud_putClipSprite(")
+if ("return ExactScreenHud_putClipSpriteOwned(" not in screen_hud or
+        "ProducerToken::ExactScreenHudClipSprite" not in screen_hud or
+        "PauseOptionArrow" in screen_hud):
+    fail("ordinary clip-sprite must forward exact ScreenHud source, not pause arrows")
+
+# Original paused-game option arrows get the separate semantic owner only
+# when VR and the actual pause state are active. Their GPU batch must be
+# drained before/after the owned original E8 call without broadening generic
+# HUD, normal menu, or F11 ownership.
+pause_arrow = function_body(uiscale, "static int __cdecl PauseOptionArrow_putClipSprite(")
+pause_markers = [
+    "!Settings::VREnabled",
+    "GameState::STATE_SMPAUSEMENU",
+    "return ExactScreenHud_putClipSprite(",
+    "FlushD3DXBeforeDirectGoalSource();",
+    "ScopedExactProducerSemantic directArrowOwner(",
+    "ProducerToken::PauseOptionArrow",
+    "ExactScreenHud_putClipSpriteOwned(",
+    "FlushD3DXAtDirectGoalSourceExit();",
+]
+pause_positions = [pause_arrow.find(m) for m in pause_markers]
+if min(pause_positions) < 0 or pause_positions != sorted(pause_positions):
+    fail("exact pause-arrow source/flush ordering or inactive fallback changed")
+if ("QueueRenderActive()" not in pause_arrow or
+        "RenderScope::ScreenHud" not in pause_arrow or
+        pause_arrow.count("ProducerToken::PauseOptionArrow") != 2 or
+        "RenderScope::WorldBillboard" in pause_arrow):
+    fail("pause-arrow exact VR producer must not borrow an unrelated owner")
 
 rival_body = function_body(uiscale, "static int __cdecl RivalMarker_sprani(")
 rival_markers = [
@@ -169,7 +202,7 @@ if "AddSpriteSpacing(&x, true);" not in left_clip or "ExactScreenHud_putClipSpri
 apply_body = function_body(uiscale, "bool apply() override")
 for marker in (
     "for (int addr : OptionArrow_ClipSpriteCalls)",
-    "Module::exe_ptr(addr), ExactScreenHud_putClipSprite",
+    "Module::exe_ptr(addr), PauseOptionArrow_putClipSprite",
     "for (int addr : ExactScreenHud_ClipSpriteCalls)",
     "for (int addr : ExactScreenHudRight_ClipSpriteCalls)",
     # R64 exact rank 6th/6 is singled out *inside* this right-side
