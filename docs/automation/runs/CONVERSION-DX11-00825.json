@@ -11,14 +11,14 @@
   "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
   "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
   "status": "SOURCE_INTEGRATION_IN_PROGRESS",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "material_result_sha": "c3290bc7a83e88aaa2e5a0b7991b99d469a534d5",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "9c303e63b6df9e83b8664b12148e06be84bdb9e0",
   "packaging_status": "NOT_REQUIRED",
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.hpp",
@@ -53,7 +53,7 @@
   "acceptance_results": {
     "native-eye-rtv-and-state": "SOURCE_CODED_WARP_PASS_DRAW_AND_DRAWINDEXED_ISSUED",
     "game-draw-input-fallback": "SOURCE_CODED_DISTINCT_EYE_OM_IA_VS_PS_RESTORE_R30_PENDING",
-    "native-stereo-host-transport": "ISOLATED_WARP_PASS_FINAL_EXACT_SHA_GATES_PENDING_REAL_R30_PENDING"
+    "native-stereo-host-transport": "WARP_AND_FULL_EXACT_SHA_GATE_PASS_REAL_GAME_CALLBACK_PENDING"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -76,7 +76,7 @@
       "tools/dx11_native_transport_probe.cpp"
     ],
     "acceptance_proof": {
-      "positive_probe": "Original C++ material commit c3290bc7: isolated native transport WARP workflow #38896804605 SUCCESS using actual encoder Draw/DrawIndexed call count; mandatory final exact-SHA five-workflow validation remains pending.",
+      "positive_probe": "Real native D3D11 Draw/DrawIndexed per-eye encoder C++ and WARP CI at c3290bc7 (workflow 38896804605 SUCCESS); audit/record repair validation-bearing SHA 9c303e63 passed required 5/5 GitHub Actions: Fast 38897552550, Backend 38897552592, Windows 38897559461, OpenXR 38897559352, HUD 38897559537. Real R30 stereo game source not connected.",
       "negative_regression": "Pre-dispatch wrong pose/raster rejected, eye output remains scoped by ring/RTV/DSV; mismatch of reported draw count is rejected. Original D3D9Ex drawing, input and FFB remain authoritative; no DXVK change or HMD claim.",
       "component_integration": "Game renderer-supplied per-eye native draw callback -> real D3D11 Draw/DrawIndexed encoder -> ring-owned separate L/R RTV+DSV -> existing GPU event and OpenXR publication metadata; game R30 source callback not yet connected."
     },
@@ -86,7 +86,7 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "WARP producer commands and exact renderer eye callback API only; sustained actual R30 menu/car/race stereo capture and Quest3/VDXR remain pending.",
     "activation_guard_and_fallback": "Explicit audited native eye recorder only; no default native route or producer promotion. Existing opt-in/fail-closed D3D9 Draw/Present/input/FFB, fallback and DXVK freeze retained.",
-    "delivery_stage": "SOURCE_PHASE_PARTIAL_GATES_PENDING_NOT_TERMINAL",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_EXACT_SHA_BUILD_GATES_VERIFIED_NOT_TERMINAL",
     "remaining_implementation": [
       "Wire real R30 menu/car/race camera-specific Draw/DrawIndexed calls and complete source state/clears into the native per-eye callbacks.",
       "Verify fully connected source graph then conduct user Quest3/VDXR game, gamepad/FFB, HUD, head pose and 72 Hz performance checks."
@@ -96,59 +96,58 @@
     "C0_RECOVER": "GitHub HEAD 53ade9de, same owner feature unfinished; exact 00824 material CI PASS recorded without runtime evidence.",
     "C1_REVIEW": "Native game eye callback self-reported drawCount without requiring actual native D3D11 Draw/DrawIndexed issued commands.",
     "C2_IMPLEMENT": "Commit c3290bc7 actual native C++ draw encoder, per-eye counter binding, WARP callback issuing Draw and DrawIndexed.",
-    "C3_VALIDATE": "Isolated WARP at material commit SUCCESS. Mandatory static gate initially rejected new audited draw entry and check-latest found 00824 C6 missing development_strategy; repair confines activation to exact audited eye record and adds current honest 00825 source record.",
-    "C4_COMMIT": "Material commit c3290bc7; follow-up same TASK_ID gate/record repair is non-feature CI remediation.",
+    "C3_VALIDATE": "At validation-bearing exact SHA 9c303e63b6df9e83b8664b12148e06be84bdb9e0, required 5/5 GitHub Actions SUCCESS: Fast #38897552550, Backend #38897552592, Windows Build #38897559461, OpenXR #38897559352, HUD #38897559537. Separate WARP #38896804605 SUCCESS at original material c3290bc7. Not an HMD/game runtime PASS.",
+    "C4_COMMIT": "Material C++ feat c3290bc7a83e88aaa2e5a0b7991b99d469a534d5; bounded CI activation gate and latest-run record repair 9c303e63b6df9e83b8664b12148e06be84bdb9e0; C6 JSON bookkeeping only [skip ci], does not change validation-bearing SHA.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING exact-SHA required gates; Quest3 gameplay UNTESTED; real R30 integration pending."
+    "C6_STATE": "C6 persisted nonterminal SOURCE_INTEGRATION_IN_PROGRESS / PASS_EXACT_SHA 5/5 at 9c303e63. Real R30 menu/car/race game stereo producer callback and Quest3/VDXR runtime remain pending/UNTESTED. No independent feature completion or scoring."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00825",
     "score_change": 0,
-    "score_status": "UNFINISHED_SOURCE_PHASE_NO_AWARD",
-    "note": "Feature identity shared with previous native eye integration; no new completion or score from this partial C2 or CI repair."
+    "score_status": "PARTIAL_SOURCE_INTEGRATION_NO_NEW_FEATURE_AWARD",
+    "note": "Existing full-game native-eye feature not terminal; C6, CI remediation, source phase and retry do not create independently completed feature score."
   },
-  "followup_material_result_sha": "675b45a38b2a733cb76f2c90ee674d8880b50b26",
   "material_commits": [
-    "dc7356fc3b459b2555399a8bdbe966770987e404",
-    "675b45a38b2a733cb76f2c90ee674d8880b50b26"
+    "c3290bc7a83e88aaa2e5a0b7991b99d469a534d5"
   ],
-  "latest_retry_event_id": "CONVERSION-DX11-00823-E003",
-  "latest_retry_attempt": 2,
   "ci_exact_sha_gates": {
-    "sha": "675b45a38b2a733cb76f2c90ee674d8880b50b26",
+    "sha": "9c303e63b6df9e83b8664b12148e06be84bdb9e0",
     "required": "5/5 SUCCESS",
-    "native_transport_warp": "SUCCESS",
+    "result": "SUCCESS",
+    "native_transport_warp": {
+      "source_sha": "c3290bc7a83e88aaa2e5a0b7991b99d469a534d5",
+      "run_id": 38896804605,
+      "result": "SUCCESS"
+    },
     "runs": [
       {
         "name": "DX11 Fast Structural Checks",
-        "run_id": 38891894234,
+        "run_id": 38897552550,
         "result": "SUCCESS"
       },
       {
         "name": "Backend Conversion Gate",
-        "run_id": 38891894221,
+        "run_id": 38897552592,
         "result": "SUCCESS"
       },
       {
         "name": "Windows Build",
-        "run_id": 38891899742,
+        "run_id": 38897559461,
         "result": "SUCCESS"
       },
       {
         "name": "OpenXR VR architecture",
-        "run_id": 38891899749,
+        "run_id": 38897559352,
         "result": "SUCCESS"
       },
       {
         "name": "OutRun EXE HUD Inspector CI",
-        "run_id": 38891899796,
-        "result": "SUCCESS"
-      },
-      {
-        "name": "DX11 Native Transport Isolated WARP",
-        "run_id": 38891894325,
+        "run_id": 38897559537,
         "result": "SUCCESS"
       }
-    ]
-  }
+    ],
+    "runtime_claim": "UNTESTED",
+    "feature_scope": "PARTIAL_SOURCE_INTEGRATION_ONLY"
+  },
+  "ci_remediation_commit_sha": "9c303e63b6df9e83b8664b12148e06be84bdb9e0"
 }
