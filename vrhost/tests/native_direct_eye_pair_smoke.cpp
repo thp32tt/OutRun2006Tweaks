@@ -130,6 +130,31 @@ int main()
                  !OutRunVrNativeEyePair::IsSrgbView(left.Format),
                  "scRGB eyes retain their independent HDR white-scale route"))
         return 1;
+    // R23 host source-pixel staging must accept the same packed RGB10A2
+    // game-eye format that the live DirectGPU importer/projector admits.
+    left.Format = right.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
+    const std::uint32_t rgb10 = 1023u | (511u << 10) | (128u << 20) | (3u << 30);
+    float decoded10[3]{};
+    if (!require(accepts(0x110u, 0x220u, 2u),
+                 "two independent 10-bit native game eyes must reach OpenXR") ||
+        !require(OutRunVrNativeEyePair::DecodeR10G10B10A2Rgb(
+                     reinterpret_cast<const std::uint8_t*>(&rgb10), decoded10),
+                 "host source-pixel decoder must admit packed RGB10A2") ||
+        !require(decoded10[0] == 1.0f &&
+                 decoded10[1] > 0.49f && decoded10[1] < 0.51f &&
+                 decoded10[2] > 0.12f && decoded10[2] < 0.13f,
+                 "packed RGB10A2 must retain red/green/blue bit ordering") ||
+        !require(!OutRunVrNativeEyePair::DecodeR10G10B10A2Rgb(
+                     nullptr, decoded10) &&
+                 !OutRunVrNativeEyePair::DecodeR10G10B10A2Rgb(
+                     reinterpret_cast<const std::uint8_t*>(&rgb10), nullptr),
+                 "missing pixel storage must reject host pixel decoding"))
+        return 1;
+    right.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    if (!require(!accepts(0x110u, 0x220u, 2u),
+                 "10-bit/8-bit mixed native stereo pair must reject"))
+        return 1;
+
     // Real OpenXR stereo race and world-locked menu require two RTVs;
     // theater only needs one. Never index an invalid runtime image slot.
     int leftRtv = 1, rightRtv = 2;

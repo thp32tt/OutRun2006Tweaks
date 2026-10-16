@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include <d3d11.h>
 
 namespace OutRunVrNativeEyePair
@@ -20,6 +21,23 @@ namespace OutRunVrNativeEyePair
                format == DXGI_FORMAT_R16G16B16A16_FLOAT ||
                IsSrgbView(format);
     }
+    // Genuine DirectGPU game frames may use the packed DXGI 10:10:10:2
+    // backbuffer path. Decode the exact little-endian DXGI channel layout
+    // for the host's nonblocking source/projection pixel evidence. This is
+    // not the HMD compositor's sRGB/HDR transfer, which stays unchanged.
+    [[nodiscard]] inline bool DecodeR10G10B10A2Rgb(
+        const std::uint8_t* pixel, float* rgb) noexcept
+    {
+        if (!pixel || !rgb) return false;
+        std::uint32_t value = 0;
+        std::memcpy(&value, pixel, sizeof(value));
+        constexpr float inverse1023 = 1.0f / 1023.0f;
+        rgb[0] = static_cast<float>(value & 0x3ffu) * inverse1023;
+        rgb[1] = static_cast<float>((value >> 10) & 0x3ffu) * inverse1023;
+        rgb[2] = static_cast<float>((value >> 20) & 0x3ffu) * inverse1023;
+        return true;
+    }
+
     // The shared handle numbers may differ while both opens refer to the same
     // D3D11 allocation. Compare canonical COM identities *after* opening, not
     // the handle values, before copying a supposedly stereo game frame.

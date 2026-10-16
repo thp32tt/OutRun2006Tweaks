@@ -114,6 +114,7 @@ namespace
         return slot < OutRunVR::RenderFrameRingSize &&
             generation != 0 &&
             leftHandle != 0 && rightHandle != 0 &&
+            leftHandle != rightHandle &&
             width != 0 && height != 0 &&
             width == frame.backbufferWidth &&
             height == frame.backbufferHeight;
@@ -377,7 +378,8 @@ namespace
         c.directRight_[slot]->GetDesc(&right);
         // Re-check before the actual GPU CopyResource + OpenXR eye projection:
         // a changed transport generation or an aliased eye cannot reach HMD.
-        if (c.directLeft_[slot] == c.directRight_[slot] ||
+        if (!OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+                c.directLeft_[slot], c.directRight_[slot], IID_IUnknown) ||
             !OutRunVrNativeEyePair::Compatible(
                 frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex],
                 frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex],
@@ -507,6 +509,8 @@ namespace
             rgb[0] = p[0] / 255.0f; rgb[1] = p[1] / 255.0f; rgb[2] = p[2] / 255.0f;
             return true;
         }
+        if (format == DXGI_FORMAT_R10G10B10A2_UNORM)
+            return OutRunVrNativeEyePair::DecodeR10G10B10A2Rgb(p, rgb);
         if (format == DXGI_FORMAT_R16G16B16A16_FLOAT)
         {
             const auto* h = reinterpret_cast<const std::uint16_t*>(p);
