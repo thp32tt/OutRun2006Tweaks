@@ -44,5 +44,29 @@ int main()
             -1.35f, -0.32f, 0.65f, delta) ||
         !near(delta.z, -1.35f))
         return 5;
+
+    // Matching cockpit render and near-clip eligibility is a shared
+    // per-frame condition, not independent ad-hoc checks in two hooks.
+    using OutRunVR::DriverSeatCamera::CameraAndBodyEligible;
+    const Vec3 nativePos{0.f, 0.f, 0.f}, nativeLook{0.f, 0.f, 10.f};
+    if (!CameraAndBodyEligible(true, true, 0.f, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f))
+        return 6;
+    if (CameraAndBodyEligible(false, true, 0.f, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f) ||
+        CameraAndBodyEligible(true, false, 0.f, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f) ||
+        CameraAndBodyEligible(true, true, 0.1f, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f) ||
+        CameraAndBodyEligible(true, true, inf, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f) ||
+        CameraAndBodyEligible(true, true, 0.f, 2, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f) ||
+        CameraAndBodyEligible(true, true, 0.f, 1, 1,
+            nativePos, nativeLook, -1.35f, nan, 0.65f))
+        return 7;
+    if (!CameraAndBodyEligible(true, true, 0.f, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f))
+        return 8;
     return 0;
 }

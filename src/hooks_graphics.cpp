@@ -173,6 +173,23 @@ static bool VRDriverSeatGameplayActive() noexcept
         *Game::game_start_progress_code == 65;
 }
 
+
+static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
+{
+    if (!camera)
+        return false;
+    const auto& pos = camera->cam_pos_F8;
+    const auto& look = camera->look_pos_104;
+    return OutRunVR::DriverSeatCamera::CameraAndBodyEligible(
+        Settings::VREnabled && Settings::VRDriverSeatView,
+        VRDriverSeatGameplayActive(), camera->cam_mode_timer_364,
+        static_cast<int>(camera->cam_mode_34A),
+        Settings::VRDriverSeatNativeMode.get(),
+        {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
+        Settings::VRDriverSeatForward.get(),
+        Settings::VRDriverSeatRight.get(), Settings::VRDriverSeatUp.get());
+}
+
 class VRDriverSeatRenderTest : public Hook
 {
 	constexpr static int PlayerCarRenderState_HookAddr = 0x69764;
@@ -191,15 +208,7 @@ class VRDriverSeatRenderTest : public Hook
 		// stereo recovery gate. Keeping it native-game active makes the test
 		// visible on the PC mirror too and prevents temporary host eligibility
 		// changes from turning the car/driver path on and off.
-		if (!Settings::VREnabled || !Settings::VRDriverSeatView)
-			return false;
-		if (!VRDriverSeatGameplayActive())
-			return false;
-		EvWorkCamera* camera = Game::camera();
-		D3DVECTOR delta{};
-		return camera && camera->cam_mode_timer_364 == 0.0f &&
-			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get() &&
-			VRDriverSeatCameraDelta(camera, delta);
+		return VRDriverSeatCameraEligible(Game::camera());
 	}
 
 	static void PlayerCarRenderState_dest(SafetyHookContext& ctx)
@@ -1481,10 +1490,7 @@ class FixZBufferPrecision : public Hook
 
 	static bool DriverSeatCameraActive(EvWorkCamera* camera)
 	{
-		return camera && Settings::VREnabled && Settings::VRDriverSeatView &&
-			VRDriverSeatGameplayActive() &&
-			camera->cam_mode_timer_364 == 0.0f &&
-			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get();
+		return VRDriverSeatCameraEligible(camera);
 	}
 
 	static bool ApplyDriverSeatCameraOffset(EvWorkCamera* camera,

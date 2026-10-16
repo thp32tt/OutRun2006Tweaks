@@ -58,4 +58,19 @@ namespace OutRunVR::DriverSeatCamera
         translation = proposed;
         return true;
     }
+    // Scope contract: cockpit near-plane, player-car model, driver suppression
+    // and camera displacement must agree for the *same* native camera frame.
+    // Re-evaluate after mode switches; never reuse a cached eligibility bit.
+    inline bool CameraAndBodyEligible(
+        bool enabled, bool gameplayActive, float transitionTime,
+        int nativeMode, int selectedMode, Vec3 position, Vec3 look,
+        float forward, float right, float up) noexcept
+    {
+        if (!enabled || !gameplayActive || nativeMode != selectedMode ||
+            !std::isfinite(transitionTime) || transitionTime != 0.0f)
+            return false;
+        Vec3 ignored{};
+        return ComputeTranslation(position, look, forward, right, up, ignored);
+    }
+
 }
