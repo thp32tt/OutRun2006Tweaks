@@ -1,0 +1,104 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00968",
+  "production_id": "CONVERSION-DX9EX-00968",
+  "event_id": "CONVERSION-DX9EX-00968-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00968",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_NEEDS_VALIDATION",
+  "phase": "C5_EXACT_SHA_GATE",
+  "checkpoint": "C5_VALIDATION",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "7581c9df7aa3a3c5e5337df90c1b896825e140e7",
+  "material_result_sha": "d23442bbcf034ac072b6b7be65fd6616129c112a",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00968.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Restore the full ESC pause/options menu optical alignment across both eyes: paused SpriteQueue shell and exact ScreenHud arrows must retain independent VRPauseMenuScale and VRPauseMenuVerticalOffset after finite-eye projection, with original game input/hitboxes and R26_SAFE fallback unchanged.",
+    "scope_boundary": "Only the native original-game ESC/pause state and its queued ScreenOverlay2D/ScreenHud geometry; never change F11, gameplay HUD, main/front-end menu, +TIME, GOAL, lens, rank, SkyGlow, world stereo, device recovery, original input/FFB, DX11, or frozen DXVK.",
+    "special_work_evidence": "R84's common finite XYZRHW eye-plane builder was used for both pause shell and exact option arrows but always selected ordinary R30HudScaleValue and zero pause displacement, while the shader sibling already carried independent ESC settings. Both were therefore split by actual physical raster path.",
+    "trace_stages": [
+      "The original game pause state STATE_SMPAUSEMENU creates ESC shell ScreenOverlay2D sprites and source-identifiable ScreenHud option arrows without modifying gamepad/keyboard controller navigation or hitboxes.",
+      "R84 R30ConfigureXyzrhwWorldEffect checks the actual physical SpriteQueue/ScreenHud scope and enters R30BuildStageExtensionXyzrhwEyePlane where the exact pause-state predicate now chooses the pause optical scale and viewport vertical fraction; nonpause originals retain their old path.",
+      "The R84 physical XYZRHW vertex transform invokes ProjectPixelPair with one latched stereo pair and atomically applies post-projection pause vertical displacement to both eyes, preserving the original GPU vertex Z/RHW/colour/UV and leaving Quest3 compositor and R26_SAFE separately protected."
+    ],
+    "subcomponents": [
+      "Correct both queued pause shell and ScreenHud pause option arrow ownership at the same finite R84 eye-plane builder without reclassifying generic/world sprites.",
+      "Retain independent ESC optical scale and signed vertical slider after binocular projection; reject malformed pair atomically while preserving original nonpause geometry.",
+      "Compile executable positive/negative bilateral GPU-pixel math smoke with zero/negative offset, overflow, malformed input and per-eye projection, without weakening original input/state restoration."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_pause_shell_and_arrows",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native paused ESC shell and exact option-arrow optical placement",
+        "expected_behavior": "Independent pause scale and vertical movement use a consistent head-recentered finite eye plane; arrows and shell preserve stereo placement and original controller navigation."
+      },
+      {
+        "id": "esc_isolation_and_invalid_pose",
+        "category": "fallback_regression",
+        "behavior_area": "Malformed bilateral eye pixel and nonpaused HUD/GOAL/F11/world inputs",
+        "expected_behavior": "Invalid either-eye displacement leaves both published values unchanged; zero/nonpaused shift preserves existing +TIME, GOAL, gameplay HUD and all original world/FFB/SkyGlow paths."
+      },
+      {
+        "id": "esc_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84/R26_SAFE x64 host package CI and modified-owner static regression",
+        "expected_behavior": "Exact-SHA DX9Ex Active Win32 game/R84 host/package, Domain Isolation, Full Source Impact and HUD Inspector all succeed; Quest3/VDXR remains UNTESTED until actual hardware exercise."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "esc_pause_shell_and_arrows": "PENDING_EXACT_SHA",
+    "esc_isolation_and_invalid_pose": "PENDING_EXACT_SHA",
+    "esc_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "The R84 R30ConfigureXyzrhwWorldEffect dispatches original pause menu queued overlay and exact ScreenHud into the stage-extension XYZRHW eye-plane, which previously hardcoded R30HudScaleValue and no vertical shift even though ESC has VRPauseMenuScale and VRPauseMenuVerticalOffset.",
+    "source_trace": [
+      "STATE_SMPAUSEMENU original game sprites retain ScreenOverlay2D/ScreenHud exact source ownership.",
+      "R30 finite-stage eye builder chooses an independent pause optical scale and scaled viewport offset only in original ESC pause scope.",
+      "R30 pixel projector writes both eye XY shifts atomically, with original D3D9 primitive and state backup/restoration; x64 OpenXR host receives stereo as before."
+    ],
+    "root_cause": "The generic and exact ESC sprite families converged on a finite XYZRHW eye-plane implemented for +TIME/GOAL, whose scale selector ignored pause settings and whose post-eye pixel branch lacked the signed vertical displacement that the dedicated shader ESC path already used.",
+    "alternatives_rejected": [
+      "Do not globally rescale +TIME/GOAL, use HUD flat-FOV-only fallback, change game input/hitboxes, disable SKYGlow or lens, or force mono rendering to hide mismatches."
+    ],
+    "fix_evidence": "Material C++ source change d23442bbcf034ac072b6b7be65fd6616129c112a updates the actual R84 finite eye-plane producer and bilateral pixel sink, adding portable helper and source-level executable smoke.",
+    "negative_test_evidence": "vrhost/tests/stage_extension_eye_plane_smoke.cpp verifies negative, zero and positive ESC shifts, bad float input and overflow leave both eyes unchanged, and independent eye projector source remains intact.",
+    "eye_ownership": "One exact original paused state controls both ScreenHud arrow and SpriteQueue overlay shell; two eye pixels share one latched OpenXR frame, independent pause scale and only pause-specific post-projection vertical shift; HMD runtime remains UNTESTED."
+  },
+  "ci_repair": {
+    "failed_validation_sha": "d23442bbcf034ac072b6b7be65fd6616129c112a",
+    "failed_run_id": 38946101597,
+    "failed_gate": "DX9Ex Active Validation / feature-unit policy",
+    "reason": "The material source commit lacked the same-task canonical feature-contract run file; policy exited before x86/x64 compilation, no game compile failure demonstrated.",
+    "correction": "Restore the exact feature catalog ESC_MENU and whole-source acceptance record in the same task without changing the renderer, test policy or mandatory jobs.",
+    "score_delta": 0
+  },
+  "ci_evidence": {
+    "result": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify immutable exact-SHA Active, Domain, HUD Inspector, Full Source gates, repair only a real failure under this TASK_ID, then record C6. Quest3/VDXR UI acceptance requires separate HMD run."
+}
