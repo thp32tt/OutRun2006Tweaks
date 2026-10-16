@@ -273,6 +273,31 @@ namespace OutRunVrNativeEyePair
             !holdMatches(holdL) || !holdMatches(holdR))
             return false;
 
+        // Source eyes can still be bound as native menu/vehicle/race RTVs
+        // when R23 imports the pair. Temporarily detach ALL OM outputs before
+        // the actual GPU transfers and restore the full MRT/DSV set afterward.
+        // A one-target restore would silently discard the next game's HUD RT1.
+        struct ScopedHoldCopyOutput final {
+            Context* immediate{};
+            enum : unsigned { kRtvSlots = 8u };
+            ID3D11RenderTargetView* targets[kRtvSlots]{};
+            ID3D11DepthStencilView* depth{};
+            explicit ScopedHoldCopyOutput(Context* current) noexcept
+                : immediate(current) {
+                immediate->OMGetRenderTargets(kRtvSlots, targets, &depth);
+            }
+            ~ScopedHoldCopyOutput() noexcept {
+                immediate->OMSetRenderTargets(kRtvSlots, targets, depth);
+                const auto release = [](auto*& view) noexcept {
+                    if (view) { view->Release(); view = nullptr; }
+                };
+                for (auto*& target : targets) release(target);
+                release(depth);
+            }
+            ScopedHoldCopyOutput(const ScopedHoldCopyOutput&) = delete;
+            ScopedHoldCopyOutput& operator=(const ScopedHoldCopyOutput&) = delete;
+        } savedOutput(context);
+        context->OMSetRenderTargets(0u, nullptr, nullptr);
         context->CopyResource(holdLeft, sourceLeft);
         context->CopyResource(holdRight, sourceRight);
         return true;

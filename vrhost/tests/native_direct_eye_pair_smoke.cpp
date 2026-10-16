@@ -293,6 +293,26 @@ int main()
         // slots for subsequent menu/HUD rendering, not leave OM unbound.
         ID3D11RenderTargetView* originalTargets[2]{nativeLeftRtv, nativeRightRtv};
         warpContext->OMSetRenderTargets(2u, originalTargets, nullptr);
+        // The host hold-copy path must preserve both game/output bindings
+        // while the actual source-eye RTVs are live. The subsequent XR copy
+        // reads these newly staged red/green holds, proving two GPU pixels.
+        const bool holdCopyWithMrt = stageEyes(
+            warpContext, warpDevice, holdLeft, holdRight, gpuLeft, gpuRight);
+        const bool badHoldRejectedWithMrt = !stageEyes(
+            warpContext, warpDevice, holdLeft, holdRight, gpuLeft, gpuLeft);
+        ID3D11RenderTargetView* holdObserved[2]{};
+        ID3D11DepthStencilView* holdDepth = nullptr;
+        warpContext->OMGetRenderTargets(2u, holdObserved, &holdDepth);
+        const bool holdMrtRestored =
+            holdObserved[0] == nativeLeftRtv &&
+            holdObserved[1] == nativeRightRtv && holdDepth == nullptr;
+        for (auto*& view : holdObserved)
+            if (view) { view->Release(); view = nullptr; }
+        if (holdDepth) holdDepth->Release();
+        if (!require(holdCopyWithMrt && badHoldRejectedWithMrt &&
+                     holdMrtRestored,
+                     "DirectGPU R23 hold staging must restore native MRT0/MRT1 on success and rejection"))
+            return 1;
         ID3D11DeviceContext* deferred = nullptr;
         const bool deferredAvailable =
             SUCCEEDED(warpDevice->CreateDeferredContext(0u, &deferred)) &&
