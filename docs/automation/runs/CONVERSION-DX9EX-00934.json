@@ -66,19 +66,66 @@
     ]
   },
   "acceptance_results": {
-    "menu_custom_quad_all_corners": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PASS",
-    "protected_gameplay_reset": "SOURCE_IMPLEMENTED_LOCAL_SMOKE_PASS",
-    "exact_sha_integrated_quality": "PENDING_EXACT_SHA_CI"
+    "menu_custom_quad_all_corners": "PASS_BUILD",
+    "protected_gameplay_reset": "PASS_BUILD",
+    "exact_sha_integrated_quality": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Existing Vanilla custom-sprite X corner writes use screenScaleY, including on the 3440x1440 21:9 front end where game's intended native horizontal scale is 5.375 instead of 3.0.",
     "root_cause": "Screen-space custom-quad X/Y were conflated in the uncontained branch, even when Vanilla explicitly requests stretched native UI.",
     "negative_test_evidence": "Changed-area C++ portable native smoke checks all four dimensions, gameplay fallback and invalid/reset inputs.",
     "policy_gate_failure": "Run 38845682094 policy job 116796020745 failed because visual feature ID was unregistered and feature_contract lacked 2 substantive subcomponents; no game/host/package compile was attempted.",
-    "repaired_by_retry": "CONVERSION-DX9EX-00934-E003"
+    "repaired_by_retry": "CONVERSION-DX9EX-00934-E003",
+    "source_trace": [
+      "Original game's draw_sprite_custom_matrix_mid consumes SPRARGS2 authored four-corner geometry and D3DXVec4Transform on every corner.",
+      "Original Vanilla source mistakenly scaled all four X screen vertices with screenScaleY; new exact title/menu/car-select selector independently maps X to screenScaleX while contained modes preserve min-axis 4:3.",
+      "Original Y verticalCenter and pixel half-offset remain byte-equivalent after fail-scoped repair; validated finite quad copied atomically before original IDirect3DDevice9::DrawPrimitiveUP.",
+      "Unchanged R84 R29/R30/R31/R32/R33 and x64 OpenXR host/presentation path consume this game-side 2D output with original protected fallbacks."
+    ],
+    "alternatives_rejected": [
+      "Do not rewrite R84 stereo matrix owners or change F11/GOAL/HUD geometry, as the defect was proven in original custom quad X scale before GPU draw.",
+      "Do not globally stretch every Vanilla gameplay or unsupported-state quad: restrict to exact front-end modes and preserve protected source Y letterbox path.",
+      "Do not disable existing UI matrix safety negative mutations or claim Quest3 optical correction without a physical HMD test."
+    ],
+    "fix_evidence": "Original actual C++ source updated in commits 7d849ef7 and efc0d52c, plus portable menu_content_aspect_smoke scenarios for 4:3, 16:9, 21:9, portrait, Vanilla and gameplay/reset; exact-SHA Windows R84 main, R26_SAFE game, x64 host, packaged payload, HUD Inspector, Domain and Full Source MSVC analyzer succeeded.",
+    "eye_ownership": "This patch affects original game menu quad source-space XY only; R84 stereo and OpenXR host eye ownership, source camera pose, projection and existing HUD/GOAL/SkyGlow remain untouched. Physical Quest3 binocular acceptance is pending."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 exact-SHA GitHub CI SUCCESS verified; Quest3/VDXR HMD runtime optical/FPS acceptance remains NEED_HMD_TEST. No source changes or further CI rerun required.",
+  "next_action": "BUILD_VERIFIED exact-SHA all mandatory CI SUCCESS; await physical Quest3/VDXR comparison of title/menu and vehicle-selection 4:3/16:9/21:9 optics and original input, SkyGlow and 3D. No automatic HMD PASS.",
   "material_result_sha": "7d849ef7d1ace6cd7c8f3dc440211919d971e779",
-  "validation_bearing_result_sha": "efc0d52c73b2e9833b33ddbd8c271f49e030dc4e"
+  "validation_bearing_result_sha": "efc0d52c73b2e9833b33ddbd8c271f49e030dc4e",
+  "ci_evidence": {
+    "exact_sha": "efc0d52c73b2e9833b33ddbd8c271f49e030dc4e",
+    "dx9ex_active_validation": {
+      "run_id": 38846218071,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "policy",
+        "game",
+        "full-chain-compile",
+        "host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38846218560,
+      "conclusion": "SUCCESS"
+    },
+    "out_run_exe_hud_inspector": {
+      "run_id": 38846218104,
+      "conclusion": "SUCCESS"
+    },
+    "dx9ex_full_source_impact": {
+      "run_id": 38846218073,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game"
+      ]
+    },
+    "hmd_test": "NOT_EXECUTED",
+    "prior_failed_sha": "58703cbc095e00ed2963b38bfdabffb04d2f65f8",
+    "prior_failure": "verified UI portrait path regression test due early over-broad Y refactor; repaired same TASK_ID without removing the test"
+  }
 }
