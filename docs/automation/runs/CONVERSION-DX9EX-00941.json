@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00941",
+  "production_id": "CONVERSION-DX9EX-00941",
+  "event_id": "CONVERSION-DX9EX-00941-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00941",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "97d43a4864017cc3a2a04dfe707d9566de0224cc",
+  "material_result_sha": "d5ca7a6f24957d6a17dd4b70a277e430c5e7d98d",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/game/goal_result_parent_provenance.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/game/goal_result_parent_provenance.hpp",
+    "tools/verify_vr_visual_composition_p0.py",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00941.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Restore the original GOAL-progress 0–99 percent result record, stage title and time glyph group to an explicitly source-owned binocular ScreenHud plane without resurrecting either crashing B9200 return-site detour.",
+    "scope_boundary": "Only canonical 19 E8 B9200 caller-return addresses, recognized on the installed 2C808/2C9DB glyph hook call stack inside STATE_GOAL, may identify B9200 ScreenHud; preserve 100% final result, ordinary timer, +TIME, rank, R26_SAFE, input/FFB, SkyGlow and all original EXE bytes. Unverifiable stack remains native fallback.",
+    "trace_stages": [
+      "Canonical original 19 EXE E8→4B9200 parents and 2C808/2C9DB glyph hook; historical 97C5F/97E75 crashes prohibit rva+5 detours.",
+      "Win32 frame stack address with module image base and exact 19 return-RVA allowlist; direct ScopedExactProducerSemantic and all newly queued glyph SpriteNodes.",
+      "R84 independently compiled R30 finite binocular GOAL XYZRHW eye plane with original OpenXR pose; unproven D3DX batches keep unchanged native End fallback."
+    ],
+    "subcomponents": [
+      "Implement exact Win32 caller-return provenance and C++ static positive/negative cases, restoring B9200 source attribution with no game EXE patch.",
+      "Propagate source owner through direct glyph invocation and all SpriteNode siblings, admit only proven B9200 ScreenHud to R84 GOAL finite plane and preserve default glyph owner on failed proof.",
+      "Integrate changed-source regression and final exact-SHA CI with R84 game, x64 host, R26 rollback, package, Domain, Full Source Impact and EXE HUD inspector."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_original_b9200_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GOAL 0–99 source to R84 stereo eye plane",
+        "expected_behavior": "Nineteen exact B9200 parent returns can assign result glyphs the GOAL-progress optical HUD owner while preserving original 19 E8 CALL bytes and previous crash guard."
+      },
+      {
+        "id": "goal_unknown_and_final_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Non-GOAL and unproven result text/FFB/SkyGlow/R26",
+        "expected_behavior": "Adjacent return addresses, missing stack frames and unknown source cannot acquire GOAL ownership; all other text maintains existing TextGlyphPutSprite behavior; no D3DX flush owner widened."
+      },
+      {
+        "id": "goal_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 game, OpenXR host, R26 safe package and CI gates",
+        "expected_behavior": "Final validation-bearing candidate passes exact SHA DX9Ex Active, Domain Isolation, Full Source Impact, EXE HUD Inspector and native C++ compile; HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_original_b9200_source": "PENDING_CI",
+    "goal_unknown_and_final_fallback": "PENDING_CI",
+    "goal_exact_sha_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Original 19 exact 4B9200 result-text E8 producers lost exact ScreenHud semantic ownership after rva+5 midhooks were disabled following real 97C5F/97E75 instruction-overlap crashes.",
+    "original_evidence": "Canonical original EXE fingerprint maps 19 E8 calls to 4B9200; two real minidumps rule out every return-site midhook.",
+    "source_trace": [
+      "Original GOAL E8 97xxx→4B9200 producer",
+      "Existing 2C808/2C9DB→2CFE0 TextGlyph_putSprite wrapper",
+      "R84 source ScreenHud producer→queued SpriteNode→R30 finite result eye plane"
+    ],
+    "alternatives_rejected": [
+      "Do not reinstall unsafe 19 E8 rva+5 midhooks, patch global alpha/GOAL state or flush unowned D3DX batches."
+    ],
+    "eye_ownership": "R84 R30 finite ScreenHud transform uses the latched head inverse and individual XR eye FOV/cant; source-preserved tagged glyphs only.",
+    "remaining_uncertainty": "x86 optimized stack unwind may omit original parent return and intentionally fails closed; physical Quest3 GOAL 0–99 result and final result remain unverified."
+  },
+  "score_delta_this_attempt": 0,
+  "ci_evidence": {
+    "validation_sha": null,
+    "exact_sha": "PENDING",
+    "run_ids": {},
+    "conclusions": {},
+    "hmd_validation": "UNTESTED"
+  },
+  "next_action": "Repair failing exact-SHA source verification and run record gate under the same task; validate all required GitHub Actions at final immutable SHA. No Quest3 or HMD PASS claim."
+}

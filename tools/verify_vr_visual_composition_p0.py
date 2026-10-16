@@ -562,8 +562,7 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
                  'ScopedExactProducerSemantic', 'ResultTextB9200',
                  'if (exactGoalResult)', 'ProducerToken::TextGlyphPutSprite'):
         require(part, glyph, 'B9200 exact glyph source vs unchanged fallback')
-    require('src/vr/game/goal_result_parent_provenance.hpp'
-            .replace('src/', '') in ui_source,
+    require('vr/game/goal_result_parent_provenance.hpp',
             ui_source, 'portable B9200 source provenance linked')
     require('ResultTextBefore[p] = root ? root->tail_4 : nullptr;',
             enter, 'exact parent must snapshot full sprite queue')
