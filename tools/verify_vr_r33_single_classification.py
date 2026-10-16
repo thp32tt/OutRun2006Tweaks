@@ -345,7 +345,11 @@ def negative_write_flag_cache(src: str) -> None:
 
 def check_gpu_profiler_disabled_fastpath(src: str) -> None:
     """GPU timestamp opt-out must not enter the Meter singleton on any draw."""
+    # R33 may enter the Meter only when enabled AND the live draw belongs
+    # to the owning game device; retain the null/game-device check, not only
+    # the environmental opt-in.  This is a semantic source invariant.
     before = ("const bool gpuTimed = GpuWaterProbe::Enabled() &&\n"
+              "                device && R32ReviewIsGameDevice(device) &&\n"
               "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);")
     after = ("if (gpuTimed)\n"
              "                GpuWaterProbe::instance().afterDraw(true);")
@@ -375,6 +379,15 @@ def negative_gpu_profiler_fastpath(src: str) -> None:
         ("if (gpuTimed)\n", "if (true)\n"),
         ("GpuWaterProbe::instance().afterDraw(true);",
          "GpuWaterProbe::instance().afterDraw(gpuTimed);"),
+        # Guard against wrongly metering auxiliary devices or null pointers.
+        ("device && R32ReviewIsGameDevice(device) &&\n"
+         "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);",
+         "device &&\n"
+         "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);"),
+        ("device && R32ReviewIsGameDevice(device) &&\n"
+         "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);",
+         "R32ReviewIsGameDevice(device) &&\n"
+         "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);"),
         ("if (GpuWaterProbe::Enabled())\n"
          "                    GpuWaterProbe::instance().afterPresent(device);",
          "GpuWaterProbe::instance().afterPresent(device);"),
