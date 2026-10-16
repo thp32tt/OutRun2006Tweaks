@@ -8,7 +8,8 @@
 namespace outrun::vr::dx11 {
 
 enum class NativeSm3ArithmeticOpcode {
-    Move, Add, Subtract, Multiply, MultiplyAdd, Dot3, Dot4, Minimum, Maximum
+    Move, Add, Subtract, Multiply, MultiplyAdd, Dot3, Dot4, Minimum, Maximum,
+    Absolute, Fraction, SetLessThan, SetGreaterEqual, Compare
 };
 
 // Preserve lane masks and scalar-dot replication. Unsupported operand counts,
@@ -31,6 +32,12 @@ inline bool append_native_sm3_arithmetic(
     case NativeSm3ArithmeticOpcode::Move:
         if (!validSources(1u)) return false;
         expression = sources[0]; break;
+    case NativeSm3ArithmeticOpcode::Absolute:
+    case NativeSm3ArithmeticOpcode::Fraction:
+        if (!validSources(1u)) return false;
+        expression = std::string(
+            opcode == NativeSm3ArithmeticOpcode::Absolute ? "abs(" : "frac(") +
+            sources[0] + ")"; break;
     case NativeSm3ArithmeticOpcode::Add:
     case NativeSm3ArithmeticOpcode::Subtract:
     case NativeSm3ArithmeticOpcode::Multiply:
@@ -54,6 +61,36 @@ inline bool append_native_sm3_arithmetic(
         expression = "((" + sources[0] + " * " + sources[1] +
                      ") + " + sources[2] + ")";
         break;
+    case NativeSm3ArithmeticOpcode::SetLessThan:
+    case NativeSm3ArithmeticOpcode::SetGreaterEqual: {
+        if (!validSources(2u)) return false;
+        expression = "float4(";
+        constexpr char lanes[] = "xyzw";
+        for (unsigned lane = 0; lane < 4u; ++lane) {
+            if (lane) expression += ", ";
+            const char component = lanes[lane];
+            expression += "((" + sources[0] + ")." + component +
+                (opcode == NativeSm3ArithmeticOpcode::SetLessThan
+                    ? " < (" : " >= (") + sources[1] + ")." +
+                component + " ? 1.0f : 0.0f)";
+        }
+        expression += ")";
+        break;
+    }
+    case NativeSm3ArithmeticOpcode::Compare: {
+        if (!validSources(3u)) return false;
+        expression = "float4(";
+        constexpr char lanes[] = "xyzw";
+        for (unsigned lane = 0; lane < 4u; ++lane) {
+            if (lane) expression += ", ";
+            const char component = lanes[lane];
+            expression += "((" + sources[0] + ")." + component +
+                " >= 0.0f ? (" + sources[1] + ")." + component +
+                " : (" + sources[2] + ")." + component + ")";
+        }
+        expression += ")";
+        break;
+    }
     case NativeSm3ArithmeticOpcode::Dot3:
     case NativeSm3ArithmeticOpcode::Dot4: {
         if (!validSources(2u)) return false;

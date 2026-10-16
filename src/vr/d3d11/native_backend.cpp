@@ -260,14 +260,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V2";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V3";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_MASK_SWIZZLE_PROVENANCE_V2";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_MASK_SWIZZLE_PROVENANCE_V3";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -363,6 +363,8 @@ bool build_r283_sm3_mov_shader_source(
         std::array<bool, 32> tempUsed{};
         std::array<unsigned, 16> outputWritten{};
         constexpr UINT kMaxOps = 512u;
+        // Comparison, fraction and absolute operations are source-replayed;
+        // unsupported flow control and source state still fail closed.
         // No constants or dynamic indexing are fabricated here: real game
         // Set*ShaderConstantF and sampler bindings must be connected before
         // programs requiring them can become native Draw candidates.
@@ -390,6 +392,16 @@ bool build_r283_sm3_mov_shader_source(
                 opcode = NativeSm3ArithmeticOpcode::Minimum; sourceCount = 2u; break;
             case D3DSIO_MAX:
                 opcode = NativeSm3ArithmeticOpcode::Maximum; sourceCount = 2u; break;
+            case D3DSIO_ABS:
+                opcode = NativeSm3ArithmeticOpcode::Absolute; sourceCount = 1u; break;
+            case D3DSIO_FRC:
+                opcode = NativeSm3ArithmeticOpcode::Fraction; sourceCount = 1u; break;
+            case D3DSIO_SLT:
+                opcode = NativeSm3ArithmeticOpcode::SetLessThan; sourceCount = 2u; break;
+            case D3DSIO_SGE:
+                opcode = NativeSm3ArithmeticOpcode::SetGreaterEqual; sourceCount = 2u; break;
+            case D3DSIO_CMP:
+                opcode = NativeSm3ArithmeticOpcode::Compare; sourceCount = 3u; break;
             default:
                 return false;
             }

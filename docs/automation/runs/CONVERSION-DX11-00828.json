@@ -2,9 +2,9 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00828",
   "production_id": "CONVERSION-DX11-00828",
-  "event_id": "CONVERSION-DX11-00828-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00828-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
@@ -52,7 +52,7 @@
     ]
   },
   "acceptance_results": {
-    "sm3-arithmetic-source": "SOURCE_CODED_BUILD_PENDING",
+    "sm3-arithmetic-source": "SOURCE_CODED_14_ARITHMETIC_OPCODE_FAMILIES_CI_PENDING",
     "source-safety-fallback": "SOURCE_CODED_TARGETED_REGRESSION_PENDING",
     "exact-sha-ci": "PENDING_EXACT_SHA"
   },
@@ -63,7 +63,8 @@
     "integration_path": [
       "Actual game D3D9 SM3 parser and semantic decode validates source registers and per-component read-before-write before admitting arithmetic shaders.",
       "C++ HLSL arithmetic emitter feeds the existing D3DCompiler VS/PS bytecode materializer and exact-identity semantic receipts; rejected shaders preserve original D3D9 game frame.",
-      "Portable compiled arithmetic probe and full unchanged build/transport/OpenXR/HUD/Backend exact-SHA Gates validate source checkpoint; R30 camera scene journal hookup still unfinished."
+      "Portable compiled arithmetic probe and full unchanged build/transport/OpenXR/HUD/Backend exact-SHA Gates validate source checkpoint; R30 camera scene journal hookup still unfinished.",
+      "These shader opcodes are only an upstream prerequisite; the actual R30 game-native full-size draw-to-eye scene connection is unfinished and runtime untested."
     ],
     "batch_components": [
       "src/vr/d3d11/native_backend.cpp",
@@ -71,7 +72,7 @@
       "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
     ],
     "acceptance_proof": {
-      "positive_probe": "C++ arithmetic emitter supports nine SM3 instruction families with temp and masked output; GitHub CI pending.",
+      "positive_probe": "Shared native HLSL shader materializer extended from 9 to 14 arithmetic/comparison opcode families plus masked writes and wrong-operand negative checks, exact-SHA CI pending.",
       "negative_regression": "Constant, predication, uninitialized temp, unsupported modifiers/opcodes rejected; D3D9/input/FFB/owner and DXVK untouched.",
       "component_integration": "SM3 game shader bytes -> parsed register arithmetic -> HLSL VS/PS -> D3DCompiler DXBC materialization; full R30 menu/car/race native L/R binding incomplete."
     },
@@ -81,10 +82,25 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "visible_frame_acceptance": "Shader translation is only a prerequisite, NOT yet a gameplay scene source callback or Quest3 PASS.",
     "activation_guard_and_fallback": "No default native routing or OpenXR producer promotion; D3D9 original and DX9Ex fallback remain authoritative.",
-    "delivery_stage": "SOURCE_PHASE_PARTIAL_SM3_ARITHMETIC_WARP_PENDING",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_SM3_ARITHMETIC_COMPARE_EXTENSION_CI_PENDING",
     "remaining_implementation": [
       "Bind actual game shader constants and textures in the R30 native scene replay before shader-bearing Draw.",
       "Finish game-authored independent L/R R30 callback into NativeGameStereoSubmission and final real HMD tests."
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
     ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "Backend run 38907890682 at 9474fdb failed DX11 policy: run record lacks required live_game_draw_path; compile not reached.",
+    "C1_REVIEW": "SM3 translator was missing common ABS/FRC/SLT/SGE/CMP instructions; R30 menu/race to eye replay still unconnected.",
+    "C2_IMPLEMENT": "Material source batch: extend actual native SM3 shader translator/codegen and portable positive/negative regression, restore truthful planned live-game callsite path.",
+    "C3_VALIDATE": "Focus codegen regression and exact-SHA five mandatory CI gates pending; no HMD claimed.",
+    "C4_COMMIT": "Material result to be identified by GitHub exact commit.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "SOURCE_PHASE_PARTIAL; GATES PENDING; RUNTIME_VALIDATION=UNTESTED."
   }
 }
