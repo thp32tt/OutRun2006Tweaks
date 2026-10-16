@@ -1,0 +1,138 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00832",
+  "production_id": "CONVERSION-DX11-00832",
+  "event_id": "CONVERSION-DX11-00832-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_ORDERED_CLEAR_STREAM",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "R30_GAME_MENU_VEHICLE_RACE_STEREO_SOURCE_CALLBACK_PENDING",
+  "material_result_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+  "validation_bearing_result_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+  "source_material_commits": [
+    "7b1ecfede315ddf5cd91ec79a34976fd1d70a331"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "goal": "Replay real game-authored color TARGET whole/rect clears and selected Z/stencil clears in order between genuine D3D11 Draw/DrawIndexed on independent L/R native eye outputs; no fabricated draw evidence; preserve D3D9/DX9Ex input/FFB fallback. Full R30 actual scene callback is still pending.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "ordered-native-per-eye-clears",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_d3d11_eye_color_and_depth_command_stream",
+        "expected_behavior": "Native eye encoder emits source-order D3D11.1 ClearView and ClearDepthStencilView commands after actual geometry while retaining both L/R GPU output identity."
+      },
+      {
+        "id": "fail-closed-original-game",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_game_eye_offscreen_clear_and_original_input",
+        "expected_behavior": "Off-target/invalid bounded clear cannot affect native published eye; unmodified original D3D9 Draw/Present/input/FFB remains available."
+      },
+      {
+        "id": "verified-exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "warp_gpu_pixel_and_github_actions",
+        "expected_behavior": "True GPU post-Draw per-eye red/green patch pixel regression and all five mandatory exact SHA gates pass without claiming HMD runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "ordered-native-per-eye-clears": "PASS_BUILD",
+    "fail-closed-original-game": "PASS_BUILD",
+    "verified-exact-sha-ci": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Real game source-native encoder can submit ordered D3D11 Color/Z Clear commands between full-sized Draws to each independent ring-owned eye.",
+      "Deterministic WARP producer fixture executes independent L/R post-Draw color rectangles and Z/stencil commands; CPU mapped GPU pixels validate exact eye colors.",
+      "Existing NativeSharedEyeRing GPU fences, consumer ACK, OM state preservation and original D3D9/FFB fallback remain authoritative. R30 real game callback still pending."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native Transport Isolated WARP SUCCESS at exact SHA with post-Draw RGBA L/R pixel and full five required GitHub Actions SUCCESS.",
+      "negative_regression": "Detached/offscreen eye OM and invalid rect/Z/no-op request rejected, no manufactured Draw count, DX9Ex and DXVK not modified.",
+      "component_integration": "Native D3D11 eye command stream plus GPU pixel WARP probe and existing OpenXR producer ring."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_ORDERED_CLEAR_STREAM"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "remaining_implementation": [
+      "Integrate authentic R30 eye-by-eye captured menu/vehicle/race game Draw/DrawIndexed plus distinct eye camera/shader constant data with native ring callback.",
+      "Verify real-game/HMD Quest 3 VDXR stereo, HUD, FFB/input and sustained 72 Hz frame pacing."
+    ]
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38923190904,
+      "head_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38923190904"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38923190931,
+      "head_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38923190931"
+    },
+    "Windows Build": {
+      "run_id": 38923197302,
+      "head_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38923197302"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38923197144,
+      "head_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38923197144"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38923197183,
+      "head_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38923197183"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38923191276,
+      "head_sha": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38923191276"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub branch authority and 00831 source contract checked; R30 genuine source callback still pending.",
+    "C1_REVIEW": "Scoped owned native command stream post-draw clear defect with WARP regression.",
+    "C2_IMPLEMENT": "Actual D3D11.1 per-eye TARGET color RECT/full and Z/stencil clear GPU APIs implemented after native Draws.",
+    "C3_VALIDATE": "All mandatory five exact SHA GitHub Actions and direct WARP positive/negative tests SUCCESS.",
+    "C4_COMMIT": "7b1ecfede315ddf5cd91ec79a34976fd1d70a331",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; HMD UNTESTED; full renderer not complete."
+  }
+}
