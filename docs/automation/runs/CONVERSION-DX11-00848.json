@@ -116,7 +116,7 @@
       "conclusion": "success"
     }
   },
-  "previous_hold_reason": "PREVIOUS_00847_C6_SOURCE_PATH_FORMAT_POLICY_MISMATCH_REPAIRED_SAME_00848",
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
   "known_blockers": [
     "R30 live game-authored stereo camera Draw/DrawIndexed callback is not connected to native L/R eye submission and OpenXR host transport; whole-game stereo output is not complete.",
     "No matching real OutRun game menu/vehicle/race and Quest3/VDXR/HMD performance evidence; RUNTIME_VALIDATION=UNTESTED."
