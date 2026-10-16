@@ -21,6 +21,43 @@ static void TestHeadsetCadence(double hz)
     assert(cadence.Observe(0.022));             // legacy >18 ms protection
     assert(!cadence.Observe(period));           // recovery does not retain debt
 }
+
+static void TestSlowerRefreshRelock(double beforeHz, double afterHz)
+{
+    AdaptiveFrameCadence cadence;
+    for (int i = 0; i < 30; ++i)
+        assert(!cadence.Observe(1.0 / beforeHz));
+    for (int i = 0; i < 23; ++i)
+        assert(cadence.Observe(1.0 / afterHz));
+    // Only a continuous nominal series is allowed to re-lock, not a
+    // single GPU-late frame. First normal-budget frame is sample 24.
+    assert(!cadence.Observe(1.0 / afterHz));
+    assert(!cadence.Observe(1.0 / afterHz));
+    assert(cadence.Observe(0.025));
+    assert(!cadence.Observe(1.0 / afterHz));
+}
+
+static void TestLateGpuFramesNeverTrainRefresh()
+{
+    AdaptiveFrameCadence cadence;
+    for (int i = 0; i < 30; ++i)
+        assert(!cadence.Observe(1.0 / 120.0));
+    // A persistently overloaded but noncanonical 12ms 120Hz frame is late.
+    for (int i = 0; i < 64; ++i)
+        assert(cadence.Observe(0.012));
+    // Interleaving a recovered 120Hz frame or a loading gap invalidates a
+    // partial 72Hz candidate; the next 72Hz frame is still protected.
+    for (int i = 0; i < 18; ++i)
+        assert(cadence.Observe(1.0 / 72.0));
+    assert(!cadence.Observe(1.0 / 120.0));
+    for (int i = 0; i < 23; ++i)
+        assert(cadence.Observe(1.0 / 72.0));
+    assert(cadence.Observe(0.150));
+    assert(cadence.Observe(1.0 / 72.0));
+    cadence.Reset(); // VR disabled, restart or lost timing source.
+    assert(!cadence.Observe(1.0 / 72.0));
+}
+
 int main()
 {
     TestHeadsetCadence(60.0);
@@ -28,6 +65,12 @@ int main()
     TestHeadsetCadence(80.0);
     TestHeadsetCadence(90.0);
     TestHeadsetCadence(120.0);
+    TestSlowerRefreshRelock(120.0, 90.0);
+    TestSlowerRefreshRelock(120.0, 80.0);
+    TestSlowerRefreshRelock(120.0, 72.0);
+    TestSlowerRefreshRelock(120.0, 60.0);
+    TestSlowerRefreshRelock(90.0, 72.0);
+    TestLateGpuFramesNeverTrainRefresh();
     AdaptiveFrameCadence cadence;
     for (int i = 0; i < 8; ++i) assert(!cadence.Observe(1.0 / 120.0));
     assert(cadence.Observe(0.012)); // 120-Hz missed frame; old 18-ms gate missed

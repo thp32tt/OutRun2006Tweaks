@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00978",
+  "production_id": "CONVERSION-DX9EX-00978",
+  "event_id": "CONVERSION-DX9EX-00978-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00978",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:REFLECTION_REFRESH_RELOCK",
+  "symptom_id": "DX9EX:SYMPTOM:REFLECTION_REFRESH_CHANGE_STUCK_LATE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "status": "IN_PROGRESS",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "834b3d3b047829a5b2fe0705b08564846f1bee42",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/reflection_frame_budget.hpp",
+    "src/hooks_graphics.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/reflection_frame_budget.hpp",
+    "tools/test_vr_reflection_frame_budget.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00978.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:REFLECTION_REFRESH_RELOCK",
+    "goal": "Restore complete original stereo car-reflection update pacing when a Quest/OpenXR refresh-rate transition moves from 120 to stable 90/80/72/60 Hz, without teaching the late-frame limiter to accept isolated GPU overruns.",
+    "scope_boundary": "R84 original game Envmap_FaceCount temporal classifier and reflection cube-face budget only; protect SkyGlow, HUD/GOAL, original graphics, input/FFB, R26_SAFE and frozen DXVK.",
+    "special_work_evidence": "Deterministic QPC source-path defect: after 120Hz healthy 8.333ms samples, 72Hz 13.889ms remains cadenceMiss forever because the existing late branch cannot adapt referenceSeconds. This permanently enforces the two-face late budget at valid 72Hz until a manual Reset; no hardware FPS gain is claimed.",
+    "trace_stages": [
+      "Original OutRun EXE Envmap_FaceCount hook records QPC frame cadence in src/hooks_graphics.cpp.",
+      "R84 ReflectionFrameBudget::AdaptiveFrameCadence must distinguish sustained nominal refresh transitions from short deadline misses and long loading gaps.",
+      "Original D3D9 Envmap_RenderToCubeMap consumes bounded cube faces before the R84 two-eye VR rendering and OpenXR host presentation."
+    ],
+    "subcomponents": [
+      "Conservative continuous nominal-Hz re-lock that remains late until twenty-four valid samples and rejects GPU spikes, noncanonical overload and interrupted transitions.",
+      "Retain original face count accumulation, desktop and VR-off reset, late-two-face protection, original >18ms cutoff and native 60Hz budget.",
+      "Executable portable C++ positive and adversarial regression, followed by final exact-SHA Windows R84/R26_SAFE game, host, package, Domain, Full Source Impact and HUD gate."
+    ],
+    "acceptance_items": [
+      {
+        "id": "reflect_refresh_transition",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original EXE QPC to R84 headset refresh classifier",
+        "expected_behavior": "Stable 120-to-90/80/72/60Hz and 90-to-72Hz sequences re-lock after 24 frames instead of remaining permanently late."
+      },
+      {
+        "id": "reflect_overrun_negative",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9 cubemap draw-budget safety and desktop fallback",
+        "expected_behavior": "Single missed frames, sustained noncanonical 12ms GPU load, loading gaps, VR-off reset and ordinary desktop budget never masquerade as a refresh transition."
+      },
+      {
+        "id": "reflect_refresh_exact_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game DLL and OpenXR host plus R26_SAFE package",
+        "expected_behavior": "Compile changed-area native C++ behavior checks then pass non-skipped exact-SHA required Active, Domain, Full Source Impact and HUD GitHub Actions gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "reflect_refresh_transition": "PENDING_EXACT_SHA",
+    "reflect_overrun_negative": "PENDING_EXACT_SHA",
+    "reflect_refresh_exact_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Code deterministic: 120Hz->72Hz makes 13.889ms greater than reference 8.333ms*1.2+.5ms; Observe() only retrains when !late, so it cannot recover by staying at 72Hz.",
+    "root_cause": "The adaptive cadence state has no controlled slower-refresh re-lock after healthy 120Hz frames, trapping reflection submission in the late GPU budget after a headset rate decrease.",
+    "source_trace": [
+      "EXE+0x1447E original reflection face-count hook samples QPC and holds the cadence object.",
+      "Observe() determines frameSpike before passing dt to reflection frameScale60.",
+      "Advance() limits original D3D9 cubemap GPU faces to 2 when frameSpike, ahead of headset eye transport."
+    ],
+    "alternatives_rejected": [
+      "Do not simply raise the 120Hz late threshold: that would hide actual 12ms missed-refresh work.",
+      "Do not reduce cubemap resolution, remove reflections or modify per-eye image quality as an unmeasured FPS claim."
+    ],
+    "runtime_limit": "Portable source regression and CI are not Quest3/VDXR hardware proof. Real refresh transition, GPU p95/p99 and image quality remain UNTESTED."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run changed-area portable C++ regression and the required final exact-SHA GitHub Actions gates. Record C6 separately only after all Gate results are confirmed; Quest3/VDXR remains UNTESTED."
+}

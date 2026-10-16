@@ -15,11 +15,22 @@ namespace OutRunVR::ReflectionFrameBudget
     {
         double referenceSeconds = 0.0;
         unsigned healthySamples = 0;
+        // A stable lower XR refresh rate must be allowed to re-lock after
+        // a headset mode switch. A single late GPU frame cannot teach it.
+        double slowerCandidateSeconds = 0.0;
+        unsigned slowerCandidateSamples = 0;
+
+        void ClearSlowerCandidate() noexcept
+        {
+            slowerCandidateSeconds = 0.0;
+            slowerCandidateSamples = 0;
+        }
 
         void Reset() noexcept
         {
             referenceSeconds = 0.0;
             healthySamples = 0;
+            ClearSlowerCandidate();
         }
 
         bool Observe(double elapsedSeconds) noexcept
@@ -52,7 +63,58 @@ namespace OutRunVR::ReflectionFrameBudget
                 if (healthySamples < 4)
                     ++healthySamples;
             }
-            return late;
+            if (!late)
+            {
+                ClearSlowerCandidate();
+                return false;
+            }
+
+            // 120->90/80/72/60 Hz and 90->72 Hz used to stay "late" forever:
+            // the late branch intentionally did not learn a new slow target.
+            // Distinguish a sustained nominal refresh transition from isolated
+            // 12-ms missed-120-Hz frames and nonstandard overloaded cadence.
+            // Never relearn from a >18-ms spike, a load/pause gap or bad QPC.
+            if (!cadenceMiss || elapsedSeconds > OriginalLateSeconds ||
+                elapsedSeconds < FastestPlausible ||
+                elapsedSeconds > SlowestPlausible)
+            {
+                ClearSlowerCandidate();
+                return true;
+            }
+            constexpr double nominalPeriods[] = {
+                1.0 / 60.0, 1.0 / 72.0, 1.0 / 80.0,
+                1.0 / 90.0, 1.0 / 120.0
+            };
+            double match = 0.0;
+            for (double period : nominalPeriods)
+            {
+                if (period > referenceSeconds * 1.20 + 0.0005 &&
+                    std::fabs(elapsedSeconds - period) <= period * 0.015)
+                {
+                    match = period;
+                    break;
+                }
+            }
+            if (match == 0.0)
+            {
+                ClearSlowerCandidate();
+                return true;
+            }
+            if (match != slowerCandidateSeconds)
+            {
+                slowerCandidateSeconds = match;
+                slowerCandidateSamples = 1;
+            }
+            else if (slowerCandidateSamples < 24u)
+                ++slowerCandidateSamples;
+            if (slowerCandidateSamples >= 24u)
+            {
+                referenceSeconds = match;
+                healthySamples = 4;
+                ClearSlowerCandidate();
+                return false;
+            }
+            return true;
         }
     };
 
