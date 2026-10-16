@@ -32,6 +32,7 @@
 #include "native_game_frame_batch.hpp"
 #include "native_game_source_mutation.hpp"
 #include "native_game_frame_publication.hpp"
+#include "native_game_gpu_handoff.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
 #include "native_game_readback_provenance.hpp"
@@ -1231,6 +1232,8 @@ struct State {
     // D3D9 SYSTEMMEM uploads are dimension-owned independently of their format.
     UINT insetSurfaceWidth = 0u, insetSurfaceHeight = 0u;
     bool pending = false;
+    NativeFullGameGpuSink gpuFrameSink = nullptr;
+    void* gpuFrameSinkUser = nullptr;
     GameNativeFrameBatch frameBatch{}; // Opt-in native only, original D3D9/input preserved.
     bool logged = false;
     UINT observed = 0;
@@ -5416,6 +5419,13 @@ bool diagnostic_enabled() noexcept {
     return optedIn;
 }
 
+void set_native_full_game_gpu_sink(NativeFullGameGpuSink sink, void* user) noexcept {
+    State& s = state();
+    std::lock_guard<std::mutex> lock(s.mutex);
+    s.gpuFrameSink = sink;
+    s.gpuFrameSinkUser = sink ? user : nullptr;
+}
+
 void observe_empty_game_draw(IDirect3DDevice9* game,
                              D3DPRIMITIVETYPE type) noexcept {
     // No fabricated GPU Draw: only an already seeded actual game frame
@@ -6450,6 +6460,22 @@ void before_game_present(IDirect3DDevice9* game,
             : s.frameBatch.publishable(s.pending);
         if (s.backend.ready() && s.backend.context()) {
             auto* ctx = s.backend.context();
+            // Native GPU copy handoff operates on the actual *complete*
+            // menu/car/race Draw output before staging to CPU/D3D9. A sink
+            // must record any GPU CopyResource synchronously on this same
+            // immediate context; original D3D9 Draw/input remain intact.
+            bool gpuHandoffQueued = false;
+            if (GameNativeGpuHandoff::may_offer(
+                    fullMode, complete, outputWritable,
+                    s.sourceGameDevice == presentDevice,
+                    s.backend.color_texture() != nullptr,
+                    s.gpuFrameSink != nullptr,
+                    surfaceWidth, surfaceHeight, s.outputGeneration)) {
+                const NativeFullGameGpuFrame frame{
+                    ctx, s.backend.color_texture(), surfaceWidth, surfaceHeight,
+                    s.presents, s.sourceDrawsThisFrame, s.outputGeneration};
+                gpuHandoffQueued = s.gpuFrameSink(s.gpuFrameSinkUser, frame);
+            }
             // Full-resolution publication must be sampled before THIS D3D9
             // Present, not uploaded one or two frames later. Retire older GPU
             // copies only once their fences complete, never reuse busy memory.
@@ -6504,7 +6530,7 @@ void before_game_present(IDirect3DDevice9* game,
                         ++s.failed;
                     }
                 }
-                if (complete && outputWritable &&
+                if (!gpuHandoffQueued && complete && outputWritable &&
                     s.sourceGameDevice == presentDevice) {
                     // Stale GPU readbacks can occupy the preferred ring slot
                     // while another staging resource is already free. Prefer the

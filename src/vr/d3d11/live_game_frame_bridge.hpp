@@ -1,9 +1,27 @@
 #pragma once
 
 #include <d3d9.h>
+#include <d3d11.h>
 #include <cstdint>
 
 namespace outrun::vr::dx11::live_game_frame {
+
+// Full-size native GAME Draw/DrawIndexed GPU texture, not an inset or
+// a CPU readback. Borrowed for ONE synchronous callback under the producer
+// lock; the consumer may queue GPU CopyResource but must not retain pointers
+// or reenter this bridge. Two genuine eye renders are still required before
+// any OpenXR stereo publication (mono duplication is forbidden).
+struct NativeFullGameGpuFrame {
+    ID3D11DeviceContext* context{};
+    ID3D11Texture2D* source{};
+    std::uint32_t width{}, height{};
+    std::uint64_t presentOrdinal{}, sourceDraws{};
+    std::uint32_t outputGeneration{};
+};
+using NativeFullGameGpuSink = bool (*)(void*, const NativeFullGameGpuFrame&) noexcept;
+// Successful GPU handoff suppresses CPU staging for this frame, without
+// suppressing the original D3D9 Draw/Present/gamepad/FFB fallback.
+void set_native_full_game_gpu_sink(NativeFullGameGpuSink sink, void* user) noexcept;
 
 // Production behavior remains DX9Ex. An explicit process environment opt-in
 // enables a separate diagnostic native draw of the *actual game vertex data*.
