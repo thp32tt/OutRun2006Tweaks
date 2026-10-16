@@ -1,5 +1,6 @@
 #include "native_game_stereo_submission.hpp"
 #include "native_game_eye_pair_sources.hpp"
+#include <limits>
 
 namespace outrun::vr::dx11 {
 
@@ -14,12 +15,13 @@ void NativeGameStereoSubmission::release_local() noexcept {
 
 bool NativeGameStereoSubmission::begin(
     ID3D11DeviceContext* context, std::uint64_t frameId,
-    std::uint64_t sourcePoseSequence,
+    std::uint32_t sourcePoseSequence,
     const OutRunVR::Core::FrameAck* ack) noexcept
 {
     if (active() || !ring_.activation_ready() || !context ||
         context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE ||
-        !frameId || !sourcePoseSequence)
+        !frameId || frameId > (std::numeric_limits<std::uint32_t>::max)() ||
+        !sourcePoseSequence)
         return false;
     std::uint32_t acquired = OutRunVR::RenderFrameRingSize;
     if (!ring_.try_acquire_slot(context, frameId, ack, acquired))
@@ -39,7 +41,7 @@ bool NativeGameStereoSubmission::source_is_live(
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice, sourceDevice;
     context_->GetDevice(contextDevice.GetAddressOf());
     source->GetDevice(sourceDevice.GetAddressOf());
-    if (!contextDevice || contextDevice != sourceDevice)
+    if (!contextDevice || contextDevice.Get() != sourceDevice.Get())
         return false;
     D3D11_TEXTURE2D_DESC desc{};
     source->GetDesc(&desc);
@@ -57,7 +59,7 @@ bool NativeGameStereoSubmission::source_is_live(
 bool NativeGameStereoSubmission::capture_eye(
     std::uint32_t eyeIndex, ID3D11Texture2D* nativeColor,
     std::uint64_t nativeDrawCount, std::uint64_t eyeViewSignature,
-    std::uint64_t sourcePoseSequence) noexcept
+    std::uint32_t sourcePoseSequence) noexcept
 {
     if (state_ != State::Acquired || eyeIndex >= 2u ||
         eyes_[eyeIndex] || !nativeDrawCount || !eyeViewSignature ||
@@ -92,7 +94,7 @@ bool NativeGameStereoSubmission::submit() noexcept
 }
 
 bool NativeGameStereoSubmission::try_publish(
-    NativeSharedEyePublication& published) noexcept
+    NativeGameStereoPublishedFrame& published) noexcept
 {
     published = {};
     if (state_ != State::GpuPending ||
@@ -103,7 +105,10 @@ bool NativeGameStereoSubmission::try_publish(
     if (!ring_.snapshot_published_frame(slot_, frameId_, candidate) ||
         !ring_.validate_publication_snapshot(candidate))
         return false;
-    published = candidate;
+    published.gpu = candidate;
+    published.sourcePoseSequence = poseSequence_;
+    published.eyeViewSignature[0] = eyeViews_[0];
+    published.eyeViewSignature[1] = eyeViews_[1];
     release_local();
     return true;
 }

@@ -4,6 +4,14 @@
 
 namespace outrun::vr::dx11 {
 
+struct NativeGameStereoPublishedFrame {
+    NativeSharedEyePublication gpu{};
+    // The exact pose snapshot and two camera-view signatures which produced
+    // these source textures must accompany the OpenXR frame metadata.
+    std::uint32_t sourcePoseSequence{};
+    std::uint64_t eyeViewSignature[2]{};
+};
+
 // Ingress for TWO separately rendered, game-authored native D3D11 eye frames.
 // The legacy full-frame diagnostic bridge exposes only one mono texture;
 // feeding that texture to both eyes here is forbidden. A real game stereo
@@ -17,6 +25,7 @@ class NativeGameStereoSubmission final {
 public:
     explicit NativeGameStereoSubmission(NativeSharedEyeRing& ring) noexcept
         : ring_(ring) {}
+    ~NativeGameStereoSubmission() noexcept { (void)cancel(); }
     NativeGameStereoSubmission(const NativeGameStereoSubmission&) = delete;
     NativeGameStereoSubmission& operator=(const NativeGameStereoSubmission&) = delete;
 
@@ -24,7 +33,7 @@ public:
     // current immediate D3D11 context. sourcePoseSequence binds both eyes
     // to the same OpenXR pose snapshot without retaining HMD pose pointers.
     bool begin(ID3D11DeviceContext* context, std::uint64_t frameId,
-               std::uint64_t sourcePoseSequence,
+               std::uint32_t sourcePoseSequence,
                const OutRunVR::Core::FrameAck* ack = nullptr) noexcept;
 
     // Called once per REAL native eye render. eyeViewSignature must identify
@@ -34,12 +43,12 @@ public:
     bool capture_eye(std::uint32_t eyeIndex, ID3D11Texture2D* nativeColor,
                      std::uint64_t nativeDrawCount,
                      std::uint64_t eyeViewSignature,
-                     std::uint64_t sourcePoseSequence) noexcept;
+                     std::uint32_t sourcePoseSequence) noexcept;
 
     // Copy both genuine game eyes on the producer's single GPU command stream,
     // then arm its asynchronous fence. Never advertise or ACK on mere enqueue.
     bool submit() noexcept;
-    bool try_publish(NativeSharedEyePublication& published) noexcept;
+    bool try_publish(NativeGameStereoPublishedFrame& published) noexcept;
 
     // Safe only before the first GPU copy. After submit the ring owns all
     // in-flight work; destroy/reset the ring on synchronization failure.
@@ -57,7 +66,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> eyes_[2];
     std::uint64_t eyeViews_[2]{};
     std::uint64_t frameId_{};
-    std::uint64_t poseSequence_{};
+    std::uint32_t poseSequence_{};
     std::uint32_t slot_{OutRunVR::RenderFrameRingSize};
     State state_{State::Idle};
 };
