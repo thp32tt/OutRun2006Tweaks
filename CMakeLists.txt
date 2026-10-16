@@ -991,6 +991,7 @@ target_link_libraries(dx11_native_target_resize_probe PUBLIC
 set(dx11_native_transport_probe_SOURCES
     "tools/dx11_native_transport_probe.cpp"
     "src/vr/d3d11/native_shared_eye_ring.cpp"
+    "src/vr/d3d11/native_game_stereo_submission.cpp"
 )
 
 add_executable(dx11_native_transport_probe)

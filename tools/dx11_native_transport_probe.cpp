@@ -8,6 +8,7 @@
 #include <d3d11.h>
 
 #include "vr/d3d11/native_shared_eye_ring.hpp"
+#include "vr/d3d11/native_game_stereo_submission.hpp"
 
 namespace
 {
@@ -633,6 +634,92 @@ int main()
             !ring.validate_publication_snapshot(directPublication),
             "00812 exact OpenXR host ACK retires directly rendered native eyes");
 
+    // 00818: exercise the production submission object's direct producer
+    // route end-to-end: two real D3D11 eye RTV writes -> one producer EVENT ->
+    // exact Frame.v2 DirectGPU host metadata -> ACK lifetime retirement.
+    // Rejected provenance must leave the acquired slot untouched.
+    outrun::vr::dx11::NativeGameStereoSubmission directSubmit(ring);
+    require(directSubmit.begin(d3d.context, 23, 31) &&
+            directSubmit.active() && !directSubmit.in_flight(),
+            "00818 direct game-eye submission acquired exact frame");
+    void* eyeUser = const_cast<float (*)[4]>(nativeEyeColors);
+    require(!directSubmit.render_direct_eyes(
+                nativeDraw, eyeUser, 2, 2, 0x101, 0x101, 31) &&
+            !directSubmit.render_direct_eyes(
+                nativeDraw, eyeUser, 2, 2, 0x101, 0x202, 32) &&
+            !directSubmit.render_direct_eyes(
+                nativeDraw, eyeUser, 0, 2, 0x101, 0x202, 31) &&
+            !directSubmit.render_direct_eyes(
+                nullptr, eyeUser, 2, 2, 0x101, 0x202, 31) &&
+            !directSubmit.in_flight() &&
+            !ring.synchronization_faulted(),
+            "00818 invalid source camera/pose/draw contract is rejected before GPU writes");
+    require(directSubmit.render_direct_eyes(
+                nativeDraw, eyeUser, 2, 3, 0x101, 0x202, 31) &&
+            directSubmit.in_flight() &&
+            !directSubmit.cancel(),
+            "00818 two independent native game eyes recorded, pending frame not cancelable");
+    outrun::vr::dx11::NativeGameStereoPublishedFrame directFrame{};
+    bool directReady = false;
+    for (int retry = 0; retry < 2000 && !directReady; ++retry) {
+        directReady = directSubmit.try_publish(directFrame);
+        require(!ring.synchronization_faulted(),
+                "00818 direct game-eye producer fence must not fail");
+        if (!directReady) Sleep(1);
+    }
+    require(directReady && !directSubmit.active() &&
+            directFrame.sourcePoseSequence == 31 &&
+            directFrame.eyeViewSignature[0] == 0x101 &&
+            directFrame.eyeViewSignature[1] == 0x202 &&
+            ring.validate_publication_snapshot(directFrame.gpu),
+            "00818 exact two-eye pose and camera signatures persist across GPU fence");
+    OutRunVR::SharedRenderFrameState hostFrame{};
+    hostFrame.clientPid = generationB.producerPid;
+    hostFrame.reserved[OutRunVR::RenderFrameRunGenerationIndex] = generationB.runGeneration;
+    hostFrame.frameId = 23;
+    hostFrame.sourcePoseSequence = 31;
+    hostFrame.state = OutRunVR::StereoSbsActive;
+    hostFrame.presentQpc = 1234;
+    hostFrame.flags = OutRunVR::RenderFrameStereoComplete |
+        OutRunVR::RenderFrameWorldStereo |
+        OutRunVR::RenderFrameDrawDuplicated |
+        OutRunVR::RenderFrameEffectivePoseValid;
+    // The ring was rebound to generation 13 for the producer; the game frame
+    // must match its current transport identity, not an older generation.
+    require(directSubmit.attach_host_frame(directFrame, hostFrame) &&
+            (hostFrame.flags & OutRunVR::RenderFrameDirectGpuTransport) &&
+            hostFrame.reserved[OutRunVR::RenderFrameDirectSlotIndex] ==
+                directFrame.gpu.slot &&
+            hostFrame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] ==
+                ring.identity().generation &&
+            hostFrame.backbufferWidth == 64 &&
+            hostFrame.backbufferHeight == 64,
+            "00818 native L/R host handoff stamped exact shared resources");
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex) {
+        d3d.context->CopyResource(readback,
+            ring.eye(directFrame.gpu.slot, eyeIndex));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0, D3D11_MAP_READ, 0, &mapped)),
+                "00818 direct GPU eye readback");
+        const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool match = eyeIndex == 0
+            ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255 &&
+              pixel[3] == 255
+            : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0 &&
+              pixel[3] == 255;
+        d3d.context->Unmap(readback, 0);
+        require(match, "00818 game eye GPU colors remain distinct without CopyResource producer");
+    }
+    auto mismatchedGame = hostFrame;
+    mismatchedGame.sourcePoseSequence = 32;
+    require(!directSubmit.attach_host_frame(directFrame, mismatchedGame),
+            "00818 wrong game pose may not advertise native stereo");
+    require(ring.retire_acknowledged(
+                make_ack(ring.identity(), directFrame.gpu.slot, 23)) &&
+            !directSubmit.attach_host_frame(directFrame, hostFrame),
+            "00818 ACK invalidates old direct eye publication");
+
     // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
     // cancellation nor another frame may reuse the ring without hard retire.
     const auto partialDraw = [](
@@ -644,10 +731,10 @@ int main()
         return false;
     };
     std::uint32_t partialSlot = 99;
-    require(ring.try_acquire_slot(d3d.context, 23, nullptr, partialSlot) &&
-            !ring.render_eye_pair(d3d.context, partialSlot, 23, partialDraw, nullptr) &&
+    require(ring.try_acquire_slot(d3d.context, 24, nullptr, partialSlot) &&
+            !ring.render_eye_pair(d3d.context, partialSlot, 24, partialDraw, nullptr) &&
             ring.synchronization_faulted() &&
-            !ring.cancel_acquired_slot(partialSlot, 23) &&
+            !ring.cancel_acquired_slot(partialSlot, 24) &&
             !ring.activation_ready(),
             "00812 partial native eye draw quarantines transport until Reset");
 

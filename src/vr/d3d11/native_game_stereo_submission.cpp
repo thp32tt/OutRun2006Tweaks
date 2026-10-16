@@ -71,6 +71,33 @@ bool NativeGameStereoSubmission::capture_eye(
     return true;
 }
 
+bool NativeGameStereoSubmission::render_direct_eyes(
+    NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,
+    std::uint64_t leftDrawCount, std::uint64_t rightDrawCount,
+    std::uint64_t leftViewSignature, std::uint64_t rightViewSignature,
+    std::uint32_t sourcePoseSequence) noexcept
+{
+    // A direct GPU producer owns two real game-camera draws, not a mono
+    // texture copied to both OpenXR eyes. Reject before entering a recorder
+    // that may have GPU side effects; keep the original D3D9 path valid.
+    if (state_ != State::Acquired || !context_ || !recorder ||
+        eyes_[0] || eyes_[1] || !leftDrawCount || !rightDrawCount ||
+        !leftViewSignature || !rightViewSignature ||
+        leftViewSignature == rightViewSignature ||
+        sourcePoseSequence == 0u || sourcePoseSequence != poseSequence_)
+        return false;
+    // render_eye_pair owns the same exact frame/slot identity as the
+    // copy-based submission and arms one EVENT after both GPU eye writes.
+    // If the callback fails after recording commands, the ring remains
+    // faulted and neither cancellation nor new-frame reuse is permitted.
+    if (!ring_.render_eye_pair(context_.Get(), slot_, frameId_, recorder, user))
+        return false;
+    eyeViews_[0] = leftViewSignature;
+    eyeViews_[1] = rightViewSignature;
+    state_ = State::GpuPending;
+    return true;
+}
+
 bool NativeGameStereoSubmission::submit() noexcept
 {
     if (state_ != State::Acquired || !eyes_[0] || !eyes_[1] ||

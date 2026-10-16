@@ -47,6 +47,19 @@ public:
 
     // Copy both genuine game eyes on the producer's single GPU command stream,
     // then arm its asynchronous fence. Never advertise or ACK on mere enqueue.
+    // Direct native Draw/DrawIndexed stereo path: the renderer records two
+    // genuinely different camera views straight into the ring's L/R RTVs.
+    // Unlike capture_eye()/submit(), no extra GPU eye-to-eye copy is needed.
+    // The callback must restore its D3D11 state and submit both views on the
+    // supplied immediate context. A partial GPU write quarantines the ring.
+    // Draw counts and signatures come from actual renderer callsites, never
+    // synthetic eye-index identifiers. The original D3D9 frame is untouched.
+    bool render_direct_eyes(
+        NativeSharedEyeRing::NativeEyeDrawRecorder recorder, void* user,
+        std::uint64_t leftDrawCount, std::uint64_t rightDrawCount,
+        std::uint64_t leftViewSignature, std::uint64_t rightViewSignature,
+        std::uint32_t sourcePoseSequence) noexcept;
+
     bool submit() noexcept;
     bool try_publish(NativeGameStereoPublishedFrame& published) noexcept;
 
