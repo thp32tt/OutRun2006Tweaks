@@ -228,8 +228,16 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
             static_cast<LONG>(destX), static_cast<LONG>(destY),
             static_cast<LONG>(destX + width),
             static_cast<LONG>(destY + height)};
-        return stretch_game_surface(
-            source, box, destination, false, sourceArraySlice);
+        // Unlike CopySubresourceRegion this path temporarily replaces
+        // the entire OM/viewport/shader state to draw a conversion triangle.
+        // A successful GPU postpass must also restore THIS native eye's
+        // render/depth attachments before its next genuine game Draw.
+        // If restoration fails, reject the frame (the producer quarantines
+        // any already queued GPU writes) instead of publishing stale eyes.
+        if (!stretch_game_surface(
+                source, box, destination, false, sourceArraySlice))
+            return false;
+        return eye_targets_bound();
     }
     // A game GPU post-pass may copy its RT to a DEFAULT shader-readable
     // intermediate before the eye compositor samples it. D3D11 GPU copy
