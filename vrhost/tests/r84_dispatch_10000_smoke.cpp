@@ -128,8 +128,16 @@ int main() {
             ++badEye;
         } else {
             const std::uint32_t capW=2650,capH=2900;
+            // ResolveHost publishes the *allocated* XR size. D3D9Ex's
+            // startup contract intentionally refuses below 640x480; it
+            // must NOT resize the two eyes or impersonate desktop pixels.
+            const bool startupEligible =
+                expected.width>=640u && expected.height>=480u &&
+                static_cast<std::uint64_t>(expected.width)*expected.height
+                    <=16777216ull;
             if(!Valid(expected) || expected.width>capW ||
-                expected.height>capH || !Valid(ResolveStartup(expected,expected)) ||
+                expected.height>capH ||
+                Valid(ResolveStartup(expected,expected))!=startupEligible ||
                 !Equal(ResolveGame(expected,{capW,capH}),expected))
                 return fail(i,"XR eye extent/host publication");
             if(Valid(ResolveStartup(expected,{expected.width+1,expected.height})))
