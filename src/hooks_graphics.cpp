@@ -185,7 +185,9 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
 {
     if (!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass())
         return false;
-    if (!camera)
+    // A missing player vehicle has no seat geometry to render. Do not
+    // displace the camera, force a near plane, or hide any occupant.
+    if (!camera || !Game::pl_car())
         return false;
     const auto& pos = camera->cam_pos_F8;
     const auto& look = camera->look_pos_104;
@@ -262,12 +264,17 @@ class VRDriverSeatRenderTest : public Hook
 		if (Active() && robot)
 		{
 			TraceRobotCandidate(robot);
-			if (OutRunVR::DriverSeatOccupant::HideVerifiedDriver(
+            // Native game tables track selected driver vs heroine chrsets.
+            // Unlike a naked workId, this protects the seated passenger.
+            const int* driverChrsets = Module::exe_ptr<int>(0x2549B0);
+            const int* heroineChrsets = Module::exe_ptr<int>(0x2549C8);
+			if (OutRunVR::DriverSeatOccupant::HideIdentifiedDriver(
 				Settings::VRDriverSeatHideDriver,
 				static_cast<int>(robot->workId_0),
 				static_cast<int>(robot->chrset_8),
 				Settings::VRDriverSeatDriverWorkId.get(),
-				Settings::VRDriverSeatDriverChrset.get()))
+				Settings::VRDriverSeatDriverChrset.get(),
+                driverChrsets, heroineChrsets, 6))
 			{
 				if (!DriverHiddenLogged)
 				{
