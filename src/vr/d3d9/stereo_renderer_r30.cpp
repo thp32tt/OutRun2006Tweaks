@@ -3120,6 +3120,14 @@ namespace OutRunVRStereo
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
+            // Capture the original C993 flare identity BEFORE the generic
+            // fixed-function/XYZRHW fast path. R33Dispatch cannot restore
+            // the exact central-sun WVP after a prior generic eye submit.
+            // Keep all ordinary +TIME/GOAL/HUD/smoke XYZRHW routes intact.
+            if (!OutRunVR::GameSemantic::CapturePhysicalDrawCommand()
+                    .CanUseGenericXyzrhwStereo())
+                return false;
+
             // World VS draws cannot be XYZRHW; skip the expensive stable
             // stereo checks before crossing the per-draw fast-world path.
             if (R29OwnerCurrentVertexShaderIdentity() != 0 ||

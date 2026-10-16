@@ -902,6 +902,16 @@ namespace OutRunVR::GameSemantic
                 lensCentreCallEpoch != 0;
         }
 
+        // Quest's native flare callback is distinct from the HUD/2D flush.
+        // Our original C993 source can only enter the dedicated game-WVP
+        // world route. In particular, a temporary null VS / POSITIONT state
+        // must not bypass C993 provenance through R30's generic XYZRHW path.
+        // A missing exact world WVP remains ONE unchanged game draw at R33.
+        constexpr bool CanUseGenericXyzrhwStereo() const noexcept
+        {
+            return !IsDirectWorldLensCentre();
+        }
+
         constexpr bool IsDirectCarBaseShadow() const noexcept
         {
             return !queued && scope == RenderScope::WorldParticle &&

@@ -7,7 +7,8 @@ int main()
     CurrentDirectExactProducer=ProducerToken::None;
     auto generic=CapturePhysicalDrawCommand();
     if(generic.scope!=RenderScope::SceneEffect || generic.queued ||
-       generic.queueNode || generic.IsDirectWorldLensCentre() ||
+       generic.queueNode || !generic.CanUseGenericXyzrhwStereo() ||
+       generic.IsDirectWorldLensCentre() ||
        generic.IsSourceProvenHud())return 1;
 
     // A directly generated stage/GOAL HUD command survives the original
@@ -18,6 +19,7 @@ int main()
             ProducerToken::StageExtensionTime);
         auto cmd=CapturePhysicalDrawCommand();
         if(cmd.queued || cmd.queueNode ||
+           !cmd.CanUseGenericXyzrhwStereo() ||
            cmd.scope!=RenderScope::ScreenHud ||
            cmd.producer!=ProducerToken::StageExtensionTime ||
            !cmd.IsSourceProvenHud())return 2;
@@ -58,6 +60,7 @@ int main()
         ScopedExactLensCentreGpuDraw lens(true);
         auto cmd=CapturePhysicalDrawCommand();
         if(!cmd.IsDirectWorldLensCentre() ||
+           cmd.CanUseGenericXyzrhwStereo() ||
            cmd.IsSourceProvenHud() || cmd.queueNode ||
            cmd.lensCentreCallEpoch!=41) return 7;
         // A later nested source mutation must not rewrite the already captured
