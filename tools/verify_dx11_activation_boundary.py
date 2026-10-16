@@ -32,6 +32,67 @@ def iter_activation_sources() -> list[Path]:
     ]
 
 
+
+def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[str]:
+    """Allow one scoped DSV-only GPU fill; never authorize a game color Draw.
+
+    Keep this audit independent of the global Draw count: an extra arbitrary
+    dispatch remains forbidden even if the depth helper is otherwise valid.
+    """
+    marker = "// D3D11 ClearDepthStencilView ignores rectangles."
+    depth_pass = source.partition(marker)[2].partition("\n} // namespace")[0]
+    required = [
+        "[[nodiscard]] bool raster_partial_eye_depth_clear(",
+        "(!clearDepth && !clearStencil)",
+        "rect.right <= rect.left || rect.bottom <= rect.top ||",
+        "static_cast<std::uint32_t>(rect.right) > width ||",
+        "static_cast<std::uint32_t>(rect.bottom) > height ||",
+        "std::isfinite(depth)",
+        "static std::mutex mutex;",
+        "if (cachedDevice.Get() != device.Get()) {",
+        "desc.DepthWriteMask = clearDepth",
+        "desc.StencilEnable = clearStencil ? TRUE : FALSE;",
+        "desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;",
+        "ScopedNativeGameEyeOutput saved(context, width, height);",
+        "if (!saved.valid()) return false;",
+        "context->OMSetRenderTargets(0u, nullptr, depthView);",
+        "context->OMSetDepthStencilState(states[mode].Get(), stencil);",
+        "context->RSSetState(nullptr); // disable inherited game scissor",
+        "context->RSSetViewports(1u, &viewport);",
+        "context->PSSetShader(pixel.Get(), nullptr, 0u);",
+        "context->Draw(3u, 0u);",
+    ]
+    # The GPU depth shader must bind no RTV, and cannot increment the
+    # encoder's game Draw evidence or bypass a missing/null DSV.
+    missing = ["depth:" + needle for needle in required if needle not in depth_pass]
+    if (not depth_pass or DRAW_DISPATCH.findall(depth_pass) != ["->Draw("] or
+            "drawCount_++" in depth_pass or "colorDrawCount_++" in depth_pass):
+        missing.append("depth: one DSV-only non-evidence GPU draw required")
+    source_requirements = [
+        "if (!eye_targets_bound() || (!clearDepth && !clearStencil) ||",
+        "return raster_partial_eye_depth_clear(",
+        "partial ? &clear.rect : nullptr))",
+        "const bool partial = rect.left || rect.top ||",
+        "rect.right > static_cast<LONG>(ring_.width()) ||",
+        "rect.bottom > static_cast<LONG>(ring_.height())",
+    ]
+    missing += ["timeline:" + needle for needle in source_requirements
+                if needle not in source]
+    test_requirements = [
+        "partialGameClear.count[0] = partialGameClear.count[1] = 6u;",
+        "zRect.kind = SourceClear::Kind::FullDepthStencil;",
+        "fixture.replayedPartialDepthStencil[eyeIndex] =",
+        "!encoder.clear_depth_stencil(0.5f, 0u, true, true, &badRect)",
+        "encoder.clear_depth_stencil(0.41f, 0u, true, false, &zOnly)",
+        "false, true, &zOnly)",
+        "gameEyeFixture.replayedPartialDepthStencil[0] &&",
+        "gameEyeFixture.replayedPartialDepthStencil[1] &&",
+    ]
+    missing += ["regression:" + needle for needle in test_requirements
+                if needle not in transport_probe]
+    return missing
+
+
 def main() -> None:
     # Keep every ID3D11DeviceContext Draw* entry point inside the dormant
     # activation boundary. DrawAuto is easy to omit because it has no explicit
@@ -88,9 +149,10 @@ def main() -> None:
         text = path.read_text(encoding="utf-8")
         matches = list(DRAW_DISPATCH.finditer(text))
         if path == audited_eye_recorder and matches:
-            # This is a second narrowly reviewed rendering surface, NOT a
-            # blanket DX11 activation exemption. Only the two renderer-owned
-            # GPU draw emitters are permitted. Their callback must be scoped
+            # This is a narrowly reviewed rendering surface, NOT a blanket
+            # activation exemption. The two game Draw emitters and exactly two
+            # audited non-evidence GPU postpasses (DSV and Stretch) are allowed.
+            # Their callback must be scoped
             # by exact frame/pose ring ownership, independent L/R RTV+DSV and
             # a count matched to issued commands before publication. The
             # normal D3D9 Draw/Present/input/FFB path stays authoritative.
@@ -192,6 +254,9 @@ def main() -> None:
             # is permitted to authorize a new game-geometry Draw.
             del stretch_helper, stretch_regression
             missing = [token for token in required_eye_contract if token not in text]
+            depth_probe = (ROOT / "tools" / "dx11_native_transport_probe.cpp").read_text(
+                encoding="utf-8")
+            missing += audit_native_partial_depth_clear(text, depth_probe)
             missing += ["postpass:" + token for token in required_postpass
                         if token not in postpass]
             postpass_draws = DRAW_DISPATCH.findall(postpass)
@@ -199,7 +264,8 @@ def main() -> None:
                     "drawCount_++" in postpass or "colorDrawCount_++" in postpass):
                 missing.append("postpass must issue one bounded non-evidence Draw")
             dispatches = [match.group(0).replace(" ", "") for match in matches]
-            if missing or dispatches != ["->Draw(", "->DrawIndexed(", "->Draw("]:
+            if missing or dispatches != [
+                    "->Draw(", "->DrawIndexed(", "->Draw(", "->Draw("]:
                 violations.append(
                     f"{path.relative_to(ROOT)}: unauthorized native eye Draw "
                     f"dispatch or missing frame/pose/output/evidence guard: "
