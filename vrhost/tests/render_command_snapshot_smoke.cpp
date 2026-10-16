@@ -82,5 +82,71 @@ int main()
     if(CapturePhysicalDrawCommand().IsDirectCarBaseShadow())
         return 11;
     EndSpriteQueueRender();
+
+    // R84 physical GPU dispatch: if R30 cannot prove the finite HUD eye
+    // plane, none of these exact source owners may borrow R31's cached road
+    // world WVP. Both direct D3DX Flush and tagged SpriteNode draws are
+    // tested, including GOAL progress and B9200's source-proven glyphs.
+    const ProducerToken results[]{
+        ProducerToken::StageExtensionTime,
+        ProducerToken::GoalTime020,
+        ProducerToken::GoalTime150,
+        ProducerToken::ResultProgress,
+        ProducerToken::OutRunStagePrintf,
+        ProducerToken::ResultTextB9200
+    };
+    for (auto producer : results)
+    {
+        CurrentScope=RenderScope::SceneEffect;
+        {
+            ScopedExactProducerSemantic owner(
+                RenderScope::ScreenHud, nullptr, true, producer);
+            const auto c=CapturePhysicalDrawCommand();
+            if (c.queued || !c.IsExactFiniteResultHud() ||
+                !c.IsSourceProvenHud() || c.IsDirectWorldLensCentre())
+                return 12;
+        }
+        int glyph=0;
+        RegisterSpriteNodeScope(&glyph,RenderScope::ScreenHud,producer);
+        BeginSpriteQueueRender();
+        SelectSpriteQueueNode(&glyph);
+        const auto c=CapturePhysicalDrawCommand();
+        if (!c.queued || c.queueNode!=&glyph || c.queueEpoch==0 ||
+            !c.IsExactFiniteResultHud()) return 13;
+        EndSpriteQueueRender();
+    }
+    // Unknown or wrong-scope tokens, rank markers, world shadows and the
+    // original D3A5 sun retain their existing world/marking routes.
+    CurrentScope=RenderScope::ScreenHud;
+    {
+        ScopedExactProducerSemantic notAResult(
+            RenderScope::ScreenHud,nullptr,true,
+            ProducerToken::DispRankFirst);
+        if(CapturePhysicalDrawCommand().IsExactFiniteResultHud())
+            return 14;
+    }
+    {
+        ScopedExactProducerSemantic foreign(
+            RenderScope::WorldBillboard,nullptr,true,
+            ProducerToken::StageExtensionTime);
+        if(CapturePhysicalDrawCommand().IsExactFiniteResultHud())
+            return 15;
+    }
+    {
+        ScopedExactProducerSemantic generic(
+            RenderScope::ScreenOverlay2D,nullptr,true,
+            ProducerToken::ResultProgress);
+        if(CapturePhysicalDrawCommand().IsExactFiniteResultHud())
+            return 16;
+    }
+    CurrentScope=RenderScope::WorldBillboard;
+    {
+        ScopedExactLensCentreGpuDraw lens(true);
+        if(CapturePhysicalDrawCommand().IsExactFiniteResultHud())
+            return 17;
+    }
+    CurrentScope=RenderScope::SceneEffect;
+    if(CapturePhysicalDrawCommand().IsExactFiniteResultHud())
+        return 18;
     return 0;
 }

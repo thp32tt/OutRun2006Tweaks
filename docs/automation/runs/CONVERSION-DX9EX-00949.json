@@ -1,0 +1,83 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00949",
+  "production_id": "CONVERSION-DX9EX-00949",
+  "event_id": "CONVERSION-DX9EX-00949-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00949",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RESULT_HUD_FALLBACK",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME_GOAL_DUPLICATION",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_REQUIRED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "f99ade29c4a193e31dc3bee0bca15818bb8314a6",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/render_command_snapshot_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00949.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RESULT_HUD_FALLBACK",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME_GOAL_DUPLICATION",
+    "goal": "When R84 cannot prove two-eye +TIME/GOAL original HUD GPU submission, preserve precisely one original game draw instead of applying a previous perspective-world shader/WVP or borrowing R29 road geometry.",
+    "scope_boundary": "Exact source-proven ScreenHud +TIME/GOAL GPU commands in R33 only; validated physical two-eye R84 HUD remains unchanged; rank markers, C993, car/road/SkyGlow, original input/FFB, desktop fallback, DX11 and DXVK unchanged.",
+    "trace_stages": [
+      "Original stage extension or GOAL E8 helper tags direct D3DXSprite Draw/Flush or original SpriteNode with an exact producer token.",
+      "Physical R33 GPU draw snapshots effective scope and source before any world or HUD classification; R30 chooses finite stereo HUD only when c64, pose and game render state are proven.",
+      "If the exact result command cannot be submitted in the actual two-eye R33 HUD route, original game Draw executes once, never the R31 cached last-world WVP route."
+    ],
+    "subcomponents": [
+      "Fence all six exact stage-extension/GOAL GPU producers at R33 raster-not-ready, unclassified and classified-but-HUD-unhandled branches without altering proven two-eye submission.",
+      "Extend native physical draw command snapshot smoke with direct D3DX and queued SpriteNode positive/negative source provenance; forbid generic HUD, lens, rank and world fallbacks."
+    ],
+    "acceptance_items": [
+      {
+        "id": "result_gpu_fallback_one_original_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R33 exact +TIME/GOAL GPU source routing",
+        "expected_behavior": "When finite two-eye HUD path is missing, preserve one unmodified game draw; no reinterpretation as previously verified road/world c64."
+      },
+      {
+        "id": "result_gpu_fallback_negative_sources",
+        "category": "fallback_regression",
+        "behavior_area": "Existing world, lens, rank and non-result HUD routes",
+        "expected_behavior": "No change to proven binocular HUD, C993, road, rank, original SkyGlow, DX9Ex fallback and FFB."
+      },
+      {
+        "id": "result_gpu_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 game and x64 host build",
+        "expected_behavior": "Native snapshot regression plus mandatory DX9Ex Active, Domain Isolation, Full Source Impact and affected Inspector pass on one exact SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "result_gpu_fallback_one_original_draw": "PENDING_CI",
+    "result_gpu_fallback_negative_sources": "PENDING_CI",
+    "result_gpu_exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R33 classified HUD failure (`None`) entered R33TryFastWorld and an unhandled classified HUD returned to the R29 fallback, allowing a source-tagged +TIME/GOAL physical GPU command to be treated as perspective road/world despite missing HUD stereo ownership.",
+    "source_evidence": "R33Dispatch branches after CapturePhysicalDrawCommand; R31BuildFastWorldConstants validates previous shader/pose/generation but does not require that the physical current producer is world rather than exact stage/GOAL.",
+    "fix_evidence": "Restrict all three R33 fallback exits for CanReprojectFiniteResultHudPlane exact source family to the original draw, leaving the successful R33TryHud binocular path untouched.",
+    "negative_test_evidence": "Extend render_command_snapshot_smoke with original direct and queued physical GPU producer captures for all six exact result families and negative markers, lens, generic overlay, world source.",
+    "runtime_limit": "Without Quest3/VDXR no conclusion that on-device double-image symptom is resolved; actual game visual behavior UNTESTED.",
+    "eye_ownership": "Physical two-eye R33 success remains authoritative; absent proof, the game draws once, never coerced into a cached world eye WVP."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify exact validation-bearing SHA across mandatory CI. Record C6 separately only after full exact-SHA SUCCESS. HMD gameplay remains UNTESTED."
+}

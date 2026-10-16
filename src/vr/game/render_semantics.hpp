@@ -902,6 +902,16 @@ namespace OutRunVR::GameSemantic
             return scope == RenderScope::ScreenHud &&
                 producer != ProducerToken::None;
         }
+
+        // +TIME and the exact original GOAL producer family own a finite
+        // HUD-plane GPU draw, not the last verified perspective road c64.
+        // Only the R30/R33 physically proven HUD stereo route may replace
+        // their original draw. A missing HUD proof must never fall into
+        // R31's cached fast-world WVP, even if shader/pose happen to match.
+        constexpr bool IsExactFiniteResultHud() const noexcept
+        {
+            return CanReprojectFiniteResultHudPlane(scope, producer);
+        }
     };
 
     inline PhysicalDrawCommand CapturePhysicalDrawCommand() noexcept
