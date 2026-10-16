@@ -1,0 +1,105 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00810",
+  "production_id": "CONVERSION-DX11-00810",
+  "event_id": "CONVERSION-DX11-00810-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_SHARED_DESKTOP_BACKUP_CACHE",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "d354ff1556a6e723469dcc191d23c6b39fd31fec",
+  "validation_bearing_result_sha": "d354ff1556a6e723469dcc191d23c6b39fd31fec",
+  "changed_files": [
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_backup.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "recovery_basis": "Reconstructed from validated material commit because original run record was absent (RUN_RECORD_NOT_FOUND); no prior feature contract could be read.",
+    "full_dx11_renderer_complete": false,
+    "goal": "Reuse bounded D3D9Ex game-backbuffer rollback render targets across native game Presents without reusing old pixels or permitting device/generation/format/extent-invalid backups.",
+    "acceptance_items": [
+      {
+        "id": "same-generation-backup-allocation-reuse",
+        "category": "performance",
+        "behavior_area": "native_game_shared_desktop",
+        "expected_behavior": "Reuse exact-size rollback GPU allocations for steady game/menu/race Presents when owner, generation, format and tile dimensions match."
+      },
+      {
+        "id": "fresh-snapshot-and-safe-rollback",
+        "category": "fallback_regression",
+        "behavior_area": "native_game_shared_desktop",
+        "expected_behavior": "Copy original game pixels into each selected backup before native blits and restore visible regions on failed publication; discard stale allocations on Reset or key mismatch."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_d3d11_host",
+        "expected_behavior": "Validate this material source at the specified unmodified Git commit SHA; HMD runtime remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "same-generation-backup-allocation-reuse": "PASS_BUILD",
+    "fresh-snapshot-and-safe-rollback": "PASS_BUILD",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "C6 prior record missing on target branch (RUN_RECORD_NOT_FOUND); restored from existing material commit.",
+    "C1_REVIEW": "Read original source changes and local source-regression test within the validation-bearing material commit; no new source edits.",
+    "C2_IMPLEMENT": "Existing material changes only; not reimplemented as part of this C6 result.",
+    "C3_VALIDATE": "Exact material SHA supplied by task; GitHub reported successful associated Build, OpenXR and HUD Inspector Actions. No workflow rerun.",
+    "C4_COMMIT": "Original material commit d354ff1556a6e723469dcc191d23c6b39fd31fec bears [AUTO:CONVERSION-DX11-00810]; this record is a separate [skip ci] bookkeeping change.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA; HMD/Quest3/VDXR and gamepad runtime UNTESTED."
+  },
+  "evidence": {
+    "exact_sha": "d354ff1556a6e723469dcc191d23c6b39fd31fec",
+    "exact_sha_gate_results": {
+      "Build": {
+        "run_id": 38853791790,
+        "conclusion": "success",
+        "associated_commit_sha": "d354ff1556a6e723469dcc191d23c6b39fd31fec"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38853791806,
+        "conclusion": "success",
+        "associated_commit_sha": "d354ff1556a6e723469dcc191d23c6b39fd31fec"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38853791807,
+        "conclusion": "success",
+        "associated_commit_sha": "d354ff1556a6e723469dcc191d23c6b39fd31fec"
+      }
+    },
+    "additional_ci_note": "User confirmed exact-SHA GitHub CI SUCCESS. Associated-run lookup surfaced the three successes above; no CI/build was reexecuted for this C6 bookkeeping action.",
+    "runtime_evidence": "NONE - Quest3/VDXR HMD and gamepad testing not executed"
+  },
+  "material_source_commits": [
+    "d354ff1556a6e723469dcc191d23c6b39fd31fec"
+  ],
+  "recovery": {
+    "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "original_record_found": false,
+    "material_fields_recovered_from_commit": true,
+    "feature_contract_reconstruction": "No preexisting 00810 contract/acceptance record to preserve; reconstructed conservatively from the original source and test changes."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00810",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "C6 recording of already-existing material and CI; never score this same implementation twice."
+  }
+}
