@@ -201,6 +201,36 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     D3D11_TEXTURE2D_DESC sourceDesc{}, eyeDesc{};
     source->GetDesc(&sourceDesc);
     eyeColor->GetDesc(&eyeDesc);
+    // D3D9 StretchRect also performs format conversion for unscaled
+    // menu/vehicle postpasses. CopySubresourceRegion cannot do that. Replay
+    // the caller's exact mip-zero source rectangle with a native point-sampled
+    // GPU shader instead of dropping both genuine game camera color outputs
+    // or falling back to a CPU/desktop copy. The existing stretch admission
+    // rejects unsupported/foreign resources before GPU mutation. This path
+    // must never count its fullscreen shader triangle as game Draw evidence.
+    if (sourceDesc.Format != eyeDesc.Format) {
+        const D3D11_BOX box = sourceRegion
+            ? *sourceRegion
+            : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
+        if (box.left >= box.right || box.top >= box.bottom)
+            return false;
+        const UINT width = box.right - box.left;
+        const UINT height = box.bottom - box.top;
+        const UINT maxLong = static_cast<UINT>(
+            (std::numeric_limits<LONG>::max)());
+        if (destX > targetWidth_ || destY > targetHeight_ ||
+            width > targetWidth_ - destX ||
+            height > targetHeight_ - destY ||
+            destX > maxLong || destY > maxLong ||
+            width > maxLong - destX || height > maxLong - destY)
+            return false;
+        const D3D11_RECT destination{
+            static_cast<LONG>(destX), static_cast<LONG>(destY),
+            static_cast<LONG>(destX + width),
+            static_cast<LONG>(destY + height)};
+        return stretch_game_surface(
+            source, box, destination, false, sourceArraySlice);
+    }
     // A game GPU post-pass may copy its RT to a DEFAULT shader-readable
     // intermediate before the eye compositor samples it. D3D11 GPU copy
     // accepts either owned RT or SRV texture as source; do not require a

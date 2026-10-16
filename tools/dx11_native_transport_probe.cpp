@@ -959,6 +959,27 @@ int main()
     d3d.context->UpdateSubresource(
         gameEyeArray, D3D11CalcSubresource(0u, 1u, 2u), nullptr,
         rightEyePixels.data(), 64u * sizeof(UINT), 0u);
+    // True game menu and vehicle postpasses can use BGRA camera arrays even
+    // when the native OpenXR eye target uses RGBA. Preserve each camera's
+    // pixels through a GPU point-sampled color conversion (no CPU readback).
+    D3D11_TEXTURE2D_DESC convertedDesc = gameSurfaceDesc;
+    convertedDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    convertedDesc.ArraySize = 2u;
+    convertedDesc.BindFlags =
+        D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    ID3D11Texture2D* gameConvertedArray = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &convertedDesc, nullptr, &gameConvertedArray)) &&
+            gameConvertedArray,
+            "00844 GPU camera-array BGRA source allocated");
+    std::vector<UINT> convertedLeft(64u * 64u, 0xffff0000u);
+    std::vector<UINT> convertedRight(64u * 64u, 0xff00ff00u);
+    d3d.context->UpdateSubresource(
+        gameConvertedArray, 0u, nullptr, convertedLeft.data(),
+        64u * sizeof(UINT), 0u);
+    d3d.context->UpdateSubresource(
+        gameConvertedArray, 1u, nullptr, convertedRight.data(),
+        64u * sizeof(UINT), 0u);
     // A game scene may render to MSAA before a full-frame or cropped menu
     // postpass. The native eye path must GPU-resolve the *actual* RT instead
     // of dropping the pixels or staging the entire eye through system memory.
@@ -1015,6 +1036,7 @@ int main()
         ID3D11Texture2D* gameShaderIntermediate{};
         ID3D11Texture2D* gameMipIntermediate{};
         ID3D11Texture2D* gameEyeArray{};
+        ID3D11Texture2D* gameConvertedArray{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
@@ -1022,6 +1044,7 @@ int main()
         bool replayedPostDrawShaderCopy[2]{};
         bool replayedPostDrawMipZeroCopy[2]{};
         bool replayedDistinctArrayEyeCopy[2]{};
+        bool replayedFormatConvertedArrayCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
         bool replayedScaledPostpass[2]{};
         bool replayedScaledArrayEye[2]{};
@@ -1055,6 +1078,7 @@ int main()
     gameEyeFixture.gameShaderIntermediate = gameShaderIntermediate;
     gameEyeFixture.gameMipIntermediate = mipGameIntermediate;
     gameEyeFixture.gameEyeArray = gameEyeArray;
+    gameEyeFixture.gameConvertedArray = gameConvertedArray;
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
 
@@ -1348,6 +1372,19 @@ int main()
                 fixture.gameEyeArray, &sourcePatch, destX, 16u, eyeIndex) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Source BGRA != eye RGBA. A genuine unscaled game GPU postpass
+        // must now convert and sample the correct independent camera slice.
+        // A foreign slice or out-of-bounds destination must fail closed.
+        // Copying must leave native Draw/DrawIndexed evidence untouched.
+        fixture.replayedFormatConvertedArrayCopy[eyeIndex] =
+            !encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, destX, 42u, 2u) &&
+            !encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, 63u, 42u, eyeIndex) &&
+            encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, destX, 42u, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         // A real game MSAA RT must resolve on the GPU before copying just
         // the selected menu/vehicle patch, preserving the rest of both eyes.
         fixture.replayedPostDrawMsaaResolve[eyeIndex] =
@@ -1408,6 +1445,7 @@ int main()
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
             !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
             !fixture.replayedDistinctArrayEyeCopy[eyeIndex] ||
+            !fixture.replayedFormatConvertedArrayCopy[eyeIndex] ||
             !fixture.replayedPostDrawMsaaResolve[eyeIndex] ||
             !fixture.replayedScaledPostpass[eyeIndex] ||
             !fixture.replayedScaledArrayEye[eyeIndex] ||
@@ -1462,6 +1500,8 @@ int main()
             gameEyeFixture.replayedPostDrawMipZeroCopy[1] &&
             gameEyeFixture.replayedDistinctArrayEyeCopy[0] &&
             gameEyeFixture.replayedDistinctArrayEyeCopy[1] &&
+            gameEyeFixture.replayedFormatConvertedArrayCopy[0] &&
+            gameEyeFixture.replayedFormatConvertedArrayCopy[1] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[0] &&
             gameEyeFixture.replayedPostDrawMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
@@ -1585,6 +1625,7 @@ int main()
     gameShaderIntermediate->Release();
     mipGameIntermediate->Release();
     gameEyeArray->Release();
+    gameConvertedArray->Release();
     gameMultisampleView->Release();
     gameMultisample->Release();
     gameSurface->Release();
@@ -1635,6 +1676,17 @@ int main()
             : scaledArrayPixel[0] == 0x33u &&
               scaledArrayPixel[1] == 0xbbu &&
               scaledArrayPixel[2] == 0x22u;
+        // BGRA source is sampled as colors rather than raw reordered
+        // bytes. Left camera is red; right camera green, despite sharing
+        // one game-owned GPU array and converting into RGBA eye targets.
+        const UINT convertedX = eyeIndex == 0u ? 18u : 50u;
+        const auto* convertedPixel =
+            pixel + 43u * mapped.RowPitch + convertedX * 4u;
+        const bool actualConvertedArrayEye = eyeIndex == 0u
+            ? convertedPixel[0] == 255u &&
+              convertedPixel[1] == 0u && convertedPixel[2] == 0u
+            : convertedPixel[0] == 0u &&
+              convertedPixel[1] == 255u && convertedPixel[2] == 0u;
         const UINT mipX = eyeIndex == 0u ? 18u : 50u;
         const auto* mipPixel = pixel + 34u * mapped.RowPitch + mipX * 4u;
         const bool actualMipZeroCopy =
@@ -1650,7 +1702,8 @@ int main()
             ? later[0] == 255u && later[1] == 0u && later[2] == 0u
             : later[0] == 0u && later[1] == 255u && later[2] == 0u;
         if (!distinctColor || !actualMipZeroCopy || !actualDistinctArrayEye ||
-            !actualScaledArrayEye || !actualPartialClear ||
+            !actualScaledArrayEye || !actualConvertedArrayEye ||
+            !actualPartialClear ||
             !orderedAfterDrawClear) {
             std::cerr << "00829 eye=" << eyeIndex
                       << " full RGBA=" << unsigned(pixel[0]) << ","
