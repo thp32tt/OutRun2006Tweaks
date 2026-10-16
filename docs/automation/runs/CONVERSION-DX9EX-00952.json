@@ -2,31 +2,38 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00952",
   "production_id": "CONVERSION-DX9EX-00952",
-  "event_id": "CONVERSION-DX9EX-00952-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX9EX-00952-E004",
+  "event_type": "retry",
+  "attempt": 3,
   "run_key": "CONVERSION-DX9EX-00952",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
-  "status": "IMPLEMENTED_GATE_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "9b9b267d9580ae2bf41bf243cd26cb8d08868ba2",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
-    "src/hooks_uiscaling.cpp"
+    "src/hooks_uiscaling.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
   ],
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_uiscaling.cpp",
     "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00952.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00952.json",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_pause_menu_eye_affine.py",
+    "tools/verify_vr_hud_cadence_restore.py",
+    "tools/verify_vr_projected_marker_anchor.py",
+    "tools/verify_vr_hud_exact_callsite_contract.py",
+    "tools/verify_vr_visual_composition_p0.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:ESC_MENU",
@@ -65,9 +72,9 @@
     ]
   },
   "acceptance_results": {
-    "esc_arrow_gpu_batch": "PENDING_CI",
-    "esc_native_negative": "PENDING_CI",
-    "esc_exact_gate": "PENDING_CI"
+    "esc_arrow_gpu_batch": "PASS_EXACT_SHA",
+    "esc_native_negative": "PASS_EXACT_SHA",
+    "esc_exact_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Original ESC arrow hook scoped ScreenHud only during CPU producer; D3DX can defer actual GPU rendering and the generic clip token could not identify this exact physical batch, losing source ownership at Flush/End.",
@@ -79,7 +86,44 @@
     "alternatives_rejected": [
       "Generic ExactScreenHudClipSprite must not enter deferred batch whitelist: it includes unrelated menus and sprites."
     ],
-    "runtime_limit": "No direct Quest3/VDXR HMD session; visual or interactive acceptance is untested."
+    "runtime_limit": "No direct Quest3/VDXR HMD session; visual or interactive acceptance is untested.",
+    "original_evidence": "Twelve original SMPAUSEMENU pause-option E8 put_clip_sprite call sites, separately pinned against the canonical OutRun original EXE CALL manifest, execute the exact game producer and may emit queued sprite siblings.",
+    "eye_ownership": "The dedicated PauseOptionArrow ScreenHud semantic survives original immediate E8 rendering, SpriteNode queue tagging, and homogeneous D3DX Draw/Flush/End delayed GPU emission; R84 pause optical eye transform admits only paused-screen exact tokens and keeps generic HUD/world excluded."
   },
-  "next_action": "Wait for exact-SHA full CI; repair only demonstrated failure, no HMD PASS without headset evidence."
+  "next_action": "Build-verified at exact validation-bearing SHA. Require matching Quest3/VDXR headset visual and original navigation/input evaluation before declaring runtime PASS; do not resubmit unchanged SHA.",
+  "initial_event_id": "CONVERSION-DX9EX-00952-E001",
+  "material_result_sha": "f60d0d00479398a4bceadcb0589ad7bf67f6c0dd",
+  "initial_material_result_sha": "cea6f009fc5f7dcdabca648df0907ededbee8f96",
+  "validation_bearing_result_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149",
+    "gates": [
+      {
+        "name": "dx9ex_active",
+        "run_id": 38892000240,
+        "conclusion": "SUCCESS",
+        "validation_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149"
+      },
+      {
+        "name": "domain_isolation",
+        "run_id": 38892000279,
+        "conclusion": "SUCCESS",
+        "validation_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149"
+      },
+      {
+        "name": "hud_inspector",
+        "run_id": 38892000183,
+        "conclusion": "SUCCESS",
+        "validation_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149"
+      },
+      {
+        "name": "full_source_impact",
+        "run_id": 38892000355,
+        "conclusion": "SUCCESS",
+        "validation_sha": "0eb8e0f7c5df0a17323012e93fd45c3e5076c149"
+      }
+    ],
+    "qualification": "BUILD_VERIFIED_ONLY",
+    "hardware": "QUEST3_VDXR_UNTESTED"
+  }
 }
