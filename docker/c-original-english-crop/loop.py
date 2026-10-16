@@ -141,8 +141,8 @@ def main():
                 if now-last_discovery >= 600:
                     last_discovery=now
                     try:
-                        discovery=discover.run(verified_runner.VERIFIED, verified_runner.check_original)
-                        write_audit(discovery)
+                        # OCR derives the native ROI coordinates itself; the older
+                        # alpha-only proposal sweep is not required in production.
                         recognized=ocr_recognize.scan(verified_runner.VERIFIED, verified_runner.check_original, max_new=args.max_per_cycle)
                         write_audit(recognized)
                     except Exception as e:
