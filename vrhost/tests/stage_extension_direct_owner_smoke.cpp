@@ -94,7 +94,9 @@ int main()
     NextDrawScope = RenderScope::None;
     // Used verbatim by the live D3DX hook; test old-owner-first before
     // first +TIME queue, old queued owner, and all negative admissions.
-    static_assert(CanFlushD3DXPreQueueStageBatch(
+    // An unowned None/None D3DX batch must keep native End fallback.
+    // This used to assert true; the source now correctly fails closed.
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
         false, true, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
         RenderScope::ScreenOverlay2D, ProducerToken::None));
     static_assert(CanFlushD3DXPreQueueStageBatch(
@@ -113,6 +115,38 @@ int main()
     static_assert(!CanFlushD3DXPreQueueStageBatch(
         false, true, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
         RenderScope::ScreenOverlay2D, ProducerToken::StageExtensionTime));
+    // A direct +TIME/GOAL batch must physically flush under its saved owner
+    // BEFORE the first foreign queued sprite, but never if it is mixed,
+    // detached from the live D3DXSprite, or owned by an unknown source.
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2u, true, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 1u, true, RenderScope::ScreenHud,
+        ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2u, true, RenderScope::ScreenHud,
+        ProducerToken::None, RenderScope::ScreenOverlay2D,
+        ProducerToken::StageExtensionTime));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2u, false, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, false, 2u, true, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2u, true, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 1u, true, RenderScope::ScreenHud,
+        ProducerToken::ResultTextB9200,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+
     // A deferred Draw may still remain when the numeric E8 parent returns.
     // Only the same homogeneous +TIME source may submit before RAII restore.
     auto exactExit = [](bool queued, bool active, bool sprite,
