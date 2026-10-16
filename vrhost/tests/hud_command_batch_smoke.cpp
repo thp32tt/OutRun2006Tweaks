@@ -61,5 +61,32 @@ int main()
     l.recordDraw(RenderScope::ScreenHud,ProducerToken::None);
     if (l.exactUniformOwner())
         return 13;
+    // A nested native INVALIDCALL retains the exact +TIME owner, draw count,
+    // queue boundary and generation until the original Flush/End.
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime);
+    l.boundaryReady = true;
+    const auto oldGeneration = l.generation;
+    l.onBeginResult(&spriteA, false, true);
+    if (!l.active || l.sprite != &spriteA || !l.boundaryReady ||
+        !l.exactUniformOwner() || l.drawCount != 1 ||
+        l.generation != oldGeneration)
+        return 14;
+    // A failed device/driver Begin must NOT allow an old numeric +TIME
+    // producer to be replayed under the next game SpriteQueue/End.
+    l.onBeginResult(&spriteA, false, false);
+    if (l.active || l.sprite || l.boundaryReady || l.exactUniformOwner() ||
+        l.drawCount || l.producer != ProducerToken::None ||
+        l.generation != oldGeneration)
+        return 15;
+    l.onBeginResult(&spriteA, true, false);
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::GoalTime020);
+    if (!l.exactUniformOwner() || l.producer != ProducerToken::GoalTime020 ||
+        l.generation != oldGeneration + 1)
+        return 16;
+    // An INVALIDCALL from a foreign sprite cannot inherit a live GOAL batch.
+    l.onBeginResult(&spriteB, false, true);
+    if (l.exactUniformOwner() || l.active || l.sprite)
+        return 17;
     return 0;
 }

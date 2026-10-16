@@ -35,6 +35,25 @@ namespace OutRunVR::HudCommandBatch
                 ++generation;
         }
 
+        // Nested Begin on the exact same object may fail with INVALIDCALL
+        // while the original Draw batch remains live. Other failed Begin
+        // results (including DEVICELOST) cannot prove that the pending GPU
+        // batch or its +TIME/GOAL semantic survived. Revoke BOTH object
+        // identity and provenance, without changing native HRESULT handling.
+        void onBeginResult(void* exactSprite, bool succeeded,
+                           bool reentrantInvalidCall) noexcept
+        {
+            if (succeeded)
+            {
+                begin(exactSprite, true);
+                return;
+            }
+            if (reentrantInvalidCall && active && exactSprite != nullptr &&
+                sprite == exactSprite)
+                return;
+            invalidate();
+        }
+
         // CPU-side Draw only records commands; no GPU submission occurs here.
         // Unknown or mixed producer batches must never be promoted to HUD.
         void recordDraw(Scope newScope, Producer newProducer) noexcept

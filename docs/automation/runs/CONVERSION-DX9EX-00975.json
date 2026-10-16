@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00975",
+  "production_id": "CONVERSION-DX9EX-00975",
+  "event_id": "CONVERSION-DX9EX-00975-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00975",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTING",
+  "phase": "C2_SOURCE_IMPLEMENTATION",
+  "checkpoint": "C2_D3DX_BEGIN_FAILURE_OWNER_FENCE",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "91c25917e6f0c48d0775989467d16a6b11274798",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/hud_command_batch.hpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/hud_command_batch.hpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00975.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Make the original stage +TIME decoration and numeric glyphs retain exact deferred D3DX GPU owner semantics across successful, nested and device-loss Begin/Draw/Flush/End paths; complete the same stage-transition visible function through the physical R84 binocular renderer with safe native fallback.",
+    "scope_boundary": "Only the six original +TIME producers and the pre-existing exact D3DX sprite command ledger/source-owner boundary; keep GOAL, menus, R84 world shader, SkyGlow, R26_SAFE rollback, input/FFB, DX11 and frozen DXVK unmodified.",
+    "trace_stages": [
+      "Canonical OutRun stage-extension sprani parents 0x9898E, 0x98A36, 0x98AC6 and direct numeric parents 0x989AD, 0x98A10, 0x98A89 own ScreenHud source lifetime.",
+      "The original ID3DXSprite Begin/Draw native trampoline records homogeneous per-batch producer while a later Flush/End may submit its physical GPU draws after the original caller returns.",
+      "R84 R30 finite +TIME XYZRHW stereo plane consumes only a verified physical ScreenHud +TIME draw with two valid eye transforms; lost-device and unrelated native drawing retain original fail-closed path."
+    ],
+    "subcomponents": [
+      "Actually modify the live game D3DX Begin hook and C++ HudCommandBatch ledger so only same-object native INVALIDCALL preserves an active pending +TIME batch, while other native Begin failures revoke stale owner and sprite identity.",
+      "Regression-test live tracked +TIME owner survival for nested Begin, device-loss/driver Begin failure invalidation, clean recovery into a distinct GOAL producer and foreign-object INVALIDCALL rejection; retain native error code/fallback.",
+      "Preserve the remaining whole sprite+numeric GPU/eye visual acceptance as pending until full exact-SHA CI and matching Quest3/VDXR test without inventing optical success."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_original_sprite_numeric_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original +TIME sprite and numeral source to deferred physical GPU batch",
+        "expected_behavior": "Valid +TIME sprani and numeric sprites preserve original scope through nested native INVALIDCALL; only active verified D3DX owners may reach R84 binocular draw."
+      },
+      {
+        "id": "stage_device_failure_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Device loss, failed Begin and unrelated D3DX game producer",
+        "expected_behavior": "Non-INVALIDCALL Begin failures revoke stale GPU batch owner; original HRESULT, native fallback, Reset and clean GOAL producer recovery stay intact."
+      },
+      {
+        "id": "stage_exact_sha_full_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA x86 R84/R26_SAFE game, x64 host and GitHub Actions",
+        "expected_behavior": "Pass existing DX9Ex Active, Domain Isolation and affected Full Source/HUD Inspector jobs on validation-bearing exact source SHA, with Quest3 gameplay separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_original_sprite_numeric_owner": "PARTIAL_SOURCE_IMPLEMENTED",
+    "stage_device_failure_fallback": "IMPLEMENTED_PENDING_CI",
+    "stage_exact_sha_full_gates": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "The currently selected R84 package compiles source hooks_uiscaling.cpp::BeginDest. An existing same-object active batch was retained on ANY FAILED(hr), even if the underlying Begin returned device loss rather than nested INVALIDCALL.",
+    "root_cause": "The hook equated every failed Begin with native D3DX reentrancy and could retain a stale screen +TIME/GOAL batch producer across lost-device or other failed driver commands; native HRESULT was already available to distinguish failure classes.",
+    "source_trace": [
+      "Six original 0x989xx StageExtensionEnter/Leave source parents",
+      "HudCommandBatch::Ledger plus ID3DXSprite BeginDest -> DrawDest -> FlushDest/EndDest",
+      "R84 R30 physical XYZRHW +TIME/GOAL per-eye stage plane and guarded game fallback"
+    ],
+    "alternatives_rejected": [
+      "Already present six-parent source hooks, outgoing owner FlushTracked and R84 stage eye projection were not omitted, and their duplication is not a valid new fix."
+    ],
+    "eye_ownership": "Only a verified ScreenHud StageExtensionTime physical GPU draw is eligible for existing R84 left/right finite optical plane; invalid Begin denies stale owner, and fallback does not imply successful binocular optics.",
+    "runtime_limit": "No new Quest3/VDXR screenshots or game test; this proves a source lifecycle hazard, not full resolution of the previously user-observed +TIME optical duplication."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Validate exact material SHA with required GitHub Actions, then continue whole +TIME sprite/numeric actual GPU ownership and per-eye visual acceptance in the same feature without claiming HMD success."
+}

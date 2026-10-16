@@ -2678,17 +2678,21 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall BeginDest(void* self, DWORD flags)
     {
-        // A re-entrant Begin on an already-active ID3DXSprite fails with
-        // INVALIDCALL; it does NOT close the previous Begin/Draw batch.
-        // Keep its exact +TIME/GOAL provenance for the eventual Flush/End.
-        const bool existingBatch =
-            HudBatch.active && self == HudBatch.sprite && IsExactSprite(self);
+        // A nested Begin returning INVALIDCALL cannot close the prior native
+        // batch; its +TIME/GOAL owner must survive to the original Flush/End.
+        // Any OTHER Begin failure may mean device loss or a driver error:
+        // keeping that owner's deferred GPU provenance across Reset is unsafe.
         const HRESULT hr = Begin_hk.stdcall<HRESULT>(self, flags);
         if (IsExactSprite(self))
         {
-            if (FAILED(hr) && existingBatch)
-                return hr;
-            HudBatch.begin(self, SUCCEEDED(hr));
+            HudBatch.onBeginResult(
+                self, SUCCEEDED(hr), hr == D3DERR_INVALIDCALL);
+        }
+        else if (self && self == HudBatch.sprite)
+        {
+            // The global game sprite changed while original Begin executed.
+            // A previously tracked object is no longer proof of a live batch.
+            HudBatch.invalidate();
         }
         return hr;
     }
