@@ -19,6 +19,24 @@ namespace OutRunVR::DriverSeatRenderPass
         ScopedSceneEffect& operator=(const ScopedSceneEffect&) = delete;
     };
 
+    // A half-installed pair renders a full car with its driver still inside.
+    // Stage the native car and occupant detours as move-only RAII candidates;
+    // commit both owners only after both original entrypoints are hooked.
+    template<class CarHook, class OccupantHook, class CarInstall, class OccupantInstall>
+    inline bool InstallAtomicCockpitPair(
+        CarHook& car, OccupantHook& occupant,
+        CarInstall&& installCar, OccupantInstall&& installOccupant)
+    {
+        CarHook pendingCar = std::forward<CarInstall>(installCar)();
+        if (!pendingCar) return false;
+        OccupantHook pendingOccupant =
+            std::forward<OccupantInstall>(installOccupant)();
+        if (!pendingOccupant) return false; // RAII unhooks pending car
+        car = std::move(pendingCar);
+        occupant = std::move(pendingOccupant);
+        return true;
+    }
+
     inline bool IsWorldOrCockpitPass() noexcept
     {
         return SceneEffectDepth == 0;

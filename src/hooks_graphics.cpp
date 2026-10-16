@@ -311,11 +311,16 @@ public:
 
 	bool apply() override
 	{
-		PlayerCarRenderStateHook = safetyhook::create_mid(
-			Module::exe_ptr(PlayerCarRenderState_HookAddr), PlayerCarRenderState_dest);
-		RobotDisplayHook = safetyhook::create_inline(
-			Module::exe_ptr(RobotDisplay_Addr), RobotDisplay_dest);
-		return !!PlayerCarRenderStateHook && !!RobotDisplayHook;
+        // A rejected second detour used to leave the car-state midhook live
+        // even though HookManager was told installation failed. Either both
+        // gameplay callbacks are active, or neither changes native rendering.
+        return OutRunVR::DriverSeatRenderPass::InstallAtomicCockpitPair(
+            PlayerCarRenderStateHook, RobotDisplayHook,
+            [] { return safetyhook::create_mid(
+                Module::exe_ptr(PlayerCarRenderState_HookAddr),
+                PlayerCarRenderState_dest); },
+            [] { return safetyhook::create_inline(
+                Module::exe_ptr(RobotDisplay_Addr), RobotDisplay_dest); });
 	}
 
 	static VRDriverSeatRenderTest instance;

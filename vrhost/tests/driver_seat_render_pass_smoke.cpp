@@ -1,7 +1,59 @@
 #include "vr/game/driver_seat_render_pass.hpp"
+#include <utility>
+
+// Model native detours as move-only RAII owners. A failed second install must
+// destroy the temporary first detour, not retain a visible half cockpit.
+struct MockNativeHook {
+    int* live = nullptr;
+    MockNativeHook() = default;
+    explicit MockNativeHook(int* p) noexcept : live(p) {
+        if (live) ++*live;
+    }
+    MockNativeHook(const MockNativeHook&) = delete;
+    MockNativeHook& operator=(const MockNativeHook&) = delete;
+    MockNativeHook(MockNativeHook&& old) noexcept :
+        live(std::exchange(old.live, nullptr)) {}
+    MockNativeHook& operator=(MockNativeHook&& old) noexcept {
+        if (this != &old) {
+            if (live) --*live;
+            live = std::exchange(old.live, nullptr);
+        }
+        return *this;
+    }
+    ~MockNativeHook() { if (live) --*live; }
+    explicit operator bool() const noexcept { return live != nullptr; }
+};
+static int TestCockpitAtomicInstall() {
+    int carLive = 0, occupantLive = 0, occupantCalls = 0;
+    {
+        MockNativeHook car{}, occupant{};
+        if (InstallAtomicCockpitPair(car, occupant,
+                [] { return MockNativeHook{}; },
+                [&] { ++occupantCalls; return MockNativeHook{&occupantLive}; }))
+            return 13;
+        if (carLive || occupantLive || car || occupant || occupantCalls)
+            return 14;
+        if (InstallAtomicCockpitPair(car, occupant,
+                [&] { return MockNativeHook{&carLive}; },
+                [&] { ++occupantCalls; return MockNativeHook{}; }))
+            return 15;
+        if (carLive || occupantLive || car || occupant || occupantCalls != 1)
+            return 16;
+        if (!InstallAtomicCockpitPair(car, occupant,
+                [&] { return MockNativeHook{&carLive}; },
+                [&] { ++occupantCalls; return MockNativeHook{&occupantLive}; }))
+            return 17;
+        if (carLive != 1 || occupantLive != 1 || !car || !occupant ||
+            occupantCalls != 2)
+            return 18;
+    }
+    return carLive == 0 && occupantLive == 0 ? 0 : 19;
+}
+
 using namespace OutRunVR::DriverSeatRenderPass;
 int main()
 {
+    if (const int failure = TestCockpitAtomicInstall()) return failure;
     if (!IsWorldOrCockpitPass() || !UseCockpitForCamera(true) ||
         UseCockpitForCamera(false))
         return 1;
