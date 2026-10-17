@@ -1,0 +1,74 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01030",
+  "production_id": "CONVERSION-DX9EX-01030",
+  "event_id": "CONVERSION-DX9EX-01030-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "C2_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Maintain one original C993 world-space central sun and its exact binocular physical source across the R84 R30 GPU LEFT and RIGHT draws, independent of valid outer lens discs.",
+    "scope_boundary": "Original direct D3A5→C993 central lens producer only in R30 shader ScreenSpace path; R33 independent guard unchanged; no outer CABE, SkyGlow, menu, HUD, GOAL, input/FFB or R26_SAFE semantic widening.",
+    "trace_stages": [
+      "Original game D3A5→C993 centre generates exact LensFlareCentre/WorldBillboard source and raw shader c64 WVP.",
+      "R84 R30 validates physical producer, pose, shader and original raw WVP generation before uploading lens LEFT eye GPU c64.",
+      "Native LEFT GPU callback may reenter a foreign scene source; before RIGHT compare exact game c64 serial, original producer, shader, pose, draw and restore the saved game c64 on mismatch."
+    ],
+    "subcomponents": [
+      "Attach R30 shader-path native LEFT physical lens source snapshot and verify exact C993 original raw shader WVP.",
+      "Fence RIGHT GPU submission on changed source/write serial/call/pose/shader and restore original c64 without replaying native LEFT; preserve good CABE outer lens/SkyGlow.",
+      "Extend portable C++ positive and negative regression for centre raw generations, outer lens isolation and post-left mutation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_original_native_left_right",
+        "category": "end_to_end_behavior",
+        "behavior_area": "C993 physical binocular world centre",
+        "expected_behavior": "Same original source and native c64 generation across both physical eye callbacks."
+      },
+      {
+        "id": "centre_foreign_source_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native left reentrant producer and optical protection",
+        "expected_behavior": "Reject changed source or WVP before right, preserve outer rings/SkyGlow and restore the original GPU shader matrix."
+      },
+      {
+        "id": "centre_exact_sha_integrated_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 game x64 host and feature gates",
+        "expected_behavior": "Required DX9Ex Active, Domain Isolation, HUD Inspector and Full Source Impact pass at one exact source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "centre_original_native_left_right": "PENDING",
+    "centre_foreign_source_safe_fallback": "PENDING",
+    "centre_exact_sha_integrated_ci": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R30 shader ScreenSpace eye path prepared original C993 lens centre c64 and issued native LEFT then RIGHT without the R33-style source-and-original-c64 after-left validation; reentrant native producer could repurpose the right-eye GPU draw."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "Source-implementation batch, not Quest3 optical PASS; C6 and score pending exact SHA automated gates."
+}

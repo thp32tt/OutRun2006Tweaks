@@ -59,6 +59,33 @@ int main()
     noSource.shaderEpoch = 0;
     assert(!SameStereoDrawSource(noSource, left));
 
+    // R30 C993 native shader draw must keep one source and one ORIGINAL
+    // game c64 generation across the left-eye GPU callback. The outer
+    // flare ring / SkyGlow and stale or reentrant game WVP are rejected.
+    const RawStereoSource centreRaw{101, 39, 7, 7, 9, 9, 0x100, 11, true};
+    assert(IsCoherentNativeCentrePair(left, centreRaw));
+    assert(SameRawStereoSource(centreRaw, centreRaw));
+    auto overwritten = centreRaw;
+    overwritten.writeSerial++;
+    assert(!SameRawStereoSource(centreRaw, overwritten));
+    auto differentGameDraw = centreRaw;
+    differentGameDraw.writtenDraw++;
+    assert(!SameRawStereoSource(centreRaw, differentGameDraw));
+    auto resetRawPose = centreRaw;
+    resetRawPose.poseEpoch++;
+    assert(!SameRawStereoSource(centreRaw, resetRawPose));
+    auto differentRawShader = centreRaw;
+    differentRawShader.shaderEpoch++;
+    assert(!SameRawStereoSource(centreRaw, differentRawShader));
+    auto foreignSource = centreRaw;
+    foreignSource.centreCall++;
+    assert(!IsCoherentNativeCentrePair(left, foreignSource));
+    auto invalidRaw = centreRaw;
+    invalidRaw.exactDirectRaw = false;
+    assert(!IsCoherentNativeCentrePair(left, invalidRaw));
+    assert(!IsCoherentNativeCentrePair(outerDisc, centreRaw));
+    assert(!IsCoherentNativeCentrePair(left, resetRawPose));
+
     // The whole centre draw is exclusive: both source-owned and unknown
     // C993 c64 bypass the earlier road-shader and R28 world rebind owner.
     assert(SelectWorldRoute(true, OwnsRawWvp(raw)) ==

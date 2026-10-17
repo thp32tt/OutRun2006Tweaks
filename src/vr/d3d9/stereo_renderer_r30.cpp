@@ -7398,6 +7398,62 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            // The shader C993 path is an exact WORLD centre, not the outer
+            // CABE flare discs or an arbitrary alpha HUD sprite. R33 has a
+            // physical native-left owner transaction; R30's independently
+            // callable screen-space route must enforce the same guarantee.
+            // The GPU c64 below is temporarily stereo-corrected, so the
+            // original-game raw writer (not live c64) is the authority.
+            struct CentrePhysicalSource
+            {
+                OutRunVR::LensCentre::StereoDrawSource draw{};
+                OutRunVR::LensCentre::RawStereoSource raw{};
+            };
+            const bool exactCentre =
+                screenKind == R30ScreenSpaceKind::ExactLensCentreWorld;
+            const auto captureCentre = [&]() noexcept -> CentrePhysicalSource {
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                std::uintptr_t shader = 0, writtenShader = 0;
+                std::uint64_t shaderEpoch = 0, writtenShaderEpoch = 0;
+                std::uint64_t serial = 0, writtenDraw = 0;
+                float gameRaw[16]{};
+                const bool liveShader =
+                    R29OwnerCurrentShaderEpoch(shader, shaderEpoch);
+                const bool originalGameWvp =
+                    R30HasExactLensCentreRawWvp(gameRaw) &&
+                    OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        gameRaw, serial, writtenDraw,
+                        writtenShader, writtenShaderEpoch);
+                const auto poseEpoch =
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch();
+                const auto writtenPoseEpoch =
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch();
+                const auto writtenCall =
+                    OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch();
+                const bool exactRaw = originalGameWvp && liveShader &&
+                    serial != 0 && writtenDraw != 0 &&
+                    writtenShader == shader &&
+                    writtenShaderEpoch == shaderEpoch &&
+                    poseEpoch != 0 && poseEpoch == writtenPoseEpoch &&
+                    command.lensCentreCallEpoch != 0 &&
+                    command.lensCentreCallEpoch == writtenCall;
+                return {
+                    {command.lensCentreCallEpoch, R29OwnerTopLevelDrawSerial(),
+                     shaderEpoch, stereo.poseSequence, shader,
+                     command.IsDirectWorldLensCentre() && liveShader},
+                    {serial, writtenDraw, command.lensCentreCallEpoch,
+                     writtenCall, poseEpoch, writtenPoseEpoch,
+                     writtenShader, writtenShaderEpoch, exactRaw}
+                };
+            };
+            const CentrePhysicalSource centreBefore =
+                exactCentre ? captureCentre() : CentrePhysicalSource{};
+            if (exactCentre &&
+                !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
+                    centreBefore.draw, centreBefore.raw))
+                return E_NOTIMPL; // no native GPU eye submitted
+
             D3DVIEWPORT9 savedViewport{};
             if (!R29OwnerTryGetTrackedViewport(savedViewport) &&
                 FAILED(device->GetViewport(&savedViewport)))
@@ -7470,6 +7526,38 @@ namespace OutRunVRStereo
                     R29OwnerNoteRestoreFailure("R30 HUD left draw c64");
                 R29OwnerArmMonoSafety();
                 return leftHr;
+            }
+
+            if (exactCentre)
+            {
+                const CentrePhysicalSource centreAfter = captureCentre();
+                if (!OutRunVR::LensCentre::SameStereoDrawSource(
+                        centreBefore.draw, centreAfter.draw) ||
+                    !OutRunVR::LensCentre::SameRawStereoSource(
+                        centreBefore.raw, centreAfter.raw) ||
+                    !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
+                        centreAfter.draw, centreAfter.raw))
+                {
+                    // LEFT has already reached the game's native GPU Draw.
+                    // Never borrow a new scene/outer-disc/c64 for RIGHT, and
+                    // never replay LEFT. Roll back our temporary game c64
+                    // while the caller's normal device state remains owned.
+                    bool restored = false;
+                    {
+                        R30ScopedInternalPass guard;
+                        restored = R29OwnerSetWvpOneRegisterAtATime(
+                            device, original);
+                    }
+                    R29OwnerMarkRightDrawFailed();
+                    R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R29OwnerReportStereoFailure(
+                        OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
+                    if (!restored)
+                        R29OwnerNoteRestoreFailure(
+                            "R30 C993 centre post-left c64");
+                    R29OwnerArmMonoSafety();
+                    return leftHr;
+                }
             }
 
             // Game left-eye draw may update tracked surfaces.
