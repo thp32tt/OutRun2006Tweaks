@@ -5523,10 +5523,31 @@ namespace OutRunVRStereo
             if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                 R29OwnerCurrentVertexShaderIdentity() != 0)
                 return false;
+            // The XYZRHW/fixed-function +TIME draw shares the shader path's
+            // original c64 generation guard. A native LEFT submission may
+            // reenter an original game WVP writer with the SAME stage token,
+            // SpriteNode, shader and pose. Without the raw write serial,
+            // R30 could submit that foreign generation to the RIGHT eye.
+            // The raw tracker excludes R30/R32 private eye uploads; if no
+            // complete source pair is available, retain the conservative
+            // legacy zero/zero stamp rather than importing live stereo c64.
+            float rawWvp[16]{};
+            std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
+            std::uintptr_t rawShader = 0;
+            std::uint64_t rawShaderEpoch = 0;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    rawWvp, rawWriteSerial, rawDrawSerial,
+                    rawShader, rawShaderEpoch) ||
+                rawWriteSerial == 0 || rawDrawSerial == 0)
+            {
+                rawWriteSerial = 0;
+                rawDrawSerial = 0;
+            }
             source = {draw.scope, draw.producer, draw.queued,
                 draw.queueNode, draw.queueEpoch,
                 OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+                R29OwnerTopLevelDrawSerial(), shader, shaderEpoch,
+                rawWriteSerial, rawDrawSerial};
             return OutRunVR::StageExtensionPhysical::IsValid(source);
         }
 
