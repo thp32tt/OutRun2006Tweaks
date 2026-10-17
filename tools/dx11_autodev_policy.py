@@ -107,6 +107,32 @@ def source_stage_build_verified(task: dict) -> bool:
     )
 
 
+def source_stage_native_desktop_gpu_build_verified(task: dict) -> bool:
+    """A verified game-owned desktop GPU output bracket is a SOURCE stage.
+
+    Copy/Resolve MRT/DSV/UAV restoration is real integration progress, but
+    it does not demonstrate the missing D3D9->native Draw->visible frame or
+    Quest3 runtime. Admit only this bounded, exact-SHA tested stage, never a
+    complete renderer or a score-bearing new milestone.
+    """
+    strategy = task.get("development_strategy") or {}
+    changed = task.get("changed_files") or []
+    return (
+        source_stage_build_verified(task)
+        and strategy.get("milestone_id") == "full_resolution_native_game_frame"
+        and strategy.get("gameplay_delivery_target")
+            == "NATIVE_FULL_FRAME_GPU_DESKTOP_OUTPUT_STATE_PRESERVATION"
+        and strategy.get("live_game_draw_path")
+            == ["D3D11_NATIVE_DRAW", "NATIVE_FULL_FRAME_GPU_DESKTOP_OUTPUT"]
+        and isinstance(strategy.get("visible_frame_acceptance"), str)
+        and "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED" in strategy["visible_frame_acceptance"]
+        and any(isinstance(path, str) and path.startswith("src/vr/d3d11/")
+                for path in changed)
+        and any(isinstance(path, str) and "gpu_output" in path.lower()
+                for path in changed)
+    )
+
+
 def source_stage_ci_pending(task: dict) -> bool:
     """Allow only an actual DX11 native-eye SOURCE checkpoint to await CI.
 
@@ -178,7 +204,8 @@ def validate_task(task: dict, policy: dict) -> list[str]:
     # Older in-flight 00531..00536 records remain grandfathered unchanged.
     if int(found.group(1)) >= policy.get("gameplay_direction_effective_from_task_number", 537):
         delivery = strategy.get("gameplay_delivery_target")
-        if delivery not in policy["gameplay_delivery_targets"]:
+        if (delivery not in policy["gameplay_delivery_targets"]
+                and not source_stage_native_desktop_gpu_build_verified(task)):
             errors.append("gameplay_delivery_target must close a real game-frame milestone")
         if milestone == "mono_native_draw":
             errors.append("dormant mono WARP fixture is no longer a new task milestone")
@@ -187,7 +214,9 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                 errors.append("R175 repair must resolve the shader parity blocker")
             if not isinstance(strategy.get("r175_owner_handoff_evidence"), str) or not strategy["r175_owner_handoff_evidence"].strip():
                 errors.append("R175 owner must be released or handed off explicitly before edits")
-        elif delivery in {"FIRST_GAME_DRAW_FRAME", "FULL_RESOLUTION_GAME_FRAME", "MENU_TO_RACE_NATIVE_FRAME", "NATIVE_STEREO_EYE_OUTPUT"}:
+        elif (delivery in {"FIRST_GAME_DRAW_FRAME", "FULL_RESOLUTION_GAME_FRAME",
+                            "MENU_TO_RACE_NATIVE_FRAME", "NATIVE_STEREO_EYE_OUTPUT"}
+              or source_stage_native_desktop_gpu_build_verified(task)):
             stages = strategy.get("live_game_draw_path")
             expected = ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"]
             has_full_path = (
@@ -212,7 +241,8 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                      "NATIVE_STEREO_EYE_OUTPUT"],
                 )
             )
-            if not has_full_path and not partial_eye_stage:
+            if (not has_full_path and not partial_eye_stage
+                    and not source_stage_native_desktop_gpu_build_verified(task)):
                 errors.append("gameplay path must connect real D3D9 callsite through native Draw to visible frame output")
             for field in ("visible_frame_acceptance", "activation_guard_and_fallback"):
                 if not isinstance(strategy.get(field), str) or not strategy[field].strip():

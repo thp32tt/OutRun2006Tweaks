@@ -224,6 +224,29 @@ failed_gate = copy.deepcopy(build_verified)
 failed_gate["acceptance_results"]["gates"] = "FAIL"
 assert validate_task(failed_gate, p), "failing exact-SHA Gate improperly completed"
 
+# 00900 has exact-SHA WARP/5-Gate proof of an intermediate GPU desktop
+# output-preservation source stage; never promote that to gameplay/HMD success.
+# The historical record must remain valid when a new 00901 task arrives.
+from pathlib import Path
+desktop_record = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-00900.json").read_text(encoding="utf-8"))
+assert not validate_task(desktop_record, p), validate_task(desktop_record, p)
+for label, mutate in (
+    ("forged gameplay completed", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("no stage marker", lambda t: t["development_strategy"].update(visible_frame_acceptance="gameplay done")),
+    ("forged visible frame", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
+    ("missing GPU output stage", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW"])),
+    ("missing source evidence", lambda t: t.update(changed_files=["tools/test_probe.py"])),
+    ("unverified full gate", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+    ("unearned score", lambda t: t.update(score_change=1)),
+    ("HMD unobserved", lambda t: t.update(runtime_validation="PASS")),
+):
+    bad = copy.deepcopy(desktop_record)
+    mutate(bad)
+    assert validate_task(bad, p), "00900 source-only negative admitted: " + label
+
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")

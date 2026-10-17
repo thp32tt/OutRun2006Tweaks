@@ -7,7 +7,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00900",
-  "feature_id": null,
+  "feature_id": "DX11:NATIVE_FULL_FRAME_GAME_GPU_OUTPUT_PRESERVATION",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -19,7 +19,7 @@
   "material_result_sha": "c4651168d22e8a14dd275ffe2dbc5ab497f0320e",
   "validation_bearing_result_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20",
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:NATIVE_FULL_FRAME_GAME_GPU_OUTPUT_PRESERVATION",
     "goal": "Preserve game-authored MRT/DSV and pixel/compute UAV output bindings across the native D3D11 full-resolution camera source Resolve/Copy into the GPU-only shared D3D9Ex desktop Present handoff without altering the original gameplay Draw or input fallback.",
     "acceptance_items": [
       {
@@ -45,7 +45,7 @@
   },
   "acceptance_results": {
     "native_game_camera_mrt_uav_gpu_copy": "PASS_BUILD_AND_WARP_GPU_PIXEL",
-    "native_game_output_restore_fallback": "PASS_WARP_MRT_PS_CS_UAV_RESTORATION; HMD_GAME_RUNTIME_UNTESTED",
+    "native_game_output_restore_fallback": "PASS_WARP_MRT_PS_CS_UAV_RESTORATION",
     "exact_sha_warp_pixels_and_required_ci": "PASS_EXACT_SHA_5_OF_5"
   },
   "development_strategy": {
@@ -70,7 +70,12 @@
       "positive_probe": "DX11 Native Transport Isolated WARP run 39076664859 SUCCESS on exact SHA; real copied GPU red source pixel and output restoration probe.",
       "negative_regression": "Initial WARP crash 0xC0000005 fixed under same TASK_ID 342c90147f596f5e91223789631201843c3ae277; null-array CS UAV unbind corrected, MRT/PS/CS source preservation checked on WARP.",
       "component_integration": "Native game shared desktop source transfer and scoped OM/compute-output restore C++ code at material c4651168d22e8a14dd275ffe2dbc5ab497f0320e; exact-SHA 5 mandatory GitHub CI successful at e9c39457717904f9d5eae9ebe6ee2e118c872c20."
-    }
+    },
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_FULL_FRAME_GPU_DESKTOP_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: WARP GPU copied game-authored camera source into native shared-desktop path with live game MRT/DSV/PS/CS UAV output restoration. Real D3D9 Draw and visible OutRun/Quest3 menu, vehicle, race runtime have NOT been observed; this is only build-verified source progress."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
@@ -139,5 +144,6 @@
     "preservation_limit": "No existing CONVERSION-DX11-00900.json found at validation SHA or material SHA. material_result_sha recovered from original source commit; feature_contract and acceptance_results reconstructed using its patch, WARP evidence and exact CI, not copied from an unavailable original.",
     "source_material_commit": "c4651168d22e8a14dd275ffe2dbc5ab497f0320e",
     "reconstruction_does_not_create_new_feature_or_score": true
-  }
+  },
+  "acceptance_result_original_detail": "PASS_WARP_MRT_PS_CS_UAV_RESTORATION; HMD_GAME_RUNTIME_UNTESTED"
 }
