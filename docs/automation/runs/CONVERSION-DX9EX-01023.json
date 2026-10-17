@@ -1,0 +1,101 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01023",
+  "production_id": "CONVERSION-DX9EX-01023",
+  "event_id": "CONVERSION-DX9EX-01023-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "5343d2c085ccd58372b38d570a02651aa17326b6",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/rank_marker_fixedfn_r62.hpp",
+    "vrhost/tests/r62_rank_route_1000_smoke.cpp",
+    "tools/verify_vr_r30_screen_hud_finite_plane.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Restore binocular stereo for source-owned original game FVF142 fixed-function gameplay HUD sprites across all four native GPU Draw families instead of allowing right-eye omissions during race HUD and related native sprite rendering.",
+    "scope_boundary": "R84 R30/R33 source-proven FVF142 native gameplay ScreenHud physical draw admission and unchanged existing rank/paused sprite fallback; excludes generic menu re-layout, F11 external overlay, lens flare, SkyGlow, world geometry, original controls and FFB, R26_SAFE, DX11, DXVK.",
+    "trace_stages": [
+      "Native original game fixed-function FVF 0x142 ScreenHud sprite producer and strict queue/producer-scope ownership are captured before GPU Draw.",
+      "R84 R33 receives DrawPrimitive, DrawIndexedPrimitive, DrawPrimitiveUP and DrawIndexedPrimitiveUP and calls the R30 original sprite stereo executor only after resynchronization.",
+      "R30 verifies live shader/FVF, producer, target and stereo pose before R30ExecuteXyzrhwStereo projects to left/right eyes, otherwise preserves native original-draw fallback."
+    ],
+    "subcomponents": [
+      "Share strict R84 R30 source ownership and fixed-function stereo rendering across all four physical native Draw routes, including immediate UP sources.",
+      "Keep exact source-anchored rank and paused ESC admission separate from unrelated HUD/world owners, exercising both successful stereo routes and destructive negative fallback regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_fvf142_both_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original gameplay HUD fixed-function native and UP Draw families",
+        "expected_behavior": "Source-proven original FVF142 gameplay HUD follows one binocular stereo route across all four D3D9 Draw families, without left-eye-only original fixed-function submission."
+      },
+      {
+        "id": "hud_source_owner_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Live FVF shader and backbuffer ownership, marker anchor and pause identity",
+        "expected_behavior": "Unproven projected markers, foreign queued sprites, shader-driven or wrong-FVF world draws and invalid game targets fall back to the original native Draw without promotion to screen HUD."
+      },
+      {
+        "id": "hud_integrated_required_gate",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows game, host, package and independent source impact workflows",
+        "expected_behavior": "One final validation-bearing SHA passes DX9Ex Active, Domain Isolation, HUD Inspector, Full Source Impact; Quest3 and VDXR eye acceptance remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_fvf142_both_eyes": "PENDING_FULL_GATE",
+    "hud_source_owner_fallback": "PENDING_FULL_GATE",
+    "hud_integrated_required_gate": "PENDING_FULL_GATE"
+  },
+  "diagnosis": {
+    "original_evidence": "User observed gameplay rank/HUD elements left-eye-only or head-locked in Quest3; native game FVF 0x142 fixed-function sprites were submitted via more than one GPU Draw family, while the prior exact R30 owner supported only an indexed primitive path.",
+    "source_trace": [
+      "Original R84 sprite source sets native fixed-function draw, source scope, and live FVF/vertex shader before R33's Draw destination hooks.",
+      "Prior R30SupportTryFixedFunctionProjectedRankIndexed handled one indexed source while R33 nonindexed and both UP destinations did not call the corresponding fixed-function original sprite stereo route.",
+      "Material commit 5343d2c0 adds R30TryFixedFunctionOriginalSpriteStereo shared executor and invokes it from R33 DrawPrimitive/IndexedPrimitive/PrimitiveUP/IndexedPrimitiveUP with fail-closed original game fallback."
+    ],
+    "root_cause": "R84 original native fixed-function FVF142 ScreenHud producer and rank-adjacent sprite routes were not consistently admitted to the R30 per-eye submission across nonindexed/UP physical draw families, leaving potential single-eye native draw paths.",
+    "alternatives_rejected": [
+      "Do not promote every FVF142 draw to HUD without live source, queue, render target and shader checks; world/FX must remain conservative.",
+      "Do not globally Flush D3DX queues, mutate original sprite animation, or suppress native fallback/FFB/SkyGlow."
+    ],
+    "fix_evidence": "Material source commit 5343d2c0 introduces shared native R30 stereo executor, four guarded R33 route hooks, rank source-owner predicate, C++ negative smoke and source mutation guard.",
+    "negative_test_evidence": "FVF142 route source-mutation and native rank-owner smoke were added; automated exact-SHA full gate still pending after initial failed run #39054934011 (missing run record).",
+    "eye_ownership": "R30 submits per-eye only when source scope, live FVF and shader, backbuffer, pose and exact marker/pause ownership qualify; invalid inputs retain the original native draw.",
+    "evidence_limit": "No matching Quest3/VDXR headset rerun; optical correctness is unverified."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "previous_failure": {
+      "run_id": 39054934011,
+      "exact_sha": "5343d2c085ccd58372b38d570a02651aa17326b6",
+      "failed_step": "Enforce feature-sized DX9Ex autonomous completion",
+      "diagnostic": "Missing docs/automation/runs/CONVERSION-DX9EX-01023.json"
+    },
+    "follow_up_verifier": "Current subsequent branch also encountered an undefined r30 in tools/verify_vr_r30_screen_hud_finite_plane.py; addressed in independent commit a6d7b786423df25b21665c2ee21998557ecdd0e9 by another writer; do not claim separate feature or score.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ]
+  },
+  "notes": "Continuation of the same 01023 material result and E003 retry. This checkpoint fixes mandatory missing run record without new gameplay work or new feature score. Full exact-SHA automation gate and HMD acceptance remain pending; DXVK remains frozen."
+}
