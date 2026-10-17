@@ -1413,6 +1413,14 @@ namespace OutRunVRStereo
             // primitive; never re-infer it from render-state or alpha.
             const auto drawCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            // The independent R84 dispatcher can reject/delegate a native
+            // ESC SpriteNode before R30TryHud succeeds. R26 captured the
+            // unpainted stereo world at this *physical* pre-screen boundary.
+            // Preserve that invariant for every R33 fallback without moving
+            // non-screen world/sky/lens sources to the HUD pipeline.
+            R30SupportBeforeScreenDrawForSkyGlow(device,
+                OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(
+                    drawCommand.scope));
             const bool directLensCentre =
                 drawCommand.IsDirectWorldLensCentre();
             const bool directCarShadow =
