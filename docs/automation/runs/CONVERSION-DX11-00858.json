@@ -80,9 +80,9 @@
     "tools/dx11_native_transport_probe.cpp"
   ],
   "acceptance_results": {
-    "end2end": "PENDING_WARP",
-    "fallback": "PENDING_WARP",
-    "gates": "PENDING_EXACT_SHA",
+    "end2end": "PASS_WARP_GPU_MRT",
+    "fallback": "PASS_WARP_MRT_RESTORE",
+    "gates": "PASS_EXACT_SHA",
     "real_game_and_quest3": "UNTESTED"
   },
   "pipeline": {
@@ -94,5 +94,21 @@
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PASS_EXACT_SHA: five required GitHub CI checks SUCCESS at d215591145f55cb302caf159cc79a1ef2cf4b7f7; C6 bookkeeping-only [skip ci]. Quest3/VDXR HMD and gamepad runtime UNTESTED."
   },
-  "next_action": "Check exact material SHA five mandatory GitHub Actions gates; repair real failures on this same TASK_ID; record C6 only after exact-SHA full PASS."
+  "next_action": "Check exact material SHA five mandatory GitHub Actions gates; repair real failures on this same TASK_ID; record C6 only after exact-SHA full PASS.",
+  "acceptance_provenance": {
+    "source_sha": "d215591145f55cb302caf159cc79a1ef2cf4b7f7",
+    "positive_and_fallback_test": "tools/dx11_native_transport_probe.cpp: 00858 MRT0/MRT1 GPU copy plus original game MRT restore assertions were executed in the Windows isolated WARP probe",
+    "warp_run_id": 38996166250,
+    "warp_conclusion": "success",
+    "backend_run_id": 38996166219,
+    "backend_conclusion": "success",
+    "build_run_id": 38996169910,
+    "build_conclusion": "success",
+    "openxr_run_id": 38996169958,
+    "openxr_conclusion": "success",
+    "hud_run_id": 38996169963,
+    "hud_conclusion": "success",
+    "game_or_hmd_test": "UNTESTED",
+    "recording_scope": "Prior 00858 acceptance bookkeeping reconciliation only; no new renderer feature, source edit, or score"
+  }
 }
