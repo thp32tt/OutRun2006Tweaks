@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01016",
+  "production_id": "CONVERSION-DX9EX-01016",
+  "event_id": "CONVERSION-DX9EX-01016-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_MATERIAL_CANDIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "a0deb331dafc542e6469c2f3d4143231d434fd1d",
+  "material_result_sha": "PENDING_MATERIAL_COMMIT",
+  "validation_bearing_result_sha": "PENDING_EXACT_SHA",
+  "source_paths": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01016.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Preserve the original C993 central sun in its independent R84 binocular world eye path only if both native GPU submissions belong to the same direct source-owned original-game c64 and shader/pose epoch, rather than a nested or previous effect.",
+    "scope_boundary": "Original game D3A5/C993 sun object 0x570002 only. Preserve CABE outer lens rings, SkyGlow, gameplay HUD, stage +TIME, GOAL/rank, R26_SAFE, original input and FFB.",
+    "trace_stages": [
+      "Exact C993 original game DrawObjectAlpha_Internal and parent centre call tagging",
+      "R30 source-owned original game raw c64 reconstruction into per-eye world WVP",
+      "R33 temporary LEFT c64 upload, native LEFT physical draw, RIGHT source revalidation and original-state rollback"
+    ],
+    "subcomponents": [
+      "Tie physical direct sun parent/shader to the original game c64 writer and bounded top-level draw generation before submitting LEFT.",
+      "Preserve the original GPU c64 with fail-closed restore when the exact centre physical/raw pair drifts before LEFT.",
+      "After native LEFT, reject cross-source shader/c64/sun drift before RIGHT rather than letting a valid but foreign source borrow the second eye.",
+      "Exercise executable native C++ smoke mutations for foreign producer, shader, game write generation, draw-serial advance and absent raw upload."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_same_gpu_source_both_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "C993 original lens producer, raw game c64 uploads, native R84 LEFT and RIGHT eye draw",
+        "expected_behavior": "Both stereo submissions are accepted only for a coherent original-game C993 source and physical sun draw, not a stale or nested write."
+      },
+      {
+        "id": "centre_fallback_and_other_effects",
+        "category": "fallback_regression",
+        "behavior_area": "Nested raw c64 changes, missing source, original-game draw and all unrelated CABE/flat effects",
+        "expected_behavior": "A source mismatch rejects unsafe stereo before LEFT with original matrix restored; outer flare rings, world scene, R26_SAFE and SkyGlow are untouched."
+      },
+      {
+        "id": "centre_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Active R84 x86 game, R26_SAFE x86 fallback, x64 OpenXR host/package, Domain and affected inspector/source gate",
+        "expected_behavior": "All mandatory GitHub Actions succeed at one precise material validation SHA, without claiming Quest3 visual correctness."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "centre_same_gpu_source_both_eyes": "PENDING_EXACT_SHA",
+    "centre_fallback_and_other_effects": "PENDING_EXACT_SHA",
+    "centre_exact_sha_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original game 0xD3A5 -> 0xC993 central lens producer is already tagged, and R30 rejects unowned raw WVP. R33 uploaded temporary left c64 and then checked pre-left source proofs only for HUD, stage +TIME and GOAL, not the exact central lens.",
+    "root_cause": "An intervening nested game callback while preparing the R84 LEFT c64 could change the C993 physical source or game WVP between R30 classification and native GPU submission. Existing C993 after-left verification could cancel RIGHT, but could not prevent the unrelated LEFT draw.",
+    "source_trace": [
+      "src/hooks_graphics.cpp exact parent C993 centre hook and raw game source identity.",
+      "src/vr/d3d9/stereo_renderer_r30.cpp raw original c64 and independent per-eye constants.",
+      "src/vr/d3d9/stereo_renderer_r33.cpp source capture before LEFT, right validation, and rollback paths.",
+      "src/vr/d3d9/lens_centre_source_provenance.hpp executable pair guard and C++ smoke with positive/negative mutation."
+    ],
+    "alternatives_rejected": [
+      "Do not blanket-classify alpha or projected sprites as world lens, change SkyGlow, suppress opacity, or globally replay a native Draw."
+    ],
+    "fix_evidence": "C++ direct-source pair guard runs before native LEFT and after native LEFT, with source-wide C++ smoke mutation; no HMD run.",
+    "evidence_limit": "Correctness proof is source/compile only. The user's previously observed central lens double image is NOT claimed runtime solved without Quest3/VDXR visual test."
+  }
+}

@@ -38,6 +38,38 @@ int main()
     auto absent = original;
     absent.uploadGeneration = 0;
     assert(!SameSourceAfterNativeUpload(original, absent));
+    // Each independently complete source must also describe the same
+    // original C993 physical GPU submission before the LEFT eye.
+    const StereoDrawSource pairPhysical{7,40,11,9,0x100,true};
+    const RawStereoSource pairRaw{101,39,7,7,9,9,0x100,11,true};
+    assert(IsCoherentNativeCentrePair(pairPhysical,pairRaw));
+    auto foreignCall=pairRaw;
+    foreignCall.centreCall=foreignCall.writtenCentreCall=8;
+    assert(SameRawStereoSource(foreignCall,foreignCall));
+    assert(!IsCoherentNativeCentrePair(pairPhysical,foreignCall));
+    auto foreignShader=pairRaw;
+    foreignShader.shader=0x200;
+    assert(SameRawStereoSource(foreignShader,foreignShader));
+    assert(!IsCoherentNativeCentrePair(pairPhysical,foreignShader));
+    auto foreignEpoch=pairRaw;
+    foreignEpoch.shaderEpoch=12;
+    assert(!IsCoherentNativeCentrePair(pairPhysical,foreignEpoch));
+    auto futureWrite=pairRaw;
+    futureWrite.writtenDraw=pairPhysical.drawSerial+1;
+    assert(!IsCoherentNativeCentrePair(pairPhysical,futureWrite));
+    auto stalePhysical=pairPhysical;
+    stalePhysical.drawSerial=167;
+    assert(!IsCoherentNativeCentrePair(stalePhysical,pairRaw));
+    auto missingRaw=pairRaw;
+    missingRaw.writeSerial=0;
+    assert(!IsCoherentNativeCentrePair(pairPhysical,missingRaw));
+    auto foreignProducer=pairPhysical;
+    foreignProducer.exactDirectCentre=false;
+    assert(!IsCoherentNativeCentrePair(foreignProducer,pairRaw));
+    auto interveningWrite=pairRaw;
+    ++interveningWrite.writeSerial;
+    assert(!SameRawStereoSource(pairRaw,interveningWrite));
+
     // Production R33 must not send C993 to the right eye after an
     // intervening native left Draw changes its exact physical source.
     const StereoDrawSource left{7, 40, 11, 9, 0x100, true};

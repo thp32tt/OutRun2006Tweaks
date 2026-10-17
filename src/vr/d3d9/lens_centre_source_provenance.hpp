@@ -110,6 +110,32 @@ namespace OutRunVR::LensCentre
             before.shaderEpoch != 0 &&
             before.shaderEpoch == after.shaderEpoch;
     }
+    // R30 derives binocular constants before the temporary R33 LEFT c64
+    // upload. If a nested callback changes the original C993 producer or
+    // original-game matrix in between, individually valid stamps alone
+    // cannot certify the GPU submission. The pair must be the SAME sun.
+    constexpr bool IsCoherentNativeCentrePair(
+        const StereoDrawSource& physical,
+        const RawStereoSource& raw) noexcept
+    {
+        return SameStereoDrawSource(physical, physical) &&
+            SameRawStereoSource(raw, raw) &&
+            physical.centreCall == raw.centreCall &&
+            physical.shader == raw.shader &&
+            physical.shaderEpoch == raw.shaderEpoch &&
+            raw.writtenDraw <= physical.drawSerial &&
+            physical.drawSerial - raw.writtenDraw < 128u;
+    }
+    static_assert(IsCoherentNativeCentrePair(
+        {7,40,11,9,0x100,true},
+        {101,39,7,7,9,9,0x100,11,true}));
+    static_assert(!IsCoherentNativeCentrePair(
+        {7,40,11,9,0x100,true},
+        {101,39,8,8,9,9,0x100,11,true}));
+    static_assert(!IsCoherentNativeCentrePair(
+        {7,40,11,9,0x100,true},
+        {101,39,7,7,9,9,0x200,11,true}));
+
     static_assert(AdmitsCentreRawSourceScope(
         GameSemantic::RenderScope::WorldBillboard,
         GameSemantic::ProducerToken::LensFlareCentre, nullptr,

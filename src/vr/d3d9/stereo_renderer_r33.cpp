@@ -1114,7 +1114,10 @@ namespace OutRunVRStereo
             const auto hudBeforeLeft = exactNativeHud
                 ? captureNativeHudSource()
                 : OutRunVR::HudNativeSource::SourceStamp{};
-            if ((exactNativeHud &&
+            if ((exactCentreEye &&
+                 !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
+                     centreBeforeLeft, centreRawBeforeLeft)) ||
+                (exactNativeHud &&
                  !OutRunVR::HudNativeSource::IsExactHudSource(hudBeforeLeft)) ||
                 (exactStageEye &&
                  !OutRunVR::StageExtensionPhysical::IsValid(stageBeforeLeft)) ||
@@ -1132,8 +1135,9 @@ namespace OutRunVRStereo
                 {
                     R32ReviewMarkFrameRightDrawFailed();
                     R32ReviewNoteRestoreFailure(
-                        exactStageEye ? "R33 +TIME pre-left c64 rollback"
-                                      : "R33 GOAL pre-left c64 rollback");
+                        exactCentreEye ? "R33 C993 pre-left c64 rollback"
+                        : exactStageEye ? "R33 +TIME pre-left c64 rollback"
+                                       : "R33 GOAL pre-left c64 rollback");
                     R32ReviewArmStereoRecoverySafety();
                     return {true, E_FAIL};
                 }
@@ -1166,11 +1170,19 @@ namespace OutRunVRStereo
                 return result;
             }
 
+            const auto centreAfterLeft = exactCentreEye
+                ? captureCentreSource()
+                : OutRunVR::LensCentre::StereoDrawSource{};
+            const auto centreRawAfterLeft = exactCentreEye
+                ? captureCentreRawSource()
+                : OutRunVR::LensCentre::RawStereoSource{};
             const bool centreSourceChanged = exactCentreEye &&
                 (!OutRunVR::LensCentre::SameStereoDrawSource(
-                    centreBeforeLeft, captureCentreSource()) ||
+                    centreBeforeLeft, centreAfterLeft) ||
                  !OutRunVR::LensCentre::SameRawStereoSource(
-                    centreRawBeforeLeft, captureCentreRawSource()));
+                    centreRawBeforeLeft, centreRawAfterLeft) ||
+                 !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
+                    centreAfterLeft, centreRawAfterLeft));
             const bool shadowSourceChanged = exactShadowEye &&
                 !OutRunVR::CarShadowStereo::SameStereoDrawSource(
                     shadowBeforeLeft, captureShadowSource());
