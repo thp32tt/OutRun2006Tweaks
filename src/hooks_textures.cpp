@@ -5,6 +5,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/texture_pack_cursor.hpp"
 #include "vr/game/dds_alpha_mask_policy.hpp"
+#include "vr/game/sprite_uv_transaction.hpp"
 #include <fstream>
 #include <xxhash.h>
 #include <d3d9.h>
@@ -894,34 +895,6 @@ class TextureReplacement : public Hook
 		return ret;
 	}
 
-	static void RescaleSprArgs2(SPRARGS2* a1, float scaleX, float scaleY)
-	{
-		// left is kept at both unk_88 & unk_A0, we'll do both seperately in case they're different for some reason
-		float origLeft = 1.0f - a1->left_88;
-		origLeft = origLeft * scaleX;
-		a1->left_88 = 1.0f - origLeft;
-
-		origLeft = 1.0f - a1->left_A0;
-		origLeft = origLeft * scaleX;
-		a1->left_A0 = 1.0f - origLeft;
-
-		// right at unk_90 & unk_98
-		float origRight = 1.0f - a1->right_90;
-		origRight = origRight * scaleX;
-		a1->right_90 = 1.0f - origRight;
-
-		origRight = 1.0f - a1->right_98;
-		origRight = origRight * scaleX;
-		a1->right_98 = 1.0f - origRight;
-
-		// bottom?
-		a1->bottom_84 = a1->bottom_84 * scaleY;
-		a1->bottom_8C = a1->bottom_8C * scaleY;
-
-		// top?
-		a1->top_94 = a1->top_94 * scaleY;
-		a1->top_9C = a1->top_9C * scaleY;
-	}
 
 	using VrSpriteTailSnapshot =
 		std::array<SpriteNode*, Game::SpritePriorityCount>;
@@ -1007,6 +980,10 @@ class TextureReplacement : public Hook
 		const auto vrTailsBefore = SnapshotVrSpriteTails();
 		OutRunVRHudInspector::TracePutSprite2(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
+		// Original game input storage can be submitted again in the next menu
+		// or selector frame. Only the native call sees replacement UVs.
+		OutRunVR::SpriteUV::ScopedSprArgs2Scale<SPRARGS2> originalUv;
+		OutRunVR::SpriteUV::ScopedSprArgs2Scale<SPRARGS2> maskUv;
 
 		// The active option may change while these get_texture hooks stay
 		// installed. Discard pending pointer/ID bindings on disable, including
@@ -1025,7 +1002,7 @@ class TextureReplacement : public Hook
 			const auto scale = sprite_scales.find(prevTextureId);
 			if (scale != sprite_scales.end())
 			{
-				RescaleSprArgs2(a1, scale->second.first, scale->second.second);
+				originalUv.Apply(a1, scale->second.first, scale->second.second);
 				prevTexture = nullptr;
 				prevTextureId = 0;
 			}
@@ -1042,7 +1019,7 @@ class TextureReplacement : public Hook
 					const auto scale = sprite_scales.find(prevMaskTextureId);
 					if (scale != sprite_scales.end())
 					{
-						RescaleSprArgs2(a1->child_B4, scale->second.first, scale->second.second);
+						maskUv.Apply(a1->child_B4, scale->second.first, scale->second.second);
 						prevMaskTexture = nullptr;
 						prevMaskTextureId = 0;
 					}
@@ -1051,6 +1028,9 @@ class TextureReplacement : public Hook
 		}
 
 		const int result = put_sprite_ex2.call<int>(a1, a2);
+		// Restore before any following producer reads the shared parent/mask.
+		maskUv.Restore();
+		originalUv.Restore();
 		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
 		return result;
 	}
@@ -1062,6 +1042,7 @@ class TextureReplacement : public Hook
 		const auto vrTailsBefore = SnapshotVrSpriteTails();
 		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
+		OutRunVR::SpriteUV::ScopedSprArgsScale<SPRARGS> originalUv;
 		if (ShouldApplyUIScale(Settings::UITextureReplacement, true))
 		{
 			const auto scale = sprite_scales.find(xstnum);
@@ -1069,15 +1050,11 @@ class TextureReplacement : public Hook
 			{
 				const auto scaleX = scale->second.first;
 				const auto scaleY = scale->second.second;
-				a1->top_4 = a1->top_4 * scaleY;
-				a1->left_8 = a1->left_8 * scaleX;
-				a1->bottom_C = a1->bottom_C * scaleY;
-				a1->right_10 = a1->right_10 * scaleX;
-				a1->scaleX = a1->scaleX / scaleX;
-				a1->scaleY = a1->scaleY / scaleY;
+				originalUv.Apply(a1, scaleX, scaleY);
 			}
 		}
 		const int result = put_sprite_ex.call<int>(a1, a2);
+		originalUv.Restore();
 		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
 		return result;
 	}
