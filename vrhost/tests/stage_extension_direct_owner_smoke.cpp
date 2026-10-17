@@ -168,10 +168,19 @@ int main()
         false, true, false, 2u, true, RenderScope::ScreenHud,
         ProducerToken::StageExtensionTime,
         RenderScope::ScreenOverlay2D, ProducerToken::None));
+    // Direct numeric and queued +TIME may share the original semantic
+    // token but must NOT share an owned native GPU batch. The physical
+    // queue-node/epoch ledger distinguishes the sources, not the token.
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2u, true, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime, true));
+    // A stale queued +TIME buffer with that same token is never drained as
+    // direct work; it must follow its original queue/End fallback instead.
     static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
         false, true, true, 2u, true, RenderScope::ScreenHud,
         ProducerToken::StageExtensionTime,
-        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime, false));
     static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
         false, true, true, 1u, true, RenderScope::ScreenHud,
         ProducerToken::ResultTextB9200,
