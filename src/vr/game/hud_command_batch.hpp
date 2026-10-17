@@ -21,6 +21,81 @@ namespace OutRunVR::HudCommandBatch
         Scope scope = Scope::None;
         Producer producer = Producer::None;
         std::uint64_t generation = 0;
+        // Every native Begin/Draw/Flush/End transition must be tied to the
+        // batch that was active BEFORE the D3DX call. The original D3DX
+        // implementation may reenter a hooked callback or start a fresh
+        // texture batch. A stale outer return must not erase that new owner.
+        std::uint64_t mutationSerial = 0;
+        struct NativeSnapshot final
+        {
+            void* sprite;
+            std::uint64_t generation;
+            std::uint64_t mutationSerial;
+        };
+
+        NativeSnapshot snapshot() const noexcept
+        {
+            return { sprite, generation, mutationSerial };
+        }
+
+        bool sameGeneration(const NativeSnapshot& previous) const noexcept
+        {
+            return previous.sprite != nullptr &&
+                sprite == previous.sprite &&
+                generation == previous.generation;
+        }
+
+        bool unchanged(const NativeSnapshot& previous) const noexcept
+        {
+            return sameGeneration(previous) &&
+                mutationSerial == previous.mutationSerial;
+        }
+
+        void touch() noexcept
+        {
+            if (++mutationSerial == 0)
+                ++mutationSerial;
+        }
+
+        // Preserve a reentrant NEW Begin; a mutation within the SAME Begin
+        // makes the submission's original-source ownership ambiguous.
+        // Fail closed rather than promoting partially submitted glyphs.
+        bool completeNativeFlush(const NativeSnapshot& previous,
+                                 bool succeeded) noexcept
+        {
+            if (!sameGeneration(previous))
+                return false;
+            if (!unchanged(previous) || !succeeded)
+            {
+                onFlushFailure();
+                return false;
+            }
+            onFlushSuccess();
+            return true;
+        }
+
+        bool completeNativeEnd(const NativeSnapshot& previous) noexcept
+        {
+            if (!sameGeneration(previous))
+                return false;
+            end();
+            return true;
+        }
+
+        bool completeNativeDraw(const NativeSnapshot& previous,
+                                bool succeeded, Scope drawScope,
+                                Producer drawProducer) noexcept
+        {
+            if (!sameGeneration(previous))
+                return false;
+            if (!unchanged(previous) || !succeeded)
+            {
+                onFlushFailure();
+                return false;
+            }
+            recordDraw(drawScope, drawProducer);
+            return true;
+        }
 
         // Only an actual Begin or Reset alters the batch generation.
         // An invalid/reentrant Begin is handled by the hook's original
@@ -72,10 +147,13 @@ namespace OutRunVR::HudCommandBatch
             }
             if (drawCount != (std::numeric_limits<unsigned>::max)())
                 ++drawCount;
+            // Even a saturated draw count is a new native GPU registration.
+            touch();
         }
 
         void forget() noexcept
         {
+            touch();
             drawCount = 0;
             homogeneous = true;
             scope = Scope::None;

@@ -2719,6 +2719,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall BeginDest(void* self, DWORD flags)
     {
+        const auto beforeBegin = HudBatch.snapshot();
         // A nested Begin returning INVALIDCALL cannot close the prior native
         // batch; its +TIME/GOAL owner must survive to the original Flush/End.
         // Any OTHER Begin failure may mean device loss or a driver error:
@@ -2726,8 +2727,11 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         const HRESULT hr = Begin_hk.stdcall<HRESULT>(self, flags);
         if (IsExactSprite(self))
         {
-            HudBatch.onBeginResult(
-                self, SUCCEEDED(hr), hr == D3DERR_INVALIDCALL);
+            // A reentrant successful Begin has already published a NEW
+            // batch. The outer native Begin must not overwrite its source.
+            if (HudBatch.generation == beforeBegin.generation)
+                HudBatch.onBeginResult(
+                    self, SUCCEEDED(hr), hr == D3DERR_INVALIDCALL);
         }
         else if (self && self == HudBatch.sprite)
         {
@@ -2741,6 +2745,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     static HRESULT __stdcall FlushDest(void* self)
     {
         using namespace OutRunVR::GameSemantic;
+        const auto submission = HudBatch.snapshot();
         // The game's normal Flush is allowed to occur after the original
         // +TIME/GOAL source leaves. Recover the proven producer for the
         // physical GPU draw, not merely the earlier CPU Draw registration.
@@ -2760,29 +2765,17 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 restore ? HudBatch.producer : ProducerToken::None);
             hr = Flush_hk.stdcall<HRESULT>(self);
         }
-        if (self == HudBatch.sprite)
-        {
-            if (SUCCEEDED(hr))
-            {
-                // An explicit game Flush physically consumes the current
-                // D3DX batch. A queue-exit boundary from the previous +TIME
-                // or GOAL Draw cannot authorize the *next* producer's Draw.
-                // Its first successful exact-owner Draw will re-arm normally.
-                HudBatch.onFlushSuccess();
-            }
-            else
-            {
-                // A failed flush is not proof that the old draw buffer was
-                // submitted. Preserve the game HRESULT and cease promotion.
-                HudBatch.onFlushFailure();
-            }
-        }
+        // A new Begin/Draw may have reentered D3DX during this Flush.
+        // Never clear that NEW generation; a changed same-generation batch
+        // cannot safely keep its old exact +TIME/GOAL GPU owner either.
+        HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));
         return hr;
     }
 
     static HRESULT __stdcall EndDest(void* self)
     {
         using namespace OutRunVR::GameSemantic;
+        const auto submission = HudBatch.snapshot();
         // ID3DXSprite::End may be the first physical submission when neither
         // a source-exit nor a queue boundary was able to flush safely.
         // Preserve the exact homogeneous producer only until End returns;
@@ -2800,10 +2793,9 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 restore ? HudBatch.producer : ProducerToken::None);
             hr = End_hk.stdcall<HRESULT>(self);
         }
-        if (self == HudBatch.sprite)
-        {
-            HudBatch.end();
-        }
+        // End consumed the previous native session, not a reentrant new
+        // Begin issued from within the driver's original End callback.
+        HudBatch.completeNativeEnd(submission);
         return hr;
     }
 
@@ -3116,30 +3108,23 @@ private:
                     1, std::memory_order_relaxed);
             }
         }
-        const HRESULT hr = Draw_hk.stdcall<HRESULT>(
-            self, texture, rect, center, pos, color);
-        if (FAILED(hr))
-        {
-            // D3DX can have submitted part of the pending batch before a
-            // failed Draw. Its GPU ownership is now unknown: never submit
-            // stale +TIME/GOAL provenance under a later queue/source scope.
-            // Preserve the game's HRESULT and its original Flush/End path.
-            if (self && self == HudBatch.sprite)
-            {
-                HudBatch.active = false;
-                HudBatch.boundaryReady = false;
-                ForgetBatch();
-            }
-            return hr;
-        }
-        if (!self)
-            return hr;
-
+        // Capture the source BEFORE native D3DX::Draw. The D3DX driver can
+        // implicitly Flush a texture batch or reenter a hooked Begin/Draw;
+        // sampling TLS only after return may attach the wrong producer to
+        // an earlier GPU batch. A changed same-generation native session is
+        // revoked, while a newer Begin is left untouched.
         using namespace OutRunVR::GameSemantic;
         const auto scope = EffectiveScope();
         const auto source = CurrentRenderProducerToken();
-        if (self == HudBatch.sprite)
-            HudBatch.recordDraw(scope, source);
+        const auto submission = HudBatch.snapshot();
+        const HRESULT hr = Draw_hk.stdcall<HRESULT>(
+            self, texture, rect, center, pos, color);
+        if (self && self == submission.sprite &&
+            !HudBatch.completeNativeDraw(
+                submission, SUCCEEDED(hr), scope, source))
+            return hr;
+        if (FAILED(hr) || !self)
+            return hr;
 
         // +TIME is a complete producer batch, not one GPU submission per
         // sprite. The first node/source entry splits the previous producer;

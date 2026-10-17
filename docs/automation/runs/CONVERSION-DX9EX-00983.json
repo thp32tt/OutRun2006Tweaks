@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00983",
+  "production_id": "CONVERSION-DX9EX-00983",
+  "event_id": "CONVERSION-DX9EX-00983-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "INTEGRATED_VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "fdae7a57771ebe8d03c138399752ce5a19805f95",
+  "source_paths": [
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00983.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve +TIME sprite and numeric glyph GPU submission provenance across reentrant ID3DXSprite Begin, Draw, Flush and End on the R84 active path.",
+    "scope_boundary": "Original +TIME/GOAL exact homogeneous D3DX sprite batches; retain native HRESULT and texture batching, unchanged original input/FFB/SkyGlow/world, R26_SAFE fallback and DXVK freeze.",
+    "special_work_evidence": "Native FlushDest and EndDest unconditionally cleared the TLS HudBatch after calling original D3DX methods, even when a nested Begin had already published a new generation. Native DrawDest sampled producer only after the original call and could attribute another submission to an incorrect producer.",
+    "trace_stages": [
+      "Original +TIME six E8 parents enter the exact StageExtensionTime direct or SpriteNode producer and GPU ledger.",
+      "Native D3DX sprite registration, texture flush and End are intercepted on original object; a per-transition snapshot protects generation and mutation provenance during reentrant original D3DX callbacks.",
+      "The physical GPU eye dispatch accepts an exact homogeneous owner only while the same Begin/Draw/Flush session has remained authoritative; ambiguous old sessions fail closed to original native D3DX behavior."
+    ],
+    "subcomponents": [
+      "Add mutation-serial and native-session snapshots to the real C++ homogeneous +TIME/GOAL GPU batch ledger.",
+      "Tie Begin/Draw/Flush/End hooks to the captured native generation, preserve reentrant fresh Begin ownership and revoke contaminated same-generation batches.",
+      "Add portable positive/negative lifecycle cases for mixed same-generation callback, fresh nested Begin, reset/recycled sprite and normal +TIME Flush/End."
+    ],
+    "acceptance_items": [
+      {
+        "id": "time_native_batch_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original stage +TIME CPU D3DX Draw through native GPU Flush/End",
+        "expected_behavior": "Only matching unmutated exact-source D3DX sessions retain semantic ownership through physical native GPU submission; new reentrant sessions cannot be cleared by stale original returns."
+      },
+      {
+        "id": "reentrant_negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Native D3DX callback recursion, device reset, mixed producer and stale sprite",
+        "expected_behavior": "Reentrant same-generation ambiguity revokes ownership, a later successful Begin remains untouched, and native HRESULT, untracked sprites and protected non-result content remain unaffected."
+      },
+      {
+        "id": "exact_gate_headset_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Portable C++ smoke and Windows R84/R26_SAFE game+OpenXR host+package",
+        "expected_behavior": "Changed-area test and mandatory exact-SHA Active, Domain Isolation and source impact Gates pass; Quest3/VDXR image correction remains UNTESTED without matching headset run."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "score_delta_this_attempt": 0,
+  "next_action": "Await exact-SHA GitHub DX9Ex Active, Domain Isolation and required Full Source Impact/HUD gate; headset acceptance remains UNTESTED."
+}

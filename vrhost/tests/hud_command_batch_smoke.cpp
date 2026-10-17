@@ -88,5 +88,78 @@ int main()
     l.onBeginResult(&spriteB, false, true);
     if (l.exactUniformOwner() || l.active || l.sprite)
         return 17;
+
+    // Native D3DX callback reentrancy: a previous Flush must not discard a
+    // fresh Begin/Draw that registered AFTER the outer Flush began.
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime);
+    const auto outerFlush = l.snapshot();
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::GoalTime020);
+    if (l.completeNativeFlush(outerFlush,true) ||
+        !l.exactUniformOwner() ||
+        l.producer != ProducerToken::GoalTime020 ||
+        l.generation != outerFlush.generation + 1)
+        return 18;
+
+    // A same-generation reentrant Draw invalidates uncertain GPU submit
+    // ordering; no old +TIME/GOAL tag may survive the outer Flush return.
+    const auto sameBeginFlush = l.snapshot();
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::GoalTime020);
+    if (l.completeNativeFlush(sameBeginFlush,true) ||
+        l.active || l.exactUniformOwner() || l.drawCount)
+        return 19;
+
+    l.begin(&spriteA,true);
+    const auto normalDraw = l.snapshot();
+    if (!l.completeNativeDraw(normalDraw,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime) ||
+        !l.exactUniformOwner() || l.drawCount != 1)
+        return 20;
+    const auto normalFlush = l.snapshot();
+    if (!l.completeNativeFlush(normalFlush,true) ||
+        !l.active || l.drawCount || l.exactUniformOwner())
+        return 21;
+
+    // The outer native Draw cannot reattribute a newer Begin's glyphs.
+    const auto oldDraw = l.snapshot();
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::GoalTime150);
+    if (l.completeNativeDraw(oldDraw,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime) ||
+        !l.exactUniformOwner() ||
+        l.producer != ProducerToken::GoalTime150)
+        return 22;
+
+    // A failed same-generation Draw cannot keep a possibly half-submitted
+    // +TIME batch; the original HRESULT is handled by the live hook.
+    const auto failingDraw = l.snapshot();
+    if (l.completeNativeDraw(failingDraw,false,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime) ||
+        l.active || l.exactUniformOwner())
+        return 23;
+
+    l.begin(&spriteB,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::GoalTime020);
+    const auto outerEnd = l.snapshot();
+    l.begin(&spriteB,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    if (l.completeNativeEnd(outerEnd) || !l.exactUniformOwner() ||
+        l.producer != ProducerToken::StageExtensionTime)
+        return 24;
+    const auto nativeEnd = l.snapshot();
+    if (!l.completeNativeEnd(nativeEnd) || l.active || l.exactUniformOwner())
+        return 25;
+
+    // A recycled sprite pointer across device loss is a NEW generation and
+    // must never be owned by an old Flush/Draw completion.
+    l.begin(&spriteA,true);
+    const auto beforeReset = l.snapshot();
+    l.invalidate();
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    if (l.completeNativeFlush(beforeReset,true) ||
+        !l.exactUniformOwner())
+        return 26;
     return 0;
 }
