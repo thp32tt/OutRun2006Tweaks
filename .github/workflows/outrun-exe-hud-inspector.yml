@@ -3,7 +3,7 @@ name: OutRun EXE HUD Inspector CI
 on:
   workflow_dispatch:
   push:
-    branches-ignore: [ vr-dx11-native-r71, vr-dxvk-r71-disasm, 'vr-d3d9ex-review-feature-*' ]
+    branches-ignore: [ vr-dxvk-r71-disasm, 'vr-d3d9ex-review-feature-*' ]
     paths:
       - 'src/vr/debug/hud_inspector.cpp'
       - 'OutRun2006Tweaks.ini'
@@ -28,6 +28,12 @@ on:
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
+      - 'src/vr/d3d11/**'
+      - 'tools/dx11_autodev_policy.py'
+      - 'tools/test_dx11_autodev_policy.py'
+      - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/vr-openxr.yml'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
   pull_request:
     paths:
@@ -68,6 +74,14 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
 
       - name: Validate PowerShell helper syntax
         shell: pwsh
@@ -124,6 +138,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
 
       - name: Configure Win32 game DLL
         shell: pwsh
