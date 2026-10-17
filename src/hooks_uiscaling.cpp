@@ -3028,8 +3028,18 @@ public:
                 QueueRenderActive(), CurrentQueueNode(), nextNode,
                 EffectiveScope(), CurrentRenderProducerToken(),
                 nextScope, nextProducer);
+        // A GOAL/result batch can cross two different queued SpriteNodes
+        // bearing the same original producer (progress %, elapsed glyphs).
+        // The old goalBoundary tested only token changes, so an outgoing
+        // physical node could be submitted with the incoming R33 queue epoch.
+        // Submit under the old node before SelectSpriteQueueNode changes it.
+        const bool goalNodeBoundary =
+            CanIsolateD3DXGoalQueueNodeTransition(
+                QueueRenderActive(), CurrentQueueNode(), nextNode,
+                EffectiveScope(), CurrentRenderProducerToken(),
+                nextScope, nextProducer);
         if (enteringStage == leavingStage && !goalBoundary &&
-            !stageNodeBoundary)
+            !stageNodeBoundary && !goalNodeBoundary)
             return;
 
         void* sprite = *Module::exe_ptr<void*>(0x55B218);

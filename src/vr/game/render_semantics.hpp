@@ -162,6 +162,24 @@ namespace OutRunVR::GameSemantic
             incomingProducer == ProducerToken::StageExtensionTime;
     }
 
+    // R33 GOAL stereo fences the *physical* SpriteNode and queue epoch,
+    // not just the result/progress producer token. Distinct nodes with the
+    // same GOAL E8 source can accumulate separate D3DX Draw batches; drain
+    // the previous homogeneous node while it is still selected. Do not
+    // affect the already isolated +TIME path, pause arrows, or unknown HUD.
+    inline constexpr bool CanIsolateD3DXGoalQueueNodeTransition(
+        bool queueActive, const void* outgoingNode, const void* incomingNode,
+        RenderScope outgoingScope, ProducerToken outgoingProducer,
+        RenderScope incomingScope, ProducerToken incomingProducer) noexcept
+    {
+        return queueActive && outgoingNode != nullptr &&
+            incomingNode != nullptr && outgoingNode != incomingNode &&
+            outgoingProducer == incomingProducer &&
+            outgoingProducer != ProducerToken::StageExtensionTime &&
+            CanReprojectFiniteResultHudPlane(outgoingScope, outgoingProducer) &&
+            CanReprojectFiniteResultHudPlane(incomingScope, incomingProducer);
+    }
+
     // The source E8 can return before its registered D3DX triangles reach
     // the GPU. On the very FIRST SpriteNode, QueueRenderActive is still false
     // and there is no outgoing queue owner to compare. An unrelated incoming

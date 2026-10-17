@@ -77,6 +77,65 @@ int main() {
             return 63;
     }
 
+    // GOAL 0-99%, elapsed time and stage-result text share exact screen
+    // semantics across several SpriteNodes. R33 binds each queued physical
+    // Draw to its own node/epoch, so same-token transitions must submit the
+    // previous proven D3DX buffer before changing selection.
+    {
+        using namespace OutRunVR::GameSemantic;
+        const int firstNode=11, secondNode=12;
+        for (const auto producer : {
+                ProducerToken::GoalTime020, ProducerToken::GoalTime150,
+                ProducerToken::ResultProgress, ProducerToken::OutRunStagePrintf,
+                ProducerToken::ResultTextB9200}) {
+            const auto isolated = [&](bool active, const void* prior,
+                                      const void* next, RenderScope scope,
+                                      ProducerToken incoming) {
+                return CanIsolateD3DXGoalQueueNodeTransition(
+                    active, prior, next, scope, producer,
+                    RenderScope::ScreenHud, incoming);
+            };
+            if (!isolated(true, &firstNode, &secondNode,
+                          RenderScope::ScreenHud, producer))
+                return 64;
+            // Keep native multi-Draw batching within one node; never borrow
+            // the old producer after a queue reset or an unrelated source.
+            if (isolated(true, &firstNode, &firstNode,
+                         RenderScope::ScreenHud, producer) ||
+                isolated(false, &firstNode, &secondNode,
+                         RenderScope::ScreenHud, producer) ||
+                isolated(true, nullptr, &secondNode,
+                         RenderScope::ScreenHud, producer) ||
+                isolated(true, &firstNode, nullptr,
+                         RenderScope::ScreenHud, producer) ||
+                isolated(true, &firstNode, &secondNode,
+                         RenderScope::ScreenOverlay2D, producer) ||
+                isolated(true, &firstNode, &secondNode,
+                         RenderScope::WorldBillboard, producer) ||
+                isolated(true, &firstNode, &secondNode,
+                         RenderScope::ScreenHud, ProducerToken::None))
+                return 65;
+        }
+        // Only a previously tagged GOAL owner may request this boundary;
+        // never expand to stage +TIME, pause UI, DispRank, F11 or SkyGlow.
+        for (const auto foreign : {
+                ProducerToken::StageExtensionTime,
+                ProducerToken::PauseOptionArrow,
+                ProducerToken::DispRankClipSprite,
+                ProducerToken::None}) {
+            if (CanIsolateD3DXGoalQueueNodeTransition(
+                    true, &firstNode, &secondNode,
+                    RenderScope::ScreenHud, foreign,
+                    RenderScope::ScreenHud, foreign))
+                return 66;
+        }
+        if (CanIsolateD3DXGoalQueueNodeTransition(
+                true, &firstNode, &secondNode,
+                RenderScope::ScreenHud, ProducerToken::GoalTime020,
+                RenderScope::ScreenHud, ProducerToken::GoalTime150))
+            return 67;
+    }
+
     const float identity[16]={1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
     float x=0,y=0;
     if(!ProjectPixel(identity,320,240,0,0,640,480,1,x,y) ||
