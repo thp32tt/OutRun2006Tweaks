@@ -3,7 +3,7 @@
 from pathlib import Path
 from verify_dx11_activation_boundary import (
     DRAW_DISPATCH, audit_native_partial_depth_clear,
-    audit_native_partial_color_clear,
+    audit_native_partial_color_clear, audit_native_offscreen_game_draw,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,11 +17,12 @@ assert not audit_native_partial_depth_clear(source, probe), "valid DSV audit fai
 # negative companion must actually lie outside the eye (not an old valid box).
 assert "invalidPartialDepth.entries[1][0].rect = {-1, 1, 4, 4};" in probe
 assert "zRect.kind = SourceClear::Kind::FullDepthStencil;" in probe
-# Guard the exact seven reviewed GPU dispatch locations: four genuine
-# per-eye commands and three non-evidence color/depth/stretch GPU triangles.
+# Guard all nine reviewed GPU dispatches: two offscreen game camera Draws,
+# four true eye commands and three non-evidence color/depth/stretch triangles.
 # A new source Draw still requires explicit owner/activation audit.
 expected_dispatches = [
-    "->Draw(", "->DrawIndexed(",
+    "->Draw(", "->DrawIndexed(",  # genuine offscreen game source RTV
+    "->Draw(", "->DrawIndexed(",  # genuine eye RTV
     "->DrawInstanced(", "->DrawIndexedInstanced(",
     "->Draw(", "->Draw(", "->Draw(",
 ]
@@ -56,7 +57,7 @@ assert audit_native_partial_depth_clear(
         "route == live_game_stereo::NativeDepthClearRoute::Reject",
         "route == live_game_stereo::NativeDepthClearRoute::FullDsv", 1),
     probe), "invalid depth-region admission slipped through"
-# The caller still owns the boundary: a fifth unauthorized Draw is not made
+# The caller still owns the boundary: an unauthorized Draw is not made
 # legitimate by the narrowly reviewed depth-only callback.
 assert DRAW_DISPATCH.findall(source + "\ncontext->Draw(8u, 0u);") != expected_dispatches
 
@@ -87,4 +88,30 @@ assert audit_native_partial_color_clear(
         'const bool ready = GetProcAddress(compiler, "D3DCompile") != nullptr;',
         'const bool ready = false;', 1),
 ), "missing D3D11.0 preflight slipped through"
-print("DX11 native partial DSV/TARGET GPU draw audit: PASS (positive + negative tamper)")
+# The source-owned offscreen camera Draws must never fabricate eye color.
+# Test explicit OM binding/alias/device and source chronology tampering.
+assert not audit_native_offscreen_game_draw(source, probe), "valid offscreen audit failed"
+assert audit_native_offscreen_game_draw(
+    source.replace("const bool bound = actual == gameTarget;",
+                   "const bool bound = actual != gameTarget;", 1), probe
+), "offscreen RTV bound-state tamper slipped through"
+assert audit_native_offscreen_game_draw(
+    source.replace("sourceResource.Get() == eyeResource.Get()",
+                   "sourceResource.Get() != eyeResource.Get()", 1), probe
+), "aliased eye texture tamper slipped through"
+assert audit_native_offscreen_game_draw(
+    source.replace("if (!producer || producer.Get() != sourceOwner.Get()) return false;",
+                   "if (!producer) return false;", 1), probe
+), "foreign device tamper slipped through"
+assert audit_native_offscreen_game_draw(
+    source.replace("if (!replay_due_source_clears()) return false;",
+                   "return true;", 1), probe
+), "source event timeline bypass slipped through"
+assert audit_native_offscreen_game_draw(
+    source.replace("++drawCount_; // source ordinal, NEVER direct XR color evidence",
+                   "++colorDrawCount_; // invalid eye color", 1), probe
+), "phantom eye color slipped through"
+assert audit_native_offscreen_game_draw(
+    source, probe.replace("fixture.offscreenGameColor, &offscreenPatch,", "", 1)
+), "missing offscreen camera-to-eye GPU copy proof slipped through"
+print("DX11 partial DSV/TARGET and game offscreen Draw: PASS (positive + negative tamper)")
