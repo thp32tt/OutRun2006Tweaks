@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ebf912c39fc34bd9d6efff2258da4fefa6b76ee8",
   "material_result_sha": "7bf80e2857270da753a206e196da3da0c640f072",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "03897f213ff8ab6fd3ae8baf69583a087de7ea85",
   "source_paths": [
     "src/vr/game/goal_progress_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -91,15 +91,16 @@
   },
   "ci_evidence": {
     "source_commit": "7bf80e2857270da753a206e196da3da0c640f072",
-    "exact_sha": "PENDING",
-    "gates": "PENDING_ALL_REQUIRED_GATES_AFTER_PACKAGE_FIX",
+    "exact_sha": "03897f213ff8ab6fd3ae8baf69583a087de7ea85",
+    "gates": "SUCCESS",
     "hmd": "UNTESTED",
     "initial_material_sha_gates": "Domain/Inspector SUCCESS; Active feature record missing FAILURE; Full Source cancelled by concurrent HEAD.",
     "initial_policy_failure": "Material commit lacked whole-feature JSON; next validation-bearing commit passed feature policy, but ran a stale cockpit glass source-edit assertion superseded by the concurrently adopted immutable original-model runtime diagnostic policy.",
     "cause_limited_fix_commit": "8326eb5efe8d82ab541530c8e3acb2416ac4f831",
     "cause_limited_fix": "tools/Test-OutRunVRTestPolicy.ps1 now positively verifies that G_COCKPIT cannot invoke unproven original PMT/file editors, while retaining verified driver-seat, particle, runtime profile and original game file protection. VR Test Policy #39030761606 SUCCESS; awaiting complete same-SHA R84/R26_SAFE/host and all four required workflow gates.",
     "package_gate_failure": "At exact SHA 8326eb5efe8d82ab541530c8e3acb2416ac4f831, DX9Ex Active R84 game/R26_SAFE/host stages compiled SUCCESS, but Validate active package rejected the protected diagnostic-only cockpit GUI because it required quest_cockpit_glass.py file mutation. This was a stale CI/payload integration contract, not a GOAL compile failure.",
-    "package_gate_fix": "Keep original source-tree glass editing fixture regression but prohibit packaging or exposing the original PMT mutation tool; require glass diagnostic UI and preserve all existing DLL/host/rollback/launcher/package and other safety checks."
+    "package_gate_fix": "Keep original source-tree glass editing fixture regression but prohibit packaging or exposing the original PMT mutation tool; require glass diagnostic UI and preserve all existing DLL/host/rollback/launcher/package and other safety checks.",
+    "verification_basis": "Exact SHA GitHub CI SUCCESS as supplied in FEATURE C6 RESULT ONLY request; no workflow rerun."
   },
   "validation_notes": "GOAL material source preserved; initial feature contract registration, subsequent obsolete G_COCKPIT policy and packaging checks repaired under same TASK. No engine safety test disabled; original file mutation is now forbidden in active ZIP/GUI. This next exact-SHA commit must prove all required DX9Ex Active, Domain, HUD Inspector and Full Source Impact gates before PASS. HMD UNTESTED. CI repair/bookkeeping +0 independent work."
 }
