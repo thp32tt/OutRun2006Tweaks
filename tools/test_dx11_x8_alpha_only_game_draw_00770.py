@@ -25,7 +25,9 @@ def connected(source, masked):
         "GetRenderTarget(0, target.GetAddressOf())" in helper,
         "status != D3DERR_NOTFOUND" in helper,
         "GetRenderState(D3DRS_STENCILWRITEMASK," in helper,
-        "GameNativeOffscreenPass::no_main_stencil_write(" in helper,
+        "const bool stencilReadOnly = game_stencil_is_read_only(" in helper,
+        "stencilEnabled, stencilMaskKnown, stencilWriteMask" in helper,
+        "if (!stencilReadOnly) return false;" in helper,
         "stencilWrites, false" in helper,
         "GameNativeOffscreenPass::inactive_extra_mrt(true, extraMask)" in helper,
         "s.clearColor.matches(" in helper,
@@ -49,6 +51,8 @@ for old, new in (
     assert old in tail and not connected(
         head + "bool proven_game_draw_no_target_writes(" + tail.replace(old, new, 1),
         header), old
+assert not connected(bridge.replace(
+    "if (!stencilReadOnly) return false;", "if (false) return false;"), header)
 assert not connected(bridge.replace(
     "if (fullMode && proven_game_draw_no_target_writes(game, s))",
     "if (false && proven_game_draw_no_target_writes(game, s))", 1), header)
