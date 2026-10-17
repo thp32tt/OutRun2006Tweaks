@@ -71,6 +71,12 @@ def linked(b, h, r):
 
 
 assert linked(bridge, hooks, region), "live surface copy integration is disconnected"
+# Mutate the owning replay function, not an earlier frame admission check.
+# A global first-occurrence replacement misses the actual protected copy when
+# multiple native frame stages now use the same admission predicate.
+replay_begin = bridge.index("bool preserve_game_surface_copy(")
+replay_end = bridge.index("bool begin_game_surface_cpu_write(", replay_begin)
+replay_body = bridge[replay_begin:replay_end]
 for token in (
     "game->GetRenderTargetData(",
     "s.frameBatch.publishable(s.pending)",
@@ -80,7 +86,9 @@ for token in (
     "s.surfaceReplayReadback->UnlockRect()",
     "++s.surfaceReplayCount;",
 ):
-    mutant = bridge.replace(token, "/* removed native postpass */", 1)
+    assert token in replay_body, "replay guard absent before mutation: " + token
+    mutant_body = replay_body.replace(token, "/* removed native postpass */", 1)
+    mutant = bridge[:replay_begin] + mutant_body + bridge[replay_end:]
     assert mutant != bridge and not linked(mutant, hooks, region), token
 for token in (
     "GameNativeSurfaceCopyRegion::update_surface(",
