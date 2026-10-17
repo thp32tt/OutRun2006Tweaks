@@ -182,7 +182,24 @@ def main() -> None:
             required_eye_contract = [
                 "bool NativeGameEyeDrawEncoder::draw(",
                 "bool NativeGameEyeDrawEncoder::draw_indexed(",
-                # Count only Draw/DrawIndexed submitted into the exact
+                # Game-authored ordinary and hardware-instanced D3D11
+                # geometry uses the same exact owned eye and source timeline.
+                # Never authorize instancing on a general host/census path.
+                "bool NativeGameEyeDrawEncoder::draw_instanced(",
+                "bool NativeGameEyeDrawEncoder::draw_indexed_instanced(",
+                "if (!live_game_stereo::may_issue_instanced(",
+                "if (!eye_output_bound() || !replay_due_source_clears())",
+                "context_->DrawInstanced(",
+                "context_->DrawIndexedInstanced(",
+                # Color evidence is invalid for a Draw discarded by an
+                # asynchronous D3D11 occlusion predicate; retain depth/order
+                # history while enforcing at least one real color-eligible draw.
+                "bool NativeGameEyeDrawEncoder::unpredicated_color_evidence() const noexcept",
+                "context_->GetPredication(&predicate, &comparison);",
+                "const bool clear = predicate == nullptr;",
+                "live_game_stereo::color_certifiable(",
+                "eye_color_writable(), unpredicated_color_evidence());",
+                # Count only Draws submitted into the exact
                 # per-eye output (not an unbound or desktop OM target).
                 "if (!vertexCount || !eye_output_bound() ||",
                 "if (!indexCount || !eye_output_bound() ||",
@@ -298,7 +315,9 @@ def main() -> None:
                 missing.append("postpass must issue one bounded non-evidence Draw")
             dispatches = [match.group(0).replace(" ", "") for match in matches]
             if missing or dispatches != [
-                    "->Draw(", "->DrawIndexed(", "->Draw(", "->Draw("]:
+                    "->Draw(", "->DrawIndexed(",
+                    "->DrawInstanced(", "->DrawIndexedInstanced(",
+                    "->Draw(", "->Draw("]:
                 violations.append(
                     f"{path.relative_to(ROOT)}: unauthorized native eye Draw "
                     f"dispatch or missing frame/pose/output/evidence guard: "

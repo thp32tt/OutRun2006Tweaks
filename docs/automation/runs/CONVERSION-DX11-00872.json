@@ -74,9 +74,9 @@
     ]
   },
   "acceptance_results": {
-    "end2end": "PENDING_CI",
-    "fallback": "PENDING_CI",
-    "gates": "PENDING_EXACT_SHA",
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
     "real_game_and_quest3": "UNTESTED"
   },
   "changed_files": [
@@ -87,14 +87,14 @@
     "C0_RECOVER": "PASS GitHub HEAD 45d0918c; prior 00871 C6 sealed, different host file.",
     "C1_REVIEW": "PASS confirmed host OMSetRenderTargets drops pixel UAV outputs; producer 00870 fixed separate x86 path.",
     "C2_IMPLEMENT": "PASS SOURCE: host OM PS UAV capture/detach/restore in both GPU eye copy routes plus WARP positive/rejection regression.",
-    "C3_VALIDATE": "PENDING exact SHA mandatory GitHub Actions",
-    "C4_COMMIT": "PENDING material result",
+    "C3_VALIDATE": "PASS exact SHA d08be87622f559427f9973180f025020aabc4d40 mandatory five GitHub workflows verified SUCCESS",
+    "C4_COMMIT": "PASS material 136a7608536495fd1cb59599dfed1881298a2b4f, regression d08be87622f559427f9973180f025020aabc4d40",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Evaluate exact material GitHub SHA mandatory five CI; repair causal failure in the same task, then separately seal C6 without scoring until feature verified.",
+  "next_action": "C6 sealed on exact validated source SHA d08be87622f559427f9973180f025020aabc4d40; preserve Quest3 runtime UNTESTED and continue independent DX11 development.",
   "validation_bearing_result_sha": "d08be87622f559427f9973180f025020aabc4d40"
 }
