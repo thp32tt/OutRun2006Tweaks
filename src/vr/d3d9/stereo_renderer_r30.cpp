@@ -20,6 +20,7 @@
 // Needed by independent R30 TU as well as textual R29/R30 owner.
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_particle_dual_eye_ring.hpp"
+#include "r30_projection_inverse_cache.hpp"
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
@@ -132,6 +133,29 @@ namespace OutRunVRStereo
         SafetyHookInline R30DrawIndexedPrimitiveR29Hook{};
         SafetyHookInline R30DrawPrimitiveUPR29Hook{};
         SafetyHookInline R30DrawIndexedPrimitiveUPR29Hook{};
+
+        // Matrix inversion is pure, but expensive at each HUD/effect GPU draw.
+        // The ORIGINAL game base projection is the complete key: dynamic FOV,
+        // stage transitions and recenter-induced projection changes cannot
+        // inherit an inverse from an older screen or eye. No matrix is cached
+        // on a failed inversion; return the exact original fail-closed path.
+        thread_local OutRunVR::R30Projection::ExactInverseCache<D3DMATRIX>
+            R30BaseProjectionInverseCache{};
+        bool R30InvertBaseProjectionCached(
+            const D3DMATRIX& base, D3DMATRIX& inverse) noexcept
+        {
+            if (!R29OwnerMatrixFinite(base))
+            {
+                R30BaseProjectionInverseCache.invalidate();
+                return false;
+            }
+            return R30BaseProjectionInverseCache.get(
+                base, inverse,
+                [](const D3DMATRIX& source, D3DMATRIX& result) noexcept {
+                    return R29OwnerInvertMatrix(source, result) &&
+                        R29OwnerMatrixFinite(result);
+                });
+        }
 
         // Independent Quest-inspired DX9Ex opt-in. R30 already computes
         // BOTH stereo XYZRHW vertex arrays; batch only their GPU upload.
@@ -2778,7 +2802,7 @@ namespace OutRunVRStereo
             const D3DMATRIX gameWvp = R29OwnerTransposeMatrix(rawUploadedT);
             if (!R29OwnerMatrixFinite(gameWvp) ||
                 !R29OwnerMatrixFinite(baseProjection) ||
-                !R29OwnerInvertMatrix(baseProjection, inverseProjection))
+                !R30InvertBaseProjectionCached(baseProjection, inverseProjection))
                 return false;
             const D3DMATRIX worldView =
                 R29OwnerMultiplyMatrix(gameWvp, inverseProjection);
@@ -3324,7 +3348,7 @@ namespace OutRunVRStereo
             D3DMATRIX headInverse{}, inverseBase{};
             std::memcpy(&headInverse, rawHead, sizeof(headInverse));
             if (!R29OwnerMatrixFinite(headInverse) ||
-                !R29OwnerInvertMatrix(baseProjection, inverseBase))
+                !R30InvertBaseProjectionCached(baseProjection, inverseBase))
                 return false;
 
             // The R84 shader ScreenHud uses this same -2.50 game-view-unit
@@ -3944,7 +3968,7 @@ namespace OutRunVRStereo
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
                 std::fabs(baseProjection._34) < 0.25f ||
-                !R29OwnerInvertMatrix(baseProjection, state.inverseBaseProjection) ||
+                !R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection) ||
                 !R29OwnerMatrixFinite(state.inverseBaseProjection))
                 return false;
             state.fullWorldReprojection = true;
@@ -6529,7 +6553,7 @@ namespace OutRunVRStereo
             std::memcpy(next.eyeOffset, stereo.eyeOffset,
                 sizeof(stereo.eyeOffset));
             std::memcpy(next.eyeFov, stereo.eyeFov, sizeof(stereo.eyeFov));
-            if (!R29OwnerInvertMatrix(baseProjection, next.inverseBaseProjection))
+            if (!R30InvertBaseProjectionCached(baseProjection, next.inverseBaseProjection))
                 return nullptr;
 
             constexpr float OverlayPlaneViewZ = -2.50f;
@@ -6700,7 +6724,7 @@ namespace OutRunVRStereo
                 if (!R29OwnerMatrixFinite(hudWvp) ||
                     !R29OwnerMatrixFinite(baseProjection) ||
                     !R29OwnerMatrixFinite(headInverse) ||
-                    !R29OwnerInvertMatrix(baseProjection, inverseBase))
+                    !R30InvertBaseProjectionCached(baseProjection, inverseBase))
                     return false;
 
                 // The original HMD-proven R26 HUD used a uniform requested
@@ -6847,7 +6871,7 @@ namespace OutRunVRStereo
                 D3DMATRIX inverseBaseProjection{};
                 if (!R29OwnerMatrixFinite(baseProjection) ||
                     !R29OwnerMatrixFinite(headInverse) ||
-                    !R29OwnerInvertMatrix(baseProjection,
+                    !R30InvertBaseProjectionCached(baseProjection,
                         inverseBaseProjection))
                     return false;
                 // Preserve the proven R26 spatial billboard association:
