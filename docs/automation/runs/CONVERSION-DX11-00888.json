@@ -96,5 +96,35 @@
     "C6_STATE": "PASS_EXACT_SHA at c8fb990d0a2c6e6b59fad585b443c37f19b6d414; COMPLETE_BUILD_VERIFIED. Separate docs-only bookkeeping [skip ci] commit; RUNTIME_VALIDATION=UNTESTED. No score duplication."
   },
   "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
-  "next_action": "C6 BUILD_VERIFIED; do not rerun CI or modify source for this C6. Quest3/VDXR real-game runtime remains UNTESTED."
+  "next_action": "C6 BUILD_VERIFIED; do not rerun CI or modify source for this C6. Quest3/VDXR real-game runtime remains UNTESTED.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Intercepted game D3D9 draw emits guarded native D3D11 full-resolution color/depth eye resources",
+      "Native source eye GPU copies save and restore OM MRT/DSV, PS UAV and CS UAV state without losing game bindings",
+      "Native L/R GPU eye handoff remains opt-in for OpenXR; unsupported source and DX9Ex input/frame fallback are unchanged"
+    ],
+    "batch_components": [
+      "D3D11 RTV-aware PS UAV query and restore plus compute UAV counter-preserving scope",
+      "R30/native frame owner eye copy and 256 sparse RTV occupancy / negative alias regression coverage"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00888 material 693df35aea41cfef1c71234f3206cd62e32c6779, exact-SHA validation c8fb990d0a2c6e6b59fad585b443c37f19b6d414; 256 RTV mask source regression and original 00888 C6 validation evidence retained.",
+      "negative_regression": "00888 source-level negative overlap and missing OM/CS UAV restore assertions; real Quest3/VDXR runtime was not executed.",
+      "component_integration": "Live game native-eye copy boundary saves OM RTV/DSV, PS UAV, CS UAV resources and counter state before GPU handoff and restores them for the following original HUD/game frame."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_COPY:OM_RTV_PS_UAV_RESTORE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Original 00888 CI validates GPU eye copy resource/state lifetime; no claim of live menu/vehicle/race or Quest3 visible stereo frame parity, which remains UNTESTED.",
+    "activation_guard_and_fallback": "Opt-in protected native-eye copy; reject invalid/missing/incompatible eye sources, preserve unchanged original D3D9/DX9Ex game draw, input, FFB and SBS fallback."
+  },
+  "development_strategy_provenance": "Restored missing existing-task acceptance metadata on 00889 Gate-failure repair; reconstructed from 00888 committed C++/regression evidence; does not alter 00888 original validated source SHA, acceptance outcomes, or score."
 }
