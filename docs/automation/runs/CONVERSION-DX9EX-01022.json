@@ -9,15 +9,15 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_branch": "feature/dx9ex-01022-stage-raw-wvp-guard",
   "feature_base_sha": "5fc13f23e15b9c22d3d48a8d4879397792b030f7",
-  "feature_last_head": "e8fe8195146bb1a3ee1f1b40d15bfc80de77bbb7",
-  "status": "FEATURE_CANDIDATE_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "feature_last_head": "32c0ece2292ebb82dd5a5a9232ca7071bbbbea53",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "0bc94f6bc8da279c979c9ea3025f6315935b838a",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "32c0ece2292ebb82dd5a5a9232ca7071bbbbea53",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -60,9 +60,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_both_eye_source": "PENDING_FEATURE_CI",
-    "stage_foreign_world_fallback": "PENDING_FEATURE_CI",
-    "stage_integrated_exact_sha": "PENDING_EXACT_SHA"
+    "stage_both_eye_source": "PASS",
+    "stage_foreign_world_fallback": "PASS",
+    "stage_integrated_exact_sha": "PASS"
   },
   "evidence_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -76,7 +76,7 @@
     "build-host/bin/outrun-vr-stage-extension-owner-smoke.exe",
     "GitHub DX9Ex Active + Domain Isolation + HUD Inspector + Full Source Impact exact SHA"
   ],
-  "validation_execution": "PENDING_FEATURE_CI; commands are planned, not claimed executed",
+  "validation_execution": "PASS: exact-SHA GitHub DX9Ex Active policy/game/host/full-chain/package, Domain, HUD Inspector and Full Source Impact. Native stage owner C++ smoke and destructive Python verifier gated in Active CI. No Quest3/VDXR HMD session performed.",
   "diagnosis": {
     "original_evidence": "2026-10-18 read-only original EXE/Ghidra evidence identified original 0x00498670 mixed sprani and numeric producer; no Quest3 run is asserted.",
     "source_trace": [
@@ -90,17 +90,65 @@
       "No unproven HMD rendering success or changes to world-lens, SkyGlow and unrelated GOAL producers."
     ],
     "fix_evidence": "R30 source stamps original c64 generation and reuses StageExtensionPhysical::SameAfterNativeLeft; exact physical ScreenHud source gates game pixel extents; smoke + destructive mutation gates added.",
-    "negative_test_evidence": "Queued node/epoch change, partial WVP serial, GOAL/world substitution and deliberate removal of capture/admission are represented in new smoke/mutation tests; actual execution pending CI.",
+    "negative_test_evidence": "PASS (source and native smoke): stage raw c64 generation, queue node/epoch, paired unavailable raw stamp, GOAL/world non-admission; destructive mutation test on R30 stage source and source pixel ownership. Exact-SHA PR Active and target Active policy/game/host/full-chain/package success.",
     "eye_ownership": "Right eye must retain same stage source, queue/pose/shader epoch and raw original WVP write/draw pair as native left; no double submission if mismatch."
   },
   "ci_evidence": {
-    "status": "PENDING",
-    "required_gates": [
-      "DX9Ex Active Validation",
-      "Domain Isolation Guard",
-      "OutRun EXE HUD Inspector CI",
-      "DX9Ex Full Source Impact Review"
-    ]
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "32c0ece2292ebb82dd5a5a9232ca7071bbbbea53",
+    "mandatory_gates": {
+      "dx9ex_active": {
+        "run_id": 39053822198,
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "game",
+          "host",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      "domain_isolation": {
+        "run_id": 39053822023,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39053822053,
+        "conclusion": "success"
+      },
+      "full_source_impact": {
+        "run_id": 39053822080,
+        "conclusion": "success",
+        "jobs": [
+          "msvc-analyze-openxr-host",
+          "msvc-analyze-active-game",
+          "source-cross-domain"
+        ]
+      }
+    },
+    "bundle_artifact_proof": {
+      "pr_active_run_id": 39052940389,
+      "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-d2b003442e0b699a8433b5e90d92211bf7234e95",
+      "artifact_id": 12108886275
+    },
+    "runtime_validation": "UNTESTED"
   },
-  "notes": "Roll-over is not a retry; existing attempt remains 1/3. This is a material feature candidate, not final HMD proof or a scored completion."
+  "notes": "TASK rollover attempt 1/3 unchanged. Source code validation exact SHA predates independent docs-only [skip ci] target commits and this C6 record. No source changes since validation SHA. Runtime hardware UNTESTED; actual headset optical acceptance remains open.",
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "submitted": true,
+    "validation_bearing_result_sha": "32c0ece2292ebb82dd5a5a9232ca7071bbbbea53",
+    "evidence_paths": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/game/stage_extension_physical_source.hpp",
+      "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+      "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
+    ],
+    "validation_command": [
+      "python tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+      "cmake --build build-host --config Release --target outrun-vr-stage-extension-owner-smoke",
+      "build-host/bin/outrun-vr-stage-extension-owner-smoke.exe",
+      "GitHub DX9Ex Active + Domain Isolation + HUD Inspector + Full Source Impact exact SHA"
+    ]
+  }
 }
