@@ -1,0 +1,135 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00896",
+  "production_id": "CONVERSION-DX11-00896",
+  "event_id": "CONVERSION-DX11-00896-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": 1,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00896",
+  "feature_id": "DX11:NATIVE_GAME_EYE_FRAGMENT_REJECT_COLOR_EVIDENCE",
+  "work_key": "DX11:FULLFRAME:STEREO_DEPTH_STENCIL_FRAGMENT_REJECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 1,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "ec8d5851d79dd4f8b5c5a4f8f1fa49a19c1c7efb",
+  "material_result_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92",
+  "validation_bearing_result_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_EYE_FRAGMENT_REJECT_COLOR_EVIDENCE",
+    "goal": "Actual D3D11 game stereo Draw/DrawIndexed may execute with writable 1x color/sample and live VS+PS yet have every fragment rejected by enabled D3D11 depth NEVER or both-sided stencil NEVER. Preserve real source draw ordinals but never certify nonexistent XR eye color. Preserve original D3D9Ex Draw/Present/input/FFB and DXVK freeze.",
+    "acceptance_items": [
+      {
+        "id": "real_draw_fragment_reject_continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_menu_car_race_game_geometry",
+        "expected_behavior": "Live native game eye encoder still issues genuine D3D11 Draw/DrawIndexed and advances authentic draw ordinals for guaranteed depth/stencil rejects while recording zero false eye color draws."
+      },
+      {
+        "id": "one_sided_stencil_and_disabled_depth",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_color_output_admission",
+        "expected_behavior": "Depth-disabled NEVER does not suppress color; enabled one-face NEVER with the opposite face potentially passing does not suppress valid eye color, so valid menu/car/race rendering remains admitted."
+      },
+      {
+        "id": "original_source_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9ex_game_input_ffb",
+        "expected_behavior": "Native game source chronology and authentic Copy/Stretch postpass color retained; failed full native eye publication does not bypass original DX9Ex Draw/Present/input/FFB or re-enable DXVK."
+      },
+      {
+        "id": "native_gpu_and_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_warp_and_github_exact_sha",
+        "expected_behavior": "Isolated real WARP native Draw/DrawIndexed positive/negative fragment rejection + unchanged exact-SHA Fast, Backend, Win32 Build, OpenXR, and HUD Inspector Gates pass."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_stereo_game_frame",
+    "gameplay_delivery_target": "MENU_CAR_RACE_REAL_GAME_EYE_COLOR_EVIDENCE",
+    "full_gate_plan": "one_validation_bearing_sha",
+    "conflict_keys": [
+      "DX11:FULLFRAME:STEREO_DEPTH_STENCIL_FRAGMENT_REJECT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "batch_components": [
+      "D3D11 real depth-stencil-state readback in NativeGameEyeDrawEncoder::eye_color_writable",
+      "constexpr conservative visibility predicate and positive/negative one-face depth semantics",
+      "real Win32 WARP stereo GPU negative Draw and DrawIndexed source ordinal fixture"
+    ],
+    "activation_guard_and_fallback": "NativeDrawPathActive explicit opt-in, original D3D9Ex Draw/Present/input/FFB and preserved source no-output ordinals, strict ring GPU stereo publication and DXVK frozen",
+    "visible_frame_acceptance": "Only BUILD_VERIFIED DX11 native eye fragment reject color evidence in genuine GPU encoder, not an entire converted game, real game menu/car/race screen, HMD, input or 72Hz runtime."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "real_draw_fragment_reject_continuity": "PASS_CPP_NATIVE_WARP",
+    "one_sided_stencil_and_disabled_depth": "PASS_CPP_STATIC_ASSERT",
+    "original_source_and_fallback": "PASS_SOURCE_AND_GATES",
+    "native_gpu_and_required_gates": "PASS_EXACT_SHA_5_OF_5_WARP"
+  },
+  "validation_evidence": {
+    "material_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92",
+    "validation_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39069282958,
+        "conclusion": "success",
+        "validation_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39069282959,
+        "conclusion": "success",
+        "validation_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92"
+      },
+      {
+        "name": "Build",
+        "run_id": 39069286317,
+        "conclusion": "success",
+        "validation_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39069286109,
+        "conclusion": "success",
+        "validation_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39069286068,
+        "conclusion": "success",
+        "validation_sha": "ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92"
+      }
+    ],
+    "isolated_native_warp_run_id": 39069283061,
+    "isolated_native_warp_conclusion": "success",
+    "runtime_validation": "UNTESTED",
+    "blocking_evidence": "No Quest3/VDXR, real OutRun game menu/car/race image, gamepad, FFB, native OpenXR HMD session performed. Full DX11 renderer and headset usability not certified."
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD ec8d5851d79dd4f8b5c5a4f8f1fa49a19c1c7efb, 00895 C6 5/5 prior PASS, no 00896 run record.",
+    "C1_REVIEW": "Real D3D11 eye color evidence previously trusted writable OM color/shaders/sample-zero without rejecting guaranteed NEVER depth/both-face stencil game pixel elimination.",
+    "C2_IMPLEMENT": "Updated live C++ encoder, paired compile-time source predicate, and real WARP native GPU stereo Draw/Indexed negative regression; original source ordinals and DX9Ex fallback preserved.",
+    "C3_VALIDATE": "Exactly 5 mandatory GitHub Actions plus standalone Win32 WARP pass on material/validation-bearing SHA ecf98eeb; HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "Source+regression material validation-bearing ecf98eeb9c9fe84e9f1d9b0647c1578a4e356d92; checkpoint metadata committed only AFTER all exact-SHA gate SUCCESS.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "BUILD_VERIFIED of fragment reject color evidence only, no Quest3/VDXR or menu/car/race runtime proof; scoreboard RUN_KEY=CONVERSION-DX11-00896 +1 once, same TASK CI/C6/retry no additional credit."
+  }
+}
