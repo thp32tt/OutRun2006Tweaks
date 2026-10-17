@@ -2,23 +2,23 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01002",
   "production_id": "CONVERSION-DX9EX-01002",
-  "event_id": "CONVERSION-DX9EX-01002-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-01002-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:F11_MENU",
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_CI_PENDING",
-  "automation_validation": "PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "c1b62b9d14f05e02bc9023d3177cdf462bbd9cbd",
   "material_result_sha": "a15f65c9db05dd5c4f5e001bddd909d5ad733abc",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "b0030a059e4031299962f4b4c4669cb0c3527cda",
   "source_paths": [
     "src/overlay/f11_responsive_fit.hpp",
     "src/overlay/overlay.cpp",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "f11_first_run_xr_accessible": "PENDING_CI",
-    "f11_native_keyboard_scale_fallback": "PENDING_CI",
-    "f11_r84_exact_sha_gate": "PENDING_CI"
+    "f11_first_run_xr_accessible": "PASS_BUILD",
+    "f11_native_keyboard_scale_fallback": "PASS",
+    "f11_r84_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The main F11 settings shell used XR density with a per-window font fit and scrolling child tabs, but the independent first-run welcome popup kept full atlas font pixels and placed a confirmation action after a long help body in the same scrollable popup. Height caps therefore cannot ensure the action remains accessible for Quest3 gamepad-only navigation.",
@@ -99,8 +99,33 @@
         "run_id": 39012627752,
         "conclusion": "in_progress"
       }
-    }
+    },
+    "exact_sha": "b0030a059e4031299962f4b4c4669cb0c3527cda",
+    "DX9Ex Active Validation": {
+      "run_id": 39013596251,
+      "status": "SUCCESS",
+      "jobs": "policy/full-chain-compile/host/game/package"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 39013596273,
+      "status": "SUCCESS",
+      "jobs": "msvc-analyze-active-game/source-cross-domain/msvc-analyze-openxr-host"
+    },
+    "Domain Isolation Guard": {
+      "run_id": 39013596239,
+      "status": "SUCCESS"
+    },
+    "prior_exact_sha_pass": {
+      "head_sha": "8f70c8694ecb120a1e98a54ec9eff81264e4ee28",
+      "dx9ex_active_run_id": 39013209749,
+      "domain_run_id": 39013209766
+    },
+    "ci_repair_commits": [
+      "8cce1b281fb9cc78c761c126aeaa98579c804ad9",
+      "8f70c8694ecb120a1e98a54ec9eff81264e4ee28"
+    ],
+    "final_source_correction_sha": "b0030a059e4031299962f4b4c4669cb0c3527cda"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run all required GitHub Actions on the new validation-bearing exact SHA that includes this feature record. Repair only actual identified failures under the same TASK_ID; then record C6 without re-executing identical SHA CI. Quest3/VDXR runtime remains UNTESTED."
+  "next_action": "C6 build verified on exact SHA; Quest3/VDXR visual F11 first-run scroll/desktop transition and input still NEED_HMD_TEST. Do not claim runtime PASS or rescore this task. New independent features belong to the controller."
 }
