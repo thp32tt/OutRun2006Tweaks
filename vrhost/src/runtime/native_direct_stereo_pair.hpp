@@ -8,6 +8,7 @@
 // full COM interfaces are required only at the actual D3D11/WARP callsite.
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
+struct ID3D11UnorderedAccessView;
 
 namespace OutRunVrNativeEyePair
 {
@@ -89,6 +90,52 @@ namespace OutRunVrNativeEyePair
         return same;
     }
 
+
+    // Live DirectGPU game eye sources may still be bound as CS UAVs after
+    // native camera compute postpasses. D3D11 GPU copies must detach both
+    // those writable aliases and the full host OM MRT/DSV attachments, then
+    // restore the exact caller bindings for the next HUD/game pass.
+    // No append/consume counter is reset by these two-eye transfers.
+    template <typename Context>
+    class ScopedNativeEyeCopyBindings final
+    {
+    public:
+        explicit ScopedNativeEyeCopyBindings(Context* context) noexcept
+            : context_(context)
+        {
+            context_->OMGetRenderTargets(kRenderSlots, targets_, &depth_);
+            context_->CSGetUnorderedAccessViews(0u, kComputeSlots, compute_);
+            ID3D11UnorderedAccessView* empty[kComputeSlots]{};
+            context_->CSSetUnorderedAccessViews(0u, kComputeSlots, empty, nullptr);
+            context_->OMSetRenderTargets(0u, nullptr, nullptr);
+        }
+
+        ~ScopedNativeEyeCopyBindings() noexcept
+        {
+            context_->OMSetRenderTargets(kRenderSlots, targets_, depth_);
+            UINT preserveCounters[kComputeSlots]{};
+            for (auto& counter : preserveCounters) counter = UINT(-1);
+            context_->CSSetUnorderedAccessViews(
+                0u, kComputeSlots, compute_, preserveCounters);
+            const auto release = [](auto*& view) noexcept {
+                if (view) { view->Release(); view = nullptr; }
+            };
+            for (auto*& target : targets_) release(target);
+            release(depth_);
+            for (auto*& output : compute_) release(output);
+        }
+
+        ScopedNativeEyeCopyBindings(const ScopedNativeEyeCopyBindings&) = delete;
+        ScopedNativeEyeCopyBindings& operator=(const ScopedNativeEyeCopyBindings&) = delete;
+
+    private:
+        enum : unsigned { kRenderSlots = 8u, kComputeSlots = 8u };
+        Context* context_{};
+        ID3D11RenderTargetView* targets_[kRenderSlots]{};
+        ID3D11DepthStencilView* depth_{};
+        ID3D11UnorderedAccessView* compute_[kComputeSlots]{};
+    };
+
     // Native game-produced independent L/R eyes may be copied directly into
     // matching OpenXR array slices. Unlike an SBS atlas this is already one
     // complete full-size image per eye, so there is no UV crop or color
@@ -167,36 +214,7 @@ namespace OutRunVrNativeEyePair
         // must be unbound for the GPU copy, but the next game/HUD pass must
         // get EXACTLY its previous RTV/DSV attachments back, including
         // RT1..RT7. Never leave the host pointing at no render target.
-        struct ScopedOutputMerger final {
-            Context* immediate{};
-            // D3D11 specifies eight OM RTV slots; the descriptor-only
-            // test header intentionally does not provide that SDK macro.
-            enum : unsigned { kRtvSlots = 8u };
-            ID3D11RenderTargetView* targets[kRtvSlots]{};
-            ID3D11DepthStencilView* depth{};
-            explicit ScopedOutputMerger(Context* current) noexcept
-                : immediate(current) {
-                immediate->OMGetRenderTargets(kRtvSlots, targets, &depth);
-            }
-            ~ScopedOutputMerger() noexcept {
-                immediate->OMSetRenderTargets(kRtvSlots, targets, depth);
-                // COM Release is deferred to template instantiation, where
-                // full D3D11 interfaces are available.
-                const auto release = [](auto*& view) noexcept {
-                    if (view) { view->Release(); view = nullptr; }
-                };
-                for (auto*& target : targets) release(target);
-                release(depth);
-            }
-            ScopedOutputMerger(const ScopedOutputMerger&) = delete;
-            ScopedOutputMerger& operator=(const ScopedOutputMerger&) = delete;
-        } savedOutput(context);
-
-        // Exact full-resolution L/R game colors, no SBS UV crop. One immediate
-        // command stream owns both XR array slices and the producer ACK fence.
-        // OM restoration is scoped to BOTH GPU copies, including failure-free
-        // completion: the source switch must not destroy the next HUD target.
-        context->OMSetRenderTargets(0u, nullptr, nullptr);
+        ScopedNativeEyeCopyBindings<Context> savedOutput(context);
         context->CopySubresourceRegion(
             projection, 0u, 0u, 0u, 0u, left, 0u, nullptr);
         context->CopySubresourceRegion(
@@ -277,27 +295,7 @@ namespace OutRunVrNativeEyePair
         // when R23 imports the pair. Temporarily detach ALL OM outputs before
         // the actual GPU transfers and restore the full MRT/DSV set afterward.
         // A one-target restore would silently discard the next game's HUD RT1.
-        struct ScopedHoldCopyOutput final {
-            Context* immediate{};
-            enum : unsigned { kRtvSlots = 8u };
-            ID3D11RenderTargetView* targets[kRtvSlots]{};
-            ID3D11DepthStencilView* depth{};
-            explicit ScopedHoldCopyOutput(Context* current) noexcept
-                : immediate(current) {
-                immediate->OMGetRenderTargets(kRtvSlots, targets, &depth);
-            }
-            ~ScopedHoldCopyOutput() noexcept {
-                immediate->OMSetRenderTargets(kRtvSlots, targets, depth);
-                const auto release = [](auto*& view) noexcept {
-                    if (view) { view->Release(); view = nullptr; }
-                };
-                for (auto*& target : targets) release(target);
-                release(depth);
-            }
-            ScopedHoldCopyOutput(const ScopedHoldCopyOutput&) = delete;
-            ScopedHoldCopyOutput& operator=(const ScopedHoldCopyOutput&) = delete;
-        } savedOutput(context);
-        context->OMSetRenderTargets(0u, nullptr, nullptr);
+        ScopedNativeEyeCopyBindings<Context> savedOutput(context);
         context->CopyResource(holdLeft, sourceLeft);
         context->CopyResource(holdRight, sourceRight);
         return true;

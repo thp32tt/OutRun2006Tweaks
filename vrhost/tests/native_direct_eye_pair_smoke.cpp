@@ -296,6 +296,111 @@ int main()
         // The host hold-copy path must preserve both game/output bindings
         // while the actual source-eye RTVs are live. The subsequent XR copy
         // reads these newly staged red/green holds, proving two GPU pixels.
+
+        // Compute-authored game camera surfaces can remain bound as CS UAVs
+        // when R23 stages the two full-sized eyes and the OpenXR compositor
+        // copies them into array slices. Exercise BOTH live GPU copy paths
+        // against a genuinely UAV-bound source; verify the caller's compute
+        // binding and both distinct RGBA eye pixels survive the transfers.
+        D3D11_TEXTURE2D_DESC computeDesc = left;
+        computeDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        computeDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE |
+            D3D11_BIND_RENDER_TARGET | D3D11_BIND_UNORDERED_ACCESS;
+        auto computeHoldDesc = computeDesc;
+        computeHoldDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE |
+            D3D11_BIND_RENDER_TARGET;
+        auto computeArrayDesc = computeHoldDesc;
+        computeArrayDesc.ArraySize = 2u;
+        ID3D11Texture2D* computeSource[2]{};
+        ID3D11Texture2D* computeHold[2]{};
+        ID3D11Texture2D* computeArray = nullptr;
+        ID3D11Texture2D* computeReadback = nullptr;
+        ID3D11RenderTargetView* computeRtv[2]{};
+        ID3D11UnorderedAccessView* gameComputeUav = nullptr;
+        const bool computeReady =
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &computeDesc, nullptr, &computeSource[0])) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &computeDesc, nullptr, &computeSource[1])) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &computeHoldDesc, nullptr, &computeHold[0])) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &computeHoldDesc, nullptr, &computeHold[1])) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &computeArrayDesc, nullptr, &computeArray)) &&
+            SUCCEEDED(warpDevice->CreateRenderTargetView(
+                computeSource[0], nullptr, &computeRtv[0])) &&
+            SUCCEEDED(warpDevice->CreateRenderTargetView(
+                computeSource[1], nullptr, &computeRtv[1])) &&
+            SUCCEEDED(warpDevice->CreateUnorderedAccessView(
+                computeSource[0], nullptr, &gameComputeUav));
+        bool computeStageCopied = false, computeProjectionCopied = false;
+        bool stageUavRestored = false, projectionUavRestored = false;
+        bool computePixelsDistinct = false;
+        if (computeReady) {
+            const float computeRed[4]{1.f, 0.f, 0.f, 1.f};
+            const float computeGreen[4]{0.f, 1.f, 0.f, 1.f};
+            warpContext->ClearRenderTargetView(computeRtv[0], computeRed);
+            warpContext->ClearRenderTargetView(computeRtv[1], computeGreen);
+            warpContext->CSSetUnorderedAccessViews(
+                0u, 1u, &gameComputeUav, nullptr);
+            const auto computeBindingRestored = [&]() {
+                ID3D11UnorderedAccessView* observed = nullptr;
+                warpContext->CSGetUnorderedAccessViews(0u, 1u, &observed);
+                const bool same = observed == gameComputeUav;
+                if (observed) observed->Release();
+                return same;
+            };
+            computeStageCopied = stageEyes(
+                warpContext, warpDevice, computeHold[0], computeHold[1],
+                computeSource[0], computeSource[1]);
+            stageUavRestored = computeBindingRestored();
+            computeProjectionCopied =
+                OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    warpContext, warpDevice, computeHold[0], computeHold[1],
+                    computeArray, true, true, true, IID_IUnknown);
+            projectionUavRestored = computeBindingRestored();
+            ID3D11UnorderedAccessView* unbind = nullptr;
+            warpContext->CSSetUnorderedAccessViews(0u, 1u, &unbind, nullptr);
+            auto computeReadDesc = computeArrayDesc;
+            computeReadDesc.Usage = D3D11_USAGE_STAGING;
+            computeReadDesc.BindFlags = 0u;
+            computeReadDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            if (computeStageCopied && computeProjectionCopied &&
+                SUCCEEDED(warpDevice->CreateTexture2D(
+                    &computeReadDesc, nullptr, &computeReadback))) {
+                warpContext->CopyResource(computeReadback, computeArray);
+                D3D11_MAPPED_SUBRESOURCE pixels[2]{};
+                const bool mappedL = SUCCEEDED(warpContext->Map(
+                    computeReadback, 0u, D3D11_MAP_READ, 0u, &pixels[0]));
+                std::uint8_t red = 0u, green = 0u;
+                if (mappedL && pixels[0].pData) {
+                    red = static_cast<const std::uint8_t*>(
+                        pixels[0].pData)[0];
+                }
+                if (mappedL) warpContext->Unmap(computeReadback, 0u);
+                const bool mappedR = SUCCEEDED(warpContext->Map(
+                    computeReadback, 1u, D3D11_MAP_READ, 0u, &pixels[1]));
+                if (mappedR && pixels[1].pData) {
+                    green = static_cast<const std::uint8_t*>(
+                        pixels[1].pData)[1];
+                }
+                if (mappedR) warpContext->Unmap(computeReadback, 1u);
+                computePixelsDistinct = mappedL && mappedR &&
+                    red >= 250u && green >= 250u;
+            }
+        }
+        for (auto*& rtv : computeRtv) if (rtv) rtv->Release();
+        if (gameComputeUav) gameComputeUav->Release();
+        for (auto*& source : computeSource) if (source) source->Release();
+        for (auto*& hold : computeHold) if (hold) hold->Release();
+        if (computeArray) computeArray->Release();
+        if (computeReadback) computeReadback->Release();
+        if (!require(computeReady && computeStageCopied &&
+                     computeProjectionCopied && stageUavRestored &&
+                     projectionUavRestored && computePixelsDistinct,
+                     "native host compute camera UAV state and independent L/R pixels must survive both GPU copy paths"))
+            return 1;
         const bool holdCopyWithMrt = stageEyes(
             warpContext, warpDevice, holdLeft, holdRight, gpuLeft, gpuRight);
         const bool badHoldRejectedWithMrt = !stageEyes(
