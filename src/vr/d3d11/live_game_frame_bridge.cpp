@@ -6495,8 +6495,18 @@ void before_game_present(IDirect3DDevice9* game,
             // must record any GPU CopyResource synchronously on this same
             // immediate context; original D3D9 Draw/input remain intact.
             bool gpuHandoffQueued = false;
+            // This synchronous native D3D11 GPU consumer does not touch the
+            // D3D9 backbuffer. Unlike CPU staging / UpdateSurface and the
+            // shared-desktop fallback below, it needs no writable D3D9 format,
+            // non-MSAA D3D9 surface or CPU dirty-tile upload. It DOES require
+            // a real complete native game frame at the current Present,
+            // matching output geometry, and an allowed mono publication scope.
+            const bool gpuOutputAdmissible = GameNativeGpuHandoff::gpu_frame_output_ready(
+                monoNativePublicationAllowed,
+                backbufferKnown && outputNow.valid(),
+                nativeExtentMatches, fullPlacement.valid);
             if (GameNativeGpuHandoff::may_offer(
-                    fullMode, complete, outputWritable,
+                    fullMode, complete, gpuOutputAdmissible,
                     s.sourceGameDevice == presentDevice,
                     s.backend.color_texture() != nullptr,
                     s.gpuFrameSink != nullptr,
