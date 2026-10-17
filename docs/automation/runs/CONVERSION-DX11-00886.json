@@ -21,8 +21,8 @@
   "score_change": 0,
   "full_dx11_renderer_complete": false,
   "base_sha": "28f54969560fb90b07d99a1d902ce4099aa24e9e",
-  "material_result_sha": "23ef2949e93959a8c5f208b9dde0b1f04059a3cf",
-  "feature_last_head": "8090e3ada5c5262baa60940fb0d607608dada469",
+  "material_result_sha": "e0d791ae2ba8d4a3270fd584698ce8137849b892",
+  "feature_last_head": "e0d791ae2ba8d4a3270fd584698ce8137849b892",
   "validation_bearing_result_sha": null,
   "feature_contract": {
     "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
@@ -105,7 +105,7 @@
     "C1_REVIEW": "PASS_ONCE: 00885 owns offscreen camera eye clears, 00477 R175 complete. Selected distinct real-game main-backbuffer postpass integration.",
     "C2_IMPLEMENT": "PASS_SOURCE: D3D9 UpdateSurface/StretchRect original output -> cached SYS staging -> owned D3D11 scratch -> CopySubresourceRegion full-size native color RTV, bounded regions, X8 alpha, OM restore, original fallback.",
     "C3_VALIDATE": "LOCAL_PORTABLE_SOURCE_ONLY: representative C++17 region geometry and GitHub source token checks passed. Windows build/GPU and exact-SHA Actions not executed.",
-    "C4_COMMIT": "PASS_FEATURE_BRANCH: material C++ commit 23ef2949 and source/test/workflow commit 8090e3ad; target intentionally unchanged.",
+    "C4_COMMIT": "PASS_FEATURE_BRANCH: native Draw/game postpass C++ material e0d791ae; source tests+workflow 8090e3ad; source implementation intentionally not target-promoted.",
     "C5_PACKAGE": "NOT_REQUIRED; no runtime HMD build/package",
     "C6_STATE": "PENDING_FIVE_EXACT_SHA_ACTIONS_AND_TARGET_FAST_FORWARD"
   },
