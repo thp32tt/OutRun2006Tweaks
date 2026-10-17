@@ -16,6 +16,28 @@ namespace {
     std::uint32_t, std::uint32_t, const D3D11_RECT&,
     float, std::uint8_t, bool, bool) noexcept;
 
+// D3D11 OM UAVs share the output merger with MRT/DSV. A game/host
+// postpass can leave a pixel-stage UAV bound while the native camera
+// copies or replays its eye. Restore the occupied RTV prefix and every
+// remaining UAV slot together: OMSetRenderTargets alone loses the UAVs.
+// -1 retains append/consume counters for structured game GPU outputs.
+void restore_native_om_outputs(
+    ID3D11DeviceContext* ctx,
+    ID3D11RenderTargetView* const* targets,
+    ID3D11DepthStencilView* depth,
+    ID3D11UnorderedAccessView* const* unordered) noexcept {
+    UINT rtCount = 0u;
+    for (UINT i = 0u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        if (targets[i]) rtCount = i + 1u;
+    UINT keep[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+    for (auto& value : keep) value = UINT(-1);
+    const UINT remaining = D3D11_PS_CS_UAV_REGISTER_COUNT - rtCount;
+    ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+        rtCount, rtCount ? targets : nullptr, depth,
+        rtCount, remaining, remaining ? unordered + rtCount : nullptr,
+        remaining ? keep + rtCount : nullptr);
+}
+
 // Native GPU game postpasses may sample compute-produced camera textures.
 // Detach every bound CS UAV and OM target before copying/sampling, then
 // restore unrelated MRT/depth/UAV outputs without resetting UAV counters.
@@ -23,21 +45,28 @@ struct ScopedNativePostpassOutputs final {
     ID3D11DeviceContext* ctx{};
     ID3D11RenderTargetView* targets[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
     ID3D11DepthStencilView* depth{};
+    ID3D11UnorderedAccessView* om[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     ID3D11UnorderedAccessView* compute[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     explicit ScopedNativePostpassOutputs(ID3D11DeviceContext* c) noexcept : ctx(c) {
-        ctx->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth);
+        ctx->OMGetRenderTargetsAndUnorderedAccessViews(
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth,
+            0u, D3D11_PS_CS_UAV_REGISTER_COUNT, om);
         ctx->CSGetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, compute);
         ID3D11UnorderedAccessView* empty[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
         ctx->CSSetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, empty, nullptr);
-        ctx->OMSetRenderTargets(0u, nullptr, nullptr);
+        // Detach both PS/OM and CS writable aliases before sampling or Copy.
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            0u, nullptr, nullptr, 0u, D3D11_PS_CS_UAV_REGISTER_COUNT,
+            empty, nullptr);
     }
     ~ScopedNativePostpassOutputs() noexcept {
-        ctx->OMSetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, depth);
+        restore_native_om_outputs(ctx, targets, depth, om);
         UINT keep[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
         for (auto& v : keep) v = UINT(-1);
         ctx->CSSetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, compute, keep);
         for (auto* v : targets) if (v) v->Release();
         if (depth) depth->Release();
+        for (auto* v : om) if (v) v->Release();
         for (auto* v : compute) if (v) v->Release();
     }
     ScopedNativePostpassOutputs(const ScopedNativePostpassOutputs&) = delete;
@@ -473,8 +502,10 @@ public:
                               std::uint32_t height) noexcept
         : context_(context), width_(width), height_(height) {
         if (!context_ || !width_ || !height_) return;
-        context_->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-                                     savedTargets_, &savedDepth_);
+        context_->OMGetRenderTargetsAndUnorderedAccessViews(
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+            savedTargets_, &savedDepth_, 0u,
+            D3D11_PS_CS_UAV_REGISTER_COUNT, savedOmOutputs_);
         context_->OMGetBlendState(&savedBlend_, savedBlendFactors_, &savedSampleMask_);
         context_->OMGetDepthStencilState(&savedDepthState_, &savedStencilRef_);
         context_->RSGetState(&savedRasterizer_);
@@ -535,8 +566,8 @@ public:
     }
     ~ScopedNativeGameEyeOutput() noexcept {
         if (!active_) return;
-        context_->OMSetRenderTargets(
-            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, savedTargets_, savedDepth_);
+        restore_native_om_outputs(
+            context_, savedTargets_, savedDepth_, savedOmOutputs_);
         context_->OMSetBlendState(savedBlend_, savedBlendFactors_, savedSampleMask_);
         context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
         context_->RSSetState(savedRasterizer_);
@@ -549,6 +580,8 @@ public:
             if (target) { target->Release(); target = nullptr; }
         }
         if (savedDepth_) { savedDepth_->Release(); savedDepth_ = nullptr; }
+        for (auto*& om : savedOmOutputs_)
+            if (om) { om->Release(); om = nullptr; }
         if (savedBlend_) { savedBlend_->Release(); savedBlend_ = nullptr; }
         if (savedDepthState_) { savedDepthState_->Release(); savedDepthState_ = nullptr; }
         if (savedRasterizer_) { savedRasterizer_->Release(); savedRasterizer_ = nullptr; }
@@ -683,6 +716,7 @@ private:
     std::uint32_t width_{}, height_{};
     ID3D11RenderTargetView* savedTargets_[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
     ID3D11DepthStencilView* savedDepth_{};
+    ID3D11UnorderedAccessView* savedOmOutputs_[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     ID3D11BlendState* savedBlend_{};
     FLOAT savedBlendFactors_[4]{};
     UINT savedSampleMask_{};

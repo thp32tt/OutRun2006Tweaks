@@ -1165,6 +1165,15 @@ int main()
                             eye == 0u ? 0.f : 1.f, 1.f};
         d3d.context->ClearUnorderedAccessViewFloat(gameComputeViews[eye], rgba);
     }
+    D3D11_TEXTURE2D_DESC omOutputDesc = gameSurfaceDesc;
+    omOutputDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    ID3D11Texture2D* gameOmTexture = nullptr;
+    ID3D11UnorderedAccessView* gameOmView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &omOutputDesc, nullptr, &gameOmTexture)) && gameOmTexture &&
+            SUCCEEDED(d3d.device->CreateUnorderedAccessView(
+                gameOmTexture, nullptr, &gameOmView)) && gameOmView,
+            "00866 independent pixel-stage GPU output allocated");
     // True game menu and vehicle postpasses can use BGRA camera arrays even
     // when the native OpenXR eye target uses RGBA. Preserve each camera's
     // pixels through a GPU point-sampled color conversion (no CPU readback).
@@ -1247,6 +1256,7 @@ int main()
         ID3D11Texture2D* gameConvertedArray{};
         ID3D11Texture2D* gameComputeArray{};
         ID3D11UnorderedAccessView* gameComputeViews[2]{};
+        ID3D11UnorderedAccessView* gameOmView{};
         bool replayedComputeCopyStretch[2]{};
         bool preservedComputeOutputs[2]{};
         bool inheritedComputeState[2]{};
@@ -1761,7 +1771,9 @@ int main()
         // and both MRT slots plus the eye DSV must survive the GPU operation.
         ID3D11RenderTargetView* beforeCopyMrt[2]{
             eyeTarget, fixture.gameSurfaceView};
-        ctx->OMSetRenderTargets(2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex]);
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex],
+            2u, 1u, &fixture.gameOmView, nullptr);
         fixture.replayedPostDrawSurfaceCopy[eyeIndex] =
             encoder.copy_game_surface(
                 fixture.gameSurface, &sourcePatch, destX, 38u) &&
@@ -1959,11 +1971,15 @@ int main()
             encoder.color_draw_count() == beforeCopyColorDraws;
         ID3D11RenderTargetView* afterCopyMrt[2]{};
         ID3D11DepthStencilView* afterCopyDepth = nullptr;
-        ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
+        ID3D11UnorderedAccessView* afterCopyOm = nullptr;
+        ctx->OMGetRenderTargetsAndUnorderedAccessViews(
+            2u, afterCopyMrt, &afterCopyDepth, 2u, 1u, &afterCopyOm);
         fixture.preservedPostDrawMrt[eyeIndex] =
             afterCopyMrt[0] == eyeTarget &&
             afterCopyMrt[1] == fixture.gameSurfaceView &&
-            afterCopyDepth == fixture.eyeDepth[eyeIndex];
+            afterCopyDepth == fixture.eyeDepth[eyeIndex] &&
+            afterCopyOm == fixture.gameOmView;
+        if (afterCopyOm) afterCopyOm->Release();
         for (auto* target : afterCopyMrt)
             if (target) target->Release();
         if (afterCopyDepth) afterCopyDepth->Release();
@@ -2056,11 +2072,15 @@ int main()
     gameEyeFixture.gameComputeArray = gameComputeArray;
     gameEyeFixture.gameComputeViews[0] = gameComputeViews[0];
     gameEyeFixture.gameComputeViews[1] = gameComputeViews[1];
+    gameEyeFixture.gameOmView = gameOmView;
     d3d.context->CSSetUnorderedAccessViews(
         0u, 2u, gameComputeViews, nullptr);
     d3d.context->CSSetShaderResources(0u, 1u, &gameSampleView);
     d3d.context->CSSetSamplers(0u, 1u, &gameSampler);
     d3d.context->CSSetConstantBuffers(0u, 1u, &gameConstants);
+    d3d.context->OMSetRenderTargetsAndUnorderedAccessViews(
+        1u, &originalGameTarget, preservedDepthView,
+        1u, 1u, &gameOmView, nullptr);
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -2164,7 +2184,10 @@ int main()
             "00821 eye GPU commands own distinct Z/stencil attachments");
     ID3D11RenderTargetView* restoredGameTarget = nullptr;
     ID3D11DepthStencilView* restoredGameDepth = nullptr;
-    d3d.context->OMGetRenderTargets(1, &restoredGameTarget, &restoredGameDepth);
+    ID3D11UnorderedAccessView* restoredGameOm = nullptr;
+    d3d.context->OMGetRenderTargetsAndUnorderedAccessViews(
+        1u, &restoredGameTarget, &restoredGameDepth,
+        1u, 1u, &restoredGameOm);
     UINT restoredViewportCount = 1, restoredScissorCount = 1;
     D3D11_VIEWPORT restoredViewport{};
     D3D11_RECT restoredScissor{};
@@ -2235,6 +2258,7 @@ int main()
         restoredBlendFactor[3] == preservedBlendFactor[3] &&
         restoredGameTarget == originalGameTarget &&
         restoredGameDepth == preservedDepthView &&
+        restoredGameOm == gameOmView &&
         restoredViewportCount == 1 &&
         restoredViewport.TopLeftX == preservedViewport.TopLeftX &&
         restoredViewport.TopLeftY == preservedViewport.TopLeftY &&
@@ -2262,6 +2286,7 @@ int main()
     if (restoredIndexBuffer) restoredIndexBuffer->Release();
     if (restoredGameTarget) restoredGameTarget->Release();
     if (restoredGameDepth) restoredGameDepth->Release();
+    if (restoredGameOm) restoredGameOm->Release();
     if (restoredRaster) restoredRaster->Release();
     if (restoredBlend) restoredBlend->Release();
     if (restoredDepthState) restoredDepthState->Release();
@@ -2315,6 +2340,8 @@ int main()
     d3d.context->CSSetUnorderedAccessViews(0u, 2u, nullComputeViews, nullptr);
     for (auto* v : gameComputeViews) if (v) v->Release();
     gameComputeArray->Release();
+    gameOmView->Release();
+    gameOmTexture->Release();
     gameCopyOnlyArray->Release();
     gameConvertedArray->Release();
     gameMultisampleView->Release();
