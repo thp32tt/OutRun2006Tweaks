@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01001",
+  "production_id": "CONVERSION-DX9EX-01001",
+  "event_id": "CONVERSION-DX9EX-01001-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_CI_PENDING",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "47f16f009e2acad55983bb02b4b107a6d65a2ccf",
+  "material_result_sha": "6a6a9bd5d83cf6ca8e1076dddefdb97b8eaff793",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01001.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Restore original 4:3 physical aspect for fully captured stretched OutRun title and main menu while keeping every desktop UV pixel visible; preserve the right-side Ferrari/vehicle-selection imagery at native wide aspect, safely reacting to live GameState changes with explicit rollback and independent stereo eyes.",
+    "scope_boundary": "VR host LOCAL menu projection and source GameState read only; no HUD/F11/ESC, GOAL/+TIME, stereo world, reflection, SkyGlow, wheel/input/FFB, DX11, frozen DXVK or R26_SAFE source modification.",
+    "trace_stages": [
+      "Original 2D title/menu versus selector/selector-exit/selector-reset GameState and UIScalingMode/UILetterboxing source geometry",
+      "Native producer publishes ClientGameStateIndex in unchanged V2 IPC; R23 snapshots state, cached projection and original full-client UV for LOCAL-fixed menu optical projection",
+      "Two-eye OpenXR projection preserves full source UV and common FOV clip; the title optical 4:3 differs from the uncropped vehicle selector native aspect, invalid/partial cases fall back"
+    ],
+    "subcomponents": [
+      "Classify real game menu states and source-only aspect-correct title/main menu without clipping UV pixels or using unverified image matte",
+      "Keep selector and transition wide imagery native, invalidate cached two-eye projections on live state changes, respect existing explicit native-aspect/crop overrides and desktop fallback"
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_title_native_optical_aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original title/main-menu source through host binocular optics",
+        "expected_behavior": "Fully captured 3440x1440 and 1920x1080 source in original title/menu state, confirmed letterboxing and no native rollback projects as 4:3 physical aspect with source pixels/UV intact in both Quest eye targets."
+      },
+      {
+        "id": "selector_complete_source_and_rollback",
+        "category": "fallback_regression",
+        "behavior_area": "Vehicle selector/right-side art, partial/unknown state, explicit fallback and reset",
+        "expected_behavior": "Selection/reset/exit source retains native 4:3/16:9/21:9 and right-side vehicle list, unknown/partial/invalid/nonletterboxed/runtime rollback unaffected, mode transitions invalidate prior host menu projection without game input changes."
+      },
+      {
+        "id": "menu_exact_sha_win32_host_domain",
+        "category": "integrated_validation",
+        "behavior_area": "Exact Windows x86 game plus x64 host/package and domain",
+        "expected_behavior": "Mandatory GitHub Actions DX9Ex Active, Full Source Impact, Domain Isolation, HUD Inspector when applicable all SUCCESS on one final validation-bearing SHA, with actual Quest3/VDXR optics separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_title_native_optical_aspect": "PENDING_CI",
+    "selector_complete_source_and_rollback": "PENDING_CI",
+    "menu_exact_sha_win32_host_domain": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Full-client 21:9 sourceAspect was universally used for both title/menu and Ferrari/car-select though native game publishes distinct GameState and Quest3 showed title stretched but source crop cuts selector images. Existing imageMatteVerified is permanently false, so prior safe conservative path could never correct known stretched title separately from selector.",
+    "original_evidence": "Issue #119 user A/B tested Quest3: crop OFF title looks horizontally stretched, crop ON cuts yellow Ferrari/right vehicle list. Original host R23 used same sampled aspect regardless ClientGameStateIndex; new branch reads actual 0x04/0x09 versus 0x0A..0x0C.",
+    "source_trace": [
+      "Native OutRun GameState is published in V2 IPC reserved word 5 with presentation source metadata.",
+      "Host SharedWriter::GameState accesses original state with HeaderValid guard; R23 uses exact state to select source-authorized optical aspect only for title/main menu when full client is captured and letterboxing confirmed.",
+      "Menu cache invalidates on state change; source UV and stereo common intersected FOV/anchor remain untouched."
+    ],
+    "limitations": "Preservation of all source pixels with title optical 4:3 can alter full-width custom title art. Explicit OUTRUN_VR_MENU_NATIVE_ASPECT=1 restores full client proportions; Quest3 HMD acceptance is required."
+  },
+  "ci_evidence": {
+    "initial_result_commit_run_id": 39011394557,
+    "initial_failure": "REQUIRED_RUN_RECORD_NOT_FOUND; source compilation not reached"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run required exact GitHub Actions Gates on validation-bearing HEAD and repair real failures under this same TASK_ID. Quest3/VDXR optical inspection remains NEED_HMD_TEST."
+}
