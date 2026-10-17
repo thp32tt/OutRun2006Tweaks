@@ -1,0 +1,111 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01004",
+  "production_id": "CONVERSION-DX9EX-01004",
+  "event_id": "CONVERSION-DX9EX-01004-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING_EXACT_SHA",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "247c611803878badc4d3601989c1e8a2792df446",
+  "material_result_sha": "5944975fffdafca2652908e885913da583c3b224",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "tools/verify_vr_r30_screen_hud_finite_plane.py"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "tools/verify_vr_r30_screen_hud_finite_plane.py",
+    "docs/automation/runs/CONVERSION-DX9EX-01004.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Restore the complete original OutRun gameplay speed, time and position HUD layout, including queued HUD and peripheral group anchors, when the native 2D screen resolution differs from each OpenXR eye target, preserving independently projected eyes and same-resolution desktop output.",
+    "scope_boundary": "Only R84 source-proven native and queued gameplay ScreenHud XYZRHW pixel-space layout and safe peripheral anchors. Protect GOAL/+TIME semantics, projected car/rank world markers, external F11/ESC overlays, world stereo, SkyGlow, original input and FFB, native fallback, R26_SAFE and frozen DXVK.",
+    "trace_stages": [
+      "Original game Game::screen_resolution, native ScreenHud producer and canonical queued HUD establish authoritative source 2D pixels rather than the physically sized XR RT viewport.",
+      "R84 R30BuildStageExtensionXyzrhwEyePlane admits only corroborated HUD or queued finite-HUD plane semantics, latches source game width and height, and keeps independent +TIME and GOAL owner checks.",
+      "R30 XYZRHW vertex handling uses the same source extent for peripheral edge anchors and RemapFiniteHudPixel before ProjectPixelPairAcrossViewports submits independent left/right OpenXR eye coordinates."
+    ],
+    "subcomponents": [
+      "Map all source-proven native gameplay speed/time/position glyph and queued screen HUD geometry from original 2D extents into separate XR-sized physical eyes, excluding foreign overlays and projected world owners.",
+      "Compute grouped HUD left/right edge anchoring from that same source game viewport and check different eye extents, matching desktop dimensions, left/right symmetry and negative ownership regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_game_extent_binocular_layout",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native/queued speed time position gameplay HUD under mismatched game and XR eye extents",
+        "expected_behavior": "Canonical HUD uses the original 2D game pixel viewport for grouped position and finite eye plane, and projects to independent left/right XR eyes without incorrect offset or source aspect substitution."
+      },
+      {
+        "id": "hud_fallback_world_semantic_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Same-extent desktop, queue isolation and external/world draw semantics",
+        "expected_behavior": "Matching native dimensions keep identical pixel positions; uncorroborated overlays, external F11, world, projected rank car markers, SkyGlow and missing 2D resolution do not inherit gameplay HUD remapping."
+      },
+      {
+        "id": "hud_r84_required_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Source regression plus exact-SHA R84 and R26_SAFE Windows and host gates",
+        "expected_behavior": "R84 source finite-HUD negative verifier and pixel-pair smoke tests pass alongside DX9Ex Active game/full-chain/host/package, Domain Isolation, HUD Inspector and Full Source Impact required GitHub Actions for one final exact SHA; physical Quest3/VDXR validation remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_game_extent_binocular_layout": "PENDING_CI",
+    "hud_fallback_world_semantic_isolation": "PENDING_CI",
+    "hud_r84_required_exact_sha_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R84 stage finite-HUD originally sourced 2D pixels from game screen_resolution only for +TIME and GOAL; source-owned ordinary native and queued gameplay HUD decoded 2D positions and peripheral anchoring against the physically different XR render target extent, leading to mispositioned/mis-sized HUD groups when source and eye resolutions differed.",
+    "original_evidence": "In pre-fix R30BuildStageExtensionXyzrhwEyePlane the source viewport was selected only for exact StageExtensionTime and GOAL; later R30GetExactHudEdgeAnchor and RemapFiniteHudPixel used physical x0/y0/width/height. Material commit 5944975f adds game-resolution admission for native/queued game HUD and passes the source dimensions consistently to peripheral remap; headset effect not yet measured.",
+    "source_trace": [
+      "Original gameplay speed/time/position ScreenHud and queuing tags originate from OutRun source game screen pixels; R84 samples Game::screen_resolution for source-owned HUD semantics.",
+      "R30 physical draw capture and CorroboratesHud/QueueOverlayNeedsFiniteHudPlane prove canonical owner before substituting source game 2D pixel extent, preserving exact GOAL/+TIME path.",
+      "R84 R30GetExactHudEdgeAnchor and RemapFiniteHudPixel use latched source extent and ProjectPixelPairAcrossViewports produces independently projected left and right XR target coordinates."
+    ],
+    "alternatives_rejected": [
+      "Do not globally resize XR target or treat all overlays as HUD, as that would break native fallback, F11 external ImGui, unrelated world particle/sky optics and projected vehicle markers."
+    ],
+    "eye_ownership": "One original game-pixel source extent is used for both independently calculated eye viewports and per-eye projection; a source-owned finite gameplay HUD anchor cannot be inherited from unrelated world/foreign draws."
+  },
+  "ci_evidence": {
+    "first_material_candidate": {
+      "head_sha": "5944975fffdafca2652908e885913da583c3b224",
+      "dx9ex_active": {
+        "run_id": 39015068967,
+        "conclusion": "failure",
+        "reason": "policy verify_vr_feature_unit_policy.py --check-head: missing docs/automation/runs/CONVERSION-DX9EX-01004.json; game/host/full-chain/package skipped"
+      },
+      "domain_isolation": {
+        "run_id": 39015068982,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39015068979,
+        "status": "in_progress_at_initial_recovery"
+      },
+      "full_source_impact": {
+        "run_id": 39015068993,
+        "status": "in_progress_at_initial_recovery"
+      }
+    },
+    "next_exact_sha": "PENDING_RUN_CREATION"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run the existing mandatory GitHub Actions on the recovery validation-bearing SHA (no CI-skip); only when all exact-SHA gates succeed, record C6 separately without changing the original material_result_sha. Do not claim Quest3/VDXR PASS."
+}
