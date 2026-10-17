@@ -79,10 +79,15 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
     missing += ["timeline:" + needle for needle in source_requirements
                 if needle not in source]
     test_requirements = [
-        # The seventh source event is a real game-authored, eye-specific
-        # clipped GPU Copy. Retain the older partial depth/stencil evidence
-        # AND require positive+negative WARP pixel coverage for this new path.
-        "partialGameClear.count[0] = partialGameClear.count[1] = 7u;",
+        # Keep the seventh eye-specific clipped GPU Copy and eighth
+        # CopyResource-only scaled postpass, plus partial Z/stencil evidence.
+        # Require WARP real eye pixels and wrong-camera negative admission.
+        "partialGameClear.count[0] = partialGameClear.count[1] = 8u;",
+        "gpuScale.kind = SourceClear::Kind::SourceStretch;",
+        "gpuScale.source = gameCopyOnlyArray;",
+        "gpuScale.sourceArraySlice = eye;",
+        "invalidCopyOnlyStretch.entries[1][7].sourceArraySlice = 2u;",
+        "require(realGpuScale,",
         "edgeCopy.kind = SourceClear::Kind::SourceCopy;",
         "edgeCopy.destX = 62u;",
         "edgeCopy.sourceArraySlice = eye;",
@@ -227,8 +232,12 @@ def main() -> None:
                 "FAILED(device->CheckFormatSupport(ed.Format, &eyeSupport)))",
                 "(sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,",
                 "(eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,",
-                "(sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u);",
+                "(sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,",
+                "sd.BindFlags == 0u && sd.SampleDesc.Count == 1u);",
                 "if (transfer == NativeGameStretchSourceTransfer::Reject)",
+                "sampled.Get() != source",
+                "context_->CopySubresourceRegion(",
+                "sourceArraySlice, sd.MipLevels",
                 "ScopedNativeGameEyeOutput restore(context_, targetWidth_, targetHeight_);",
                 "if (!restore.valid()) return false;",
                 "context_->OMSetRenderTargets(1u, &target, nullptr);",
