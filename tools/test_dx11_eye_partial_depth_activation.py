@@ -189,7 +189,8 @@ assert offscreen_rect_contract(source, probe)
 assert not offscreen_rect_contract(source.replace(
     "rectContext->ClearView(gameTarget, rgba, region, 1u);", "", 1), probe)
 assert not offscreen_rect_contract(source.replace(
-    "raster_partial_eye_depth_clear(", "missing_partial_depth(", 1), probe)
+    "return raster_partial_eye_depth_clear(\n            context_, gameDepth",
+    "return missing_partial_depth(\n            context_, gameDepth", 1), probe)
 assert not offscreen_rect_contract(source, probe.replace(
     "rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible",
     "true"))
