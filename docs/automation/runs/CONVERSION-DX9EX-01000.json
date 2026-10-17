@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01000",
+  "production_id": "CONVERSION-DX9EX-01000",
+  "event_id": "CONVERSION-DX9EX-01000-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_CI_PENDING",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "127b56143d1af65a44152faaa0679d6453e516ed",
+  "material_result_sha": "558921cda8a9c50648d565964b5623aaf3fe4057",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/pause_menu_eye_affine_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/pause_menu_eye_affine_smoke.cpp",
+    "tools/verify_vr_pause_menu_eye_affine.py",
+    "docs/automation/runs/CONVERSION-DX9EX-01000.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Restore the complete ESC pause menu's shader-based option arrows and physical XYZRHW shell to one consistent native-screen-to-Quest-eye aspect containment and optical scale, without changing original game navigation or slider handling.",
+    "scope_boundary": "Only explicitly source-owned paused-game ESC ScreenHud shader glyphs receive the responsive aspect scaling already used by the ESC physical 2D path; unrelated gameplay HUD, GOAL, +TIME, F11, lens, world, input, FFB, SkyGlow and R26_SAFE stay unchanged.",
+    "trace_stages": [
+      "Original pause menu mode, PauseOptionArrow or exact ScreenHudClipSprite producer from queued or direct native 2D draws.",
+      "R84 R30 native shader HUD c64 projection and XYZRHW ESC draw consume a common responsive source-to-XR physical aspect scale while retaining direct game navigation.",
+      "Both Quest3 OpenXR eyes receive contained native menu and arrows with existing per-eye FOV alignment and post-projection signed vertical slider offset."
+    ],
+    "subcomponents": [
+      "Unify R84 pause-native aspect containment for physical XYZRHW sprites and source-identified shader WVP option arrows.",
+      "Keep original pause shell and arrow horizontal/vertical offsets aligned with changed-area numerical and negative mutation regressions across eye geometry and invalid states."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_native_shader_aspect_parity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ESC physical-shell plus WVP arrow stereo optical dimensions",
+        "expected_behavior": "At 3440x1440 source and 2496x2688 eye extents, shader-backed ESC arrows use the exact native sprite horizontal and vertical physical containment so YES/NO and options share optical size and per-eye positioning."
+      },
+      {
+        "id": "esc_desktop_and_non_pause_protection",
+        "category": "fallback_regression",
+        "behavior_area": "Unchanged desktop source and protected non-ESC draws",
+        "expected_behavior": "Native/equal aspect, invalid extent, legacy opt-out, non-ESC HUD, F11, +TIME, GOAL, lens, world, SkyGlow, input, FFB and R26_SAFE preserve their prior routing and safety contract."
+      },
+      {
+        "id": "esc_exact_sha_win32_host_domain",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 game plus x64 host package and source policy",
+        "expected_behavior": "Final exact GitHub SHA passes DX9Ex Active, Domain Isolation, HUD Inspector/Full Source Impact when required, with no disabled existing tests; actual Quest3 optical acceptance remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "esc_native_shader_aspect_parity": "PENDING_CI",
+    "esc_desktop_and_non_pause_protection": "PENDING_CI",
+    "esc_exact_sha_win32_host_domain": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R84 paused source-owned shader HUD took a uniform pause scale in the original WVP path, but the sibling physical XYZRHW ESC path applied game-presentation-to-XR-eye pixel aspect containment. At 3440x1440 versus 2496x2688, this lets the same pause menu element families carry different vertical optical dimensions.",
+    "original_evidence": "HEAD 127b5614 R30HudContainScale applied sourceOverTarget optical containment to XYZRHW while R30BuildScreenSpaceEyeConstants' exactPauseShaderOwner kept hudScale._11 and ._22 at userScale. The dispatch difference is statically verifiable; no physical HMD assertion made.",
+    "source_trace": [
+      "Original ESC game state and pause exact arrow producer enter R30IsPauseMenuElement and select source-owned ScreenHud.",
+      "R30HudContainScale derives sourceOverTarget from the presentation frame and coherent pair of XR eye extents for native physical primitives.",
+      "R30 original-WVP shader branch now borrows that exact owner-sensitive containing scale only for exact pause-owned shader arrows before reconstructing the existing bilateral world-locked HUD plane.",
+      "The native and shader paths retain the existing per-eye FOV, vertical shift, pose generation and original 2D/non-ESC fallback."
+    ],
+    "alternatives_rejected": [
+      "Enlarging every HUD/WVP shader, globally changing OpenXR eye FOV, or re-enabling older ResponsiveMenuScale would affect previously protected HUD and double-enlarge Quest pause controls."
+    ],
+    "eye_ownership": "Source +TIME/GOAL and generic HUD never opt in. Only the two R84 ESC eye submissions of an exact paused ScreenHud source reuse common native pixel scaling while preserving their independent eye pose and projection."
+  },
+  "ci_evidence": {},
+  "score_delta_this_attempt": 0,
+  "next_action": "Inspect mandatory Actions for validation-bearing exact SHA; repair any actual failed gate under this TASK_ID. After complete SUCCESS record C6 without repeat CI. HMD Quest3/VDXR remains UNTESTED."
+}
