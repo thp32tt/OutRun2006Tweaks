@@ -22,6 +22,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/lens_centre_partial_wvp.hpp"
 #include "vr/game/lens_centre_upload_transaction.hpp"
+#include "vr/game/game_wvp_native_upload.hpp"
 #include "vr/game/queued_hud_partial_wvp.hpp"
 #include "../core/r23_target_owner_api.hpp"
 
@@ -1994,17 +1995,28 @@ namespace OutRunVRRenderer
 			// The subsequent game world write supersedes a queued HUD
 			// original source even if the GPU shader stays bound.
 			HudQueuedPartialWvp.Reset();
-			// Avoid a 4 KiB local stack frame on every c64-containing upload.
-			// TLS keeps independent buffers across game render threads. The
-			// original call consumes these constants synchronously.
-			static thread_local float patchedData[256 * 4];
-			const bool prepared = TryPrepareOutRunWvp(
+			// Native D3D9 shader-constant hooks can reenter this game setter.
+			// A single TLS float[1024] let the inner upload overwrite the outer
+			// call's still-live GPU input and its later verified-WVP recording.
+			// Give each active callback its own allocation-free TLS frame; on
+			// bounded stack exhaustion forward the ORIGINAL game constants.
+			static thread_local OutRunVR::GameWvpNative::ScratchBank uploadScratch{};
+			OutRunVR::GameWvpNative::ScopedFrame uploadFrame(uploadScratch);
+			float* patchedData = uploadFrame.data();
+			const bool prepared = patchedData && TryPrepareOutRunWvp(
 				startRegister, constantData, vector4fCount, patchedData);
 			const float* uploadedData = prepared ? patchedData : constantData;
 			const HRESULT result = SetVertexShaderConstantFHook.stdcall<HRESULT>(
 				device, startRegister, uploadedData, vector4fCount);
+			// A nested GAME c64 write invalidates the outer source before its
+			// native callback returns, even if the outer HRESULT succeeded.
+			// Preserve the newer shader/pose/draw provenance and normal fallback.
+			const bool nativeSourceCurrent =
+				OutRunVR::GameWvpNative::MayPublishReturnedWvp(
+					SUCCEEDED(result), uploadGeneration,
+					LensCentreUploadGeneration);
 
-			if (SUCCEEDED(result))
+			if (nativeSourceCurrent)
 			{
 				const UINT wvpOffsetRegisters = OutRunWvpRegister - startRegister;
 				RecordGameWvpWrite(
@@ -2014,7 +2026,7 @@ namespace OutRunVRRenderer
 
 			if (prepared)
 			{
-				if (SUCCEEDED(result))
+				if (nativeSourceCurrent)
 				{
 					++WvpUploadSucceededCalls;
 					FrameTelemetryFlags |= ClientRendererPoseInjected;

@@ -214,6 +214,17 @@ add_custom_command(TARGET outrun-vr-lens-upload-transaction-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-lens-upload-transaction-smoke>"
     COMMENT "Run exact C993 source/native reentrancy and fallback regression"
     VERBATIM)
+# Protect R84 game-world WVP against nested native SetVertexShaderConstantF:
+# independent GPU input buffers and no stale successful outer publication.
+add_executable(outrun-vr-game-wvp-native-upload-smoke
+    tests/game_wvp_native_upload_smoke.cpp)
+target_include_directories(outrun-vr-game-wvp-native-upload-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-game-wvp-native-upload-smoke)
+add_custom_command(TARGET outrun-vr-game-wvp-native-upload-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-game-wvp-native-upload-smoke>"
+    COMMENT "Run R84 world c64 reentrant native scratch/generation regression"
+    VERBATIM)
 # The mandatory x64 host CI compiles and executes real C993 game-eye math.
 add_executable(outrun-vr-lens-eye-pose-smoke tests/lens_centre_eye_pose_smoke.cpp)
 target_include_directories(outrun-vr-lens-eye-pose-smoke PRIVATE
