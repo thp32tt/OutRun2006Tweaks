@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00898",
+  "production_id": "CONVERSION-DX11-00898",
+  "event_id": "CONVERSION-DX11-00898-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": 1,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00898",
+  "feature_id": "DX11:NATIVE_OFFSCREEN_CAMERA_EYE_DEPTH_ISOLATION",
+  "work_key": "DX11:FULLFRAME:OFFSCREEN_CAMERA_SHARED_EYE_DEPTH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "base_sha": "9781d88e45a0537d336815b5984daa758c01c125",
+  "material_result_sha": "973961eb1e6525fde476151aec41f61391cfa591",
+  "validation_bearing_result_sha": "973961eb1e6525fde476151aec41f61391cfa591",
+  "feature_contract": {
+    "goal": "Reject real menu/car/race offscreen camera native Draw/DrawIndexed and both instanced entrypoints when its color RT is paired with the OpenXR ring eye's depth/stencil allocation, while preserving independent game-camera depth and original DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "reject_stereo_eye_depth_alias",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_eye_and_game_camera_gpu",
+        "expected_behavior": "Offscreen source geometry cannot write an XR eye's depth/stencil through a borrowed or aliased DSV."
+      },
+      {
+        "id": "camera_depth_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "menu_vehicle_race_and_input",
+        "expected_behavior": "Camera-owned depth, optional no-depth color-only passes and DX9Ex Present/gamepad/FFB remain available."
+      },
+      {
+        "id": "gpu_positive_negative_and_full_ci",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_and_exact_sha",
+        "expected_behavior": "Actual Win32 WARP rejection/accepted draw paths and 5 mandatory GitHub Actions succeed on same exact SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Live D3D9 menu/car/race source camera RTV0 and DSV -> D3D11 native offscreen Draw/DrawIndexed/instanced admission",
+      "Reject XR eye depth allocation aliases before GPU command; preserve valid camera Z and subsequent native GPU Copy/Stretch -> left/right OpenXR fence publication"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp actual OM depth resource/device admission",
+      "tools/dx11_native_transport_probe.cpp actual Win32 WARP negative four-Draw and positive game-camera source GPU copy regression"
+    ],
+    "conflict_keys": [
+      "DX11:FULLFRAME:OFFSCREEN_CAMERA_SHARED_EYE_DEPTH"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "acceptance_proof": {
+      "positive_probe": "Win32 WARP Native Transport run 39072315315 SUCCESS at exact SHA, original camera depth Draw and source Copy remain active.",
+      "negative_regression": "WARP borrowed eye DSV rejects offscreen Draw, DrawIndexed, DrawInstanced, DrawIndexedInstanced without advancing authentic source draw/color counters.",
+      "component_integration": "GPU source camera OM depth resource isolation + Win32 WARP source commands; exact five mandatory GitHub Action gates successful at 973961eb."
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "reject_stereo_eye_depth_alias": "PASS_WARP_AND_BUILD",
+    "camera_depth_and_original_fallback": "PASS_WARP_AND_SOURCE",
+    "gpu_positive_negative_and_full_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "material_sha": "973961eb1e6525fde476151aec41f61391cfa591",
+    "validation_sha": "973961eb1e6525fde476151aec41f61391cfa591",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39072315401,
+        "conclusion": "success",
+        "validation_sha": "973961eb1e6525fde476151aec41f61391cfa591"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39072315348,
+        "conclusion": "success",
+        "validation_sha": "973961eb1e6525fde476151aec41f61391cfa591"
+      },
+      {
+        "name": "Build",
+        "run_id": 39072319681,
+        "conclusion": "success",
+        "validation_sha": "973961eb1e6525fde476151aec41f61391cfa591"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39072319742,
+        "conclusion": "success",
+        "validation_sha": "973961eb1e6525fde476151aec41f61391cfa591"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39072319690,
+        "conclusion": "success",
+        "validation_sha": "973961eb1e6525fde476151aec41f61391cfa591"
+      }
+    ],
+    "isolated_native_warp_run_id": 39072315315,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_sha": "973961eb1e6525fde476151aec41f61391cfa591",
+    "runtime_validation": "UNTESTED",
+    "blocking_evidence": "OutRun game menu/car/race, Quest3/VDXR OpenXR real HMD, actual gamepad/FFB and 72Hz not executed. The complete native DX11 renderer is not proven playable."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Confirmed previous 00897 owner completed at 9781d88 and no concurrent branch change.",
+    "C1_REVIEW": "Found offscreen game source camera validated RTV0 but did not isolate the OpenXR eye depth/stencil DSV allocation.",
+    "C2_IMPLEMENT": "Implemented actual C++ camera/eye depth GPU Draw isolation plus four source Draw entrypoint WARP positive/negative tests.",
+    "C3_VALIDATE": "Win32 WARP run 39072315315 SUCCESS and unchanged five exact-SHA mandatory Gates 5/5 SUCCESS at material 973961eb.",
+    "C4_COMMIT": "Material result 973961eb includes exact task marker, no CI-skip; this C6 bookkeeping commit is separate.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "BUILD_VERIFIED source-only camera depth isolation; full native renderer unfinished, Quest3/VDXR runtime untested. Same TASK retry/CI/C6 does not add duplicate score."
+  }
+}
