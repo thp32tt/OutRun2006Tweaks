@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00886",
+  "production_id": "CONVERSION-DX11-00886",
+  "event_id": "CONVERSION-DX11-00886-E003",
+  "event_type": "rollover",
+  "attempt": 1,
+  "chat_rollover": 2,
+  "checked_at_kst": "2026-10-18T00:28:00+09:00",
+  "checkpoint_mode": "GITHUB_VERIFIED",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head": "28f54969560fb90b07d99a1d902ce4099aa24e9e",
+  "base_sha": "17c4905eb5be2cba686746c239c54afbb8492b38",
+  "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
+  "feature_branch": "feature/dx11-00886-game-surface-mutation-replay",
+  "feature_last_head": "ae70104fbe62f1f99e70c3d99f9b97f38a28815e",
+  "material_result_sha": "23ef2949e93959a8c5f208b9dde0b1f04059a3cf",
+  "run_record_path": "docs/automation/runs/CONVERSION-DX11-00886.json",
+  "run_record_ref": "feature/dx11-00886-game-surface-mutation-replay",
+  "compare": {
+    "base": "vr-dx11-native-r71",
+    "head": "feature/dx11-00886-game-surface-mutation-replay",
+    "behind_by": 0,
+    "ahead_by": 9
+  },
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "validation": {
+    "local_cxx17_region_probe": "PASS_RECONSTRUCTED_PORTABLE",
+    "git_source_static_checks": "PASS",
+    "windows_build": "NOT_RUN",
+    "mandatory_dx11_exact_sha_actions": "NOT_RUN",
+    "real_game_quest3": "UNTESTED"
+  },
+  "scoreboard": {
+    "ai": "AI 2 ChatGPT2",
+    "confirmed_before": 1483,
+    "delta": 0,
+    "confirmed_after": 1483,
+    "score_committed": false
+  },
+  "source_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d11/native_game_surface_copy_region.hpp"
+  ],
+  "test_files": [
+    "tools/dx11_game_surface_copy_region_probe_00886.cpp",
+    "tools/test_dx11_game_surface_copy_00886.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "unresolved_items": [
+    "Build and run Windows native C++/x86 graph for added replay code; repair any compiling failures.",
+    "Run all five mandatory GitHub Actions at the same validation-bearing SHA and inspect artifacts.",
+    "Preserve 00885 offscreen camera Clear ownership; do not repeat 00477 R175 WARP.",
+    "Promote only after exact CI PASS with target behind_by=0 and expected target HEAD and force=false.",
+    "Native game XR stereo output, performance, menu/car/race pixel parity, Quest3 hardware are UNTESTED."
+  ],
+  "next_action": "Continue source implementation/CI compile repair on FEATURE_BRANCH. Do not rerun completed source review or create new independent probe-only task. Attempt remains 1/3; event E003 is rollover, not retry.",
+  "ownership": {
+    "dx11_00885": "offscreen camera bounded clear CI pending, no overlapping modifications",
+    "dx11_00477": "R175 existing task marked complete, no duplication"
+  },
+  "ci_policy": "SOURCE_IMPLEMENTED_CI_PENDING is NOT FEATURE_READY or target completion."
+}
