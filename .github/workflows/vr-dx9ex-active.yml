@@ -726,6 +726,7 @@ jobs:
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
           Copy-Item docs/DX9EX_TEST_LAUNCH_CONTRACT.md (Join-Path $dir 'DX9EX_TEST_LAUNCH_CONTRACT.md')
+          Copy-Item docs/VR_NIGHT_AB_COCKPIT_TEST_20261017.md (Join-Path $dir 'NIGHT_AB_COCKPIT_TEST.md')
           Copy-Item docs/VR_HUD_NIGHT_TEST_20261009.md (Join-Path $dir 'HUD_NIGHT_TEST_GUIDE.md')
           @(
             'OUTRUN 2006 VR DX9EX - START HERE / 실행 방법'
@@ -815,7 +816,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+          foreach ($file in @('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md','NIGHT_AB_COCKPIT_TEST.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           # Original player-car PMT and EXE remain immutable. The cockpit glass
@@ -938,6 +939,12 @@ jobs:
               $inputPolicy.GpuDiagnosticsMode -ne 'SLOT_SELECTOR_CHECKBOX') { throw 'GPU diagnostics manifest gate failed' }
           foreach ($token in @('GpuDiagnostics','OUTRUN_VR_GPU_PROFILE','OUTRUN_VR_PACING_DIAGNOSTICS','D3D9TimestampQueryRequested','gpu-utilization-status.json')) {
             if ($runnerText -notlike "*$token*") { throw "GPU diagnostics runner marker missing $token" }
+          }
+          foreach ($token in @('A_SEAT_STOCK','B_SEAT_115','C_SEAT_130','-CockpitVehicleScale','-CockpitGlassProbeOpacity','G_COCKPIT')) {
+            if ($guiText -notlike "*$token*") { throw "Cockpit A/B/C GUI contract missing $token" }
+          }
+          foreach ($token in @('CockpitVehicleScale','CockpitGlassProbeOpacity','cockpitGlassActualTransparency=NOT_IMPLEMENTED')) {
+            if ($runnerText -notlike "*$token*") { throw "Cockpit A/B/C runner contract missing $token" }
           }
           foreach ($token in @('GPU 상세 진단','-GpuDiagnostics','$gpuCheck.Checked')) {
             if ($guiText -notlike "*$token*") { throw "GPU diagnostics selector marker missing $token" }

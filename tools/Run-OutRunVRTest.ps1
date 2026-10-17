@@ -4,6 +4,8 @@ param(
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
     [string]$GpuDiagnostics = 'OFF',
+    [ValidateSet('DEFAULT','1.00','1.15','1.30')][string]$CockpitVehicleScale = 'DEFAULT',
+    [ValidateSet('DEFAULT','0.20','0.30','0.50','0.80')][string]$CockpitGlassProbeOpacity = 'DEFAULT',
     [ValidateSet('DEFAULT','ON','OFF')][string]$GpuLabTransparency = 'DEFAULT',
     [ValidateSet('DEFAULT','512','1024')][string]$GpuLabReflection = 'DEFAULT',
     [ValidateSet('DEFAULT','0','4')][string]$GpuLabSkyGlow = 'DEFAULT',
@@ -146,6 +148,24 @@ if($backend -eq 'd3d9'){
     }
 }
 
+# A/B/C cockpit presets are runtime settings, never original EXE/PMT edits.
+# Each session records the exact choice; glass opacity is diagnostic only until
+# the real PC windshield material has been positively identified.
+if($CockpitVehicleScale -ne 'DEFAULT' -or $CockpitGlassProbeOpacity -ne 'DEFAULT'){
+    if($backend -ne 'd3d9' -or $TestProfile -ne 'COCKPIT_PARTICLES'){
+        throw 'Cockpit scale/glass probes require DX9Ex COCKPIT_PARTICLES.'
+    }
+    if($CockpitVehicleScale -ne 'DEFAULT'){
+        $gameArgs=@($gameArgs|Where-Object{$_ -notmatch '^-DriverSeatVehicleScale='})
+        $gameArgs+='-DriverSeatVehicleScale='+$CockpitVehicleScale
+    }
+    if($CockpitGlassProbeOpacity -ne 'DEFAULT'){
+        $gameArgs=@($gameArgs|Where-Object{$_ -notmatch '^-DriverSeatGlassOpacity='})
+        $gameArgs+='-DriverSeatGlassOpacity='+$CockpitGlassProbeOpacity
+        $gameArgs+='-DriverSeatGlassMaterialTrace=true'
+    }
+}
+
 # The measured C preset may run WITHOUT the GPU-Lab instrumentation. Other
 # A/B diagnostic combinations still require GPU Diagnostics ON; they are not
 # silently promoted to gameplay defaults.
@@ -209,6 +229,9 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "backend=$backend"
     "profile=$TestProfile"
     "gpuDiagnostics=$GpuDiagnostics"
+    "cockpitVehicleScale=$CockpitVehicleScale"
+    "cockpitGlassProbeOpacity=$CockpitGlassProbeOpacity"
+    "cockpitGlassActualTransparency=NOT_IMPLEMENTED"
     "gpuLabTransparency=$GpuLabTransparency"
     "gpuLabReflection=$GpuLabReflection"
     "gpuLabSkyGlow=$GpuLabSkyGlow"

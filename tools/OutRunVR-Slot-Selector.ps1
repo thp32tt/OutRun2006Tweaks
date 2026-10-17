@@ -6,6 +6,9 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 
 $slots=[ordered]@{
+    'A_SEAT_STOCK'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.00';Title='A 운전석 기본 크기 100%';Help='운전석 ON, 전체 차체 1.00x / 위치는 F11에서 조절.'}
+    'B_SEAT_115'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.15';Title='B 운전석 차량 115%';Help='운전석 ON, 전체 차체 1.15x / 이전 실험 기본 배율.'}
+    'C_SEAT_130'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.30';Title='C 운전석 차량 130%';Help='운전석 ON, 전체 차체 1.30x / 시야 가림 및 위치 확인.'}
     'CURRENT_FOCUS'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='MAIN R84 / R29-R33';Help='기본 구조 개선 렌더러. Quest3 검증 필요.'}
     'R26_SAFE'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R26 SAFE / 기존 보호판';Help='기존 R26+HUD 렌더러 복귀. CURRENT FOCUS로 R84 재선택.'}
     'R84_TEST'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R84 TEST / 개편 경로';Help='기본 R84와 동일한 독립 렌더러 A/B 진단.'}
@@ -31,6 +34,7 @@ function Get-Active {
 function Prepare-Slot([string]$slot){
     if(!$slots.Contains($slot)){throw "Unknown slot: $slot"}
     $cfg=$slots[$slot]
+    $actualVariant=if($cfg.Contains('Variant')){[string]$cfg.Variant}else{$slot}
     $sessionPath=Join-Path $root 'CURRENT_VR_SESSION.json'
     # A previous successful test can leave this file behind. Its existence
     # is not evidence that the selector actually prepared this launch.
@@ -44,7 +48,7 @@ function Prepare-Slot([string]$slot){
         }
     }
     # Direct invocation preserves spaces and propagates backend/PE/hash errors.
-    & $selector -Backend $cfg.Backend -TestProfile $cfg.Profile -VariantId $slot
+    & $selector -Backend $cfg.Backend -TestProfile $cfg.Profile -VariantId $actualVariant
     if(-not (Test-Path -LiteralPath $sessionPath)){
         throw "Slot preparation did not create a session: $slot"
     }
@@ -60,13 +64,13 @@ function Prepare-Slot([string]$slot){
     }
     if($session.Backend -ne $cfg.Backend -or
        $session.TestProfile -ne $cfg.Profile -or
-       $session.VariantId -ne $slot){
+       $session.VariantId -ne $actualVariant){
         throw "Slot preparation session identity mismatch for $slot"
     }
     # The manifest and the actual installed backend marker must agree.
     $active=Get-Active
     if($active.backend -ne $cfg.Backend -or
-       $active.variant -ne $slot -or
+       $active.variant -ne $actualVariant -or
        $active.profile -ne $cfg.Profile){
         throw "Slot preparation active backend identity mismatch for $slot"
     }
@@ -77,19 +81,22 @@ function Start-Slot([string]$slot){
     $cfg=$slots[$slot]
     $gpuSetting = if ($gpuCheck.Checked) { 'ON' } else { 'OFF' }
     if ($gpuSetting -eq 'ON' -and $cfg.Backend -ne 'd3d9') { throw 'GPU detailed profiling is DX9Ex-only.' }
-    $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile,'-GpuDiagnostics',$gpuSetting)
+    $vehicleScale=if($cfg.Contains('Scale')){[string]$cfg.Scale}else{'DEFAULT'}
+    $glassProbe=if($cfg.Contains('Scale')){[string]$glassProbeBox.SelectedItem}else{'DEFAULT'}
+    $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile,'-GpuDiagnostics',$gpuSetting,'-CockpitVehicleScale',$vehicleScale,'-CockpitGlassProbeOpacity',$glassProbe)
     # Start-Process joins string[] arguments without quoting the -File value.
     # Quote the full script path; OutRun is often installed under a folder
     # containing spaces. The runner trap writes a launch error + modal dialog.
     $quotedRunner = '"' + $runner + '"'
-    $launchArgs = "-NoProfile -ExecutionPolicy Bypass -File $quotedRunner -TestProfile $($cfg.Profile) -GpuDiagnostics $gpuSetting"
+    $launchArgs = "-NoProfile -ExecutionPolicy Bypass -File $quotedRunner -TestProfile $($cfg.Profile) -GpuDiagnostics $gpuSetting -CockpitVehicleScale $vehicleScale -CockpitGlassProbeOpacity $glassProbe"
     Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $launchArgs -WorkingDirectory $root -WindowStyle Normal -ErrorAction Stop
 }
 
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun VR Slot Selector V2'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=New-Object System.Drawing.Size(620,795)
+$form.ClientSize=New-Object System.Drawing.Size(620,840)
+$form.AutoScroll=$true
 $form.FormBorderStyle='FixedDialog'
 $form.MaximizeBox=$false
 
@@ -195,7 +202,8 @@ $($cfg.Help)
     $y+=58
 }
 # An added R84 row must never overlap diagnostics, help or the collector note.
-$form.ClientSize=[System.Drawing.Size]::new(620, [int]($y+330))
+# Keep the window usable on 1080p displays; extra test rows scroll.
+$form.ClientSize=[System.Drawing.Size]::new(620,840)
 
 $gpuCheck=New-Object System.Windows.Forms.CheckBox
 $gpuCheck.Text='GPU 상세 진단 (타임스탬프 + 투명/깊이 + VR 페이싱 + NVIDIA GPU 사용률)'
@@ -206,6 +214,19 @@ $gpuCheck.Location=[System.Drawing.Point]::new(35, [int]($y+12))
 $form.Controls.Add($gpuCheck)
 
 
+$glassProbeLabel=New-Object System.Windows.Forms.Label
+$glassProbeLabel.Text='유리 불투명도 후보 (진단값만 기록, 실제 렌더 미적용)'
+$glassProbeLabel.AutoSize=$true
+$glassProbeLabel.Location=[System.Drawing.Point]::new(35,[int]($y+53))
+$form.Controls.Add($glassProbeLabel)
+$glassProbeBox=New-Object System.Windows.Forms.ComboBox
+$glassProbeBox.DropDownStyle='DropDownList'
+foreach($value in @('0.20','0.30','0.50','0.80')){[void]$glassProbeBox.Items.Add($value)}
+$glassProbeBox.SelectedItem='0.30'
+$glassProbeBox.Size=New-Object System.Drawing.Size(130,26)
+$glassProbeBox.Location=[System.Drawing.Point]::new(35,[int]($y+78))
+$form.Controls.Add($glassProbeBox)
+
 # PC game/PMT assets are immutable in the DX9Ex cockpit workflow.
 # The legacy disk-model patch controls were deliberately removed. Live
 # runtime glass alpha remains gated on verified player windshield ownership.
@@ -214,15 +235,15 @@ $helpBox.Multiline=$true
 $helpBox.ReadOnly=$true
 $helpBox.ScrollBars='Vertical'
 $helpBox.Size=New-Object System.Drawing.Size(550,92)
-$helpBox.Location=[System.Drawing.Point]::new(35, [int]($y+166))
-$helpBox.Text='운전석 기본 ON. F11 > VR > DriverSeatVehicleScale로 차량 크기 조절. F11의 DriverSeatGlassOpacity는 현재 진단 설정이며 유리에 적용되지 않습니다. 원본 차량 PMT·EXE 수정 금지에 따라 파일 변경 버튼은 제거했습니다. 재질 식별을 위해 DriverSeatGlassMaterialTrace를 켜고 재실행 후 로그 ZIP을 확인하세요. Quest3/VDXR 실기 검증 전에는 유리 효과를 보장하지 않습니다.'
+$helpBox.Location=[System.Drawing.Point]::new(35, [int]($y+176))
+$helpBox.Text='A/B/C 운전석은 모두 ON, 차체 배율만 100/115/130% 비교. 일반 CURRENT_FOCUS는 운전석 OFF 대조군. 테스트 종료 후 다시 선택하면 매번 새로운 로그가 분리 저장됩니다. F11에서 위치/배율도 조절 가능합니다. 운전석 기본 ON. F11 > VR > DriverSeatVehicleScale로 차량 크기 조절. F11의 DriverSeatGlassOpacity는 현재 진단 설정이며 유리에 적용되지 않습니다. 원본 차량 PMT·EXE 수정 금지에 따라 파일 변경 버튼은 제거했습니다. 재질 식별을 위해 DriverSeatGlassMaterialTrace를 켜고 재실행 후 로그 ZIP을 확인하세요. Quest3/VDXR 실기 검증 전에는 유리 효과를 보장하지 않습니다.'
 $form.Controls.Add($helpBox)
 
 $note=New-Object System.Windows.Forms.Label
 $note.Text='게임 종료 후 collector가 자동 실행되어 OutRun2_VR_ANALYZE_<slot>_<profile>_<session>.zip 을 만듭니다.'
 $note.AutoSize=$false
 $note.Size=New-Object System.Drawing.Size(550,40)
-$note.Location=[System.Drawing.Point]::new(35, [int]($y+274))
+$note.Location=[System.Drawing.Point]::new(35, [int]($y+283))
 $form.Controls.Add($note)
 
 [void]$form.ShowDialog()
