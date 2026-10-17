@@ -12,12 +12,12 @@
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
   "phase": "C3_VALIDATE",
-  "checkpoint": "C2_MATERIAL",
+  "checkpoint": "C3_EXACT_SHA_CANDIDATE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "11b03e118195a6d883c9d80c66f6b67a15b606e4",
-  "material_result_sha": null,
+  "material_result_sha": "b9ae958884d87c32b74ee873826d34504a03dae8",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/hud_command_batch.hpp",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_sprite_glyph_native_texture_transition": "PENDING_EXACT_SHA",
-    "foreign_batch_native_failure_rejection": "PENDING_EXACT_SHA",
-    "exact_sha_win32_hmd_separation": "PENDING_EXACT_SHA"
+    "stage_sprite_glyph_native_texture_transition": "PASS_GITHUB_HOST_CPP17",
+    "foreign_batch_native_failure_rejection": "PASS_GITHUB_HOST_CPP17",
+    "exact_sha_win32_hmd_separation": "PENDING_ALL_FOUR_GATES"
   },
   "diagnosis": {
     "root_cause": "Ledger::completeNativeDraw currently treats any mutation during native Draw as a failed GPU transaction. A successful hooked Flush from D3DXSprite::Draw itself changes that serial, causing the returning successful texture draw to be discarded as an exact +TIME/GOAL owner.",
@@ -85,9 +85,27 @@
     "eye_ownership": "Loss of the exact ScreenHud producer can route +TIME sprite or numeric glyph into generic overlay behavior rather than R84's finite binocular HUD plane."
   },
   "local_validation": {
-    "cpp17_smoke": "NOT_RUN_LOCALLY",
-    "planned": "Existing portable hud_command_batch_smoke compiled and executed by mandatory x64 host CI"
+    "cpp17_smoke": "PASS_GITHUB_ACTIONS_HOST",
+    "verified_on_sha": "165ed79a10011d58248ecd33ada6a420ce491b41",
+    "platform": "WINDOWS_X64_CMAKE_HOST"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Wait for final exact-SHA required CI; then C6-only bookkeeping update if green. Quest3/VDXR optics still UNTESTED."
+  "next_action": "Require one final validation-bearing SHA with all four required GitHub Actions exact-match successes. C6 must be separate [skip ci] bookkeeping; Quest3 UNTESTED.",
+  "ci_preflight": {
+    "source_implementation_sha": "b9ae958884d87c32b74ee873826d34504a03dae8",
+    "policy_sha": "165ed79a10011d58248ecd33ada6a420ce491b41",
+    "policy": "SUCCESS",
+    "host": "SUCCESS",
+    "r26_safe_game": "SUCCESS",
+    "domain": "SUCCESS",
+    "main_r84_full_chain": "IN_PROGRESS",
+    "initial_material_hud_inspector": "SUCCESS_DIFFERENT_SHA",
+    "initial_material_full_source": "SUCCESS_DIFFERENT_SHA"
+  },
+  "last_ci_failure": {
+    "validation_sha": "b9ae958884d87c32b74ee873826d34504a03dae8",
+    "run_id": 38991513644,
+    "job": "policy",
+    "cause": "Existing D3DX static mutation verifier required four-argument native Draw and old strict unchanged callback; incompatible with the actual new successful internal Flush transaction. Verifier corrected without reducing original failure checks."
+  }
 }
