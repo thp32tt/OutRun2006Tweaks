@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C2_IMPLEMENTED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "material_result_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7",
+  "validation_bearing_result_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/overlay/hooks_overlay.cpp",
@@ -56,9 +56,9 @@
     ]
   },
   "acceptance_results": {
-    "xr_main_menu_letterbox_owner": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "original_menu_and_desktop_fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "main_menu_exact_sha_integration": "PENDING_EXACT_SHA"
+    "xr_main_menu_letterbox_owner": "PASS_BUILD",
+    "original_menu_and_desktop_fallback": "PASS_BUILD",
+    "main_menu_exact_sha_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Observed native hook D3DEndScene generates two independent 4:3 rail DrawPrimitive calls without any game or external overlay scope; GPU R84 dispatch bases stereo route on capture of current semantic.",
@@ -78,13 +78,42 @@
     "evidence_limit": "Static source path and targeted CI only; no matching Quest3/VDXR physical optical verification."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7",
+    "material_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
-    ]
+    ],
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39062245263,
+        "conclusion": "success",
+        "exact_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39062245232,
+        "conclusion": "success",
+        "exact_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39062245225,
+        "conclusion": "success",
+        "exact_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39062245322,
+        "conclusion": "success",
+        "exact_sha": "efd095cce1fafbf1ac0469b3203059888cdca7a7"
+      }
+    ],
+    "runtime_validation": "UNTESTED"
   },
-  "notes": "Material source scope in main-menu letterbox path, not a new F11 or gameplay HUD claim; build and HMD conclusions pending."
+  "notes": "C6 bookkeeping after 4/4 exact-SHA SUCCESS; material implementation and validation-bearing SHA remain efd095cce1fa. Quest3/VDXR stereo visuals UNTESTED; no replay, no duplicate CI or score for C6."
 }
