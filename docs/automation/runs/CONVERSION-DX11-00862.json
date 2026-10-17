@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00862",
+  "production_id": "CONVERSION-DX11-00862",
+  "event_id": "CONVERSION-DX11-00862-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_POSTPASS_COMPUTE_CAMERA_REPLAY",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 1,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "bafe6239503ade4927aa404508d468281df369fd",
+  "validation_bearing_result_sha": "960866a2591a12b255ac1d38b641b8f15b593fdf",
+  "result_sha": "960866a2591a12b255ac1d38b641b8f15b593fdf",
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Replay real game-compute-authored UAV-only camera color into separate native DX11 L/R eye targets using GPU Copy and scaled GPU Stretch while detaching/restoring original caller OM MRT/depth and CS UAV state; retain dormant native activation and DX9Ex game input/FFB fallback. Hardware gameplay parity remains UNTESTED.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_left_right_gpu_game_camera_postpass",
+        "expected_behavior": "Each game-authored compute-UAV eye slice is consumed through native GPU Copy and shader Stretch into the corresponding separate eye; exact red/blue eye pixel identity is checked on WARP."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_compute_uav_om_state",
+        "expected_behavior": "Preserve original CS UAV slots and append counters, RTV/MRT and depth, reject invalid foreign source slices before GPU writes; preserve D3D9 Draw/Present/gamepad/FFB fallback and dormant activation."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_windows_openxr_hud_exact_sha",
+        "expected_behavior": "All five required GitHub Actions workflows succeed on validation-bearing SHA; real-game Quest3/VDXR runtime not inferred."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp: add scoped CS-UAV/OM-output detach and restore for game compute camera GPU postpasses; admit UAV-only camera source for native per-eye Copy/Stretch and both-eye event preflight.",
+      "tools/dx11_native_transport_probe.cpp: generate independent GPU compute UAV camera slices, exercise native eye post-draw Copy and scaled Stretch and prove original CS UAV slots and pixel identity by WARP.",
+      "tools/verify_dx11_activation_boundary.py: causal repair of pre-existing fixed string activation audit to preserve native Draw boundary while requiring new CS UAV safety tokens."
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native transport WARP #39002250678 SUCCESS on material SHA; compute-authored L/R pixels survive native per-eye GPU Copy and Stretch.",
+      "negative_regression": "Invalid array slice rejected and original CS UAV output bindings restored; native Draw evidence and original DX9Ex input/fallback unchanged.",
+      "component_integration": "Game compute UAV-only camera texture -> native GPU Copy/Stretch -> distinct native L/R eye RTV/depth -> GPU transport fence and OpenXR host handoff; Quest3 scene parity UNTESTED.",
+      "activation_guard_and_fallback": "No runtime promotion; DXVK frozen, native Draw scoped and original D3D9Ex/FFB input retained."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_POSTPASS_COMPUTE_CAMERA_REPLAY"
+    ],
+    "full_gate_plan": "one_final_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_NATIVE_WARP_COMPUTE_UAV_LEFT_RIGHT_COPY_STRETCH",
+    "fallback": "PASS_CS_UAV_OM_OUTPUT_RESTORE_AND_FAIL_CLOSED",
+    "gates": "PASS_EXACT_SHA_5_OF_5",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub latest HEAD, AGENTS.md, DX11 policy, previous 00861 C6 and active branch claim reviewed.",
+    "C1_REVIEW": "PASS: identified disjoint missing compute-UAV game camera Copy/Stretch postpass and selected cohesive source+WARP acceptance.",
+    "C2_IMPLEMENT": "PASS: meaningful native game camera GPU Copy/Stretch source and WARP regression in material bafe6239503ade4927aa404508d468281df369fd.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: mandatory five GitHub workflows SUCCESS at 960866a2591a12b255ac1d38b641b8f15b593fdf; initial bafe6239503ade4927aa404508d468281df369fd WARP SUCCESS. Quest3/VDXR runtime UNTESTED.",
+    "C4_COMMIT": "PASS: bafe6239503ade4927aa404508d468281df369fd material plus 960866a2591a12b255ac1d38b641b8f15b593fdf causal source-guard CI repair (both non-CI-skip); separate C6 bookkeeping [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED: no hardware validated playable game package.",
+    "C6_STATE": "PASS_EXACT_SHA: all five required workflows SUCCESS on 960866a2591a12b255ac1d38b641b8f15b593fdf, WARP on bafe6239503ade4927aa404508d468281df369fd; Quest3 gameplay UNTESTED; no duplicate score across retries/checkpoint."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "bafe6239503ade4927aa404508d468281df369fd",
+    "validation_bearing_sha": "960866a2591a12b255ac1d38b641b8f15b593fdf",
+    "dx11_fast_run_id": 39002369783,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 39002369620,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 39002373809,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 39002373815,
+    "openxr_conclusion": "success",
+    "hud_inspector_run_id": 39002373804,
+    "hud_inspector_conclusion": "success",
+    "native_transport_warp_run_id": 39002250678,
+    "native_transport_warp_result_sha": "bafe6239503ade4927aa404508d468281df369fd",
+    "native_transport_warp_conclusion": "success",
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "score_policy": "One new meaningful DX11 source delivery +1 only once, contingent on scoreboard RUN_KEY; C6/retry/verifier repair +0."
+  },
+  "next_action": "Continue independent menu->vehicle->race DX11 full native frame source graph; Quest3/VDXR/menu/vehicle/race/gamepad visible validation is still required for gameplay/VR promotion; do not rerun PASS exact SHA."
+}
