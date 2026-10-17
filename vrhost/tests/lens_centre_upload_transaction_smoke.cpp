@@ -63,5 +63,32 @@ int main()
     inner = left;
     inner.centreCall = 0;
     assert(!SameStereoDrawSource(left, inner));
+
+    // Counterexample: native nested game c64 replacement with an unchanged
+    // producer, physical draw, shader and headset pose passes the old guard.
+    const RawStereoSource original{101, 39, 7, 7, 9, 9, 0x100, 11, true};
+    assert(SameStereoDrawSource(left, left));
+    assert(SameRawStereoSource(original, original));
+    auto changed = original;
+    changed.writeSerial++;
+    assert(!SameRawStereoSource(original, changed));
+    changed = original;
+    changed.writtenDraw++;
+    assert(!SameRawStereoSource(original, changed));
+    changed = original;
+    changed.writtenCentreCall++;
+    assert(!SameRawStereoSource(original, changed));
+    changed = original;
+    changed.writtenPoseEpoch++;
+    assert(!SameRawStereoSource(original, changed));
+    changed = original;
+    changed.shaderEpoch++;
+    assert(!SameRawStereoSource(original, changed));
+    changed = original;
+    changed.exactDirectRaw = false;
+    assert(!SameRawStereoSource(original, changed));
+    changed = original;
+    changed.writeSerial = 0;
+    assert(!SameRawStereoSource(original, changed));
     return 0;
 }

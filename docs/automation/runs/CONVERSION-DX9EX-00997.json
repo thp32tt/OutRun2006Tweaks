@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00997",
+  "production_id": "CONVERSION-DX9EX-00997",
+  "event_id": "CONVERSION-DX9EX-00997-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING_EXACT_SHA",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "25d1d007291a7614f19e93ee48ab32d113e5b673",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00997.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Preserve the original central C993 sun's exact game-created c64 WVP through physical R84 left and right eye GPU submissions, even when a nested native left Draw restores its shader, source and pose after replacing the original GPU matrix.",
+    "scope_boundary": "Only the original direct C993 centre, not CABE outer halos, SkyGlow, ordinary roads, +TIME, GOAL, DX9Ex rollback, input or FFB.",
+    "trace_stages": [
+      "Original D3A5 calls C993 and publishes source-owned original game shader c64 WVP with a monotonic successful upload serial.",
+      "R84 R30 proves raw game C993 producer matrix and builds two eye constants while its native R33 left GPU Draw may reenter.",
+      "R84 R33 snapshots before left and rechecks the actual successful game c64 upload generation after left before any right-eye emission.",
+      "On a changed or missing GPU matrix R33 restores original c64 and vetoes this frame without a duplicate original left draw."
+    ],
+    "subcomponents": [
+      "Capture original game c64 upload serial and producer/pose/shader provenance on both sides of the physical left native GPU Draw.",
+      "Reject same-producer nested GPU upload replacement and missing proof with a portable regression while keeping original fallbacks and unrelated halo sources."
+    ],
+    "acceptance_items": [
+      {
+        "id": "c993_same_raw_wvp_two_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "C993 producer to original game c64 and R84 two GPU eye submissions",
+        "expected_behavior": "Right GPU eye uses precisely the same original successful C993 source matrix as the left eye after a native callback."
+      },
+      {
+        "id": "c993_nested_upload_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Reentrant game c64 callback, native rollback and adjacent effects",
+        "expected_behavior": "Different game c64 generation with unchanged shader and producer cannot enter right eye, keeping one native left draw and safe restoration."
+      },
+      {
+        "id": "c993_exact_sha_windows_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 Windows game and x64 host build/package",
+        "expected_behavior": "Exact SHA DX9Ex Active, Domain, affected HUD Inspector/Full Source regressions pass; hardware optics stay untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "c993_same_raw_wvp_two_eyes": "PENDING_WINDOWS_CI",
+    "c993_nested_upload_negative": "PENDING_WINDOWS_CI",
+    "c993_exact_sha_windows_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R33's physical stereo reentrancy fence compared source call/draw/shader/pose but not the monotonic original-game c64 GPU upload generation already published in outrun_renderer.cpp.",
+    "original_evidence": "Successful game c64 writes increment LastGameWvpWriteSerial; source-only R33 captureCentreSource excluded that value despite earlier R30 source WVP proof.",
+    "source_trace": [
+      "Original C993 produces game WVP and successful write serial.",
+      "R30 builds eye matrices using game raw c64 provenance.",
+      "R33 native left Draw may synchronously cause another write; right must compare the original serial before submission."
+    ],
+    "alternatives_rejected": [
+      "Unconditional GPU Flush, generic world shader inference and repeating producer registration do not guarantee identical physical c64 input."
+    ],
+    "eye_ownership": "Exact left source and original game matrix must survive as one GPU submission identity for right; otherwise frame invalidation retains original single native left."
+  },
+  "local_validation": "PENDING_HOST_SMOKE",
+  "score_delta_this_attempt": 0,
+  "next_action": "Check one final source-bearing exact SHA in all mandatory GitHub Windows Actions; HMD stays UNTESTED."
+}

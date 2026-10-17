@@ -37,6 +37,7 @@
 namespace OutRunVRRenderer {
     std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
     std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
+    std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
     bool GetLastRawGameWvpWrite(float outConstants[16],
         std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
         std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
@@ -917,11 +918,57 @@ namespace OutRunVRStereo
                     command.IsDirectWorldLensCentre() && validShader
                 };
             };
+            // R30 admitted an original source-owned WVP. Its native upload
+            // serial must survive the reentrant left GPU Draw before R33
+            // may submit the already-computed right-eye c64.
+            auto captureCentreRawSource = [&]() noexcept {
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                float gameRaw[16]{};
+                std::uint64_t serial = 0, writtenDraw = 0;
+                std::uint64_t writtenShaderEpoch = 0;
+                std::uintptr_t writtenShader = 0, shader = 0;
+                std::uint64_t shaderEpoch = 0, queueEpoch = 0;
+                const void* queueNode = nullptr;
+                OutRunVR::GameSemantic::RenderScope writtenScope =
+                    OutRunVR::GameSemantic::RenderScope::None;
+                OutRunVR::GameSemantic::ProducerToken writtenProducer =
+                    OutRunVR::GameSemantic::ProducerToken::None;
+                const auto pose = OutRunVRRenderer::GetCurrentLatchedPoseEpoch();
+                const auto writtenPose =
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch();
+                const auto writtenCall =
+                    OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch();
+                const bool exactRaw = command.IsDirectWorldLensCentre() &&
+                    OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        gameRaw, serial, writtenDraw,
+                        writtenShader, writtenShaderEpoch) &&
+                    OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                        writtenScope, queueEpoch, queueNode, writtenProducer) &&
+                    R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                    writtenScope ==
+                        OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
+                    writtenProducer ==
+                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre &&
+                    queueNode == nullptr && command.lensCentreCallEpoch != 0 &&
+                    command.lensCentreCallEpoch == writtenCall &&
+                    pose != 0 && pose == writtenPose &&
+                    writtenShader != 0 && writtenShader == shader &&
+                    writtenShaderEpoch != 0 &&
+                    writtenShaderEpoch == shaderEpoch;
+                return OutRunVR::LensCentre::RawStereoSource{
+                    serial, writtenDraw, command.lensCentreCallEpoch,
+                    writtenCall, pose, writtenPose, writtenShader,
+                    writtenShaderEpoch, exactRaw};
+            };
             const bool exactCentreEye =
                 screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;
             const auto centreBeforeLeft = exactCentreEye
                 ? captureCentreSource()
                 : OutRunVR::LensCentre::StereoDrawSource{};
+            const auto centreRawBeforeLeft = exactCentreEye
+                ? captureCentreRawSource()
+                : OutRunVR::LensCentre::RawStereoSource{};
 
             // Only the original player shadow's game WVP may feed the right
             // eye. Native left Draw may synchronously reenter another producer,
@@ -1065,8 +1112,10 @@ namespace OutRunVRStereo
             }
 
             const bool centreSourceChanged = exactCentreEye &&
-                !OutRunVR::LensCentre::SameStereoDrawSource(
-                    centreBeforeLeft, captureCentreSource());
+                (!OutRunVR::LensCentre::SameStereoDrawSource(
+                    centreBeforeLeft, captureCentreSource()) ||
+                 !OutRunVR::LensCentre::SameRawStereoSource(
+                    centreRawBeforeLeft, captureCentreRawSource()));
             const bool shadowSourceChanged = exactShadowEye &&
                 !OutRunVR::CarShadowStereo::SameStereoDrawSource(
                     shadowBeforeLeft, captureShadowSource());

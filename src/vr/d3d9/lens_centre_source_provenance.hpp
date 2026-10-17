@@ -51,6 +51,50 @@ namespace OutRunVR::LensCentre
             before.shaderEpoch != 0 &&
             before.shaderEpoch == after.shaderEpoch;
     }
+    // R84 C993: left native Draw can reenter and replace original-game
+    // c64 even when the exact producer, shader, pose and draw survive.
+    // Preserve one raw GPU upload generation for BOTH physical eye draws.
+    struct RawStereoSource
+    {
+        std::uint64_t writeSerial = 0;
+        std::uint64_t writtenDraw = 0;
+        std::uint64_t centreCall = 0;
+        std::uint64_t writtenCentreCall = 0;
+        std::uint64_t poseEpoch = 0;
+        std::uint64_t writtenPoseEpoch = 0;
+        std::uintptr_t shader = 0;
+        std::uint64_t shaderEpoch = 0;
+        bool exactDirectRaw = false;
+    };
+    constexpr bool SameRawStereoSource(
+        const RawStereoSource& before, const RawStereoSource& after) noexcept
+    {
+        return before.exactDirectRaw && after.exactDirectRaw &&
+            before.writeSerial != 0 &&
+            before.writeSerial == after.writeSerial &&
+            before.writtenDraw == after.writtenDraw &&
+            before.centreCall != 0 &&
+            before.centreCall == before.writtenCentreCall &&
+            before.centreCall == after.centreCall &&
+            after.centreCall == after.writtenCentreCall &&
+            before.poseEpoch != 0 &&
+            before.poseEpoch == before.writtenPoseEpoch &&
+            before.poseEpoch == after.poseEpoch &&
+            after.poseEpoch == after.writtenPoseEpoch &&
+            before.shader != 0 && before.shader == after.shader &&
+            before.shaderEpoch != 0 &&
+            before.shaderEpoch == after.shaderEpoch;
+    }
+    static_assert(SameRawStereoSource(
+        {21, 11, 7, 7, 9, 9, 0x100, 3, true},
+        {21, 11, 7, 7, 9, 9, 0x100, 3, true}));
+    static_assert(!SameRawStereoSource(
+        {21, 11, 7, 7, 9, 9, 0x100, 3, true},
+        {22, 11, 7, 7, 9, 9, 0x100, 3, true}));
+    static_assert(!SameRawStereoSource(
+        {21, 11, 7, 7, 9, 9, 0x100, 3, true},
+        {21, 11, 7, 7, 9, 8, 0x100, 3, true}));
+
     static_assert(SameStereoDrawSource(
         {7, 30, 11, 9, 0x100, true}, {7, 30, 11, 9, 0x100, true}));
     static_assert(!SameStereoDrawSource(
