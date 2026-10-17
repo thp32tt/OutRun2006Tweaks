@@ -105,9 +105,9 @@ namespace Settings
         "Experimental cockpit-only player-car visual model scale. 1.0 preserves stock geometry; affects neither game physics nor original asset bytes. F11 adjustable after shader-safe player-car draw identification.", Range<float>{ 0.85f, 1.35f } };
     Setting<float> VRDriverSeatGlassOpacity{ "VR", "DriverSeatGlassOpacity", 0.30f,
         "Requested cockpit glass material opacity (0.10 to 0.90). A live renderer change requires a verified player-windshield material identity; currently diagnostic only and DOES NOT recolor unrelated materials.", Range<float>{ 0.10f, 0.90f } };
-    Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", false,
+    Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", true,
         "Restart-required read-only bounded canonical PMT material probe; logs candidate blend/material IDs, never changes any glass or world opacity." };
-	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", false,
+	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", true,
         "Experimental: align cockpit camera offsets to the player's car matrix_B0 rather than camera yaw. Invalid/sideways transforms suppress the cockpit pass; verify each vehicle in HMD before enabling." };
 	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,
 		"Native camera mode used as the synchronized base for DriverSeatView. Default 1 is the bumper/in-car camera discovered from the canonical EXE.", Range<int>{ 0, 2 } };
