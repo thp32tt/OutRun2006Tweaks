@@ -33,6 +33,94 @@ def iter_activation_sources() -> list[Path]:
 
 
 
+
+def audit_native_partial_color_clear(source: str) -> list[str]:
+    """Authorize only a cropped, game-authored D3D11.0 GPU TARGET fill.
+
+    Unlike geometry, this bounded shader triangle never contributes to eye
+    drawCount/colorDrawCount. Require independent encoder, two-eye preflight,
+    precise color viewport and complete caller pipeline restore.
+    """
+    helper = source.partition(
+        "// A D3D11.0 immediate context has no rectangle-aware ClearView."
+    )[2].partition("\n// D3D11 ClearDepthStencilView ignores rectangles.")[0]
+    required = [
+        "[[nodiscard]] bool raster_partial_eye_color_clear(",
+        "rect.left < 0 || rect.top < 0 || rect.right <= rect.left ||",
+        "static_cast<std::uint32_t>(rect.right) > width ||",
+        "static_cast<std::uint32_t>(rect.bottom) > height)",
+        "if (!device) return false;",
+        "static std::mutex mutex;",
+        "if (cachedDevice.Get() != device.Get()) {",
+        "ds.DepthEnable = FALSE;",
+        "ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;",
+        "ds.StencilEnable = FALSE;",
+        "ScopedNativeGameEyeOutput restore(context, width, height);",
+        "if (!restore.valid()) return false;",
+        "context->OMSetRenderTargets(1u, &target, nullptr);",
+        "context->OMSetDepthStencilState(noDepth.Get(), 0u);",
+        "context->OMSetBlendState(nullptr, nullptr, 0xffffffffu);",
+        "context->RSSetState(nullptr); // game Clear ignores saved scissor/cull",
+        "static_cast<float>(rect.right - rect.left)",
+        "static_cast<float>(rect.bottom - rect.top)",
+        "context->RSSetViewports(1u, &viewport);",
+        "context->PSSetConstantBuffers(0u, 1u, &cb);",
+        "context->Draw(3u, 0u); // authored Clear, never native game Draw evidence",
+    ]
+    missing = ["color-raster:" + needle for needle in required
+               if needle not in helper]
+    if (not helper or DRAW_DISPATCH.findall(helper) != ["->Draw("] or
+            "drawCount_++" in helper or "colorDrawCount_++" in helper):
+        missing.append("color-raster: one scoped non-evidence GPU fill required")
+    encoder = source.partition(
+        "bool NativeGameEyeDrawEncoder::clear_target_argb("
+    )[2].partition("\nbool NativeGameEyeDrawEncoder::clear_depth_stencil(")[0]
+    encoder_required = [
+        "if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;",
+        "live_game_stereo::color_clear_route(",
+        "case live_game_stereo::NativeColorClearRoute::FullRtv:",
+        "context_->ClearRenderTargetView(eyeTarget_, rgba);",
+        "case live_game_stereo::NativeColorClearRoute::ClearView:",
+        "rectContext->ClearView(eyeTarget_, rgba, region, 1u);",
+        "case live_game_stereo::NativeColorClearRoute::ShaderRaster:",
+        "return raster_partial_eye_color_clear(",
+        "default:",
+        "return false;",
+        "desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||",
+        "desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;",
+    ]
+    missing += ["color-encoder:" + n for n in encoder_required if n not in encoder]
+    preflight = source.partition(
+        "bool NativeGameStereoSubmission::render_game_eye_passes("
+    )[2].partition("\n    // Allocate separate, full-size native depth")[0]
+    preflight_required = [
+        "if (needsClearView &&",
+        "FAILED(context_->QueryInterface(",
+        "ring_.format() != DXGI_FORMAT_R8G8B8A8_UNORM &&",
+        "ring_.format() != DXGI_FORMAT_B8G8R8A8_UNORM)",
+        'LoadLibraryW(L"d3dcompiler_47.dll")',
+        'GetProcAddress(compiler, "D3DCompile")',
+        "if (!ready) return false;",
+        "rect.right > static_cast<LONG>(ring_.width()) ||",
+        "rect.bottom > static_cast<LONG>(ring_.height())",
+    ]
+    missing += ["color-preflight:" + n for n in preflight_required
+                if n not in preflight]
+    regression = (ROOT / "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+                  ).read_text(encoding="utf-8")
+    regression_required = [
+        "NativeColorClearRoute::ShaderRaster",
+        "NativeColorClearRoute::ClearView",
+        "NativeColorClearRoute::FullRtv",
+        "NativeColorClearRoute::Reject",
+        "color_clear_route(true, -1, 0, 50, 50",
+        "color_clear_route(true, 0, 0, 1921, 1080",
+    ]
+    missing += ["color-regression:" + n for n in regression_required
+                if n not in regression]
+    return missing
+
+
 def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[str]:
     """Allow one scoped DSV-only GPU fill; never authorize a game color Draw.
 
@@ -260,6 +348,8 @@ def main() -> None:
                 "ring_.render_eye_pair(context_.Get(), slot_, frameId_,",
                 "context_->OMSetRenderTargets(1u, &target, depth);",
             ]
+            # Separate audited GPU partial-color raster, partial-depth raster
+            # and StretchRect postpasses each perform one non-evidence Draw.
             # The native GPU StretchRect postpass performs exactly one
             # fullscreen-triangle Draw, but it is NOT a game-authored geometry
             # Draw and must never advance source geometry evidence counters.
@@ -339,6 +429,7 @@ def main() -> None:
             depth_probe = (ROOT / "tools" / "dx11_native_transport_probe.cpp").read_text(
                 encoding="utf-8")
             missing += audit_native_partial_depth_clear(text, depth_probe)
+            missing += audit_native_partial_color_clear(text)
             missing += ["postpass:" + token for token in required_postpass
                         if token not in postpass]
             postpass_draws = DRAW_DISPATCH.findall(postpass)
@@ -349,7 +440,7 @@ def main() -> None:
             if missing or dispatches != [
                     "->Draw(", "->DrawIndexed(",
                     "->DrawInstanced(", "->DrawIndexedInstanced(",
-                    "->Draw(", "->Draw("]:
+                    "->Draw(", "->Draw(", "->Draw("]:
                 violations.append(
                     f"{path.relative_to(ROOT)}: unauthorized native eye Draw "
                     f"dispatch or missing frame/pose/output/evidence guard: "

@@ -3,6 +3,7 @@
 from pathlib import Path
 from verify_dx11_activation_boundary import (
     DRAW_DISPATCH, audit_native_partial_depth_clear,
+    audit_native_partial_color_clear,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,13 +17,13 @@ assert not audit_native_partial_depth_clear(source, probe), "valid DSV audit fai
 # negative companion must actually lie outside the eye (not an old valid box).
 assert "invalidPartialDepth.entries[1][0].rect = {-1, 1, 4, 4};" in probe
 assert "zRect.kind = SourceClear::Kind::FullDepthStencil;" in probe
-# Guard the exact six reviewed GPU dispatch locations: four genuine
-# per-eye commands and two non-evidence depth/stretch postpass triangles.
+# Guard the exact seven reviewed GPU dispatch locations: four genuine
+# per-eye commands and three non-evidence color/depth/stretch GPU triangles.
 # A new source Draw still requires explicit owner/activation audit.
 expected_dispatches = [
     "->Draw(", "->DrawIndexed(",
     "->DrawInstanced(", "->DrawIndexedInstanced(",
-    "->Draw(", "->Draw(",
+    "->Draw(", "->Draw(", "->Draw(",
 ]
 assert DRAW_DISPATCH.findall(source) == expected_dispatches, (
     "unexpected native Draw dispatch")
@@ -58,4 +59,31 @@ assert audit_native_partial_depth_clear(
 # The caller still owns the boundary: a fifth unauthorized Draw is not made
 # legitimate by the narrowly reviewed depth-only callback.
 assert DRAW_DISPATCH.findall(source + "\ncontext->Draw(8u, 0u);") != expected_dispatches
-print("DX11 native partial DSV draw audit: PASS (positive + negative tamper)")
+
+# A D3D11.0 source TARGET Clear uses one strictly cropped GPU shader Draw,
+# never authorizes unrelated game draws or an unbounded full-eye color Clear.
+assert not audit_native_partial_color_clear(source), "valid color audit failed"
+assert audit_native_partial_color_clear(
+    source.replace(
+        "context->OMSetRenderTargets(1u, &target, nullptr);",
+        "context->OMSetRenderTargets(0u, nullptr, nullptr);", 1),
+), "missing owned eye RTV slipped through"
+assert audit_native_partial_color_clear(
+    source.replace(
+        "context->RSSetState(nullptr); // game Clear ignores saved scissor/cull",
+        "", 1),
+), "inherited scissor/cull tamper slipped through"
+assert audit_native_partial_color_clear(
+    source.replace(
+        "ds.DepthEnable = FALSE;", "ds.DepthEnable = TRUE;", 1),
+), "inherited depth test tamper slipped through"
+assert audit_native_partial_color_clear(
+    source.replace(
+        "case live_game_stereo::NativeColorClearRoute::ShaderRaster:",
+        "case live_game_stereo::NativeColorClearRoute::FullRtv:", 1),
+), "cropped TARGET clear widened into full-eye Clear"
+assert audit_native_partial_color_clear(
+    source.replace(
+        'GetProcAddress(compiler, "D3DCompile")', "nullptr", 1),
+), "missing D3D11.0 preflight slipped through"
+print("DX11 native partial DSV/TARGET GPU draw audit: PASS (positive + negative tamper)")
