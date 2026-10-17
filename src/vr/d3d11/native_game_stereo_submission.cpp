@@ -337,6 +337,40 @@ bool NativeGameEyeDrawEncoder::game_source_target_bound(
         desc.CPUAccessFlags || (desc.MiscFlags & sharedFlags) ||
         (desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u)
         return false;
+
+    // Menu/car/race source cameras may omit depth for color-only HUD draws,
+    // but a camera must NEVER borrow this native eye's depth/stencil. The
+    // prior RT0-only admission let an authentic offscreen Draw overwrite
+    // live XR-eye Z/stencil even though its color went to a game camera.
+    // Test backing allocations, not DSV interface addresses: an alternate
+    // view of the same eye depth texture is equally unsafe.
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> cameraDepth;
+    context_->OMGetRenderTargets(0u, nullptr, cameraDepth.GetAddressOf());
+    if (cameraDepth) {
+        Microsoft::WRL::ComPtr<ID3D11Resource> cameraDepthResource;
+        Microsoft::WRL::ComPtr<ID3D11Resource> nativeEyeDepthResource;
+        cameraDepth->GetResource(cameraDepthResource.GetAddressOf());
+        if (eyeDepth_)
+            eyeDepth_->GetResource(nativeEyeDepthResource.GetAddressOf());
+        if (!cameraDepthResource || !nativeEyeDepthResource ||
+            cameraDepthResource.Get() == nativeEyeDepthResource.Get() ||
+            cameraDepthResource.Get() == eyeResource.Get() ||
+            cameraDepthResource.Get() == sourceResource.Get())
+            return false;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> cameraDepthTexture;
+        Microsoft::WRL::ComPtr<ID3D11Device> depthOwner;
+        if (FAILED(cameraDepthResource.As(&cameraDepthTexture)) ||
+            !cameraDepthTexture) return false;
+        cameraDepthTexture->GetDevice(depthOwner.GetAddressOf());
+        D3D11_TEXTURE2D_DESC depthDesc{};
+        cameraDepthTexture->GetDesc(&depthDesc);
+        if (!depthOwner || depthOwner.Get() != producer.Get() ||
+            depthDesc.Usage != D3D11_USAGE_DEFAULT ||
+            depthDesc.CPUAccessFlags != 0u ||
+            (depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL) == 0u ||
+            (depthDesc.MiscFlags & sharedFlags) != 0u)
+            return false;
+    }
     UINT count = 1u;
     D3D11_VIEWPORT view{};
     context_->RSGetViewports(&count, &view);

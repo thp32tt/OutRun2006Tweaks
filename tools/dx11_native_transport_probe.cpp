@@ -1982,6 +1982,24 @@ int main()
             encoder.color_draw_count() == beforeOffscreenEyeColor;
         ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
         if (!rejectsCameraMrt) return false;
+        // A source camera can have a valid RTV0 while mistakenly retaining
+        // the stereo eye's own DSV. It must not issue any original game
+        // geometry: doing so would change the next eye's Z/stencil history.
+        // Exercise the real Win32 WARP Draw/Indexed/instancing entrypoints;
+        // the ordinary camera-owned depth pair below remains accepted.
+        ctx->OMSetRenderTargets(
+            1u, &gameOffscreen, fixture.eyeDepth[eyeIndex]);
+        const bool rejectsBorrowedEyeDepth =
+            !encoder.draw_offscreen(gameOffscreen, 3u, 0u) &&
+            !encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0) &&
+            !encoder.draw_offscreen_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0u) &&
+            !encoder.draw_offscreen_indexed_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0, 0u) &&
+            encoder.draw_count() == beforeOffscreen &&
+            encoder.color_draw_count() == beforeOffscreenEyeColor;
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
+        if (!rejectsBorrowedEyeDepth) return false;
         const bool issuedOffscreen = eyeIndex == 0u
             ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
             : encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0);
