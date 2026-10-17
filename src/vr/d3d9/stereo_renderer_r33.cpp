@@ -29,6 +29,7 @@
 #include "gpu_water_profiler.hpp"
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "../core/r29_owner_api.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -689,6 +690,34 @@ namespace OutRunVRStereo
                 return {};
             }
 
+            // The exact C993 centre is a source-owned world billboard.
+            // A native left-eye Draw can reenter another producer or shader.
+            // Do not send the old left-eye constants to an unrelated right
+            // eye merely because the original left Draw returned S_OK.
+            auto captureCentreSource = [&]() noexcept {
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                const auto* liveStereo =
+                    OutRunVRRenderer::GetLatchedStereoFrameView();
+                std::uintptr_t shader = 0;
+                std::uint64_t shaderEpoch = 0;
+                const bool validShader =
+                    R29OwnerCurrentShaderEpoch(shader, shaderEpoch);
+                return OutRunVR::LensCentre::StereoDrawSource{
+                    command.lensCentreCallEpoch,
+                    R29OwnerTopLevelDrawSerial(),
+                    shaderEpoch,
+                    liveStereo ? liveStereo->poseSequence : 0u,
+                    shader,
+                    command.IsDirectWorldLensCentre() && validShader
+                };
+            };
+            const bool exactCentreEye =
+                screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;
+            const auto centreBeforeLeft = exactCentreEye
+                ? captureCentreSource()
+                : OutRunVR::LensCentre::StereoDrawSource{};
+
             R32ReviewNoteStereoDrawWithoutMonoBackup();
             if (mayWriteDepth || mayWriteStencil)
                 R32ReviewNoteMainDepthContentWrite();
@@ -710,6 +739,33 @@ namespace OutRunVRStereo
                 }
                 if (!restored)
                     R32ReviewNoteRestoreFailure("R33 fast left draw c64");
+                R32ReviewArmStereoRecoverySafety();
+                return result;
+            }
+
+            if (exactCentreEye &&
+                !OutRunVR::LensCentre::SameStereoDrawSource(
+                    centreBeforeLeft, captureCentreSource()))
+            {
+                // Left native Draw already ran once; never replay it.
+                // Restore the game's original GPU c64 without submitting
+                // an unrelated right-eye flare, invalidate this stereo frame
+                // and preserve the original left Draw HRESULT.
+                bool restored = false;
+                {
+                    R32ReviewInternalStereoPassScope guard;
+                    restored = R32ReviewSetWvpBatch(device, original);
+                }
+                R32ReviewMarkFrameRightDrawFailed();
+                R33InvalidateRightForLeftWrite(
+                    mayWriteDepth, mayWriteStencil);
+                R32ReviewReportStereoFailure(
+                    restored ? OutRunVR::StereoFailureRightStateFailed
+                             : OutRunVR::StereoFailureRestoreFailed,
+                    "R33/C993-centre-source-changed", E_FAIL);
+                if (!restored)
+                    R32ReviewNoteRestoreFailure(
+                        "R33 C993 original c64 rollback");
                 R32ReviewArmStereoRecoverySafety();
                 return result;
             }

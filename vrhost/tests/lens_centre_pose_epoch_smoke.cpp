@@ -27,6 +27,38 @@ int main()
     queued.noQueue = false;
     assert(!OwnsRawWvp(queued));
 
+    // The first physical C993 left Draw is allowed to submit to the
+    // right eye only when native reentrant callbacks left its exact
+    // centre producer, shader, pose and physical draw unchanged.
+    const StereoDrawSource left{7, 40, 11, 9, 0x100, true};
+    assert(SameStereoDrawSource(left, left));
+    auto changedCentre = left;
+    changedCentre.centreCall++;
+    assert(!SameStereoDrawSource(left, changedCentre));
+    auto nestedDraw = left;
+    nestedDraw.drawSerial++;
+    assert(!SameStereoDrawSource(left, nestedDraw));
+    auto newPose = left;
+    newPose.poseSequence++;
+    assert(!SameStereoDrawSource(left, newPose));
+    auto newShader = left;
+    newShader.shaderEpoch++;
+    assert(!SameStereoDrawSource(left, newShader));
+    newShader = left;
+    newShader.shader = 0x200;
+    assert(!SameStereoDrawSource(left, newShader));
+    auto outerDisc = left;
+    outerDisc.exactDirectCentre = false;
+    assert(!SameStereoDrawSource(left, outerDisc));
+    auto noSource = left;
+    noSource.centreCall = 0;
+    assert(!SameStereoDrawSource(noSource, left));
+    // Untagged, queued, other effect, or an epoch reset cannot pass this
+    // physical binocular owner. The original mono draw still runs once.
+    noSource = left;
+    noSource.shaderEpoch = 0;
+    assert(!SameStereoDrawSource(noSource, left));
+
     // The whole centre draw is exclusive: both source-owned and unknown
     // C993 c64 bypass the earlier road-shader and R28 world rebind owner.
     assert(SelectWorldRoute(true, OwnsRawWvp(raw)) ==

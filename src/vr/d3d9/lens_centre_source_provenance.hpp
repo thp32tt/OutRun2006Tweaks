@@ -23,6 +23,43 @@ namespace OutRunVR::LensCentre
             e.shaderEpoch != 0 && e.shaderEpoch == e.writtenShaderEpoch &&
             e.spatialCentreSource && e.exactCentreProducer && e.noQueue;
     }
+    // R33 prepares the left-eye C993 c64 and then invokes the original
+    // game draw before dispatching the right eye. A nested game draw may
+    // replace the exact producer, physical draw or bound shader in between.
+    // Both eyes must belong to ONE original physical sun submission.
+    struct StereoDrawSource
+    {
+        std::uint64_t centreCall = 0;
+        std::uint64_t drawSerial = 0;
+        std::uint64_t shaderEpoch = 0;
+        std::uint32_t poseSequence = 0;
+        std::uintptr_t shader = 0;
+        bool exactDirectCentre = false;
+    };
+    constexpr bool SameStereoDrawSource(
+        const StereoDrawSource& before,
+        const StereoDrawSource& after) noexcept
+    {
+        return before.exactDirectCentre && after.exactDirectCentre &&
+            before.centreCall != 0 &&
+            before.centreCall == after.centreCall &&
+            before.drawSerial != 0 &&
+            before.drawSerial == after.drawSerial &&
+            before.poseSequence != 0 &&
+            before.poseSequence == after.poseSequence &&
+            before.shader != 0 && before.shader == after.shader &&
+            before.shaderEpoch != 0 &&
+            before.shaderEpoch == after.shaderEpoch;
+    }
+    static_assert(SameStereoDrawSource(
+        {7, 30, 11, 9, 0x100, true}, {7, 30, 11, 9, 0x100, true}));
+    static_assert(!SameStereoDrawSource(
+        {7, 30, 11, 9, 0x100, true}, {7, 31, 11, 9, 0x100, true}));
+    static_assert(!SameStereoDrawSource(
+        {7, 30, 11, 9, 0x100, true}, {7, 30, 12, 9, 0x100, true}));
+    static_assert(!SameStereoDrawSource(
+        {7, 30, 11, 9, 0x100, true}, {7, 30, 11, 9, 0x100, false}));
+
     // A central C993 sun must never be consumed by the historic verified
     // world shader / rebind path before its own game-upload proof is checked.
     // Missing source evidence is not permission to borrow a previous road WVP.
