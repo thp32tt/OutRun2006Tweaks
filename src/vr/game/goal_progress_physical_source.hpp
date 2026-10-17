@@ -24,6 +24,19 @@ namespace OutRunVR::GoalPhysical
         std::uint64_t rawWvpWriteSerial = 0;
         std::uint64_t rawWvpDrawSerial = 0;
     };
+    // Only original-game c64 writes identify GOAL source generations.
+    // An unavailable/incomplete tracker pair must remain the existing
+    // zero/zero conservative fallback, never half-initialized or a live
+    // stereo-adjusted c64 upload borrowed from another eye.
+    constexpr Source StampOriginalGameWvpGeneration(
+        Source source, bool captured, std::uint64_t writeSerial,
+        std::uint64_t drawSerial) noexcept
+    {
+        const bool complete = captured && writeSerial != 0 && drawSerial != 0;
+        source.rawWvpWriteSerial = complete ? writeSerial : 0;
+        source.rawWvpDrawSerial = complete ? drawSerial : 0;
+        return source;
+    }
     constexpr bool IsGoal(const Source& s) noexcept
     {
         return GameSemantic::CanReprojectFiniteResultHudPlane(s.scope, s.producer) &&

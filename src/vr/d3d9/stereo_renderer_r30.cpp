@@ -5567,9 +5567,24 @@ namespace OutRunVRStereo
             if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                 R29OwnerCurrentVertexShaderIdentity() != 0)
                 return false;
-            out = {draw.scope, draw.producer, draw.queued, draw.queueNode,
+            // R33 already fences the ORIGINAL shader/c64 WVP generation.
+            // R30's fixed-function and XYZRHW GOAL path must use the same
+            // physical identity: native LEFT may reenter a different game
+            // matrix writer without changing its producer, SpriteNode, pose
+            // or shader. Private stereo uploads do not count as game writes.
+            float originalRawWvp[16]{};
+            std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
+            std::uintptr_t rawShader = 0;
+            std::uint64_t rawShaderEpoch = 0;
+            const bool captured = OutRunVRRenderer::GetLastRawGameWvpWrite(
+                originalRawWvp, rawWriteSerial, rawDrawSerial,
+                rawShader, rawShaderEpoch);
+            const OutRunVR::GoalPhysical::Source baseline{
+                draw.scope, draw.producer, draw.queued, draw.queueNode,
                 draw.queueEpoch, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
                 R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+            out = OutRunVR::GoalPhysical::StampOriginalGameWvpGeneration(
+                baseline, captured, rawWriteSerial, rawDrawSerial);
             return OutRunVR::GoalPhysical::IsValid(out);
         }
 

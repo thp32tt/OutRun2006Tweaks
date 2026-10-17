@@ -202,6 +202,33 @@ static bool CheckGoalPhysicalBothEyeSources()
         changedRaw = stampedDirect;
         changedRaw.rawWvpWriteSerial = 0;
         if (IsValid(changedRaw) || SameAfterNativeLeft(stampedDirect, changedRaw)) return false;
+        // Real R30 physical submission must stamp the same original c64
+        // generation as R33, even when a nested native LEFT callback writes
+        // another matrix for the SAME GOAL producer, node and shader.
+        auto r30Before = StampOriginalGameWvpGeneration(queued, true, 901, 77);
+        auto r30After = StampOriginalGameWvpGeneration(queued, true, 902, 77);
+        if (!SameAfterNativeLeft(r30Before, r30Before) ||
+            SameAfterNativeLeft(r30Before, r30After)) return false;
+        r30After = StampOriginalGameWvpGeneration(queued, true, 901, 78);
+        if (SameAfterNativeLeft(r30Before, r30After)) return false;
+        // The original fixed-function fallback accepts absent proof but
+        // may not quietly treat an incomplete or newly captured generation
+        // as identical to a previously proven one.
+        const auto unknown = StampOriginalGameWvpGeneration(queued, false, 901, 77);
+        const auto incomplete = StampOriginalGameWvpGeneration(queued, true, 901, 0);
+        if (!IsValid(unknown) || !IsValid(incomplete) ||
+            unknown.rawWvpWriteSerial != 0 || unknown.rawWvpDrawSerial != 0 ||
+            incomplete.rawWvpWriteSerial != 0 || incomplete.rawWvpDrawSerial != 0 ||
+            SameAfterNativeLeft(r30Before, unknown) ||
+            SameAfterNativeLeft(unknown, r30Before)) return false;
+        // No cross-family borrowing: +TIME and world markers are rejected
+        // even if their original c64 generation happens to match.
+        auto foreignStage = StampOriginalGameWvpGeneration(queued, true, 901, 77);
+        foreignStage.producer = ProducerToken::StageExtensionTime;
+        auto foreignWorld = StampOriginalGameWvpGeneration(queued, true, 901, 77);
+        foreignWorld.scope = RenderScope::WorldBillboard;
+        if (SameAfterNativeLeft(r30Before, foreignStage) ||
+            SameAfterNativeLeft(r30Before, foreignWorld)) return false;
         // Both absent stamps retain existing native fallback eligibility.
         if (!IsValid(queued) || !IsValid(direct)) return false;
         auto changed = queued;
