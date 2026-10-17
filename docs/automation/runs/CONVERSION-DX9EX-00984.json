@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "INTEGRATED_VALIDATION_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "0eee6e54516146c2463cd1fb64e259764e30607d",
@@ -76,5 +76,6 @@
       "Do not add duplicate C993 source hook, flatten world centre into head-locked HUD, alter alpha or remove verified CABE halo/SkyGlow."
     ]
   },
-  "next_action": "Verify immutable exact result SHA through mandatory GitHub Gates; leave Quest3/VDXR optics UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA recorded at immutable validation-bearing SHA; actual Quest3/VDXR headset validation remains NEED_HMD_TEST.",
+  "validation_bearing_result_sha": "ad8e5eff1a0a3bb0aed25a1a737a16b11d261a6d"
 }
