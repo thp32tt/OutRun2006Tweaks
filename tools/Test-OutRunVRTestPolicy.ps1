@@ -26,9 +26,15 @@ Assert-True ($cockpit.Environment.OUTRUN_VR_R30_PARTICLE_VB -eq '1') 'G_COCKPIT 
 Assert-True (-not $correctness.Environment.Contains('OUTRUN_VR_R30_PARTICLE_VB')) 'CORRECTNESS must not opt into untested R30 uploads'
 $slotSource = Get-Content (Join-Path $root 'OutRunVR-Slot-Selector.ps1') -Raw
 $runSource = Get-Content (Join-Path $root 'Run-OutRunVRTest.ps1') -Raw
-Assert-True ($slotSource.Contains('quest_cockpit_glass.py')) 'G_COCKPIT must expose original model glass opacity edit'
-Assert-True ($slotSource.Contains('glassSlider')) 'glass opacity GUI slider missing'
-Assert-True ($slotSource.Contains("'--restore'")) 'glass original restoration missing'
+# Runtime-only cockpit testing must NEVER call the legacy PMT modifier.
+# The user's original game files are immutable; F11 glass opacity is a
+# diagnostic setting until a proven windshield-only runtime owner exists.
+Assert-True (-not $slotSource.Contains('quest_cockpit_glass.py')) 'G_COCKPIT must not invoke the legacy original-model PMT editor'
+Assert-True (-not $slotSource.Contains('glassSlider')) 'G_COCKPIT must not advertise an unconnected file-edit glass slider'
+Assert-True (-not $slotSource.Contains("'--restore'")) 'G_COCKPIT must not offer original-model PMT restore/mutation'
+Assert-True ($slotSource.Contains('DriverSeatGlassMaterialTrace')) 'G_COCKPIT must expose the runtime-only windshield material trace'
+Assert-True ($slotSource.Contains('DriverSeatGlassOpacity')) 'G_COCKPIT must clearly document that glass opacity is not yet applied'
+Assert-True ($slotSource.Contains('원본 차량 PMT·EXE 수정 금지')) 'G_COCKPIT must explicitly protect original car models and EXE'
 Assert-True ($slotSource.Contains("Profile='COCKPIT_PARTICLES'")) 'G_COCKPIT UI must select the actual experimental runtime profile'
 Assert-True ($runSource.Contains('$env:OUTRUN_VR_R30_PARTICLE_VB = $null')) 'baseline must clear inherited experimental uploads'
 Assert-True ($runSource.Contains('$env:OUTRUN_VR_R30_PARTICLE_VB=$oldParticleGpuUpload')) 'runner must restore prior experimental upload state'
