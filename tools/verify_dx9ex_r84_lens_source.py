@@ -184,6 +184,39 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "stereo->poseSequence",
     ):
         assert marker in physical, "R33 C993 physical draw proof lost: " + marker
+    # The new R33 physical fence must run AFTER the original left native
+    # Draw and BEFORE any right-eye submission. Both source integrity and
+    # original-c64 rollback are required: removing either is a regression.
+    for marker in (
+        "const bool exactCentreEye =",
+        "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;",
+        "const auto centreBeforeLeft = exactCentreEye",
+        "if (exactCentreEye &&",
+        "OutRunVR::LensCentre::SameStereoDrawSource(",
+        "captureCentreSource()))",
+    ):
+        assert marker in physical, "C993 binocular source fence missing: " + marker
+    left_draw = physical.index("R32ReviewOwnedResult result{ true, actualDraw() };")
+    after_left = physical.index("if (exactCentreEye &&")
+    right_eye = physical.index("IDirect3DSurface9* rightEye =")
+    assert left_draw < after_left < right_eye
+    fenced = physical[after_left:physical.index(
+        "IDirect3DSurface9* savedRt", after_left)]
+    for marker in (
+        "R32ReviewSetWvpBatch(device, original)",
+        "R32ReviewMarkFrameRightDrawFailed();",
+        "R33InvalidateRightForLeftWrite(",
+        "R32ReviewArmStereoRecoverySafety();",
+        "return result;",
+    ):
+        assert marker in fenced, "C993 left/right fallback lost: " + marker
+    exact_log = ("if (screenKind == "
+        "R32ReviewScreenSpaceKind::ExactLensCentreWorld &&\\n"
+        "                R33TelemetryEnabled())")
+    # Keep the preexisting separate diagnostic mutation meaningful: a C993
+    # source check earlier in the function must not mask its deletion.
+    assert exact_log.replace("\\\\n", "\\n") in physical
+
     assert (physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") <
         physical.index("if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld") <
         physical.index('VR R84 C993 EXACT_STEREO_DRAW: {}'))
@@ -289,7 +322,12 @@ def main():
         (6, "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;", "return R32ReviewScreenSpaceKind::None;"),
         (6, "lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;", "lower = R30SupportScreenSpaceKind::None;"),
         (7, "SUCCEEDED(rightHr) && restoreOk", "true"),
-        (7, "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld", "screenKind == R32ReviewScreenSpaceKind::Hud2D"),
+        (7, "if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld &&\\n                R33TelemetryEnabled())",
+             "if (screenKind == R32ReviewScreenSpaceKind::Hud2D &&\\n                R33TelemetryEnabled())"),
+        (7, "OutRunVR::LensCentre::SameStereoDrawSource(",
+             "OutRunVR::LensCentre::NeverOwnSource("),
+        (7, "const bool exactCentreEye =",
+             "const bool disabledCentreEye ="),
         (8, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
         (9, "ScopedExactLensCentreGpuDraw centreGpuOwner(", "/*lost owner*/ centreGpuOwner("),
         (10, "!queued && scope == RenderScope::WorldBillboard",
