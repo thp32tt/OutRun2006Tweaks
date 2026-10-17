@@ -102,13 +102,13 @@ namespace Settings
 	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
 		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
     Setting<float> VRDriverSeatVehicleScale{ "VR", "DriverSeatVehicleScale", 1.15f,
-        "Experimental cockpit-only player-car visual model scale. 1.0 preserves stock geometry; affects neither game physics nor original asset bytes. F11 adjustable after shader-safe player-car draw identification.", Range<float>{ 0.85f, 1.35f } };
+        "Experimental cockpit-only player-car visual model scale. 1.0 preserves stock geometry; affects neither game physics nor original asset bytes. F11 adjustable; applied to the original PC player's stack-local draw matrix only when the cockpit mode is eligible. Not an APK-proven scale.", Range<float>{ 0.85f, 1.35f } };
     Setting<float> VRDriverSeatGlassOpacity{ "VR", "DriverSeatGlassOpacity", 0.30f,
         "Requested cockpit glass material opacity (0.10 to 0.90). A live renderer change requires a verified player-windshield material identity; currently diagnostic only and DOES NOT recolor unrelated materials.", Range<float>{ 0.10f, 0.90f } };
     Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", true,
         "Restart-required read-only bounded canonical PMT material probe; logs candidate blend/material IDs, never changes any glass or world opacity." };
 	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", true,
-        "Experimental: align cockpit camera offsets to the player's car matrix_B0 rather than camera yaw. Invalid/sideways transforms suppress the cockpit pass; verify each vehicle in HMD before enabling." };
+        "Experimental: align cockpit camera offsets to the player's car matrix_B0 rather than camera yaw. Invalid/sideways body transforms fall back to validated native-camera pose; test each vehicle in HMD." };
 	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,
 		"Native camera mode used as the synchronized base for DriverSeatView. Default 1 is the bumper/in-car camera discovered from the canonical EXE.", Range<int>{ 0, 2 } };
 	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -1.35f,
