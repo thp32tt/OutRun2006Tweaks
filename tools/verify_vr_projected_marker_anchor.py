@@ -734,16 +734,23 @@ for label, original, broken in (
     # Inject into the actual capture function, not the earlier
     # R30HasXyzrhwInputLayout GetFVF probe. A file-wide replace changes
     # the wrong callsite and leaves this physical-rank guard untouched.
-    capture_marker = "bool R30CaptureProjectedRankPhysicalSource("
-    capture = function_body(r84, capture_marker)
-    if original not in capture:
-        fail("R84 rank capture mutation input missing: " + label)
-    capture_start = r84.find(capture, r84.find(capture_marker))
-    if capture_start < 0:
-        fail("R84 rank capture mutation source span missing: " + label)
-    modified_capture = capture.replace(original, broken, 1)
-    mutant = (r84[:capture_start] + modified_capture +
-              r84[capture_start + len(capture):])
+    # The FVF/serial snapshot belongs to the capture function; the
+    # after-native-left snapshot call belongs to the stereo executor.
+    # Never mutate an unrelated first occurrence in this large renderer.
+    target_function = (
+        "HRESULT R30ExecuteXyzrhwStereo("
+        if label == "reused old snapshot"
+        else "bool R30CaptureProjectedRankPhysicalSource("
+    )
+    target_body = function_body(r84, target_function)
+    if original not in target_body:
+        fail("R84 rank mutation input missing in target function: " + label)
+    target_start = r84.find(target_body, r84.find(target_function))
+    if target_start < 0:
+        fail("R84 rank mutation target span missing: " + label)
+    modified_body = target_body.replace(original, broken, 1)
+    mutant = (r84[:target_start] + modified_body +
+              r84[target_start + len(target_body):])
     try:
         require_r84_physical_rank_transaction(rank_physical, mutant)
     except SystemExit:
