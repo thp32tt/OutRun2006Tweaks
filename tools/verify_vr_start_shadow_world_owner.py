@@ -173,6 +173,7 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
         "uploadSerial != 0",
         "shadowBeforeLeft = exactShadowEye",
         "shadowAfterLeft = exactShadowEye",
+        "if (!command.IsDirectCarBaseShadow())",
         "CarShadowStereo::IsCoherentBeforeNativeLeft(",
         "shadowBeforeLeft, shadowAfterLeft",
     ):
@@ -190,6 +191,8 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
          "false /* mutated original owner */ && RejectedShadowOwner({"),
         ("CarShadowStereo::IsCoherentBeforeNativeLeft(",
          "CarShadowStereo::BypassNativeShadowProvenance("),
+        ("if (!command.IsDirectCarBaseShadow())",
+         "if (false && !command.IsDirectCarBaseShadow())"),
         ("centreSourceChanged || shadowSourceChanged", "centreSourceChanged || false"),
     ):
         altered = physical.replace(original, mutant)
@@ -206,6 +209,8 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
          "false /* mutated original owner */ && RejectedShadowOwner({"),
         ("CarShadowStereo::IsCoherentBeforeNativeLeft(",
          "CarShadowStereo::BypassNativeShadowProvenance("),
+        ("if (!command.IsDirectCarBaseShadow())",
+         "if (false && !command.IsDirectCarBaseShadow())"),
     ):
         sources = [semantic, r30, r33]
         owner = next(i for i, source in enumerate(sources) if before in source)
@@ -228,6 +233,7 @@ def check_r84_shadow_route_shape(semantic, r30, r33, r32, support, review):
     assert "uploadSerial != 0" in r33
     assert r33.count("CarShadowStereo::IsCoherentBeforeNativeLeft(") >= 2
     assert "shadowBeforeLeft, shadowAfterLeft" in r33
+    assert "if (!command.IsDirectCarBaseShadow())" in r33
     assert all("ExactCarBaseShadowWorld" in x for x in (r30, r32, support, review))
 
 

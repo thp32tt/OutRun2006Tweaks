@@ -978,6 +978,10 @@ namespace OutRunVRStereo
             auto captureShadowSource = [&]() noexcept {
                 const auto command =
                     OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                // A nested native callback may have selected another physical
+                // owner. Fail before reading a foreign game's raw GPU c64.
+                if (!command.IsDirectCarBaseShadow())
+                    return OutRunVR::CarShadowStereo::StereoDrawSource{};
                 float rawGameWvp[16]{};
                 std::uint64_t uploadSerial=0, uploadDraw=0;
                 std::uint64_t writeShaderEpoch=0, shaderEpoch=0;
