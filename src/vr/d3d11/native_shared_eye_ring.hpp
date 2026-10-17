@@ -22,6 +22,12 @@ namespace outrun::vr::dx11
     {
         Microsoft::WRL::ComPtr<ID3D11Texture2D> eye[2];
         Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv[2];
+        // Native game Draw/DrawIndexed depth belongs to the same eye SLOT as
+        // color: lazily allocated, preserved only until a matching ACK/fence
+        // allows the slot to be recycled, then cleared for its next frame.
+        // Never share a DSV between the simultaneous left and right passes.
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> depth[2];
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv[2];
         Microsoft::WRL::ComPtr<ID3D11Query> producer_fence;
         HANDLE shared_handle[2]{};
         std::uint64_t frame_id{};
@@ -159,6 +165,16 @@ namespace outrun::vr::dx11
             std::uint32_t slot) const noexcept;
         [[nodiscard]] std::uint64_t slot_frame_id(
             std::uint32_t slot) const noexcept;
+
+        // Prepare exactly two private native Z/stencil attachments before the
+        // first GPU eye command. Reject foreign context, incorrect frame/slot,
+        // queued GPU work or invalidated lifetime without returning views.
+        // Views are borrowed only during this acquired frame's synchronous
+        // recorder; the ring retains them until generation teardown.
+        bool acquire_depth_pair(
+            ID3D11DeviceContext* context, std::uint32_t slot,
+            std::uint64_t frame_id,
+            ID3D11DepthStencilView* (&out_views)[2]) noexcept;
 
         [[nodiscard]] ID3D11Texture2D* eye(
             std::uint32_t slot, std::uint32_t eye_index) const noexcept;

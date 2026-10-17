@@ -152,6 +152,32 @@ int main()
             ring.slot_state(slot) == SharedEyeSlotState::Acquired &&
             ring.slot_frame_id(slot) == 1,
             "acquired slot identity");
+    // Game eye Draw depth is cached on the same fenced transport slot, not
+    // freshly allocated for every menu/vehicle/race frame. A wrong producer
+    // or frame may not observe a borrowed eye depth view.
+    ID3D11DepthStencilView* depthViews[2]{};
+    require(!ring.acquire_depth_pair(foreign.context, slot, 1, depthViews) &&
+            !depthViews[0] && !depthViews[1],
+            "foreign context cannot borrow native eye depth");
+    require(!ring.acquire_depth_pair(d3d.context, slot, 2, depthViews) &&
+            !depthViews[0] && !depthViews[1],
+            "wrong frame cannot borrow native eye depth");
+    require(ring.acquire_depth_pair(d3d.context, slot, 1, depthViews) &&
+            depthViews[0] && depthViews[1] &&
+            depthViews[0] != depthViews[1],
+            "allocate independent left/right native eye depth");
+    ID3D11DepthStencilView* firstDepthLeft = depthViews[0];
+    ID3D11DepthStencilView* firstDepthRight = depthViews[1];
+    const std::uint32_t firstDepthSlot = slot;
+    require(ring.acquire_depth_pair(d3d.context, slot, 1, depthViews) &&
+            depthViews[0] == firstDepthLeft &&
+            depthViews[1] == firstDepthRight,
+            "acquired eye retains same GPU depth pair");
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthDesc{};
+    depthViews[0]->GetDesc(&depthDesc);
+    require(depthDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT &&
+            depthDesc.ViewDimension == D3D11_DSV_DIMENSION_TEXTURE2D,
+            "native depth formats match game-eye Clear and Draw");
     rejectedSlot = 99;
     require(!ring.try_acquire_slot(d3d.context, 1, nullptr, rejectedSlot) &&
             rejectedSlot == OutRunVR::RenderFrameRingSize &&
@@ -180,12 +206,20 @@ int main()
     slot = 99;
     require(ring.try_acquire_slot(d3d.context, 5, nullptr, slot),
             "acquire published-frame candidate");
+    require(slot == firstDepthSlot &&
+            ring.acquire_depth_pair(d3d.context, slot, 5, depthViews) &&
+            depthViews[0] == firstDepthLeft &&
+            depthViews[1] == firstDepthRight,
+            "fenced slot reuse retains native left/right depth allocations");
     require(!ring.signal_producer_fence(foreign.context, slot, 5) &&
             ring.slot_state(slot) == SharedEyeSlotState::Acquired &&
             !ring.synchronization_faulted(),
             "foreign-device context cannot signal producer EVENT");
     require(ring.signal_producer_fence(d3d.context, slot, 5),
             "signal producer EVENT after eye work");
+    require(!ring.acquire_depth_pair(d3d.context, slot, 5, depthViews) &&
+            !depthViews[0] && !depthViews[1],
+            "producer-pending ring slot cannot lend depth to new GPU writes");
     rejectedSlot = 99;
     require(!ring.try_acquire_slot(d3d.context, 5, nullptr, rejectedSlot) &&
             rejectedSlot == OutRunVR::RenderFrameRingSize &&

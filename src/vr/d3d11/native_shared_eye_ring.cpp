@@ -113,6 +113,8 @@ namespace outrun::vr::dx11
             slot.producer_fence.Reset();
             for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
             {
+                slot.dsv[eyeIndex].Reset();
+                slot.depth[eyeIndex].Reset();
                 slot.rtv[eyeIndex].Reset();
                 slot.eye[eyeIndex].Reset();
                 // GetSharedHandle returns a legacy shared-resource handle whose
@@ -723,6 +725,73 @@ namespace outrun::vr::dx11
         frame_id_high_watermark_ = native_game_eye_frame_high_watermark(
             frame_id_high_watermark_, ack.frameId);
         reset_slot_lifetime(entry);
+        return true;
+    }
+
+    bool NativeSharedEyeRing::acquire_depth_pair(
+        ID3D11DeviceContext* context, std::uint32_t slot,
+        std::uint64_t frame_id,
+        ID3D11DepthStencilView* (&out_views)[2]) noexcept
+    {
+        out_views[0] = out_views[1] = nullptr;
+        if (!activation_ready() || !same_producer_context(context) ||
+            slot >= slots_.size() || frame_id == 0)
+            return false;
+
+        auto& entry = slots_[slot];
+        if (entry.state != SharedEyeSlotState::Acquired ||
+            entry.frame_id != frame_id || entry.gpu_copy_queued ||
+            !entry.eye[0] || !entry.eye[1])
+            return false;
+
+        // A previously published slot is reusable only after exact ACK or
+        // a completed, never-advertised producer EVENT. Thus no other frame
+        // can still write the old DSV when this new frame starts.
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> new_depth[2];
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> new_dsv[2];
+        for (std::uint32_t eye_index = 0; eye_index < 2u; ++eye_index)
+        {
+            D3D11_TEXTURE2D_DESC color{};
+            entry.eye[eye_index]->GetDesc(&color);
+            if (color.Width != width_ || color.Height != height_ ||
+                color.SampleDesc.Count != 1u ||
+                color.SampleDesc.Quality != 0u)
+                return false;
+            if (entry.depth[eye_index] && entry.dsv[eye_index])
+                continue;
+
+            D3D11_TEXTURE2D_DESC desc{};
+            desc.Width = color.Width;
+            desc.Height = color.Height;
+            desc.MipLevels = 1u;
+            desc.ArraySize = 1u;
+            desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            desc.SampleDesc = color.SampleDesc;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            if (FAILED(producer_device_->CreateTexture2D(
+                    &desc, nullptr, new_depth[eye_index].GetAddressOf())) ||
+                !new_depth[eye_index] ||
+                FAILED(producer_device_->CreateDepthStencilView(
+                    new_depth[eye_index].Get(), nullptr,
+                    new_dsv[eye_index].GetAddressOf())) ||
+                !new_dsv[eye_index])
+                return false;
+        }
+        // Publish allocations atomically only after BOTH eyes succeeded.
+        for (std::uint32_t eye_index = 0; eye_index < 2u; ++eye_index)
+        {
+            if (new_depth[eye_index])
+            {
+                entry.depth[eye_index] = std::move(new_depth[eye_index]);
+                entry.dsv[eye_index] = std::move(new_dsv[eye_index]);
+            }
+        }
+        if (!entry.dsv[0] || !entry.dsv[1] ||
+            entry.dsv[0].Get() == entry.dsv[1].Get())
+            return false;
+        out_views[0] = entry.dsv[0].Get();
+        out_views[1] = entry.dsv[1].Get();
         return true;
     }
 

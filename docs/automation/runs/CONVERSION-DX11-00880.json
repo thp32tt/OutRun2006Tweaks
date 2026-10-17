@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00880",
+  "production_id": "CONVERSION-DX11-00880",
+  "event_id": "CONVERSION-DX11-00880-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_EYE_SLOT_DEPTH_RESIDENCY",
+  "feature_id": "DX11:NATIVE_STEREO_EYE_SLOT_DEPTH_RESIDENCY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Native game-authored left/right eye Draw/DrawIndexed source recorder borrows exact frame-owned private depth/stencil from the acknowledged shared GPU transport ring.",
+      "Ring depth allocations are lazy per-slot/per-eye, never reused until prior producer fence or consumer ACK safely releases the slot; DSV is cleared for both eyes at each camera frame and retired on shutdown.",
+      "WARP transport regression verifies real D24S8 DSV pair residency across frame recycling and denies wrong device/frame or pending fence."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.hpp",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Windows WARP native transport probe validates distinct real GPU depth views and same-slot reuse after frame recycle.",
+      "negative_regression": "Foreign-context, wrong-frame and producer-pending depth admission reject without modifying returned pointers. DX9Ex Draw/Present/input and DXVK frozen untouched.",
+      "component_integration": "Stereo game-eye render dispatch uses the transport slot-owned depth pair; native ring GPU fence/ACK and destructor govern attachment lifetime."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_EYE_SLOT_DEPTH_RESIDENCY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Runtime menu/car/race and Quest3 pixel matching not yet observed.",
+    "activation_guard_and_fallback": "Production DX11 remains opt-in; preserve original DX9Ex rendering and original gamepad/FFB."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_EYE_SLOT_DEPTH_RESIDENCY",
+    "goal": "Connect native per-eye Z/stencil Draw state to ACK/fence-owned full-sized color ring, eliminating per-frame GPU DSV creation across sustained game menu/vehicle/race rendering.",
+    "acceptance_items": [
+      {
+        "id": "native_eye_depth",
+        "category": "end_to_end_behavior",
+        "behavior_area": "gpu_eye_recording_and_slot_lifetime",
+        "expected_behavior": "Both live stereo camera draws bind distinct DSVs owned by the acquired GPU color ring slot and cleared each new frame."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "eye_fence_ack_reset_and_d3d9_input",
+        "expected_behavior": "Foreign or pending inputs reject before GPU commands, slot reuse follows fence/ACK, shutdown releases views; original D3D9 fallback remains."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_github_actions",
+        "expected_behavior": "Five required DX11 Github Actions succeed on final single validation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_eye_depth": "PENDING_CI",
+    "fallback": "PENDING_CI",
+    "gates": "PENDING_CI",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: checked GitHub HEAD and completed 00879 record",
+    "C1_REVIEW": "PASS: confirmed per-frame per-eye CreateTexture2D/CreateDepthStencilView in stereo recorder",
+    "C2_IMPLEMENT": "PASS: ring-slot-owned GPU depth pair and WARP regression",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  }
+}

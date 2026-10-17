@@ -1741,39 +1741,15 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         }
     }
 
-    // Allocate separate, full-size native depth/stencil attachments BEFORE
-    // any GPU recording. A failed allocation keeps the ring cancellable and
-    // cannot expose a color-only race frame to the OpenXR consumer.
-    Microsoft::WRL::ComPtr<ID3D11Device> device;
-    context_->GetDevice(device.GetAddressOf());
-    if (!device || !ring_.width() || !ring_.height()) return false;
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTextures[2];
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthViews[2];
-    for (std::uint32_t eye = 0; eye < 2u; ++eye) {
-        ID3D11Texture2D* color = ring_.eye(slot_, eye);
-        if (!color) return false;
-        D3D11_TEXTURE2D_DESC colorDesc{};
-        color->GetDesc(&colorDesc);
-        if (colorDesc.Width != ring_.width() ||
-            colorDesc.Height != ring_.height() ||
-            colorDesc.SampleDesc.Count == 0u)
-            return false;
-        D3D11_TEXTURE2D_DESC depthDesc{};
-        depthDesc.Width = colorDesc.Width;
-        depthDesc.Height = colorDesc.Height;
-        depthDesc.MipLevels = 1u;
-        depthDesc.ArraySize = 1u;
-        depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthDesc.SampleDesc = colorDesc.SampleDesc;
-        depthDesc.Usage = D3D11_USAGE_DEFAULT;
-        depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        if (FAILED(device->CreateTexture2D(
-                &depthDesc, nullptr, depthTextures[eye].GetAddressOf())) ||
-            FAILED(device->CreateDepthStencilView(
-                depthTextures[eye].Get(), nullptr,
-                depthViews[eye].GetAddressOf())))
-            return false;
-    }
+    // The shared-eye ring owns one independent Z/stencil pair PER SLOT,
+    // reused only after the prior frame's GPU fence/consumer ACK releases
+    // that slot. ClearDepthStencilView below initializes BOTH planes on
+    // every frame; no stale menu/car/race depth may bleed across frames.
+    // Allocate before the first GPU command, preserving DX9Ex on failure.
+    ID3D11DepthStencilView* depthViews[2]{};
+    if (!ring_.acquire_depth_pair(
+            context_.Get(), slot_, frameId_, depthViews))
+        return false;
     struct EyePassDispatch {
         NativeGameEyePass callback{};
         void* user{};
@@ -1786,7 +1762,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         const NativeGameEyePartialTargetClear* partialTargetClear{};
     } dispatch{pass, user, sourcePoseSequence, {},
                ring_.width(), ring_.height(),
-               {depthViews[0].Get(), depthViews[1].Get()},
+               {depthViews[0], depthViews[1]},
                fullTargetClear, gameRaster, partialTargetClear};
 
     // The ring verifies the immediate context and reserves the exact frame
