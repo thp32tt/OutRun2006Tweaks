@@ -1,6 +1,7 @@
 #include "../../src/vr/d3d11/native_game_shared_desktop_admission.hpp"
 #include "../../src/vr/d3d11/native_game_shared_desktop_rollback.hpp"
 #include "../../src/vr/d3d11/native_game_shared_desktop_backup.hpp"
+#include "../../src/vr/d3d11/native_game_shared_desktop_source.hpp"
 #include <cassert>
 #include <array>
 using outrun::vr::dx11::live_game_frame::NativeSharedDesktopAdmission;
@@ -24,6 +25,23 @@ int main() {
     assert(!allowed(true,true,true,true,true,true,true,
                     NativeSharedDesktopAdmission::destination_compatible(23u,a8,x8),
                     true,3440,1440,3));
+    // Real GPU game color MSAA is resolved before shared-desktop Present.
+    // The GPU fence, exact-tile copy and original-D3D9 rollback still apply.
+    using outrun::vr::dx11::live_game_frame::NativeSharedDesktopSourceTransfer;
+    using outrun::vr::dx11::live_game_frame::native_shared_desktop_source_transfer;
+    constexpr auto copy = NativeSharedDesktopSourceTransfer::Copy;
+    constexpr auto resolve = NativeSharedDesktopSourceTransfer::Resolve;
+    constexpr auto reject = NativeSharedDesktopSourceTransfer::Reject;
+    static_assert(native_shared_desktop_source_transfer(1,1,1,0,false,false) == copy);
+    static_assert(native_shared_desktop_source_transfer(1,1,4,0,true,true) == resolve);
+    static_assert(native_shared_desktop_source_transfer(1,1,8,7,true,true) == resolve);
+    static_assert(native_shared_desktop_source_transfer(1,1,4,0,false,true) == reject);
+    static_assert(native_shared_desktop_source_transfer(1,1,4,0,true,false) == reject);
+    static_assert(native_shared_desktop_source_transfer(1,2,4,0,true,true) == reject);
+    static_assert(native_shared_desktop_source_transfer(2,1,4,0,true,true) == reject);
+    static_assert(native_shared_desktop_source_transfer(1,1,0,0,true,true) == reject);
+    static_assert(native_shared_desktop_source_transfer(1,1,33,0,true,true) == reject);
+    static_assert(native_shared_desktop_source_transfer(1,1,1,1,true,true) == reject);
     // Strictly fail closed for default-off gameplay/fallback, unsupported
     // scene draws, unknown dirty regions and non-BGRA/MSAA.
     for (unsigned mask = 0; mask < 9; ++mask) {

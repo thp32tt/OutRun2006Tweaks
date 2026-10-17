@@ -8,6 +8,7 @@
 #include "native_game_shared_desktop_admission.hpp"
 #include "native_game_shared_desktop_rollback.hpp"
 #include "native_game_shared_desktop_backup.hpp"
+#include "native_game_shared_desktop_source.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // One process-local, opt-in, GPU-only game-frame presentation route.
@@ -25,6 +26,7 @@ public:
         for (auto& backup : backups_) backup.Reset();
         for (auto& key : backupKeys_) key = {};
         source_.Reset();
+        resolvedSource_.Reset();
         fence_.Reset();
         shared9_.Reset();
         game9Ex_.Reset();
@@ -81,8 +83,6 @@ public:
         source->GetDesc(&desc);
         if (desc.Width != width || desc.Height != height ||
             desc.Format != DXGI_FORMAT_B8G8R8A8_UNORM ||
-            desc.SampleDesc.Count != 1 || desc.SampleDesc.Quality != 0 ||
-            desc.MipLevels != 1 || desc.ArraySize != 1 ||
             desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
             context->GetType() != D3D11_DEVICE_CONTEXT_IMMEDIATE)
             return false;
@@ -96,6 +96,21 @@ public:
         Microsoft::WRL::ComPtr<ID3D11Device> sourceOwner;
         source->GetDevice(sourceOwner.GetAddressOf());
         if (!sourceOwner || sourceOwner.Get() != device)
+            return false;
+        // The source may be a real multisampled game color target. CopyResource
+        // cannot transfer MSAA into a one-sample D3D9Ex shared texture:
+        // preflight a full GPU ResolveSubresource before any D3D9 pixel write.
+        // Never treat an unsupported depth, copy-only MSAA or array source as
+        // a complete menu/car/race frame.
+        UINT sourceFormatSupport = 0u;
+        const bool canResolve = desc.SampleDesc.Count > 1u &&
+            SUCCEEDED(device->CheckFormatSupport(desc.Format, &sourceFormatSupport)) &&
+            (sourceFormatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u;
+        const auto transfer = native_shared_desktop_source_transfer(
+            desc.MipLevels, desc.ArraySize, desc.SampleDesc.Count,
+            desc.SampleDesc.Quality,
+            (desc.BindFlags & D3D11_BIND_RENDER_TARGET) != 0u, canResolve);
+        if (transfer == NativeSharedDesktopSourceTransfer::Reject)
             return false;
 
         // Confirm the real game destination independently of the Present
@@ -189,12 +204,36 @@ public:
         // incurred a full 3440x1440 GPU CopyResource on every frame.
         // Source/destination are identically sized BGRA textures; source_
         // pixels outside this region are never exposed by StretchRect.
+        ID3D11Texture2D* readySource = source;
+        if (transfer == NativeSharedDesktopSourceTransfer::Resolve) {
+            // Cache one non-MSAA GPU intermediate per output generation. The
+            // existing EVENT fence protects it and the shared D3D9 allocation
+            // from premature reuse; no CPU Map or readback is introduced.
+            if (!resolvedSource_) {
+                D3D11_TEXTURE2D_DESC resolved = desc;
+                resolved.MipLevels = 1u;
+                resolved.ArraySize = 1u;
+                resolved.SampleDesc.Count = 1u;
+                resolved.SampleDesc.Quality = 0u;
+                resolved.BindFlags = 0u; // copy-only GPU intermediate
+                resolved.MiscFlags = 0u;
+                if (FAILED(device->CreateTexture2D(
+                        &resolved, nullptr, resolvedSource_.GetAddressOf())) ||
+                    !resolvedSource_)
+                    return false;
+            }
+            // Resolve is whole-subresource even for a cropped/dirty Present;
+            // copy only the admitted visible tiles from that resolved image.
+            context->ResolveSubresource(
+                resolvedSource_.Get(), 0u, source, 0u, desc.Format);
+            readySource = resolvedSource_.Get();
+        }
         const bool entire = regionCount == 1u &&
             visibleRegions[0].left == 0 && visibleRegions[0].top == 0 &&
             static_cast<std::uint32_t>(visibleRegions[0].right) == width &&
             static_cast<std::uint32_t>(visibleRegions[0].bottom) == height;
         if (entire) {
-            context->CopyResource(source_.Get(), source);
+            context->CopyResource(source_.Get(), readySource);
         } else {
             for (std::uint32_t i = 0; i < regionCount; ++i) {
                 const RECT& tile = visibleRegions[i];
@@ -205,7 +244,7 @@ public:
                     static_cast<UINT>(tile.bottom), 1u};
                 context->CopySubresourceRegion(
                     source_.Get(), 0u, region.left, region.top, 0u,
-                    source, 0u, &region);
+                    readySource, 0u, &region);
             }
         }
         context->End(fence_.Get());
@@ -310,6 +349,7 @@ private:
     std::array<NativeSharedDesktopBackupKey,
                GameNativeDirtyRegionCoverage::kMaxPartitionRects> backupKeys_{};
     Microsoft::WRL::ComPtr<ID3D11Texture2D> source_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> resolvedSource_;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> shared9_;
     Microsoft::WRL::ComPtr<ID3D11Query> fence_;
     Microsoft::WRL::ComPtr<IDirect3DDevice9Ex> game9Ex_;
