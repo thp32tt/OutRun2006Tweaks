@@ -408,6 +408,11 @@ int main()
             ID3D11UnorderedAccessView* clearPixel[8]{};
             warpContext->OMSetRenderTargetsAndUnorderedAccessViews(
                 0u, nullptr, nullptr, 0u, 8u, clearPixel, nullptr);
+            // Restore the preceding WARP fixture's live MRT state before
+            // its independent hold/projection copy and SBS fallback checks.
+            // Otherwise our added PS-UAV test would mask the regression by
+            // leaving the caller's original targets deliberately unbound.
+            warpContext->OMSetRenderTargets(2u, gameMrt, nullptr);
             auto computeReadDesc = computeArrayDesc;
             computeReadDesc.Usage = D3D11_USAGE_STAGING;
             computeReadDesc.BindFlags = 0u;
