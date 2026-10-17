@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00854",
+  "production_id": "CONVERSION-DX11-00854",
+  "event_id": "CONVERSION-DX11-00854-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_GPU_COPY_ONLY_STEREO_SCALED_STRETCH",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Replay source-ordered game-owned GPU CopyResource-only DEFAULT texture scaled postpasses to the native D3D11 left/right eye frames using a private shader-readable GPU copy, preserving menu/vehicle/race eye identity without CPU Map, native activation bypass, or original D3D9Ex Draw/input/FFB regression.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "gpu_only_scaled_native_eye_stretch",
+        "expected_behavior": "BindFlags=0 GPU-only game camera array SourceStretch stages the selected slice into a private SRV and produces real WARP pixels for distinct left/right eyes in the chronological game draw timeline"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "camera_slice_and_original_d3d9_safety",
+        "expected_behavior": "Reject out-of-range/foreign camera slices or unsupported source configurations; retain original D3D9Ex Draw/input/FFB, protected device resource ownership and DXVK freeze"
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_build_matrix",
+        "expected_behavior": "Same validation-bearing SHA passes DX11 Fast, Backend Conversion Gate, Win32 Build, OpenXR and HUD Inspector without weakening checks or CI skip"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "batch_components": [
+      "native_game_stereo_submission.cpp GPU-only CopyResource eye source transfer and SRV staging",
+      "native_game_stretch_source.hpp private sampled copy source admission",
+      "dx11_native_transport_probe.cpp bilateral WARP real pixel and invalid-slice rejection fixture",
+      "verify_dx11_activation_boundary.py exact existing eighth-event/source-graph regression audit repair"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "activation_guard_and_fallback": "Native eye Draw remains opt-in; original D3D9Ex draw/FFB and DXVK frozen paths unchanged. Full game/HMD behavior untested."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stretch_source.hpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "acceptance_results": {
+    "end2end": "PASS_BUILD_AND_WARP_REGRESSION",
+    "fallback": "PASS_STATIC_AND_NEGATIVE_REGRESSION",
+    "gates": "PASS_EXACT_SHA_5_OF_5",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: diagnosed Backend failure 38988987650 (stale seven-event activation audit)",
+    "C1_REVIEW": "PASS: exact failed source graph check was out-of-date after eighth GPU scaled postpass",
+    "C2_IMPLEMENT": "PASS: substantial GPU CopyResource-only stereo native C++/WARP implementation a570c765b7a2db54249c7652ee9d712da6a24927",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 8172dd169f01ac41826d2a7d06eb5978d5772e9f; DX11 Fast #38989114449, Backend #38989114415, Win32 Build #38989117065, OpenXR #38989117054, HUD #38989117055 all success; source graph failure repaired, readiness smoke success",
+    "C4_COMMIT": "PASS: material a570c765b7a2db54249c7652ee9d712da6a24927; causal checker repair and validation-bearing 8172dd169f01ac41826d2a7d06eb5978d5772e9f; both [AUTO:CONVERSION-DX11-00854] with no CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: 5/5 mandatory checks SUCCESS; Quest3/VDXR HMD and gamepad actual gameplay UNTESTED"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "a570c765b7a2db54249c7652ee9d712da6a24927",
+    "validation_bearing_sha": "8172dd169f01ac41826d2a7d06eb5978d5772e9f",
+    "original_backend_failure_run_id": 38988987650,
+    "original_backend_failure_conclusion": "failure",
+    "failure_root_cause": "Activation audit expected seventh timeline event and old GPU source capability token; eighth scaled GPU CopyResource-only source changed both source contract and WARP regression",
+    "dx11_fast_run_id": 38989114449,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 38989114415,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 38989117065,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38989117054,
+    "openxr_conclusion": "success",
+    "hud_inspector_run_id": 38989117055,
+    "hud_inspector_conclusion": "success",
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST"
+  },
+  "next_action": "No rerun or extra score for this TASK_ID. Full renderer/game/menu/vehicle/race/Quest3 visual parity remains unverified; independently assigned controller work should continue on non-conflicting native DX11 source, DXVK remains frozen.",
+  "material_result_sha": "a570c765b7a2db54249c7652ee9d712da6a24927",
+  "validation_bearing_result_sha": "8172dd169f01ac41826d2a7d06eb5978d5772e9f",
+  "result_sha": "8172dd169f01ac41826d2a7d06eb5978d5772e9f"
+}
