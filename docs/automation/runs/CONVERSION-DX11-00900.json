@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00900",
+  "production_id": "CONVERSION-DX11-00900",
+  "event_id": "CONVERSION-DX11-00900-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00900",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "c4651168d22e8a14dd275ffe2dbc5ab497f0320e",
+  "validation_bearing_result_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20",
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Preserve game-authored MRT/DSV and pixel/compute UAV output bindings across the native D3D11 full-resolution camera source Resolve/Copy into the GPU-only shared D3D9Ex desktop Present handoff without altering the original gameplay Draw or input fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_game_camera_mrt_uav_gpu_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_vehicle_race_gpu_source_to_shared_desktop",
+        "expected_behavior": "Native full-resolution color source is GPU Resolve/Copy transferred after temporarily detaching live OM/CS write bindings, with original targets restored before fence and Present."
+      },
+      {
+        "id": "native_game_output_restore_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_mrt_dsv_pixel_compute_uav_and_original_input",
+        "expected_behavior": "The game-owned MRT/DSV/PS-UAV/CS-UAV bindings and UAV counters are restored after transfer, including failure paths; opt-in native bridge remains guarded and DX9Ex/gamepad/FFB fallback remains intact."
+      },
+      {
+        "id": "exact_sha_warp_pixels_and_required_ci",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_and_exact_sha_actions",
+        "expected_behavior": "Real D3D11 WARP verifies GPU copied red source pixel, live MRT/PS/CS output detachment/restoration and exact-SHA mandatory five GitHub Actions succeed."
+      }
+    ],
+    "reconstruction_notice": "SOURCE_RECONSTRUCTED_FROM_MATERIAL_COMMIT_AND_VALIDATION_CI; no pre-existing 00900 run record was available to preserve verbatim."
+  },
+  "acceptance_results": {
+    "native_game_camera_mrt_uav_gpu_copy": "PASS_BUILD_AND_WARP_GPU_PIXEL",
+    "native_game_output_restore_fallback": "PASS_WARP_MRT_PS_CS_UAV_RESTORATION; HMD_GAME_RUNTIME_UNTESTED",
+    "exact_sha_warp_pixels_and_required_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "NATIVE_FULL_FRAME_GPU_DESKTOP_OUTPUT_STATE_PRESERVATION",
+    "integration_path": [
+      "Game-owned D3D11 menu/vehicle/race camera source with live MRT/DSV and pixel/compute UAV -> scoped output snapshot and detach",
+      "GPU ResolveSubresource/CopyResource/CopySubresourceRegion to shared desktop source -> original game outputs restored before fence and original DX9Ex Present"
+    ],
+    "batch_components": [
+      "NativeSharedDesktopBridge source GPU transfer bracketed by ScopedNativeGameGpuTransferOutputs, including early return cleanup",
+      "Real Win32 WARP copied GPU pixels and restored MRT/PS-UAV/CS-UAV regression target plus workflow wiring"
+    ],
+    "conflict_keys": [
+      "DX11:FULLFRAME:NATIVE_GAME_GPU_OUTPUT_PRESERVE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "blocking_evidence": "Live D3D11 source was still bound as writable game-owned MRT or pixel/compute UAV during native shared-desktop GPU Copy/Resolve, requiring explicit output suspension/restoration.",
+    "activation_guard_and_fallback": "Native draw routing remains opt-in/fail-closed; original D3D9Ex input/FFB/Present fallback retained. HMD/gameplay was not executed.",
+    "acceptance_proof": {
+      "positive_probe": "DX11 Native Transport Isolated WARP run 39076664859 SUCCESS on exact SHA; real copied GPU red source pixel and output restoration probe.",
+      "negative_regression": "Initial WARP crash 0xC0000005 fixed under same TASK_ID 342c90147f596f5e91223789631201843c3ae277; null-array CS UAV unbind corrected, MRT/PS/CS source preservation checked on WARP.",
+      "component_integration": "Native game shared desktop source transfer and scoped OM/compute-output restore C++ code at material c4651168d22e8a14dd275ffe2dbc5ab497f0320e; exact-SHA 5 mandatory GitHub CI successful at e9c39457717904f9d5eae9ebe6ee2e118c872c20."
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "tools/dx11_native_desktop_gpu_output_probe.cpp",
+    "cmake.toml",
+    "CMakeLists.txt",
+    ".github/workflows/dx11-native-transport-isolated.yml",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "validation_evidence": {
+    "material_sha": "c4651168d22e8a14dd275ffe2dbc5ab497f0320e",
+    "validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39076664929,
+        "conclusion": "success",
+        "validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39076664871,
+        "conclusion": "success",
+        "validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20"
+      },
+      {
+        "name": "Build",
+        "run_id": 39076667741,
+        "conclusion": "success",
+        "validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39076667813,
+        "conclusion": "success",
+        "validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39076667628,
+        "conclusion": "success",
+        "validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20"
+      }
+    ],
+    "isolated_native_warp_run_id": 39076664859,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20",
+    "prior_warp_fix_sha": "342c90147f596f5e91223789631201843c3ae277",
+    "prior_warp_success_run_id": 39076256741,
+    "runtime_validation": "UNTESTED",
+    "blocking_evidence": "OutRun menu/vehicle/race live game, Quest3/VDXR HMD, gamepad/FFB real hardware and frame pacing have not been executed. CI does not demonstrate full native renderer game runtime completion."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Confirmed validation SHA is branch HEAD; RUN_RECORD_NOT_FOUND at branch HEAD and material SHA; reconstructed missing 00900 durable record from exact GitHub commit and CI evidence.",
+    "C1_REVIEW": "Material changes and required exact-SHA successful CI inspected without re-running tests.",
+    "C2_IMPLEMENT": "Previously committed native OM/CS output detach/restore and WARP probe at c4651168d22e8a14dd275ffe2dbc5ab497f0320e; no implementation in this C6-only transaction.",
+    "C3_VALIDATE": "At e9c39457717904f9d5eae9ebe6ee2e118c872c20 five required Actions SUCCESS: Fast 39076664929; Backend 39076664871; Build 39076667741; OpenXR 39076667813; HUD 39076667628. Isolated WARP 39076664859 SUCCESS.",
+    "C4_COMMIT": "Material c4651168d22e8a14dd275ffe2dbc5ab497f0320e; WARP repair 342c90147f596f5e91223789631201843c3ae277; exact validation-bearing CI wiring e9c39457717904f9d5eae9ebe6ee2e118c872c20; separate [skip ci] C6 bookkeeping.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; runtime UNTESTED; no new score for recovery/retry."
+  },
+  "recovery": {
+    "reason": "RUN_RECORD_NOT_FOUND",
+    "source_file_missing_at_validation_sha": "e9c39457717904f9d5eae9ebe6ee2e118c872c20",
+    "preservation_limit": "No existing CONVERSION-DX11-00900.json found at validation SHA or material SHA. material_result_sha recovered from original source commit; feature_contract and acceptance_results reconstructed using its patch, WARP evidence and exact CI, not copied from an unavailable original.",
+    "source_material_commit": "c4651168d22e8a14dd275ffe2dbc5ab497f0320e",
+    "reconstruction_does_not_create_new_feature_or_score": true
+  }
+}
