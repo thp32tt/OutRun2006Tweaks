@@ -1,0 +1,103 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00985",
+  "production_id": "CONVERSION-DX9EX-00985",
+  "event_id": "CONVERSION-DX9EX-00985-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:RENDER:WORLD_WVP_NATIVE_REENTRANCY",
+  "symptom_id": "DX9EX:SYMPTOM:WORLD_WVP_NATIVE_REENTRANCY",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C4_MATERIAL_COMMITTED_C5_EXACT_CI",
+  "checkpoint": "C5_VALIDATE",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "070ec2d7942b77b2c3da2a62e2e18eaed407ed85",
+  "material_result_sha": "fd1af7babc1eff7956c62e18851255e9c43ca628",
+  "source_paths": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/game_wvp_native_upload.hpp",
+    "vrhost/tests/game_wvp_native_upload_smoke.cpp",
+    "vrhost/CMakeLists.txt"
+  ],
+  "changed_files": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/game_wvp_native_upload.hpp",
+    "vrhost/tests/game_wvp_native_upload_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00985.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:RENDER:WORLD_WVP_NATIVE_REENTRANCY",
+    "symptom_id": "DX9EX:SYMPTOM:WORLD_WVP_NATIVE_REENTRANCY",
+    "goal": "Ensure that original-game native D3D9 c64 WVP submissions retain independent input rows through nested original shader constant callbacks and never republish a superseded world view matrix after the native callback returns.",
+    "scope_boundary": "Only R84 shared original game normal world c64 head-tracking injection and exact source-generation publication; preserve the C993 lens, queued HUD, car shadow, native D3D9 HRESULT, R26_SAFE rollback, SkyGlow, input/FFB and DXVK freeze.",
+    "special_work_evidence": "Confirmed source defect: normal world callback used one thread_local float[1024] for every in-flight native shader constant callback, allowing a nested call to overwrite outer GPU input and post-return cached verified WVP; unlike lens/HUD, normal world publication ignored generation changes.",
+    "trace_stages": [
+      "Original OutRun2006 camera worldView * perspective projection creates the game shader c64..c67 constant payload and renderer verifies original source WVP before head correction.",
+      "Every original game shader constant upload reserves a distinct bounded TLS scratch frame, calls the unmodified native D3D9 handler synchronously, and returns its real HRESULT with original rows on overflow.",
+      "Only the still-current original game c64 upload generation may write game-world source provenance and R31-eligible verified WVP after the native callback; R84 R29-R33 OpenXR stereo must not inherit an older nested eye matrix."
+    ],
+    "subcomponents": [
+      "Replace the single normal-world thread_local mutable upload buffer with independently owned nested scratch frames and bounded original-constant fallback.",
+      "Fence normal-world original and injected WVP success publication to same game c64 generation across native callback reentry; preserve nested successful owner and error telemetry semantics.",
+      "Compile and execute positive nested, successive, depth-exhaustion and generation mismatch C++ regressions in mandatory host path."
+    ],
+    "acceptance_items": [
+      {
+        "id": "world_native_source_isolation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original world game c64 to D3D9 native GPU upload and R84 eye WVP",
+        "expected_behavior": "Two simultaneous original world constant callbacks never reuse a mutable upload buffer and stale outer returns never overwrite the newer shader constant source."
+      },
+      {
+        "id": "native_fallback_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Native D3D9 HRESULT, recursion exhaustion, lens HUD and unknown producer protection",
+        "expected_behavior": "Bounded nesting exhaustion passes original unmodified game constants; callback failure and changed generation cannot publish false WVP while existing HUD, lens, FFB and R26 safe paths are untouched."
+      },
+      {
+        "id": "exact_sha_build_and_hmd",
+        "category": "integrated_validation",
+        "behavior_area": "Mandatory Windows R84 game DLL, R26 safe rollback, x64 host, package and GitHub safety gates",
+        "expected_behavior": "Portable host C++ regression and exact GitHub Active, Domain, Full Source and HUD Inspector gates all pass before build-verified state; Quest3 stereo remains untested until matching HMD evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "world_native_source_isolation": "PASS",
+    "native_fallback_negative": "PASS",
+    "exact_sha_build_and_hmd": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "The normal world shader upload used a single TLS mutable 4KiB buffer shared by multiple in-flight reentrant callbacks and published stale GPU WVP data after successful but superseded native callback returns.",
+    "original_evidence": "The game-world branch in outrun_renderer.cpp passed static thread_local patchedData to original SetVertexShaderConstantF; the return wrote RecordGameWvpWrite and RecordVerifiedWvp without comparing the existing LensCentreUploadGeneration captured on entry.",
+    "source_trace": [
+      "Original game c64 WVP comes from the original renderer matrices and is verified by TryPrepareOutRunWvp before native submission.",
+      "The native SetVertexShaderConstantF hook can synchronously call a nested game c64 setter while the outer buffer is live.",
+      "The renderer publishes source/verified WVP on return to the R84 R31/R33 world eye path, so superseded outer metadata must not replace nested current metadata."
+    ],
+    "alternatives_rejected": [
+      "Do not infer that every HMD sky-double observation is caused by this deterministic reentrancy flaw; no Quest3 trace verifies this specific native callback nesting frequency.",
+      "Do not touch C993 lens, overlay, car shadow, SkyGlow or original simulation/input/FFB to hide a stale GPU constant."
+    ],
+    "per_eye_impact": "Stale world c64 data can make R84 per-eye transformed world draws refer to another camera/draw; exact binocular correctness requires later HMD evidence."
+  },
+  "local_validation": {
+    "cpp17_smoke": "PASS",
+    "gxx_flags": "-std=c++17 -Wall -Wextra -pedantic",
+    "platform": "LOCAL_PORTABLE_NO_WINDOWS_GAME"
+  },
+  "last_ci_failure": {
+    "validation_sha": "fd1af7babc1eff7956c62e18851255e9c43ca628",
+    "run_id": 38989569516,
+    "job": "policy",
+    "cause": "Missing required docs/automation/runs/CONVERSION-DX9EX-00985.json in feature-sized DX9Ex Gate; not a C++ compiler failure."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Record the feature contract for policy recovery, run required exact-SHA CI without skip; if PASS, perform separate C6 bookkeeping while retaining material SHA. Quest3 HMD stays UNTESTED."
+}
