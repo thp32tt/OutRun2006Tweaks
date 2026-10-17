@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00989",
+  "production_id": "CONVERSION-DX9EX-00989",
+  "event_id": "CONVERSION-DX9EX-00989-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "914254175da074e6cd170fcb93d0ee27c3f36566",
+  "material_result_sha": "080d058e1016f730c4fdff6aff574292fe524fec",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/hud_command_batch.hpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/hud_command_batch.hpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00989.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep original stage +TIME animated sprite and numeric glyph GPU submissions attributed to their genuine producer across native D3DX Draw and later R84 stereoscopic HUD flush, rejecting a changed source before recording new triangles.",
+    "scope_boundary": "Only native ID3DXSprite command-provenance lifetime for exact +TIME and shared GOAL result batches; exclude lens optics, world geometry, SkyGlow, input/FFB, R26 rollback semantics, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original stage +TIME three animated sprani and three numeric-print EXE E8 parent calls assign exact StageExtensionTime semantic.",
+      "Native D3DX Draw can reenter rendering or change the effective producer independently of a tracked batch mutation, before CPU Draw registers its triangles.",
+      "Only an unchanged source in the live command ledger survives as ScreenHud to the physical D3DX Flush/End and R84 per-eye finite HUD plane."
+    ],
+    "subcomponents": [
+      "Fail closed on source changes even when the native batch mutation serial remains unchanged, without interfering with actual D3DX Draw HRESULT or the original GPU submission.",
+      "Exercise the source-change regression and clean new Begin recovery with the real portable C++ HUD command-batch smoke test."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_sprite_and_number_exact_gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original stage +TIME sprani and numeric Draw through R84 stereoscopic HUD",
+        "expected_behavior": "A successful original Draw that changes its effective game producer cannot be recorded as a prior +TIME ScreenHud GPU submission, whereas unchanged-source Draw batching remains valid."
+      },
+      {
+        "id": "foreign_source_and_native_begin_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign producer, native batch reset, Begin and GOAL/D3DX fallback isolation",
+        "expected_behavior": "Changed-source callbacks revoke synthetic ownership even without nested hooked D3DX mutation; a new live Begin accepts correct +TIME glyphs and never modifies original HRESULT, input, FFB or world."
+      },
+      {
+        "id": "exact_sha_windows_and_hmd_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA Win32 R84 and R26_SAFE plus x64 OpenXR host/package and policy gates",
+        "expected_behavior": "All mandatory exact-SHA Active/Domain/Full Source and affected HUD gates succeed before BUILD_VERIFIED; Quest3/VDXR runtime is independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_sprite_and_number_exact_gpu_owner": "PENDING_EXACT_SHA",
+    "foreign_source_and_native_begin_fallback": "PENDING_EXACT_SHA",
+    "exact_sha_windows_and_hmd_separation": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Ledger::completeNativeDraw previously tested sourceStillMatches only in the mutated-serial implicit Flush branch; an otherwise unchanged mutationSerial let a source-changing native Draw retain the earlier producer and ScreenHud entitlement.",
+    "original_evidence": "Exact src/hooks_uiscaling.cpp DrawDest snapshots the source before original D3DX Draw, computes sameSourceAfterNative after it returns, and hands the boolean to src/vr/game/hud_command_batch.hpp where the non-mutated successful path did not check it.",
+    "source_trace": [
+      "Original +TIME E8 parent tags exact source for original D3DXSprite Draw registration.",
+      "The original Draw may return after current producer changes while no other hooked Begin/Draw/Flush has mutated the ledger.",
+      "Physical Flush/End later consumes the erroneous registered ScreenHud source through R84 stereo HUD selection unless revoked."
+    ],
+    "alternatives_rejected": [
+      "No per-Draw forced Flush, no weakened GPU/host safety checks, no generic alpha/UI scope promotion and no unrelated backend edits."
+    ],
+    "eye_ownership": "The exact +TIME source is an input to R84 finite per-eye HUD projection only when native GPU batch ownership is still proven; head-locked/doubled HMD symptoms are not claimed fixed without a matching Quest3 run."
+  },
+  "local_validation": {
+    "cpp17_smoke": "PENDING_GITHUB_ACTIONS_HOST",
+    "initial_ci_policy_failure": "missing run record on source SHA 080d058e1016f730c4fdff6aff574292fe524fec"
+  },
+  "last_ci_failure": {
+    "source_sha": "080d058e1016f730c4fdff6aff574292fe524fec",
+    "run_id": 38995679586,
+    "failed_job": "policy",
+    "reason": "Required 00989 run contract JSON absent",
+    "compiler_executed": false
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify the single resulting validation-bearing exact SHA with mandatory GitHub Actions. Correct proven failures under the same TASK_ID; C6 bookkeeping only after all gates pass, keeping material SHA and Quest3 runtime UNTESTED."
+}
