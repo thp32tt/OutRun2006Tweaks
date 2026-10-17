@@ -9,7 +9,7 @@ policy="QueueOverlayNeedsFiniteHudPlane("
 def verify(src,pol):
     block=src.split("bool R30ConfigureXyzrhwWorldEffect(",1)[1].split(
         "// Smoke/sand can redraw a static VB/IB span",1)[0]
-    queue=block.split("// R26_SAFE HMD baseline:",1)[1]
+    queue=block.split("// R26_SAFE HMD baseline: the canonical untagged SpriteNode queue",1)[1]
     for token in ("CapturePhysicalDrawCommand()",policy,
                   "physical.scope, physical.queued",
                   "ExternalOverlaySemanticDepth != 0",
@@ -31,7 +31,7 @@ for tok in ("CapturePhysicalDrawCommand()",
              "ExternalOverlaySemanticDepth != 0",
              "R30BuildStageExtensionXyzrhwEyePlane(state, baseProjection)",
              "QueueOverlayNeedsFiniteHudPlane("):
-    anchor=source.index("// R26_SAFE HMD baseline:")
+    anchor=source.index("// R26_SAFE HMD baseline: the canonical untagged SpriteNode queue")
     mutated=source[:anchor]+source[anchor:].replace(tok,"REMOVED_FOR_NEGATIVE_TEST",1)
     try: verify(mutated,sem)
     except AssertionError: pass
