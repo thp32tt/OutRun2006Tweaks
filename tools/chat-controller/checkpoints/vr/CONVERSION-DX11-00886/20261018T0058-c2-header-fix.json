@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_source_fix_checkpoint",
+  "captured_at_kst": "2026-10-18T00:58:00+09:00",
+  "task_id": "CONVERSION-DX11-00886",
+  "production_id": "CONVERSION-DX11-00886",
+  "event_id": "CONVERSION-DX11-00886-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_at_fix": "e49f7f191ecd2749340d68aaa161bd6ce56e7069",
+  "current_fix_branch": "feature/dx11-00886-c2-header-repair-20261018",
+  "current_fix_sha": "d352bbe61caffdd615d12e1f5707815dcfd40ec4",
+  "base_target_sha": "e49f7f191ecd2749340d68aaa161bd6ce56e7069",
+  "original_feature_branch": "feature/dx11-00886-game-surface-mutation-replay",
+  "original_material_cpp_sha": "e0d791ae2ba8d4a3270fd584698ce8137849b892",
+  "failed_target_ci": {
+    "name": "OpenXR VR architecture",
+    "run_id": 39046627003,
+    "failed_job_id": 117436816868,
+    "failed_step": "Build Win32 C2 DLL",
+    "msvc_errors": [
+      "C2039: preserve_game_surface_copy not a member",
+      "C3861: identifier not found"
+    ],
+    "affected_source": "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "missing_declaration": "src/vr/d3d11/live_game_frame_bridge.hpp"
+  },
+  "material_changes": [
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "tools/test_dx11_game_surface_copy_00886.py"
+  ],
+  "current_feature_build": {
+    "run_id": 39047418347,
+    "status": "IN_PROGRESS_AT_CAPTURE"
+  },
+  "target_ci_before_fix": {
+    "head": "e49f7f191ecd2749340d68aaa161bd6ce56e7069",
+    "fast": 39046623128,
+    "hud": 39046626977,
+    "build": 39046626972,
+    "openxr_failed": 39046627003,
+    "backend": 39046623172
+  },
+  "acceptance_incomplete": [
+    "new feature Windows Build exact SHA success",
+    "compare target behind=0, expected_sha, force=false fast-forward only if no conflicting concurrent owner",
+    "five target exact-SHA Actions including C2 OpenXR",
+    "C6 durable result",
+    "scoreboard SSOT, once only if full feature confirmed"
+  ],
+  "next_action": "Read latest target HEAD and 00886 run; check concurrent same-task commits before cherry-picking, merging or promoting d352. If another owner fixed header, skip duplicate. Otherwise feature d352 Build PASS then verify compare behind=0 lease before promotion, rerun exact-SHA mandatory gates. Hardware UNTESTED.",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0
+}
