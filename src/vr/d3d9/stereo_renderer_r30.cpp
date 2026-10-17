@@ -1134,6 +1134,11 @@ namespace OutRunVRStereo
         std::uint64_t R30SkyGlowFrames = 0;
         std::uint64_t R30SkyGlowFailures = 0;
         std::uint64_t R30SkyGlowSceneCaptureEpoch = 0;
+        // R26 protected the source BEFORE any HUD/ESC sprites entered the
+        // bloom source. Track even a failed pre-HUD copy, so Present never
+        // extracts the already-painted pause shell/sky twice.
+        std::uint64_t R30SkyGlowScreenDrawEpoch = 0;
+        std::uint64_t R30SkyGlowUiCaptureSkips = 0;
         bool R30FirstSkyGlowLogged = false;
         bool R30FirstSkyGlowFailureLogged = false;
 
@@ -1472,6 +1477,10 @@ namespace OutRunVRStereo
             if (R29OwnerSkyGlowCaptureStillValid(R30SkyGlowSceneCaptureEpoch))
                 return true;
             const auto frame = R29OwnerCaptureFrameSnapshot();
+            // This is the exact FIRST eligible screen/HUD boundary. If the
+            // clean left/right scene cannot be copied now, never reuse
+            // post-HUD backbuffers as SkyGlow input at Present.
+            R30SkyGlowScreenDrawEpoch = frame.presentEpoch;
             if (!frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
                 frame.rightDrawFailed || frame.stereoIncomplete ||
                 !frame.backBuffer || !frame.rightEyeSurface)
@@ -1510,6 +1519,39 @@ namespace OutRunVRStereo
                 frame.stereoIncomplete || !frame.backBuffer ||
                 !frame.rightEyeSurface)
                 return true;
+
+            // R26/HMD known-good source policy lost in the R84 split:
+            // the sky is redrawn across these camera/mode boundaries and
+            // stale eye history must not get a second bloom layer.
+            if (Game::current_mode)
+            {
+                switch (static_cast<GameState>(*Game::current_mode))
+                {
+                case GameState::STATE_WARP:
+                case GameState::STATE_RESTART:
+                case GameState::STATE_GOAL:
+                case GameState::STATE_TIMEUP:
+                case GameState::STATE_LINK_TIMEUP:
+                case GameState::STATE_GIVEUP:
+                    return true;
+                default:
+                    break;
+                }
+            }
+
+            // R26 captured the clean world BEFORE the first UI sprite.
+            // If capture failed yet an ESC/HUD source was submitted, do not
+            // bloom the already composited menus/text/sky as though world.
+            // The ordinary no-UI Present fallback remains unchanged.
+            if (R30SkyGlowSceneCaptureEpoch != frame.presentEpoch &&
+                R30SkyGlowScreenDrawEpoch == frame.presentEpoch)
+            {
+                ++R30SkyGlowUiCaptureSkips;
+                if (Settings::VRTelemetry && R30SkyGlowUiCaptureSkips == 1u)
+                    spdlog::warn(
+                        "VR SKY GLOW R84/R26: no clean pre-HUD eye pair; avoiding post-ESC/sky double bloom");
+                return true;
+            }
 
             if (!R30EnsureSkyGlowResources(device))
                 return false;
@@ -1770,6 +1812,8 @@ namespace OutRunVRStereo
             }
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R30SkyGlowScreenDrawEpoch = 0;
+            R30SkyGlowUiCaptureSkips = 0;
             R30FlatEffectGeometry = {};
             R30InvalidateXyzrhwWorldGeometry();
             R30HudContain = {};
