@@ -17,7 +17,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "5580cb2df863f80e618d7a396321837bf3b6e2c5",
-  "material_result_sha": null,
+  "material_result_sha": "b92c12f83507463620976eeefc7229fd3b15c50a",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/stage_extension_physical_source.hpp",
@@ -38,18 +38,32 @@
       {
         "id": "stage_queued_direct_physical_source",
         "category": "end_to_end_behavior",
-        "expected_behavior": "R84 native two-eye XYZRHW submission uses one unchanged original +TIME direct/queued source."
+        "expected_behavior": "R84 native two-eye XYZRHW submission uses one unchanged original +TIME direct/queued source.",
+        "behavior_area": "six stage extension producer calls through direct/queued D3DX physical GPU owner and native x86 R84 XYZRHW left-right render path"
       },
       {
         "id": "stage_native_reentry_fallback",
         "category": "fallback_regression",
-        "expected_behavior": "Producer/queue/pose/shader/draw mutations after left mark stereo incomplete without replaying left."
+        "expected_behavior": "Producer/queue/pose/shader/draw mutations after left mark stereo incomplete without replaying left.",
+        "behavior_area": "reentrant native left Draw changing producer/queue/pose/shader between left and right-eye RT writes"
       },
       {
         "id": "stage_exact_sha_windows",
         "category": "integrated_validation",
-        "expected_behavior": "All mandatory x86 R84 and R26_SAFE, host, Domain, Full Source and HUD Inspector GitHub Gates pass; Quest3 remains UNTESTED."
+        "expected_behavior": "All mandatory x86 R84 and R26_SAFE, host, Domain, Full Source and HUD Inspector GitHub Gates pass; Quest3 remains UNTESTED.",
+        "behavior_area": "integrated exact-SHA R84 game/R26_SAFE host/package/Domain/Full Source/HUD Inspector GitHub gates"
       }
+    ],
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "trace_stages": [
+      "Original six stage-extension EXE sprite and numeric E8 CALL parents tag StageExtensionTime ScreenHud for direct and queued producers.",
+      "Existing D3DX Begin/Draw/Flush/End ledger and sprite queue ownership propagate their original source to the physical GPU submission boundary.",
+      "R84 R30 captures exact physical stage source, queue identity, pose, top-level native draw and shader before submitting the original left-eye GPU draw.",
+      "After native left callback, R30 validates the unchanged source before right-eye RT and cancels incomplete stereo if producer, queue, pose, shader or draw identity changed."
+    ],
+    "subcomponents": [
+      "Real game-side R30CaptureStagePhysicalSource captures and validates original direct/queued +TIME source provenance at GPU submission, including fixedfn-null VS and pose/draw identity.",
+      "R30ExecuteXyzrhwStereo enforces a before/after native-left source transaction with no original Draw retry, stereo failure publication veto, and host-compiled positive/negative regression across direct and queued stage siblings."
     ]
   },
   "acceptance_results": {
@@ -59,7 +73,30 @@
   },
   "diagnosis": {
     "source_gap": "R30ExecuteXyzrhwStereo had post-native-left physical source validation for projected ranks, not original StageExtensionTime GPU batches; GPU callbacks may switch source before right eye.",
-    "unverified": "Whether this is the observed +TIME diplopia cause requires exact-SHA HMD test. Shader R33 native path and optical acceptance are not claimed complete."
+    "unverified": "Whether this is the observed +TIME diplopia cause requires exact-SHA HMD test. Shader R33 native path and optical acceptance are not claimed complete.",
+    "root_cause": "The R84 physical XYZRHW executor validated reentrant rank marker sources after native left GPU Draw, but submitted +TIME from a precomputed owner without validating exact direct/queued stage source again.",
+    "original_evidence": "R30ExecuteXyzrhwStereo before b92c12f had a rank-only post-left fence; the six +TIME source parents and D3DX ledger exist upstream but their native draw-boundary identity was not rechecked.",
+    "source_trace": [
+      "Original six stage-extension EXE sprite and numeric E8 CALL parents tag StageExtensionTime ScreenHud for direct and queued producers.",
+      "Existing D3DX Begin/Draw/Flush/End ledger and sprite queue ownership propagate their original source to the physical GPU submission boundary.",
+      "R84 R30 captures exact physical stage source, queue identity, pose, top-level native draw and shader before submitting the original left-eye GPU draw.",
+      "After native left callback, R30 validates the unchanged source before right-eye RT and cancels incomplete stereo if producer, queue, pose, shader or draw identity changed."
+    ],
+    "alternatives_rejected": [
+      "Do not reroute all alpha/FVF to HUD, alter original game stage timer, Flush every D3DX draw or modify R26_SAFE/DXVK; the missing physical source validation is narrower and source-proven."
+    ],
+    "eye_ownership": "An unchanged exact +TIME producer stamp is required for the second physical GPU eye; a reentrant source mismatch marks the stereo frame incomplete while retaining original left HRESULT.",
+    "fix_evidence": "New stage_extension_physical_source.hpp and R30 native transaction in material commit b92c12f83507463620976eeefc7229fd3b15c50a.",
+    "negative_test_evidence": "Extended existing stage_extension_eye_plane_smoke.cpp with queued/direct positive and foreign producer, node, queue epoch, pose, shader, draw and invalid source negatives."
   },
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "local_validation": {
+    "status": "GITHUB_EXACT_SHA_POLICY_FAILED_RECORD_CONTRACT",
+    "failed_validation_sha": "b92c12f83507463620976eeefc7229fd3b15c50a",
+    "run_id": 39001942044,
+    "failed_step": "Enforce feature-sized DX9Ex autonomous completion",
+    "actual_error": "Run record omitted feature_contract.symptom_id, trace_stages, subcomponents and acceptance behavior_area; no Windows compile attempted.",
+    "source_code_change": "NONE_IN_THIS_REPAIR"
+  },
+  "next_action": "Revalidate exact SHA of this same task after correcting mandatory feature-contract record. The existing material source SHA remains b92c12f; HMD optical acceptance remains UNTESTED."
 }
