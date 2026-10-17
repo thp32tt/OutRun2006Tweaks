@@ -240,7 +240,13 @@ def main() -> None:
                 "(sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,",
                 "(eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,",
                 "(sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,",
-                "sd.BindFlags == 0u && sd.SampleDesc.Count == 1u);",
+                # UAV-only compute camera sources are copied to a private
+                # GPU SRV, not bound directly while their CS writer is live.
+                # The old no-bind CopyResource camera path must also remain.
+                "(sd.BindFlags == 0u ||",
+                "(sd.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&",
+                "sd.SampleDesc.Count == 1u);",
+                "ScopedNativePostpassOutputs outputs(context_);",
                 "if (transfer == NativeGameStretchSourceTransfer::Reject)",
                 "sampled.Get() != source",
                 "context_->CopySubresourceRegion(",
