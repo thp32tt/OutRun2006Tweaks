@@ -110,8 +110,8 @@ for mutant_index, mutant in enumerate((
                    'rightDst[1] = transformedLeftY;', 1),
     source.replace('clipCorrection._42 = pauseVertical.offset[eye] -',
                    'clipCorrection._42 =', 1),
-    source.replace(
-        s if False else 'not_used', 'not_used', 0) if False else
+    # Mutate the ESC owner only. A separate rank/HUD source guard now has
+    # the same expression and must not make this mutation a false failure.
     source[:source.index('bool R30IsPauseMenuElement()')] +
     source[source.index('bool R30IsPauseMenuElement()'):].replace(
         'ExternalOverlaySemanticDepth == 0',

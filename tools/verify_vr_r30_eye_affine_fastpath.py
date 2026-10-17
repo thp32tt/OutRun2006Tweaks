@@ -29,7 +29,11 @@ def verify_contract(code):
         assert token in code, f"R30 affine cache contract missing: {token}"
     assert code.index("cache.valid = false;") < code.index("std::tan(")
     assert code.index("cache.valid = true;") > code.index("std::isfinite(offset)")
-    assert source.count("R30BuildEyeAffine(state.stereo,") == 1
+    # R84 mainline has one POSITIONT caller and one restored R62
+    # fixed-function XYZ car-marker caller. Both share this same cached
+    # eye-FOV helper; raw game renderer and FPS paths are unaffected.
+    assert source.count("R30BuildEyeAffine(state.stereo,") == 2
+    assert "R30TryFixedFunctionProjectedRankIndexed(" in source
     assert source.count("R30BuildEyeAffine(stereo,") == 1
 
 
