@@ -1878,7 +1878,9 @@ int main()
         cameraDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
         cameraDesc.MiscFlags = 0u;
         Microsoft::WRL::ComPtr<ID3D11Texture2D> cameraReadback;
-        if (FAILED(fixture.device->CreateTexture2D(
+        Microsoft::WRL::ComPtr<ID3D11Device> cameraDevice;
+        fixture.offscreenGameColor->GetDevice(cameraDevice.GetAddressOf());
+        if (!cameraDevice || FAILED(cameraDevice->CreateTexture2D(
                 &cameraDesc, nullptr, cameraReadback.GetAddressOf())))
             return false;
         ctx->OMSetRenderTargets(0u, nullptr, nullptr);
