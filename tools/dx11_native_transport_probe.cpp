@@ -1279,6 +1279,19 @@ int main()
             offscreenGameRtv,
             "00882 game-created offscreen camera RTV");
 
+    D3D11_TEXTURE2D_DESC offscreenDepthDesc = offscreenDesc;
+    offscreenDepthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    offscreenDepthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    ID3D11Texture2D* offscreenGameDepthTexture = nullptr;
+    ID3D11DepthStencilView* offscreenGameDsv = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &offscreenDepthDesc, nullptr, &offscreenGameDepthTexture)) &&
+            offscreenGameDepthTexture &&
+            SUCCEEDED(d3d.device->CreateDepthStencilView(
+                offscreenGameDepthTexture, nullptr, &offscreenGameDsv)) &&
+            offscreenGameDsv,
+            "00884 real game offscreen color/depth camera pair");
+
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
@@ -1320,6 +1333,8 @@ int main()
         ID3D11RenderTargetView* gameSurfaceView{};
         ID3D11Texture2D* offscreenGameColor{};
         ID3D11RenderTargetView* offscreenGameRtv{};
+        ID3D11DepthStencilView* offscreenGameDsv{};
+        bool replayedOffscreenGameClears[2]{};
         bool replayedOffscreenGameDraw[2]{};
         bool replayedInstancedOffscreenCamera[2]{};
         bool rejectedInvalidSurfaceCopy[2]{};
@@ -1392,6 +1407,7 @@ int main()
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
     gameEyeFixture.offscreenGameColor = offscreenGameColor;
     gameEyeFixture.offscreenGameRtv = offscreenGameRtv;
+    gameEyeFixture.offscreenGameDsv = offscreenGameDsv;
     // Two game-created GPU postpasses run between the REAL eye Draw calls:
     // an unscaled per-camera array-slice copy followed by a format-converting
     // scaled source overlay AFTER the original TARGET Clear. Later callback
@@ -1804,10 +1820,34 @@ int main()
         const auto beforeOffscreen = encoder.draw_count();
         const auto beforeOffscreenEyeColor = encoder.color_draw_count();
         ID3D11RenderTargetView* gameOffscreen = fixture.offscreenGameRtv;
-        ctx->OMSetRenderTargets(1u, &gameOffscreen, nullptr);
-        const float offscreenClear[4]{
-            eyeIndex == 0u ? 0.75f : 0.25f, 0.5f, 0.25f, 1.f};
-        ctx->ClearRenderTargetView(gameOffscreen, offscreenClear);
+        ID3D11DepthStencilView* gameOffscreenDepth = fixture.offscreenGameDsv;
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
+        const auto clearDraws = encoder.draw_count();
+        const auto clearEyeColor = encoder.color_draw_count();
+        const bool rejectsCameraClear =
+            !encoder.clear_offscreen_game_color(eyeTarget, 0xffabcdefu) &&
+            !encoder.clear_offscreen_game_color(nullptr, 0xffabcdefu) &&
+            !encoder.clear_offscreen_game_depth_stencil(
+                gameOffscreen, fixture.eyeDepth[eyeIndex],
+                true, 0.5f, true, 1u) &&
+            !encoder.clear_offscreen_game_depth_stencil(
+                gameOffscreen, gameOffscreenDepth,
+                false, 1.f, false, 0u) &&
+            !encoder.clear_offscreen_game_depth_stencil(
+                gameOffscreen, gameOffscreenDepth,
+                true, -0.5f, false, 0u);
+        const bool clearsCamera =
+            encoder.clear_offscreen_game_color(
+                gameOffscreen, eyeIndex == 0u ? 0xffbf8040u : 0xff4080bfu) &&
+            encoder.clear_offscreen_game_depth_stencil(
+                gameOffscreen, gameOffscreenDepth, true,
+                eyeIndex == 0u ? 0.25f : 0.75f,
+                true, static_cast<std::uint8_t>(eyeIndex + 3u));
+        fixture.replayedOffscreenGameClears[eyeIndex] =
+            rejectsCameraClear && clearsCamera &&
+            encoder.draw_count() == clearDraws &&
+            encoder.color_draw_count() == clearEyeColor;
+        if (!fixture.replayedOffscreenGameClears[eyeIndex]) return false;
         const bool issuedOffscreen = eyeIndex == 0u
             ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
             : encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0);
@@ -1834,7 +1874,7 @@ int main()
         // draws never forge color evidence, while rejected eye/foreign/empty
         // instances issue zero GPU commands. Keep the original per-eye source
         // timeline intact, then rebind the ring eye for subsequent HUD draws.
-        ctx->OMSetRenderTargets(1u, &gameOffscreen, nullptr);
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
         outrun::vr::dx11::NativeGameEyeDrawEncoder instancedCamera(
             ctx, eyeTarget, fixture.eyeDepth[eyeIndex], 64u, 64u);
         const bool rejectedInstanced =
@@ -2310,6 +2350,8 @@ int main()
             gameEyeFixture.endedOnOffscreenTarget[1] &&
             gameEyeFixture.rejectedDetachedDraw[0] &&
             gameEyeFixture.rejectedDetachedDraw[1] &&
+            gameEyeFixture.replayedOffscreenGameClears[0] &&
+            gameEyeFixture.replayedOffscreenGameClears[1] &&
             gameEyeFixture.replayedOffscreenGameDraw[0] &&
             gameEyeFixture.replayedOffscreenGameDraw[1] &&
             gameEyeFixture.replayedInstancedOffscreenCamera[0] &&
@@ -2539,6 +2581,8 @@ int main()
     }
     preservedDepthView->Release();
     preservedDepthTexture->Release();
+    offscreenGameDsv->Release();
+    offscreenGameDepthTexture->Release();
     offscreenGameRtv->Release();
     offscreenGameColor->Release();
     gameSurfaceView->Release();

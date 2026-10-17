@@ -64,6 +64,14 @@ public:
     [[nodiscard]] bool draw_indexed_instanced(
         UINT indicesPerInstance, UINT instanceCount, UINT startIndex,
         INT baseVertex, UINT startInstance) noexcept;
+    // Native game-owned auxiliary camera Clears are GPU source commands,
+    // not XR-eye Clears or direct-eye Draw/color evidence.
+    [[nodiscard]] bool clear_offscreen_game_color(
+        ID3D11RenderTargetView* gameTarget, std::uint32_t argb) noexcept;
+    [[nodiscard]] bool clear_offscreen_game_depth_stencil(
+        ID3D11RenderTargetView* gameTarget, ID3D11DepthStencilView* gameDepth,
+        bool clearDepth, float depth, bool clearStencil,
+        std::uint8_t stencil) noexcept;
     // Replay a game-authored TARGET Clear at its exact position between
     // menu/vehicle/race eye Draws, never as fabricated draw evidence. Partial
     // clears require D3D11.1 ClearView (no implicit full-eye fallback).

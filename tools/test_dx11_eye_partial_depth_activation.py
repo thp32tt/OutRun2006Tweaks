@@ -131,4 +131,32 @@ assert audit_native_offscreen_game_draw(
         "indicesPerInstance, instanceCount, startIndex,\n"
         "        baseVertex, startInstance);\n    ++colorDrawCount_;", 1), probe
 ), "indexed instanced phantom eye color slipped through"
-print("DX11 partial DSV/TARGET and game offscreen Draw: PASS (positive + negative tamper)")
+# Offscreen camera color+depth Clear must remain an owned GPU command and
+# cannot forge a direct-eye clear/draw. Mutation checks cover both domains.
+def camera_clear_contract(code):
+    color = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(", 1)[-1].split(
+        "bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[0]
+    depth = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[-1].split(
+        "bool NativeGameEyeDrawEncoder::replay_due_source_clears(", 1)[0]
+    return all(t in color for t in (
+        "prepare_offscreen_game_draw(gameTarget)",
+        "context_->ClearRenderTargetView(gameTarget, rgba);",
+    )) and all(t in depth for t in (
+        "!prepare_offscreen_game_draw(gameTarget)",
+        "boundDepth.Get() != gameDepth",
+        "depthResource.Get() == eyeDepthResource.Get()",
+        "dd.Width != cd.Width",
+        "dd.SampleDesc.Count != cd.SampleDesc.Count",
+        "context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);",
+    ))
+assert camera_clear_contract(source)
+assert not camera_clear_contract(source.replace(
+    "boundDepth.Get() != gameDepth", "false", 1))
+assert not camera_clear_contract(source.replace(
+    "depthResource.Get() == eyeDepthResource.Get()", "false", 1))
+assert not camera_clear_contract(source.replace(
+    "context_->ClearRenderTargetView(gameTarget, rgba);", "", 1))
+assert "gameEyeFixture.replayedOffscreenGameClears[0] &&" in probe
+assert "gameEyeFixture.replayedOffscreenGameClears[1] &&" in probe
+assert "encoder.copy_game_surface(" in probe
+print("DX11 owned offscreen camera color/depth + Draw/Copy: PASS")

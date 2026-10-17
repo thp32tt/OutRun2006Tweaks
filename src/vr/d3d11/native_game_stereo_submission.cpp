@@ -320,6 +320,66 @@ void NativeGameEyeDrawEncoder::set_source_clear_timeline(
     sourceClearCursor_ = 0u;
 }
 
+// Real game menu/vehicle auxiliary camera Clears must write the camera's
+// own target before source Draw/DrawIndexed and chronological GPU Copy/Stretch.
+// Never convert them into direct-eye color evidence.
+bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
+    ID3D11RenderTargetView* gameTarget, std::uint32_t argb) noexcept {
+    if (!prepare_offscreen_game_draw(gameTarget)) return false;
+    constexpr float scale = 1.0f / 255.0f;
+    const float rgba[4]{
+        static_cast<float>((argb >> 16) & 0xffu) * scale,
+        static_cast<float>((argb >> 8) & 0xffu) * scale,
+        static_cast<float>(argb & 0xffu) * scale,
+        static_cast<float>((argb >> 24) & 0xffu) * scale};
+    context_->ClearRenderTargetView(gameTarget, rgba);
+    return true;
+}
+
+// The game's offscreen DSV must be actively bound on the SAME context and
+// device, independent of the OpenXR ring depth, and compatible with its
+// currently bound color camera. Full Clears ignore viewport and scissor.
+bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
+    ID3D11RenderTargetView* gameTarget, ID3D11DepthStencilView* gameDepth,
+    bool clearDepth, float depth, bool clearStencil,
+    std::uint8_t stencil) noexcept {
+    if (!gameDepth || gameDepth == eyeDepth_ ||
+        (!clearDepth && !clearStencil) ||
+        (clearDepth && (!std::isfinite(depth) || depth < 0.f || depth > 1.f)) ||
+        !prepare_offscreen_game_draw(gameTarget)) return false;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> boundDepth;
+    context_->OMGetRenderTargets(0u, nullptr, boundDepth.GetAddressOf());
+    if (boundDepth.Get() != gameDepth) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> depthResource, colorResource;
+    Microsoft::WRL::ComPtr<ID3D11Resource> eyeDepthResource;
+    gameDepth->GetResource(depthResource.GetAddressOf());
+    gameTarget->GetResource(colorResource.GetAddressOf());
+    if (eyeDepth_) eyeDepth_->GetResource(eyeDepthResource.GetAddressOf());
+    if (!depthResource || !colorResource ||
+        depthResource.Get() == eyeDepthResource.Get() ||
+        depthResource.Get() == colorResource.Get()) return false;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTexture, colorTexture;
+    if (FAILED(depthResource.As(&depthTexture)) || !depthTexture ||
+        FAILED(colorResource.As(&colorTexture)) || !colorTexture) return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> owner, depthOwner;
+    context_->GetDevice(owner.GetAddressOf());
+    depthTexture->GetDevice(depthOwner.GetAddressOf());
+    D3D11_TEXTURE2D_DESC dd{}, cd{};
+    depthTexture->GetDesc(&dd);
+    colorTexture->GetDesc(&cd);
+    if (!owner || owner.Get() != depthOwner.Get() ||
+        !dd.Width || !dd.Height || dd.Width != cd.Width ||
+        dd.Height != cd.Height ||
+        dd.SampleDesc.Count != cd.SampleDesc.Count ||
+        dd.SampleDesc.Quality != cd.SampleDesc.Quality ||
+        dd.Usage != D3D11_USAGE_DEFAULT || dd.CPUAccessFlags ||
+        (dd.BindFlags & D3D11_BIND_DEPTH_STENCIL) == 0u) return false;
+    const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
+                       (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
+    context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);
+    return true;
+}
+
 bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
     if (!sourceClears_) return true;
     const auto count = sourceClears_->count[sourceClearEye_];
