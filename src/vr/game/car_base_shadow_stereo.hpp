@@ -65,6 +65,25 @@ struct StereoDrawSource
     std::uint32_t poseSequence = 0;
     bool exactSource = false;
 };
+// R30 originally admits this direct shadow only when the last original
+// game c64 was written for the *current* top-level GPU draw. A nested game
+// callback can replace it between R30 classification and native LEFT.
+// Validate the same source/generation again before either physical eye.
+// drawSerial is the current completed top-level serial; R30's next serial
+// must be exactly uploadDraw + 1 (without wrapping).
+constexpr bool IsCoherentBeforeNativeLeft(
+    const StereoDrawSource& source) noexcept
+{
+    return source.exactSource &&
+        source.uploadSerial != 0 && source.uploadDraw != 0 &&
+        source.drawSerial != 0 &&
+        source.uploadDraw == source.drawSerial &&
+        source.poseEpoch != 0 &&
+        source.poseEpoch == source.uploadPoseEpoch &&
+        source.shaderEpoch != 0 && source.shader != 0 &&
+        source.poseSequence != 0;
+}
+
 constexpr bool SameStereoDrawSource(
     const StereoDrawSource& a, const StereoDrawSource& b) noexcept
 {

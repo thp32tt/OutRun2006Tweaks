@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01017",
+  "production_id": "CONVERSION-DX9EX-01017",
+  "event_id": "CONVERSION-DX9EX-01017-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C5_VALIDATION",
+  "checkpoint": "C5_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "bed30a43919ab6d9736e7d1f5bf6ab3aa99ea778",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01017.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Preserve the original player contact shadow at race startup and gameplay as a source-owned binocular world draw, rejecting foreign raw car/road c64 before native LEFT or reentrant left-to-right ownership changes while preserving the normal shadow and existing native fallback.",
+    "scope_boundary": "Only the exact original direct CarBaseShadow world producer and independent R84 R30/R33 native c64 stereo transaction. No SkyGlow, lens, +TIME, GOAL, rank, input, FFB, shader world, frozen DXVK or R26_SAFE changes.",
+    "trace_stages": [
+      "Original player car contact-shadow direct producer records WorldParticle/CarBaseShadow semantic and its original game c64 writer.",
+      "R84 R30 authorizes same-pose same-shader original c64 for immediate stereo eye constants and R33 revalidates before native LEFT submission.",
+      "R84 R33 revalidates the original game upload and physical shadow after native LEFT, refusing an unrelated RIGHT before eye composition while restoring the original game WVP and state."
+    ],
+    "subcomponents": [
+      "Revalidate raw original car-shadow shader, upload pose, immediate draw serial, source semantic and nonqueue identity in R33 before LEFT, rather than relying only on earlier R30 classification.",
+      "Fence both GPU eyes by an executable original-write/draw-generation coherence contract with rollback and mutation regressions for unrelated world and reentrant game c64 sources."
+    ],
+    "acceptance_items": [
+      {
+        "id": "original_shadow_two_eye_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original player contact-shadow direct c64 producer through R84 left and right GPU submissions",
+        "expected_behavior": "Source-coherent original game c64 is required at native LEFT and survives native RIGHT with identical physical stamp, not stale road or other car matrices."
+      },
+      {
+        "id": "shadow_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign original game WVP, mixed queue, pose and shader changes, native mono fallback plus protected world/sky",
+        "expected_behavior": "Foreign or missing source falls back before native LEFT with original WVP rollback; after-left drift blocks RIGHT without replaying the first eye or changing unrelated source."
+      },
+      {
+        "id": "shadow_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Active R84 and R26_SAFE native Windows x86, x64 OpenXR host, package, Domain, Inspector and Full Source gates",
+        "expected_behavior": "One exact committed source SHA passes required GitHub Actions and matching Quest3 visual evidence remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "original_shadow_two_eye_source": "PENDING_EXACT_SHA",
+    "shadow_original_fallback": "PENDING_EXACT_SHA",
+    "shadow_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "R30 already authorizes exact direct shadow original c64 with next-draw proof, but R33 captured a weaker source after temporary left-eye upload and skipped the shadow in its pre-left reject branch.",
+    "source_trace": [
+      "src/vr/game/render_semantics.hpp exact original contact-shadow producer command",
+      "src/vr/d3d9/stereo_renderer_r30.cpp R30HasExactCarBaseShadowRawWvp original shader/pose/next-draw proof",
+      "src/vr/d3d9/stereo_renderer_r33.cpp GPU LEFT and RIGHT c64 revalidation plus rollback"
+    ],
+    "root_cause": "Between R30 classification and actual native LEFT GPU submission, nested original game work may overwrite c64 or queue identity. R33 checked raw source changes only after LEFT, allowing a foreign left-eye shadow draw; it also did not compare original writer generation against the immediate draw.",
+    "alternatives_rejected": [
+      "Do not classify arbitrary alpha/world particles as player shadow, apply HUD flattening, hide any original shadow or suppress the first native GPU draw."
+    ],
+    "fix_evidence": "Added exact original direct-WVP generation recheck and source-owned native pre-left/after-left guards with C++ smoke, without touching original game binary assets.",
+    "negative_test_evidence": "Portable C++ shadow smoke verifies original current-draw source and mutations for prior/future draw, missing write serial, invalid pose/shader and reentrant writer after LEFT.",
+    "eye_ownership": "Left and right use the same original game c64 producer/write, top-level draw generation, shader/pose and physical shadow, or preserve original native fallback when source proof is lost.",
+    "evidence_limit": "No matching Quest3 / VDXR runtime observed; deterministic native pre-left source mismatch prevention is not a hardware proof that the race-start shadow is visually fixed."
+  }
+}

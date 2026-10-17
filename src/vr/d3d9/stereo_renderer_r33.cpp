@@ -988,24 +988,31 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::RenderScope::None;
                 OutRunVR::GameSemantic::ProducerToken writtenProducer =
                     OutRunVR::GameSemantic::ProducerToken::None;
+                const auto drawSerial = R29OwnerTopLevelDrawSerial();
+                // R30 proved this same direct original WVP before building
+                // the two eyes. Reject a now-foreign/shader/pose/queue
+                // source before native LEFT (not only after it).
                 const bool sourceOwned =
                     OutRunVRRenderer::GetLastRawGameWvpWrite(
                         rawGameWvp, uploadSerial, uploadDraw,
                         writeShader, writeShaderEpoch) &&
+                    uploadSerial != 0 &&
                     OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
                         writtenScope, queueEpoch, queueNode, writtenProducer) &&
                     R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
-                    writeShader == shader && writeShaderEpoch == shaderEpoch &&
-                    writtenScope ==
-                        OutRunVR::GameSemantic::RenderScope::WorldParticle &&
-                    writtenProducer ==
-                        OutRunVR::GameSemantic::ProducerToken::CarBaseShadow &&
-                    queueNode == nullptr;
+                    drawSerial != UINT64_MAX &&
+                    OutRunVR::CarShadowStereo::OwnsDirectGameWvp({
+                        OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                        OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                        drawSerial + 1u, uploadDraw,
+                        shader, writeShader, shaderEpoch, writeShaderEpoch,
+                        writtenScope, writtenProducer, queueNode, queueEpoch
+                    });
                 return OutRunVR::CarShadowStereo::StereoDrawSource{
                     uploadSerial, uploadDraw,
                     OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
                     OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
-                    R29OwnerTopLevelDrawSerial(), shaderEpoch, shader,
+                    drawSerial, shaderEpoch, shader,
                     (stereo && stereo->valid) ? stereo->poseSequence : 0u,
                     command.IsDirectCarBaseShadow() && sourceOwned
                 };
@@ -1119,6 +1126,9 @@ namespace OutRunVRStereo
                      centreBeforeLeft, centreRawBeforeLeft)) ||
                 (exactNativeHud &&
                  !OutRunVR::HudNativeSource::IsExactHudSource(hudBeforeLeft)) ||
+                (exactShadowEye &&
+                 !OutRunVR::CarShadowStereo::IsCoherentBeforeNativeLeft(
+                     shadowBeforeLeft)) ||
                 (exactStageEye &&
                  !OutRunVR::StageExtensionPhysical::IsValid(stageBeforeLeft)) ||
                 (exactGoalEye &&
@@ -1136,6 +1146,7 @@ namespace OutRunVRStereo
                     R32ReviewMarkFrameRightDrawFailed();
                     R32ReviewNoteRestoreFailure(
                         exactCentreEye ? "R33 C993 pre-left c64 rollback"
+                        : exactShadowEye ? "R33 car shadow pre-left c64 rollback"
                         : exactStageEye ? "R33 +TIME pre-left c64 rollback"
                                        : "R33 GOAL pre-left c64 rollback");
                     R32ReviewArmStereoRecoverySafety();
@@ -1183,9 +1194,14 @@ namespace OutRunVRStereo
                     centreRawBeforeLeft, centreRawAfterLeft) ||
                  !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
                     centreAfterLeft, centreRawAfterLeft));
+            const auto shadowAfterLeft = exactShadowEye
+                ? captureShadowSource()
+                : OutRunVR::CarShadowStereo::StereoDrawSource{};
             const bool shadowSourceChanged = exactShadowEye &&
-                !OutRunVR::CarShadowStereo::SameStereoDrawSource(
-                    shadowBeforeLeft, captureShadowSource());
+                (!OutRunVR::CarShadowStereo::IsCoherentBeforeNativeLeft(
+                     shadowAfterLeft) ||
+                 !OutRunVR::CarShadowStereo::SameStereoDrawSource(
+                     shadowBeforeLeft, shadowAfterLeft));
             const bool goalSourceChanged = exactGoalEye &&
                 !OutRunVR::GoalPhysical::SameAfterNativeLeft(
                     goalBeforeLeft, captureGoalSource());

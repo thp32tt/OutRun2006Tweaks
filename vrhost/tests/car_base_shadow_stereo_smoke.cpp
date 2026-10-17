@@ -81,6 +81,47 @@ int main()
     if (!CarShadowStereo::ValidScaledAlpha(.3f,.5f,scaled) ||
         scaled < .149f || scaled > .151f)
         return 16;
+    // Source-correct original contact-shadow Draw: R30's "next draw"
+    // generation is 41, and the original raw c64 belongs to draw 40.
+    // The physical R33 guard must reject a different left-eye owner even
+    // when its shader/pose and alpha state look identical.
+    const CarShadowStereo::StereoDrawSource physical{
+        11, 40, 30, 30, 40, 50, 0x100, 60, true
+    };
+    if (!CarShadowStereo::IsCoherentBeforeNativeLeft(physical))
+        return 17;
+    auto physicalMutation = physical;
+    physicalMutation.uploadSerial = 0; // no game WVP write
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 18;
+    physicalMutation = physical; physicalMutation.uploadDraw = 39;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 19; // previous vehicle or world draw
+    physicalMutation = physical; physicalMutation.uploadDraw = 41;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 20; // future/mismatched submission
+    physicalMutation = physical; physicalMutation.uploadPoseEpoch = 31;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 21;
+    physicalMutation = physical; physicalMutation.poseSequence = 0;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 22;
+    physicalMutation = physical; physicalMutation.shaderEpoch = 0;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 23;
+    physicalMutation = physical; physicalMutation.exactSource = false;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
+        return 24;
+    physicalMutation = physical; ++physicalMutation.uploadSerial;
+    if (!CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation) ||
+        CarShadowStereo::SameStereoDrawSource(physical, physicalMutation))
+        return 25; // reentrant writer AFTER LEFT prevents native RIGHT
+    physicalMutation = physical; ++physicalMutation.drawSerial;
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation) ||
+        CarShadowStereo::SameStereoDrawSource(physical, physicalMutation))
+        return 26;
+    if (!CarShadowStereo::SameStereoDrawSource(physical, physical))
+        return 27;
     std::cout << "R84 contact shadow eye-owner PASS\n";
     return 0;
 }
