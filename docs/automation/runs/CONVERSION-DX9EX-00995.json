@@ -1,0 +1,96 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00995",
+  "production_id": "CONVERSION-DX9EX-00995",
+  "event_id": "CONVERSION-DX9EX-00995-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_WAIT_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "fd0c9ec1104418a54e7a51a003708b923becee16",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00995.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Protect the complete original GOAL 0-99 progress, result glyph and time family in both physical R84 fixedfn/XYZRHW and shader/c64 native left/right GPU submissions against synchronous producer reentrancy.",
+    "scope_boundary": "Exact GOAL only; original +TIME, ordinary gameplay HUD, scene/SkyGlow, input, FFB, R26_SAFE and frozen DXVK unchanged.",
+    "trace_stages": [
+      "Original GOAL result progress, two time helper parents, Sumo stage print and nineteen B9200 result text source tokens reach direct/queued D3DX GPU submission.",
+      "R84 R30 XYZRHW physical native Draw and separate R33 shader/c64 HUD native Draw both previously performed left-eye callbacks before right without GOAL provenance revalidation.",
+      "Carry GOAL producer, node/epoch, original pose, top-level Draw and shader epoch through actual left GPU Draw; suppress contaminated right-eye submission and restore shader c64 as needed."
+    ],
+    "subcomponents": [
+      "Original game C++ source modification in both R30 fixedfn/XYZRHW and R33 shader HUD post-left GPU transactions, with original native left HRESULT/fallback preserved.",
+      "Compile-and-run real direct/queued GOAL five-family source mutations in existing host GOAL progress test, preserving package and rollback gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_gpu_full_routes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original result GOAL direct/queued producer through R84 R30 and R33 physical GPU eye submissions",
+        "expected_behavior": "Five GOAL producer families retain their exact original owner for both real GPU eyes."
+      },
+      {
+        "id": "goal_reentrant_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Native callback mutation of GOAL producer, queue, draw serial, pose and shader, plus state restoration",
+        "expected_behavior": "No foreign GOAL right eye or repeated native left draw; ordinary HUD, +TIME, world, SkyGlow, original controls and R26_SAFE unchanged."
+      },
+      {
+        "id": "goal_full_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "Exact Windows game R84/R26_SAFE, host regression, package, Domain/Full Source/Inspector GitHub gates",
+        "expected_behavior": "All required Actions pass on one validation-bearing SHA; HMD status remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_gpu_full_routes": "PENDING_WINDOWS_CI",
+    "goal_reentrant_fallback": "PENDING_WINDOWS_CI",
+    "goal_full_exact_sha": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R30ExecuteXyzrhwStereo guards rank and +TIME after native left draw, but GOAL percent/time/result source lacked the same GPU-eye lifetime; R33TryHud guards centre lens/car shadow but not exact native shader GOAL left/right callback reentrancy.",
+    "original_evidence": "Inspected current GitHub HEAD fd0c9ec1104418a54e7a51a003708b923becee16 source at R30 physical Draw and R33TryHud physical Draw.",
+    "source_trace": [
+      "Proven GOAL parent and D3DX producer tokens",
+      "R84 fixedfn XYZRHW and shader/c64 native Draw",
+      "Post-left source identity and right-eye veto"
+    ],
+    "alternatives_rejected": [
+      "No blanket alpha/hud reclassification, timer change, repeated +TIME gate or generic D3DX Flush."
+    ],
+    "eye_ownership": "Exact GOAL direct or queued producer only. If changed after native left draw, right-eye incomplete and original left result retained.",
+    "fix_evidence": "R30 and R33 whole GOAL GPU source transactions.",
+    "negative_test_evidence": "Required x64 host GOAL smoke five producer families and original direct/queued shader/pose/queue mutation."
+  },
+  "local_validation": {
+    "status": "SOURCE_PREFLIGHT_READY",
+    "full_windows_ci": "PENDING"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Observe full exact-SHA GitHub Gates; repair actual errors under this TASK_ID; Quest3 runtime separately UNTESTED."
+}

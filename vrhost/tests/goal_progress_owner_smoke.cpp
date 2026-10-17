@@ -1,5 +1,6 @@
 #include "../../src/vr/game/render_semantics.hpp"
 #include "../../src/vr/game/goal_result_parent_provenance.hpp"
+#include "../../src/vr/game/goal_progress_physical_source.hpp"
 #include <iostream>
 
 using namespace OutRunVR::GameSemantic;
@@ -156,8 +157,65 @@ static bool CheckB9200DirectGpuSource()
         OutRunVR::GoalResult::CheckParentReturnProvenance();
 }
 
+// Native GOAL eye-source identity is checked only at the real Draw boundary,
+// after D3DX direct/queued registration, in both R30 and R33 render paths.
+static bool CheckGoalPhysicalBothEyeSources()
+{
+    using namespace OutRunVR::GoalPhysical;
+    const int nodeA = 1, nodeB = 2;
+    for (const auto token : {ProducerToken::ResultProgress,
+             ProducerToken::GoalTime020, ProducerToken::GoalTime150,
+             ProducerToken::OutRunStagePrintf, ProducerToken::ResultTextB9200})
+    {
+        Source queued{RenderScope::ScreenHud, token, true, &nodeA, 41, 8, 15, 0, 0};
+        Source direct{RenderScope::ScreenHud, token, false, nullptr, 0,
+            8, 15, 0x1234, 11};
+        if (!SameAfterNativeLeft(queued, queued) ||
+            !SameAfterNativeLeft(direct, direct)) return false;
+        auto changed = queued;
+        changed.node = &nodeB;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; ++changed.queueEpoch;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; changed.producer = ProducerToken::StageExtensionTime;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; changed.scope = RenderScope::ScreenOverlay2D;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; changed.queued = false;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; changed.poseEpoch = 0;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; ++changed.poseEpoch;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = queued; ++changed.drawSerial;
+        if (SameAfterNativeLeft(queued, changed)) return false;
+        changed = direct; ++changed.shaderEpoch;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+        changed = direct; changed.shader = 0x2345;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+        changed = direct; changed.shaderEpoch = 0;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+        changed = direct; changed.node = &nodeA;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+        changed = direct; changed.queueEpoch = 1;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+        changed = direct; changed.queued = true;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+        changed = direct; changed.producer = ProducerToken::None;
+        if (SameAfterNativeLeft(direct, changed)) return false;
+    }
+    return !IsValid(Source{}) &&
+        !IsValid(Source{RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, false, nullptr, 0, 8, 15, 0, 0}) &&
+        !IsValid(Source{RenderScope::ScreenHud,
+            ProducerToken::OutRunHudText, false, nullptr, 0, 8, 15, 0, 0}) &&
+        !IsValid(Source{RenderScope::WorldBillboard,
+            ProducerToken::GoalTime020, false, nullptr, 0, 8, 15, 0, 0});
+}
+
 int main()
 {
+    if (!CheckGoalPhysicalBothEyeSources()) return 8;
     if (!CheckB9200DirectGpuSource()) return 7;
     if (!CheckVerifiedB9200GpuOwnership()) return 6;
     if (!CheckStagePrintfBatch()) return 4;

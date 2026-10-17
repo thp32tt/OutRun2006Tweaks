@@ -30,6 +30,7 @@
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "../game/car_base_shadow_stereo.hpp"
+#include "../game/goal_progress_physical_source.hpp"
 #include "../core/r29_owner_api.hpp"
 
 namespace OutRunVRRenderer {
@@ -966,6 +967,47 @@ namespace OutRunVRStereo
                 ? captureShadowSource()
                 : OutRunVR::CarShadowStereo::StereoDrawSource{};
 
+            // Shader/c64 HUD bypasses R30's fixedfn/XYZRHW source fence.
+            // A native left callback may select a foreign GOAL result child;
+            // never bind the old per-eye matrix to that new GPU owner.
+            auto captureGoalSource = [&]() noexcept {
+                const auto cmd = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                std::uintptr_t shader = 0;
+                std::uint64_t shaderEpoch = 0;
+                if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                    R29OwnerCurrentVertexShaderIdentity() != 0)
+                    return OutRunVR::GoalPhysical::Source{};
+                return OutRunVR::GoalPhysical::Source{
+                    cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,
+                    cmd.queueEpoch, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+            };
+            const auto goalCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool exactGoalEye = goalCommand.IsExactFiniteResultHud() &&
+                goalCommand.producer !=
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
+            const auto goalBeforeLeft = exactGoalEye
+                ? captureGoalSource() : OutRunVR::GoalPhysical::Source{};
+            if (exactGoalEye && !OutRunVR::GoalPhysical::IsValid(goalBeforeLeft))
+            {
+                // Temporary left c64 already uploaded; preserve original
+                // game Draw only after rolling back the uploaded matrix.
+                bool restored = false;
+                {
+                    R32ReviewInternalStereoPassScope guard;
+                    restored = R32ReviewSetWvpBatch(device, original);
+                }
+                if (!restored)
+                {
+                    R32ReviewMarkFrameRightDrawFailed();
+                    R32ReviewNoteRestoreFailure("R33 GOAL pre-left c64 rollback");
+                    R32ReviewArmStereoRecoverySafety();
+                    return {true, E_FAIL};
+                }
+                return {};
+            }
+
             R32ReviewNoteStereoDrawWithoutMonoBackup();
             if (mayWriteDepth || mayWriteStencil)
                 R32ReviewNoteMainDepthContentWrite();
@@ -998,7 +1040,10 @@ namespace OutRunVRStereo
             const bool shadowSourceChanged = exactShadowEye &&
                 !OutRunVR::CarShadowStereo::SameStereoDrawSource(
                     shadowBeforeLeft, captureShadowSource());
-            if (centreSourceChanged || shadowSourceChanged)
+            const bool goalSourceChanged = exactGoalEye &&
+                !OutRunVR::GoalPhysical::SameAfterNativeLeft(
+                    goalBeforeLeft, captureGoalSource());
+            if (centreSourceChanged || shadowSourceChanged || goalSourceChanged)
             {
                 // Left native Draw already ran once; never replay it.
                 // Restore the game's original GPU c64 without submitting
@@ -1016,12 +1061,15 @@ namespace OutRunVRStereo
                     restored ? OutRunVR::StereoFailureRightStateFailed
                              : OutRunVR::StereoFailureRestoreFailed,
                     shadowSourceChanged ? "R33/car-shadow-source-changed"
-                                        : "R33/C993-centre-source-changed",
+                        : goalSourceChanged ? "R33/GOAL-source-changed"
+                                            : "R33/C993-centre-source-changed",
                     E_FAIL);
                 if (!restored)
                     R32ReviewNoteRestoreFailure(
                         shadowSourceChanged
                             ? "R33 car shadow original c64 rollback"
+                          : goalSourceChanged
+                            ? "R33 GOAL original c64 rollback"
                             : "R33 C993 original c64 rollback");
                 R32ReviewArmStereoRecoverySafety();
                 return result;

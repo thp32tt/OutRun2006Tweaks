@@ -39,6 +39,7 @@
 #include "../game/rank_marker_raw_wvp.hpp"
 #include "../game/rank_marker_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
+#include "../game/goal_progress_physical_source.hpp"
 #include "../game/rank_marker_fixedfn_r62.hpp"
 #include <cstring>
 #include <cstdlib>
@@ -5334,6 +5335,22 @@ namespace OutRunVRStereo
             return OutRunVR::StageExtensionPhysical::IsValid(source);
         }
 
+        // GOAL 0-99%, time and result glyphs require their own physical
+        // GPU source, distinct from +TIME and generic HUD/particle draws.
+        bool R30CaptureGoalPhysicalSource(OutRunVR::GoalPhysical::Source& out) noexcept
+        {
+            const auto draw = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            std::uintptr_t shader = 0;
+            std::uint64_t shaderEpoch = 0;
+            if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                R29OwnerCurrentVertexShaderIdentity() != 0)
+                return false;
+            out = {draw.scope, draw.producer, draw.queued, draw.queueNode,
+                draw.queueEpoch, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+            return OutRunVR::GoalPhysical::IsValid(out);
+        }
+
         // Sample the actual producer/queue/Calc3D2D identity at the GPU
         // primitive, not the previous tick's SpriteNode or cached rank WVP.
         // Fixed-function FVF 0x142 legitimately has a null vertex shader.
@@ -5403,6 +5420,13 @@ namespace OutRunVRStereo
             if (exactStage && !R30CaptureStagePhysicalSource(stageBefore))
                 return E_NOTIMPL; // native left Draw has NOT run yet
 
+            // Original GOAL percent and all its direct/queued text children
+            // were not covered by the +TIME/rank post-left source transaction.
+            OutRunVR::GoalPhysical::Source goalBefore{};
+            const bool exactGoal = stageCommand.IsExactFiniteResultHud() && !exactStage;
+            if (exactGoal && !R30CaptureGoalPhysicalSource(goalBefore))
+                return E_NOTIMPL; // no native GPU draw submitted yet
+
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
             {
@@ -5427,6 +5451,23 @@ namespace OutRunVRStereo
                     // Never repeat native left Draw or borrow an unrelated
                     // +TIME/GOAL source for the right eye. Enclosing R30
                     // owners still restore RT, viewport and fixedfn state.
+                    R29OwnerMarkRightDrawFailed();
+                    R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R29OwnerReportStereoFailure(
+                        OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
+                    R29OwnerArmMonoSafety();
+                    return leftHr;
+                }
+            }
+
+            if (exactGoal)
+            {
+                OutRunVR::GoalPhysical::Source goalAfter{};
+                if (!R30CaptureGoalPhysicalSource(goalAfter) ||
+                    !OutRunVR::GoalPhysical::SameAfterNativeLeft(goalBefore, goalAfter))
+                {
+                    // Left was native-submitted once. Never repeat it or
+                    // submit a newly selected result to the right eye.
                     R29OwnerMarkRightDrawFailed();
                     R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                     R29OwnerReportStereoFailure(
