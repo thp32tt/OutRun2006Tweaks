@@ -3323,6 +3323,98 @@ int main()
             gameArrayViews[eye][mip]->Release();
     gameEyeArray842->Release();
 
+    // 00901 integrated game-to-XR SRV postpass: the real game first renders
+    // independent left/right camera pixels into RTVs, then GPU-copies them
+    // into a shader-readable-only two-eye mipmapped camera texture. No CPU
+    // staging, fake second-eye duplication or readback participates in input.
+    D3D11_TEXTURE2D_DESC shaderEyeDesc = sourceDesc;
+    shaderEyeDesc.MipLevels = 2u;
+    shaderEyeDesc.ArraySize = 2u;
+    shaderEyeDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    ID3D11Texture2D* shaderEyes = nullptr;
+    ID3D11ShaderResourceView* shaderEyeView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &shaderEyeDesc, nullptr, &shaderEyes)) && shaderEyes &&
+            SUCCEEDED(d3d.device->CreateShaderResourceView(
+                shaderEyes, nullptr, &shaderEyeView)) && shaderEyeView,
+            "00901 game GPU SRV-only stereo postpass allocation");
+    d3d.context->ClearRenderTargetView(leftView, red);
+    d3d.context->ClearRenderTargetView(rightView, blue);
+    d3d.context->CopySubresourceRegion(shaderEyes,
+        D3D11CalcSubresource(0u, 0u, 2u), 0u, 0u, 0u,
+        leftSource, 0u, nullptr);
+    d3d.context->CopySubresourceRegion(shaderEyes,
+        D3D11CalcSubresource(0u, 1u, 2u), 0u, 0u, 0u,
+        rightSource, 0u, nullptr);
+    // A live shader read binding is legal during GPU-to-GPU camera transfer;
+    // the producer must restore rather than drop the original game SRV.
+    d3d.context->PSSetShaderResources(0u, 1u, &shaderEyeView);
+    outrun::vr::dx11::NativeGameStereoSubmission shaderSubmit(ring);
+    require(shaderSubmit.begin(d3d.context, 27u, 36u) &&
+            !shaderSubmit.capture_eye(
+                0u, shaderEyes, 1u, 0xa1u, 36u, 2u) &&
+            shaderSubmit.capture_eye(
+                0u, shaderEyes, 1u, 0xa1u, 36u, 0u) &&
+            shaderSubmit.capture_eye(
+                1u, shaderEyes, 1u, 0xb2u, 36u, 0u) &&
+            !shaderSubmit.submit() && shaderSubmit.cancel() &&
+            !ring.synchronization_faulted(),
+            "00901 invalid slice and duplicated mono eye reject without GPU work");
+    require(shaderSubmit.begin(d3d.context, 28u, 36u) &&
+            shaderSubmit.capture_eye(
+                0u, shaderEyes, 1u, 0xa1u, 36u, 0u) &&
+            shaderSubmit.capture_eye(
+                1u, shaderEyes, 1u, 0xb2u, 36u, 1u) &&
+            shaderSubmit.submit() && shaderSubmit.in_flight(),
+            "00901 independent real GPU SRV postpass eyes submitted");
+    ID3D11ShaderResourceView* boundShaderView = nullptr;
+    d3d.context->PSGetShaderResources(0u, 1u, &boundShaderView);
+    const bool retainedShaderRead = boundShaderView == shaderEyeView;
+    if (boundShaderView) boundShaderView->Release();
+    require(retainedShaderRead,
+            "00901 game compositor shader binding preserved across eye GPU handoff");
+    outrun::vr::dx11::NativeGameStereoPublishedFrame shaderFrame{};
+    bool shaderReady = false;
+    for (int retry = 0; retry < 2000 && !shaderReady; ++retry) {
+        shaderReady = shaderSubmit.try_publish(shaderFrame);
+        require(!ring.synchronization_faulted(),
+                "00901 native SRV eyes fence remains healthy");
+        if (!shaderReady) Sleep(1);
+    }
+    require(shaderReady && shaderFrame.eyeViewSignature[0] == 0xa1u &&
+            shaderFrame.eyeViewSignature[1] == 0xb2u &&
+            shaderFrame.sourcePoseSequence == 36u,
+            "00901 real L/R SRV eye frame and original pose preserved");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        d3d.context->CopyResource(
+            readback, ring.eye(shaderFrame.gpu.slot, eye));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0u, D3D11_MAP_READ, 0u, &mapped)),
+                "00901 shared OpenXR eye GPU pixel verification");
+        const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool correct = eye == 0u
+            ? pixel[0] == 255u && pixel[1] == 0u &&
+              pixel[2] == 0u && pixel[3] == 255u
+            : pixel[0] == 0u && pixel[1] == 0u &&
+              pixel[2] == 255u && pixel[3] == 255u;
+        d3d.context->Unmap(readback, 0u);
+        require(correct, "00901 independently rendered physical left/right colors");
+    }
+    hostFrame.frameId = 28u;
+    hostFrame.sourcePoseSequence = 36u;
+    hostFrame.flags &= ~OutRunVR::RenderFrameDirectGpuTransport;
+    require(shaderSubmit.attach_host_frame(shaderFrame, hostFrame) &&
+            (hostFrame.flags & OutRunVR::RenderFrameDirectGpuTransport) &&
+            ring.retire_acknowledged(
+                make_ack(ring.identity(), shaderFrame.gpu.slot, 28u)) &&
+            !shaderSubmit.attach_host_frame(shaderFrame, hostFrame),
+            "00901 exact OpenXR generation/slot/ACK retirement and stale reject");
+    ID3D11ShaderResourceView* unboundShaderView = nullptr;
+    d3d.context->PSSetShaderResources(0u, 1u, &unboundShaderView);
+    shaderEyeView->Release();
+    shaderEyes->Release();
+
     // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
     // cancellation nor another frame may reuse the ring without hard retire.
     const auto partialDraw = [](
@@ -3334,10 +3426,10 @@ int main()
         return false;
     };
     std::uint32_t partialSlot = 99;
-    require(ring.try_acquire_slot(d3d.context, 27, nullptr, partialSlot) &&
-            !ring.render_eye_pair(d3d.context, partialSlot, 27, partialDraw, nullptr) &&
+    require(ring.try_acquire_slot(d3d.context, 29, nullptr, partialSlot) &&
+            !ring.render_eye_pair(d3d.context, partialSlot, 29, partialDraw, nullptr) &&
             ring.synchronization_faulted() &&
-            !ring.cancel_acquired_slot(partialSlot, 27) &&
+            !ring.cancel_acquired_slot(partialSlot, 29) &&
             !ring.activation_ready(),
             "00812 partial native eye draw quarantines transport until Reset");
 

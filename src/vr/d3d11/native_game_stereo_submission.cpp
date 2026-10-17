@@ -1861,6 +1861,12 @@ bool NativeGameStereoSubmission::source_is_live(
             D3D11_RESOURCE_MISC_SHARED |
             D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
             D3D11_RESOURCE_MISC_SHARED_NTHANDLE) ||
+         native_game_eye_gpu_shader_postpass_source_admitted(
+             desc.BindFlags, desc.MiscFlags, desc.SampleDesc.Count,
+             D3D11_BIND_SHADER_RESOURCE,
+             D3D11_RESOURCE_MISC_SHARED |
+             D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+             D3D11_RESOURCE_MISC_SHARED_NTHANDLE) ||
          native_game_eye_gpu_compute_source_admitted(
             desc.BindFlags, desc.MiscFlags, desc.SampleDesc.Count,
             D3D11_BIND_UNORDERED_ACCESS, D3D11_BIND_RENDER_TARGET,

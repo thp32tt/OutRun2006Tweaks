@@ -30,6 +30,29 @@ namespace outrun::vr::dx11 {
     return bindFlags == 0u && sampleCount == 1u &&
            (miscFlags & sharedFlags) == 0u;
 }
+
+ // Shader-readable, game-owned postpass camera images are commonly produced
+ // by a GPU Copy/Resolve after the last real Draw, then sampled by a menu or
+ // race compositor. They need not have RTV/UAV bind flags themselves. Accept
+ // only a local, single-sample DEFAULT color source with the SRV flag alone:
+ // the ring still requires exact eye extent/format, independent L/R slices,
+ // producer device ownership, unique physical resource and a completed fence.
+ [[nodiscard]] constexpr bool native_game_eye_gpu_shader_postpass_source_admitted(
+     std::uint32_t bindFlags, std::uint32_t miscFlags,
+     std::uint32_t sampleCount, std::uint32_t shaderResourceFlag,
+     std::uint32_t sharedFlags) noexcept {
+     return shaderResourceFlag != 0u && bindFlags == shaderResourceFlag &&
+         sampleCount == 1u && (miscFlags & sharedFlags) == 0u;
+ }
+ static_assert(native_game_eye_gpu_shader_postpass_source_admitted(
+     8u, 0u, 1u, 8u, 0x700u));
+ static_assert(!native_game_eye_gpu_shader_postpass_source_admitted(
+     8u, 0x200u, 1u, 8u, 0x700u));
+ static_assert(!native_game_eye_gpu_shader_postpass_source_admitted(
+     8u, 0u, 4u, 8u, 0x700u));
+ static_assert(!native_game_eye_gpu_shader_postpass_source_admitted(
+     8u | 0x80u, 0u, 1u, 8u, 0x700u));
+
 // A compute-generated camera eye may never be RTV-bound: postprocessing
 // writes an independent UAV-only texture (or UAV + SRV) and the native OpenXR
 // handoff must still copy its complete mip-zero pixels on GPU. Admit only a
