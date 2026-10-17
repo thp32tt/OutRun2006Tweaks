@@ -29,7 +29,14 @@ def check(r30, r7, r26, semantic):
         "bool R30TryScreenSpaceFovDraw(",1)[0]
     assert "if (exactHud || genericQueuedHud)" in shader
     assert "R30GetRecentOriginalHudWvp(rawGameWvp)" in shader
-    assert "exactHud && R30IsPauseMenuElement()" in shader
+    # Keep the live source-owned queue in the ESC optical plane only after
+    # exact original WVP provenance; the former exactHud-only condition is
+    # deliberately replaced by the shared paused source predicate.
+    assert "const bool exactPauseShaderOwner =" in shader
+    assert "OutRunVrPauseEye::OwnsPauseShaderPlane(" in shader
+    assert "exactHud, genericQueuedHud, R30IsPauseMenuElement());" in shader
+    assert shader.index("R30GetRecentOriginalHudWvp(rawGameWvp)") < shader.index(
+        "OutRunVrPauseEye::OwnsPauseShaderPlane(")
     fixed=r30.split("HRESULT R30TryFixedFunctionProjectedRankIndexed(",1)[1].split(
         "HRESULT R30TryXyzrhwIndexedPrimitiveVB(",1)[0]
     for flag in ("const bool pauseOverlay =", "sourceScope == RenderScope::ScreenOverlay2D",
@@ -94,6 +101,10 @@ mutations=[
     (0,"drawCommand.queueEpoch != 0","false /* no queue generation */"),
     (0,"drawCommand.queueEpoch != 0\n                    ? R30ScreenSpaceKind::Hud2D",
      "drawCommand.queueEpoch != 0\n                    ? R30ScreenSpaceKind::None"),
+    (0,"exactHud, genericQueuedHud, R30IsPauseMenuElement());",
+     "exactHud, genericQueuedHud, true);"),
+    (0,"OutRunVrPauseEye::OwnsPauseShaderPlane(",
+     "OutRunVrPauseEye::WrongPauseShaderPlane("),
     (0,"pauseCommand.queueNode &&","true &&"),
     (0,"R84/R62-FVF142-PauseOverlay","R84/R62-FVF142-WorldSky"),
     (1,".DeniesGenericWorldFallback()",".IsDirectWorldLensCentre()"),
