@@ -232,6 +232,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "OutRunVRRenderer::GetLastGameWvpPoseEpoch()",
         "OutRunVR::GameSemantic::ProducerToken::LensFlareCentre",
         "R29OwnerCurrentShaderEpoch(shader, shaderEpoch)",
+        "writtenShaderEpoch == shaderEpoch",
     ):
         assert marker in physical, "C993 raw c64 provenance missing: " + marker
     fenced = physical[after_left:physical.index(

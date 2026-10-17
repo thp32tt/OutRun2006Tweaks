@@ -87,13 +87,13 @@
   },
   "local_validation": "PENDING_HOST_SMOKE",
   "score_delta_this_attempt": 0,
-  "next_action": "Check exact SHA DX9Ex Active, Domain, HUD Inspector, Full Source Impact after this cause-scoped verifier repair. No HMD proof.",
+  "next_action": "Exact-SHA full GitHub Windows Active, Domain, HUD Inspector, Full Source Impact gate check; preserve original material SHA and HMD UNTESTED.",
   "last_ci_failure": {
-    "sha": "8d69cb97a22ad261a8a9c6cfa6845b5eafb04681",
+    "sha": "e3133b349e197ccff994baa096aa6af4a50bce4f",
     "workflow": "DX9Ex Active Validation",
     "job": "policy",
     "step": "Verify R84 C993 original-WVP source proof and conservative optics",
-    "cause": "old exact substring captureCentreSource()); does not match new composite native semantic-plus-original-c64 guard",
-    "repair": "retain existing source tests; require combined source and GPU generation marker and add negative guards for removing serial/call/pose/shader validation"
+    "cause": "new negative test correctly mutated R33 c64 shader epoch equality, but static positive contract did not explicitly assert this newly added equality; mutation escaped policy check",
+    "repair": "also assert the original game c64 written shader epoch equals live bound shader epoch; retain nested serial/call/pose tests and all mandatory CI"
   }
 }
