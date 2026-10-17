@@ -10,14 +10,14 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "status": "VALIDATING_EXACT_SHA",
   "phase": "C5_VALIDATE",
-  "checkpoint": "C5_WAIT_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "checkpoint": "C5_REPAIRED_VALIDATOR",
+  "automation_validation": "PENDING_NEW_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "fd0c9ec1104418a54e7a51a003708b923becee16",
-  "material_result_sha": null,
+  "material_result_sha": "fcc25739f5632d1bc307bfd29c1e76e0aa09f885",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/game/goal_progress_physical_source.hpp",
@@ -30,7 +30,8 @@
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "vrhost/tests/goal_progress_owner_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00995.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00995.json",
+    "tools/verify_dx9ex_r84_lens_source.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
@@ -88,9 +89,14 @@
     "negative_test_evidence": "Required x64 host GOAL smoke five producer families and original direct/queued shader/pose/queue mutation."
   },
   "local_validation": {
-    "status": "SOURCE_PREFLIGHT_READY",
+    "status": "CI_POLICY_STRING_ASSERTION_REPAIRED",
+    "failed_validation_sha": "fcc25739f5632d1bc307bfd29c1e76e0aa09f885",
+    "run_id": 39003323458,
+    "failed_step": "Verify R84 C993 original-WVP source proof and conservative optics",
+    "actual_error": "Stale two-source literal assertion excludes new third GOAL post-left source fence; no game or host Windows compile performed on failed Active pipeline.",
+    "source_code_change": "NONE_IN_THIS_REPAIR",
     "full_windows_ci": "PENDING"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Observe full exact-SHA GitHub Gates; repair actual errors under this TASK_ID; Quest3 runtime separately UNTESTED."
+  "next_action": "Revalidate mandatory GitHub workflows on CI verifier repair SHA only; preserve GOAL C++ material SHA. HMD runtime UNTESTED."
 }

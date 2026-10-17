@@ -194,11 +194,16 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "const bool centreSourceChanged = exactCentreEye &&",
         "OutRunVR::LensCentre::SameStereoDrawSource(",
         "captureCentreSource());",
-        "if (centreSourceChanged || shadowSourceChanged)",
+        # The GOAL result owns an additional independent post-left fence.
+        # Keep the C993 centre and car-shadow checks mandatory in that same
+        # composite guard rather than requiring an obsolete two-term string.
     ):
         assert marker in physical, "C993 binocular source fence missing: " + marker
+    guard_marker = ("if (centreSourceChanged || shadowSourceChanged ||" +
+        chr(10) + "                goalSourceChanged)")
+    assert guard_marker in physical, "C993 binocular composite source fence missing"
     left_draw = physical.index("R32ReviewOwnedResult result{ true, actualDraw() };")
-    after_left = physical.index("if (centreSourceChanged || shadowSourceChanged)")
+    after_left = physical.index(guard_marker)
     right_eye = physical.index("IDirect3DSurface9* rightEye =")
     assert left_draw < after_left < right_eye
     assert physical.index("const bool centreSourceChanged = exactCentreEye &&") < after_left
