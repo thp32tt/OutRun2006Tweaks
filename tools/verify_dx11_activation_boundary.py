@@ -326,13 +326,15 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
     ]
     preflight_guards = [
         "if (!game_source_target_bound(gameTarget) ||",
+        "!geometry_outputs_isolated(gameTarget) ||",
         "drawCount_ == (std::numeric_limits<std::uint64_t>::max)())",
         "if (sourceClears_ &&",
         ".afterDrawOrdinal <= drawCount_)",
         "ScopedNativePostpassOutputs restore(context_);",
         "context_->OMSetRenderTargets(1u, &eye, eyeDepth_);",
         "if (!replay_due_source_clears()) return false;",
-        "return game_source_target_bound(gameTarget);",
+        "return game_source_target_bound(gameTarget) &&",
+        "geometry_outputs_isolated(gameTarget);",
     ]
     plain_guards = [
         "if (!vertexCount || !prepare_offscreen_game_draw(gameTarget))",
@@ -508,6 +510,13 @@ def main() -> None:
                 "if (!vertexCount || !eye_output_bound() ||",
                 "if (!indexCount || !eye_output_bound() ||",
                 "bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept",
+                # A real draw must never write a foreign MRT or inherited PS UAV.
+                # Enforce both source-eye and auxiliary camera GPU output scopes.
+                "bool NativeGameEyeDrawEncoder::geometry_outputs_isolated(",
+                "context_->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,",
+                "for (UINT i = 1u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)",
+                "context_->OMGetRenderTargetsAndUnorderedAccessViews(",
+                "!geometry_outputs_isolated(eyeTarget_)) return false;",
                 "context_->OMGetRenderTargets(1u, &actualTarget, &actualDepth);",
                 "actualTarget == eyeTarget_ && actualDepth == eyeDepth_",
                 "bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept",
