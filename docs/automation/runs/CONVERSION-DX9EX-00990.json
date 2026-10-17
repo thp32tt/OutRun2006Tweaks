@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "2f4189f2ec8d605c94dee7577b0f7bd802616ef9",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+  "validation_bearing_result_sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
   "source_paths": [
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/hud_native_source_transaction.hpp",
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "screenhud_original_gpu_source_eyes": "PENDING_EXACT_SHA",
-    "native_callback_and_visual_fallback": "PENDING_EXACT_SHA",
-    "integrated_exact_sha_validation": "PENDING_EXACT_SHA"
+    "screenhud_original_gpu_source_eyes": "PASS",
+    "native_callback_and_visual_fallback": "PASS",
+    "integrated_exact_sha_validation": "PASS"
   },
   "diagnosis": {
     "root_cause": "Game original c64 native callback return checked LensCentreUploadGeneration but did not check HUD producer, queue node/epoch, shader identity, pose or physical draw after a source-only reentrant callback.",
@@ -82,12 +82,58 @@
     "alternatives_rejected": [
       "No global Flush, no broad tagging of unclassified alpha, no modified native HRESULT and no edits to lens, SkyGlow, FFB or frozen DXVK."
     ],
-    "eye_ownership": "Source identity must remain stable from CPU original-game glyph to GPU WVP; otherwise the R84 binocular shader HUD preserves its native fallback and does not inherit foreign head-lock."
+    "eye_ownership": "Source identity must remain stable from CPU original-game glyph to GPU WVP; otherwise the R84 binocular shader HUD preserves its native fallback and does not inherit foreign head-lock.",
+    "fix_evidence": "The actual R84 game original shader-constant callback now captures and compares direct/queued source identity before and after both full and partial native c64 writes, and resets stale partial HUD rows on source mutation.",
+    "negative_test_evidence": "Required host C++ smoke executes direct/queue source mutations covering 1,000 node/epoch/shader/draw/pose perturbations; exact SHA Active, Domain, HUD Inspector and Full Source workflows completed SUCCESS."
   },
   "local_validation": {
-    "planned": "C++17 hud_native_source_transaction_smoke executable in mandatory Windows host CI",
-    "status": "PENDING_CI"
+    "cpp17_smoke": "PASS_GITHUB_ACTIONS_HOST",
+    "verified_on_sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+    "platform": "WINDOWS_X64_HOST",
+    "other": "WINDOWS_X86_GAME_R84_R26_SAFE"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Exact-SHA Active/Domain/affected HUD and Full Source workflows must succeed; physical Quest3 remains UNTESTED."
+  "next_action": "C6 build-verified complete. Do not re-run unchanged CI or rescore this TASK_ID; independent Quest3/VDXR HMD test remains NEED_HMD_TEST.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38997198926,
+        "sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38997198987,
+        "sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38997198940,
+        "sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38997199146,
+        "sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "runtime_test": "NOT_EXECUTED"
+  },
+  "c6_result": {
+    "checkpoint": "C6_STATE",
+    "result": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "da76f8c615ef9ede85a93c699ecdbcdfd8f1c843",
+    "bookkeeping_only": true,
+    "runtime_validation": "UNTESTED",
+    "recorded_in_separate_commit": true
+  }
 }
