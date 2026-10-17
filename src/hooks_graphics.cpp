@@ -7,6 +7,7 @@
 #include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/game/driver_seat_car_space.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
+#include "vr/game/driver_seat_vehicle_scale.hpp"
 #include "vr/game/driver_seat_occupant.hpp"
 #include "vr/game/cockpit_glass_material_probe.hpp"
 #include "vr/game/reflection_frame_budget.hpp"
@@ -40,6 +41,8 @@ namespace Settings
 	extern Setting<bool> VRDisableDesktopVsync;
 	extern Setting<bool> VRDriverSeatView;
     extern Setting<bool> VRDriverSeatGlassMaterialTrace;
+    extern Setting<float> VRDriverSeatVehicleScale;
+    extern Setting<float> VRDriverSeatGlassOpacity;
 	extern Setting<bool> VRDriverSeatCarSpaceBasis;
 	extern Setting<int> VRDriverSeatNativeMode;
 	extern Setting<float> VRDriverSeatForward;
@@ -326,6 +329,76 @@ public:
 	static VRDriverSeatRenderTest instance;
 };
 VRDriverSeatRenderTest VRDriverSeatRenderTest::instance;
+
+// Canonical PC OR2006C2C.EXE player-car renderer:
+// 0x4697B8 LEA EDX,[ESP+70h]; 0x4697BC PUSH EDX;
+// 0x4697BD CALL 0x409FD0 (load temporary display matrix).
+// Restrict this midhook to the EXACT player-car EBX and live cockpit pose;
+// no physics EVWORK_CAR, camera matrix, resource, texture, PMT or disk writes.
+class VRDriverSeatVehicleScaleRenderHook final : public Hook
+{
+    static constexpr int PlayerCarMatrixCallRva = 0x697BD;
+    inline static SafetyHookMid MatrixCallHook{};
+    inline static bool FirstAppliedLogged = false;
+
+    static void ScalePlayerCarMatrix(SafetyHookContext& ctx)
+    {
+        if (!Settings::VREnabled || !Settings::VRDriverSeatView ||
+            !VRDriverSeatCameraEligible(Game::camera()) ||
+            reinterpret_cast<EVWORK_CAR*>(ctx.ebx) != Game::pl_car() ||
+            !ctx.esp)
+            return;
+
+        const float scale = Settings::VRDriverSeatVehicleScale.get();
+        if (!std::isfinite(scale) || scale == 1.0f)
+            return;
+        // Before the original call, [ESP] is the pointer PUSHed from EDX
+        // to the caller's own 64-byte stack-local display transform.
+        const auto* args = reinterpret_cast<D3DMATRIX* const*>(ctx.esp);
+        D3DMATRIX* temporaryRenderMatrix = args[0];
+        if (!temporaryRenderMatrix ||
+            !OutRunVR::DriverSeatVehicle::TryScaleModelBasis(
+                *temporaryRenderMatrix, scale))
+            return;
+
+        if (!FirstAppliedLogged)
+        {
+            FirstAppliedLogged = true;
+            spdlog::info(
+                "VR DRIVER SEAT: player-only temporary render matrix scaled {:.2f}; world translation, physics and original PMT unchanged",
+                scale);
+        }
+    }
+
+public:
+    std::string_view description() override
+    {
+        return "VRDriverSeatVehicleScaleRenderHook";
+    }
+
+    bool apply() override
+    {
+        // Fail closed for unknown EXE variants instead of detouring nearby
+        // instructions or risk scaling non-player traffic/world geometry.
+        constexpr std::array<std::uint8_t, 5> signature{
+            0xE8, 0x0E, 0x08, 0xFA, 0xFF
+        };
+        const auto* instruction =
+            Module::exe_ptr<std::uint8_t>(PlayerCarMatrixCallRva);
+        if (!std::equal(signature.begin(), signature.end(), instruction))
+        {
+            spdlog::warn(
+                "VR DRIVER SEAT: original player matrix call signature differs, car scale hook not installed");
+            return false;
+        }
+        MatrixCallHook = safetyhook::create_mid(
+            Module::exe_ptr(PlayerCarMatrixCallRva), ScalePlayerCarMatrix);
+        return !!MatrixCallHook;
+    }
+    static VRDriverSeatVehicleScaleRenderHook instance;
+};
+VRDriverSeatVehicleScaleRenderHook
+    VRDriverSeatVehicleScaleRenderHook::instance;
 
 // Canonical EXE+0x4901: PUSH EDX; CALL 0x408C80 (material application).
 // EXE+0x48F2 loads the PMT material table; EXE+0x48F5 multiplies
