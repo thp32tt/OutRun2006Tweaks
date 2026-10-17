@@ -2001,9 +2001,15 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             // game TARGET replay uses a bounded GPU color raster instead.
             // Check both eye formats and shader compiler availability before
             // either eye starts writing. Fail closed on missing dependencies.
-            if (ring_.format() != DXGI_FORMAT_R8G8B8A8_UNORM &&
-                ring_.format() != DXGI_FORMAT_B8G8R8A8_UNORM)
-                return false;
+            // Check BOTH typed ring RTVs with the same supported D3D11.0
+            // GPU color raster contract before the first eye queues commands.
+            // A game camera may store pixels in a typeless texture; only its
+            // typed view format defines a legal pixel shader output.
+            for (std::uint32_t eye = 0u; eye < 2u; ++eye) {
+                if (!native_game_partial_color_shader_rtv(
+                        context_.Get(), ring_.rtv(slot_, eye)))
+                    return false;
+            }
             HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
             if (!compiler) return false;
             const bool ready = GetProcAddress(compiler, "D3DCompile") != nullptr;

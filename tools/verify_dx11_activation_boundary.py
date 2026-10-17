@@ -86,18 +86,51 @@ def audit_native_partial_color_clear(source: str) -> list[str]:
         "return raster_partial_eye_color_clear(",
         "default:",
         "return false;",
-        "desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||",
-        "desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;",
+        "cropped && !rectContext &&",
+        "native_game_partial_color_shader_rtv(context_, eyeTarget_);",
     ]
     missing += ["color-encoder:" + n for n in encoder_required if n not in encoder]
+    # Never trust a partial GPU clear if only the XR eye or only the game
+    # offscreen camera is protected. Check the actual typed RTV view contract,
+    # including the negative path for integer/typeless and unsupported GPUs.
+    camera = source.partition(
+        "bool NativeGameEyeDrawEncoder::clear_offscreen_game_color("
+    )[2].partition(
+        "\nbool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil("
+    )[0]
+    typed_rtv = source.partition(
+        "[[nodiscard]] bool native_game_partial_color_shader_rtv("
+    )[2].partition("\n}\n")[0]
+    camera_required = [
+        "cropped && !rectContext &&",
+        "native_game_partial_color_shader_rtv(context_, gameTarget);",
+        "case live_game_stereo::NativeColorClearRoute::ShaderRaster:",
+        "return raster_partial_eye_color_clear(",
+    ]
+    missing += ["color-camera:" + n for n in camera_required if n not in camera]
+    typed_required = [
+        "target->GetDesc(&view);",
+        "switch (view.Format)",
+        "DXGI_FORMAT_R8G8B8A8_UNORM:",
+        "DXGI_FORMAT_R10G10B10A2_UNORM:",
+        "DXGI_FORMAT_R16G16B16A16_FLOAT:",
+        "DXGI_FORMAT_R11G11B10_FLOAT:",
+        "default:",
+        "return false;",
+        "CheckFormatSupport(view.Format, &support)",
+        "(support & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u;",
+    ]
+    missing += ["color-typed-rtv:" + n for n in typed_required
+                if n not in typed_rtv]
     preflight = source.partition(
         "bool NativeGameStereoSubmission::render_game_eye_passes("
     )[2].partition("\n    // Allocate separate, full-size native depth")[0]
     preflight_required = [
         "if (needsClearView &&",
         "FAILED(context_->QueryInterface(",
-        "ring_.format() != DXGI_FORMAT_R8G8B8A8_UNORM &&",
-        "ring_.format() != DXGI_FORMAT_B8G8R8A8_UNORM)",
+        "for (std::uint32_t eye = 0u; eye < 2u; ++eye) {",
+        "native_game_partial_color_shader_rtv(",
+        "context_.Get(), ring_.rtv(slot_, eye))",
         'LoadLibraryW(L"d3dcompiler_47.dll")',
         'GetProcAddress(compiler, "D3DCompile")',
         "if (!ready) return false;",

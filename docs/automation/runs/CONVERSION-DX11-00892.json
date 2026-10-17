@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00892",
+  "production_id": "CONVERSION-DX11-00892",
+  "event_id": "CONVERSION-DX11-00892-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00892",
+  "feature_id": "DX11:FULLFRAME_TYPED_CAMERA_RECT_CLEAR_STEREO",
+  "work_key": "DX11:FULLFRAME:CAMERA_TARGET_RECT_TO_NATIVE_LR",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "2ae93b0b276e7994a5aefbaecc2663c3c972441a",
+  "material_result_sha": "b063ca06672662f623e39d69f902b6350c5f7bde",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:FULLFRAME_TYPED_CAMERA_RECT_CLEAR_STEREO",
+    "goal": "Replay real game offscreen and stereo TARGET rectangle Clears at full resolution using actual typed D3D11 RTV formats, with guarded original D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_typed_camera_partial_clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "offscreen_menu_vehicle_race_game_render_target",
+        "expected_behavior": "D3D11.0 uses actual typed GPU-supported RTV for bounded color raster Clear of 8-bit, 10-bit and float camera views."
+      },
+      {
+        "id": "native_typed_stereo_eye_partial_clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_stereo_gpu_frame_submission",
+        "expected_behavior": "Both ring eye RTVs preflight identical typed view format and bounded GPU color Clear before native eye Draw/Copy."
+      },
+      {
+        "id": "original_d3d9_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_ffb_original_dx9ex_fallback",
+        "expected_behavior": "Unsupported format/region is fail-closed; original D3D9Ex Draw/gamepad/FFB and frozen DXVK untouched."
+      },
+      {
+        "id": "same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_validation",
+        "expected_behavior": "All five mandatory exact-SHA CI Gate workflows SUCCESS; Quest3/VDXR hardware remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real game menu/vehicle camera TARGET Rect -> native typed offscreen RTV GPU raster",
+      "Real game source Copy/Stretch and full-size stereo LEFT/RIGHT RTV typed GPU raster -> native shared ring -> OpenXR frame fence/ACK",
+      "Original D3D9Ex gamepad/FFB and desktop frame survives unsupported format fail-closed"
+    ],
+    "batch_components": [
+      "Native C++ bounded game offscreen RTV and native shared-eye typed color clears",
+      "Native both-eye GPU preflight on exact producer ring render target views",
+      "Native WARP GPU clear/copy and negative source authorization regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native WARP GPU pixel camera/eye partial rectangle Clear, real Draw and source Copy proof is required from final validation-bearing SHA.",
+      "negative_regression": "Both offscreen and eye typed format checks, per-format CheckFormatSupport, invalid view, full-RT widening and DX9Ex fallback regression verified on final exact SHA.",
+      "component_integration": "D3D9 source game scene timeline via offscreen native Draw/RT partial Clear -> GPU Copy/Stretch -> independently rendered native L/R shared ring and host frame, with actual game/HMD untested."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME:CAMERA_TARGET_RECT_TO_NATIVE_LR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Isolated native WARP expected; OutRun Quest3 full frame and gamepad UNTESTED",
+    "activation_guard_and_fallback": "Native diagnostic opt-in/fail closed; original D3D9Ex game/input/FFB retained and DXVK frozen"
+  },
+  "acceptance_results": {
+    "native_typed_camera_partial_clear": "SOURCE_IMPLEMENTED_AWAIT_GATE",
+    "native_typed_stereo_eye_partial_clear": "SOURCE_IMPLEMENTED_AWAIT_GATE",
+    "original_d3d9_safe_fallback": "STATIC_NEGATIVE_AWAIT_GATE",
+    "same_sha_gates": "PENDING_EXACT_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_eye_partial_depth_activation.py"
+  ],
+  "validation_evidence": {
+    "material_sha": "b063ca06672662f623e39d69f902b6350c5f7bde",
+    "initial_backend_failed_run": 39062701966,
+    "initial_fast_failed_run": 39062702012,
+    "initial_windows_build_failed_run": 39062705236,
+    "early_failure_causes": [
+      "00891 completed run record missing new mandatory blocking_evidence, encountered by --check-latest until 00892 run exists",
+      "Static source auditor retained obsolete RGBA8-only exact-string checks"
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "00891 exact-SHA PASS and C6 complete; new 00892 material b063ca06672662f623e39d69f902b6350c5f7bde",
+    "C1_REVIEW": "Backend/Fast current 00891 missing blocking_evidence and Windows Build stale RGBA8 source static audit",
+    "C2_IMPLEMENT": "Typed RTV GPU format checking for offscreen plus native eye and exact preflight with safe D3D9Ex fallback",
+    "C3_VALIDATE": "PENDING_EXACT_SHA_GATES",
+    "C4_COMMIT": "Material b063ca06672662f623e39d69f902b6350c5f7bde and same-task CI source/audit correction in next validation-bearing commit",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING"
+  }
+}

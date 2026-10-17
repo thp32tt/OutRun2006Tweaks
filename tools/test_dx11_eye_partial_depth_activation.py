@@ -252,5 +252,7 @@ assert not typed_partial_color_admission(source.replace(
 assert not typed_partial_color_admission(source.replace(
     "native_game_partial_color_shader_rtv(context_, gameTarget)",
     "false", 1)), "offscreen camera Clear lost"
+assert "context_.Get(), ring_.rtv(slot_, eye))" in source, (
+    "shared-eye D3D11.0 preflight lost typed RTV admission")
 
 print("DX11 owned offscreen camera color/depth + Draw/Copy: PASS")
