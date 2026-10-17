@@ -8,7 +8,7 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "status": "VALIDATION_PENDING",
-  "checkpoint": "C3_VALIDATE",
+  "checkpoint": "C5_PACKAGE",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
@@ -95,7 +95,32 @@
       "Domain Isolation Guard",
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
-    ]
+    ],
+    "follow_up_failures": [
+      {
+        "run_id": 39055267544,
+        "exact_sha": "ad008f4f08a9539a9e63fa7cdc929c7a785edf04",
+        "failure": "Stale pause owner source assertion after shared R30 original FVF142 executor; subsequently repaired on c83d85d3 without changing functional gate acceptance."
+      }
+    ],
+    "confirmed_parent_active": {
+      "run_id": 39055272089,
+      "exact_sha": "c83d85d3141317a6dd732a2a6aa7ba684dae5da0",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "confirmed_parent_domain": {
+      "run_id": 39055272074,
+      "exact_sha": "c83d85d3141317a6dd732a2a6aa7ba684dae5da0",
+      "conclusion": "success"
+    },
+    "gate_candidate_reason": "Required HUD Inspector and Full Source Impact path-filtered workflows were not emitted for the script-only c83d85d3 commit. This 01023 run-record CI repair revision requests all four mandatory checks on the same integrated exact SHA; no new gameplay feature or score."
   },
-  "notes": "Continuation of the same 01023 material result and E003 retry. This checkpoint fixes mandatory missing run record without new gameplay work or new feature score. Full exact-SHA automation gate and HMD acceptance remain pending; DXVK remains frozen."
+  "notes": "Same 01023 E003 retry, original material_result_sha preserved. Two source/regression repairs are already on remote branch, and parent active+domain passed on c83d85d3. This nonterminal record update is the final gate-request candidate (not runtime acceptance), no new score."
 }
