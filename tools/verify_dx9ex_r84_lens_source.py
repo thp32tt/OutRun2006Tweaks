@@ -201,19 +201,24 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         # composite guard rather than requiring an obsolete two-term string.
     ):
         assert marker in physical, "C993 binocular source fence missing: " + marker
-    # Native R33 fences all four separately authenticated GPU-eye sources.
-    # Match the actual multiline composite, not an obsolete three-source
-    # literal. Check each independently: the GOAL and stage +TIME routes
-    # must never accidentally reclassify each other's shader/c64 Draw.
+    # All five independent physical sources must keep their same-draw
+    # ownership between the native left callback and right-eye submission.
     guard_marker = ("if (centreSourceChanged || shadowSourceChanged ||" +
-                    chr(10) + "                goalSourceChanged || stageSourceChanged)")
-    assert guard_marker in physical, "C993/GOAL/+TIME composite source fence missing"
+                    chr(10) + "                goalSourceChanged || stageSourceChanged ||" +
+                    chr(10) + "                nativeHudSourceChanged)")
+    assert guard_marker in physical, "C993/GOAL/+TIME/HUD composite fence missing"
     assert "const bool goalSourceChanged = exactGoalEye &&" in physical
     assert "OutRunVR::GoalPhysical::SameAfterNativeLeft(" in physical
     assert "const bool stageSourceChanged = exactStageEye &&" in physical
     assert "OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(" in physical
     assert "const bool exactStageEye = goalCommand.IsExactFiniteResultHud() &&" in physical
     assert "R33/+TIME-source-changed" in physical
+    assert "const bool exactNativeHud = goalCommand.IsSourceProvenHud() &&" in physical
+    assert "const auto hudBeforeLeft = exactNativeHud" in physical
+    assert "OutRunVR::HudNativeSource::IsExactHudSource(hudBeforeLeft)" in physical
+    assert "const bool nativeHudSourceChanged = exactNativeHud &&" in physical
+    assert "OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(" in physical
+    assert "R33/HUD-source-changed" in physical
     left_draw = physical.index("R32ReviewOwnedResult result{ true, actualDraw() };")
     after_left = physical.index(guard_marker)
     right_eye = physical.index("IDirect3DSurface9* rightEye =")
@@ -375,9 +380,14 @@ def main():
         (7, "const bool exactCentreEye =",
              "const bool disabledCentreEye ="),
         (7, "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
-             "                goalSourceChanged || stageSourceChanged)",
+             "                goalSourceChanged || stageSourceChanged ||" + chr(10) +
+             "                nativeHudSourceChanged)",
              "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
-             "                goalSourceChanged)"),
+             "                goalSourceChanged || stageSourceChanged)"),
+        (7, "const bool nativeHudSourceChanged = exactNativeHud &&",
+             "const bool nativeHudSourceChanged = false &&"),
+        (7, "OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(",
+             "OutRunVR::HudNativeSource::NeverSameSource("),
         (7, "const bool goalSourceChanged = exactGoalEye &&",
              "const bool goalSourceChanged = false &&"),
         (7, "const bool stageSourceChanged = exactStageEye &&",
