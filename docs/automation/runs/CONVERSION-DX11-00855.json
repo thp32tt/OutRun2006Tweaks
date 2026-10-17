@@ -89,7 +89,7 @@
     "C0_RECOVER": "PASS: source and owner lease GitHub branch HEAD checked",
     "C1_REVIEW": "PASS: twelve-event game GPU source chronology incomplete at eight and source copy bilateral format/MSAA admission missing",
     "C2_IMPLEMENT": "PASS: material source commit 90865f755be08df5d56bc88a7381a27aa0ff5140 with native C++ renderer and mixed pixel regression",
-    "C3_VALIDATE": "PENDING: material exact-SHA isolated WARP 38990448240 failed due overlapping regression fixture, code compiled; Fast/Backend 00854 prior record missing fields repaired at 9f50fe6c; final new SHA Gates pending",
+    "C3_VALIDATE": "PENDING: source compiled, exact WARP failed ONLY because ClearView fixture assumed BGRA though XR eye is RGBA (sample 68,136,204,255); source-graph token condition restored to literal executable require. Final exact-SHA full mandatory Gates and WARP pending.",
     "C4_COMMIT": "PASS material, validation-bearing repair pending",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_FULL_EXACT_SHA"
@@ -101,12 +101,15 @@
     "material_sha": "90865f755be08df5d56bc88a7381a27aa0ff5140",
     "prior_material_native_warp_run_id": 38990448240,
     "prior_material_native_warp_conclusion": "failure",
-    "prior_native_warp_root_cause": "followArray late pixel sample overlapped a later intended typed-format Copy to same x0..7/y42..49",
+    "prior_native_warp_root_cause": "Exact WARP run 38991468195 confirmed camera copies/scale/array R8G8B8A8 pixel bytes all match; source ClearView output RGBA [0x44,0x88,0xcc,0xff], fixture incorrectly expected BGRA [0xcc,0x88,0x44]. Repair checks true target format; no shader change.",
     "prior_dx11_fast_run_id": 38990448355,
     "prior_backend_run_id": 38990448273,
     "prior_gate_root_cause": "00854 prior valid build record was missing required development_strategy fields; disjoint fix 9f50fe6c by other owner",
     "game_quest3_vdxr": "UNTESTED",
     "gamepad_input": "UNTESTED",
-    "native_visual_parity": "NEED_HMD_TEST"
-  }
+    "native_visual_parity": "NEED_HMD_TEST",
+    "additional_native_warp_failure_run_id": 38991468195,
+    "additional_dx11_source_graph_failure_run_id": 38991471711
+  },
+  "next_action": "Validate new exact SHA with DX11 Fast, Backend, Win32 Build, OpenXR, HUD, and isolated WARP. Only mark BUILD_VERIFIED/C6 after all required checks SUCCESS. Quest3/VDXR and real gamepad remain UNTESTED."
 }

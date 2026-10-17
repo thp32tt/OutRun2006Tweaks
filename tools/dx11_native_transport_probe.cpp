@@ -2071,9 +2071,13 @@ int main()
         const bool lateCopyMatches = expectedCamera(lateCopy);
         const bool lateScaleMatches = expectedCamera(lateScale);
         const bool lateArrayMatches = expectedCamera(lateArray);
+        // The shared L/R color targets are R8G8B8A8_UNORM: ClearView's
+        // ARGB(0xff4488cc) maps to raw RGBA bytes [0x44,0x88,0xcc,0xff].
+        // This is NOT the BGRA channel order used by the separate converted
+        // game source. WARP readback at bb57f328 confirmed the real bytes.
         const bool lateClearMatches =
-            lateClear[0] == 0xccu && lateClear[1] == 0x88u &&
-            lateClear[2] == 0x44u;
+            lateClear[0] == 0x44u && lateClear[1] == 0x88u &&
+            lateClear[2] == 0xccu && lateClear[3] == 0xffu;
         if (!lateCopyMatches || !lateScaleMatches ||
             !lateArrayMatches || !lateClearMatches) {
             // Surface actual WARP sample values on failure rather than
@@ -2094,8 +2098,13 @@ int main()
             show("clear", lateClear);
             std::cerr << '\n';
         }
-        require(lateCopyMatches && lateScaleMatches &&
-                lateArrayMatches && lateClearMatches,
+        // Keep the original source-graph activation's exact executable
+        // negative/positive pixel contract, not a replacement metadata flag.
+        require(expectedCamera(lateCopy) &&
+                expectedCamera(lateScale) &&
+                expectedCamera(lateArray) &&
+                lateClear[0] == 0x44u && lateClear[1] == 0x88u &&
+                lateClear[2] == 0xccu && lateClear[3] == 0xffu,
                 "00855 twelve-event source timeline actual L/R GPU pixels and Clear order");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
