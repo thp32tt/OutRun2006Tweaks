@@ -603,12 +603,24 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "forget();" in ledger_begin and
          "if (succeeded && generation != UINT64_MAX)" in ledger_begin,
          "Ledger Begin must clear ownership only after accepted native Begin")
+    # Node and queue epoch are part of the *physical* GPU source, not just
+    # a semantic token. Keep direct glyphs isolated from queued sprites and
+    # reject reentrant native Draws from a different SpriteNode.
     need("if (!active)" in ledger_draw and "if (drawCount == 0)" in ledger_draw and
          "scope = newScope;" in ledger_draw and "producer = newProducer;" in ledger_draw and
-         "else if (scope != newScope || producer != newProducer)" in ledger_draw and
+         "const bool validQueue = !drawQueued ||" in ledger_draw and
+         "drawQueueNode != nullptr && drawQueueEpoch != 0" in ledger_draw and
+         "queued = drawQueued;" in ledger_draw and
+         "queueNode = drawQueued ? drawQueueNode : nullptr;" in ledger_draw and
+         "queueEpoch = drawQueued ? drawQueueEpoch : 0;" in ledger_draw and
+         "homogeneous = validQueue;" in ledger_draw and
+         "else if (!validQueue || scope != newScope ||" in ledger_draw and
+         "producer != newProducer || queued != drawQueued ||" in ledger_draw and
+         "queueNode != drawQueueNode" in ledger_draw and
+         "queueEpoch != drawQueueEpoch" in ledger_draw and
          "homogeneous = false;" in ledger_draw and "++drawCount;" in ledger_draw and
          "std::numeric_limits<unsigned>::max" in ledger_draw,
-         "Ledger must quarantine mixed producer and count bounded successful Draws")
+         "Ledger must quarantine mixed token, direct/queue and distinct node/epoch Draws")
     need("drawCount = 0;" in ledger_forget and "homogeneous = true;" in ledger_forget and
          "scope = Scope::None;" in ledger_forget and "producer = Producer::None;" in ledger_forget,
          "Ledger forget must withdraw old source, not silently promote it")
@@ -666,21 +678,29 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          draw.index("flushed = FlushTracked(self);") <
          draw.index("const HRESULT hr = Draw_hk.stdcall"),
          "foreign Draw must submit previous batch under outgoing owner")
-    need("const auto scope = EffectiveScope();" in draw and
-         "const auto source = CurrentRenderProducerToken();" in draw and
+    need("const auto command = CapturePhysicalDrawCommand();" in draw and
+         "const auto scope = command.scope;" in draw and
+         "const auto source = command.producer;" in draw and
          "const auto submission = HudBatch.snapshot();" in draw and
+         "const auto afterNative = CapturePhysicalDrawCommand();" in draw and
+         "afterNative.scope == command.scope" in draw and
+         "afterNative.producer == command.producer" in draw and
+         "afterNative.queued == command.queued" in draw and
+         "afterNative.queueNode == command.queueNode" in draw and
+         "afterNative.queueEpoch == command.queueEpoch" in draw and
+         "const bool sameSourceAfterNative =" in draw and
          "if (self && self == submission.sprite &&" in draw and
          "HudBatch.completeNativeDraw(" in draw and
-         "submission, SUCCEEDED(hr), scope, source,\n                sameSourceAfterNative)" in draw and
-         "const bool sameSourceAfterNative =" in draw and
-         "EffectiveScope() == scope &&" in draw and
-         "CurrentRenderProducerToken() == source;" in draw and
+         "submission, SUCCEEDED(hr), scope, source," in draw and
+         "sameSourceAfterNative, command.queued," in draw and
+         "command.queueNode, command.queueEpoch))" in draw and
          "if (FAILED(hr) || !self)" in draw and
-         draw.index("const auto scope = EffectiveScope();") <
+         draw.index("const auto command = CapturePhysicalDrawCommand();") <
          draw.index("const auto submission = HudBatch.snapshot();") <
          draw.index("const HRESULT hr = Draw_hk.stdcall<HRESULT>(") <
+         draw.index("const auto afterNative = CapturePhysicalDrawCommand();") <
          draw.index("HudBatch.completeNativeDraw("),
-         "native Draw must capture owner before D3DX and quarantine failed submission")
+         "native Draw must preserve exact scope, queue node and epoch across original D3DX")
     need("CanFlushD3DXPreQueueStageBatch(" in direct_stage and
          "false, true, HudBatch.homogeneous" in direct_stage and
          "HudBatch.scope, HudBatch.producer" in direct_stage and
@@ -690,9 +710,13 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.drawCount, HudBatch.homogeneous" in exit_stage and
          "if (FlushTracked(sprite))" in exit_stage,
          "direct +TIME source exit must submit complete proven batch")
+    first_guard = scope(header, "inline constexpr bool CanDrainDirectResultBeforeFirstQueueNode(", "    static_assert(")
     need("CanDrainDirectResultBeforeFirstQueueNode(" in node and
          "HudBatch.drawCount, HudBatch.homogeneous" in node and
          "HudBatch.scope, HudBatch.producer, nextScope, nextProducer" in node and
+         "!HudBatch.queued && HudBatch.queueNode == nullptr &&" in node and
+         "HudBatch.queueEpoch == 0" in node and
+         "return knownResult && pendingBatchDirect;" in first_guard and
          "ScopedExactProducerSemantic outgoingBatch(" in node and
          "flushed = FlushTracked(firstQueueSprite);" in node and
          node.index("flushed = FlushTracked(firstQueueSprite);") <
@@ -752,10 +776,11 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "lastSuccessfulFlushMutationSerial == mutationSerial" in cd and
          "if (!cleanInternalFlush)" in cd and
          "onFlushFailure();" in cd and
-         "recordDraw(drawScope, drawProducer);" in cd and
+         "recordDraw(drawScope, drawProducer," in cd and
+         "drawQueued, drawQueueNode, drawQueueEpoch);" in cd and
          cd.find("if (!succeeded || !sourceStillMatches)") < cd.find("if (!unchanged(previous))") <
          cd.find("if (!cleanInternalFlush)") <
-         cd.rfind("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);") and
+         cd.rfind("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer,") and
          "lastSuccessfulFlushMutationSerial = mutationSerial;" in ledger_flush_success and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_draw and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_begin and
@@ -804,12 +829,19 @@ def main_current_ledger(code: str, header: str) -> int:
         ("foreign-draw-steals-owner", "code", "ScopedExactProducerSemantic outgoingBatch(", "ScopedExactProducerSemantic wrongBatch("),
         ("foreign-batch-no-split", "code", "flushed = FlushTracked(self);", "flushed = false;"),
         ("mix-becomes-homogeneous", "ledger", "homogeneous = false;", "homogeneous = true;"),
+        ("queue-invalid-owner-accepted", "ledger", "homogeneous = validQueue;", "homogeneous = true;"),
+        ("queue-direct-mix-accepted", "ledger", "queued != drawQueued", "queued == drawQueued"),
+        ("queue-node-mix-accepted", "ledger", "queueNode != drawQueueNode", "queueNode == drawQueueNode"),
+        ("queue-epoch-mix-accepted", "ledger", "queueEpoch != drawQueueEpoch", "queueEpoch == drawQueueEpoch"),
 
-        ("successful-draw-untracked", "ledger", "recordDraw(drawScope, drawProducer);", "(void)drawScope; (void)drawProducer;"),
+        ("successful-draw-untracked", "ledger",
+         "recordDraw(drawScope, drawProducer,\n                drawQueued, drawQueueNode, drawQueueEpoch);",
+         "(void)drawScope; (void)drawProducer;"),
         ("texture-flush-stamp-lost", "ledger", "lastSuccessfulFlushMutationSerial = mutationSerial;", "lastSuccessfulFlushMutationSerial = 0;"),
         ("texture-flush-stamp-ignored", "ledger", "lastSuccessfulFlushMutationSerial == mutationSerial", "true"),
         ("texture-flush-promotes-source-switch", "ledger", "if (!succeeded || !sourceStillMatches)", "if (!succeeded)"),
-        ("texture-flush-source-check-unused", "code", "sameSourceAfterNative))", "true))"),
+        ("texture-flush-source-check-unused", "code",
+         "sameSourceAfterNative, command.queued,", "true, command.queued,"),
         ("texture-flush-wrong-mutation", "ledger", "if (!unchanged(previous))", "if (false)"),
         ("texture-flush-draw-failure-promoted", "ledger", "if (!succeeded || !sourceStillMatches)", "if (!sourceStillMatches)"),
 
@@ -826,6 +858,14 @@ def main_current_ledger(code: str, header: str) -> int:
         ("wrong-live-owner", "code", "self, HudBatch.sprite, liveSprite", "self, HudBatch.sprite, self"),
         ("queue-exit-without-provenance", "code", "HudBatch.producer == CurrentRenderProducerToken()", "true"),
         ("queue-first-unowned", "code", "flushed = FlushTracked(firstQueueSprite);", "flushed = false;"),
+        ("queue-first-direct-proof-lost", "code",
+         "!HudBatch.queued && HudBatch.queueNode == nullptr &&", "true &&"),
+        ("native-queue-node-context-lost", "code",
+         "afterNative.queueNode == command.queueNode", "true"),
+        ("native-queue-epoch-context-lost", "code",
+         "afterNative.queueEpoch == command.queueEpoch", "true"),
+        ("first-queue-predicate-not-direct", "header",
+         "return knownResult && pendingBatchDirect;", "return knownResult;"),
         ("goal-transition-lost", "code", "HudBatch.boundaryReady = enteringStage || enteringGoal;", "HudBatch.boundaryReady = enteringStage;"),
         ("source-exit-no-flush", "code", "if (FlushTracked(sprite))", "if (false)"),
         ("shader-loses-goal-route", "code", "CanDeferD3DXQueueGoalBatch(", "CanDeferD3DXQueueNoneBatch("),
