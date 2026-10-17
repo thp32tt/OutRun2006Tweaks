@@ -211,11 +211,12 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     ):
         assert marker in fenced, "C993 left/right fallback lost: " + marker
     exact_log = ("if (screenKind == "
-        "R32ReviewScreenSpaceKind::ExactLensCentreWorld &&\\n"
+        "R32ReviewScreenSpaceKind::ExactLensCentreWorld &&" + chr(10) +
         "                R33TelemetryEnabled())")
-    # Keep the preexisting separate diagnostic mutation meaningful: a C993
-    # source check earlier in the function must not mask its deletion.
-    assert exact_log.replace("\\\\n", "\\n") in physical
+    # The distinct old diagnostic must remain independent of the new
+    # per-eye source gate; otherwise a destructive mutation can hit only
+    # the early guard and silently leave telemetry unchanged.
+    assert exact_log in physical
 
     assert (physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") <
         physical.index("if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld") <
@@ -322,8 +323,10 @@ def main():
         (6, "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;", "return R32ReviewScreenSpaceKind::None;"),
         (6, "lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;", "lower = R30SupportScreenSpaceKind::None;"),
         (7, "SUCCEEDED(rightHr) && restoreOk", "true"),
-        (7, "if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld &&\\n                R33TelemetryEnabled())",
-             "if (screenKind == R32ReviewScreenSpaceKind::Hud2D &&\\n                R33TelemetryEnabled())"),
+        (7, "if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld &&" +
+             chr(10) + "                R33TelemetryEnabled())",
+             "if (screenKind == R32ReviewScreenSpaceKind::Hud2D &&" +
+             chr(10) + "                R33TelemetryEnabled())"),
         (7, "OutRunVR::LensCentre::SameStereoDrawSource(",
              "OutRunVR::LensCentre::NeverOwnSource("),
         (7, "const bool exactCentreEye =",
