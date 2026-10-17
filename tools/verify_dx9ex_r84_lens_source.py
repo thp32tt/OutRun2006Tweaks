@@ -449,8 +449,14 @@ def main():
             end = mod[2].index("bool R30HasExactCarBaseShadowRawWvp(", start)
             owned = mod[2][start:end]
             assert old in owned, "C993 provenance mutant missing exact owner: " + old
-            mod[2] = (mod[2][:start] + owned.replace(old, new, 1) +
-                      mod[2][end:])
+            # R30 consumes the same next draw in BOTH source-age and
+            # nested SceneEffect provenance checks. Mutate both callsites.
+            if old == "R29OwnerTopLevelDrawSerial() + 1u":
+                assert owned.count(old) == 2
+                owned = owned.replace(old, new)
+            else:
+                owned = owned.replace(old, new, 1)
+            mod[2] = mod[2][:start] + owned + mod[2][end:]
         elif idx == 2 and old in (
             "headPoseSequence != stereo.poseSequence",
             "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))",
