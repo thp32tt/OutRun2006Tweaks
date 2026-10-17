@@ -60,3 +60,47 @@ for old in (
     else:
         raise AssertionError(f"ordinary ScreenHud mutation survived: {old}")
 print("PASS R84 source-owned XYZRHW ScreenHud finite bilateral plane; sky/particles/markers isolated; Quest3 UNTESTED")
+
+
+# The same source-proven native ScreenHud / queued HUD screen pixels must
+# use the ORIGINAL 2D viewport, not the physically larger OpenXR eye RT.
+stage = r84.split("bool R30BuildStageExtensionXyzrhwEyePlane(", 1)[1].split(
+    "bool R30XyzrhwHasProjectedDepthSignature(", 1)[0]
+for token in ("nativeScreenHudPixels", "queuedOriginalHudPixels",
+              "CorroboratesHud(", "QueueOverlayNeedsFiniteHudPlane(",
+              "ExternalOverlaySemanticDepth != 0", "goalPresentationPixels",
+              "state.stageSource2DWidth = gameWidth;",
+              "state.stageSource2DHeight = gameHeight;"):
+    assert token in stage, token
+assert stage.index("nativeScreenHudPixels") < stage.index(
+    "Game::screen_resolution")
+vertices = r84.split("const bool gamePixelViewport =", 1)[1].split(
+    "if (state.stageExtensionEyePlane)", 1)[0]
+for token in ("state.stageSource2DWidth > 0.f",
+              "state.stageSource2DHeight > 0.f",
+              "const float sourceX0 =", "const float sourceY0 =",
+              "const float sourceWidth =", "const float sourceHeight =",
+              "R30GetExactHudEdgeAnchor("):
+    assert token in vertices, token
+draw = r84.split("if (state.stageExtensionEyePlane)", 1)[-1]
+assert "sourceX, sourceY, sourceX0, sourceY0," in draw
+assert "sourceWidth, sourceHeight," in draw
+assert "ProjectPixelPairAcrossViewports(" in draw
+for token in ("nativeScreenHudPixels ||", "queuedOriginalHudPixels) &&",
+              "const float sourceWidth = gamePixelViewport"):
+    mutated = r84.replace(token, "BROKEN_HUD_VIEWPORT_OWNER", 1)
+    assert token not in mutated
+    try:
+        if token == "nativeScreenHudPixels ||":
+            assert token in mutated.split(
+                "bool R30BuildStageExtensionXyzrhwEyePlane(", 1)[1]
+        elif token == "queuedOriginalHudPixels) &&":
+            assert token in mutated.split(
+                "bool R30BuildStageExtensionXyzrhwEyePlane(", 1)[1]
+        else:
+            assert token in mutated.split("const bool gamePixelViewport =", 1)[1]
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("game/source viewport negative mutation survived: " + token)
+print("PASS R84 original game-pixel HUD to XR-eye viewport; native/queue/goal ownership and rollback negatives")

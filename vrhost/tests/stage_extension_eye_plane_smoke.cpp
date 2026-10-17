@@ -136,6 +136,41 @@ int main() {
             !Near(a,la) || !Near(b,lb) || !Near(c,ra) || !Near(d,rb))
             return 49;
     }
+    // Physical eye size MUST NOT become the coordinate source for the
+    // original gameplay speed/time/position and rank HUD. The +TIME/GOAL
+    // path already uses this adapter: source-proven ordinary HUD now shares
+    // it. Preserve both eye offsets, game centre, edge and source aspect.
+    {
+        const float eyeIdentity[16]{
+            1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
+        float a=0,b=0,c=0,d=0;
+        float wrongX=0,wrongY=0,wrongRx=0,wrongRy=0;
+        if (!ProjectPixelPairAcrossViewports(
+                eyeIdentity,eyeIdentity,320,240,
+                0,0,640,480,0,0,2496,2688,1,a,b,c,d) ||
+            !Near(a,1248.f)||!Near(b,1344.f)||
+            !Near(c,1248.f)||!Near(d,1344.f) ||
+            !ProjectPixelPair(eyeIdentity,eyeIdentity,320,240,
+                0,0,2496,2688,1,wrongX,wrongY,wrongRx,wrongRy) ||
+            !(wrongX<600.f&&wrongY<600.f))
+            return 50;
+        if (!ProjectPixelPairAcrossViewports(
+                eyeIdentity,eyeIdentity,80,120,
+                0,0,640,480,0,0,2496,2688,1,a,b,c,d) ||
+            !Near(a,312.f)||!Near(b,672.f)||
+            !Near(c,312.f)||!Near(d,672.f))
+            return 51;
+        // With a matching game/RT extent there is no extra adjustment.
+        float oldLx=0,oldLy=0,oldRx=0,oldRy=0;
+        if (!ProjectPixelPair(eyeIdentity,eyeIdentity,80,120,
+                0,0,640,480,.55f,oldLx,oldLy,oldRx,oldRy) ||
+            !ProjectPixelPairAcrossViewports(
+                eyeIdentity,eyeIdentity,80,120,
+                0,0,640,480,0,0,640,480,.55f,a,b,c,d) ||
+            !Near(a,oldLx)||!Near(b,oldLy)||
+            !Near(c,oldRx)||!Near(d,oldRy))
+            return 52;
+    }
     // R84 paused ESC shell (queued ScreenOverlay2D) and exact option
     // arrows (ScreenHud) share one optical plane but use the independent
     // pause slider/offset. The +TIME/GOAL path supplies zero shift.

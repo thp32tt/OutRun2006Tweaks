@@ -3399,15 +3399,16 @@ namespace OutRunVRStereo
                 return false;
             state.stageExtensionScale = hudScale;
             state.stageExtensionPostEyeVerticalPixels = postEyeVerticalPixels;
-            // The original +TIME sprite/numeric and GOAL progress/result
-            // producers both submit game-presentation pixels; their D3DX
-            // fixedfn/XYZRHW draws may be deferred into an XR-sized RT.
-            // A previous fix decoded +TIME against the game extent but
-            // incorrectly decoded the five exact GOAL families against the
-            // physical XR target, displacing/resizing the same result beside
-            // source-owned shader glyphs. Require an exact physical result
-            // producer: never remap ordinary HUD, ESC, F11, world or SkyGlow.
-            // Native same-size output still takes the unchanged pixel path.
+            // These are ORIGINAL GAME presentation pixels, not physical
+            // XR render-target pixels. +TIME/GOAL already used the source
+            // viewport; ordinary exact ScreenHud (including native speed,
+            // time and rank glyphs) and canonical queued HUD used the same
+            // finite eye plane but still decoded pixels against the XR RT.
+            // A different 2D/eye extent displaced and rescaled both groups.
+            // Prove original ScreenHud or queue ownership before selecting
+            // game dimensions. F11 external ImGui, unknown overlays, world
+            // effects, SkyGlow and projected vehicle markers stay excluded.
+            // Equal extents retain the original one-viewport projection.
             const auto resultDraw =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
             const bool goalPresentationPixels =
@@ -3415,9 +3416,17 @@ namespace OutRunVRStereo
                 OutRunVR::GoalPhysical::IsGoal(
                     OutRunVR::GoalPhysical::Source{
                         resultDraw.scope, resultDraw.producer});
+            const bool nativeScreenHudPixels =
+                OutRunVR::GameSemantic::CorroboratesHud(
+                    OutRunVR::GameSemantic::EffectiveScope());
+            const bool queuedOriginalHudPixels =
+                OutRunVR::GameSemantic::QueueOverlayNeedsFiniteHudPlane(
+                    resultDraw.scope, resultDraw.queued,
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0);
             if ((OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
                     OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
-                 goalPresentationPixels) &&
+                 goalPresentationPixels || nativeScreenHudPixels ||
+                 queuedOriginalHudPixels) &&
                 Game::screen_resolution)
             {
                 const float gameWidth = Game::screen_resolution->x;
@@ -5072,9 +5081,24 @@ namespace OutRunVRStereo
                 // Proven peripheral HUD must be checked BEFORE the R84
                 // finite-head early return. Nonperipheral scope/producer
                 // returns a neutral anchor without scanning vertices.
+                // Source-space anchors and finite HUD remapping must use
+                // the SAME original 2D extent as the subsequent binocular
+                // projection. Otherwise a 3440x1440 HUD group is clipped or
+                // centred as if authored for a 2496x2688 XR eye.
+                const bool gamePixelViewport =
+                    state.stageExtensionEyePlane &&
+                    state.stageSource2DWidth > 0.f &&
+                    state.stageSource2DHeight > 0.f;
+                const float sourceX0 = gamePixelViewport ? 0.f : x0;
+                const float sourceY0 = gamePixelViewport ? 0.f : y0;
+                const float sourceWidth = gamePixelViewport
+                    ? state.stageSource2DWidth : width;
+                const float sourceHeight = gamePixelViewport
+                    ? state.stageSource2DHeight : height;
                 const R30HudEdgeAnchor exactHudAnchor =
                     R30GetExactHudEdgeAnchor(source, vertexCount, stride,
-                        x0, y0, width, height, usedMask, touched, knownUsedCount);
+                        sourceX0, sourceY0, sourceWidth, sourceHeight,
+                        usedMask, touched, knownUsedCount);
                 const float finiteHudBoost = state.stageExtensionEyePlane
                     ? R30ExactPeripheralHudBoost(exactHudAnchor) : 1.0f;
                 if (state.stageExtensionEyePlane)
@@ -5134,7 +5158,8 @@ namespace OutRunVRStereo
                              exactHudAnchor.y != 0.0f))
                         {
                             if (!OutRunVrHudEdge::RemapFiniteHudPixel(
-                                    sourceX, sourceY, x0, y0, width, height,
+                                    sourceX, sourceY, sourceX0, sourceY0,
+                                    sourceWidth, sourceHeight,
                                     sourceScale, finiteHudBoost,
                                     exactHudAnchor.x, exactHudAnchor.y,
                                     sourceX, sourceY))
@@ -5147,9 +5172,9 @@ namespace OutRunVRStereo
                         const float* rclip = reinterpret_cast<const float*>(
                             &state.stageExtensionClipFromGameNdc[1]);
                         // Same-resolution desktop/R84 path stays unchanged.
-                        // Only exact +TIME or GOAL fixedfn/XYZRHW sprites,
-                        // percent digits and result glyphs use game-pixel
-                        // dimensions when XR's physical viewport differs.
+                        // Source-proven native/queued gameplay ScreenHud and
+                        // exact +TIME/GOAL sprite/glyph pixels use their game
+                        // 2D extent whenever the XR target differs.
                         const bool separate2D =
                             state.stageSource2DWidth > 0.f &&
                             state.stageSource2DHeight > 0.f &&
