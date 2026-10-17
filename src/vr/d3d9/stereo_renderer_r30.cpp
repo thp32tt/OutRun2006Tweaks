@@ -38,6 +38,7 @@
 #include "../game/rank_marker_sparse.hpp"
 #include "../game/rank_marker_raw_wvp.hpp"
 #include "../game/rank_marker_physical_source.hpp"
+#include "../game/stage_extension_physical_source.hpp"
 #include "../game/rank_marker_fixedfn_r62.hpp"
 #include <cstring>
 #include <cstdlib>
@@ -5312,6 +5313,27 @@ namespace OutRunVRStereo
             return ok;
         }
 
+
+        // The original 6 +TIME E8 parents feed both queued sprite quads
+        // and direct numeric D3DX triangles. Classify only the exact physical
+        // stage producer, never an alpha/FVF or stale prior HUD source.
+        bool R30CaptureStagePhysicalSource(
+            OutRunVR::StageExtensionPhysical::Source& source) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            const auto draw = CapturePhysicalDrawCommand();
+            std::uintptr_t shader = 0;
+            std::uint64_t shaderEpoch = 0;
+            if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                R29OwnerCurrentVertexShaderIdentity() != 0)
+                return false;
+            source = {draw.scope, draw.producer, draw.queued,
+                draw.queueNode, draw.queueEpoch,
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+            return OutRunVR::StageExtensionPhysical::IsValid(source);
+        }
+
         // Sample the actual producer/queue/Calc3D2D identity at the GPU
         // primitive, not the previous tick's SpriteNode or cached rank WVP.
         // Fixed-function FVF 0x142 legitimately has a null vertex shader.
@@ -5366,6 +5388,21 @@ namespace OutRunVRStereo
                 !R30CaptureProjectedRankPhysicalSource(rankBefore))
                 return E_NOTIMPL; // no physical GPU draw yet
 
+            // A queued +TIME sprite or direct numeric glyph must retain
+            // its original physical owner THROUGH the native left GPU Draw.
+            // Unlike the previous CPU D3DX registration, the actual GPU
+            // Draw can reenter a new SpriteNode, Begin, shader or pose.
+            // Capture before submission; no side effects for unrelated HUD.
+            OutRunVR::StageExtensionPhysical::Source stageBefore{};
+            const auto stageCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool exactStage =
+                stageCommand.IsExactFiniteResultHud() &&
+                stageCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
+            if (exactStage && !R30CaptureStagePhysicalSource(stageBefore))
+                return E_NOTIMPL; // native left Draw has NOT run yet
+
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
             {
@@ -5378,6 +5415,25 @@ namespace OutRunVRStereo
                     site, leftHr);
                 R29OwnerArmMonoSafety();
                 return leftHr;
+            }
+
+            if (exactStage)
+            {
+                OutRunVR::StageExtensionPhysical::Source stageAfter{};
+                if (!R30CaptureStagePhysicalSource(stageAfter) ||
+                    !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+                        stageBefore, stageAfter))
+                {
+                    // Never repeat native left Draw or borrow an unrelated
+                    // +TIME/GOAL source for the right eye. Enclosing R30
+                    // owners still restore RT, viewport and fixedfn state.
+                    R29OwnerMarkRightDrawFailed();
+                    R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R29OwnerReportStereoFailure(
+                        OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
+                    R29OwnerArmMonoSafety();
+                    return leftHr;
+                }
             }
 
             if (exactRank)

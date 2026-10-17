@@ -1,0 +1,65 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00994",
+  "production_id": "CONVERSION-DX9EX-00994",
+  "event_id": "CONVERSION-DX9EX-00994-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C2_IMPLEMENTED",
+  "checkpoint": "C5_EXACT_SHA_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "5580cb2df863f80e618d7a396321837bf3b6e2c5",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00994.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "goal": "Keep both original stage +TIME queued sprites and direct numeric glyphs attached to the same physical GPU source across R84 XYZRHW two-eye submission even if a native left Draw reenters the game producer.",
+    "scope_boundary": "Only exact StageExtensionTime ScreenHud physical XYZRHW/fixedfn route; original D3DX batches and shader R33 route remain unchanged, no timer alteration, no DXVK.",
+    "acceptance_items": [
+      {
+        "id": "stage_queued_direct_physical_source",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "R84 native two-eye XYZRHW submission uses one unchanged original +TIME direct/queued source."
+      },
+      {
+        "id": "stage_native_reentry_fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Producer/queue/pose/shader/draw mutations after left mark stereo incomplete without replaying left."
+      },
+      {
+        "id": "stage_exact_sha_windows",
+        "category": "integrated_validation",
+        "expected_behavior": "All mandatory x86 R84 and R26_SAFE, host, Domain, Full Source and HUD Inspector GitHub Gates pass; Quest3 remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_queued_direct_physical_source": "PENDING_WINDOWS_CI",
+    "stage_native_reentry_fallback": "PENDING_WINDOWS_CI",
+    "stage_exact_sha_windows": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "source_gap": "R30ExecuteXyzrhwStereo had post-native-left physical source validation for projected ranks, not original StageExtensionTime GPU batches; GPU callbacks may switch source before right eye.",
+    "unverified": "Whether this is the observed +TIME diplopia cause requires exact-SHA HMD test. Shader R33 native path and optical acceptance are not claimed complete."
+  },
+  "score_delta_this_attempt": 0
+}

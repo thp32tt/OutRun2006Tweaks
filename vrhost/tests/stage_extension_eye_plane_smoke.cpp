@@ -1,4 +1,5 @@
 #include "../../src/vr/d3d9/stage_extension_eye_plane.hpp"
+#include "../../src/vr/game/stage_extension_physical_source.hpp"
 #include <cmath>
 #include <limits>
 #include <initializer_list>
@@ -140,5 +141,63 @@ int main() {
        !Near(pauseLy,originalPauseLy+48.f,0.002f) ||
        !Near(pauseRy,originalPauseRy+48.f,0.002f))
         return 19;
+
+    // GPU SUBMISSION rather than CPU D3DX Draw registration is the real
+    // +TIME ownership boundary. Both direct numeric and queued sprite
+    // paths must keep the same source through a reentrant native left Draw.
+    using namespace OutRunVR::StageExtensionPhysical;
+    using OutRunVR::GameSemantic::RenderScope;
+    using OutRunVR::GameSemantic::ProducerToken;
+    const int stageNode = 1, foreignNode = 2;
+    Source queuedStage{RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime, true, &stageNode, 41,
+        23, 9, 0, 0}; // FVF 0x142 fixed-function: null VS is legitimate.
+    Source directStage{RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime, false, nullptr, 0,
+        23, 9, 0x1234, 11}; // Original numeric shader glyphs.
+    if (!SameAfterNativeLeft(queuedStage, queuedStage) ||
+        !SameAfterNativeLeft(directStage, directStage))
+        return 20;
+    auto reject = [](const Source& original, const Source& changed) {
+        return !SameAfterNativeLeft(original, changed);
+    };
+    auto altered = queuedStage;
+    altered.node = &foreignNode; if (!reject(queuedStage,altered)) return 21;
+    altered = queuedStage; ++altered.queueEpoch;
+    if (!reject(queuedStage,altered)) return 22;
+    altered = queuedStage; altered.queued = false;
+    if (!reject(queuedStage,altered)) return 23;
+    altered = queuedStage; altered.producer = ProducerToken::GoalTime020;
+    if (!reject(queuedStage,altered)) return 24;
+    altered = queuedStage; altered.scope = RenderScope::ScreenOverlay2D;
+    if (!reject(queuedStage,altered)) return 25;
+    altered = queuedStage; altered.poseEpoch = 0;
+    if (!reject(queuedStage,altered)) return 26;
+    altered = queuedStage; ++altered.topLevelDrawSerial;
+    if (!reject(queuedStage,altered)) return 27;
+    altered = queuedStage; altered.shader = 0x2345;
+    if (!reject(queuedStage,altered)) return 28;
+    altered = directStage; ++altered.shaderEpoch;
+    if (!reject(directStage,altered)) return 29;
+    altered = directStage; altered.shaderEpoch = 0;
+    if (!reject(directStage,altered)) return 30;
+    altered = directStage; altered.node = &stageNode;
+    if (!reject(directStage,altered)) return 31;
+    altered = directStage; altered.queueEpoch = 1;
+    if (!reject(directStage,altered)) return 32;
+    altered = directStage; altered.queued = true;
+    if (!reject(directStage,altered)) return 33;
+    altered = directStage; altered.scope = RenderScope::WorldBillboard;
+    if (!reject(directStage,altered)) return 34;
+    altered = directStage; altered.producer = ProducerToken::None;
+    if (!reject(directStage,altered)) return 35;
+    altered = queuedStage; altered.poseEpoch = 24;
+    if (!reject(queuedStage,altered)) return 36;
+    // Original HUD/GOAL/rival/SkyGlow and untagged native draws are
+    // never admitted by this exact stage-only transaction.
+    if (IsValid(Source{}) ||
+        IsValid(Source{RenderScope::ScreenHud,
+            ProducerToken::ResultProgress, false, nullptr, 0, 23, 9, 0, 0}))
+        return 37;
     return 0;
 }
