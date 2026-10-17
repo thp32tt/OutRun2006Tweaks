@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "BUILD_PENDING",
-  "phase": "C2_IMPLEMENTED",
-  "checkpoint": "C2_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "4de1d61597cfebcacb78c935d60947fbe5b0d650",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "209e58de75629d3c2128bf7a171e2099f6c66423",
+  "validation_bearing_result_sha": "d5a185c9d6f79ad79db3a60cd9b4f1504c3dfcd6",
   "source_paths": [
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "lens_nested_original_c64_stereo": "PENDING_EXACT_SHA",
-    "lens_outer_effect_and_stale_guard": "PENDING_EXACT_SHA",
-    "lens_r84_exact_sha_integrated": "PENDING_EXACT_SHA"
+    "lens_nested_original_c64_stereo": "PASS",
+    "lens_outer_effect_and_stale_guard": "PASS",
+    "lens_r84_exact_sha_integrated": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R30 and R33 only admitted raw c64 stamped WorldBillboard, although the original C993 D3A5 source persists through nested SceneEffect helper writes. This can discard otherwise original source-owned matrix and fall back to an uncorrected mono draw; exact runtime frequency not yet measured.",
@@ -85,5 +85,34 @@
     "evidence_limit": "Source-level scope handoff candidate with deterministic negative and positive acceptance tests; no physical HMD screen proof and no assertion this is the sole optical cause."
   },
   "runtime_validation_notes": "No Quest3/VDXR runtime test performed; display correction is a candidate pending exact package runtime testing.",
-  "result_notes": "Material source + compiled smoke change, not review-only. Exact CI outcome and C6 remain pending; any policy repair stays under this task, without duplicate score."
+  "result_notes": "Real R30/R33 central C993 source scope C++ implementation at 209e58de75629d3c2128bf7a171e2099f6c66423; exact GitHub CI 4/4 PASS on repaired source verifier SHA d5a185c9d6f79ad79db3a60cd9b4f1504c3dfcd6. Policy retries and C6 are same TASK, +0 separate score. HMD/runtime visual proof remains UNTESTED.",
+  "ci_evidence": {
+    "validated_exact_sha": "d5a185c9d6f79ad79db3a60cd9b4f1504c3dfcd6",
+    "source_commit": "209e58de75629d3c2128bf7a171e2099f6c66423",
+    "dx9ex_active": {
+      "run_id": 39021372704,
+      "conclusion": "success",
+      "includes": [
+        "policy",
+        "Win32 game",
+        "R84 full-chain",
+        "R26_SAFE",
+        "x64 OpenXR host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39021372703,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 39021372846,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 39021372839,
+      "conclusion": "success"
+    }
+  },
+  "completed_kst": "2026-10-17 18:40 KST"
 }
