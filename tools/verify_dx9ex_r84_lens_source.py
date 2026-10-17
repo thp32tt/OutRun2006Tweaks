@@ -235,7 +235,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "OutRunVRRenderer::GetLastGameWvpSemanticProvenance(",
         "OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch()",
         "OutRunVRRenderer::GetLastGameWvpPoseEpoch()",
-        "OutRunVR::GameSemantic::ProducerToken::LensFlareCentre",
+        "OutRunVR::LensCentre::AdmitsCentreRawSourceScope(",
         "R29OwnerCurrentShaderEpoch(shader, shaderEpoch)",
         "writtenShaderEpoch == shaderEpoch",
     ):
