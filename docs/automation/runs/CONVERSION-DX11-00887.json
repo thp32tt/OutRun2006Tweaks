@@ -10,17 +10,17 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00887",
   "feature_id": "DX11:REAL_GAME_CPU_GDI_POSTDRAW_BACKBUFFER_REPLAY",
   "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:CPU_GDI_BACKBUFFER_REPLAY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
-  "score_change": 0,
+  "score_change": 1,
   "full_dx11_renderer_complete": false,
   "base_sha": "11634e679b4a153ec2660c0a40b62c8bb5852221",
   "material_result_sha": "11634e679b4a153ec2660c0a40b62c8bb5852221",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "7e8a9a4d9b427b39eb9a106c1164eab0bebaf389",
   "feature_contract": {
     "feature_id": "DX11:REAL_GAME_CPU_GDI_POSTDRAW_BACKBUFFER_REPLAY",
     "goal": "Pair game LockRect/UnlockRect and GetDC/ReleaseDC writable acquisitions and replay completed original D3D9 main-backbuffer pixels into the full-size native D3D11 game frame while preserving D3D9 gameplay and input.",
@@ -52,10 +52,10 @@
     ]
   },
   "acceptance_results": {
-    "lockrect": "PENDING_EXACT_SHA",
-    "getdc": "PENDING_EXACT_SHA",
-    "fallback": "PENDING_EXACT_SHA",
-    "exact_gates": "PENDING_EXACT_SHA",
+    "lockrect": "PASS_BUILD_SOURCE_AND_PORTABLE_REGRESSION",
+    "getdc": "PASS_BUILD_SOURCE_AND_PORTABLE_REGRESSION",
+    "fallback": "PASS_BUILD_NEGATIVE_REGRESSION",
+    "exact_gates": "PASS_EXACT_SHA_5_OF_5",
     "quest3_vdxr": "UNTESTED"
   },
   "changed_files": [
@@ -79,8 +79,8 @@
       "Native D3D11 ticket and GPU surface replay with portable negative regression"
     ],
     "acceptance_proof": {
-      "positive_probe": "Portable C++ ticket test covers lock/GDI paired acquisition and completion, Windows Gates pending.",
-      "negative_regression": "Wrong completion kind, owner/identity mismatch, overlapping writes and malformed regions cannot release write ticket; original game output remains authoritative.",
+      "positive_probe": "DX11 Fast exact-SHA PASS portable 00887 C++ ticket probe; OpenXR and Windows compile PASS at 7e8a9a4d. Game/HMD actual pixels UNTESTED.",
+      "negative_regression": "Fast exact-SHA Python 00886 source-copy negative mutations and native 00887 C++ wrong-completion-type assertions PASS, original D3D9 fallback preserved in source.",
       "component_integration": "Live game main D3D9 writable surface -> native frame write ticket -> D3D9 readback -> D3D11 GPU CopySubresourceRegion -> game-sized frame."
     },
     "conflict_keys": [
@@ -100,10 +100,15 @@
     "C0_RECOVER": "Backend run 39049915543 and Fast run 39049915525 failed due to 00886 false terminal status with PENDING acceptance; earlier 00886 OpenXR build fails missing bridge header declaration, already added by material 00887.",
     "C1_REVIEW": "Same 00887 work key; GameNativeCpuSurfaceTicket lacked write acquisition kind.",
     "C2_IMPLEMENT": "Distinct LockRect vs GetDC acquisition/completion through R30 and native D3D11 replay path; portable negative tests.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "Material follow-up to 11634e67 with source-level completion repair.",
+    "C3_VALIDATE": "PASS_EXACT_SHA 7e8a9a4d; DX11 Fast #39050786440, Backend #39050786431, Build #39050791361, OpenXR #39050792884, HUD #39050791330 all SUCCESS. HMD UNTESTED.",
+    "C4_COMMIT": "Original material 11634e67; C++ pairing repair 7220cc65; focused old source-mutation test repairs e64e3771 and 7e8a9a4d; all recorded under same TASK_ID.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "PASS_EXACT_SHA: 7e8a9a4d9b427b39eb9a106c1164eab0bebaf389 exact 5/5 gates SUCCESS, build verified only; Quest3/VDXR/gamepad RUNTIME_VALIDATION=UNTESTED. Bookkeeping commit separate [skip ci]."
   },
-  "next_action": "Verify all five unmodified GitHub Actions Gate conclusions on exact new material SHA; keep runtime UNTESTED and no new score until complete."
+  "next_action": "C6 BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED. Do not rerun same task or re-add score; real-game/Quest3 source/menu/vehicle/race parity needs separate user HMD test.",
+  "source_repair_material_sha": "7220cc65168b3de893e15e3d0dfc8345b4713bea",
+  "validation_test_repair_shas": [
+    "e64e3771be7c3e69766920f581a8f8d71efc869e",
+    "7e8a9a4d9b427b39eb9a106c1164eab0bebaf389"
+  ]
 }
