@@ -6281,6 +6281,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             // post-Clear Draw/DrawIndexed on this SAME game device/Present.
             // Never revive a batch after a partial or foreign Clear.
             s.frameBatch.reset();
+            s.surfaceReplayCount = 0u; // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
