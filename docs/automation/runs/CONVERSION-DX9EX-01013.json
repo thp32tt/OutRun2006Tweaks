@@ -68,8 +68,8 @@
     ]
   },
   "acceptance_results": {
-    "original_game_sprite_uv_transaction": "PASS_LOCAL_PORTABLE",
-    "mask_nested_and_legacy_fallback": "PASS_LOCAL_PORTABLE",
+    "original_game_sprite_uv_transaction": "PASS_BUILD",
+    "mask_nested_and_legacy_fallback": "PASS_BUILD",
     "required_exact_sha_r84_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
@@ -83,15 +83,42 @@
       "Do not suppress draw, force alpha, alter DDS swap/channel order, patch unrelated shader, or globally change VR menu aspect: these do not restore the original reused game sprite UV contract."
     ],
     "fix_evidence": "Material C++ source commit dc97d283b63d5570bb905089ac398987b434730e changes original put_sprite calls plus source templated scoped UV and sibling mask transactions.",
-    "negative_test_evidence": "Portable C++17 Release (-DNDEBUG) smoke locally passed repeated scale, sibling mask, overflow, invalid dimensions, nested call and source restoration. Exact Windows R84 CI pending.",
+    "negative_test_evidence": "Portable C++17 Release (-DNDEBUG) smoke locally passed repeated scale, sibling mask, overflow, invalid dimensions, nested call and source restoration. GitHub exact-SHA Windows R84 game/R26_SAFE, host, packaging and full-source review SUCCESS; Quest3 runtime UNTESTED.",
     "eye_ownership": "Existing R84 renderer performs source-aware physical stereo, no per-eye matrix routes were modified by UV transaction; original game sprite submission and stereo output remain under existing owners.",
     "evidence_limit": "No actual car-selector HMD test or confirmed correction of observed white textures; the change addresses a source-proven repeated input mutation and preserves RUNTIME_VALIDATION=UNTESTED."
   },
-  "validation_notes": "C6 PASS_EXACT_SHA: exact validation-bearing GitHub commit f0c21164c3999f29542427f614226deae77adbfa reported CI SUCCESS. Material source commit dc97d283b63d5570bb905089ac398987b434730e and feature contract/portable smoke acceptance preserved. This is separate [skip ci] result bookkeeping only; no source edit, rebuild, workflow rerun, or duplicate AI score credit. Quest3 HMD runtime remains UNTESTED.",
+  "validation_notes": "C6 exact-SHA verified: material dc97d283b63d5570bb905089ac398987b434730e, validation-bearing f0c21164c3999f29542427f614226deae77adbfa. Mandatory GitHub Actions 4/4 SUCCESS (DX9Ex Active, Domain, HUD Inspector, Full Source Impact) on the exact validation SHA. Existing C6 bookkeeping f473e699 updated by this same TASK corrective bookkeeping commit solely to map local smoke acceptance to the policy's PASS_BUILD positive vocabulary and replace unverified 'user confirmed' attribution with observed CI IDs. No CI rerun, source modification or additional AI score; Quest3 HMD runtime UNTESTED.",
   "ci_evidence": {
     "validated_exact_sha": "f0c21164c3999f29542427f614226deae77adbfa",
+    "source_commit": "dc97d283b63d5570bb905089ac398987b434730e",
     "conclusion": "success",
-    "verification_basis": "User-confirmed GitHub CI SUCCESS at exact SHA; no CI jobs rerun",
-    "runtime_validation": "UNTESTED"
+    "verification_basis": "GitHub Actions run results and exact head SHA independently inspected (not HMD runtime)",
+    "dx9ex_active": {
+      "run_id": 39027771590,
+      "sha": "f0c21164c3999f29542427f614226deae77adbfa",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "game",
+        "host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39027771555,
+      "sha": "f0c21164c3999f29542427f614226deae77adbfa",
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 39027771544,
+      "sha": "f0c21164c3999f29542427f614226deae77adbfa",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 39027771560,
+      "sha": "f0c21164c3999f29542427f614226deae77adbfa",
+      "conclusion": "success"
+    }
   }
 }
