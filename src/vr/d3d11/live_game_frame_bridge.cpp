@@ -30,6 +30,7 @@
 #include "live_game_rgba16_texture.hpp"
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
+#include "native_game_cpu_surface_ticket.hpp"
 #include "native_game_source_mutation.hpp"
 #include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
@@ -1077,6 +1078,7 @@ struct State {
     UINT surfaceReplayScratchWidth = 0u, surfaceReplayScratchHeight = 0u;
     std::vector<std::uint8_t> surfaceReplayPixels;
     std::uint32_t surfaceReplayCount = 0u;
+    GameNativeCpuSurfaceTicket cpuSurfaceReplay{};
     NativeBackend backend;
     // Persistent native D3D11 upload buffers for a whole real game frame.
     // Re-upload every Draw to preserve game-authored mutable VB/IB content.
@@ -5157,6 +5159,11 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         std::lock_guard<std::mutex> lock(s.mutex);
         ++s.observed;
         if (!observe_source_device(s, game)) return;
+        if (s.cpuSurfaceReplay.active()) {
+            s.frameBatch.abort();
+            s.pending = false;
+            return; // native Draw may not cross a writable surface acquisition
+        }
         // Record every observed game Draw/DrawIndexed before native state
         // admission. Eligible-only ordinals are insufficient to establish
         // contiguous menu, vehicle-selection or race source calls.
@@ -5579,7 +5586,8 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
 
 bool preserve_game_surface_copy(
     IDirect3DDevice9* game, IDirect3DSurface9* destination,
-    const RECT* changedArea, HRESULT originalResult) noexcept {
+    const RECT* changedArea, HRESULT originalResult,
+    bool completingCpuWrite) noexcept {
     // This is invoked AFTER the original D3D9 StretchRect/UpdateSurface has
     // succeeded. The game-visible fallback always keeps its original HRESULT.
     // Only active full-resolution real-game native Draw batches are eligible.
@@ -5623,6 +5631,13 @@ bool preserve_game_surface_copy(
             : GameNativeSurfaceCopyRegion::destination(
                 0, 0, desc.Width, desc.Height, desc.Width, desc.Height);
         if (!region.valid) return false;
+        // No other D3D9 postpass may consume pixels from an open CPU/GDI
+        // write. Only the exact locked surface/rectangle may finish it.
+        if (s.cpuSurfaceReplay.active() != completingCpuWrite ||
+            (completingCpuWrite && !s.cpuSurfaceReplay.matches(
+                owner, reinterpret_cast<std::uintptr_t>(actualIdentity.Get()),
+                region.left, region.top, region.right, region.bottom)))
+            return false;
 
         // GetRenderTargetData synchronizes real D3D9 pixels. It is explicitly
         // diagnostic/opt-in, never silently promoted as a performant shared
@@ -5722,11 +5737,103 @@ bool preserve_game_surface_copy(
         if (oldColor) oldColor->Release();
         if (oldDepth) oldDepth->Release();
         ++s.surfaceReplayCount;
+        if (completingCpuWrite) s.cpuSurfaceReplay.reset();
         // Neither a CPU readback nor its D3D11 GPU copy counts as a native
         // Draw/DrawIndexed or supplies invented left/right eye evidence.
         return true;
     } catch (...) {
         return false; // next mutation observer aborts native publication
+    }
+}
+
+
+bool begin_game_surface_cpu_write(IDirect3DDevice9* game,
+    IDirect3DSurface9* destination, const RECT* rect) noexcept {
+    if (nativeOutputUploadDepth || !diagnostic_enabled() ||
+        !env_full_game_opt_in() || !game || !destination) return false;
+    try {
+        D3DSURFACE_DESC desc{};
+        ComPtr<IUnknown> identity, backbufferIdentity;
+        ComPtr<IDirect3DSurface9> backbuffer;
+        if (FAILED(destination->GetDesc(&desc)) ||
+            FAILED(destination->QueryInterface(IID_PPV_ARGS(identity.GetAddressOf()))) ||
+            !identity ||
+            FAILED(game->GetBackBuffer(0u, 0u, D3DBACKBUFFER_TYPE_MONO,
+                backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(backbuffer.As(&backbufferIdentity)) ||
+            identity.Get() != backbufferIdentity.Get() ||
+            desc.Pool != D3DPOOL_DEFAULT ||
+            desc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+            (desc.Format != D3DFMT_A8R8G8B8 &&
+             desc.Format != D3DFMT_X8R8G8B8)) return false;
+        const auto region = rect
+            ? GameNativeSurfaceCopyRegion::destination(
+                rect->left, rect->top, rect->right, rect->bottom,
+                desc.Width, desc.Height)
+            : GameNativeSurfaceCopyRegion::destination(
+                0, 0, desc.Width, desc.Height, desc.Width, desc.Height);
+        if (!region.valid) return false;
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        if (s.cpuSurfaceReplay.active()) {
+            s.frameBatch.abort();
+            s.pending = false;
+            return false;
+        }
+        if (s.sourceGameDevice != owner ||
+            !s.clearColor.matches(owner,
+                reinterpret_cast<std::uintptr_t>(identity.Get())) ||
+            !s.frameBatch.publishable(s.pending) ||
+            !s.backend.ready() || !s.backend.color_texture() ||
+            s.nativeWidth != desc.Width || s.nativeHeight != desc.Height ||
+            s.surfaceReplayCount >= 8u) return false;
+        return s.cpuSurfaceReplay.begin(owner,
+            reinterpret_cast<std::uintptr_t>(identity.Get()),
+            region.left, region.top, region.right, region.bottom,
+            desc.Width, desc.Height);
+    } catch (...) { return false; }
+}
+
+void finish_game_surface_cpu_write(IDirect3DDevice9* game,
+    IDirect3DSurface9* destination, HRESULT originalResult) noexcept {
+    if (!game || !destination) return;
+    try {
+        ComPtr<IUnknown> identity;
+        if (FAILED(destination->QueryInterface(IID_PPV_ARGS(
+                identity.GetAddressOf()))) || !identity) return;
+        RECT r{};
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        {
+            State& s = state();
+            std::lock_guard<std::mutex> lock(s.mutex);
+            if (!s.cpuSurfaceReplay.active() ||
+                s.cpuSurfaceReplay.owner != owner ||
+                s.cpuSurfaceReplay.surface !=
+                    reinterpret_cast<std::uintptr_t>(identity.Get()))
+                return; // read-only/foreign resource never opened a ticket
+            r = {static_cast<LONG>(s.cpuSurfaceReplay.left),
+                 static_cast<LONG>(s.cpuSurfaceReplay.top),
+                 static_cast<LONG>(s.cpuSurfaceReplay.right),
+                 static_cast<LONG>(s.cpuSurfaceReplay.bottom)};
+        }
+        if (SUCCEEDED(originalResult) &&
+            preserve_game_surface_copy(game, destination, &r,
+                                       originalResult, true)) return;
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        s.cpuSurfaceReplay.reset();
+        s.frameBatch.abort();
+        s.pending = false;
+        s.preDrawFills.discard();
+        s.clearColor.discard();
+        if (++s.outputGeneration == 0u) ++s.outputGeneration;
+    } catch (...) {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        s.cpuSurfaceReplay.reset();
+        s.frameBatch.abort();
+        s.pending = false;
     }
 }
 
@@ -6281,6 +6388,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             // post-Clear Draw/DrawIndexed on this SAME game device/Present.
             // Never revive a batch after a partial or foreign Clear.
             s.frameBatch.reset();
+            s.cpuSurfaceReplay.reset();
             s.surfaceReplayCount = 0u; // a new verified full Clear starts a new source epoch
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
@@ -6650,6 +6758,10 @@ void before_game_present(IDirect3DDevice9* game,
                 s.sourceModeKnown, s.sourceWasFullMode, fullMode)) {
             s.frameBatch.abort();
             s.pending = false;
+        }
+        if (s.cpuSurfaceReplay.active()) {
+            s.frameBatch.abort();
+            s.pending = false; // original Present stays authoritative
         }
         const bool currentFullFrameComplete =
             s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame) &&
@@ -7198,6 +7310,7 @@ void before_game_present(IDirect3DDevice9* game,
         } else if (s.pending) ++s.failed;
         s.pending = false;
         s.frameBatch.reset();
+        s.cpuSurfaceReplay.reset();
         s.clearColor.discard();
         s.preDrawFills.discard();
         // Menu/car/race frames often have more than 64 eligible draws. The
@@ -7230,6 +7343,7 @@ void before_game_present(IDirect3DDevice9* game,
         State& s = state();
         s.pending = false;
         s.frameBatch.reset();
+        s.cpuSurfaceReplay.reset();
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
@@ -7259,6 +7373,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
         return;
     s.pending = false;
     s.frameBatch.reset();
+    s.cpuSurfaceReplay.reset();
     s.eligibleThisFrame = 0;
     s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;

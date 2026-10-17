@@ -74,7 +74,9 @@ namespace OutRunVRStereo
         // Backbuffer surface CPU/DC writes bypass device Draw/Clear observers.
         constexpr std::size_t R30GetBackBufferVtableIndex = 18;
         constexpr std::size_t R30SurfaceLockRectVtableIndex = 13;
+        constexpr std::size_t R30SurfaceUnlockRectVtableIndex = 14;
         constexpr std::size_t R30SurfaceGetDCVtableIndex = 15;
+        constexpr std::size_t R30SurfaceReleaseDCVtableIndex = 16;
         constexpr std::size_t R30CreateTextureVtableIndex = 23;
         constexpr std::size_t R30CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
@@ -97,7 +99,9 @@ namespace OutRunVRStereo
         SafetyHookInline R30ColorFillHook{};
         SafetyHookInline R30GetBackBufferHook{};
         SafetyHookInline R30SurfaceLockRectHook{};
+        SafetyHookInline R30SurfaceUnlockRectHook{};
         SafetyHookInline R30SurfaceGetDCHook{};
+        SafetyHookInline R30SurfaceReleaseDCHook{};
         SafetyHookInline R30TextureReleaseHook{};
         SafetyHookInline R30TextureLockRectHook{};
         SafetyHookInline R30TextureUnlockRectHook{};
@@ -655,7 +659,8 @@ namespace OutRunVRStereo
         // the successful *writable acquisition* before the client can change
         // bytes; a failed/READONLY acquisition cannot invalidate a frame.
         void R30ObserveCpuSurfaceWrite(
-            IDirect3DSurface9* surface, HRESULT hr, bool readOnly)
+            IDirect3DSurface9* surface, HRESULT hr, bool readOnly,
+            const RECT* region)
         {
             if (!surface) return;
             D3DSURFACE_DESC desc{};
@@ -670,9 +675,22 @@ namespace OutRunVRStereo
             IDirect3DDevice9* sourceDevice = nullptr;
             if (SUCCEEDED(surface->GetDevice(&sourceDevice)) && sourceDevice)
             {
-                outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
-                    sourceDevice, surface, hr);
+                if (!outrun::vr::dx11::live_game_frame::
+                        begin_game_surface_cpu_write(sourceDevice, surface, region))
+                    outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                        sourceDevice, surface, hr);
                 sourceDevice->Release();
+            }
+        }
+
+        void R30FinishCpuSurfaceWrite(IDirect3DSurface9* surface, HRESULT hr)
+        {
+            if (!surface) return;
+            IDirect3DDevice9* device = nullptr;
+            if (SUCCEEDED(surface->GetDevice(&device)) && device) {
+                outrun::vr::dx11::live_game_frame::finish_game_surface_cpu_write(
+                    device, surface, hr);
+                device->Release();
             }
         }
 
@@ -683,7 +701,14 @@ namespace OutRunVRStereo
             const HRESULT hr = R30SurfaceLockRectHook.stdcall<HRESULT>(
                 surface, locked, rect, flags);
             R30ObserveCpuSurfaceWrite(
-                surface, hr, (flags & D3DLOCK_READONLY) != 0u);
+                surface, hr, (flags & D3DLOCK_READONLY) != 0u, rect);
+            return hr;
+        }
+
+        HRESULT __stdcall R30SurfaceUnlockRectDest(IDirect3DSurface9* surface)
+        {
+            const HRESULT hr = R30SurfaceUnlockRectHook.stdcall<HRESULT>(surface);
+            R30FinishCpuSurfaceWrite(surface, hr);
             return hr;
         }
 
@@ -694,7 +719,15 @@ namespace OutRunVRStereo
                 R30SurfaceGetDCHook.stdcall<HRESULT>(surface, dc);
             // A successful DC permits writes before ReleaseDC; do not wait
             // until after the modified pixels could reach Present.
-            R30ObserveCpuSurfaceWrite(surface, hr, false);
+            R30ObserveCpuSurfaceWrite(surface, hr, false, nullptr);
+            return hr;
+        }
+
+        HRESULT __stdcall R30SurfaceReleaseDCDest(
+            IDirect3DSurface9* surface, HDC dc)
+        {
+            const HRESULT hr = R30SurfaceReleaseDCHook.stdcall<HRESULT>(surface, dc);
+            R30FinishCpuSurfaceWrite(surface, hr);
             return hr;
         }
 
@@ -707,11 +740,20 @@ namespace OutRunVRStereo
                 R30SurfaceLockRectHook = safetyhook::create_inline(
                     vtable[R30SurfaceLockRectVtableIndex],
                     R30SurfaceLockRectDest);
+            if (!R30SurfaceUnlockRectHook)
+                R30SurfaceUnlockRectHook = safetyhook::create_inline(
+                    vtable[R30SurfaceUnlockRectVtableIndex],
+                    R30SurfaceUnlockRectDest);
             if (!R30SurfaceGetDCHook)
                 R30SurfaceGetDCHook = safetyhook::create_inline(
                     vtable[R30SurfaceGetDCVtableIndex],
                     R30SurfaceGetDCDest);
-            return R30SurfaceLockRectHook && R30SurfaceGetDCHook;
+            if (!R30SurfaceReleaseDCHook)
+                R30SurfaceReleaseDCHook = safetyhook::create_inline(
+                    vtable[R30SurfaceReleaseDCVtableIndex],
+                    R30SurfaceReleaseDCDest);
+            return R30SurfaceLockRectHook && R30SurfaceUnlockRectHook &&
+                R30SurfaceGetDCHook && R30SurfaceReleaseDCHook;
         }
 
         HRESULT __stdcall R30GetBackBufferDest(
@@ -925,7 +967,9 @@ namespace OutRunVRStereo
             // registry, so clearing the maps cannot invalidate an in-flight
             // shadow object.
             R30GetBackBufferHook = {};
+            R30SurfaceReleaseDCHook = {};
             R30SurfaceGetDCHook = {};
+            R30SurfaceUnlockRectHook = {};
             R30SurfaceLockRectHook = {};
             R30ColorFillHook = {};
             R30StretchRectHook = {};
