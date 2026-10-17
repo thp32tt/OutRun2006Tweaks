@@ -192,7 +192,7 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
          "CarShadowStereo::BypassNativeShadowProvenance("),
         ("centreSourceChanged || shadowSourceChanged", "centreSourceChanged || false"),
     ):
-        altered = physical.replace(original, mutant, 1)
+        altered = physical.replace(original, mutant)
         assert original in physical and original not in altered
 
     # Real producer->raw-c64->R84 physical Draw path, not a new token/enum-only
@@ -210,7 +210,7 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
         sources = [semantic, r30, r33]
         owner = next(i for i, source in enumerate(sources) if before in source)
         altered = sources.copy()
-        altered[owner] = altered[owner].replace(before, after, 1)
+        altered[owner] = altered[owner].replace(before, after)
         try:
             check_r84_shadow_route_shape(*altered, r32, support, review)
         except (AssertionError, ValueError):
@@ -226,7 +226,7 @@ def check_r84_shadow_route_shape(semantic, r30, r33, r32, support, review):
     assert "if (directCarShadow && !provenCarShadowStereo)" in r33
     assert "OutRunVR::CarShadowStereo::OwnsDirectGameWvp({" in r33
     assert "uploadSerial != 0" in r33
-    assert "CarShadowStereo::IsCoherentBeforeNativeLeft(" in r33
+    assert r33.count("CarShadowStereo::IsCoherentBeforeNativeLeft(") >= 2
     assert "shadowBeforeLeft, shadowAfterLeft" in r33
     assert all("ExactCarBaseShadowWorld" in x for x in (r30, r32, support, review))
 

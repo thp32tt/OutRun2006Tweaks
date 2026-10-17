@@ -84,6 +84,15 @@ constexpr bool IsCoherentBeforeNativeLeft(
         source.poseSequence != 0;
 }
 
+// Both original-source identity and the native draw generation must still
+// match immediately before the left eye; prior car/world matrices are unsafe.
+static_assert(IsCoherentBeforeNativeLeft(
+    {11, 40, 30, 30, 40, 50, 0x100, 60, true}));
+static_assert(!IsCoherentBeforeNativeLeft(
+    {11, 39, 30, 30, 40, 50, 0x100, 60, true}));
+static_assert(!IsCoherentBeforeNativeLeft(
+    {0, 40, 30, 30, 40, 50, 0x100, 60, true}));
+
 constexpr bool SameStereoDrawSource(
     const StereoDrawSource& a, const StereoDrawSource& b) noexcept
 {
