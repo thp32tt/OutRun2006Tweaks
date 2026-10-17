@@ -22,6 +22,7 @@ import c_original_hd_crop_only_checked_20261016 as crop_helper
 sys.path.insert(0, str(BASE / 'docker'))
 import discover
 import ocr_recognize
+import ocr_hd108
 
 STOP = False
 
@@ -146,6 +147,8 @@ def main():
                         verified_runner.VERIFIED.update(verified_runner.load_auto_sources())
                         recognized=ocr_recognize.scan(verified_runner.VERIFIED, verified_runner.check_original, max_new=args.max_per_cycle, max_sources=4)
                         write_audit(recognized)
+                        original108=ocr_hd108.scan(max_sources=2, max_new=args.max_per_cycle)
+                        write_audit(original108)
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
                 summary = process_batch(args.max_per_cycle)
