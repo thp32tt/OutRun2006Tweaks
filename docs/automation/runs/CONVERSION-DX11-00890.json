@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00890",
   "feature_id": "DX11:GAME_EYE_SPARSE_MRT_PIXEL_UAV_GPU_REPLAY",
   "work_key": "DX11:GAME_EYE:SPARSE_MRT_PIXEL_UAV_POSTPASS",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_SOURCE_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -22,7 +22,7 @@
   "base_sha": "1d97461906f43770beaf6ffa55316283981068b4",
   "material_result_sha": "09b626bc3a1853e2539e5ed7483f943c1f1b751f",
   "ci_repair_commit_sha": "c34c5313f94758ad4802be7d227e18597a8d0739",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d3b79e1616b944b0b52ad801936507f8000c83ef",
   "feature_contract": {
     "feature_id": "DX11:GAME_EYE_SPARSE_MRT_PIXEL_UAV_GPU_REPLAY",
     "goal": "Preserve genuine D3D11 game camera sparse MRT/DSV and legal PS UAV output bindings across native full-frame eye Draw/DrawIndexed and post-draw GPU Copy/Stretch, while preserving distinct eye pixels, MSAA composition and original DX9Ex fallback.",
@@ -57,7 +57,7 @@
     "native_sparse_eye_copy": "PASS_WARP_SPARSE_MRT_RT0_RT2_UAV3",
     "native_stereo_pipeline": "PASS_WARP_NATIVE_EYE_MSAA_PIXELS",
     "dx9_fallback": "PASS_WARP_INVALID_GPU_COPY_AND_DX9_INPUT_SAFE",
-    "same_sha_gates": "PENDING_EXACT_SHA",
+    "same_sha_gates": "PASS_EXACT_SHA_5_OF_5",
     "quest3_vdxr": "UNTESTED"
   },
   "changed_files": [
@@ -103,15 +103,49 @@
       "openxr": 39058076691,
       "hud": 39058076670
     },
-    "hmd_test": "UNTESTED"
+    "hmd_test": "UNTESTED",
+    "validation_sha": "d3b79e1616b944b0b52ad801936507f8000c83ef",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39059033731,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39059033556,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39059036975,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39059036972,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39059036973,
+        "conclusion": "success"
+      }
+    ],
+    "isolated_native_warp_run_id": 39058073253,
+    "isolated_native_warp_sha": "c34c5313f94758ad4802be7d227e18597a8d0739",
+    "isolated_native_warp_conclusion": "success",
+    "runtime_validation": "UNTESTED",
+    "source_material_sha": "09b626bc3a1853e2539e5ed7483f943c1f1b751f",
+    "score_change": 0
   },
   "pipeline": {
     "C0_RECOVER": "Read exact GitHub HEAD and 00889 COMPLETE run; confirm current 00890 no run record and previous owners inactive.",
     "C1_REVIEW": "Class A real native eye game-camera OM copy state bug: GetRTV8+GetUAV0..7 illegal overlap with sparse MRT; original game/camera state and fallback must survive.",
     "C2_IMPLEMENT": "Actual game D3D11 C++ native postpass+eye scoped sparse MRT and PS UAV capture/restore plus WARP GPU post-draw copy on L/R, no gameplay promotion.",
-    "C3_VALIDATE": "WARP exact c34c5313 SUCCESS after real failure repair; final exact-SHA 5 required gates still in progress until confirmation.",
-    "C4_COMMIT": "Material source 09b626bc, bounded source-test repairs db676b59 and c34c5313; this checkpoint documents the one cohesive task.",
+    "C3_VALIDATE": "Final exact d3b79e1616b944b0b52ad801936507f8000c83ef required five GitHub Actions SUCCESS plus isolated native WARP real GPU pixels SUCCESS at c34c5313; Quest3 and game controller UNTESTED.",
+    "C4_COMMIT": "Material C++ result 09b626bc3a1853e2539e5ed7483f943c1f1b751f; same TASK regression corrections db676b59, c34c5313; source+run checkpoint validation SHA d3b79e1616b944b0b52ad801936507f8000c83ef.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_EXACT_SHA_AND_C6_SEAL"
+    "C6_RESULT": "PASS_EXACT_SHA, COMPLETE_BUILD_VERIFIED, NEED_HMD_TEST for actual game menu/car/race + Quest3/VDXR; C6 bookkeeping does not alter validation-bearing result."
   }
 }
