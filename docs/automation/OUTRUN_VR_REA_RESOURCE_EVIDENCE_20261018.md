@@ -83,3 +83,26 @@ The user explicitly requests actual functional C++ fixes, not reviews, based on 
 - DX9EX:VIS:GOAL_PROGRESS: separate original `CBF8ECBF` GOAL, `BF3EE5C6` 3-2-1 and ranked final scoreboard `C598919A`; trace GOAL time and result producer scopes.
 **Execution:** On each new/continued C DX9Ex dispatch, recover existing active lease/TASK_ID/feature/symptom first from live GitHub run record; never increment work IDs on retry/rollover. Choose ONE whole defect and implement actual source correction in R84 independent R29-R33 plus owner producer and tests. Do not mark fixed from asset mapping, static call paths or CI alone. Preserve DX11 independence, DXVK freeze, input/FFB/SkyGlow/world positives, exact-SHA final CI/HUD Inspector/Domain/Full Source gating. Quest3/VDXR `RUNTIME_VALIDATION=UNTESTED` until matching physical runtime test. Do not restart or terminate an existing active Ghidra process from an auto-dev dispatch; consume only durable results.
 **Local evidence:** `/home/chatgpt-runner/rea-analysis/sprite_dds_map.json`, `dds_audit.json`, `static/OR2006C2C_EXE_ANALYSIS.json`, `atlas/index.json`, `ghidra/progress.json`. The local game EXE SHA is `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`.
+
+
+## 2026-10-18 Follow-up: decompiled producer chains and static call graph
+This **additional evidence** was extracted from 7,237 local Ghidra C decompilations, never from HMD runtime. All 7,238 recognized internal functions were attempted: 7,237 decompiled, 1 failed (VA 0x00536D82, Ghidra cannot read unmapped bytes 0x03020100 even after 180-second retry; original disassembly retained). The original image remains read-only. Decompiled proprietary source must remain on N100 and must NOT enter GitHub.
+
+### Producer ownership with VA (not RVA)
+| Visible element | Owning original function VA | Static source observations | Automated implementation hook |
+|---|---|---|---|
+| +TIME / stage event | 0x00498670 | Stage branch uses game-mode-dependent animations ID 0x2C00B4 or 0x2C00B5 and distinct 0x2C006C. Same function calls 0x004973C0, 0x004974E0 (time/numeric), separately from sprites | DX9EX:VIS:EXTENDED_TIME: **all animation+glyph branches** must carry stage ScreenHud provenance to physical per-eye GPU draw; don't overroute ordinary result/GOAL or world |
+| 6th/6 display | 0x004B9D80 | One leading sprite 0x2B005F followed by separate `put_clip_sprite` decimal digits/labels | DX9EX:VIS:HUD_GAMEPLAY: ensure first kind1 and all clip siblings reach left+right, separate from world markers |
+| Vehicle-attached positions | 0x004BAD20 | Original object positions passed to projection 0x00449940; conditional animation IDs 0x2B0047/48/49 and 0x2C00CB plus clip digits | DX9EX:VIS:RANK_MARKERS: preserve world anchor and per-eye projection, never flatten to 6th/6 screen HUD |
+| Shared HUD formatted text | 0x004BA9D0 | Chooses clipped digit `0x0042D280` OR animation-alpha `0x00429580` based on source option; 15 direct pseudo-C callers | Resolve original caller family before tagging whole routine, mixed producers are not one stereo owner |
+| Lens central vs outer | 0x0040CBC0 | Inside same scene-function family, centre `0x0040C980`, outer discs `0x0040C9A0` calls; projection service `0x00449940` also referenced | DX9EX:VIS:LENS_FLARE_CENTRE must isolate center from good outer rings and world/SkyGlow |
+| Race time string | 0x004973C0 | Formats time as minutes/seconds/milliseconds, then routes into 0x004B9200 | Text draw needs source-specific stage or timer ownership, not generic HUD tag |
+| Seven-digit number | 0x004974E0 | Formats a seven-digit decimal through the 0x004B9200 text path | Treat as stage result subset when caller 0x00498670, no unconditional remap |
+
+Heuristic function reference graph: 7,237 decompiled files, 16,811 distinct FUN_XXXXXXXX pseudo-C edges (indirect function pointers and executable raw CALL displacement are not guaranteed by this graph). `0x004BA9D0` has 15 pseudo-C callers; `0x00429530` animation producer has 49; `0x0042D280` clipped sprite has 24. Main stage/rank entry functions lack direct pseudo-C callers in the resulting index; **this is not proof they have no callers** (possible indirect dispatch, decompiler limitations). Avoid claiming a runtime or exact renderer source from pseudo-C alone.
+
+Additional N100-only outputs:
+- `/home/chatgpt-runner/rea-analysis/derived_call_graph.json`
+- `/home/chatgpt-runner/rea-analysis/ghidra/functions/00498670.c` / `004b9d80.c` / `004bad20.c` / `004ba9d0.c` / `0040cbc0.c`
+- `/home/chatgpt-runner/rea-analysis/high_value_producers.py` and `/home/chatgpt-runner/rea-analysis/crossref_check.py`
+**Priority order for active, individually leased features:** +TIME mixed producer lifetime; rank 6th/6 vs projected markers; ESC/F11/UI shell ownership; centre lens vs sky; menu replacement XY UV and intended aspect. Keep original R84 source ownership, 1 defect per existing TASK_ID, CI exact-SHA and separate HMD test. This document provides evidence; it is NOT a completed C++ functional repair or a new scoring event.
