@@ -1787,7 +1787,11 @@ int main()
         // Depth-only commands remain in the real GPU stream and in the Draw
         // evidence ordinal, but cannot publish an empty native color eye.
         const auto maskedBaseline = encoder.draw_count();
-        ctx->OMSetBlendState(nullptr, nullptr, 0u);
+        // A nonzero mask can still suppress EVERY pixel on our 1x native
+        // OpenXR eye: bit zero, not any high bit, is the hardware sample.
+        // The previous implementation counted this real GPU Draw as color
+        // evidence despite the ring eye remaining unchanged.
+        ctx->OMSetBlendState(nullptr, nullptr, 0xfffffffeu);
         const bool zeroSample = encoder.draw(3u, 0u) &&
             encoder.draw_count() == maskedBaseline + 1u &&
             encoder.color_draw_count() == 0u;

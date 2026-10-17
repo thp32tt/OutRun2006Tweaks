@@ -93,6 +93,18 @@ static_assert(depth_clear_route(true, 0, 0, 1921, 1080, 1920u, 1080u) ==
 }
 // D3D11 occlusion predicates can suppress a submitted GPU Draw without
 // an API failure. Never claim that draw as color evidence for native stereo.
+// The shared native XR eye ring uses a single-sample RTV. D3D11's OM
+// SampleMask bit zero is the ONLY sample that can write that RTV: a nonzero
+// high bit (for example 0xfffffffe) must never certify a blank stereo eye.
+// Preserve the Draw itself for D3D9 chronology/depth and fallback.
+[[nodiscard]] constexpr bool single_sample_eye_color_write(
+    std::uint32_t sampleMask) noexcept {
+    return (sampleMask & 1u) != 0u;
+}
+static_assert(!single_sample_eye_color_write(0u));
+static_assert(!single_sample_eye_color_write(0xfffffffeu));
+static_assert(single_sample_eye_color_write(1u));
+static_assert(single_sample_eye_color_write(0xffffffffu));
 [[nodiscard]] constexpr bool color_certifiable(
     bool colorWritable, bool noActivePredicate) noexcept {
     return colorWritable && noActivePredicate;

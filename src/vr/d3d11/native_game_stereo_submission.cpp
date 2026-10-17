@@ -208,7 +208,10 @@ bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
     FLOAT blendFactors[4]{};
     UINT sampleMask = 0u;
     context_->OMGetBlendState(&blend, blendFactors, &sampleMask);
-    bool writable = sampleMask != 0u;
+    // Ring eyes are 1x MSAA: bits 1..31 cannot write sample zero.
+    // Native scene Draw/DrawIndexed still execute, but must not certify XR
+    // color when only nonexistent samples were enabled by the source state.
+    bool writable = live_game_stereo::single_sample_eye_color_write(sampleMask);
     if (blend) {
         D3D11_BLEND_DESC desc{};
         blend->GetDesc(&desc);
