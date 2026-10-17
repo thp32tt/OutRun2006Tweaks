@@ -1480,17 +1480,21 @@ namespace OutRunVRStereo
             // later in this SAME Present, there is no uncontaminated scene
             // left to sample. Tag first, and let Present skip the bloom
             // rather than copying HUD/text into BOTH eye glow inputs.
+            // A previously valid clean pair is a zero-work fastpath:
+            // no fresh frame snapshot (or glow-flag read) is needed.
+            // Resource invalidation and right-eye failure are already
+            // fenced by R29OwnerSkyGlowCaptureStillValid.
+            if (R29OwnerSkyGlowCaptureStillValid(R30SkyGlowSceneCaptureEpoch))
+                return true;
+            // Otherwise consume the FIRST screen/HUD boundary EVEN when
+            // SkyGlow is disabled: an OFF->ON transition later in this
+            // Present must not bloom the now HUD-painted eye backbuffers.
             const auto frame = R29OwnerCaptureFrameSnapshot();
             R30SkyGlowScreenDrawEpoch = frame.presentEpoch;
             if (Settings::SkyGlowFactor <= 0 || !R30GameGlowActive())
                 return false;
-            // Most HUD draws arrive after the first successful scene copy.
-            // Recheck *all* live R29 eligibility flags, not just the epoch:
-            // a right-eye failure in this Present must invalidate reuse.
-            if (R29OwnerSkyGlowCaptureStillValid(R30SkyGlowSceneCaptureEpoch))
-                return true;
-            // A screen boundary is already latched above, regardless of
-            // mid-frame effect toggles or an unsuccessful eye copy.
+            // Without a previously valid clean pair we must copy BOTH
+            // pre-HUD eyes now or let Present fail closed for this frame.
             if (!frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
                 frame.rightDrawFailed || frame.stereoIncomplete ||
                 !frame.backBuffer || !frame.rightEyeSurface)

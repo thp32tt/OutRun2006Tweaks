@@ -45,12 +45,12 @@ def check(text):
     boundary = "R30SkyGlowScreenDrawEpoch = frame.presentEpoch;"
     assert capture.count(boundary) == 1, "screen boundary not recorded exactly once"
     assert (capture.index("if (!device)") <
+            capture.index("R29OwnerSkyGlowCaptureStillValid(") <
             capture.index("const auto frame = R29OwnerCaptureFrameSnapshot();") <
             capture.index(boundary) <
             capture.index("Settings::SkyGlowFactor <= 0") <
-            capture.index("R30GameGlowActive()") <
-            capture.index("R29OwnerSkyGlowCaptureStillValid(")), (
-                "SkyGlow mid-frame enable could reuse post-HUD pixels")
+            capture.index("R30GameGlowActive()")), (
+                "SkyGlow fastpath or mid-frame screen boundary ordering lost")
     assert "R30SkyGlowSceneCaptureEpoch = frame.presentEpoch;" in capture
     assert "R30SkyGlowScreenDrawEpoch == frame.presentEpoch" in apply
     assert "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch" in apply
