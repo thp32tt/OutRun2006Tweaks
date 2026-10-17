@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_CI_PENDING",
-  "automation_validation": "PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "47f16f009e2acad55983bb02b4b107a6d65a2ccf",
   "material_result_sha": "6a6a9bd5d83cf6ca8e1076dddefdb97b8eaff793",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "5b33c98f5f5b8ff3a45fbd58afdb28b734980b18",
   "source_paths": [
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "vrhost/src/main.cpp",
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "menu_title_native_optical_aspect": "PENDING_CI",
-    "selector_complete_source_and_rollback": "PENDING_CI",
-    "menu_exact_sha_win32_host_domain": "PENDING_CI"
+    "menu_title_native_optical_aspect": "PASS",
+    "selector_complete_source_and_rollback": "PASS",
+    "menu_exact_sha_win32_host_domain": "PASS"
   },
   "diagnosis": {
     "root_cause": "Full-client 21:9 sourceAspect was universally used for both title/menu and Ferrari/car-select though native game publishes distinct GameState and Quest3 showed title stretched but source crop cuts selector images. Existing imageMatteVerified is permanently false, so prior safe conservative path could never correct known stretched title separately from selector.",
@@ -83,9 +83,28 @@
     "limitations": "Preservation of all source pixels with title optical 4:3 can alter full-width custom title art. Explicit OUTRUN_VR_MENU_NATIVE_ASPECT=1 restores full client proportions; Quest3 HMD acceptance is required."
   },
   "ci_evidence": {
+    "exact_sha": "5b33c98f5f5b8ff3a45fbd58afdb28b734980b18",
+    "DX9Ex Active Validation": {
+      "run_id": 39011539999,
+      "status": "SUCCESS",
+      "jobs": "policy/full-chain-compile/host/game/package"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 39011539903,
+      "status": "SUCCESS",
+      "jobs": "msvc-analyze-active-game/source-cross-domain/msvc-analyze-openxr-host"
+    },
+    "Domain Isolation Guard": {
+      "run_id": 39011539902,
+      "status": "SUCCESS"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39011539984,
+      "status": "SUCCESS"
+    },
     "initial_result_commit_run_id": 39011394557,
-    "initial_failure": "REQUIRED_RUN_RECORD_NOT_FOUND; source compilation not reached"
+    "initial_failure": "Original material source commit lacked feature-unit record; repaired in validation-bearing bookkeeping-input SHA above."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run required exact GitHub Actions Gates on validation-bearing HEAD and repair real failures under this same TASK_ID. Quest3/VDXR optical inspection remains NEED_HMD_TEST."
+  "next_action": "Build verified on exact SHA; user must test Quest3/VDXR menu title, selector edges, recenter, source aspect and input before declaring visual acceptance. No duplicate automated CI or score for C6."
 }
