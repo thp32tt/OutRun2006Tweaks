@@ -132,8 +132,17 @@ def source_contract(renderer=RENDERER, r30=R30, semantic=SEMANTICS):
             "exact HUD must not bypass projection signature sanity")
     require(cls.index("if (ownedOverlay)") > projection_gate,
             "generic 2D queue must not bypass projection signature")
-    require("if (ownedOverlay)\n                return R30ScreenSpaceKind::None;" in cls,
-            "perspective generic overlay must not become HUD")
+    # The original ESC queued sprite may retain perspective projection:
+    # only the exact game pause state + node/epoch can use R26's finite HUD.
+    # Unknown/perspective world, front-end, F11 and sky remain non-HUD.
+    overlay = cls.split("if (ownedOverlay)", 1)[1].split(
+        "// All other tagged overlays/effects", 1)[0]
+    for proof in ("R30IsPauseMenuElement()", "drawCommand.queued",
+                  "drawCommand.queueNode", "drawCommand.queueEpoch != 0",
+                  "R30ScreenSpaceKind::Hud2D",
+                  "R30ScreenSpaceKind::None"):
+        require(proof in overlay,
+                "perspective generic overlay must remain pause-only: " + proof)
     require("if (R30SpatialSceneEffectNeedsWorldRouting())" in depth_off,
             "spatial original SceneEffect WVP must veto flattening")
     helper = r30.split("bool R30SpatialSceneEffectNeedsWorldRouting()", 1)
