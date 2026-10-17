@@ -444,6 +444,35 @@ int main() {
     duringLeft.shaderEpoch = 14;
     if (SameAfterNativeLeft(queuedStage, duringLeft))
         return 45;
+    // Native LEFT +TIME can reenter another original game c64 writer
+    // without changing shader, queue, producer or frame-pose identity.
+    // Both queued stage sprites and direct numeric D3DX glyphs must
+    // reject that GPU source change before submitting RIGHT.
+    auto stampedQueued = queuedStage;
+    stampedQueued.rawWvpWriteSerial = 711;
+    stampedQueued.rawWvpDrawSerial = 99;
+    auto stampedDirect = directStage;
+    stampedDirect.rawWvpWriteSerial = 712;
+    stampedDirect.rawWvpDrawSerial = 100;
+    if (!SameAfterNativeLeft(stampedQueued, stampedQueued) ||
+        !SameAfterNativeLeft(stampedDirect, stampedDirect))
+        return 69;
+    altered = stampedQueued; ++altered.rawWvpWriteSerial;
+    if (SameAfterNativeLeft(stampedQueued, altered)) return 70;
+    altered = stampedDirect; ++altered.rawWvpDrawSerial;
+    if (SameAfterNativeLeft(stampedDirect, altered)) return 71;
+    altered = stampedQueued; altered.rawWvpWriteSerial = 0;
+    if (SameAfterNativeLeft(stampedQueued, altered)) return 72;
+    altered = stampedDirect; altered.rawWvpDrawSerial = 0;
+    if (SameAfterNativeLeft(stampedDirect, altered)) return 73;
+    // Missing raw-WVP telemetry must retain the legacy stage eligibility;
+    // a partly present pair is invalid (not evidence for physical stereo).
+    if (!IsValid(queuedStage) || !IsValid(directStage))
+        return 74;
+    auto unpaired = stampedQueued;
+    unpaired.rawWvpDrawSerial = 0;
+    if (IsValid(unpaired)) return 75;
+
     // Original HUD/GOAL/rival/SkyGlow and untagged native draws are
     // never admitted by this exact stage-only transaction.
     if (IsValid(Source{}) ||

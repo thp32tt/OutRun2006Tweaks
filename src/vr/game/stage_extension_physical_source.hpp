@@ -19,6 +19,10 @@ namespace OutRunVR::StageExtensionPhysical
         std::uint64_t topLevelDrawSerial = 0;
         std::uintptr_t shader = 0;
         std::uint64_t shaderEpoch = 0;
+        // Preserve the original game's physical c64 upload generation, not
+        // the already stereo-corrected live GPU c64. Zero/zero means unknown.
+        std::uint64_t rawWvpWriteSerial = 0;
+        std::uint64_t rawWvpDrawSerial = 0;
     };
 
     constexpr bool IsStage(const Source& s) noexcept
@@ -32,6 +36,7 @@ namespace OutRunVR::StageExtensionPhysical
         return IsStage(s) && s.poseEpoch != 0 &&
             s.topLevelDrawSerial != 0 &&
             (s.shader == 0 || s.shaderEpoch != 0) &&
+            ((s.rawWvpWriteSerial == 0) == (s.rawWvpDrawSerial == 0)) &&
             (s.queued ? (s.node != nullptr && s.queueEpoch != 0)
                       : (s.node == nullptr && s.queueEpoch == 0));
     }
@@ -44,6 +49,8 @@ namespace OutRunVR::StageExtensionPhysical
             a.queueEpoch == b.queueEpoch &&
             a.poseEpoch == b.poseEpoch &&
             a.topLevelDrawSerial == b.topLevelDrawSerial &&
-            a.shader == b.shader && a.shaderEpoch == b.shaderEpoch;
+            a.shader == b.shader && a.shaderEpoch == b.shaderEpoch &&
+            a.rawWvpWriteSerial == b.rawWvpWriteSerial &&
+            a.rawWvpDrawSerial == b.rawWvpDrawSerial;
     }
 }

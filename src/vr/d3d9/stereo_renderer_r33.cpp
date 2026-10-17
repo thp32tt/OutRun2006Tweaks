@@ -1046,11 +1046,28 @@ namespace OutRunVRStereo
                 if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                     R29OwnerCurrentVertexShaderIdentity() != 0)
                     return OutRunVR::StageExtensionPhysical::Source{};
+                // The native LEFT callback can synchronously invoke another
+                // original game c64 writer without changing the queue,
+                // producer, shader or pose. Private R32 eye uploads do not
+                // advance this original game WVP generation.
+                float originalRawWvp[16]{};
+                std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
+                std::uintptr_t rawShader = 0;
+                std::uint64_t rawShaderEpoch = 0;
+                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        originalRawWvp, rawWriteSerial, rawDrawSerial,
+                        rawShader, rawShaderEpoch) ||
+                    rawWriteSerial == 0 || rawDrawSerial == 0)
+                {
+                    rawWriteSerial = 0;
+                    rawDrawSerial = 0;
+                }
                 return OutRunVR::StageExtensionPhysical::Source{
                     cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,
                     cmd.queueEpoch,
                     OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch,
+                    rawWriteSerial, rawDrawSerial};
             };
             const bool exactStageEye = goalCommand.IsExactFiniteResultHud() &&
                 goalCommand.producer ==
