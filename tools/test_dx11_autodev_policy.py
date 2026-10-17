@@ -168,6 +168,36 @@ partial_eye.update(
     },
 )
 assert not validate_task(partial_eye, p), validate_task(partial_eye, p)
+# A source checkpoint awaiting the first exact-SHA Gate is valid only as
+# pending native GPU-eye progress; no full R30/OpenXR output is asserted.
+pending_eye = copy.deepcopy(partial_eye)
+pending_eye.update(
+    status="SOURCE_IMPLEMENTED_CI_PENDING",
+    automation_validation="PENDING_EXACT_SHA",
+    acceptance_results={"end2end": "PENDING_CI", "fallback": "PENDING_CI",
+                        "gates": "PENDING_CI"},
+    changed_files=["src/vr/d3d11/native_shared_eye_ring.cpp",
+                   "src/vr/d3d11/native_game_stereo_submission.cpp",
+                   "tools/dx11_native_transport_probe.cpp"],
+)
+pending_eye.pop("validation_bearing_result_sha", None)
+assert not validate_task(pending_eye, p), validate_task(pending_eye, p)
+for label, mutate in (
+    ("pending claimed terminal", lambda t: t.update(status="COMPLETE_BUILD_VERIFIED")),
+    ("pending claims renderer", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("pending runtime PASS", lambda t: t.update(runtime_validation="PASS")),
+    ("pending extra score", lambda t: t.update(score_change=1)),
+    ("pending fake gate PASS", lambda t: t.update(automation_validation="PASS_EXACT_SHA")),
+    ("pending lacks native source", lambda t: t.update(changed_files=["tools/test_probe.py"])),
+    ("pending missing native eye", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW"])),
+    ("pending forges visible frame", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
+):
+    bad = copy.deepcopy(pending_eye)
+    mutate(bad)
+    assert validate_task(bad, p), "unverified native eye incorrectly accepted: " + label
+
 for label, mutate in (
     ("false final renderer", lambda t: t.update(full_dx11_renderer_complete=True)),
     ("unverified exact SHA", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),

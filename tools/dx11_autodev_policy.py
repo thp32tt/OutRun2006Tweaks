@@ -107,6 +107,27 @@ def source_stage_build_verified(task: dict) -> bool:
     )
 
 
+def source_stage_ci_pending(task: dict) -> bool:
+    """Allow only an actual DX11 native-eye SOURCE checkpoint to await CI.
+
+    The source/transport change is real, but neither the exact SHA gates nor
+    an R30 game callback have been proven. Terminal acceptance remains sealed
+    by source_stage_build_verified and the independent feature checks.
+    """
+    changed = task.get("changed_files")
+    return (
+        task.get("status") == "SOURCE_IMPLEMENTED_CI_PENDING"
+        and task.get("full_dx11_renderer_complete") is False
+        and task.get("automation_validation") == "PENDING_EXACT_SHA"
+        and task.get("runtime_validation") == "UNTESTED"
+        and task.get("score_change", 0) == 0
+        and not task.get("validation_bearing_result_sha")
+        and isinstance(changed, list)
+        and any(isinstance(path, str) and path.startswith("src/vr/d3d11/")
+                for path in changed)
+    )
+
+
 def validate_task(task: dict, policy: dict) -> list[str]:
     identity = task.get("task_id", "")
     found = re.fullmatch(r"CONVERSION-DX11-(\d{5})", identity)
@@ -180,7 +201,7 @@ def validate_task(task: dict, policy: dict) -> list[str]:
             # missing R30 camera game-draw callsite reached visible OpenXR.
             # Full renderer completion still requires the full ordered path.
             partial_eye_stage = (
-                source_stage_build_verified(task)
+                (source_stage_build_verified(task) or source_stage_ci_pending(task))
                 and milestone == "native_stereo_eye_transport"
                 # Do not invent an R30 live game callsite for an isolated
                 # source-ordered GPU-eye stage. Older verified run records
