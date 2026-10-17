@@ -7,14 +7,14 @@
   "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "VALIDATION_PENDING",
-  "checkpoint": "C5_PACKAGE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "5343d2c085ccd58372b38d570a02651aa17326b6",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "44b9b547a2622618cf345a5575545f6a1590681e",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/core/r30_support_api.hpp",
@@ -60,9 +60,9 @@
     ]
   },
   "acceptance_results": {
-    "hud_fvf142_both_eyes": "PENDING_FULL_GATE",
-    "hud_source_owner_fallback": "PENDING_FULL_GATE",
-    "hud_integrated_required_gate": "PENDING_FULL_GATE"
+    "hud_fvf142_both_eyes": "PASS_BUILD",
+    "hud_source_owner_fallback": "PASS_BUILD",
+    "hud_integrated_required_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "User observed gameplay rank/HUD elements left-eye-only or head-locked in Quest3; native game FVF 0x142 fixed-function sprites were submitted via more than one GPU Draw family, while the prior exact R30 owner supported only an indexed primitive path.",
@@ -82,7 +82,7 @@
     "evidence_limit": "No matching Quest3/VDXR headset rerun; optical correctness is unverified."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "previous_failure": {
       "run_id": 39054934011,
       "exact_sha": "5343d2c085ccd58372b38d570a02651aa17326b6",
@@ -120,7 +120,41 @@
       "exact_sha": "c83d85d3141317a6dd732a2a6aa7ba684dae5da0",
       "conclusion": "success"
     },
-    "gate_candidate_reason": "Required HUD Inspector and Full Source Impact path-filtered workflows were not emitted for the script-only c83d85d3 commit. This 01023 run-record CI repair revision requests all four mandatory checks on the same integrated exact SHA; no new gameplay feature or score."
+    "gate_candidate_reason": "Required HUD Inspector and Full Source Impact path-filtered workflows were not emitted for the script-only c83d85d3 commit. This 01023 run-record CI repair revision requests all four mandatory checks on the same integrated exact SHA; no new gameplay feature or score.",
+    "exact_sha": "44b9b547a2622618cf345a5575545f6a1590681e",
+    "mandatory_gates": {
+      "dx9ex_active": {
+        "run_id": 39055829074,
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "game",
+          "host",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      "domain_isolation": {
+        "run_id": 39055829099,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39055829064,
+        "conclusion": "success"
+      },
+      "full_source_impact": {
+        "run_id": 39055829040,
+        "conclusion": "success",
+        "jobs": [
+          "source-cross-domain",
+          "msvc-analyze-openxr-host",
+          "msvc-analyze-active-game"
+        ]
+      }
+    },
+    "hmd_runtime": "UNTESTED",
+    "post_validation_head_note": "Validation applies exactly to 44b9b547; later commits on the integration branch are independent and not HMD-certified by this feature's four run IDs."
   },
-  "notes": "Same 01023 E003 retry, original material_result_sha preserved. Two source/regression repairs are already on remote branch, and parent active+domain passed on c83d85d3. This nonterminal record update is the final gate-request candidate (not runtime acceptance), no new score."
+  "notes": "C6 bookkeeping only [skip ci]. Material source commit 5343d2c0, validation-bearing exact SHA 44b9b547, and later integration HEAD are distinct. Source after exact SHA requires its own checks under its owner; this record asserts build verification of 01023 material at exact SHA only. No HMD or duplicate score.",
+  "validation_execution": "PASS_EXACT_SHA: DX9Ex Active policy/game/host/full-chain/package, Domain, HUD Inspector and Full Source Impact at 44b9b547a2622618cf345a5575545f6a1590681e. Physical Quest3/VDXR UNTESTED."
 }
