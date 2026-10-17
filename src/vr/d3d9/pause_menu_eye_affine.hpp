@@ -77,6 +77,28 @@ namespace OutRunVrPauseEye
         return pauseOwned ? commonScale * eyeFovScale : commonScale;
     }
 
+    // R84 pause shell and exact shader-owned option arrows originate in
+    // native game pixels, whereas each headset eye has its own pixel aspect.
+    // Both submission paths must use ONE contained optical size. This is
+    // not a general HUD/F11 or world-billboard transform.
+    struct AspectContainedScale
+    {
+        float x = 1.0f;
+        float y = 1.0f;
+    };
+
+    inline AspectContainedScale ContainNativePauseScale(
+        float userScale, float sourceOverTarget, bool pauseResponsive) noexcept
+    {
+        if (!pauseResponsive || !std::isfinite(userScale) ||
+            userScale <= 0.0f || !std::isfinite(sourceOverTarget) ||
+            sourceOverTarget <= 0.0f)
+            return {userScale, userScale};
+        if (sourceOverTarget >= 1.0f)
+            return {userScale, userScale / sourceOverTarget};
+        return {userScale * sourceOverTarget, userScale};
+    }
+
     inline VerticalAffine Compute(
         float leftDown, float leftUp, float rightDown, float rightUp) noexcept
     {

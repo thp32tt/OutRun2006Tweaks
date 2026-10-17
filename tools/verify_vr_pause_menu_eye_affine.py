@@ -80,11 +80,14 @@ def check(s: str, h: str) -> None:
     require('R30HudContain.pauseResponsive = pauseResponsive;' in s)
     # User's R84 HMD regression: do not multiply pause size twice in XR.
     require('OutRunVrPauseEye::ResponsiveMenuScale(' not in s)
-    require('const float opticalScale = userScale;' in s)
-    require('scaleX = opticalScale;' in s)
-    require('scaleY = opticalScale / sourceOverTarget;' in s)
-    require('scaleX = opticalScale * sourceOverTarget;' in s)
-    require('scaleY = opticalScale;' in s)
+    require('const auto contained = OutRunVrPauseEye::ContainNativePauseScale(' in s)
+    require('scaleX = contained.x;' in s and 'scaleY = contained.y;' in s)
+    require('userScale / sourceOverTarget' in h)
+    require('userScale * sourceOverTarget' in h)
+    require('ContainNativePauseScale(1.0f, sourceOverEye, true)' in tests)
+    require('if (exactPauseShaderOwner)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);' in s)
+    require('hudScale._11 = shaderPauseX;' in s and
+            'hudScale._22 = shaderPauseY;' in s)
     require('const float questScale = ResponsiveMenuScale(' in tests)
     require('ResponsiveMenuScale(1.25f, factor, false)' in tests)
 
@@ -102,8 +105,8 @@ for mutant_index, mutant in enumerate((
                    'clipCorrection._11 = (', 1),
     source.replace('return std::clamp(requested, 0.55f, 1.50f);',
                    'return std::clamp(requested * 1.25f, 0.55f, 1.50f);', 1),
-    source.replace('const float opticalScale = userScale;',
-                   'const float opticalScale = 2.0f * userScale;', 1),
+    source.replace('scaleX = contained.x;',
+                   'scaleX = contained.y;', 1),
     source.replace('hudScaleY * pauseVertical.scale[eye] * ndcY',
                    'hudScaleY * ndcY', 1),
     source.replace('rightDst[1] = transformedRightY;',
@@ -126,10 +129,10 @@ for mutant_index, mutant in enumerate((
                    'R30HudContain.pauseResponsive == false', 1),
     source.replace('R30HudContain.pauseResponsive = pauseResponsive;',
                    'R30HudContain.pauseResponsive = false;', 1),
-    source.replace('const float opticalScale = userScale;',
-                   'const float opticalScale = OutRunVrPauseEye::ResponsiveMenuScale(userScale, sourceOverTarget, pauseResponsive);', 1),
-    source.replace('scaleY = opticalScale / sourceOverTarget;',
-                   'scaleY = opticalScale;', 1),
+    source.replace('scaleY = contained.y;',
+                   'scaleY = contained.x;', 1),
+    source.replace('if (exactPauseShaderOwner)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);',
+                   'if (false)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);', 1),
 )):
     try:
         check(mutant, helper)
@@ -141,6 +144,10 @@ for bad_helper in (
                    'commonScale'),
     helper.replace('pauseOwned ? commonScale * eyeFovScale : commonScale',
                    'commonScale * eyeFovScale'),
+    helper.replace('userScale / sourceOverTarget',
+                   'userScale * sourceOverTarget'),
+    helper.replace('userScale * sourceOverTarget',
+                   'userScale'),
 ):
     try:
         check(source, bad_helper)

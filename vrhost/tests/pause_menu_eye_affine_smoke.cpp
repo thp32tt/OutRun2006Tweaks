@@ -133,6 +133,43 @@ int main()
     if (!Near(ShaderHorizontalScale(1.25f, 1.0f, true), 1.25f) ||
         !Near(ShaderHorizontalScale(1.25f, 0.87f, true),
               1.25f * 0.87f)) return 17;
+    // A native 3440x1440 game viewport and 2496x2688 Quest eye have
+    // different aspect ratios. R84 ESC original shader arrows and XYZRHW
+    // shell must use the exact same X/Y optical dimensions.
+    const float gameAspect = 3440.0f / 1440.0f;
+    const float eyeAspect = 2496.0f / 2688.0f;
+    const float sourceOverEye = gameAspect / eyeAspect;
+    const auto nativePause = ContainNativePauseScale(1.0f, sourceOverEye, true);
+    const auto shaderPause = ContainNativePauseScale(1.0f, sourceOverEye, true);
+    if (!Near(nativePause.x, shaderPause.x) ||
+        !Near(nativePause.y, shaderPause.y) ||
+        !Near(nativePause.x, 1.0f) ||
+        !Near(nativePause.y, 1.0f / sourceOverEye) ||
+        !(nativePause.y < nativePause.x))
+        return 19;
+    // Source 4:3, 16:9 and 21:9 vary monotonically across the SAME
+    // binocular optical mapping. Return to native size without stale cache.
+    const auto fourThreePause =
+        ContainNativePauseScale(1.0f, (4.0f/3.0f)/eyeAspect, true);
+    const auto widePause =
+        ContainNativePauseScale(1.0f, (16.0f/9.0f)/eyeAspect, true);
+    const auto nativeAgain = ContainNativePauseScale(1.0f, 1.0f, true);
+    if (!(fourThreePause.y > widePause.y &&
+          widePause.y > nativePause.y) ||
+        !Near(nativeAgain.x, 1.0f) || !Near(nativeAgain.y, 1.0f))
+        return 20;
+    // Portrait game to landscape eye, disabled responsiveness, nonfinite
+    // publication, zero source extent and independent gameplay HUD/F11.
+    const auto tallPause = ContainNativePauseScale(1.25f, 0.75f, true);
+    const auto optOut = ContainNativePauseScale(0.55f, sourceOverEye, false);
+    const auto nanAspect = ContainNativePauseScale(1.25f,
+        std::numeric_limits<float>::quiet_NaN(), true);
+    const auto invalidAspect = ContainNativePauseScale(1.25f, 0.0f, true);
+    if (!Near(tallPause.x, 0.9375f) || !Near(tallPause.y, 1.25f) ||
+        !Near(optOut.x, 0.55f) || !Near(optOut.y, 0.55f) ||
+        !Near(nanAspect.x, 1.25f) || !Near(nanAspect.y, 1.25f) ||
+        !Near(invalidAspect.x, 1.25f) || !Near(invalidAspect.y, 1.25f))
+        return 21;
     std::cout << "DX9Ex pause vertical affine + responsive optical size PASS\n";
     return 0;
 }

@@ -2111,17 +2111,13 @@ namespace OutRunVRStereo
             // Apply only the aspect-preserving contain split, not a second
             // hidden pause enlargement. This is R84-only: the protected R26
             // rollback owner retains its existing independent implementation.
-            const float opticalScale = userScale;
-            if (sourceOverTarget >= 1.0f)
-            {
-                scaleX = opticalScale;
-                scaleY = opticalScale / sourceOverTarget;
-            }
-            else
-            {
-                scaleX = opticalScale * sourceOverTarget;
-                scaleY = opticalScale;
-            }
+            // Shared with the exact paused shader-owner branch: otherwise
+            // the VS arrows retained an uncropped native Y size while the
+            // same ESC menu's XYZRHW shell used portrait-eye containment.
+            const auto contained = OutRunVrPauseEye::ContainNativePauseScale(
+                userScale, sourceOverTarget, pauseResponsive);
+            scaleX = contained.x;
+            scaleY = contained.y;
             if (!canCache || !std::isfinite(scaleX) ||
                 !std::isfinite(scaleY))
                 return;
@@ -6682,8 +6678,16 @@ namespace OutRunVRStereo
                     exactPauseShaderOwner, R30HudScaleValue(), pauseScale);
                 const float pauseClipShift = R30PauseShaderPlaneNdcShift(
                     exactPauseShaderOwner, R30PauseMenuVerticalFraction());
-                hudScale._11 = userScale;
-                hudScale._22 = userScale;
+                // ESC's exact shader-owned arrows share the physical 2D
+                // source-to-eye contain scale used by XYZRHW pause sprites.
+                // Other HUD, GOAL/+TIME, F11 and world shader planes keep
+                // the previously verified uniform user scale unchanged.
+                float shaderPauseX = userScale;
+                float shaderPauseY = userScale;
+                if (exactPauseShaderOwner)
+                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);
+                hudScale._11 = shaderPauseX;
+                hudScale._22 = shaderPauseY;
                 // Apply ESC's signed vertical shift after each eye's final
                 // projection, exactly like the XYZRHW pause shell. A clip
                 // translation here is incorrectly rotated with head pose.
