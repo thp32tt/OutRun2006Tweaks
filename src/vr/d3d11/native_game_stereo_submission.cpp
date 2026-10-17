@@ -825,8 +825,9 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         ed.SampleDesc.Count != 1u || ed.SampleDesc.Quality != 0u ||
         sd.Usage != D3D11_USAGE_DEFAULT ||
         sd.CPUAccessFlags != 0u || (sd.MiscFlags & shared) != 0u ||
-        (sd.BindFlags & (D3D11_BIND_RENDER_TARGET |
-                         D3D11_BIND_SHADER_RESOURCE)) == 0u ||
+        ((sd.BindFlags & (D3D11_BIND_RENDER_TARGET |
+                          D3D11_BIND_SHADER_RESOURCE)) == 0u &&
+         !(sd.BindFlags == 0u && sd.SampleDesc.Count == 1u)) ||
         ed.Width != targetWidth_ || ed.Height != targetHeight_ ||
         srcBox.front != 0u || srcBox.back != 1u ||
         srcBox.left >= srcBox.right || srcBox.top >= srcBox.bottom ||
@@ -850,7 +851,8 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         (sd.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0u,
         (sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
         (eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
-        (sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u);
+        (sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
+        sd.BindFlags == 0u && sd.SampleDesc.Count == 1u);
     if (transfer == NativeGameStretchSourceTransfer::Reject)
         return false;
 
@@ -935,6 +937,8 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         constants = std::move(cb);
     }
 
+    // Extract only the selected camera slice of bindless GPU game output
+    // into an SRV; never CPU Map or recycle the other native eye's pixels.
     // Shader-readable single-slice sources can be sampled in place. A
     // TEXTURE2DARRAY source is not compatible with the postpass Texture2D
     // pixel shader: extract only the selected game camera into a one-slice
@@ -1198,11 +1202,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         desc.MipLevels == 0u ||
                         ((desc.BindFlags &
                           (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET)) == 0u &&
-                         !(event.kind ==
-                               NativeGameEyePartialTargetClear::Kind::SourceCopy &&
-                           desc.BindFlags == 0u &&
-                           desc.Format == ring_.format() &&
-                           desc.SampleDesc.Count == 1u)) ||
+                         !(desc.BindFlags == 0u &&
+                           desc.SampleDesc.Count == 1u &&
+                           (event.kind ==
+                                NativeGameEyePartialTargetClear::Kind::SourceStretch ||
+                            (event.kind ==
+                                NativeGameEyePartialTargetClear::Kind::SourceCopy &&
+                             desc.Format == ring_.format())))) ||
                         b.front != 0u || b.back != 1u ||
                         b.left >= b.right || b.top >= b.bottom ||
                         b.right > desc.Width || b.bottom > desc.Height)
@@ -1238,7 +1244,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                                 (eyeSupport &
                                  D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
                                 (sourceSupport &
-                                 D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u) ==
+                                 D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
+                                desc.BindFlags == 0u &&
+                                desc.SampleDesc.Count == 1u) ==
                                 NativeGameStretchSourceTransfer::Reject ||
                             !native_game_stretch_clipped_region(
                                 desc.Width, desc.Height,

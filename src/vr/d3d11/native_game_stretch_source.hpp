@@ -10,6 +10,8 @@ namespace outrun::vr::dx11 {
 // A texture postpass samples its source through an SRV and renders into the
 // native eye RTV. Source and destination formats may differ: the D3D11
 // shader performs their supported typed conversion during rasterization.
+// DEFAULT GPU CopyResource outputs with no bind flags can be copied to a
+// private sampled texture without a CPU round-trip or changing game input.
 // Unsupported sources must leave the original D3D9 game path intact.
 enum class NativeGameStretchSourceTransfer : std::uint8_t {
     Reject, DirectSample, CopyToSampled, ResolveToSampled
@@ -20,10 +22,12 @@ native_game_stretch_source_transfer(
     std::uint32_t mipLevels, std::uint32_t sampleCount,
     std::uint32_t sampleQuality, bool sourceRenderTarget,
     bool sourceShaderResource, bool sourceSampleable,
-    bool eyeRenderable, bool formatSupportsResolve) noexcept
+    bool eyeRenderable, bool formatSupportsResolve,
+    bool sourceGpuCopyOnly = false) noexcept
 {
     if (!mipLevels || !sampleCount || !sourceSampleable ||
-        !eyeRenderable || (!sourceRenderTarget && !sourceShaderResource))
+        !eyeRenderable ||
+        (!sourceRenderTarget && !sourceShaderResource && !sourceGpuCopyOnly))
         return NativeGameStretchSourceTransfer::Reject;
     // D3D11 multisampled textures have exactly one mip, and only a
     // render-target source with format resolve support can be sampled as 2D.
@@ -33,12 +37,22 @@ native_game_stretch_source_transfer(
             ? NativeGameStretchSourceTransfer::ResolveToSampled
             : NativeGameStretchSourceTransfer::Reject;
     }
-    if (sampleQuality != 0u)
+    if (sampleQuality != 0u || (sourceGpuCopyOnly && sampleCount != 1u))
         return NativeGameStretchSourceTransfer::Reject;
     return sourceShaderResource
         ? NativeGameStretchSourceTransfer::DirectSample
         : NativeGameStretchSourceTransfer::CopyToSampled;
 }
+static_assert(native_game_stretch_source_transfer(
+    1u, 1u, 0u, false, false, true, true, false, true) ==
+    NativeGameStretchSourceTransfer::CopyToSampled);
+static_assert(native_game_stretch_source_transfer(
+    1u, 4u, 0u, false, false, true, true, true, true) ==
+    NativeGameStretchSourceTransfer::Reject);
+static_assert(native_game_stretch_source_transfer(
+    1u, 1u, 0u, false, false, true, true, false) ==
+    NativeGameStretchSourceTransfer::Reject);
+
 // Game-authored Copy/Resolve may start off the LEFT/TOP as well as extend
 // beyond the RIGHT/BOTTOM edge during menu and car transitions. D3D11's
 // destination is unsigned: move the source box by exactly the negative

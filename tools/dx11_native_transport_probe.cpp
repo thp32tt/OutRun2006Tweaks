@@ -1061,6 +1061,7 @@ int main()
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
         bool replayedGpuOnlyArrayCopy[2]{};
+        bool replayedGpuOnlyArrayStretch[2]{};
         bool replayedPostDrawMipZeroCopy[2]{};
         bool replayedDistinctArrayEyeCopy[2]{};
         bool replayedFormatConvertedArrayCopy[2]{};
@@ -1082,7 +1083,7 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 7u;
+    partialGameClear.count[0] = partialGameClear.count[1] = 8u;
     // Game-origin full Z/stencil Clear after three masked geometry Draws,
     // followed by per-eye HUD TARGET Clears after the remaining geometry.
     // Chronological replay must preserve BOTH independent eye command lists.
@@ -1181,6 +1182,16 @@ int main()
         edgeCopy.destX = 62u;
         edgeCopy.destY = 20u;
         edgeCopy.sourceArraySlice = eye;
+        // Actual menu/car GPU-only scaled postpass follows the original Draw.
+        auto& gpuScale = partialGameClear.entries[eye][7];
+        gpuScale.kind = SourceClear::Kind::SourceStretch;
+        gpuScale.afterDrawOrdinal = eye == 0u ? 5u : 6u;
+        gpuScale.source = gameCopyOnlyArray;
+        gpuScale.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        gpuScale.destination = eye == 0u
+            ? D3D11_RECT{24, 30, 28, 32}
+            : D3D11_RECT{56, 30, 60, 32};
+        gpuScale.sourceArraySlice = eye;
     }
 
     std::cerr << "R178-DIAG stereo fixture ready\n";
@@ -1613,6 +1624,20 @@ int main()
                 false, eyeIndex) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Camera-sliced GPU-only DEFAULT output must scale without CPU staging
+        // or extra geometry Draw evidence, while preserving caller OM/DSV.
+        const D3D11_RECT gpuOnlyDest = eyeIndex == 0u
+            ? D3D11_RECT{4, 58, 10, 62}
+            : D3D11_RECT{36, 58, 42, 62};
+        fixture.replayedGpuOnlyArrayStretch[eyeIndex] =
+            !encoder.stretch_game_surface(
+                fixture.gameCopyOnlyArray, sourcePatch,
+                gpuOnlyDest, true, 2u) &&
+            encoder.stretch_game_surface(
+                fixture.gameCopyOnlyArray, sourcePatch,
+                gpuOnlyDest, true, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         ID3D11RenderTargetView* afterCopyMrt[2]{};
         ID3D11DepthStencilView* afterCopyDepth = nullptr;
         ctx->OMGetRenderTargets(2u, afterCopyMrt, &afterCopyDepth);
@@ -1630,6 +1655,7 @@ int main()
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
             !fixture.replayedGpuOnlyArrayCopy[eyeIndex] ||
+            !fixture.replayedGpuOnlyArrayStretch[eyeIndex] ||
             !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
             !fixture.replayedDistinctArrayEyeCopy[eyeIndex] ||
             !fixture.replayedFormatConvertedArrayCopy[eyeIndex] ||
@@ -1668,10 +1694,10 @@ int main()
     invalidSourceSlice.entries[1][1].sourceArraySlice = 2u;
     auto invalidStretchSource = partialGameClear;
     invalidStretchSource.entries[1][3].source = nullptr;
-    // A bindless DEFAULT texture permits GPU-only same-format Copy,
-    // never shader Stretch; reject right-eye input before any eye writes.
+    // Bindless scaling is valid now; a foreign right camera slice is NOT.
+    // Reject before the left eye can enqueue any native GPU commands.
     auto invalidCopyOnlyStretch = partialGameClear;
-    invalidCopyOnlyStretch.entries[1][3].source = gameCopyOnlyArray;
+    invalidCopyOnlyStretch.entries[1][7].sourceArraySlice = 2u;
     auto invalidStretchBounds = partialGameClear;
     invalidStretchBounds.entries[1][3].destination = {65, 26, 71, 30};
     require(directSubmit.begin(d3d.context, 24, 33) &&
@@ -1739,6 +1765,8 @@ int main()
             gameEyeFixture.replayedPostDrawShaderCopy[1] &&
             gameEyeFixture.replayedGpuOnlyArrayCopy[0] &&
             gameEyeFixture.replayedGpuOnlyArrayCopy[1] &&
+            gameEyeFixture.replayedGpuOnlyArrayStretch[0] &&
+            gameEyeFixture.replayedGpuOnlyArrayStretch[1] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[0] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[1] &&
             gameEyeFixture.replayedDistinctArrayEyeCopy[0] &&
@@ -1956,6 +1984,21 @@ int main()
                    copiedGpuOnly[1] == 0xbbu && copiedGpuOnly[2] == 0x22u);
         require(gpuOnlyCameraPixels,
                 "00853 GPU-only CopyResource camera pixels survive timeline and native L/R postpass");
+        const auto* gpuScaleTimeline =
+            pixel + 31u * mapped.RowPitch + (eyeIndex == 0u ? 25u : 57u) * 4u;
+        const auto* gpuScaleDirect =
+            pixel + 60u * mapped.RowPitch + (eyeIndex == 0u ? 6u : 38u) * 4u;
+        const bool realGpuScale = eyeIndex == 0u
+            ? (gpuScaleTimeline[0] == 0x11u && gpuScaleTimeline[1] == 0u &&
+               gpuScaleTimeline[2] == 0xccu &&
+               gpuScaleDirect[0] == 0x11u && gpuScaleDirect[1] == 0u &&
+               gpuScaleDirect[2] == 0xccu)
+            : (gpuScaleTimeline[0] == 0x33u && gpuScaleTimeline[1] == 0xbbu &&
+               gpuScaleTimeline[2] == 0x22u &&
+               gpuScaleDirect[0] == 0x33u && gpuScaleDirect[1] == 0xbbu &&
+               gpuScaleDirect[2] == 0x22u);
+        require(realGpuScale,
+                "00854 GPU-only scaled game postpass actual L/R eye pixels");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
         const UINT arrayX = eyeIndex == 0u ? 18u : 50u;
