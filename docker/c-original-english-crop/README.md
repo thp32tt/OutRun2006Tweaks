@@ -62,3 +62,32 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
 retained for offline diagnostics but no longer runs periodically in production.
 Tesseract supplies phrase text and native coordinates in the same bounded pass.
 2026-10-17 validation: the C worker processed new Q044 and Q047 original HD\nsource records, OCR automatically queued 10 previously unknown English ROIs,\nand emitted new TEST_ONLY native PNG crops with verified SHA. There is no\nimplicit game/runtime PASS, and historic 255 crops remain unchanged.\n
+
+## Full unsplit original HD PNG 108 — 2026-10-17
+
+- **Source of truth:** ChatGPT Library original assets under
+  `아웃런 한글화 이미지/2026-10-13_HD원본_PNG_수동번역`.
+  Five original ZIPs were copied to the connected private Google Drive folder
+  `OutRun_N100_TRANSFER_20261014` only for transfer, then downloaded to N100.
+  The old Google Drive content had only the legacy tile ZIPs.
+- On N100 the original ZIPs are at `hd_original_108_zip_inbox/`, total 5 ZIP.
+  All five ZIP SHA256 digests match the original Library ZIP hashes.
+  `import_hd108_zip_inbox.py` extracted and independently SHA-verified all
+  108 unique **unsplit** PNGs against `01_DDS_PNG_MANIFEST_108.csv`.
+  The 108 original files are in `hd_original_108_verified/`.
+  Import receipt is `hd108_import_receipt.json`: 108/108 SHA/dimensions PASS.
+- **Offline automation:** `docker/ocr_hd108.py` processes the 108 source PNGs,
+  two at a time, before the older 50-source DDS OCR pass. It cross-checks each
+  PNG's original SHA before OCR, allows only official reviewed English phrases,
+  enforces overlap and clipped-alpha holds, outputs pixel-exact native RGBA
+  crops to `hd108_outputs/`, and records `TEST_ONLY_UNTESTED_IN_GAME`.
+  Progress is in `hd108_ocr/cursor.json` and `hd108_ocr/last_scan.json`.
+- These 108 source PNGs have their **original DDS path and SHA** in the
+  library manifest; **DDS pixel equality is not independently proven** for
+  assets not available as original DDS. Do not describe those results as
+  DDS-pixel-verified. The original DDS verification pipeline stays separate.
+- No historic 986 split tiles, AI-generated output, background cleanup,
+  Korean replacement, DDS composition, VR, or A/B changes.
+- Docker redeployed with Tesseract OCR and `unless-stopped`; source-side
+  initial two-item OCR smoke returned scanned=2, held=0, new_crops=0.
+  Processing additional source PNGs is asynchronous and not claimed complete.
