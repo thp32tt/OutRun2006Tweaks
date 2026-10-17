@@ -381,6 +381,84 @@ int main()
                 &sourceDesc, nullptr, &foreignSource)),
             "R306 foreign-device source created");
 
+    // Game compute passes may finish a stereo camera directly into a UAV-only
+    // texture array. Carry both physical slices to distinct shared OpenXR
+    // eyes without CPU staging, preserve the original compute UAV bindings,
+    // and reject a doubled-up mono slice before touching the ring.
+    D3D11_TEXTURE2D_DESC uavOnlyDesc = sourceDesc;
+    uavOnlyDesc.ArraySize = 2u;
+    uavOnlyDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    ID3D11Texture2D* uavOnlyCamera = nullptr;
+    ID3D11UnorderedAccessView* uavOnlyEyes[2]{};
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &uavOnlyDesc, nullptr, &uavOnlyCamera)) && uavOnlyCamera,
+            "00863 game compute-only stereo texture array allocated");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        D3D11_UNORDERED_ACCESS_VIEW_DESC view{};
+        view.Format = uavOnlyDesc.Format;
+        view.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+        view.Texture2DArray.ArraySize = 1u;
+        view.Texture2DArray.FirstArraySlice = eye;
+        require(SUCCEEDED(d3d.device->CreateUnorderedAccessView(
+                    uavOnlyCamera, &view, &uavOnlyEyes[eye])) &&
+                uavOnlyEyes[eye],
+                "00863 distinct compute camera eye UAV created");
+        const float color[4] = {eye == 0u ? 1.f : 0.f, 0.f,
+                                eye == 1u ? 1.f : 0.f, 1.f};
+        d3d.context->ClearUnorderedAccessViewFloat(uavOnlyEyes[eye], color);
+    }
+    d3d.context->CSSetUnorderedAccessViews(0u, 2u, uavOnlyEyes, nullptr);
+    std::uint32_t uavOnlySlot = 99u;
+    require(ring.try_acquire_slot(d3d.context, 18u, nullptr, uavOnlySlot) &&
+            !ring.submit_eye_pair(d3d.context, uavOnlySlot, 18u,
+                                  uavOnlyCamera, uavOnlyCamera, 0u, 0u) &&
+            ring.slot_state(uavOnlySlot) == SharedEyeSlotState::Acquired,
+            "00863 identical camera slice cannot masquerade as stereo");
+    require(ring.submit_eye_pair(d3d.context, uavOnlySlot, 18u,
+                                 uavOnlyCamera, uavOnlyCamera, 0u, 1u) &&
+            ring.slot_state(uavOnlySlot) == SharedEyeSlotState::ProducerPending,
+            "00863 independent compute UAV camera slices enter native ring");
+    ID3D11UnorderedAccessView* restoredUavOnly[2]{};
+    d3d.context->CSGetUnorderedAccessViews(0u, 2u, restoredUavOnly);
+    const bool restoredBothUavs =
+        restoredUavOnly[0] == uavOnlyEyes[0] &&
+        restoredUavOnly[1] == uavOnlyEyes[1];
+    for (auto* view : restoredUavOnly) if (view) view->Release();
+    require(restoredBothUavs,
+            "00863 both original game compute outputs remain bound");
+    ID3D11UnorderedAccessView* detachedUavOnly[2]{};
+    d3d.context->CSSetUnorderedAccessViews(0u, 2u, detachedUavOnly, nullptr);
+    publish_bounded(ring, d3d.context, uavOnlySlot, 18u);
+    D3D11_TEXTURE2D_DESC uavReadbackDesc = sourceDesc;
+    uavReadbackDesc.Usage = D3D11_USAGE_STAGING;
+    uavReadbackDesc.BindFlags = 0u;
+    uavReadbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Texture2D* uavReadback = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &uavReadbackDesc, nullptr, &uavReadback)) && uavReadback,
+            "00863 test-only shared eye pixel readback allocated");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        d3d.context->CopyResource(uavReadback, ring.eye(uavOnlySlot, eye));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    uavReadback, 0u, D3D11_MAP_READ, 0u, &mapped)),
+                "00863 independent UAV eye GPU pixels read");
+        const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool correct = eye == 0u
+            ? pixel[0] == 255u && pixel[1] == 0u &&
+              pixel[2] == 0u && pixel[3] == 255u
+            : pixel[0] == 0u && pixel[1] == 0u &&
+              pixel[2] == 255u && pixel[3] == 255u;
+        d3d.context->Unmap(uavReadback, 0u);
+        require(correct, "00863 computed L/R eye pixel identity");
+    }
+    require(ring.retire_acknowledged(
+                make_ack(ring.identity(), uavOnlySlot, 18u)),
+            "00863 exact OpenXR consumer ACK retires UAV-only eye pair");
+    uavReadback->Release();
+    for (auto* view : uavOnlyEyes) view->Release();
+    uavOnlyCamera->Release();
+
     // A real menu/vehicle compute postpass can leave its camera color
     // bound as a CS UAV. Copying directly from that live output races the
     // producer. The native eye ring must detach the UAV, copy BOTH GPU eyes,

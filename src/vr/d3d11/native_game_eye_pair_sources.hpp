@@ -30,6 +30,20 @@ namespace outrun::vr::dx11 {
     return bindFlags == 0u && sampleCount == 1u &&
            (miscFlags & sharedFlags) == 0u;
 }
+// A compute-generated camera eye may never be RTV-bound: postprocessing
+// writes an independent UAV-only texture (or UAV + SRV) and the native OpenXR
+// handoff must still copy its complete mip-zero pixels on GPU. Admit only a
+// single-sample, locally owned color source; depth/RTV combinations use their
+// own established paths and shared allocations can alias published eyes.
+[[nodiscard]] constexpr bool native_game_eye_gpu_compute_source_admitted(
+    std::uint32_t bindFlags, std::uint32_t miscFlags,
+    std::uint32_t sampleCount, std::uint32_t uavFlag,
+    std::uint32_t renderTargetFlag, std::uint32_t depthFlag,
+    std::uint32_t sharedFlags) noexcept {
+    return uavFlag != 0u && (bindFlags & uavFlag) == uavFlag &&
+        (bindFlags & (renderTargetFlag | depthFlag)) == 0u &&
+        sampleCount == 1u && (miscFlags & sharedFlags) == 0u;
+}
 enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
 // Same-generation cumulative ACKs may retire frames with lower frame IDs.
 // Disallow frame-ID reuse or a new ID already covered by a supplied ACK:
