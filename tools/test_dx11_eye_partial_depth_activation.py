@@ -16,7 +16,16 @@ assert not audit_native_partial_depth_clear(source, probe), "valid DSV audit fai
 # negative companion must actually lie outside the eye (not an old valid box).
 assert "invalidPartialDepth.entries[1][0].rect = {-1, 1, 4, 4};" in probe
 assert "zRect.kind = SourceClear::Kind::FullDepthStencil;" in probe
-assert len(DRAW_DISPATCH.findall(source)) == 4, "unexpected native Draw dispatch"
+# Guard the exact six reviewed GPU dispatch locations: four genuine
+# per-eye commands and two non-evidence depth/stretch postpass triangles.
+# A new source Draw still requires explicit owner/activation audit.
+expected_dispatches = [
+    "->Draw(", "->DrawIndexed(",
+    "->DrawInstanced(", "->DrawIndexedInstanced(",
+    "->Draw(", "->Draw(",
+]
+assert DRAW_DISPATCH.findall(source) == expected_dispatches, (
+    "unexpected native Draw dispatch")
 # Removing the OM0 unbind would let a helper write a color RTV instead of
 # replacing only depth/stencil under exactly scoped per-eye provenance.
 assert audit_native_partial_depth_clear(
@@ -36,5 +45,5 @@ assert audit_native_partial_depth_clear(
     )), "bad-RECT regression removal slipped through"
 # The caller still owns the boundary: a fifth unauthorized Draw is not made
 # legitimate by the narrowly reviewed depth-only callback.
-assert len(DRAW_DISPATCH.findall(source + "\ncontext->Draw(8u, 0u);")) != 4
+assert DRAW_DISPATCH.findall(source + "\ncontext->Draw(8u, 0u);") != expected_dispatches
 print("DX11 native partial DSV draw audit: PASS (positive + negative tamper)")
