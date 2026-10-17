@@ -108,13 +108,25 @@ def unique_regions(words,phrasemap,w,h):
         filtered.append(candidate)
     return filtered
 
-def scan(verified,check_original,max_new=10):
+def scan(verified,check_original,max_new=10,max_sources=4):
     if not shutil_which_tesseract():return {"status":"OCR_HOLD_TESSERACT_MISSING"}
     master=json.loads(discover.MASTER.read_text(encoding="utf-8"))
     if len(master.get("items",[]))!=255:raise ValueError("ARCHIVE_NOT_255")
-    result={"status":"OCR_SCAN","verified_sources_scanned":0,"ocr_matched":0,
+    keys=sorted(verified)
+    if not keys:return {"status":"OCR_IDLE_NO_VERIFIED_SOURCE"}
+    # Rotate through native-HD source groups instead of repeatedly analyzing only
+    # the first six. Cursor is persisted after every scan and never affects A/B.
+    cursorfile=AUDIT/"ocr_source_cursor.json"
+    try: cursor=int(json.loads(cursorfile.read_text()).get("cursor",0))
+    except (ValueError,KeyError,OSError,TypeError):cursor=0
+    # Cursor points to the NEXT lexicographic source key. This remains stable
+    # when more validated original sources are appended between scans.
+    selected=[keys[(cursor+i)%len(keys)] for i in range(min(max_sources,len(keys)))]
+    result={"status":"OCR_SCAN","verified_source_count":len(keys),"selected":selected,
+            "verified_sources_scanned":0,"ocr_matched":0,
             "queued":0,"skipped_existing":0,"held":0,"details":[]}
-    for q,rec in sorted(verified.items()):
+    for q in selected:
+        rec=verified[q]
         if result["queued"]>=max_new:break
         meta={"queue_id":q,"source_kind":"N100_DDS_VERIFIED_READABLE_FULL_HD_PNG",
               "source_png":rec["png"],"source_sha256":rec["png_sha256"],
@@ -177,6 +189,8 @@ def scan(verified,check_original,max_new=10):
             result["held"]+=1
             result["details"].append({"source":q,"status":"OCR_HOLD","reason":str(e)[:300]})
     discover.save_json_atomic(AUDIT/"ocr_last_scan.json",result)
+    discover.save_json_atomic(cursorfile,{"cursor":(cursor+len(selected))%len(keys),"after":selected[-1],
+                                            "verified_source_count":len(keys)})
     return result
 
 def shutil_which_tesseract():
