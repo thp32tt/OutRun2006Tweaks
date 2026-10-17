@@ -32,7 +32,9 @@ def linked(source: str) -> bool:
         "D3DRS_STENCILENABLE" in helper,
         "status != D3DERR_NOTFOUND" in helper,
         "inactive_extra_mrt(true, extraMask)" in helper,
-        "no_main_stencil_write(" in helper,
+        "const bool stencilReadOnly = game_stencil_is_read_only(" in helper,
+        "if (!stencilReadOnly) return false;" in helper,
+        "stencilEnabled, stencilMaskKnown, stencilWriteMask" in helper,
         "s.clearColor.matches(" in helper,
     ))
 
@@ -81,6 +83,8 @@ assert not linked(bridge.replace(
 assert not linked(bridge.replace(
     "status != D3DERR_NOTFOUND", "false"))
 assert not linked(bridge.replace(
+    "if (!stencilReadOnly) return false;", "if (false) return false;"))
+assert not linked(bridge.replace(
     "s.clearColor.matches(", "bypassed_clear("))
 assert "python tools/test_dx11_no_target_write_draw_00768.py" in workflow
 
@@ -91,7 +95,7 @@ with TemporaryDirectory(prefix="dx11-no-write-source-") as tmp:
     (dst / "tools").mkdir()
     (dst / "src/vr/d3d11").mkdir(parents=True)
     for filename in ("native_game_masked_draw.hpp", "native_game_frame_batch.hpp",
-                     "native_game_scissor_clip.hpp"):
+                     "native_game_scissor_clip.hpp", "native_game_offscreen_pass.hpp"):
         shutil.copyfile(root / "src/vr/d3d11" / filename,
                         dst / "src/vr/d3d11" / filename)
     shutil.copyfile(probe, dst / "tools" / probe.name)
