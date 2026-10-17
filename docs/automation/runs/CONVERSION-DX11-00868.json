@@ -22,8 +22,8 @@
   "validation_bearing_result_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
   "result_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
   "development_strategy": {
-    "work_class": "failure_repair",
-    "milestone_id": "native_game_cpu_frame_transactional_fallback",
+    "work_class": "safety_regression",
+    "milestone_id": "full_resolution_native_game_frame",
     "integration_path": [
       "Game-origin native menu/vehicle/race CPU frame upload via D3D9 UpdateSurface",
       "Exact full, cropped, partial or multi-dirty destination region GPU snapshot",
@@ -44,13 +44,16 @@
       "DX11:NATIVE_GAME_CPU_UPLOAD_ROLLBACK"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "gameplay_delivery_target": "NATIVE_GAME_CPU_FRAME_FALLBACK",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "live_game_draw_path": [
-      "D3D9EX_GAME_DRAW_FALLBACK",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
       "NATIVE_CPU_FRAME_UPDATE_SURFACE"
     ],
     "visible_frame_acceptance": "Source and CI-backed rollback regression only; physical menu/car/race rendering on user device and Quest3/VDXR visual output remain UNTESTED.",
-    "activation_guard_and_fallback": "Native CPU publication remains opt-in; original D3D9Ex rendering, controller/FFB, native GPU route and DXVK lane are not modified by this C6 result."
+    "activation_guard_and_fallback": "Native CPU publication remains opt-in; original D3D9Ex rendering, controller/FFB, native GPU route and DXVK lane are not modified by this C6 result.",
+    "blocking_evidence": "Confirmed real D3D9 backbuffer corruption when a native full-frame CPU UpdateSurface fails or partially writes. The source commit e623986fd60acf3bea9e33913fe94c3313540c3b implements exact-region GPU backup, restore, quarantine and deterministic partial-write regression; this field corrects only the schema classification."
   },
   "feature_contract": {
     "feature_id": "DX11:NATIVE_GAME_CPU_UPLOAD_ROLLBACK",
@@ -95,7 +98,7 @@
     "C3_VALIDATE": "PASS_EXACT_SHA: all five required GitHub Actions workflow runs independently observed completed SUCCESS at exact material SHA; also second OpenXR run succeeded. No CI rerun or actual HMD session.",
     "C4_COMMIT": "PASS_EXISTING_SOURCE: existing source-bearing commit e623986fd60acf3bea9e33913fe94c3313540c3b includes [AUTO:CONVERSION-DX11-00868] without skip-ci; C6 creates only independent bookkeeping commit.",
     "C5_PACKAGE": "NOT_REQUIRED: bookkeeping only, no new deployment/runtime package or HMD test.",
-    "C6_STATE": "PASS_EXACT_SHA: missing run record restored by separate [skip ci] bookkeeping commit; original validation-bearing SHA unchanged and no duplicate score awarded."
+    "C6_STATE": "PASS_EXACT_SHA: missing run record restored by separate [skip ci] bookkeeping commit; original validation-bearing SHA unchanged and no duplicate score awarded. Policy strategy normalization on later CI does not change this task's source SHA, already observed successful exact-SHA gates, or scored outcome."
   },
   "packaging": {
     "status": "NOT_REQUIRED"
