@@ -425,6 +425,22 @@ if(!(Test-Path $resultFile)){
     @('FPS=','HMD_SMOOTHNESS=','STEREO=','RECENTER=','HUD_RANK_SCORE=','SKY_CLOUD=','SMOKE_SKID=','MENU_CAR=','EXIT_YES_NO=','NOTES=')|Set-Content $resultFile -Encoding UTF8
 }
 
+# Optional all-screen draw/eye/provenance triage. Never turn a missing
+# developer Python installation into a failed or lost HMD evidence archive.
+$screenAnalyzer=Join-Path $PSScriptRoot 'analyze_vr_screen_traces.py'
+$screenPython=Get-Command python -ErrorAction SilentlyContinue
+if((Test-Path $screenAnalyzer) -and $screenPython){
+    try {
+        $screenReport=Join-Path $dest 'OutRunVR-screen-trace-summary.json'
+        & $screenPython.Source $screenAnalyzer $dest --output $screenReport
+        if($LASTEXITCODE -ne 0){
+            Write-Warning 'R84 screen trace analyzer exited nonzero; raw logs remain preserved.'
+        }
+    } catch {
+        Write-Warning ('R84 screen trace aggregation unavailable: '+$_.Exception.Message)
+    }
+}
+
 if($All){
     $zipName='OutRun2_VR_ANALYZE_MATRIX_'+$matrix+'_'+$session+'.zip'
     $zip=Join-Path $root $zipName
