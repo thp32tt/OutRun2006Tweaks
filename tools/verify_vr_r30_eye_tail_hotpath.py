@@ -411,8 +411,8 @@ def main():
     else:
         raise AssertionError("Reset invalidation mutation escaped")
     geometry_mutations = (
-        ("R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection)",
-         "!R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection)"),
+        ("!R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection)",
+         "R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection)"),
         ("geometryCache.worldScale == worldScale", "true"),
         ("geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence", "true"),
         ("std::memcmp(&geometryCache.geometry.baseProjection,", "std::memcmp(&state.baseProjection,"),
