@@ -1448,20 +1448,20 @@ namespace OutRunVRStereo
                 // source-proven veto rather than weakening that safety gate.
                 if (sourceScreenRequiresProof && !exactResultHud)
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
                 if (exactResultHud || directCarShadow ||
                     OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(
                         directLensCentre, resyncAlreadyFlushed))
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
                 // No stereo eligibility: never let a screen/HUD/SkyGlow
@@ -1469,10 +1469,10 @@ namespace OutRunVRStereo
                 // The unmodified original draw is the only safe fallback.
                 if (drawCommand.DeniesGenericWorldFallback())
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
                 return fallbackToR29();
@@ -1494,10 +1494,10 @@ namespace OutRunVRStereo
             // WVP. A missing source never inherits R29's previous road WVP.
             if (directCarShadow && !provenCarShadowStereo)
             {
-                if (telemetry)
-                    R32ReviewNoteDispatchFallback();
                 OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                     OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
                 return actualDraw();
             }
             // R30 cannot establish a source-owned HUD/marker eye plane.
@@ -1509,19 +1509,19 @@ namespace OutRunVRStereo
             if (sourceScreenRequiresProof && !exactResultHud &&
                 screenKind == R32ReviewScreenSpaceKind::None)
             {
-                if (telemetry)
-                    R32ReviewNoteDispatchFallback();
                 OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                     OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
                 return actualDraw();
             }
             if ((exactResultHud || directCarShadow) &&
                 screenKind == R32ReviewScreenSpaceKind::None)
             {
-                if (telemetry)
-                    R32ReviewNoteDispatchFallback();
                 OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                     OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
                 return actualDraw();
             }
             if (OutRunVR::LensCentre::PreserveOriginalAtUpperDispatch(
@@ -1530,10 +1530,10 @@ namespace OutRunVRStereo
             {
                 // The game's exact original draw occurs once; no effect is
                 // suppressed or borrowed road/particle WVP submitted.
-                if (telemetry)
-                    R32ReviewNoteDispatchFallback();
                 OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                     OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
                 return actualDraw();
             }
             if (screenKind != R32ReviewScreenSpaceKind::None)
@@ -1553,19 +1553,19 @@ namespace OutRunVRStereo
                 // exact original +TIME/GOAL path alone, not hand it to R29.
                 if (sourceScreenRequiresProof && !exactResultHud)
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
                 if (exactResultHud ||
                     (directCarShadow && !hud.handled))
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
                 // A fully source-proven C993 centre whose stereo path was
@@ -1573,10 +1573,10 @@ namespace OutRunVRStereo
                 if (OutRunVR::LensCentre::PreserveOriginalAtUpperDispatch(
                         directLensCentre, provenLensStereo, hud.handled))
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
             }
@@ -1588,10 +1588,10 @@ namespace OutRunVRStereo
                 // shader-epoch/pose from R31's previous road WVP.
                 if (drawCommand.DeniesGenericWorldFallback())
                 {
-                    if (telemetry)
-                        R32ReviewNoteDispatchFallback();
                     OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                         OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
                     return actualDraw();
                 }
                 const auto fast = R33TryFastWorld(device,
@@ -1611,10 +1611,10 @@ namespace OutRunVRStereo
             // An R29 fallback must not turn that screen into road geometry.
             if (drawCommand.DeniesGenericWorldFallback())
             {
-                if (telemetry)
-                    R32ReviewNoteDispatchFallback();
                 OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
                     OutRunVR::UniversalTrace::Route::OriginalPreserved);
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
                 return actualDraw();
             }
 
