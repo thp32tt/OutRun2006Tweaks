@@ -35,6 +35,11 @@ namespace OutRunVRStereo
         None, Hud2D, FlatPerspectiveEffect, ExactLensCentreWorld,
         ExactCarBaseShadowWorld, ProjectedWorldMarker2D
     };
+    // R26 protected even delegated/original ESC sprites: capture the clean
+    // binocular scene before the first screen-owned physical GPU Draw.
+    // Unknown/world/SkyGlow draws do not call this lower-owner hook.
+    void R30SupportBeforeScreenDrawForSkyGlow(
+        IDirect3DDevice9* device, bool exactScreenBoundary) noexcept;
     R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(
         IDirect3DDevice9* device) noexcept;
     bool R30SupportBuildScreenSpaceEyeConstants(
