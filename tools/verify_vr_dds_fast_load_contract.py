@@ -16,7 +16,10 @@ def check(source: str, policy: str) -> bool:
             "return E_FAIL;" in source[fmt:create] and
             "requested > 0u && requested <= available" in policy and
             "requested == resolved" in policy and
-            "requested == fromFile" in policy)
+            "requested == fromFile" in policy and
+            "kD3dxFromFile = 0xfffffffdu" in policy and
+            "DdsFastLoad::kD3dxFromFile" in source and
+            "D3DX_FROM_FILE" not in source)
 
 if __name__ == "__main__":
     text, policy = SRC.read_text(encoding="utf-8"), HEADER.read_text(encoding="utf-8")
@@ -24,4 +27,6 @@ if __name__ == "__main__":
     assert not check(text.replace("RequestedMipCountSupported", "MipGuardRemoved"), policy)
     assert not check(text.replace("RequestedFormatSupported", "FormatGuardRemoved"), policy)
     assert not check(text, policy.replace("requested == resolved", "false"))
+    assert not check(text.replace("DdsFastLoad::kD3dxFromFile", "D3DX_FROM_FILE"), policy)
+    assert not check(text, policy.replace("kD3dxFromFile = 0xfffffffdu", "kD3dxFromFile = 0"))
     print("PASS: requested mip/format preserved or native D3DX fallback")

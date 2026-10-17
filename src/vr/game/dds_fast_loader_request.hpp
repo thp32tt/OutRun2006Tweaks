@@ -5,6 +5,9 @@
 #include <cstdint>
 namespace OutRunVR::DdsFastLoad
 {
+    // D3DX_FROM_FILE is not declared by the pinned legacy Win32 SDK;
+    // preserve its documented 32-bit ABI sentinel without an absent macro.
+    constexpr std::uint32_t kD3dxFromFile = 0xfffffffdu;
     constexpr bool RequestedMipCountSupported(
         std::uint32_t requested, std::uint32_t available,
         std::uint32_t automatic) noexcept

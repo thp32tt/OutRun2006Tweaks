@@ -434,7 +434,7 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		static_cast<std::uint32_t>(Format),
 		static_cast<std::uint32_t>(format_present),
 		static_cast<std::uint32_t>(D3DX_DEFAULT),
-		static_cast<std::uint32_t>(D3DX_FROM_FILE)))
+		OutRunVR::DdsFastLoad::kD3dxFromFile))
 		return E_FAIL;
 
 #ifdef _DEBUG
