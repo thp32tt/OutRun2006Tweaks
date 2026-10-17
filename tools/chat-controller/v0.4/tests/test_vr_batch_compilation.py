@@ -93,7 +93,7 @@ class BatchCompilePolicy(unittest.TestCase):
             self.assertIn("DEVELOPMENT_FOCUS_20261017=ON", text)
             self.assertIn("필수 GitHub Actions 전체 Gate", text)
             self.assertIn("DEVELOPMENT_FOCUS_20261017=ON", text)
-            self.assertIn("이미 PASS인 동일 SHA", text)
+            self.assertIn("과거 PASS/기록 미완료", text)
 
     def test_development_first_does_not_activate_frozen_dxvk(self):
         self.assertNotIn("DEVELOPMENT_FOCUS_20261017=ON", prefix("DXVK", continuous=True))
