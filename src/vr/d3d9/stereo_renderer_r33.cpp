@@ -886,8 +886,9 @@ namespace OutRunVRStereo
             auto captureCentreSource = [&]() noexcept {
                 const auto command =
                     OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
-                const auto* liveStereo =
-                    OutRunVRRenderer::GetLatchedStereoFrameView();
+                // Use the BeginScene-borrowed live pose; a second view
+                // acquisition per Draw defeats R33's frame-pose contract.
+                // Reset invalidates this same slot, so validate it again.
                 std::uintptr_t shader = 0;
                 std::uint64_t shaderEpoch = 0;
                 const bool validShader =
@@ -896,7 +897,8 @@ namespace OutRunVRStereo
                     command.lensCentreCallEpoch,
                     R29OwnerTopLevelDrawSerial(),
                     shaderEpoch,
-                    liveStereo ? liveStereo->poseSequence : 0u,
+                    (stereo && stereo->valid)
+                        ? stereo->poseSequence : 0u,
                     shader,
                     command.IsDirectWorldLensCentre() && validShader
                 };
