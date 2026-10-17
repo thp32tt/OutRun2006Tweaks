@@ -72,7 +72,14 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
         "if (!eye_targets_bound() || (!clearDepth && !clearStencil) ||",
         "return raster_partial_eye_depth_clear(",
         "partial ? &clear.rect : nullptr))",
-        "const bool partial = rect.left || rect.top ||",
+        # Real game full-eye Z/stencil RECTs now bypass the expensive
+        # depth-only raster Draw; cropped regions retain that audited Draw.
+        # Route admission is shared by two-eye preflight and GPU execution.
+        "const bool hasRect = rect.left || rect.top ||",
+        "const auto route = live_game_stereo::depth_clear_route(",
+        "route == live_game_stereo::NativeDepthClearRoute::Reject",
+        "route == live_game_stereo::NativeDepthClearRoute::PartialRaster",
+        "context_->ClearDepthStencilView(eyeDepth_, flags,",
         "rect.right > static_cast<LONG>(ring_.width()) ||",
         "rect.bottom > static_cast<LONG>(ring_.height())",
     ]

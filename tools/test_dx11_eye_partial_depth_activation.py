@@ -43,6 +43,18 @@ assert audit_native_partial_depth_clear(
     source, probe.replace(
         "!encoder.clear_depth_stencil(0.5f, 0u, true, true, &badRect)", ""
     )), "bad-RECT regression removal slipped through"
+# Reject a real partial HUD/menu Clear being widened into a whole-eye
+# DSV operation, and reject deleting the malformed two-eye preflight.
+assert audit_native_partial_depth_clear(
+    source.replace(
+        "route == live_game_stereo::NativeDepthClearRoute::PartialRaster",
+        "route == live_game_stereo::NativeDepthClearRoute::FullDsv", 1),
+    probe), "cropped depth-region widening slipped through"
+assert audit_native_partial_depth_clear(
+    source.replace(
+        "route == live_game_stereo::NativeDepthClearRoute::Reject",
+        "route == live_game_stereo::NativeDepthClearRoute::FullDsv", 1),
+    probe), "invalid depth-region admission slipped through"
 # The caller still owns the boundary: a fifth unauthorized Draw is not made
 # legitimate by the narrowly reviewed depth-only callback.
 assert DRAW_DISPATCH.findall(source + "\ncontext->Draw(8u, 0u);") != expected_dispatches
