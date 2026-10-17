@@ -1652,12 +1652,16 @@ namespace OutRunVRStereo
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
                     (!OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
-                // R62's working D3DXSprite FVF=0x142 (XYZ, NOT POSITIONT)
-                // has two exact-source owners: 4th/5th projected rank and
-                // native ScreenHud 6th/6/text. The R30 check rejects unknown,
-                // external ImGui, SkyGlow and all ordinary world primitives;
-                // the upper raster/pose guard already resynchronized.
-                if (tryXyzrhw)
+                // R62's proven D3DXSprite FVF=0x142 (XYZ, NOT POSITIONT)
+                // has separate projected-rank and native-HUD owners. Do not
+                // gate this exact-source route on the *cached* shader identity:
+                // a stale setter/StateBlock shadow can say VS!=0 while the
+                // real device has already returned to fixed function, leaving
+                // rank/6th/6 drawn only once in the left eye. R30 checks the
+                // actual GetVertexShader and GetFVF state, source semantic,
+                // target and bilateral eye resources before touching the GPU.
+                // The ordinary XYZRHW hotpath keeps its cached-state gate.
+                if (resyncAlreadyFlushed)
                 {
                     const HRESULT r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
                         device, type, baseVertexIndex, minVertexIndex,
