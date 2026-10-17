@@ -671,7 +671,10 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "const auto submission = HudBatch.snapshot();" in draw and
          "if (self && self == submission.sprite &&" in draw and
          "HudBatch.completeNativeDraw(" in draw and
-         "submission, SUCCEEDED(hr), scope, source)" in draw and
+         "submission, SUCCEEDED(hr), scope, source,\n                sameSourceAfterNative)" in draw and
+         "const bool sameSourceAfterNative =" in draw and
+         "EffectiveScope() == scope &&" in draw and
+         "CurrentRenderProducerToken() == source;" in draw and
          "if (FAILED(hr) || !self)" in draw and
          draw.index("const auto scope = EffectiveScope();") <
          draw.index("const auto submission = HudBatch.snapshot();") <
@@ -734,12 +737,30 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "end();" in ce and
          ce.find("if (!sameGeneration(previous))") < ce.find("end();"),
          "native End must preserve a reentrant Begin")
+    # D3DX Sprite::Draw can synchronously call the hooked native Flush on a
+    # texture switch. Do not throw away the incoming Draw's owner after that
+    # exact successful GPU drain. Failed/mixed/new-generation callbacks still
+    # cannot inherit a clean texture-transition stamp.
+    ledger_flush_success = scope(ledger, "void onFlushSuccess()", "void onFlushFailure()")
     need("if (!sameGeneration(previous))" in cd and
-         "if (!unchanged(previous) || !succeeded)" in cd and
+         "if (!succeeded)" in cd and
+         "if (!unchanged(previous))" in cd and
+         "sourceStillMatches && active && drawCount == 0" in cd and
+         "homogeneous && scope == Scope::None" in cd and
+         "producer == Producer::None" in cd and
+         "lastSuccessfulFlushMutationSerial != 0" in cd and
+         "lastSuccessfulFlushMutationSerial == mutationSerial" in cd and
+         "if (!cleanInternalFlush)" in cd and
          "onFlushFailure();" in cd and
          "recordDraw(drawScope, drawProducer);" in cd and
-         cd.find("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);"),
-         "native failed or reentrant Draw must not borrow old HUD provenance")
+         cd.find("if (!succeeded)") < cd.find("if (!unchanged(previous))") <
+         cd.find("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);") and
+         "lastSuccessfulFlushMutationSerial = mutationSerial;" in ledger_flush_success and
+         "lastSuccessfulFlushMutationSerial = 0;" in ledger_draw and
+         "lastSuccessfulFlushMutationSerial = 0;" in ledger_begin and
+         "lastSuccessfulFlushMutationSerial = 0;" in ledger_failure and
+         "lastSuccessfulFlushMutationSerial = 0;" in ledger_end,
+         "native Draw must preserve only successful internal texture Flush and reject all unsafe reentry")
     need("vtable[8]" in h and "vtable[9]" in h and "vtable[10]" in h and
          "vtable[11]" in h and "vtable[12]" in h and "vtable[13]" in h and
          "LostDevice_hk.enable().has_value()" in h and
@@ -784,14 +805,20 @@ def main_current_ledger(code: str, header: str) -> int:
         ("mix-becomes-homogeneous", "ledger", "homogeneous = false;", "homogeneous = true;"),
 
         ("successful-draw-untracked", "ledger", "recordDraw(drawScope, drawProducer);", "(void)drawScope; (void)drawProducer;"),
+        ("texture-flush-stamp-lost", "ledger", "lastSuccessfulFlushMutationSerial = mutationSerial;", "lastSuccessfulFlushMutationSerial = 0;"),
+        ("texture-flush-stamp-ignored", "ledger", "lastSuccessfulFlushMutationSerial == mutationSerial", "true"),
+        ("texture-flush-promotes-source-switch", "ledger", "sourceStillMatches && active && drawCount == 0", "true && active && drawCount == 0"),
+        ("texture-flush-source-check-unused", "code", "sameSourceAfterNative))", "true))"),
+        ("texture-flush-wrong-mutation", "ledger", "if (!unchanged(previous))", "if (false)"),
+        ("texture-flush-draw-failure-promoted", "ledger", "if (!succeeded)", "if (false)"),
 
         ("failed-draw-keeps", "code", "HudBatch.completeNativeDraw(", "HudBatch.completeNativeUnsafeDraw("),
 
         ("flush-no-revoke", "code", "HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));", "HudBatch.boundaryReady = true;"),
 
-        ("flush-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            active = false;", "void onFlushFailure() noexcept\n        {\n            active = true;"),
-        ("ledger-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            active = false;", "void onFlushFailure() noexcept\n        {\n            active = true;"),
-        ("ledger-end-retains", "ledger", "void end() noexcept\n        {\n            active = false;", "void end() noexcept\n        {\n            active = true;"),
+        ("flush-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            lastSuccessfulFlushMutationSerial = 0;\n            active = false;", "void onFlushFailure() noexcept\n        {\n            lastSuccessfulFlushMutationSerial = 0;\n            active = true;"),
+        ("ledger-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            lastSuccessfulFlushMutationSerial = 0;\n            active = false;", "void onFlushFailure() noexcept\n        {\n            lastSuccessfulFlushMutationSerial = 0;\n            active = true;"),
+        ("ledger-end-retains", "ledger", "void end() noexcept\n        {\n            lastSuccessfulFlushMutationSerial = 0;\n            active = false;", "void end() noexcept\n        {\n            lastSuccessfulFlushMutationSerial = 0;\n            active = true;"),
         ("reset-no-forget", "code", "HudBatch.invalidate();", "HudBatch.boundaryReady = true;"),
         ("reset-keeps-sprite", "ledger", "void invalidate() noexcept\n        {\n            end();\n            sprite = nullptr;", "void invalidate() noexcept\n        {\n            end();\n            sprite = exactSprite;"),
         ("missing-live-pointer", "code", "void* liveSprite = *Module::exe_ptr<void*>(0x55B218);", "void* liveSprite = HudBatch.sprite;"),
