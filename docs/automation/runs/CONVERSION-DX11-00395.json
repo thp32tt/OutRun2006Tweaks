@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00395",
+  "production_id": "CONVERSION-DX11-00395",
+  "event_id": "CONVERSION-DX11-00395-E007",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "rollover_is_retry": true,
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R258_TRANSCRIPT_CONTAMINATION_FAIL_EARLY_GUARD_SOURCE_HYGIENE_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "base_sha": "a8a2bdac2ac04809e07271e22d0ccba09abc0e64",
+  "result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+  "material_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+  "source_implementation_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+  "validation_bearing_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+  "result_marker": "[AUTO:CONVERSION-DX11-00395]",
+  "selected_work_item": "DX11_R258_TRANSCRIPT_CONTAMINATION_FAIL_EARLY_GUARD",
+  "summary": "E007 retry preserves the already validated R258 dormant source-revalidation logic and hardens the DX11 validation path against the exact transcript-marker contamination that broke historical Gate 37242462890. A source-graph guard checks the R258 native backend/probe inputs, while the Backend Conversion Gate performs a pre-Python git-grep hygiene check so a contaminated verifier fails early with an explicit diagnostic instead of a Python syntax error.",
+  "evidence": "Required failed Gate 37242462890 at c32e63ce21b8f8bef2e53b864cb263a55fe5981a failed in Verify DX11 source graph because a bare N100 execution transcript marker caused Python SyntaxError. Retry commits 7b7377b44ea0c1953551ad15603de51a7037c635, 060ec9a2da1a82abd3747ccb646657a4d74de03f and 7b32fef4c04073154163636015f23d4ce7aef960 add fail-early source hygiene and normalize PowerShell's clean no-match exit. Exact SHA 7b32fef4c04073154163636015f23d4ce7aef960 passed Backend Conversion Gate 37243733306: validate 111557396889 and DX11 readiness smoke 111557999666 succeeded. Artifact 11318731042 digest sha256:4d8d710183f8daa1481556db81b9e37f7b4b802d91c574a3bc1afcee9eb068ec. No HMD/game runtime test was performed.",
+  "changed_paths": [
+    "tools/verify_dx11_source_graph.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "implementation_commits": [
+    "7b7377b44ea0c1953551ad15603de51a7037c635",
+    "060ec9a2da1a82abd3747ccb646657a4d74de03f",
+    "7b32fef4c04073154163636015f23d4ce7aef960"
+  ],
+  "validation_candidate_commit": "7b32fef4c04073154163636015f23d4ce7aef960",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current GitHub HEAD, AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, branch-local conversion state and the current task record. Inspected required failed Backend Conversion Gate 37242462890. The failed SHA c32e63ce21b8f8bef2e53b864cb263a55fe5981a stopped at Verify DX11 source graph due a bare N100 execution transcript marker in tools/verify_dx11_source_graph.py. Existing R258 logic had already been cleaned and validated at 1e297b537e2ed8dffd402a535d0bc4e50ce2c008, so it was not duplicated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The retry failure context is validation-input contamination, not R258 semantics. Because the contaminated verifier cannot execute its own Python checks, the smallest robust repair is a pre-Python workflow hygiene check plus defense-in-depth checks over R258 backend/probe source content.",
+      "review_lenses": {
+        "architecture": "Keep R258 dormant and unchanged; harden only the DX11 validation boundary.",
+        "ownership_lifetime": "No COM/device/context ownership or resource lifetime changes.",
+        "stereo_correctness": "No WVP/projection/HUD/eye/pose/recenter or stereo-routing behavior changes.",
+        "performance": "CI/static-only guard; no game hot-path cost.",
+        "adversarial": "Catch the exact '[executed on device:' transcript signature before Python parsing, and also reject it from native_backend.hpp/cpp or the constant-buffer probe."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "7b7377b4 adds source-graph hygiene checks for native_backend.hpp/cpp and dx11_constant_buffer_probe.cpp. 060ec9a2 adds a pre-Python Gate git-grep guard over src/vr/d3d11 and the relevant DX11 verifier/probe files. Gate 37243657123 exposed that a clean git-grep no-match exit 1 propagated as the job exit status; 7b32fef4 fixes only that control path with explicit exit 0 while preserving fail-closed behavior for matches and unexpected git-grep failures."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R258_TRANSCRIPT_CONTAMINATION_FAIL_EARLY_GUARD_SOURCE_HYGIENE_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "validation_run_id": 37243733306,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111557396889,
+      "readiness_smoke_job_id": 111557999666,
+      "artifact_id": 11318731042,
+      "artifact_digest": "sha256:4d8d710183f8daa1481556db81b9e37f7b4b802d91c574a3bc1afcee9eb068ec",
+      "evidence": "Exact SHA 7b32fef4c04073154163636015f23d4ce7aef960 passed the new DX11 source-hygiene step, source graph, dormant activation boundary, census analyzer, Win32 configure/build/binary artifact and the full DX11 readiness smoke chain including R258 constant-buffer probe. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "material_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "source_implementation_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "validation_bearing_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "result_marker": "[AUTO:CONVERSION-DX11-00395]",
+      "implementation_commits": [
+        "7b7377b44ea0c1953551ad15603de51a7037c635",
+        "060ec9a2da1a82abd3747ccb646657a4d74de03f",
+        "7b32fef4c04073154163636015f23d4ce7aef960"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "This retry changes only DX11 source/CI validation hygiene and does not add a runtime route or distributable HMD behavior."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "issue14_implementation_comment_id": 5985574533,
+      "issue14_validation_comment_id": 5985623230,
+      "exact_next_action": "Preserve validated R239-R258 programmable readiness and the new transcript-contamination guard. Under a new TASK_ID, continue the remaining DX11 activation-prerequisite handoff work without enabling Draw/DrawIndexed or NativeDrawPath; runtime-visible activation still requires matching Quest 3/VDXR evidence.",
+      "authoritative_event_id": "CONVERSION-DX11-00395-E007",
+      "authoritative_event_type": "retry",
+      "authoritative_attempt": "2/3",
+      "rollover_is_retry": true
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE",
+      "VR_BACKEND_INDEX_F_DIAGNOSTICS_CI"
+    ],
+    "evidence": "Only validation tooling/workflow changed. R258 runtime logic, DX9Ex baseline, OpenXR transport, selector, production Draw* routing and NativeDrawPath activation are untouched."
+  },
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "dx9ex_branch_modified": false
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00395",
+    "production_id": "CONVERSION-DX11-00395",
+    "event_id": "CONVERSION-DX11-00395-E007",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "rollover_is_retry": true,
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "failure_context": "Backend Conversion Gate exact run 37242462890 concluded failure",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+    "source_implementation_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+    "validation_bearing_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+    "validation_run_id": 37243733306,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111557396889,
+    "readiness_smoke_job_id": 111557999666,
+    "artifact_id": 11318731042,
+    "artifact_digest": "sha256:4d8d710183f8daa1481556db81b9e37f7b4b802d91c574a3bc1afcee9eb068ec",
+    "implementation_comment_id": 5985574533,
+    "validation_comment_id": 5985623230
+  },
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37243733306,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "validate_job_id": 111557396889,
+      "readiness_smoke_job_id": 111557999666,
+      "artifact_id": 11318731042,
+      "artifact_digest": "sha256:4d8d710183f8daa1481556db81b9e37f7b4b802d91c574a3bc1afcee9eb068ec",
+      "artifact_size_bytes": 2366687
+    },
+    "historical_failure_inspected": {
+      "run_id": 37242462890,
+      "exact_sha": "c32e63ce21b8f8bef2e53b864cb263a55fe5981a",
+      "conclusion": "failure",
+      "failed_job_id": 111553729831,
+      "failed_step": "Verify DX11 source graph",
+      "signature": "bare N100 execution transcript marker caused Python SyntaxError invalid decimal literal"
+    },
+    "repair_probe_failure": {
+      "run_id": 37243657123,
+      "exact_sha": "060ec9a2da1a82abd3747ccb646657a4d74de03f",
+      "conclusion": "failure",
+      "failed_job_id": 111557190509,
+      "failed_step": "Verify DX11 source hygiene",
+      "signature": "clean git grep no-match exit code 1 propagated as PowerShell process exit; no contamination match was reported",
+      "repaired_by": "7b32fef4c04073154163636015f23d4ce7aef960"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5985574533,
+    "validation_comment_id": 5985623230
+  },
+  "exact_next_action": "Preserve validated R239-R258 programmable readiness and the new transcript-contamination guard. Under a new TASK_ID, continue the remaining DX11 activation-prerequisite handoff work without enabling Draw/DrawIndexed or NativeDrawPath; runtime-visible activation still requires matching Quest 3/VDXR evidence.",
+  "validation_run_id": 37243733306,
+  "validation_run_attempt": 1,
+  "validation_job_id": 111557396889,
+  "readiness_smoke_job_id": 111557999666,
+  "artifact_id": 11318731042,
+  "artifact_digest": "sha256:4d8d710183f8daa1481556db81b9e37f7b4b802d91c574a3bc1afcee9eb068ec",
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00395",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00395",
+      "production_id": "CONVERSION-DX11-00395",
+      "event_id": "CONVERSION-DX11-00395-E007",
+      "event_type": "retry",
+      "attempt": "2/3",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE",
+      "runtime_validation": "UNTESTED",
+      "material_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "validation_bearing_result_sha": "7b32fef4c04073154163636015f23d4ce7aef960"
+    },
+    "superseded": [
+      {
+        "event_id": "CONVERSION-DX11-00395-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "reason": "older same-task durable bookkeeping superseded by explicit E007 retry"
+      }
+    ],
+    "reason": "E007 is the latest explicit controller dispatch. The requested historical failed run was inspected and a bounded validation-hygiene repair was implemented and validated at a new exact SHA.",
+    "material_and_validation_bearing_sha_unchanged": false
+  },
+  "current_user_metadata_reconciliation": {
+    "authoritative_production_id": "CONVERSION-DX11-00395",
+    "authoritative_event_id": "CONVERSION-DX11-00395-E007",
+    "authoritative_attempt": "2/3",
+    "event_type": "retry",
+    "source": "CURRENT_USER_QUEUE",
+    "material_and_validation_bearing_sha_unchanged": false
+  },
+  "chat_rollover": 3,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "task_origin_base_sha": "1df8051546cf6ba114f68080d4b9887b020a597b",
+  "prior_validated_result_sha": "1e297b537e2ed8dffd402a535d0bc4e50ce2c008",
+  "failure_context": "Backend Conversion Gate exact run 37242462890 concluded failure",
+  "retry_history": [
+    {
+      "event": "historical_failure",
+      "run_id": 37242462890,
+      "sha": "c32e63ce21b8f8bef2e53b864cb263a55fe5981a",
+      "outcome": "FAIL",
+      "reason": "transcript marker contaminated verify_dx11_source_graph.py"
+    },
+    {
+      "event": "repair_probe",
+      "run_id": 37243657123,
+      "sha": "060ec9a2da1a82abd3747ccb646657a4d74de03f",
+      "outcome": "FAIL",
+      "reason": "PowerShell retained expected git-grep no-match exit code 1"
+    },
+    {
+      "event": "final_retry_validation",
+      "run_id": 37243733306,
+      "sha": "7b32fef4c04073154163636015f23d4ce7aef960",
+      "outcome": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00630",
+  "production_id": "CONVERSION-DX11-00630",
+  "event_id": "CONVERSION-DX11-00630-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_SELECTARG2_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "623a5cc3198b6fa4ac9481298894c47ce7e34700",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live game D3D9 ALPHAOP SELECTARG2/ALPHAARG2 TFACTOR state and high-byte render-state capture",
+      "Existing compiled D3D11 PM RGB/factor-alpha PS -> native Draw/DrawIndexed -> diagnostic frame",
+      "Reject modifiers and unhandled states with original DX9Ex draw and input"
+    ],
+    "batch_components": [
+      "C++ strict D3D9 ALPHAARG2 admission and live factor capture",
+      "C++ shader routing precedence override and DX9Ex failure guard",
+      "Destructive source graph and 16384 pixel arithmetic combinations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB with TFACTOR alpha SELECTARG2 uses independently captured ARGB factor high byte",
+      "negative_regression": "Wrong active argument, shader override or missing factor read fails; prior diffuse SELECTARG2 remains distinct",
+      "component_integration": "Real game D3D9 GetTextureStageState/GetRenderState to compiled D3D11 PS with guarded DrawIndexed/Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_SELECTARG2_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Code and exact-SHA CI only; actual game image/HMD not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit diagnostic enable; unsupported game and input remain DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_factor_arg2_00630.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00630.json",
+    "tools/test_dx11_selectarg_factor_alpha_00584.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_selectarg_tfactor_arg2_00588.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: resumed failed exact-SHA Gate #38299838426 from existing original material implementation",
+    "C1_REVIEW": "PASS: isolated three stale legacy test predicates on widened real-game D3D9 factor capture",
+    "C2_IMPLEMENT": "PASS: original real-game PM RGB/SELECTARG2 TFACTOR C++ implementation preserved; actual failed source regression checks repaired",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend #38300625576, Fast #38300625443, Build #38300631713, OpenXR #38300632065, HUD #38300631646 SUCCESS",
+    "C4_COMMIT": "PASS: final validation-bearing material result d3b9c1475a0f820c795d6e8f8401a79b0b895141",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED at validation-bearing d3b9c1475a0f820c795d6e8f8401a79b0b895141; GitHub CI SUCCESS; RUNTIME_VALIDATION=UNTESTED; HMD test not performed"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Controller may allocate independent DX11 development. This TASK_ID already has a validation-bearing material result and must not be repeated or scored twice. Quest3/VDXR menu/vehicle/race image, gamepad and DX9Ex safe return still NEED_HMD_TEST.",
+  "result_sha": "d3b9c1475a0f820c795d6e8f8401a79b0b895141",
+  "validation_bearing_result_sha": "d3b9c1475a0f820c795d6e8f8401a79b0b895141",
+  "material_implementation_sha": "74d3a16f7ac97e5be2803be26bec78b468b28024",
+  "failure_recovery": {
+    "original_failed_run_id": 38299838426,
+    "original_failed_step": "test_dx11_selectarg_factor_alpha_00584.py",
+    "repaired_regressions": [
+      "00584 factor capture OR-list legacy exact suffix and destructive mutation anchor",
+      "SAFE-RETURN first-game-frame legacy capture list suffix",
+      "00588 ALPHAARG2 TFACTOR legacy guard suffix"
+    ],
+    "repair_result_sha": "d3b9c1475a0f820c795d6e8f8401a79b0b895141"
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38300625576,
+      "conclusion": "SUCCESS"
+    },
+    "dx11_fast": {
+      "run_id": 38300625443,
+      "conclusion": "SUCCESS"
+    },
+    "win32_build": {
+      "run_id": 38300631713,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "run_id": 38300632065,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38300631646,
+      "conclusion": "SUCCESS"
+    }
+  }
+}

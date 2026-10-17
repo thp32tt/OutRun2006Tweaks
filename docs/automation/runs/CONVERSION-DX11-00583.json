@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00583",
+  "production_id": "CONVERSION-DX11-00583",
+  "event_id": "CONVERSION-DX11-00583-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00583",
+  "base_sha": "f5e62bd82354dbc7fdd8c93767c67640014f3425",
+  "work_key": "DX11:MENU_RACE_SELECTTEXTURE_MODULATE2X4X_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Real D3D9 SELECTARG1 RGB scaled alpha capture/admission",
+      "Native D3D11 shader create/select -> Draw/DrawIndexed -> opt-in visible inset"
+    ],
+    "batch_components": [
+      "C++ D3D9 pipeline capture and fail-closed admission",
+      "Two HLSL native pixel shaders plus D3D11 dispatch",
+      "22 destructive mutations and 10 arithmetic cases in mandatory Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "SELECTARG1 texture RGB independent of MODULATE2X/4X saturating alpha",
+      "negative_regression": "22 destructive mutations + 10 numeric cases",
+      "component_integration": "Live game-author D3D9 draw -> native D3D11 shader -> Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTTEXTURE_MODULATE2X4X_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTTEXTURE_SCALED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "activation_guard_and_fallback": "Opt-in OUTRUN_DX11_FIRST_GAME_FRAME only, original D3D9 Draw/DX9Ex fallback unchanged",
+    "visible_frame_acceptance": "Only diagnostic inset code; HMD/gamepad NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg_modulate_scaled_00583.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00583.json"
+  ],
+  "evidence": {
+    "static_precommit": "Unique anchors and PS/reset/capture/draw linkage checked",
+    "runtime_validation": "UNTESTED"
+  },
+  "next_action": "C6 complete for exact validation-bearing SHA; HMD and gamepad runtime validation remain UNTESTED.",
+  "validation_bearing_result_sha": "6a8431e4e28c936bb8bd9eecb70d6f807a00ba14"
+}

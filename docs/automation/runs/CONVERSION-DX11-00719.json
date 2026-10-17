@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00719",
+  "production_id": "CONVERSION-DX11-00719",
+  "event_id": "CONVERSION-DX11-00719-C6-E001",
+  "event_type": "c6_result_recovery",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "79191f6e05c20d1d5b546bd3d736ca05b88c0c0b",
+  "material_result_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165",
+  "validation_bearing_result_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165",
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Preserve main D3D9-device-owned native D3D11 game Draw/DrawIndexed and pending GPU readback across auxiliary device Draw/Present while retaining original game Draw/input, provenance fencing and Reset fallback.",
+    "acceptance_items": [
+      {
+        "id": "owned-live-frame-survives-foreign-present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_d3d9_draw_to_native_d3d11_present",
+        "expected_behavior": "Foreign-device Draw and Present cannot abort or rotate the original game's native Draw batch or consume its pending readback; device owner proceeds through its own Present."
+      },
+      {
+        "id": "owner-provenance-reset-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_original_input_and_device_lifecycle",
+        "expected_behavior": "Foreign device remains fail-closed for native overlay without changing original D3D9 Draw/input, provenance fences or Reset recovery; negative mutations are rejected."
+      },
+      {
+        "id": "validated-exact-sha-five-gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_source_regressions_and_github_actions",
+        "expected_behavior": "Portable C++ helper asserts, positive and mutation-negative source regressions, DX11 Fast, Backend, Build, OpenXR and HUD checks pass for the same source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "owned-live-frame-survives-foreign-present": "PASS_BUILD",
+    "owner-provenance-reset-input-fallback": "PASS_BUILD",
+    "validated-exact-sha-five-gates": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/test_dx11_game_device_handoff_00681.py"
+  ],
+  "gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38531094249,
+      "conclusion": "success",
+      "head_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38531094262,
+      "conclusion": "success",
+      "head_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38531101892,
+      "conclusion": "success",
+      "head_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38531101917,
+      "conclusion": "success",
+      "head_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38531101837,
+      "conclusion": "success",
+      "head_sha": "1362feaf50d1268b0f6d24ec08f9f383bac3a165"
+    }
+  ],
+  "record_recovery": {
+    "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "original_run_record_found": false,
+    "material_sha_source": "GitHub commit with source changes",
+    "feature_contract_and_acceptance_results_source": "Reconstructed only from source commit and existing exact-SHA CI; no prior run record existed to preserve.",
+    "source_commit": "1362feaf50d1268b0f6d24ec08f9f383bac3a165"
+  },
+  "next_action": "Build verified for exact source SHA. Quest 3/VDXR gameplay/visual parity, HMD and gamepad runtime remain UNTESTED. No CI rerun or score change for C6 bookkeeping.",
+  "state_persisted": true
+}

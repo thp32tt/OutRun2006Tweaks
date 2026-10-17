@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00144",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-10-01T01:23:33+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "6a441a4fb3187435c8fc22346f4c71f661bea68c",
+  "result_sha": "855c4f17e5aa8cd33b364405c697b3e605ecafe8",
+  "validation_bearing_result_sha": "855c4f17e5aa8cd33b364405c697b3e605ecafe8",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R144_TARGET_65970_THIRD_CALL_ALIGNMENT",
+  "summary": "Completed the remaining bounded exact-byte/manual-decode proof for guarded-GF target C. The reviewed exact-EXE prefix now extends contiguously from 0x65970 through the third/final raw outbound CALL at 0x659C1. The exact public EXE proves 0x659C1 is an instruction-aligned E8 resolving to 0x28800 in .text, while the previously proven 0x65997->0x28460 and 0x659AC->0x28320 CALLs remain exact. This is provenance/alignment evidence only; semantic effect remains UNRESOLVED and ownership effect remains NONE.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00141",
+    "source_result_sha": "5ec78a1cb96c42ab5deb71e2a7cbdf3f2d5b38b3",
+    "reason": "The exact EXE identity is shared and the isolated DXVK lane had already automation-validated the byte sequence 0x659B1..0x659C1. The DX11 task reused that evidence and independently revalidated it on the DX11 branch instead of repeating discovery."
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier-only change. No DX11 runtime renderer, native backend, host, D3D9 policy, transport, selector, packaging or vr-d3d9ex-focus source changed.",
+    "ownership": "All guarded GF hooks remain spacing-only. No producer range or ScreenHud/native draw ownership was added or widened.",
+    "stereo_correctness": "No WVP/projection/HUD/world/rank/SkyGlow/recenter/menu behavior changed.",
+    "performance": "No runtime hot-path, cadence, copy, wait, draw or telemetry path changed.",
+    "adversarial": "Aggregate proof is fail-closed: the full manually reviewed prefix must remain contiguous and byte-exact, and each of the three aligned CALLs must decode to the expected mapped .text target."
+  },
+  "target_c_alignment_proof": {
+    "entry_rva": "0x00065970",
+    "function_start_guess_rva": "0x00065970",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "first_call": "0x00065997->0x00028460",
+    "first_call_target_section": ".text",
+    "second_call": "0x000659AC->0x00028320",
+    "second_call_target_section": ".text",
+    "third_call": "0x000659C1->0x00028800",
+    "third_call_target_section": ".text",
+    "third_call_alignment_proven": true,
+    "status": "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "remaining_raw_target_c_outbound_calls": 0
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "The change only strengthens static exact-EXE provenance. It does not touch the runtime risk paths of the protected R51 baseline or claim to fix the open HUD/rank regressions."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36742770886,
+      "conclusion": "success",
+      "exact_result_sha": "855c4f17e5aa8cd33b364405c697b3e605ecafe8",
+      "artifact_id": 11111616324,
+      "artifact_digest": "sha256:5033b4a106eadae20ed16dbe804acc58de495fc741cd91a0100ad507968c3f6a",
+      "evidence": "Queue/baseline/one-click/disassembly/source-graph checks, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and artifact upload all passed."
+    },
+    "build": {
+      "run_id": 36742774976,
+      "conclusion": "success",
+      "result_head_sha": "855c4f17e5aa8cd33b364405c697b3e605ecafe8",
+      "trigger": "pull_request",
+      "artifact_id": 11110927829,
+      "artifact_digest": "sha256:05a8536c894ab521ad8d4ef027b206692a4f4a75bda1c2feed4bb107b982b73e"
+    },
+    "hud_inspector": {
+      "run_id": 36742774989,
+      "conclusion": "success",
+      "result_head_sha": "855c4f17e5aa8cd33b364405c697b3e605ecafe8",
+      "trigger": "pull_request",
+      "analysis_artifact_id": 11111410525,
+      "analysis_artifact_digest": "sha256:cc865bc164ddecfb6f249a0d515ad190c74d6c3d8f714e601c10e1065ff54af4",
+      "game_artifact_id": 11110784896,
+      "game_artifact_digest": "sha256:64cfbac215e83962784aa962361f595224696675ea0f2d046f72c571d38eea88",
+      "evidence": "Exact EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 emitted status=EXACT_PREFIX_CALL_ALIGNMENT_PROVEN, layout_contiguous=True, bytes_match=True, third_call=0x659C1, third_target=0x28800, third_target_section=.text, third_call_proven=True, semantic_effect=UNRESOLVED, ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36742774936,
+      "conclusion": "success",
+      "result_head_sha": "855c4f17e5aa8cd33b364405c697b3e605ecafe8",
+      "trigger": "pull_request",
+      "jobs_passed": "6/6",
+      "artifacts": [
+        {
+          "id": 11111860468,
+          "name": "outrun-vr-host-x64",
+          "digest": "sha256:9fae45d7c89533e0050efef2a0eb6e8da563513aca025479b9083b5c9998bdc1"
+        },
+        {
+          "id": 11111516583,
+          "name": "outrun2006-vr-x86-safe-draw-compare",
+          "digest": "sha256:282da20efb49da724e26fb904e4f9c59ebfebbe53a713472ca708909dff61850"
+        },
+        {
+          "id": 11111461573,
+          "name": "outrun2006-vr-x86-r26-only-diagnostic-DO-NOT-PACKAGE",
+          "digest": "sha256:daccee63abd2edb14b40fea25a038dcdceaa65fc75def0bc7f19e89b035d8eda"
+        },
+        {
+          "id": 11111316831,
+          "name": "outrun2006-vr-x86-c1-r29-r28-classify",
+          "digest": "sha256:790eceb5b639ec3d4995fc2b5a74c57d16f10a3b1fe1a2a609d7f97cff286a1d"
+        },
+        {
+          "id": 11111163285,
+          "name": "outrun2006-vr-x86-c2-r30-hud",
+          "digest": "sha256:a824105b36201daa0b40cb041d492152a4e62e607051051a9d67d9939adb1bb1"
+        },
+        {
+          "id": 11110943419,
+          "name": "outrun2006-vr-x86-r26-hud-safe",
+          "digest": "sha256:25287004b37dcd13a138e52024846f3574a10b13a78d441ac3552a13a26c4d8f"
+        }
+      ]
+    },
+    "pc_fast": {
+      "run_id": 36742770899,
+      "conclusion": "skipped",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5915178509,
+    "validation_comment_id": 5915328780,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Result commit message contains exact marker [AUTO:CONVERSION-DX11-00144] and no CI-skip directive.",
+    "The canonical exact EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "The manually reviewed 0x65970 prefix is contiguous and byte-exact through 0x659C1.",
+    "0x65997->0x28460, 0x659AC->0x28320 and 0x659C1->0x28800 are all aligned CALLs into .text.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game runtime execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 target-C bounded CALL-alignment work is complete through all three raw outbound candidates. Helper semantic/control-flow identity for 0x28460, 0x28320 and 0x28800 remains unresolved; no ScreenHud ownership promotion is justified.",
+  "next_action": "Keep guarded GF hooks spacing-only. Select one separate bounded helper semantic/control-flow proof for 0x28460/0x28320/0x28800, or move to a higher-priority independent DX11 item if durable state changes. Runtime-visible claims still require Quest 3/VDXR evidence."
+}

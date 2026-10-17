@@ -1,0 +1,139 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00542",
+  "production_id": "CONVERSION-DX11-00542",
+  "event_id": "CONVERSION-DX11-00542-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00542",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_COLORWRITE_MASK_OM",
+  "base_sha": "88c1ad2cc0e14f2a7bded09f8ba00e319211e24d",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Read live game D3D9 D3DRS_COLORWRITEENABLE on eligible menu/vehicle/race Draw/DrawIndexed",
+      "Explicitly translate enabled D3D9 RGB/alpha channels into native OM blend RenderTargetWriteMask with alpha blend/no-blend distinct lazy cache",
+      "Submit same game-authored geometry to native Draw/DrawIndexed and copy isolated opt-in desktop inset; original D3D9 Draw and input always preserved"
+    ],
+    "batch_components": [
+      "C++ D3D9 source color-mask legality and explicit DX11 channel translation",
+      "C++ D3D11 cached OM mask/blend binding for live indexed and non-indexed Draw, with reset lifecycle",
+      "Python mutation-negative source integration regression and mask admissibility checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact final material SHA 9f6dcf2 Backend Gate #38137465086 SUCCESS, Win32 Release Build #38137468603 SUCCESS and DX11 Fast #38137465096 SUCCESS; source->native live Draw/DrawIndexed path intact; GPU menu/Quest3 runtime visual pixels UNTESTED.",
+      "negative_regression": "DX11-SAFE-RETURN Python negative mutations passed in Win32 Build; D3D9 zero/alpha-only/unknown mask rejected; native RGB/alpha mask mapping, mode-separated descriptor cache, valid disabled-blend enumerants, omitted OM binding and Reset checks. No game runtime proof.",
+      "component_integration": "Game D3D9 GetRenderState COLORWRITEENABLE -> OutputCapture mask -> D3D11 cached valid BlendState mask/alpha mode -> OMSetBlendState -> real Draw/DrawIndexed -> diagnostic inset, original DX9Ex Draw/input preserved."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_COLORWRITE_MASK_OM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:COLORWRITE_MASK_OM",
+      "tools/test_dx11_first_game_frame_regressions.py:COLORWRITE_MASK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI source/Win32 evidence required; actual source menu/vehicle/race colored pixels, gamepad and Quest3/VDXR parity untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only, native gameplay inactive; invisible, unknown and invalid mask states fail closed, original DX9Ex game Draw/input remains authoritative."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00542.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub source HEAD 88c1ad2, policy, AGENTS, 00541 previous C6 and active ownership inspected",
+    "C1_REVIEW": "PASS selected live game COLORWRITE->native OM state integration, independent of prior 00540 alpha and 00541 scissor; R175 remains blocked/owned",
+    "C2_IMPLEMENT": "PASS C++ game state RGB-visible legal mask producer, actual D3D11 cached per-mask/no-alpha/alpha OM consumer, corrected valid disabled-blend factor enums, reset lifecycle and destructive Python tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA 9f6dcf2: Backend Conversion Gate #38137465086 SUCCESS (validate+readiness), Win32 Release Build #38137468603 SUCCESS (incl DX11 acceptance), OpenXR #38137465098 SUCCESS, DX11 Fast #38137465096 SUCCESS. First material 52526a5 Gate #38136941858/Build #38136944480 also SUCCESS. No game/Quest3/HMD runtime pixel proof.",
+    "C4_COMMIT": "PASS two real source/test/run commits 52526a5 and 9f6dcf2 [AUTO:CONVERSION-DX11-00542] no CI skip, no force, final exact-SHA verified",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in desktop diagnostic-only source, native gameplay remains off; no release binary/Quest3 package requested",
+    "C6_STATE": "PASS_EXACT_SHA material 9f6dcf2; separate [skip ci] C6 bookkeeping, HMD UNTESTED and no backend promotion. AI2 RUN_KEY 00542 counted once +1."
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE_CI",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE_CI",
+    "DX11-VISIBLE-FRAME": "PASS_SOURCE_CI",
+    "DX11-SAFE-RETURN": "PASS_SOURCE_CI",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "next_action": "Dispatch a new independent DX11 feature, prioritize programmable-shader game-created Draw capture/translation and subsequent menu-to-race native frame/OpenXR submission; do not re-run 00542 mask/alpha/scissor. Quest3/VDXR/gamepad full parity testing separately NEED_HMD_TEST.",
+  "runtime_evidence": "No actual OutRun gameplay/menu/vehicle selection/race/gamepad/Quest3 VDXR test in this task; native draw path is opt-in diagnostic-only.",
+  "material_result_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+  "validation_bearing_result_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+  "result_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+  "material_source_shas": [
+    "52526a563005d1cbc43401e14a0ee69e7fdd77be",
+    "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452"
+  ],
+  "feature_status": "SOURCE_INTEGRATED__HMD_PENDING",
+  "source_stage": "BUILD_VERIFIED__GAME_AND_QUEST3_UNTESTED",
+  "validation_gates": {
+    "backend_conversion": {
+      "name": "Backend Conversion Gate",
+      "run_id": 38137465086,
+      "head_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+      "conclusion": "SUCCESS",
+      "jobs": "validate and DX11 readiness smoke success"
+    },
+    "build": {
+      "name": "Build",
+      "run_id": 38137468603,
+      "head_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+      "conclusion": "SUCCESS",
+      "win32_release": "SUCCESS",
+      "source_acceptance": {
+        "DX11-LIVE-CALLSITE": "SUCCESS",
+        "DX11-NATIVE-DRAW": "SUCCESS",
+        "DX11-VISIBLE-FRAME": "SUCCESS",
+        "DX11-SAFE-RETURN": "SUCCESS"
+      }
+    },
+    "openxr": {
+      "name": "OpenXR VR architecture",
+      "run_id": 38137465098,
+      "head_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+      "conclusion": "SUCCESS"
+    },
+    "fast": {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38137465096,
+      "head_sha": "9f6dcf2f08933f65f25e00fae4a0ac64fcc34452",
+      "conclusion": "SUCCESS"
+    }
+  },
+  "validation_history": [
+    {
+      "sha": "52526a563005d1cbc43401e14a0ee69e7fdd77be",
+      "backend_conversion_id": 38136941858,
+      "build_id": 38136944480,
+      "result": "SUCCESS_PRE_FINAL",
+      "note": "Follow-on actual C++ descriptor hardening 9f6dcf2 preserves legal BlendDesc factors for opaque masked output; no duplicate task scoring."
+    }
+  ],
+  "score_change": 1,
+  "scoreboard": {
+    "repo": "thp32tt/ai-dev-lab",
+    "path": "AI_SCOREBOARD.md",
+    "run_key": "CONVERSION-DX11-00542",
+    "previous": 976,
+    "delta": 1,
+    "total": 977,
+    "commit_sha": "ae6b85842b81d1ac7207c7c27f05efacf717c0cf",
+    "confirmed_in_repo": "VERIFIED_REMOTE_ONCE"
+  },
+  "state_persisted": true
+}

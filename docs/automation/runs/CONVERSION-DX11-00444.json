@@ -1,0 +1,50 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00444",
+  "production_id": "CONVERSION-DX11-00444",
+  "event_id": "CONVERSION-DX11-00444-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "f714417e865aa41e3078a49dc7fa7213f15db0f9",
+  "result_sha": "edeb10f046d5a55851e79c655594f27a824ac6cd",
+  "material_result_sha": "edeb10f046d5a55851e79c655594f27a824ac6cd",
+  "validation_bearing_result_sha": "edeb10f046d5a55851e79c655594f27a824ac6cd",
+  "selected_work_item": "DX11_R306_R293_PRODUCTION_PREREQUISITE_ANALYZER_BRIDGE",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R306 adds signature-scoped analyzer ingestion for the existing R293 productionPrerequisiteCensus record. It correlates receipt presence against missingReceiptMask and verifies that R292 exact/static/boundary/snapshot states remain internally consistent, while exporting this evidence strictly as diagnostic-only with ActivationProof=false.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "edeb10f046d5a55851e79c655594f27a824ac6cd"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered branch HEAD f714417e, AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, current lane state, 00443 durable run, VR automation/state documents, regression knowledge and Issue #14",
+    "C1_REVIEW": "PASS: selected analyzer-side R293 gap because runtime already emitted production prerequisite receipt/exactness/mask/snapshot evidence but analyze_dx11_census.py ignored it entirely",
+    "C2_IMPLEMENT": "PASS: added R293 parser, per-signature evidence attachment, receipt-mask/exactness/static/boundary/snapshot correlation checks, diagnostic coverage counters, fail-closed and inconsistent fixtures, and source-graph registration",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37671432245; validate job 112963877232 SUCCESS including DX11 census analyzer and source graph; readiness smoke job 112966360792 SUCCESS",
+    "C4_COMMIT": "PASS: material/validation-bearing result edeb10f046d5a55851e79c655594f27a824ac6cd contains [AUTO:CONVERSION-DX11-00444] and no CI-skip directive",
+    "C5_PACKAGE": "NOT_REQUIRED: analyzer/static evidence change; canonical CI artifact retained only as validation evidence, not a runtime candidate",
+    "C6_STATE": "PASS: durable task record and conversion lane state persisted after exact-SHA Gate; Issue #14 event 6044971083 appended"
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37671432245,
+    "validation_job_id": 112963877232,
+    "readiness_smoke_job_id": 112966360792,
+    "artifact_id": 11504149406,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-edeb10f046d5a55851e79c655594f27a824ac6cd",
+    "artifact_digest": "sha256:b158e1b3018453edc46062c86ad6632745b0cdc05e8fc7b16fc4c586f4d4582a",
+    "issue14_comment_id": 6044971083
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "Inspect R297 productionSourceRevalidation telemetry and analyzer coverage for the same signature-scoped provenance/correlation gap, especially missingEvidenceMask/r258Present/joinExact/snapshot consistency, while keeping NativeDrawPath/Draw/DrawIndexed authorization fail-closed."
+}

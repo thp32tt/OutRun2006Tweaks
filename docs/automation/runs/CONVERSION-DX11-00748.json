@@ -1,0 +1,139 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00748",
+  "production_id": "CONVERSION-DX11-00748",
+  "event_id": "CONVERSION-DX11-00748-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_DIRTY_PRESENT_COVERAGE",
+  "feature_id": "DX11-MENU-RACE-NATIVE-DIRTY-PRESENT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "454d0512a77aa5c7fb0a80e15098f53e5d3485da",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Full-frame native D3D11 menu/vehicle/race readback now may publish through D3D9 Present when the caller's explicit RGNDATA is a verified single whole-backbuffer dirty rectangle. Partial, invalid, mismatched and unbounded regions preserve original D3D9 Present and gamepad; diagnostics remain unchanged.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_dirty_region.hpp",
+    "tools/dx11_full_dirty_present_probe_00748.cpp",
+    "tools/test_dx11_full_dirty_present_00748.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00748.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Capture actual D3D9 Draw/DrawIndexed for full-resolution native D3D11 menu/vehicle/race output",
+      "Validate real D3D9 dirty RGNDATA full-backbuffer coverage at same-source Present, never infer from header alone",
+      "Native GPU staging Map and D3D9 backbuffer UpdateSurface for valid coverage, fallback to unchanged D3D9 Present/gamepad for partial/malformed regions"
+    ],
+    "batch_components": [
+      "Live C++ D3D9 Present dirty region integrated publication decision",
+      "Portable strict backbuffer coverage contract for RGNDATA geometry",
+      "Executable C++ positive/negative test and destructive Python integration tests in GitHub Fast exact-SHA Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00748 whole-backbuffer D3D9 dirty region C++ probe plus native live game Present integrated source; full exact SHA Gate pending",
+      "negative_regression": "Reject partial rect, short buffer, multiple regions, invalid bounds/format; original D3D9 screen and gamepad continue",
+      "component_integration": "Genuine source Draw -> native D3D11 full frame -> GPU fence -> Map -> D3D9 backbuffer UpdateSurface subject to verified full dirty region"
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_DIRTY_PRESENT_COVERAGE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Pending exact-SHA five mandatory GitHub gates, matching Quest3/VDXR HMD and gamepad runtime UNTESTED",
+    "activation_guard_and_fallback": "Requires explicit dual opt-in, original full-game source admission and exact one-full-rectangle dirty coverage; partial/malformed dirty never uploads, original D3D9 Present/input remain untouched"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-NATIVE-DIRTY-PRESENT",
+    "goal": "Publish actual native D3D11 menu/car/race full-backbuffer frames through D3D9 Present with explicit whole-surface dirty region, preserving safe game/input fallback and same-SHA Gates.",
+    "acceptance_items": [
+      {
+        "id": "full-dirty-game-frame",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Live game full-frame GPU readback reaches D3D9 UpdateSurface when dirty RGNDATA contains one exact full-backbuffer rectangle."
+      },
+      {
+        "id": "partial-dirty-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_and_d3d9_fallback",
+        "expected_behavior": "Partial, malformed, wrong-count or mismatched dirty region never publishes native frame, leaves original D3D9 Present and controller intact."
+      },
+      {
+        "id": "exact-sha-full-gates",
+        "category": "integrated_validation",
+        "behavior_area": "ci_win32_openxr_hud",
+        "expected_behavior": "Executable coverage contract and destructive source integration checks plus DX11 Fast, Backend, Windows Build, OpenXR and HUD Gates pass at one exact SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "full-dirty-game-frame": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "partial-dirty-safe-fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "exact-sha-full-gates": "PENDING_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub authoritative branch HEAD, AGENTS, policy, 00747 material+5/5 result reviewed",
+    "C1_REVIEW": "PASS verified whole-backbuffer dirty Present was rejected solely because dirtyRegion pointer nonnull",
+    "C2_IMPLEMENT": "PASS source integrated whole-coverage native publication and fail-closed fallback, executable and destructive probes",
+    "C3_VALIDATE": "REPAIR: Windows Build #38644587249 failed legacy source test before compiler acceptance was complete; updated fail-closed full dirty-region mutation verifier. All exact-SHA Gates pending rerun.",
+    "C4_COMMIT": "PENDING result SHA",
+    "C5_PACKAGE": "NOT_REQUIRED; user owns release",
+    "C6_STATE": "PASS_EXACT_SHA: exact validation SHA 7ba74b621d4c871de8b11524caa9605198260869 GitHub CI SUCCESS; distinct [skip ci] C6 bookkeeping, HMD/gamepad runtime UNTESTED."
+  },
+  "blocking_evidence": "Full native same-Present outputWritable unconditionally required !outputNow.hasDirtyRegion, even if RGNDATA correctly marked the whole backbuffer; unchanged fallback protected partial dirty regions. Same-SHA Win32 Build #38644587249 failed a legacy pre-00748 destructive verifier: safe_inset_copy required literal !outputNow.hasDirtyRegion &&, excluding newly verified fullDirtyCoverage despite real guarded implementation.",
+  "next_action": "C6 exact-SHA build verification recorded. Runtime HMD/gamepad verification remains UNTESTED; packaging by user. No further CI or source changes for this C6 result.",
+  "recorded_at_kst": "2026-10-15 07:00 KST",
+  "material_result_sha": "1bf0e2962b891059a8bfb8adb68f27c4aff535a7",
+  "ci_evidence": {
+    "initial_sha": {
+      "sha": "1bf0e2962b891059a8bfb8adb68f27c4aff535a7",
+      "fast": {
+        "run_id": 38644579708,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 38644587249,
+        "conclusion": "failure",
+        "failure_cause": "obsolete dirty region rejection literal in inherited source verifier"
+      }
+    },
+    "exact_sha": {
+      "sha": "7ba74b621d4c871de8b11524caa9605198260869",
+      "conclusion": "success",
+      "result_basis": "User-confirmed exact SHA CI success; GitHub connector independently returned these successful Build/OpenXR/HUD workflow runs.",
+      "verified_runs": {
+        "windows_build": {
+          "run_id": 38644838021,
+          "conclusion": "success"
+        },
+        "openxr_architecture": {
+          "run_id": 38644838043,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "run_id": 38644838019,
+          "conclusion": "success"
+        }
+      }
+    }
+  },
+  "validation_bearing_result_sha": "7ba74b621d4c871de8b11524caa9605198260869",
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+}

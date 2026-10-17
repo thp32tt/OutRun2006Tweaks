@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00110",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T10:44:19+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "9fa224d7852cdf1f48903eff9b605a7f943747d8",
+  "result_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c",
+  "validation_bearing_result_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F15 projected semantic expressiveness closure on the DX11 branch.",
+  "summary": "The DX11 branch shared backend-neutral semantic policy now represents ProjectedWorldMarker2D and ProjectedScreenEffect2D. GameSemantic::ScopeFromDisasmPolicy maps both exactly to the existing runtime RenderScope classes with compile-time assertions, hud_semantics names both policies, and the backend disassembly verifier guards the projected-policy contract. Existing 25 producer ranges remain unchanged; no ownership is widened or reclassified.",
+  "changed_paths": [
+    "src/vr/game/disasm_render_contract.hpp",
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/hud_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F15",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "VR-R51-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "reason": "This change extends only semantic vocabulary/bridging. Existing runtime projected classes already exist; no existing producer is reassigned to them. Hosted CI proves contract/build integrity only, not HMD visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36654569356,
+      "conclusion": "success",
+      "validated_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c",
+      "artifact_id": 11071214538,
+      "artifact_digest": "sha256:6d731fb902552fbf2b4f8960950ece48f570dd1397507e8183482d76c59a00b9",
+      "evidence": "Queue, HMD-proven baseline, one-click, backend disassembly including F15 projected-policy markers, DX11 native transport/source graph/census, Win32 build, semantic/object/linkage/native probes, binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36654574251,
+      "conclusion": "success",
+      "validated_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c"
+    },
+    "hud_inspector": {
+      "run_id": 36654574348,
+      "conclusion": "success",
+      "validated_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36654574224,
+      "conclusion": "success",
+      "validated_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36654569238,
+      "conclusion": "skipped",
+      "validated_sha": "e66d4fee8dc54648366c5fce5d1a7c427fbf727c"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5902176701,
+    "validation_comment_id": 5902419469,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00110] and no CI-skip directive.",
+    "ProjectedWorldMarker2D and ProjectedScreenEffect2D are represented in the DX11 shared SpacePolicy vocabulary.",
+    "ScopeFromDisasmPolicy maps each projected policy to its existing runtime RenderScope with compile-time assertions.",
+    "hud_semantics names both projected policies.",
+    "The backend disassembly verifier requires projected-policy markers.",
+    "No existing CriticalProducerRanges entry was added, widened or reclassified.",
+    "Backend Conversion Gate, Build, HUD Inspector and OpenXR architecture all pass on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "F15 projected semantic expressiveness is automation-validated on the DX11 branch. Existing producer ownership remains unchanged and runtime visual behavior is untested.",
+  "next_action": "F16 semantic-tag overflow remains the next software-only Set04 semantic safety gap on vr-dx11-native-r71 unless a higher-priority independent DX11 exactness item appears. Keep runtime claims HMD-gated."
+}

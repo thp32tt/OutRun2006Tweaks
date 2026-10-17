@@ -1,0 +1,132 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00597",
+  "production_id": "CONVERSION-DX11-00597",
+  "event_id": "CONVERSION-DX11-00597-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00597",
+  "work_key": "DX11:MENU_RACE_NATIVE_PREMULTIPLIED_OM",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "aba86639e5e6ab404641759b4211191b5fcb65a9",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game D3D9 ONE/INVSRCALPHA and BLENDOP capture",
+      "Exact DX11 premultiplied RGB/alpha OM and per-channel mask binding",
+      "Game-authored Draw/DrawIndexed -> native diagnostic inset while DX9Ex and input survive"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_premultiplied_00597.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Premultiplied native OM numerical 8481 cases and exact-SHA Gate",
+      "negative_regression": "15 destructive producer/consumer mutations and prior additive regression",
+      "component_integration": "Real D3D9 state -> D3D11 OM -> native Draw/DrawIndexed -> game diagnostic Present"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_PREMULTIPLIED_OM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:PREMULTIPLIED_OM"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR actual menu/vehicle/race visual and gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1, never replaces original D3D9 Draw/Present/input; native backend remains dormant by default"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_premultiplied_00597.py",
+    "tools/test_dx11_native_game_blends_00596.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00597.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD-tested distribution for diagnostic-only native inset"
+  },
+  "next_action": "Quest3/VDXR real menu, vehicle selection, race, gamepad and diagnostic inset parity still NEED_HMD_TEST; never infer full native gameplay activation. Next independent DX11 code task assigned by controller; 00597 is complete.",
+  "runtime_evidence": null,
+  "material_result_sha": "c0c9abf67e71533cde88c5b6362f74a14cadf8ad",
+  "validation_bearing_result_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "validation_bearing_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "result_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "c6_basis_head_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "validation_source_repair_shas": [
+    "b85eb3a90a96d14a2762a65132cdfc3523916480",
+    "72556f5935d96c8e26d40b97552822bb11e24374"
+  ],
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38216955825,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38216959979,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38216955724,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38216959978,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38216959957,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    }
+  ],
+  "evidence": {
+    "backend_gate_run": 38216955825,
+    "backend_gate_conclusion": "success",
+    "windows_build_run": 38216959979,
+    "windows_build_conclusion": "success",
+    "dx11_fast_run": 38216955724,
+    "dx11_fast_conclusion": "success",
+    "openxr_run": 38216959978,
+    "openxr_conclusion": "success",
+    "hud_run": 38216959957,
+    "hud_conclusion": "success",
+    "result_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+  },
+  "local_validation": [
+    "Live D3D9 ONE/INVSRCALPHA -> native premultiplied D3D11 OM Draw/DrawIndexed code material, masked OM and safe DX9Ex opt-in preserved",
+    "15 destructive source mutations and 8481 numeric blend cases executed through GitHub Backend validate",
+    "Legacy 00596 additive source-mutation duplicate factor guard fixed; 00597 premultiplied duplicated reset guard fixed",
+    "Exact-SHA Backend validate+readiness, Windows Build, DX11 Fast, OpenXR, HUD all SUCCESS"
+  ],
+  "ci_failure_repair": "Initial c0c9abf Gate 00596 legacy additive destructive mutation failed when new valid ONE factor duplicated. b85eb3a guarded both occurrences. New 00597 reset mutation likewise guarded both lifecycle reset occurrences at 72556f59. Final exact-SHA five required workflows all SUCCESS."
+}

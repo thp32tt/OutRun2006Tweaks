@@ -1,0 +1,147 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00878",
+  "production_id": "CONVERSION-DX11-00878",
+  "event_id": "CONVERSION-DX11-00878-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_NATIVE_D3D11_0_PARTIAL_TARGET_COLOR_CLEAR",
+  "feature_id": "DX11:GAME_NATIVE_PARTIAL_TARGET_COLOR_CLEAR_GPU_REPLAY",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "90666c5ab122ea1575dc6f9d017f36b86fe31411",
+  "validation_bearing_result_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe",
+  "result_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Implement a real per-eye D3D11.0 GPU color raster for game-authored cropped TARGET Clears without D3D11.1 ClearView; keep the original per-eye ordered scene timeline.",
+      "Clip GPU color clear to the exact original D3D9 game rectangle, disable blend/depth/scissor and restore prior host/game OM, IA, shader and predicate state.",
+      "Preflight both stereo eye color formats and D3D compiler availability before the first eye GPU write, preserve fail-closed DX9Ex fallback, original input/FFB/SkyGlow and DXVK freeze."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+      "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ source now routes genuine cropped TARGET Clears to a scoped GPU shader raster in D3D11.0 when ID3D11DeviceContext1 is unavailable; full-eye cases still use standard ClearRenderTargetView.",
+      "negative_regression": "C++ route static asserts and independent Fast Gate activation audit/tamper checks reject malformed/offscreen clear rectangles, foreign format, missing compiler preflight, state-restoration removal and unauthorized geometry Draw evidence.",
+      "component_integration": "ColorClearRoute is consumed by the actual game eye encoder, authentic ordered Clear timeline and both-eye GPU preflight; audited shader helper restores outputs and never increments draw_count."
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_D3D11_0_PARTIAL_TARGET_COLOR_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA source/Windows/VR/transport/GitHub checks succeeded, but OutRun 2006 game/menu/car/race pixels on Quest3/VDXR remain unverified.",
+    "activation_guard_and_fallback": "Native DX11 backend not promoted; unsupported paths retain original D3D9Ex frame and gamepad/FFB."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_NATIVE_PARTIAL_TARGET_COLOR_CLEAR_GPU_REPLAY",
+    "goal": "Preserve genuine cropped menu/car/race TARGET Clear pixels in independently replayed left/right D3D11.0 GPU eye frames while maintaining the original fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "source_authored_partial_target_clear_gpu_replay",
+        "expected_behavior": "Cropped game TARGET Clears use exactly bounded, GPU-only D3D11.0 color raster without fabricating game geometry Draw evidence."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "two_eye_preflight_and_original_dx9ex",
+        "expected_behavior": "Out-of-bounds/unsupported color/source and compiler failures reject before GPU publication and preserve unchanged game input, FFB and DX9Ex fallback."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_five_mandatory_build_gates",
+        "expected_behavior": "Fast, Backend, Windows Build, OpenXR and HUD Inspector must all succeed on one validation-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_eye_partial_depth_activation.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub authenticated branch initial HEAD 8f7afa460439700cfc16e6ca14ee3ac11a51950c; previous 00877 full Z/stencil route not duplicated.",
+    "C1_REVIEW": "PASS: Cropped source TARGET Clear incorrectly required D3D11.1 ClearView even when D3D11.0 raster could preserve region; chose a separate game-visible native GPU path.",
+    "C2_IMPLEMENT": "PASS: material 90666c5ab122ea1575dc6f9d017f36b86fe31411 implemented actual D3D11.0 rectangular per-eye GPU color Clear and source regression.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: be0b4ff19e04d9ce034c7e606f7185e3a39dbafe 5/5 mandatory GitHub Actions SUCCESS; first material SHA activation-contract failure repaired by separate restricted audit 5b40ac85, then incorrect tamper target repaired be0b4ff, same TASK and no gate weakening.",
+    "C4_COMMIT": "PASS: material 90666c5ab122ea1575dc6f9d017f36b86fe31411 includes [AUTO:CONVERSION-DX11-00878]; causal CI-only commits 5b40ac85cab73b3e35f171f2bc9858da7fa4c1b8 and be0b4ff19e04d9ce034c7e606f7185e3a39dbafe are separate with no independent development credit.",
+    "C5_PACKAGE": "NOT_REQUIRED: no user-testable/native Quest3/VDXR package or live renderer backend promotion.",
+    "C6_STATE": "PASS_EXACT_SHA: be0b4ff19e04d9ce034c7e606f7185e3a39dbafe confirmed five-Gate SUCCESS; checkpoint bookkeeping separate, real HMD/gamepad testing UNTESTED."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "90666c5ab122ea1575dc6f9d017f36b86fe31411",
+    "validation_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe",
+    "causal_ci_repair_shas": [
+      "5b40ac85cab73b3e35f171f2bc9858da7fa4c1b8",
+      "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe"
+    ],
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39027529619,
+        "conclusion": "success",
+        "head_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39027529600,
+        "conclusion": "success",
+        "head_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe"
+      },
+      {
+        "name": "Build",
+        "id": 39027533389,
+        "conclusion": "success",
+        "head_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39027533362,
+        "conclusion": "success",
+        "head_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39027533346,
+        "conclusion": "success",
+        "head_sha": "be0b4ff19e04d9ce034c7e606f7185e3a39dbafe"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "live_menu_vehicle_race_test": "NOT_PERFORMED",
+    "quest3_vdxr_hmd_test": "NOT_PERFORMED"
+  },
+  "next_action": "Do not rerun this TASK's exact-SHA CI, reproduce C6, or double score retries. Controller owns next independent game source integration."
+}

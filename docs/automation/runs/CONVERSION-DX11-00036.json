@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00036",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "recorded_kst": "2026-09-29T11:15:00+09:00",
+  "base_sha": "eda8005cb0fbafa671ffc25cb4a8f779ac4cd0de",
+  "code_result_sha": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+  "result_sha": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R89 hosted vertex-shader input-signature contract smoke for R88 FVF blend-weight/index layouts.",
+  "summary": "R89 hosted vertex-shader input-signature semantic smoke completed after an evidence-backed link repair. Backend Conversion Gate 36508328443 failed because D3DReflect referenced IID_ID3D11ShaderReflection while the smoke target omitted dxguid.lib. ATTEMPT 2 repair commit aac1839f6af310c2e4b34388f3ff4032a3a756a2 added dxguid.lib to cmake.toml and generated CMakeLists.txt plus a source-graph guard. ATTEMPT 3 verified that exact repair SHA across Backend Conversion Gate, Build, OpenXR and HUD Inspector. Production renderer/runtime behavior was not changed by the repair.",
+  "evidence": [
+    "Failure run 36508328443: Build DX11 input-signature semantic smoke failed with LNK2019 unresolved external symbol _IID_ID3D11ShaderReflection.",
+    "Job log proves dx11_input_signature_semantics compiled pipeline_translation.cpp/state_translation.cpp/test source and failed only at link; prior R87/R88 semantic smokes passed.",
+    "Repair commit aac1839f6af310c2e4b34388f3ff4032a3a756a2 adds dxguid.lib to cmake.toml and generated CMakeLists.txt, and verifies the link contract in tools/verify_dx11_source_graph.py.",
+    "Backend Conversion Gate 36509613920 PASS on exact repair SHA, including Verify DX11 source graph, Build DX11 input-signature semantic smoke and Run DX11 input-signature semantic smoke.",
+    "Build 36509617864 PASS on exact repair SHA.",
+    "OpenXR VR architecture 36509617873 PASS across all six jobs on exact repair SHA.",
+    "HUD Inspector 36509617857 PASS on exact repair SHA.",
+    "No Quest 3/VDXR, game execution, GPU input-layout creation/binding, or native D3D11 runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "cmake.toml",
+      "result": "Added dxguid.lib to dx11_input_signature_semantics link-libraries so D3DReflect resolves IID_ID3D11ShaderReflection."
+    },
+    {
+      "path": "CMakeLists.txt",
+      "result": "Added generated dxguid.lib link entry for dx11_input_signature_semantics."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added R89 link contract guard requiring dxguid.lib in generated and source-of-truth CMake graphs."
+    }
+  ],
+  "semantic_cases": {
+    "supported": [
+      "D3DFVF_XYZB5 -> POSITION float3 + BLENDWEIGHT0 float4 + BLENDWEIGHT1 float reflected signature",
+      "D3DFVF_XYZB3 | LASTBETA_UBYTE4 -> BLENDINDICES uint4 reflected signature",
+      "D3DFVF_XYZB2 | LASTBETA_D3DCOLOR -> BLENDINDICES float4 reflected signature for UNORM input",
+      "D3DFVF_XYZB4 | NORMAL -> blend-weight plus NORMAL reflected signature"
+    ],
+    "fail_closed": [
+      "UBYTE4 BLENDINDICES descriptor paired with float4 BLENDINDICES HLSL must fail the reflected component-type contract"
+    ]
+  },
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "R88_BLEND_DESCRIPTOR_SUBSET_PLUS_R89_HOSTED_SHADER_SIGNATURE_CONTRACT_AUTOMATION_PASS_RUNTIME_PARITY_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "SUPPORTED_SUBSET_HAS_GENERATION_COMPILER_AND_DETERMINISTIC_SEMANTIC_SMOKE_NATIVE_BINDING_NOT_ENABLED",
+    "F21_shader_translation_readiness": "PROGRAMMABLE_TRANSLATION_OPEN_R89_ONLY_INPUT_SIGNATURE_CONTRACT",
+    "F22_sampling_signature_saturation": "OPEN_RUNTIME_CENSUS_COVERAGE_LIMITS_REMAIN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED_AND_HOSTED_CONTRACT_SEPARATED_FROM_RUNTIME"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R89 hosted reflection/ABI smoke and its link repair do not create or bind a D3D11 input layout/shader in the game runtime and do not prove Quest3/VDXR parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36509613920,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+      "dx11_source_graph": "PASS",
+      "win32_build": "PASS",
+      "input_signature_smoke_build": "PASS",
+      "input_signature_smoke_run": "PASS",
+      "artifact_id": 11008773212,
+      "artifact_digest": "sha256:f5c2183542d6334e37cb178fc33b5d1cdccbacf2700fbfd314468c6c963c0584"
+    },
+    "build": {
+      "run_id": 36509617864,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+      "artifact_id": 11008413556,
+      "artifact_digest": "sha256:ba6018c656f249bd09dbcbb246e24550d8fe5407f2566e438415a8adbdba0db8"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36509617873,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 11008692864,
+      "host_artifact_digest": "sha256:e311ec33e5492289889b3e10e121508af922728fb706bca92fe21b0ea13c4595"
+    },
+    "hud_inspector": {
+      "run_id": 36509617857,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+      "artifact_id": 11008603447,
+      "artifact_digest": "sha256:9b004c2bf0a2675b9ddabaf57d06d01184a76af42dd65b65722a169e10075250"
+    },
+    "pc_fast": {
+      "run_id": 36509613800,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "blocker": null,
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5881835145,
+    "prior_validation_comment_id": 5881919815,
+    "validation_comment_id": 5882439198
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. The next bounded DX11 task should use the now-hosted-validated R88/R89 input contract to advance a non-routing input-layout object/probe or another narrowly scoped F19/F21 prerequisite, without claiming runtime parity. Exact-build Quest3/VDXR validation remains required.",
+  "finalized_kst": "2026-09-29T11:15:00+09:00",
+  "failure_context": {
+    "run_id": 36508328443,
+    "conclusion": "failure",
+    "failed_step": "Build DX11 input-signature semantic smoke",
+    "error": "LNK2019 unresolved external symbol _IID_ID3D11ShaderReflection",
+    "root_cause": "D3DReflect interface IID lives in dxguid.lib; smoke target omitted that GUID provider.",
+    "repaired_by": "aac1839f6af310c2e4b34388f3ff4032a3a756a2",
+    "repeated_without_change": false
+  }
+}

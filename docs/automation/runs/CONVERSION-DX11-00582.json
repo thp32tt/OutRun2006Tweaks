@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00582",
+  "production_id": "CONVERSION-DX11-00582",
+  "event_id": "CONVERSION-DX11-00582-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00582",
+  "base_sha": "7b6bbbaf4b0fb61e80e4d3664c50652a768ae2a9",
+  "work_key": "DX11:MENU_RACE_SELECTARG_ADDSMOOTH_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 game-authored stage0 SELECTARG1/2 RGB with ADDSMOOTH alpha admission",
+      "D3D11 HLSL shader create/select and native Draw/DrawIndexed to opt-in visible inset"
+    ],
+    "batch_components": [
+      "C++ D3D9 fixed-function state capture and fail-closed admission",
+      "Two HLSL PS objects and D3D11 submission dispatch",
+      "20 negative-mutation tests wired to exact-SHA conversion Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 ADDSMOOTH Arg1 + Arg2*(1-Arg1) alpha for both RGB selectors",
+      "negative_regression": "20 deliberate mutations and five arithmetic cases",
+      "component_integration": "Game-authored D3D9 callsite -> DX11 shader -> native Draw -> visible frame inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SELECTARG_ADDSMOOTH_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SELECTARG_ADDSMOOTH"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "activation_guard_and_fallback": "Only OUTRUN_DX11_FIRST_GAME_FRAME=1 explicit opt-in, D3D9 original Draw preserved and DX9Ex fallback; default gameplay replacement OFF",
+    "visible_frame_acceptance": "Existing 256x144 diagnostic native output only; Quest3/VDXR menu/race/gamepad runtime requires HMD"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_selectarg_addsmooth_00582.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00582.json"
+  ],
+  "evidence": {
+    "static_precommit": "20 new destructive mutation regressions plus 5 ADDSMOOTH arithmetic cases wired to mandatory Backend Gate",
+    "runtime_validation": "UNTESTED",
+    "initial_windows_build": {
+      "run_id": 38193000888,
+      "conclusion": "failure",
+      "reason": "legacy fixed-function ADD readiness contiguous source anchor changed; verified via job 114629580294 logs"
+    },
+    "repair": {
+      "sha": "00c3c91040e0138a31200ba5b8d5b0abb463203a",
+      "description": "restored original readiness substring while preserving native new PS readiness; no test removal/weakening"
+    },
+    "backend_gate": {
+      "run_id": 38193205092,
+      "attempt": 2,
+      "head_sha": "00c3c91040e0138a31200ba5b8d5b0abb463203a",
+      "conclusion": "success",
+      "validate_job_id": 114630313864,
+      "validate": "success",
+      "readiness_smoke": "success"
+    },
+    "build": {
+      "run_id": 38193207723,
+      "conclusion": "success",
+      "feature_acceptance": [
+        "DX11-LIVE-CALLSITE",
+        "DX11-NATIVE-DRAW",
+        "DX11-VISIBLE-FRAME",
+        "DX11-SAFE-RETURN"
+      ]
+    },
+    "dx11_fast": {
+      "run_id": 38193205090,
+      "conclusion": "success"
+    },
+    "openxr": [
+      {
+        "run_id": 38193205087,
+        "conclusion": "success"
+      },
+      {
+        "run_id": 38193207744,
+        "conclusion": "success"
+      }
+    ],
+    "hud_inspector": {
+      "run_id": 38193207734,
+      "conclusion": "success"
+    },
+    "issue14_initial_comment_id": 6116297944,
+    "quest3_vdxr_gamepad": "NOT_TESTED; DO_NOT_CLAIM_RUNTIME_PASS"
+  },
+  "next_action": "FEATURE_ID MENU_TO_RACE_NATIVE_FRAME remains open for new real game native draw combinations and Quest3/VDXR HMD menu/vehicle/race/gamepad runtime parity. Do NOT redo TASK_ID=CONVERSION-DX11-00582, no DXVK, no automatic native gameplay promotion.",
+  "material_result_sha": "4cf1ad50c86e1cf1c6208069d7b664e53637aaae",
+  "validation_bearing_result_sha": "00c3c91040e0138a31200ba5b8d5b0abb463203a",
+  "checkpoints": {
+    "C0_RECOVER": "PASS: latest branch HEAD 7b6bbbaf, AGENTS, DX11 policy, 00581 task record and owner boundaries inspected",
+    "C1_REVIEW": "PASS: select arg RGB plus independent ADDSMOOTH alpha not yet native",
+    "C2_IMPLEMENT": "PASS: two actual native HLSL PS, game stage0 capture/admission, Draw/DrawIndexed dispatch and 20 negative tests",
+    "C3_VALIDATE": "PASS: exact-SHA 00c3c910 Backend Conversion Gate #38193205092 and Win32 Build #38193207723, DX11 Fast #38193205090, OpenXR #38193205087/#38193207744, HUD #38193207734",
+    "C4_COMMIT": "PASS: initial 4-file material 4cf1ad50 and source regression repair 00c3c910 with exact marker, non-force; no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: opt-in diagnostic inset only, no HMD game parity or player-facing native promotion",
+    "C6_STATE": "PASS: durable run record sealed in separate [skip ci] bookkeeping commit; result SHA remains 00c3c910"
+  }
+}

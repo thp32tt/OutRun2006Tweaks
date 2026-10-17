@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00011",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "recorded_kst": "2026-09-29T01:33:23+09:00",
+  "base_sha": "019cc5ff8e25a5e065332aae0a16c9a38b0780b0",
+  "code_result_sha": "325b3a5b90cd37690a70b2be2ceddbc9b9794f00",
+  "result_sha": "325b3a5b90cd37690a70b2be2ceddbc9b9794f00",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R76 passive 2D texture mutation/update census coverage for F18 without native D3D11 draw activation.",
+  "summary": "Added observation-only IDirect3DTexture9 LockRect/UnlockRect and IDirect3DDevice9 UpdateTexture/UpdateSurface coverage using the existing R30 hook layer. R76 reports texture write/read-only unlocks, descriptor failures, and device update success/failure counts. Analyzer regression and source-graph contracts cover R76 while NativeDrawPathActivationAllowed remains false.",
+  "failure_context": {
+    "reported_run_id": 36450746676,
+    "reported_conclusion": "cancelled",
+    "diagnosis": "The run validated intermediate SHA c892cea4b710a532d7e6aace3ad0b74a81ca5530 and was cancelled when later same-task commits superseded the branch head. No failed job or test existed to repair.",
+    "corrective_action": "Completed the missing R76 analyzer regression/source-graph contracts, then held final SHA 325b3a5b90cd37690a70b2be2ceddbc9b9794f00 stable until all exact-SHA validation workflows completed."
+  },
+  "source_commits": [
+    "17bb00fe3c587a47783fab291ec41b382d384883",
+    "048f1eae13fc0e24aaf04861556002ecb89cc387",
+    "c892cea4b710a532d7e6aace3ad0b74a81ca5530",
+    "adc63dc1c9a29e572a05d208928e1475a105f058",
+    "5a45cd1f116ae983c711e57742913e3d57be86a1",
+    "fafe2fbd0f12a2c053ab10070cca23e4f1df41c7",
+    "325b3a5b90cd37690a70b2be2ceddbc9b9794f00"
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/runtime_census.hpp",
+      "result": "Added R76 texture LockRect/UnlockRect and UpdateTexture/UpdateSurface observation API."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added passive texture mutation registry/counters and R76 periodic census output; native draw routing remains disabled."
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "result": "Bridged existing R30 device/resource hook infrastructure to texture Create/LockRect/UnlockRect and device UpdateSurface/UpdateTexture observations."
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "result": "Applied the same R76 observation bridge to the active R26-safe renderer variant."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R76 summary/signature compatibility and texture mutation fields."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R76 analyzer regression case while preserving R72-R75 compatibility."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for R76 APIs, counters, hook indices/bridges, and analyzer contract."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "VB_IB_AND_2D_TEXTURE_MUTATION_OBSERVATION_COVERED_MANAGED_RESET_MODEL_OPEN",
+    "F19_input_layout_readiness": "OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "OPEN",
+    "F21_shader_translation_readiness": "OPEN",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "reason": "R76 is observation-only. Live D3D11 resource mirror ownership is not enabled; MANAGED CPU-shadow/reset-generation, input-layout/shader readiness, and exact-build Quest 3/OpenXR visual parity remain prerequisites."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36451009169,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "325b3a5b90cd37690a70b2be2ceddbc9b9794f00",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10982859171,
+      "artifact_digest": "sha256:36962af9137f146f9435a890565f59165b29ac0c49321bcf6b9dc24bf7489dbc"
+    },
+    "build": {
+      "run_id": 36451015469,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "325b3a5b90cd37690a70b2be2ceddbc9b9794f00",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10984122115,
+      "binary_artifact_digest": "sha256:5d58c2724001e2ae4cff8779f619de505797ef1f65f1a6d39023995bb44322dc"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36451015447,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "325b3a5b90cd37690a70b2be2ceddbc9b9794f00",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10982783805,
+      "host_artifact_digest": "sha256:7ddc28f6b140417f851d40839dff5d4adca51d4d280a24c729db69514f8491eb"
+    },
+    "hud_inspector": {
+      "run_id": 36451015584,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "325b3a5b90cd37690a70b2be2ceddbc9b9794f00",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10983552684,
+      "artifact_digest": "sha256:cd98b72880647c933287b43ea60705c53ae250541df4c88c88e70357785688c0"
+    }
+  },
+  "validation_notes": [
+    "The failure-context run 36450746676 was cancellation-by-superseding-commit, not a source/test failure.",
+    "Final production SHA 325b3a5b90cd37690a70b2be2ceddbc9b9794f00 passed Backend Conversion Gate, Build, OpenXR VR architecture and HUD Inspector CI.",
+    "AUTOMATION_VALIDATION=PASS covers static, analyzer, build and architecture evidence only.",
+    "RUNTIME_VALIDATION=UNTESTED because no Quest 3/HMD/in-game execution was performed."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5874220935,
+    "validation_comment_id": 5874313886
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false. A later bounded DX11 task may implement the MANAGED CPU-shadow/reset-generation model. F19/F21 remain open. Exact-build Quest 3/VDXR runtime parity is mandatory before native draw promotion.",
+  "finalized_kst": "2026-09-29T01:33:23+09:00"
+}

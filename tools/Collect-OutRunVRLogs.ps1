@@ -94,7 +94,7 @@ $kv=@{}
 Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1]]=$matches[2]}}
 $backend=$kv.backend
 if(!$backend){throw 'backend identity missing'}
-$variant=if($kv.variant){$kv.variant}else{switch($backend){'d3d9'{'A_CONTROL'};'dxvk-safe'{'E_DXVK_SAFE'};'dxvk'{'E_DXVK_MULTIVIEW'};'dx12'{'F_DX12_STRICT'};'2d'{'CONTROL_2D'};default{'UNKNOWN'}}}
+$variant=if($kv.variant){$kv.variant}else{switch($backend){'d3d9'{'A_CONTROL'};'dxvk-safe'{'E_DXVK_SAFE'};'dxvk'{'E_DXVK_MULTIVIEW'};'2d'{'CONTROL_2D'};default{'UNKNOWN'}}}
 $profile=if($kv.profile){$kv.profile}else{'CORRECTNESS'}
 $matrix=if($kv.matrix){$kv.matrix}else{'UNIFIED'}
 $activeSourceSha=if($kv.sourceSha){[string]$kv.sourceSha}else{'unknown'}
@@ -135,6 +135,58 @@ if(Test-Path $captureRoot){
 }
 $inputs=Join-Path $root 'BUILD_INPUTS.json'
 if(Test-Path $inputs){Copy-Item $inputs $dest -Force}
+
+$visualChecklistPath=Join-Path $root 'ONE_RUN_VISUAL_CHECKLIST.txt'
+if(Test-Path $visualChecklistPath){
+    try{
+        Copy-Item $visualChecklistPath $dest -Force
+        $copied+='ONE_RUN_VISUAL_CHECKLIST.txt'
+    }catch{
+        Write-Warning "Could not collect ONE_RUN_VISUAL_CHECKLIST.txt: $($_.Exception.Message)"
+    }
+}
+
+$oneClickPreflightPath=Join-Path $root 'VR_ONE_CLICK_PREFLIGHT.json'
+if(Test-Path $oneClickPreflightPath){
+    try{
+        Copy-Item $oneClickPreflightPath $dest -Force
+        $copied+='VR_ONE_CLICK_PREFLIGHT.json'
+    }catch{
+        Write-Warning "Could not collect VR_ONE_CLICK_PREFLIGHT.json: $($_.Exception.Message)"
+    }
+}
+
+$oneClickTargetPath=Join-Path $root 'VR_ONE_CLICK_TARGET.json'
+$oneClickTarget=$null
+$developmentBranch='unknown'
+$rendererTarget='unknown'
+$developmentStage='unknown'
+$nativeDrawPathActive=$false
+$dxvkVersion=''
+if(Test-Path $oneClickTargetPath){
+    try{
+        $oneClickTarget=Get-Content $oneClickTargetPath -Raw|ConvertFrom-Json
+        if($oneClickTarget.DevelopmentBranch){$developmentBranch=[string]$oneClickTarget.DevelopmentBranch}
+        if($oneClickTarget.RendererTarget){$rendererTarget=[string]$oneClickTarget.RendererTarget}
+        if($oneClickTarget.Stage){$developmentStage=[string]$oneClickTarget.Stage}
+        if($null -ne $oneClickTarget.NativeDrawPathActive){$nativeDrawPathActive=[bool]$oneClickTarget.NativeDrawPathActive}
+        if($oneClickTarget.DxvkVersion){$dxvkVersion=[string]$oneClickTarget.DxvkVersion}
+        Copy-Item $oneClickTargetPath $dest -Force
+        $copied+='VR_ONE_CLICK_TARGET.json'
+    }catch{
+        Write-Warning "Could not parse VR_ONE_CLICK_TARGET.json: $($_.Exception.Message)"
+    }
+}
+
+if($backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'){
+    foreach($name in @('DXVK_VERSION.txt','DXVK_D3D9_SHA256.txt')){
+        $providerMeta=Join-Path $root ("backends/dxvk/" + $name)
+        if(Test-Path $providerMeta){
+            Copy-Item $providerMeta $dest -Force
+            $copied+=$name
+        }
+    }
+}
 
 $matchesUpstream=$false
 $exeSemanticIdentity='MISSING'
@@ -253,10 +305,33 @@ if(Test-Path $hudCsv){
 
 $sha=if($state.SourceSha){[string]$state.SourceSha}else{$activeSourceSha}
 if($sha -eq 'unknown'){
-    $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe'){'d3d9'}else{$backend}
+    $payloadBackend=if($backend -eq '2d' -or $backend -eq 'dxvk-safe' -or $backend -eq 'dx11'){'d3d9'}else{$backend}
     $source=Join-Path $root "backends/$payloadBackend/SOURCE_SHA.txt"
     if(Test-Path $source){$sha=(Get-Content $source -Raw).Trim()}
 }
+$dx11CensusAnalyzer=Join-Path $root 'analyze_dx11_census.py'
+if($rendererTarget -eq 'dx11-native' -and (Test-Path $dx11CensusAnalyzer)){
+    $python=Get-Command python -ErrorAction SilentlyContinue
+    if($python){
+        try{
+            $dx11CensusOut=Join-Path $dest 'DX11_CENSUS_SUMMARY.json'
+            & $python.Source $dx11CensusAnalyzer --session-dir $dest --output $dx11CensusOut
+            if($LASTEXITCODE -ne 0){
+                throw "DX11 census analyzer exited with code $LASTEXITCODE"
+            }
+            if(Test-Path $dx11CensusOut){$copied+='DX11_CENSUS_SUMMARY.json'}
+        }catch{
+            @(
+                'DX11_CENSUS_ANALYSIS_STATUS=ERROR'
+                "message=$($_.Exception.Message)"
+            )|Set-Content (Join-Path $dest 'DX11_CENSUS_ANALYSIS_ERROR.txt') -Encoding UTF8
+            $copied+='DX11_CENSUS_ANALYSIS_ERROR.txt'
+        }
+    }else{
+        Write-Warning 'python not found; DX11 census JSON extraction skipped.'
+    }
+}
+
 $analyzer=Join-Path $root 'Analyze-OutRunVRSession.ps1'
 if(Test-Path $analyzer){
     try {
@@ -280,7 +355,11 @@ $analysisRequest=[ordered]@{
     AutoAnalyzeOnUpload=$true
     RequiresUserDescription=$false
     Project='OutRun2006Tweaks VR'
-    IntegrationBranch='vr-d3d9ex-focus'
+    IntegrationBranch=$developmentBranch
+    RendererTarget=$rendererTarget
+    DevelopmentStage=$developmentStage
+    NativeDrawPathActive=$nativeDrawPathActive
+    DxvkVersion=$dxvkVersion
     BuildMatrixId=$matrix
     VariantId=$variant
     Backend=$backend
@@ -291,6 +370,9 @@ $analysisRequest=[ordered]@{
     ConfigSha256=$configHash
     ExeIdentityFile='EXE_IDENTITY.txt'
     PrimaryManifest='variant_manifest.json'
+    OneClickPreflightFile='VR_ONE_CLICK_PREFLIGHT.json'
+    VisualGateChecklist='ONE_RUN_VISUAL_CHECKLIST.txt'
+    BackendSummaryFile=$(if($rendererTarget -eq 'dx11-native'){'DX11_CENSUS_SUMMARY.json'}elseif($rendererTarget -eq 'dxvk'){'DXVK_SESSION_SUMMARY.json'}else{''})
     AnalysisContract='Treat upload of this ZIP as an immediate analysis request. Do not require the user to restate symptoms. Validate identity first, then analyze all available runtime evidence, correlate with static/reverse-engineering evidence, and report actionable findings. Missing optional evidence should reduce confidence, not block analysis.'
 }
 $analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_REQUEST.json') -Encoding UTF8
@@ -306,6 +388,9 @@ $analysisRequest|ConvertTo-Json -Depth 5|Set-Content (Join-Path $dest 'ANALYSIS_
     "backend=$backend"
     "profile=$profile"
     "sourceSha=$sha"
+    "developmentBranch=$developmentBranch"
+    "rendererTarget=$rendererTarget"
+    "developmentStage=$developmentStage"
 )|Set-Content (Join-Path $dest 'UPLOAD_THIS_ZIP.txt') -Encoding UTF8
 $copied+='ANALYSIS_REQUEST.json'
 $copied+='UPLOAD_THIS_ZIP.txt'
@@ -338,6 +423,11 @@ if($assetSemanticsPresent){
     "SESSION_STARTED_UTC=$($startedUtc.ToString('o'))"
     "BUILD_MATRIX=$matrix"
     "SOURCE_SHA=$sha"
+    "DEVELOPMENT_BRANCH=$developmentBranch"
+    "RENDERER_TARGET=$rendererTarget"
+    "DEVELOPMENT_STAGE=$developmentStage"
+    "NATIVE_DRAW_PATH_ACTIVE=$nativeDrawPathActive"
+    "DXVK_VERSION=$dxvkVersion"
     "CONFIG_SHA256=$configHash"
     "EXE_SEMANTIC_IDENTITY=$exeSemanticIdentity"
     "EXE_SEMANTIC_BASELINE_VALID=$matchesUpstream"
@@ -361,6 +451,11 @@ if($assetSemanticsPresent){
     SessionStartedUtc=$startedUtc.ToString('o')
     BuildMatrixId=$matrix
     GitSha=$sha
+    DevelopmentBranch=$developmentBranch
+    RendererTarget=$rendererTarget
+    DevelopmentStage=$developmentStage
+    NativeDrawPathActive=$nativeDrawPathActive
+    DxvkVersion=$dxvkVersion
     ConfigSha256=$configHash
     ExeSemanticIdentity=$exeSemanticIdentity
     ExeSemanticBaselineValid=$matchesUpstream

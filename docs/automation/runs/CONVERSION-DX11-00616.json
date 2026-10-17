@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00616",
+  "production_id": "CONVERSION-DX11-00616",
+  "event_id": "CONVERSION-DX11-00616-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00616",
+  "work_key": "DX11:LIVE_STAGE0_BLENDCURRENTALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "base_head_sha": "e8d09e329f816ce1774f07f9ce2f4bbcf2fcb8c8",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_TEXTURE_STAGE0_OPS",
+      "STAGE0_CURRENT_ALPHA_CANONICALIZATION",
+      "VERIFIED_DIFFUSE_ALPHA_NATIVE_PS",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage0_blend.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_stage0_current_alpha_probe.cpp",
+      "tools/test_dx11_stage0_current_alpha_00616.py",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 stage0 BLENDCURRENTALPHA in RGB and independently in alpha resolves to the existing native BLENDDIFFUSEALPHA shader for game Draw/DrawIndexed; C++ portable truth table and structural linkage",
+      "negative_regression": "Fail closed when DIFFUSE missing, stage1 active, RESULTARG TEMP, unrelated stages or unmatched operations; five destructive regression mutations",
+      "component_integration": "Game GetTextureStageState stage0 -> stage0 CURRENT=DIFFUSE guarded canonical op -> existing pixel shader variants -> native Draw/DrawIndexed -> opt-in visible inset; D3D9 fallback preserved"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_STAGE0_BLENDCURRENTALPHA_NATIVE_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED/NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Diagnostic opt-in only, no gameplay enablement; stage1 disable/RESULTARG CURRENT and diffuse mandatory; original D3D9 Draw, input and Present unchanged",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_BLENDCURRENTALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage0_blend.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_stage0_current_alpha_probe.cpp",
+    "tools/test_dx11_stage0_current_alpha_00616.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Quest 3/VDXR menu->vehicle->race visible HMD parity and gamepad input remain NEED_HMD_TEST; do not promote native gameplay. Next independent DX11 unimplemented integration item.",
+  "material_commit": "5eadd704ad11bb45272d992f3901faad4989a484",
+  "validation_bearing_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+  "validation_bearing_result_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+  "result_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+  "validation_runs": [
+    {
+      "name": "OpenXR VR architecture",
+      "event": "pull_request",
+      "run_id": 38264655187,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38264655187"
+    },
+    {
+      "name": "Build",
+      "event": "pull_request",
+      "run_id": 38264655778,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38264655778"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "pull_request",
+      "run_id": 38264655207,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38264655207"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 38264647472,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38264647472"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 38264647312,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38264647312"
+    }
+  ],
+  "retry_repair": {
+    "commit": "3830858fe5b935b2f990cfea492ea31a9f8d6a37",
+    "base_sha": "5eadd704ad11bb45272d992f3901faad4989a484",
+    "reason": "Portable C++ probe initializer_list header corrected; same TASK_ID, no duplicate achievement"
+  }
+}

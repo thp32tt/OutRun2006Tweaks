@@ -1,0 +1,164 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00841",
+  "production_id": "CONVERSION-DX11-00841",
+  "event_id": "CONVERSION-DX11-00841-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_GAME_GPU_ARRAY_SLICE_MIP0",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "NATIVE_MIP0_AND_INDEPENDENT_LR_GAME_ARRAY_COPY_VERIFIED_R30_LIVE_STEREO_CALLBACK_REMAINS",
+  "material_result_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+  "validation_bearing_result_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+  "source_material_commits": [
+    "bf455c831280234f8165036a9a3820aa4cfb0fc1",
+    "74f0f790cfa08ec78a165a83311f1002cb2737f9"
+  ],
+  "validation_repair_commits": [
+    "52a3ffbf51fef54f67e73fb39610dc887ed772d2"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "No separately completed native full-game stereo feature. This source/WARP exact-SHA checkpoint continues DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR; no score for mip or array variants, CI repair, C6 or revalidation.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Preserve game-authored full-resolution mip-zero GPU postpass color from independent left/right D3D11 array slices into their respective native eye RTs without readback or mono duplication. Keep original D3D9/FFB fallback. Real R30 stereo game-camera replay remains an unsolved integration dependency.",
+    "acceptance_items": [
+      {
+        "id": "native-mip-zero-and-independent-gpu-array-eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_render_source_to_native_lr_eye_gpu",
+        "expected_behavior": "Single-sample GPU postprocess copy selects mip zero and the independently authored eye array slice; preserves source color across menu/vehicle independent L/R native RTVs."
+      },
+      {
+        "id": "gpu-copy-msaa-and-ordered-eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "gpu_source_resolve_and_color_depth",
+        "expected_behavior": "MSAA source resolves only the selected valid eye slice; each eye copy preserves GPU command ordering, remaining MRT/depth and actual native Draw evidence."
+      },
+      {
+        "id": "failure-rejection-and-d3d9-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_admission_and_input_isolation",
+        "expected_behavior": "Reject invalid eye slices, foreign GPU resources, unsafe color formats, aliased eye ownership and unsupported MSAA, without altering original D3D9 Draw/Present/gamepad/FFB or frozen DXVK."
+      },
+      {
+        "id": "final-validation-bearing-exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "full_dx11_backend_openxr_win32_hud_warp",
+        "expected_behavior": "All five mandatory GitHub Actions and additional isolated real WARP GPU pixel tests pass at one exact result commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-mip-zero-and-independent-gpu-array-eyes": "PASS_NATIVE_WARP_REAL_GPU_LR_DISTINCT_PIXEL_COPY",
+    "gpu-copy-msaa-and-ordered-eyes": "PASS_NATIVE_WARP_MRT_DEPTH_AND_SOURCE_DRAW_EVIDENCE",
+    "failure-rejection-and-d3d9-fallback": "PASS_NATIVE_WARP_NEGATIVE_BOUNDARIES_AND_UNCHANGED_ORIGINAL_D3D9",
+    "final-validation-bearing-exact-sha": "PASS_EXACT_SHA_5_MANDATORY_PLUS_ISOLATED_WARP"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38955511857,
+      "head_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38955511661,
+      "head_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+      "conclusion": "success"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38955520280,
+      "head_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38955520261,
+      "head_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38955520163,
+      "head_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38955511647,
+      "head_sha": "74f0f790cfa08ec78a165a83311f1002cb2737f9",
+      "conclusion": "success"
+    }
+  },
+  "known_blockers": [
+    "Actual OutRun R30 game-authored independent eye camera VS/PS Draw/DrawIndexed callback into native GPU eye transport remains not fully wired; source integration checkpoint only.",
+    "Quest3/VDXR menu/car/race visual stereo, input/FFB and frame pacing runtime have not been observed; no native backend promotion."
+  ],
+  "resume_cursor": "Continue separate authentic R30 real-game left/right camera Draw/DrawIndexed capture and GPU eye producer callback, not re-validation of mip/array source or this C6 bookkeeping. Preserve DXVK freeze and DX9Ex fallback.",
+  "pipeline": {
+    "C0_RECOVER": "BRANCH_HEAD_AND_00840_OWNER_NONCONFLICT_CHECKED",
+    "C1_REVIEW": "NATIVE_GPU_POSTPASS_MIP0_AND_DISTINCT_ARRAY_LR_SOURCE_GAP",
+    "C2_IMPLEMENT": [
+      "bf455c831280234f8165036a9a3820aa4cfb0fc1",
+      "74f0f790cfa08ec78a165a83311f1002cb2737f9"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_MANDATORY_PLUS_ISOLATED_WARP",
+    "C4_COMMIT": [
+      "bf455c831280234f8165036a9a3820aa4cfb0fc1",
+      "52a3ffbf51fef54f67e73fb39610dc887ed772d2",
+      "74f0f790cfa08ec78a165a83311f1002cb2737f9"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_BOOKKEEPING_SEPARATE_SKIP_CI"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Accept mip-zero of game-native GPU postpass texture, including multi-mip sources, into exact bound eye RTV.",
+      "Select independently game-authored L/R source array slices with proper D3D11 subresource indices for both CopySubresourceRegion and MSAA ResolveSubresource, preserving OM/depth.",
+      "Isolated Win32 WARP probes verify non-duplicated source-eye pixels, negative invalid slice, same exact-SHA mandatory five Gate success."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Isolated WARP native GPU pixels and six exact-SHA workflows SUCCESS",
+      "negative_regression": "Out-of-range slice fails before GPU mutation, copy preserves depth/MRT and native Draw count",
+      "component_integration": "NativeGameEyeDrawEncoder::copy_game_surface selects source mip-zero L/R eye array and copies into the genuine ring-bound eye."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_GAME_GPU_ARRAY_SLICE_MIP0"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "WARP isolated and GitHub builds verified; actual menu/car/race full native source-to-OpenXR remains unfinished and game/HMD is UNTESTED.",
+    "activation_guard_and_fallback": "No renderer promotion; original DX9Ex/gamepad/FFB/SkyGlow and frozen DXVK protected.",
+    "remaining_implementation": [
+      "Connect real R30 game-camera independent L/R Draw/DrawIndexed callsite to the native stereo submission callback.",
+      "Perform matching Quest3/VDXR runtime menu, vehicle, race, input, stereo and frame pacing verification."
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00554",
+  "production_id": "CONVERSION-DX11-00554",
+  "event_id": "CONVERSION-DX11-00554-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00554",
+  "work_key": "DX11:MENU_RACE_STAGE0_SUBTRACT_RGBA_NATIVE_DRAW",
+  "base_sha": "bea76495da713fa385cf67d651c204069d481c0d",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game D3D9 stage0 SUBTRACT(TEXTURE,CURRENT/DIFFUSE) exact RGB/alpha",
+      "D3D11 saturating shader/SRV and native Draw/DrawIndexed",
+      "Opt-in diagnostic Present keeping DX9Ex input/draw"
+    ],
+    "batch_components": [
+      "C++ D3D9 state and argument admission",
+      "C++ DX11 HLSL shader lifecycle and draw dispatch",
+      "Python source mutation and arithmetic validation"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live game stage0 SUBTRACT native shader/Draw wired in source; GitHub exact SHA pending.",
+      "negative_regression": "Invalid operand modifiers, mixed operations and extra stages fallback; RGBA underflow vectors and destructively mutated source.",
+      "component_integration": "Real game D3D9 Draw -> captured TEXTURE minus DIFFUSE -> DX11 native DrawIndexed/Draw -> inset Present and preserved D3D9 controls."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_SUBTRACT_RGBA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_SUBTRACT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_SUBTRACT_RGBA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI build required; real menu/vehicle/race/Quest3 gamepad native pixels NEED_HMD_TEST.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; D3D9 Draw/Present and input always run."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00554.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "HEAD bea76495da713fa385cf67d651c204069d481c0d; 00553 already complete.",
+    "C1_REVIEW": "Missing stage0 SUBTRACT native game path; unique source/feature scope.",
+    "C2_IMPLEMENT": "Live state admission, HLSL subtraction PS, lifecycle and Draw dispatch, positive/negative regression.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: commit d0c1987a43bbb618cbb6c6d993c2442ba82a5616; GitHub Build #38155206182, OpenXR VR architecture #38155206208, HUD Inspector #38155206194 all SUCCESS. Runtime/HMD UNTESTED.",
+    "C4_COMMIT": "PASS: material result and exact-SHA CI validation d0c1987a43bbb618cbb6c6d993c2442ba82a5616; C6 bookkeeping-only [skip ci] separated.",
+    "C5_PACKAGE": "NOT_REQUIRED: opt-in diagnostic only.",
+    "C6_STATE": "PASS_EXACT_SHA BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED; source unchanged and no CI rerun."
+  },
+  "material_result_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+  "validation_bearing_result_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+  "result_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Terminal automation BUILD_VERIFIED recorded. Independent DX11 features may proceed; Quest3/VDXR native pixels, gamepad, menu/vehicle/race NEED_HMD_TEST. Do not re-score or re-run C6.",
+  "runtime_evidence": "HMD, game pixels, gamepad not executed",
+  "state_persisted": true,
+  "validation_evidence": {
+    "exact_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+    "github_actions": [
+      {
+        "run_id": 38155206182,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38155206208,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38155206194,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

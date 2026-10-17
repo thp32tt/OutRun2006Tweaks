@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00274",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "07d1978b059c22b6a1220b353d6505e477da4a4f",
+  "result_sha": "07ff1005982b16f03e5060ca3677b1d22fbd7c3a",
+  "validation_bearing_result_sha": "07ff1005982b16f03e5060ca3677b1d22fbd7c3a",
+  "source_commits": [
+    "9bfacb96cb82edb4789e1ceab82b541e731867d2",
+    "07ff1005982b16f03e5060ca3677b1d22fbd7c3a"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_DUAL_SOURCE_BLEND_FAIL_CLOSED",
+  "selection_reason": "The fixed-function DX11 pixel-shader prototype emits only SV_Target0, while D3DBLEND_SRCCOLOR2 and D3DBLEND_INVSRCCOLOR2 were previously marked exact through SRC1 blend enums. Without a proven second color output and linkage, this overstated dormant native pipeline readiness.",
+  "summary": "Marked both D3D9 dual-source blend factors inexact until SV_Target1/linkage semantics are implemented and proven, and added a source-graph regression guard. Native D3D11 Draw* routing remains disabled.",
+  "changed_paths": [
+    "src/vr/d3d11/state_translation.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00274.json"
+  ],
+  "conversion_changed_paths": [
+    "src/vr/d3d11/state_translation.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "dxvk_lane_modified": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "evidence": [
+    "GitHub target branch HEAD matched 07d1978b059c22b6a1220b353d6505e477da4a4f at C0 and AGENTS.md plus docs/CONVERSION_LANE_STATE.json were read through the connected GitHub connector.",
+    "state_translation.cpp now returns exact=false for D3DBLEND_SRCCOLOR2 and D3DBLEND_INVSRCCOLOR2 while retaining the corresponding D3D11 SRC1 enum values as descriptive translation.",
+    "tools/verify_dx11_source_graph.py now fails closed if either dual-source blend mapping is promoted back to exact without an explicit reviewed contract change.",
+    "Backend Conversion Gate 36957128453 completed success for exact SHA 07ff1005982b16f03e5060ca3677b1d22fbd7c3a, including source graph, dormant activation boundary, census analyzer, Win32 build, semantic/object/linkage/constant-buffer/native-transport probes and artifact verification.",
+    "Build 36957131793 completed success for exact SHA 07ff1005982b16f03e5060ca3677b1d22fbd7c3a.",
+    "VR PC Fast Test Build was skipped by policy and was not used as validation."
+  ],
+  "related_finding_or_regression_keys": [
+    "DX11-DUAL-SOURCE-BLEND-READINESS-001",
+    "DX11-DRAW-ACTIVATION-SURFACE-001"
+  ],
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 36957128453,
+      "head_sha": "07ff1005982b16f03e5060ca3677b1d22fbd7c3a",
+      "conclusion": "success"
+    },
+    "build": {
+      "run_id": 36957131793,
+      "head_sha": "07ff1005982b16f03e5060ca3677b1d22fbd7c3a",
+      "conclusion": "success"
+    }
+  },
+  "blocker": "Native DX11 Draw* routing remains deliberately disabled. Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required, and dual-source blending additionally requires a proven second pixel-shader output/linkage path.",
+  "next_action": "Continue bounded GitHub-only DX11 readiness work that does not activate native Draw*. In a later exact-build runtime session collect exhaustive census and Quest 3/VDXR parity evidence before any separate activation change.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}

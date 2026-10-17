@@ -1,0 +1,114 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00544",
+  "production_id": "CONVERSION-DX11-00544",
+  "event_id": "CONVERSION-DX11-00544-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00544",
+  "attempt": "2/3",
+  "work_key": "DX11:MENU_RACE_PACKED16_TEXTURE_BGRA_SRV",
+  "base_sha": "fbc91fccbabdd2fa4e0d7e264743c0b109cf0703",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Observe game-authored fixed-function D3D9 textured Draw/DrawIndexed and LockRect R5G6B5/A1R5G5B5/A4R4G4B4 level-0 source",
+      "Expand each 16-bit little-endian source texel RGB/alpha to BGRA8 using source 2B pitch and 4B output pitch",
+      "Upload immutable DX11 texture and bind SRV+sampler into existing native Draw/DrawIndexed and visible desktop inset with DX9Ex/input fallback"
+    ],
+    "batch_components": [
+      "Pure C++ bit-accurate 565/1555/4444 pixel decoder and portable CPU fixture",
+      "Live D3D9 LockRect 16-bit format admission and pitch-separated D3D11 BGRA8 SRV/Draw",
+      "Source/consumer linkage regression and destructive mutations",
+      "CPU texel layout-dispatch hoisted out of the per-pixel loop; GNU C++17 optimized red/alpha fixtures PASS"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GNU C++17 optimized packed16 CPU probe PASS; exact material SHA 16d778226d9ce5de053938169df3f61ac828eda1 Backend Conversion Gate #38140413857 validate and DX11 readiness smoke probes SUCCESS; Win32 Build #38140416697, OpenXR #38140416646, DX11 Fast #38140413916 all SUCCESS. HMD and real game pixels UNTESTED.",
+      "negative_regression": "Original exact e915ce1 Win32 SAFE-RETURN source-mutation test exposed a test oracle bug. Scoped predicate assertion patched at e6e4f768; multiple formats plus per-row alpha CPU probes PASS. Final SHA Gate pending.",
+      "component_integration": "D3D9 game Texture9->LockRect 16-bit source -> BGRA8 decoder -> immutable CreateTexture2D -> CreateShaderResourceView -> PSSetShaderResources -> Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_PACKED16_TEXTURE_BGRA_SRV",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:PACKED16",
+      "src/vr/d3d11/packed_texture_16bit.hpp",
+      "tools/test_dx11_first_game_frame_regressions.py:PACKED16",
+      "src/vr/d3d11/packed_texture_16bit.hpp:DISPATCH_ONCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_PACKED16_LOCKRECT",
+      "D3D11_BGRA8_TEXTURE_SRV",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-level native Draw/DrawIndexed to desktop inset and packed16 RGB/alpha admission verified at exact SHA CI; actual gameplay menu/vehicle/race/gamepad frame/Quest3/VDXR UNTESTED, no native promotion.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; never override NativeDrawPathActive=false or the original D3D9 Draw/gamepad; fail closed for other formats/pools/locks"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/packed_texture_16bit.hpp",
+    "tools/dx11_packed_texture_16bit_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00544.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest branch HEAD fbc91fccbabdd2fa4e0d7e264743c0b109cf0703 and 00543 C6 exact SHA; 00544 absent",
+    "C1_REVIEW": "PASS independent 16-bit game texture source gap, R175 ownership unchanged",
+    "C2_IMPLEMENT": "PASS packed source format, decoder, BGRA8 SRV Draw integration with D3D9 fallback",
+    "C3_VALIDATE": "PASS_EXACT_SHA 16d778226d9ce5de053938169df3f61ac828eda1: Backend Conversion Gate #38140413857 (validate + readiness smoke), Win32 Build #38140416697, OpenXR #38140416646, DX11 Fast Structural Checks #38140413916 all SUCCESS. Local GNU C++17 CPU probe PASS. HMD/actual game pixels UNTESTED.",
+    "C4_COMMIT": "PASS material 16d778226d9ce5de053938169df3f61ac828eda1 [AUTO:CONVERSION-DX11-00544] preserves 16-bit game texture decode BGRA8 SRV + native Draw/DrawIndexed + fail-closed DX9Ex fallback; C6 is separate [skip ci] bookkeeping.",
+    "C5_PACKAGE": "NOT_REQUIRED; opt-in desktop diagnostic, no game release claim",
+    "C6_STATE": "PASS_EXACT_SHA; BUILD_VERIFIED; NEED_HMD_TEST for real OutRun menu/vehicle/race pixels and Quest3/VDXR/gamepad. No runtime/native backend promotion."
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE",
+    "DX11-VISIBLE-FRAME": "NEED_GAME_TEST",
+    "DX11-SAFE-RETURN": "PASS_SOURCE",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "material_result_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+  "validation_bearing_result_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "runtime_evidence": "No actual gamepad/Quest3 VDXR or game frame test; DX9Ex rendering and input always authoritative.",
+  "next_action": "Controller selects a new independent DX11 native menu-to-race integration task without waiting for HMD test or this task C6. Retain first-game-frame opt-in and original DX9Ex Draw/input; Quest3/VDXR HMD gameplay-only proof remains NEED_HMD_TEST.",
+  "controller_runtime_adoption": "NOT_VERIFIED",
+  "result_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+  "state_persisted": true,
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "run_id": 38140413857,
+      "head_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "win32_build": {
+      "run_id": 38140416697,
+      "head_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 38140416646,
+      "head_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+      "conclusion": "success"
+    },
+    "dx11_fast": {
+      "run_id": 38140413916,
+      "head_sha": "16d778226d9ce5de053938169df3f61ac828eda1",
+      "conclusion": "success"
+    }
+  }
+}

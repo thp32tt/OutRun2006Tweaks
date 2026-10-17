@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00608",
+  "production_id": "CONVERSION-DX11-00608",
+  "event_id": "CONVERSION-DX11-00608-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00608",
+  "work_key": "DX11:LIVE_SRCALPHASAT_COPY_ADD",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "ced7848a53d4246a2307a582eee184f002772900",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live D3D9 game Draw SRCBLEND/DESTBLEND saturation capture",
+      "Native DX11 SRC_ALPHA_SAT RGB and ONE alpha plus dedicated color-write masks and reset",
+      "Native diagnostic Draw/DrawIndexed and opt-in game frame with D3D9/input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_src_alpha_sat_00608.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "83,521 numeric RGBA scalar cases; two per-pair native DX11 OM descriptors",
+      "negative_regression": "25 destructive mutations across state capture, descriptor, masks, lifecycle, submission",
+      "component_integration": "D3D9 authored state to native OM to diagnostic Draw and visible game inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SRCALPHASAT_COPY_ADD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact SHA CI build is not Quest3/VDXR native gameplay proof; NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; original D3D9 render and gamepad authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_src_alpha_sat_00608.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Diagnostic opted-in code only; runtime test and manual deployment outstanding"
+  },
+  "next_action": "00608 C0-C6 source and five Gate complete. Next independent TASK_ID continues DX11 native menu/vehicle/race Draw integration. No HMD/runtime promotion; Quest3/VDXR and pad NEED_HMD_TEST.",
+  "result_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "material_commit": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "validation_bearing_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "validation_bearing_result_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "ci_summary": "Exact SHA 00608 Backend validate+readiness native regression SUCCESS; Win32 Build SUCCESS, DX11 Fast SUCCESS, OpenXR(push+PR) SUCCESS, HUD Inspector SUCCESS. VR PC Fast Test Build skipped by policy; Quest3/VDXR/menu/vehicle/race/gamepad UNTESTED.",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38241862491,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241862491"
+    },
+    {
+      "name": "Build",
+      "run_id": 38241868165,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241868165"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38241862527,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241862527"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38241862498,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241862498"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38241868131,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241868131"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38241868105,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241868105"
+    }
+  ],
+  "skipped_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 38241862530,
+      "conclusion": "skipped"
+    }
+  ],
+  "evidence": {
+    "exact_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+    "backend_gate_conclusion": "success",
+    "source_regression": "00608 25 destructive mutants / 83,521 scalar RGBA cases, exact SHA CI step Verify 00608 SUCCESS",
+    "gamepad_test_performed": false,
+    "hmd_test_performed": false
+  }
+}

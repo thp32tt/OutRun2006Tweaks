@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00166",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "9069ce44501516acfa93cc7f954b53cef9a08cae",
+  "result_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+  "validation_bearing_result_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R166_HELPER_283DE_INSTRUCTION_TERMINAL",
+  "selection_reason": "CONVERSION-DX11-00164 captured exact 0x283DE continuation bytes and explicitly named complete-instruction decoding as the next bounded F13 task. The 96-byte window ends exactly at RET 0x2843D, so the full capture can be proven without another byte fetch.",
+  "summary": "Completed an independent DX11 fail-closed exact-EXE terminal/data-write proof for the complete 96-byte window 0x283DE..0x2843D. Every byte belongs to a complete instruction, the layout is contiguous/byte-exact, the previously proven failure edge lands on shared epilogue entry 0x28433, and terminal RET is exactly 0x2843D. Function-entry status, data-structure semantics and ScreenHud/world/render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00165",
+    "source_result_sha": "abcc7a90cc29d147ed4e6f541c38dba046592363",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded terminal-proof design only. DX11 binds the proof to its own 00164 provenance predecessor and must independently pass exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00166.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00164 validation-bearing result e5fe3137aea436706e2f613212a32fa0c0cb008c captured the exact 96-byte 0x283DE continuation window.",
+    "Validation-bearing result 72b4bca0250b0080c4ee3226f8ce4d5943adf2d7 contains exact marker [AUTO:CONVERSION-DX11-00166] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD Inspector static job 110073743763 PASS proved every instruction in 0x283DE..0x2843D, shared epilogue entry 0x28433 and terminal RET 0x2843D.",
+    "DXVK-00165 independently passed the same bounded exact-EXE terminal/shared-epilogue proof on validation-bearing result abcc7a90cc29d147ed4e6f541c38dba046592363.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on the exact DX11 result SHA.",
+    "VR PC Fast Test Build was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. Continue only with another bounded exact-EXE proof. Runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T05:12:16+09:00",
+  "next_code_283de_terminal_proof": {
+    "target_rva": "0x000283DE",
+    "end_exclusive_rva": "0x0002843E",
+    "predecessor_status": "EXACT_EXE_NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURED",
+    "predecessor_exact": true,
+    "target_section": ".text",
+    "function_start_guess_rva": null,
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "shared_epilogue_rva": "0x00028433",
+    "shared_epilogue_link": true,
+    "terminal_ret_rva": "0x0002843D",
+    "terminal_ret_matches": true,
+    "status": "EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "PARTIAL_BOUNDED_DATA_WRITES_AND_EPILOGUE_ONLY",
+    "data_structure_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The proof establishes bounded instruction/data-write/epilogue shape only. It does not assign ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed on byte drift, non-contiguous layout, terminal RET drift, predecessor provenance failure, or if the previous 0x28433 fail target no longer lands on an exact instruction boundary in this terminal window."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer risk path was changed and no open visual regression is claimed fixed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36770014648,
+      "conclusion": "success",
+      "validated_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+      "artifact_id": 11123985230,
+      "artifact_digest": "sha256:9eda53a9895a0aa506c074138ef7eab3d1408f0961e2d73f8b69c9f1a8806f50"
+    },
+    "build": {
+      "run_id": 36770023002,
+      "conclusion": "success",
+      "validated_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+      "artifact_id": 11123366143,
+      "artifact_digest": "sha256:c4cc74e11c5f49d019c40c2c9a61c18569ff43eef52e92976e7876346103e19b",
+      "source_snapshot_artifact_id": 11123351117,
+      "source_snapshot_artifact_digest": "sha256:5a0170ad662c8c429bec896b381ae1907ef1552a4bc84d11a3a8ab522541bf38"
+    },
+    "hud_inspector": {
+      "run_id": 36770023128,
+      "conclusion": "success",
+      "validated_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+      "static_analysis_job_id": 110073743763,
+      "analysis_artifact_id": 11122983402,
+      "analysis_artifact_digest": "sha256:254b26299013529c39907445d980670810a7ab5df8e1f5fd2c0d144859334605",
+      "game_artifact_id": 11124005356,
+      "game_artifact_digest": "sha256:2ab42db56a810175698e7ecb16f2e24463728a8fef294f8c15ee8d5f1764eace",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_next_code_continuation_2_prefix=0x000283DE status=EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN predecessor_status=EXACT_EXE_NEXT_CODE_CONTINUATION_2_PROVENANCE_CAPTURED predecessor_exact=True section=.text start_guess=- end=0x0002843E layout_contiguous=True bytes_match=True shared_epilogue=0x00028433 shared_epilogue_link=True ret=0x0002843D ret_match=True function_entry=UNRESOLVED semantic_effect=PARTIAL_BOUNDED_DATA_WRITES_AND_EPILOGUE_ONLY data_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36770023601,
+      "conclusion": "success",
+      "validated_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11123520392,
+      "host_artifact_digest": "sha256:5b472c86bc37abba54123391eb00a1da242d31d5107c8cce7c720e75f9973549"
+    },
+    "pc_fast": {
+      "run_id": 36770014645,
+      "conclusion": "skipped",
+      "validated_sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "72b4bca0250b0080c4ee3226f8ce4d5943adf2d7",
+      "message": "dx11: prove target C continuation-2 terminal [AUTO:CONVERSION-DX11-00166]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5918723173,
+    "validation_comment_id": 5918845929,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_HELPER_283DE_CONTINUATION_PROVENANCE",
+    "after": "PARTIAL_PLUS_HELPER_283DE_TERMINAL_EPILOGUE_PROOF",
+    "runtime_claim": false
+  },
+  "blocker": "The complete 0x283DE..0x2843D terminal window is now exact, but function-entry identity, higher-level data-structure meaning, semantic meaning of callees 0x8BD20 and 0x182194, full routine semantics, and all ScreenHud/world/render ownership remain unresolved.",
+  "resume_cursor": "Set04/F13 now has exact bounded instruction coverage from 0x28320 through terminal RET 0x2843D, including aligned calls 0x28379->0x282B0, 0x28390->0x8BD20, 0x2839D->0x182194 and shared epilogue 0x28433. The next bounded task may assess whether this fully bounded routine has sufficient exact evidence for a higher-level semantic label, or independently analyze either proven callee."
+}

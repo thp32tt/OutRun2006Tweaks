@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00665",
+  "production_id": "CONVERSION-DX11-00665",
+  "event_id": "CONVERSION-DX11-00665-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_A8P8_PALETTE_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "a7831ff330c8a8edc2eb6d810d10d3641e8cfa40",
+  "status": "MATERIAL_COMMITTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "game D3D9 A8P8 texture mip LockRect plus current palette lookup at Draw",
+      "palette RGB + explicit per-texel alpha converted to BGRA8 per mip and D3D11 SRV",
+      "guarded native Draw/DrawIndexed diagnostic inset; original D3D9 Present and gamepad continue"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp A8P8 eligibility, palette API, SRV upload, sRGB fail-closed",
+      "live_game_a8p8_texture.hpp reusable per-row decoder",
+      "dx11_game_a8p8_probe.cpp native C++ pitch/alpha/mip test and 23 destructive regression links"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A8P8 padded rows, live palette high index, explicit 0/17/51/128/255 alpha and 1x1 mip",
+      "negative_regression": "23 destructive linkage mutations, no palette and sRGB fallback, DEFAULT pool blocked, D3D9 Draw and input preserved",
+      "component_integration": "D3D9 GetCurrentTexturePalette/GetPaletteEntries and LockRect -> per-mip BGRA8 -> CreateTexture2D/SRV -> PSSetShaderResources -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_A8P8_PALETTE_MIP_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_a8p8_texture.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; real menu, car selection and race NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit opt-in; fail closed missing palette/unreadable/DEFAULT/sRGB; original D3D9 game Draw, Present and gamepad unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_a8p8_texture.hpp",
+    "tools/dx11_game_a8p8_probe.cpp",
+    "tools/test_dx11_native_a8p8_00665.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00665.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS a7831ff330c8a8edc2eb6d810d10d3641e8cfa40, 00664 C6 complete; separate A8P8 work key",
+    "C1_REVIEW": "PASS A8P8 unsupported by live mirror; palette is device state",
+    "C2_IMPLEMENT": "PASS A8P8 decoder + live palette lookup and mip native Draw integration",
+    "C3_VALIDATE": "PENDING_EXACT_SHA GitHub workflow and g++ probe",
+    "C4_COMMIT": "MATERIAL_COMMITTED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "PENDING_GITHUB_FAST",
+    "static_regression": "PENDING_GITHUB_ACTIONS",
+    "compile_build": "PENDING_GITHUB_ACTIONS",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Wait for exact-SHA mandatory Github gates; once success, write separate C6 bookkeeping [skip ci], leaving current material commit as validation-bearing. No HMD/gamepad validation claimed."
+}

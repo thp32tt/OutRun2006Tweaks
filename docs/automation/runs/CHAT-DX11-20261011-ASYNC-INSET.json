@@ -1,0 +1,105 @@
+{
+  "schema_version": 3,
+  "task_id": "CHAT-DX11-20261011-ASYNC-INSET",
+  "production_id": "CHAT-DX11-20261011-ASYNC-INSET",
+  "event_id": "CHAT-DX11-20261011-ASYNC-INSET-E001",
+  "event_type": "chat_direct",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CHAT-DX11-20261011-ASYNC-INSET",
+  "base_sha": "fbc91fccbabdd2fa4e0d7e264743c0b109cf0703",
+  "status": "MATERIAL_COMMITTED__CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "work_key": "DX11:ASYNC_LIVE_DIAGNOSTIC_READBACK_RING",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game-origin D3D9 fixed-function draw -> D3D11 Draw/DrawIndexed on opt-in diagnostic target",
+      "GPU staging ring CopyResource -> EVENT query fence with nonblocking GetData/Map, then cached D3D9 system-memory upload -> UpdateSurface visible inset"
+    ],
+    "batch_components": [
+      "D3D11 triple-event-fenced GPU readback with nonblocking Present and slow-GPU saturation drop",
+      "D3D9 desktop inset system-memory surface lifetime cache and reset/format invalidation",
+      "Source activation verifier strengthened for exact asynchronous visible-output chain; 5 negative-mutation regression controls"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact source integration committed with GPU EVENT fence, DONOTFLUSH GetData, DO_NOT_WAIT Map, upload-surface caching, and visible-pixel diagnostic; Windows exact-SHA validation pending",
+      "negative_regression": "5 destructive static mutations detect removal of event fence, nonblocking flags, bounded slot ownership, and format invalidation; exact gate pending",
+      "component_integration": "live intercepted game Draw -> GPU offscreen copy -> asynchronous GPU completion -> CPU readback -> D3D9 UpdateSurface, original DX9Ex Draw and input untouched"
+    },
+    "conflict_keys": [
+      "DX11:ASYNC_LIVE_DIAGNOSTIC_READBACK_RING",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:readback_ring",
+      "tools/verify_dx11_first_game_frame_boundary.py:async_output_gate"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "D3D11_STAGING_EVENT_FENCE",
+      "CPU_NONBLOCKING_MAP",
+      "D3D9_CACHED_INSET_UPLOAD"
+    ],
+    "visible_frame_acceptance": "Code-path integration only; no observed game pixels or measured FPS/HMD latency in this environment",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic only, NativeDrawPathActive=false, leave original D3D9 Draw/Present/input unchanged"
+  },
+  "changed_files": [
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "docs/automation/runs/CHAT-DX11-20261011-ASYNC-INSET.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS 00543 C6 PASS_EXACT_SHA, branch and AGENTS.md, latest 00544 absent as of C0; independent diagnostic readback work",
+    "C1_REVIEW": "PASS identified synchronous native GPU Map and per-present D3D9 SYSTEMMEM allocation in opt-in visible-inset path",
+    "C2_IMPLEMENT": "PASS three-slot GPU EVENT query readback plus cached D3D9 upload, reset invalidation, static negative controls",
+    "C3_VALIDATE": "PENDING exact material SHA Build/OpenXR/backend gate; first Build failed on preexisting validator stale s.staging token, repaired validator by explicitly enforcing stronger async fence/nonblocking/visible output predicate",
+    "C4_COMMIT": "PASS material commits f5e9b184745c1d25cf7c8771740224dff82e5475, 09263a05c12af747a44a450b9e0836d4cdc7c8fb, e9c14c0c20361db35610fc6097c4f8866b792ac8; no skip ci",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic-only path; do not distribute as runtime-proven",
+    "C6_STATE": "PENDING_EXACT_SHA; do not promote to verified or score until exact material SHA full CI SUCCESS"
+  },
+  "material_result_sha": "e9c14c0c20361db35610fc6097c4f8866b792ac8",
+  "validation_bearing_result_sha": "e9c14c0c20361db35610fc6097c4f8866b792ac8",
+  "material_source_shas": [
+    "f5e9b184745c1d25cf7c8771740224dff82e5475",
+    "09263a05c12af747a44a450b9e0836d4cdc7c8fb",
+    "e9c14c0c20361db35610fc6097c4f8866b792ac8"
+  ],
+  "acceptance_results": {
+    "DX11-GPU-FENCE": "SOURCE_INTEGRATED",
+    "DX11-NONBLOCKING-MAP": "SOURCE_INTEGRATED",
+    "DX11-D3D9-INSET-CACHE": "SOURCE_INTEGRATED",
+    "DX11-VISIBLE-FRAME": "SOURCE_INTEGRATED",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "source_stage": "MATERIAL_COMMITTED__CI_PENDING__GAME_AND_QUEST3_UNTESTED",
+  "score_change": 0,
+  "scoreboard": {
+    "repo": "thp32tt/ai-dev-lab",
+    "path": "AI_SCOREBOARD.md",
+    "previous": 979,
+    "delta": 0,
+    "total": 979,
+    "note": "Task not yet exact-SHA build verified; no new score"
+  },
+  "validation_gates": {
+    "first_failed_build": {
+      "run_id": 38140006281,
+      "head_sha": "09263a05c12af747a44a450b9e0836d4cdc7c8fb",
+      "conclusion": "FAILURE",
+      "reason": "stale synchronous visible-output predicate in tools/verify_dx11_first_game_frame_boundary.py; repaired with stricter async contract"
+    },
+    "full_build": {
+      "run_id": 38140173343,
+      "head_sha": "e9c14c0c20361db35610fc6097c4f8866b792ac8",
+      "conclusion": "PENDING"
+    }
+  },
+  "next_action": "Check exact-SHA 38140173343 plus Backend Conversion Gate and source acceptance; if SUCCESS update C6 bookkeeping without source changes and award score once; if FAILURE repair root cause and validate new SHA. Actual Quest3/VDXR/game runtime test remains UNTESTED."
+}

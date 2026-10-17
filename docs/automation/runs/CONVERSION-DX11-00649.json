@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00649",
+  "production_id": "CONVERSION-DX11-00649",
+  "event_id": "CONVERSION-DX11-00649-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_CW_CCW_CULL_TRIANGLE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "89c0105bd1070e26313dfbfd522d11ff5a8df72f",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "game-authored R30 D3D9 Draw/DrawIndexed triangle cull state",
+      "game CW/CCW admission -> D3D11 RS raster with scissor -> native Draw to visible opt-in diagnostic inset"
+    ],
+    "batch_components": [
+      "native C++ live CullMode capture, D3D11 raster states, draw binding",
+      "portable C++ positive/negative probe and destructive source regressions integrated in mandatory Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "game triangle list/strip/fan CW/CCW eligible for native Draw",
+      "negative_regression": "invalid cull rejects, point/line no-cull, scissor mapping and original D3D9 Draw/input preserved",
+      "component_integration": "live R30 state -> native raster RSSetState -> Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_CW_CCW_CULL_TRIANGLE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI/static only; menu, vehicle, race, HMD and gamepad UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in, original D3D9 draw/input unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "src/vr/d3d11/live_game_cull_state.hpp",
+    "tools/dx11_game_cull_probe.cpp",
+    "tools/test_dx11_game_cull_draw_00649.py",
+    "docs/automation/runs/CONVERSION-DX11-00649.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS: live CW/CCW culling excluded",
+    "C2_IMPLEMENT": "PASS: native CW/CCW raster+Draw",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Implementation/build exact-SHA SUCCESS; Quest3/VDXR visual game menu/vehicle/race and gamepad optical runtime UNTESTED. Keep opt-in diagnostic, DX9Ex fallback and DXVK frozen; continue a new independent DX11 task.",
+  "material_result_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+  "result_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+  "validation_bearing_result_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38337793355,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+      "jobs": "validate+DX11 readiness smoke probes SUCCESS"
+    },
+    "dx11_fast_structural": {
+      "id": 38337793315,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "windows_build": {
+      "id": 38337796132,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "openxr_architecture_push": {
+      "id": 38337793316,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "openxr_architecture_build": {
+      "id": 38337796206,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "hud_inspector": {
+      "id": 38337796214,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    }
+  }
+}

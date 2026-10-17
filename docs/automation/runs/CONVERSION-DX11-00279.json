@@ -1,0 +1,21 @@
+{
+  "task_id": "CONVERSION-DX11-00279",
+  "lane": "DX11",
+  "branch": "vr-dx11-native-r71",
+  "previous_head": "73b1491893fa62738e9d9a0aa3cb7a2b4a94a41f",
+  "c0": "RECOVER",
+  "c1": "REVIEW",
+  "c2": "IMPLEMENT_PENDING",
+  "c3": "VALIDATE_PENDING",
+  "c4": "COMMIT",
+  "c5": "PACKAGE_PENDING",
+  "c6": "STATE",
+  "gate_investigation": {
+    "run_id": 36960361966,
+    "result": "cancelled",
+    "failed_stage": "Build Win32",
+    "observed": "All contract and static validation steps completed successfully before build cancellation."
+  },
+  "next_action": "Reduce backend conversion gate cancellation risk by separating expensive DX11 smoke builds from the mandatory Win32 artifact gate and validate with a new exact SHA run.",
+  "runtime_validation": "UNTESTED"
+}

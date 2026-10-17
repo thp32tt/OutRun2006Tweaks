@@ -1,0 +1,166 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00839",
+  "production_id": "CONVERSION-DX11-00839",
+  "event_id": "CONVERSION-DX11-00839-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_STRETCH_TYPED_MIP_AND_COMPILER_LIFETIME",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "GPU_STRETCH_SOURCE_AND_WARP_FIXED_R30_GAME_LR_DRAW_CALLSITE_STILL_PENDING",
+  "material_result_sha": "5016d4dbe6b1bacf241fe349b537365bdbcc6d04",
+  "validation_bearing_result_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+  "source_material_commits": [
+    "5016d4dbe6b1bacf241fe349b537365bdbcc6d04",
+    "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f"
+  ],
+  "validation_repair_commits": [
+    "528e1b19f080c39a812d05f9973a595c4188edac"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "No new standalone completed full native renderer FEATURE_ID: this is verified source integration and repair within existing DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR. No duplicate award while R30 game-camera callsite/HMD remains unfinished.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stretch_source.hpp",
+    "tools/dx11_native_stretch_source_00839.cpp",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Accept real game-authored typed and mipmapped scaled/cropped D3D11 GPU postpasses in native stereo L/R eye RTs, preserve MSAA source resolve and source-output guards, and remove Win32 WARP d3dcompiler COM lifetime crash without activating incomplete R30 full gameplay rendering.",
+    "acceptance_items": [
+      {
+        "id": "gpu-scaled-source-typed-mip",
+        "category": "end_to_end_behavior",
+        "behavior_area": "producer_gpu_postpass_and_native_eye_output",
+        "expected_behavior": "Real game GPU StretchRect uses typed D3D11 shader conversion and mip-zero sampling; valid multi-mip RTV-only sources make complete intermediate copy."
+      },
+      {
+        "id": "gpu-stretch-msaa-and-compiler-lifetime",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_source_and_warp_runtime",
+        "expected_behavior": "Real MSAA source resolves before shader scaling and first-use compiler blobs release while the compiler DLL remains loaded; isolated Win32 WARP native transport runs without access violation."
+      },
+      {
+        "id": "source-ownership-and-d3d9-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_stereo_eye_guard_and_original_input",
+        "expected_behavior": "Reject unsupported source formats, bounds and ownership; never synthesize stereo draw evidence or modify original DX9Ex, gamepad, FFB or DXVK."
+      },
+      {
+        "id": "final-validation-bearing-exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "full_dx11_backend_host_build_hud_native_warp",
+        "expected_behavior": "Five mandatory GitHub Actions and additional Native Transport WARP are successful for precisely the validation-bearing result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "gpu-scaled-source-typed-mip": "PASS_SOURCE_AND_LOCAL_CXX_REGRESSION_10_OF_10",
+    "gpu-stretch-msaa-and-compiler-lifetime": "PASS_GITHUB_NATIVE_TRANSPORT_WARP",
+    "source-ownership-and-d3d9-fallback": "PASS_STATIC_AND_WARP_NEGATIVE_REGRESSION",
+    "final-validation-bearing-exact-sha": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38948669893,
+      "head_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38948669839,
+      "head_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+      "conclusion": "success"
+    },
+    "Build (Win32, Release)": {
+      "run_id": 38948677471,
+      "head_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38948677532,
+      "head_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38948677482,
+      "head_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38948669838,
+      "head_sha": "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f",
+      "conclusion": "success"
+    }
+  },
+  "known_blockers": [
+    "R30 actual per-eye game camera/VS/PS Draw/DrawIndexed source-to-OpenXR hookup not yet complete.",
+    "Matching Quest3/VDXR gameplay menu/car/race visual, HUD, gamepad and performance remain untested; cannot claim QUEST3_PLAYABLE or backend activation."
+  ],
+  "resume_cursor": "Continue next disjoint real game producer-to-native L/R camera Draw/DrawIndexed integration, not a recheck of 00839. Preserve exact-SHA source result and no scored duplicate.",
+  "pipeline": {
+    "C0_RECOVER": "GITHUB_HEAD_AND_OWNER_CLAIM_CHECKED",
+    "C1_REVIEW": "R30_SOURCE_TYPED_MIP_STRETCH_AND_00836_WARP_BLOB_LIFETIME_BUG_SELECTED",
+    "C2_IMPLEMENT": [
+      "5016d4dbe6b1bacf241fe349b537365bdbcc6d04",
+      "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_MANDATORY_PLUS_ISOLATED_WARP",
+    "C4_COMMIT": [
+      "5016d4dbe6b1bacf241fe349b537365bdbcc6d04",
+      "528e1b19f080c39a812d05f9973a595c4188edac",
+      "fb4ac9dc1596ceba748fde9092b5c0e0b3fc3d7f"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_BOOKKEEPING_SEPARATE_SKIP_CI"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Real source GPU postpasses sample game-authored typed and mipmapped RT/SRV textures for bounded L/R eye StretchRect shader output.",
+      "Compiler-owned shader bytecode blobs are safely released before d3dcompiler_47.dll unload, validated by previously failing WARP transport probe.",
+      "Exact final SHA passes DX11 Fast, Backend, Win32 Build, OpenXR, HUD and native WARP without changing original D3D9/FFB or promoting unvalidated Quest3 rendering."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stretch_source.hpp",
+      "tools/dx11_native_stretch_source_00839.cpp",
+      "tools/verify_dx11_activation_boundary.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Win32 release Build and Native Transport WARP success at exact SHA fb4ac9dc; correct-first-use d3dcompiler lifetime, actual GPU postpass exercised.",
+      "negative_regression": "10 constexpr route positive/negative scenarios; static native Draw/pose/evidence boundary and WARP source rejection preserved.",
+      "component_integration": "NativeGameEyeDrawEncoder::stretch_game_surface selects direct SRV/copy/resolve and D3D11 postpass renders genuine game source into currently bound ring eye RTV."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STRETCH_TYPED_MIP_AND_COMPILER_LIFETIME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Typed/mip GPU source bridge and Windows WARP verified, actual real Quest3 stereo gameplay and input not yet tested.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains dormant pending complete source/HMD evidence. Original DX9Ex/SkyGlow/gamepad/FFB and DXVK freeze preserved.",
+    "remaining_implementation": [
+      "Complete authentic R30 per-eye game camera source and menu to race native Draw connection.",
+      "Quest3/VDXR runtime frame, HUD, gamepad and performance verification."
+    ]
+  }
+}

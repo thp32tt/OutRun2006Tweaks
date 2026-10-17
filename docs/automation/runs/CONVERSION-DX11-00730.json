@@ -1,0 +1,131 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00730",
+  "production_id": "CONVERSION-DX11-00730",
+  "event_id": "CONVERSION-DX11-00730-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FAILED_ORIGINAL_DRAW_FRAME_INTEGRITY",
+  "feature_id": "DX11-NATIVE-GAME-DRAW-HRESULT-FALLBACK",
+  "status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "4df201f89e79bcf7287a9ca3e3789696bd3611b7",
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "R30 live D3D9 VB/IB/UP game Draw captures source for native rendering",
+      "R30 original game Draw HRESULT post-call confirms native frame ownership",
+      "On failed original Draw, D3D11 bridge aborts full-frame batch before same-Present publication",
+      "Original D3D9 Present, Draw return and controller input remain authoritative"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_failed_game_draw_00730.py",
+      "tools/dx11_failed_game_draw_probe_00730.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Successful real VB/IB/UP game Draw continues contiguous full-size D3D11 Draw/DrawIndexed and same-Present output",
+      "negative_regression": "Any failed original D3D9 Draw aborts speculative native scene including prior valid Draws, leaving original game HRESULT/pad untouched",
+      "component_integration": "R30 live game entrypoints + native GPU frame batch + same-Present fallback + C++ and Python regression tests"
+    },
+    "conflict_keys": [
+      "DX11:FAILED_ORIGINAL_DRAW_FRAME_INTEGRITY",
+      "src/vr/d3d9/stereo_renderer_r30.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Full-frame source and CI only; game menu/vehicle/race and Quest3 screen visual parity not runtime-tested",
+    "activation_guard_and_fallback": "Native rendering opt-in only; original D3D9 HRESULT, Draw/Present and gamepad unchanged on native abort",
+    "blocking_evidence": "At prior HEAD real R30 live game Draw/DrawIndexed native mirror is submitted before R30TryXyzrhw/GuardScreenSpace returns the original HRESULT. Failed D3D9 Draw can leave a complete native batch marked publishable and overwrite successful D3D9 menu/vehicle/race fallback; this change notifies native frame of every failed original draw. DX11 Fast #38573559962 found inherited 00644/00645 source-only probes assumed legacy direct `return R30GuardScreenSpace` despite correctly preserving gameHr for HRESULT-based fail-closed behavior; assertions now accept newer return value and verify failure callback, without weakening source continuity."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-NATIVE-GAME-DRAW-HRESULT-FALLBACK",
+    "goal": "Ensure real game menu, vehicle and race VB/IB/UP Draw/DrawIndexed only publish full-resolution native D3D11 pixels when corresponding original D3D9 calls succeed, preserving controller/render fallback.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_draw_hr",
+        "expected_behavior": "Four live R30 D3D9 Draw/DrawIndexed paths report actual game HRESULT after optional native capture"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "native_frame_input_fallback",
+        "expected_behavior": "Failed source Draw invalidates all native batch publication without modifying D3D9 Draw or controller input"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_source_ci",
+        "expected_behavior": "Mutation regression, portable C++ full-frame state test and all 5 exact-SHA GitHub integration Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_failed_game_draw_00730.py",
+    "tools/dx11_failed_game_draw_probe_00730.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00730.json"
+  ],
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "28728de8590f3069dc2f26ec21c3cb17cebb896c",
+  "validation_bearing_result_sha": "782a990c8227b7de9e1b80840af654625a552378",
+  "packaging_status": "NOT_REQUIRED",
+  "evidence": {
+    "exact_sha": "782a990c8227b7de9e1b80840af654625a552378",
+    "mandatory_actions": {
+      "fast": {
+        "run_id": 38574145298,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "backend": {
+        "run_id": 38574145313,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "windows_build": {
+        "run_id": 38574152010,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "openxr": {
+        "run_id": 38574152083,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "hud_inspector": {
+        "run_id": 38574152024,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      }
+    },
+    "all_five_same_sha": "SUCCESS",
+    "runtime_note": "No actual Quest3/VDXR game, display or controller test was performed; source/CI only",
+    "repair_note": "Same TASK 00730 inherited line/point static verifier updated after first Fast failure; material SHA differs from validated source+verifier SHA"
+  }
+}

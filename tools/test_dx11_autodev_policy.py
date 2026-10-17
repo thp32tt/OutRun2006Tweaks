@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""Executable negative controls for DX11 task allocation and Gate protection."""
+import copy
+import json
+
+from dx11_autodev_policy import POLICY_FILE, validate_policy, validate_task, latest_dx11_run
+
+p = json.loads(POLICY_FILE.read_text(encoding="utf-8"))
+assert not validate_policy(p), validate_policy(p)
+# Guard against regressing to a full remote build for each source/test edit.
+for batch_rule in (
+    "batch_source_and_regressions_before_full_gate",
+    "avoid_full_build_after_each_individual_edit",
+    "prefer_one_material_commit_per_coherent_batch_when_possible",
+    "only_one_final_full_gate_per_coherent_batch_when_possible",
+):
+    broken_policy = copy.deepcopy(p)
+    broken_policy["selection_rules"][batch_rule] = False
+    assert validate_policy(broken_policy), "per-edit heavy CI policy silently allowed: " + batch_rule
+base = {
+    "task_id": "CONVERSION-DX11-00531",
+    "target_branch": "vr-dx11-native-r71",
+    "runtime_validation": "UNTESTED",
+    "automation_validation": "PENDING",
+    "development_strategy": {
+        "work_class": "vertical_slice",
+        "milestone_id": "mono_native_draw",
+        "integration_path": ["D3D9 draw source snapshot", "owned D3D11 resources", "real WARP Draw pixel"],
+        "batch_components": ["source translator", "GPU integration probe"],
+        "acceptance_proof": {
+            "positive_probe": "same-device native Draw paints expected pixel",
+            "negative_regression": "stale resource generation rejected",
+            "component_integration": "D3D9 source lineage reaches bound DX11 target",
+        },
+        "conflict_keys": ["DX11:MONO_NATIVE_DRAW"],
+        "full_gate_plan": "one_validation_bearing_sha",
+    },
+}
+assert not validate_task(base, p), validate_task(base, p)
+cases = [
+    ("guard-only", lambda t: t["development_strategy"].update(work_class="readiness_guard")),
+    ("missing bridge", lambda t: t["development_strategy"].update(integration_path=["one guard"])),
+    ("single component", lambda t: t["development_strategy"].update(batch_components=["source guard"])),
+    ("missing positive", lambda t: t["development_strategy"]["acceptance_proof"].update(positive_probe="")),
+    ("missing negative", lambda t: t["development_strategy"]["acceptance_proof"].update(negative_regression="")),
+    ("missing integration", lambda t: t["development_strategy"]["acceptance_proof"].update(component_integration="")),
+    ("wrong milestone", lambda t: t["development_strategy"].update(milestone_id="legacy_small_fence")),
+    ("no exact gate", lambda t: t["development_strategy"].update(full_gate_plan="skip_full_gate")),
+    ("runtime fake", lambda t: t.update(runtime_validation="PASS")),
+    ("full gate fake", lambda t: t.update(automation_validation="PASS", evidence={"backend_gate_conclusion": "failure"})),
+    ("unsafe DXVK scope", lambda t: t.update(target_branch="vr-dxvk-r71-disasm")),
+]
+for label, mutate in cases:
+    bad = copy.deepcopy(base)
+    mutate(bad)
+    assert validate_task(bad, p), f"negative task admitted: {label}"
+blocked = copy.deepcopy(base)
+blocked["development_strategy"].update(
+    work_class="blocker_resolution", milestone_id="shader_parity_r175",
+    blocking_evidence="R175 VS/PS TEXCOORD6 output mismatch [128,0,16,255] vs expected [224,128,32,255]",
+)
+assert not validate_task(blocked, p), validate_task(blocked, p)
+blocked["development_strategy"].pop("blocking_evidence")
+assert validate_task(blocked, p)
+legacy = copy.deepcopy(base)
+legacy["task_id"] = "CONVERSION-DX11-00530"
+legacy.pop("development_strategy")
+assert not validate_task(legacy, p), "live 00530 must not be retroactively invalidated"
+# 00531-00536 durable work remains grandfathered; 00537+ must ship game-frame progress.
+historical = copy.deepcopy(base)
+historical['task_id'] = 'CONVERSION-DX11-00536'
+assert not validate_task(historical, p), validate_task(historical, p)
+frame = copy.deepcopy(base)
+frame['task_id'] = 'CONVERSION-DX11-00537'
+frame['development_strategy'].update(
+    milestone_id='first_live_game_draw',
+    gameplay_delivery_target='FIRST_GAME_DRAW_FRAME',
+    live_game_draw_path=['LIVE_D3D9_CALLSITE', 'D3D11_NATIVE_DRAW', 'VISIBLE_FRAME_OUTPUT'],
+    visible_frame_acceptance='one OutRun authored draw creates a diagnostic native game frame; HMD result untested',
+    activation_guard_and_fallback='explicit diagnostic opt-in, NativeDrawPathActive false by default, unsupported paths use DX9Ex',
+)
+assert not validate_task(frame, p), validate_task(frame, p)
+mutations = [
+    ('old dormant milestone', lambda t: t['development_strategy'].update(milestone_id='mono_native_draw')),
+    ('missing gameplay delivery', lambda t: t['development_strategy'].pop('gameplay_delivery_target')),
+    ('missing actual D3D9 callsite', lambda t: t['development_strategy'].update(live_game_draw_path=['D3D11_NATIVE_DRAW','VISIBLE_FRAME_OUTPUT'])),
+    ('no visible output', lambda t: t['development_strategy'].update(live_game_draw_path=['LIVE_D3D9_CALLSITE','D3D11_NATIVE_DRAW'])),
+    ('reverse-order frame pipeline', lambda t: t['development_strategy'].update(live_game_draw_path=['VISIBLE_FRAME_OUTPUT','D3D11_NATIVE_DRAW','LIVE_D3D9_CALLSITE'])),
+    ('no fallback', lambda t: t['development_strategy'].update(activation_guard_and_fallback='')),
+    ('no acceptance', lambda t: t['development_strategy'].update(visible_frame_acceptance='')),
+    ('test-only claimed complete', lambda t: t.update(status='COMPLETE', changed_files=['tools/test_dx11_probe.py'])),
+]
+for label, mutate in mutations:
+    bad = copy.deepcopy(frame)
+    mutate(bad)
+    assert validate_task(bad, p), 'gameplay-first negative admitted: '+label
+r175_new = copy.deepcopy(frame)
+r175_new['development_strategy'].update(
+    milestone_id='shader_parity_r175', work_class='blocker_resolution',
+    gameplay_delivery_target='R175_CI_UNBLOCK',
+    blocking_evidence='R175 mismatch WARP TEXCOORD6 [128,0,16,255] != [224,128,32,255]',
+    r175_owner_handoff_evidence='verified fenced handoff from original 00477 owner',
+)
+assert not validate_task(r175_new, p), validate_task(r175_new, p)
+r175_new['development_strategy'].pop('r175_owner_handoff_evidence')
+assert validate_task(r175_new, p), 'R175 ownership takeover without evidence must fail'
+# New 00672+ feature-sized unit contract: reject per-format microtask completion.
+feature = copy.deepcopy(frame)
+feature["task_id"] = "CONVERSION-DX11-00672"
+feature["feature_id"] = "DX11-INTEGRATED-TEXTURE-MIRROR"
+# The positive terminal fixture includes a substantive game renderer change;
+# negative contract mutations must fail for their own reason, not merely for
+# missing source work from the inherited pre-feature test fixture.
+feature["changed_files"] = ["src/vr/d3d11/live_game_frame_bridge.cpp"]
+feature["feature_contract"] = {
+    "feature_id": "DX11-INTEGRATED-TEXTURE-MIRROR",
+    "goal": "Integrate the real game texture family through native game-frame draws and fallbacks",
+    "acceptance_items": [
+        {"id": "end2end", "category": "end_to_end_behavior", "behavior_area": "game_capture", "expected_behavior": "Source mip rows reach native D3D11 Draw"},
+        {"id": "fallback", "category": "fallback_regression", "behavior_area": "safe_fallback", "expected_behavior": "Unsupported texture returns to D3D9 Draw"},
+        {"id": "gates", "category": "integrated_validation", "behavior_area": "game_capture", "expected_behavior": "Full exact SHA build and regression success"},
+    ],
+}
+assert not validate_task(feature, p), validate_task(feature, p)
+for label, mutate in (
+    ("no contract", lambda t: t.pop("feature_contract")),
+    ("only one acceptance", lambda t: t["feature_contract"].update(acceptance_items=t["feature_contract"]["acceptance_items"][:1])),
+    ("no fallback", lambda t: t["feature_contract"]["acceptance_items"][1].update(category="end_to_end_behavior")),
+    ("single area", lambda t: [i.update(behavior_area="same") for i in t["feature_contract"]["acceptance_items"]]),
+    ("wrong feature", lambda t: t["feature_contract"].update(feature_id="OTHER")),
+    ("one piece done", lambda t: t.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, acceptance_results={"end2end": "PASS"})),
+):
+    bad = copy.deepcopy(feature)
+    mutate(bad)
+    assert validate_task(bad, p), "feature-sized negative admitted: " + label
+complete = copy.deepcopy(feature)
+complete.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, changed_files=["src/vr/d3d11/live_game_frame_bridge.cpp"], acceptance_results={"end2end":"PASS", "fallback":"PASS", "gates":"PASS_EXACT_SHA"})
+assert not validate_task(complete, p), validate_task(complete, p)
+# Build-verifiable gameplay and fallback acceptance is distinct from HMD
+# runtime proof. The preceding legacy feature-unit check already accepts
+# PASS_BUILD; its newer duplicate check must not reject the same evidence.
+build_verified = copy.deepcopy(complete)
+build_verified["acceptance_results"]["end2end"] = "PASS_BUILD"
+build_verified["acceptance_results"]["fallback"] = "PASS_BUILD"
+build_verified["runtime_validation"] = "UNTESTED"
+assert not validate_task(build_verified, p), validate_task(build_verified, p)
+# 00839 is a confirmed passed native-eye GPU source stage, not the fully
+# connected R30/menu/race renderer. Preserve its detailed PASS evidence
+# rather than rewriting it as an unearned feature-completion claim.
+partial_eye = copy.deepcopy(build_verified)
+partial_eye["development_strategy"].update(
+    work_class="integration",
+    milestone_id="native_stereo_eye_transport",
+    gameplay_delivery_target="NATIVE_STEREO_EYE_OUTPUT",
+    # The isolated native eye is real GPU source progress but the missing
+    # R30 live game callback must not be represented as an implemented stage.
+    live_game_draw_path=[
+        "D3D11_NATIVE_DRAW", "NATIVE_STEREO_EYE_OUTPUT",
+    ],
+)
+partial_eye.update(
+    full_dx11_renderer_complete=False,
+    score_change=0,
+    acceptance_results={
+        "end2end": "PASS_SOURCE_AND_LOCAL_CXX_REGRESSION_10_OF_10",
+        "fallback": "PASS_STATIC_AND_WARP_NEGATIVE_REGRESSION",
+        "gates": "PASS_EXACT_SHA_5_OF_5",
+    },
+)
+assert not validate_task(partial_eye, p), validate_task(partial_eye, p)
+# A source checkpoint awaiting the first exact-SHA Gate is valid only as
+# pending native GPU-eye progress; no full R30/OpenXR output is asserted.
+pending_eye = copy.deepcopy(partial_eye)
+pending_eye.update(
+    status="SOURCE_IMPLEMENTED_CI_PENDING",
+    automation_validation="PENDING_EXACT_SHA",
+    acceptance_results={"end2end": "PENDING_CI", "fallback": "PENDING_CI",
+                        "gates": "PENDING_CI"},
+    changed_files=["src/vr/d3d11/native_shared_eye_ring.cpp",
+                   "src/vr/d3d11/native_game_stereo_submission.cpp",
+                   "tools/dx11_native_transport_probe.cpp"],
+)
+pending_eye.pop("validation_bearing_result_sha", None)
+assert not validate_task(pending_eye, p), validate_task(pending_eye, p)
+for label, mutate in (
+    ("pending claimed terminal", lambda t: t.update(status="COMPLETE_BUILD_VERIFIED")),
+    ("pending claims renderer", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("pending runtime PASS", lambda t: t.update(runtime_validation="PASS")),
+    ("pending extra score", lambda t: t.update(score_change=1)),
+    ("pending fake gate PASS", lambda t: t.update(automation_validation="PASS_EXACT_SHA")),
+    ("pending lacks native source", lambda t: t.update(changed_files=["tools/test_probe.py"])),
+    ("pending missing native eye", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW"])),
+    ("pending forges visible frame", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
+):
+    bad = copy.deepcopy(pending_eye)
+    mutate(bad)
+    assert validate_task(bad, p), "unverified native eye incorrectly accepted: " + label
+
+for label, mutate in (
+    ("false final renderer", lambda t: t.update(full_dx11_renderer_complete=True)),
+    ("unverified exact SHA", lambda t: t.update(automation_validation="FAIL_EXACT_SHA")),
+    ("no exact SHA", lambda t: t.update(validation_bearing_result_sha=None)),
+    ("unobserved HMD PASS", lambda t: t.update(runtime_validation="PASS")),
+    ("unearned score", lambda t: t.update(score_change=1)),
+    ("missing native GPU eye", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW"])),
+    ("native eye before Draw", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["NATIVE_STEREO_EYE_OUTPUT", "D3D11_NATIVE_DRAW"])),
+    ("invented visible output", lambda t: t["development_strategy"].update(
+        live_game_draw_path=["D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"])),
+    ("forged probe", lambda t: t["acceptance_results"].update(
+        fallback="PASS_UNTESTED")),
+):
+    bad = copy.deepcopy(partial_eye)
+    mutate(bad)
+    assert validate_task(bad, p), "partial source-stage negative admitted: " + label
+
+unverified_build = copy.deepcopy(build_verified)
+unverified_build["acceptance_results"]["fallback"] = "UNTESTED"
+assert validate_task(unverified_build, p), "unknown fallback improperly completed"
+failed_gate = copy.deepcopy(build_verified)
+failed_gate["acceptance_results"]["gates"] = "FAIL"
+assert validate_task(failed_gate, p), "failing exact-SHA Gate improperly completed"
+
+run = latest_dx11_run()
+assert run is not None, "expected durable DX11 run records"
+print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")

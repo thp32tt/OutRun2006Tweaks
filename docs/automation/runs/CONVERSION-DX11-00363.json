@@ -1,0 +1,221 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00363",
+  "production_id": "CONVERSION-DX11-00363",
+  "event_id": "CONVERSION-DX11-00363-E004",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "85265dcc6876afd0d4aac55078e932cbb02467dc",
+  "result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+  "material_result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+  "validation_bearing_result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+  "result_marker": "[AUTO:CONVERSION-DX11-00363]",
+  "selected_work_item": "DX11_XR_NATIVE_SOURCE_RESOLUTION_AB_LAUNCH_POLICY",
+  "summary": "Adds an opt-in DX11 source-resolution A/B launch policy. Desktop remains the default A path; XR_NATIVE_2496X2688 is the bounded B candidate and passes -width 2496 -height 2688 plus MirrorFitDesktop=true so the game internal backbuffer can target the last observed Quest 3/VDXR recommended per-eye size while the PC mirror remains monitor-fitted. The policy is not promoted without HMD A/B evidence and NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/test_dx11_xr_source_resolution_policy.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00363.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT with CONVERSION-DX11-00363 already automation-complete at material e55de3a0ecb443f18a5e51330345070ac9352ff8. The current user-issued CONVERSION-DX11-00363-E004 / CHAT_ROLLOVER=3 is a rollover, not a retry, so ATTEMPT remains 1/3. Completed implementation and exact-SHA validation were not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "DX11 plan priority #1 cadence already has automatic XR-native launch settings; remaining smoothness proof is runtime dependent. Priority #2 source-render resolution decoupling is the highest-priority independently executable unit. Existing post-config -width/-height overrides feed Game::screen_resolution before D3D initialization, and MirrorFitDesktop preserves the internal backbuffer while fitting the PC window, allowing an opt-in A/B launcher boundary without risky new device hooks.",
+      "review_lenses": {
+        "architecture": "Launcher/workflow/test boundary only; preserve DX9Ex reference and NativeDrawPath dormancy.",
+        "ownership_lifetime": "Reuse existing command-line resolution and mirror-fit hooks; no D3D device/resource lifetime change.",
+        "stereo_correctness": "B candidate uses the last observed 2496x2688 per-eye target; no runtime visual correctness claim without Quest 3/VDXR A/B evidence.",
+        "performance": "Desktop A remains default; B is opt-in for frame-time, aliasing, and fresh/cached cadence comparison.",
+        "adversarial": "Gate asserts default Desktop behavior, candidate-only 2496x2688 overrides, run identity logging, and mirror-fit/internal-backbuffer invariants."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Run-OutRunVRTest.ps1 gains DX11SourceResolution={Desktop,XR_NATIVE_2496X2688}; only the B candidate appends -width 2496 -height 2688 -MirrorFitDesktop=true. RUN_OVERRIDES records A/B identity/effective source dimensions. Added tools/test_dx11_xr_source_resolution_policy.py and wired it into Backend Conversion Gate."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "exact_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+      "backend_conversion_gate": {
+        "run_number": 1955,
+        "run_id": 37190459447,
+        "run_attempt": 2,
+        "conclusion": "success",
+        "validate_job_id": 111401772529,
+        "validate_conclusion": "success",
+        "readiness_smoke_job_id": 111402633702,
+        "readiness_smoke_conclusion": "success",
+        "artifact_id": 11299335674,
+        "artifact_digest": "sha256:fffc582d215c8d83bb6c5dff4a4869ced00a95b6d93367131e6a6fee4ef16ba4"
+      },
+      "evidence": "Exact-SHA Backend Conversion Gate #1955 attempt 2 on e55de3a0ecb443f18a5e51330345070ac9352ff8 SUCCESS. The DX11 XR source-resolution A/B policy test, source graph, dormant activation boundary, census, Win32 configure/build/binary verification, and the full DX11 readiness smoke probe suite all succeeded. No Quest 3/VDXR HMD/game A/B test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+      "validation_bearing_result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+      "result_marker": "[AUTO:CONVERSION-DX11-00363]",
+      "evidence": "Material commit dx11: add XR source-resolution A/B launch policy [AUTO:CONVERSION-DX11-00363] is published and exact-SHA validated."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "This task creates an opt-in launch-policy A/B boundary and validation contract; no tester package is required by this controller unit."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37190459447,
+      "validation_run_attempt": 2,
+      "validation_job_id": 111401772529,
+      "readiness_smoke_job_id": 111402633702,
+      "artifact_id": 11299335674,
+      "artifact_digest": "sha256:fffc582d215c8d83bb6c5dff4a4869ced00a95b6d93367131e6a6fee4ef16ba4",
+      "issue14_comment_id": 5978372272,
+      "exact_next_action": "Release CONVERSION-DX11-00363 as automation-complete while retaining RUNTIME_VALIDATION=UNTESTED. Keep Desktop as default and perform Quest 3/VDXR Desktop versus XR_NATIVE_2496X2688 A/B testing before any source-resolution policy promotion."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_DX11_NATIVE_PLAN_2026_10_04_XR_SOURCE_RESOLUTION"
+    ],
+    "evidence": "Launcher/workflow/test-only material change. Default Desktop behavior is unchanged; XR_NATIVE_2496X2688 is opt-in. No D3D9 hook, renderer, transport, OpenXR host, resource lifetime, or NativeDrawPath production code is modified."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00363",
+    "production_id": "CONVERSION-DX11-00363",
+    "event_id": "CONVERSION-DX11-00363-E004",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_QUEUE",
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "material_result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+    "validation_bearing_result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+    "validation_run_id": 37190459447,
+    "validation_run_attempt": 2,
+    "validation_job_id": 111401772529,
+    "readiness_smoke_job_id": 111402633702,
+    "artifact_id": 11299335674,
+    "artifact_digest": "sha256:fffc582d215c8d83bb6c5dff4a4869ced00a95b6d93367131e6a6fee4ef16ba4",
+    "issue14_comment_id": 5978372272,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "dispatch_correction_comment_id": 5978375980
+  },
+  "recovery_reconciliation": {
+    "duplicate_commit": "06b78a6e7105e4d07d4d6f18a973248fc29a1451",
+    "duplicate_revert_commit": "03900358d4c4511a4ec0c7074a5a2a2794a9e299",
+    "duplicate_is_result": false,
+    "restored_material_tree": "26068b87a42d2b76c89f5a6836a1851a8538db4c",
+    "note": "The duplicate was created only because the intended 00363 material commit appeared concurrently after the initial recovery read. It was immediately reverted before exact-SHA validation. No duplicate work or score is credited."
+  },
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37190459447,
+      "run_number": 1955,
+      "run_attempt": 2,
+      "result_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
+      "conclusion": "success",
+      "validate_job_id": 111401772529,
+      "readiness_smoke_job_id": 111402633702,
+      "artifact_id": 11299335674,
+      "artifact_digest": "sha256:fffc582d215c8d83bb6c5dff4a4869ced00a95b6d93367131e6a6fee4ef16ba4"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5978372272,
+    "dispatch_correction_comment_id": 5978375980
+  },
+  "exact_next_action": "Automation work is complete. Keep Desktop as the default A path and run Quest 3/VDXR A/B testing against XR_NATIVE_2496X2688; compare aliasing, frame time, and fresh/cached cadence before promotion.",
+  "rollover_metadata_correction": {
+    "task_id": "CONVERSION-DX11-00363",
+    "corrected_from": [
+      {
+        "task_id": "CONVERSION-DX11-00363",
+        "production_id": "CONVERSION-DXVK-00362",
+        "event_id": "CONVERSION-DXVK-00362-E003",
+        "event_type": "retry",
+        "attempt": "1/3"
+      },
+      {
+        "task_id": "CONVERSION-DX11-00363",
+        "production_id": "CONVERSION-DX11-00363",
+        "event_id": "CONVERSION-DX11-00363-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false
+      }
+    ],
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00363",
+      "production_id": "CONVERSION-DX11-00363",
+      "event_id": "CONVERSION-DX11-00363-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "rollover_is_retry": false,
+      "source": "CURRENT_USER_QUEUE",
+      "chat_rollover": 3,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "reason": "The current user-issued CONVERSION-DX11-00363-E004 / CHAT_ROLLOVER=3 is authoritative. It supersedes earlier dispatch bookkeeping only. Rollover is not a retry, so ATTEMPT remains 1/3; the material/result SHA and exact-SHA Backend Conversion Gate #1955 evidence are unchanged.",
+    "dispatch_correction_comment_id": 5978375980,
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00363",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00363",
+      "production_id": "CONVERSION-DX11-00363",
+      "event_id": "CONVERSION-DX11-00363-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "rollover_is_retry": false,
+      "source": "CURRENT_USER_QUEUE",
+      "chat_rollover": 3,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00363",
+        "production_id": "CONVERSION-DXVK-00362",
+        "event_id": "CONVERSION-DXVK-00362-E003",
+        "event_type": "retry",
+        "attempt": "1/3"
+      },
+      {
+        "task_id": "CONVERSION-DX11-00363",
+        "production_id": "CONVERSION-DX11-00363",
+        "event_id": "CONVERSION-DX11-00363-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false
+      }
+    ],
+    "reason": "Newest explicit rollover wins; completed material/result SHA and validation evidence are unchanged."
+  }
+}

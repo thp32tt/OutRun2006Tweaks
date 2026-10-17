@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00062",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "chat_rollover": 1,
+  "recorded_kst": "2026-09-29T23:32:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "db6faceeffd5df98fb47491a399b546c8fd02eca",
+  "initial_code_result_sha": "e8cefbc1fd16d73df598c9fd318319706a337cd1",
+  "validation_bearing_result_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+  "result_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R103 dormant MANAGED Texture2D D3D11 DEFAULT mirror recreation/upload for Set 05 F18.",
+  "summary": "Extended the R102 MANAGED CPU shadow into a dormant, generation-bound D3D11 DEFAULT Texture2D/SRV mirror recreation path. Mirror readiness now requires concrete GPU resources, Reset or subsequent CPU-shadow mutation releases stale mirror ownership, and post-Reset recreation uploads the preserved shadow into the new device generation. Native draw remains dormant.",
+  "controller_failure_context": {
+    "supplied_run_id": 36578732698,
+    "supplied_run_conclusion": "cancelled",
+    "supplied_run_sha": "47cbd8efaa7c885c494448edf50f328bf658f79a",
+    "actual_failure": "The cancelled run reached Build DX11 constant buffer probe and failed because NativeManagedTextureShadow was referenced without importing the outrun::vr::dx11 type.",
+    "disposition": "ALREADY_REPAIRED_BEFORE_ATTEMPT_2",
+    "repaired_by_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+    "superseding_successful_gate_run_id": 36579424571
+  },
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "R103 adds concrete managed mirror recreation API, D3D11 device/Texture2D/SRV ownership getters and fail-closed mirror_ready requiring both lifetime match and live resources."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Creates D3D11_USAGE_DEFAULT Texture2D+SRV from valid CPU shadow rows, acknowledges readiness only after both resources exist, and releases generation-bound resources on Reset, shadow mutation and shutdown."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Adds invalid-shadow rejection, concrete DEFAULT descriptor checks, WARP staging readback, Reset/reupload generation proof, mutation invalidation and shutdown ownership checks while preserving all R102 probe invariants."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Adds durable R103 header/source/probe guards for concrete mirror ownership, upload source, reset/mutation release and hosted completion marker."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R103 remains dormant. No live D3D9 LockRect/UnlockRect source bridge, no PSSetShaderResources binding, no native game draw routing and no Quest3/VDXR runtime evidence exists."
+  },
+  "repair_history": [
+    {
+      "attempt": 1,
+      "result_sha": "7e591d59dca799aa3d1a822c577c07888c4f384a",
+      "failed_run_id": 36581852965,
+      "failure": "R103 probe replaced durable R102 Reset lifetime proof message.",
+      "repair": "Split R102 lifetime invariant and R103 resource-release invariant."
+    },
+    {
+      "attempt": 2,
+      "result_sha": "444d5a4f1148784cddfe7b9f744c13cad350ed2f",
+      "failed_run_id": 36582033364,
+      "failure": "R103 probe replaced durable R102 post-Reset reupload proof message.",
+      "repair": "Retained R102 generation acknowledgment assertion and added separate R103 concrete-resource assertion."
+    },
+    {
+      "attempt": 3,
+      "result_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+      "failed_run_id": 36582240340,
+      "failure": "R103 probe replaced durable R102 shutdown lifetime proof message.",
+      "repair": "Retained R102 shutdown state-reset assertion and added separate R103 GPU ownership-clear assertion; exact-SHA CI passed."
+    }
+  ],
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36582417326,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+      "completed_utc": "2026-09-29T14:30:01Z",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; production Win32 build PASS; DX11 R87-R103 probes PASS; WARP probe emitted DX11 managed texture mirror reupload R103: PASS."
+    },
+    "build": {
+      "run_id": 36582423230,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+      "completed_utc": "2026-09-29T14:31:30Z"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36582422989,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+      "completed_utc": "2026-09-29T14:31:48Z",
+      "evidence": "All six jobs PASS: host-x64, game-x86, safe-draw comparison, R26 HUD safe, C1 and C2."
+    },
+    "hud_inspector": {
+      "run_id": 36582423041,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+      "completed_utc": "2026-09-29T14:30:50Z",
+      "evidence": "build-hud-inspector and static-exe-analysis PASS."
+    },
+    "pc_fast": {
+      "run_id": 36582417125,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+      "completed_utc": "2026-09-29T14:24:20Z"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit f84b2ce701f1fe947d626060cdf45ed459700321 contains [AUTO:CONVERSION-DX11-00062] and no CI-skip directive.",
+    "Backend Conversion Gate 36582417326 PASS on exact result SHA with hosted WARP marker DX11 managed texture mirror reupload R103: PASS.",
+    "Build 36582423230 PASS, OpenXR VR architecture 36582422989 PASS across all six jobs, HUD Inspector 36582423041 PASS across both jobs.",
+    "VR PC Fast Test Build 36582417125 SKIPPED; no N100 workspace, Quest3/VDXR or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5892175077,
+    "repair_comment_ids": [
+      5892194195,
+      5892226497,
+      5892246471
+    ],
+    "validation_comment_id": 5892384320,
+    "status": "IMPLEMENTATION_REPAIRS_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R103 is automation-validated but runtime-untested. F18 now has DEFAULT dynamic upload, MANAGED CPU-shadow/reset storage and dormant managed-shadow-to-D3D11 mirror recreation. The next software-only gap is a proven live D3D9 Texture2D LockRect/UnlockRect content bridge into the R102 shadow path.",
+  "next_action": "Continue Set 05 F18 with one bounded non-routing prerequisite: connect proven live D3D9 Texture2D LockRect/UnlockRect content into R102 storage. Keep native draw dormant until remaining exactness gates and exact-build Quest3/VDXR evidence close.",
+  "in_task_repairs": 3,
+  "prior_attempt_1": {
+    "result_sha": "0081496886a9aea22aec1819ea2f8639648d8735",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "selected_work": "R102 dormant MANAGED Texture2D CPU-shadow/reset lifetime storage."
+  }
+}

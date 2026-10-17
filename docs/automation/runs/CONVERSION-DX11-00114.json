@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00114",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T18:57:47+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "9d9921fb65b9b451dc5dfb63822c856ab3676f51",
+  "result_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa",
+  "validation_bearing_result_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R129_CTRL_ICON_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "The three exact ctrl/set icon position-correction edges at 0x60D40, 0x60FBC and 0x60A21 now derive immediate ScreenHud ownership from the shared backend-neutral producer map. Existing AddSpriteSpacing behavior is preserved, the existing stack write at 0x60FBC/0x60A21 is preserved, and compile-time assertions plus the backend disassembly verifier prevent drift back to spacing-only callbacks. The canonical ctrl_icon_work range 0x60900-0x61100 is unchanged.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "This is a bounded ownership-source substitution for three already-proven ScreenHud callsites. It preserves their existing position-correction behavior and does not widen producer semantics, enable native DX11 draw ownership, or alter D3D9/OpenXR transport. Hosted CI is not HMD visual proof."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36698752940,
+      "conclusion": "success",
+      "validated_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa",
+      "artifact_id": 11089317767,
+      "artifact_digest": "sha256:4c5900bb2a3b5e3477d67910c55eb2e92bd30815edebf74642a20ce848561c1d",
+      "evidence": "Queue, HMD-proven baseline static gate, one-click structure, backend disassembly including R129 ctrl-icon exact bindings, DX11 native transport/source graph/census, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes, binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36698759059,
+      "conclusion": "success",
+      "validated_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa"
+    },
+    "hud_inspector": {
+      "run_id": 36698759020,
+      "conclusion": "success",
+      "validated_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36698759082,
+      "conclusion": "success",
+      "validated_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36698752896,
+      "conclusion": "skipped",
+      "validated_sha": "dc6b754d5facae85dc2db582acde5c2d0b4816aa"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5908734965,
+    "validation_comment_id": 5908856255,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00114] and no CI-skip directive.",
+    "0x60A21, 0x60D40 and 0x60FBC are compile-time classified as ScreenHud through GameSemantic::ClassifyCriticalProducer.",
+    "The original AddSpriteSpacing correction remains on all three edges.",
+    "The original ESP stack write remains on the 0x60A21 and 0x60FBC callback path.",
+    "The backend verifier requires all three exact shared-producer-map bindings and rejects the three legacy spacing-only bindings.",
+    "The existing canonical ctrl_icon_work producer range 0x60900-0x61100 was not added, widened or reclassified.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs pass on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R129 ctrl_icon_work shared producer-map adoption is automation-validated on the DX11 branch. Runtime visual behavior remains untested.",
+  "next_action": "Continue Set04/F13 only with another independently proven canonical producer family. The unchanged exact DispTempHeartNum position-correction edge 0xBBA89 is a bounded DX11 candidate. Do not widen producer ranges or claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}

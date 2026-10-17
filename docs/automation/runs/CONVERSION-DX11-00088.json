@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00088",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T05:35:10+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "0fcc88cb3a670d5b848d3b3d3208608bf10a5d21",
+  "initial_result_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec",
+  "result_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec",
+  "validation_bearing_result_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R116 hosted native DX11 shared-eye transport lifecycle probe: exercise exact lifetime binding, producer EVENT publication, ACK retirement, invalidation quarantine, and hard-retirement/rebind behavior without enabling native draw routing.",
+  "summary": "R116 adds a WARP-hosted executable probe for the existing NativeSharedEyeRing transport contract. It verifies dormant allocation, exact producer/consumer/run/transport identity binding, in-flight generation retag rejection, acquired-slot cancellation, producer EVENT completion before publication, stale/wrong/old-frame ACK rejection, exact and cumulative ACK retirement, invalidation fail-closed behavior, shutdown hard retirement, and fresh-generation rebind. The probe is wired into the mandatory Backend Conversion Gate and source-contract verifier; production renderer routing is unchanged.",
+  "source_commits": [
+    "64afbbb09c7a992a52065bee143f4aafa9c91dec"
+  ],
+  "changed_paths": [
+    ".github/workflows/backend-conversion-gate.yml",
+    "CMakeLists.txt",
+    "cmake.toml",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "production_state_binding_added": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "The result commit changes only hosted probe/build/gate/verifier coverage. No production DX11 renderer, DX9Ex renderer/HUD, OpenXR transport, or activation-routing source is modified. Hosted WARP validation proves transport lifecycle behavior but cannot establish Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36626566575,
+      "conclusion": "success",
+      "validated_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec",
+      "artifact_id": 11060613134,
+      "artifact_digest": "sha256:122f022a34a135c741f0a87c4853455a4934e504cde5f0b18284defef2716bcc",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer probes PASS; R116 dx11_native_transport_probe build and run PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36626572603,
+      "conclusion": "success",
+      "validated_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36626572757,
+      "conclusion": "success",
+      "validated_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36626572594,
+      "conclusion": "success",
+      "validated_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36626566601,
+      "conclusion": "skipped",
+      "validated_sha": "64afbbb09c7a992a52065bee143f4aafa9c91dec"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5898258128,
+    "validation_comment_id": 5898330160,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact controller marker [AUTO:CONVERSION-DX11-00088] and no CI-skip directive.",
+    "R116 is one commit ahead of the CONVERSION-DX11-00086 bookkeeping base and changes only five hosted test/build/verifier files.",
+    "The new WARP probe builds and runs successfully inside Backend Conversion Gate, including generation-retag rejection, EVENT publication, stale ACK rejection, cumulative ACK retirement, invalidation quarantine, shutdown retirement, and fresh-generation rebind.",
+    "Build, HUD Inspector and all six OpenXR architecture jobs pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R116 is automation-validated but runtime-untested. The native shared-eye transport lifecycle now has executable hosted coverage in the mandatory conversion gate; native game draw routing remains dormant.",
+  "next_action": "Continue with the next independent bounded DX11 prerequisite. Do not claim graphics/runtime correctness or promote native draw ownership before exact-build Quest3/VDXR evidence."
+}

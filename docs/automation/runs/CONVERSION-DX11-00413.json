@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00413",
+  "production_id": "CONVERSION-DX11-00413",
+  "event_id": "CONVERSION-DX11-00413-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 0,
+  "rollover_is_retry": false,
+  "dispatch_source": "CURRENT_USER_QUEUE",
+  "source": "CURRENT_USER_QUEUE",
+  "selected_work_item": "DX11_R275_TRANSLATED_SEMANTIC_RECEIPT",
+  "base_sha": "6cee6d282b471be4074e27c777ece07e26654bc5",
+  "result_sha": "852fc127364da0f754297cc610bcf03a2772cf52",
+  "source_implementation_sha": "852fc127364da0f754297cc610bcf03a2772cf52",
+  "material_result_sha": "852fc127364da0f754297cc610bcf03a2772cf52",
+  "validation_bearing_result_sha": "852fc127364da0f754297cc610bcf03a2772cf52",
+  "automation_validation": "PASS",
+  "automation_validation_detail": "EXACT_SHA_BACKEND_CONVERSION_GATE_AND_DX11_READINESS_SMOKE_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "COMPLETE",
+  "summary": "R275 seals the dormant translated-semantic scalar bundle into a tamper-evident receipt bound to the exact R239 programmable pair, R242 translated-object ownership and R273 source-mapping handoff. R263 now consumes only that typed receipt plus R243 input-layout and R268 linkage evidence; programmable production translation and native draw activation remain off.",
+  "evidence": [
+    "native_backend.hpp/cpp add NativeProgrammableShaderTranslatedSemanticReceipt plus a snapshot-integrity validator and make R263 consume the typed receipt instead of loose translated semantic hashes/revision/contract/exactness parameters.",
+    "dx11_constant_buffer_probe covers exact R275 receipt sealing, stale R273 handoff rejection, R263 positive receipt consumption, stale R275 rejection and tampered constant/sampler receipt fail-closed behavior.",
+    "verify_dx11_source_graph.py enforces the R275 receipt contract, R263 typed consumption and continued production shaderTranslationExact=false boundary.",
+    "Historical regression riskPaths were checked before implementation; no registered runtime regression case directly names the changed native_backend/probe/verifier paths.",
+    "Exact-SHA Backend Conversion Gate 37473327575 validate 112302201910 and DX11 readiness smoke 112304774218 both succeeded.",
+    "Artifact 11418077046 digest sha256:98114c5e1fa30a6b40dc1dedcc4b7b4c66628ba70ae8000ed2610dd58b22ce61."
+  ],
+  "native_draw_path_activation_changed": false,
+  "scope_guards": {
+    "modified_dx9ex_focus": false,
+    "native_draw_path_enabled": false,
+    "draw_enabled": false,
+    "draw_indexed_enabled": false,
+    "runtime_claimed": false
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub HEAD 6cee6d282b471be4074e27c777ece07e26654bc5; read AGENTS.md, review index, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json and inherited automation state. 00413 had no prior durable run record."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected the next bounded F21 provenance gap after R274: loose translated semantic hashes/revision/contract/exactness values entering R263 without a snapshot-sealed handoff. Regression riskPaths showed no direct changed-path trigger."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R275 translated-semantic receipt composition/integrity validation, changed R263 to consume the typed receipt, added positive/stale/tamper probe coverage and source-graph enforcement."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37473327575 validate 112302201910 SUCCESS and DX11 readiness smoke 112304774218 SUCCESS, including constant-buffer probe. No HMD/game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material/validation-bearing commit 852fc127364da0f754297cc610bcf03a2772cf52 contains [AUTO:CONVERSION-DX11-00413] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R275 is a dormant diagnostic semantic receipt boundary only; it creates no runtime programmable shader payload or user-test candidate."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "This run record and CONVERSION_LANE_STATE persist the exact material SHA, Gate receipts, UNTESTED runtime status and next independent R276 action."
+    }
+  },
+  "exact_next_action": "Under CONVERSION-DX11-00414, add a diagnostic-only R276 programmable semantic translation-plan evidence producer that replaces R275 probe-supplied translated semantic hash/exactness fixtures with source-derived target semantic identities bound to R271/R268/R273 provenance. Keep shader creation/binding and native draw activation off.",
+  "status": "COMPLETE",
+  "implementation_commits": [
+    "852fc127364da0f754297cc610bcf03a2772cf52"
+  ],
+  "runtime_test_performed": false,
+  "runtime_claim": "NO_RUNTIME_NORMALITY_CLAIM",
+  "validation": {
+    "exact_sha": "852fc127364da0f754297cc610bcf03a2772cf52",
+    "backend_conversion_gate": {
+      "run_id": 37473327575,
+      "conclusion": "success",
+      "validate_job_id": 112302201910,
+      "validate_conclusion": "success",
+      "dx11_readiness_smoke_job_id": 112304774218,
+      "dx11_readiness_smoke_conclusion": "success",
+      "artifact_id": 11418077046,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-852fc127364da0f754297cc610bcf03a2772cf52",
+      "artifact_digest": "sha256:98114c5e1fa30a6b40dc1dedcc4b7b4c66628ba70ae8000ed2610dd58b22ce61"
+    }
+  }
+}

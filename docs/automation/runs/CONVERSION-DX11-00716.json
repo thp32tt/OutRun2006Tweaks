@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00716",
+  "production_id": "CONVERSION-DX11-00716",
+  "event_id": "CONVERSION-DX11-00716-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_SHARED_GAME_TEXTURE_NATIVE_SRV_REUSE",
+  "work_key": "DX11:STAGE1_SAME_SOURCE_SRV_SAMPLER",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real D3D9 menu/vehicle/race Stage1 native Draw/DrawIndexed captures same game texture with independent UV and sampler state",
+      "reuse already uploaded D3D11 stage0 SRV only when D3D9 resource, sRGB view and mip completeness match; create independent native sampler s1",
+      "bind t1/s1 for Stage1 HLSL, retain separate full source mirror for mismatches and original D3D9 gamepad/input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_stage1_mirror_reuse.hpp",
+      "tools/dx11_game_stage1_mirror_reuse_probe_00716.cpp",
+      "tools/test_dx11_stage1_mirror_reuse_00716.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Shared D3D9 source across native Stage1 UV/sampler is mirrored once; distinct sampler s1 and t1 are bound in live game native Draw and DrawIndexed",
+      "negative_regression": "Different D3D9 resource, sRGB encoding, mip-chain completeness, or missing prior GPU view require separate mirroring; failed GPU mirror or sampler retains original D3D9 game Draw and gamepad",
+      "component_integration": "D3D9 stage1 capture and texture mirror -> shared D3D11 SRV and separately created sampler -> real PS t1/s1 and Draw/DrawIndexed -> diagnostic inset; exact-SHA CI"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_SAME_SOURCE_SRV_SAMPLER",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native diagnostic inset gameplay and Quest3/VDXR menu/vehicle/race visuals remain UNTESTED without HMD; no backend promotion",
+    "activation_guard_and_fallback": "Explicit diagnostic opt-in, original D3D9 Draw/input preserved; incompatible sampler/view state uses existing full separate texture mirror"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_SHARED_GAME_TEXTURE_NATIVE_SRV_REUSE",
+    "goal": "Avoid repeated real-game D3D9 texture readback/upload when Stage1 uses same texture with independent UV/sampler, while maintaining correct D3D11 per-stage texture/sampler binding and DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "same-game-texture-independent-sampler-native-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_capture_texture_shader_draw",
+        "expected_behavior": "One native view from same real D3D9 texture is shared across stage0/stage1; independently translated D3D11 sampler1 feeds actual native Draw and DrawIndexed"
+      },
+      {
+        "id": "mismatched-texture-srgb-mips-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_original_d3d9",
+        "expected_behavior": "Resource, color-space or mip-profile differences retain full separate Stage1 mirror, and mirror/sampler failure never suppresses original D3D9 Draw/input"
+      },
+      {
+        "id": "portable-integrated-exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_source_python_windows_ci",
+        "expected_behavior": "Portable C++ reuse predicate, destructive source integration mutations and five final exact-SHA GitHub Gates pass"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_stage1_mirror_reuse.hpp",
+    "tools/dx11_game_stage1_mirror_reuse_probe_00716.cpp",
+    "tools/test_dx11_stage1_mirror_reuse_00716.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00716.json"
+  ],
+  "base_head_sha": "e9bcef1b5011e22828e83e5c0ad16b145c00ad25",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "acceptance_results": {
+    "same-game-texture-independent-sampler-native-draw": "PENDING",
+    "mismatched-texture-srgb-mips-fallback": "PENDING",
+    "portable-integrated-exact-sha": "PENDING"
+  },
+  "next_action": "Run exact-SHA five mandatory GitHub Actions; repair only failed tests on same TASK_ID, then record BUILD_VERIFIED/NEED_HMD_TEST separately."
+}

@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00640",
+  "production_id": "CONVERSION-DX11-00640",
+  "event_id": "CONVERSION-DX11-00640-E004",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_FACTOR_ADD_ADDSMOOTH",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "ae075ee852d221593ba1c02eda579856c1a89e39",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live D3D9 stage0 PM RGB game Draw captures exact ADD/ADDSMOOTH alpha/TFACTOR",
+      "Read actual factor, modifier and guarded state; bind alpha high-byte into native constant",
+      "Compile native D3D11 shaders and issue Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "Game D3D9 source and lifetime capture with DX9Ex fallback",
+      "D3D11 alpha PS pair and native draw integration",
+      "20480 numeric regressions + destructive source graph in Fast/full CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB preserved with ADD or ADDSMOOTH TFACTOR alpha",
+      "negative_regression": "Disallow modified/swapped game inputs and factor read failure",
+      "component_integration": "GetTextureStageState -> GetRenderState -> alphaParams -> native PS -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_FACTOR_ADD_ADDSMOOTH"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Code integrated, runtime Quest3/gamepad not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in, default DX9Ex fallback"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_stage0_pm_add_factor_00640.py",
+    "docs/automation/runs/CONVERSION-DX11-00640.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "head and prior 00639 checked",
+    "C1_REVIEW": "Disjoint ADD/ADDSMOOTH native path",
+    "C2_IMPLEMENT": "GAME_CODE_AND_REGRESSION",
+    "C3_VALIDATE": "EXACT_SHA_ALL_MANDATORY_GATES_SUCCESS",
+    "C4_COMMIT": "MATERIAL_RESULT_SHA:b2d87633a6bd5009870bf8a935a00c1268c84b79",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "DONE"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "NEED_HMD_TEST for real Quest3/VDXR game/menu/gamepad proof; controller selects next independent DX11 feature, do not repeat 00640",
+  "result_sha": "b2d87633a6bd5009870bf8a935a00c1268c84b79",
+  "validation_bearing_sha": "b2d87633a6bd5009870bf8a935a00c1268c84b79",
+  "git_actions": {
+    "backend_conversion_gate": {
+      "run_id": 38321006237,
+      "conclusion": "success"
+    },
+    "dx11_fast_structural": {
+      "run_id": 38321006141,
+      "conclusion": "success"
+    },
+    "windows_build": {
+      "run_id": 38321010530,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 38321010597,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38321010696,
+      "conclusion": "success"
+    },
+    "vr_pc_fast_test_build": {
+      "run_id": 38321006166,
+      "conclusion": "skipped"
+    }
+  },
+  "validation_bearing_result_sha": "b2d87633a6bd5009870bf8a935a00c1268c84b79"
+}

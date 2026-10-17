@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00046",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T19:05:32+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "8da054d09bc933b71936b0ac10e7f7cc5df6168e",
+  "code_result_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13",
+  "result_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R94 passive fixed-function transform constants readiness for Set 05 F21.",
+  "summary": "Added passive R94 transform readiness for the R93 fixed-function vertex-shader b0 contract. pipeline_translation now converts finite observed D3D9 WORLD*VIEW*PROJECTION matrices into a deterministic row-major 16-float payload and fails closed on incomplete/non-finite observations. runtime_census samples GetTransform only on the existing diagnostic draw-sampling path and logs R93 vertex-prototype plus R94 transform readiness. The existing shader-linkage probe verifies matrix order and negative cases. No native D3D11 constant buffer or runtime shader binding was added.",
+  "prerequisite": {
+    "task_id": "CONVERSION-DX11-00044",
+    "code_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Added R94 FixedFunctionTransformConstants contract and incomplete/non-finite fail-closed reasons."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Added finite-checked WORLD*VIEW*PROJECTION matrix multiplication, row-major b0 payload construction and deterministic payload hash."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added passive sampled GetTransform(WORLD/VIEW/PROJECTION), R93 vertex-prototype readiness evidence and R94 transform readiness log without runtime binding."
+    },
+    {
+      "path": "tools/dx11_shader_linkage_probe.cpp",
+      "result": "Added positive WORLD*VIEW ordering test plus incomplete/non-finite transform fail-closed regression cases."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R94 translation/census/regression contract guards."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R94 proves only passive D3D9 transform observation and deterministic constant payload preparation. It does not allocate/upload/bind an ID3D11Buffer, bind native shaders in the game, cover lighting/skinning/transformed vertices, or prove HMD visual parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36552656468,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13",
+      "evidence": "Production Win32 build PASS and Build/Run DX11 shader linkage probe PASS with R94 matrix-order/fail-closed checks."
+    },
+    "build": {
+      "run_id": 36552661807,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36552661948,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13"
+    },
+    "hud_inspector": {
+      "run_id": 36552662021,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "fb6923d4bbaaf10e62c485fc99a119ea87202c13"
+    },
+    "pc_fast": {
+      "run_id": 36552656423,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit fb6923d4bbaaf10e62c485fc99a119ea87202c13 contains [AUTO:CONVERSION-DX11-00046] and no CI-skip directive.",
+    "Verify DX11 source graph PASS on the exact result SHA.",
+    "Backend Conversion Gate 36552656468 PASS including Win32 compile and R94-backed shader linkage run.",
+    "Build 36552661807 PASS.",
+    "OpenXR VR architecture 36552661948 PASS across all six jobs.",
+    "HUD Inspector 36552662021 PASS.",
+    "Issue #14 implementation comment 5887933722 and validation comment 5888028202 written.",
+    "No N100 workspace, PC fast runner, Quest3/VDXR, or in-game runtime execution was used."
+  ],
+  "blocker": null,
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN",
+    "implementation_comment_id": 5887933722,
+    "validation_comment_id": 5888028202
+  },
+  "resume_cursor": "R94 is automation-validated. Continue F21 only with another bounded non-routing prerequisite such as D3D11 constant-buffer object/upload readiness; keep NativeDrawPathActivationAllowed and shaderTranslationExact false.",
+  "next_action": "Add a hosted D3D11 constant-buffer object/upload-readiness probe for the R94 64-byte WVP payload, or advance another narrowly scoped shader-translation prerequisite. Exact-build Quest3/VDXR remains mandatory before runtime promotion."
+}

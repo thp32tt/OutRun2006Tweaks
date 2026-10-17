@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00441",
+  "production_id": "CONVERSION-DX11-00441",
+  "event_id": "CONVERSION-DX11-00441-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "99473640f37e9047d03594fa344840289c2df50a",
+  "result_sha": "28b47c79a9f2a1f80d69868606fc21e88e0a8347",
+  "material_result_sha": "28b47c79a9f2a1f80d69868606fc21e88e0a8347",
+  "validation_bearing_result_sha": "28b47c79a9f2a1f80d69868606fc21e88e0a8347",
+  "selected_work_item": "DX11_R303_R262_TO_R292_PRODUCTION_PAYLOAD_INTEGRITY_GUARD",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R303 propagates R262 full-resource receipt self-integrity into the R292 production activation-prerequisite boundary. R292 independently reconstructs the exact R262 payload and refuses to create the R259 prerequisite handoff when a copied R262 receipt is mutated behind an unchanged stored review token.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "28b47c79a9f2a1f80d69868606fc21e88e0a8347"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: read current branch HEAD 99473640, VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, conversion lane state, VR_AUTODEV_STATE/VR_RUN_STATE, regression history and Issue #14",
+    "C1_REVIEW": "PASS: selected the highest-priority downstream R262 trust gap at R292 production activation prerequisites, where stored/caller R262 review-token equality was accepted without payload reconstruction",
+    "C2_IMPLEMENT": "PASS: added exact R262 payload recomputation, resourceBehaviorPayloadSnapshotMatches, production handoff/boundary gating, R292 snapshot sealing, an R303 tamper regression and source-graph registration",
+    "C3_VALIDATE": "PASS: exact-SHA Backend Conversion Gate 37666255700; validate job 112946132236 SUCCESS; DX11 readiness smoke job 112948454663 SUCCESS; Build/Run DX11 constant buffer probe SUCCESS",
+    "C4_COMMIT": "PASS: material/validation-bearing result 28b47c79a9f2a1f80d69868606fc21e88e0a8347 contains [AUTO:CONVERSION-DX11-00441] and no CI-skip directive",
+    "C5_PACKAGE": "NOT_REQUIRED: bounded diagnostic/static production receipt-integrity change; no runtime candidate requested",
+    "C6_STATE": "PASS: durable task record and lane-state bookkeeping persisted after exact-SHA Gate"
+  },
+  "evidence": {
+    "backend_conversion_gate_run_id": 37666255700,
+    "validation_job_id": 112946132236,
+    "readiness_smoke_job_id": 112948454663,
+    "artifact_id": 11502542785,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-28b47c79a9f2a1f80d69868606fc21e88e0a8347",
+    "artifact_digest": "sha256:1b541d9beb6a4403f44e4f0015b88e8bc60c698219282a86d44886c26b9019ca",
+    "issue14_comment_id": 6044133922
+  },
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "runtime_test_required": false,
+  "next_action": "Inspect the next production consumer downstream of R303/R292, especially census/activation consumers that trust R292 or R259 derived receipt tokens without payload self-validation; keep object binding and NativeDrawPath/Draw/DrawIndexed authorization fail-closed."
+}

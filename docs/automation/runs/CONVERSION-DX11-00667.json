@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00667",
+  "production_id": "CONVERSION-DX11-00667",
+  "event_id": "CONVERSION-DX11-00667-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_RGB332_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "e323a02d26d9521d8ddedcce5ee78e1178b2d02e",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live game D3D9 R3G3B2/A8R3G3B2 texture LockRect mip sources",
+      "packed 1/2-byte texels decoded row-by-row to BGRA8 upload/immutable SRV",
+      "native D3D11 texture binding and diagnostic Draw/DrawIndexed; original D3D9 input and Present preserved"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_rgb332_texture.hpp",
+      "tools/dx11_game_rgb332_probe.cpp",
+      "tools/test_dx11_native_rgb332_00667.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "CPU C++ 2-row padded 3:3:2 and A8 3:3:2 color/alpha plus 1x1 mip, Linux ASan/UBSan PASS",
+      "negative_regression": "16 destructive source/header integration mutations; sRGB/DEFAULT/unreadable textures fall back to D3D9",
+      "component_integration": "game D3D9 format/LockRect mip -> source stride -> per-row BGRA8 -> CreateTexture2D/SRV -> PSSetShaderResources -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_RGB332_MIP_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_rgb332_texture.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; actual menu/race/Quest3 pixels NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; sRGB and DEFAULT textures fail closed; original D3D9 Draw/Present and gamepad untouched"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_rgb332_texture.hpp",
+    "tools/dx11_game_rgb332_probe.cpp",
+    "tools/test_dx11_native_rgb332_00667.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00667.json",
+    "tools/test_dx11_native_extended_luminance_00663.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS head e323a02d26d9521d8ddedcce5ee78e1178b2d02e; 00666 C6 complete; new independent RGB332 work key",
+    "C1_REVIEW": "PASS R3G3B2 and A8R3G3B2 unsupported by native mirror_texture; no palette dependence",
+    "C2_IMPLEMENT": "PASS source format eligibility, mip conversion, BGRA8 SRV live native Draw, fail-closed sRGB",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 450a6e9cf7197d0c7852dd1c0a782fa556849dce; Backend Conversion Gate, DX11 Fast Structural Checks, Build, OpenXR VR architecture and HUD Inspector SUCCESS (VR PC Fast Test Build skipped)",
+    "C4_COMMIT": "PASS material c0c64fd38b167b8790d50c631e3e7385ab73f8d4, validation-bearing regression repair 450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+    "C5_PACKAGE": "NOT_REQUIRED; Quest3 not tested",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_ASAN_UBSAN_PASS",
+    "static_regression": "PENDING_GITHUB_FAST",
+    "compile_build": "PENDING_GITHUB_BUILD",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "c0c64fd38b167b8790d50c631e3e7385ab73f8d4",
+  "validation_bearing_result_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+  "result_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+  "next_action": "C6 COMPLETE_BUILD_VERIFIED. No repeat build/CI or source modification for this TASK_ID; HMD/Quest3/VDXR/gamepad runtime UNTESTED.",
+  "ci_evidence": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38374075633,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38374075577,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 38374081475,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38374081420,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38374081499,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    }
+  ]
+}

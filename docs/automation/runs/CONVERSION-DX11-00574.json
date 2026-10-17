@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00574",
+  "production_id": "CONVERSION-DX11-00574",
+  "event_id": "CONVERSION-DX11-00574-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00574",
+  "base_sha": "8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
+  "work_key": "DX11:MENU_RACE_BLENDFACTOR_RGB_MODULATE2X4X_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "real D3D9 stage0 BLENDFACTORALPHA+scaled independent alpha capture",
+      "D3D11 compiled HLSL PS->Draw/DrawIndexed->opt-in readback"
+    ],
+    "batch_components": [
+      "state capture/operand validation and native shader",
+      "shader lifetime/draw selection and regression mutants"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "stage0 modulate2x/modulate4x alpha admitted with factor RGB",
+      "negative_regression": "10 source-link mutants and four body math mutants plus 8 operand cases",
+      "component_integration": "game Draw->D3D11 PS->native Draw/DrawIndexed->diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLENDFACTOR_RGB_MODULATE2X4X_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLENDFACTOR_SCALED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "FACTOR_RGB_SCALED_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; actual game/HMD/input UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only, original D3D9 input/draw/present maintained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
+    "C1_REVIEW": "Missing scaled independent alpha D3D9 state variants",
+    "C2_IMPLEMENT": "C++ HLSL/Draw implementation and destructive regressions",
+    "C3_VALIDATE": "All 5 mandatory exact-SHA GitHub Actions SUCCESS at a27e1c4a, including source/functional/regression/Win32 builds; separate hardware tests UNTESTED",
+    "C4_COMMIT": "C++ material 095be67a, test/policy repair 05deea78 / 4b5ae17, exact validation-bearing result a27e1c4a; all no CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED; opt-in diagnostic mode, not promoted or distributed",
+    "C6_STATE": "Separate bookkeeping checkpoint AFTER complete 5/5 Gate SUCCESS; no additional CI or score"
+  },
+  "next_action": "Independent next game/native integration work on latest HEAD. Quest3/VDXR/gamepad menu->race comparison needs manual hardware; DXVK frozen.",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "material_result_sha": "095be67aac83a750173f0d5d0aa550ab8a0e46a3",
+  "validation_bearing_result_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc",
+  "result_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc",
+  "validation_evidence": {
+    "first_material_sha": "095be67aac83a750173f0d5d0aa550ab8a0e46a3",
+    "failed_acceptance_repairs": [
+      "05deea784d85d21e3b56c97c9259345bf477fb57",
+      "4b5ae1729902fee413837b51bcd2e5c7cf29fb1f"
+    ],
+    "numeric_reference_fix_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc",
+    "exact_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc",
+    "github_workflow_runs_observed": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38182889673,
+        "run_attempt": 2,
+        "conclusion": "success",
+        "head_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc"
+      },
+      {
+        "name": "Build",
+        "run_id": 38182892873,
+        "run_attempt": 1,
+        "conclusion": "success",
+        "head_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38182892960,
+        "run_attempt": 1,
+        "conclusion": "success",
+        "head_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38182892882,
+        "run_attempt": 1,
+        "conclusion": "success",
+        "head_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38182889707,
+        "run_attempt": 1,
+        "conclusion": "success",
+        "head_sha": "a27e1c4ac31eb6df4d416b3f3693894c12ada0fc"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "state_persisted": true,
+  "updated_utc": "2026-10-11T23:17:00Z"
+}

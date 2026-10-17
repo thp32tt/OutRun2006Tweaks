@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00290",
+  "production_id": "CONVERSION-DX11-00290",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00290-E003",
+  "event_type": "retry",
+  "status": "BLOCKED_ATTEMPTS_EXHAUSTED",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "78dc8aee1d38b86307bdf75fbe8e02db67081d65",
+  "source_implementation_sha": "337106efc2dbe03aa1635e4ad940cd5f86b92bf4",
+  "result_sha": "8e7ee4b1a023310dea1e77cc60c327707226e9c4",
+  "validation_bearing_result_sha": "8e7ee4b1a023310dea1e77cc60c327707226e9c4",
+  "result_marker": "[AUTO:CONVERSION-DX11-00290]",
+  "selected_work_item": "DX11_R203_R145_READINESS_HASH_SYMMETRY",
+  "summary": "Restored copied R145 render-target-bound draw readiness hash symmetry by including inputLayoutStream0Stride in integrity validation, then corrected an invalid R148/R154 positive triangle-fan probe fixture exposed by the first validation run. The direct constant-buffer/readiness chain now passes through R145/R147/R148/R154 and all subsequent native transport, surface mirror and generated-fan probes. The required aggregate exact-SHA Backend Conversion Gate remains failed at the final independent R194 fixed-function pipeline handoff assertion after the third automatic attempt.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "337106efc2dbe03aa1635e4ad940cd5f86b92bf4",
+    "8e7ee4b1a023310dea1e77cc60c327707226e9c4"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md and docs/CONVERSION_LANE_STATE.json. Reconstructed the previous exact-SHA failure from Backend Conversion Gate run 37122948823. ATTEMPT advanced only from controller retry events and is now 3/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The R145 composer hashed inputLayoutStream0Stride while validate_fixed_function_render_target_bound_draw_readiness_integrity omitted it, so a valid copied readiness snapshot could fail its own integrity check and block downstream R147 dispatch. After that repair, the next failure proved the R148 positive nonindexed-fan fixture itself exceeded the existing R154 256-byte VB capacity proof."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "commits": [
+        "337106efc2dbe03aa1635e4ad940cd5f86b92bf4",
+        "8e7ee4b1a023310dea1e77cc60c327707226e9c4"
+      ],
+      "summary": "Added inputLayoutStream0Stride to R145 copied-readiness integrity hashing with WARP/source-graph regression coverage. Then bounded the R148 positive nonindexed triangle-fan fixture to baseVertex 5 so its source span fits the 256-byte managed VB at stride 24, retained the +1 base-vertex drift negative case, and added an explicit positive fixture-capacity assertion. NativeDrawPath activation was not changed."
+    },
+    "C3_VALIDATE": {
+      "status": "FAIL_ATTEMPTS_EXHAUSTED",
+      "validation_bearing_result_sha": "8e7ee4b1a023310dea1e77cc60c327707226e9c4",
+      "backend_conversion_gate_run_id": 37123563827,
+      "validate_job_id": 111204283717,
+      "readiness_smoke_job_id": 111204993986,
+      "passed_evidence": [
+        "Verify queue automation contract",
+        "Verify HMD-proven baseline",
+        "Verify one-click structure contract",
+        "Verify backend disassembly contract",
+        "Test VR session auto-analysis regressions",
+        "Verify DX11 native transport lifetime contract",
+        "Verify DX11 dual-source blend contract",
+        "Test/verify DX11 static surface contract",
+        "Verify DX11 source graph",
+        "Verify DX11 dormant activation boundary",
+        "Test DX11 census analyzer",
+        "Configure Win32",
+        "Build Win32",
+        "Verify binary exists",
+        "Artifact upload",
+        "DX11 fixed-function shader semantic smoke",
+        "DX11 input-layout semantic smoke",
+        "DX11 input-signature semantic smoke",
+        "DX11 input-layout object probe",
+        "DX11 shader object probe",
+        "DX11 shader linkage probe",
+        "DX11 constant-buffer probe including R95/R145/R147/R148/R151/R153/R155/R156/R160",
+        "DX11 native transport probe",
+        "DX11 surface mirror probe",
+        "DX11 triangle-fan generated index-buffer probe",
+        "Build DX11 fixed-function pipeline handoff probe"
+      ],
+      "failure_signature": "Run DX11 fixed-function pipeline handoff probe: DX11 R118 fixed-function pipeline smoke failure: R194 D3DTOP_MULTIPLYADD unsupported ARG0 selector must fail closed",
+      "prior_gate_run_id": 37122948823,
+      "prior_gate_note": "Exact SHA 337106efc2dbe03aa1635e4ad940cd5f86b92bf4 passed validate/build and built the constant-buffer probe, then failed R148 because the positive fan fixture requested vertices through 11 at stride 24 against a 256-byte managed VB. The production R154 capacity check was correct; 8e7ee4b1 repaired only the fixture.",
+      "task_specific_validation": "PASS_R145_R147_R148_R154_AND_DOWNSTREAM_READINESS_PROBES",
+      "aggregate_gate_validation": "FAIL_R194_PIPELINE_HANDOFF",
+      "automatic_repairs_exhausted": true,
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "marker_present": true,
+      "result_commits": [
+        "337106efc2dbe03aa1635e4ad940cd5f86b92bf4",
+        "8e7ee4b1a023310dea1e77cc60c327707226e9c4"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant DX11 source/static/probe correctness work only. No runtime candidate was requested or justified, and the required aggregate Backend Conversion Gate did not pass."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_ids": [
+        5969162453,
+        5969261395,
+        5969315168
+      ],
+      "exact_next_action": "Do not attempt a fourth automatic repair under CONVERSION-DX11-00290. Preserve 8e7ee4b1a023310dea1e77cc60c327707226e9c4 as the validation-bearing material result. Dispatch a later independent DX11 task to inspect and repair the R194 D3DTOP_MULTIPLYADD unsupported ARG0 fail-closed contract, then rerun the exact-SHA aggregate Backend Conversion Gate. Keep NativeDrawPathActive disabled and retain RUNTIME_VALIDATION=UNTESTED until matching Quest 3/VDXR evidence exists."
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "FAIL",
+    "run_id": 37123563827,
+    "head_sha": "8e7ee4b1a023310dea1e77cc60c327707226e9c4",
+    "reason": "Validate/build and all readiness probes through constant-buffer, native transport, surface mirror and triangle-fan generated-index probes passed. The final fixed-function pipeline handoff probe failed at R194 D3DTOP_MULTIPLYADD unsupported ARG0 selector fail-closed assertion. Automatic repair limit 3/3 reached."
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_ids": [
+    5969162453,
+    5969261395,
+    5969315168
+  ],
+  "exact_next_action": "Controller must not release this task as PASS and must not issue a fourth repair attempt. Preserve the material result and dispatch a later independent DX11 task for the R194 pipeline-handoff blocker."
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00663",
+  "production_id": "CONVERSION-DX11-00663",
+  "event_id": "CONVERSION-DX11-00663-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_EXTENDED_LUMINANCE_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "f11615070fe272b8a3f5bf171782aa49723530b8",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real game D3D9 A4L4/L16 LockRect mip/row pitch",
+      "normalized nibble/16-bit luminance and alpha to D3D11 BGRA8 SRV",
+      "native Draw/DrawIndexed diagnostic opt-in plus DX9Ex Present/input fallback"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp format eligibility, pitch, all-mip upload and sRGB fail-closed",
+      "live_game_extended_luminance_texture.hpp little-endian pixel decoder",
+      "local native C++ pitched/mip/alpha probe, 22 destructive Draw connection regressions and exact-SHA CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "LOCAL_CPP_PASS: A4L4 two pitched rows, L16 two pitched rows, 1x1 mip and midpoint rounding",
+      "negative_regression": "22 static destructive source/decoder mutations, sRGB fallback, unreadable LockRect fail-closed, DEFAULT no readable mirror, legacy D3D9 Draw preserved",
+      "component_integration": "D3D9 GetLevelDesc/LockRect -> A4L4/L16 BGRA8 mips -> CreateTexture2D/SRV -> guarded game Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_EXTENDED_LUMINANCE_MIP_DRAW",
+      "src/vr/d3d11/live_game_extended_luminance_texture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; real menu/vehicle/race visual parity NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; sRGB unsupported A4L4/L16 and unreadable texture fail closed; original D3D9 input/Draw/Present preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_extended_luminance_texture.hpp",
+    "tools/dx11_game_extended_luminance_probe.cpp",
+    "tools/test_dx11_native_extended_luminance_00663.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00663.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS base f11615070fe272b8a3f5bf171782aa49723530b8 last 00662 C6 verified",
+    "C1_REVIEW": "PASS two separate game legacy luminance formats excluded from native SRV",
+    "C2_IMPLEMENT": "PASS source decoder/mip upload and native Draw connection",
+    "C3_VALIDATE": "PASS exact-SHA Backend Conversion Gate #38365053993, DX11 Fast #38365053957, Build #38365062129, OpenXR #38365062021, HUD #38365062072; all SUCCESS; local C++ pix/pitch probe PASS",
+    "C4_COMMIT": "MATERIAL_COMMITTED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_CPP_PASS",
+    "static_regression": "PASS_EXACT_SHA",
+    "compile_build": "SUCCESS_EXACT_SHA",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "17492625390c30368f034ffebad07d08464713f8",
+  "validation_bearing_result_sha": "17492625390c30368f034ffebad07d08464713f8",
+  "result_sha": "17492625390c30368f034ffebad07d08464713f8",
+  "next_action": "C6 complete on exact validation SHA 17492625390c30368f034ffebad07d08464713f8; mandatory 5/5 GitHub Actions SUCCESS. Real menu, vehicle, race, gamepad and Quest3/VDXR remain RUNTIME_VALIDATION=UNTESTED/NEED_HMD_TEST. No retry or further score under CONVERSION-DX11-00663.",
+  "gate_runs": {
+    "Backend Conversion Gate": 38365053993,
+    "DX11 Fast Structural Checks": 38365053957,
+    "Build": 38365062129,
+    "OpenXR VR architecture": 38365062021,
+    "OutRun EXE HUD Inspector CI": 38365062072
+  }
+}

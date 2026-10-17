@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00470",
+  "production_id": "CONVERSION-DX11-00470",
+  "event_id": "CONVERSION-DX11-00470-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00470",
+  "lease_epoch": 1,
+  "work_key": "DX11:R165:OFFSCREEN_INDEXED_COLOR_READBACK:src/vr/d3d11/surface_mirror.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/surface_mirror.hpp:R165",
+    "src/vr/d3d11/surface_mirror.cpp:R165",
+    "tools/dx11_constant_buffer_probe.cpp:R165"
+  ],
+  "selected_work_item": "DX11_R165_INDEXED_OFFSCREEN_WARP_COLOR_READBACK",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "3eef1eb1015a12e1e1025e2d83fa29f1c327c0cf",
+  "material_result_sha": "0ec96635096457b1043be8bf0c9c05398a94f731",
+  "validation_bearing_result_sha": "0ec96635096457b1043be8bf0c9c05398a94f731",
+  "result_sha": "0ec96635096457b1043be8bf0c9c05398a94f731",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R165 adds generation-bound same-device immediate-context color mirror staging copy and WARP indexed draw post-submit GPU border pixel readback/negative controls. Native game Draw remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/surface_mirror.hpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "static_validation": "PASS: R165 changed-source contract single pass (8 checks); Windows WARP execution requires exact-SHA CI",
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated branch base 3eef1eb1015a12e1e1025e2d83fa29f1c327c0cf; 00469 terminal; 00470 absent and work_key independent.",
+    "C1_REVIEW": "PASS: R157 WARP IA primitive statistics without readback; R164 OM DSV live identity, surface descriptor contract and protected Draw gate reviewed.",
+    "C2_IMPLEMENT": "PASS: current generation/device immediate-context surface color staging method, R165 WARP negative contexts and post-indexed BGRA readback.",
+    "C3_VALIDATE": "PASS: single changed-source static 8/8; exact SHA 0ec96635096457b1043be8bf0c9c05398a94f731 Backend Conversion Gate 37869403303, Win32 validate 113623759337 SUCCESS + DX11 readiness smoke 113625074670 SUCCESS (R165 probe); artifact 11589753016 sha256:172451b85653e5323d4ff83e9d5cc7266ca37aee52eb04fb4072db6ad11eeab3.",
+    "C4_COMMIT": "PASS: material implementation SHA 0ec96635096457b1043be8bf0c9c05398a94f731 committed via GitHub expected HEAD CAS; commit marker [AUTO:CONVERSION-DX11-00470], no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: isolated WARP offscreen GPU readback diagnostic; no deployable game/HMD candidate and no native-game Draw activation.",
+    "C6_STATE": "PASS: run record and branch lane state sealed in separate post-Gate bookkeeping commit; canonical validation-bearing material SHA retained. Issue14 6072335566 + 6072400147; runtime UNTESTED."
+  },
+  "next_action": "00470 complete; do not rerun/rescore. Select independent DX11 native offscreen draw shaded-pixel coverage/lifetime fixture or next live object/pipeline dependency without opening production Draw; Quest3/VDXR needed for actual gameplay visual/input/HUD/cadence promotion.",
+  "state_persisted": true,
+  "validation_bearing_sha": "0ec96635096457b1043be8bf0c9c05398a94f731",
+  "validation_run_id": 37869403303,
+  "validation_job_id": 113623759337,
+  "readiness_smoke_job_id": 113625074670,
+  "artifact_id": 11589753016,
+  "artifact_digest": "sha256:172451b85653e5323d4ff83e9d5cc7266ca37aee52eb04fb4072db6ad11eeab3",
+  "implementation_commits": [
+    "0ec96635096457b1043be8bf0c9c05398a94f731"
+  ],
+  "issue14_comment_id": 6072335566,
+  "validation_issue14_comment_id": 6072400147,
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "last_real_activity_at": "2026-10-09T10:29:38+09:00",
+  "last_activity_evidence": "Backend Conversion Gate 37869403303 exact SHA 0ec96635096457b1043be8bf0c9c05398a94f731: validate 113623759337 SUCCESS, DX11 readiness smoke 113625074670 SUCCESS (R165 WARP staging BGRA readback), artifact 11589753016.",
+  "blockers": [
+    "No Quest3/VDXR exact-build runtime evidence; native gameplay Draw remains gated."
+  ],
+  "updated_at_kst": "2026-10-09T10:29:38+09:00"
+}

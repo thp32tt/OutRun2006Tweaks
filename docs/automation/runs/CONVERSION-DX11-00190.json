@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00190",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "36825e204baf17c15ffe78e50165c57fe7a85cff",
+  "staged_source_commits": [
+    "cae83079ef1c4bf82a428ba9a3b57cf8f6611408",
+    "fe677c6109b65db1ac745d9f7dcc9dfc37bb0836"
+  ],
+  "result_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+  "validation_bearing_result_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R190_1822D2_SEQUENCE_RET_PADDING",
+  "selection_reason": "CONVERSION-DX11-00188 proved 0x1822D2 as the immediate exact instruction start after the 0x1822D0/0x1822D1 leave;ret terminal and explicitly left wider decode for the next bounded task. The R186 exact bytes contain a compact sequence ending at ret 0x1822F3 followed by twelve CC bytes through 0x1822FF, making this the smallest complete next control-flow/padding unit. DXVK-00189 independently uses the same public-EXE proof shape; DX11 validation remains independent.",
+  "summary": "ATTEMPT=1 complete. Validation-bearing result 1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69 proves the exact 0x1822D2..0x1822F3 sequence and the following 12-byte INT3 padding. Eleven instructions are contiguous/exact; je 0x1822E0->0x1822E7 lands on an instruction boundary; calls 0x1822D2->0x185BEC, 0x1822E2->0x186B0E and 0x1822EC->0x182209 decode exactly and match R186 raw provenance; ret is exact at 0x1822F3; padding 0x1822F4..0x1822FF is twelve CC bytes and ends exactly at next code boundary 0x182300. Backend Conversion Gate, Build, HUD Inspector and OpenXR all passed. Neither 0x1822D2 nor 0x182300 is promoted to function-entry identity; call semantics and render/HUD ownership remain unresolved. No runtime source changed and no Quest 3/VDXR or in-game test was performed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00190.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Validation-bearing result 1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69 contains exact marker [AUTO:CONVERSION-DX11-00190] and has no CI-skip directive.",
+    "Base 36825e204baf17c15ffe78e50165c57fe7a85cff is the completed CONVERSION-DX11-00188 bookkeeping descendant; validation-bearing ancestor a8bda09aaab369b7e060da0a2a821b9e14d23fe1 proves 0x1822D2 is the exact immediate instruction start after leave;ret.",
+    "Backend Conversion Gate 36797434656 validate job 110164147416 PASS on exact result SHA. Queue automation/HMD baseline/one-click/backend disassembly/session-regression/DX11 transport/source-graph/census contracts, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and binary verification all succeeded.",
+    "Backend Gate artifact 11134806145 digest sha256:4ffd53d551ea1ddcec42d08c2fe41d86e20360db93ab92932c9e1c34c0db2c78.",
+    "HUD Inspector 36797438160 PASS. static job 110164152660 emitted EXACT_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN with predecessor/provenance exact, 11 contiguous exact instructions, exact local branch 0x1822E0->0x1822E7 landing on an instruction boundary, exact/raw calls 0x1822D2->0x185BEC, 0x1822E2->0x186B0E and 0x1822EC->0x182209, ret at 0x1822F3, twelve CC bytes at 0x1822F4..0x1822FF, and exact next boundary 0x182300.",
+    "HUD proof preserves terminal_status=EXACT_RET_AT_1822F3_PROVEN, padding_status=EXACT_12_BYTE_INT3_PADDING_PROVEN, next_boundary_status=EXACT_182300_CODE_BOUNDARY_PROVEN, function_entry=UNRESOLVED_AT_1822D2_AND_182300, semantic_effect=BOUNDED_SEQUENCE_CONTROL_FLOW_ONLY, call_semantics=UNRESOLVED and ownership_effect=NONE.",
+    "Canonical replacement EXE SHA-256 remained 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD analysis artifact 11134596105 digest sha256:bbc860bbdaac658e8c71f536365150c5018baa679562f54bd2b4911841c22a99; HUD inspector game artifact 11135050259 digest sha256:95c30b218570b574e068dbba90611fe2ad9275906796fc8fd0fa9586abb5c908.",
+    "Build 36797438185 PASS on exact result SHA; binary artifact 11134676829 digest sha256:9131c8454161bff27fad4d8ca432a41d90dc4a7d8b17a8c5b1180ea41a3b4116; wheel-source artifact 11134696764 digest sha256:87ca3d94ca3cd1a15fb2e57bf628aeda83e2d08426a6780e5f3b402b0437ff2c.",
+    "OpenXR VR architecture 36797438155 PASS on exact result SHA with all 6/6 jobs successful. Host artifact 11134356489 digest sha256:144265daef79800bb4f8ec3fdbac1a81ff642cf57c9f7de8d86f3e6c21417dd4.",
+    "VR PC Fast Test Build 36797434667 was skipped by branch policy and is not runtime validation.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00189",
+    "source_result_sha": "b2114ffd3e6f07e608246548142a2dca66aa8d81",
+    "source_validation_state_at_selection": "PENDING",
+    "source_proof_target": "EXACT_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "reason": "Reuse only the bounded exact-byte sequence/padding proof design on the shared canonical EXE. DX11 depends on its own R188 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_1822D0_LEAVE_RET_AND_1822D2_NEXT_INSTRUCTION_PROVEN",
+    "start_rva": "0x001822D2",
+    "prefix_end_rva": "0x001822F4",
+    "instruction_count": 11,
+    "branch_rva": "0x001822E0",
+    "branch_target_rva": "0x001822E7",
+    "branch_target_is_instruction_boundary": true,
+    "calls": [
+      "0x001822D2->0x00185BEC",
+      "0x001822E2->0x00186B0E",
+      "0x001822EC->0x00182209"
+    ],
+    "all_call_targets_match": true,
+    "all_raw_call_candidates_present": true,
+    "ret_rva": "0x001822F3",
+    "padding_rva": "0x001822F4",
+    "padding_len": 12,
+    "padding_bytes": "cc cc cc cc cc cc cc cc cc cc cc cc",
+    "next_code_rva": "0x00182300",
+    "status": "EXACT_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "terminal_status": "EXACT_RET_AT_1822F3_PROVEN",
+    "padding_status": "EXACT_12_BYTE_INT3_PADDING_PROVEN",
+    "next_boundary_status": "EXACT_182300_CODE_BOUNDARY_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_1822D2_AND_182300",
+    "semantic_effect": "BOUNDED_SEQUENCE_CONTROL_FLOW_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Bounded control-flow/padding proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless all eleven instruction byte sequences are contiguous/exact, the local branch lands on an instruction start, all three rel32 targets match the R186 raw census, ret remains at 0x1822F3, exactly twelve CC padding bytes occupy 0x1822F4..0x1822FF, and the padding ends exactly at 0x182300. Function-entry status is deliberately not inferred."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1822D0_TERMINAL_AND_D2_BOUNDARY_PROVEN",
+    "after": "PARTIAL_PLUS_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x1822D2 sequence, its ret, 12-byte INT3 padding and 0x182300 next code boundary are now durable. Function-entry identity at 0x1822D2/0x182300 and the semantics of callees 0x185BEC, 0x186B0E, 0x182209 plus later R186 raw targets, earlier 0x1882CC callee, 0x182194 function identity and all ScreenHud/world/render ownership remain unresolved.",
+  "next_action": "Continue F13 from the proven 0x182300 code boundary with a fresh exact provenance/decode unit, or independently prove one of 0x185BEC/0x186B0E/0x182209 callee provenances. Do not promote 0x1822D2/0x182300 to function-entry identities or infer higher-level ScreenHud/world/render ownership until separately proven. Runtime remains UNTESTED.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T09:49:02+09:00",
+  "runtime_claim": "NONE",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36797434656,
+      "job_id": 110164147416,
+      "conclusion": "success",
+      "validated_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+      "artifact_id": 11134806145,
+      "artifact_digest": "sha256:4ffd53d551ea1ddcec42d08c2fe41d86e20360db93ab92932c9e1c34c0db2c78"
+    },
+    "build": {
+      "run_id": 36797438185,
+      "conclusion": "success",
+      "validated_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+      "artifact_id": 11134676829,
+      "artifact_digest": "sha256:9131c8454161bff27fad4d8ca432a41d90dc4a7d8b17a8c5b1180ea41a3b4116",
+      "source_snapshot_artifact_id": 11134696764,
+      "source_snapshot_artifact_digest": "sha256:87ca3d94ca3cd1a15fb2e57bf628aeda83e2d08426a6780e5f3b402b0437ff2c"
+    },
+    "hud_inspector": {
+      "run_id": 36797438160,
+      "conclusion": "success",
+      "validated_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+      "static_analysis_job_id": 110164152660,
+      "analysis_artifact_id": 11134596105,
+      "analysis_artifact_digest": "sha256:bbc860bbdaac658e8c71f536365150c5018baa679562f54bd2b4911841c22a99",
+      "game_artifact_id": 11135050259,
+      "game_artifact_digest": "sha256:95c30b218570b574e068dbba90611fe2ad9275906796fc8fd0fa9586abb5c908",
+      "proof_status": "EXACT_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+      "proof_predecessor_status": "EXACT_1822D0_LEAVE_RET_AND_1822D2_NEXT_INSTRUCTION_PROVEN",
+      "proof_predecessor_exact": true,
+      "proof_provenance_status": "EXACT_EXE_1822D1_CONTINUATION_PROVENANCE_CAPTURED",
+      "proof_provenance_exact": true,
+      "proof_layout_contiguous": true,
+      "proof_all_instruction_bytes_match": true,
+      "proof_instruction_count": 11,
+      "proof_prefix_end_rva": "0x001822F4",
+      "proof_ret_rva": "0x001822F3",
+      "proof_branch_rva": "0x001822E0",
+      "proof_branch_target_rva": "0x001822E7",
+      "proof_branch_target_is_instruction_boundary": true,
+      "proof_call_targets_match": true,
+      "proof_raw_call_candidates_present": true,
+      "proof_padding_rva": "0x001822F4",
+      "proof_padding_len": 12,
+      "proof_padding_matches": true,
+      "proof_padding_end_rva": "0x00182300",
+      "proof_next_code_rva": "0x00182300",
+      "proof_next_code_boundary_matches": true,
+      "proof_terminal_status": "EXACT_RET_AT_1822F3_PROVEN",
+      "proof_padding_status": "EXACT_12_BYTE_INT3_PADDING_PROVEN",
+      "proof_next_boundary_status": "EXACT_182300_CODE_BOUNDARY_PROVEN",
+      "proof_function_entry_status": "UNRESOLVED_AT_1822D2_AND_182300",
+      "proof_semantic_effect": "BOUNDED_SEQUENCE_CONTROL_FLOW_ONLY",
+      "proof_call_semantics": "UNRESOLVED",
+      "proof_ownership_effect": "NONE"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36797438155,
+      "conclusion": "success",
+      "validated_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11134356489,
+      "host_artifact_digest": "sha256:144265daef79800bb4f8ec3fdbac1a81ff642cf57c9f7de8d86f3e6c21417dd4"
+    },
+    "pc_fast": {
+      "run_id": 36797434667,
+      "conclusion": "skipped",
+      "validated_sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+      "policy": "Branch policy skipped PC fast runner; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "cae83079ef1c4bf82a428ba9a3b57cf8f6611408",
+      "message": "dx11: stage 0x1822D2 sequence boundary proof",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "fe677c6109b65db1ac745d9f7dcc9dfc37bb0836",
+      "message": "dx11: stage post-terminal sequence verifier",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "1bd287eeda0c4e82671ee6ea790b7ebb8fce3e69",
+      "message": "dx11: prove 0x1822D2 sequence boundary [AUTO:CONVERSION-DX11-00190]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5922379665,
+    "validation_comment_id": 5922461242,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  }
+}

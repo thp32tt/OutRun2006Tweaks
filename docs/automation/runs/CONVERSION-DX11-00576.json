@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00576",
+  "production_id": "CONVERSION-DX11-00576",
+  "event_id": "CONVERSION-DX11-00576-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00576",
+  "base_sha": "a831fcec8730358c757993f23a406e4dc06571b2",
+  "work_key": "DX11:MENU_RACE_UNTEXTURED_DIFFUSE_RGB_ALPHA_STAGE0",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 live untextured FVF stage0 RGB/alpha capture and validated DIFFUSE/CURRENT selection",
+      "native D3D11 compiled PS(v.diffuse) via Draw/DrawIndexed to opt-in desktop frame inset"
+    ],
+    "batch_components": [
+      "C++ stage0 RGB and alpha source admission, reject unbound material/texture/modifier",
+      "existing native PS/D3D11 draw binding plus destructive 14-mutation regression and channel-selection cases"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Untextured game FVF DIFFUSE with stage0 SELECTARG1/SELECTARG2 and independent alpha selection reaches the native PS/Draw path",
+      "negative_regression": "14 source mutation cases plus missing DIFFUSE, modifier and unsupported RGB/alpha operand cases",
+      "component_integration": "real game-origin D3D9 Draw/DrawIndexed -> FVF state -> native PS(diffuse) -> D3D11 Draw/DrawIndexed -> async diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_UNTEXTURED_DIFFUSE_RGB_ALPHA_STAGE0",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:UNTEXTURED_DIFFUSE_STAGE0"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "UNTEXTURED_DIFFUSE_ALPHA_STAGE0",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and exact-SHA build proof only; game/menu/vehicle/race/Quest3/frame parity UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 diagnostic opt-in; original D3D9 Draw/Present/input unchanged; unsupported state stays DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00576.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD a831fcec8730358c757993f23a406e4dc06571b2",
+    "C1_REVIEW": "Live untextured stage0 alpha source unchecked; ARG2/CURRENT valid color paths incorrectly rejected",
+    "C2_IMPLEMENT": "D3D9 untextured RGB+alpha state capture to existing native PS/Draw and destructive regressions",
+    "C3_VALIDATE": "Exact-SHA mandatory GitHub Actions 5 types SUCCESS (Backend Conversion Gate incl 101-step WARP smoke, DX11 Fast, Build, OpenXR, HUD); Quest3/VDXR/gamepad UNTESTED",
+    "C4_COMMIT": "Material source + integrated regressions; no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic opt-in, no build promotion",
+    "C6_STATE": "PASS_EXACT_SHA, COMPLETE_BUILD_VERIFIED; separate [skip ci] bookkeeping only. No new native gameplay enablement or revalidation."
+  },
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Independent next DX11 integration task on current HEAD; Quest3/VDXR actual menu, vehicle selection, race and gamepad input remain runtime UNTESTED; DXVK frozen.",
+  "material_result_sha": "2015659706347aacdd6a6185ef5a476f97d0188c",
+  "validation_bearing_result_sha": "2015659706347aacdd6a6185ef5a476f97d0188c",
+  "result_sha": "2015659706347aacdd6a6185ef5a476f97d0188c",
+  "validation_evidence": {
+    "exact_sha": "2015659706347aacdd6a6185ef5a476f97d0188c",
+    "github_workflow_runs_observed": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38185214552,
+        "conclusion": "success",
+        "head_sha": "2015659706347aacdd6a6185ef5a476f97d0188c"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38185214538,
+        "conclusion": "success",
+        "head_sha": "2015659706347aacdd6a6185ef5a476f97d0188c"
+      },
+      {
+        "name": "Build",
+        "run_id": 38185217820,
+        "conclusion": "success",
+        "head_sha": "2015659706347aacdd6a6185ef5a476f97d0188c"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38185214545,
+        "conclusion": "success",
+        "head_sha": "2015659706347aacdd6a6185ef5a476f97d0188c"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38185217891,
+        "conclusion": "success",
+        "head_sha": "2015659706347aacdd6a6185ef5a476f97d0188c"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38185217840,
+        "conclusion": "success",
+        "head_sha": "2015659706347aacdd6a6185ef5a476f97d0188c"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    },
+    "feature_acceptance": "DX11-LIVE-CALLSITE / DX11-NATIVE-DRAW / DX11-VISIBLE-FRAME / DX11-SAFE-RETURN source acceptance SUCCESS; runtime untested."
+  },
+  "state_persisted": true,
+  "updated_utc": "2026-10-11T23:52:52.635Z"
+}

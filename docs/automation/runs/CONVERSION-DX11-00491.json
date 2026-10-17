@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00491",
+  "production_id": "CONVERSION-DX11-00491",
+  "event_id": "CONVERSION-DX11-00491-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00491",
+  "lease_epoch": 1,
+  "work_key": "DX11:R189:NATIVE_INDEXED_DSV_DEPTH_STATE_WARP",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_depth_binding.hpp:R189",
+    "tools/dx11_depth_indexed_probe_r189.cpp:R189",
+    "tools/test_dx11_depth_indexed_r189.py:R189",
+    "cmake.toml:R189",
+    ".github/workflows/backend-conversion-gate.yml:R189"
+  ],
+  "base_sha": "63d1bc1609815119d513d9f408f87640f4d0a6c2",
+  "result_sha": "b9beb94b0be2a08f932814c3c6ba91d0610368b8",
+  "material_result_sha": "b9beb94b0be2a08f932814c3c6ba91d0610368b8",
+  "validation_bearing_result_sha": "b9beb94b0be2a08f932814c3c6ba91d0610368b8",
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_draw_path_activation_changed": false,
+  "summary": "R189 dormant native indexed exact DSV and depth-stencil state preflight, four-mutant source contract, Win32 native probe and real WARP near/far depth-tested DrawIndexed GPU pixels PASS after E002 invalid stencil fixture repair. Exact SHA entire Gate FAIL only separately owned pre-existing R175 generic TEXCOORD6 varying BGRA mismatch; game native Draw, Quest3/VDXR and runtime UNTESTED.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub base HEAD 1b6ccd47a30db2de6e26c4e0439327531180808d, 00491 unclaimed, prior 00490/00489 R188/R187 sealed, checkpoint dir 00491 absent.",
+    "C1_REVIEW": "PASS: R189 DSV/depth state as independent live native DrawIndexed ownership gap; compare R187/R188 and 00477 R175 owner; protected DX9Ex and DXVK untouched.",
+    "C2_IMPLEMENT": "PASS E001: new native_indexed_depth_binding.hpp plus WARP near/far DrawIndexed pixels test, negative source mutant test, cmkr and CI. PASS E002: fix real WARP failure at invalid negative stencil fixture by initializing valid D3D11_STENCIL_OP_KEEP/COMPARISON_ALWAYS front/back state.",
+    "C3_VALIDATE": "PASS scoped on exact E002 SHA b9beb94b0be2a08f932814c3c6ba91d0610368b8: R189 source contract and 4 negative mutations, MSVC Win32 probe build, WARP near-green/far-red actual depth pixels PASS. Validate job 113957646117 SUCCESS. Full Backend Conversion Gate 37971106770 FAIL because readiness smoke job 113959891641 reaches unchanged 00477-owned R175 TEXCOORD6 mismatch [128,0,16,255] != [224,128,32,255]. E001 Gate 37969893985 R189 fixture FAIL fixed by E002; never pretend whole Gate PASS.",
+    "C4_COMMIT": "PASS material result b9beb94b0be2a08f932814c3c6ba91d0610368b8 [AUTO:CONVERSION-DX11-00491], no CI-skip. Exact material Gate 37971106770 terminal FAIL. This separate C6 [skip ci] bookkeeping update does not replace the validation-bearing SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED: no native gameplay Draw activation, no backend promotion, Quest3/VDXR runtime TEST NOT PERFORMED.",
+    "C6_STATE": "SEALED BLOCKED_UPSTREAM_R175_FULL_GATE: R189 source/static/Win32/WARP real depth pixels PASS; whole exact-SHA Gate FAIL inherited R175 owned by 00477; preserve both. RUNTIME_VALIDATION=UNTESTED. Do not retry R189 unchanged or double-score."
+  },
+  "changed_paths": [
+    "src/vr/d3d11/native_indexed_depth_binding.hpp",
+    "tools/dx11_depth_indexed_probe_r189.cpp",
+    "tools/test_dx11_depth_indexed_r189.py",
+    "cmake.toml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00491.json"
+  ],
+  "validation_evidence": {
+    "r189_local_static": "PASS",
+    "r189_negative_mutants": 4,
+    "ci_gate": "PENDING_E002",
+    "r189_warp_gpu_pixel_readback": "PASS",
+    "inherited_r175_warning": "R175_GENERIC_VARYING_MISMATCH owned by 00477, do not edit.",
+    "previous_gate_run_id": 37969893985,
+    "first_failure": "R189 WARP failed: stencil state",
+    "gate_name": "Backend Conversion Gate",
+    "gate_run_id": 37971106770,
+    "gate_event": "push",
+    "gate_head_sha": "b9beb94b0be2a08f932814c3c6ba91d0610368b8",
+    "gate_status": "completed",
+    "gate_conclusion": "failure",
+    "validate_job_id": 113957646117,
+    "validate_conclusion": "success",
+    "readiness_smoke_job_id": 113959891641,
+    "readiness_smoke_conclusion": "failure",
+    "r189_source_contract": "PASS",
+    "r189_win32_probe_build": "PASS",
+    "failing_step": "Run DX11 constant buffer probe",
+    "inherited_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ]
+  },
+  "blockers": [
+    "R175_GENERIC_VARYING_MISMATCH owned by separate 00477 (tools/dx11_constant_buffer_probe.cpp); WARP TEXCOORD6 BGRA [128,0,16,255] versus [224,128,32,255] blocks mandatory whole exact-SHA Gate.",
+    "Quest3/VDXR real game visual/native gameplay DX11 rendering not tested."
+  ],
+  "next_action": "Do not repeat 00491 R189 or count whole Gate as PASS. Owner 00477 must independently resolve R175. Future independently dispatched DX11 task selects distinct work_key (live resource/shader/Draw/OpenXR), no DXVK development; Quest3/VDXR HMD runtime remains UNTESTED.",
+  "score_change": 0,
+  "previous_material_result_sha": "63d1bc1609815119d513d9f408f87640f4d0a6c2",
+  "previous_validation_evidence": {
+    "gate_run_id": 37969893985,
+    "validate_job_id": 113953532734,
+    "validate": "SUCCESS",
+    "readiness_smoke_job_id": 113955888789,
+    "readiness": "FAIL",
+    "r189_source_contract": "PASS",
+    "r189_win32_probe_build": "PASS",
+    "r189_gpu_probe": "FAIL_CREATE_STENCIL_STATE_INVALID_ZERO_STENCIL_OPS",
+    "fixed_by": "R189 explicit valid stencil KEEP + ALWAYS negative-fixture state"
+  },
+  "scoped_automation_validation": "PASS_R189_DSV_DEPTH_STATIC_WIN32_WARP_GPU_PIXELS",
+  "automation_gate": {
+    "name": "Backend Conversion Gate",
+    "run_id": 37971106770,
+    "head_sha": "b9beb94b0be2a08f932814c3c6ba91d0610368b8",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "failure",
+    "validate_job_id": 113957646117,
+    "validate": "SUCCESS",
+    "dx11_readiness_smoke_job_id": 113959891641,
+    "dx11_readiness_smoke": "FAIL",
+    "r189_contract": "PASS",
+    "r189_source_negative_mutants": 4,
+    "r189_win32_build": "PASS",
+    "r189_warp_actual_depth_pixel_readback": "PASS",
+    "failure_signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "upstream_owner_task": "CONVERSION-DX11-00477",
+    "earlier_gate_run_id": 37969893985,
+    "earlier_r189_fixture_failure": "CreateDepthStencilState invalid zero stencil ops; fixed E002"
+  },
+  "score_reason": "R189 independently real native source and WARP depth DrawIndexed PASS, but required exact-SHA whole Gate FAIL solely inherited 00477 R175; no terminal PASS and no points. AI2 stays 1283.",
+  "issue14_comment_ids": [
+    6086399730,
+    6086554810
+  ]
+}

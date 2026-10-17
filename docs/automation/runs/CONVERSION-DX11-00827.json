@@ -1,0 +1,119 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00827",
+  "production_id": "CONVERSION-DX11-00827",
+  "event_id": "CONVERSION-DX11-00827-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "SOURCE_PHASE_PARTIAL",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": "03a50e0f66bbd375ce0d0e71fb8dc0f8cb3fcc92",
+  "validation_bearing_result_sha": null,
+  "packaging_status": "NOT_REQUIRED",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "CMakeLists.txt"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Connect full-resolution native D3D11 per-eye color target binding and original OM/RS restoration to separately posed game-authored Draw/DrawIndexed stereo callbacks, then finish real R30 menu/car/race source replay to OpenXR with input-safe DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-eye-rtv-and-state",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_output_binding",
+        "expected_behavior": "Renderer-owned left and right D3D11 draw passes bind the exact generation-owned per-eye RTV, full-target viewport and scissor, and issue native GPU writes without contaminating desktop RT."
+      },
+      {
+        "id": "game-draw-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_input_ffb_and_recovery",
+        "expected_behavior": "Live game D3D9 Present and gamepad/FFB remain authoritative; original D3D11 OM/RS state is restored on completion and failure; stale/partial GPU submissions never reach OpenXR."
+      },
+      {
+        "id": "native-stereo-host-transport",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_host_transport_ci",
+        "expected_behavior": "Distinct eye GPU outputs pass isolated WARP, exact producer EVENT, snapshot/ACK and five mandatory GitHub Actions checks; real R30 stereo replay, Quest3 visual and performance evidence remain separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-eye-rtv-and-state": "SOURCE_CODED_GS_HS_DS_PER_EYE_ISOLATION_AND_CALLER_RESTORE_WARP_PENDING",
+    "game-draw-input-fallback": "ORIGINAL_D3D9EX_GAME_DRAW_INPUT_FFB_UNCHANGED_RUNTIME_UNTESTED",
+    "native-stereo-host-transport": "NATIVE_WARP_AND_FINAL_EXACT_SHA_FIVE_GATES_PENDING_REAL_R30_CALLBACK_UNCONNECTED"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "integration_path": [
+      "Save original shared D3D11 GS/HS/DS shader owners/class instances before native game L/R replay.",
+      "Unbind inherited/previous-eye geometry and tessellation shaders independently before each camera-specific GPU Draw/DrawIndexed, then restore exact original shared host stages at all exits.",
+      "An isolated Win32 WARP regression compiles a real inherited GS, verifies both native eye callbacks begin without it, deliberately rebinds it in each eye and checks final caller restoration; fixture must not unload compiler while COM bytecode remains live."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp",
+      "CMakeLists.txt"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real C++ stage isolation material 03a50e0, test DLL lifetime causal repair applied. No WARP/Quest3 PASS inferred; final exact SHA Gates pending.",
+      "negative_regression": "D3D9 gamepad/FFB/Present fallback unchanged; no XR producer promotion, no DXVK edits.",
+      "component_integration": "Renderer-owned eye callback IA/VS/PS + scoped GPU shader-stage isolation -> native Draw/DrawIndexed -> distinct ring-owned L/R RTV/DSV -> producer fence/host publication; game R30 live stereo source callback still pending."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_EYE_RENDER_CALLBACK_INTEGRATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "GPU-target correctness source committed; full R30 native menu/car/race image and Quest3/VDXR unavailable, no production promotion.",
+    "activation_guard_and_fallback": "Explicit audited native eye recorder only; no default native route or producer promotion. Existing opt-in/fail-closed D3D9 Draw/Present/input/FFB, fallback and DXVK freeze retained.",
+    "delivery_stage": "SOURCE_PHASE_PARTIAL_NATIVE_EYE_STAGE_ISOLATION_WARP_REPAIR_PENDING",
+    "remaining_implementation": [
+      "Connect real R30 menu/car/race Draw and pose/constant/texture scene journal to the per-eye native callback before full renderer can be called integrated.",
+      "Run final 5 exact-SHA GitHub Gates, user Quest3/VDXR game/gamepad/HUD/72Hz performance only after integration."
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD f8acb46 before implementation; 00826 exact SHA 04009dba 5/5 Gate passed. Existing stereo R30 source replay unfinished.",
+    "C1_REVIEW": "Shared D3D11 context restores IA/VS/PS per eye but inherited GS/HS/DS can reinterpret native geometry and left-eye shader state can contaminate right eye.",
+    "C2_IMPLEMENT": "Material commit 03a50e0: real C++ native GS/HS/DS stage isolation/restoration and WARP geometry-shader callback mutation regression.",
+    "C3_VALIDATE": "WARP material 03a50e0 LNK2019; 706ab2a linked but crashed 0xC0000005 from unloading compiler DLL before bytecode COM vtable use. First repair 17056c7 inserted later FreeLibrary but retained premature unload; this causal patch removes the early call and retains only post-Release unload. Exact five GitHub Gates and WARP are PENDING.",
+    "C4_COMMIT": "Source material 03a50e0; test/build failures corrected under same TASK_ID. No CI-skip on gate-bearing commit.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA_GATE; full R30 native menu/car/race connection incomplete; HMD UNTESTED."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00827",
+    "score_change": 0,
+    "score_status": "PARTIAL_SOURCE_INTEGRATION_NO_NEW_FEATURE_AWARD",
+    "note": "Continuation of same unfinished native R30 stereo feature; no independent score for partial source or WARP/link repair."
+  },
+  "material_commits": [
+    "03a50e0f66bbd375ce0d0e71fb8dc0f8cb3fcc92"
+  ],
+  "ci_exact_sha_gates": {
+    "sha": null,
+    "required": "5/5",
+    "result": "PENDING",
+    "runtime_claim": "UNTESTED"
+  }
+}

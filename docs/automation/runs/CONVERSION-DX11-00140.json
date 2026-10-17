@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00140",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-10-01T00:23:49+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "3cf20ec6e18b0e71f9bd07dd517d3f27774ab887",
+  "result_sha": "05236b5c62f7297ab902b06d33657ec48099495b",
+  "validation_bearing_result_sha": "05236b5c62f7297ab902b06d33657ec48099495b",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R141_TARGET_65970_FIRST_CALL_ALIGNMENT",
+  "summary": "Added an exact-byte/manual-decode fail-closed proof for guarded-GF target C from entry 0x65970 through its first raw outbound E8 candidate. On the exact public EXE, the reviewed prefix is contiguous, all bytes match, the function-start guess equals 0x65970, and 0x65997 is an instruction-aligned CALL decoding to 0x28460 in .text. This proves call alignment only. Semantic effect remains UNRESOLVED and ownership effect remains NONE; no ScreenHud/native-draw routing or runtime renderer behavior changed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "architecture": "Exact-EXE analyzer/verifier only; no game renderer, DX11 backend, host or transport source changed.",
+    "ownership": "No guarded GF hook or target was promoted to ScreenHud/native ownership; spacing-only policy remains.",
+    "stereo_correctness": "No WVP/projection/HUD/world/rank/SkyGlow/recenter behavior changed.",
+    "performance": "Static/CI-only analysis; no runtime hot-path code or telemetry added.",
+    "adversarial": "The analyzer requires contiguous manually reviewed instructions, exact bytes, exact entry guess, exact rel32 target and mapped target section; any drift fails the analysis instead of accepting a raw E8 byte match."
+  },
+  "target_c_alignment_proof": {
+    "entry_rva": "0x00065970",
+    "function_start_guess_rva": "0x00065970",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "aligned_call_rva": "0x00065997",
+    "decoded_call_target_rva": "0x00028460",
+    "call_target_section": ".text",
+    "status": "EXACT_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "semantic_effect": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "interpretation": "The first raw outbound candidate of target 0x65970 is a real instruction-aligned CALL to 0x28460. This does not identify 0x28460 semantics, prove HUD-specific behavior, or justify ScreenHud ownership."
+  },
+  "carried_static_context": {
+    "target_65970_raw_inbound_count": 224,
+    "target_65970_raw_outbound_candidates": [
+      "0x65997->0x28460",
+      "0x659AC->0x28320",
+      "0x659C1->0x28800"
+    ],
+    "previous_r140_helper_285a0": {
+      "status": "EXACT_HELPER_PROVENANCE_CAPTURED",
+      "raw_inbound_count": 200,
+      "raw_outbound_count_128b": 0,
+      "semantic_effect": "UNRESOLVED",
+      "ownership_effect": "NONE"
+    }
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "F13 still requires exact producer/call semantics before ownership promotion. The change only strengthens static provenance and does not touch R50/R51 runtime-risk paths."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36735448055,
+      "conclusion": "success",
+      "validated_sha": "05236b5c62f7297ab902b06d33657ec48099495b",
+      "artifact_id": 11106084858,
+      "artifact_digest": "sha256:3210c35e766455a918cb8892a08a847863bb2b5f2edcb2d43be4ed2ea0835378",
+      "evidence": "Queue/baseline/one-click/disassembly/analyzer/source-graph checks, Win32 build, DX11 fixed-function/input/shader/linkage/constant-buffer/native-transport probes and artifact upload passed."
+    },
+    "build": {
+      "run_id": 36735454000,
+      "conclusion": "success",
+      "validated_sha": "05236b5c62f7297ab902b06d33657ec48099495b"
+    },
+    "hud_inspector": {
+      "run_id": 36735453969,
+      "conclusion": "success",
+      "validated_sha": "05236b5c62f7297ab902b06d33657ec48099495b",
+      "analysis_artifact_id": 11106278704,
+      "analysis_artifact_digest": "sha256:456374281859cbc4fc45eded6cd4f18b72f404a1c6b539d86f1836c48de6d522",
+      "game_artifact_id": 11106952394,
+      "game_artifact_digest": "sha256:58a1cc187bbfa005bae6265fdf90d53bfe5bb1a9404be14f726738aa4c5171ec",
+      "evidence": "Exact EXE emitted gf_target_c_alignment=0x00065970 status=EXACT_PREFIX_CALL_ALIGNMENT_PROVEN start_guess=0x00065970 layout_contiguous=True bytes_match=True call=0x00065997 target=0x00028460 target_section=.text semantic_effect=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36735453739,
+      "conclusion": "success",
+      "validated_sha": "05236b5c62f7297ab902b06d33657ec48099495b",
+      "evidence": "All OpenXR architecture jobs passed."
+    },
+    "pc_fast": {
+      "run_id": 36735447964,
+      "conclusion": "skipped",
+      "validated_sha": "05236b5c62f7297ab902b06d33657ec48099495b"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5914192525,
+    "validation_comment_id": 5914328963,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Validation-bearing result commit contains exact marker [AUTO:CONVERSION-DX11-00140] and no CI-skip directive.",
+    "Exact public EXE reports target 0x65970 start_guess=0x65970 with three raw outbound candidates.",
+    "The reviewed exact prefix through 0x6599F is contiguous and all instruction bytes match.",
+    "0x65997 is proven to be an instruction-boundary CALL to 0x28460 in .text.",
+    "Semantic effect remains UNRESOLVED and ownership effect remains NONE.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and OpenXR architecture all passed on the exact result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R141 exact first-CALL alignment for target 0x65970 is automation-validated. 0x65997->0x28460 is aligned and exact, but helper identity/effect remains unresolved and no ScreenHud ownership change is justified.",
+  "next_action": "Keep all guarded GF hooks spacing-only. Continue F13 with one separate bounded proof for 0x659AC->0x28320 or helper 0x28460 semantics; require exact effect evidence before any ownership promotion."
+}

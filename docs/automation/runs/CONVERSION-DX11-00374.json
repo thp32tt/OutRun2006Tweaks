@@ -1,0 +1,193 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00374",
+  "production_id": "CONVERSION-DX11-00374",
+  "event_id": "CONVERSION-DX11-00374-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+  "result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+  "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+  "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+  "result_marker": "[AUTO:CONVERSION-DX11-00374]",
+  "selected_work_item": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
+  "summary": "R251 adds a dormant fail-closed non-indexed programmable direct-dispatch argument receipt after R250. It revalidates the live R250 geometry binding, translates D3D9 primitive counts to the exact D3D11 vertex count, seals StartVertexLocation plus managed vertex byte range, rejects stale receipts/live IA drift/device-generation changes/overflow, and still does not issue Draw* or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00374.json",
+    "docs/CONVERSION_LANE_STATE.json"
+  ],
+  "predecessor_recovery": {
+    "task_id": "CONVERSION-DX11-00373",
+    "repair_result_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+    "validation_run_id": 37219099066,
+    "validation_conclusion": "success",
+    "note": "00374 consumed the successful predecessor repair Gate only as C0 evidence and did not repeat R250."
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT and preserved completed R251 material/validation evidence. CONVERSION-DX11-00374-E002 / CHAT_ROLLOVER=3 is the latest explicit rollover; it is not a retry, so ATTEMPT remains 1/3. Material SHA 518db8efe987af98521ef5d66e8390859c228e0c and exact-SHA Backend Conversion Gate 37220153246 remain unchanged."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R250 seals the current non-indexed IA geometry binding but does not yet seal the exact Draw vertex-count/StartVertexLocation tuple or prove that the requested non-indexed vertex window fits the current managed vertex buffer. The smallest next pre-Draw boundary is therefore a dormant non-indexed dispatch-argument readiness receipt.",
+      "review_lenses": {
+        "architecture": "Add one R251 readiness/validator boundary only; no Draw*, render-target promotion or NativeDrawPath activation.",
+        "ownership_lifetime": "Recompute current R250 geometry readiness on every R251 observation and require the exact R250 snapshot plus current managed mirror generation.",
+        "stereo_correctness": "No WVP/projection/HUD/surface/OpenXR semantics change; runtime remains UNTESTED.",
+        "performance": "Dormant validation path only; no production hot-path work.",
+        "adversarial": "Fail closed on stale R250 snapshot, live IA drift, primitive-count overflow, out-of-range vertex windows and device-generation replacement."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderNonIndexedDirectDispatchReadiness plus cache readiness/snapshot validation, exact overflow-safe primitive-count translation, StartVertexLocation/managed byte-range proof, WARP regressions and source-graph guards. No Draw* or NativeDrawPath activation was added."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37220153246,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111488678722,
+      "readiness_smoke_job_id": 111489677604,
+      "artifact_id": 11310351741,
+      "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+      "evidence": "Exact-SHA Backend Conversion Gate #37220153246 for 518db8efe987af98521ef5d66e8390859c228e0c completed SUCCESS. validate and DX11 readiness smoke probes completed success; the R251-bearing dx11_constant_buffer_probe built and ran successfully. Source graph and dormant activation boundary also passed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "result_marker": "[AUTO:CONVERSION-DX11-00374]",
+      "implementation_commits": [
+        "518db8efe987af98521ef5d66e8390859c228e0c"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable direct-dispatch argument/range readiness only; no runtime package, HMD binary distribution or selector changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded indexed programmable dispatch/source-range readiness unit; keep Draw*/NativeDrawPath dormant until separately validated."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant DX11 programmable readiness and hosted probes only; no production renderer/transport/OpenXR path is activated or changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00374",
+    "production_id": "CONVERSION-DX11-00374",
+    "event_id": "CONVERSION-DX11-00374-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_run_id": 37220153246,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111488678722,
+    "readiness_smoke_job_id": 111489677604,
+    "artifact_id": 11310351741,
+    "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+    "implementation_comment_id": 5982586235,
+    "validation_comment_id": 5982586235,
+    "dispatch_source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded indexed programmable dispatch/source-range readiness unit; keep Draw*/NativeDrawPath dormant.",
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 37220153246,
+      "run_attempt": 1,
+      "conclusion": "success",
+      "exact_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validate_job_id": 111488678722,
+      "readiness_smoke_job_id": 111489677604,
+      "artifact_id": 11310351741,
+      "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5982586235
+  },
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00374",
+    "authoritative": {
+      "task_id": "CONVERSION-DX11-00374",
+      "production_id": "CONVERSION-DX11-00374",
+      "event_id": "CONVERSION-DX11-00374-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+      "source": "CURRENT_USER_QUEUE",
+      "runtime_validation": "UNTESTED",
+      "native_draw_path_activation_changed": false,
+      "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validation_run_id": 37220153246,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111488678722,
+      "readiness_smoke_job_id": 111489677604,
+      "artifact_id": 11310351741,
+      "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+      "implementation_comment_id": 5982586235,
+      "validation_comment_id": 5982586235,
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E008",
+        "event_type": "retry",
+        "attempt": "2/3"
+      },
+      {
+        "task_id": "CONVERSION-DX11-00374",
+        "production_id": "CONVERSION-DX11-00374",
+        "event_id": "CONVERSION-DX11-00374-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false,
+        "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
+      }
+    ],
+    "reason": "CONVERSION-DX11-00374-E002 / CHAT_ROLLOVER=3 is the newest explicit controller rollover. It is not a retry, so ATTEMPT remains 1/3. The already-completed R251 material and exact-SHA validation-bearing result are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+}

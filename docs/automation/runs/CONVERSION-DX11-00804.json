@@ -1,0 +1,142 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00804",
+  "production_id": "CONVERSION-DX11-00804",
+  "event_id": "CONVERSION-DX11-00804-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP",
+  "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "2e08cc4d3a10fce6c693af2e8b09b6309a69110f",
+  "material_result_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea",
+  "validation_bearing_result_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_admission.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+    "goal": "Continue the existing full-resolution DX11 game Draw/DrawIndexed GPU shared-desktop pipeline for both ARGB and XRGB real game Present backbuffers, with exact producer-device ownership and unmodified D3D9 input/FFB fallback.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "full-game-x8-desktop",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_menu_vehicle_race_full_resolution_output",
+        "expected_behavior": "D3D9Ex X8R8G8B8 destinations can receive a same-Present native full-size A8R8G8B8 shared GPU texture through StretchRect when the driver supports conversion."
+      },
+      {
+        "id": "exact-source-and-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_to_d3d9ex_owned_destination",
+        "expected_behavior": "Foreign D3D11 source owners, wrong backbuffer dimensions/formats and MSAA reject before CopyResource; driver conversion failure returns to original game-owned D3D9 Draw/Present/input/FFB."
+      },
+      {
+        "id": "five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "All unchanged required GitHub Actions pass for precisely the validation-bearing material result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "full-game-x8-desktop": "PASS_BUILD",
+    "exact-source-and-fallback": "PASS_BUILD",
+    "five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Observed live game full-size native Draw/DrawIndexed produces an exact D3D11 BGRA render target",
+      "D3D11 shared GPU allocation imports on actual game D3D9Ex device; A8 and X8 destination selection and owner/extent/MSAA checks precede source CopyResource",
+      "Completed EVENT allows same-Present StretchRect; incompatible formats/owners or busy GPU retain original D3D9 desktop, gamepad, FFB and optional CPU fallback"
+    ],
+    "batch_components": [
+      "Live-game Present decision extended to X8 native GPU desktop output",
+      "Native shared D3D11 GPU source device ownership and real D3D9 backbuffer checks",
+      "Portable X8/A8 accepted and unsupported-format denied regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast source checks and portable admission regressions, plus Win32/Backend builds on exact SHA.",
+      "negative_regression": "Unsupported D3D9 destinations, foreign D3D11 source device, MSAA and extent mismatch remain denied without changing default-off native activation.",
+      "component_integration": "Real game full-size D3D11 output -> D3D11 shared BGRA GPU copy/fence -> D3D9Ex same-Present StretchRect -> original game Present; two independent XR stereo eye renders remain a separate uncompleted source requirement."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source and GitHub CI only; no matching Quest 3 / VDXR or direct gameplay visual proof.",
+    "activation_guard_and_fallback": "NativeDrawPathActive default remains false; original DX9Ex, D3D9 gamepad/FFB, SkyGlow and DXVK freeze unchanged.",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recovered exact vr-dx11-native-r71 HEAD 2e08cc4d3a10fce6c693af2e8b09b6309a69110f; previous 00803 five CI gates success, no active exact-SHA validation cancellation.",
+    "C1_REVIEW": "Live full-game Present admitted A8 but excluded X8 even though backbuffer writability already accepted X8; GPU shared-desktop CopyResource lacked exact source D3D11 device ownership check.",
+    "C2_IMPLEMENT": "Actual native game GPU shared desktop source owner, D3D9Ex A8/X8 destination routing, MSAA/extent checks and portable regressions committed in one coherent material batch.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: unchanged DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all success for 29fa9ce3dac19e1b7b8318d6ce0208dc201530ea; hardware/HMD UNTESTED.",
+    "C4_COMMIT": "Material code commit 29fa9ce3dac19e1b7b8318d6ce0208dc201530ea without CI skip; later C6 documentation [skip ci] cannot replace validation-bearing SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED: no native VR promotion until actual game/Quest3 stereoscopic validation.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED for the scoped GPU-desktop continuation only; entire mono/LR/OpenXR game-source graph remains incomplete, runtime UNTESTED."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00804",
+    "score_change": 0,
+    "score_status": "NO_NEW_SCORE_UNFINISHED_FULL_DX11_INTEGRATION",
+    "note": "Continues earlier 00803 GPU desktop feature with X8 coverage and source ownership. Source/CI checkpoint not scored independently, no scoreboard update or duplicate credit."
+  },
+  "evidence": {
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38842993292,
+        "conclusion": "success",
+        "head_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea"
+      },
+      "Backend Conversion": {
+        "run_id": 38842993273,
+        "conclusion": "success",
+        "head_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea"
+      },
+      "Windows Build": {
+        "run_id": 38842998029,
+        "conclusion": "success",
+        "head_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea"
+      },
+      "OpenXR": {
+        "run_id": 38842998057,
+        "conclusion": "success",
+        "head_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea"
+      },
+      "HUD Inspector": {
+        "run_id": 38842998052,
+        "conclusion": "success",
+        "head_sha": "29fa9ce3dac19e1b7b8318d6ce0208dc201530ea"
+      }
+    }
+  },
+  "ci_record_reconciliation": {
+    "cause": "Both DX11 Fast and Backend Conversion Gate at 00805 material SHA dec11b09e60b195334d09a69aee3558f151f65dd rejected an earlier 00804 C6 record: missing gameplay target/stages and obsolete SOURCE_AND_CI_VERIFIED_RUNTIME_UNTESTED acceptance labels.",
+    "proof": "00804 validation SHA 29fa9ce3dac19e1b7b8318d6ce0208dc201530ea already has five exact-SHA GitHub Actions successes; PASS_BUILD means source/build proof only, not game/Quest3 runtime proof.",
+    "preserve": "Existing 00804 material_result_sha, validation_bearing_result_sha, C6 checkpoint and RUNTIME_VALIDATION=UNTESTED remain unchanged. Scoped GPU desktop continuation is not full mono/LR/OpenXR renderer completion.",
+    "correction_task_id": "CONVERSION-DX11-00805",
+    "score_change": 0
+  }
+}

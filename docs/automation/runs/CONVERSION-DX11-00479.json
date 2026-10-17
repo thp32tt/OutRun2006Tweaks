@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00479",
+  "production_id": "CONVERSION-DX11-00479",
+  "event_id": "CONVERSION-DX11-00479-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00479",
+  "lease_epoch": 1,
+  "work_key": "DX11:R177:NATIVE_BACKEND_TARGET_TRANSACTIONAL_RESIZE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:R177",
+    "tools/test_dx11_native_target_resize.py:R177",
+    ".github/workflows/backend-conversion-gate.yml:R177"
+  ],
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "1c178e488fa063ce06d8bafc4366f8108e39482a",
+  "material_result_sha": "d96d64d6b7e1ffd4acce628546e2655846b79a03",
+  "validation_bearing_result_sha": "d96d64d6b7e1ffd4acce628546e2655846b79a03",
+  "result_sha": "d96d64d6b7e1ffd4acce628546e2655846b79a03",
+  "automation_validation": "FAIL",
+  "scoped_validation": "PASS_R177_WIN32_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R177 transactional NativeBackend::resize and create_color_target stage new D3D11 texture/RTV/SRV before replacing live objects; original target and config survive allocation failure. New Python negative mutation contract runs in GitHub validate. Whole exact-SHA Gate blocked by unchanged 00477-owned R175 WARP generic-varying mismatch.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/test_dx11_native_target_resize.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "owner_isolation": "00477 owns tools/dx11_constant_buffer_probe.cpp and 00478 owns tools/dx11_shader_linkage_probe.cpp; neither edited. DXVK/DX9Ex untouched.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest GitHub HEAD, AGENTS, 100-review index, queue contract, lane state, 00478 record, 00479 missing run and checkpoint 404 checked.",
+    "C1_REVIEW": "PASS: selected new R177 transactional D3D11 native target creation failure; independent from R175/R176.",
+    "C2_IMPLEMENT": "PASS: staged candidateTexture/candidateRtv/candidateSrv, single commit after all success, rollback naturally through ComPtr destruction, config updated last, new negative mutation static script and workflow.",
+    "C3_VALIDATE": "SCOPED PASS / WHOLE GATE FAIL: exact d96d64d6 Backend Conversion Gate 37933198848; Win32 validate job 113828725660 SUCCESS including new R177 test; DX11 smoke 113830454270 FAIL at pre-existing R175 [128,0,16,255] vs [224,128,32,255].",
+    "C4_COMMIT": "PASS: substantive source+test+workflow single material commit d96d64d6 [AUTO:CONVERSION-DX11-00479], CAS published; Issue14 6081327098 and 6081443140.",
+    "C5_PACKAGE": "NOT_REQUIRED: no gameplay native Draw activation or Quest3/VDXR release; artifact is Win32 build evidence only.",
+    "C6_STATE": "PERSISTED_BLOCKED_DEPENDENCY: actual R177 code and scoped validation preserved; exact whole Gate remains FAIL at 00477-owned R175. Not a terminal completed task."
+  },
+  "validation_run_id": 37933198848,
+  "validation_job_id": 113828725660,
+  "readiness_smoke_job_id": 113830454270,
+  "validation_evidence": {
+    "gate": "failure",
+    "validate": "success",
+    "r177_static": "success",
+    "r177_negative_mutation": "REJECT",
+    "r176_linkage": "success",
+    "r175_smoke": "failure",
+    "signature": "R175_GENERIC_VARYING_MISMATCH",
+    "observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "artifact_id": 11617451820,
+    "artifact_digest": "sha256:4149e4807b8cf2a8ed9d94ac17fe2c957093acb8ae98048cf315dc282d1fb093"
+  },
+  "issue14_comment_ids": [
+    6081327098,
+    6081443140
+  ],
+  "native_draw_path_activation_changed": false,
+  "state_persisted": true,
+  "last_real_activity_at": "2026-10-09T22:03:00+09:00",
+  "resume_cursor": "WAIT_SEPARATE_00477_R175_REPAIR_BEFORE_FULL_GATE",
+  "next_action": "Preserve new R177 material and scoped validate. 00477 owner must repair R175 WARP mismatch in its source. Then rerun exact-SHA Gate and reconcile 00479 without replaying R177. Quest3/VDXR runtime still UNTESTED.",
+  "blockers": [
+    "Inherited R175 generic-varying WARP pixel mismatch blocks whole shared Gate.",
+    "No real Quest3/VDXR native runtime evidence."
+  ],
+  "score_change": 0,
+  "score_reason": "Full Backend Conversion Gate FAILED at inherited R175; no normal task release or duplicate scoring."
+}

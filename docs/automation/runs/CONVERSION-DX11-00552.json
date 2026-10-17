@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00552",
+  "production_id": "CONVERSION-DX11-00552",
+  "event_id": "CONVERSION-DX11-00552-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00552",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_STAGE0_TEX5_TEX8_UV_SELECTION",
+  "base_sha": "2b938a44d2caac9dfea75cb6948c08c78bf4aeee",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live D3D9 FVF TEX5..TEX8 bytes",
+      "FVF eight-slot 2D UV decoder and D3D9 stage0 TEXCOORDINDEX 4..7",
+      "D3D11 native Draw/DrawIndexed -> opt-in visible inset; original D3D9 draw and input retained"
+    ],
+    "batch_components": [
+      "C++ FVF TEX5..8 byte layout and UV decoding",
+      "SDK constant binding in live Draw/DrawIndexed bridge",
+      "C++ positive/negative and Python destructive regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact SHA 1079669c68b6dbccb0a768166816b3db0739fd48: Backend Gate #38152222429 validate+readiness smoke SUCCESS; Windows Release Build #38152226869 SUCCESS; DX11 Fast #38152222455 SUCCESS; OpenXR #38152226868 SUCCESS. Actual game/HMD pixels UNTESTED. HUD Inspector #38152226855 SUCCESS at exact SHA.",
+      "negative_regression": "TEX9, unsupported UV dimension, short stride, corrupted offset, missing UV index fail closed; destructive test mutations.",
+      "component_integration": "Game D3D9 draw FVF TEX5..8 -> vertex decode -> selected stage0 UV 4..7 -> native D3D11 Draw/DrawIndexed -> diagnostic Present inset. Exact-SHA CI confirms compilation/probe but does not prove actual pixels."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_TEX5_TEX8_UV_SELECTION",
+      "src/vr/d3d11/live_game_fvf_layout.hpp:TEX5_TEX8",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:TEX5_TEX8"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "EIGHT_UV_FVF_SNAPSHOT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-integrated and exact-SHA Gate + Win32 Build verified; Quest3/VDXR menu, vehicle, race, gamepad visual checks NEED_HMD_TEST.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in diagnostic, original D3D9 Draw/input/Present preserved; unsupported states remain DX9Ex."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_fvf_layout_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00552.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "2b938a44d2caac9dfea75cb6948c08c78bf4aeee; 00551 C6 complete",
+    "C1_REVIEW": "TEX5..8 FVF gap, disjoint new work key, R175 unchanged",
+    "C2_IMPLEMENT": "FVF8 layout/bridge C++ plus tests implemented",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38152222429 validate and DX11 readiness smoke probes SUCCESS; Win32 Release Build #38152226869 SUCCESS; DX11 Fast #38152222455 SUCCESS; OpenXR #38152226868 SUCCESS. HUD Inspector #38152226855 SUCCESS at exact SHA. Hardware/game visuals UNTESTED.",
+    "C4_COMMIT": "PASS: real TEX5..8 source material d56f539744f3466907da1501b2f9b1dfbf92ca52 and same-task destructive regression repair; validation-bearing 1079669c68b6dbccb0a768166816b3db0739fd48; no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic only",
+    "C6_STATE": "PASS_EXACT_SHA: Backend Gate, Win32, DX11 Fast, OpenXR and HUD Inspector SUCCESS at validation-bearing SHA; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED; original D3D9 input and fallback unchanged."
+  },
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "runtime_evidence": "No Quest3/VDXR game or HMD test performed",
+  "next_action": "Independent new DX11 implementation by controller; Quest3/VDXR actual menu/vehicle/race/gamepad and native pixels NEED_HMD_TEST; do not rerun or rescore 00552.",
+  "controller_runtime_adoption": "NOT_VERIFIED",
+  "material_result_sha": "1079669c68b6dbccb0a768166816b3db0739fd48",
+  "validation_bearing_result_sha": "1079669c68b6dbccb0a768166816b3db0739fd48",
+  "result_sha": "1079669c68b6dbccb0a768166816b3db0739fd48",
+  "state_persisted": true,
+  "visible_frame_acceptance": "CI/Gate verified for exact material SHA; real Quest3/VDXR diagnostic frame NOT TESTED.",
+  "validation_evidence": {
+    "exact_sha": "1079669c68b6dbccb0a768166816b3db0739fd48",
+    "backend_conversion_gate": {
+      "run_id": 38152222429,
+      "status": "SUCCESS",
+      "jobs": [
+        {
+          "id": 114507981732,
+          "name": "validate",
+          "status": "success"
+        },
+        {
+          "id": 114509097209,
+          "name": "DX11 readiness smoke probes",
+          "status": "success"
+        }
+      ]
+    },
+    "windows_build": {
+      "run_id": 38152226869,
+      "status": "SUCCESS"
+    },
+    "dx11_fast": {
+      "run_id": 38152222455,
+      "status": "SUCCESS"
+    },
+    "openxr": {
+      "run_id": 38152226868,
+      "status": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38152226855,
+      "status": "SUCCESS",
+      "head_sha": "1079669c68b6dbccb0a768166816b3db0739fd48"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

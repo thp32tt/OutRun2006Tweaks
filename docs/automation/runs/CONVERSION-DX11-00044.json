@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00044",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T18:42:16+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "953b38bcad7b2ee2602605a8a25d69c888184f70",
+  "code_result_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad",
+  "result_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R93 reusable diagnostic fixed-function vertex-shader prototype for Set 05 F21.",
+  "summary": "Added a reusable R93 vertex-shader source prototype to pipeline_translation for the narrow fixed-function FVF subset XYZ + optional DIFFUSE + up to eight 1D-4D texture coordinates. The prototype models a D3D11 b0 row-major WVP constant-buffer contract and matching COLOR0/TEXCOORD outputs. XYZRHW, blend weights/indices, NORMAL/lighting, PSIZE and SPECULAR fail closed. The existing R92 linkage probe now compiles and reflects the generated R93 VS instead of a hardcoded compatible shader.",
+  "prerequisite": {
+    "task_id": "CONVERSION-DX11-00042",
+    "code_sha": "ee8bbfb8e3f37f468b509c17e71bd501ae6506d2",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Added R93 vertex-shader prototype contract and fail-closed unsupported reasons."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Added FVF-driven diagnostic VS source generation with b0 WVP, diffuse propagation and 1D-4D texcoord forwarding."
+    },
+    {
+      "path": "tools/dx11_shader_linkage_probe.cpp",
+      "result": "Replaced hardcoded compatible VS with generated R93 source and added XYZRHW/blend/NORMAL fail-closed regression cases."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R93 source/header/linkage contract guards."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R93 proves only source generation/compile/linkage for a narrow fixed-function subset. It does not capture or upload live D3D9 transform state, implement lighting/skinning/transformed vertices, bind native shaders in-game, or prove HMD visual parity."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36550181225,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad",
+      "evidence": "Production Win32 build PASS; Build/Run DX11 shader linkage probe PASS using generated R93 VS."
+    },
+    "build": {
+      "run_id": 36550188442,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36550188520,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad"
+    },
+    "hud_inspector": {
+      "run_id": 36550188502,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "918eba74e0949dcb1973bdf4da1fc66fe08eacad"
+    },
+    "pc_fast": {
+      "run_id": 36550181157,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 918eba74e0949dcb1973bdf4da1fc66fe08eacad contains [AUTO:CONVERSION-DX11-00044] and no CI-skip directive.",
+    "Verify DX11 source graph PASS before compilation.",
+    "Backend Conversion Gate 36550181225 PASS including R93-backed shader linkage build/run.",
+    "Build 36550188442 PASS.",
+    "OpenXR VR architecture 36550188520 PASS across all six jobs.",
+    "HUD Inspector 36550188502 PASS.",
+    "Issue #14 implementation comment 5887583048 and validation comment 5887676362 written.",
+    "No N100 workspace, PC fast runner, Quest3/VDXR, or in-game runtime execution was used."
+  ],
+  "blocker": null,
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN",
+    "implementation_comment_id": 5887583048,
+    "validation_comment_id": 5887676362
+  },
+  "resume_cursor": "R93 is automation-validated. Continue F21 with a bounded transform-state capture/binding-readiness prerequisite or another independent shader semantic step; keep native draw activation and shaderTranslationExact false.",
+  "next_action": "Add passive fixed-function transform-state evidence/binding contract or the next narrowly scoped programmable/fixed-function shader prerequisite. Exact-build Quest3/VDXR remains mandatory before runtime promotion."
+}

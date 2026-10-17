@@ -20,6 +20,7 @@
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/recenter_request.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/disasm_render_contract.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -88,13 +89,18 @@ namespace OutRunVRRenderer
 		constexpr std::size_t BeginSceneVtableIndex = 41;
 		constexpr std::size_t EndSceneVtableIndex = 42;
 		constexpr std::size_t SetVertexShaderConstantFVtableIndex = 94;
-		constexpr UINT OutRunWvpRegister = 64;
-		constexpr UINT OutRunWvpRegisterCount = 4;
+		constexpr UINT OutRunWvpRegister =
+			static_cast<UINT>(OutRunVR::DisasmContract::WvpVsRegister);
+		constexpr UINT OutRunWvpRegisterCount =
+			static_cast<UINT>(OutRunVR::DisasmContract::WvpVsRegisterCount);
 
-		// Stock 0x00400000 image-base addresses expressed as RVAs for ASLR safety.
-		constexpr std::uintptr_t OutRunViewRva = 0x0095D860u - 0x00400000u;
-		constexpr std::uintptr_t OutRunProjectionRva = 0x0095D8A0u - 0x00400000u;
-		constexpr std::uintptr_t OutRunWorldViewRva = 0x0095DB20u - 0x00400000u;
+		// Recovered EXE addresses are centralized in the backend-neutral contract.
+		constexpr std::uintptr_t OutRunViewRva =
+			OutRunVR::DisasmContract::ViewRva;
+		constexpr std::uintptr_t OutRunProjectionRva =
+			OutRunVR::DisasmContract::ProjectionRva;
+		constexpr std::uintptr_t OutRunWorldViewRva =
+			OutRunVR::DisasmContract::WorldViewRva;
 
 		constexpr float Pi = 3.14159265358979323846f;
 		constexpr float WvpVerifyAbsoluteEpsilon = 0.05f;

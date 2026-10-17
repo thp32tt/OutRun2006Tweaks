@@ -1,0 +1,144 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00834",
+  "production_id": "CONVERSION-DX11-00834",
+  "event_id": "CONVERSION-DX11-00834-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_SHADER_READABLE_GPU_INTERMEDIATE_COPY",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "R30_GAME_MENU_VEHICLE_RACE_STEREO_SOURCE_CALLBACK_PENDING",
+  "material_result_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+  "validation_bearing_result_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+  "source_material_commits": [
+    "e99b838f39f415f81e8097e840f5ec72854bfba2"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "run_record_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "score_change": 0,
+  "score_note": "C6 bookkeeping and exact-SHA CI reconciliation are not independent scored development; preserve prior score.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "goal": "Extend authentic native D3D11 left/right game-eye GPU post-Draw transfers from render targets to source-owned DEFAULT shader-readable intermediate textures without CPU staging, preserving the eye output-merger attachments, source Draw provenance, original D3D9/DX9Ex input fallback and OpenXR producer chain; real R30 stereo camera hookup remains unfinished.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "shader-intermediate-to-independent-gpu-eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_d3d11_game_eye_gpu_intermediate_copy",
+        "expected_behavior": "CopySubresourceRegion accepts same-device single-mip DEFAULT GPU shader-readable game intermediates into each actual native full-size eye target after independent eye Draws without fabricating Draw counts."
+      },
+      {
+        "id": "mrt-depth-source-admission-and-dx9ex-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_eye_output_merger_and_original_d3d9_input",
+        "expected_behavior": "Unsupported/shared/foreign/bounds-invalid copies reject; original D3D9 Draw/Present, gamepad and FFB are unchanged and valid GPU copies restore every active color MRT and eye DSV."
+      },
+      {
+        "id": "gpu-left-right-pixel-and-five-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_eye_warp_pixel_and_github_actions",
+        "expected_behavior": "WARP validates source render target to shader-only intermediate to distinct actual left/right eye GPU pixels, plus required DX11 Fast, Backend, Windows Build, OpenXR and HUD checks at the exact committed implementation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "shader-intermediate-to-independent-gpu-eyes": "PASS_BUILD",
+    "mrt-depth-source-admission-and-dx9ex-fallback": "PASS_BUILD",
+    "gpu-left-right-pixel-and-five-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Native game GPU source render target transfers actual intermediate pixels into a DEFAULT shader-resource-only GPU texture without system-memory staging.",
+      "Native eye encoder replays a bounded source-owned GPU copy independently after the left/right real Draws into the ring-owned eye RTV, while preserving complete MRT/DSV bindings and source provenance.",
+      "GPU WARP probe verifies both independent eye pixel regions from shader-only intermediates and preexisting render-target copy, with source/viewport/bounds rejection and caller OM restoration.",
+      "Native OpenXR ring protocol and original DX9Ex rendering/input remain isolated; authentic R30 eye camera command-recording hookup remains to be integrated."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact SHA e99b838: DX11 Native Transport Isolated WARP #38929769652 SUCCESS; GPU source RT -> DEFAULT shader-only intermediate -> separate L/R eye pixel and draw provenance assertions; mandatory five GitHub workflow gates SUCCESS.",
+      "negative_regression": "Source same-device, matching format, one mip/array, unshared DEFAULT GPU usage and bounded region checks retained; original D3D9 Draw, Present, gamepad and FFB unchanged; full MRT/DSV restore remains covered.",
+      "component_integration": "NativeGameEyeDrawEncoder::copy_game_surface and native stereo eye command recording plus WARP pixels of GPU shader-readable intermediates and existing OpenXR native shared-eye transport."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_SHADER_READABLE_GPU_INTERMEDIATE_COPY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source implementation and WARP GPU pixels demonstrate distinct native eye post-Draw shader-only intermediate transfer but do not establish authentic R30 menu, vehicle selection and sustained race full-frame stereo composition or Quest3-visible output.",
+    "activation_guard_and_fallback": "Copy acceptance checks same D3D11 device, format, dimensions, GPU default usage, source ownership and bounded region; off-target copy fails closed, full output-merger attachments restore, original D3D9/DX9Ex Draw/Present/input/FFB and SkyGlow remain authoritative; no backend promotion.",
+    "remaining_implementation": [
+      "Connect authentic R30 per-eye menu/vehicle/race Draw/DrawIndexed and independent camera/shader constants to native OpenXR eye command recorder.",
+      "Validate actual Quest3/VDXR GPU eye output, stereo HUD, controls/FFB, frame pacing before runtime approval. DXVK remains frozen."
+    ]
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38929769651,
+      "head_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38929769760,
+      "head_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+      "conclusion": "success"
+    },
+    "Windows Build": {
+      "run_id": 38929775137,
+      "head_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38929769866,
+      "head_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38929775296,
+      "head_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38929769652,
+      "head_sha": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+      "conclusion": "success"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recover existing branch with e99b838 source and confirmed exact-SHA GitHub SUCCESS; task run JSON absent (RUN_RECORD_NOT_FOUND).",
+    "C1_REVIEW": "Validate actual implementation diff, previous 00833 feature continuity and mandatory five source SHA workflow results; no source edits or CI reruns.",
+    "C2_IMPLEMENT": "Existing material commit e99b838 implements GPU shader-readable intermediate copy; C6-only replay does not modify implementation.",
+    "C3_VALIDATE": "At exact material SHA e99b838: mandatory DX11 Fast, Backend, Windows Build, OpenXR and HUD GitHub Actions SUCCESS; independent Native Transport WARP SUCCESS.",
+    "C4_COMMIT": "e99b838f39f415f81e8097e840f5ec72854bfba2",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; C6 bookkeeping only; R30 actual stereo scene callback pending; Quest3/HMD runtime UNTESTED; score +0."
+  }
+}

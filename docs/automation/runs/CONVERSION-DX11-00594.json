@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00594",
+  "production_id": "CONVERSION-DX11-00594",
+  "event_id": "CONVERSION-DX11-00594-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00594",
+  "work_key": "DX11:MENU_RACE_NATIVE_BORDER_COLOR",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "23afe1b093c1ecf1900be123eeb38bbb304b3ddd",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Capture D3D9 sampler ADDRESSU/ADDRESSV and conditional BORDERCOLOR from live game draw",
+      "Admit BORDER addressing with existing texture capture/gates",
+      "Convert D3D9 ARGB into native D3D11 normalized RGBA border sampler and Draw/DrawIndexed",
+      "Maintain original D3D9 Draw/Present/gamepad and diagnostic fail-closed fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      ".github/workflows/backend-conversion-gate.yml",
+      "tools/test_dx11_native_border_color_00594.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "384 ARGB cases plus 700 U/V address cases",
+      "negative_regression": "20 destructive source mutations and existing 00591 regression",
+      "component_integration": "D3D9 GetSamplerState -> TextureCapture -> D3D11 CreateSamplerState -> PSSetSamplers -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_BORDER_COLOR",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BORDER_COLOR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "No game screen/Quest3/VDXR evidence until runtime HMD check",
+    "activation_guard_and_fallback": "Opt-in diagnostic only; original D3D9 Draw/Present remains, DXVK frozen"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_native_border_color_00594.py",
+    "docs/automation/runs/CONVERSION-DX11-00594.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD-approved binary"
+  },
+  "next_action": "BUILD_VERIFIED / NEED_HMD_TEST: validate native diagnostic inset in Quest3/VDXR menu, vehicle selection, race and gamepad. Do not promote without game/HMD evidence. Next independent DX11 work may start; DXVK remains frozen.",
+  "material_result_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "validation_bearing_result_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "result_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "c6_basis_head_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38210988820,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "push"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38210994274,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "OpenXR VR architecture (push)",
+      "run_id": 38210988780,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "push"
+    },
+    {
+      "workflow": "OpenXR VR architecture (PR)",
+      "run_id": 38210994343,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38210988774,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "push"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38210994825,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "pull_request"
+    }
+  ],
+  "local_validation": [
+    "00594 BORDER/ARGB live-capture -> native PS sampler guarded Draw/DrawIndexed; 20 negative mutations, 384 channel examples, 700 U/V combinations",
+    "Existing 00591 address regression, 00589..00593 mip tests and full CI successful"
+  ],
+  "runtime_evidence": null
+}

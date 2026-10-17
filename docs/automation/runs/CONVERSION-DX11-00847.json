@@ -1,0 +1,163 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00847",
+  "production_id": "CONVERSION-DX11-00847",
+  "event_id": "CONVERSION-DX11-00847-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_EYE_SOURCE_TIMED_TARGET_CLEAR",
+  "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "source_gate": "PER_EYE_NATIVE_GAME_CLEAR_TIMELINE_BUILD_VERIFIED_R30_LIVE_GAME_STEREO_CALLBACK_STILL_INCOMPLETE",
+  "material_result_sha": "00d4ce9c84350c400fbe0163f7ba00fcb65a8f30",
+  "validation_bearing_result_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+  "source_material_commits": [
+    "00d4ce9c84350c400fbe0163f7ba00fcb65a8f30"
+  ],
+  "validation_repair_commits": [
+    "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc"
+  ],
+  "packaging_status": "NOT_REQUIRED",
+  "score_change": 0,
+  "score_note": "Incremental native eye source-stage implementation inside the still unfinished whole-game stereo OpenXR integration feature. Material source and exact-SHA CI verified; no separately completed whole renderer or hardware validation, therefore no score increment.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-NATIVE-EYE-CALLSITE-TO-OPENXR",
+    "full_dx11_renderer_complete": false,
+    "goal": "Preserve real D3D9-authored per-eye TARGET Clear chronological positions relative to native D3D11 Draw/DrawIndexed, including after-geometry HUD/menu partial rectangle clears, while keeping separate L/R OpenXR targets and original D3D9 input/FFB fallback. Live game camera integration and Quest3 runtime still outstanding.",
+    "acceptance_items": [
+      {
+        "id": "source-timed-native-eye-clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_stereo_eye_draw_command_order",
+        "expected_behavior": "Both camera eye encoders replay ordered game TARGET ClearView rectangles precisely at their respective actual emitted source geometry ordinal (including after final draw)."
+      },
+      {
+        "id": "invalid-clear-order-rejected",
+        "category": "regression",
+        "behavior_area": "source_order_preflight_and_gpu_fallback",
+        "expected_behavior": "Out-of-order source commands reject before GPU write and unconsumed commands reject publication, without modifying D3D9 fallback."
+      },
+      {
+        "id": "per-eye-gpu-color-evidence",
+        "category": "end_to_end_behavior",
+        "behavior_area": "dx11_native_eye_pixel_submission",
+        "expected_behavior": "Isolated WARP native transport confirms real left/right GPU pixel colors after source-timed after-geometry TARGET Clears."
+      },
+      {
+        "id": "legacy-d3d9-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_dx9ex_input_ffb",
+        "expected_behavior": "No changes to D3D9 Draw/Present, gamepad, FFB, DXVK or SkyGlow source files."
+      },
+      {
+        "id": "exact-sha-integrated-ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_native_build_backend_openxr_hud_warp",
+        "expected_behavior": "Five unchanged mandatory GitHub Gate workflows plus isolated WARP all succeed at exact source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source-timed-native-eye-clear": "PASS_CXX_SOURCE_IMPLEMENTED_AND_WARP_GPU_REGRESSION",
+    "invalid-clear-order-rejected": "PASS_WARP_MALFORMED_TIMELINE_NEGATIVE_REGRESSION",
+    "per-eye-gpu-color-evidence": "PASS_ISOLATED_WARP_EXACT_SHA",
+    "legacy-d3d9-fallback": "PASS_SOURCE_DIFF_LEGACY_PATHS_UNMODIFIED",
+    "exact-sha-integrated-ci": "PASS_EXACT_SHA_5_REQUIRED_PLUS_NATIVE_WARP"
+  },
+  "github_actions": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38974370254,
+      "head_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38974370250,
+      "head_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 38974375872,
+      "head_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38974375987,
+      "head_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38974375934,
+      "head_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+      "conclusion": "success"
+    },
+    "DX11 Native Transport Isolated WARP": {
+      "run_id": 38974370300,
+      "head_sha": "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc",
+      "conclusion": "success"
+    }
+  },
+  "previous_hold_reason": "NONE_NEW_FEATURE_SOURCE_REPAIR_ON_SAME_TASK",
+  "known_blockers": [
+    "R30 independent live game-authored left/right Draw/DrawIndexed camera callback to native stereo ring/host OpenXR remains unfinished: this commit provides source-ordered Clear replay only.",
+    "Quest3/VDXR menu, car selection, race, HUD, input/FFB and frame pacing never physically tested; RUNTIME_VALIDATION=UNTESTED."
+  ],
+  "resume_cursor": "Implement actual R30 source-authored stereo game camera Draw/DrawIndexed callback and native full-size L/R GPU render target submission to host OpenXR. Do not repeat 00847 SOURCE Clear timeline or exact-SHA GATE. Preserve D3D9 fallback, original input/FFB and DXVK freeze.",
+  "pipeline": {
+    "C0_RECOVER": "LATEST_HEAD_AND_OWNER_SOURCE_INSPECTED",
+    "C1_REVIEW": "CONFIRMED_SOURCE_CLEAR_REPLAY_ORDER_ERROR",
+    "C2_IMPLEMENT": [
+      "00d4ce9c84350c400fbe0163f7ba00fcb65a8f30"
+    ],
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_MANDATORY_PLUS_NATIVE_WARP",
+    "C4_COMMIT": [
+      "00d4ce9c84350c400fbe0163f7ba00fcb65a8f30",
+      "73b43b6f2a20d1ccfc3d1b9463045cbeafbf78dc"
+    ],
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA_SEPARATE_BOOKKEEPING_SKIP_CI"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_SOURCE_TIMED_TARGET_CLEAR"
+    ],
+    "integration_path": [
+      "Independent L/R native game-authored Draw and DrawIndexed are issued through NativeGameEyeDrawEncoder into real per-eye GPU RTV/DSV",
+      "Per-eye ClearView source target rectangles are replayed at the source geometry Draw ordinal and GPU colors are available for ring OpenXR publication (actual R30 live camera callback still pending)"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "visible_frame_acceptance": "Isolated WARP validates native GPU L/R colors; live game/Quest3 observable menu-to-race frame is not yet tested.",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "activation_guard_and_fallback": "Native gameplay remains opt-in/fail-closed. Existing original D3D9 Render/Present/input/FFB unmodified.",
+    "acceptance_proof": {
+      "positive_probe": "Exact source SHA 73b43b6 produced WARP true GPU per-eye after-geometry TARGET Clear pixels plus 5 required GitHub Actions success.",
+      "negative_regression": "WARP rejects an out-of-order game Clear before GPU mutation, keeps both eye renderers separate; D3D9 fallback unchanged.",
+      "component_integration": "NativeGameEyeDrawEncoder and submission ordering with GPU WARP pixel readback, not a fixture-only header/CI edit."
+    },
+    "full_gate_plan": "one_validation_bearing_sha"
+  }
+}

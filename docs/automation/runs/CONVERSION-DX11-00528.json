@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00528",
+  "production_id": "CONVERSION-DX11-00528",
+  "event_id": "CONVERSION-DX11-00528-E005",
+  "event_type": "retry",
+  "lane": "DX11",
+  "attempt": "3/3",
+  "chat_rollovers": 2,
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "140cf9c7bfc3a5139e2affba8e7df9bec77adf48",
+  "checkpoint_base_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00528",
+  "lease_epoch": 1,
+  "work_key": "DX11:R231:INDEXED_STREAM_OUTPUT_SIDE_EFFECT_FENCE",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    "tools/test_dx11_indexed_stream_output_r231.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_STATE",
+  "terminal": true,
+  "result_sha": "06c087a729dd7505fb6f633b47e326af65395a5e",
+  "material_result_sha": "06c087a729dd7505fb6f633b47e326af65395a5e",
+  "validation_bearing_result_sha": "06c087a729dd7505fb6f633b47e326af65395a5e",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "summary": "R231 indexed dormant sole-eye rejects any SO target slot, composed after R229 predication fence; WARP slot-zero/slot-three rejection and restored GPU pixel; unrelated R175 remains independently owned.",
+  "changed_files": [
+    "src/vr/d3d11/native_indexed_uav_eye_guard.hpp",
+    "tools/dx11_indexed_draw_probe_r186.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_indexed_stream_output_r231.py",
+    "docs/automation/runs/CONVERSION-DX11-00528.json",
+    "tools/test_dx11_indexed_predication_r229.py"
+  ],
+  "pipeline": {
+    "C0": "PASS GitHub controller periodic E001 WAIT_CHAT checkpoint and current branch HEAD recovered, rollover E002 attempt 1/3 preserved",
+    "C1": "PASS independent indexed SO side-eye R231 selected after R229; R175 owned by 00477 expressly excluded",
+    "C2": "PASS C++ R231 compositional SOGetTargets 4 slots + COM cleanup, R186 same-device SO slot 0/3 WARP negative and green pixel restoration, 8 static mutations; R229 verifier composition-scoped repair",
+    "C3": "SCOPED_PASS exact 06c087a7 Win32 validate, R219/R229/R231 source guards and R186 real WARP build/run all SUCCESS; FULL_GATE_FAIL inherited separate R175 constant buffer GPU step",
+    "C4": "PASS implementation ffc8633843052dce62459cd82fecbb11df6e11ee and scoped test repair 06c087a729dd7505fb6f633b47e326af65395a5e both actual commits containing [AUTO:CONVERSION-DX11-00528]; Issue #14 entries 6095765704 and 6095771784",
+    "C5": "NOT_REQUIRED: dormant readiness only, no in-game draw activation or HMD package",
+    "C6": "BLOCKED_DEPENDENCY_R175 after completed exact-SHA Backend Conversion Gate; preserve material/validation SHA and scoped PASS; no score because full Gate FAIL; HMD UNTESTED"
+  },
+  "blockers": [
+    "Full Backend Conversion Gate 38038718720 on exact 06c087a7: validate SUCCESS; readiness smoke FAIL at inherited Run DX11 constant buffer probe (R175, owner CONVERSION-DX11-00477). Latest run did not independently capture pixel bytes; previously observed R175 [128,0,16,255] vs expected [224,128,32,255], not re-asserted for this run.",
+    "Quest3/VDXR runtime not tested; native DrawIndexed activation remains dormant."
+  ],
+  "resume_cursor": "TERMINAL_BLOCKED_INDEPENDENT_R175_OWNER_RETRY_3_OF_3",
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00528",
+  "next_action": "Controller must reconcile/release terminal blocked 00528 and atomically claim a truly independent new DX11 work_key/task; preserve R175 ownership; do not relaunch 00528 or count bookkeeping as material PASS.",
+  "evidence": {
+    "checkpoint": "chat-controller-downloads/tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00528/20261010T1735-periodic.json",
+    "static_contract_precommit": "R231 eight source omissions fail contract; R186 WARP slot 0/3 and restored green pixel included; native compile requires GitHub Actions",
+    "material_commits": [
+      "ffc8633843052dce62459cd82fecbb11df6e11ee",
+      "06c087a729dd7505fb6f633b47e326af65395a5e"
+    ],
+    "exact_sha_gate": {
+      "id": 38038718720,
+      "head_sha": "06c087a729dd7505fb6f633b47e326af65395a5e",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38038718720",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate_job_id": 114174526931,
+      "validate": "success",
+      "smoke_job_id": 114175415404,
+      "smoke": "failure",
+      "verified_steps": {
+        "Verify R186 native indexed Draw ownership": "success",
+        "Verify R219 indexed OM UAV isolation": "success",
+        "Verify R229 indexed GPU predication fence": "success",
+        "Verify R231 indexed stream-output isolation": "success",
+        "Build R186 owned indexed Draw WARP probe": "success",
+        "Run R186 owned indexed Draw WARP probe": "success",
+        "Run DX11 constant buffer probe": "failure"
+      }
+    },
+    "issue14_comment_ids": [
+      6095765704,
+      6095771784
+    ],
+    "runtime": "UNTESTED"
+  },
+  "scoped_automation_validation": "PASS_R219_R229_R231_R186_SOURCE_WARP_WIN32",
+  "score_previous_confirmed": 1088,
+  "score_new_confirmed": 1088,
+  "last_real_activity_at": "2026-10-10T08:54:00Z",
+  "last_activity_evidence": "Read-only GitHub log diagnosis and durable retry terminal reconciliation, no source changes; Gate #38038718720 unchanged",
+  "timestamp_kst": "2026-10-10 17:54 KST",
+  "state_persisted": true,
+  "retry_reconciliation": {
+    "event_id": "CONVERSION-DX11-00528-E005",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "at_kst": "2026-10-10T17:54:00+09:00",
+    "state": "TERMINAL_BLOCKED_NO_SOURCE_REPLAY",
+    "source_result_preserved": "06c087a729dd7505fb6f633b47e326af65395a5e",
+    "branch_head_prior": "65dfe1d8c194fe49632d88eb28894752fd255e18",
+    "gate": {
+      "id": 38038718720,
+      "sha": "06c087a729dd7505fb6f633b47e326af65395a5e",
+      "conclusion": "failure",
+      "validate": "success",
+      "readiness_smoke": "failure",
+      "step": "Run DX11 constant buffer probe",
+      "classification": "R175_GENERIC_VARYING_MISMATCH",
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ]
+    },
+    "owner_conflict": "CONVERSION-DX11-00477 owns R175 tools/dx11_constant_buffer_probe.cpp; 00528 does not rewrite or revalidate that work_key",
+    "replayed_source": false,
+    "replayed_ci": false,
+    "new_material_result": false,
+    "score_delta": 0,
+    "next_action": "Controller must reconcile/release terminal blocked 00528 and atomically claim a truly independent new DX11 work_key/task; preserve R175 ownership; do not relaunch 00528 or count bookkeeping as material PASS."
+  }
+}

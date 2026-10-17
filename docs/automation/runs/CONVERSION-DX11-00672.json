@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00672",
+  "production_id": "CONVERSION-DX11-00672",
+  "event_id": "CONVERSION-DX11-00672-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_SPARSE_MESH_CAPTURE_1536",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME_SPARSE_MESH_CAPTURE",
+  "base_head_sha": "91b13fe6015df78691cb3e2c4076e152756cd35e",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real D3D9 DrawIndexedPrimitive R30 game hook captures live VB/IB shadow",
+      "bounded 1536-unique noncontiguous physical index compaction and epoch-checked vertex gather on both R30 runtime modes",
+      "original Draw remains intact; compacted game vertices and indices reach DX11 native DrawIndexed and existing diagnostic Present readback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_primitive_span.hpp",
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "tools/dx11_game_primitive_span_probe.cpp",
+      "tools/test_dx11_sparse_index_draw_00646.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "512 TRIANGLELIST primitives with 1536 widely separated VB physical slots preserve ordered native DrawIndexed input",
+      "negative_regression": "1535 cap, invalid >1536 requests and missing shadow bytes fail closed without partial vertex/index publication",
+      "component_integration": "both R30 interception implementations reuse exact same bounded sparse capture before live_game_frame::observe_indexed and original game Draw"
+    },
+    "conflict_keys": [
+      "DX11:GAME_SPARSE_MESH_CAPTURE_1536",
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST; actual vehicle/menu/race pixels and input not runtime-verified",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 controlled diagnostic only; all original D3D9 draws and gamepad path remain authoritative"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME_SPARSE_MESH_CAPTURE",
+    "goal": "Capture complete 512-triangle indexed OutRun game meshes whose valid CPU shadow vertices are scattered across a dynamic D3D9 VB, feeding native DX11 DrawIndexed without altering D3D9 input or output fallback",
+    "acceptance_items": [
+      {
+        "id": "mesh-end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_indexed_capture",
+        "expected_behavior": "Game-authored full 1536-slot sparse VB/IB is compacted with exact index order and offered to native DrawIndexed"
+      },
+      {
+        "id": "mesh-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "safe_fallback",
+        "expected_behavior": "Over-limit, invalid game indices, shadow holes or stale epochs cannot partially publish native draws; original D3D9 Draw remains authoritative"
+      },
+      {
+        "id": "mesh-gate",
+        "category": "integrated_validation",
+        "behavior_area": "native_draw_handoff",
+        "expected_behavior": "Executable 512-triangle positive and destructive negative probe and both R30 variants pass exact-SHA full GitHub gate"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_sparse_index_draw_00646.py",
+    "docs/automation/runs/CONVERSION-DX11-00672.json",
+    "tools/dx11_autodev_policy.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "R30 duplicated source paths cap sparse native indexed captures at 128 though actual native Draw/DrawIndexed accepts 1536",
+    "C2_IMPLEMENT": "1536-cap shared compactor + both game R30 shadow producers + executable mesh regression",
+    "C3_VALIDATE": "FIX_FEATURE_CONTRACT_SCHEMA_AND_VALIDATE_NEGATIVE_MUTATIONS_PENDING_EXACT_SHA",
+    "C4_COMMIT": "MATERIAL_REPAIR_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "positive_probe": "PENDING_GITHUB_FAST",
+    "negative_regression": "PENDING_GITHUB_FAST",
+    "component_integration": "SOURCE_LINKAGE_REVIEWED",
+    "compile_build": "PENDING_GITHUB_BUILD",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED",
+    "mesh-end2end": "PENDING_GITHUB_FAST",
+    "mesh-fallback": "PENDING_GITHUB_FAST",
+    "mesh-gate": "PENDING_EXACT_SHA"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}

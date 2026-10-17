@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00593",
+  "production_id": "CONVERSION-DX11-00593",
+  "event_id": "CONVERSION-DX11-00593-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00593",
+  "work_key": "DX11:MENU_RACE_NATIVE_MIP_LOD_BIAS",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Get original game's IEEE754 DWORD MIPMAPLODBIAS from live D3D9 Draw",
+      "Admit only finite supported signed bias and point/linear mip mode; carry alongside MAXMIPLEVEL in source capture",
+      "Copy live source mip chain and bind native D3D11 PS sampler with bias for Draw/DrawIndexed",
+      "Preserve diagnostic opt-in, original D3D9 Draw/Present/gamepad and safe DX9Ex fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_mip_lod_bias_00593.py",
+      "tools/test_dx11_native_mip_chain_00589.py + tools/test_dx11_native_mip_linear_00590.py + tools/test_dx11_native_address_mirror_00591.py + tools/test_dx11_native_maxmiplevel_00592.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Negative and fractional game MIPMAPLODBIAS survives IEEE754 reinterpretation, capture and D3D11 sampler Draw/DrawIndexed.",
+      "negative_regression": "Reject NaN/Inf, unsupported hardware LOD range, no-mip nonzero bias and aniso; 18 destructive mutations and 1716 boundary inputs.",
+      "component_integration": "D3D9 GetSamplerState -> bit reinterpret -> TextureCapture -> D3D11 CreateSamplerState -> PSSetSamplers -> Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_MIP_LOD_BIAS",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:MIP_LOD_BIAS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA CI; actual game pixels/Quest3/VDXR and gamepad remain NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Fail-closed diagnostic opt-in only, original D3D9 Draw/Present unchanged, DXVK frozen"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_mip_chain_00589.py",
+    "tools/test_dx11_native_mip_linear_00590.py",
+    "tools/test_dx11_native_address_mirror_00591.py",
+    "tools/test_dx11_native_maxmiplevel_00592.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_native_mip_lod_bias_00593.py",
+    "docs/automation/runs/CONVERSION-DX11-00593.json"
+  ],
+  "base_head_sha": "31ec1dadee74745d620d5440a499635b7f32ebef",
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD-approved runtime candidate"
+  },
+  "runtime_evidence": null,
+  "next_action": "BUILD_VERIFIED, NEED_HMD_TEST: Quest3/VDXR native diagnostic inset in menu/vehicle/race and gamepad return; keep original DX9Ex Draw/Present and DXVK frozen; next independent DX11 coding task may start.",
+  "material_result_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "validation_bearing_result_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "result_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "c6_basis_head_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38209680279,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38209680339,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38209683798,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38209683904,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38209680278,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+      "event": "push"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38209683896,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301"
+    }
+  ],
+  "local_validation": [
+    "Game D3D9 signed MIPMAPLODBIAS IEEE754 DWORD reinterpret -> native D3D11 sampler -> guarded game Draw/DrawIndexed",
+    "00593 regression 1716 IEEE754 cases, 18 destructive source mutations (Backend Gate success)",
+    "00589/00590/00591/00592 source chain regressions unchanged in meaning, all success",
+    "Exact-SHA Windows Build, Backend validate/readiness smoke, DX11 Fast, OpenXR PR and push, HUD Inspector all success"
+  ]
+}

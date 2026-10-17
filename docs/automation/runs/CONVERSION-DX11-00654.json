@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00654",
+  "production_id": "CONVERSION-DX11-00654",
+  "event_id": "CONVERSION-DX11-00654-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_GREATER_DEPTH_DSV",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "9f74bec65175892327b40cd15b9c4d7a5a965004",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live game D3D9 ZFUNC/ZWRITE GetRenderState -> portable GREATER/GREATEREQUAL strict admission",
+      "native D3D11 4-way depth descriptor cache + diagnostic reversed-depth clear -> OMSetDepthStencilState -> game-authored Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "real game C++ D3D9 depth state capture, D3D11 OM resource binding and reset",
+      "portable C++ depth probe, destructive Python regression, existing test migration and exact SHA CI integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "GREATER/GREATEREQUAL and Z-write 0/1 yield four independent native states; portable probe, mutation test and full CI passed",
+      "negative_regression": "unsupported NEVER/W buffer/depth bias/missing DSV reject; native DSV slot/compare/clear/reset mutations are rejected",
+      "component_integration": "D3D9 game callsite -> captured depth state -> D3D11 diagnostic DSV -> Draw/DrawIndexed native inset readback"
+    },
+    "conflict_keys": [
+      "DX11:GAME_GREATER_DEPTH_DSV",
+      "src/vr/d3d11/live_game_depth_state.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_depth_probe.cpp",
+      "tools/test_dx11_depth_ordering_draw_00654.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY: diagnostic per-Draw depth isolation does not prove scene parity, game/HMD real pixels and gamepad untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; unsupported game state falls through to original D3D9 and gamepad path"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_depth_state.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_depth_probe.cpp",
+    "tools/test_dx11_depth_equality_draw_00653.py",
+    "tools/test_dx11_depth_ordering_draw_00654.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD 9f74bec6 and prior task 00653 completed, no duplicate feature",
+    "C1_REVIEW": "PASS: GREATER/GREATEREQUAL native depth Draw gap",
+    "C2_IMPLEMENT": "PASS: native game C++ admission/DSV/Draw and 00654 regressions",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Gate validation+smoke, DX11 Fast, Windows Build, OpenXR, HUD all success on validation SHA",
+    "C4_COMMIT": "PASS: original material e44ca60b; one cause-based regression repair 9856cfd",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: separate bookkeeping commit, no replacement of validation-bearing SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Quest 3/VDXR menu, vehicle-select, race, stereo and gamepad tests remain untested; preserve D3D9 fallback, DXVK freeze and let controller select next independent DX11 feature.",
+  "material_result_sha": "e44ca60b08d157c9e11d1ab03200c61a2625a643",
+  "validation_bearing_result_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+  "result_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+  "source_test_repair_shas": [
+    "9856cfdffe1838c80a28da0b9104c9f05da25228"
+  ],
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38345249874,
+      "conclusion": "success",
+      "validation_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38345249874"
+    },
+    "dx11_fast_structural": {
+      "id": 38345249765,
+      "conclusion": "success",
+      "validation_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38345249765"
+    },
+    "windows_build": {
+      "id": 38345254052,
+      "conclusion": "success",
+      "validation_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38345254052"
+    },
+    "openxr_architecture": {
+      "id": 38345254013,
+      "conclusion": "success",
+      "validation_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38345254013"
+    },
+    "hud_inspector": {
+      "id": 38345254023,
+      "conclusion": "success",
+      "validation_sha": "9856cfdffe1838c80a28da0b9104c9f05da25228",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38345254023"
+    }
+  }
+}

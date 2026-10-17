@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00560",
+  "production_id": "CONVERSION-DX11-00560",
+  "event_id": "CONVERSION-DX11-00560-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00560",
+  "base_sha": "0743849c9fd9dd30bb060ba5309120056922a413",
+  "work_key": "DX11:MENU_RACE_DEFAULT_RT_TEXTURE_TO_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual OutRun D3D9 DEFAULT RT texture stage0 and game-authored Draw",
+      "Non-MSAA exact-format D3D9 GetRenderTargetData to lockable CPU BGRA8",
+      "D3D11 immutable SRV / live shader / DrawIndexed or Draw / opt-in game Present inset"
+    ],
+    "batch_components": [
+      "C++ D3D9 GPU render-target texture ownership and readback",
+      "C++ level0 CPU snapshot / D3D11 SRV actual game Draw resource path",
+      "Python destructive producer/consumer and unsupported-format negative tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DEFAULT A8/X8 render target source reaches native D3D11 Draw when exact single-sample readback succeeds",
+      "negative_regression": "GPU-only non-RT, compressed/default, MSAA, format/size mismatch excluded; destructive C++ link controls",
+      "component_integration": "Live D3D9 texture producer -> readback/lock BGRA -> existing SRV/shader -> native linear or indexed game draw -> opt-in inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_DEFAULT_RT_TEXTURE_TO_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:DEFAULT_RT_LEVEL0"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "DEFAULT_RT_LEVEL0",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST Quest3/VDXR game menu/selection/race and controller",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact opt-in; original D3D9 Draw/Present/input always executes"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00560.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 0743849c9fd9dd30bb060ba5309120056922a413 and AGENTS/policy/00559 C6 checked",
+    "C1_REVIEW": "DEFAULT GPU-backed game RT sources rejected before D3D11 native Draw even when safe RT readback possible",
+    "C2_IMPLEMENT": "Source D3D9 render-target GetRTData exact B8G8R8A8 snapshot -> existing D3D11 SRV native draw and destructive regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA 05546c433e56d72fc966c45424cfbf5fd8df671c: Backend Gate #38163791658 2/2 SUCCESS; Win32 Release Build #38163796456 SUCCESS; OpenXR architecture #38163796491 SUCCESS; DX11 Fast Structural #38163791732 SUCCESS. HUD Inspector #38163796394 SUCCESS (late CI completion, same exact SHA); runtime/gamepad/HMD UNTESTED.",
+    "C4_COMMIT": "C++/test/run material 95c4493cf5574d3c8410b36b469c803d744a897f non-skip; two source-test regression corrections, exact validation-bearing 05546c433e56d72fc966c45424cfbf5fd8df671c non-skip; C6 separate [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic without actual game/HMD parity",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED/PASS_EXACT_SHA at 05546c433e56d72fc966c45424cfbf5fd8df671c; original DX9Ex game Draw/Present/input retained; Quest3/VDXR/menu/vehicle/race visual+gamepad NEED_HMD_TEST."
+  },
+  "runtime_evidence": "No Quest3/VDXR/menu/vehicle/race/physical gamepad test. Runtime UNTESTED",
+  "next_action": "C6 closed at exact verified SHA; do not rerun/rescore task. Controller should select an independent remaining DX11 menu/race native source feature; runtime Quest3/VDXR/gamepad NEED_HMD_TEST.",
+  "material_result_sha": "95c4493cf5574d3c8410b36b469c803d744a897f",
+  "validation_bearing_result_sha": "05546c433e56d72fc966c45424cfbf5fd8df671c",
+  "result_sha": "05546c433e56d72fc966c45424cfbf5fd8df671c",
+  "feature_contract": {
+    "scope": "Live D3D9 DEFAULT RT A8/X8 texture via non-MSAA GetRenderTargetData exact level0 into real D3D11 native game Draw",
+    "runtime_acceptance": "Quest3/VDXR visual/gamepad NEED_HMD_TEST",
+    "source_material_sha": "95c4493cf5574d3c8410b36b469c803d744a897f",
+    "validation_bearing_sha": "05546c433e56d72fc966c45424cfbf5fd8df671c"
+  },
+  "acceptance_results": {
+    "source_and_negative_regression": "Real DEFAULT RT (A8/X8 single-sample exact D3D9 RT readback) to D3D11 SRV and native linear/indexed Draw, branch-local negative source/format/MSAA metadata regression; two same-TASK test fixture corrections",
+    "runtime_validation": "UNTESTED",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "exact_sha": "05546c433e56d72fc966c45424cfbf5fd8df671c"
+  },
+  "state_persisted": true,
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "validation_evidence": {
+    "exact_sha": "05546c433e56d72fc966c45424cfbf5fd8df671c",
+    "github_actions": [
+      {
+        "run_id": 38163791658,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38163796456,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38163796491,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38163791732,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38163796394,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
+}

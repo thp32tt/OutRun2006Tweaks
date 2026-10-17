@@ -1,0 +1,136 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00744",
+  "production_id": "CONVERSION-DX11-00744",
+  "event_id": "CONVERSION-DX11-00744-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_GPU_FENCE_ERROR_QUARANTINE",
+  "feature_id": "DX11-MENU-RACE-READBACK-FENCE-ERROR-QUARANTINE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "3d03a031c302b8f287ed89cc362d16fd53ec3475",
+  "material_result_sha": "6b861abb2d4530b359aae937bbcbdcc868f351fe",
+  "validation_bearing_result_sha": "57ececdfd3be0b32758807514f9b2477440cdd71",
+  "result_sha": "57ececdfd3be0b32758807514f9b2477440cdd71",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Fix real menu/vehicle-selection/race native D3D11 full-frame readback GPU fence ownership: only S_OK proves completion. Failed or unexpected GetData results quarantine busy staging allocations until source Reset instead of recycling them; original D3D9 Draw/Present and gamepad fallback preserved.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_publication.hpp",
+    "tools/dx11_readback_quarantine_probe_00744.cpp",
+    "tools/test_dx11_readback_quarantine_00744.py",
+    "tools/test_dx11_full_frame_same_present_00726.py",
+    "tools/test_dx11_full_frame_slot_reuse_00743.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00743.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "live D3D9 game Draw/DrawIndexed -> native D3D11 GPU CopyResource -> same-Present EVENT fence",
+      "in-flight/failed EVENT ownership retained across staging ring readback and presentation",
+      "original D3D9 game image, Present HRESULT and gamepad fallback remain authoritative on timeout/error"
+    ],
+    "batch_components": [
+      "live D3D11 frame readback fence and staging allocation lifecycle",
+      "full-frame/native fallback source game Present and gamepad",
+      "portable C++ tri-state regression, destructive Python source integration, DX11 Fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00744 C++ HRESULT success/pending/error probe and source regression pass exact-SHA DX11 Fast #38628589465.",
+      "negative_regression": "00744 Python destructive mutants reject incorrect success/error fence semantics and quarantine omission; previous 00726/00743 source tests adjusted for stronger guard and pass.",
+      "component_integration": "Actual source D3D9 Draw/DrawIndexed native frame staging CopyResource fence->same-Present optional upload, quarantining GPU-uncertain resources and keeping original D3D9 Draw/Present/gamepad."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_GPU_FENCE_ERROR_QUARANTINE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build and source validation for native game full frame succeeded; real Quest3/VDXR menu/race pixel output remains UNTESTED.",
+    "activation_guard_and_fallback": "Explicit opt-in full-frame native output; never mark GPU-uncertain staging slot free; original D3D9 game drawing, Present and controller input survive."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-READBACK-FENCE-ERROR-QUARANTINE",
+    "goal": "Prevent failed D3D11 same-Present GPU EVENT queries from releasing/overwriting an in-flight full-resolution game frame staging allocation across menu, car selection and race while retaining D3D9 original fallback.",
+    "acceptance_items": [
+      {
+        "id": "gpu-readback-error-quarantine",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Native frame GPU readback success frees slots, pending remains busy, failure quarantines staging resources until Reset."
+      },
+      {
+        "id": "original-d3d9-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_fallback_input_and_transport",
+        "expected_behavior": "A failed GPU fence never uploads a stale native frame or blocks original D3D9 menu/race Present and gamepad."
+      },
+      {
+        "id": "exact-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "build_ci_openxr_hud",
+        "expected_behavior": "Validation-bearing SHA passes DX11 Fast, Backend Conversion, Windows Build, OpenXR architecture and HUD Inspector."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "gpu-readback-error-quarantine": "PASS",
+    "original-d3d9-input-fallback": "PASS",
+    "exact-sha-integrated-gates": "PASS_EXACT_SHA"
+  },
+  "blocking_evidence": "Before task: failed D3D11 GetData on pending or active staging EVENT was treated as completion; busy=false could recycle a still GPU-owned allocation into future live-game full-frame CopyResource.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38628589465,
+      "conclusion": "success",
+      "head_sha": "57ececdfd3be0b32758807514f9b2477440cdd71"
+    },
+    "backend_conversion": {
+      "run_id": 38628589414,
+      "conclusion": "success",
+      "head_sha": "57ececdfd3be0b32758807514f9b2477440cdd71"
+    },
+    "windows_build": {
+      "run_id": 38628597623,
+      "conclusion": "success",
+      "head_sha": "57ececdfd3be0b32758807514f9b2477440cdd71"
+    },
+    "openxr_architecture": {
+      "run_id": 38628597637,
+      "conclusion": "success",
+      "head_sha": "57ececdfd3be0b32758807514f9b2477440cdd71"
+    },
+    "hud_inspector": {
+      "run_id": 38628597320,
+      "conclusion": "success",
+      "head_sha": "57ececdfd3be0b32758807514f9b2477440cdd71"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub branch HEAD and previous 00743 exact SHA/readback source recovered.",
+    "C1_REVIEW": "PASS: confirmed GPU error GetData prematurely recycled native game staging slot; disjoint from 00743 preferred-slot busy recovery.",
+    "C2_IMPLEMENT": "PASS: real C++ staging quarantine plus HRESULT classifier and portable C++/Python destructive source tests.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast 38628589465, Backend 38628589414, Windows Build 38628597623, OpenXR 38628597637, HUD 38628597320 all SUCCESS.",
+    "C4_COMMIT": "PASS: source material 6b861abb and CI repair/validation-bearing 57ececdf, no force/no CI-skip on Gates.",
+    "C5_PACKAGE": "NOT_REQUIRED: Quest3/VDXR real hardware test not run; packaging remains user-controlled.",
+    "C6_STATE": "PASS: exact-SHA gate evidence preserved separately, HMD UNTESTED, no extra score for bookkeeping."
+  },
+  "result_note": "COMPLETE_BUILD_VERIFIED for exact-SHA 5 mandatory GitHub CI gates, not real gamepad/HMD/runtime acceptance. DXVK frozen, DX11 source only.",
+  "packaging_reason": "No Quest3/VDXR real runtime validation performed.",
+  "recorded_at_kst": "2026-10-15 05:20 KST"
+}

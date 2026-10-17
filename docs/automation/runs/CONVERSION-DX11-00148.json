@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00148",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T02:15:00+09:00",
+  "base_sha": "492771516f68e5ddd9b4dc0142103ee824ed191a",
+  "result_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+  "validation_bearing_result_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R148_HELPER_28460_SUCCESS_CALL_CHAIN_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00146 proved the bounded helper 0x28460 packed-selector lookup prefix through success continuation 0x284B0 and explicitly named the 0x284B0 success path as the next independent static unit. DXVK-00145 independently validated the same exact-EXE bytes and call targets, so this task reused only those reviewed bytes/targets while applying an independent fail-closed DX11 proof and independent Actions validation.",
+  "summary": "Completed a bounded fail-closed exact-EXE proof for helper 0x28460 success path 0x284B0..0x284DE. Exact bytes prove call 0x284BC->0x282B0, EAX==-1 branch 0x284CB->0x28587, and call 0x284D2->0x8BD20. Both call targets are in .text and match the raw outbound candidate census. Callee semantics, helper behavior from 0x284DF onward, and render/ScreenHud ownership remain unresolved. No runtime renderer, native DX11 transport, OpenXR behavior or vr-d3d9ex-focus source changed.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00145",
+    "source_result_sha": "f1fad531f8dee31909a4550743188e9282e742d3",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE. Reused reviewed instruction bytes and decoded branch/call targets only; DX11 independently revalidated the proof and full hosted Gate set."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00148.json"
+  ],
+  "helper_28460_success_prefix_proof": {
+    "target_rva": "0x00028460",
+    "lookup_prefix_status": "EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN",
+    "success_start_rva": "0x000284B0",
+    "success_prefix_end_exclusive_rva": "0x000284DF",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "first_call_rva": "0x000284BC",
+    "first_call_target_rva": "0x000282B0",
+    "first_call_target_section": ".text",
+    "first_call_target_matches": true,
+    "failure_branch_rva": "0x000284CB",
+    "failure_target_rva": "0x00028587",
+    "failure_target_matches": true,
+    "failure_condition": "EAX == -1 after first call",
+    "second_call_rva": "0x000284D2",
+    "second_call_target_rva": "0x0008BD20",
+    "second_call_target_section": ".text",
+    "second_call_target_matches": true,
+    "outbound_candidates_match": true,
+    "status": "EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN",
+    "semantic_effect": "PARTIAL_CALL_CHAIN_ONLY",
+    "callee_semantics": "UNRESOLVED",
+    "full_helper_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier-only exact-EXE evidence. Native DX11 renderer/backend activation, transport and host runtime source are unchanged.",
+    "ownership": "The proof establishes two exact call edges plus the intervening -1 guard only. Callee effects, full helper semantics and ScreenHud/native draw ownership remain UNRESOLVED/NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world/rank/SkyGlow/recenter/menu behavior changed.",
+    "performance": "No runtime hot path, frame pacing, copy, wait, cadence, draw or telemetry policy changed.",
+    "adversarial": "The proof fails closed if exact bytes drift, predecessor lookup proof stops reaching 0x284B0, either rel32 call changes target/section, the EAX==-1 branch stops reaching 0x28587, the prefix is no longer contiguous through 0x284DE, or raw outbound evidence no longer contains both calls."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "The change advances static disassembly provenance only and does not touch protected R51 runtime renderer risk paths or claim to fix open visual defects."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36749283548,
+      "conclusion": "success",
+      "validated_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+      "artifact_id": 11114515506,
+      "artifact_digest": "sha256:35512daaeb78cf90e13f7dbc5a18f4253e5a94ca48c2c465c2664c6a54d7d876"
+    },
+    "build": {
+      "run_id": 36749291245,
+      "conclusion": "success",
+      "validated_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+      "artifact_id": 11113429403,
+      "artifact_digest": "sha256:4f161bf0f4ceefd23ffe9cd48d6d8d156ea1c6ec1b227377cee7ca9a569a5d8d",
+      "source_snapshot_artifact_id": 11113698019,
+      "source_snapshot_artifact_digest": "sha256:223506f5c1ecbadc5273d792a942bb75c50a38344e247b086695a1f2a673a07d"
+    },
+    "hud_inspector": {
+      "run_id": 36749291161,
+      "conclusion": "success",
+      "validated_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+      "static_analysis_job_id": 110003448778,
+      "analysis_artifact_id": 11113274299,
+      "analysis_artifact_digest": "sha256:7977a8f4a61280a9909f9d683767f51ca9f6a68f4ecdc946c924c2ad9b498ecc",
+      "game_artifact_id": 11114550390,
+      "game_artifact_digest": "sha256:2a0367d0dca9dbbdd99289f3bdfef00518c2b69943f4803d0db495cf4eca12b2",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_success=0x000284B0 status=EXACT_SUCCESS_CALL_CHAIN_PREFIX_PROVEN lookup_status=EXACT_PACKED_SELECTOR_LOOKUP_PREFIX_PROVEN layout_contiguous=True bytes_match=True first_call=0x000284BC->0x000282B0:.text failure_branch=0x000284CB->0x00028587 failure_condition=EAX == -1 after first call second_call=0x000284D2->0x0008BD20:.text outbound_candidates=True semantic_effect=PARTIAL_CALL_CHAIN_ONLY callee_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36749291284,
+      "conclusion": "success",
+      "validated_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11113623274,
+      "host_artifact_digest": "sha256:340cbc2aa6ad88124662313fdedf63d2b403ffc1f72511dca8ebf167b6ad42a3"
+    },
+    "pc_fast": {
+      "run_id": 36749283641,
+      "conclusion": "skipped",
+      "validated_sha": "afff66edff678cb6c5b99591efc2e481563a5689",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5916026904,
+    "validation_comment_id": 5916131587,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Validation-bearing result commit message contains exact marker [AUTO:CONVERSION-DX11-00148] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "The 0x284B0..0x284DE success-path prefix is contiguous and byte-exact.",
+    "Static analysis proves both pinned .text calls and the intervening EAX==-1 failure branch while preserving callee/full-helper semantics as unresolved.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on afff66edff678cb6c5b99591efc2e481563a5689.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game runtime execution was used."
+  ],
+  "blocker": "Only the bounded helper success prefix through 0x284DE is proven. Callee semantics for 0x282B0 and 0x8BD20, helper behavior from 0x284DF onward, helpers 0x28320/0x28800, and all guarded-GF ScreenHud/render ownership remain unresolved; no ownership promotion is justified.",
+  "resume_cursor": "Set04/F13 now has target-C three-CALL alignment, helper 0x28460 packed-selector lookup prefix, and the first success call-chain prefix through 0x284DE proven. The next independent bounded static unit can capture/prove callee 0x282B0 or 0x8BD20, or continue helper 0x28460 from 0x284DF.",
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. A later independent task may prove callee 0x282B0/0x8BD20 semantics or continue exact helper control flow from 0x284DF. Runtime-visible claims still require Quest 3/VDXR evidence."
+}

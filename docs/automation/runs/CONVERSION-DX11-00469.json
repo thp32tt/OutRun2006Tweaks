@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00469",
+  "production_id": "CONVERSION-DX11-00469",
+  "event_id": "CONVERSION-DX11-00469-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00469",
+  "lease_epoch": 1,
+  "work_key": "DX11:R164:OFFSCREEN_INDEXED_LIVE_DSV_IDENTITY:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.hpp:R164",
+    "src/vr/d3d11/native_backend.cpp:prepare_fixed_function_indexed_direct_draw_probe:R164",
+    "tools/dx11_constant_buffer_probe.cpp:R164"
+  ],
+  "selected_work_item": "DX11_R164_INDEXED_OFFSCREEN_DSV_LIFETIME_GUARD",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "baf96a0c2ddea76fbfef945cf11c8e28f34d5729",
+  "result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+  "material_result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+  "validation_bearing_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R164 isolated WARP indexed DrawIndexed preflight requires exact live DSV identity and device ownership in addition to the prior RTV/stage/output-state checks. WARP probe detaches and restores DSV; game native draw remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "implementation_commits": [
+    "4069b911650e8f2c7ab3ff2d0c1851d55ad7ec14",
+    "333650ac74381d902639b543d370e6718ac6e7cb",
+    "c091e8821e64aa4b0629ccdce303402144e0fe94"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: verified branch head baf96a0c2ddea76fbfef945cf11c8e28f34d5729, previous 00468 COMPLETE and 00469 absent; rollover E002 ATTEMPT=1/3 unchanged",
+    "C1_REVIEW": "PASS: R157/R161/R162/R163 indexed preflight and regression ledger reveal no exact live OM DSV identity guard",
+    "C2_IMPLEMENT": "PASS: native header+implementation and WARP negative DSV-detach/exact restoration regression fixture committed",
+    "C3_VALIDATE": "PASS: exact material SHA c091e8821e64aa4b0629ccdce303402144e0fe94, Backend Conversion Gate 37868311768 SUCCESS; Win32 validate 113620564741 SUCCESS; DX11 readiness smoke 113621607081 SUCCESS including R164 DSV detach/restore probe; artifact 11589107295 sha256:f5a104698a6038cb6c85cb0559296130c9d1f532f6366ba7cc3f8d609ad0a696",
+    "C4_COMMIT": "PASS: three material commits all contain [AUTO:CONVERSION-DX11-00469]",
+    "C5_PACKAGE": "NOT_REQUIRED: isolated WARP preflight proof, no deployable candidate, gameplay native Draw dormant",
+    "C6_STATE": "PASS: task run sealed and lane update follows on authenticated GitHub; Issue14 source comment 6072188910 and validation comment 6072272030; runtime UNTESTED."
+  },
+  "validation_run_id": 37868311768,
+  "issue14_comment_id": 6072188910,
+  "state_persisted": true,
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "next_action": "00469 terminal; do not repeat, retry or rescore. Choose new independent offscreen indexed WARP pixel readback / lifetime proof; gameplay native Draw activation requires exact-build Quest3/VDXR input/stereo/HUD/frame pacing validation.",
+  "blockers": [
+    "Quest3/VDXR HMD not tested; native gameplay Draw unauthorized."
+  ],
+  "last_activity_evidence": "Backend Conversion Gate 37868311768 completed SUCCESS exact SHA c091e8821e64aa4b0629ccdce303402144e0fe94; Win32 validate 113620564741 and DX11 readiness smoke 113621607081 SUCCESS; artifact 11589107295; Issue14 6072272030.",
+  "updated_at_kst": "2026-10-09T10:17:23+09:00",
+  "validation_bearing_result_sha": "c091e8821e64aa4b0629ccdce303402144e0fe94",
+  "validation_job_id": 113620564741,
+  "readiness_smoke_job_id": 113621607081,
+  "artifact_id": 11589107295,
+  "artifact_digest": "sha256:f5a104698a6038cb6c85cb0559296130c9d1f532f6366ba7cc3f8d609ad0a696",
+  "validation_issue14_comment_id": 6072272030
+}

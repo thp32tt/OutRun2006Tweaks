@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00598",
+  "production_id": "CONVERSION-DX11-00598",
+  "event_id": "CONVERSION-DX11-00598-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00598",
+  "work_key": "DX11:MENU_RACE_MULTIPLY_OM",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "5256b8ee8c9c431e55b8e1e4443c683aa2d01dc0",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game D3D9 SRCBLEND/DESTBLEND pair and no-separate-alpha state capture",
+      "Exact D3D11 RGB DEST_COLOR/ZERO and alpha DEST_ALPHA/ZERO plus 16 masked OM states",
+      "Live game Draw/DrawIndexed->native diagnostic inset and untouched DX9Ex Present/gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_multiply_00598.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "1089 RGBA multiplication comparisons, exact-SHA Windows build/Backend Gate pending",
+      "negative_regression": "17 source mutations plus inherited 00596/00597 blend/Reset regressions",
+      "component_integration": "Actual D3D9 blend state -> D3D11 resource/OM -> live native Draw/DrawIndexed -> diagnostic Present"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_MULTIPLY_OM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:MULTIPLY_OM"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR menu, vehicle select, race and gamepad still NEED_HMD_TEST; diagnostic background cannot prove destination-color parity",
+    "activation_guard_and_fallback": "Only when OUTRUN_DX11_FIRST_GAME_FRAME=1; original D3D9 Draw/Present/input retained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_multiply_00598.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00598.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Diagnostic blend mode only; no HMD-verified release"
+  },
+  "next_action": "Complete Quest3/VDXR actual menu->vehicle selection->race and gamepad parity testing separately; HMD/visible frame still NEED_HMD_TEST. Begin next independent DX11 C++ integration item; do not replay this TASK_ID.",
+  "material_result_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362",
+  "validation_bearing_result_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362",
+  "validation_bearing_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362",
+  "result_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362",
+  "c6_basis_head_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38218722261,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38218727123,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38218722160,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38218727189,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38218727071,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362"
+    }
+  ],
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run": 38218722261,
+    "windows_build_run": 38218727123,
+    "windows_build_conclusion": "success",
+    "dx11_fast_run": 38218722160,
+    "dx11_fast_conclusion": "success",
+    "openxr_run": 38218727189,
+    "openxr_conclusion": "success",
+    "hud_run": 38218727071,
+    "hud_conclusion": "success",
+    "result_sha": "2280cf73865d056bd63ae8fed0c45b37dd851362"
+  },
+  "local_validation": [
+    "17 destructive mutations + 1,089 numerical multiply comparisons, DX11 source Reset/mask probe",
+    "Source D3D9 DESTCOLOR/ZERO or ZERO/SRCCOLOR -> exact native DX11 RGB/alpha OM and masked Draw/DrawIndexed",
+    "Five exact-SHA GitHub Actions all SUCCESS; no game/HMD/gamepad validation"
+  ]
+}

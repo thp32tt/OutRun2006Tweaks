@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00512",
+  "production_id": "CONVERSION-DX11-00512",
+  "event_id": "CONVERSION-DX11-00512-E004",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "chat_rollovers": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "474c2de10857bc20472ced92d941e0979d3cb3b1",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00512",
+  "lease_epoch": 1,
+  "work_key": "DX11:R215:SEALED_OPAQUE_FULL_EYE_VIEWPORT_RS_OM",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp:R215",
+    "tools/dx11_linear_buffer_mirror_probe.cpp:R215",
+    "tools/test_dx11_sealed_opaque_eye_r215.py",
+    ".github/workflows/backend-conversion-gate.yml:R215"
+  ],
+  "status": "BLOCKED_INDEPENDENT_R175_GATE",
+  "checkpoint": "C6_STATE",
+  "summary": "R215 sealed opaque full-eye viewport/RS/OM preflight and dedicated DSV resource mip/array/extent/sample protection; source and real WARP pixel scope PASS at exact material SHA. Full Backend Conversion Gate blocked by separately owned R175 TEXCOORD6 VS/PS varying WARP control, not by R215.",
+  "pipeline": {
+    "C0_RECOVER": "PASS branch HEAD, previous result, checkpoint and failed exact SHA Gate 38016836234 recovered",
+    "C1_REVIEW": "PASS R215 DSV object identity lacked depth resource extent/mip/array proof; R175 existing independent owner preserved",
+    "C2_IMPLEMENT": "PASS R215 C++ depth texture descriptor checks + actual WARP nonbase depth-mip bind/draw + fourteen-mutant static guard, 3 material files",
+    "C3_VALIDATE": "R215_SCOPED_PASS; exact SHA 38017691937 validate SUCCESS and R215 static/WARP PASS; overall Gate FAILURE due independent R175 TEXCOORD6 mismatch",
+    "C4_COMMIT": "PASS material ad569e50842334d0a249d2bfdf602b080a655d98 with exact [AUTO:CONVERSION-DX11-00512] marker; C6 record commit separate",
+    "C5_PACKAGE": "NOT_REQUIRED dormant native Draw readiness; no HMD testing",
+    "C6_STATE": "PASS durable blocked-state record; canonical validation-bearing SHA preserved"
+  },
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "material_result_sha": "ad569e50842334d0a249d2bfdf602b080a655d98",
+  "validation_bearing_result_sha": "ad569e50842334d0a249d2bfdf602b080a655d98",
+  "result_sha": "ad569e50842334d0a249d2bfdf602b080a655d98",
+  "next_action": "Do not duplicate R215 material or credit completion. Resolve R175 under owner 00477 after fenced owner reconciliation, then independently revalidate the resulting exact SHA. Keep DXVK frozen, DX9Ex reference untouched, native gameplay Draw dormant, Quest3 runtime UNTESTED.",
+  "blockers": [
+    "R175 TEXCOORD6 VS/PS WARP varying mismatch belongs to pre-existing unresolved 00477 ownership and prevents full exact-SHA Gate PASS",
+    "Quest3/VDXR user test not performed; activation/deployment unapproved"
+  ],
+  "score_change": 0,
+  "validation_run_id": 38017691937,
+  "validation_job_id": 114111537976,
+  "readiness_smoke_job_id": 114112170129,
+  "evidence": {
+    "initial_failed_run_id": 38016836234,
+    "initial_material_sha": "87ebbbf7e2e35531ce902d30a1aaac174677e795",
+    "repair_material_sha": "ad569e50842334d0a249d2bfdf602b080a655d98",
+    "repair_commit_files": [
+      "src/vr/d3d11/native_linear_target_viewport.hpp",
+      "tools/dx11_linear_buffer_mirror_probe.cpp",
+      "tools/test_dx11_sealed_opaque_eye_r215.py"
+    ],
+    "canonical_exact_sha_gate_run": 38017691937,
+    "validate": "SUCCESS",
+    "r215_source_guard": "PASS (14 mutation guard checks)",
+    "r215_warp": "PASS (actual nonbase depth-mip DSV WARP negative control, restored red-pixel state, R183 VB/IB owner)",
+    "smoke": "FAILURE",
+    "smoke_failure_step": "Run DX11 constant buffer probe",
+    "independent_owner_task": "CONVERSION-DX11-00477",
+    "r175_observed_bgra": [
+      128,
+      0,
+      16,
+      255
+    ],
+    "r175_expected_bgra": [
+      224,
+      128,
+      32,
+      255
+    ],
+    "r175_classification": "R175_GENERIC_VARYING_MISMATCH",
+    "hmd_runtime": "UNTESTED"
+  }
+}

@@ -1,7 +1,9 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
-    [string]$TestProfile = 'CORRECTNESS'
+    [string]$TestProfile = 'CORRECTNESS',
+    [ValidateSet('Desktop','XR_NATIVE_2496X2688')]
+    [string]$DX11SourceResolution = 'Desktop'
 )
 
 $ErrorActionPreference='Stop'
@@ -155,12 +157,53 @@ Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
 Write-Host "Profile: $TestProfile"
 
+$dx11SourceResolutionProfile='N/A'
+$dx11SourceWidth=0
+$dx11SourceHeight=0
+
 if($backend -eq 'd3d9'){
     $profile=Get-OutRunVRTestProfile -Name $TestProfile
     $gameArgs=@($profile.Arguments)
+}elseif($backend -eq 'dx11'){
+    # 2026-10-04 Quest 3/VDXR evidence: a 90 Hz XR stream fed by a forced
+    # 60 Hz game renderer produced a visible 60->90 3:2 repeat cadence
+    # (roughly fresh=300/cached=150 per 450 XR frames). Make the DX11
+    # development path XR-clock owned: keep simulation at 60 Hz, render on
+    # xrWaitFrame cadence, and interpolate the intermediate render frames.
+    $gameArgs=@(
+        '-FramerateLimit=0',
+        '-FramerateFastLoad=0',
+        '-FramerateInterpolation=true',
+        '-FramerateUnlockExperimental=true',
+        '-FrameCadenceMode=1',
+        '-FrameCadenceTargetHz=0',
+        '-DisableDesktopVsync=true',
+        '-TargetRefreshRateHz=0',
+        '-SkyGlowFactor=1'
+    )
+    $dx11SourceResolutionProfile=$DX11SourceResolution
+    if($DX11SourceResolution -eq 'XR_NATIVE_2496X2688'){
+        # 2026-10-04 Quest 3/VDXR runtime evidence rejected the old B candidate.
+        # 2496x2688 is a per-eye OpenXR target, not a valid game logical canvas:
+        # feeding that portrait size into Game::screen_resolution stretches the
+        # 4:3 menu/vehicle selector, collapses HUD coordinates toward centre and
+        # increases game-side fill cost. Keep the HMD swapchain native in the
+        # host, but preserve the desktop/game source aspect until a dedicated
+        # offscreen eye-size path exists that does not mutate UI coordinates.
+        Write-Warning 'XR_NATIVE_2496X2688 game-source override was runtime-rejected; using Desktop source aspect while OpenXR keeps its native eye swapchain.'
+        $dx11SourceResolutionProfile='DESKTOP_ASPECT_SAFE_AFTER_XR_NATIVE_REJECT'
+    }
+    $profile=[ordered]@{
+        Name=$TestProfile
+        Description='DX11 primary path: XR-native cadence with 60 Hz simulation and interpolated render frames'
+        Environment=[ordered]@{
+            OUTRUN_VR_TEST_PROFILE=$TestProfile
+            OUTRUN_VR_PERFORMANCE_PROFILE='1'
+        }
+    }
 }else{
-    # Non-DX9Ex backends are retained only for explicit legacy comparison.
-    # Keep them on the conservative startup policy until the DX9Ex reference is accepted.
+    # DXVK and other non-reference backends remain conservative until their
+    # own runtime evidence justifies a cadence policy change.
     $gameArgs=@(
         '-FramerateLimit=60',
         '-FramerateFastLoad=0',
@@ -182,8 +225,13 @@ if($backend -eq 'd3d9'){
     }
 }
 
-if($backend -ne '2d'){
+# Keep expensive HUD stack-walk tracing out of normal play/performance runs.
+# HUD-focused and stage-diagnostic profiles opt in explicitly.
+$hudInspectorProfiles=@('HUD_SCREEN','HUD_MENU','HUD_WORLD','STAGE_DIAGNOSTIC')
+if($backend -ne '2d' -and $hudInspectorProfiles -contains $TestProfile){
     $gameArgs += '-HudInspector=true'
+}else{
+    $gameArgs += '-HudInspector=false'
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
@@ -218,6 +266,9 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
 @(
     "backend=$backend"
     "profile=$TestProfile"
+    "dx11SourceResolutionProfile=$dx11SourceResolutionProfile"
+    "dx11SourceWidth=$dx11SourceWidth"
+    "dx11SourceHeight=$dx11SourceHeight"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
     "exeSha256=$exeSha256"
@@ -234,10 +285,14 @@ $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
+$oldDxvkLogPath = $env:DXVK_LOG_PATH
+$oldDxvkLogLevel = $env:DXVK_LOG_LEVEL
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
+$oldDx11Census = $env:OUTRUN_VR_DX11_CENSUS
+$oldDx11CensusExhaustive = $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE
 $identityKeys = @(
     'OUTRUN_VR_SESSION_ID',
     'OUTRUN_VR_VARIANT_ID',
@@ -268,11 +323,19 @@ if($backend -eq '2d'){
     $env:OUTRUN_VR_FORCE_DISABLED=$null
 }
 
-if($backend -ne '2d'){
+# Expensive shader fingerprint capture and DX11 draw census are diagnostics,
+# not part of the normal CORRECTNESS performance path.
+if($backend -ne '2d' -and $TestProfile -eq 'STAGE_DIAGNOSTIC'){
     $env:OUTRUN_VR_SHADER_FINGERPRINT='1'
 }else{
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
 }
+if($backend -eq 'dx11' -and $TestProfile -eq 'STAGE_DIAGNOSTIC'){
+    $env:OUTRUN_VR_DX11_CENSUS='1'
+}else{
+    $env:OUTRUN_VR_DX11_CENSUS='0'
+}
+$env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE='0'
 
 foreach($entry in $profile.Environment.GetEnumerator()){
     Set-Item -Path ("Env:" + $entry.Key) -Value ([string]$entry.Value)
@@ -282,6 +345,8 @@ if($dxvkMode){
     $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
     $env:VK_INSTANCE_LAYERS=$null
     $env:VK_LOADER_DEBUG='error,warn,layer'
+    $env:DXVK_LOG_PATH=$sessionRoot
+    $env:DXVK_LOG_LEVEL='info'
     $bandicam=Get-Process -ErrorAction SilentlyContinue|Where-Object{
         $_.ProcessName -match '^bdcam' -or $_.ProcessName -match 'bandicam'
     }
@@ -290,14 +355,18 @@ if($dxvkMode){
     }
 }
 
+$gameExitCode=0
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
     $p.WaitForExit()
+    $gameExitCode=$p.ExitCode
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
+    $env:OUTRUN_VR_DX11_CENSUS=$oldDx11Census
+    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=$oldDx11CensusExhaustive
     $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticVerified
     $env:OUTRUN_VR_EXE_SEMANTIC_MODE=$oldExeSemanticMode
     $env:OUTRUN_VR_HUD_EXPERIMENT_MODE=$oldHudExperimentMode
@@ -311,6 +380,8 @@ try{
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
         $env:VK_LOADER_DEBUG=$oldVkDebug
+        $env:DXVK_LOG_PATH=$oldDxvkLogPath
+        $env:DXVK_LOG_LEVEL=$oldDxvkLogLevel
     }
 }
 
@@ -333,3 +404,8 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
 
 & $collector
 if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+if($gameExitCode -ne 0){
+    Write-Warning ("OR2006C2C.EXE exited with code {0}; diagnostic collection completed before propagating failure." -f $gameExitCode)
+    exit $gameExitCode
+}
+exit 0

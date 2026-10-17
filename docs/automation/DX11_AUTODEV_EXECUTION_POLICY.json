@@ -1,0 +1,259 @@
+{
+  "schema_version": 3,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "effective_from_task_number": 531,
+  "mission": "2026-10-14 override: implement full-resolution actual OutRun gameplay D3D9->native D3D11 Draw/DrawIndexed->full-frame presentation across menu/vehicle/race BEFORE more 256x144 inset probes, WARP-only work, isolated state formats, CI bookkeeping or speculative optimizations. Keep safe DX9Ex fallback and final exact-SHA quality gate.",
+  "policy_status": "repository-enforced-at-exact-sha-ci; external controller runtime adoption requires separate verification",
+  "no_automatic_gameplay_promotion": true,
+  "allowed_work_classes": [
+    "blocker_resolution",
+    "vertical_slice",
+    "integration",
+    "safety_regression",
+    "ci_acceleration"
+  ],
+  "milestones": [
+    {
+      "id": "full_resolution_native_game_frame",
+      "rank": 0,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "done_when": "Actual intercepted live D3D9 game Draw and DrawIndexed with native VS/PS, resources and render target produce the full-size menu/vehicle/race game frame (not solely 256x144 inset), connected to guarded presentation with original D3D9 gamepad/render fallback; source/CI verified distinctly from HMD observed output."
+    },
+    {
+      "id": "shader_parity_r175",
+      "rank": 1,
+      "work_class": "blocker_resolution",
+      "owner_conflict_key": "DX11:R175:existing-00477",
+      "done_when": "Exact WARP TEXCOORD6/VS-PS varying color matches expected; no unrelated probe bypass",
+      "note": "Do not duplicate an active/blocked owner without fenced release or new evidence."
+    },
+    {
+      "id": "first_live_game_draw",
+      "rank": 2,
+      "work_class": "vertical_slice",
+      "owner_conflict_key": "DX11:REAL_GAME_DRAW",
+      "done_when": "Intercept a real game-authored D3D9 draw; bind live D3D11 resources, shader, IA/OM; issue guarded native Draw/DrawIndexed into a game-visible diagnostic target, record pixel/frame evidence and DX9Ex fallback. CI/WARP is not sufficient to claim in-game PASS."
+    },
+    {
+      "id": "gameplay_draw_activation",
+      "rank": 3,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:GAME_DRAW_ACTIVATION",
+      "done_when": "Controlled opt-in/fail-closed routing of supported game draws to the native frame output with fallback for unsupported states; capture a game frame and input-safe return path."
+    },
+    {
+      "id": "menu_to_race_native_frame",
+      "rank": 4,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:MENU_RACE_FRAME",
+      "done_when": "Actual game menu/vehicle selection/race draw path and presentation validated against DX9Ex reference, with Quest 3 testing separately tracked."
+    },
+    {
+      "id": "mono_native_draw",
+      "rank": 5,
+      "work_class": "vertical_slice",
+      "owner_conflict_key": "DX11:MONO_NATIVE_DRAW",
+      "done_when": "Owned D3D9 source snapshot -> D3D11 resources+shader -> real WARP Draw -> positive/negative pixel proof; gameplay routing remains disabled",
+      "note": "Historical pre-00537 dormant WARP milestone; no longer an independent new task"
+    },
+    {
+      "id": "live_resource_capture",
+      "rank": 7,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:LIVE_RESOURCE_CAPTURE",
+      "done_when": "Actual D3D9 creation/lock/unlock/mutation/reset/release lifetimes connect to D3D11 mirrors in fail-closed scoped test"
+    },
+    {
+      "id": "programmable_shader_path",
+      "rank": 8,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
+      "done_when": "Representative observed VS/PS pair materialized and bound with correct constants/input layout and GPU pixel result"
+    },
+    {
+      "id": "native_stereo_eye_transport",
+      "rank": 9,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:EYE_XR_HANDOFF",
+      "done_when": "D3D11 eye target producer -> shared ring/host consumes exact generation with fence and ACK proof"
+    },
+    {
+      "id": "dx11_build_acceleration",
+      "rank": 10,
+      "work_class": "ci_acceleration",
+      "owner_conflict_key": "DX11:FAST_VALIDATION",
+      "done_when": "Measured change-specific FAST/TARGETED probe plus single final exact-SHA Gate, no reduced mandatory coverage"
+    }
+  ],
+  "selection_rules": {
+    "forbid_guard_only_new_task": true,
+    "prefer_complete_vertical_slice": true,
+    "skip_conflicting_active_owner": true,
+    "use_independent_milestone_if_top_blocker_owned": true,
+    "forbid_bookkeeping_only_material_commit": true,
+    "require_two_substantive_components_per_task": true,
+    "only_one_final_full_gate_per_coherent_batch_when_possible": true,
+    "maintain_full_exact_sha_gate": true,
+    "scope_failed_gate_causes_separately": true,
+    "no_score_on_full_gate_failure": true,
+    "preserve_runtime_validation_untested": true,
+    "no_ci_skip_on_validation_bearing_commit": true,
+    "no_implicit_draw_activation": true,
+    "prohibit_new_dormant_warp_only_tasks": true,
+    "require_game_created_draw_for_native_feature": true,
+    "require_explicit_gameplay_outcome_since_00537": true,
+    "prioritize_r175_and_game_frame_before_more_readiness_guards": true,
+    "never_bypass_r175_or_visual_fail_closed_gate": true,
+    "batch_source_and_regressions_before_full_gate": true,
+    "avoid_full_build_after_each_individual_edit": true,
+    "prefer_one_material_commit_per_coherent_batch_when_possible": true,
+    "forbid_per_format_microtask_completion": true,
+    "require_feature_level_acceptance_contract": true,
+    "resume_unfinished_feature_same_task_id": true,
+    "prioritize_fullscreen_game_render_over_inset_probes": true,
+    "prohibit_repeated_validation_per_micro_edit": true,
+    "prohibit_standalone_per_shader_state_work_without_fullframe_dependency": true,
+    "defer_nonblocking_performance_until_real_game_frame": true,
+    "require_compact_checkpoint_without_new_score": true,
+    "require_whole_dx11_source_before_hmd_test": true,
+    "forbid_independent_microtasks_during_source_completion": true
+  },
+  "required_task_strategy_fields": [
+    "work_class",
+    "milestone_id",
+    "integration_path",
+    "batch_components",
+    "acceptance_proof",
+    "conflict_keys",
+    "full_gate_plan"
+  ],
+  "allowed_full_gate_plan": "one_validation_bearing_sha",
+  "minimum_integration_path_stages": 2,
+  "minimum_batch_components": 2,
+  "mandatory_acceptance_proof_fields": [
+    "positive_probe",
+    "negative_regression",
+    "component_integration"
+  ],
+  "exception_rules": "Independent blocker, safety regression, or CI acceleration work is eligible only with source-root-cause evidence and a measurable unblocking outcome, not a new readiness guard without an integration path.",
+  "validation_layers": [
+    "FAST_STATIC",
+    "TARGETED_WARP",
+    "FULL_EXACT_SHA_GATE",
+    "RUNTIME_HMD_IF_PROMOTING"
+  ],
+  "gameplay_direction_effective_from_task_number": 537,
+  "gameplay_delivery_targets": [
+    "FULL_RESOLUTION_GAME_FRAME",
+    "R175_CI_UNBLOCK",
+    "FIRST_GAME_DRAW_FRAME",
+    "MENU_TO_RACE_NATIVE_FRAME",
+    "NATIVE_STEREO_EYE_OUTPUT"
+  ],
+  "gameplay_gate": {
+    "immediate_blocker": "Fix only a confirmed blocker for full-size native game frame (including inherited R175 shader/TEXCOORD6 mismatch after owner handoff when demonstrably blocking); parallel independent full-frame source may continue while owner is active.",
+    "next_goal": "Actual full-resolution native D3D11 game frame for menu -> vehicle selection -> sustained race, not just current 256x144 inset; preserve D3D9/input fallback and produce matched game/HMD evidence later.",
+    "production_default": "Keep NativeDrawPathActive=false by default; use fail-closed diagnostic activation only for proven supported draws with DX9Ex fallback",
+    "success_evidence": "Source/CI: full-resolution real-game Draw/DrawIndexed->native VS/PS+texture/RT->presentation integration and exact-SHA mandatory gates; actual screen/HMD parity a separately required runtime promotion gate. Diagnostic inset WARP pass alone is insufficient.",
+    "owner_safety": "R175 owner 00477 must be checked and formally released/handed off before writes; if owner is live, pursue disjoint live-game-draw integration and explicitly preserve R175 blocker"
+  },
+  "gameplay_strategy_fields": [
+    "gameplay_delivery_target",
+    "live_game_draw_path",
+    "visible_frame_acceptance",
+    "activation_guard_and_fallback"
+  ],
+  "ci_batching": {
+    "strategy": "2026-10-14 source-first: implement coherent native full-resolution gameplay source batch before one final exact-SHA integrated gate; repeated unchanged CI and lengthy review/checklist passes must not displace C2 source work",
+    "during_implementation": [
+      "CHANGED_COMPONENT_MINIMAL_STATIC_OR_COMPILE_ONLY_IF_NEEDED",
+      "TARGETED_WARP_ONLY_FOR_CONCRETE_BLOCKING_PARITY_OR_FAILURE"
+    ],
+    "heavy_build_trigger": "once_at_integrated_feature_candidate_with_real_CXX_HLSL_HOST_DIFF_or_after_causal_failure_repair",
+    "required_exact_sha_checks_unchanged": true,
+    "no_skip_ci_on_validation_bearing_commit": true,
+    "heavy_gate_concurrency": "one_running_plus_newest_pending_per_branch; older pending is SUPERSEDED, never PASS",
+    "repair_policy": "one coherent cause-based repair batch under same TASK_ID, then revalidate new exact SHA",
+    "runtime_validation_boundary": "UNTESTED until actual matching Quest3/VDXR game and fps evidence",
+    "do_not_repeat_for": [
+      "unchanged_SHA",
+      "review_only_notes",
+      "same_TASK_C6_bookkeeping",
+      "each_individual_format_or_shader_variant"
+    ],
+    "final_checks": [
+      "DX11 Fast",
+      "Backend Conversion",
+      "Windows Build",
+      "OpenXR",
+      "HUD Inspector"
+    ]
+  },
+  "feature_unit": {
+    "effective_from_task_number": 672,
+    "unit": "one integrated functional renderer capability, not one enum/format/guard/hook helper",
+    "minimum_acceptance_items": 3,
+    "minimum_behavior_areas": 2,
+    "required_categories": [
+      "end_to_end_behavior",
+      "fallback_regression",
+      "integrated_validation"
+    ],
+    "require_same_feature_id_across_retries": true,
+    "reuse_task_id_until_full_feature_build_verified": true,
+    "no_new_task_for_format_variant_or_single_CI_repair": true,
+    "no_new_score_for_partial_feature_commit": true,
+    "complete_only_with_all_build_acceptance_pass": true,
+    "hmd_acceptance_separate_from_build": true,
+    "exception_requires": "documented concrete crash/build/blocker evidence and integrated restoration acceptance",
+    "examples": [
+      "Complete real-game full-resolution native renderer source batch: live menu/car/race Draw/DrawIndexed, native resources/VS/PS, game-sized target and guarded presentation, fallback and one final exact-SHA full CI",
+      "DX11 full texture-mirror family: related format conversions + SRV/mip binding + game Draw/DrawIndexed + unsupported fallbacks + test matrix",
+      "DX11 native gameplay frame: live D3D9 callsite→native resources/shaders/draw→visible frame, input-safe fallback and exact-SHA build",
+      "DX11 complete render-state family: coherent alpha/depth/raster states bound to game draws with positive/negative behavior tests"
+    ]
+  },
+  "user_override_20261014": {
+    "status": "ACTIVE",
+    "precedence": "highest_for_dx11_development_priority_and_validation_cadence",
+    "scope": "vr-dx11-native-r71; DX11 Native A only; existing owner and safety rules preserved",
+    "immediate_delivery": "FULL_RESOLUTION_GAME_FRAME",
+    "current_baseline": "256x144 D3D11 native diagnostic inset with original D3D9 game rendering authoritative",
+    "target": "Actual full-resolution live menu, vehicle selection and race native D3D11 frame output; then native L/R OpenXR output",
+    "implementation_order": [
+      "P0 real D3D9 game Draw/DrawIndexed -> native D3D11 resources/VS/PS -> full-resolution owned render target -> native frame presentation",
+      "P0 close only shader/texture/IA/OM/lifetime/Reset failures preventing the P0 game-frame path (including R175 only with owner handoff)",
+      "P1 native OpenXR stereo L/R eye ownership, source switching, HUD/marker/flare/shadow, gamepad and fallback parity",
+      "P2 measurable frame pacing, GPU copy and allocations after correct frame path is proven"
+    ],
+    "stop_microtask_churn": true,
+    "no_inset_only_completion": true,
+    "no_warp_only_completion": true,
+    "no_bookkeeping_only_completion": true,
+    "source_first_validation": "During implementation perform targeted changed-component smoke/compile only where needed; batch cohesive material changes; do not repeat unchanged reviews or exact-SHA full Gate per micro-edit.",
+    "final_validation": "Once per cohesive integrated capability, require actual exact-SHA DX11 Fast/Backend/Windows Build/OpenXR/HUD gates; repair failures within same TASK_ID. No CI bypass.",
+    "runtime_boundary": "Code+CI verification is not game/HMD proof; headset parity and performance remain UNTESTED until exact matching hardware result",
+    "external_controller_activation": "GitHub instructions/policy update does not reload or prove adoption by Docker/controller runtime"
+  },
+  "source_completion_directive": {
+    "effective_date_kst": "2026-10-16",
+    "execution_mode": "INTEGRATE_ALL_NATIVE_SOURCE_BEFORE_GAME_HMD_TEST",
+    "source_integration_order": [
+      "native_full_game_monoscopic_draw_present",
+      "complete_live_shader_resource_depth_alpha_reset",
+      "distinct_native_left_right_eye_targets",
+      "direct_gpu_openxr_host_handoff_fence_generation_ack",
+      "final_exact_sha_five_gate_ci",
+      "single_matching_game_quest3_validation"
+    ],
+    "forbid_independent_microtask_dispatch": true,
+    "reuse_existing_unfinished_task_and_owner_lease": true,
+    "source_phase_checks": "targeted compile/static/unit only as necessary; avoid repeated full matrix before integrated code candidate",
+    "terminal_ci": "all five unmodified required DX11 Fast/Backend/Windows Build/OpenXR/HUD checks at one integrated exact SHA",
+    "runtime_hmd": "defer until source integrated and full exact-SHA mandatory CI passes",
+    "preserve": "opt-in, native activation fail-closed, original D3D9/DX9Ex renderer, gamepad, FFB and branch isolation",
+    "external_controller_adoption": "NOT_VERIFIED"
+  }
+}

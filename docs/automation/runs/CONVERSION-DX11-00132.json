@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00132",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T22:23:31+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "3a5484571380ee04440073c2e7f495e00ff7bd90",
+  "result_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586",
+  "validation_bearing_result_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R137_GUARDED_GF_TARGET_FUNCTION_FINGERPRINT_CENSUS",
+  "summary": "Extended the exact-EXE analyzer for recurring guarded-GF rel32 targets 0x653C0, 0x65860 and 0x65970. The analyzer now records first 64 target bytes, a backward function-start guess, raw inbound E8 candidates and bounded 96-byte raw outbound rel32 candidates in JSON, Markdown and stdout. The backend verifier requires this diagnostic contract. No runtime ownership or renderer/backend behavior changed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "architecture": "Analyzer/verifier only; no backend activation or renderer path changes.",
+    "ownership": "All guarded hooks remain spacing-only; no ArmNextDraw or ScreenHud promotion.",
+    "stereo_correctness": "No WVP, projection, HUD or world policy changed.",
+    "performance": "CI-only static byte scanning; no game/host hot-path cost or runtime logging.",
+    "adversarial": "Inbound/outbound E8 rows and backward prologue guesses are explicitly raw candidates and heuristics, not decoded instruction-boundary or semantic-effect proof."
+  },
+  "target_provenance": {
+    "0x653C0": {
+      "section": ".text",
+      "function_start_guess": "0x65290",
+      "raw_inbound_count": 34,
+      "raw_outbound_count": 0,
+      "bytes64": "0f57c0f30f1064240cf30f10542408f30f104c24040f2ee09ff6c444c7818800000001000000f30f114160f30f114154f30f115150f30f11494c7a268b442410"
+    },
+    "0x65860": {
+      "section": ".text",
+      "function_start_guess": "0x65860",
+      "raw_inbound_count": 251,
+      "raw_outbound_count": 1,
+      "raw_outbound": ["0x65874->0x285A0"]
+    },
+    "0x65970": {
+      "section": ".text",
+      "function_start_guess": "0x65970",
+      "raw_inbound_count": 224,
+      "raw_outbound_count": 3,
+      "raw_outbound": ["0x65997->0x28460", "0x659AC->0x28320", "0x659C1->0x28800"]
+    },
+    "interpretation": "The three recurring rel32 targets are not proven HUD-specific draw functions. The high raw inbound counts for 0x65860 and 0x65970 indicate broad reuse, and no known HUD/sprite target appears in the bounded outbound windows. Raw E8 candidates and backward function-start guesses do not prove instruction boundaries or semantic effect."
+  },
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "R136 reduced guarded GF hook raw rel32 candidates to three recurring mapped .text targets. R137 fingerprints those targets without changing runtime semantics. The evidence still does not prove aligned CALL boundaries or immediate draw ownership."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36720537224,
+      "conclusion": "success",
+      "validated_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586",
+      "artifact_id": 11099940421,
+      "artifact_digest": "sha256:b682c36193d72e3711a6cf8897b28327a37787e146dcb89dca16e646a6489836"
+    },
+    "build": {
+      "run_id": 36720542733,
+      "conclusion": "success",
+      "validated_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586"
+    },
+    "hud_inspector": {
+      "run_id": 36720542662,
+      "conclusion": "success",
+      "validated_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586",
+      "analysis_artifact_id": 11098097255,
+      "analysis_artifact_digest": "sha256:2b7a5e69ce0b8cbaf8b9193cf6cbe1a5ac1cf003d4e909a8e3cfeeaca0c34b09",
+      "game_artifact_id": 11100045303,
+      "game_artifact_digest": "sha256:b62e170369466c51a20f79186b234cceb9e038d8b859e4089ab46971550ef5ff",
+      "evidence": "static-exe-analysis and build-hud-inspector both passed. Static logs emitted guarded_gf_targets=3/3 and target fingerprints matching the independently validated DXVK R137 evidence."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36720542645,
+      "conclusion": "success",
+      "validated_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586",
+      "evidence": "All six jobs passed: game-x86, host-x64, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud, game-x86-safe-draw-compare and game-x86-r26-hud-safe."
+    },
+    "pc_fast": {
+      "run_id": 36720537302,
+      "conclusion": "skipped",
+      "validated_sha": "b088d349f539db6769fd86f7b6d8e676c08f2586"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5912097570,
+    "validation_comment_id": 5912246783,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact marker [AUTO:CONVERSION-DX11-00132] and no CI-skip directive.",
+    "The target fingerprint census covers exactly 0x653C0, 0x65860 and 0x65970 and records target bytes, backward start guesses and raw inbound/outbound rel32 candidates.",
+    "DX11 exact-EXE R137 evidence matches the independently validated DXVK R137 census.",
+    "All five guarded GF hooks remain spacing-only and the R134 negative guard remains intact.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R137 guarded GF target-function fingerprint census is automation-validated on the DX11 branch. Targets 0x653C0, 0x65860 and 0x65970 remain unidentified/broadly reused and do not justify ScreenHud promotion.",
+  "next_action": "Keep all five guarded hooks spacing-only. Continue exact disassembly/identity work for 0x653C0, 0x65860 and 0x65970 plus helper targets 0x285A0, 0x28460, 0x28320 and 0x28800; prove aligned CALL boundaries and semantic effect before any ownership change."
+}

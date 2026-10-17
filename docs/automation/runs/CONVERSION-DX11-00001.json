@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "started_kst": "2026-09-28T13:49:55+09:00",
+  "recorded_kst": "2026-09-28T16:07:23+09:00",
+  "base_sha": "337d74c0980ad240030ec8ff5f5141ebf385157e",
+  "result_sha": "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "Chat rollover 3 preserved ATTEMPT=1/3 and continued from the validated semantic-parity checkpoint. The native DX11 shared-eye transport now carries exact producer/consumer PID, runGeneration, transport generation, per-slot frame lifetime, producer EVENT fencing and exact consumer ACK retirement. A post-review P0 defect was then fixed: hard ID3D11Query::GetData errors no longer reclaim ProducerPending textures as if GPU work completed; they quarantine the ring until shutdown/recreation. Exact-SHA hosted CI passed across Backend Conversion Gate, normal Build, all OpenXR host/game variants, and HUD Inspector. NativeDrawPathActivationAllowed remains false and no HMD/in-game runtime test was performed.",
+  "selected_work": "Close the next DX11 activation prerequisite by inheriting the proven run/generation/fence/consumer-ACK lifetime contract in the dormant native shared-eye transport, compile/gate that code in hosted CI, then adversarially review producer-fence failure handling without enabling native draw routing.",
+  "changes": [
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r7.inc",
+      "action": "restore accidentally deleted implementation tail from immediate pre-truncation parent while preserving current shared disassembly contract WVP constants",
+      "before_blob": "5c0cdea066792f01afbb70ac767ade12f03efc3d",
+      "reference_parent_commit": "a3fae79a473cfeffda9c2d046544cba23762d26f",
+      "reference_parent_blob": "453ba4bd3e74312632e524683bc13fae0acb08b3",
+      "after_blob": "da247b74126eea6fd13546ba38c55269eb4e70f7",
+      "culprit_commit": "f7adc004aca009edab53454f6989315444ad2695",
+      "culprit_evidence": "GitHub commit patch shows intended shared-WVP edits plus 1513 unintended deletions from stereo_renderer_r7.inc."
+    },
+    {
+      "path": "src/vr/game/outrun_renderer.cpp",
+      "action": "restore the 1,930-line immediate pre-truncation implementation and reapply the culprit commit's intended backend-neutral disassembly-contract include/WVP/RVA substitutions; generated restored file is 1,936 lines and its first 706 lines exactly match the previously truncated branch file",
+      "before_blob": "e8c5e932cc7d46ba3c3819ac086b3703b98c09b6",
+      "reference_parent_commit": "77923e713766dd0fd5259d9fc159365747a6d8d4",
+      "reference_parent_blob": "ca0f3ac1f712fd1009b5485eac205cc60c957b79",
+      "after_blob": "cb796717e35831f07b708b4d91e2c90014d20603",
+      "culprit_commit": "3c64693ed1ba926a1428296cd87e9d320e7633d4"
+    },
+    {
+      "path": "tools/Test-VROneClickContract.ps1",
+      "action": "escape the literal $backend token inside the expected collector-text string so PowerShell StrictMode does not expand an undefined verifier variable",
+      "before_blob": "a7948144d8daad95ef672c95820ca38097fe8216",
+      "after_blob": "af81f771c15187d388acf93a99c6bce3ab87549d"
+    },
+    {
+      "path": "src/vr/game/disasm_render_contract.hpp",
+      "action": "expand CriticalProducerRanges from 23 to 25 by restoring ctrl_icon_work 0x060900-0x061100 and DispTempHeartNum 0x0BBA00-0x0BBC00 as SCREEN_HUD, with compile-time assertions"
+    },
+    {
+      "path": "tools/analyze_outrun_exe.py",
+      "action": "add the same two missing semantic ranges so EXE analysis matches the canonical HUD semantic catalog"
+    },
+    {
+      "path": "tools/verify_vr_backend_disasm_contract.py",
+      "action": "add semantic-range parity verification across disasm_render_contract.hpp, analyze_outrun_exe.py, and hud_semantics.hpp; fail closed on range/policy drift"
+    },
+    {
+      "path": "src/vr/core/transport.hpp",
+      "action": "add D3D11NativeShared transport kind plus exact TransportIdentity/FrameAck validation and slot/frame ACK release helpers"
+    },
+    {
+      "path": "src/vr/d3d11/native_shared_eye_ring.hpp; src/vr/d3d11/native_shared_eye_ring.cpp",
+      "action": "add slot lifetime state machine, exact lifetime binding, nonblocking EVENT fence publication, per-slot ACK retirement, fail-closed backpressure, and synchronization-fault quarantine until shutdown/recreation"
+    },
+    {
+      "path": "CMakeLists.txt; tools/verify_dx11_native_transport_contract.py; .github/workflows/backend-conversion-gate.yml",
+      "action": "make native_shared_eye_ring compile-visible and fail CI if lifetime/fault-quarantine gates or dormant NativeDrawPath activation protection drift"
+    },
+    {
+      "path": "vrhost/tests/direct_ack_identity_smoke.cpp; .github/workflows/vr-openxr.yml",
+      "action": "extend deterministic host smoke to reject stale/foreign native ACK producer/consumer PID, run generation, transport generation, slot and frame identities"
+    },
+    {
+      "commit": "95be6a1dbc772a8578778d99765aecf7b4d047ab",
+      "path": "src/vr/core/transport.hpp",
+      "action": "define backend-neutral D3D11NativeShared transport identity and FrameAck with exact producerPid/consumerPid/runGeneration/generation/slot/frame coverage checks"
+    },
+    {
+      "commit": "ea33d032f5ead62aefc1d99299b8bf9ce73ebdfe",
+      "path": "src/vr/d3d11/native_shared_eye_ring.hpp",
+      "action": "add Free/Acquired/ProducerPending/Published slot states, lifetime binding, producer fence publication and exact consumer ACK retirement API"
+    },
+    {
+      "commit": "ad8f3d614944e5edf14d0275655b47fcf64fe9a3",
+      "path": "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "action": "implement non-blocking producer EVENT fence and exact ACK-gated slot reuse; subsequent review found hard query-error completion was handled too permissively and fixed it at b29c7a71"
+    },
+    {
+      "commit": "00a0c73ae88448fbae5dbeb368c830fa5a8d1c44",
+      "path": "CMakeLists.txt + tools/verify_dx11_native_transport_contract.py + .github/workflows/backend-conversion-gate.yml",
+      "action": "compile native shared-eye ring in Win32 target and add fail-closed lifetime contract verification while keeping NativeDrawPathActivationAllowed=false"
+    },
+    {
+      "commit": "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7",
+      "path": "src/vr/d3d11/native_shared_eye_ring.{hpp,cpp}; tools/verify_dx11_native_transport_contract.py; vrhost/tests/direct_ack_identity_smoke.cpp; .github/workflows/vr-openxr.yml",
+      "action": "quarantine ring when producer EVENT query completion is unknowable, preserve ProducerPending on query error, extend exact backend-neutral ACK identity smoke and execute it in hosted OpenXR host CI"
+    }
+  ],
+  "evidence": {
+    "pre_task_conversion_gate": {
+      "run_id": 36376987659,
+      "job_id": 108784726715,
+      "result": "FAIL",
+      "blocker": "P8_STEREO_SHARED_PREDICATE missing literal because R7 implementation had been truncated before this task."
+    },
+    "targeted_post_fix_gate": {
+      "run_id": 36379785307,
+      "job_id": 108792968423,
+      "proven_baseline": "PASS_44_GUARDS",
+      "p8_stereo_shared_predicate": "PASS",
+      "overall": "FAIL",
+      "next_independent_blocker": "tools/Test-VROneClickContract.ps1 line 136 expands undefined $backend under StrictMode while constructing an expected-text string."
+    },
+    "build_cross_check": {
+      "build_run_id": 36379788575,
+      "result": "FAIL",
+      "proven_baseline": "PASS_44_GUARDS",
+      "blocker": "same pre-existing Test-VROneClickContract.ps1 undefined-$backend validation-harness failure before compile"
+    },
+    "architecture_build_cross_check": {
+      "run_id": 36379788596,
+      "host_x64": "PASS",
+      "architecture_boundaries": "PASS",
+      "win32_configure": "PASS",
+      "win32_compile": "FAIL",
+      "blocker": "separate source truncation in src/vr/game/outrun_renderer.cpp causes unmatched namespace/brace and downstream missing identifiers in outrun_renderer_r13/r23."
+    },
+    "hud_inspector_cross_check": {
+      "run_id": 36379788606,
+      "static_exe_analysis": "PASS",
+      "build": "FAIL",
+      "blocker": "same independent outrun_renderer.cpp truncation chain"
+    },
+    "next_source_blocker": {
+      "path": "src/vr/game/outrun_renderer.cpp",
+      "current_blob": "e8c5e932cc7d46ba3c3819ac086b3703b98c09b6",
+      "current_line_count": 706,
+      "culprit_commit": "3c64693ed1ba926a1428296cd87e9d320e7633d4",
+      "culprit_message": "VR: centralize renderer WVP anchors in disassembly contract",
+      "culprit_patch_stats": "+14/-1237; patch ends mid-block after preserving intended shared WVP/address anchor edits",
+      "disposition": "NOT_FIXED_IN_THIS_TASK; one-task scope preserved"
+    },
+    "runtime_test_performed": false,
+    "n100_used": false,
+    "vr_d3d9ex_focus_modified": false,
+    "rollover_1": {
+      "continuation_base_sha": "570721cf38e15c731f799d439625ba4cf266b4b6",
+      "code_result_sha": "3c794a3d988a9b2c2a55983b38e42c341f8a7da0",
+      "attempt_preserved": "1/3",
+      "renderer_restore_invariant": "first 706 lines of reconstructed 1,936-line renderer exactly matched the truncated branch file before commit",
+      "n100_used": false
+    },
+    "post_rollover_validation": {
+      "backend_conversion_gate": {
+        "run_id": 36385677777,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "build": {
+        "run_id": 36385681058,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "openxr_vr_architecture": {
+        "run_id": 36385681050,
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          "game-x86-r26-hud-safe",
+          "game-x86-c1-r29-r28-classify",
+          "game-x86",
+          "host-x64",
+          "game-x86-c2-r30-hud",
+          "game-x86-safe-draw-compare"
+        ]
+      },
+      "hud_inspector": {
+        "run_id": 36385681086,
+        "status": "completed",
+        "conclusion": "success"
+      },
+      "validated_head_sha": "3c794a3d988a9b2c2a55983b38e42c341f8a7da0"
+    },
+    "rollover_2": {
+      "continuation_base_sha": "9f58bf2fbc7df7206a4eb98ce6ed18a4b42759d5",
+      "code_result_sha": "918f0121c8f2351625def04022b3f1ae1c85b766",
+      "attempt_preserved": "1/3",
+      "semantic_drift": {
+        "missing_shared_ranges": [
+          "0x060900-0x061100 ctrl_icon_work SCREEN_HUD",
+          "0x0BBA00-0x0BBC00 DispTempHeartNum SCREEN_HUD"
+        ],
+        "canonical_reference": "src/vr/hud_semantics.hpp"
+      },
+      "validation_runs": {
+        "backend_conversion_gate": {
+          "run_id": 36387380780,
+          "status": "completed",
+          "conclusion": "success",
+          "completed_utc": "2026-09-28T06:42:27Z",
+          "disassembly_contract_step": "PASS"
+        },
+        "build": {
+          "run_id": 36387384494,
+          "status": "completed",
+          "conclusion": "success",
+          "completed_utc": "2026-09-28T06:42:51Z",
+          "disassembly_contract_step": "PASS"
+        },
+        "openxr_vr_architecture": {
+          "run_id": 36387384457,
+          "status": "completed",
+          "conclusion": "success",
+          "completed_utc": "2026-09-28T06:42:50Z",
+          "jobs": [
+            "host-x64",
+            "game-x86-c2-r30-hud",
+            "game-x86",
+            "game-x86-r26-hud-safe",
+            "game-x86-c1-r29-r28-classify",
+            "game-x86-safe-draw-compare"
+          ],
+          "host_x64": "PASS",
+          "game_x86": "PASS",
+          "game_x86_r26_hud_safe": "PASS",
+          "game_x86_c1_r29_r28_classify": "PASS",
+          "game_x86_c2_r30_hud": "PASS",
+          "game_x86_safe_draw_compare": "PASS"
+        },
+        "hud_inspector": {
+          "run_id": 36387384404,
+          "status": "completed",
+          "conclusion": "success",
+          "completed_utc": "2026-09-28T06:42:11Z",
+          "static_exe_analysis": "PASS",
+          "build_hud_inspector": "PASS"
+        }
+      },
+      "next_independent_dx11_item": {
+        "finding": "native shared-eye transport has texture/query allocation but has not yet inherited the proven run/generation/fence/consumer-ACK lifetime contract",
+        "paths": [
+          "src/vr/core/transport.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.cpp"
+        ],
+        "constraint": "do not enable NativeDrawPathActive while transport/exactness activation gates remain open"
+      },
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "validated_head_sha": "918f0121c8f2351625def04022b3f1ae1c85b766"
+    },
+    "rollover_5": {
+      "continuation_base_sha": "5fb8730a34a340b1854d60ebf1a7a7bc806ebc16",
+      "code_result_sha": "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7",
+      "source_commits": [
+        "95be6a1dbc772a8578778d99765aecf7b4d047ab",
+        "ea33d032f5ead62aefc1d99299b8bf9ce73ebdfe",
+        "ad8f3d614944e5edf14d0275655b47fcf64fe9a3",
+        "00a0c73ae88448fbae5dbeb368c830fa5a8d1c44",
+        "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7"
+      ],
+      "attempt_preserved": "1/3",
+      "lifetime_contract": {
+        "exact_identity": [
+          "producerPid",
+          "consumerPid",
+          "runGeneration",
+          "transportGeneration",
+          "slot",
+          "frameId"
+        ],
+        "slot_states": [
+          "Free",
+          "Acquired",
+          "ProducerPending",
+          "Published"
+        ],
+        "producer_fence": "D3D11_QUERY_EVENT polled with D3D11_ASYNC_GETDATA_DONOTFLUSH; no blocking wait introduced",
+        "published_reuse": "requires exact matching consumer ACK",
+        "query_error": "does not imply completion; ring is synchronization-faulted and quarantined until shutdown/recreation",
+        "native_draw_path_enabled": false
+      },
+      "validation_runs": {
+        "backend_conversion_gate": {
+          "run_id": 36389281889,
+          "status": "completed",
+          "conclusion": "success",
+          "dx11_native_transport_contract": "PASS"
+        },
+        "build": {
+          "run_id": 36389286592,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "openxr_vr_architecture": {
+          "run_id": 36389286637,
+          "status": "completed",
+          "conclusion": "success",
+          "jobs": [
+            "host-x64",
+            "game-x86",
+            "game-x86-r26-hud-safe",
+            "game-x86-c1-r29-r28-classify",
+            "game-x86-c2-r30-hud",
+            "game-x86-safe-draw-compare"
+          ],
+          "direct_transport_identity_regression": "PASS"
+        },
+        "hud_inspector": {
+          "run_id": 36389286522,
+          "status": "completed",
+          "conclusion": "success",
+          "static_exe_analysis": "PASS",
+          "build_hud_inspector": "PASS"
+        }
+      },
+      "regression_guard": "VR-R50-FRAME-STABILITY-PRESERVE-001 lifetime/fence invariants rechecked statically/build-only; HMD same-scene validation not performed",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "validated_head_sha": "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7"
+    },
+    "rollover_3": {
+      "continuation_base_sha": "5fb8730a34a340b1854d60ebf1a7a7bc806ebc16",
+      "attempt_preserved": "1/3",
+      "transport_commit_chain": [
+        "95be6a1dbc772a8578778d99765aecf7b4d047ab",
+        "ea33d032f5ead62aefc1d99299b8bf9ce73ebdfe",
+        "ad8f3d614944e5edf14d0275655b47fcf64fe9a3",
+        "00a0c73ae88448fbae5dbeb368c830fa5a8d1c44",
+        "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7"
+      ],
+      "final_code_result_sha": "b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7",
+      "p0_review_finding": {
+        "finding": "A hard ID3D11Query::GetData error was being treated as reusable completion for an unpublished ProducerPending slot.",
+        "risk": "GPU completion is unknowable on query error; freeing/reusing the texture can overlap unresolved previous writes with a new frame.",
+        "disposition": "FIXED_FAIL_CLOSED",
+        "fix": "preserve ProducerPending, latch synchronization_faulted, stop acquiring/publishing/rebinding, require shutdown/recreation"
+      },
+      "validation_runs": {
+        "backend_conversion_gate": {
+          "run_id": 36389281889,
+          "status": "completed",
+          "conclusion": "success",
+          "dx11_native_transport_lifetime_verifier": "PASS",
+          "win32_build": "PASS"
+        },
+        "build": {
+          "run_id": 36389286592,
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "openxr_vr_architecture": {
+          "run_id": 36389286637,
+          "status": "completed",
+          "conclusion": "success",
+          "host_x64": "PASS",
+          "direct_transport_identity_regression": "PASS",
+          "game_x86": "PASS",
+          "game_x86_r26_hud_safe": "PASS",
+          "game_x86_c1_r29_r28_classify": "PASS",
+          "game_x86_c2_r30_hud": "PASS",
+          "game_x86_safe_draw_compare": "PASS"
+        },
+        "hud_inspector": {
+          "run_id": 36389286522,
+          "status": "completed",
+          "conclusion": "success",
+          "static_exe_analysis": "PASS",
+          "build_hud_inspector": "PASS"
+        },
+        "pc_fast": {
+          "run_id": 36389281811,
+          "status": "completed",
+          "conclusion": "skipped",
+          "reason": "no [pc-build] authorization/marker; PC runner not used"
+        }
+      },
+      "production_change_ledger": {
+        "issue": 14,
+        "comment_id": 5865141459
+      },
+      "regression_revalidation": {
+        "key": "VR-R50-FRAME-STABILITY-PRESERVE-001",
+        "trigger": "producer/consumer fences, copies, waits or shared-frame lifetime changed",
+        "static_build_result": "PASS",
+        "runtime_result": "UNTESTED"
+      },
+      "activation_gate": {
+        "NativeDrawPathActivationAllowed": false,
+        "reason": "resource mirror/lifetime, shader/input translation and HMD graphics parity remain open prerequisites"
+      },
+      "runtime_test_performed": false,
+      "n100_used": false
+    }
+  },
+  "validation_notes": [
+    "AUTOMATION_VALIDATION=PASS applies to GitHub CI for code result SHA 3c794a3d988a9b2c2a55983b38e42c341f8a7da0.",
+    "The previously failing one-click structure contract now passes after escaping the literal $backend token.",
+    "The previously truncated outrun_renderer.cpp now compiles successfully across the normal Build, HUD Inspector build, Backend Conversion Gate Win32 build, and all OpenXR VR architecture variants.",
+    "RUNTIME_VALIDATION remains UNTESTED because no Quest 3/HMD/game-screen execution was performed.",
+    "No DX11 runtime-normality, visual correctness, synchronization correctness, or crash-free behavior is claimed.",
+    "Rollover 2 exact-SHA static contract checks passed in Backend Conversion Gate and normal Build before compilation.",
+    "HUD Inspector static EXE analysis passed with the synchronized analyzer ranges.",
+    "RUNTIME_VALIDATION remains UNTESTED because no Quest 3/HMD/game-screen execution was performed.",
+    "Rollover 2 full exact-SHA compile/architecture/HUD CI matrix completed successfully.",
+    "AUTOMATION_VALIDATION=PASS applies to code SHA 918f0121c8f2351625def04022b3f1ae1c85b766 only; it is not runtime/HMD proof.",
+    "Rollover 2 exact-SHA validation is complete: Backend Conversion Gate 36387380780, Build 36387384494, OpenXR VR architecture 36387384457 (all six jobs), and HUD Inspector 36387384404 all passed for 918f0121c8f2351625def04022b3f1ae1c85b766.",
+    "AUTOMATION_VALIDATION=PASS now includes the semantic-range parity fix at 918f0121c8f2351625def04022b3f1ae1c85b766.",
+    "Rollover 5 exact-SHA validation completed for b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7: Backend Conversion Gate 36389281889 PASS, Build 36389286592 PASS, OpenXR VR architecture 36389286637 PASS across all six jobs including direct transport identity regression, and HUD Inspector 36389286522 PASS.",
+    "Native shared-eye EVENT query errors now fail closed: ProducerPending is preserved and the allocation is quarantined until shutdown/recreation; an unknown GetData result is never treated as GPU completion.",
+    "AUTOMATION_VALIDATION=PASS applies to code SHA b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7 only; NativeDrawPathActive remains disabled and this is not runtime/HMD proof.",
+    "RUNTIME_VALIDATION remains UNTESTED because no Quest 3/HMD/in-game execution was performed. N100/local clone/worktree was not used.",
+    "Rollover 3 exact-SHA hosted validation PASS applies to b29c7a71ddab61c72c7f7f4cfea4f2ea0eebaec7: Backend Conversion Gate 36389281889, Build 36389286592, OpenXR VR architecture 36389286637, and HUD Inspector 36389286522 all succeeded.",
+    "The OpenXR host CI executed and passed the expanded direct transport identity regression for backend-neutral FrameAck semantics.",
+    "Producer EVENT query errors now fail closed: no ProducerPending slot is reclaimed or advertised unless GetData returns S_OK; the ring is quarantined until shutdown/recreation after an unexpected result.",
+    "VR-R50-FRAME-STABILITY-PRESERVE-001 is statically/build revalidated only. Quest 3/VDXR same-scene frame-pacing evidence is still required for runtime validation.",
+    "NativeDrawPathActivationAllowed remains false. No D3D9 game draw was redirected to the native D3D11 path.",
+    "RUNTIME_VALIDATION remains UNTESTED; no Quest 3/HMD/in-game execution was performed.",
+    "N100/local clone/worktree and PC fast runner were not used."
+  ],
+  "next_action": "Keep NativeDrawPathActivationAllowed=false. Continue one bounded DX11 activation prerequisite at a time: first review/implement R73 explicit VB/IB/texture/render-target/depth mirror lifetime tables, then R74 shader/FVF/vertex-declaration input-layout exactness. Before any concrete IFrameConsumer implementation consumes the backend-neutral transport interface, reconcile its frameId-only acknowledge API with the exact FrameAck identity contract so producer/consumer/run/generation/slot ownership cannot be bypassed. Runtime graphics/frame-pacing acceptance remains Quest 3/VDXR gated.",
+  "chat_rollover": 3
+}

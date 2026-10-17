@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00531",
+  "production_id": "CONVERSION-DX11-00531",
+  "event_id": "CONVERSION-DX11-00531-E004",
+  "event_type": "retry",
+  "lane": "DX11",
+  "attempt": "3/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "b6b6d1bf5a6d89f2b15390bd6d07bc42226c38c8",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00531",
+  "lease_epoch": 1,
+  "work_key": "DX11:R234:LINEAR_CPU_TEXTURE_TO_WARP_PIXEL",
+  "conflict_keys": [
+    "DX11:R234:LINEAR_CPU_TEXTURE_MIRROR",
+    "src/vr/d3d11/native_linear_texture_binding.hpp",
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "tools/test_dx11_textured_linear_r203.py",
+    "src/vr/d3d11/native_linear_source_texture_r234.hpp"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 A8B8G8R8 CPU LockRect-derived source snapshot plus byte pitch/version",
+      "owned immutable D3D11 Texture2D/SRV and live PS slot bind",
+      "native linear VB/IA/PS exact source owner and OM isolation",
+      "WARP Draw red/blue/red pixel verification and source/UAV/stale negative recovery"
+    ],
+    "batch_components": [
+      "native_linear_source_texture_r234.hpp producer resource lifetime + PS binding",
+      "native_linear_texture_binding.hpp consumer texture/UAV eye isolation",
+      "dx11_textured_linear_probe_r203.cpp WARP GPU positive/negative integration",
+      "test_dx11_textured_linear_r203.py mutation regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "R234 CPU A8B8G8R8 RGBA source converted to immutable D3D11 texture and bound PS draws red/blue/red WARP pixels",
+      "negative_regression": "Wrong D3D9 version, mutable/default and RTV alias SRV, OM UAV side-eye, expired source and VB rejected",
+      "component_integration": "D3D9 source bytes/revision -> native Texture2D+SRV -> native PS binding -> real WARP Draw GPU-pixel readback"
+    },
+    "conflict_keys": [
+      "DX11:R234:LINEAR_CPU_TEXTURE_MIRROR",
+      "src/vr/d3d11/native_linear_texture_binding.hpp",
+      "tools/dx11_textured_linear_probe_r203.cpp",
+      "tools/test_dx11_textured_linear_r203.py",
+      "src/vr/d3d11/native_linear_source_texture_r234.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "BLOCKED",
+  "checkpoint": "C6_STATE",
+  "result_sha": "279c2c70b7688be5a1f99047609f43c3e9167d26",
+  "material_result_sha": "279c2c70b7688be5a1f99047609f43c3e9167d26",
+  "validation_bearing_result_sha": "279c2c70b7688be5a1f99047609f43c3e9167d26",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "summary": "R234 actual D3D9 RGBA CPU source snapshot ownership -> immutable D3D11 texture/SRV, PS bind -> WARP Draw red/blue/red. Reject stale version/byte length/writable aliases/OM UAV and retire, no gameplay activation.",
+  "changed_files": [
+    "src/vr/d3d11/native_linear_texture_binding.hpp",
+    "tools/dx11_textured_linear_probe_r203.cpp",
+    "tools/test_dx11_textured_linear_r203.py",
+    "src/vr/d3d11/native_linear_source_texture_r234.hpp",
+    "docs/automation/runs/CONVERSION-DX11-00531.json"
+  ],
+  "pipeline": {
+    "C0": "PASS recovered canonical branch HEAD, 00531 durable run, controller checkpoint and failed gate #38042453799",
+    "C1": "PASS independent R234 CPU texture -> D3D11 owned texture/SRV -> PS -> WARP pixel slice; R175 work owned by 00477",
+    "C2": "PASS existing material source+tests commit d84fc7df; repair negative mutation-only test 279c2c70, both [AUTO:CONVERSION-DX11-00531]",
+    "C3": "SCOPED_PASS / FULL_GATE_FAIL. exact SHA 279c2c70 Gate #38043047956: validate SUCCESS, R203/R234 static + WARP textured probe SUCCESS; inherited independent R175 mismatch fails Run DX11 constant buffer probe",
+    "C4": "PASS substantive validation-bearing source SHA 279c2c70b7688be5a1f99047609f43c3e9167d26 (full Gate FAIL; not promoted)",
+    "C5": "NOT_REQUIRED dormant gameplay Draw and no release/HMD deployment",
+    "C6": "BLOCKED (3/3 retry limit): exact-SHA full gate inherited R175 error; no additional attempt or duplicate 00531"
+  },
+  "evidence": {
+    "source_preflight": "JS negative guard/mutation evidence and WARP source assertions; exact CI actual execution authoritative",
+    "policy": "new DX11 AUTODEV policy strategy fields present, CI will invoke Python policy --check-latest",
+    "validation_bearing_result_sha": "279c2c70b7688be5a1f99047609f43c3e9167d26",
+    "failed_previous_gate": {
+      "run_id": 38042453799,
+      "head_sha": "d84fc7df0256e4594c24db863df35841caf9b8da",
+      "failure": "R234 owner deletion mutant survived because generation/sourceVersion clause appeared twice; fixed by removing all occurrences"
+    },
+    "latest_exact_sha_gate": {
+      "run_id": 38043047956,
+      "head_sha": "279c2c70b7688be5a1f99047609f43c3e9167d26",
+      "status": "completed",
+      "conclusion": "failure",
+      "jobs": {
+        "validate": "success",
+        "DX11 readiness smoke probes": "failure"
+      },
+      "failed_step": "Run DX11 constant buffer probe",
+      "failure_code": "R175_GENERIC_VARYING_MISMATCH",
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ]
+    },
+    "scoped_validated": [
+      "Verify R203 native linear PS texture ownership PASS",
+      "Build R203 textured linear WARP probe PASS",
+      "Run R203 textured linear WARP probe PASS",
+      "DX11 Fast Structural Checks #38043047942 SUCCESS",
+      "Backend Conversion Gate validate job #114186965379 SUCCESS"
+    ],
+    "controller_runtime_adoption": "NOT_VERIFIED"
+  },
+  "blockers": [
+    "Full exact-SHA Gate blocked by independent preexisting R175 TEXCOORD6 VS/PS varying mismatch (owner CONVERSION-DX11-00477); do not steal owner or bypass",
+    "Quest 3/VDXR exact-build runtime test not performed"
+  ],
+  "score_change": 0,
+  "next_action": "Park 00531 BLOCKED; preserve R234 scoped PASS. Resolve separately owned R175 00477 after ownership/fencing, or controller assigns a nonconflicting new DX11 vertical slice. Do not re-run 00531 or mark FULL PASS without exact-SHA Gate success.",
+  "last_real_activity_at": "2026-10-10T10:04:15Z",
+  "last_activity_evidence": "Backend Conversion Gate #38043047956 exact-SHA concluded FAILURE after R203/R234 PASS; R175 existing independent mismatch"
+}

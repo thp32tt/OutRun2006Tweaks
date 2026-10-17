@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00652",
+  "production_id": "CONVERSION-DX11-00652",
+  "event_id": "CONVERSION-DX11-00652-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_ALWAYS_Z_DSV",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "9acab987a8c6e0be54a35a36cb80c10ba971762e",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "capture live D3D9 ZFUNC ALWAYS and ZWRITEENABLE -> portable C++ native depth admission",
+      "D3D11 DSV CreateDepthStencilState with ALWAYS and two write states -> native Draw/DrawIndexed -> visible inset"
+    ],
+    "batch_components": [
+      "real C++ native D3D9 Draw capture and D3D11 depth OM state binding",
+      "portable C++ probe and destructive Python regression wired into exact SHA CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 ZFUNC ALWAYS admits zwrite 0/1 to distinct D3D11 ALWAYS DSV states",
+      "negative_regression": "bad comparator/binding/cache/unsupported depth states rejected by regressions",
+      "component_integration": "GetRenderState -> depth admission -> OutputCapture -> D3D11 DSV/OM -> Draw/DrawIndexed -> readback"
+    },
+    "conflict_keys": [
+      "DX11:GAME_ALWAYS_Z_DSV",
+      "src/vr/d3d11/live_game_depth_state.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_depth_probe.cpp",
+      "tools/test_dx11_depth_always_draw_00652.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI and source only; no Quest3/VDXR actual pixel or gamepad evidence",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit opt-in; preserve original D3D9 Draw and input"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_depth_state.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_depth_probe.cpp",
+    "tools/test_dx11_depth_always_draw_00652.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00652.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS prior 00651 exact-SHA Gate",
+    "C1_REVIEW": "PASS native ALWAYS Z missing",
+    "C2_IMPLEMENT": "PASS C++ depth admission and OM binding with tests",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend conversion validate+readiness, DX11 fast, Win32 Build, OpenXR architecture, HUD Inspector all success on 20ee6e5dd4f42aef928f653becabc9e575d1199c",
+    "C4_COMMIT": "PASS: source material 89712d3e, CI verifier repair and validation-bearing 20ee6e5dd4f42aef928f653becabc9e575d1199c",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: record finalized separately from gated source commit"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "C6 PASS_EXACT_SHA for material/repair SHA; Quest 3, VDXR, menu/vehicle/race real pixels, real gamepad input remain RUNTIME_VALIDATION=UNTESTED. No backend promotion. Next independent DX11 scope assigned by controller.",
+  "material_result_sha": "89712d3ef1c82d79dae2a4b17c5a7aaba86ad070",
+  "validation_bearing_result_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+  "result_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38342300734,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342300734"
+    },
+    "dx11_fast_structural": {
+      "id": 38342300766,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342300766"
+    },
+    "windows_build": {
+      "id": 38342304347,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342304347"
+    },
+    "openxr_architecture": {
+      "id": 38342304267,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342304267"
+    },
+    "hud_inspector": {
+      "id": 38342304213,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342304213"
+    }
+  },
+  "failure_repair": {
+    "initial_material_sha": "89712d3ef1c82d79dae2a4b17c5a7aaba86ad070",
+    "initial_dx11_fast_failure_run_id": 38342224129,
+    "initial_backend_failure_run_id": 38342224254,
+    "cause": "legacy 00651 destructive test modified only the first depth-write-mask descriptor; new ALWAYS comparator adds a preceding descriptor; destructive assertion made false negative",
+    "repair_commit": "20ee6e5dd4f42aef928f653becabc9e575d1199c"
+  }
+}

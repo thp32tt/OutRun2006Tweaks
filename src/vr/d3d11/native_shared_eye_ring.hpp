@@ -1,0 +1,214 @@
+#pragma once
+
+#include <array>
+#include <cstdint>
+#include <d3d11.h>
+#include <wrl/client.h>
+
+#include "vr/core/transport.hpp"
+#include "vr/ipc/protocol.hpp"
+
+namespace outrun::vr::dx11
+{
+    enum class SharedEyeSlotState : std::uint32_t
+    {
+        Free = 0,
+        Acquired,
+        ProducerPending,
+        Published,
+    };
+
+    struct SharedEyeSlot
+    {
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> eye[2];
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv[2];
+        // Native game Draw/DrawIndexed depth belongs to the same eye SLOT as
+        // color: lazily allocated, preserved only until a matching ACK/fence
+        // allows the slot to be recycled, then cleared for its next frame.
+        // Never share a DSV between the simultaneous left and right passes.
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> depth[2];
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv[2];
+        Microsoft::WRL::ComPtr<ID3D11Query> producer_fence;
+        HANDLE shared_handle[2]{};
+        std::uint64_t frame_id{};
+        // Once the producer schedules native GPU eye copies, the allocation
+        // cannot be cancelled as a CPU-only reservation until its EVENT fence
+        // completes, even if fence arming later fails.
+        bool gpu_copy_queued{};
+        SharedEyeSlotState state{SharedEyeSlotState::Free};
+    };
+
+    // R118 immutable handoff evidence. A caller may advertise a native eye pair
+    // only while this exact lifetime/slot/frame snapshot is still Published.
+    struct NativeSharedEyePublication
+    {
+        OutRunVR::Core::TransportIdentity identity{};
+        std::uint32_t slot{};
+        std::uint64_t frame_id{};
+        HANDLE left_handle{};
+        HANDLE right_handle{};
+        std::uint32_t width{};
+        std::uint32_t height{};
+        DXGI_FORMAT format{DXGI_FORMAT_UNKNOWN};
+    };
+
+    class NativeSharedEyeRing final
+    {
+    public:
+        bool initialize(
+            ID3D11Device* device,
+            std::uint32_t width,
+            std::uint32_t height,
+            DXGI_FORMAT format) noexcept;
+        void shutdown() noexcept;
+
+        // Resource allocation alone is not enough to activate the native path.
+        // The exact producer/consumer process pair, producer run generation and
+        // transport generation must be bound first. A different identity cannot
+        // replace an in-flight generation; recreate the ring to retire it.
+        bool bind_lifetime(
+            std::uint32_t producer_pid,
+            std::uint32_t consumer_pid,
+            std::uint32_t run_generation,
+            std::uint32_t transport_generation) noexcept;
+        void invalidate_lifetime() noexcept;
+
+        [[nodiscard]] bool ready() const noexcept { return ready_; }
+        [[nodiscard]] bool activation_ready() const noexcept
+        {
+            return ready_ && producer_device_ && !synchronization_faulted_ &&
+                OutRunVR::Core::TransportIdentityValid(identity_);
+        }
+        [[nodiscard]] bool synchronization_faulted() const noexcept
+        {
+            return synchronization_faulted_;
+        }
+        [[nodiscard]] bool all_slots_idle() const noexcept;
+        [[nodiscard]] const OutRunVR::Core::TransportIdentity&
+            identity() const noexcept { return identity_; }
+
+        [[nodiscard]] std::uint32_t width() const noexcept { return width_; }
+        [[nodiscard]] std::uint32_t height() const noexcept { return height_; }
+        [[nodiscard]] DXGI_FORMAT format() const noexcept { return format_; }
+
+        // Reserve a free slot for frame_id. Producer-pending slots are reclaimed
+        // only after their EVENT query completes. Published slots remain immutable
+        // until an ACK with the exact lifetime identity, slot and frame is seen.
+        bool try_acquire_slot(
+            ID3D11DeviceContext* context,
+            std::uint64_t frame_id,
+            const OutRunVR::Core::FrameAck* ack,
+            std::uint32_t& out_slot) noexcept;
+        bool cancel_acquired_slot(
+            std::uint32_t slot,
+            std::uint64_t frame_id) noexcept;
+
+        // Call after both eye writes/copies have been recorded. The EVENT query
+        // is ended immediately and the slot is quarantined until completion.
+        // R306: Copy the complete native game-created eye pair into this
+        // generation's shared resources before arming the producer EVENT.
+        // Both sources are validated before either GPU copy is recorded.
+        // The caller still owns the original D3D9 Draw/input fallback.
+        bool submit_eye_pair(
+            ID3D11DeviceContext* context,
+            std::uint32_t slot,
+            std::uint64_t frame_id,
+            ID3D11Texture2D* left_source,
+            ID3D11Texture2D* right_source,
+            UINT left_array_slice = 0u,
+            UINT right_array_slice = 0u) noexcept;
+
+        // The native game renderer can draw two genuine, independently posed
+        // views directly into the shared ring RTs, avoiding the extra GPU
+        // CopyResource/Resolve of the source-eye handoff. The recorder must
+        // issue BOTH eyes' graphics commands synchronously on this immediate
+        // context and restore any changed pipeline state before returning.
+        // A failed/partial draw quarantines the ring: GPU writes may already
+        // be queued, so neither eye can be cancelled or recycled.
+        using NativeEyeDrawRecorder = bool (*)(
+            void* user, ID3D11DeviceContext* context,
+            ID3D11RenderTargetView* left, ID3D11RenderTargetView* right) noexcept;
+        bool render_eye_pair(
+            ID3D11DeviceContext* context,
+            std::uint32_t slot,
+            std::uint64_t frame_id,
+            NativeEyeDrawRecorder recorder,
+            void* user) noexcept;
+
+        bool signal_producer_fence(
+            ID3D11DeviceContext* context,
+            std::uint32_t slot,
+            std::uint64_t frame_id) noexcept;
+
+        // Only a completed EVENT query can move ProducerPending -> Published.
+        // The caller may advertise shared handles only after this returns true.
+        bool publish_if_fence_complete(
+            ID3D11DeviceContext* context,
+            std::uint32_t slot,
+            std::uint64_t frame_id) noexcept;
+
+        // Snapshot only a fully Published frame. The snapshot is immutable
+        // evidence for a later IPC handoff; validation fails after ACK,
+        // lifetime invalidation, generation replacement or hard retirement.
+        bool snapshot_published_frame(
+            std::uint32_t slot,
+            std::uint64_t frame_id,
+            NativeSharedEyePublication& out) const noexcept;
+        [[nodiscard]] bool validate_publication_snapshot(
+            const NativeSharedEyePublication& publication) const noexcept;
+
+        // Consumer ACK retirement is exact-identity and exact-slot gated.
+        bool retire_acknowledged(
+            const OutRunVR::Core::FrameAck& ack) noexcept;
+
+        [[nodiscard]] SharedEyeSlotState slot_state(
+            std::uint32_t slot) const noexcept;
+        [[nodiscard]] std::uint64_t slot_frame_id(
+            std::uint32_t slot) const noexcept;
+
+        // Prepare exactly two private native Z/stencil attachments before the
+        // first GPU eye command. Reject foreign context, incorrect frame/slot,
+        // queued GPU work or invalidated lifetime without returning views.
+        // Views are borrowed only during this acquired frame's synchronous
+        // recorder; the ring retains them until generation teardown.
+        bool acquire_depth_pair(
+            ID3D11DeviceContext* context, std::uint32_t slot,
+            std::uint64_t frame_id,
+            ID3D11DepthStencilView* (&out_views)[2]) noexcept;
+
+        [[nodiscard]] ID3D11Texture2D* eye(
+            std::uint32_t slot, std::uint32_t eye_index) const noexcept;
+        [[nodiscard]] ID3D11RenderTargetView* rtv(
+            std::uint32_t slot, std::uint32_t eye_index) const noexcept;
+        [[nodiscard]] HANDLE shared_handle(
+            std::uint32_t slot, std::uint32_t eye_index) const noexcept;
+        [[nodiscard]] ID3D11Query* producer_fence(
+            std::uint32_t slot) const noexcept;
+
+    private:
+        // A frame fence belongs to the producer's exact immediate D3D11 context.
+        // Reject foreign/deferred contexts without mutating live frame slots.
+        [[nodiscard]] bool same_producer_context(
+            ID3D11DeviceContext* context) const noexcept;
+        void reset_slot_lifetime(SharedEyeSlot& slot) noexcept;
+        bool refresh_unpublished_fence(
+            ID3D11DeviceContext* context,
+            SharedEyeSlot& slot) noexcept;
+
+        Microsoft::WRL::ComPtr<ID3D11Device> producer_device_;
+        std::array<SharedEyeSlot, OutRunVR::RenderFrameRingSize> slots_{};
+        OutRunVR::Core::TransportIdentity identity_{};
+        std::uint32_t width_{};
+        std::uint32_t height_{};
+        DXGI_FORMAT format_ = DXGI_FORMAT_UNKNOWN;
+        // Reserved and cumulatively acknowledged frame IDs never regress
+        // within this producer/consumer transport generation.
+        std::uint64_t frame_id_high_watermark_ = 0u;
+        bool ready_ = false;
+        // Any unexpected GetData result leaves GPU completion unknowable.
+        // Quarantine the allocation until shutdown() recreates the resources.
+        bool synchronization_faulted_ = false;
+    };
+
+    static_assert(OutRunVR::RenderFrameRingSize == 4);
+}

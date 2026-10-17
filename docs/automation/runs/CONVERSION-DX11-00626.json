@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00626",
+  "production_id": "CONVERSION-DX11-00626",
+  "event_id": "CONVERSION-DX11-00626-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_ADDSIGNED2X_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "base_head_sha": "5276ff8bbdc66b47d6be67169419fd2e79433f09",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game D3D9 fixed-function stage0 PM RGB / ADDSIGNED2X alpha live capture",
+      "D3D11 native PS/Draw/DrawIndexed into bounded visible opt-in diagnostic target",
+      "Unsupported operands/states preserve DX9Ex and gamepad passthrough"
+    ],
+    "batch_components": [
+      "Exact C++ D3D9 signed2x alpha predicate/diffuse admission/TextureCapture",
+      "HLSL independent signed2x shader, lifetime/compile/create and live native draw dispatch",
+      "Source-destructive test with 256 alpha/color numeric fixtures linked to DX11 Fast"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Correct D3D9 signed2x alpha capture selects native D3D11 shader and Draw/DrawIndexed with 256 numeric source fixtures",
+      "negative_regression": "Swapped operands, changed alpha operation, invalid shader equation or missing dispatch/state reset are rejected",
+      "component_integration": "Game callsite captured D3D9 -> D3D11 pixel shader and Draw -> diagnostic frame, guarded DX9Ex fallback"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_ADDSIGNED2X_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Automated BUILD_VERIFIED only, actual menu/vehicle/race and HMD input need runtime",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only, fail-closed DX9Ex fallback, no gamepad hook"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_addsigned2x_00626.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00626.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: previous 00625 completed, unique 00626 owner/branch HEAD checked",
+    "C1_REVIEW": "PASS: D3D9 ADDSIGNED2X alpha missing from live native PM RGB draw path",
+    "C2_IMPLEMENT": "PASS: game capture + D3D11 shader/create/lifetime + native Draw/DrawIndexed integration",
+    "C3_VALIDATE": "PASS_EXACT_SHA: existing GitHub CI SUCCESS for 47fcd94c2f2a6dc762f36758ff305adc2ee182f5 (Build #38289485093, OpenXR #38289486902, HUD #38289485072); no CI rerun",
+    "C4_COMMIT": "PASS: existing source/validation-bearing commit 47fcd94c2f2a6dc762f36758ff305adc2ee182f5; C6 bookkeeping only",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; HMD/Quest3/VDXR/gamepad runtime UNTESTED"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "C6 complete on existing exact SHA; no CI rerun or source edit. Actual Quest3/VDXR, gamepad input and native visual parity remain UNTESTED; no duplicate TASK_ID scoring.",
+  "validation_bearing_result_sha": "47fcd94c2f2a6dc762f36758ff305adc2ee182f5"
+}

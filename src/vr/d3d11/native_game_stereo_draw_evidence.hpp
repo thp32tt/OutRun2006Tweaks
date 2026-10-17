@@ -1,0 +1,127 @@
+#pragma once
+#include <cstdint>
+#include <limits>
+
+namespace outrun::vr::dx11::live_game_stereo {
+// D3D9 full-TARGET rectangles are real full-eye GPU Clears, not partial
+// ClearView operations. D3D11.0 ClearRenderTargetView supports these without
+// requiring ID3D11DeviceContext1; only bounded regions need D3D11.1.
+[[nodiscard]] constexpr bool full_eye_target_rect(
+    std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight) noexcept {
+    return eyeWidth != 0u && eyeHeight != 0u &&
+        left == 0 && top == 0 &&
+        right == static_cast<std::int64_t>(eyeWidth) &&
+        bottom == static_cast<std::int64_t>(eyeHeight);
+}
+static_assert(full_eye_target_rect(0, 0, 1920, 1080, 1920u, 1080u));
+static_assert(!full_eye_target_rect(0, 0, 1920, 1079, 1920u, 1080u));
+static_assert(!full_eye_target_rect(1, 0, 1920, 1080, 1920u, 1080u));
+static_assert(!full_eye_target_rect(0, 0, 0, 1080, 0u, 1080u));
+
+enum class NativeColorClearRoute : std::uint8_t {
+    Reject, FullRtv, ClearView, ShaderRaster
+};
+// A cropped, game-authored TARGET clear still needs an actual native GPU
+// pixel write on D3D11.0. Select a private full-screen triangle raster only
+// for supported 8-bit eye targets when the D3D11.1 ClearView is unavailable.
+// Reject invalid rectangles before recording either eye; never widen to
+// ClearRenderTargetView and erase the rest of a menu/race frame.
+[[nodiscard]] constexpr NativeColorClearRoute color_clear_route(
+    bool hasRegion, std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight,
+    bool clearViewAvailable, bool shaderRasterSupported) noexcept {
+    if (!eyeWidth || !eyeHeight) return NativeColorClearRoute::Reject;
+    if (!hasRegion) return NativeColorClearRoute::FullRtv;
+    if (left < 0 || top < 0 || right <= left || bottom <= top ||
+        right > static_cast<std::int64_t>(eyeWidth) ||
+        bottom > static_cast<std::int64_t>(eyeHeight))
+        return NativeColorClearRoute::Reject;
+    if (full_eye_target_rect(left, top, right, bottom, eyeWidth, eyeHeight))
+        return NativeColorClearRoute::FullRtv;
+    if (clearViewAvailable) return NativeColorClearRoute::ClearView;
+    return shaderRasterSupported ? NativeColorClearRoute::ShaderRaster
+                                 : NativeColorClearRoute::Reject;
+}
+static_assert(color_clear_route(true, 4, 5, 80, 90, 1920u, 1080u,
+    false, true) == NativeColorClearRoute::ShaderRaster);
+static_assert(color_clear_route(true, 4, 5, 80, 90, 1920u, 1080u,
+    true, false) == NativeColorClearRoute::ClearView);
+static_assert(color_clear_route(true, 0, 0, 1920, 1080, 1920u, 1080u,
+    false, false) == NativeColorClearRoute::FullRtv);
+static_assert(color_clear_route(true, -1, 0, 80, 90, 1920u, 1080u,
+    false, true) == NativeColorClearRoute::Reject);
+
+// D3D9 Z/stencil Clears with an explicit whole-eye RECT must use the real
+// D3D11.0 ClearDepthStencilView, just like an implicit whole-surface Clear.
+// Sending those through the partial rectangle rasterizer consumes an extra
+// shader Draw per eye and can fail when d3dcompiler_47 is absent. Keep cropped
+// HUD/menu clears confined to their game-authored rectangle instead.
+enum class NativeDepthClearRoute : std::uint8_t { Reject, FullDsv, PartialRaster };
+[[nodiscard]] constexpr NativeDepthClearRoute depth_clear_route(
+    bool hasRegion, std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight) noexcept {
+    if (!eyeWidth || !eyeHeight) return NativeDepthClearRoute::Reject;
+    if (!hasRegion) return NativeDepthClearRoute::FullDsv;
+    if (left < 0 || top < 0 || right <= left || bottom <= top ||
+        right > static_cast<std::int64_t>(eyeWidth) ||
+        bottom > static_cast<std::int64_t>(eyeHeight))
+        return NativeDepthClearRoute::Reject;
+    return full_eye_target_rect(left, top, right, bottom, eyeWidth, eyeHeight)
+        ? NativeDepthClearRoute::FullDsv : NativeDepthClearRoute::PartialRaster;
+}
+static_assert(depth_clear_route(false, 0, 0, 0, 0, 1920u, 1080u) ==
+    NativeDepthClearRoute::FullDsv);
+static_assert(depth_clear_route(true, 0, 0, 1920, 1080, 1920u, 1080u) ==
+    NativeDepthClearRoute::FullDsv);
+static_assert(depth_clear_route(true, 0, 0, 1919, 1080, 1920u, 1080u) ==
+    NativeDepthClearRoute::PartialRaster);
+static_assert(depth_clear_route(true, 0, 0, 0, 0, 1920u, 1080u) ==
+    NativeDepthClearRoute::Reject);
+static_assert(depth_clear_route(true, 0, 0, 1921, 1080, 1920u, 1080u) ==
+    NativeDepthClearRoute::Reject);
+// Hardware instancing is a single source-authored command/clear ordinal.
+// A zero-instance call writes no pixels and cannot establish an XR eye.
+[[nodiscard]] constexpr bool may_issue_instanced(
+    std::uint32_t elementsPerInstance, std::uint32_t instanceCount,
+    std::uint64_t issuedCommands) noexcept {
+    return elementsPerInstance != 0u && instanceCount != 0u &&
+        issuedCommands != (std::numeric_limits<std::uint64_t>::max)();
+}
+// D3D11 occlusion predicates can suppress a submitted GPU Draw without
+// an API failure. Never claim that draw as color evidence for native stereo.
+[[nodiscard]] constexpr bool color_certifiable(
+    bool colorWritable, bool noActivePredicate) noexcept {
+    return colorWritable && noActivePredicate;
+}
+// A completed game-authored Copy/Stretch can be the final visible color
+// source for a depth-only on-eye Draw (offscreen menu/car/race composition).
+// Still require at least one real geometry Draw and the existing independently
+// validated view/pose evidence; postpasses do NOT fabricate Draw ordinals.
+[[nodiscard]] constexpr bool authored_color_output_ready(
+    std::uint64_t geometryDraws, std::uint64_t directColorDraws,
+    std::uint32_t authoredColorPostpasses,
+    std::uint32_t authoredFullColorClears = 0u,
+    std::uint64_t lastFullClearDrawOrdinal = 0u) noexcept {
+    // A genuine game TARGET clear provides eye color even if later
+    // menu/car/race geometry writes only depth. A real draw AFTER the
+    // latest full clear is needed: a blank or stale cleared frame is not
+    // game geometry evidence. A later GPU postpass is independently valid.
+    return geometryDraws != 0u &&
+           (directColorDraws != 0u || authoredColorPostpasses != 0u ||
+            (authoredFullColorClears != 0u &&
+             geometryDraws > lastFullClearDrawOrdinal));
+}
+static_assert(authored_color_output_ready(2u, 0u, 1u));
+static_assert(authored_color_output_ready(1u, 1u, 0u));
+static_assert(!authored_color_output_ready(0u, 0u, 1u));
+static_assert(!authored_color_output_ready(4u, 0u, 0u));
+static_assert(authored_color_output_ready(2u, 0u, 0u, 1u, 0u));
+static_assert(authored_color_output_ready(3u, 0u, 0u, 1u, 2u));
+static_assert(!authored_color_output_ready(0u, 0u, 0u, 1u, 0u));
+static_assert(!authored_color_output_ready(2u, 0u, 0u, 1u, 2u));
+static_assert(authored_color_output_ready(2u, 0u, 1u, 1u, 2u));
+} // namespace outrun::vr::dx11::live_game_stereo

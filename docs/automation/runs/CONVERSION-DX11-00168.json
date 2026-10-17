@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00168",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "83f9175084410cb9fb527675b1bd60cd0711d2ac",
+  "result_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+  "validation_bearing_result_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R168_HELPER_28320_FUNCTION_BOUNDARY",
+  "selection_reason": "CONVERSION-DX11-00166 completed exact structural coverage of 0x28320..0x2843D and explicitly called for an independent assessment before higher-level semantics. Existing DX11 proofs establish aligned CALL 0x659AC->0x28320, seven-byte INT3 predecessor padding, contiguous exact body coverage, shared epilogue and terminal RET. The smallest safe promotion is structural function-entry boundary identity only.",
+  "summary": "Completed an independent DX11 fail-closed structural function-entry boundary cross-proof for target-C routine 0x28320..0x2843D. The exact result combines aligned external CALL 0x659AC->0x28320, exact seven-byte INT3 predecessor padding, contiguous exact body coverage, .text membership, shared epilogue 0x28433 and terminal RET 0x2843D. Boundary identity is promoted only; data-structure semantics, callee semantics and ScreenHud/world/render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00167",
+    "source_result_sha": "daf803c1e2fdd1ed0bda5dc25ecf323c4fef1871",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and boundary cross-proof design only. DX11 uses its own target-C alignment proof fields, its own 00166 structural predecessor chain and independent exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00168.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Validation-bearing result d60ac4b005f45a463542246c24e7cd147fb7b96f contains exact marker [AUTO:CONVERSION-DX11-00168] and no CI-skip directive.",
+    "Existing DX11 EXACT_PREFIX_CALL_ALIGNMENT_PROVEN target-C proof establishes second aligned CALL 0x659AC->0x28320 in .text.",
+    "Existing DX11 EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN proof fixes seven INT3 bytes 0x28319..0x2831F and the 0x28320 next-code anchor.",
+    "CONVERSION-DX11-00166 validation-bearing result 72b4bca0250b0080c4ee3226f8ce4d5943adf2d7 completes contiguous exact instruction coverage through shared epilogue 0x28433 and RET 0x2843D.",
+    "HUD Inspector static job 110081231230 PASS reported status=EXACT_28320_FUNCTION_ENTRY_BOUNDARY_PROVEN, external_call=0x000659AC->0x00028320, external_call_link=True, padding=0x00028319-0x0002831F, padding_boundary=True, body_chain=True, section=.text, text_boundary=True, ret=0x0002843D, shared_epilogue=0x00028433.",
+    "The proof reports function_entry=EXACT_CALL_TARGET_PADDING_BOUNDARY_PROVEN, semantic_effect=BOUNDARY_IDENTITY_ONLY, data_semantics=UNRESOLVED, callee_semantics=UNRESOLVED and ownership_effect=NONE.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on the exact result SHA.",
+    "DXVK-00167 independently passed the same boundary-only exact-EXE proof on validation-bearing result daf803c1e2fdd1ed0bda5dc25ecf323c4fef1871; DX11 validation remained independent.",
+    "VR PC Fast Test Build was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Keep guarded GF ownership unchanged. Function-entry boundary identity at 0x28320 is now exact, but higher-level data-structure meaning, callee semantics for proven calls, and all ScreenHud/world/render ownership remain unresolved. Continue only with another bounded exact-EXE semantic proof; runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T05:30:14+09:00",
+  "runtime_claim": "NONE",
+  "function_boundary_28320_proof": {
+    "entry_rva": "0x00028320",
+    "end_exclusive_rva": "0x0002843E",
+    "external_call_rva": "0x000659AC",
+    "external_call_target_rva": "0x00028320",
+    "external_call_link": true,
+    "padding_start_rva": "0x00028319",
+    "padding_end_exclusive_rva": "0x00028320",
+    "padding_boundary": true,
+    "prefix_status": "EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN",
+    "continuation_status": "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN",
+    "terminal_status": "EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN",
+    "body_chain": true,
+    "target_section": ".text",
+    "text_boundary": true,
+    "terminal_ret_rva": "0x0002843D",
+    "shared_epilogue_rva": "0x00028433",
+    "status": "EXACT_28320_FUNCTION_ENTRY_BOUNDARY_PROVEN",
+    "function_entry_status": "EXACT_CALL_TARGET_PADDING_BOUNDARY_PROVEN",
+    "semantic_effect": "BOUNDARY_IDENTITY_ONLY",
+    "data_structure_semantics": "UNRESOLVED",
+    "callee_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "Only structural function-entry boundary identity is promoted. No ScreenHud/world/render ownership is inferred; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed if the external aligned call stops targeting 0x28320, the seven-byte INT3 predecessor padding drifts, any structural body proof breaks, .text membership changes, or terminal RET/shared-epilogue linkage is lost. Boundary identity alone cannot justify data or render semantics."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer risk path changed and no open visual regression is claimed fixed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36772227779,
+      "conclusion": "success",
+      "validated_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+      "artifact_id": 11123468886,
+      "artifact_digest": "sha256:126d85b8e9343539fd19052ece21f939546d3d1cb0825c7e4a2806a26f74e0b2"
+    },
+    "build": {
+      "run_id": 36772234378,
+      "conclusion": "success",
+      "validated_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+      "artifact_id": 11124273525,
+      "artifact_digest": "sha256:99fb1ff2392fc3c15dd0b23b66dcc6ee746da02164aa0e4bd97d8a8f1d9d14d3",
+      "source_snapshot_artifact_id": 11124208616,
+      "source_snapshot_artifact_digest": "sha256:e5da46ee8931450af17f810d408e708d2280e706c0a6d0cdb38feda95857ad83"
+    },
+    "hud_inspector": {
+      "run_id": 36772234435,
+      "conclusion": "success",
+      "validated_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+      "static_analysis_job_id": 110081231230,
+      "analysis_artifact_id": 11124725838,
+      "analysis_artifact_digest": "sha256:1066c533e3935a1ac848b9e2106f75cc1d8400f946aab267cfd9887b703a14c3",
+      "game_artifact_id": 11124483096,
+      "game_artifact_digest": "sha256:f8a9c799f6a8852aefe0039f6bf65e4401179230db986e529b36337189a429e4",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_next_code_function_boundary=0x00028320 status=EXACT_28320_FUNCTION_ENTRY_BOUNDARY_PROVEN end=0x0002843E external_call=0x000659AC->0x00028320 external_call_link=True padding=0x00028319-0x0002831F padding_boundary=True prefix_status=EXACT_NEXT_CODE_PREFIX_CALL_ALIGNMENT_PROVEN continuation_status=EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN terminal_status=EXACT_NEXT_CODE_CONTINUATION_2_TERMINAL_PROVEN body_chain=True section=.text text_boundary=True ret=0x0002843D shared_epilogue=0x00028433 function_entry=EXACT_CALL_TARGET_PADDING_BOUNDARY_PROVEN semantic_effect=BOUNDARY_IDENTITY_ONLY data_semantics=UNRESOLVED callee_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36772234357,
+      "conclusion": "success",
+      "validated_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11123842855,
+      "host_artifact_digest": "sha256:346f1bbec986772f5086862298309d463f3c1b01c95b6ad1c30e26f60f44e384"
+    },
+    "pc_fast": {
+      "run_id": 36772227973,
+      "conclusion": "skipped",
+      "validated_sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "d60ac4b005f45a463542246c24e7cd147fb7b96f",
+      "message": "dx11: prove target C 0x28320 function boundary [AUTO:CONVERSION-DX11-00168]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5919114138,
+    "validation_comment_id": 5919207722,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_HELPER_28320_2843D_STRUCTURAL_COMPLETE",
+    "after": "PARTIAL_PLUS_HELPER_28320_FUNCTION_ENTRY_BOUNDARY",
+    "runtime_claim": false
+  },
+  "blocker": "Function-entry boundary identity at 0x28320 is now structurally exact, but higher-level data-structure meaning, callee semantics, and all ScreenHud/world/render ownership remain unresolved.",
+  "resume_cursor": "Set04/F13 now has exact structural function-entry identity for 0x28320..0x2843D, including external aligned CALL 0x659AC->0x28320, seven-byte predecessor INT3 boundary, bounded calls 0x28379->0x282B0, 0x28390->0x8BD20, 0x2839D->0x182194, shared epilogue 0x28433 and terminal RET 0x2843D. The next bounded task may assess one higher-level data/callee semantic dimension independently; do not infer ScreenHud/world/render ownership from boundary identity."
+}

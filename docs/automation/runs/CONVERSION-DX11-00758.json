@@ -1,0 +1,110 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00758",
+  "production_id": "CONVERSION-DX11-00758",
+  "event_id": "CONVERSION-DX11-00758-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:MENU_RACE_STAGE1_GPU_CONSTANT_OWNER",
+  "feature_id": "DX11-MENU-RACE-STAGE1-CONSTANT-OWNERSHIP",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "3ddf9b56c9372365e788a0c20f43edd8b4b6b07d",
+  "material_result_sha": "ea75f5f8a03516e3b8ef132c7daf43bd9dcc9891",
+  "validation_bearing_result_sha": "165b4198e505f629db63d277c20c1300db0e21a2",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage1_game_constant_owner_00758.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00758.json",
+    "tools/test_dx11_stage1_factor_00673.py",
+    "tools/test_dx11_stage1_triop_00705.py",
+    "tools/test_dx11_stage1_constant_00707.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "change_summary": "Real game Stage1 texture combiner b1 uses one device-owned native D3D11 constant buffer, refreshes the captured game operands/factors for every Draw/DrawIndexed, explicitly unbinds for stage0-only menu/HUD draws, and releases on rebuild/Reset, preserving original D3D9 game/input fallback.",
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-STAGE1-CONSTANT-OWNERSHIP",
+    "goal": "Menu, vehicle selection, and race Stage-1 D3D9 combiner source states survive the real native Draw/DrawIndexed chain through GPU b1 ownership and full-frame presentation without per-draw immutable D3D11 allocations, cross-draw stale constants, or interruption of gamepad/D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "full-game-stage1-native-gpu-binding",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_game_stage1_capture_to_d3d11_shader_draw",
+        "expected_behavior": "Each supported game-author Stage1 captures factors, TEMP routing, stage constants and texture mode, uploads b1 in game draw order, and binds it on the corresponding real full-frame native Draw/DrawIndexed."
+      },
+      {
+        "id": "device-reset-stage0-gamepad-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "dx9ex_gamepad_device_lifetime_and_stage0",
+        "expected_behavior": "Game-authored stage0-only draws clear D3D11 b1, device Reset/resize retires old GPU object, and buffer setup/unknown states cannot bypass the original D3D9 Draw or gamepad input."
+      },
+      {
+        "id": "stage1-source-and-exact-gate",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_windows_openxr_hud_backend",
+        "expected_behavior": "Destructive Stage1 upload/lifetime/PS unbind regressions fail locally, exact-SHA five mandatory GitHub Actions succeed, and runtime HMD success remains unclaimed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "full-game-stage1-native-gpu-binding": "PASS_EXACT_SHA",
+    "device-reset-stage0-gamepad-fallback": "PASS_EXACT_SHA",
+    "stage1-source-and-exact-gate": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Draw/DrawIndexed submitted for game menu, vehicle and race can use the same native b1 allocation while reflecting different original game stage1 constants per draw, even across stage0-only draws; HMD pixels not asserted.",
+    "activation_guard_and_fallback": "Native gameplay opt-in remains default-off, Stage1 resource setup fails closed before native submission, D3D9 source Draw/Present and controller inputs remain authoritative.",
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE1_GPU_CONSTANT_OWNER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "R30 real game Stage1 state capture -> native 80-byte GPU constant-buffer UpdateSubresource",
+      "Per-draw PS b1 bind or stage0 unbind -> native Draw/DrawIndexed -> guarded full-resolution readback/Present with DX9Ex fallback"
+    ],
+    "batch_components": [
+      "D3D11 production renderer GPU constant buffer ownership, game-authored stage1 payload mapping, PS binding and Reset lifetime",
+      "Destructive Python source regression executed in exact-SHA Fast workflow plus existing Windows source compile and fallback guard"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native Stage1 b1 lifetime is device-owned, initialized with 80 aligned bytes, updated from real game factors, constants and texture operand routing on every Stage1 Draw, then bound before native GPU Draw.",
+      "negative_regression": "Mutations removing device reset, GPU update, shader b1 unbind, buffer size or ready-check are rejected; original D3D9 gamepad/render remains authoritative.",
+      "component_integration": "D3D9 captured game Stage1 state -> D3D11 PS constant-buffer UpdateSubresource/PSSetConstantBuffers -> native IA/DrawIndexed -> same-Present full-frame diagnostic output."
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote HEAD 3ddf9b56c9372365e788a0c20f43edd8b4b6b07d; 00757 complete; new Stage1 per-game-draw immutable b1 allocation found",
+    "C1_REVIEW": "PASS evidence: each actual game Stage1 Draw calls CreateBuffer IMMUTABLE, risks unbounded resource churn and stale stage0 PS b1; disjoint from previous VB/IB owner fix",
+    "C2_IMPLEMENT": "PASS production C++ Stage1 per-device mutable constant buffer, exact payload refresh, unconditional b1 bind/unbind, Reset lifetime",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact 165b4198e505f629db63d277c20c1300db0e21a2 Fast #38688159948, Backend #38688159944, Build #38688163532, OpenXR #38688163468, HUD #38688163463 all SUCCESS; HMD/game/gamepad UNTESTED.",
+    "C4_COMMIT": "PASS: material ea75f5f8a03516e3b8ef132c7daf43bd9dcc9891 production C++ with destructive game-combiner regression, four follow-up source-regression repairs, latest validation-bearing 165b4198e505f629db63d277c20c1300db0e21a2 (no CI skip).",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: five required workflows SUCCESS for 165b4198e505f629db63d277c20c1300db0e21a2; this separate bookkeeping record uses [skip ci], does not change validation-bearing result. Quest3/VDXR/real game/gamepad UNTESTED."
+  },
+  "validation_workflow_runs": {
+    "dx11_fast": 38688159948,
+    "backend_conversion": 38688159944,
+    "windows_build": 38688163532,
+    "openxr": 38688163468,
+    "hud_inspector": 38688163463
+  },
+  "c6_trigger_reason": "CI_COMPLETE_FIVE_REQUIRED_EXACT_SHA"
+}

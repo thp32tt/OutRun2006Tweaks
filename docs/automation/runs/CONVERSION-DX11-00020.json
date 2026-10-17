@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00020",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T04:08:26+09:00",
+  "base_sha": "5d31250b89338536887c372012ebfd898661eaa8",
+  "code_result_sha": "5100a8d64a2a9f586cb625e56c2af46a5ed23abf",
+  "result_sha": "5100a8d64a2a9f586cb625e56c2af46a5ed23abf",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R81 bounded F20 fixed-function texture-stage/sampler observation coverage.",
+  "summary": "Expanded passive fixed-function census coverage from four to all eight D3D9 texture stages and moved the currently modeled sampler MIN/MAG/MIP/ADDRESSU/ADDRESSV observation from sampler 0 to every stage. Every fixed-function texture-stage/sampler query participates in a fail-closed coverage bit with exact/failure counters; analyzer and source-graph contracts cover R81. shaderTranslationExact and native draw activation remain disabled.",
+  "evidence": [
+    "VR_BACKEND_100_REVIEW_SET_05 F20 identifies incomplete fixed-function coverage: four texture stages and sampler state only for stage 0.",
+    "R80/CONVERSION-DX11-00018 explicitly selected F20 coverage tightening as the next bounded DX11 action.",
+    "Backend Conversion Gate 36469424390 PASS on exact production SHA.",
+    "Build 36469431107 PASS on exact production SHA.",
+    "OpenXR VR architecture 36469431051 PASS across host-x64 and all Win32 jobs.",
+    "HUD Inspector 36469430925 PASS.",
+    "No Quest 3/VDXR or in-game runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Expanded FixedFunctionStageSignature census to eight stages, added per-stage sampler MIN/MAG/MIP/U/V evidence, fail-closed query completeness and exact/failure counters, and R81 logs."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R81 summary/signature compatibility, ffpCoverage fields, per-stage sampler parsing and fixedFunctionQueryFailure unsupported accounting."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R81 regression fixture proving stage 7 sampler parsing and fail-closed fixedFunctionQueryFailure accounting."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added structural guards for eight fixed-function stages, per-stage sampler observation, coverage counters and R81 analyzer fields."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "MANAGED_LIFETIME_STATE_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "EIGHT_STAGE_CORE_SAMPLER_OBSERVATION_COVERED_EMULATION_AND_UNMODELED_STATE_TYPES_OPEN",
+    "F21_shader_translation_readiness": "FAIL_CLOSED_FINGERPRINTED_TRANSLATION_NOT_IMPLEMENTED",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_R80_SHADER_GATE_R81_FFP_COVERAGE_AND_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R81 is observation coverage only. Complete fixed-function translation/emulation, programmable F21 translation, live resource mirror ownership and exact-build Quest3/VDXR parity remain prerequisites."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36469424390,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5100a8d64a2a9f586cb625e56c2af46a5ed23abf",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10990594248,
+      "artifact_digest": "sha256:87c1a9ff7b62bbe6f8c5c136ff2835ccd76899d63c00fee473c46e213f001d03"
+    },
+    "build": {
+      "run_id": 36469431107,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5100a8d64a2a9f586cb625e56c2af46a5ed23abf",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10991223075,
+      "binary_artifact_digest": "sha256:f29a2efad93973214fbc1a523cb4cfc795473fcd34e7e7faea50aa2f42ce5fac"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36469431051,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5100a8d64a2a9f586cb625e56c2af46a5ed23abf",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10990548707,
+      "host_artifact_digest": "sha256:b0f7ba6a2a7f9ffd7b37be3b96660f62547021a033f41622fb4dc12225d83a1b"
+    },
+    "hud_inspector": {
+      "run_id": 36469430925,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5100a8d64a2a9f586cb625e56c2af46a5ed23abf",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10990743664,
+      "artifact_digest": "sha256:0971f8c33bd6ea9de353f3fe3a69c9d69ce1ee6dc8a456b20996da8cc3172459"
+    },
+    "pc_fast": {
+      "run_id": 36469424260,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5876579878,
+    "validation_comment_id": 5876669877
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. In the next bounded DX11 task, define a conservative F20 fixed-function translation/readiness model from the now eight-stage observation evidence, or separately extend still-unmodeled fixed-function/sampler state types if required by evidence. Do not combine that with F21 programmable shader translation. Exact-build Quest3/VDXR parity remains mandatory before native draw promotion.",
+  "finalized_kst": "2026-09-29T04:08:26+09:00"
+}

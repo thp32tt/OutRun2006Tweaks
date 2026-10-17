@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00636",
+  "production_id": "CONVERSION-DX11-00636",
+  "event_id": "CONVERSION-DX11-00636-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_MODULATE_TEXTURE_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "7593311a86fa8fc424f6a799b2bda2ed50cf9d3d",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game-authored D3D9 stage-0 PM RGB / alpha MODULATE(TEXTURE,TFACTOR) state capture",
+      "D3DRS_TEXTUREFACTOR alpha read and native D3D11 PS byte-normalized constant",
+      "Native HLSL compile, PS binding, Draw/DrawIndexed diagnostic frame; game falls back to D3D9"
+    ],
+    "batch_components": [
+      "D3D9 game render state exact admission + factor capture + fallback",
+      "Native pixel shader, owner/compile/lifetime, Draw selection",
+      "Destructive source connectivity and 32768-case numeric regression in Fast/Backend CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact D3D9 PM RGB and independent texture-alpha times live TFACTOR high-byte on both native draw variants",
+      "negative_regression": "Swapped operands/modified factor/unsupported alpha operation do not admit; mutation kills shader/capture/native graph",
+      "component_integration": "Captured D3D9 stage state -> texture factor -> PS constant -> HLSL -> native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_MODULATE_TEXTURE_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source + CI only; no captured game menu/vehicle selection/race frame or Quest3 gameplay parity",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit diagnostic; untouched gamepad hooks and protected D3D9 fallback"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_modulate_factor_00636.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00636.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: resume failed exact Gate 38314342991 at 4c715820; source anchor repair already committed at 1242fbcb, same TASK_ID; no duplicate code rewrite.",
+    "C1_REVIEW": "PASS: failed 00636 source-link predicate mismatch, not a D3D11 PS/Draw runtime failure; confirm original material source and preservation of legacy factor selectors.",
+    "C2_IMPLEMENT": "PASS: material 4c715820 C++ shader, capture, native Draw/DrawIndexed and numeric/destructive tests; followup 1242fbcb fixes source test anchor with no weakening of production gate.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 1242fbcb; DX11 Fast 38314485264, Backend Gate 38314485276 (validate + readiness smoke), Build 38314492048, OpenXR 38314492085, HUD 38314492041 all completed SUCCESS.",
+    "C4_COMMIT": "PASS: original material 4c715820; exact validation-bearing test repair 1242fbcb. Both have [AUTO:CONVERSION-DX11-00636] and neither used CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: native game opt-in diagnostic only, Quest3/VDXR and gamepad never tested; no promotion or user deployment.",
+    "C6_STATE": "PASS_EXACT_SHA: preserved validation-bearing 1242fbcb, PASS build/static; runtime NEED_HMD_TEST; separate bookkeeping-only [skip ci] commit."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No native gameplay promotion; Quest3/VDXR visual/input runtime still UNTESTED"
+  },
+  "material_result_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
+  "validation_bearing_result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
+  "result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
+  "next_action": "Do not repeat task 00636 or reactivate DXVK. Controller may select independent disjoint native menu->vehicle->race draw/input integration; Quest3/VDXR screen+gamepad proof is NEED_HMD_TEST, no backend promotion until then.",
+  "material_implementation_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38314485276,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "dx11_fast": {
+      "run_id": 38314485264,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "windows_build": {
+      "run_id": 38314492048,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "openxr_architecture": {
+      "run_id": 38314492085,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "hud_inspector": {
+      "run_id": 38314492041,
+      "conclusion": "IN_PROGRESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    }
+  },
+  "failure_recovery": {
+    "first_candidate_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
+    "initial_fast_run_id": 38314342995,
+    "initial_backend_run_id": 38314342991,
+    "cause": "Feature-owned Python regression expected pre-refactor adjacent TFACTOR read and allowlist anchors, whereas new C++ preserved the legacy 00619/00635 anchors and isolated the new stage path.",
+    "corrected_validation_bearing_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
+    "corrected_fast_and_gate": "SUCCESS"
+  },
+  "completed_at": "2026-10-13T07:16:40+09:00",
+  "evidence": {
+    "backend_gate_run_id": 38314485276,
+    "backend_gate_conclusion": "success",
+    "dx11_fast_run_id": 38314485264,
+    "dx11_fast_conclusion": "success",
+    "windows_build_run_id": 38314492048,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38314492085,
+    "openxr_conclusion": "success",
+    "hud_run_id": 38314492041,
+    "hud_conclusion": "success",
+    "failed_predecessor_run_id": 38314342991,
+    "failed_predecessor_conclusion": "failure",
+    "validation_bearing_result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+  }
+}

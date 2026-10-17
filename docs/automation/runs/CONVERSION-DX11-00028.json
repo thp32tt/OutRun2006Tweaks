@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00028",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T06:38:01+09:00",
+  "base_sha": "522923524be51890985c43d49d5d16a68a3704a0",
+  "code_result_sha": "f17892a2387508b13f45aa5bad6cfce460c3a6f8",
+  "result_sha": "f17892a2387508b13f45aa5bad6cfce460c3a6f8",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R85 bounded non-routing D3DCompile validation probe for R84 generated fixed-function HLSL.",
+  "summary": "Added a diagnostic compiler-acceptance probe for generated R84 HLSL. Newly observed unique fixed-function signatures with generated prototypes are compiled only within the existing first-64 detailed-signature cap using D3DCompile ps_4_0 with strictness/optimization. HRESULT, bytecode hash/size and diagnostics hash/size are recorded, then all blobs are released. No shader object is created or bound and native routing remains disabled.",
+  "evidence": [
+    "CONVERSION-DX11-00026 established diagnostic R84 HLSL generation and selected non-routing compilation validation as the next bounded task.",
+    "The existing checked-in build graph already links d3dcompiler.lib; R85 source-graph verification now guards that dependency.",
+    "Backend Conversion Gate 36486586851 PASS on exact production SHA.",
+    "Build 36486593630 PASS on exact production SHA.",
+    "OpenXR VR architecture 36486593690 PASS across all six jobs.",
+    "HUD Inspector 36486593666 PASS.",
+    "Hosted CI compiled and linked the D3DCompile probe but did not launch the game/census, so actual game-generated HLSL compiler acceptance was not observed.",
+    "No Quest 3/VDXR or in-game runtime validation was performed."
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Added R85 diagnostic compiler probe result/API."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Added D3DCompile ps_4_0 non-routing probe, bytecode/diagnostic hashing, immediate blob release."
+    },
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Added first-64 unique-signature compile-probe invocation, success/failure/skipped-cap counters and per-signature compiler evidence."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Added R85 compiler summary/per-signature parsing and compile failure evidence."
+    },
+    {
+      "path": "tools/test_analyze_dx11_census.py",
+      "result": "Added R85 analyzer regression fixture for successful compiler evidence."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added D3DCompile API, bounded invocation, parser and d3dcompiler.lib link guards."
+    }
+  ],
+  "review_findings": {
+    "F18_resource_usage_pool_lock_update_semantics": "EIGHT_TEXTURE_STAGE_DESCRIPTOR_BEHAVIOR_FORMAT_EXACTNESS_MODELED_LIVE_MIRROR_NOT_ENABLED",
+    "F19_input_layout_readiness": "DECLARATION_AND_CONSERVATIVE_FVF_LAYOUT_READY_BLEND_ENCODINGS_OPEN",
+    "F20_fixed_function_stage_sampler_coverage": "EIGHT_STAGE_READY_SUBSET_HAS_GENERATED_HLSL_AND_BOUNDED_COMPILER_PROBE_RUNTIME_EVIDENCE_OPEN",
+    "F21_shader_translation_readiness": "PROGRAMMABLE_TRANSLATION_OPEN_FIXED_FUNCTION_COMPILER_ACCEPTANCE_DIAGNOSTIC_ONLY",
+    "F22_sampling_signature_saturation": "OPEN_R85_COMPILER_INSTRUMENTATION_EXPLICITLY_BOUNDED_TO_64_DETAILED_SIGNATURES",
+    "F23_exact_status_semantics": "MITIGATED_NATIVE_ACTIVATION_DISABLED"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R85 only validates compiler-call integration and records future compiler acceptance. It creates/binds no shader object and does not prove D3D9 semantic parity or exact-build Quest3/VDXR behavior."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36486586851,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f17892a2387508b13f45aa5bad6cfce460c3a6f8",
+      "queue_contract": "PASS",
+      "dx11_source_graph": "PASS",
+      "dx11_census_analyzer_regression": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10998808625,
+      "artifact_digest": "sha256:06a082a70d46e5a295fd94297187734e0650481feeb0e4423cad26d101537956"
+    },
+    "build": {
+      "run_id": 36486593630,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f17892a2387508b13f45aa5bad6cfce460c3a6f8",
+      "win32_build": "PASS",
+      "binary_verification": "PASS",
+      "binary_artifact_id": 10999488132,
+      "binary_artifact_digest": "sha256:1b7ee7ba577675b932da18d21df487ec538fe7ca230d81c38ef1379abba86b7c"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36486593690,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f17892a2387508b13f45aa5bad6cfce460c3a6f8",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS",
+      "host_artifact_id": 10999043332,
+      "host_artifact_digest": "sha256:d1db660b2e75e05b6104cff4f95a21146dac7d31ce1a0d8a059f8304f22959ac",
+      "c1_artifact_id": 10999507792,
+      "c1_artifact_digest": "sha256:47ae2a8634e5e7b294f1276fc0688fbddd563a255a10268b6604504317288e0d"
+    },
+    "hud_inspector": {
+      "run_id": 36486593666,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "f17892a2387508b13f45aa5bad6cfce460c3a6f8",
+      "static_exe_analysis": "PASS",
+      "win32_build": "PASS",
+      "artifact_id": 10999667911,
+      "artifact_digest": "sha256:f4c3e7f249db2b48566a1e4f30a909f48d5fc4dca7d2b746ec4155d73ebc2dc8"
+    },
+    "pc_fast": {
+      "run_id": 36486586880,
+      "status": "completed",
+      "conclusion": "skipped"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "implementation_comment_id": 5879098350,
+    "validation_comment_id": 5879232185
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false. A later bounded task may add deterministic semantic expectations for selected compiler-accepted fixed-function cases or consume a real OUTRUN_VR_DX11_CENSUS runtime log. Do not create/bind native shaders until compiler acceptance, semantic parity and exact-build Quest3/VDXR evidence are all present.",
+  "finalized_kst": "2026-09-29T06:38:01+09:00"
+}

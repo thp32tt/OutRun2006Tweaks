@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00558",
+  "production_id": "CONVERSION-DX11-00558",
+  "event_id": "CONVERSION-DX11-00558-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00558",
+  "work_key": "DX11:MENU_RACE_STAGE0_TEXTURE_DIFFUSE_ALPHA_BLEND_NATIVE_DRAW",
+  "base_sha": "df99bcf0461cccc35de6d97d9f2bf10377769df3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game D3D9 stage0 BLENDTEXTUREALPHA or BLENDDIFFUSEALPHA GetTextureStageState and original Draw",
+      "D3D11 shader compilation/lifetime and real game-source Draw or DrawIndexed",
+      "Opt-in game-visible diagnostic inset via existing readback and D3D9 Present; original controller input/game Draw fallback unchanged"
+    ],
+    "batch_components": [
+      "C++ live D3D9 stage0 exact color/alpha admission and texture/diffuse input",
+      "C++ HLSL PS creation lifecycle and native Draw dispatch",
+      "Python source disconnection negative controls and RGBA numeric vectors"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live GetTextureStageState -> PS -> Draw or DrawIndexed static integration with CPU blend math fixtures",
+      "negative_regression": "Mismatched blend ops, modified arg sources, unmirrored source states remain DX9Ex-only; source mutation checks",
+      "component_integration": "D3D9 game-authored stage0 texel and per-vertex diffuse -> native shader -> GPU Draw -> bounded opt-in readback/inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_TEXTURE_DIFFUSE_ALPHA_BLEND_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_BLEND_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_TEXTURE_DIFFUSE_ALPHA_BLEND",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR menu/vehicle/race/gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; original D3D9 Draw/Present/input authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00558.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub exact branch HEAD df99bcf0461cccc35de6d97d9f2bf10377769df3, AGENTS.md/policy/00557 C6 inspected",
+    "C1_REVIEW": "Stage0 texture/diffuse-alpha blend was absent from live game native shader subset; opt-in only",
+    "C2_IMPLEMENT": "Two HLSL PS + D3D9 op capture + D3D11 lifecycle and native dispatch + negative regression and numeric checks",
+    "C3_VALIDATE": "PASS_EXACT_SHA d05d5ebc5ff661a2308bdab9c31f5589f40fcce3: Backend Gate #38161304245, Win32 Release Build #38161307475, OpenXR #38161307483, HUD Inspector #38161307459, DX11 Fast #38161304254 all SUCCESS at same SHA. Original 95dda7deee5ffa23aa1003d561fae28843d09a31 Build #38161187885 failed a stale 00557 negative source-link fixture; same TASK validation-bearing SHA d05d5ebc5ff661a2308bdab9c31f5589f40fcce3 repairs it. HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "C++/test/material 95dda7deee5ffa23aa1003d561fae28843d09a31 non-skip; test regression-repair validation-bearing SHA d05d5ebc5ff661a2308bdab9c31f5589f40fcce3 non-skip; C6 bookkeeping is isolated [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED: opt-in diagnostic and runtime visual/gamepad/HMD tests not performed",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED/PASS_EXACT_SHA on d05d5ebc5ff661a2308bdab9c31f5589f40fcce3; 5 exact-SHA GitHub Actions workflows SUCCESS, native diagnostic remains opt-in and original game D3D9 Draw/Present/gamepad preserved; Quest3/VDXR/gamepad UNTESTED."
+  },
+  "runtime_evidence": "No real game/HMD/Quest3/VDXR/gamepad test. GitHub CI is not visual or input parity evidence.",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Task complete C6 at exact SHA. Do not rerun/rescore 00558. New independent DX11 menu/race native integration feature may start; Quest3/VDXR and gamepad visual parity NEED_HMD_TEST.",
+  "material_result_sha": "95dda7deee5ffa23aa1003d561fae28843d09a31",
+  "validation_bearing_result_sha": "d05d5ebc5ff661a2308bdab9c31f5589f40fcce3",
+  "result_sha": "d05d5ebc5ff661a2308bdab9c31f5589f40fcce3",
+  "feature_contract": {
+    "scope": "Game D3D9 stage0 BLENDTEXTUREALPHA/BLENDDIFFUSEALPHA -> D3D11 PS owned and sampled resources -> indexed or linear native draw in opt-in desktop inset",
+    "source_material_sha": "95dda7deee5ffa23aa1003d561fae28843d09a31",
+    "validation_bearing_sha": "d05d5ebc5ff661a2308bdab9c31f5589f40fcce3",
+    "runtime_acceptance": "Quest3/VDXR menu/vehicle/race native pixels, presentation, and controller input NEED_HMD_TEST"
+  },
+  "acceptance_results": {
+    "source_and_negative_regression": "D3D9 texture/diffuse alpha blend native shader and draw integration, branch-local source disconnect negative controls, CPU RGBA numeric vectors; first material Build stale negative string fixture repaired in same TASK.",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "runtime_validation": "UNTESTED",
+    "exact_sha": "d05d5ebc5ff661a2308bdab9c31f5589f40fcce3"
+  },
+  "validation_evidence": {
+    "exact_sha": "d05d5ebc5ff661a2308bdab9c31f5589f40fcce3",
+    "github_actions": [
+      {
+        "run_id": 38161304245,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38161307475,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38161307483,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38161304254,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38161307459,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "state_persisted": true
+}

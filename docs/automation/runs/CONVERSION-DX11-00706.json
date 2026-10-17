@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00706",
+  "production_id": "CONVERSION-DX11-00706",
+  "event_id": "CONVERSION-DX11-00706-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_FVF_SPECULAR_STAGE1_RGB_ALPHA_MENU_RACE",
+  "work_key": "DX11:LIVE_GAME_SPECULAR_STAGE1_INTERPOLANT",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Decode actual game-authored D3D9 FVF SPECULAR field",
+      "Transfer COLOR1 via D3D11 VS into Stage1 RGB, independent alpha, and three-source HLSL operators",
+      "Mirror guarded game Draw/DrawIndexed, rejecting missing SPECULAR and preserving original D3D9/gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_fvf_layout.hpp",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_specular_probe_00706.cpp",
+      "tools/test_dx11_stage1_specular_00706.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "256 2-source and 4096 3-source operand+modifier cases plus packed D3D9 FVF source bytes",
+      "negative_regression": "Reject missing FVF SPECULAR, unknown operands and invalid flags, original D3D9 Draw continues",
+      "component_integration": "D3D9 FVF bytes -> NativeVertex COLOR1 -> D3D11 VS/PS -> native Draw/DrawIndexed and inset Present"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_SPECULAR_STAGE1_INTERPOLANT",
+      "src/vr/d3d11/live_game_fvf_layout.hpp",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "FVF_SPECULAR_COLOR1",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA GitHub build and portable source matrix; actual Quest3/VDXR game runtime NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Exact OUTRUN_DX11_FIRST_GAME_FRAME opt-in; unsupported state/missing FVF fallback to D3D9; gamepad untouched"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_FVF_SPECULAR_STAGE1_RGB_ALPHA_MENU_RACE",
+    "goal": "Make live fixed-function vertex SPECULAR a distinct native Stage1 RGB and alpha source without changing default DX9Ex/gamepad.",
+    "acceptance_items": [
+      {
+        "id": "specular-native",
+        "category": "end_to_end_behavior",
+        "behavior_area": "fvf_d3d11_shader",
+        "expected_behavior": "Packed vertex SPECULAR becomes VS COLOR1 and HLSL Stage1 RGB+alpha input"
+      },
+      {
+        "id": "missing-specular-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "input_safe_d3d9",
+        "expected_behavior": "Missing specular or unsupported flags skip native and preserve D3D9/gamepad"
+      },
+      {
+        "id": "exact-sha-build",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_ci",
+        "expected_behavior": "4562 matrix variants and FVF source byte regression with mandatory exact-SHA CI"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "specular-native": "PENDING_CI",
+    "missing-specular-fallback": "PENDING_CI",
+    "exact-sha-build": "PENDING_CI"
+  },
+  "base_head_sha": "0c39e68a917d45a17dd3bba66a5cff129f24243f",
+  "changed_files": [
+    "tools/dx11_game_stage1_factor_probe.cpp",
+    "tools/dx11_game_stage1_cross_channel_probe_00704.cpp",
+    "tools/dx11_game_stage1_triop_probe_00705.cpp",
+    "tools/test_dx11_stage1_cross_channel_00704.py",
+    "tools/test_dx11_stage1_triop_00705.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_specular_probe_00706.cpp",
+    "tools/test_dx11_stage1_specular_00706.py",
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00706.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE",
+    "C1_REVIEW": "DONE",
+    "C2_IMPLEMENT": "DONE",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Verify 5 exact SHA gates; repair code if failed; maintain Quest3/VDXR and gamepad UNTESTED."
+}

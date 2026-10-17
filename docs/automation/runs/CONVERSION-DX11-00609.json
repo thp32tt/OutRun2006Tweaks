@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00609",
+  "production_id": "CONVERSION-DX11-00609",
+  "event_id": "CONVERSION-DX11-00609-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00609",
+  "work_key": "DX11:LIVE_FVF_PSIZE_MENU_WORLD",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "8cb3ff124c4a1f83548b596c10b4cd51667be37f",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game Draw/DrawIndexed uses a D3D9 FVF XYZRHW or XYZ stream with PSIZE field",
+      "Native D3D11 diagnostic FVF decoder skips four PSIZE bytes between NORMAL and DIFFUSE without reinterpreting COLOR/UV",
+      "Existing native Draw/DrawIndexed diagnostic inset retains original D3D9 draw and gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_fvf_layout.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_fvf_layout_probe.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ menu XYZRHW+PSIZE and world XYZ/NORMAL/PSIZE/DIFFUSE/SPECULAR/TEX stream layout/vertex sample checks",
+      "negative_regression": "Malformed stream length, pointSizeBytes and diffuseOffset corruption, incompatible FVF with NORMAL+XYZRHW, and static mutation link tests",
+      "component_integration": "Game-sourced GetFVF to FVF layout/decode to existing native diagnostic Draw/DrawIndexed pathway; 5 exact-SHA GitHub Actions green"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_FVF_PSIZE_MENU_WORLD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_GETFVF",
+      "PSIZE_LAYOUT_DECODE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_DIAGNOSTIC_INSET"
+    ],
+    "visible_frame_acceptance": "Exact SHA CI supports BUILD_VERIFIED only; real menu/car-select/race frame parity NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 remains diagnostic only; original D3D9 Draw/Present/gamepad authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_fvf_layout_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "result_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+  "material_commit": "34177541704f851d047ff32d0f5e113bf958de56",
+  "validation_bearing_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+  "validation_bearing_result_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+  "repair_commit": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+  "ci_summary": "All five exact-SHA mandatory Gates SUCCESS. Backend validate and DX11 readiness smoke SUCCESS, Win32 Build SUCCESS, DX11 Fast SUCCESS, OpenXR SUCCESS, HUD SUCCESS. VR PC Fast Test Build intentionally SKIPPED. Runtime Quest3/VDXR/menu/car-select/race/gamepad UNTESTED.",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38244487620,
+      "conclusion": "success",
+      "head_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38244487620"
+    },
+    {
+      "name": "Build",
+      "run_id": 38244492863,
+      "conclusion": "success",
+      "head_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38244492863"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38244487579,
+      "conclusion": "success",
+      "head_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38244487579"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38244492870,
+      "conclusion": "success",
+      "head_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38244492870"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38244492854,
+      "conclusion": "success",
+      "head_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38244492854"
+    }
+  ],
+  "skipped_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 38244487582,
+      "conclusion": "skipped"
+    }
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Diagnostic opt-in C++ source integration only; Quest3 runtime and user manual deployment pending"
+  },
+  "next_action": "New independent DX11 TASK_ID should select an unowned gameplay Draw/DrawIndexed/menu->vehicle->race or transport gap, without repeating 00609 PSIZE; do not lift runtime guard until Quest3/VDXR real test.",
+  "evidence": {
+    "first_material_sha": "34177541704f851d047ff32d0f5e113bf958de56",
+    "first_build_failure": "38243929038 feature acceptance failed due to legacy NORMAL-only source assertion; repaired in result SHA",
+    "final_exact_sha": "b3b0efd373694b59fe5fb5c3af8fafcf9fe357a8",
+    "backend_gate_conclusion": "success",
+    "runtime_test_performed": false
+  }
+}

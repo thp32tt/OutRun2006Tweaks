@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00691",
+  "production_id": "CONVERSION-DX11-00691",
+  "event_id": "CONVERSION-DX11-00691-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_AUTHORED_RENDER_TARGET_COLOR_FAMILY_READBACK",
+  "work_key": "DX11:GAME_RENDER_TARGET_COLOR_READBACK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Capture actual game-created D3D9 DEFAULT render target via same-format SYSTEMMEM GetRenderTargetData",
+      "Decode native BGRA, swizzled RGBA, or 10:10:10:2 into immutable D3D11 BGRA8 SRV",
+      "Bind mirrored SRV in game Draw and DrawIndexed while keeping DX9Ex original and input"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_render_target_readback.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_rt_readback_probe_00691.cpp",
+      "tools/test_dx11_native_rgba_texture_00660.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable compiled pixel tests cover BGRA/opaque XRGB, swizzled RGBA/X8, and both packed 10-bit game RT layouts; live staging consumed by existing Draw/Indexed.",
+      "negative_regression": "Reject unsupported RT formats and unverified 10-bit sRGB; validate source pitch, lock, surface descriptor and staging failures; destructive source mutations detect severed native draw links.",
+      "component_integration": "D3D9 game-produced menu/car/race render-target textures -> SYSTEMMEM snapshot -> RGB layout decoding -> D3D11 SRV -> native Draw/Indexed."
+    },
+    "conflict_keys": [
+      "DX11:GAME_RENDER_TARGET_COLOR_READBACK",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_render_target_readback.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_RT_READBACK",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Integrated game source RT support, but visual fidelity and Quest3/VDXR evidence remain NEED_HMD_TEST.",
+    "activation_guard_and_fallback": "No native gameplay takeover. Original D3D9 Draw/Present and gamepad preserved, and unverified formats/sRGB/failed staging reject native diagnostic."
+  },
+  "feature_contract": {
+    "feature_id": "GAME_AUTHORED_RENDER_TARGET_COLOR_FAMILY_READBACK",
+    "goal": "Expand actual game-created native menu/vehicle/race Draw source textures to supported DEFAULT render-target color layouts without claiming runtime parity.",
+    "acceptance_items": [
+      {
+        "id": "game-rt-native-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_d3d9_rt_to_dx11_srvs",
+        "expected_behavior": "Read one exact D3D9 game render-target mip and submit its color via DX11 Draw/DrawIndexed"
+      },
+      {
+        "id": "rt-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_dx9ex_readback_failure",
+        "expected_behavior": "Unsupported formats, 10-bit sRGB and staging readback/lock failure retain original D3D9 Draw/Present/input without native promotion"
+      },
+      {
+        "id": "integration-gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_pixels_and_exact_sha_github_ci",
+        "expected_behavior": "Compiled native source probe, destructive source wiring tests and exact-SHA required CI verification"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-rt-native-draw": "PASS_EXACT_SHA (source/CI verified; HMD untested)",
+    "rt-fallback": "PASS_EXACT_SHA (negative guard/format tests; live game untested)",
+    "integration-gates": "PASS_EXACT_SHA"
+  },
+  "base_head_sha": "7ce62159334db4e0280b5df2cef21076f5d679f0",
+  "material_result_sha": "e5b6b7c29c0aa0a905c2c24769eb85e430e2e787",
+  "validation_bearing_result_sha": "06820059b675f02be1549688742bf262fd990119",
+  "changed_files": [
+    "src/vr/d3d11/live_game_render_target_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_rt_readback_probe_00691.cpp",
+    "tools/test_dx11_native_rgba_texture_00660.py",
+    "docs/automation/runs/CONVERSION-DX11-00691.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub head + remote owner / already completed 00689/00690 reconcilied",
+    "C1_REVIEW": "PASS game-authored DEFAULT render-target color formats not previously supported; no duplicate shader-only work",
+    "C2_IMPLEMENT": "PASS actual D3D9 RT readback and DX11 SRV Draw/DrawIndexed conversion, source and decoder C++ committed e5b6b7c29c0aa0a905c2c24769eb85e430e2e787",
+    "C3_VALIDATE": "PASS exact validation-bearing SHA 06820059b675f02be1549688742bf262fd990119; Backend Conversion Gate #38449688609, Fast #38449688634, Build #38449696590, OpenXR #38449696446, HUD #38449696505 all SUCCESS; 3 successive failed exact-SHA test/wiring regressions repaired",
+    "C4_COMMIT": "PASS material e5b6b7c29c0aa0a905c2c24769eb85e430e2e787; validation-bearing repairs 06820059b675f02be1549688742bf262fd990119 (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED; diagnostic opt-in, no standalone deployment request; runtime remains UNTESTED",
+    "C6_STATE": "PASS_EXACT_SHA record in separate [skip ci] bookkeeping commit; hardware validation deferred without blocking future DX11 development"
+  },
+  "next_action": "Controller select next independent real DX11 native scene/input integration item; keep this BUILD_VERIFIED, park Quest3/VDXR/menu-car-race/gamepad visual acceptance as NEED_HMD_TEST and never claim runtime PASS.",
+  "validation_evidence": {
+    "validation_bearing_result_sha": "06820059b675f02be1549688742bf262fd990119",
+    "verified_git_branch": "vr-dx11-native-r71",
+    "automated_verification": "PASS_EXACT_SHA",
+    "workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38449688609,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38449688634,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 38449696590,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38449696446,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38449696505,
+        "conclusion": "success"
+      },
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 38449688627,
+        "conclusion": "skipped",
+        "note": "optional PC-fast trigger, not requested"
+      }
+    ],
+    "portable_cpp_probe": "PASS in DX11 Fast Structural Checks",
+    "source_integration_regression": "PASS native RGBA/10-bit/RT tests + legacy Build regressions",
+    "quest3_vdxr_hmd": "UNTESTED",
+    "gameplay_and_gamepad": "UNTESTED"
+  }
+}

@@ -25,6 +25,9 @@
 
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
+#include "runtime/native_direct_stereo_pair.hpp"
+#include "runtime/native_stereo_source_route.hpp"
+#include "runtime/native_xr_swapchain_image.hpp"
 
 namespace
 {
@@ -729,7 +732,8 @@ namespace
         }
 
         bool ReadFrame(std::uint32_t frameId,
-            OutRunVR::SharedRenderFrameState& out) const
+            OutRunVR::SharedRenderFrameState& out,
+            std::uint32_t directGeneration = 0) const
         {
             if (!frameId || !ValidateRing())
                 return false;
@@ -746,7 +750,11 @@ namespace
                 {
                     OutRunVR::SharedRenderFrameState candidate{};
                     if (ReadSlot(i, candidate) &&
-                        candidate.frameId == frameId)
+                        candidate.frameId == frameId &&
+                        (directGeneration == 0 ||
+                         ((candidate.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0 &&
+                          candidate.reserved[OutRunVR::RenderFrameDirectGenerationIndex] ==
+                              directGeneration)))
                     {
                         selected = candidate;
                         found = true;
@@ -968,8 +976,10 @@ namespace
         float uvOffset[2];
         float sdrWhiteScale;
         float sourceIsScRgb;
-        float padding[2];
+        float sourceIsSrgbView;
+        float padding;
     };
+    static_assert(sizeof(BlitParams) == 32u, "Native OpenXR blit HLSL b0 ABI");
 
     struct MenuPlaneParams
     {
@@ -1016,6 +1026,74 @@ namespace
 
     class StereoCompositor
     {
+        // BFVR-style diagnostic granularity, independently implemented here.
+        // QPC spans only existing CPU/API work; never add a GPU wait just to time it.
+        struct PhaseTimingSeries
+        {
+            std::array<double, 256> samples{};
+            std::size_t count = 0;
+            std::size_t cursor = 0;
+
+            void Add(double ms)
+            {
+                samples[cursor++ % samples.size()] = ms;
+                if (count < samples.size())
+                    ++count;
+            }
+
+            double Percentile(double p) const
+            {
+                if (!count)
+                    return 0.0;
+                auto copy = samples;
+                std::sort(copy.begin(), copy.begin() + count);
+                const std::size_t index = std::min<std::size_t>(
+                    count - 1,
+                    static_cast<std::size_t>(std::ceil(p * count)) - 1);
+                return copy[index];
+            }
+        };
+
+        struct SwapchainPhaseTimings
+        {
+            PhaseTimingSeries acquire;
+            PhaseTimingSeries wait;
+            PhaseTimingSeries release;
+            PhaseTimingSeries blit;
+            PhaseTimingSeries menuBlit;
+            LARGE_INTEGER frequency{};
+            ULONGLONG lastLogMs = 0;
+
+            SwapchainPhaseTimings()
+            {
+                QueryPerformanceFrequency(&frequency);
+            }
+
+            double Ms(const LARGE_INTEGER& begin, const LARGE_INTEGER& end) const
+            {
+                return frequency.QuadPart
+                    ? double(end.QuadPart - begin.QuadPart) * 1000.0 /
+                        double(frequency.QuadPart)
+                    : 0.0;
+            }
+
+            void MaybeLog()
+            {
+                const ULONGLONG now = GetTickCount64();
+                if (now - lastLogMs < 5000)
+                    return;
+                lastLogMs = now;
+                std::cout
+                    << "VR compositor timing ms p95/p99: acquire "
+                    << acquire.Percentile(.95) << "/" << acquire.Percentile(.99)
+                    << " wait " << wait.Percentile(.95) << "/" << wait.Percentile(.99)
+                    << " release " << release.Percentile(.95) << "/" << release.Percentile(.99)
+                    << " blit " << blit.Percentile(.95) << "/" << blit.Percentile(.99)
+                    << " menuBlit " << menuBlit.Percentile(.95) << "/" << menuBlit.Percentile(.99)
+                    << "\n";
+            }
+        };
+
     public:
         StereoCompositor(XrSession session, ID3D11Device* device, ID3D11DeviceContext* context,
             HWND hwnd, const std::array<XrViewConfigurationView, 2>& configs,
@@ -1060,8 +1138,9 @@ namespace
 
         bool Initialize()
         {
-            // R37: direct-only is a real transport-isolation mode. Do not
-            // create IDXGIOutputDuplication while measuring DirectGPU cadence.
+            // DirectGpuOnly is a gameplay-source policy. Desktop Duplication is
+            // disabled only by the explicit full-session diagnostic switch so
+            // PresentationTheater/menu can keep a fresh mono capture.
             if (!disableDesktopDuplication_ && !BindCaptureOutput(true))
                 throw std::runtime_error("failed to bind game capture output");
             CreateShaders();
@@ -1074,7 +1153,8 @@ namespace
                 << " per eye; projection " << projection_.width << "x" << projection_.height << "x2 (scale=" << renderScale_
                 << "); theater " << theater_.width << "x" << theater_.height
                 << "; directGPU=" << (directTransportEnabled_ ? "enabled" : "disabled")
-                << "; desktopDuplication=" << (directTransportOnly_ ? "disabled-direct-only" : "enabled")
+                << "; directGameplayClassicFallback=" << (directTransportOnly_ ? "blocked" : "allowed")
+                << "; desktopDuplication=" << (disableDesktopDuplication_ ? "disabled-explicit" : "enabled")
                 << ".\n";
             return true;
         }
@@ -1279,8 +1359,20 @@ namespace
             const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
             const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
             const std::uint32_t generation = frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue || !width || !height || !generation){invalidateDirect();return false;}
-            const bool same = directLeft_[slot] && directRight_[slot] && directLeftSrv_[slot] && directRightSrv_[slot] && directLeftHandle_[slot] == leftHandleValue && directRightHandle_[slot] == rightHandleValue && directGeneration_[slot] == generation;
+            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue ||
+                leftHandleValue == rightHandleValue || !width || !height || !generation)
+            { invalidateDirect(); return false; }
+            // A new host OpenXR/D3D11 device invalidates the old cached GPU
+            // opens even when the legacy handle numbers, slot and transport
+            // generation happen to match. Never feed a foreign-device eye
+            // texture to this device's projection context.
+            const bool same = directLeft_[slot] && directRight_[slot] &&
+                directLeftSrv_[slot] && directRightSrv_[slot] &&
+                directLeftHandle_[slot] == leftHandleValue &&
+                directRightHandle_[slot] == rightHandleValue &&
+                directGeneration_[slot] == generation &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(directLeft_[slot], device_) &&
+                OutRunVrNativeEyePair::TextureOwnedByDevice(directRight_[slot], device_);
             if (!same)
             {
                 ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]); ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]); invalidateDirect();
@@ -1290,13 +1382,36 @@ namespace
                     if (FAILED(device_->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) || !resource) return false;
                     const HRESULT q = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(texture)); resource->Release(); if (FAILED(q) || !*texture) return false;
                     D3D11_TEXTURE2D_DESC d{}; (*texture)->GetDesc(&d);
-                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || (d.Format != DXGI_FORMAT_B8G8R8A8_UNORM && d.Format != DXGI_FORMAT_R8G8B8A8_UNORM && d.Format != DXGI_FORMAT_R10G10B10A2_UNORM && d.Format != DXGI_FORMAT_R16G16B16A16_FLOAT) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
+                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || !OutRunVrNativeEyePair::IsSupportedSourceFormat(d.Format) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
                     return true;
                 };
                 if (!openOne(leftHandleValue,&directLeft_[slot],&directLeftSrv_[slot]) || !openOne(rightHandleValue,&directRight_[slot],&directRightSrv_[slot])){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();if(!directOpenFailureLogged_){directOpenFailureLogged_=true;std::cout<<"Direct GPU eye ring open failed; host will request SBS fallback.\n";}return false;}
                 D3D11_TEXTURE2D_DESC ld{}; directLeft_[slot]->GetDesc(&ld); D3D11_TEXTURE2D_DESC rd{}; directRight_[slot]->GetDesc(&rd);
                 if(ld.Format!=rd.Format){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();std::cout<<"Direct GPU eye ring format mismatch; Ready cleared and SBS fallback requested.\n";return false;}
                 directLeftHandle_[slot]=leftHandleValue;directRightHandle_[slot]=rightHandleValue;directGeneration_[slot]=generation;directFormat_[slot]=ld.Format;std::cout<<"Direct GPU eye ring slot "<<slot<<" opened: source "<<width<<"x"<<height<<" -> OpenXR "<<projection_.width<<"x"<<projection_.height<<".\n";
+            }
+            // Validate even a cached source: reused handles with different
+            // frame metadata must never masquerade as a valid pair. The R23
+            // compositor copies only after this succeeds, preserving the
+            // original DX9Ex/SBS frame and gamepad on any rejection.
+            D3D11_TEXTURE2D_DESC nativeLeft{}, nativeRight{};
+            directLeft_[slot]->GetDesc(&nativeLeft);
+            directRight_[slot]->GetDesc(&nativeRight);
+            // Different legacy shared handle values are not proof of two
+            // distinct GPU allocations. Fail closed before R23's direct
+            // OpenXR hold-texture copies or legacy same-frame snapshots.
+            if (!OutRunVrNativeEyePair::DistinctSourceAllocations<IUnknown>(
+                    directLeft_[slot], directRight_[slot], IID_IUnknown) ||
+                !OutRunVrNativeEyePair::Compatible(
+                    leftHandleValue, rightHandleValue, generation,
+                    width, height, nativeLeft, nativeRight))
+            {
+                ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
+                ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
+                directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
+                directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
+                invalidateDirect();
+                return false;
             }
             // Production R23 copies directly into its host-owned hold textures.
             // Stop here after opening/validating the shared ring so that path
@@ -1317,11 +1432,33 @@ namespace
             const std::uint32_t slot =
                 frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
             D3D11_TEXTURE2D_DESC sourceDesc{};directLeft_[slot]->GetDesc(&sourceDesc);
-            if(!directSnapshotLeft_||!directSnapshotRight_||directSnapshotWidth_!=sourceDesc.Width||directSnapshotHeight_!=sourceDesc.Height||directSnapshotFormat_!=sourceDesc.Format){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);D3D11_TEXTURE2D_DESC d=sourceDesc;d.MipLevels=1;d.ArraySize=1;d.SampleDesc.Count=1;d.SampleDesc.Quality=0;d.Usage=D3D11_USAGE_DEFAULT;d.BindFlags=D3D11_BIND_SHADER_RESOURCE;d.CPUAccessFlags=0;d.MiscFlags=0;if(FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotLeft_))||FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotRight_))||FAILED(device_->CreateShaderResourceView(directSnapshotLeft_,nullptr,&directSnapshotLeftSrv_))||FAILED(device_->CreateShaderResourceView(directSnapshotRight_,nullptr,&directSnapshotRightSrv_))){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);directSnapshotWidth_=directSnapshotHeight_=0;directSnapshotFormat_=DXGI_FORMAT_UNKNOWN;invalidateDirect();return false;}directSnapshotWidth_=sourceDesc.Width;directSnapshotHeight_=sourceDesc.Height;directSnapshotFormat_=sourceDesc.Format;}
-            context_->CopyResource(directSnapshotLeft_,directLeft_[slot]);context_->CopyResource(directSnapshotRight_,directRight_[slot]);
+            if(!directSnapshotLeft_||!directSnapshotRight_||directSnapshotWidth_!=sourceDesc.Width||directSnapshotHeight_!=sourceDesc.Height||directSnapshotFormat_!=sourceDesc.Format||
+                !OutRunVrNativeEyePair::TextureOwnedByDevice(directSnapshotLeft_,device_)||
+                !OutRunVrNativeEyePair::TextureOwnedByDevice(directSnapshotRight_,device_)){
+                ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);D3D11_TEXTURE2D_DESC d=sourceDesc;d.MipLevels=1;d.ArraySize=1;d.SampleDesc.Count=1;d.SampleDesc.Quality=0;d.Usage=D3D11_USAGE_DEFAULT;d.BindFlags=D3D11_BIND_SHADER_RESOURCE;d.CPUAccessFlags=0;d.MiscFlags=0;if(FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotLeft_))||FAILED(device_->CreateTexture2D(&d,nullptr,&directSnapshotRight_))||FAILED(device_->CreateShaderResourceView(directSnapshotLeft_,nullptr,&directSnapshotLeftSrv_))||FAILED(device_->CreateShaderResourceView(directSnapshotRight_,nullptr,&directSnapshotRightSrv_))){ReleaseCom(directSnapshotLeftSrv_);ReleaseCom(directSnapshotLeft_);ReleaseCom(directSnapshotRightSrv_);ReleaseCom(directSnapshotRight_);directSnapshotWidth_=directSnapshotHeight_=0;directSnapshotFormat_=DXGI_FORMAT_UNKNOWN;invalidateDirect();return false;}directSnapshotWidth_=sourceDesc.Width;directSnapshotHeight_=sourceDesc.Height;directSnapshotFormat_=sourceDesc.Format;}
+            if (!OutRunVrNativeEyePair::CopyDirectEyesToHold<IUnknown>(
+                    context_,device_,directSnapshotLeft_,directSnapshotRight_,
+                    directLeft_[slot],directRight_[slot],IID_IUnknown)) {
+                invalidateDirect();
+                return false;
+            }
             ID3D11Query* copyFence=nullptr;D3D11_QUERY_DESC q{};q.Query=D3D11_QUERY_EVENT;if(FAILED(device_->CreateQuery(&q,&copyFence))||!copyFence){invalidateDirect();return false;}context_->End(copyFence);context_->Flush();const ULONGLONG deadline=GetTickCount64()+DirectCopyFenceBudgetMs;HRESULT ready=S_FALSE;do{ready=context_->GetData(copyFence,nullptr,0,D3D11_ASYNC_GETDATA_DONOTFLUSH);if(ready==S_OK||FAILED(ready))break;Sleep(0);}while(GetTickCount64()<deadline);copyFence->Release();
             if(ready!=S_OK){invalidateDirect();if(!directCopyFenceFailureLogged_){directCopyFenceFailureLogged_=true;std::cout<<"Direct GPU private snapshot copy did not complete inside the safety budget; ACK withheld and SBS fallback requested.\n";}return false;}
+            // This GPU-fenced direct snapshot is now the authoritative stereo
+            // source. An older SBS capture must not be reused if a later
+            // DirectGPU transfer fails before the next matching frame.
+            stereoSourceValid_ = false;
             directActiveSlot_=slot;directFrameValid_=true;directTransportReady_=true;return true;
+        }
+
+        // A stale GPU copy cannot be displayed with the last committed pose.
+        // Clear both routes, including an old SBS fallback, after a failed
+        // DirectGPU transfer or a changed producer snapshot.
+        void DiscardUnmatchedStereoSource() noexcept
+        {
+            directFrameValid_ = false;
+            directTransportReady_ = false;
+            stereoSourceValid_ = false;
         }
 
         bool DirectTransportReady() const { return directTransportEnabled_ && directTransportReady_; }
@@ -1358,20 +1495,40 @@ namespace
                 stereoSourceFormat_ = sourceFormat_;
             }
             context_->CopyResource(stereoSource_, source_);
+            // A successful SBS fallback replaces any previous DirectGPU eye
+            // snapshot. Otherwise the live menu->race transport switch keeps
+            // showing stale direct left/right pixels despite the new capture.
+            directFrameValid_ = false;
+            directTransportReady_ = false;
             stereoSourceValid_ = true;
             return true;
         }
 
-        bool HasStereoSource() const { return directFrameValid_ || (stereoSourceValid_ && stereoSourceSrv_); }
+        OutRunVrNativeEyePair::StereoSourceRoute StereoSource() const
+        {
+            return OutRunVrNativeEyePair::ChooseStereoSource(
+                directFrameValid_, directSnapshotLeftSrv_ != nullptr,
+                directSnapshotRightSrv_ != nullptr,
+                stereoSourceValid_, stereoSourceSrv_ != nullptr);
+        }
+
+        bool HasStereoSource() const
+        {
+            return StereoSource() != OutRunVrNativeEyePair::StereoSourceRoute::None;
+        }
 
         bool RenderProjection(const std::array<XrView, 2>& views,
             std::array<XrCompositionLayerProjectionView, 2>& pv)
         {
-            if (!HasStereoSource()) return false;
+            const auto sourceRoute = StereoSource();
+            if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+                return false;
             UvRect eyes[2]{};
             ID3D11ShaderResourceView* eyeSrv[2]{};
             DXGI_FORMAT eyeFormat[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-            if (directFrameValid_ && directSnapshotLeftSrv_ && directSnapshotRightSrv_)
+            const bool selectedDirectPair =
+                sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu;
+            if (selectedDirectPair)
             {
                 eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
                 eyeSrv[0] = directSnapshotLeftSrv_; eyeSrv[1] = directSnapshotRightSrv_;
@@ -1388,11 +1545,35 @@ namespace
             }
 
             std::uint32_t image = 0;
-            Acquire(projection_, image);
-            bool ok = RenderTo(projection_.rtvs[image][0], projection_.width, projection_.height,
-                eyes[0], eyeSrv[0], eyeFormat[0]);
-            ok = RenderTo(projection_.rtvs[image][1], projection_.width, projection_.height,
-                eyes[1], eyeSrv[1], eyeFormat[1]) && ok;
+            if (!Acquire(projection_, image, 2u)) return false;
+            // The legacy compositor is also a real DirectGPU consumer. Reuse
+            // the R23 verified whole-eye -> XR array GPU route when the
+            // selected game frame is a complete native L/R pair. Never
+            // promote a stale hold, classic SBS atlas, scaled target or
+            // different color transfer. Their original shader projection
+            // remains authoritative; D3D9 game input/FFB is untouched.
+            static const bool nativeEyeCopyOptIn = [] {
+                const char* value = std::getenv("OUTRUN_VR_NATIVE_XR_EYE_COPY");
+                return value && std::strcmp(value, "1") == 0;
+            }();
+            bool directEyeCopied = false;
+            if (image < projection_.images.size() &&
+                projection_.images[image].texture) {
+                directEyeCopied =
+                    OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                        context_, device_, directSnapshotLeft_,
+                        directSnapshotRight_, projection_.images[image].texture,
+                        nativeEyeCopyOptIn,
+                        selectedDirectPair,
+                        directFrameValid_ && directTransportReady_, IID_IUnknown);
+            }
+            bool ok = directEyeCopied;
+            if (!directEyeCopied) {
+                ok = RenderTo(projection_.rtvs[image][0], projection_.width,
+                    projection_.height, eyes[0], eyeSrv[0], eyeFormat[0]);
+                ok = RenderTo(projection_.rtvs[image][1], projection_.width,
+                    projection_.height, eyes[1], eyeSrv[1], eyeFormat[1]) && ok;
+            }
             Release(projection_);
             if (!ok) return false;
 
@@ -1421,6 +1602,8 @@ namespace
                 !menuConstantBuffer_ || !menuVs_)
                 return false;
 
+            LARGE_INTEGER blitBegin{}, blitEnd{};
+            QueryPerformanceCounter(&blitBegin);
             D3D11_MAPPED_SUBRESOURCE map{};
             if (FAILED(context_->Map(
                     constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
@@ -1433,7 +1616,10 @@ namespace
             p->sdrWhiteScale = sdrWhiteScale_;
             p->sourceIsScRgb =
                 sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
+            // A typed sRGB SRV already returns linear values from D3D11 sampling.
+            p->sourceIsSrgbView =
+                OutRunVrNativeEyePair::IsSrgbView(sourceFormat) ? 1.f : 0.f;
+            p->padding = 0.f;
             context_->Unmap(constantBuffer_, 0);
 
             if (FAILED(context_->Map(
@@ -1467,6 +1653,9 @@ namespace
             context_->PSSetShaderResources(0, 1, &nullSrv);
             ID3D11RenderTargetView* nullRtv = nullptr;
             context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            QueryPerformanceCounter(&blitEnd);
+            swapchainTimings_.menuBlit.Add(
+                swapchainTimings_.Ms(blitBegin, blitEnd));
             return true;
         }
 
@@ -1514,8 +1703,8 @@ namespace
             }
 
             std::uint32_t image = 0;
-            Acquire(projection_, image);
-            bool ok = image < projection_.rtvs.size();
+            if (!Acquire(projection_, image, 2u)) return false;
+            bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
                 float clip[4][4]{};
@@ -1592,7 +1781,7 @@ namespace
             UvRect whole{};
             if (!GetGameUv(whole)) return false;
             std::uint32_t image = 0;
-            Acquire(theater_, image);
+            if (!Acquire(theater_, image, 1u)) return false;
             const bool ok = RenderTo(theater_.rtvs[image][0], theater_.width, theater_.height,
                 whole, sourceSrv_, sourceFormat_);
             Release(theater_);
@@ -1894,19 +2083,56 @@ namespace
             }
         }
 
-        void Acquire(SwapchainSet& s, std::uint32_t& image)
+        // Native game L/R projection and menu need both live RTV slices;
+        // mono theater needs one. Reject absent resources before xrAcquire.
+        bool Acquire(SwapchainSet& s, std::uint32_t& image,
+            std::uint32_t requiredViews)
         {
+            image = 0;
+            if (s.handle == XR_NULL_HANDLE || s.images.empty() ||
+                s.rtvs.size() != s.images.size() ||
+                requiredViews == 0u || requiredViews > s.arraySize ||
+                requiredViews > 2u)
+                return false;
             XrSwapchainImageAcquireInfo ai{ XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO };
+            LARGE_INTEGER acquireBegin{}, acquireEnd{};
+            QueryPerformanceCounter(&acquireBegin);
             CheckXr(xrAcquireSwapchainImage(s.handle, &ai, &image), "xrAcquireSwapchainImage");
+            QueryPerformanceCounter(&acquireEnd);
+            swapchainTimings_.acquire.Add(
+                swapchainTimings_.Ms(acquireBegin, acquireEnd));
+
             XrSwapchainImageWaitInfo wi{ XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO };
             wi.timeout = XR_INFINITE_DURATION;
+            LARGE_INTEGER waitBegin{}, waitEnd{};
+            QueryPerformanceCounter(&waitBegin);
             CheckXr(xrWaitSwapchainImage(s.handle, &wi), "xrWaitSwapchainImage");
+            QueryPerformanceCounter(&waitEnd);
+            swapchainTimings_.wait.Add(
+                swapchainTimings_.Ms(waitBegin, waitEnd));
+            if (!OutRunVrNativeXrSwapchain::ImageViewsReady(
+                    image, s.images.size(), s.arraySize, s.rtvs,
+                    requiredViews))
+            {
+                // The wait completed: release a malformed acquired image
+                // without indexing its RTV or submitting an invalid XR layer.
+                // Existing game input and the last released layer survive.
+                Release(s);
+                return false;
+            }
+            return true;
         }
 
         void Release(SwapchainSet& s)
         {
             XrSwapchainImageReleaseInfo ri{ XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO };
+            LARGE_INTEGER releaseBegin{}, releaseEnd{};
+            QueryPerformanceCounter(&releaseBegin);
             CheckXr(xrReleaseSwapchainImage(s.handle, &ri), "xrReleaseSwapchainImage");
+            QueryPerformanceCounter(&releaseEnd);
+            swapchainTimings_.release.Add(
+                swapchainTimings_.Ms(releaseBegin, releaseEnd));
+            swapchainTimings_.MaybeLog();
         }
 
         void CreateShaders()
@@ -2077,6 +2303,8 @@ namespace
             const UvRect& uv, ID3D11ShaderResourceView* sourceSrv, DXGI_FORMAT sourceFormat)
         {
             if (!rtv || !sourceSrv || !constantBuffer_) return false;
+            LARGE_INTEGER blitBegin{}, blitEnd{};
+            QueryPerformanceCounter(&blitBegin);
             D3D11_MAPPED_SUBRESOURCE map{};
             if (FAILED(context_->Map(constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
                 return false;
@@ -2087,7 +2315,10 @@ namespace
             p->uvOffset[1] = uv.y;
             p->sdrWhiteScale = sdrWhiteScale_;
             p->sourceIsScRgb = sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
+            // A typed sRGB SRV already returns linear values from D3D11 sampling.
+            p->sourceIsSrgbView =
+                OutRunVrNativeEyePair::IsSrgbView(sourceFormat) ? 1.f : 0.f;
+            p->padding = 0.f;
             context_->Unmap(constantBuffer_, 0);
 
             D3D11_VIEWPORT vp{};
@@ -2107,6 +2338,9 @@ namespace
             context_->PSSetShaderResources(0, 1, &nullSrv);
             ID3D11RenderTargetView* nullRtv = nullptr;
             context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            QueryPerformanceCounter(&blitEnd);
+            swapchainTimings_.blit.Add(
+                swapchainTimings_.Ms(blitBegin, blitEnd));
             return true;
         }
 
@@ -2127,6 +2361,7 @@ namespace
             return true;
         }
 
+        SwapchainPhaseTimings swapchainTimings_{};
         XrSession session_ = XR_NULL_HANDLE;
         ID3D11Device* device_ = nullptr;
         ID3D11DeviceContext* context_ = nullptr;
@@ -2192,7 +2427,7 @@ namespace
 
     bool QpcAtOrAfter(std::int64_t capture,std::int64_t present){return capture>0&&present>0&&capture>=present;}
     struct TimingSeries{std::array<double,256>samples{};std::size_t count=0,cursor=0;void Add(double ms){samples[cursor++%samples.size()]=ms;if(count<samples.size())++count;}double Percentile(double p)const{if(!count)return 0;auto c=samples;std::sort(c.begin(),c.begin()+count);const std::size_t i=std::min<std::size_t>(count-1,static_cast<std::size_t>(std::ceil(p*count))-1);return c[i];}};
-    struct HostTimings{TimingSeries wait,capture,render,end;LARGE_INTEGER f{};ULONGLONG last=0;HostTimings(){QueryPerformanceFrequency(&f);}double Ms(const LARGE_INTEGER&a,const LARGE_INTEGER&b)const{return f.QuadPart?double(b.QuadPart-a.QuadPart)*1000.0/double(f.QuadPart):0;}void MaybeLog(){const auto n=GetTickCount64();if(n-last<5000)return;last=n;std::cout<<"VR host timing ms p95/p99: wait "<<wait.Percentile(.95)<<"/"<<wait.Percentile(.99)<<" capture "<<capture.Percentile(.95)<<"/"<<capture.Percentile(.99)<<" render "<<render.Percentile(.95)<<"/"<<render.Percentile(.99)<<" end "<<end.Percentile(.95)<<"/"<<end.Percentile(.99)<<"\n";}};
+    struct HostTimings{TimingSeries wait,begin,locate,capture,render,end;LARGE_INTEGER f{};ULONGLONG last=0;HostTimings(){QueryPerformanceFrequency(&f);}double Ms(const LARGE_INTEGER&a,const LARGE_INTEGER&b)const{return f.QuadPart?double(b.QuadPart-a.QuadPart)*1000.0/double(f.QuadPart):0;}void MaybeLog(){const auto n=GetTickCount64();if(n-last<5000)return;last=n;std::cout<<"VR host timing ms p95/p99: wait "<<wait.Percentile(.95)<<"/"<<wait.Percentile(.99)<<" begin "<<begin.Percentile(.95)<<"/"<<begin.Percentile(.99)<<" locate "<<locate.Percentile(.95)<<"/"<<locate.Percentile(.99)<<" capture "<<capture.Percentile(.95)<<"/"<<capture.Percentile(.99)<<" render "<<render.Percentile(.95)<<"/"<<render.Percentile(.99)<<" end "<<end.Percentile(.95)<<"/"<<end.Percentile(.99)<<"\n";}};
 
     XrEnvironmentBlendMode ChooseBlendMode(XrInstance instance, XrSystemId system)
     {
@@ -2517,8 +2752,14 @@ int main(int argc, char** argv)
             LARGE_INTEGER ws{},we{};QueryPerformanceCounter(&ws);CheckXr(xrWaitFrame(session,&wi,&fs),"xrWaitFrame");QueryPerformanceCounter(&we);timings.wait.Add(timings.Ms(ws,we));
             if(pendingReferenceSpaceChange&&(pendingReferenceSpaceChangeTime==0||fs.predictedDisplayTime>=pendingReferenceSpaceChangeTime)){shared.ReferenceSpaceChanged();compositor.ReferenceSpaceChanged();viewHistory.Clear();matchedStereoValid=false;OutRunVR::SharedRenderFrameState rf{};lastProcessedStereoFrame=renderFrames.Read(rf)?rf.frameId:shared.ReadStereoMeta().frame;pendingReferenceSpaceChange=false;pendingReferenceSpaceChangeTime=0;}
             XrFrameBeginInfo bi{ XR_TYPE_FRAME_BEGIN_INFO };
+            LARGE_INTEGER beginStart{}, beginEnd{};
+            QueryPerformanceCounter(&beginStart);
             CheckXr(xrBeginFrame(session, &bi), "xrBeginFrame");
+            QueryPerformanceCounter(&beginEnd);
+            timings.begin.Add(timings.Ms(beginStart, beginEnd));
 
+            LARGE_INTEGER locateStart{}, locateEnd{};
+            QueryPerformanceCounter(&locateStart);
             XrSpaceLocation head{ XR_TYPE_SPACE_LOCATION };
             CheckXr(xrLocateSpace(viewSpace, localSpace, fs.predictedDisplayTime, &head), "xrLocateSpace");
             std::array<XrView, 2> views{};
@@ -2530,6 +2771,8 @@ int main(int argc, char** argv)
             vl.space = localSpace;
             std::uint32_t vc = 0;
             CheckXr(xrLocateViews(session, &vl, &vs, 2, &vc, views.data()), "xrLocateViews");
+            QueryPerformanceCounter(&locateEnd);
+            timings.locate.Add(timings.Ms(locateStart, locateEnd));
 
             const std::uint32_t hostSequence = shared.Write(head, views, vc, configs,
                 state, vs.viewStateFlags, fs.shouldRender == XR_TRUE, directTransportEnabled,
@@ -2561,7 +2804,61 @@ int main(int argc, char** argv)
             bool layerReady=false;
             if(fs.shouldRender==XR_TRUE&&vc>=2){
                 if(presentation==OutRunVR::PresentationGameplay){OutRunVR::SharedRenderFrameState before{};const bool have=renderFrames.Read(before);const std::uint32_t need=OutRunVR::RenderFrameStereoComplete|OutRunVR::RenderFrameWorldStereo|OutRunVR::RenderFrameDrawDuplicated|OutRunVR::RenderFrameEffectivePoseValid;
-                    if(have&&(before.flags&OutRunVR::RenderFramePresentInFlight)==0&&before.state==OutRunVR::StereoSbsActive&&before.frameId&&before.frameId!=lastProcessedStereoFrame&&before.sourcePoseSequence&&(before.flags&need)==need){std::array<XrView,2> history{};if(viewHistory.Find(before.sourcePoseSequence,history)){bool sourceReady=false;const bool directFrame=(before.flags&OutRunVR::RenderFrameDirectGpuTransport)!=0;LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);if(directFrame){sourceReady=compositor.CommitDirectStereoSource(before);}else{const CaptureStatus capture=compositor.Capture(2);sourceReady=capture.available&&QpcAtOrAfter(capture.lastPresentQpc,before.presentQpc)&&compositor.CommitStereoSource();}QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));OutRunVR::SharedRenderFrameState after{};const bool same=renderFrames.Read(after)&&(after.flags&OutRunVR::RenderFramePresentInFlight)==0&&after.state==before.state&&after.frameId==before.frameId&&after.sourcePoseSequence==before.sourcePoseSequence&&after.presentQpc==before.presentQpc&&after.flags==before.flags&&after.failureReason==before.failureReason;if(sourceReady&&same){if(directFrame)shared.AckDirectFrame(before.frameId);for(int eye=0;eye<2;++eye){matchedViews[eye]={XR_TYPE_VIEW};matchedViews[eye].pose.orientation={before.eye[eye].orientation[0],before.eye[eye].orientation[1],before.eye[eye].orientation[2],before.eye[eye].orientation[3]};matchedViews[eye].pose.position={before.eye[eye].position[0],before.eye[eye].position[1],before.eye[eye].position[2]};matchedViews[eye].fov={before.eye[eye].fov.angleLeft,before.eye[eye].fov.angleRight,before.eye[eye].fov.angleUp,before.eye[eye].fov.angleDown};}matchedStereoValid=true;lastProcessedStereoFrame=before.frameId;lastStereoMatchMs=GetTickCount64();}}}
+                    if(have&&(before.flags&OutRunVR::RenderFramePresentInFlight)==0&&before.state==OutRunVR::StereoSbsActive&&before.frameId&&before.frameId!=lastProcessedStereoFrame&&before.sourcePoseSequence&&(before.flags&need)==need) {
+                        std::array<XrView,2> history{};
+                        if (viewHistory.Find(before.sourcePoseSequence,history)) {
+                            const bool directFrame=(before.flags&OutRunVR::RenderFrameDirectGpuTransport)!=0;
+                            bool sourceReady=false;
+                            LARGE_INTEGER cs{},ce{};
+                            QueryPerformanceCounter(&cs);
+                            if (directFrame) {
+                                sourceReady=compositor.CommitDirectStereoSource(before);
+                            } else {
+                                const CaptureStatus capture=compositor.Capture(2);
+                                sourceReady=capture.available&&
+                                    QpcAtOrAfter(capture.lastPresentQpc,before.presentQpc)&&
+                                    compositor.CommitStereoSource();
+                            }
+                            QueryPerformanceCounter(&ce);
+                            timings.capture.Add(timings.Ms(cs,ce));
+                            OutRunVR::SharedRenderFrameState after{};
+                            const bool same=renderFrames.Read(after)&&
+                                (after.flags&OutRunVR::RenderFramePresentInFlight)==0&&
+                                OutRunVrNativeEyePair::SameStereoFrameIdentity(before,after);
+                            if(sourceReady&&same) {
+                                if(directFrame) shared.AckDirectFrame(before.frameId);
+                                for(int eye=0;eye<2;++eye) {
+                                    matchedViews[eye]={XR_TYPE_VIEW};
+                                    matchedViews[eye].pose.orientation={
+                                        before.eye[eye].orientation[0],
+                                        before.eye[eye].orientation[1],
+                                        before.eye[eye].orientation[2],
+                                        before.eye[eye].orientation[3]};
+                                    matchedViews[eye].pose.position={
+                                        before.eye[eye].position[0],
+                                        before.eye[eye].position[1],
+                                        before.eye[eye].position[2]};
+                                    matchedViews[eye].fov={
+                                        before.eye[eye].fov.angleLeft,
+                                        before.eye[eye].fov.angleRight,
+                                        before.eye[eye].fov.angleUp,
+                                        before.eye[eye].fov.angleDown};
+                                }
+                                matchedStereoValid=true;
+                                lastProcessedStereoFrame=before.frameId;
+                                lastStereoMatchMs=GetTickCount64();
+                            } else if(sourceReady||directFrame) {
+                                // A rejected DirectGPU frame may already have
+                                // overwritten the hold textures. Do not reuse
+                                // a previous SBS/pose with that GPU result.
+                                compositor.DiscardUnmatchedStereoSource();
+                                matchedStereoValid=false;
+                                lastStereoMatchMs=0;
+                            }
+                            // No new desktop image: retain unchanged classic
+                            // SBS source for its existing bounded grace only.
+                        }
+                    }
                     const bool grace=matchedStereoValid&&compositor.HasStereoSource()&&GetTickCount64()-lastStereoMatchMs<=StereoGraceMs;LARGE_INTEGER rs{},re{};QueryPerformanceCounter(&rs);if(grace&&compositor.RenderProjection(matchedViews,pv)){projection.space=localSpace;projection.viewCount=2;projection.views=pv.data();layers[0]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);layerReady=true;}QueryPerformanceCounter(&re);timings.render.Add(timings.Ms(rs,re));
                 }else{LARGE_INTEGER cs{},ce{};QueryPerformanceCounter(&cs);const CaptureStatus capture=compositor.Capture();QueryPerformanceCounter(&ce);timings.capture.Add(timings.Ms(cs,ce));LARGE_INTEGER rs{},re{};QueryPerformanceCounter(&rs);if(capture.available&&compositor.RenderTheater(viewSpace,localSpace,fs.predictedDisplayTime,quad)){layers[0]=reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);layerReady=true;}QueryPerformanceCounter(&re);timings.render.Add(timings.Ms(rs,re));}}
             end.layerCount=layerReady?1:0;end.layers=layerReady?layers:nullptr;LARGE_INTEGER es{},ee{};QueryPerformanceCounter(&es);CheckXr(xrEndFrame(session,&end),"xrEndFrame");QueryPerformanceCounter(&ee);timings.end.Add(timings.Ms(es,ee));timings.MaybeLog();

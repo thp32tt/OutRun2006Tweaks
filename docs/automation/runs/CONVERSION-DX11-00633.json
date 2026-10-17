@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00633",
+  "production_id": "CONVERSION-DX11-00633",
+  "event_id": "CONVERSION-DX11-00633-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_SELECTARG2_COMPLEMENTED_TEXTURE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "30f5f26f170934e62aa9b0d207af958f90162a0b",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real D3D9 stage0 PM RGB/SELECTARG2 complemented texture-alpha capture",
+      "Exact capture override to compiled native D3D11 inverted-alpha PS and Draw/DrawIndexed",
+      "Unsupported combinations keep original DX9Ex/gamepad path"
+    ],
+    "batch_components": [
+      "Live source operand admission and negative fallback",
+      "Captured pixel shader selection and D3D11 binding",
+      "Destructive source and 256 numerical cases in Backend/Fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB uses original sampled texture-alpha; output alpha is 1-texture-alpha",
+      "negative_regression": "Wrong selector/modifier/guard/PS/Draw fails new destructive regression",
+      "component_integration": "GetTextureStageState -> TextureCapture -> HLSL native PS -> guarded Draw/DrawIndexed diagnostic frame"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_SELECTARG2_COMPLEMENTED_TEXTURE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI source only; real Quest3/VDXR/menu/vehicle/race game frames not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit opt-in; unsupported states and gamepad retain DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_inverse_arg2_00633.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00633.json",
+    "tools/test_dx11_stage0_pm_factor_arg2_00630.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS source/policy/00632 GitHub HEAD",
+    "C1_REVIEW": "PASS previously unhandled SELECTARG2 complemented texture-alpha",
+    "C2_IMPLEMENT": "PASS actual C++ capture/native PS routing and destructive regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend #38308381476, DX11 Fast #38308381510, Build #38308386500, OpenXR #38308386502, HUD #38308386498 all SUCCESS on 2d97deefcefca4d8dfb8d0d24e09985b277a2f61",
+    "C4_COMMIT": "PASS: native material ce87f6b872c211bbe5350398ccc8faea87155e57; non-CI-skip verifier repair validation-bearing 2d97deefcefca4d8dfb8d0d24e09985b277a2f61",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: code/build verified, Quest3/VDXR/menu/vehicle/race/gamepad RUNTIME_VALIDATION=UNTESTED"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "New independent DX11 feature may start without repeating 00633 or rescoring. Quest3/VDXR menu/vehicle/race gamepad and fallback NEED_HMD_TEST; DXVK frozen.",
+  "material_result_sha": "ce87f6b872c211bbe5350398ccc8faea87155e57",
+  "validation_bearing_result_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61",
+  "result_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61",
+  "failure_recovery": {
+    "first_material_sha": "ce87f6b872c211bbe5350398ccc8faea87155e57",
+    "fast_run_id": 38307212201,
+    "failure": "Legacy 00630 source-graph hardcoded old suffix; repair maintains factor rejection and also requires 00633 inverse-alpha carveout",
+    "repair_status": "STAGED",
+    "first_fast_failure_run_id": 38307212201,
+    "repair": "Preserved original 00630 factor-alpha source graph and required additional 00633 inverse-alpha carveout",
+    "validation_bearing_repair_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61"
+  },
+  "material_implementation_sha": "ce87f6b872c211bbe5350398ccc8faea87155e57",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38308381476,
+      "conclusion": "SUCCESS",
+      "head_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61"
+    },
+    "dx11_fast": {
+      "run_id": 38308381510,
+      "conclusion": "SUCCESS",
+      "head_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61"
+    },
+    "win32_build": {
+      "run_id": 38308386500,
+      "conclusion": "SUCCESS",
+      "head_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61"
+    },
+    "openxr_architecture": {
+      "run_id": 38308386502,
+      "conclusion": "SUCCESS",
+      "head_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61"
+    },
+    "hud_inspector": {
+      "run_id": 38308386498,
+      "conclusion": "SUCCESS",
+      "head_sha": "2d97deefcefca4d8dfb8d0d24e09985b277a2f61"
+    }
+  }
+}

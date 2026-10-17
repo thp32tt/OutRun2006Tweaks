@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00084",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "recorded_kst": "2026-09-30T04:45:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "6df06da69c17743a836da458b2969a5a4aff546d",
+  "initial_result_sha": "e40b77109cd7d3c9c0b1e5361f04f94d284eabeb",
+  "result_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+  "validation_bearing_result_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F22 R114 hashed sampling and signature-cap saturation evidence.",
+  "summary": "R114 keeps the passive DX11 census at a bounded 1/64 diagnostic budget but replaces the fixed modulo phase with hashed per-thread draw ordinals to reduce periodic draw-order alias. It names and exposes the 512 unique-signature hash cap and 64 detailed-signature cap, records saturation/skips, and makes analyzer coverage limits explicit without promoting sampled evidence into an activation proof.",
+  "source_commits": [
+    "436cc420a2cd4fc45434b5abb9ec05ad3e7e860d",
+    "4be6a8d4f24ebc78fd1e52c9e2744534466de2f1",
+    "122169168fc0342503f227daf829fa20223228de",
+    "e40b77109cd7d3c9c0b1e5361f04f94d284eabeb",
+    "5ee00badb1f22ef584e12254f92337340d229b0d"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "production_ia_vs_ps_srv_sampler_binding_added": false,
+    "d3d9_render_policy_changed": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "No regression riskPath matched runtime_census/analyzer. R114 changes the opt-in OUTRUN_VR_DX11_CENSUS diagnostic path plus analyzer/test/verifier only; hosted CI does not establish Quest3/VDXR visual correctness."
+  },
+  "initial_validation_failure": {
+    "run_id": 36620302882,
+    "result_sha": "e40b77109cd7d3c9c0b1e5361f04f94d284eabeb",
+    "failed_step": "Verify DX11 source graph",
+    "root_cause": "Verifier still required the pre-R114 analyzer summary regex literal after the analyzer regex was extended to include R114.",
+    "repair_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+    "repair_scope": "Verifier-only contract repair; no runtime_census/analyzer/test behavior changed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36620454954,
+      "conclusion": "success",
+      "validated_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+      "artifact_id": 11057933840,
+      "artifact_digest": "sha256:12f927e2edf1e10cec5f4b404076a24dfea9c3672856c68d08c49b6f323f389d",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/R114 census analyzer checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer hosted probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36620462936,
+      "conclusion": "success",
+      "validated_sha": "5ee00badb1f22ef584e12254f92337340d229b0d"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36620463103,
+      "conclusion": "success",
+      "validated_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36620463024,
+      "conclusion": "success",
+      "validated_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36620455006,
+      "conclusion": "skipped",
+      "validated_sha": "5ee00badb1f22ef584e12254f92337340d229b0d"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5897276486,
+    "repair_comment_id": 5897288207,
+    "validation_comment_id": 5897390984,
+    "status": "IMPLEMENTATION_REPAIR_VALIDATION_AND_CONTROLLER_RETRY_RECONCILED",
+    "prior_validation_comment_id": 5897390001
+  },
+  "evidence": [
+    "Every task source/verification commit contains the exact controller marker [AUTO:CONVERSION-DX11-00084]; the validation-bearing result contains no CI-skip directive.",
+    "R114 replaces the old fixed-phase (++stride % 64) selector with a hashed ordinal gate while keeping the sample stride at 64 and explicitly retaining non-exhaustive diagnostic semantics.",
+    "SignatureHashCapHitSamples and DetailedSignatureLogSkippedSignatures make the 512/64 bounded instrumentation limits observable; analyzer SamplingCoverage records scheme, stride, cap sizes and saturation.",
+    "All-sampled-exact evidence with signature hash-cap overflow is labeled OBSERVED_SAMPLED_TRANSLATION_EXACT_COVERAGE_SATURATED rather than the normal exact-sampled diagnostic status.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R114 is automation-validated but runtime-untested. Fixed-phase 1/64 alias is reduced and signature-cap saturation is explicit; the census remains non-exhaustive diagnostic evidence and NativeDrawPathActivationAllowed remains false.",
+  "next_action": "Continue with the next independent bounded DX11 exactness/activation prerequisite. Do not promote native draw routing or claim visual/runtime correctness until exact-build Quest3/VDXR evidence exists.",
+  "controller_retry_reconciliation": {
+    "requested_attempt": "2/3",
+    "previous_automatic_failure_run_id": 36620302882,
+    "validation_bearing_result_sha": "5ee00badb1f22ef584e12254f92337340d229b0d",
+    "action": "Reused the already-created deterministic verifier repair instead of repeating the failed change. Exact-SHA Backend Conversion Gate, Build, OpenXR VR architecture and HUD Inspector all passed.",
+    "cas_note": "A concurrent bookkeeping commit 5d01a57863e29db1f6fce3600432dc67c47a2dc5 landed after validation. The controller retry metadata is reconciled on top without changing the validation-bearing result SHA."
+  }
+}

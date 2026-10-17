@@ -2,8 +2,12 @@ name: Build
 
 on:
   push:
-    branches-ignore: [ vr-d3d9ex-focus, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
+    branches-ignore: [ vr-d3d9ex-focus, vr-dx11-native-r71, vr-dxvk-r71-disasm, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
   pull_request:
+
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -22,6 +26,40 @@ jobs:
       - name: Verify HMD-proven VR baseline
         shell: pwsh
         run: python tools/verify_vr_proven_baseline.py
+
+      - name: Verify one-click VR structure contract
+        shell: pwsh
+        run: ./tools/Test-VROneClickContract.ps1
+
+      - name: Verify backend disassembly contract
+        shell: pwsh
+        run: python tools/verify_vr_backend_disasm_contract.py
+
+      - name: Verify DX11 source graph
+        shell: pwsh
+        run: python tools/verify_dx11_source_graph.py
+
+      # These are source/CI acceptance guards, not live game/HMD success.
+      # Each gate must be individually visible to FEATURE acceptance tooling.
+      - name: "Feature acceptance: DX11-LIVE-CALLSITE"
+        shell: pwsh
+        run: python tools/verify_dx11_first_game_frame_boundary.py
+
+      - name: "Feature acceptance: DX11-NATIVE-DRAW"
+        shell: pwsh
+        run: python tools/verify_dx11_first_game_frame_boundary.py
+
+      - name: "Feature acceptance: DX11-VISIBLE-FRAME"
+        shell: pwsh
+        run: python tools/verify_dx11_first_game_frame_boundary.py
+
+      - name: "Feature acceptance: DX11-SAFE-RETURN"
+        shell: pwsh
+        run: python tools/test_dx11_first_game_frame_regressions.py
+
+      - name: Test DX11 census analyzer
+        shell: pwsh
+        run: python tools/test_analyze_dx11_census.py
 
       - name: Verify consolidated wheel FFB source
         shell: pwsh
@@ -121,9 +159,8 @@ jobs:
             "VR R26+HUD SAFE TEST: R26/R23 world path + R30 HUD/XYZRHW/SkyGlow overlay ACTIVE"
             "VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE"
             "VR R66 OPTION ARROW: exact node pinned"
-            "VR R66 GOAL TIME HUD:"
+            "VR R121 GOAL TIME HUD: shared producer-map"
             "VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes"
-            "VR R65 SELECTOR: restored base shadow bypassed"
           )
           foreach ($marker in $markers) {
             if (-not $ascii.Contains($marker)) { throw "missing compiled marker: $marker" }

@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00359",
+  "production_id": "CONVERSION-DX11-00359",
+  "event_id": "CONVERSION-DX11-00359-E006",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "94da651d8333634320bc3f2c31ded701deea5b16",
+  "result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+  "validation_bearing_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+  "result_marker": "[AUTO:CONVERSION-DX11-00359]",
+  "selected_work_item": "DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT",
+  "summary": "R244 adds a dormant fail-closed programmable constant-state ownership receipt on top of a validated R243 input-layout receipt. It owns one exact same-device VS/PS D3D11 constant-buffer pair and seals exact DEFAULT/CONSTANT_BUFFER descriptors plus byte widths. It does not upload payloads, bind constant-buffer slots, route Draw*, or claim programmable translation/runtime parity.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00359.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT and resumed CONVERSION-DX11-00359 without repeating completed R244 implementation or exact-SHA validation. Current authoritative dispatch is CONVERSION-DX11-00359-E006 rollover; CHAT_ROLLOVER=4 is not a retry, so ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set05 F21 remains HIGH_ACTIVATION because shader translation/constant usage is not an exact activation gate. R243 proves input-layout ownership but not programmable constant-state ownership.",
+      "review_lenses": {
+        "architecture": "Extend only the dormant programmable cache; no translator/binding/draw caller.",
+        "ownership_lifetime": "Own exact same-device VS/PS constant buffers and bind the receipt to R240/R241/R242/R243 snapshots.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter semantics change.",
+        "performance": "No production hot path; dormant metadata plus WARP probe only.",
+        "adversarial": "Reject missing/stale R243, foreign-device buffers, descriptor/width mismatch, replacements and device-generation reuse."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R244 constant-state readiness/attach/snapshot APIs, per-entry owned VS/PS constant buffers, exact descriptor/byte-width checks and monotonic receipt generation; extended WARP probe and source-graph guards for prerequisite, same-device exactness, idempotence and fail-closed stale/replacement/foreign-device paths."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "local_auxiliary_validation": "PASS",
+      "evidence": "Local auxiliary source-graph and dual-source contract validation passed. Exact-SHA Backend Conversion Gate #1947 run 37186697270 completed SUCCESS for efe3122bc71702a0a23b50038573e85479de950e. Validate job 111390018301 passed source/static contracts, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111390674780 passed every probe including build/run of dx11_constant_buffer_probe covering the R244 constant-state receipt boundary. Artifact 11297300899 digest sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37186697270,
+      "validation_run_number": 1947,
+      "validation_job_id": 111390018301,
+      "readiness_smoke_job_id": 111390674780,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11297300899,
+      "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "validation_bearing_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "source_implementation_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "result_marker": "[AUTO:CONVERSION-DX11-00359]",
+      "implementation_commits": [
+        "efe3122bc71702a0a23b50038573e85479de950e"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R244 is a dormant programmable constant-state ownership/descriptor receipt. It adds no production constant upload/binding, programmable shader translation, Draw* routing, transport change or runtime distributable behavior."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37186697270,
+      "validation_job_id": 111390018301,
+      "readiness_smoke_job_id": 111390674780,
+      "artifact_id": 11297300899,
+      "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3",
+      "implementation_comment_id": 5977810669,
+      "validation_comment_id": 5977861554,
+      "exact_next_action": "Release CONVERSION-DX11-00359 as complete. Preserve R239-R244 programmable ownership receipts and keep NativeDrawPath dormant. Any later programmable constant payload/upload or binding boundary must be a separate bounded fail-closed unit consuming validated R244 evidence.",
+      "dispatch_correction_comment_id": 5977896280
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant native_backend ownership plus hosted WARP probe only; no D3D9 hook/stereo renderer/transport/OpenXR/NativeDrawPath caller changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00359",
+    "production_id": "CONVERSION-DX11-00359",
+    "event_id": "CONVERSION-DX11-00359-E006",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+    "source_implementation_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+    "validation_bearing_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+    "validation_run_id": 37186697270,
+    "validation_job_id": 111390018301,
+    "readiness_smoke_job_id": 111390674780,
+    "artifact_id": 11297300899,
+    "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3",
+    "implementation_comment_id": 5977810669,
+    "dispatch_correction_comment_id": 5977896280,
+    "validation_comment_id": 5977861554,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "rollover_is_retry": false,
+    "chat_rollover": 4,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00359 as complete. Preserve R239 programmable identity, R240 per-device cache, R241 translation-slot ownership, R242 translated-object receipt, R243 input-layout receipt and R244 constant-state ownership receipt; keep NativeDrawPath dormant. Any later programmable constant payload/upload or binding work remains a separate fail-closed unit.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37186697270,
+      "run_number": 1947,
+      "result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "conclusion": "success",
+      "validate_job_id": 111390018301,
+      "readiness_smoke_job_id": 111390674780,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11297300899,
+      "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5977810669,
+    "dispatch_correction_comment_id": 5977896280,
+    "validation_comment_id": 5977861554
+  },
+  "material_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+  "source_implementation_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+  "material_origin_dispatch": {
+    "production_id": "CONVERSION-DXVK-00358",
+    "event_id": "CONVERSION-DXVK-00358-E002",
+    "event_type": "retry",
+    "note": "Inherited producer metadata from the initial material publication; superseded by the current authoritative E004 rollover dispatch. Material and validation-bearing SHA are unchanged."
+  },
+  "rollover_metadata_correction": {
+    "corrected_from": [
+      {
+        "task_id": "CONVERSION-DX11-00359",
+        "production_id": "CONVERSION-DX11-00359",
+        "event_id": "CONVERSION-DX11-00359-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3,
+        "rollover_is_retry": false
+      },
+      {
+        "task_id": "CONVERSION-DX11-00359",
+        "production_id": "CONVERSION-DXVK-00358",
+        "event_id": "CONVERSION-DXVK-00358-E002",
+        "event_type": "retry",
+        "attempt": "1/3"
+      }
+    ],
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00359",
+      "production_id": "CONVERSION-DX11-00359",
+      "event_id": "CONVERSION-DX11-00359-E006",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "rollover_is_retry": false,
+      "source": "CURRENT_USER_QUEUE",
+      "chat_rollover": 4,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "reason": "Current user-issued E006 / CHAT_ROLLOVER=4 is authoritative and supersedes the earlier E004 rollover bookkeeping plus the stale E002 retry metadata from a concurrent older dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. R244 material/result SHA, exact-SHA Gate #1947, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "dispatch_correction_comment_id": 5977896280,
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "rollover_is_retry": false,
+  "chat_rollover": 4,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}

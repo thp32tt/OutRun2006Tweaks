@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00551",
+  "production_id": "CONVERSION-DX11-00551",
+  "event_id": "CONVERSION-DX11-00551-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00551",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_NORMAL_SPECULAR_FVF",
+  "base_sha": "91628172a43535331cedc9731d150bf2a92830d6",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game-authored D3D9 NORMAL/SPECULAR FVF bytes",
+      "Source state gating plus FVF stride, diffuse and indexed UV decode",
+      "Existing D3D11 Draw/DrawIndexed -> visible diagnostic Present"
+    ],
+    "batch_components": [
+      "C++ FVF layout and strict decoder extension",
+      "Live D3D9 source SPECULARENABLE safety gate and SDK FVF mapping",
+      "C++ functional probe and destructive Python regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact SHA 15b565856f5d8f0f46dd032f342adb5fa283e5c3: Backend Conversion Gate #38150926930 validate + DX11 readiness smoke SUCCESS; Windows Release Build #38150930205, DX11 Fast #38150926926, OpenXR #38150930172 and HUD Inspector #38150930187 SUCCESS; actual game pixels UNTESTED.",
+      "negative_regression": "Invalid RHW normal, corrupt offset, short stride, specular-enabled source fail closed",
+      "component_integration": "Game D3D9 hook -> FVF decode -> UV and diffuse binding -> D3D11 native Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NORMAL_SPECULAR_FVF",
+      "src/vr/d3d11/live_game_fvf_layout.hpp:NORMAL_SPECULAR",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SPECULAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "NORMAL_SPECULAR_FVF_SNAPSHOT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source integrated, exact-SHA Win32/Gate compiled and passed; actual Quest3/VDXR game pixels, menu, vehicle, race, gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in diagnostic; original D3D9 game draw/input/Present unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_fvf_layout_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00551.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS 91628172a43535331cedc9731d150bf2a92830d6",
+    "C1_REVIEW": "FVF optional NORMAL/SPECULAR gap; R175 owner untouched",
+    "C2_IMPLEMENT": "PASS decoder, live bridge, C++ probe, negative regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38150926930 validate and DX11 readiness smoke probes SUCCESS; Win32 Release Build #38150930205 SUCCESS; DX11 Fast #38150926926 SUCCESS; OpenXR #38150930172 SUCCESS; HUD Inspector #38150930187 SUCCESS. Not runtime proof.",
+    "C4_COMMIT": "PASS: initial real C++ material 6badb9ff5dd3636ba8881fb2b6aa25cfcc81df68 plus same-task negative-regression repairs; validation-bearing 15b565856f5d8f0f46dd032f342adb5fa283e5c3 (no CI skip).",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic only",
+    "C6_STATE": "PASS_EXACT_SHA BUILD_VERIFIED; runtime HMD/Quest3/VDXR UNTESTED; DX9Ex safe return preserved; no DX11 gameplay promotion."
+  },
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Quest3/VDXR game menu/vehicle selection/race/gamepad and exact native pixels remain NEED_HMD_TEST; next independent DX11 work allocated by controller (do not rerun 00551).",
+  "material_result_sha": "15b565856f5d8f0f46dd032f342adb5fa283e5c3",
+  "validation_bearing_result_sha": "15b565856f5d8f0f46dd032f342adb5fa283e5c3",
+  "result_sha": "15b565856f5d8f0f46dd032f342adb5fa283e5c3",
+  "state_persisted": true,
+  "controller_runtime_adoption": "NOT_VERIFIED",
+  "runtime_evidence": "No Quest3/VDXR in-game menu/vehicle/race/gamepad test performed",
+  "validation_evidence": {
+    "exact_sha": "15b565856f5d8f0f46dd032f342adb5fa283e5c3",
+    "backend_conversion_gate": {
+      "run_id": 38150926930,
+      "status": "SUCCESS",
+      "jobs": [
+        "validate SUCCESS",
+        "DX11 readiness smoke probes SUCCESS"
+      ]
+    },
+    "windows_build": {
+      "run_id": 38150930205,
+      "status": "SUCCESS"
+    },
+    "dx11_fast": {
+      "run_id": 38150926926,
+      "status": "SUCCESS"
+    },
+    "openxr": {
+      "run_id": 38150930172,
+      "status": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38150930187,
+      "status": "SUCCESS"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "visible_frame_acceptance": "Source integrated, exact-SHA Win32/Gate compiled and passed; actual Quest3/VDXR game pixels, menu, vehicle, race, gamepad NEED_HMD_TEST"
+}

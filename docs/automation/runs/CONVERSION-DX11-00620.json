@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00620",
+  "production_id": "CONVERSION-DX11-00620",
+  "event_id": "CONVERSION-DX11-00620-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_MODULATE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "base_head_sha": "814a72b694e444dfe75ee3579db23ad1b84e0af4",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 game Draw state and fixed-function alpha-operand capture",
+      "D3D11 shader lifecycle and pixel color/alpha interpolation",
+      "Controlled native Draw/DrawIndexed and visible diagnostic inset"
+    ],
+    "batch_components": [
+      "Live game D3D9 stage0 PM RGB and MODULATE-alpha acceptance with fail-closed operands",
+      "Compiled D3D11 shader binding and lifecycle",
+      "Source destructive regression and 256 numeric corner cases"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ source-linked native MODULATE alpha shader, compile+select, 256 modeled numeric color/alpha cases",
+      "negative_regression": "Reject TFACTOR, reversed operands, wrong alpha operation and HLSL arithmetic mutants",
+      "component_integration": "D3D9 stage0 GetTextureStageState -> GPU shader compile -> guarded DX11 Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_MODULATE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED if exact-SHA CI green; game/HMD NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in; normal DX9Ex fallback for unsupported state"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_modulate_00620.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00620.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "previous_failure": {
+    "material_sha": "754258e552a6955303fa916556c54d25d24f6542",
+    "fast_ci_run_id": 38276147315,
+    "reason": "00619 source-linked regression token adjacency after new shader path; repaired without weakening old gate"
+  },
+  "next_action": "Do not retry 00620; advance independent DX11 implementation. Physical menu/vehicle/race pixels and gamepad/Quest3 must be assessed separately before promotion.",
+  "validation_bearing_result_sha": "a05ec35d0db2f9854624a4ef500864be53dc7169",
+  "result_sha": "a05ec35d0db2f9854624a4ef500864be53dc7169",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38277299051,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38277299095,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38277306530,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38277299075,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38277306502,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38277306473,
+    "game_quest3_vdxr": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST"
+  }
+}

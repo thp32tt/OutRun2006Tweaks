@@ -1,0 +1,68 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00467",
+  "production_id": "CONVERSION-DX11-00467",
+  "event_id": "CONVERSION-DX11-00467-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "ChatGPT reported that the current conversion lane conversation reached its length limit.",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00467",
+  "lease_epoch": 1,
+  "work_key": "DX11:R162:OFFSCREEN_INDEXED_LIVE_RS_OM_OUTPUT_OWNER:src/vr/d3d11/native_backend.cpp",
+  "conflict_keys": [
+    "src/vr/d3d11/native_backend.cpp:prepare_fixed_function_indexed_direct_draw_probe:R162",
+    "src/vr/d3d11/native_backend.hpp:R162",
+    "tools/dx11_constant_buffer_probe.cpp:R162"
+  ],
+  "selected_work_item": "DX11_R162_INDEXED_OFFSCREEN_LIVE_OUTPUT_STATE",
+  "status": "COMPLETE",
+  "checkpoint": "C6_STATE",
+  "base_sha": "a2484fdf664ae046370d06f3f53092ea33b60f70",
+  "result_sha": "8e269997d75f62e89e28d3268db564627e19fa98",
+  "material_result_sha": "8e269997d75f62e89e28d3268db564627e19fa98",
+  "validation_bearing_sha": "8e269997d75f62e89e28d3268db564627e19fa98",
+  "validation_bearing_result_sha": "8e269997d75f62e89e28d3268db564627e19fa98",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "summary": "R162 augments R157/R161 isolated WARP DrawIndexed preflight with exact live R126 RS/OM output-state owner validation; post-snapshot viewport removal and scissor drift fail closed, exact restoration passes. No gameplay native Draw activation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub head a2484fdf664ae046370d06f3f53092ea33b60f70; 00466 C6 complete, 00467 run record absent; event E002 rollover (not retry), ATTEMPT=1/3 preserved.",
+    "C1_REVIEW": "PASS: regression knowledge, AGENTS.md, 00466 run record, current R157/R161 indexed WARP preflight reviewed; output binding owner R126 not live revalidated immediately before actual indexed GPU draw.",
+    "C2_IMPLEMENT": "PASS: R162 exact live R126 output state identity in native DX11 preflight, with WARP missing viewport/scissor drift negative tests and positive state restoration; 3 material commits ending 8e269997d75f62e89e28d3268db564627e19fa98.",
+    "C3_VALIDATE": "PASS: exact material SHA 8e269997d75f62e89e28d3268db564627e19fa98 Backend Conversion Gate 37865717290; Win32 validate job 113612167849 SUCCESS and DX11 readiness smoke job 113613609273 SUCCESS including modified constant-buffer WARP probe; artifact 11588441141 digest sha256:5c5a9111bdf0543a4890e79653e708fe3028b38981bc3b5fca0787a41770bc28.",
+    "C4_COMMIT": "PASS: GitHub source material commit 8e269997d75f62e89e28d3268db564627e19fa98 [AUTO:CONVERSION-DX11-00467]; issue #14 source comment 6071862338 and validation comment 6071952174.",
+    "C5_PACKAGE": "NOT_REQUIRED: isolated offscreen WARP regression proof; native in-game Draw/DrawIndexed dormant, no deployable candidate.",
+    "C6_STATE": "PASS: GitHub task durable record and branch lane state; exact-SHA proof and Issue #14 saved. Quest 3 / VDXR RUNTIME_VALIDATION=UNTESTED."
+  },
+  "last_real_activity_at": "2026-10-09T00:47:22.208Z",
+  "last_activity_evidence": "Gate 37865717290 success at exact SHA; Win32 validate 113612167849 SUCCESS, DX11 smoke 113613609273 SUCCESS, artifact 11588441141, issue14 validation comment 6071952174",
+  "resume_cursor": "TERMINAL_COMPLETE",
+  "next_action": "00467 terminal: do not repeat or rescore. Check branch HEAD and new lease; select independent offscreen WARP pixel-output proof or different bounded native DX11 guard. Keep DXVK isolated, game native Draw dormant until exact-build Quest3/VDXR user evidence.",
+  "blockers": [
+    "Quest3/VDXR exact-build game HMD input/stereo/HUD/frame pacing validation pending; gameplay Draw activation unauthorized"
+  ],
+  "native_draw_path_activation_changed": false,
+  "draw_dispatch_authorized": false,
+  "state_persisted": true,
+  "validation_run_id": 37865717290,
+  "validation_job_id": 113612167849,
+  "readiness_smoke_job_id": 113613609273,
+  "artifact_id": 11588441141,
+  "artifact_digest": "sha256:5c5a9111bdf0543a4890e79653e708fe3028b38981bc3b5fca0787a41770bc28",
+  "issue14_comment_id": 6071862338,
+  "validation_issue14_comment_id": 6071952174,
+  "implementation_commits": [
+    "3d6e462799f78b00c563d5e18dc155ebf33e6273",
+    "8efe5d3a70c0b36179d78c1e18618f72ae10a0e2",
+    "8e269997d75f62e89e28d3268db564627e19fa98"
+  ]
+}

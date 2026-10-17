@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00591",
+  "production_id": "CONVERSION-DX11-00591",
+  "event_id": "CONVERSION-DX11-00591-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00591",
+  "work_key": "DX11:MENU_RACE_NATIVE_REFLECTED_UV_ADDRESS",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Read game D3D9 U/V address states in native game Draw admission",
+      "Accept MIRROR/MIRRORONCE only alongside existing WRAP/CLAMP with unknown modes fail-closed",
+      "Translate D3D9 reflected UV states into D3D11 sampler AddressU/AddressV",
+      "Bind PS sampler to original game-origin Draw/DrawIndexed and opt-in diagnostic inset"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp live D3D9 sampler capture and native D3D11 sampler translation",
+      "tools/test_dx11_native_address_mirror_00591.py 16 address combinations and 16 negative mutations",
+      ".github/workflows/backend-conversion-gate.yml exact-SHA test"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game-sourced MIRROR/MIRRORONCE U/V sampler survives capture and native Draw/DrawIndexed",
+      "negative_regression": "16 destructive mutations, border and unsupported sampler addresses excluded, UNKNOWN cannot silently clamp",
+      "component_integration": "D3D9 live GetSamplerState -> TextureCapture -> D3D11 CreateSamplerState -> PSSetSamplers -> native Draw -> guarded inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_REFLECTED_UV_ADDRESS",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:ADDRESSU_ADDRESSV_REFLECTION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE+CI only; observed in-game image NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Opt-in diagnostic inset; original D3D9 game Draw, Present, and gamepad always preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_native_address_mirror_00591.py"
+  ],
+  "base_head_sha": "49423ea2d66cdebd4e0a52f2f052f359b8b6c483",
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD runtime validation or approved new package"
+  },
+  "runtime_evidence": null,
+  "material_result_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898",
+  "validation_bearing_result_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898",
+  "result_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898",
+  "c6_basis_head_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898",
+  "automation_ci_results": [
+    {
+      "workflow": "Build",
+      "run_id": 38206928833,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38206928906,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38206928830,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38206925894,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38206925768,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38206925877,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "e7d3e270b6018218d987fe4f6d493c82c7947898"
+    }
+  ],
+  "local_validation": [
+    "Live D3D9 ADDRESSU/V MIRROR and MIRRORONCE -> native D3D11 sampler -> opt-in Draw/DrawIndexed",
+    "16 U/V modes x mode matrix, 16 fail-closed destructive mutations",
+    "Exact-SHA GitHub Backend Conversion Gate validate+DX11 readiness smoke SUCCESS",
+    "Windows Build, DX11 Fast, OpenXR push+PR, HUD Inspector all SUCCESS"
+  ],
+  "next_action": "NEED_HMD_TEST: Quest3/VDXR menu/vehicle/race native diagnostic inset pixel and gamepad validation; gameplay activation remains disabled, DXVK frozen. New task should select other distinct incomplete DX11 implementation."
+}

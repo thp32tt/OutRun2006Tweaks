@@ -1,0 +1,134 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00875",
+  "production_id": "CONVERSION-DX11-00875",
+  "event_id": "CONVERSION-DX11-00875-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_AUTHORED_FULL_TARGET_CLEAR_STEREO_COLOR_EVIDENCE",
+  "feature_id": "DX11:GAME_AUTHORED_FULL_TARGET_CLEAR_STEREO_COLOR_EVIDENCE",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "cabc347bd2ebb203463b4fe3d06ea5caa33aa665",
+  "validation_bearing_result_sha": "cabc347bd2ebb203463b4fe3d06ea5caa33aa665",
+  "result_sha": "cabc347bd2ebb203463b4fe3d06ea5caa33aa665",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Capture genuine game-authored full TARGET clears as native per-eye color seed, including later full-eye rectangle clears.",
+      "Admit the full-clear eye color seed only when genuine geometry Draw occurs AFTER the latest full TARGET clear, or source-authored postpass color exists.",
+      "Reject empty and stale cleared frames; preserve source view/pose checks, matching Draw evidence and fail-closed fallback."
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing material commit adds compile-time probes admitting depth-only genuine Draws after a source-authored full TARGET clear, including late clear followed by a later geometry Draw.",
+      "negative_regression": "Existing probes reject zero geometry Draws and a final full clear that erases all preceding geometry; latest full clear invalidates older direct/postpass color evidence in the replay timeline.",
+      "component_integration": "Full TARGET seed passed from original D3D9 clear, full-eye replay increments authored clear counter; NativeGameStereoSubmission enforces authored_color_output_ready plus matching draw, view signature and source pose."
+    },
+    "conflict_keys": [
+      "DX11:GAME_AUTHORED_FULL_TARGET_CLEAR_STEREO_COLOR_EVIDENCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA source evidence and reported successful GitHub CI; Quest3/VDXR real menu/car/race pixels and frame timing are UNTESTED.",
+    "activation_guard_and_fallback": "No HMD activation certification or DXVK changes; original genuine Draw, view and pose gates and DX9Ex fallback remain."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_AUTHORED_FULL_TARGET_CLEAR_STEREO_COLOR_EVIDENCE",
+    "goal": "Replay original game-authored full TARGET clears as native L/R eye color background without synthesizing geometry and without admitting stale full-clear-only frames.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "full_game_authored_target_clear_as_stereo_color_seed",
+        "expected_behavior": "Original D3D9 full TARGET clear or later full-eye TARGET replay can seed authored eye color for real following geometry Draws even if those Draws write depth only."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "reject_blank_or_stale_clear_and_preserve_source_guards",
+        "expected_behavior": "Reject full clear without a subsequent genuine geometry Draw, except independently valid later authored postpass; preserve matching draw count, view/pose and fallback gates."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_gitHub_ci",
+        "expected_behavior": "Exact-SHA GitHub CI success for the existing material commit, with no rerun or source edits during C6."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: RUN_RECORD_NOT_FOUND; run JSON absent on target branch. Reconstructed feature contract and acceptance results from original material commit and read-only SHA CI, without replacing any existing fields.",
+    "C1_REVIEW": "PASS_SOURCE_EVIDENCE: original commit contains full-clear color seed, replay invalidation of earlier output, post-clear Draw ordinal predicate and positive/negative static assertions.",
+    "C2_IMPLEMENT": "PASS_EXISTING_SOURCE: original commit cabc347bd2ebb203463b4fe3d06ea5caa33aa665 has genuine C++ implementation [AUTO:CONVERSION-DX11-00875]; no C6 source edit.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: user confirmed SUCCESS for cabc347bd2ebb203463b4fe3d06ea5caa33aa665; read-only GitHub Actions query confirms Build, OpenXR VR architecture and OutRun EXE HUD Inspector CI SUCCESS at that SHA. Other mandatory workflow runs were not included in the connector's limited result; no CI/build rerun.",
+    "C4_COMMIT": "PASS_EXISTING_SOURCE: original material commit cabc347bd2ebb203463b4fe3d06ea5caa33aa665; C6 stored in a separate bookkeeping-only [skip ci] commit.",
+    "C5_PACKAGE": "NOT_REQUIRED: no package or HMD execution in this C6 action.",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED, original validation SHA unchanged, score change 0, runtime UNTESTED."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "cabc347bd2ebb203463b4fe3d06ea5caa33aa665",
+    "validation_sha": "cabc347bd2ebb203463b4fe3d06ea5caa33aa665",
+    "source_commit_message": "feat(dx11): replay genuine game full-color clears as stereo eye background after real geometry [AUTO:CONVERSION-DX11-00875]",
+    "run_record_recovery": "RUN_RECORD_NOT_FOUND: target run JSON returned 404. Reconstructed missing feature contract and acceptance results from the original material source diff. No pre-existing run-record fields were overwritten.",
+    "exact_sha_ci": {
+      "validation_sha": "cabc347bd2ebb203463b4fe3d06ea5caa33aa665",
+      "user_confirmed_conclusion": "SUCCESS",
+      "read_only_workflow_runs": [
+        {
+          "name": "Build",
+          "id": 39022394753,
+          "conclusion": "success"
+        },
+        {
+          "name": "OpenXR VR architecture",
+          "id": 39022394847,
+          "conclusion": "success"
+        },
+        {
+          "name": "OutRun EXE HUD Inspector CI",
+          "id": 39022394805,
+          "conclusion": "success"
+        }
+      ],
+      "visibility_note": "GitHub connector workflow lookup returns only an initial filtered page; do not infer status of workflows absent from this response. User supplied exact-SHA overall SUCCESS.",
+      "note": "No workflows were rerun for C6.",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "next_action": "Do not re-score or duplicate C6 for this TASK_ID; real Quest3/VDXR menu/car/race verification is still UNTESTED."
+}

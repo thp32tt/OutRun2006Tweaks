@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00693",
+  "production_id": "CONVERSION-DX11-00693",
+  "event_id": "CONVERSION-DX11-00693-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_AUTHORED_FLOAT_VECTOR_TEXTURE_FAMILY",
+  "work_key": "DX11:GAME_FLOAT_VECTOR_MIP_SCENE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game D3D9 fixed-function stage0 R/RG 16F/32F LockRect level-matched mip snapshot",
+      "Format-exact native D3D11 immutable R/RG floating SRV and sampler for live Draw/DrawIndexed",
+      "Keep D3D9 game Draw/Present/gamepad authoritative on invalid/sRGB/unsupported input"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_float_vector_texture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_float_vector_probe_00693.cpp",
+      "tools/test_dx11_game_float_vector_00693.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled C++ 4 formats R/RG half/full-float padded rows/mips and exact source-to-native SRV dispatch",
+      "negative_regression": "Reject unproved game sRGB; mutation tests remove each format, upload, shader resource or Draw path",
+      "component_integration": "Live game D3D9 lock rows -> D3D11 immutable R/RG FLOAT mip SRV -> native indexed/non-indexed Draw"
+    },
+    "conflict_keys": [
+      "DX11:GAME_FLOAT_VECTOR_MIP_SCENE",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_float_vector_texture.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_FLOAT_VECTOR_LOCK",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Automated compile/source/negative proof only; actual game menu/car/race native visual acceptance requires Quest3/VDXR runtime",
+    "activation_guard_and_fallback": "Diagnostic opt-in off by default, original game D3D9 Draw/Present/input retained on all failures"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_AUTHORED_FLOAT_VECTOR_TEXTURE_FAMILY",
+    "goal": "Integrate complete game-created scalar and two-channel floating texture mip family into both native game Draw/DrawIndexed while preserving original DX9Ex input and fallback.",
+    "acceptance_items": [
+      {
+        "id": "float-vector-game-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_float_mips_dx11_srvs_draw",
+        "expected_behavior": "R16F/RG16F/R32F/RG32F copied with original float payload and sampled by native Draw/Indexed"
+      },
+      {
+        "id": "float-vector-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "invalid_srgb_and_d3d9_gamepad_fallback",
+        "expected_behavior": "Invalid sRGB/pitch/readback never suppress the original D3D9 game input/Draw"
+      },
+      {
+        "id": "float-vector-gate",
+        "category": "integrated_validation",
+        "behavior_area": "compiled_cpp_destructive_probe_github_workflows",
+        "expected_behavior": "Compile pixel-preservation probe, negative source mutations and mandatory exact-SHA Actions"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "float-vector-game-draw": "PENDING_GATE",
+    "float-vector-fallback": "PENDING_GATE",
+    "float-vector-gate": "PENDING_GATE"
+  },
+  "base_head_sha": "9f34a95b378af585a230ed67a5f6b905fe17363f",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "7adde2beced1d58a727e0660ae0544a0a3cbd7db",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_float_vector_texture.hpp",
+    "tools/dx11_game_float_vector_probe_00693.cpp",
+    "tools/test_dx11_game_float_vector_00693.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00693.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub branch HEAD, AGENTS.md, 00692 C6, DX11 policy read",
+    "C1_REVIEW": "PASS independent gap: live native game R/RG floating source formats absent",
+    "C2_IMPLEMENT": "PASS four game textures route through format-exact native immutable SRV and real game Draw/Indexed",
+    "C3_VALIDATE": "PASS_EXACT_SHA 7adde2beced1d58a727e0660ae0544a0a3cbd7db: Backend Conversion Gate #38456703324, DX11 Fast #38456703332, Build #38456709361, OpenXR #38456709366, HUD #38456709333 all SUCCESS (five required workflows); compiled float-vector probe and destructive regressions in DX11 Fast; HMD UNTESTED",
+    "C4_COMMIT": "PASS: original material commit c7789579f5701f9620542592983f4df042b307c4 and source test repair validation-bearing commit 7adde2beced1d58a727e0660ae0544a0a3cbd7db; prior material_result_sha field preserved unchanged",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostics opt-in only",
+    "C6_STATE": "PASS_EXACT_SHA in separate [skip ci] bookkeeping commit; validation-bearing SHA unchanged; Quest3/VDXR HMD UNTESTED"
+  },
+  "next_action": "00693 COMPLETE_BUILD_VERIFIED: controller may select new independent DX11 implementation task. Runtime visual/input validation on Quest3/VDXR remains NEED_HMD_TEST; no rescore, no CI rerun.",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "validation_evidence": {
+    "verified_git_branch": "vr-dx11-native-r71",
+    "validation_bearing_result_sha": "7adde2beced1d58a727e0660ae0544a0a3cbd7db",
+    "automated_verification": "PASS_EXACT_SHA",
+    "workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38456703324,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38456703332,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 38456709361,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38456709366,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38456709333,
+        "conclusion": "success"
+      }
+    ],
+    "source_mutation_regressions": "PASS via exact-SHA DX11 Fast Structural Checks; R/RG 16F/32F source wiring + portable compiled probe",
+    "material_commit": "c7789579f5701f9620542592983f4df042b307c4",
+    "validation_repair_commit": "7adde2beced1d58a727e0660ae0544a0a3cbd7db",
+    "quest3_vdxr_hmd": "UNTESTED",
+    "gameplay_and_gamepad": "UNTESTED"
+  }
+}

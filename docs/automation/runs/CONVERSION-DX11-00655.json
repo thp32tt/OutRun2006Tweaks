@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00655",
+  "production_id": "CONVERSION-DX11-00655",
+  "event_id": "CONVERSION-DX11-00655-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_ANISOTROPIC_MIP_SAMPLER",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "1ee2fce75deb0c9578b3dd7ff45a4d3459a8a725",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real D3D9 GetSamplerState MIN/MAG/MIP/MAXANISOTROPY -> captured game texture stage0",
+      "CPU-readable game texture full mip snapshot -> native D3D11 anisotropic sampler -> original game Draw/DrawIndexed diagnostic inset"
+    ],
+    "batch_components": [
+      "live game C++ anisotropy capture / conservative sampler admission / D3D11 sampler creation",
+      "216-case negative/positive regression and destructive mutation checks in DX11 Fast and Backend Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "MIN=ANISOTROPIC, MAG=LINEAR, MIP=LINEAR, MaxAnisotropy 2..16 native PS sampler connected to Draw/DrawIndexed; static 216-case test and five exact SHA CI PASS",
+      "negative_regression": "unknown MIN/MAG/MIP/anisotropy limits, missing texture/readback/mips fail closed to original D3D9 Draw",
+      "component_integration": "live game-created D3D9 draw -> texture mip mirror -> D3D11 PSSetSamplers -> native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:GAME_ANISOTROPIC_MIP_SAMPLER",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_anisotropic_sampler_00655.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_DIAGNOSTIC_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY: no game pixels/menu/vehicle/race or Quest 3 screen observed",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in; unsupported game state original D3D9 Draw/gamepad unchanged"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "scope": "game D3D9 sampler min-anisotropic, mag-linear/mip-linear -> native diagnostic D3D11 frame; no production backend promotion"
+  },
+  "acceptance_results": {
+    "static_regression": "PASS",
+    "compile_build": "PASS_EXACT_SHA",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_anisotropic_sampler_00655.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest HEAD + 00654 C6; distinct work key",
+    "C1_REVIEW": "PASS narrow D3D9 sampler anisotropic gap",
+    "C2_IMPLEMENT": "PASS native C++ game capture/PS sampler integration and regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA five CI Gates on material result SHA",
+    "C4_COMMIT": "PASS material result",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA distinct bookkeeping"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "material_result_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+  "validation_bearing_result_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+  "result_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38346706525,
+      "conclusion": "success",
+      "validation_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38346706525"
+    },
+    "dx11_fast_structural": {
+      "id": 38346706503,
+      "conclusion": "success",
+      "validation_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38346706503"
+    },
+    "windows_build": {
+      "id": 38346710407,
+      "conclusion": "success",
+      "validation_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38346710407"
+    },
+    "openxr_architecture": {
+      "id": 38346706486,
+      "conclusion": "success",
+      "validation_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38346706486"
+    },
+    "hud_inspector": {
+      "id": 38346710393,
+      "conclusion": "success",
+      "validation_sha": "9726ddc5c9fe8900ffcdf5c91d28a1773dfb4a4a",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38346710393"
+    }
+  },
+  "next_action": "Quest3/VDXR menu, vehicle selection, race, pixel and gamepad runtime remains UNTESTED. Keep DXVK frozen and select next independent DX11 source feature."
+}

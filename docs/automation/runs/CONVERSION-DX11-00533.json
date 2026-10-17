@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00533",
+  "production_id": "CONVERSION-DX11-00533",
+  "event_id": "CONVERSION-DX11-00533-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "d77424aa9d722548e423880b548dc0ff2c3af018",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00533",
+  "lease_epoch": 1,
+  "work_key": "DX11:R236:D3D9_NONINDEXED_WINDOW_TO_WARP_MONO_PIXEL",
+  "conflict_keys": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    "DX11:R236:DRAWPRIMITIVE_MONO"
+  ],
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "mono_native_draw",
+    "integration_path": [
+      "D3D9 DrawPrimitive triangle-list source start and primitive count",
+      "R183 device-generation/immutable VB owner and native IA binding",
+      "R209 exact shader and R199 viewport/RTV binding plus OM isolation",
+      "actual WARP Draw(3,3) red center / black corner GPU readback"
+    ],
+    "batch_components": [
+      "native_linear_target_viewport.hpp R236 D3D9 command-to-mono owner preflight",
+      "dx11_linear_buffer_mirror_probe.cpp actual offset WARP Draw/readback and foreign-eye negatives",
+      "test_dx11_native_linear_draw_r185.py source mutants and WARP assertions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "nonzero start=3, count=1 red WARP center and black corner actual GPU readback",
+      "negative_regression": "11 isolated source mutations; empty/overflow/stale/foreign shader/MRT/released VB; source triangle at 0 renders black",
+      "component_integration": "D3D9 DrawPrimitive parameters -> owned VB native IA and exact shader/target -> WARP Draw(3,3) red pixel"
+    },
+    "conflict_keys": [
+      "src/vr/d3d11/native_linear_target_viewport.hpp",
+      "tools/dx11_linear_buffer_mirror_probe.cpp",
+      "tools/test_dx11_native_linear_draw_r185.py",
+      "DX11:R236:DRAWPRIMITIVE_MONO"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "status": "BLOCKED_UPSTREAM_R175_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "result_sha": "d512298f1f2a7f96f26311ba0673c137263e85c2",
+  "material_result_sha": "d512298f1f2a7f96f26311ba0673c137263e85c2",
+  "validation_bearing_result_sha": "d512298f1f2a7f96f26311ba0673c137263e85c2",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "changed_files": [
+    "src/vr/d3d11/native_linear_target_viewport.hpp",
+    "tools/dx11_linear_buffer_mirror_probe.cpp",
+    "tools/test_dx11_native_linear_draw_r185.py",
+    "docs/automation/runs/CONVERSION-DX11-00533.json"
+  ],
+  "summary": "R236 dormant D3D9 non-indexed DrawPrimitive source command to owned mono D3D11 IA/RTV/shaders and real WARP pixel; no gameplay activation.",
+  "evidence": {
+    "static": "Exact SHA d512298f: Verify DX11 native Draw R185 source contract PASS, including R236 11 scoped mutants",
+    "probe": "Exact SHA d512298f: build/run DX11 linear VB/IB mirror R183 WARP probe PASS, includes R236 nonzero Draw(3,3) red GPU pixel and negative cases",
+    "backend_gate_conclusion": "failure",
+    "inherited_failure": "R175 varying mismatch owned separately by 00477 may cause full Gate failure",
+    "backend_gate": {
+      "id": 38045771835,
+      "head_sha": "d512298f1f2a7f96f26311ba0673c137263e85c2",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate": {
+        "job_id": 114194879698,
+        "conclusion": "success"
+      },
+      "smoke": {
+        "job_id": 114195772432,
+        "conclusion": "failure"
+      },
+      "r185_static": "success",
+      "r183_warp_build": "success",
+      "r183_warp_run": "success",
+      "failure_step": "Run DX11 constant buffer probe",
+      "failure_key": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "owner_task": "CONVERSION-DX11-00477"
+    },
+    "other_exact_sha_ci": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 38045771847,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 38045775589,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 38045775443,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 38045775432,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "pipeline": {
+    "C0": "PASS: current GitHub HEAD d77424aa, checkpoint E001/E002 WAIT_CHAT, disjoint 00532 R235 owner",
+    "C1": "PASS: independent D3D9 nonindexed source-to-mono native WARP milestone",
+    "C2": "PASS: 3 material source/test components batched and committed at d512298f",
+    "C3": "SCOPED_PASS_FULL_GATE_FAIL: R185/R236 11 mutants and R183/R236 WARP GPU pixel PASS; Win32 Build and other CI PASS; inherited R175 varying mismatch FAIL at Backend Gate #38045771835",
+    "C4": "PASS: [AUTO:CONVERSION-DX11-00533] material d512298f on target branch, no CI skip on validation-bearing commit",
+    "C5": "NOT_REQUIRED: no gameplay activation, package or promotion",
+    "C6": "BLOCKED_UPSTREAM_R175_FULL_GATE: preserve exact validation-bearing d512298f; independent R175 owner 00477 must repair before full PASS; runtime remains UNTESTED"
+  },
+  "score_change": 0,
+  "next_action": "Do not re-run R236 source, mutant or WARP checks; owner 00477 must resolve R175 independent varying mismatch before any descendant full-Gate PASS. Preserve C6 material SHA d512298f, do not score failure.",
+  "blockers": [
+    "Inherited R175 programmable varying WARP pixel mismatch owned by separate CONVERSION-DX11-00477; full exact-SHA Gate fails",
+    "Quest 3/VDXR in-game native D3D11 visual/cadence validation UNTESTED"
+  ],
+  "resume_cursor": "TERMINAL_SCOPED_PASS_INHERITED_R175_FULL_GATE_FAIL",
+  "last_real_activity_at": "2026-10-10T19:51:07+09:00",
+  "last_activity_evidence": "GitHub Backend Conversion Gate #38045771835 R236 R183 WARP PASS, R175 constant-buffer mismatch FAIL"
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00805",
+  "production_id": "CONVERSION-DX11-00805",
+  "event_id": "CONVERSION-DX11-00805-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP",
+  "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "598baeb5ae39ea197f3e4266a9eecb6b3700f5e5",
+  "material_result_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e",
+  "validation_bearing_result_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_shared_desktop.hpp",
+    "src/vr/d3d11/native_game_shared_desktop_admission.hpp",
+    "tests/vr/dx11_native_shared_desktop_admission.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00804.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULLFRAME-GPU-SHARED-DESKTOP-INTEGRATION",
+    "goal": "Extend the complete real game menu/car/race D3D11 GPU shared-desktop presentation to exact source-cropped and verified single dirty rectangles, preserving every untouched game-authored D3D9 backbuffer pixel and original controls/fallback.",
+    "full_dx11_renderer_complete": false,
+    "acceptance_items": [
+      {
+        "id": "cropped-gpu-game-present",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_menu_vehicle_race_full_resolution_output",
+        "expected_behavior": "Native D3D11 game Draw/DrawIndexed full BGRA color is transferred by CopySubresourceRegion and matched source/destination StretchRect only inside validated cropped/dirty game Present bounds."
+      },
+      {
+        "id": "untouched-game-output-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_to_d3d9ex_owned_destination",
+        "expected_behavior": "Unknown, foreign, malformed or incomplete dirty bounds reject GPU transfer; original D3D9 pixels, game input/FFB and safe CPU output fallback remain authoritative."
+      },
+      {
+        "id": "five-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "All mandatory unchanged five GitHub Actions succeed for the exact final C++ source and regression-bearing SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "cropped-gpu-game-present": "PASS_BUILD",
+    "untouched-game-output-fallback": "PASS_BUILD",
+    "five-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "Intercept real game-authored menu/car/race D3D9 Draw/DrawIndexed and render complete native D3D11 BGRA frame into the game-sized output",
+      "Validate Present crop/dirty coverage; transfer matching subregion with GPU CopySubresourceRegion to a D3D9Ex-shared allocation and StretchRect exact destination region",
+      "Publish on original game D3D9 Present only after bounded GPU EVENT completion; preserve original D3D9 drawing, FFB, gamepad and CPU fallback on any rejection"
+    ],
+    "batch_components": [
+      "Actual live-game full-frame C++ shared desktop Present now accepts proven cropped and single-dirty regions",
+      "Native D3D11 source-side GPU CopySubresourceRegion avoids full-backbuffer transfers for safe partial frames; D3D9Ex StretchRect uses matched source/destination rectangle",
+      "Portable positive/negative crop and dirty-region regressions, plus inherited C6 acceptance mismatch repair under same TASK_ID"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "DX11 Fast focused portable source regression success for 51a3db7c plus Windows Build and Backend Conversion exact SHA SUCCESS; real game/HMD visuals not observed.",
+      "negative_regression": "Malformed, contradictory, disjoint or foreign dirty bounds reject native publication without altering DX9Ex game rendering/input/FFB; existing mandatory regressions all passed.",
+      "component_integration": "Live D3D9 game Draw/DrawIndexed -> native D3D11 complete game frame -> GPU shared BGRA scoped region -> D3D9Ex StretchRect -> same-game Present with retained input-safe fallback; independent L/R OpenXR render source remains unfinished."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME_GPU_SHARED_DESKTOP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Complete cropped/dirty GPU frame source and exact-SHA five-Gate PASS only; no matching Quest3/VDXR game menu/car/race visual parity session, no native stereo promotion.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains default false; all D3D9/DX9Ex rendering, gamepad, FFB, SkyGlow, CPU fallback and DXVK freeze preserved."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Recovered vr-dx11-native-r71 HEAD 598baeb5 and inherited 00804 full-desktop GPU path with all five prior exact-SHA CI passes; checked same work_key.",
+    "C1_REVIEW": "Real game cropped menu/car/race and single-dirty Present excluded from existing shared GPU desktop path; intact pixels must remain D3D9-owned.",
+    "C2_IMPLEMENT": "C++ GPU partial source-region copy plus matched D3D9Ex StretchRect and portable region regressions at dec11b09e60b195334d09a69aee3558f151f65dd; source optimization and inherited 00804 C6 policy record repair at 51a3db7c58d6c60593bc09392a010ad00c9c5d4e.",
+    "C3_VALIDATE": "PASS_EXACT_SHA for 51a3db7c58d6c60593bc09392a010ad00c9c5d4e: DX11 Fast, Backend Conversion, Windows Build, OpenXR, HUD Inspector all SUCCESS. No matching game/Quest3 HMD testing.",
+    "C4_COMMIT": "Real material source commits dec11b09e60b195334d09a69aee3558f151f65dd and 51a3db7c58d6c60593bc09392a010ad00c9c5d4e, neither CI-skipped; exact validation-bearing result 51a3db7c58d6c60593bc09392a010ad00c9c5d4e. C6 bookkeeping deliberately follows separately with [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED: no binary release or VR headset promotion without user gameplay/HMD evidence.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED for scoped native game crop/dirty GPU desktop integration only; mono/LR/OpenXR full source graph and Quest3 runtime remain not verified."
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00805",
+    "score_change": 0,
+    "score_status": "NO_NEW_SCORE_UNFINISHED_FULL_DX11_INTEGRATION",
+    "note": "Continuation of prior GPU shared desktop renderer feature, not independently scoreable until completed renderer capability; CI/document reconciliation and C6 are not accomplishments."
+  },
+  "evidence": {
+    "exact_sha_gate_results": {
+      "DX11 Fast": {
+        "run_id": 38845039302,
+        "conclusion": "success",
+        "head_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e"
+      },
+      "Backend Conversion": {
+        "run_id": 38845039292,
+        "conclusion": "success",
+        "head_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e"
+      },
+      "Windows Build": {
+        "run_id": 38845043496,
+        "conclusion": "success",
+        "head_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e"
+      },
+      "OpenXR": {
+        "run_id": 38845043503,
+        "conclusion": "success",
+        "head_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e"
+      },
+      "HUD Inspector": {
+        "run_id": 38845043508,
+        "conclusion": "success",
+        "head_sha": "51a3db7c58d6c60593bc09392a010ad00c9c5d4e"
+      }
+    },
+    "runtime_evidence": "NONE: exact matching Quest 3 / VDXR real game runtime not executed"
+  },
+  "material_source_commits": [
+    "dec11b09e60b195334d09a69aee3558f151f65dd",
+    "51a3db7c58d6c60593bc09392a010ad00c9c5d4e"
+  ]
+}

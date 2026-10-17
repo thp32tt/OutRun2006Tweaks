@@ -1,0 +1,132 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00543",
+  "production_id": "CONVERSION-DX11-00543",
+  "event_id": "CONVERSION-DX11-00543-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00543",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_DXT_TEXTURE_BC_SRV",
+  "base_sha": "19ca590f61dc0635480c50750253c4d0de3301c8",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Capture game-authored D3D9 TEX1 fixed-function Draw and read supported managed/system-memory DXT1/3/5 level-0 blocks through live LockRect",
+      "Copy exact source compressed block rows into immutable DX11 BC1/BC2/BC3 resources and bind native SRV/sampler to real Draw/DrawIndexed",
+      "Continue opt-in desktop inset and protected original D3D9 render/input fallback when source locked pixels, format, dimension or device creation fails"
+    ],
+    "batch_components": [
+      "C++ D3D9 DXT source format and block-row lifetime/ownership capture",
+      "C++ D3D11 compressed texture resource/SRV producer wired into existing native textured Draw/DrawIndexed",
+      "Python negative mutation and block pitch/data size regression checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact material 43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394: Backend Conversion Gate #38138640785 SUCCESS including readiness smoke; Win32 Build #38138645419 SUCCESS and source acceptance 4/4; OpenXR #38138645343, DX11 Fast #38138640770 SUCCESS. No actual game or HMD pixel capture.",
+      "negative_regression": "Python source/CPU validation of DXT1/3/5 admission, BC1/2/3 mapping, block-row byte pitch/row count, malformed compressed sizes, source memory pool and D3D11 resource/Draw coupling including destructive negative mutations; exact SHA CI PASS. Game runtime untested.",
+      "component_integration": "Live game texture LockRect block rows -> DXGI BC texture CreateTexture2D -> CreateShaderResourceView -> PSSetShaderResources -> Draw/DrawIndexed -> desktop inset with original game Draw untouched"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_DXT_TEXTURE_BC_SRV",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:DXT_BC_TEXTURE_SRV",
+      "tools/test_dx11_first_game_frame_regressions.py:DXT_BC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_DXT_LOCKRECT",
+      "D3D11_BC_TEXTURE_SRV",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CI pending; actual OutRun menu/vehicle/race compressed texture pixels, gamepad and Quest3 VDXR UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; NativeDrawPathActive=false; no DX9Ex or input override; unsupported GPU/default-pool or unsupported DXT geometry returns false"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00543.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS branch HEAD and latest 00542 C6, AGENTS.md, DX11 autodev policy; 00543 not found",
+    "C1_REVIEW": "PASS choose disjoint DXT1/3/5 compressed live game TEX1 source to BC SRV Draw integration; no R175 ownership transfer",
+    "C2_IMPLEMENT": "PASS mirror compressed DXT1/3/5 blocks to DXGI BC1/2/3 native textured Draw, negative mutation regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA 43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394: Backend Conversion Gate #38138640785 SUCCESS (validate+DX11 readiness smoke); Win32 Build #38138645419 SUCCESS (4 DX11 feature acceptance source tests); OpenXR #38138645343 SUCCESS; DX11 Fast #38138640770 SUCCESS; game/Quest3 HMD UNTESTED.",
+    "C4_COMMIT": "PASS two real material commits e445cd4 and 43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394 (C++ and negative mutation test), exact GitHub SHA, no force, no CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in desktop diagnostic-only live game compressed texture source; playable user package not approved.",
+    "C6_STATE": "PASS_EXACT_SHA on validation-bearing material 43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394; separate bookkeeping [skip ci] only after Gate SUCCESS; scoreboard RUN_KEY=CONVERSION-DX11-00543 +1 recorded once; no HMD gameplay promotion."
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE_CI",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE_CI",
+    "DX11-VISIBLE-FRAME": "PASS_SOURCE_CI",
+    "DX11-SAFE-RETURN": "PASS_SOURCE_CI",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "material_result_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+  "validation_bearing_result_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+  "feature_status": "SOURCE_INTEGRATED__HMD_PENDING",
+  "runtime_evidence": "No actual gamepad/Quest3 VDXR/game runtime test performed. Legacy D3D9 render/input retained.",
+  "next_action": "New independent DX11 menu/race programmable-shader or live default-pool GPU texture source integration; do not repeat 00543 BC1/2/3. Quest3/VDXR/gamepad gameplay real pixel and HMD parity separately NEED_HMD_TEST.",
+  "result_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+  "material_source_shas": [
+    "e445cd413e7fa59472e07e1c7051a5ce347774d2",
+    "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394"
+  ],
+  "source_stage": "BUILD_VERIFIED__GAME_AND_QUEST3_UNTESTED",
+  "state_persisted": true,
+  "score_change": 1,
+  "scoreboard": {
+    "repo": "thp32tt/ai-dev-lab",
+    "path": "AI_SCOREBOARD.md",
+    "run_key": "CONVERSION-DX11-00543",
+    "previous": 978,
+    "delta": 1,
+    "total": 979,
+    "commit_sha": "85e26230cb024475512ed5fe34fa6717402e47b5",
+    "confirmed_in_repo": "VERIFIED_REMOTE_ONCE"
+  },
+  "validation_gates": {
+    "backend_conversion": {
+      "name": "Backend Conversion Gate",
+      "run_id": 38138640785,
+      "head_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+      "conclusion": "SUCCESS",
+      "jobs": "validate + DX11 readiness smoke success"
+    },
+    "build": {
+      "name": "Build",
+      "run_id": 38138645419,
+      "head_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+      "conclusion": "SUCCESS",
+      "win32_release": "SUCCESS",
+      "source_acceptance": {
+        "DX11-LIVE-CALLSITE": "SUCCESS",
+        "DX11-NATIVE-DRAW": "SUCCESS",
+        "DX11-VISIBLE-FRAME": "SUCCESS",
+        "DX11-SAFE-RETURN": "SUCCESS"
+      }
+    },
+    "openxr": {
+      "name": "OpenXR VR architecture",
+      "run_id": 38138645343,
+      "head_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+      "conclusion": "SUCCESS"
+    },
+    "fast": {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38138640770,
+      "head_sha": "43e963cd69c11bcbcdb65fbf3cc3a7ac798a0394",
+      "conclusion": "SUCCESS"
+    }
+  }
+}

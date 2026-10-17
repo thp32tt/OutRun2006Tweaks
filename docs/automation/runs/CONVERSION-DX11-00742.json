@@ -1,0 +1,135 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00742",
+  "production_id": "CONVERSION-DX11-00742",
+  "event_id": "CONVERSION-DX11-00742-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:GAME_RT_MIP_NATIVE_SAMPLING",
+  "feature_id": "DX11-MENU-RACE-RT-MIP-NATIVE-SAMPLING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "85277ca60d075c7b0488f12cbb4dc655dc3b75a3",
+  "material_result_sha": "36b151d2123268697ef23d7781fc5fc56c31f105",
+  "validation_bearing_result_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "change_summary": "Capture each actual D3D9 game-created render-target texture mip level with independent same-size GPU readback, construct native DX11 immutable stage0/stage1 SRVs and submit real menu/vehicle/race Draw/DrawIndexed, retaining DX9Ex fallback. Repair 00560, 00589 and 00590 inherited source-regression assumptions and add 00742 C++/Python destructive tests.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_render_target_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_rt_mip_probe_00742.cpp",
+    "tools/test_dx11_game_rt_mips_00742.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_native_mip_chain_00589.py",
+    "tools/test_dx11_native_mip_linear_00590.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Real game D3D9 render-target texture GetSurfaceLevel(level) and validated per-level non-MSAA GPU readback on the source device",
+      "D3D11 immutable multi-mip shader resource and separate stage0/stage1 sampler bound to native Draw/DrawIndexed",
+      "Full game-origin DX11 output gated by opt-in and exact-scene native admission; unsupported mip/D3D9 state remains original DX9Ex/Present/gamepad"
+    ],
+    "batch_components": [
+      "D3D9 RT mip GPU readback and per-level SYSTEMMEM resource lifetime",
+      "Stage0/Stage1 texture mirror and native indexed/linear game Draw",
+      "C++ constexpr mip extent probe, Python destructive mutations and five mandatory GitHub Actions Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00742 C++ verifies asymmetric and terminal mip extents; Python verifies real per-level D3D9 GetSurfaceLevel(level) -> readback -> DX11 native Stage0/Stage1 Draw/Indexed path.",
+      "negative_regression": "00742 adversarial mutations reject base-level reuse, stale staging, missing upload/sampler and invalid extent; inherited 00560/00589/00590 tests updated for this real per-level source.",
+      "component_integration": "Game-authored texture target mip chain is snapshot and uploaded through native D3D11 PS Draw/DrawIndexed, while unsupported device/mip/resource failures leave D3D9 fallback authoritative."
+    },
+    "conflict_keys": [
+      "DX11:GAME_RT_MIP_NATIVE_SAMPLING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-accurate mip levels feed native game frame source for menu/vehicle/race and same-Present publication remains guarded; Quest3/VDXR visible output is UNTESTED.",
+    "activation_guard_and_fallback": "Opt-in native diagnostic only; invalid mip extent, non-readable readback, unsupported MSAA or sampler aborts native submission without replacing original game Draw/Present or altering gamepad HRESULT."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-RT-MIP-NATIVE-SAMPLING",
+    "goal": "Implement complete game-created D3D9 render-target mip-level sampling in native D3D11 menu, car-selection, and race Draw/DrawIndexed with exact source GPU readbacks, safe fallback and integrated Gates.",
+    "acceptance_items": [
+      {
+        "id": "native-rt-mip-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Each sampled game-render-target mip is read back from its own live GPU subresource and consumed in native DX11 Stage0/Stage1 Draw/DrawIndexed."
+      },
+      {
+        "id": "invalid-mip-dx9ex-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "device_input_and_texture_safety",
+        "expected_behavior": "Invalid mip extents, GPU readback, format or native pipeline resource allocation abort native publication and preserve original DX9Ex/gamepad flow."
+      },
+      {
+        "id": "exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "ci_backend_build_openxr_hud",
+        "expected_behavior": "The exact SHA of the material feature and verifier repairs passes all five mandatory DX11 Fast, Backend, Windows Build, OpenXR and HUD Actions."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-rt-mip-draw": "PASS",
+    "invalid-mip-dx9ex-fallback": "PASS",
+    "exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "blocking_evidence": "Prior game RT texture mirror refused usesMips when source levels exceeded one, so D3D9 menus, vehicle selection and race GPU render-target mip textures could not enter native shader Draw/DrawIndexed. The 00560, 00589, 00590 structural regressions assumed hard-coded level 0 or single-level fallback; verified failures on first candidate before repair.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38623424206,
+      "conclusion": "success",
+      "head_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145"
+    },
+    "backend_conversion": {
+      "run_id": 38623424240,
+      "conclusion": "success",
+      "head_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145"
+    },
+    "windows_build": {
+      "run_id": 38623431802,
+      "conclusion": "success",
+      "head_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145"
+    },
+    "openxr_architecture": {
+      "run_id": 38623431686,
+      "conclusion": "success",
+      "head_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145"
+    },
+    "hud_inspector": {
+      "run_id": 38623431730,
+      "conclusion": "success",
+      "head_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145"
+    }
+  },
+  "result_note": "COMPLETE_BUILD_VERIFIED at exact validation-bearing SHA for native game render-target multi-mip Draw/DrawIndexed and fail-closed DX9Ex fallback. Actual menu/car/race pixels, Quest3/VDXR HMD and gamepad are UNTESTED. No DXVK development or promotion.",
+  "result_sha": "1e986244ef6ce336c9c53d5fb1625ae61c7ad145",
+  "packaging_reason": "User handles deployment. No Quest3/VDXR HMD or controller in-game runtime proof; source and build verified only.",
+  "pipeline": {
+    "C0_RECOVER": "PASS: fetched current GitHub branch HEAD, AGENTS.md, DX11 execution policy, 00741 history and source ownership before new development.",
+    "C1_REVIEW": "PASS: identified unsupported multi-mip D3D9 game render targets and independent subresource readback requirements, preserving DX9Ex fallback.",
+    "C2_IMPLEMENT": "PASS: substantive source C++ per-mip render target GPU readback and native D3D11 Draw/Indexed plumbing committed 36b151d with new integration C++/Python tests; legacy first-game and 00589/00590 false negative tests repaired.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 1e986244ef6ce336c9c53d5fb1625ae61c7ad145 five mandatory GitHub Actions success: DX11 Fast #38623424206, Backend #38623424240, Build #38623431802, OpenXR #38623431686, HUD #38623431730; HMD UNTESTED.",
+    "C4_COMMIT": "PASS: actual native game C++ material 36b151d, C++/Python and source verifier updates committed without force and without CI-skip; final validation-bearing 1e986244ef6ce336c9c53d5fb1625ae61c7ad145.",
+    "C5_PACKAGE": "NOT_REQUIRED: runtime HMD and game image untested; user deploys and DXVK frozen.",
+    "C6_STATE": "PASS: separate post-success bookkeeping checkpoint; exact SHA retained and no score duplication."
+  }
+}

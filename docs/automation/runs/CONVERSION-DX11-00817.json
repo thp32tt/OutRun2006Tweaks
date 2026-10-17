@@ -1,0 +1,137 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00817",
+  "production_id": "CONVERSION-DX11-00817",
+  "event_id": "CONVERSION-DX11-00817-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:LEGACY_NATIVE_DIRECTGPU_STEREO_XR_PROJECTION",
+  "feature_id": "DX11-LEGACY-HOST-DIRECTGPU-OPENXR-STEREO-PROJECTION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": "2a8d2140d090a132b5c733e9761fc60d6b2e20bd",
+  "validation_bearing_result_sha": "7100264a1a9e71c59f612460b12b757364d19481",
+  "changed_files": [
+    "vrhost/src/main.cpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LEGACY-HOST-DIRECTGPU-OPENXR-STEREO-PROJECTION",
+    "full_dx11_renderer_complete": false,
+    "goal": "Connect the legacy x64 DirectGPU source to full-resolution independent L/R OpenXR array slices through the existing verified R23 GPU copy helper, without replacing unproven game frame or original D3D9/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "legacy-native-two-eye-projection",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_host_directgpu_openxr_projection",
+        "expected_behavior": "Selected, fence-complete, correctly owned independent game eyes copy into XR slices 0/1 only when opt-in, exact size/format and immediate-context ownership hold."
+      },
+      {
+        "id": "sbs-route-and-original-game-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_stereo_source_selection",
+        "expected_behavior": "ClassicSbs, stale/aliased/foreign GPU sources, unsupported color transfers and disabled opt-in retain the original shader/SBS projection, game D3D9 Draw/input/FFB."
+      },
+      {
+        "id": "warp-and-five-exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "host_x64_warp_windows_and_dx11_gates",
+        "expected_behavior": "WARP stereo pixel/negative source-route regression and five mandated GitHub Actions all successful at one source candidate SHA, without claiming Quest3 runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "legacy-native-two-eye-projection": "PASS_BUILD",
+    "sbs-route-and-original-game-fallback": "PASS_BUILD",
+    "warp-and-five-exact-sha-ci": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "integration_path": [
+      "Existing live game native Draw producer and independently validated native DirectGPU hold pair feed both legacy and R23 x64 compositor paths.",
+      "The legacy compositor now uses the production validated exact-format two-slice native GPU transfer; original shader/SBS fallback always remains."
+    ],
+    "batch_components": [
+      "vrhost/src/main.cpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "OpenXR host-x64 WARP native L/R copy smoke and exact-SHA five Gates SUCCESS.",
+      "negative_regression": "Explicit SBS source route rejects native copy after source switch; stale or incompatible eyes use original shader path.",
+      "component_integration": "Legacy actual RenderProjection() and existing R23 shared DirectGPU-to-XR copy helper."
+    },
+    "conflict_keys": [
+      "DX11:LEGACY_NATIVE_DIRECTGPU_STEREO_XR_PROJECTION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source/CI only; real menu, car selection, sustained race and Quest3 VR appearance are not observed.",
+    "activation_guard_and_fallback": "OUTRUN_VR_NATIVE_XR_EYE_COPY opt-in; preserve source-route, device, formats, frame and original game inputs."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read authenticated GitHub latest HEAD, source policy, existing R23 and legacy host routing before implementation.",
+    "C1_REVIEW": "Legacy RenderProjection did not use the already validated whole-eye OpenXR GPU array-slice copy and only used shader projection.",
+    "C2_IMPLEMENT": "Legacy host real D3D11 OpenXR projection C++ path plus WARP source-routing regression at material SHA 2a8d2140d090a132b5c733e9761fc60d6b2e20bd.",
+    "C3_VALIDATE": "Initial newer 00816 descendant Fast failure was a destructive route guard textual duplicate; repaired same 00817 feature. Required exact 7100264a1a9e71c59f612460b12b757364d19481 DX11 Fast/Backend/Windows/OpenXR/HUD Gates all SUCCESS. Quest3 and real game UNTESTED.",
+    "C4_COMMIT": "Implementation 2a8d2140d090a132b5c733e9761fc60d6b2e20bd and causal source/fast trigger repair 7100264a1a9e71c59f612460b12b757364d19481 are non-[skip ci] source commits; this separate record is [skip ci] bookkeeping.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; Quest3/VDXR/gamepad RUNTIME_VALIDATION=UNTESTED; full native renderer not declared done."
+  },
+  "evidence": {
+    "exact_sha": "7100264a1a9e71c59f612460b12b757364d19481",
+    "exact_sha_gate_results": {
+      "DX11 Fast Structural Checks": {
+        "status": "SUCCESS",
+        "run_id": 38872273831
+      },
+      "Backend Conversion Gate": {
+        "status": "SUCCESS",
+        "run_id": 38872273860
+      },
+      "Windows Build": {
+        "status": "SUCCESS",
+        "run_id": 38872279316
+      },
+      "OpenXR VR architecture": {
+        "status": "SUCCESS",
+        "run_id": 38872279323
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "status": "SUCCESS",
+        "run_id": 38872279332
+      }
+    },
+    "ci_result": "SUCCESS_5_OF_5",
+    "runtime_evidence": "NONE: no matched Quest3/VDXR, real game or gamepad session",
+    "source_owner": "AI2-ChatGPT2"
+  },
+  "material_source_commits": [
+    "2a8d2140d090a132b5c733e9761fc60d6b2e20bd"
+  ],
+  "repair_commits": [
+    "7100264a1a9e71c59f612460b12b757364d19481"
+  ],
+  "score": {
+    "run_key": "CONVERSION-DX11-00817",
+    "score_change": 0,
+    "score_status": "C6_BOOKKEEPING_NO_DUPLICATE_SCORE",
+    "note": "Only one new functionality credit already recorded in thp32tt/ai-dev-lab AI_SCOREBOARD.md as AI2 1421 +1 = 1422; no C6, CI repair or retry double score."
+  }
+}

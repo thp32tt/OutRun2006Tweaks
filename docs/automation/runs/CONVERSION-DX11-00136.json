@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00136",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "recorded_kst": "2026-09-30T23:37:47+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "eab3a8ae46d997af9f090c383c410c2a1aae93e9",
+  "result_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b",
+  "validation_bearing_result_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_MENU_CAPTURE_DIRECT_ONLY_POLICY_DECOUPLING",
+  "summary": "Changed the DX11 one-click selector so gameplay remains DirectGpuOnly=true while DisableDesktopDuplication=false keeps the PresentationTheater/menu mono capture source alive. The existing directTransportOnly gameplay path still rejects classic SBS frames, so ACK/run-identity failures cannot be hidden by a classic gameplay fallback. Added an exact one-click contract guard for this policy and corrected host startup logging to distinguish gameplay classic-fallback blocking from the explicit full-session Desktop Duplication switch. This is a runtime-path/config candidate for Issue #81, not runtime proof that the brown menu rectangle is fixed.",
+  "changed_paths": [
+    "tools/Select-OutRunVRBackend.ps1",
+    "tools/Test-VROneClickContract.ps1",
+    "vrhost/src/main.cpp"
+  ],
+  "controller_failure_context": {
+    "failed_run_id": 36727240080,
+    "failed_sha": "dac73da4c50db854eb5bdad2b3ef40e8074730ad",
+    "failed_step": "Test VR session auto-analysis regressions",
+    "failure_signature": "PowerShell ParserError at tools/Analyze-OutRunVRSession.ps1:64; Unexpected token transport=SBS in malformed sustainedCachedImageFallback expression.",
+    "disposition": "NOT_REPEATED",
+    "prior_repair_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+    "prior_repair_validation_run": 36727435215,
+    "prior_repair_validation": "PASS",
+    "note": "Attempt 2 did not re-edit the already repaired analyzer. Current exact-SHA Gate also passed the analyzer regression step."
+  },
+  "rationale": {
+    "hmd_evidence": "Issue #81 recorded repeated actualFinal=fallback-cached-image and 450-frame fallback-cached-image windows in the DX11 menu.",
+    "selector_before": "DX11 set DirectGpuOnly=true and DisableDesktopDuplication=true.",
+    "host_menu_path": "PresentationTheater/menu calls R23Capture(), which returns no capture when disableDesktopDuplication_ is true; a valid capture feeds R23RenderWorldLockedMenuProjection and menu-local-fixed-projection.",
+    "gameplay_isolation": "When directTransportOnly is true, classic gameplay candidates are rejected as direct-only-classic-rejected and the direct-only path does not enter the classic theater fallback branch.",
+    "conclusion": "The explicit global capture disable was unnecessary for gameplay DirectGPU isolation and deprived the menu of its intended mono source."
+  },
+  "review_lenses": {
+    "architecture": "Preserves the existing D3D9Ex game + x64 D3D11 OpenXR host architecture. No native D3D11 draw ownership is activated.",
+    "ownership": "DirectGpuOnly remains true for gameplay; Desktop Duplication is only restored as the menu/theater source.",
+    "stereo_correctness": "No WVP/HUD/world rendering semantics changed. Menu uses the existing zero-IPD LOCAL-fixed mono projection path.",
+    "performance": "Desktop Duplication becomes active during DX11 sessions again; gameplay selection still excludes classic SBS. HMD performance impact is unmeasured and remains runtime-untested.",
+    "adversarial": "One-click contract now fails if DX11 drops DirectGpuOnly=true, fails to keep DisableDesktopDuplication=false, or reintroduces the global capture-disable setting."
+  },
+  "scope_guards": {
+    "native_draw_path_active": false,
+    "native_draw_path_activation_changed": false,
+    "d3d9_render_policy_changed": false,
+    "gameplay_direct_gpu_only": true,
+    "gameplay_classic_fallback_allowed": false,
+    "menu_desktop_duplication_available": true,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36729791682,
+      "conclusion": "success",
+      "validated_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b",
+      "artifact_id": 11105680278,
+      "artifact_digest": "sha256:970d96b5a651faa24da349425b0cd7f6dd8c845bacfa524c156190ba5ff9e2f1",
+      "evidence": "One-click structure contract, analyzer regression, DX11 transport/source/census checks, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and artifact upload passed."
+    },
+    "build": {
+      "run_id": 36729797893,
+      "conclusion": "success",
+      "validated_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b"
+    },
+    "hud_inspector": {
+      "run_id": 36729797822,
+      "conclusion": "success",
+      "validated_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b",
+      "analysis_artifact_id": 11104530942,
+      "analysis_artifact_digest": "sha256:89bb5bfd1b93bc11e45de7f1edba29a642ffe5abc75432bc0378b99e3b61c2cf",
+      "game_artifact_id": 11104222178,
+      "game_artifact_digest": "sha256:53c73e6ae91241273f1321bc2131473e6bad30e90e5df8a9b809ace8f0785151"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36729797904,
+      "conclusion": "success",
+      "validated_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b"
+    },
+    "pc_fast": {
+      "run_id": 36729791705,
+      "conclusion": "skipped",
+      "validated_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b"
+    }
+  },
+  "runtime_blocker": {
+    "issue": 81,
+    "status": "ACTIVE_PENDING_EXACT_BUILD_HMD_RETEST",
+    "prior_hmd_record": "docs/automation/runs/RUNTIME-DX11-20260930-HMD-46fa5383.json",
+    "prior_tested_source_sha": "46fa5383bbf1144e58446028a452f74065fa44c8",
+    "prior_user_observation": [
+      "Menu still shows the brown rectangle.",
+      "Gameplay looks the same as the DX9Ex path."
+    ],
+    "expected_log_delta": [
+      "host startup reports desktopDuplication=enabled and directGameplayClassicFallback=blocked",
+      "menu should produce menu-local-fixed-projection-fresh/cached when capture is available",
+      "sustained actualFinal=fallback-cached-image should no longer dominate the menu"
+    ],
+    "clear_condition": "Quest 3/VDXR exact-build runtime test confirms the brown menu rectangle is gone, menu capture remains valid, and gameplay DirectGPU isolation is preserved."
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5913397836,
+    "validation_comment_id": 5913513948,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "runtime_issue_ledger": {
+    "issue": 81,
+    "comment_id": 5913470728,
+    "status": "CANDIDATE_AUTOMATION_VALIDATED_RUNTIME_UNTESTED"
+  },
+  "attempt_history": [
+    {
+      "attempt": "1/3",
+      "base_sha": "01cff75f7b2ebf9ea7ab668d6cd7e8626d4405f9",
+      "result_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+      "validation_bearing_result_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "selected_work": "DX11_RUNTIME_ANALYSIS_R139_SUSTAINED_CACHED_IMAGE_FALLBACK_DETECTION",
+      "summary": "Closed the DX11 session auto-analyzer false-negative gap exposed by the 2026-09-30 Quest 3/VDXR run. The analyzer now counts fallback-cached-image submission windows and per-frame final markers and emits DX11_SUSTAINED_CACHED_IMAGE_FALLBACK_CONFIRMED for backend=dx11 when one summarized fallback window reaches 300 frames or when 120 final fallback markers are observed. Added a synthetic 2x450-frame failure case plus direct-gpu control and wired the regression test into Backend Conversion Gate. This does not change the renderer/runtime path and does not fix the brown menu rectangle itself.",
+      "validation_runs": {
+        "backend_conversion_gate": {
+          "run_id": 36727435215,
+          "conclusion": "success",
+          "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+          "artifact_id": 11102938537,
+          "artifact_digest": "sha256:1e343dcc966dce2db547fd66c8cac36499e58d9256dfb141e3722c137e3bc621",
+          "evidence": "New Test VR session auto-analysis regressions step passed; Win32 DLL build and artifact upload also passed."
+        },
+        "hud_inspector": {
+          "run_id": 36727445587,
+          "conclusion": "success",
+          "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825",
+          "analysis_artifact_id": 11103557110,
+          "analysis_artifact_digest": "sha256:805bf9cca22e529c19f5adbb98388f8f207a938f56024d5fee22b5e17adfc6a3",
+          "game_artifact_id": 11102878733,
+          "game_artifact_digest": "sha256:ed1089a35107c76d96ba074fd2dfad2d3d19e40650eb39b804426298c70d2d69"
+        },
+        "openxr_vr_architecture": {
+          "run_id": 36727445666,
+          "conclusion": "success",
+          "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825"
+        },
+        "build": {
+          "run_id": 36727445603,
+          "conclusion": "success",
+          "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825"
+        },
+        "pc_fast": {
+          "run_id": 36727435161,
+          "conclusion": "skipped",
+          "validated_sha": "391eda7537e4d835b2eb0d21cc6b9d92aeb5d825"
+        }
+      },
+      "note": "ATTEMPT=1 ultimately passed after superseding malformed initial dac73da4 with repaired 391eda75. Controller FAILURE_CONTEXT still references the superseded failed run 36727240080."
+    },
+    {
+      "attempt": "2/3",
+      "base_sha": "eab3a8ae46d997af9f090c383c410c2a1aae93e9",
+      "result_sha": "921e7f8b767c7b83277238f65b64aed6ec96c80b",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "selected_work": "DX11_MENU_CAPTURE_DIRECT_ONLY_POLICY_DECOUPLING"
+    }
+  ],
+  "evidence": [
+    "Result commit contains the exact marker [AUTO:CONVERSION-DX11-00136] and no CI-skip directive.",
+    "DX11 selector now keeps DirectGpuOnly=true while setting DisableDesktopDuplication=false.",
+    "One-click contract isolates the DX11 selector block and requires that exact pair while rejecting DisableDesktopDuplication=true.",
+    "Host startup log now reports directGameplayClassicFallback and desktopDuplication as separate policies.",
+    "Existing gameplay source selection still rejects classic frames when directTransportOnly is true.",
+    "Exact-SHA Backend Conversion Gate, generic Build, HUD Inspector and OpenXR architecture all passed.",
+    "No N100 clone/worktree, PC fast runner, Quest 3/VDXR or in-game execution was used."
+  ],
+  "blocker": "Runtime visual result remains unverified. Automation cannot confirm that the brown menu rectangle is gone.",
+  "resume_cursor": "ATTEMPT=2 exact result 921e7f8b is automation-validated. The menu capture source is no longer globally disabled in DX11 validation while gameplay remains DirectGPU-only.",
+  "next_action": "Create/test an exact-build Quest 3/VDXR package from result 921e7f8b (or a descendant containing it). Confirm startup log desktopDuplication=enabled + directGameplayClassicFallback=blocked, confirm menu-local-fixed-projection replaces sustained fallback-cached-image, and only then update Issue #81 runtime status."
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00885",
+  "production_id": "CONVERSION-DX11-00885",
+  "event_id": "CONVERSION-DX11-00885-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "feature_id": "DX11:GAME_OFFSCREEN_CAMERA_BOUNDED_COLOR_DEPTH_CLEAR",
+  "work_key": "DX11:GAME_OFFSCREEN_CAMERA_BOUNDED_COLOR_DEPTH_CLEAR",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "b8bb145d05cf3e798a81150eede578ed695c1bee",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:GAME_OFFSCREEN_CAMERA_BOUNDED_COLOR_DEPTH_CLEAR",
+    "goal": "Preserve authentic game camera RECT-cleared color and depth/stencil GPU pixels in their original offscreen source surface, through chronological native Draw and source GPU Copy/Stretch to distinct eyes without overwriting unaffected pixels or claiming runtime frame parity.",
+    "acceptance_items": [
+      {
+        "id": "camera_target_rect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_menu_vehicle_camera_color_gpu",
+        "expected_behavior": "Game-owned offscreen RTV TARGET rectangle replays bounded ClearView or state-restored D3D11.0 shader raster and preserves outside pixels before GPU Copy to OpenXR eye."
+      },
+      {
+        "id": "camera_depth_stencil_rect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_source_depth_stencil_and_draw",
+        "expected_behavior": "Bound same-device RTV/DSV reject malformed rectangles and preserve Z/stencil outside camera Clear regions while allowing normal game Draw/DrawIndexed."
+      },
+      {
+        "id": "fallback_and_stereo",
+        "category": "fallback_regression",
+        "behavior_area": "native_eye_isolation_original_d3d9_fallback",
+        "expected_behavior": "Two independently rendered GPU cameras, invalid/foreign target rejection, unchanged draw-count provenance and state restore leave D3D9/DX9Ex input and FFB fallback intact."
+      },
+      {
+        "id": "exact_gate",
+        "category": "integrated_validation",
+        "behavior_area": "exact_source_sha_five_mandatory_actions",
+        "expected_behavior": "All five DX11 Fast, Backend Conversion, Build, OpenXR and HUD Inspector CI gates pass at one source validation-bearing SHA; Quest3 gameplay stays UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "camera_target_rect": "PENDING_EXACT_SHA",
+    "camera_depth_stencil_rect": "PENDING_EXACT_SHA",
+    "fallback_and_stereo": "PENDING_EXACT_SHA",
+    "exact_gate": "PENDING_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/test_dx11_eye_partial_depth_activation.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Authentic game-owned offscreen camera RTV+DSV RECT Clears in C++ -> bounded GPU ClearView or raster fallback -> source GPU Draw.",
+      "True game-owned post-draw GPU Copy/Stretch to each independent eye with original D3D9/DX9Ex gameplay and input untouched."
+    ],
+    "batch_components": [
+      "native_game_stereo_submission.cpp/.hpp offscreen Clear region routing",
+      "dx11_native_transport_probe.cpp two-eye WARP pixel and owner regression",
+      "test_dx11_eye_partial_depth_activation.py negative source mutation"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two camera GPU pixel regions and their per-eye source copy checked in isolated DX11 native transport fixture (CI pending)",
+      "negative_regression": "Out-of-bounds camera rectangles, foreign/eye owner alias and detached invalid source rejected; shader state restored (CI pending)",
+      "component_integration": "Source camera bounded Clear -> authentic offscreen Draw -> GPU eye Copy with no false eye Draw evidence; original D3D9 fallback remains."
+    },
+    "conflict_keys": [
+      "DX11:GAME_OFFSCREEN_CAMERA_BOUNDED_COLOR_DEPTH_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native bounded camera source GPU integration is code-only; actual menu/vehicle/race screen, Quest3/VDXR parity, performance and controls UNTESTED.",
+    "activation_guard_and_fallback": "No automatic native gameplay promotion; preserve guarded D3D9, DX9Ex, original input/FFB, independent stereo eye ownership, DXVK freeze."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: remote HEAD, 00884 terminal, ownership and DX11 source policy inspected.",
+    "C1_REVIEW": "PASS: identified missing source camera rectangle Clear integration; avoided 00884 revalidation.",
+    "C2_IMPLEMENT": "PASS_SOURCE: bounded camera RTV and DSV GPU Clear paths with two-eye WARP readback and negative tamper contracts in four source/test files.",
+    "C3_VALIDATE": "PENDING_EXACT_SHA: first CI exposed inherited previous-task checkpoint selection while new run was absent; current record makes exact source candidate discoverable.",
+    "C4_COMMIT": "PASS_SOURCE: b8bb145d05cf3e798a81150eede578ed695c1bee and repair commits e1cb37c7bbf961d911178d1fa3311549c4ec3251, 17c4905eb5be2cba686746c239c54afbb8492b38, all without CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED; no HMD deployment performed.",
+    "C6_STATE": "PENDING_BUILD_GATES"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Run existing exact-SHA five GitHub Actions at the latest source + honest pending checkpoint; only repair causal failures within this task, never promote without HMD test."
+}

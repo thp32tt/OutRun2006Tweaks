@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00070",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T01:36:29+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "8ec678f16b11f470a59e9604e0132353802b1d41",
+  "result_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a",
+  "validation_bearing_result_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F18 R107 MANAGED Texture2D mutation-source completeness for UpdateTexture/UpdateSurface.",
+  "summary": "R107 closes the next R106 readiness gap by invalidating an already-current R105 MANAGED Texture2D CPU shadow when a successful D3D9 UpdateTexture destination or UpdateSurface parent texture resolves to that registered identity. The shadow becomes fail-closed/pending until a later successful LockRect capture refreshes it. The census and analyzer export UpdateTexture/UpdateSurface invalidation evidence while native draw remains disabled.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "managed_mirror_upload_from_production": false,
+    "srv_binding_from_production": false,
+    "native_game_draw_routing": false,
+    "vr_d3d9ex_focus_modified": false,
+    "census_gate": "OUTRUN_VR_DX11_CENSUS=1"
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "No protected R50/R51 D3D9 renderer ownership path changed. The generic src/vr startup risk path was reviewed, but R107 does not change device creation, Reset, Present, transport activation or selector flow. HMD/runtime correctness is not inferred from CI."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36598085797,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:35:16Z",
+      "validated_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; all DX11 semantic/input-layout/input-signature/object/shader/linkage probes PASS; R107 hosted constant-buffer probe build and run PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36598092305,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:35:18Z",
+      "validated_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36598091991,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:36:29Z",
+      "validated_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36598091977,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T16:34:35Z",
+      "validated_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36598085627,
+      "conclusion": "skipped",
+      "completed_utc": "2026-09-29T16:29:27Z",
+      "validated_sha": "2f358d6ec8a07fd26022f358bb00172e2f2ff30a"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5894362731,
+    "validation_comment_id": 5894481457,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "evidence": [
+    "Result commit message contains exact controller marker [AUTO:CONVERSION-DX11-00070] and no CI-skip directive.",
+    "NativeManagedTextureShadow external invalidation clears active/staged capture state and marks the CPU shadow invalid without advancing its last captured version.",
+    "Successful UpdateTexture and UpdateSurface observers resolve registered target Texture2D identities and invalidate only a previously valid shadow; unrelated/unregistered destinations do not create registry state.",
+    "Hosted R107 probe proves current-to-stale invalidation, repeated fail-closed behavior and LockRect recapture recovery.",
+    "Analyzer compatibility remains backward-compatible because the R107 mutation-source summary group is optional.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R107 is automation-validated but runtime-untested. R106 readiness can no longer stay true after a known external UpdateTexture/UpdateSurface mutation of a registered MANAGED Texture2D.",
+  "next_action": "Continue Set 05 F18 with one bounded non-routing managed-mirror readiness/ownership proof before any production SRV binding or native draw promotion. Preserve R107 invalidation semantics and keep runtime graphics parity HMD-gated."
+}
