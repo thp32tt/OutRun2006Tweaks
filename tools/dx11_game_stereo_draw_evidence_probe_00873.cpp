@@ -27,13 +27,34 @@ int main() {
     static_assert(!color_certifiable(false, true));
     // Full-size TARGET rectangles take D3D11.0 ClearRenderTargetView on both
     // eyes, so native game scene replay can run without a D3D11.1 context.
-    // Cropped menu/HUD rectangles continue to require ClearView and fail
-    // closed if the extension is missing; zero-sized targets cannot clear.
+    // Cropped menu/HUD rectangles use ClearView or the bounded D3D11.0
+    // GPU raster fallback; invalid targets/unsupported paths still reject.
     static_assert(full_eye_target_rect(0, 0, 3440, 1440, 3440u, 1440u));
     static_assert(!full_eye_target_rect(0, 0, 3440, 1439, 3440u, 1440u));
     static_assert(!full_eye_target_rect(3, 0, 3440, 1440, 3440u, 1440u));
     static_assert(!full_eye_target_rect(-1, 0, 3440, 1440, 3440u, 1440u));
     static_assert(!full_eye_target_rect(0, 0, 3440, 1440, 0u, 1440u));
+    // A cropped authored TARGET Clear must preserve pixels outside its own
+    // rectangle even on D3D11.0. Never turn it into a full-eye Clear when
+    // ClearView is unavailable or promote an unsupported shader/format.
+    using outrun::vr::dx11::live_game_stereo::NativeColorClearRoute;
+    using outrun::vr::dx11::live_game_stereo::color_clear_route;
+    static_assert(color_clear_route(true, 16, 12, 160, 80, 1920u, 1080u,
+        false, true) == NativeColorClearRoute::ShaderRaster);
+    static_assert(color_clear_route(true, 16, 12, 160, 80, 1920u, 1080u,
+        true, false) == NativeColorClearRoute::ClearView);
+    static_assert(color_clear_route(true, 16, 12, 160, 80, 1920u, 1080u,
+        false, false) == NativeColorClearRoute::Reject);
+    static_assert(color_clear_route(true, 0, 0, 1920, 1080, 1920u, 1080u,
+        false, false) == NativeColorClearRoute::FullRtv);
+    static_assert(color_clear_route(false, 0, 0, 0, 0, 1920u, 1080u,
+        false, false) == NativeColorClearRoute::FullRtv);
+    static_assert(color_clear_route(true, -1, 0, 50, 50, 1920u, 1080u,
+        false, true) == NativeColorClearRoute::Reject);
+    static_assert(color_clear_route(true, 0, 0, 0, 50, 1920u, 1080u,
+        false, true) == NativeColorClearRoute::Reject);
+    static_assert(color_clear_route(true, 0, 0, 1921, 1080, 1920u, 1080u,
+        false, true) == NativeColorClearRoute::Reject);
     // Game camera Z/stencil command replay: implicit and explicit full-eye
     // rectangles clear the actual per-eye DSV on D3D11.0 without a fabricated
     // Draw or shader; cropped menu/HUD rectangles retain bounded rasterization.

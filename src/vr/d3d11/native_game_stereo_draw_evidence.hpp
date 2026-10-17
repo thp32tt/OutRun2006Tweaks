@@ -19,6 +19,41 @@ static_assert(full_eye_target_rect(0, 0, 1920, 1080, 1920u, 1080u));
 static_assert(!full_eye_target_rect(0, 0, 1920, 1079, 1920u, 1080u));
 static_assert(!full_eye_target_rect(1, 0, 1920, 1080, 1920u, 1080u));
 static_assert(!full_eye_target_rect(0, 0, 0, 1080, 0u, 1080u));
+
+enum class NativeColorClearRoute : std::uint8_t {
+    Reject, FullRtv, ClearView, ShaderRaster
+};
+// A cropped, game-authored TARGET clear still needs an actual native GPU
+// pixel write on D3D11.0. Select a private full-screen triangle raster only
+// for supported 8-bit eye targets when the D3D11.1 ClearView is unavailable.
+// Reject invalid rectangles before recording either eye; never widen to
+// ClearRenderTargetView and erase the rest of a menu/race frame.
+[[nodiscard]] constexpr NativeColorClearRoute color_clear_route(
+    bool hasRegion, std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight,
+    bool clearViewAvailable, bool shaderRasterSupported) noexcept {
+    if (!eyeWidth || !eyeHeight) return NativeColorClearRoute::Reject;
+    if (!hasRegion) return NativeColorClearRoute::FullRtv;
+    if (left < 0 || top < 0 || right <= left || bottom <= top ||
+        right > static_cast<std::int64_t>(eyeWidth) ||
+        bottom > static_cast<std::int64_t>(eyeHeight))
+        return NativeColorClearRoute::Reject;
+    if (full_eye_target_rect(left, top, right, bottom, eyeWidth, eyeHeight))
+        return NativeColorClearRoute::FullRtv;
+    if (clearViewAvailable) return NativeColorClearRoute::ClearView;
+    return shaderRasterSupported ? NativeColorClearRoute::ShaderRaster
+                                 : NativeColorClearRoute::Reject;
+}
+static_assert(color_clear_route(true, 4, 5, 80, 90, 1920u, 1080u,
+    false, true) == NativeColorClearRoute::ShaderRaster);
+static_assert(color_clear_route(true, 4, 5, 80, 90, 1920u, 1080u,
+    true, false) == NativeColorClearRoute::ClearView);
+static_assert(color_clear_route(true, 0, 0, 1920, 1080, 1920u, 1080u,
+    false, false) == NativeColorClearRoute::FullRtv);
+static_assert(color_clear_route(true, -1, 0, 80, 90, 1920u, 1080u,
+    false, true) == NativeColorClearRoute::Reject);
+
 // D3D9 Z/stencil Clears with an explicit whole-eye RECT must use the real
 // D3D11.0 ClearDepthStencilView, just like an implicit whole-surface Clear.
 // Sending those through the partial rectangle rasterizer consumes an extra

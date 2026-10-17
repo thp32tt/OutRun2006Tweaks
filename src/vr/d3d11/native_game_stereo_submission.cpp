@@ -16,6 +16,10 @@ namespace {
     ID3D11DeviceContext*, ID3D11DepthStencilView*,
     std::uint32_t, std::uint32_t, const D3D11_RECT&,
     float, std::uint8_t, bool, bool) noexcept;
+[[nodiscard]] bool raster_partial_eye_color_clear(
+    ID3D11DeviceContext*, ID3D11RenderTargetView*,
+    std::uint32_t, std::uint32_t, const D3D11_RECT&,
+    const float (&)[4]) noexcept;
 
 // D3D11 OM UAVs share the output merger with MRT/DSV. A game/host
 // postpass can leave a pixel-stage UAV bound while the native camera
@@ -326,35 +330,53 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
     // D3D9 TARGET Clear ignores viewport/scissor; target identity matters.
     // An offscreen menu RT must never be mistaken for the owned OpenXR eye.
     if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
-    if (region &&
-        (region->left < 0 || region->top < 0 ||
-         region->right <= region->left ||
-         region->bottom <= region->top ||
-         static_cast<std::uint32_t>(region->right) > targetWidth_ ||
-         static_cast<std::uint32_t>(region->bottom) > targetHeight_))
-        return false;
-    const bool requiresClearView = region &&
+    const bool cropped = region &&
         !live_game_stereo::full_eye_target_rect(
             region->left, region->top, region->right, region->bottom,
             targetWidth_, targetHeight_);
-    // A real game-authored full-size rectangle Clear must work on D3D11.0.
-    // Query the 11.1 extension only when genuine cropped eye pixels need it.
-    if (requiresClearView &&
-        (FAILED(context_->QueryInterface(
-            IID_PPV_ARGS(rectContext.GetAddressOf()))) || !rectContext))
-        return false;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
+    if (cropped)
+        (void)context_->QueryInterface(
+            IID_PPV_ARGS(rectContext.GetAddressOf()));
     constexpr float kByte = 1.0f / 255.0f;
     const float rgba[4]{
         static_cast<float>((argb >> 16) & 0xffu) * kByte,
         static_cast<float>((argb >> 8) & 0xffu) * kByte,
         static_cast<float>(argb & 0xffu) * kByte,
         static_cast<float>((argb >> 24) & 0xffu) * kByte};
-    if (requiresClearView)
-        rectContext->ClearView(eyeTarget_, rgba, region, 1u);
-    else
+    // Only actual game-owned, rect-bounded commands may take the shader
+    // fallback. For incompatible eye color formats retain original D3D9.
+    bool shaderSupported = false;
+    if (cropped && !rectContext) {
+        Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+        eyeTarget_->GetResource(resource.GetAddressOf());
+        D3D11_TEXTURE2D_DESC desc{};
+        if (resource && SUCCEEDED(resource.As(&texture)) && texture) {
+            texture->GetDesc(&desc);
+            shaderSupported =
+                desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+                desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;
+        }
+    }
+    const auto route = live_game_stereo::color_clear_route(
+        region != nullptr, region ? region->left : 0,
+        region ? region->top : 0, region ? region->right : 0,
+        region ? region->bottom : 0, targetWidth_, targetHeight_,
+        rectContext != nullptr, shaderSupported);
+    switch (route) {
+    case live_game_stereo::NativeColorClearRoute::FullRtv:
         context_->ClearRenderTargetView(eyeTarget_, rgba);
-    return true;
+        return true;
+    case live_game_stereo::NativeColorClearRoute::ClearView:
+        rectContext->ClearView(eyeTarget_, rgba, region, 1u);
+        return true;
+    case live_game_stereo::NativeColorClearRoute::ShaderRaster:
+        return raster_partial_eye_color_clear(
+            context_, eyeTarget_, targetWidth_, targetHeight_, *region, rgba);
+    default:
+        return false;
+    }
 }
 
 bool NativeGameEyeDrawEncoder::clear_depth_stencil(
@@ -886,6 +908,110 @@ private:
     UINT viewportCount_{}, scissorCount_{};
     bool active_{};
 };
+
+// A D3D11.0 immediate context has no rectangle-aware ClearView. A genuine
+// D3D9 menu/HUD TARGET rectangle still needs an EXACT color GPU operation:
+// draw a non-game-evidence triangle restricted to that rectangle, with alpha,
+// depth, blend, predicate and caller OM/IA/shader state restored on exit.
+// Do not clear the entire eye (that would erase vehicle/race geometry).
+[[nodiscard]] bool raster_partial_eye_color_clear(
+    ID3D11DeviceContext* context, ID3D11RenderTargetView* target,
+    std::uint32_t width, std::uint32_t height, const D3D11_RECT& rect,
+    const float (&rgba)[4]) noexcept {
+    if (!context || !target || !width || !height ||
+        rect.left < 0 || rect.top < 0 || rect.right <= rect.left ||
+        rect.bottom <= rect.top ||
+        static_cast<std::uint32_t>(rect.right) > width ||
+        static_cast<std::uint32_t>(rect.bottom) > height)
+        return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    context->GetDevice(device.GetAddressOf());
+    if (!device) return false;
+    static std::mutex mutex;
+    static Microsoft::WRL::ComPtr<ID3D11Device> cachedDevice;
+    static Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex;
+    static Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel;
+    static Microsoft::WRL::ComPtr<ID3D11Buffer> constants;
+    static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> noDepth;
+    std::lock_guard<std::mutex> lock(mutex);
+    if (cachedDevice.Get() != device.Get()) {
+        vertex.Reset(); pixel.Reset(); constants.Reset(); noDepth.Reset();
+        cachedDevice = device;
+    }
+    if (!vertex || !pixel || !constants || !noDepth) {
+        constexpr char shader[] = R"(
+            cbuffer SourceClear : register(b0) { float4 clearColor; };
+            float4 VS(uint id : SV_VertexID) : SV_POSITION {
+                float2 uv = float2((id << 1) & 2, id & 2);
+                return float4(uv * float2(2, -2) + float2(-1, 1), 0, 1);
+            }
+            float4 PS() : SV_TARGET { return clearColor; })";
+        HMODULE module = LoadLibraryW(L"d3dcompiler_47.dll");
+        if (!module) return false;
+        struct CompilerLifetime {
+            HMODULE handle;
+            ~CompilerLifetime() noexcept { if (handle) FreeLibrary(handle); }
+        } compiler{module};
+        Microsoft::WRL::ComPtr<ID3DBlob> vsBlob, psBlob;
+        const auto compile = reinterpret_cast<decltype(&D3DCompile)>(
+            GetProcAddress(module, "D3DCompile"));
+        if (!compile ||
+            FAILED(compile(shader, sizeof(shader) - 1u, nullptr,
+                nullptr, nullptr, "VS", "vs_4_0", 0u, 0u,
+                vsBlob.GetAddressOf(), nullptr)) ||
+            FAILED(compile(shader, sizeof(shader) - 1u, nullptr,
+                nullptr, nullptr, "PS", "ps_4_0", 0u, 0u,
+                psBlob.GetAddressOf(), nullptr)))
+            return false;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> v;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> p;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> cb;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthOff;
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = 16u;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        D3D11_DEPTH_STENCIL_DESC ds{};
+        ds.DepthEnable = FALSE;
+        ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        ds.StencilEnable = FALSE;
+        if (FAILED(device->CreateVertexShader(
+                vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+                nullptr, v.GetAddressOf())) ||
+            FAILED(device->CreatePixelShader(
+                psBlob->GetBufferPointer(), psBlob->GetBufferSize(),
+                nullptr, p.GetAddressOf())) ||
+            FAILED(device->CreateBuffer(&desc, nullptr, cb.GetAddressOf())) ||
+            FAILED(device->CreateDepthStencilState(
+                &ds, depthOff.GetAddressOf())))
+            return false;
+        vertex = std::move(v); pixel = std::move(p);
+        constants = std::move(cb); noDepth = std::move(depthOff);
+    }
+    ScopedNativeGameEyeOutput restore(context, width, height);
+    if (!restore.valid()) return false;
+    context->UpdateSubresource(constants.Get(), 0u, nullptr, rgba, 0u, 0u);
+    context->OMSetRenderTargets(1u, &target, nullptr);
+    context->OMSetDepthStencilState(noDepth.Get(), 0u);
+    context->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+    context->RSSetState(nullptr); // game Clear ignores saved scissor/cull
+    const D3D11_VIEWPORT viewport{
+        static_cast<float>(rect.left), static_cast<float>(rect.top),
+        static_cast<float>(rect.right - rect.left),
+        static_cast<float>(rect.bottom - rect.top), 0.0f, 1.0f};
+    context->RSSetViewports(1u, &viewport);
+    context->IASetInputLayout(nullptr);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context->VSSetShader(vertex.Get(), nullptr, 0u);
+    context->PSSetShader(pixel.Get(), nullptr, 0u);
+    context->GSSetShader(nullptr, nullptr, 0u);
+    context->HSSetShader(nullptr, nullptr, 0u);
+    context->DSSetShader(nullptr, nullptr, 0u);
+    ID3D11Buffer* cb = constants.Get();
+    context->PSSetConstantBuffers(0u, 1u, &cb);
+    context->Draw(3u, 0u); // authored Clear, never native game Draw evidence
+    return true;
+}
 
 // D3D11 ClearDepthStencilView ignores rectangles. Replay an original game's
 // bounded Z/stencil Clear with a depth-only draw: a one-viewport triangle
@@ -1554,8 +1680,20 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
         }
         if (needsClearView &&
             FAILED(context_->QueryInterface(
-                IID_PPV_ARGS(rectClearContext.GetAddressOf()))))
-            return false;
+                IID_PPV_ARGS(rectClearContext.GetAddressOf())))) {
+            // D3D11.0 cannot ClearView partial rectangles. The real cropped
+            // game TARGET replay uses a bounded GPU color raster instead.
+            // Check both eye formats and shader compiler availability before
+            // either eye starts writing. Fail closed on missing dependencies.
+            if (ring_.format() != DXGI_FORMAT_R8G8B8A8_UNORM &&
+                ring_.format() != DXGI_FORMAT_B8G8R8A8_UNORM)
+                return false;
+            HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
+            if (!compiler) return false;
+            const bool ready = GetProcAddress(compiler, "D3DCompile") != nullptr;
+            FreeLibrary(compiler);
+            if (!ready) return false;
+        }
     }
 
     // Allocate separate, full-size native depth/stencil attachments BEFORE
