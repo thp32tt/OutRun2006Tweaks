@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C5_VALIDATION",
-  "checkpoint": "C5_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "bed30a43919ab6d9736e7d1f5bf6ab3aa99ea778",
   "material_result_sha": "8c294cc20782a6e7f15346856f5eaf9ebf8b8941",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
   "source_paths": [
     "src/vr/game/car_base_shadow_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -28,7 +28,8 @@
     "src/vr/game/car_base_shadow_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "vrhost/tests/car_base_shadow_stereo_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-01017.json"
+    "docs/automation/runs/CONVERSION-DX9EX-01017.json",
+    "tools/verify_vr_start_shadow_world_owner.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:START_SHADOW",
@@ -66,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "original_shadow_two_eye_source": "PENDING_EXACT_SHA",
-    "shadow_original_fallback": "PENDING_EXACT_SHA",
-    "shadow_exact_sha_gates": "PENDING_EXACT_SHA"
+    "original_shadow_two_eye_source": "PASS",
+    "shadow_original_fallback": "PASS",
+    "shadow_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R30 already authorizes exact direct shadow original c64 with next-draw proof, but R33 captured a weaker source after temporary left-eye upload and skipped the shadow in its pre-left reject branch.",
@@ -88,31 +89,70 @@
   },
   "validation_evidence": {
     "dx9ex_active_validation": {
-      "run_id": 39036741371,
-      "sha": "d216dd02e1f63968485d9edc7c6bcb3cc189b95b",
-      "conclusion": "success"
+      "run_id": 39037576108,
+      "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+      "conclusion": "success",
+      "workflow": "DX9Ex Active Validation"
     },
     "domain_isolation_guard": {
-      "run_id": 39036741428,
-      "sha": "d216dd02e1f63968485d9edc7c6bcb3cc189b95b",
-      "conclusion": "success"
-    },
-    "full_source_impact_review": {
-      "run_id": 39036623641,
-      "sha": "5d036a67994bae6a1ef3c4c55b51e2a1a2934a5b",
-      "conclusion": "success"
+      "run_id": 39037575994,
+      "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+      "conclusion": "success",
+      "workflow": "Domain Isolation Guard"
     },
     "hud_inspector": {
-      "run_id": 39036216999,
-      "sha": "8c294cc20782a6e7f15346856f5eaf9ebf8b8941",
-      "conclusion": "success"
+      "run_id": 39037576002,
+      "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+      "conclusion": "success",
+      "workflow": "OutRun EXE HUD Inspector CI"
+    },
+    "full_source_impact_review": {
+      "run_id": 39037575983,
+      "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+      "conclusion": "success",
+      "workflow": "DX9Ex Full Source Impact Review"
     }
   },
   "ci_repair_commits": [
     "1471f98b91109db4eec2828793393f2fccd186c9",
     "5d036a67994bae6a1ef3c4c55b51e2a1a2934a5b",
-    "d216dd02e1f63968485d9edc7c6bcb3cc189b95b"
+    "d216dd02e1f63968485d9edc7c6bcb3cc189b95b",
+    "235a39fd790636e715370c950b988c3e9b5a1d64",
+    "9b7e9bc2e846f125875d4290b11b3b1321f95bb0"
   ],
   "prior_pass_exact_sha": "d216dd02e1f63968485d9edc7c6bcb3cc189b95b",
-  "pending_source_result_sha": "235a39fd790636e715370c950b988c3e9b5a1d64"
+  "pending_source_result_sha": "235a39fd790636e715370c950b988c3e9b5a1d64",
+  "ci_evidence": {
+    "source_commit": "8c294cc20782a6e7f15346856f5eaf9ebf8b8941",
+    "exact_sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+    "gates": "SUCCESS_4_OF_4_EXACT_SHA",
+    "hmd": "UNTESTED",
+    "proof": {
+      "dx9ex_active_validation": {
+        "run_id": 39037576108,
+        "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+        "conclusion": "success",
+        "workflow": "DX9Ex Active Validation"
+      },
+      "domain_isolation_guard": {
+        "run_id": 39037575994,
+        "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+        "conclusion": "success",
+        "workflow": "Domain Isolation Guard"
+      },
+      "hud_inspector": {
+        "run_id": 39037576002,
+        "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+        "conclusion": "success",
+        "workflow": "OutRun EXE HUD Inspector CI"
+      },
+      "full_source_impact_review": {
+        "run_id": 39037575983,
+        "sha": "9b7e9bc2e846f125875d4290b11b3b1321f95bb0",
+        "conclusion": "success",
+        "workflow": "DX9Ex Full Source Impact Review"
+      }
+    }
+  },
+  "result_summary": "R84 car-contact shadow original c64 writer/draw and physical producer pre-left+post-left guards, coupled C++ smoke and safety regression, exactly 4/4 same-SHA GitHub Gates PASS. Quest3/VDXR runtime remains UNTESTED."
 }
