@@ -86,6 +86,18 @@
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
     ],
-    "exact_sha": "PENDING"
-  }
+    "exact_sha": "PENDING",
+    "source_integrated_sha": "165c6f1f89d58baa437d5bdaf455db29719b5a0b",
+    "policy_on_source_sha": "SUCCESS #39046639845 policy",
+    "domain_on_source_sha": "SUCCESS #39046639967",
+    "full_exact_sha_required": [
+      "DX9Ex Active Validation x86 R84/R26_SAFE, x64 host, package",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "integrated_validation": "PENDING_ALL_FOUR_EXACT_SHA",
+    "remark": "Follow-up source/testing repair from the same TASK_ID is included in ancestry. This pending run record triggers the four exact-SHA push workflows; it does not assert HMD or CI success."
+  },
+  "candidate_head_sha": "165c6f1f89d58baa437d5bdaf455db29719b5a0b"
 }
