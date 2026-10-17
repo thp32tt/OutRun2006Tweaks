@@ -2068,11 +2068,34 @@ int main()
                     ? (p[0] == 0x11u && p[1] == 0x00u && p[2] == 0xccu)
                     : (p[0] == 0x33u && p[1] == 0xbbu && p[2] == 0x22u);
             };
-        require(expectedCamera(lateCopy) &&
-                expectedCamera(lateScale) &&
-                expectedCamera(lateArray) &&
-                lateClear[0] == 0xccu && lateClear[1] == 0x88u &&
-                lateClear[2] == 0x44u,
+        const bool lateCopyMatches = expectedCamera(lateCopy);
+        const bool lateScaleMatches = expectedCamera(lateScale);
+        const bool lateArrayMatches = expectedCamera(lateArray);
+        const bool lateClearMatches =
+            lateClear[0] == 0xccu && lateClear[1] == 0x88u &&
+            lateClear[2] == 0x44u;
+        if (!lateCopyMatches || !lateScaleMatches ||
+            !lateArrayMatches || !lateClearMatches) {
+            // Surface actual WARP sample values on failure rather than
+            // guessing a color-order bug or weakening native-eye coverage.
+            const auto show = [](const char* tag,
+                                 const std::uint8_t* sample) {
+                std::cerr << ' ' << tag << '='
+                          << unsigned(sample[0]) << ','
+                          << unsigned(sample[1]) << ','
+                          << unsigned(sample[2]) << ','
+                          << unsigned(sample[3]);
+            };
+            std::cerr << "00855 source timeline WARP pixel mismatch eye="
+                      << eyeIndex;
+            show("copy", lateCopy);
+            show("scale", lateScale);
+            show("array", lateArray);
+            show("clear", lateClear);
+            std::cerr << '\n';
+        }
+        require(lateCopyMatches && lateScaleMatches &&
+                lateArrayMatches && lateClearMatches,
                 "00855 twelve-event source timeline actual L/R GPU pixels and Clear order");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
