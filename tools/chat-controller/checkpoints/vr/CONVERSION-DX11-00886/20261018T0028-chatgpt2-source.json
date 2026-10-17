@@ -13,15 +13,15 @@
   "base_sha": "17c4905eb5be2cba686746c239c54afbb8492b38",
   "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
   "feature_branch": "feature/dx11-00886-game-surface-mutation-replay",
-  "feature_last_head": "ae70104fbe62f1f99e70c3d99f9b97f38a28815e",
-  "material_result_sha": "23ef2949e93959a8c5f208b9dde0b1f04059a3cf",
+  "feature_last_head": "a279e4882cd1cf1862ade447cfd5352cfe95a0f9",
+  "material_result_sha": "e0d791ae2ba8d4a3270fd584698ce8137849b892",
   "run_record_path": "docs/automation/runs/CONVERSION-DX11-00886.json",
   "run_record_ref": "feature/dx11-00886-game-surface-mutation-replay",
   "compare": {
     "base": "vr-dx11-native-r71",
     "head": "feature/dx11-00886-game-surface-mutation-replay",
     "behind_by": 0,
-    "ahead_by": 9
+    "ahead_by": 11
   },
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
   "validation": {
