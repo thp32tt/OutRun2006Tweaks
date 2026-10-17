@@ -5,6 +5,7 @@ int main()
     using namespace OutRunVR::HudNativeSource;
     using OutRunVR::GameSemantic::RenderScope;
     using OutRunVR::GameSemantic::ProducerToken;
+    using OutRunVR::GameSemantic::PhysicalDrawCommand;
     int first=1, second=2;
     SourceStamp q{true,RenderScope::ScreenHud,ProducerToken::OutRunHudText,
         &first,3,5,0x1234,7,9};
