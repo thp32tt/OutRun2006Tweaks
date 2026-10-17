@@ -10,14 +10,14 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00899",
   "feature_id": "DX11:NATIVE_GAME_CAMERA_MIP_GPU_COPY_STRETCH",
   "work_key": "DX11:FULLFRAME:GAME_CAMERA_MIP_GPU_COPY_STRETCH",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
-  "score_change": 0,
+  "score_change": 1,
   "base_sha": "450488ac26b78462a6c05743807431e39e99895b",
   "material_result_sha": "fa34400ec9778ce1204db61d06eba9216f77796d",
   "feature_contract": {
@@ -62,16 +62,17 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "NATIVE_STEREO_EYE_OUTPUT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_CI_PENDING, not complete native gameplay. GPU source code and WARP regression compile or execute only once its exact run succeeds; no Quest3 or real OutRun menu/vehicle/race screen evidence.",
+    "visible_frame_acceptance": "SOURCE-stage BUILD_VERIFIED: selected mip GPU Copy/Stretch and native stereo output code with real Win32 WARP pixels, not full live menu/car/race frame nor Quest 3/VDXR runtime visual parity. Ordered stage path is intended game-frame integration graph; R30 game callsite and user-visible HMD output are not claimed tested.",
     "activation_guard_and_fallback": "NativeDrawPathActive remains explicit opt-in, original D3D9Ex Present, input, FFB and SkyGlow own runtime fallback; rejected source subresource errors do not publish stereo eyes. DXVK remains frozen.",
     "blocking_evidence": "Prior native game Copy and shader Stretch always selected mip zero, even when the real camera authored a smaller nonzero mip. The selected mip's dimensions and subresource were not plumbed through the original per-eye timeline, risking incorrect menu/car/race camera pixels. Actual WARP green mip-1 fixture separately tests real GPU copy, filtered stretch and preserves all game render targets.",
     "acceptance_proof": {
-      "positive_probe": "GPU WARP probe added for selected mip-1 green pixel output via both Copy and Stretch; native transport isolated result pending exact workflow completion.",
-      "negative_regression": "Invalid requested mip 3 of three-level game texture and 36-pixel crop outside a 32-pixel mip1 rejected; retained original mip0 proof and RTV/MRT/DSV/UAV state.",
-      "component_integration": "Source changes to native_game_stereo_submission.hpp/.cpp, GPU regression test tools/dx11_native_transport_probe.cpp, existing source-graph audit actual selected-mip admission, final five required GitHub Actions pending."
+      "positive_probe": "Win32 WARP native transport run #39074393275 SUCCESS at exact tested GPU source SHA 82005a; actual mip-1 green selected-source eye pixel confirmed and original mip0 restored; native C++ source unchanged until full validation SHA 01677143.",
+      "negative_regression": "Native GPU WARP rejects nonexistent mip and mip1 crop outside actual subresource, retains original MRT1/DSV/PS-UAV and Draw counters; #39074393275 SUCCESS.",
+      "component_integration": "Full camera mip per-eye source timeline and C++ D3D11 GPU Copy/Stretch + WARP regression; all five mandatory GitHub Actions SUCCESS on exact validation SHA 01677143 (Fast #39074617139, Backend #39074617150, Build #39074621514, OpenXR #39074621642, HUD #39074621453)."
     }
   },
   "changed_files": [
@@ -82,23 +83,59 @@
     "docs/automation/runs/CONVERSION-DX11-00898.json"
   ],
   "acceptance_results": {
-    "native_gpu_mip_source_copy": "PENDING_EXACT_SHA",
-    "native_gpu_mip_stretch_fallback": "PENDING_EXACT_SHA",
-    "source_timeline_exact_ci_gpu_pixels": "PENDING_EXACT_SHA"
+    "native_gpu_mip_source_copy": "PASS_WARP_AND_BUILD",
+    "native_gpu_mip_stretch_fallback": "PASS_WARP_AND_SOURCE",
+    "source_timeline_exact_ci_gpu_pixels": "PASS_EXACT_SHA_5_OF_5"
   },
   "validation_evidence": {
     "material_sha": "fa34400ec9778ce1204db61d06eba9216f77796d",
-    "automation_validation": "PENDING_EXACT_SHA",
+    "validation_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39074617139,
+        "conclusion": "success",
+        "validation_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39074617150,
+        "conclusion": "success",
+        "validation_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836"
+      },
+      {
+        "name": "Build",
+        "run_id": 39074621514,
+        "conclusion": "success",
+        "validation_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39074621642,
+        "conclusion": "success",
+        "validation_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39074621453,
+        "conclusion": "success",
+        "validation_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836"
+      }
+    ],
+    "isolated_native_warp_run_id": 39074393275,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_sha": "82005a346e2cfa46ddbeb0b4191b4f62bf941975",
     "runtime_validation": "UNTESTED",
-    "blocking_evidence": "Exact updated WARP and 5 mandatory CI runs have not yet all succeeded; Quest3/VDXR/gamepad testing absent."
+    "blocking_evidence": "Original OutRun menu/car/race, Quest3/VDXR HMD, gamepad/FFB runtime and 72Hz performance not executed. Native renderer full completion unproven."
   },
   "pipeline": {
     "C0_RECOVER": "Source branch at 450488ac after 00898 C6; no overlapping owner on selected game camera mip stream.",
     "C1_REVIEW": "Game-owned nonzero mip not propagated through native GPU Copy/Stretch and source events.",
     "C2_IMPLEMENT": "Source mips, bounded copied/stretched eye GPU pixels and Win32 WARP regression committed as 00899 material fa34400e.",
-    "C3_VALIDATE": "PENDING: exact required GitHub actions and native WARP; inherited 00898 C6 parser + MSVC source + WARP fixture state regression repaired within same task.",
-    "C4_COMMIT": "SOURCE_IMPLEMENTED_CI_PENDING checkpoint, source material fa34400e, validation-bearing pending; no CI-skip.",
+    "C3_VALIDATE": "Real GPU WARP 39074393275 SUCCESS, native source from fa34400e with MSVC/fixture repair at 82005a; five unchanged exact-SHA required GitHub Actions SUCCESS at validation-bearing 01677143.",
+    "C4_COMMIT": "Material game C++/GPU changes fa34400e, causal CI/compile/test repairs through 82005a, validation-bearing result 01677143 without CI-skip; this later C6-only commit is separate.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_EXACT_SHA; no score or runtime PASS claimed."
-  }
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED selected native camera GPU mip integration, 5/5 exact-SHA mandatory GitHub CI PASS, real Win32 WARP PASS. Quest3/VDXR runtime UNTESTED, full native DX11 renderer incomplete. +1 only once RUN_KEY=CONVERSION-DX11-00899."
+  },
+  "validation_bearing_result_sha": "01677143cda6f5890fdc6147dc5f3d1e629a6836"
 }
