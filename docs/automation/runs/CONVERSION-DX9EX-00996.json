@@ -13,11 +13,11 @@
   "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
   "phase": "C2_IMPLEMENT",
   "checkpoint": "C5_WAIT_EXACT_SHA",
-  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "automation_validation": "PENDING_GITHUB_ACTIONS_AFTER_CAUSE_REPAIR",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "0fc9e695d36bbc546ceff03ab798be1ed65bab91",
-  "material_result_sha": null,
+  "material_result_sha": "19914a652e6ad9ff5505889e4e169aa9d76af195",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -27,7 +27,8 @@
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00996.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00996.json",
+    "tools/verify_dx9ex_r84_lens_source.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:EXTENDED_TIME",
@@ -72,8 +73,18 @@
   },
   "diagnosis": {
     "root_cause": "R84 R33TryHud shader/c64 path captures GOAL source and excludes StageExtensionTime, while +TIME's same physical transaction exists only in R30 fixedfn/XYZRHW path.",
-    "existing_feature": "CONVERSION-DX9EX-00994 R30 +TIME shader route excluded by its feature scope; same feature_id reused, no duplicate score for earlier outcome."
+    "existing_feature": "CONVERSION-DX9EX-00994 R30 +TIME shader route excluded by its feature scope; same feature_id reused, no duplicate score for earlier outcome.",
+    "ci_policy_failure": "Exact material SHA 19914a652e6ad9ff5505889e4e169aa9d76af195 Active policy step failed: stale three-source literal in R84 lens verifier after adding distinct +TIME fourth physical source; C++ compilation not attempted on this SHA.",
+    "ci_repair": "Update original verifier to require four-source final guard, independent StageExtension physical source and negative mutations that delete just +TIME or GOAL fencing. Preserve lens/C993 and GOAL mutations, no test disabled."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check mandatory GitHub Actions on exact material result SHA; if a real failure occurs repair under this TASK_ID without CI skip; HMD remains UNTESTED."
+  "next_action": "Exact-SHA Windows CI for verifier cause repair; retain earlier material_result_sha, no HMD claim or duplicate score.",
+  "local_validation": {
+    "status": "CAUSE_IDENTIFIED_POLICY_STRING_CONTRACT",
+    "failed_validation_sha": "19914a652e6ad9ff5505889e4e169aa9d76af195",
+    "workflow_id": 39004599517,
+    "failed_step": "verify_dx9ex_r84_lens_source.py",
+    "actual_error": "AssertionError: C993/GOAL composite source fence missing",
+    "new_windows_ci": "PENDING"
+  }
 }

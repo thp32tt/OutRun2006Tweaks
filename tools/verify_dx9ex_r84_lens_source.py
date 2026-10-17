@@ -199,12 +199,19 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         # composite guard rather than requiring an obsolete two-term string.
     ):
         assert marker in physical, "C993 binocular source fence missing: " + marker
-    # Native R33 uses a single-line composite condition. Keep all three
-    # independently authenticated sources in the same post-left/right-eye veto.
-    guard_marker = "if (centreSourceChanged || shadowSourceChanged || goalSourceChanged)"
-    assert guard_marker in physical, "C993/GOAL composite source fence missing"
+    # Native R33 fences all four separately authenticated GPU-eye sources.
+    # Match the actual multiline composite, not an obsolete three-source
+    # literal. Check each independently: the GOAL and stage +TIME routes
+    # must never accidentally reclassify each other's shader/c64 Draw.
+    guard_marker = ("if (centreSourceChanged || shadowSourceChanged ||" +
+                    chr(10) + "                goalSourceChanged || stageSourceChanged)")
+    assert guard_marker in physical, "C993/GOAL/+TIME composite source fence missing"
     assert "const bool goalSourceChanged = exactGoalEye &&" in physical
     assert "OutRunVR::GoalPhysical::SameAfterNativeLeft(" in physical
+    assert "const bool stageSourceChanged = exactStageEye &&" in physical
+    assert "OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(" in physical
+    assert "const bool exactStageEye = goalCommand.IsExactFiniteResultHud() &&" in physical
+    assert "R33/+TIME-source-changed" in physical
     left_draw = physical.index("R32ReviewOwnedResult result{ true, actualDraw() };")
     after_left = physical.index(guard_marker)
     right_eye = physical.index("IDirect3DSurface9* rightEye =")
@@ -342,10 +349,16 @@ def main():
              "OutRunVR::LensCentre::NeverOwnSource("),
         (7, "const bool exactCentreEye =",
              "const bool disabledCentreEye ="),
-        (7, "if (centreSourceChanged || shadowSourceChanged || goalSourceChanged)",
-             "if (centreSourceChanged || shadowSourceChanged)"),
+        (7, "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
+             "                goalSourceChanged || stageSourceChanged)",
+             "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
+             "                goalSourceChanged)"),
         (7, "const bool goalSourceChanged = exactGoalEye &&",
              "const bool goalSourceChanged = false &&"),
+        (7, "const bool stageSourceChanged = exactStageEye &&",
+             "const bool stageSourceChanged = false &&"),
+        (7, "OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(",
+             "OutRunVR::StageExtensionPhysical::NeverSameAfterLeft("),
         (8, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
         (9, "ScopedExactLensCentreGpuDraw centreGpuOwner(", "/*lost owner*/ centreGpuOwner("),
         (10, "!queued && scope == RenderScope::WorldBillboard",
