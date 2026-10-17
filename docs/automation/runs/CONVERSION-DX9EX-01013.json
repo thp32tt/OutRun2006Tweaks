@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01013",
+  "production_id": "CONVERSION-DX9EX-01013",
+  "event_id": "CONVERSION-DX9EX-01013-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e7c8104c0d5c442813b7de59d3e9e1aa94bad185",
+  "material_result_sha": "dc97d283b63d5570bb905089ac398987b434730e",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/sprite_uv_transaction.hpp",
+    "vrhost/tests/ui_sprite_uv_transaction_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/sprite_uv_transaction.hpp",
+    "vrhost/tests/ui_sprite_uv_transaction_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-01013.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Prevent repeated original car-selector and menu texture replacement draws from multiplying sprite UV and optical scale inputs on reused original game source structs, preserving car artwork, menu masks, and normal stereo texture presentation.",
+    "scope_boundary": "Only original UI replacement DDS sprite and child-mask argument mutation around native put_sprite_ex and put_sprite_ex2 calls; do not change DDS decoding, original texture data, R84/R26_SAFE per-eye renderer, FFB/input, SkyGlow, or DXVK.",
+    "trace_stages": [
+      "Original OutRun source DDS hashes and XST texture slot supply the replacement-to-original width and height ratios, including selector body and mask sprites.",
+      "get_texture preserves exact resource pointer and identity; put_sprite_ex and put_sprite_ex2 previously multiplied mutable SPRARGS or SPRARGS2 fields in place before sending them to native queue producers.",
+      "Native game submission still sees the converted UV and size during the call, but game input fields are restored before the next producer/frame; queued output subsequently follows the unchanged R84 physical stereo GPU and host composition paths."
+    ],
+    "subcomponents": [
+      "Integrate reversible per-call C++ UV and inverse-size transactions for both SPRARGS and SPRARGS2, preserving the complete original eight-field quad and six-field sprite layout, with exact native-call lifetime.",
+      "Apply and restore child mask sprite independently, reject nonfinite/malformed scale and overflowing output without partial mutation, and preserve upstream replacement-disable, resource-match, native fallback and pending scale lookup policy.",
+      "Compile and execute a portable Release-enabled C++ smoke that exercises repeated game source reuse, primary/mask siblings, nested render submission, malformed dimensions, and unchanged disabled paths without requiring Quest3."
+    ],
+    "acceptance_items": [
+      {
+        "id": "original_game_sprite_uv_transaction",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Texture replacement producer through OutRun original sprite and mask submission to the retained R84 GPU and XR path",
+        "expected_behavior": "Both original sprite forms receive the exact intended replacement UV during their native put_sprite call, and all original game input fields return to their saved values afterward even across repeated selector frame submissions."
+      },
+      {
+        "id": "mask_nested_and_legacy_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Child mask reentry, malformed ratios, disabled UI replacement, R26 rollback and non-UI desktop game paths",
+        "expected_behavior": "Primary and child sprite UV lifetimes remain independent; nested calls restore the outer transaction, invalid ratios fail neutral without partial writes, and untouched input/FFB, R26_SAFE, SkyGlow and DXVK paths remain unchanged."
+      },
+      {
+        "id": "required_exact_sha_r84_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Native Windows R84 game, R26_SAFE fallback, x64 OpenXR host, packaging and mandatory GitHub feature review gates",
+        "expected_behavior": "Final validation-bearing SHA passes DX9Ex Active policy/full-chain, Domain Isolation, HUD Inspector and Full Source Impact with no CI-skip; Quest3 visual correctness remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "original_game_sprite_uv_transaction": "PASS_LOCAL_PORTABLE",
+    "mask_nested_and_legacy_fallback": "PASS_LOCAL_PORTABLE",
+    "required_exact_sha_r84_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Original put_sprite_ex/ex2 hooks multiply and divide the game's mutable SPRARGS/SPRARGS2 UV and scale fields directly, and mask child UV likewise, without restoring the input after native submission. Reusing an original sprite argument can compound replacements each call. This static source hazard is confirmed; attribution to any specific Quest3 white selector report remains unproven.",
+    "source_trace": [
+      "src/hooks_textures.cpp DDS replacement hash/texture dimension mapping and sprite_scales owner",
+      "src/hooks_textures.cpp get_texture resource and mask pointer tracking followed by put_sprite_ex/ex2 original GPU command producer",
+      "src/vr/game/sprite_uv_transaction.hpp transient primary/child save, finite preflight, apply and post-call restore, followed by unmodified R84 stereo submission"
+    ],
+    "alternatives_rejected": [
+      "Do not suppress draw, force alpha, alter DDS swap/channel order, patch unrelated shader, or globally change VR menu aspect: these do not restore the original reused game sprite UV contract."
+    ],
+    "fix_evidence": "Material C++ source commit dc97d283b63d5570bb905089ac398987b434730e changes original put_sprite calls plus source templated scoped UV and sibling mask transactions.",
+    "negative_test_evidence": "Portable C++17 Release (-DNDEBUG) smoke locally passed repeated scale, sibling mask, overflow, invalid dimensions, nested call and source restoration. Exact Windows R84 CI pending.",
+    "eye_ownership": "Existing R84 renderer performs source-aware physical stereo, no per-eye matrix routes were modified by UV transaction; original game sprite submission and stereo output remain under existing owners.",
+    "evidence_limit": "No actual car-selector HMD test or confirmed correction of observed white textures; the change addresses a source-proven repeated input mutation and preserves RUNTIME_VALIDATION=UNTESTED."
+  },
+  "validation_notes": "CI policy on material SHA dc97d283 failed solely because this required TASK run record was absent; record registered under same task rather than weakening feature policy. Material source SHA remains unchanged and will not be scored twice."
+}
