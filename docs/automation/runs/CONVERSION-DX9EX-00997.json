@@ -17,7 +17,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "25d1d007291a7614f19e93ee48ab32d113e5b673",
-  "material_result_sha": null,
+  "material_result_sha": "8d69cb97a22ad261a8a9c6cfa6845b5eafb04681",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
@@ -28,7 +28,8 @@
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00997.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00997.json",
+    "tools/verify_dx9ex_r84_lens_source.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -86,5 +87,13 @@
   },
   "local_validation": "PENDING_HOST_SMOKE",
   "score_delta_this_attempt": 0,
-  "next_action": "Check one final source-bearing exact SHA in all mandatory GitHub Windows Actions; HMD stays UNTESTED."
+  "next_action": "Check exact SHA DX9Ex Active, Domain, HUD Inspector, Full Source Impact after this cause-scoped verifier repair. No HMD proof.",
+  "last_ci_failure": {
+    "sha": "8d69cb97a22ad261a8a9c6cfa6845b5eafb04681",
+    "workflow": "DX9Ex Active Validation",
+    "job": "policy",
+    "step": "Verify R84 C993 original-WVP source proof and conservative optics",
+    "cause": "old exact substring captureCentreSource()); does not match new composite native semantic-plus-original-c64 guard",
+    "repair": "retain existing source tests; require combined source and GPU generation marker and add negative guards for removing serial/call/pose/shader validation"
+  }
 }

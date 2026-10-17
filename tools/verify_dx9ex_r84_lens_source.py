@@ -193,7 +193,9 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "const auto centreBeforeLeft = exactCentreEye",
         "const bool centreSourceChanged = exactCentreEye &&",
         "OutRunVR::LensCentre::SameStereoDrawSource(",
-        "captureCentreSource());",
+        "captureCentreSource()) ||",
+        "OutRunVR::LensCentre::SameRawStereoSource(",
+        "centreRawBeforeLeft, captureCentreRawSource()));",
         # The GOAL result owns an additional independent post-left fence.
         # Keep the C993 centre and car-shadow checks mandatory in that same
         # composite guard rather than requiring an obsolete two-term string.
@@ -218,6 +220,20 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert left_draw < after_left < right_eye
     assert physical.index("const bool centreSourceChanged = exactCentreEye &&") < after_left
     assert physical.index("OutRunVR::LensCentre::SameStereoDrawSource(") < after_left
+    assert physical.index("OutRunVR::LensCentre::SameRawStereoSource(") < after_left
+    # A changed original-game c64 serial must be sampled before the native
+    # left GPU Draw and fenced before right-eye render target submission.
+    raw_capture = physical.index("const auto centreRawBeforeLeft = exactCentreEye")
+    assert raw_capture < left_draw
+    for marker in (
+        "OutRunVRRenderer::GetLastRawGameWvpWrite(",
+        "OutRunVRRenderer::GetLastGameWvpSemanticProvenance(",
+        "OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch()",
+        "OutRunVRRenderer::GetLastGameWvpPoseEpoch()",
+        "OutRunVR::GameSemantic::ProducerToken::LensFlareCentre",
+        "R29OwnerCurrentShaderEpoch(shader, shaderEpoch)",
+    ):
+        assert marker in physical, "C993 raw c64 provenance missing: " + marker
     fenced = physical[after_left:physical.index(
         "IDirect3DSurface9* savedRt", after_left)]
     for marker in (
@@ -347,6 +363,14 @@ def main():
              chr(10) + "                R33TelemetryEnabled())"),
         (7, "OutRunVR::LensCentre::SameStereoDrawSource(",
              "OutRunVR::LensCentre::NeverOwnSource("),
+        (7, "OutRunVR::LensCentre::SameRawStereoSource(",
+             "OutRunVR::LensCentre::NeverOwnRawSource("),
+        (7, "centreRawBeforeLeft, captureCentreRawSource()));",
+             "centreRawBeforeLeft, centreRawBeforeLeft));"),
+        (7, "OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch()",
+             "0 /* no matching original sun c64 source */"),
+        (7, "writtenShaderEpoch == shaderEpoch",
+             "true /* ignore overwritten shader c64 source */"),
         (7, "const bool exactCentreEye =",
              "const bool disabledCentreEye ="),
         (7, "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
