@@ -68,10 +68,11 @@
     },
     "blocking_evidence": "Confirmed native offscreen camera Draw/DrawIndexed/instancing previously admitted its color RTV while retaining a DSV alias to the OpenXR eye's own depth/stencil allocation, allowing real GPU geometry to corrupt the other output. Exact material 973961eb fixes resource ownership, proven with four real Win32 WARP rejected draw forms plus accepted owned-camera Draw and GPU Copy/Stretch; native WARP run 39072315315 and five mandatory source-Gate runs passed.",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "NATIVE_STEREO_EYE_OUTPUT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "Source-stage BUILD_VERIFIED only: real GPU offscreen game camera RTV/DSV isolation and independently recorded native eye Draw/Copy/Stretch, with exact-SHA WARP and five GitHub gates. The full game D3D9 menu/car/race callsite and real Quest3/VDXR rendered pixels were NOT verified; no full native DX11 renderer completion or playable HMD claim.",
+    "visible_frame_acceptance": "BUILD_VERIFIED 00898 offscreen camera GPU ownership and the existing native eye Draw/Copy/Stretch source chain; this pipeline-path declaration is NOT evidence that menu/car/race live game callbacks, full frame visual correctness, or Quest3/VDXR are verified. Native gameplay promotion remains disabled.",
     "activation_guard_and_fallback": "NativeDrawPathActive remains explicit opt-in/fail-closed. Rejected native game camera/eye resource aliasing never dispatches its GPU draw; original D3D9/DX9Ex Draw, Present, gamepad and FFB continue as authoritative fallback. DXVK frozen; no hardware promotion."
   },
   "changed_files": [

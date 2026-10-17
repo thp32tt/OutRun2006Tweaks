@@ -1548,7 +1548,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX& srcBox,
     const D3D11_RECT& dest, bool linearFilter,
     UINT sourceArraySlice, UINT sourceMipSlice) noexcept {
-    if (!source || !context_ || !eye_targets_bound() return false;
+    if (!source || !context_ || !eye_targets_bound()) return false;
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
     eyeTarget_->GetResource(resource.GetAddressOf());
     Microsoft::WRL::ComPtr<ID3D11Texture2D> eye;
