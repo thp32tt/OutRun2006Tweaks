@@ -8,7 +8,7 @@
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
   "owner_id": "ChatGPT2",
-  "feature_id": null,
+  "feature_id": "DX11:GAME_AUTHORED_OFFSCREEN_CAMERA_GPU_DRAW",
   "work_key": "DX11:GAME_AUTHORED_OFFSCREEN_CAMERA_GPU_DRAW",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
@@ -24,7 +24,7 @@
   "validation_bearing_result_sha": "174497fabe8f120d277fbc1a87b2e732320bfada",
   "result_sha": "174497fabe8f120d277fbc1a87b2e732320bfada",
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:GAME_AUTHORED_OFFSCREEN_CAMERA_GPU_DRAW",
     "goal": "Replay authentic game-owned offscreen camera Draw/DrawIndexed GPU commands and chronological game Clear/Copy/Stretch into independent native left/right stereo eye output without treating offscreen geometry as direct eye color evidence.",
     "acceptance_items": [
       {
@@ -82,7 +82,15 @@
       "NATIVE_STEREO_EYE_OUTPUT"
     ],
     "visible_frame_acceptance": "Source and five mandatory exact-SHA CI SUCCESS; no actual OutRun menu, vehicle, race, Quest3/VDXR screenshot or FPS verification.",
-    "activation_guard_and_fallback": "Do not promote live DX11 backend; original D3D9Ex path and D3D9 input/FFB unchanged."
+    "activation_guard_and_fallback": "Do not promote live DX11 backend; original D3D9Ex path and D3D9 input/FFB unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "The original feature's native offscreen source Draw/DrawIndexed and source-ordered GPU eye Copy/Stretch are evidenced in the recorded material source changes and five SUCCESS exact-SHA GitHub Actions runs at 174497fabe8f120d277fbc1a87b2e732320bfada; real-game/HMD remains UNTESTED.",
+      "negative_regression": "The recorded material feature rejects eye-aliased and foreign-device/foreign-owner RTVs, invalid GPU chronology, and phantom eye color; original D3D9 draw/present/input/FFB remains the guarded fallback. Source/CI evidence only.",
+      "component_integration": "native_game_stereo_submission.cpp/.hpp game-created offscreen RTV replay is integrated with tools/dx11_native_transport_probe.cpp GPU-eye chronology and the existing activation/partial-depth regression scripts."
+    },
+    "conflict_keys": [
+      "DX11:GAME_AUTHORED_OFFSCREEN_CAMERA_GPU_DRAW"
+    ]
   },
   "pipeline": {
     "C0_RECOVER": "PASS: GitHub target branch HEAD equals exact validation SHA; run record absent (RUN_RECORD_NOT_FOUND), reconstructed without rewriting prior data.",
