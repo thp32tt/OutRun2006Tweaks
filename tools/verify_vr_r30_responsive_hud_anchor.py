@@ -18,8 +18,51 @@ assert "!Settings::VRHudEdgeAnchors.get())" in code
 # The R84 visual recovery keeps the displayed ESC scale exactly user-defined.
 assert "const float readable = OutRunVrPauseEye::ResponsiveUserScale(" not in code
 assert "return std::clamp(requested, 0.55f, 1.50f);" in code
-assert "const float opticalScale = userScale;" in code
+# R84 ESC uses one pixel-aspect containment for physical XYZRHW shell
+# and the exact original-game shader arrows. The old opticalScale local
+# disappeared with this real source refactor; require the actual shared
+# helper and exact paused producer guard rather than an obsolete variable.
 assert "ResponsiveMenuScale(" not in code
+pause_helper = (root / "src/vr/d3d9/pause_menu_eye_affine.hpp").read_text()
+contain_begin = code.index("void R30HudContainScale(")
+contain_end = code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(", contain_begin)
+contain_source = code[contain_begin:contain_end]
+assert "const auto contained = OutRunVrPauseEye::ContainNativePauseScale(" in contain_source
+assert "userScale, sourceOverTarget, pauseResponsive);" in contain_source
+assert "scaleX = contained.x;" in contain_source
+assert "scaleY = contained.y;" in contain_source
+shader_begin = code.index("const float userScale = R30PauseShaderPlaneScale(")
+shader_end = code.index("const D3DMATRIX scaledClip =", shader_begin)
+shader_source = code[shader_begin:shader_end]
+assert "float shaderPauseX = userScale;" in shader_source
+assert "float shaderPauseY = userScale;" in shader_source
+assert "if (exactPauseShaderOwner)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);" in shader_source
+assert "hudScale._11 = shaderPauseX;" in shader_source
+assert "hudScale._22 = shaderPauseY;" in shader_source
+assert "return {userScale, userScale / sourceOverTarget};" in pause_helper
+assert "return {userScale * sourceOverTarget, userScale};" in pause_helper
+# Destructive mutations must not silently restore oversized shader arrows,
+# stretch only one axis, or opt in all GOAL/F11/world HUD producers.
+for original, bad in (
+    ("scaleX = contained.x;", "scaleX = userScale;"),
+    ("scaleY = contained.y;", "scaleY = userScale;"),
+):
+    mutant = contain_source.replace(original, bad, 1)
+    assert original in contain_source and original not in mutant
+for original, bad in (
+    ("if (exactPauseShaderOwner)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);",
+     "if (true)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);"),
+    ("hudScale._11 = shaderPauseX;", "hudScale._11 = userScale;"),
+    ("hudScale._22 = shaderPauseY;", "hudScale._22 = userScale;"),
+):
+    mutant = shader_source.replace(original, bad, 1)
+    assert original in shader_source and original not in mutant
+# Match native game->Quest3 portrait-eye containment, with no second
+# magnification: both optics share user X and source-aspect-corrected Y.
+aspect = (3440.0 / 1440.0) / (2496.0 / 2688.0)
+assert aspect > 1.0
+assert abs((1.0 / aspect) - ((1440.0 / 3440.0) * (2496.0 / 2688.0))) < 1e-12
+print("PASS R84 ESC native/shader shared aspect, exact owner and 5 negative mutations")
 pause_helper = (root / "src/vr/d3d9/pause_menu_eye_affine.hpp").read_text()
 assert "inline float ResponsiveUserScale(" in pause_helper
 assert "0.55f + (bounded - 0.55f) * (0.70f / 0.45f)" in pause_helper
