@@ -559,7 +559,15 @@ def main() -> None:
                 # Legacy code rejected every partially-offscreen destination.
                 # The real game now clips the viewport AND adjusts source UVs;
                 # rejecting the old guard is not permission to bypass bounds.
-                "srcBox.right > sd.Width || srcBox.bottom > sd.Height) return false;",
+                "srcBox.right > mipWidth || srcBox.bottom > mipHeight) return false;",
+                "sourceMipSlice >= sd.MipLevels ||",
+                "(sourceMipSlice && sd.SampleDesc.Count != 1u)) return false;",
+                "const UINT mipWidth = (std::max)(1u, sd.Width >> sourceMipSlice);",
+                "const UINT mipHeight = (std::max)(1u, sd.Height >> sourceMipSlice);",
+                "desc.Width = mipWidth;",
+                "desc.Height = mipHeight;",
+                "desc.MipLevels = 1u;",
+                "sd.ArraySize == 1u && sourceMipSlice == 0u;",
                 "const auto clipped = native_game_stretch_clipped_region(",
                 "dest.left, dest.top, dest.right, dest.bottom);",
                 "if (!clipped.valid) return false;",
@@ -582,7 +590,8 @@ def main() -> None:
                 "if (transfer == NativeGameStretchSourceTransfer::Reject)",
                 "sampled.Get() != source",
                 "context_->CopySubresourceRegion(",
-                "sourceArraySlice, sd.MipLevels",
+                "D3D11CalcSubresource(sourceMipSlice, sourceArraySlice,",
+                "sd.MipLevels);",
                 "ScopedNativeGameEyeOutput restore(context_, targetWidth_, targetHeight_);",
                 "if (!restore.valid()) return false;",
                 "context_->OMSetRenderTargets(1u, &target, nullptr);",
@@ -626,6 +635,21 @@ def main() -> None:
             missing += audit_native_offscreen_game_draw(text, depth_probe)
             missing += ["postpass:" + token for token in required_postpass
                         if token not in postpass]
+            # This GPU postpass is only allowed to sample the explicitly
+            # selected game-camera mip. Its Win32 regression must reject
+            # invalid/out-of-bounds mip selection and prove both eye pixels
+            # without incrementing the game-authored geometry counters.
+            mip_regressions = [
+                "fixture.replayedCameraMipGpuCopyStretch[eyeIndex] =",
+                "const bool mipRejects =",
+                "const bool mipCopies = encoder.copy_game_surface(",
+                "const bool mipStretches = encoder.stretch_game_surface(",
+                "correctMipPixel &&",
+                "encoder.draw_count() == beforeCopyDraws",
+                "encoder.color_draw_count() == beforeCopyColorDraws",
+            ]
+            missing += ["postpass-mip-regression:" + token
+                        for token in mip_regressions if token not in depth_probe]
             postpass_draws = DRAW_DISPATCH.findall(postpass)
             if (not postpass or postpass_draws != ["->Draw("] or
                     "drawCount_++" in postpass or "colorDrawCount_++" in postpass):
