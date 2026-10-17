@@ -44,7 +44,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "GetCurrentLatchedPoseEpoch()",
         "GetLastGameWvpPoseEpoch(),",
         "R29OwnerTopLevelDrawSerial() + 1u",
-        "sourceScope == RenderScope::WorldBillboard",
+        "OutRunVR::LensCentre::AdmitsCentreRawSourceScope(",
         "sourceProducer == ProducerToken::LensFlareCentre",
         "queueNode == nullptr",
         "OutRunVR::LensCentre::OwnsRawWvp({",
@@ -261,6 +261,22 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert (physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") <
         physical.index("if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld") <
         physical.index('VR R84 C993 EXACT_STEREO_DRAW: {}'))
+    # Nested original-game SceneEffect c64 is permitted only for the very
+    # next draw of the SAME central producer; generic effects cannot gain
+    # lens ownership. This is a required *additional* guard, not relaxation
+    # of the original raw shader, pose, call and finite depth contracts.
+    for marker in (
+        "writtenProducer != ProducerToken::LensFlareCentre",
+        "writtenQueueNode != nullptr",
+        "currentCall != writtenCall",
+        "nextDraw <= writtenDraw",
+        "writtenScope == RenderScope::WorldBillboard",
+        "writtenScope == RenderScope::SceneEffect &&",
+        "nextDraw - writtenDraw == 1u",
+    ):
+        assert marker in proof, "C993 nested source owner weakened: " + marker
+    assert "AdmitsCentreRawSourceScope(" in physical
+    assert "OutRunVR::LensCentre::AdmitsCentreRawSourceScope(" in owned
     assert "e.currentCall == e.writtenCall" in proof
     assert "e.currentPoseEpoch == e.writtenPoseEpoch" in proof
     assert "e.shaderEpoch == e.writtenShaderEpoch" in proof
@@ -358,6 +374,16 @@ def main():
         (2, "R29OwnerMultiplyMatrix(worldView, headInverse)", "R29OwnerMultiplyMatrix(headInverse, worldView)"),
         (2, "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))", "std::memcpy(&rawUploadedT, original, sizeof(rawUploadedT))"),
         (3, "e.nextDraw - e.writtenDraw <= 128u", "true"),
+        (2, "OutRunVR::LensCentre::AdmitsCentreRawSourceScope(",
+             "OutRunVR::LensCentre::UnboundedCentreRawScope("),
+        (3, "writtenProducer != ProducerToken::LensFlareCentre", "false"),
+        (3, "writtenQueueNode != nullptr", "false"),
+        (3, "currentCall != writtenCall", "false"),
+        (3, "writtenScope == RenderScope::SceneEffect &&",
+             "writtenScope != RenderScope::ScreenHud &&"),
+        (3, "nextDraw - writtenDraw == 1u", "nextDraw - writtenDraw <= 128u"),
+        (7, "OutRunVR::LensCentre::AdmitsCentreRawSourceScope(",
+             "OutRunVR::LensCentre::NeverProvenNestedSource("),
         (4, "None, Hud2D, FlatPerspectiveEffect, ExactLensCentreWorld", "None, Hud2D, FlatPerspectiveEffect"),
         (5, "ExactLensCentreWorld", "WrongLensMode"),
         (6, "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;", "return R32ReviewScreenSpaceKind::None;"),
