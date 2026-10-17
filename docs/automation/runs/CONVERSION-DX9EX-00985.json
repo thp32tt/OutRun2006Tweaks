@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00985",
   "production_id": "CONVERSION-DX9EX-00985",
-  "event_id": "CONVERSION-DX9EX-00985-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00985-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:RENDER:WORLD_WVP_NATIVE_REENTRANCY",
@@ -71,7 +71,7 @@
   "acceptance_results": {
     "world_native_source_isolation": "PASS",
     "native_fallback_negative": "PASS",
-    "exact_sha_build_and_hmd": "PENDING"
+    "exact_sha_build_and_hmd": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The normal world shader upload used a single TLS mutable 4KiB buffer shared by multiple in-flight reentrant callbacks and published stale GPU WVP data after successful but superseded native callback returns.",
@@ -99,6 +99,36 @@
     "cause": "Missing required docs/automation/runs/CONVERSION-DX9EX-00985.json in feature-sized DX9Ex Gate; not a C++ compiler failure."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA recorded at immutable validation-bearing SHA; actual Quest3/VDXR headset validation remains NEED_HMD_TEST.",
-  "validation_bearing_result_sha": "0607e66b229bb81c0fd035a58b02cee53562c62d"
+  "next_action": "All four mandatory exact-SHA Gates SUCCESS; C6 PASS_EXACT_SHA retained. Quest3/VDXR remains NEED_HMD_TEST, not headset-verified.",
+  "validation_bearing_result_sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+  "material_repair_sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38990271604,
+        "sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38990271660,
+        "sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38990271721,
+        "sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38990271738,
+        "sha": "0607e66b229bb81c0fd035a58b02cee53562c62d",
+        "conclusion": "success"
+      }
+    ]
+  }
 }
