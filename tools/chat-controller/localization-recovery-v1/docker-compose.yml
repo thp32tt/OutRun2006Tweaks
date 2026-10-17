@@ -20,9 +20,9 @@ services:
       OUTRUN_KR_V2_AUTO_GENERATE: "false"
       OUTRUN_KR_V2_AUTO_COMPOSE: "false"
       OUTRUN_KR_V2_AUTO_DEPLOY: "false"
-      # v2 has NO scheduled sends, including C. All stages need independent evidence.
+      # No browser scheduled sends; independent C is only native English source extraction.
       SCHEDULE_MINUTES: "" # empty = no scheduled slots; controller supports empty list
-      CHAT_SLOTS: "2" # C is assigned to independent N100 Docker english-original crop worker; no browser C tab
+      CHAT_SLOTS: "2" # A/B browser remain paused; native OCR C is the service below, not a third browser tab
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
@@ -82,65 +82,62 @@ services:
       - outrun_chat_localization_recovery_logs:/logs
 
 
-  # HISTORICAL optional offline C fallback, disabled in default Stack.
-  # C now belongs exclusively to standalone N100 `outrun-c-original-english-crop` Compose project.\n  # Do not launch this retired C salvage profile, or a third ChatGPT C browser tab.
-  # Binds source image-src read-only; never deploys localized DDS or approves QA.
-  # This service only starts when the user manually redeploys the Portainer Git stack.
-  outrun-c-salvage-offline:
-    profiles: ["retired-c-salvage-do-not-run"]
+  # Live GitHub/Portainer C slot. This is a member of THIS existing
+  # localization-recovery stack, not a standalone Compose/Portainer stack.
+  # A/B remain PAUSED; their browser schedules and state are untouched.
+  outrun-c-english-native-crop:
     build:
-      context: ./c_salvage
-      dockerfile: Dockerfile
-    image: outrun-kor-c-salvage:20261015
+      context: .
+      dockerfile: c_english_crop/Dockerfile
     pull_policy: build
-    container_name: outrun-c-salvage-offline
-    restart: "no" # retired C must never automatically repeat
+    container_name: outrun-localization-c-english-crop
+    restart: unless-stopped
     init: true
-    cpus: 0.5
-    mem_limit: 512m
-    read_only: true
     network_mode: "none"
+    read_only: true
     user: "1002:1002"
-    cap_drop:
-      - ALL
+    cap_drop: [ALL]
     security_opt:
       - no-new-privileges:true
+    pids_limit: 32
+    cpus: 0.75
+    mem_limit: 1g
     tmpfs:
-      - /tmp:rw,noexec,nosuid,size=64m
+      - /tmp:rw,nosuid,size=64m
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      TZ: Asia/Seoul
+      # Explicit role guard; English source extraction only.
+      OUTRUN_C_ROLE: "UNSPLIT_HD_NATIVE_ENGLISH_CROP_ONLY"
+    command: ["--interval-seconds", "60", "--max-per-cycle", "10"]
     volumes:
+      # Existing 108 SHA-verified unsplit originals, receipt, original ZIPs,
+      # C output/history and OCR position are in this SAME persisted tree.
       - type: bind
-        source: /home/chatgpt-runner2/work/image-src
-        target: /data/image-src
+        source: /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
+        target: /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
+        bind:
+          create_host_path: false
+      # Source DDS+PNG stay read-only; never write translated game textures.
+      - type: bind
+        source: /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012
+        target: /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012
         read_only: true
         bind:
           create_host_path: false
+      # Existing 255-crop SSOT manifest is immutable input.
       - type: bind
-        source: /home/chatgpt-runner2/work/c-salvage-production
-        target: /data/c-salvage
+        source: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
+        target: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
+        read_only: true
         bind:
           create_host_path: false
-    # Prevent accidental execution of outdated CLEAN/DDS/loop role under manual profile.
-    entrypoint: ["/bin/sh", "-c", "echo OUTRUN_V2_RETIRED_C_SALVAGE_DISABLED >&2; exit 64"]
-    command:
-      - --input-root
-      - /data/image-src
-      - --output-root
-      - /data/c-salvage
-      - --repo-root
-      - /opt/c-salvage
-      - --plate-jobs-dir
-      - /data/c-salvage/plate_jobs
-      - --recipes-dir
-      - /data/c-salvage/recipes
-      - --bundle-root
-      - /data/c-salvage/bundles
-      - --masks-dir
-      - /data/c-salvage/masks
-      - --max-per-cycle
-      - "10"
-      - --interval-seconds
-      - "1800"
-      # --loop RETIRED: C is only the native unmodified HD crop worker.
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "3"
 
 volumes:
   outrun_chat_localization_recovery_data:
