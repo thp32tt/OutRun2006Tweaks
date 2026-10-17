@@ -1280,6 +1280,9 @@ int main()
         bool replayedScaledPostpass[2]{};
         bool replayedScaledArrayEye[2]{};
         bool preservedPostDrawMrt[2]{};
+        ID3D11Predicate* callerPredicate{};
+        ID3D11Buffer* callerStreamOutput{};
+        bool isolatedConditionalOutput[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -1449,6 +1452,18 @@ int main()
         if (!ctx || !eyeTarget || eyeIndex >= 2u || !user) return false;
         std::cerr << "R178-DIAG eye callback " << eyeIndex << '\n';
         auto& fixture = *static_cast<GameEyeFixture*>(user);
+        ID3D11Predicate* inheritedPredicate = nullptr;
+        BOOL inheritedPredicateValue = FALSE;
+        ID3D11Buffer* inheritedStreamOut[D3D11_SO_BUFFER_SLOT_COUNT]{};
+        ctx->GetPredication(&inheritedPredicate, &inheritedPredicateValue);
+        ctx->SOGetTargets(D3D11_SO_BUFFER_SLOT_COUNT, inheritedStreamOut);
+        bool noInheritedStreamOut = true;
+        for (auto* target : inheritedStreamOut) {
+            if (target) { noInheritedStreamOut = false; target->Release(); }
+        }
+        fixture.isolatedConditionalOutput[eyeIndex] =
+            inheritedPredicate == nullptr && noInheritedStreamOut;
+        if (inheritedPredicate) inheritedPredicate->Release();
         ID3D11RenderTargetView* boundTarget = nullptr;
         ID3D11DepthStencilView* boundDepth = nullptr;
         ctx->OMGetRenderTargets(1, &boundTarget, &boundDepth);
@@ -2020,6 +2035,14 @@ int main()
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
         evidence.sourcePoseSequence = 33u;
+        // Simulate a game camera postpass changing conditional-output state.
+        // Eye R and the original desktop host must not inherit eye L's SO
+        // writer or occlusion predicate even after native GPU Stretch.
+        if (fixture.callerPredicate && fixture.callerStreamOutput) {
+            const UINT appendOffset = UINT(-1);
+            ctx->SOSetTargets(1u, &fixture.callerStreamOutput, &appendOffset);
+            ctx->SetPredication(fixture.callerPredicate, TRUE);
+        }
         return true;
     };
     auto invalidRaster = gameRaster;
@@ -2073,6 +2096,28 @@ int main()
     gameEyeFixture.gameComputeViews[0] = gameComputeViews[0];
     gameEyeFixture.gameComputeViews[1] = gameComputeViews[1];
     gameEyeFixture.gameOmView = gameOmView;
+    // A shared OpenXR/desktop context may arrive from a host SO + GPU
+    // predication postpass. Both game eyes must still render, while the
+    // original conditional-output bindings survive when replay returns.
+    D3D11_QUERY_DESC hostPredicateDesc{};
+    hostPredicateDesc.Query = D3D11_QUERY_OCCLUSION_PREDICATE;
+    ID3D11Predicate* hostPredicate = nullptr;
+    require(SUCCEEDED(d3d.device->CreatePredicate(
+                &hostPredicateDesc, &hostPredicate)) && hostPredicate,
+            "00867 original host GPU predicate created");
+    D3D11_BUFFER_DESC hostStreamOutDesc{};
+    hostStreamOutDesc.ByteWidth = 64u;
+    hostStreamOutDesc.Usage = D3D11_USAGE_DEFAULT;
+    hostStreamOutDesc.BindFlags = D3D11_BIND_STREAM_OUTPUT;
+    ID3D11Buffer* hostStreamOut = nullptr;
+    require(SUCCEEDED(d3d.device->CreateBuffer(
+                &hostStreamOutDesc, nullptr, &hostStreamOut)) && hostStreamOut,
+            "00867 original host stream-output buffer created");
+    gameEyeFixture.callerPredicate = hostPredicate;
+    gameEyeFixture.callerStreamOutput = hostStreamOut;
+    const UINT streamStart = 0u;
+    d3d.context->SOSetTargets(1u, &hostStreamOut, &streamStart);
+    d3d.context->SetPredication(hostPredicate, TRUE);
     d3d.context->CSSetUnorderedAccessViews(
         0u, 2u, gameComputeViews, nullptr);
     d3d.context->CSSetShaderResources(0u, 1u, &gameSampleView);
@@ -2175,7 +2220,9 @@ int main()
             gameEyeFixture.replayedClippedMsaaResolve[0] &&
             gameEyeFixture.replayedClippedMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
-            gameEyeFixture.preservedPostDrawMrt[1],
+            gameEyeFixture.preservedPostDrawMrt[1] &&
+            gameEyeFixture.isolatedConditionalOutput[0] &&
+            gameEyeFixture.isolatedConditionalOutput[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");
     require(gameEyeFixture.eyeDepth[0] && gameEyeFixture.eyeDepth[1] &&
             gameEyeFixture.eyeDepth[0] != gameEyeFixture.eyeDepth[1] &&
@@ -2292,6 +2339,25 @@ int main()
     if (restoredDepthState) restoredDepthState->Release();
     require(restoredGameState,
             "00821 stereo game draw restores caller color, depth and raster");
+    ID3D11Predicate* restoredPredicate = nullptr;
+    BOOL restoredPredicateValue = FALSE;
+    ID3D11Buffer* restoredStreamOut[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    d3d.context->GetPredication(&restoredPredicate, &restoredPredicateValue);
+    d3d.context->SOGetTargets(D3D11_SO_BUFFER_SLOT_COUNT, restoredStreamOut);
+    const bool restoredConditionalOutput =
+        restoredPredicate == hostPredicate && restoredPredicateValue == TRUE &&
+        restoredStreamOut[0] == hostStreamOut &&
+        restoredStreamOut[1] == nullptr &&
+        restoredStreamOut[2] == nullptr &&
+        restoredStreamOut[3] == nullptr;
+    if (restoredPredicate) restoredPredicate->Release();
+    for (auto* stream : restoredStreamOut) if (stream) stream->Release();
+    require(restoredConditionalOutput,
+            "00867 both native eyes bypass caller predicate/SO and restore host state");
+    d3d.context->SetPredication(nullptr, FALSE);
+    d3d.context->SOSetTargets(0u, nullptr, nullptr);
+    hostPredicate->Release();
+    hostStreamOut->Release();
     d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
     d3d.context->RSSetState(nullptr);
     ID3D11Buffer* nullVertexBuffer = nullptr;

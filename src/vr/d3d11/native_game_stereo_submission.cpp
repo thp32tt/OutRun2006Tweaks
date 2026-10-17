@@ -558,11 +558,18 @@ public:
         context_->CSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedCSSamplers_);
         context_->CSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedCSConstants_);
         context_->CSGetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, savedCSOutputs_);
+        // The caller may be in a host occlusion-predicated/stream-output
+        // postpass. D3D9 game Draw/DrawIndexed never inherited those stages.
+        // Borrow the immediate context without suppressing either eye's
+        // pixels or writing game vertices into the host's SO buffers.
+        context_->GetPredication(&savedPredicate_, &savedPredicateValue_);
+        context_->SOGetTargets(D3D11_SO_BUFFER_SLOT_COUNT, savedStreamOut_);
         viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetViewports(&viewportCount_, savedViewports_);
         scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetScissorRects(&scissorCount_, savedScissors_);
         active_ = true;
+        isolate_game_draw_outputs();
     }
     ~ScopedNativeGameEyeOutput() noexcept {
         if (!active_) return;
@@ -572,6 +579,13 @@ public:
         context_->OMSetDepthStencilState(savedDepthState_, savedStencilRef_);
         context_->RSSetState(savedRasterizer_);
         restore_draw_pipeline(false);
+        // SOGetTargets exposes buffers but not their stream cursors. -1
+        // resumes the caller's append position rather than resetting it to
+        // zero; release the borrowed refs only after binding restoration.
+        UINT append[D3D11_SO_BUFFER_SLOT_COUNT]{};
+        for (auto& offset : append) offset = UINT(-1);
+        context_->SOSetTargets(D3D11_SO_BUFFER_SLOT_COUNT, savedStreamOut_, append);
+        context_->SetPredication(savedPredicate_, savedPredicateValue_);
         context_->RSSetViewports(viewportCount_,
                                  viewportCount_ ? savedViewports_ : nullptr);
         context_->RSSetScissorRects(scissorCount_,
@@ -595,6 +609,9 @@ public:
         if (savedHS_) savedHS_->Release();
         if (savedDS_) savedDS_->Release();
         if (savedCS_) savedCS_->Release();
+        if (savedPredicate_) savedPredicate_->Release();
+        for (auto*& buffer : savedStreamOut_)
+            if (buffer) { buffer->Release(); buffer = nullptr; }
         for (UINT i = 0; i < savedCSClassCount_; ++i)
             if (savedCSClasses_[i]) savedCSClasses_[i]->Release();
         for (UINT i = 0; i < savedVSClassCount_; ++i)
@@ -640,6 +657,7 @@ public:
         // The previous eye may have rebound IA/VB/IB/VS/PS. Start each
         // replay from exactly the captured caller state, not eye L residue.
         restore_draw_pipeline(true);
+        isolate_game_draw_outputs();
         // The previous eye may also have changed blend, depth/stencil and
         // rasterizer state. Restore BEFORE each independent eye's Draw, not
         // only when exiting back to the desktop D3D9 fallback.
@@ -664,6 +682,12 @@ public:
     }
     [[nodiscard]] bool valid() const noexcept { return active_; }
 private:
+    void isolate_game_draw_outputs() noexcept {
+        context_->SetPredication(nullptr, FALSE);
+        // SOSetTargets with zero buffers detaches every inherited SO slot.
+        // The game callbacks may change them again, so isolate each eye.
+        context_->SOSetTargets(0u, nullptr, nullptr);
+    }
     void restore_draw_pipeline(bool eyeReplay) noexcept {
         context_->IASetInputLayout(savedInputLayout_);
         context_->IASetVertexBuffers(
@@ -737,6 +761,9 @@ private:
     ID3D11HullShader* savedHS_{};
     ID3D11DomainShader* savedDS_{};
     ID3D11ComputeShader* savedCS_{};
+    ID3D11Predicate* savedPredicate_{};
+    BOOL savedPredicateValue_{FALSE};
+    ID3D11Buffer* savedStreamOut_[D3D11_SO_BUFFER_SLOT_COUNT]{};
     ID3D11ShaderResourceView* savedCSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
     ID3D11SamplerState* savedCSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
     ID3D11Buffer* savedCSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
