@@ -7,18 +7,19 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C2_IMPLEMENTED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "material_result_sha": "a46f540d5719afd5d3c2286c6192ccca949503f4",
+  "validation_bearing_result_sha": "c4602314205b00bb05bba7ce281a6061d92f3fb7",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
-    "vrhost/tests/rank_marker_physical_source_smoke.cpp"
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp",
+    "tools/verify_dx9ex_r84_lens_source.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:RANK_MARKERS",
@@ -56,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "rank_shader_physical_eye_pair": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "rank_native_fallback_isolation": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "rank_exact_sha_integration": "PENDING_EXACT_SHA"
+    "rank_shader_physical_eye_pair": "PASS_BUILD",
+    "rank_native_fallback_isolation": "PASS_BUILD",
+    "rank_exact_sha_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Read-only original executable 2026-10-18 Ghidra producer evidence: 0x004BAD20 car-attached rank 0x00449940 Calc3D2D and clip/sprani; 6th/6 is independent 0x004B9D80 screen source.",
@@ -73,18 +74,46 @@
       "No runtime claim: the static source identity bug is demonstrable from missing post-left check, but visible optical failure still needs matching HMD tests."
     ],
     "fix_evidence": "R33 shader GPU physical rank stamp validates producer, queue node/epoch, per-vehicle marker, shader epoch, vertex layout and pose before and after original LEFT; changed owner skips RIGHT and restores original c64.",
-    "negative_test_evidence": "Expanded portable rank_marker_physical_source_smoke to exercise shader queued/direct success, cross-car changes, stale queue/pose, changed draw, shader, FVF and native 6th/6 rejection; exact SHA CI pending.",
+    "negative_test_evidence": "Exact-SHA 4/4 SUCCESS after the same-task static-contract repair. R84 rank physical C++ smoke has queued/direct positive and cross-car, shader, queue epoch, FVF, pose and native HUD negative cases; C993/GOAL/+TIME/HUD and rank six-source guard + mutation checks preserved. No Quest3/VDXR HMD test.",
     "eye_ownership": "Two eye projections may only originate from one live per-car Calc3D2D marker, never a stale Shader c64 from another producer; failed right ownership invalidates frame for stereo publication."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "c4602314205b00bb05bba7ce281a6061d92f3fb7",
+    "material_sha": "a46f540d5719afd5d3c2286c6192ccca949503f4",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
     ],
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39063414491,
+        "conclusion": "success",
+        "exact_sha": "c4602314205b00bb05bba7ce281a6061d92f3fb7"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39063414493,
+        "conclusion": "success",
+        "exact_sha": "c4602314205b00bb05bba7ce281a6061d92f3fb7"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39063414488,
+        "conclusion": "success",
+        "exact_sha": "c4602314205b00bb05bba7ce281a6061d92f3fb7"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39063414492,
+        "conclusion": "success",
+        "exact_sha": "c4602314205b00bb05bba7ce281a6061d92f3fb7"
+      }
+    ],
     "runtime_validation": "UNTESTED"
   },
-  "notes": "New real C++ rank shader physical-source repair, separate from fixed ScreenHud 6th/6 and existing XYZ/RHW/fixedfn rank routes. HMD untested, no CI completion or scoring declared."
+  "notes": "C6 bookkeeping only after exact-SHA four-gate success. First functional material SHA a46f540d, same-TASK real validator repair validation-bearing SHA c4602314. C6 [skip ci] does not represent a new validation-bearing result. Quest3/VDXR optical and runtime untested; never score CI repair/C6 a second time."
 }
