@@ -43,6 +43,17 @@ public:
     [[nodiscard]] bool draw_offscreen_indexed(
         ID3D11RenderTargetView* gameTarget,
         UINT indexCount, UINT startIndex, INT baseVertex) noexcept;
+    // Replay authentic game instancing into an independently allocated
+    // offscreen menu/vehicle/race RTV. One call advances one source ordinal,
+    // even with multiple instances; pixels reach the eye only through a
+    // caller-authored Copy/Stretch event, never by direct color certification.
+    [[nodiscard]] bool draw_offscreen_instanced(
+        ID3D11RenderTargetView* gameTarget, UINT verticesPerInstance,
+        UINT instanceCount, UINT startVertex, UINT startInstance) noexcept;
+    [[nodiscard]] bool draw_offscreen_indexed_instanced(
+        ID3D11RenderTargetView* gameTarget, UINT indicesPerInstance,
+        UINT instanceCount, UINT startIndex, INT baseVertex,
+        UINT startInstance) noexcept;
     // Game-origin instanced geometry is a single ordered GPU draw command,
     // independent of its instance count. These paths use the SAME bound eye
     // target, source Clear timeline and original D3D9 fail-closed evidence

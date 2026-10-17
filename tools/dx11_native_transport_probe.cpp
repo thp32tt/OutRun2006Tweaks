@@ -1321,6 +1321,7 @@ int main()
         ID3D11Texture2D* offscreenGameColor{};
         ID3D11RenderTargetView* offscreenGameRtv{};
         bool replayedOffscreenGameDraw[2]{};
+        bool replayedInstancedOffscreenCamera[2]{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
@@ -1828,6 +1829,34 @@ int main()
             encoder.draw_count() == beforeOffscreen + 1u &&
             encoder.color_draw_count() == beforeOffscreenEyeColor;
         if (!fixture.replayedOffscreenGameDraw[eyeIndex]) return false;
+
+        // Separate auxiliary-camera encoder: genuine instanced D3D11 game
+        // draws never forge color evidence, while rejected eye/foreign/empty
+        // instances issue zero GPU commands. Keep the original per-eye source
+        // timeline intact, then rebind the ring eye for subsequent HUD draws.
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, nullptr);
+        outrun::vr::dx11::NativeGameEyeDrawEncoder instancedCamera(
+            ctx, eyeTarget, fixture.eyeDepth[eyeIndex], 64u, 64u);
+        const bool rejectedInstanced =
+            !instancedCamera.draw_offscreen_instanced(
+                eyeTarget, 3u, 2u, 0u, 0u) &&
+            !instancedCamera.draw_offscreen_indexed_instanced(
+                nullptr, 3u, 2u, 0u, 0, 0u) &&
+            !instancedCamera.draw_offscreen_instanced(
+                gameOffscreen, 3u, 0u, 0u, 0u) &&
+            instancedCamera.draw_count() == 0u;
+        const bool issuedInstanced =
+            instancedCamera.draw_offscreen_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0u) &&
+            instancedCamera.draw_offscreen_indexed_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0, 0u);
+        fixture.replayedInstancedOffscreenCamera[eyeIndex] =
+            rejectedInstanced && issuedInstanced &&
+            instancedCamera.draw_count() == 2u &&
+            instancedCamera.color_draw_count() == 0u &&
+            encoder.bind_eye_output();
+        if (!fixture.replayedInstancedOffscreenCamera[eyeIndex]) return false;
+
         // A game menu/HUD can Clear a TARGET rectangle AFTER real geometry.
         // Validate ordered eye pixels, selected Z/stencil and no phantom draw.
         const D3D11_RECT badRect{63, 24, 68, 30};
@@ -2283,6 +2312,8 @@ int main()
             gameEyeFixture.rejectedDetachedDraw[1] &&
             gameEyeFixture.replayedOffscreenGameDraw[0] &&
             gameEyeFixture.replayedOffscreenGameDraw[1] &&
+            gameEyeFixture.replayedInstancedOffscreenCamera[0] &&
+            gameEyeFixture.replayedInstancedOffscreenCamera[1] &&
             gameEyeFixture.rejectedForeignDraw[0] &&
             gameEyeFixture.rejectedForeignDraw[1] &&
             gameEyeFixture.rejectedOffscreenViewport[0] &&

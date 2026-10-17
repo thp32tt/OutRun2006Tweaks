@@ -280,6 +280,39 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
     return true;
 }
 
+
+ // Instanced menu/vehicle camera draws also belong to the real source stream.
+ // They are one game command each regardless of instance count. Only a later
+ // game-authored GPU Copy/Stretch may turn their pixels into OpenXR eye color;
+ // never certify an offscreen instance as a direct XR-eye color Draw.
+bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
+    ID3D11RenderTargetView* gameTarget, UINT verticesPerInstance,
+    UINT instanceCount, UINT startVertex, UINT startInstance) noexcept {
+    if (!live_game_stereo::may_issue_instanced(
+            verticesPerInstance, instanceCount, drawCount_) ||
+        !prepare_offscreen_game_draw(gameTarget))
+        return false;
+    context_->DrawInstanced(
+        verticesPerInstance, instanceCount, startVertex, startInstance);
+    ++drawCount_;
+    return true;
+}
+
+bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
+    ID3D11RenderTargetView* gameTarget, UINT indicesPerInstance,
+    UINT instanceCount, UINT startIndex, INT baseVertex,
+    UINT startInstance) noexcept {
+    if (!live_game_stereo::may_issue_instanced(
+            indicesPerInstance, instanceCount, drawCount_) ||
+        !prepare_offscreen_game_draw(gameTarget))
+        return false;
+    context_->DrawIndexedInstanced(
+        indicesPerInstance, instanceCount, startIndex,
+        baseVertex, startInstance);
+    ++drawCount_;
+    return true;
+}
+
 void NativeGameEyeDrawEncoder::set_source_clear_timeline(
     const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept {
     sourceClears_ = (clears && eye < 2u) ? clears : nullptr;
