@@ -138,12 +138,13 @@ def main():
         while not STOP:
             try:
                 now=time.monotonic()
-                if now-last_discovery >= 600:
+                if now-last_discovery >= 60:
                     last_discovery=now
                     try:
                         # OCR derives the native ROI coordinates itself; the older
                         # alpha-only proposal sweep is not required in production.
-                        recognized=ocr_recognize.scan(verified_runner.VERIFIED, verified_runner.check_original, max_new=args.max_per_cycle)
+                        verified_runner.VERIFIED.update(verified_runner.load_auto_sources())
+                        recognized=ocr_recognize.scan(verified_runner.VERIFIED, verified_runner.check_original, max_new=args.max_per_cycle, max_sources=4)
                         write_audit(recognized)
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
