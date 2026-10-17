@@ -84,6 +84,7 @@ assert audit_native_partial_color_clear(
 ), "cropped TARGET clear widened into full-eye Clear"
 assert audit_native_partial_color_clear(
     source.replace(
-        'GetProcAddress(compiler, "D3DCompile")', "nullptr", 1),
+        'const bool ready = GetProcAddress(compiler, "D3DCompile") != nullptr;',
+        'const bool ready = false;', 1),
 ), "missing D3D11.0 preflight slipped through"
 print("DX11 native partial DSV/TARGET GPU draw audit: PASS (positive + negative tamper)")
