@@ -1163,6 +1163,10 @@ namespace OutRunVRStereo
             R30SkyGlow.glowWidth = 0;
             R30SkyGlow.glowHeight = 0;
             R30SkyGlow.factor = 0;
+            // A resized/recreated reduced texture no longer contains the
+            // pre-HUD scene, even within the same Present epoch. Never claim
+            // that a capture from the discarded resource is still valid.
+            R30SkyGlowSceneCaptureEpoch = 0;
         }
 
         bool R30CompilePixelShader(IDirect3DDevice9* device,
@@ -1555,6 +1559,17 @@ namespace OutRunVRStereo
 
             if (!R30EnsureSkyGlowResources(device))
                 return false;
+
+            // SkyGlowFactor/eye extent may change after pre-HUD capture.
+            // Ensure can then recreate the reduced eye surfaces, invalidating
+            // that snapshot. Do NOT fall back to a post-ESC/HUD eye copy:
+            // fail closed for this Present, preserving the clean-source gate.
+            if (R30SkyGlowScreenDrawEpoch == frame.presentEpoch &&
+                R30SkyGlowSceneCaptureEpoch != frame.presentEpoch)
+            {
+                ++R30SkyGlowUiCaptureSkips;
+                return true;
+            }
 
             // Create once per SkyGlow resource epoch, then update the SAME
             // D3DSBT_ALL capture before changing any of the game's state.
