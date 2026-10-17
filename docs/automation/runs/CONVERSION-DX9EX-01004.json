@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING_EXACT_SHA",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "247c611803878badc4d3601989c1e8a2792df446",
   "material_result_sha": "5944975fffdafca2652908e885913da583c3b224",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ac9f5a0fdd79de0d60e89f6737564549db02c7a6",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
@@ -104,8 +104,8 @@
         "status": "in_progress_at_initial_recovery"
       }
     },
-    "next_exact_sha": "PENDING_RUN_CREATION"
+    "next_exact_sha": "ac9f5a0fdd79de0d60e89f6737564549db02c7a6"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run the existing mandatory GitHub Actions on the recovery validation-bearing SHA (no CI-skip); only when all exact-SHA gates succeed, record C6 separately without changing the original material_result_sha. Do not claim Quest3/VDXR PASS."
+  "next_action": "C6 PASS_EXACT_SHA recorded for the user-confirmed successful GitHub CI on the exact validation-bearing SHA; physical Quest3/VDXR HMD validation remains UNTESTED. No source changes, CI reruns or duplicate scoring."
 }
