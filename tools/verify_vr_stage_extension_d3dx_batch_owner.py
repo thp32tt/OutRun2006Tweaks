@@ -795,6 +795,27 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
     return errors
 
 
+def check_r30_stage_raw_wvp(renderer: str) -> list[str]:
+    """R84's XYZRHW/fixedfn +TIME must stamp raw game c64 like R33 shader."""
+    begin = renderer.find("        bool R30CaptureStagePhysicalSource(")
+    end = renderer.find("        bool R30CaptureGoalPhysicalSource(", begin)
+    if begin < 0 or end <= begin:
+        return ["R30 physical +TIME source boundary missing"]
+    stage = renderer[begin:end]
+    evidence = (
+        ("GetLastRawGameWvpWrite(", "original game c64 serial never sampled"),
+        ("rawWriteSerial == 0 || rawDrawSerial == 0",
+         "partial raw game WVP must clear both serials"),
+        ("rawWriteSerial = 0;\n                rawDrawSerial = 0;",
+         "unknown c64 generation must retain zero/zero fallback"),
+        ("rawWriteSerial, rawDrawSerial};",
+         "raw game c64 generation missing from R30 source stamp"),
+        ("StageExtensionPhysical::IsValid(source)",
+         "R30 must validate the stamped stage source"),
+    )
+    return [msg for needle, msg in evidence if needle not in stage]
+
+
 def main_current_ledger(code: str, header: str) -> int:
     ledger_path = ROOT / "src/vr/game/hud_command_batch.hpp"
     if not ledger_path.is_file():
@@ -804,9 +825,28 @@ def main_current_ledger(code: str, header: str) -> int:
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     errors = check_current_ledger(code, header, ledger)
     errors.extend(check_exact_goal_xyzrhw_plane(renderer, header))
+    errors.extend(check_r30_stage_raw_wvp(renderer))
     if errors:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
+    # Deliberately remove the *physical* raw-game WVP source stamp in
+    # R30 only. R33 remaining intact cannot mask loss of XYZRHW stereo proof.
+    capture_begin = renderer.find("        bool R30CaptureStagePhysicalSource(")
+    capture_end = renderer.find("        bool R30CaptureGoalPhysicalSource(", capture_begin)
+    captured = renderer[capture_begin:capture_end]
+    for label, before, after in (
+        ("missing-original-c64-capture", "GetLastRawGameWvpWrite(",
+         "GetLastLiveStereoWvpWrite("),
+        ("missing-partial-pair-clear",
+         "rawWriteSerial == 0 || rawDrawSerial == 0", "false"),
+        ("missing-right-eye-c64-stamp",
+         "rawWriteSerial, rawDrawSerial};", "0, 0};"),
+    ):
+        changed = captured.replace(before, after, 1)
+        mutant = renderer[:capture_begin] + changed + renderer[capture_end:]
+        if changed == captured or not check_r30_stage_raw_wvp(mutant):
+            print("DX9Ex +TIME R30 FAIL: source mutation not detected:", label)
+            return 1
     # Every mutation must materially modify an existing live source, and
     # the validator must detect its exact missing safety condition. This
     # protects against blindly accepting a class name or a dead mock.
@@ -921,6 +961,7 @@ def main() -> int:
     errors = check(code, header)
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     errors.extend(check_exact_goal_xyzrhw_plane(renderer, header))
+    errors.extend(check_r30_stage_raw_wvp(renderer))
     if errors:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
