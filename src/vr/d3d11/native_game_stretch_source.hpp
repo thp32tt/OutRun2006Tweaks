@@ -73,6 +73,27 @@ static_assert(!native_game_postpass_gpu_source(0x80u,8u,0x20u,0x8u,0x80u));
 static_assert(!native_game_postpass_gpu_source(0u,0u,0x20u,0x8u,0x80u));
 static_assert(!native_game_postpass_gpu_source(0x2u,1u,0x20u,0x8u,0x80u));
 
+// A temporary GPU SRV or MSAA-resolve texture may be reused between
+// sequential, ordered left/right game postpasses on the SAME immediate
+// context. Device identity is verified by the caller; dimension, format and
+// binding must also match. Never reuse a differently typed camera surface.
+struct NativeGamePostpassScratchKey {
+    std::uint32_t width{}, height{}, format{}, bindFlags{};
+};
+[[nodiscard]] constexpr bool native_game_postpass_scratch_matches(
+    NativeGamePostpassScratchKey cached,
+    NativeGamePostpassScratchKey requested) noexcept {
+    return requested.width != 0u && requested.height != 0u &&
+        cached.width == requested.width &&
+        cached.height == requested.height &&
+        cached.format == requested.format &&
+        cached.bindFlags == requested.bindFlags;
+}
+static_assert(native_game_postpass_scratch_matches(
+    {1920u, 1080u, 87u, 8u}, {1920u, 1080u, 87u, 8u}));
+static_assert(!native_game_postpass_scratch_matches(
+    {1920u, 1080u, 87u, 8u}, {1920u, 1080u, 87u, 0u}));
+
 // Game-authored Copy/Resolve may start off the LEFT/TOP as well as extend
 // beyond the RIGHT/BOTTOM edge during menu and car transitions. D3D11's
 // destination is unsigned: move the source box by exactly the negative

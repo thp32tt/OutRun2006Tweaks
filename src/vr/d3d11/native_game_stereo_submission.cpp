@@ -550,16 +550,39 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         sourceDesc.Width == eyeDesc.Width &&
         sourceDesc.Height == eyeDesc.Height;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> resolved;
+    // Menu/vehicle/race MSAA partial copies may occur every eye and every
+    // frame. Keep one device-local, single-sample private resolve destination
+    // instead of allocating full-resolution GPU memory for every Copy event.
+    // Serialize cache selection THROUGH command recording: the immediate
+    // context orders Resolve -> Copy before this scratch is reused by eye R.
+    static std::mutex resolveScratchMutex;
+    static Microsoft::WRL::ComPtr<ID3D11Device> resolveScratchDevice;
+    static Microsoft::WRL::ComPtr<ID3D11Texture2D> resolveScratch;
+    static NativeGamePostpassScratchKey resolveScratchKey{};
+    std::unique_lock<std::mutex> resolveScratchLock;
     if (needsResolve && !fullResolve) {
+        resolveScratchLock = std::unique_lock<std::mutex>(resolveScratchMutex);
         D3D11_TEXTURE2D_DESC resolvedDesc = sourceDesc;
         resolvedDesc.SampleDesc.Count = 1u;
         resolvedDesc.SampleDesc.Quality = 0u;
-        resolvedDesc.ArraySize = 1u; // only the selected eye's resolved color
-        resolvedDesc.BindFlags = 0u; // GPU copy-only, no RTV/SRV/UAV alias
+        resolvedDesc.ArraySize = 1u; // selected camera only
+        resolvedDesc.BindFlags = 0u; // GPU copy-only, never alias an RTV/SRV
         resolvedDesc.MiscFlags = 0u;
-        if (FAILED(owner->CreateTexture2D(
-                &resolvedDesc, nullptr, resolved.GetAddressOf())) || !resolved)
-            return false;
+        const NativeGamePostpassScratchKey key{
+            resolvedDesc.Width, resolvedDesc.Height,
+            static_cast<std::uint32_t>(resolvedDesc.Format), resolvedDesc.BindFlags};
+        if (resolveScratchDevice.Get() != owner.Get() ||
+            !resolveScratch ||
+            !native_game_postpass_scratch_matches(resolveScratchKey, key)) {
+            Microsoft::WRL::ComPtr<ID3D11Texture2D> fresh;
+            if (FAILED(owner->CreateTexture2D(
+                    &resolvedDesc, nullptr, fresh.GetAddressOf())) || !fresh)
+                return false;
+            resolveScratch = std::move(fresh);
+            resolveScratchDevice = owner;
+            resolveScratchKey = key;
+        }
+        resolved = resolveScratch;
     }
 
     // The game may have additional color MRT attachments (e.g. deferred
@@ -1224,7 +1247,14 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     static Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
     static Microsoft::WRL::ComPtr<ID3D11SamplerState> point, linear;
     static Microsoft::WRL::ComPtr<ID3D11Buffer> constants;
+    static Microsoft::WRL::ComPtr<ID3D11Texture2D> sampledScratch;
+    static NativeGamePostpassScratchKey sampledScratchKey{};
     std::lock_guard<std::mutex> lock(mutex);
+    if (cachedDevice.Get() != device.Get()) {
+        // Reset/device loss: do not carry any old-device sampled eye source.
+        sampledScratch.Reset();
+        sampledScratchKey = {};
+    }
     if (cachedDevice.Get() != device.Get() || !vs ||
         !ps || !point || !linear || !constants) {
         constexpr char shader[] = R"(
@@ -1318,8 +1348,23 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         desc.SampleDesc.Quality = 0u;
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         desc.MiscFlags = 0u;
-        if (FAILED(device->CreateTexture2D(
-                &desc, nullptr, sampled.GetAddressOf()))) return false;
+        const NativeGamePostpassScratchKey key{
+            desc.Width, desc.Height,
+            static_cast<std::uint32_t>(desc.Format), desc.BindFlags};
+        // Reuse the same GPU-resident temporary across ordered camera
+        // Copy/Resolve -> shader Draw sequences; a full mip chain or array
+        // is reduced to a one-slice mip-zero eye source on every replay.
+        // This mutex is held through the Draw, not just the allocation.
+        if (!sampledScratch ||
+            !native_game_postpass_scratch_matches(sampledScratchKey, key)) {
+            Microsoft::WRL::ComPtr<ID3D11Texture2D> fresh;
+            if (FAILED(device->CreateTexture2D(
+                    &desc, nullptr, fresh.GetAddressOf())) || !fresh)
+                return false;
+            sampledScratch = std::move(fresh);
+            sampledScratchKey = key;
+        }
+        sampled = sampledScratch;
     }
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
     if (FAILED(device->CreateShaderResourceView(

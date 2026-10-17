@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/native_game_stereo_draw_evidence.hpp"
+#include "../src/vr/d3d11/native_game_stretch_source.hpp"
 #include <cassert>
 #include <cstdint>
 #include <limits>
@@ -9,6 +10,20 @@ using outrun::vr::dx11::live_game_stereo::full_eye_target_rect;
 using outrun::vr::dx11::live_game_stereo::NativeDepthClearRoute;
 using outrun::vr::dx11::live_game_stereo::depth_clear_route;
 int main() {
+    // Real stereo game GPU postpass scratch: same-device reuse requires
+    // identical typed extents and bind flags. A camera resize, DXGI format
+    // change, SRV-vs-copy-only mode or Reset must not alias old content.
+    using outrun::vr::dx11::native_game_postpass_scratch_matches;
+    static_assert(native_game_postpass_scratch_matches(
+        {3440u, 1440u, 87u, 8u}, {3440u, 1440u, 87u, 8u}));
+    static_assert(!native_game_postpass_scratch_matches(
+        {3440u, 1440u, 87u, 8u}, {1920u, 1080u, 87u, 8u}));
+    static_assert(!native_game_postpass_scratch_matches(
+        {3440u, 1440u, 87u, 8u}, {3440u, 1440u, 28u, 8u}));
+    static_assert(!native_game_postpass_scratch_matches(
+        {3440u, 1440u, 87u, 8u}, {3440u, 1440u, 87u, 0u}));
+    static_assert(!native_game_postpass_scratch_matches(
+        {3440u, 1440u, 87u, 8u}, {0u, 1440u, 87u, 8u}));
     // Menu/car/race native eye callback: both indexed and non-indexed
     // multi-instance commands preserve ONE genuine source draw ordinal.
     static_assert(may_issue_instanced(3u, 1u, 0u));
