@@ -34,6 +34,7 @@
 #include "native_game_frame_publication.hpp"
 #include "native_game_gpu_handoff.hpp"
 #include "native_game_shared_desktop.hpp"
+#include "native_game_cpu_upload_transaction.hpp"
 #include "native_game_shared_desktop_admission.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
@@ -1235,6 +1236,7 @@ struct State {
     UINT insetSurfaceWidth = 0u, insetSurfaceHeight = 0u;
     bool pending = false;
     NativeSharedDesktopBridge sharedDesktop;
+    NativeGameCpuUploadTransaction cpuUploadRollback;
     NativeFullGameGpuSink gpuFrameSink = nullptr;
     void* gpuFrameSinkUser = nullptr;
     GameNativeFrameBatch frameBatch{}; // Opt-in native only, original D3D9/input preserved.
@@ -6428,6 +6430,7 @@ void before_game_present(IDirect3DDevice9* game,
             // Retire the previous upload surface and advance the GPU generation.
             s.previousOutput = outputNow;
             s.sharedDesktop.reset();
+            s.cpuUploadRollback.reset();
             s.insetSurface.Reset();
             s.insetFormat = D3DFMT_UNKNOWN;
             s.insetSurfaceDevice = 0u;
@@ -6902,7 +6905,21 @@ void before_game_present(IDirect3DDevice9* game,
                                         // not another unmirrored game mutation;
                                         // suppress recursion while State is locked.
                                         const NativeOutputUploadScope outputUploadScope{};
-                                        if (!multiNativeUpload) {
+                                        const auto rollbackPlan =
+                                            NativeGameCpuUploadPlan::select(
+                                                bb.Width, bb.Height,
+                                                croppedNativeUpload, partialNativeUpload,
+                                                multiNativeUpload, presentRegion,
+                                                partialDirty.source, multiDirty.uploadBounds);
+                                        // Snapshot calls StretchRect while State is locked:
+                                        // NativeOutputUploadScope prevents recursive observation.
+                                        const bool originalSaved = !fullMode ||
+                                            s.cpuUploadRollback.capture(
+                                                game,back.Get(),bb.Width,bb.Height,
+                                                bb.Format,s.outputGeneration,rollbackPlan);
+                                        if (!originalSaved) {
+                                            // Snapshot failed: do not touch game backbuffer.
+                                        } else if (!multiNativeUpload) {
                                             uploaded = SUCCEEDED(game->UpdateSurface(
                                                 s.insetSurface.Get(),
                                                 partialNativeUpload ? &partialSourceUpload :
@@ -6926,6 +6943,7 @@ void before_game_present(IDirect3DDevice9* game,
                                                 back.Get(), &targetTiles));
                                         }
                                         if (uploaded) {
+                                            if (fullMode) s.cpuUploadRollback.commit();
                                             ++s.visible;
                                             if (!s.logged) {
                                                 spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} {} output; original D3D9 draw/input untouched; Quest3 UNTESTED",
@@ -6935,6 +6953,9 @@ void before_game_present(IDirect3DDevice9* game,
                                             }
                                         } else {
                                             ++s.failed;
+                                            if (fullMode && originalSaved &&
+                                                !s.cpuUploadRollback.restore(game,back.Get()))
+                                                spdlog::warn("DX11 CPU native upload rollback failed; CPU presentation quarantined until Reset");
                                             // A D3D9 UpdateSurface failure may invalidate
                                             // the CPU upload surface across menu, car or
                                             // race backbuffer transitions. Release it and
@@ -7072,6 +7093,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.sourceGameDevice = 0u;
     s.probeSlot = 0;
     s.sharedDesktop.reset();
+    s.cpuUploadRollback.reset();
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
         item.mapPending = false;
