@@ -407,7 +407,15 @@ def main() -> None:
          "s.frameBatch.accepts_source_draw(sourceOrdinal, false)"),
         ("s.frameBatch.publishable(s.pending)", "s.pending"),
     ):
-        bad_bridge = bridge.replace(original, replacement, 1)
+        # Native surface postpass replay also checks publishable(), before
+        # Present. Mutate the Present gate itself, not an earlier independent
+        # replay guard; otherwise the safety negative control is a false alarm.
+        mutation_start = (bridge.find("void before_game_present(")
+                          if original == "s.frameBatch.publishable(s.pending)" else 0)
+        mutation_at = bridge.find(original, mutation_start)
+        assert mutation_at >= 0, "missing native batch mutation target: " + original
+        bad_bridge = (bridge[:mutation_at] + replacement +
+                      bridge[mutation_at + len(original):])
         assert bad_bridge != bridge and not native_batch_publication_safe(bad_bridge, batch)
     for original, replacement in (
         ("ordinal - lastSourceDraw == 1u", "ordinal - lastSourceDraw <= 8u"),
