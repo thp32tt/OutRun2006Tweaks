@@ -2944,7 +2944,21 @@ namespace OutRunVRStereo
             if (ownedHud)
                 return R30ScreenSpaceKind::Hud2D;
             if (ownedOverlay)
-                return R30ScreenSpaceKind::None;
+            {
+                // R26 regression restoration: the original ESC shell and
+                // child text can use a perspective-looking sprite projection.
+                // A plain ScreenOverlay2D must NOT be promoted. Only a live
+                // queued node in the canonical paused gameplay state enters
+                // the existing head-inverse finite HUD plane; its original
+                // same-node game c64 is proved again by
+                // R30GetRecentOriginalHudWvp before touching either eye.
+                // F11, other menus, SkyGlow and world draws remain excluded.
+                return R30IsPauseMenuElement() &&
+                    drawCommand.queued && drawCommand.queueNode &&
+                    drawCommand.queueEpoch != 0
+                    ? R30ScreenSpaceKind::Hud2D
+                    : R30ScreenSpaceKind::None;
+            }
 
             // All other tagged overlays/effects retain the conservative
             // alpha/depth heuristic and StateBlock-aware cached state.
@@ -6104,10 +6118,20 @@ namespace OutRunVRStereo
             const bool projected = CorroboratesProjectedWorldMarker(sourceScope);
             const bool exactHud = CorroboratesHud(sourceScope) &&
                 ExternalOverlaySemanticDepth == 0;
+            // R26 native pause menu contained untagged D3DXSprite FVF142
+            // text/option siblings in the queued ScreenOverlay2D family.
+            // It is NOT world sky: require the exact ESC game state,
+            // selected queue node and epoch. F11 has an external owner.
+            const auto pauseCommand = CapturePhysicalDrawCommand();
+            const bool pauseOverlay =
+                sourceScope == RenderScope::ScreenOverlay2D &&
+                R30IsPauseMenuElement() &&
+                pauseCommand.queued && pauseCommand.queueNode &&
+                pauseCommand.queueEpoch != 0;
             if (!device || type != D3DPT_TRIANGLELIST ||
                 !R29OwnerTargetIsBackBuffer() ||
                 !R29OwnerStableStereoBase(device) ||
-                (!projected && !exactHud))
+                (!projected && !exactHud && !pauseOverlay))
                 return E_NOTIMPL;
             const auto* marker = CurrentProjectedMarker();
             if ((projected && (!marker || !marker->valid)) ||
@@ -6146,7 +6170,7 @@ namespace OutRunVRStereo
                 !R30ConfigureXyzrhwWorldEffect(
                     device, nullptr, 0u, 0u, state) ||
                 (projected && !state.projectedWorldMarker) ||
-                (exactHud && !state.stageExtensionEyePlane))
+                ((exactHud || pauseOverlay) && !state.stageExtensionEyePlane))
                 return E_NOTIMPL;
 
             D3DMATRIX originalProjection{};
@@ -6225,7 +6249,8 @@ namespace OutRunVRStereo
                 [&]() { return drawEye(0); },
                 [&]() { return drawEye(1); },
                 projected ? "R84/R62-FVF142-ProjectedCarRank"
-                          : "R84/R62-FVF142-NativeScreenHud");
+                          : (pauseOverlay ? "R84/R62-FVF142-PauseOverlay"
+                                          : "R84/R62-FVF142-NativeScreenHud"));
             bool restored = false;
             {
                 R30ScopedInternalPass guard;
@@ -6247,7 +6272,8 @@ namespace OutRunVRStereo
                 if ((count & (count - 1u)) == 0u)
                     spdlog::info(
                         "VR R84 R62 FVF142 stereo: owner={} hits={} marker={} primitive={}",
-                        projected ? "CAR_RANK" : "SCREEN_HUD",
+                        projected ? "CAR_RANK" :
+                            (pauseOverlay ? "PAUSE_OVERLAY" : "SCREEN_HUD"),
                         count, projected && marker && marker->valid ? 1 : 0,
                         primitiveCount);
             }
