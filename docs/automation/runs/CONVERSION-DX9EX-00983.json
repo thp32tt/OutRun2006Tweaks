@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00983",
   "production_id": "CONVERSION-DX9EX-00983",
-  "event_id": "CONVERSION-DX9EX-00983-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00983-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
@@ -26,7 +26,8 @@
     "src/vr/game/hud_command_batch.hpp",
     "src/hooks_uiscaling.cpp",
     "vrhost/tests/hud_command_batch_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00983.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00983.json",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:EXTENDED_TIME",
@@ -67,5 +68,13 @@
   },
   "acceptance_results": {},
   "score_delta_this_attempt": 0,
-  "next_action": "Await exact-SHA GitHub DX9Ex Active, Domain Isolation and required Full Source Impact/HUD gate; headset acceptance remains UNTESTED."
+  "next_action": "Await exact-SHA GitHub DX9Ex Active, Domain Isolation and required Full Source Impact/HUD gate; headset acceptance remains UNTESTED.",
+  "material_result_sha": "3defb40584466c85a2ba4c3f346b3d8b7a37afe7",
+  "last_ci_failure": {
+    "run_id": 38986278079,
+    "head_sha": "3defb40584466c85a2ba4c3f346b3d8b7a37afe7",
+    "job": "policy",
+    "cause": "Old Ledger checker expected direct native Flush/End/Draw methods removed by reentrant-safe native callback transaction.",
+    "repair": "Update current ledger checker, add negative mutation assertions and keep all existing physical owner/lifecycle requirements."
+  }
 }

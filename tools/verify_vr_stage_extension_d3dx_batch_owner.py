@@ -575,14 +575,17 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "ProducerToken::GoalTime150" in pre and
          "ProducerToken::OutRunStagePrintf" in pre,
          "exact GOAL production source edges survive")
-    need("HudBatch.onBeginResult(" in begin and
+    need("const auto beforeBegin = HudBatch.snapshot();" in begin and
+         "if (HudBatch.generation == beforeBegin.generation)" in begin and
+         "HudBatch.onBeginResult(" in begin and
          "self, SUCCEEDED(hr), hr == D3DERR_INVALIDCALL);" in begin and
          "else if (self && self == HudBatch.sprite)" in begin and
          "HudBatch.invalidate();" in begin and
-         "return hr;" in begin and
-         begin.find("HudBatch.onBeginResult(") <
-         begin.find("else if (self && self == HudBatch.sprite)"),
-         "only native nested INVALIDCALL keeps the exact live D3DX batch")
+         begin.index("const auto beforeBegin = HudBatch.snapshot();") <
+         begin.index("Begin_hk.stdcall<HRESULT>(self, flags)") <
+         begin.index("if (HudBatch.generation == beforeBegin.generation)") <
+         begin.index("HudBatch.onBeginResult("),
+         "new native Begin cannot overwrite nested successful Begin")
     # Check the actual Ledger failure transition, not only a renamed game
     # hook. DEVICELOST/other Begin failures must revoke old +TIME/GOAL
     # GPU owner, while the same-sprite nested INVALIDCALL is lossless.
@@ -618,16 +621,24 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.active, QueueRenderActive(), HudBatch.homogeneous" in flush and
          "HudBatch.scope, HudBatch.producer" in flush and
          "ScopedExactProducerSemantic owned(" in flush and
+         "const auto submission = HudBatch.snapshot();" in flush and
          "Flush_hk.stdcall<HRESULT>(self)" in flush and
-         "if (SUCCEEDED(hr))" in flush and
-         "HudBatch.onFlushSuccess();" in flush and
-         "HudBatch.onFlushFailure();" in flush,
-         "native Flush must physically submit under saved homogeneous owner")
+         "HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));" in flush and
+         "return hr;" in flush and
+         flush.index("const auto submission = HudBatch.snapshot();") <
+         flush.index("Flush_hk.stdcall<HRESULT>(self)") <
+         flush.index("HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));"),
+         "native Flush must retire only matching exact batch generation")
     need("CanRestoreDeferredResultOwner(" in end and
          "ScopedExactProducerSemantic owned(" in end and
+         "const auto submission = HudBatch.snapshot();" in end and
          "End_hk.stdcall<HRESULT>(self)" in end and
-         "HudBatch.end();" in end and "return hr;" in end,
-         "native End must physically submit under owner and retire batch")
+         "HudBatch.completeNativeEnd(submission);" in end and
+         "return hr;" in end and
+         end.index("const auto submission = HudBatch.snapshot();") <
+         end.index("End_hk.stdcall<HRESULT>(self)") <
+         end.index("HudBatch.completeNativeEnd(submission);"),
+         "native End must preserve newer nested Begin")
     need("if (!wasTrackedOrExactGameSprite)" in lifecycle and
          "HudBatch.invalidate();" in lifecycle and
          "DX9ExD3DXSpriteLifetime::OwnsLifecycle(" in lifecycle and
@@ -655,15 +666,18 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          draw.index("flushed = FlushTracked(self);") <
          draw.index("const HRESULT hr = Draw_hk.stdcall"),
          "foreign Draw must submit previous batch under outgoing owner")
-    need("if (FAILED(hr))" in draw and
-         "if (self && self == HudBatch.sprite)" in draw and
-         "HudBatch.active = false;" in draw and
-         "ForgetBatch();" in draw and
-         draw.index("if (FAILED(hr))") < draw.index("const auto scope = EffectiveScope();") and
-         "HudBatch.recordDraw(scope, source);" in draw and
-         draw.index("const HRESULT hr = Draw_hk.stdcall") <
-         draw.index("HudBatch.recordDraw(scope, source);"),
-         "failed Draw must revoke, accepted Draw must record exact current owner")
+    need("const auto scope = EffectiveScope();" in draw and
+         "const auto source = CurrentRenderProducerToken();" in draw and
+         "const auto submission = HudBatch.snapshot();" in draw and
+         "if (self && self == submission.sprite &&" in draw and
+         "HudBatch.completeNativeDraw(" in draw and
+         "submission, SUCCEEDED(hr), scope, source)" in draw and
+         "if (FAILED(hr) || !self)" in draw and
+         draw.index("const auto scope = EffectiveScope();") <
+         draw.index("const auto submission = HudBatch.snapshot();") <
+         draw.index("const HRESULT hr = Draw_hk.stdcall<HRESULT>(") <
+         draw.index("HudBatch.completeNativeDraw("),
+         "native Draw must capture owner before D3DX and quarantine failed submission")
     need("CanFlushD3DXPreQueueStageBatch(" in direct_stage and
          "false, true, HudBatch.homogeneous" in direct_stage and
          "HudBatch.scope, HudBatch.producer" in direct_stage and
@@ -698,6 +712,34 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "CanDeferD3DXQueueGoalBatch(" in draw and
          "GoalFlushes.fetch_add(" in draw,
          "post-draw +TIME batches defer while GOAL exact source retains separate path")
+    # Validate actual batch transaction logic rather than a stale naming
+    # convention. Native D3DX callbacks may reenter with a new Begin.
+    snap = scope(ledger, "NativeSnapshot snapshot(", "void touch(")
+    cf = scope(ledger, "bool completeNativeFlush(", "bool completeNativeEnd(")
+    ce = scope(ledger, "bool completeNativeEnd(", "bool completeNativeDraw(")
+    cd = scope(ledger, "bool completeNativeDraw(", "// Only an actual Begin or Reset")
+    need("std::uint64_t mutationSerial = 0;" in ledger and
+         "return { sprite, generation, mutationSerial };" in snap and
+         "sprite == previous.sprite" in snap and
+         "generation == previous.generation" in snap and
+         "mutationSerial == previous.mutationSerial" in snap and
+         "touch();" in ledger_draw and "touch();" in ledger_forget,
+         "native batch must track source sprite/generation/mutation identity")
+    need("if (!sameGeneration(previous))" in cf and
+         "if (!unchanged(previous) || !succeeded)" in cf and
+         "onFlushFailure();" in cf and "onFlushSuccess();" in cf and
+         cf.find("onFlushFailure();") < cf.find("onFlushSuccess();"),
+         "native Flush must not retire newer Begin or promote reentrant Draw")
+    need("if (!sameGeneration(previous))" in ce and
+         "end();" in ce and
+         ce.find("if (!sameGeneration(previous))") < ce.find("end();"),
+         "native End must preserve a reentrant Begin")
+    need("if (!sameGeneration(previous))" in cd and
+         "if (!unchanged(previous) || !succeeded)" in cd and
+         "onFlushFailure();" in cd and
+         "recordDraw(drawScope, drawProducer);" in cd and
+         cd.find("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);"),
+         "native failed or reentrant Draw must not borrow old HUD provenance")
     need("vtable[8]" in h and "vtable[9]" in h and "vtable[10]" in h and
          "vtable[11]" in h and "vtable[12]" in h and "vtable[13]" in h and
          "LostDevice_hk.enable().has_value()" in h and
@@ -740,10 +782,14 @@ def main_current_ledger(code: str, header: str) -> int:
         ("foreign-draw-steals-owner", "code", "ScopedExactProducerSemantic outgoingBatch(", "ScopedExactProducerSemantic wrongBatch("),
         ("foreign-batch-no-split", "code", "flushed = FlushTracked(self);", "flushed = false;"),
         ("mix-becomes-homogeneous", "ledger", "homogeneous = false;", "homogeneous = true;"),
-        ("successful-draw-untracked", "code", "HudBatch.recordDraw(scope, source);", "(void)scope; (void)source;"),
-        ("failed-draw-keeps", "code", "if (self && self == HudBatch.sprite)\n            {\n                HudBatch.active = false;", "if (self && self == HudBatch.sprite)\n            {\n                HudBatch.active = true;"),
-        ("flush-no-revoke", "code", "HudBatch.onFlushSuccess();", "HudBatch.boundaryReady = true;"),
-        ("flush-failure-retains", "code", "HudBatch.onFlushFailure();", "HudBatch.boundaryReady = true;"),
+
+        ("successful-draw-untracked", "ledger", "recordDraw(drawScope, drawProducer);", "(void)drawScope; (void)drawProducer;"),
+
+        ("failed-draw-keeps", "code", "HudBatch.completeNativeDraw(", "HudBatch.completeNativeUnsafeDraw("),
+
+        ("flush-no-revoke", "code", "HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));", "HudBatch.boundaryReady = true;"),
+
+        ("flush-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            active = false;", "void onFlushFailure() noexcept\n        {\n            active = true;"),
         ("ledger-failure-retains", "ledger", "void onFlushFailure() noexcept\n        {\n            active = false;", "void onFlushFailure() noexcept\n        {\n            active = true;"),
         ("ledger-end-retains", "ledger", "void end() noexcept\n        {\n            active = false;", "void end() noexcept\n        {\n            active = true;"),
         ("reset-no-forget", "code", "HudBatch.invalidate();", "HudBatch.boundaryReady = true;"),
@@ -756,6 +802,11 @@ def main_current_ledger(code: str, header: str) -> int:
         ("source-exit-no-flush", "code", "if (FlushTracked(sprite))", "if (false)"),
         ("shader-loses-goal-route", "code", "CanDeferD3DXQueueGoalBatch(", "CanDeferD3DXQueueNoneBatch("),
         ("post-draw-stage-no-boundary", "code", "if (exactStage && CanArmD3DXQueueStageAfterDraw(", "if (false && CanArmD3DXQueueStageAfterDraw("),
+        ("flush-ignores-new-Begin", "ledger", "if (!sameGeneration(previous))", "if (false)"),
+        ("flush-ignores-mutation", "ledger", "if (!unchanged(previous) || !succeeded)", "if (!succeeded)"),
+        ("end-clears-reentrant-Begin", "code", "HudBatch.completeNativeEnd(submission);", "HudBatch.end();"),
+        ("begin-clears-reentrant-Begin", "code", "if (HudBatch.generation == beforeBegin.generation)", "if (true)"),
+        ("draw-mutation-not-counted", "ledger", "            touch();\n        }\n\n        void forget()", "            // no mutation counted\n        }\n\n        void forget()"),
         ("lost-retains-batch", "code", "InvalidateForDeviceLifecycle(ownsBatch);", "(void)ownsBatch;"),
     ]
     for name, source, before, after in mutations:
