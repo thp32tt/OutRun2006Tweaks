@@ -2760,7 +2760,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // Unknown, mixed, foreign, Reset, and live-queue batches remain
         // untouched. ScopedExactProducerSemantic restores every prior scope
         // (including a pending marker) even when the game Flush fails.
-        const bool restore = DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
+        const bool restore = HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+            DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
             HudBatch.active, QueueRenderActive(), HudBatch.homogeneous,
             HudBatch.drawCount,
             DX9ExD3DXSpriteLifetime::CanFlush(
@@ -2788,7 +2789,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // a source-exit nor a queue boundary was able to flush safely.
         // Preserve the exact homogeneous producer only until End returns;
         // the native HRESULT and normal batch teardown are unchanged.
-        const bool restore = DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
+        const bool restore = HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+            DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
             HudBatch.active, QueueRenderActive(), HudBatch.homogeneous,
             HudBatch.drawCount,
             DX9ExD3DXSpriteLifetime::CanFlush(
@@ -2875,7 +2877,8 @@ public:
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!HudBatch.active || sprite != HudBatch.sprite || HudBatch.drawCount == 0)
             return;
-        if (!CanFlushD3DXPreQueueStageBatch(
+        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+            !CanFlushD3DXPreQueueStageBatch(
                 false, true, HudBatch.homogeneous,
                 HudBatch.scope, HudBatch.producer,
                 EffectiveScope(), CurrentRenderProducerToken()) ||
@@ -2895,7 +2898,8 @@ public:
     {
         using namespace OutRunVR::GameSemantic;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!CanFlushD3DXDirectStageAtExit(
+        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+            !CanFlushD3DXDirectStageAtExit(
                 QueueRenderActive(), HudBatch.active,
                 sprite != nullptr && sprite == HudBatch.sprite,
                 HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
@@ -2922,7 +2926,8 @@ public:
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
         if (!HudBatch.active || sprite != HudBatch.sprite || HudBatch.drawCount == 0)
             return;
-        if (!CanFlushD3DXPreQueueStageBatch(
+        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+            !CanFlushD3DXPreQueueStageBatch(
                 false, true, HudBatch.homogeneous, HudBatch.scope, HudBatch.producer,
                 EffectiveScope(), CurrentRenderProducerToken()) ||
             !FlushTracked(sprite))
@@ -2937,7 +2942,8 @@ public:
     {
         using namespace OutRunVR::GameSemantic;
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
-        if (!CanFlushD3DXDirectGoalAtExit(
+        if (!HudBatch.matchesGpuOwner(false, nullptr, 0) ||
+            !CanFlushD3DXDirectGoalAtExit(
                 QueueRenderActive(), HudBatch.active,
                 sprite != nullptr && sprite == HudBatch.sprite,
                 HudBatch.drawCount, HudBatch.homogeneous, HudBatch.scope,
@@ -3058,7 +3064,10 @@ public:
             // first +TIME edge and let later End outlive ScreenHud source.
             // Mixed, unknown prehook and mismatched buffers still fail closed;
             // ordinary first-queue GOAL/unrelated entries keep the old rule.
-            if (!CanFlushD3DXPreQueueStageBatch(
+            if (!HudBatch.matchesGpuOwner(
+                    QueueRenderActive(), CurrentQueueNode(),
+                    CurrentQueueNodeEpoch()) ||
+                !CanFlushD3DXPreQueueStageBatch(
                     // A first GOAL SpriteNode is also a valid queue transition:
                     // drain a proven prior direct batch under its OLD owner
                     // before selecting the GOAL source, exactly as for +TIME.
@@ -3081,6 +3090,8 @@ public:
     {
         using namespace OutRunVR::GameSemantic;
         if (HudBatch.boundaryReady && QueueRenderActive() &&
+            HudBatch.matchesGpuOwner(
+                true, CurrentQueueNode(), CurrentQueueNodeEpoch()) &&
             (StageOwner(EffectiveScope(), CurrentRenderProducerToken()) ||
              GoalOwner(EffectiveScope(), CurrentRenderProducerToken())) &&
             HudBatch.drawCount != 0 && HudBatch.homogeneous &&
@@ -3104,7 +3115,8 @@ private:
         // flush the earlier exact +TIME/GOAL batch BEFORE we can tag this
         // incoming Draw. Separate it under its original GPU owner now.
         // Queued, mixed and foreign buffers remain untouched/fail-closed.
-        if (DX9ExD3DXSpriteLifetime::CanDrainDeferredResultBeforeForeignDraw(
+        if (HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+            DX9ExD3DXSpriteLifetime::CanDrainDeferredResultBeforeForeignDraw(
                 HudBatch.active, OutRunVR::GameSemantic::QueueRenderActive(),
                 HudBatch.homogeneous,
                 HudBatch.drawCount,

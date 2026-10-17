@@ -297,5 +297,45 @@ int main()
     if (!l.exactUniformOwner() || l.queued || l.queueNode || l.queueEpoch)
         return 43;
 
+    // Preserve per-queue +TIME source and reject stale or recycled nodes.
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime,
+                 true,&nodeA,77);
+    if (!l.matchesGpuOwner(true,&nodeA,77) ||
+        l.matchesGpuOwner(true,&nodeB,77) ||
+        l.matchesGpuOwner(true,&nodeA,78) ||
+        l.matchesGpuOwner(false,nullptr,0))
+        return 44;
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    if (!l.matchesGpuOwner(false,nullptr,0) ||
+        l.matchesGpuOwner(true,&nodeA,77))
+        return 45;
+    // Direct and queued owner mixtures cannot be promoted to either.
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime,
+                 true,&nodeA,77);
+    if (l.homogeneous || l.matchesGpuOwner(true,&nodeA,77))
+        return 46;
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::GoalTime020,
+                 true,&nodeB,81);
+    if (!l.matchesGpuOwner(true,&nodeB,81) ||
+        l.matchesGpuOwner(true,&nodeB,80) ||
+        l.matchesGpuOwner(false,nullptr,0))
+        return 47;
+    l.invalidate();
+    if (!l.matchesGpuOwner(false,nullptr,0))
+        return 48;
+    // Corrupted direct metadata must not impersonate an exact glyph owner.
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    l.queueEpoch=88;
+    if (l.matchesGpuOwner(false,nullptr,0))
+        return 49;
+    l.onFlushFailure();
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    if (!l.matchesGpuOwner(false,nullptr,0))
+        return 50;
     return 0;
 }

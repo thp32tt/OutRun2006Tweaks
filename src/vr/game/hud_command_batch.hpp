@@ -252,6 +252,17 @@ namespace OutRunVR::HudCommandBatch
             sprite = nullptr;
         }
 
+        // A queued GPU batch cannot become a direct HUD batch after
+        // its SpriteNode leaves. Match node identity AND selection epoch.
+        bool matchesGpuOwner(bool queueActive, const void* node,
+                             std::uint64_t epoch) const noexcept
+        {
+            if (!queued)
+                return !queueActive && queueNode == nullptr && queueEpoch == 0;
+            return queueActive && queueNode != nullptr && queueEpoch != 0 &&
+                queueNode == node && queueEpoch == epoch;
+        }
+
         bool exactUniformOwner() const noexcept
         {
             return active && homogeneous && drawCount != 0 &&
