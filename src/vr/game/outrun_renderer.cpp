@@ -24,6 +24,7 @@
 #include "vr/game/lens_centre_upload_transaction.hpp"
 #include "vr/game/game_wvp_native_upload.hpp"
 #include "vr/game/queued_hud_partial_wvp.hpp"
+#include "vr/game/hud_native_source_transaction.hpp"
 #include "../core/r23_target_owner_api.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
@@ -1808,6 +1809,23 @@ namespace OutRunVRRenderer
 					OutRunVRStereo::GetTopLevelDrawSerial(),
 					LensCentreUploadGeneration, shader, exact};
 			};
+            // The original D3D9 callback can reenter a new HUD producer or
+            // shader even if no further game c64 upload increments our write
+            // generation. Retain exact direct/queued source before native call.
+            auto CaptureHudUploadSource = [&]() noexcept {
+                using namespace OutRunVR::GameSemantic;
+                std::uintptr_t shader = 0;
+                std::uint64_t epoch = 0;
+                OutRunVRStereo::GetCurrentShaderEpoch(shader, epoch);
+                return OutRunVR::HudNativeSource::SourceStamp{
+                    QueueRenderActive(), EffectiveScope(),
+                    CurrentRenderProducerToken(),
+                    CurrentQueueNode(), CurrentQueueNodeEpoch(),
+                    LatchedPoseEpoch, shader, epoch,
+                    OutRunVRStereo::GetTopLevelDrawSerial()
+                };
+            };
+
 
 			// D3D9 preserves unmodified c64 rows across successful partial
 			// writes. R84's finite shader HUD eye-plane, however, can only use
@@ -1873,6 +1891,7 @@ namespace OutRunVRRenderer
 				const auto lensBefore = exactCentre
 					? CaptureLensUploadSource()
 					: OutRunVR::LensCentre::UploadSourceStamp{};
+                const auto hudBefore = CaptureHudUploadSource();
 				const HRESULT result = SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
 				const bool callbackCurrent =
@@ -1904,8 +1923,14 @@ namespace OutRunVRRenderer
 				// A stale outer return must neither clear an inner complete WVP
 				// nor attribute its rows to an inner HUD/queue owner.
 				if (callbackCurrent)
-					TrackQueuedHudWvp(startRegister, vector4fCount,
-						constantData, result, false);
+                {
+                    if (OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(
+                            hudBefore, CaptureHudUploadSource()))
+                        TrackQueuedHudWvp(startRegister, vector4fCount,
+                            constantData, result, false);
+                    else
+                        HudQueuedPartialWvp.Reset();
+                }
 				return result;
 			}
 			LensCentrePartialWvp.Reset();
@@ -1930,7 +1955,8 @@ namespace OutRunVRRenderer
 			// renderer head injection can happen first and R30 applies a second
 			// transform, which is visible as duplicated/misplaced 6th/6 and menus.
 			const auto lensBefore = CaptureLensUploadSource();
-			const auto semanticScope =
+            const auto hudBefore = CaptureHudUploadSource();
+            const auto semanticScope =
 				OutRunVR::GameSemantic::EffectiveScope();
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
@@ -1945,9 +1971,11 @@ namespace OutRunVRRenderer
 				const bool callbackCurrent =
 					LensCentreUploadGeneration == uploadGeneration;
 				const bool sourceUnchanged = callbackCurrent &&
-					(!lensBefore.exactDirectCentre ||
-					 OutRunVR::LensCentre::SameSourceAfterNativeUpload(
-						 lensBefore, CaptureLensUploadSource()));
+                    (!lensBefore.exactDirectCentre ||
+                     OutRunVR::LensCentre::SameSourceAfterNativeUpload(
+                         lensBefore, CaptureLensUploadSource())) &&
+                    OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(
+                        hudBefore, CaptureHudUploadSource());
 				if (SUCCEEDED(result) && sourceUnchanged)
 				{
 					const UINT wvpOffsetRegisters =
@@ -1987,8 +2015,10 @@ namespace OutRunVRRenderer
 					}
 				}
 				if (sourceUnchanged)
-					TrackQueuedHudWvp(startRegister, vector4fCount,
-						constantData, result, SUCCEEDED(result));
+                    TrackQueuedHudWvp(startRegister, vector4fCount,
+                        constantData, result, SUCCEEDED(result));
+                else if (callbackCurrent)
+                    HudQueuedPartialWvp.Reset();
 				return result;
 			}
 

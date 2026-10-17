@@ -214,6 +214,17 @@ add_custom_command(TARGET outrun-vr-lens-upload-transaction-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-lens-upload-transaction-smoke>"
     COMMENT "Run exact C993 source/native reentrancy and fallback regression"
     VERBATIM)
+# Execute source identity negative tests in the required x64 OpenXR host CI.
+# A source-only HUD producer/queue reentry cannot republish old c64 ownership.
+add_executable(outrun-vr-hud-native-source-smoke
+    tests/hud_native_source_transaction_smoke.cpp)
+target_include_directories(outrun-vr-hud-native-source-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-hud-native-source-smoke)
+add_custom_command(TARGET outrun-vr-hud-native-source-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-hud-native-source-smoke>"
+    COMMENT "Run R84 HUD native source callback and reentry regression"
+    VERBATIM)
 # Protect R84 game-world WVP against nested native SetVertexShaderConstantF:
 # independent GPU input buffers and no stale successful outer publication.
 add_executable(outrun-vr-game-wvp-native-upload-smoke
