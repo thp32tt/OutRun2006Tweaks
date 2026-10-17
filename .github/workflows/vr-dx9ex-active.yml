@@ -721,7 +721,7 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
           # Keep one GUI launcher. The slot selector invokes the PowerShell
           # test runner directly; duplicate batch entrypoints are not needed.
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','START_DX9EX_TEST.cmd','quest_cockpit_glass.py','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','START_DX9EX_TEST.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -815,14 +815,22 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','quest_cockpit_glass.py','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+          foreach ($file in @('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
-          # The actual player-car PMT edit tool must ship with the cockpit GUI,
-          # not remain source-only. No engine/alpha hotpatch without model proof.
+          # Original player-car PMT and EXE remain immutable. The cockpit glass
+          # material has not been positively identified; the visible selector
+          # must provide read-only provenance diagnostics, not a hidden model
+          # writer or a nonfunctional file-edit slider.
           $glassGui = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.ps1') -Raw
-          foreach($marker in @('quest_cockpit_glass.py','--in-place','--restore','glassSlider')){
-            if(-not $glassGui.Contains($marker)){throw "Glass opacity GUI missing $marker"}
+          foreach($unsafe in @('quest_cockpit_glass.py','--in-place','--restore','glassSlider')){
+            if($glassGui.Contains($unsafe)){throw "Unsafe original-model glass edit in cockpit GUI: $unsafe"}
+          }
+          foreach($diagnostic in @('DriverSeatGlassMaterialTrace','DriverSeatGlassOpacity')){
+            if(-not $glassGui.Contains($diagnostic)){throw "Cockpit glass diagnostics missing $diagnostic"}
+          }
+          if(Test-Path (Join-Path verify 'quest_cockpit_glass.py')){
+            throw 'Active VR ZIP must not include the original-model PMT mutator'
           }
           # Both one-click visible and optional GUI launchers are required.
           $launchers = @(Get-ChildItem verify -Recurse -File | Where-Object { $_.Extension -in @('.cmd','.bat') })
