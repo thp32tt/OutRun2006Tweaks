@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "NEEDS_VALIDATION",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "e52b953d762c1169373d6d9af568236430966e35",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "validation_bearing_result_sha": "884eda99e6ce29fcc8bf9c760a565d2e539f35d8",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -58,9 +58,9 @@
     ]
   },
   "acceptance_results": {
-    "disprank_physical_eye_pair": "PENDING_CI",
-    "disprank_mixed_owner_fallback": "PENDING_CI",
-    "disprank_exact_sha_gate": "PENDING_CI"
+    "disprank_physical_eye_pair": "PASS_BUILD",
+    "disprank_mixed_owner_fallback": "PASS_BUILD",
+    "disprank_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original game's Ghidra/static resource map in docs/automation/OUTRUN_VR_REA_RESOURCE_EVIDENCE_20261018.md confirms the 0x004B9D80 fixed 6th/6 UI versus unrelated moving vehicle 0x004BAD20 marker.",
@@ -75,16 +75,17 @@
       "Do not promote all FVF142, effect or unknown sprites or claim HMD visual PASS from a static gate."
     ],
     "fix_evidence": "Added FixedFnRankHudStamp to mod game header and R30 before/after native-left GPU source validation for original DispRank producers only; unchanged game projection restore, depth error reporting and device fallback.",
-    "negative_test_evidence": "Extended rank_marker_physical_source_smoke.cpp with positive queued/direct 6th/6 and negative queue, producer, pose, serial, FVF, shader, world and stage mutations; exact build pending.",
+    "negative_test_evidence": "R84 native physical rank source host smoke completed successfully on x64, including new positive first/clip queued and direct 6th/6 source and negative node, epoch, producer, pose, draw serial, shader, FVF, scope and +TIME transitions. Final same-SHA Active, Domain, HUD and Full Source mandatory gates 4/4 SUCCESS. Quest3/VDXR runtime untested.",
     "eye_ownership": "Both eyes must use one exact game 6th/6 SpriteNode command and one pose; changed after LEFT vetoes RIGHT without resubmitting LEFT."
   },
   "ci_evidence": {
-    "status": "PENDING",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "884eda99e6ce29fcc8bf9c760a565d2e539f35d8",
     "material_sha": "e52b953d762c1169373d6d9af568236430966e35",
     "first_attempt": {
       "run_id": 39064982722,
       "conclusion": "failure",
-      "reason": "Exact-head feature record missing; policy gate blocked builds."
+      "reason": "Missing exact-head run policy record before game compile; resolved by same-task policy record repair and validated on later exact SHA."
     },
     "required_gates": [
       "DX9Ex Active Validation",
@@ -92,7 +93,33 @@
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
     ],
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39065189776,
+        "conclusion": "success",
+        "exact_sha": "884eda99e6ce29fcc8bf9c760a565d2e539f35d8"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39065189753,
+        "conclusion": "success",
+        "exact_sha": "884eda99e6ce29fcc8bf9c760a565d2e539f35d8"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39065189765,
+        "conclusion": "success",
+        "exact_sha": "884eda99e6ce29fcc8bf9c760a565d2e539f35d8"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39065189785,
+        "conclusion": "success",
+        "exact_sha": "884eda99e6ce29fcc8bf9c760a565d2e539f35d8"
+      }
+    ],
     "runtime_validation": "UNTESTED"
   },
-  "notes": "Same-task CI prerequisite repair only; original 6th/6 material source SHA remains e52b953d. Do not count metadata, retry or C6 as independent material result. Quest3/VDXR not tested."
+  "notes": "C6 bookkeeping AFTER exact validation candidate 884eda99 4/4 SUCCESS. Real C++ gameplay material commit e52b953d stays distinct from same-task policy/validation-bearing 884eda99; this C6 [skip ci] record is not the validated source commit. Quest3/VDXR optical user acceptance UNTESTED. No separate score for initial missing policy record, its repair or C6."
 }
