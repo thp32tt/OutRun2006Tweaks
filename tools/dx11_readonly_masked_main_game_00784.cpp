@@ -13,7 +13,10 @@ constexpr bool native_frame_with_readonly_main_draws() {
     game.succeeded(true); game.record_source_draw(0u);
     const bool noMainStencilWrite = GameNativeOffscreenPass::no_main_stencil_write(true, true, 0u);
     const bool noExtraMrtWrite = GameNativeOffscreenPass::inactive_extra_mrt(true, 0u);
-    if (!noMainStencilWrite || !noExtraMrtWrite ||
+    const bool noMutationOnEitherFace =
+        GameNativeOffscreenPass::all_stencil_ops_keep(
+            1u, 1u, 1u, true, 1u, 1u, 1u);
+    if (!noMainStencilWrite || !noMutationOnEitherFace || !noExtraMrtWrite ||
         !GameNativeMaskedDraw::no_visible_target_write_source_draw(
             true, true, 0u, true, true, false, !noMainStencilWrite, !noExtraMrtWrite))
         return false;
@@ -32,7 +35,9 @@ constexpr bool unsafe_state_keeps_original_d3d9_fallback() {
     using F = GameNativeFragmentReject;
     // A writable or UNKNOWN stencil mask, writable/unknown MRT and real A8
     // destination-alpha or main Z writes must not be silently dropped.
-    if (O::no_main_stencil_write(true, false, 0u) ||
+    if (O::all_stencil_ops_keep(1u, 1u, 1u, true, 1u, 2u, 1u) ||
+        O::all_stencil_ops_keep(1u, 1u, 2u, false, 1u, 1u, 1u) ||
+        O::no_main_stencil_write(true, false, 0u) ||
         O::no_main_stencil_write(true, true, 1u) ||
         O::inactive_extra_mrt(false, 0u) ||
         O::inactive_extra_mrt(true, 0x08u) ||

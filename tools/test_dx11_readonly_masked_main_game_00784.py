@@ -22,7 +22,9 @@ def linked(h, source=draw, miss=unavailable):
         "GetRenderState(kExtraColorMasks[i - 1u], &extraMask)",
         "inactive_extra_mrt(true, extraMask)",
         "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)",
-        "no_main_stencil_write(", "stencilMaskKnown, stencilWriteMask",
+        "const bool stencilReadOnly = game_stencil_is_read_only(",
+        "stencilEnabled, stencilMaskKnown, stencilWriteMask",
+        "if (!stencilReadOnly) return false;",
         "stencilWrites, false", "!stencilWrites, alphaTest == TRUE",
         "s.clearColor.matches(", "targetIdentity.Get() != identity.Get()",
     )) and all(token in source for token in (
@@ -36,12 +38,37 @@ def linked(h, source=draw, miss=unavailable):
 assert linked(helper), "read-only stencil/inactive MRT not connected to real Draw/DrawIndexed"
 for old, new in (
     ("inactive_extra_mrt(true, extraMask)", "true /* ignored live MRT */"),
-    ("stencilMaskKnown, stencilWriteMask", "true, 0u /* ignored stencil */"),
+    ("if (!stencilReadOnly) return false;", "if (false) return false;"),
     ("!stencilWrites, alphaTest == TRUE", "true, alphaTest == TRUE"),
     ("s.clearColor.matches(", "unconditional_clear("),
 ):
     altered = helper.replace(old, new, 1)
     assert altered != helper and not linked(altered), old
+# The shared D3D9 helper must inspect both stencil faces before the main
+# and offscreen callers may consume the original no-output Draw ordinal.
+stencil = bridge.split("// Read a real D3D9 stencil state,", 1)[1].split(
+    "// Preserve the complete game Draw/DrawIndexed source stream", 1)[0]
+def linked_stencil(s):
+    return all(token in s for token in (
+        "GetRenderState(D3DRS_STENCILFAIL, &frontFail)",
+        "GetRenderState(D3DRS_STENCILZFAIL, &frontZFail)",
+        "GetRenderState(D3DRS_STENCILPASS, &frontPass)",
+        "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)",
+        "GetRenderState(D3DRS_CCW_STENCILFAIL, &backFail)",
+        "GetRenderState(D3DRS_CCW_STENCILZFAIL, &backZFail)",
+        "GetRenderState(D3DRS_CCW_STENCILPASS, &backPass)",
+        "GameNativeOffscreenPass::all_stencil_ops_keep(",
+    ))
+assert linked_stencil(stencil), "both D3D9 stencil faces must be inspected"
+for old, new in (
+    ("D3DRS_CCW_STENCILFAIL, &backFail", "D3DRS_STENCILFAIL, &backFail"),
+    ("D3DRS_CCW_STENCILZFAIL, &backZFail", "D3DRS_STENCILZFAIL, &backZFail"),
+    ("D3DRS_CCW_STENCILPASS, &backPass", "D3DRS_STENCILPASS, &backPass"),
+    ("GameNativeOffscreenPass::all_stencil_ops_keep(",
+     "unconditional_read_only_stencil("),
+):
+    altered = stencil.replace(old, new, 1)
+    assert altered != stencil and not linked_stencil(altered), old
 assert "python tools/test_dx11_readonly_masked_main_game_00784.py" in workflow
 cxx = shutil.which("g++") or shutil.which("clang++")
 assert cxx, "C++17 compiler required"

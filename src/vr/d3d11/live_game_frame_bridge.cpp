@@ -5134,12 +5134,13 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
     DWORD stencilWriteMask = 0xffffffffu;
     const bool stencilMaskKnown = stencilEnabled == FALSE ||
         SUCCEEDED(game->GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask));
-    if (!GameNativeOffscreenPass::no_main_stencil_write(
-            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask))
-        return false;
-    const bool stencilWrites = stencilEnabled != FALSE &&
-        !game_stencil_is_read_only(
-            game, stencilEnabled, stencilMaskKnown, stencilWriteMask);
+    // A nonzero write mask alone does not make a stencil TEST writable:
+    // front and CCW KEEP operations preserve the main Z/S on both faces.
+    // Unknown operations or any writable face still abort native output.
+    const bool stencilReadOnly = game_stencil_is_read_only(
+        game, stencilEnabled, stencilMaskKnown, stencilWriteMask);
+    if (!stencilReadOnly) return false;
+    const bool stencilWrites = stencilEnabled != FALSE && !stencilReadOnly;
     ComPtr<IDirect3DSurface9> target, backbuffer;
     ComPtr<IUnknown> targetIdentity, identity;
     D3DSURFACE_DESC targetDesc{}, backbufferDesc{};
