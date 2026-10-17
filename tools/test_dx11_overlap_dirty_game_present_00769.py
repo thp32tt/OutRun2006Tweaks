@@ -58,7 +58,19 @@ for before, after in (
      "const auto& bounds = presentRegion;"),
     ("back.Get(), &targetTiles", "back.Get(), &destination"),
 ):
-    mutant = bridge.replace(before, after, 1)
+    # 00886 added an earlier real-game D3D9 postpass readback. Mutate the
+    # 00769 dirty-tile seed inside Present itself, not the independent
+    # pre-Present native replay path.
+    if before == "game->GetRenderTargetData(":
+        present_start = bridge.index("void before_game_present(")
+        tile_start = bridge.index(
+            "const auto multiDirty = GameNativeMultiDirtyUpload::select(",
+            present_start)
+        mutation_at = bridge.index(before, tile_start)
+        mutant = (bridge[:mutation_at] + after +
+                  bridge[mutation_at + len(before):])
+    else:
+        mutant = bridge.replace(before, after, 1)
     assert mutant != bridge and not integrated(mutant, header, coverage), before
 for before, after in (
     ("if (!allowOverlap)", "if (true)"),
