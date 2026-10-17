@@ -754,7 +754,8 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "onFlushFailure();" in cd and
          "recordDraw(drawScope, drawProducer);" in cd and
          cd.find("if (!succeeded)") < cd.find("if (!unchanged(previous))") <
-         cd.find("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);") and
+         cd.find("if (!cleanInternalFlush)") <
+         cd.rfind("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);") and
          "lastSuccessfulFlushMutationSerial = mutationSerial;" in ledger_flush_success and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_draw and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_begin and
