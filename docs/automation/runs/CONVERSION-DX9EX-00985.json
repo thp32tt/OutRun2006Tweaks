@@ -85,7 +85,9 @@
       "Do not infer that every HMD sky-double observation is caused by this deterministic reentrancy flaw; no Quest3 trace verifies this specific native callback nesting frequency.",
       "Do not touch C993 lens, overlay, car shadow, SkyGlow or original simulation/input/FFB to hide a stale GPU constant."
     ],
-    "per_eye_impact": "Stale world c64 data can make R84 per-eye transformed world draws refer to another camera/draw; exact binocular correctness requires later HMD evidence."
+    "per_eye_impact": "Stale world c64 data can make R84 per-eye transformed world draws refer to another camera/draw; exact binocular correctness requires later HMD evidence.",
+    "fix_evidence": "Real R84 game C++ uses a bounded independently owned thread-local native c64 callback scratch frame, fences source and verified-eye WVP publication by returned generation, and differentiates superseded native success from a genuine failed HRESULT. All four mandatory GitHub workflows succeeded on exact validation SHA 0607e66b.",
+    "negative_test_evidence": "Native game WVP upload C++ smoke covers separate nested callback buffers, original game-row fallback at depth limit, native error, stale generation and reuse. Full R84 x86 game/R26_SAFE, x64 host, HUD Inspector, Domain Isolation and full-source MSVC analysis succeeded at exact SHA; Quest3 visual validation remains UNTESTED."
   },
   "local_validation": {
     "cpp17_smoke": "PASS",
