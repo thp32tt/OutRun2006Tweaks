@@ -57,8 +57,13 @@ def preserves_game_pixel_uavs(source: str) -> bool:
         and "0u, nullptr, nullptr, outputSlots.uavStart" in portion
         and "outputSlots.uavCount, pixelOutputs + outputSlots.uavStart" in portion
         and portion.count("OMSetRenderTargetsAndUnorderedAccessViews(") == 2
-        and "outputSlots.uavCount ? pixelOutputs + outputSlots.uavStart : nullptr" in portion
-        and "outputSlots.uavCount ? keepCounters + outputSlots.uavStart : nullptr" in portion
+        # RT7 leaves zero PS UAV slots: StartSlot=8 is illegal, so native
+        # game eye GPU Copy restores MRT0..7 with the RTV-only API.
+        and "if (outputSlots.uavCount == 0u)" in portion
+        and "context->OMSetRenderTargets(rtCount, targets, depth);" in portion
+        # Every nonzero UAV tail must restore its original slot and counters.
+        and "pixelOutputs + outputSlots.uavStart," in portion
+        and "keepCounters + outputSlots.uavStart);" in portion
         and "counter = UINT(-1)" in portion
         and "for (auto* output : pixelOutputs)" in portion
         and portion.count("CSSetUnorderedAccessViews(") == 2
@@ -75,8 +80,12 @@ for old, replacement in [
     ("outputSlots.uavCount, pixelOutputs + outputSlots.uavStart",
      "outputSlots.uavCount, pixelOutputs"),
     ("OMSetRenderTargetsAndUnorderedAccessViews(", "OMSetRenderTargets("),
-    ("outputSlots.uavCount ? pixelOutputs + outputSlots.uavStart : nullptr",
-     "outputSlots.uavCount ? computeOutputs + outputSlots.uavStart : nullptr"),
+    ("pixelOutputs + outputSlots.uavStart,",
+     "computeOutputs + outputSlots.uavStart,"),
+    ("if (outputSlots.uavCount == 0u)",
+     "if (outputSlots.uavCount != 0u)"),
+    ("context->OMSetRenderTargets(rtCount, targets, depth);",
+     "context->OMSetRenderTargets(0u, nullptr, nullptr);"),
     ("counter = UINT(-1)", "counter = 0u"),
 ]:
     assert old in submit
