@@ -94,8 +94,12 @@ namespace OutRunVR::HudCommandBatch
         {
             if (!sameGeneration(previous))
                 return false;
-            if (!succeeded)
+            if (!succeeded || !sourceStillMatches)
             {
+                // Native D3DX Draw can replace its original producer without
+                // another hooked batch mutation. Never assign foreign GPU
+                // triangles to the previously captured +TIME/GOAL eye plane.
+                // Native Draw HRESULT and GPU submission remain unchanged.
                 onFlushFailure();
                 return false;
             }
@@ -107,7 +111,7 @@ namespace OutRunVR::HudCommandBatch
                 // this completed transition: never reattribute reentrant
                 // Draw/Begin, mixed commands, failed Flush or changed source.
                 const bool cleanInternalFlush =
-                    sourceStillMatches && active && drawCount == 0 &&
+                    active && drawCount == 0 &&
                     homogeneous && scope == Scope::None &&
                     producer == Producer::None &&
                     lastSuccessfulFlushMutationSerial != 0 &&

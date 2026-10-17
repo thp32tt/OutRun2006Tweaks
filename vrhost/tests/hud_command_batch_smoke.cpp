@@ -236,5 +236,26 @@ int main()
         l.producer != ProducerToken::GoalTime020)
         return 34;
 
+    // A producer can change during native Draw without any hooked D3DX
+    // mutation. That Draw must not inherit the prior +TIME GPU eye owner.
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    const auto beforeUntrackedSourceChange = l.snapshot();
+    if (l.completeNativeDraw(beforeUntrackedSourceChange,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime,false) ||
+        l.active || l.exactUniformOwner() || l.drawCount ||
+        l.producer != ProducerToken::None)
+        return 35;
+
+    // An actual later Begin reopens the native batch; unchanged-source
+    // +TIME glyphs still batch normally rather than flushing each Draw.
+    l.begin(&spriteB,true);
+    const auto cleanAfterSourceChange = l.snapshot();
+    if (!l.completeNativeDraw(cleanAfterSourceChange,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime,true) ||
+        !l.exactUniformOwner() || l.drawCount != 1 ||
+        l.producer != ProducerToken::StageExtensionTime)
+        return 36;
+
     return 0;
 }
