@@ -1,0 +1,80 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00984",
+  "production_id": "CONVERSION-DX9EX-00984",
+  "event_id": "CONVERSION-DX9EX-00984-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "INTEGRATED_VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "0eee6e54516146c2463cd1fb64e259764e30607d",
+  "source_paths": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/lens_centre_upload_transaction.hpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
+    "vrhost/CMakeLists.txt"
+  ],
+  "changed_files": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/game/lens_centre_upload_transaction.hpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00984.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Keep the original 0xD3A5/C993 central flare's source-owned c64/eye transform bound to the actual native GPU submission when game shader-constant hooks reenter; do not reproject a stale or foreign matrix.",
+    "scope_boundary": "R84 original-game c64 producer and native callback, preserving C993 fallback, CABE outer halos, world/road shaders, game input, FFB, SkyGlow, R26_SAFE and DXVK freeze.",
+    "special_work_evidence": "SetVertexShaderConstantFDest invalidated the old c64 evidence on entry, but both partial and full native callback returns could republish an outer WVP or clear a nested owner after an intervening game c64 upload. Original source scope was queried after the native callback, not fenced to its entering upload.",
+    "trace_stages": [
+      "Exact D3A5/C993 game producer owns the central 0x570002 source; original c64 setter records source-call, latched pose, shader epoch and top-level draw.",
+      "Every overlapping original game c64 setter gets a unique generation before invoking the native D3D9 call; original producer identity is sampled across that native boundary.",
+      "R84 raw game-WVP registry accepts a split or full C993 upload only when its native callback remains the authoritative generation, preserving later reentrant producers and the R33 original single-draw fallback."
+    ],
+    "subcomponents": [
+      "Add pure C++ source-stamp comparison for direct C993 call/pose/shader/draw and game-upload generation.",
+      "Wire generation and pre/post source fences into the real game c64 setter's split/full semantic paths; do not clear or relabel nested successful uploads from a stale outer callback.",
+      "Execute positive and mutation/negative C++ regression under the mandatory x64 host build, retain all Win32 R84/R26_SAFE and other required GitHub exact-SHA Gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_native_gpu_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original game D3A5/C993 source through SetVertexShaderConstantF to physical R84 per-eye c64",
+        "expected_behavior": "Uncontended complete or split original C993 source WVP can retain its exact raw owner; an older native callback cannot replace the newer source after a nested c64 mutation."
+      },
+      {
+        "id": "reentrant_fallback_and_outer_rings",
+        "category": "fallback_regression",
+        "behavior_area": "Original native HRESULT, nested source, reset/pose/shader/draw changes and CABE outer ring isolation",
+        "expected_behavior": "Foreign, new, changed-shader or reentrant source refuses stale stereo ownership without altering original D3D9 draw, FFB, SkyGlow, DXVK or R26_SAFE behavior."
+      },
+      {
+        "id": "exact_gate_and_hmd_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Portable C++ regression and exact GitHub Windows main/fallback/host/package plus Domain/affected inspection",
+        "expected_behavior": "All unchanged mandatory exact-SHA CI passes before BUILD_VERIFIED; real Quest3/VDXR binocular central flare remains UNTESTED until matched HMD evidence."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "score_delta_this_attempt": 0,
+  "diagnosis": {
+    "root_cause": "Native c64 return-time ownership was not fenced against newer game writes in the same call stack; an outer split/full C993 callback could republish stale WVP provenance after nested game writes.",
+    "original_evidence": "Source-review-confirmed ordering in SetVertexShaderConstantFDest; native-hook reentrancy remains a deterministic regression scenario, not an observed Quest3 cause.",
+    "alternatives_rejected": [
+      "Do not add duplicate C993 source hook, flatten world centre into head-locked HUD, alter alpha or remove verified CABE halo/SkyGlow."
+    ]
+  },
+  "next_action": "Verify immutable exact result SHA through mandatory GitHub Gates; leave Quest3/VDXR optics UNTESTED."
+}

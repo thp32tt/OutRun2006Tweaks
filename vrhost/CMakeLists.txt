@@ -203,6 +203,17 @@ add_custom_command(TARGET outrun-vr-pmt-node-cull-contract-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-pmt-node-cull-contract-smoke>"
     COMMENT "Run canonical PMT node-visible gate and patch-compatibility regression"
     VERBATIM)
+# Protect the real C993 native c64 hook against reentrant game writes:
+# this executable tests its source ownership transaction, not mock pixels.
+add_executable(outrun-vr-lens-upload-transaction-smoke
+    tests/lens_centre_upload_transaction_smoke.cpp)
+target_include_directories(outrun-vr-lens-upload-transaction-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-lens-upload-transaction-smoke)
+add_custom_command(TARGET outrun-vr-lens-upload-transaction-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-lens-upload-transaction-smoke>"
+    COMMENT "Run exact C993 source/native reentrancy and fallback regression"
+    VERBATIM)
 # The mandatory x64 host CI compiles and executes real C993 game-eye math.
 add_executable(outrun-vr-lens-eye-pose-smoke tests/lens_centre_eye_pose_smoke.cpp)
 target_include_directories(outrun-vr-lens-eye-pose-smoke PRIVATE
