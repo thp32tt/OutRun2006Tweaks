@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "INTEGRATED_VALIDATION_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "fdae7a57771ebe8d03c138399752ce5a19805f95",
@@ -68,7 +68,7 @@
   },
   "acceptance_results": {},
   "score_delta_this_attempt": 0,
-  "next_action": "Await exact-SHA GitHub DX9Ex Active, Domain Isolation and required Full Source Impact/HUD gate; headset acceptance remains UNTESTED.",
+  "next_action": "C6 PASS_EXACT_SHA at validation-bearing result SHA; actual Quest3/VDXR headset acceptance remains NEED_HMD_TEST, not runtime verified.",
   "material_result_sha": "3defb40584466c85a2ba4c3f346b3d8b7a37afe7",
   "last_ci_failure": {
     "run_id": 38986278079,
@@ -76,5 +76,32 @@
     "job": "policy",
     "cause": "Old Ledger checker expected direct native Flush/End/Draw methods removed by reentrant-safe native callback transaction.",
     "repair": "Update current ledger checker, add negative mutation assertions and keep all existing physical owner/lifecycle requirements."
+  },
+  "validation_bearing_result_sha": "98efd013664ad76f5a8ac3856341a42abd812083",
+  "c6_gate_evidence": {
+    "validation_sha": "98efd013664ad76f5a8ac3856341a42abd812083",
+    "verified_result": "PASS_EXACT_SHA",
+    "completed_checks": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38987180025,
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38987180035,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38987180029,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38987180007,
+        "conclusion": "success"
+      }
+    ]
   }
 }
