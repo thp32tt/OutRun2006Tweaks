@@ -81,6 +81,14 @@ def perf_check(root):
         ("R84 bounded indexedUP", "R30IndexedUpBounds::" in r30),
         ("R84 indexed sparse visit", "R30SeedTouchedXyzrhwVertices" in r30),
         ("R84 stereo world", "R30TransformWorldAffineStereo" in r30),
+        ("R84 R62 native HUD exact owner", "const bool exactHud = CorroboratesHud(sourceScope)" in r30),
+        ("R84 R62 original FVF142 constraint", "fvf != 0x00000142u" in r30),
+        ("R84 R62 same finite eye plane", "state.stageExtensionClipFromGameNdc[eye]" in r30),
+        ("R84 R62 HUD restore", '"R84/R62-FVF142-NativeScreenHud"' in r30),
+        ("R84 R62 indexed dispatcher", "R30SupportTryFixedFunctionProjectedRankIndexed" in r33),
+        ("R84 explicit GUI cockpit basis", "'-CockpitCameraBasis $cameraBasis'" not in "" and
+            "-CockpitCameraBasis $cameraBasis" in (root / "tools/OutRunVR-Slot-Selector.ps1").read_text(encoding="utf-8-sig")),
+        ("R84 native cockpit stable", "VRDriverSeatCarSpaceBasis{ \"VR\", \"DriverSeatCarSpaceBasis\", false," in (root / "src/vr/settings.cpp").read_text(encoding="utf-8-sig")),
         ("R84 R29 perf cache", "R29" in r29 and "cache" in r29.lower()),
         ("R84 sole dispatcher", "R33" in r33 and "R30" in r33),
     ]
