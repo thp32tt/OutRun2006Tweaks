@@ -6,9 +6,9 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 
 $slots=[ordered]@{
-    'A_SEAT_STOCK'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.00';Title='A 운전석 기본 크기 100%';Help='운전석 ON, 전체 차체 1.00x / 위치는 F11에서 조절.'}
-    'B_SEAT_115'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.15';Title='B 운전석 차량 115%';Help='운전석 ON, 전체 차체 1.15x / 이전 실험 기본 배율.'}
-    'C_SEAT_130'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.30';Title='C 운전석 차량 130%';Help='운전석 ON, 전체 차체 1.30x / 시야 가림 및 위치 확인.'}
+    'A_SEAT_STOCK'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.00';Title='A 운전석 기본 크기 100%';Help='안정화: native 카메라 좌표계 고정. 차량 1.00x, 위치 F11 조절.'}
+    'B_SEAT_115'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.15';Title='B 운전석 차량 115%';Help='안정화: native 카메라 좌표계 고정. 차량 1.15x.'}
+    'C_SEAT_130'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.30';Title='C 운전석 차량 130%';Help='안정화: native 카메라 좌표계 고정. 차량 1.30x.'}
     'CURRENT_FOCUS'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='MAIN R84 / R29-R33';Help='기본 구조 개선 렌더러. Quest3 검증 필요.'}
     'R26_SAFE'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R26 SAFE / 기존 보호판';Help='기존 R26+HUD 렌더러 복귀. CURRENT FOCUS로 R84 재선택.'}
     'R84_TEST'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R84 TEST / 개편 경로';Help='기본 R84와 동일한 독립 렌더러 A/B 진단.'}
@@ -16,7 +16,7 @@ $slots=[ordered]@{
     'B_HUD'=[ordered]@{Backend='d3d9';Profile='HUD_SCREEN';Title='B HUD';Help='6th/6, YES/NO, 시간/랭크 HUD 확인.'}
     'C_FLARE'=[ordered]@{Backend='d3d9';Profile='HUD_WORLD';Title='C FLARE / WORLD';Help='렌즈 플레어/월드 마커 producer 진단.'}
     'D_PERF'=[ordered]@{Backend='d3d9';Profile='PERFORMANCE';Title='D PERFORMANCE';Help='프레임 페이싱/fence telemetry.'}
-    'G_COCKPIT'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Title='G COCKPIT + PARTICLES (실험)';Help='운전석/전체 차량/운전자 가림과 검증된 WorldParticle 양안 업로드 시험. 유리 PMT 교체는 포함하지 않음.'}
+    'G_COCKPIT'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Title='G COCKPIT + PARTICLES (실험)';Help='카메라 native 좌표계 고정. 기존 카메라 확대축소 반복 개선 확인용; HMD 검증 필요.'}
     'E_DXVK_SAFE'=[ordered]@{Backend='dxvk-safe';Profile='CORRECTNESS';Title='E DXVK SAFE (진단)';Help='현재 SBS/DesktopDup fallback 재현용. 성능 기준으로 사용 금지.'}
 }
 
@@ -83,12 +83,13 @@ function Start-Slot([string]$slot){
     if ($gpuSetting -eq 'ON' -and $cfg.Backend -ne 'd3d9') { throw 'GPU detailed profiling is DX9Ex-only.' }
     $vehicleScale=if($cfg.Contains('Scale')){[string]$cfg.Scale}else{'DEFAULT'}
     $glassProbe=if($cfg.Contains('Scale')){[string]$glassProbeBox.SelectedItem}else{'DEFAULT'}
+    $cameraBasis=if($cfg.Profile -eq 'COCKPIT_PARTICLES'){'NATIVE'}else{'DEFAULT'}
     $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile,'-GpuDiagnostics',$gpuSetting,'-CockpitVehicleScale',$vehicleScale,'-CockpitGlassProbeOpacity',$glassProbe)
     # Start-Process joins string[] arguments without quoting the -File value.
     # Quote the full script path; OutRun is often installed under a folder
     # containing spaces. The runner trap writes a launch error + modal dialog.
     $quotedRunner = '"' + $runner + '"'
-    $launchArgs = "-NoProfile -ExecutionPolicy Bypass -File $quotedRunner -TestProfile $($cfg.Profile) -GpuDiagnostics $gpuSetting -CockpitVehicleScale $vehicleScale -CockpitGlassProbeOpacity $glassProbe"
+    $launchArgs = "-NoProfile -ExecutionPolicy Bypass -File $quotedRunner -TestProfile $($cfg.Profile) -GpuDiagnostics $gpuSetting -CockpitVehicleScale $vehicleScale -CockpitGlassProbeOpacity $glassProbe -CockpitCameraBasis $cameraBasis"
     Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $launchArgs -WorkingDirectory $root -WindowStyle Normal -ErrorAction Stop
 }
 
