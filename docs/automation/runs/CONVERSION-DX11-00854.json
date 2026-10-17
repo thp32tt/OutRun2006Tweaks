@@ -53,7 +53,26 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
-    "activation_guard_and_fallback": "Native eye Draw remains opt-in; original D3D9Ex draw/FFB and DXVK frozen paths unchanged. Full game/HMD behavior untested."
+    "activation_guard_and_fallback": "Native eye Draw remains opt-in; original D3D9Ex draw/FFB and DXVK frozen paths unchanged. Full game/HMD behavior untested.",
+    "integration_path": [
+      "Existing live D3D9 game-owned per-camera GPU source and chronological postpass events -> private shader-readable D3D11 GPU copy for DEFAULT bindless array source",
+      "Native L/R source-slice validation -> source-ordered per-eye D3D11 Stretch/Copy replay, with original game Draw/DrawIndexed and eye ring ownership preserved",
+      "Native eye frame producer -> guarded presentation/OpenXR transport with original DX9Ex Draw/input/FFB fallback; real-game/Quest3 visual parity remains UNTESTED"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00854 existing material a570c765 and validation-bearing 8172dd16: native_game_stereo_submission.cpp private GPU CopyResource staging for per-eye SourceStretch; native WARP positive L/R pixels; Windows Build 38989117065 SUCCESS",
+      "negative_regression": "00854 exact SHA 8172dd16 Backend 38989114415 and Windows Build 38989117065 SUCCESS: reject foreign array camera slice and unsupported source; original D3D9Ex input/FFB and DXVK freeze preserved",
+      "component_integration": "D3D9 camera postpass source chronology -> source slice GPU-only DEFAULT resource -> private D3D11 SRV staging -> bilaterally validated native-eye draw/Copy/Stretch -> existing ring/host eye handoff; source-completion is not HMD gameplay evidence"
+    },
+    "conflict_keys": [
+      "DX11:GAME_GPU_COPY_ONLY_STEREO_SCALED_STRETCH"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Existing game-owned source to native stereo eye GPU source pipeline is build-and-WARP verified on 8172dd16 (5/5 required CI); live full menu-to-race final image, Quest3/VDXR depth/performance and gamepad evidence remain UNTESTED, and no renderer promotion is claimed."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.cpp",
