@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01003",
+  "production_id": "CONVERSION-DX9EX-01003",
+  "event_id": "CONVERSION-DX9EX-01003-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_CI_PENDING",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "8f70c8694ecb120a1e98a54ec9eff81264e4ee28",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01003.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Restore the whole original GOAL result and 0–99% progress presentation across source-game screen pixels and XR native eye RTs without stretching the final score glyphs, while preserving complete binocular finite-HUD ownership and the native game fallback.",
+    "scope_boundary": "Only original GOAL progress, final B9200, print and time helper fixed-function/XYZRHW sprite pixel interpretation. Preserve +TIME, HUD, ESC, F11, menus, world, SkyGlow, input/FFB, R26_SAFE, independent DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Two original 0–99% result progress E8 calls, original time/helper E8 calls and nineteen B9200 glyph producer parents assign distinct source tokens that survive direct D3DX and SpriteNode queue replay.",
+      "Exact GPU Draw source scope and producer in R84 R30 choose game-native 2D resolution rather than XR physical RT dimensions for GOAL fixed-function/XYZRHW, while shader c64 keeps its original game WVP.",
+      "Two independently projected R84 OpenXR eyes use the shared head-local finite result plane and transactional pixel-pair viewport conversion, with native fallback on invalid source dimensions or pose."
+    ],
+    "subcomponents": [
+      "Repair full exact GOAL fixed-function family pixel extent to agree with source-native result shader glyphs and preexisting six-call +TIME implementation, without changing default generic HUD/unknown draws.",
+      "Verify original percent, time and final text tokens at 3440×1440 to 2496×2688 plus equal-sized desktop display, right-eye rejection, unrelated producers, and HMD-only optic acceptance boundaries."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_native_progress_result_layout",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL percentage and final text through exact D3DX/XYZRHW to independent eyes",
+        "expected_behavior": "Both original GOAL progress 0–99 percent and final result/time five source families map native presentation pixels into VR left and right targets instead of assuming physical target extent, preserving source geometry and optical parallax."
+      },
+      {
+        "id": "goal_native_fallback_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Native desktop and unrelated draw ownership",
+        "expected_behavior": "Original 1:1 desktop source, +TIME independent producer, game HUD, F11/ESC, unknown and world do not inherit GOAL rescaling; invalid source dimensions and bad eye projection preserve the original draw or return without half-pair output."
+      },
+      {
+        "id": "goal_exact_sha_r84_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Windows R84 and R26_SAFE host/package validation",
+        "expected_behavior": "Required DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector as applicable validate the final exact source SHA, while real Quest3 binocular GOAL layout is separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_native_progress_result_layout": "PENDING_CI",
+    "goal_native_fallback_isolation": "PENDING_CI",
+    "goal_exact_sha_r84_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R30BuildStageExtensionXyzrhwEyePlane reads original game screen_resolution only when CurrentRenderProducerToken equals StageExtensionTime. GOAL progress, time, original OutRunStagePrintf and B9200 result display travel the same finite-2D plane but otherwise decode native game pixels against physical XR RT viewport, causing a source/target extent mismatch when dimensions differ.",
+    "original_evidence": "R30BuildStageExtensionXyzrhwEyePlane source branch explicitly says +TIME only and excludes GOAL; the shared per-eye renderer calls ProjectPixelPair for GOAL using state.viewport even though original 0x97xxx/0xBExxx producers originate in game presentation coordinates. This is a static source-math mismatch, not yet an HMD-observed confirmed root cause.",
+    "source_trace": [
+      "Original GOAL source parents register direct and queued ScreenHud/ResultProgress, GoalTime020/150, OutRunStagePrintf and ResultTextB9200 source ownership.",
+      "R84 physical CapturePhysicalDrawCommand and GoalPhysical::IsGoal gate avoid retroactively promoting generic HUD or world, with exact producer identity retained across D3DX registration and physical GPU submission.",
+      "R30 finite eye plane projects native-game 2D pixels for every admitted exact result into independent native XR target extents; shader/GOAL raw original c64 remains unchanged."
+    ],
+    "alternatives_rejected": [
+      "Do not globally scale XR RT, change HUD plane depth, de-duplicate sprites, or alter GOAL timer: those cannot correct source-vs-physical viewport ambiguity and would regress protected visuals."
+    ],
+    "eye_ownership": "Exact GOAL source uses one latched pose, two separate R84 eye projection matrices and atomic two-eye ProjectPixelPairAcrossViewports; no per-eye transform is derived from a previous world/HUD draw."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check final exact-SHA Windows GitHub Actions on material source commit; repair true CI failures only under this TASK_ID. Quest3/VDXR HMD visual outcome remains UNTESTED, no asserted runtime pass."
+}

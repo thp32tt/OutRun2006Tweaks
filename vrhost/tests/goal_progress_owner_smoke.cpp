@@ -2,6 +2,8 @@
 #include "../../src/vr/game/goal_result_parent_provenance.hpp"
 #include "../../src/vr/game/goal_progress_physical_source.hpp"
 #include <iostream>
+#include <cmath>
+#include "../../src/vr/d3d9/stage_extension_eye_plane.hpp"
 
 using namespace OutRunVR::GameSemantic;
 
@@ -213,8 +215,80 @@ static bool CheckGoalPhysicalBothEyeSources()
             ProducerToken::GoalTime020, false, nullptr, 0, 8, 15, 0, 0});
 }
 
+
+// Verify that the five original GOAL producer families, including both
+// progress helpers and final result text, agree with +TIME on the original
+// 2D-to-native-eye viewport path. The physical XR RT must not be interpreted
+// as the source pixel extent; unknown sprites must retain their old path.
+static bool CheckGoalOriginalPresentationPixels()
+{
+    using namespace OutRunVR::GameSemantic;
+    using namespace OutRunVR::GoalPhysical;
+    using OutRunVR::StageExtensionPlane::ProjectPixelPairAcrossViewports;
+    const float left[16]{
+        1,0,0,0, 0,1,0,0, 0,0,1,0, -0.04f,0,0,1};
+    const float right[16]{
+        1,0,0,0, 0,1,0,0, 0,0,1,0, 0.04f,0,0,1};
+    auto near = [](float a, float b) {
+        return std::isfinite(a) && std::fabs(a-b) < 0.02f;
+    };
+    const ProducerToken goalFamilies[]{
+        ProducerToken::ResultProgress, ProducerToken::GoalTime020,
+        ProducerToken::GoalTime150, ProducerToken::OutRunStagePrintf,
+        ProducerToken::ResultTextB9200};
+    for (const auto token : goalFamilies)
+    {
+        Source draw{RenderScope::ScreenHud, token, false};
+        if (!IsGoal(draw) ||
+            !CanReprojectFiniteResultHudPlane(draw.scope, draw.producer))
+            return false;
+        // Original 3440x1440 game source, XR 2496x2688 right/left RT:
+        // keep the native 1720x720 screen centre while preserving stereo
+        // parallax. Verify both progress and final result families.
+        float lx=0, ly=0, rx=0, ry=0;
+        if (!ProjectPixelPairAcrossViewports(left,right,1720,720,
+                0,0,3440,1440,0,0,2496,2688,1,
+                lx,ly,rx,ry) ||
+            !near(lx,1198.08f) || !near(rx,1297.92f) ||
+            !near(ly,1344.f) || !near(ry,1344.f))
+            return false;
+        // Native 1:1 game/eye desktop output does not resize results.
+        if (!ProjectPixelPairAcrossViewports(left,right,960,540,
+                0,0,1920,1080,0,0,1920,1080,1,
+                lx,ly,rx,ry) ||
+            !near(lx,921.6f) || !near(rx,998.4f) ||
+            !near(ly,540.f) || !near(ry,540.f))
+            return false;
+    }
+    for (const auto foreign : {
+             ProducerToken::None, ProducerToken::OutRunHudText,
+             ProducerToken::StageExtensionTime,
+             ProducerToken::DispRankClipSprite})
+    {
+        if (IsGoal(Source{RenderScope::ScreenHud, foreign}))
+            return false;
+    }
+    if (IsGoal(Source{RenderScope::ScreenOverlay2D,
+                     ProducerToken::ResultProgress}) ||
+        IsGoal(Source{RenderScope::WorldBillboard,
+                     ProducerToken::ResultTextB9200}))
+        return false;
+    // A bad right eye, invalid native source or missing source extent
+    // must publish neither half of the pair.
+    const float badEye[16]{};
+    float lx=11.f,ly=13.f,rx=17.f,ry=19.f;
+    if (ProjectPixelPairAcrossViewports(left,badEye,1720,720,
+            0,0,3440,1440,0,0,2496,2688,1,lx,ly,rx,ry) ||
+        ProjectPixelPairAcrossViewports(left,right,1720,720,
+            0,0,0,1440,0,0,2496,2688,1,lx,ly,rx,ry) ||
+        lx!=11.f || ly!=13.f || rx!=17.f || ry!=19.f)
+        return false;
+    return true;
+}
+
 int main()
 {
+    if (!CheckGoalOriginalPresentationPixels()) return 9;
     if (!CheckGoalPhysicalBothEyeSources()) return 8;
     if (!CheckB9200DirectGpuSource()) return 7;
     if (!CheckVerifiedB9200GpuOwnership()) return 6;

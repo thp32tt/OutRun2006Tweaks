@@ -3399,12 +3399,25 @@ namespace OutRunVRStereo
                 return false;
             state.stageExtensionScale = hudScale;
             state.stageExtensionPostEyeVerticalPixels = postEyeVerticalPixels;
-            // Six exact +TIME producer calls use game presentation pixels.
-            // The physical XR viewport may have a different aspect/extent.
-            // Only +TIME adopts separate input coordinates. All other HUD,
-            // GOAL, pause, SkyGlow and generic scene sprites stay untouched.
-            if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime &&
+            // The original +TIME sprite/numeric and GOAL progress/result
+            // producers both submit game-presentation pixels; their D3DX
+            // fixedfn/XYZRHW draws may be deferred into an XR-sized RT.
+            // A previous fix decoded +TIME against the game extent but
+            // incorrectly decoded the five exact GOAL families against the
+            // physical XR target, displacing/resizing the same result beside
+            // source-owned shader glyphs. Require an exact physical result
+            // producer: never remap ordinary HUD, ESC, F11, world or SkyGlow.
+            // Native same-size output still takes the unchanged pixel path.
+            const auto resultDraw =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool goalPresentationPixels =
+                resultDraw.IsExactFiniteResultHud() &&
+                OutRunVR::GoalPhysical::IsGoal(
+                    OutRunVR::GoalPhysical::Source{
+                        resultDraw.scope, resultDraw.producer});
+            if ((OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+                 goalPresentationPixels) &&
                 Game::screen_resolution)
             {
                 const float gameWidth = Game::screen_resolution->x;
@@ -5133,10 +5146,10 @@ namespace OutRunVRStereo
                             &state.stageExtensionClipFromGameNdc[0]);
                         const float* rclip = reinterpret_cast<const float*>(
                             &state.stageExtensionClipFromGameNdc[1]);
-                        // Same-resolution desktop/R84 path remains exactly
-                        // unchanged, including HUD/GOAL and the original
-                        // two-eye projection. Only verified source-produced
-                        // +TIME quads can change input viewport dimensions.
+                        // Same-resolution desktop/R84 path stays unchanged.
+                        // Only exact +TIME or GOAL fixedfn/XYZRHW sprites,
+                        // percent digits and result glyphs use game-pixel
+                        // dimensions when XR's physical viewport differs.
                         const bool separate2D =
                             state.stageSource2DWidth > 0.f &&
                             state.stageSource2DHeight > 0.f &&
