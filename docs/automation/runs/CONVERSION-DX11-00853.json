@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "6de297c4b0898365894a63c38068ff2639183d8e",
-  "status": "SOURCE_IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -57,8 +57,8 @@
       "Preserve game/native Draw count, original D3D9Ex input/FFB and owner/GPU ring isolation"
     ],
     "acceptance_proof": {
-      "positive_probe": "Source-scope validation: per-camera GPU CopyResource into bindless DEFAULT array, SourceCopy event and direct native Copy with two-eye WARP readback assertions added; Windows WARP and final five CI gates pending",
-      "negative_regression": "Invalid source slice, fully off-eye destination and bindless GPU-only Stretch fail-closed tests included; old shader-copy/RT-only/MSAA conversion checks retained",
+      "positive_probe": "Win32 native transport WARP regression SUCCESS run 38987696442 on exact material bc394447 with actual per-camera GPU CopyResource-only eye pixels in chronological timeline and direct per-eye copy.",
+      "negative_regression": "Win32 native transport WARP regression SUCCESS run 38987696442: invalid source slice, off-eye destination, bindless SourceStretch both-eye preflight rejected with draw counts and DX9Ex fallback protected.",
       "component_integration": "Actual game-owned per-camera GPU texture -> GPU-only DEFAULT CopyResource array -> bilateral native Copy preflight -> chronological eye CopySubresourceRegion -> native left/right frame publication and host transport"
     },
     "conflict_keys": [
@@ -71,7 +71,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "Source-level implementation with WARP regression prepared; final exact SHA and real Quest3/VDXR menu/car/race parity not yet verified",
+    "visible_frame_acceptance": "Native L/R GPU CopyResource-only source C++ and WARP exact-source regression, all five exact-SHA GitHub Actions SUCCESS; real game menu/car/race and Quest3/VDXR visual parity remain NEED_HMD_TEST.",
     "activation_guard_and_fallback": "Native path remains opt-in; only same-format single-sample BindFlags=0 DEFAULT GPU texture is newly allowed, texture sampling/Stretch rejected; DX9Ex game Draw/input/FFB original fallback unchanged"
   },
   "changed_files": [
@@ -79,27 +79,45 @@
     "tools/dx11_native_transport_probe.cpp"
   ],
   "acceptance_results": {
-    "end2end": "PENDING_WARP",
-    "fallback": "PENDING_WARP",
-    "gates": "PENDING_EXACT_SHA"
+    "end2end": "PASS_BUILD",
+    "fallback": "PASS_STATIC_AND_WARP_NEGATIVE_REGRESSION",
+    "gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "pipeline": {
-    "C0_RECOVER": "PASS: verified exact 6de297c4 HEAD and prior 00852 five CI SUCCESS",
-    "C1_REVIEW": "PASS: DEVICE_LOCAL DEFAULT BindFlags=0 game CopyResource output was rejected by native copy and two-eye timeline admission",
-    "C2_IMPLEMENT": "PASS_SOURCE: native same-format single-sample GPU-only Copy path plus bilateral WARP test setup",
-    "C3_VALIDATE": "PENDING: WARP and five mandatory GitHub exact-SHA workflows",
-    "C4_COMMIT": "SOURCE MATERIAL_COMMIT being published without CI skip",
+    "C0_RECOVER": "PASS: base GitHub HEAD 6de297c4 and 00852 complete record reviewed",
+    "C1_REVIEW": "PASS: confirmed native GPU Copy and bilateral preflight reject valid game CopyResource DEFAULT BindFlags=0 source",
+    "C2_IMPLEMENT": "PASS: source material bc3944478a271308a336384f5c58e51a3eefa41d implemented native same-format GPU-only Copy, bilateral SourceCopy preflight, GPU pixel and negative WARP regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA: bc3944478a271308a336384f5c58e51a3eefa41d GitHub DX11 Fast 38987696441, Backend 38987696447, Windows Build 38987699705, OpenXR 38987699703/38987696413 and HUD 38987699714 all SUCCESS; native transport WARP 38987696442 SUCCESS",
+    "C4_COMMIT": "PASS: substantive C++ and WARP implementation material bc3944478a271308a336384f5c58e51a3eefa41d [AUTO:CONVERSION-DX11-00853] without CI-skip; following C6 bookkeeping is separate [skip ci] commit",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA, Quest3/VDXR UNTESTED"
+    "C6_STATE": "PASS_EXACT_SHA: exact material and validation bearing bc3944478a271308a336384f5c58e51a3eefa41d all five CI success; physical Quest3/VDXR gamepad/FFB and real gameplay UNTESTED, full DX11 renderer incomplete"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Inspect CI for this exact material SHA. On a real failure, repair same TASK_ID on this branch. When all required Gates pass, seal C6 in a separate [skip ci] bookkeeping commit while preserving material SHA, runtime UNTESTED and score deduplication.",
+  "next_action": "Do not retry or re-score 00853. Same-SHA five mandatory CI and WARP are SUCCESS; GPU-only native copy source stage BUILD_VERIFIED. Full native game/menu/car/race and Quest3 stereo/input/performance remain need real integrated development/HMD test under a non-conflicting controller lease.",
   "evidence": {
+    "material_sha": "bc3944478a271308a336384f5c58e51a3eefa41d",
+    "validation_bearing_sha": "bc3944478a271308a336384f5c58e51a3eefa41d",
+    "native_transport_warp_run_id": 38987696442,
+    "native_transport_warp_conclusion": "success",
+    "dx11_fast_run_id": 38987696441,
+    "dx11_fast_conclusion": "success",
+    "backend_gate_run_id": 38987696447,
+    "backend_gate_conclusion": "success",
+    "windows_build_run_id": 38987699705,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38987699703,
+    "openxr_conclusion": "success",
+    "openxr_secondary_run_id": 38987696413,
+    "openxr_secondary_conclusion": "success",
+    "hud_inspector_run_id": 38987699714,
+    "hud_inspector_conclusion": "success",
     "game_quest3_vdxr": "UNTESTED",
     "gamepad_input": "UNTESTED",
-    "material_native_transport_warp_conclusion": "PENDING",
     "native_visual_parity": "NEED_HMD_TEST"
-  }
+  },
+  "material_result_sha": "bc3944478a271308a336384f5c58e51a3eefa41d",
+  "validation_bearing_result_sha": "bc3944478a271308a336384f5c58e51a3eefa41d",
+  "result_sha": "bc3944478a271308a336384f5c58e51a3eefa41d"
 }
