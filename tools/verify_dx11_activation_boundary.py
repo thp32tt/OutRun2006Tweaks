@@ -236,6 +236,118 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
     return missing
 
 
+
+def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[str]:
+    """Admit exactly two source-owned camera geometry draws, not eye evidence.
+
+    These are real D3D11 Draws and must remain under the same frame/pose
+    submission owner. They only advance chronological source draw ordinals:
+    a separately verified game Copy/Stretch supplies XR eye color.
+    """
+    def section(start: str, end: str) -> str:
+        return source.partition(start)[2].partition(end)[0]
+
+    target = section(
+        "bool NativeGameEyeDrawEncoder::game_source_target_bound(",
+        "\nbool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(")
+    preflight = section(
+        "bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(",
+        "\nbool NativeGameEyeDrawEncoder::draw_offscreen(")
+    plain = section(
+        "bool NativeGameEyeDrawEncoder::draw_offscreen(",
+        "\nbool NativeGameEyeDrawEncoder::draw_offscreen_indexed(")
+    indexed = section(
+        "bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(",
+        "\nvoid NativeGameEyeDrawEncoder::set_source_clear_timeline(")
+
+    source_guards = [
+        "if (!context_ || !eyeTarget_ || !gameTarget || gameTarget == eyeTarget_)",
+        "context_->OMGetRenderTargets(1u, &actual, nullptr);",
+        "const bool bound = actual == gameTarget;",
+        "if (!bound) return false;",
+        "gameTarget->GetResource(sourceResource.GetAddressOf());",
+        "eyeTarget_->GetResource(eyeResource.GetAddressOf());",
+        "sourceResource.Get() == eyeResource.Get()",
+        "if (FAILED(sourceResource.As(&source)) || !source) return false;",
+        "context_->GetDevice(producer.GetAddressOf());",
+        "source->GetDevice(sourceOwner.GetAddressOf());",
+        "if (!producer || producer.Get() != sourceOwner.Get()) return false;",
+        "D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX",
+        "D3D11_RESOURCE_MISC_SHARED_NTHANDLE",
+        "desc.Usage != D3D11_USAGE_DEFAULT",
+        "desc.CPUAccessFlags || (desc.MiscFlags & sharedFlags)",
+        "(desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u",
+        "context_->RSGetViewports(&count, &view);",
+        "std::isfinite(view.TopLeftX) && std::isfinite(view.TopLeftY)",
+        "view.Width > 0.f && view.Height > 0.f",
+        "view.TopLeftX < static_cast<float>(desc.Width)",
+        "view.TopLeftY < static_cast<float>(desc.Height)",
+        "view.TopLeftX + view.Width > 0.f",
+        "view.TopLeftY + view.Height > 0.f;",
+    ]
+    preflight_guards = [
+        "if (!game_source_target_bound(gameTarget) ||",
+        "drawCount_ == (std::numeric_limits<std::uint64_t>::max)())",
+        "if (sourceClears_ &&",
+        ".afterDrawOrdinal <= drawCount_)",
+        "ScopedNativePostpassOutputs restore(context_);",
+        "context_->OMSetRenderTargets(1u, &eye, eyeDepth_);",
+        "if (!replay_due_source_clears()) return false;",
+        "return game_source_target_bound(gameTarget);",
+    ]
+    plain_guards = [
+        "if (!vertexCount || !prepare_offscreen_game_draw(gameTarget))",
+        "context_->Draw(vertexCount, startVertex);",
+        "++drawCount_;",
+    ]
+    indexed_guards = [
+        "if (!indexCount || !prepare_offscreen_game_draw(gameTarget))",
+        "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
+        "++drawCount_;",
+    ]
+    proof = [
+        "encoder.draw_offscreen(gameOffscreen, 3u, 0u)",
+        "encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0)",
+        "!encoder.draw_offscreen(eyeTarget, 3u, 0u)",
+        "!encoder.draw_offscreen(nullptr, 3u, 0u)",
+        "!encoder.draw(3u, 0u)",
+        "encoder.draw_count() == beforeOffscreen + 1u",
+        "encoder.color_draw_count() == beforeOffscreenEyeColor",
+        "encoder.copy_game_surface(",
+        "fixture.offscreenGameColor, &offscreenPatch,",
+        "gameEyeFixture.replayedOffscreenGameDraw[0] &&",
+        "gameEyeFixture.replayedOffscreenGameDraw[1] &&",
+    ]
+    missing = [
+        "offscreen-target:" + token for token in source_guards if token not in target
+    ]
+    missing += [
+        "offscreen-timeline:" + token for token in preflight_guards
+        if token not in preflight
+    ]
+    missing += [
+        "offscreen-draw:" + token for token in plain_guards if token not in plain
+    ]
+    missing += [
+        "offscreen-indexed:" + token for token in indexed_guards
+        if token not in indexed
+    ]
+    missing += [
+        "offscreen-probe:" + token for token in proof if token not in transport_probe
+    ]
+    for label, block, calls in (
+        ("target", target, []),
+        ("timeline", preflight, []),
+        ("draw", plain, ["->Draw("]),
+        ("indexed", indexed, ["->DrawIndexed("]),
+    ):
+        if not block or DRAW_DISPATCH.findall(block) != calls:
+            missing.append("offscreen-" + label + ": unexpected GPU Draw dispatch")
+        if "colorDrawCount_" in block or "authoredColorPostpassCount_" in block:
+            missing.append("offscreen-" + label + ": fabricated eye-color evidence")
+    return missing
+
+
 def main() -> None:
     # Keep every ID3D11DeviceContext Draw* entry point inside the dormant
     # activation boundary. DrawAuto is easy to omit because it has no explicit
@@ -430,6 +542,7 @@ def main() -> None:
                 encoding="utf-8")
             missing += audit_native_partial_depth_clear(text, depth_probe)
             missing += audit_native_partial_color_clear(text)
+            missing += audit_native_offscreen_game_draw(text, depth_probe)
             missing += ["postpass:" + token for token in required_postpass
                         if token not in postpass]
             postpass_draws = DRAW_DISPATCH.findall(postpass)
@@ -438,7 +551,8 @@ def main() -> None:
                 missing.append("postpass must issue one bounded non-evidence Draw")
             dispatches = [match.group(0).replace(" ", "") for match in matches]
             if missing or dispatches != [
-                    "->Draw(", "->DrawIndexed(",
+                    "->Draw(", "->DrawIndexed(",  # game-created offscreen RTV
+                    "->Draw(", "->DrawIndexed(",  # actual XR eye RTV
                     "->DrawInstanced(", "->DrawIndexedInstanced(",
                     "->Draw(", "->Draw(", "->Draw("]:
                 violations.append(
