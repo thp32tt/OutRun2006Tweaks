@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01014",
+  "production_id": "CONVERSION-DX9EX-01014",
+  "event_id": "CONVERSION-DX9EX-01014-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "8a3542572ad66cc15f1a3e1acd4b0d99ff148d05",
+  "material_result_sha": "23742fcaf9b74d4e16c3028db021e680563432df",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01014.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve the complete stage-extension +TIME stereo sprite and numeric glyph submission by ensuring both physical eyes belong to the same original game c64 WVP writer even when the native left GPU Draw reenters another writer; retain the entire original queue, host and fallback path.",
+    "scope_boundary": "Only +TIME exact ScreenHud original WVP upload generation across the R84 R33 physical native left/right GPU submission. Do not relabel unrelated GOAL, HUD, lenses, rank, world or SkyGlow, and do not touch R26_SAFE, DXVK, FFB, input or original timer logic.",
+    "trace_stages": [
+      "Original OutRun six +TIME E8 sprite and numeric glyph parents tag physical StageExtensionTime source on either direct or SpriteNode queued D3DX producer.",
+      "R84 R33 captures the physical +TIME queue token, pose, shader and original-game c64 WVP write/draw generations before and after native LEFT Draw; a reentrant original game c64 writer invalidates the prepared RIGHT eye.",
+      "Existing R84 R30 native shader and fixed-function/XYZRHW eye draws and host OpenXR composition continue unchanged when generation matches, with original native fallback for invalid or missing evidence."
+    ],
+    "subcomponents": [
+      "Attach original WVP write-serial and write-draw identity to both direct numeric glyph and queued sprite physical sources, requiring complete stamp consistency while allowing the existing no-evidence fallback.",
+      "Fence R84 native LEFT/RIGHT against same-shader and same-node reentrant original game c64 writes without touching current eye constants, F11, GOAL, lens outer disks or SkyGlow.",
+      "Add executable host C++ smoke positives and negative mutations for both source routes, partial stamp, same physical owner, changed write serial and changed draw generation, then exact-SHA native Windows integration."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_complete_original_c64_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original game +TIME sprite and numeric sources into R33 physical native shader stereo eye submission",
+        "expected_behavior": "A native LEFT Draw that reenters another original c64 writer is rejected before RIGHT, while matching direct and queued +TIME GPU owner stamps retain stereo eligibility."
+      },
+      {
+        "id": "stage_legacy_fallback_and_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Direct and queued stage identity, absent/incomplete raw proof, original native fallback, unrelated visual and device/input paths",
+        "expected_behavior": "Null raw source evidence preserves the previous conservative behavior, incomplete or mutated generations fail closed, and unrelated original GOAL/F11/world/FFB/SkyGlow and R26_SAFE remain unchanged."
+      },
+      {
+        "id": "stage_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 full-chain x86 plus R26_SAFE x86, x64 host and package with DX9Ex Active/Domain/HUD Inspector/Full Source Impact CI",
+        "expected_behavior": "The exact validation-bearing GitHub commit passes all required existing Windows game/host/package and policy/Inspector gates; matching Quest3 VDXR visual test remains explicitly UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_complete_original_c64_owner": "PENDING_EXACT_SHA",
+    "stage_legacy_fallback_and_negative": "PENDING_EXACT_SHA",
+    "stage_exact_sha_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R33 StageExtensionPhysical previously captured only queue/producer/pose/shader/draw serial. A nested original game SetVertexShaderConstantF(c64) from another draw writer could replace source WVP while these outer identities remain unchanged between native LEFT and RIGHT, unlike the C993 central-flare raw WVP generation fence.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp original six StageExtension E8 enter/leave, deferred D3DX lifetime and queued physical producer tags.",
+      "src/vr/d3d9/stereo_renderer_r33.cpp captureStageSource before and after native LEFT, reading OutRunVRRenderer original game raw c64 generation rather than internal eye upload.",
+      "src/vr/game/stage_extension_physical_source.hpp SameAfterNativeLeft and vrhost/tests/stage_extension_eye_plane_smoke.cpp positive/negative source identity regression; existing R30 per-eye/host output unchanged."
+    ],
+    "alternatives_rejected": [
+      "Do not duplicate existing stage producer hooks, flush every D3DX Draw, expand stage ownership to GOAL or infer from live already eye-modified c64; each would change native batching or borrow unrelated GPU WVP."
+    ],
+    "fix_evidence": "Real material source and executable C++ smoke added at commit 23742fcaf9b74d4e16c3028db021e680563432df. Static source diagnosis confirmed, but Windows/Quest3 correctness not yet asserted.",
+    "negative_test_evidence": "The new host C++ smoke checks stage queued/direct unchanged, modified original write serial, modified original write draw generation and partial invalid raw provenance. Test execution awaits exact SHA CI.",
+    "eye_ownership": "R84 uses one original c64 generation plus independently projected left and right eye constants. The new guard verifies original write generation across native LEFT, and refuses to submit RIGHT for another original source; it does not assert HMD optics.",
+    "evidence_limit": "No observed headset +TIME symptom fixed claim; the narrow source-proven reentrant WVP hazard is removed but the full optical defect may require further HMD-rooted work."
+  },
+  "ci_evidence": {
+    "source_commit": "23742fcaf9b74d4e16c3028db021e680563432df",
+    "exact_sha": "PENDING",
+    "gates": "PENDING",
+    "hmd": "UNTESTED"
+  }
+}
