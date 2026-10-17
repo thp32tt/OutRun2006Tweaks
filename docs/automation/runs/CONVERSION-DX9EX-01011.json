@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01011",
+  "production_id": "CONVERSION-DX9EX-01011",
+  "event_id": "CONVERSION-DX9EX-01011-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_POLICY_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "8985282c6be1674792f02b287b82d6fa52c0bb0b",
+  "material_result_sha": "e32f2fd18cfbcf871732acb8d48383ae8926cb28",
+  "source_paths": [
+    "src/vr/d3d9/hud_original_wvp_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/hud_original_wvp_provenance.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01011.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Prevent original directly submitted white HUD glyph matrices from borrowing a selected queued SpriteNode during reentrant and just-ended queue transitions in the R84 per-eye shader HUD route, while preserving correct direct and queued source projection.",
+    "scope_boundary": "Only source-proven R84 shader ScreenHud original c64 provenance; preserve queued projected rank, GOAL/+TIME, stage, C993/CABE lens, F11, input, FFB, SkyGlow and R26_SAFE legacy rollback.",
+    "trace_stages": [
+      "OutRun game draws direct HUD text and asynchronously selected queued SpriteNode HUD with a source-specific original c64 write.",
+      "R84 R30 tests GetLastRawGameWvpWrite and GetLastGameWvpSemanticProvenance against the current shader, pose, direct-versus-queue scope, active node and epoch before native GPU submission.",
+      "R30 derives stereo-eye HUD WVP only when direct c64 has no live SpriteNode or queued HUD matches the same node/epoch; R33 preserves original one-draw mono fallback and eye publication on unsafe source."
+    ],
+    "subcomponents": [
+      "Reject a lingering live queue node from both current direct physical draw and written direct c64 provenance, while respecting the historical epoch that remains nonzero after queue leave.",
+      "Compile positive direct and same-node queued source cases plus cross-node, inconsistent direct state and stale queued-epoch negatives as C++ static contract regressions at the actual R84 header."
+    ],
+    "acceptance_items": [
+      {
+        "id": "direct_original_hud_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "OutRun native direct HUD c64 through R84 R30 stereo-eye acceptance",
+        "expected_behavior": "Original direct HUD c64 remains eligible only with no live node on either source or draw; historical nonzero queue epochs alone do not reject a valid direct source."
+      },
+      {
+        "id": "queue_reentrant_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Queued source identity and original mono fallback after foreign reentrant SpriteNode",
+        "expected_behavior": "Valid same-node same-epoch queued HUD remains eligible, while foreign nodes, stale epochs and mismatched direct owners reject stereo promotion without changing original Draw output."
+      },
+      {
+        "id": "source_integrated_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 native game and OpenXR host plus DX9Ex Active, Domain, HUD and Full Source Impact actions",
+        "expected_behavior": "The integrated source-and-contract SHA passes all triggered mandatory GitHub Actions jobs; Quest3 HMD visual acceptance remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "direct_original_hud_owner": "PASS",
+    "queue_reentrant_safe_fallback": "PASS",
+    "source_integrated_exact_sha": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "OwnsProducer on the direct ScreenHud raw WVP path checked only writtenNode for null and ignored a selected currentNode. A reentrant or just-finished queue cursor could be misinterpreted as original direct HUD c64 despite a stale physical queue selection.",
+    "source_trace": [
+      "src/vr/game/render_semantics.hpp current queue cursor and effective HUD semantic producer",
+      "src/vr/d3d9/stereo_renderer_r30.cpp original WVP provenance and exact shader HUD eye routing",
+      "src/vr/d3d9/hud_original_wvp_provenance.hpp direct and queued admission guard"
+    ],
+    "alternatives_rejected": [
+      "Do not enlarge shader/pose draw-age windows, infer HUD from alpha/FVF, or consume/suppress the native OutRun glyph; these alternatives would risk road, lens or stage producer confusion."
+    ],
+    "fix_evidence": "Material C++ source commit e32f2fd18cfbcf871732acb8d48383ae8926cb28 rejects currentNode for direct original ScreenHud and preserves valid historic queue epochs.",
+    "negative_test_evidence": "C++ compile-time constexpr positive direct and queued tests with negative current-node, written-node, foreign node and node-epoch mutations; Windows exact-SHA integrated gate pending.",
+    "eye_ownership": "Both XR HUD eye matrices may consume one original direct ScreenHud c64 only when source and current physical draw are provably direct; unsafe requests keep one original mono GPU submission.",
+    "evidence_limit": "Deterministic semantic admission bug is source-confirmed. No matching Quest3 optical failure or visual correction is claimed; RUNTIME_VALIDATION=UNTESTED."
+  }
+}
