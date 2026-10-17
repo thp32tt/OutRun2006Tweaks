@@ -84,7 +84,7 @@
   "acceptance_results": {
     "native_typed_camera_partial_clear": "PASS_STATIC_TYPED_RTV_AND_WARP_GAME_CAMERA",
     "native_typed_stereo_eye_partial_clear": "PASS_TWO_EYE_FORMAT_PREFLIGHT_AND_GPU_RECT_CLEAR",
-    "original_d3d9_safe_fallback": "PASS_FAIL_CLOSED_STATIC_NEGATIVE_REGRESSION",
+    "original_d3d9_safe_fallback": "PASS_CLOSED_FALLBACK_STATIC_NEGATIVE_REGRESSION",
     "same_sha_gates": "PASS_EXACT_SHA_5_OF_5",
     "quest3_vdxr": "UNTESTED"
   },
