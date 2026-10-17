@@ -105,6 +105,24 @@ static_assert(!single_sample_eye_color_write(0u));
 static_assert(!single_sample_eye_color_write(0xfffffffeu));
 static_assert(single_sample_eye_color_write(1u));
 static_assert(single_sample_eye_color_write(0xffffffffu));
+// A real D3D11 Draw can be successfully enqueued while every fragment is
+// guaranteed rejected by the active game depth/stencil state. Do not treat
+// that depth-only/occlusion command as an eye color source just because VS/PS
+// and an OM color mask are present. One-sided stencil NEVER is NOT enough:
+// the opposite winding may still reach the native eye.
+[[nodiscard]] constexpr bool fragment_can_reach_eye_color(
+    bool depthEnabled, bool depthNever,
+    bool stencilEnabled, bool frontStencilNever,
+    bool backStencilNever) noexcept {
+    return !(depthEnabled && depthNever) &&
+           !(stencilEnabled && frontStencilNever && backStencilNever);
+}
+static_assert(fragment_can_reach_eye_color(false, true, false, true, true));
+static_assert(fragment_can_reach_eye_color(true, false, true, true, false));
+static_assert(fragment_can_reach_eye_color(true, false, true, false, true));
+static_assert(!fragment_can_reach_eye_color(true, true, false, false, false));
+static_assert(!fragment_can_reach_eye_color(false, false, true, true, true));
+
 [[nodiscard]] constexpr bool color_certifiable(
     bool colorWritable, bool noActivePredicate) noexcept {
     return colorWritable && noActivePredicate;

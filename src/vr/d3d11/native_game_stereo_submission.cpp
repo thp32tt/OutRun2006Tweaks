@@ -227,6 +227,26 @@ bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
     const bool hasShaders = vertex != nullptr && pixel != nullptr;
     if (vertex) vertex->Release();
     if (pixel) pixel->Release();
+
+    // Game-authored menu/vehicle occluders often draw with both shaders and
+    // writable OM color but a NEVER depth/stencil comparison. D3D11 queues
+    // those commands successfully without emitting ANY eye color samples.
+    // Preserve their real source ordinals, while requiring subsequent
+    // color-capable game geometry/Copy/Stretch before XR publication.
+    ID3D11DepthStencilState* depthStencil = nullptr;
+    UINT stencilReference = 0u;
+    context_->OMGetDepthStencilState(&depthStencil, &stencilReference);
+    if (depthStencil) {
+        D3D11_DEPTH_STENCIL_DESC desc{};
+        depthStencil->GetDesc(&desc);
+        writable = writable && live_game_stereo::fragment_can_reach_eye_color(
+            desc.DepthEnable != FALSE,
+            desc.DepthFunc == D3D11_COMPARISON_NEVER,
+            desc.StencilEnable != FALSE,
+            desc.FrontFace.StencilFunc == D3D11_COMPARISON_NEVER,
+            desc.BackFace.StencilFunc == D3D11_COMPARISON_NEVER);
+        depthStencil->Release();
+    }
     return writable && hasShaders;
 }
 

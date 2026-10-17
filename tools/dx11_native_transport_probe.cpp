@@ -1823,8 +1823,53 @@ int main()
             encoder.draw_count() == maskedBaseline + 3u &&
             encoder.color_draw_count() == 0u;
         ctx->PSSetShader(fixture.gamePixelShader, nullptr, 0u);
+        // 00896: real D3D11 game occluder Draws can have live VS/PS, OM
+        // color mask and sample zero yet reject ALL fragments at the GPU
+        // depth/stencil stage. Source ordinals advance, but neither eye may
+        // claim those commands as successful native color output.
+        Microsoft::WRL::ComPtr<ID3D11Device> rejectionDevice;
+        ctx->GetDevice(rejectionDevice.GetAddressOf());
+        if (!rejectionDevice) return false;
+        D3D11_DEPTH_STENCIL_DESC neverDepthDesc{};
+        neverDepthDesc.DepthEnable = TRUE;
+        neverDepthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+        neverDepthDesc.DepthFunc = D3D11_COMPARISON_NEVER;
+        D3D11_DEPTH_STENCIL_DESC neverStencilDesc{};
+        neverStencilDesc.DepthEnable = FALSE;
+        neverStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        neverStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+        neverStencilDesc.StencilEnable = TRUE;
+        neverStencilDesc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+        neverStencilDesc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+        const D3D11_DEPTH_STENCILOP_DESC neverOps{
+            D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP,
+            D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_NEVER};
+        neverStencilDesc.FrontFace = neverOps;
+        neverStencilDesc.BackFace = neverOps;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> neverDepth, neverStencil;
+        if (FAILED(rejectionDevice->CreateDepthStencilState(
+                &neverDepthDesc, neverDepth.GetAddressOf())) ||
+            FAILED(rejectionDevice->CreateDepthStencilState(
+                &neverStencilDesc, neverStencil.GetAddressOf())))
+            return false;
+        ID3D11DepthStencilState* savedDepthState = nullptr;
+        UINT savedStencilRef = 0u;
+        ctx->OMGetDepthStencilState(&savedDepthState, &savedStencilRef);
+        ctx->OMSetDepthStencilState(neverDepth.Get(), 0u);
+        const bool impossibleDepthColor =
+            encoder.draw(3u, 0u) &&
+            encoder.draw_count() == maskedBaseline + 4u &&
+            encoder.color_draw_count() == 0u;
+        ctx->OMSetDepthStencilState(neverStencil.Get(), 0u);
+        const bool impossibleStencilColor =
+            encoder.draw_indexed(3u, 0u, 0) &&
+            encoder.draw_count() == maskedBaseline + 5u &&
+            encoder.color_draw_count() == 0u;
+        ctx->OMSetDepthStencilState(savedDepthState, savedStencilRef);
+        if (savedDepthState) savedDepthState->Release();
         fixture.rejectedNoColorOutput[eyeIndex] =
-            zeroSample && zeroWrite && unshaded;
+            zeroSample && zeroWrite && unshaded &&
+            impossibleDepthColor && impossibleStencilColor;
         if (!fixture.rejectedNoColorOutput[eyeIndex]) return false;
         // Use the actual immediate D3D11 draw APIs through the per-eye
         // recorder with both correct eye OM bindings restored. The saved
