@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "8a3542572ad66cc15f1a3e1acd4b0d99ff148d05",
   "material_result_sha": "23742fcaf9b74d4e16c3028db021e680563432df",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ad0bf8c8243825432961e4ddc710c09adee2e78d",
   "source_paths": [
     "src/vr/game/stage_extension_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -88,8 +88,10 @@
   },
   "ci_evidence": {
     "source_commit": "23742fcaf9b74d4e16c3028db021e680563432df",
-    "exact_sha": "PENDING",
-    "gates": "PENDING",
-    "hmd": "UNTESTED"
-  }
+    "exact_sha": "ad0bf8c8243825432961e4ddc710c09adee2e78d",
+    "gates": "SUCCESS",
+    "hmd": "UNTESTED",
+    "verification_basis": "Exact SHA GitHub CI SUCCESS as supplied in FEATURE C6 RESULT ONLY request; no workflow rerun."
+  },
+  "validation_notes": "C6 PASS_EXACT_SHA for validation-bearing ad0bf8c8243825432961e4ddc710c09adee2e78d; existing material source 23742fcaf9b74d4e16c3028db021e680563432df preserved. Reported exact-SHA GitHub CI SUCCESS; resolved pending terminal reason TERMINAL_STATUS_NOT_COMPLETE. No source changes or CI reruns. acceptance_results left unchanged as requested. Quest3/VDXR RUNTIME_VALIDATION=UNTESTED. This bookkeeping record adds no AI score."
 }
