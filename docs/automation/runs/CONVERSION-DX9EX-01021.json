@@ -8,6 +8,7 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
