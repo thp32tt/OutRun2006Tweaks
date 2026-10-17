@@ -15,6 +15,34 @@ namespace {
     ID3D11DeviceContext*, ID3D11DepthStencilView*,
     std::uint32_t, std::uint32_t, const D3D11_RECT&,
     float, std::uint8_t, bool, bool) noexcept;
+
+// Native GPU game postpasses may sample compute-produced camera textures.
+// Detach every bound CS UAV and OM target before copying/sampling, then
+// restore unrelated MRT/depth/UAV outputs without resetting UAV counters.
+struct ScopedNativePostpassOutputs final {
+    ID3D11DeviceContext* ctx{};
+    ID3D11RenderTargetView* targets[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    ID3D11DepthStencilView* depth{};
+    ID3D11UnorderedAccessView* compute[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+    explicit ScopedNativePostpassOutputs(ID3D11DeviceContext* c) noexcept : ctx(c) {
+        ctx->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth);
+        ctx->CSGetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, compute);
+        ID3D11UnorderedAccessView* empty[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+        ctx->CSSetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, empty, nullptr);
+        ctx->OMSetRenderTargets(0u, nullptr, nullptr);
+    }
+    ~ScopedNativePostpassOutputs() noexcept {
+        ctx->OMSetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, depth);
+        UINT keep[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+        for (auto& v : keep) v = UINT(-1);
+        ctx->CSSetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, compute, keep);
+        for (auto* v : targets) if (v) v->Release();
+        if (depth) depth->Release();
+        for (auto* v : compute) if (v) v->Release();
+    }
+    ScopedNativePostpassOutputs(const ScopedNativePostpassOutputs&) = delete;
+    ScopedNativePostpassOutputs& operator=(const ScopedNativePostpassOutputs&) = delete;
+};
 }
 
 // Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
@@ -332,8 +360,11 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // They remain real, device-local game postpass sources for an unscaled,
     // identical-format CopySubresourceRegion. Shader conversion still needs
     // an RTV or SRV and multisample sources still need an RTV for resolve.
-    // Do not admit UAV-only, CPU/staging or shared textures through this path.
+    // Game compute outputs may be UAV-only but are still GPU copyable.
     const bool gpuCopyOnlySource = sourceDesc.BindFlags == 0u &&
+        sourceDesc.SampleDesc.Count == 1u;
+    const bool gpuComputeSource =
+        (sourceDesc.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u &&
         sourceDesc.SampleDesc.Count == 1u;
     constexpr UINT sharedFlags =
         D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
@@ -353,7 +384,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         eyeDesc.SampleDesc.Count != 1u ||
         sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
         sourceDesc.CPUAccessFlags != 0u ||
-        (!gpuCopyOnlySource &&
+        (!gpuCopyOnlySource && !gpuComputeSource &&
          (sourceDesc.BindFlags &
           (D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE)) == 0u) ||
         (sourceDesc.MiscFlags & sharedFlags) != 0u ||
@@ -406,28 +437,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // copy silently discards RT1..RT7 and breaks the next real game Draw.
     // Preserve the complete OM set, including its exact depth attachment,
     // while temporarily unbinding both copy source and destination.
-    struct ScopedCopyOutputMerger final {
-        ID3D11DeviceContext* context{};
-        ID3D11RenderTargetView* renderTargets[
-            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
-        ID3D11DepthStencilView* depth{};
-        explicit ScopedCopyOutputMerger(ID3D11DeviceContext* ctx) noexcept
-            : context(ctx) {
-            context->OMGetRenderTargets(
-                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-                renderTargets, &depth);
-        }
-        ~ScopedCopyOutputMerger() noexcept {
-            context->OMSetRenderTargets(
-                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-                renderTargets, depth);
-            for (auto* target : renderTargets)
-                if (target) target->Release();
-            if (depth) depth->Release();
-        }
-    };
     {
-        ScopedCopyOutputMerger restore{context_};
+        ScopedNativePostpassOutputs restore{context_};
         context_->OMSetRenderTargets(0u, nullptr, nullptr);
         if (needsResolve) {
             context_->ResolveSubresource(
@@ -867,7 +878,9 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         sd.CPUAccessFlags != 0u || (sd.MiscFlags & shared) != 0u ||
         ((sd.BindFlags & (D3D11_BIND_RENDER_TARGET |
                           D3D11_BIND_SHADER_RESOURCE)) == 0u &&
-         !(sd.BindFlags == 0u && sd.SampleDesc.Count == 1u)) ||
+         !((sd.BindFlags == 0u ||
+            (sd.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
+            sd.SampleDesc.Count == 1u)) ||
         ed.Width != targetWidth_ || ed.Height != targetHeight_ ||
         srcBox.front != 0u || srcBox.back != 1u ||
         srcBox.left >= srcBox.right || srcBox.top >= srcBox.bottom ||
@@ -892,7 +905,9 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         (sourceSupport & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
         (eyeSupport & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
         (sourceSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
-        sd.BindFlags == 0u && sd.SampleDesc.Count == 1u);
+        (sd.BindFlags == 0u ||
+         (sd.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
+        sd.SampleDesc.Count == 1u);
     if (transfer == NativeGameStretchSourceTransfer::Reject)
         return false;
 
@@ -1013,6 +1028,7 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     // binding across native eye pass teardown; restore synchronously here.
     ScopedNativeGameEyeOutput restore(context_, targetWidth_, targetHeight_);
     if (!restore.valid()) return false;
+    ScopedNativePostpassOutputs outputs(context_);
     context_->OMSetRenderTargets(0u, nullptr, nullptr);
     if (sampled.Get() != source) {
         // Subresource 0 of EACH array slice is the camera's full-sized
@@ -1246,7 +1262,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         event.sourceArraySlice >= desc.ArraySize ||
                         desc.MipLevels == 0u ||
                         ((desc.BindFlags &
-                          (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET)) == 0u &&
+                          (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET |
+                           D3D11_BIND_UNORDERED_ACCESS)) == 0u &&
                          !(desc.BindFlags == 0u &&
                            desc.SampleDesc.Count == 1u &&
                            (event.kind ==
@@ -1295,7 +1312,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                                      D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
                                     (sourceSupport &
                                      D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
-                                    desc.BindFlags == 0u &&
+                                    (desc.BindFlags == 0u ||
+                                     (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
                                     desc.SampleDesc.Count == 1u) ==
                                     NativeGameStretchSourceTransfer::Reject)
                                 return false;
@@ -1337,7 +1355,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                                  D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
                                 (sourceSupport &
                                  D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
-                                desc.BindFlags == 0u &&
+                                (desc.BindFlags == 0u ||
+                                 (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
                                 desc.SampleDesc.Count == 1u) ==
                                 NativeGameStretchSourceTransfer::Reject ||
                             !native_game_stretch_clipped_region(

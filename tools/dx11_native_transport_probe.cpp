@@ -1063,6 +1063,30 @@ int main()
             gameCopyOnlyArray, eye, 0u, 0u, 0u, gameEyeArray,
             D3D11CalcSubresource(0u, eye, eyeArrayDesc.MipLevels), nullptr);
     }
+    // GPU compute-produced camera outputs: two independent UAV-only array
+    // slices, never staging/CPU readback or a duplicated mono texture.
+    D3D11_TEXTURE2D_DESC computeDesc = gameSurfaceDesc;
+    computeDesc.ArraySize = 2u;
+    computeDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+    ID3D11Texture2D* gameComputeArray = nullptr;
+    ID3D11UnorderedAccessView* gameComputeViews[2]{};
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &computeDesc, nullptr, &gameComputeArray)) && gameComputeArray,
+            "00862 compute camera color texture created");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+        uavDesc.Format = computeDesc.Format;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+        uavDesc.Texture2DArray.ArraySize = 1u;
+        uavDesc.Texture2DArray.FirstArraySlice = eye;
+        require(SUCCEEDED(d3d.device->CreateUnorderedAccessView(
+                    gameComputeArray, &uavDesc, &gameComputeViews[eye])) &&
+                gameComputeViews[eye],
+                "00862 game GPU camera per-eye UAV created");
+        const float rgba[4]{eye == 0u ? 1.f : 0.f, 0.f,
+                            eye == 0u ? 0.f : 1.f, 1.f};
+        d3d.context->ClearUnorderedAccessViewFloat(gameComputeViews[eye], rgba);
+    }
     // True game menu and vehicle postpasses can use BGRA camera arrays even
     // when the native OpenXR eye target uses RGBA. Preserve each camera's
     // pixels through a GPU point-sampled color conversion (no CPU readback).
@@ -1143,6 +1167,10 @@ int main()
         ID3D11Texture2D* gameEyeArray{};
         ID3D11Texture2D* gameCopyOnlyArray{};
         ID3D11Texture2D* gameConvertedArray{};
+        ID3D11Texture2D* gameComputeArray{};
+        ID3D11UnorderedAccessView* gameComputeViews[2]{};
+        bool replayedComputeCopyStretch[2]{};
+        bool preservedComputeOutputs[2]{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
@@ -1649,6 +1677,29 @@ int main()
                 fixture.gameShaderIntermediate, &sourcePatch, destX, 48u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Both live CS UAV slots persist while the source is used by a
+        // genuine post-Draw Copy and a bilinear GPU Stretch into this eye.
+        const UINT computeX = eyeIndex == 0u ? 20u : 52u;
+        const D3D11_RECT computeRect{
+            static_cast<LONG>(computeX), 6,
+            static_cast<LONG>(computeX + 4u), 10};
+        fixture.replayedComputeCopyStretch[eyeIndex] =
+            !encoder.copy_game_surface(
+                fixture.gameComputeArray, &sourcePatch, computeX, 2u, 2u) &&
+            encoder.copy_game_surface(
+                fixture.gameComputeArray, &sourcePatch,
+                computeX, 2u, eyeIndex) &&
+            encoder.stretch_game_surface(
+                fixture.gameComputeArray, sourcePatch,
+                computeRect, true, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        ID3D11UnorderedAccessView* computeAfter[2]{};
+        ctx->CSGetUnorderedAccessViews(0u, 2u, computeAfter);
+        fixture.preservedComputeOutputs[eyeIndex] =
+            computeAfter[0] == fixture.gameComputeViews[0] &&
+            computeAfter[1] == fixture.gameComputeViews[1];
+        for (auto* v : computeAfter) if (v) v->Release();
         // The no-RTV/no-SRV intermediate is GPU-written by CopyResource;
         // its camera slice must still be replayed without a shader blit.
         // An invalid slice or fully off-eye destination must fail closed.
@@ -1825,6 +1876,8 @@ int main()
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
+            !fixture.replayedComputeCopyStretch[eyeIndex] ||
+            !fixture.preservedComputeOutputs[eyeIndex] ||
             !fixture.replayedGpuOnlyArrayCopy[eyeIndex] ||
             !fixture.replayedGpuOnlyArrayStretch[eyeIndex] ||
             !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
@@ -1892,6 +1945,11 @@ int main()
     d3d.context->DSSetShaderResources(0u, 1u, &gameSampleView);
     d3d.context->DSSetSamplers(0u, 1u, &gameSampler);
     d3d.context->DSSetConstantBuffers(0u, 1u, &gameConstants);
+    gameEyeFixture.gameComputeArray = gameComputeArray;
+    gameEyeFixture.gameComputeViews[0] = gameComputeViews[0];
+    gameEyeFixture.gameComputeViews[1] = gameComputeViews[1];
+    d3d.context->CSSetUnorderedAccessViews(
+        0u, 2u, gameComputeViews, nullptr);
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -1961,6 +2019,10 @@ int main()
             gameEyeFixture.replayedPostDrawSurfaceCopy[1] &&
             gameEyeFixture.replayedPostDrawShaderCopy[0] &&
             gameEyeFixture.replayedPostDrawShaderCopy[1] &&
+            gameEyeFixture.replayedComputeCopyStretch[0] &&
+            gameEyeFixture.replayedComputeCopyStretch[1] &&
+            gameEyeFixture.preservedComputeOutputs[0] &&
+            gameEyeFixture.preservedComputeOutputs[1] &&
             gameEyeFixture.replayedGpuOnlyArrayCopy[0] &&
             gameEyeFixture.replayedGpuOnlyArrayCopy[1] &&
             gameEyeFixture.replayedGpuOnlyArrayStretch[0] &&
@@ -2136,6 +2198,10 @@ int main()
     gameShaderIntermediate->Release();
     mipGameIntermediate->Release();
     gameEyeArray->Release();
+    ID3D11UnorderedAccessView* nullComputeViews[2]{};
+    d3d.context->CSSetUnorderedAccessViews(0u, 2u, nullComputeViews, nullptr);
+    for (auto* v : gameComputeViews) if (v) v->Release();
+    gameComputeArray->Release();
     gameCopyOnlyArray->Release();
     gameConvertedArray->Release();
     gameMultisampleView->Release();
@@ -2163,6 +2229,20 @@ int main()
                     readback, 0, D3D11_MAP_READ, 0, &mapped)),
                 "00819 distinct native game eye readback");
         const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        // Read back exact native GPU camera colors, not merely successful
+        // Copy/Stretch API returns. L=red and R=blue from separate UAVs.
+        const UINT computeX = eyeIndex == 0u ? 21u : 53u;
+        const auto* computeCopy = pixel + 3u * mapped.RowPitch + computeX * 4u;
+        const auto* computeScale = pixel + 7u * mapped.RowPitch + computeX * 4u;
+        const bool computePixels = eyeIndex == 0u
+            ? computeCopy[0] == 255u && computeCopy[1] == 0u &&
+              computeCopy[2] == 0u && computeScale[0] == 255u &&
+              computeScale[1] == 0u && computeScale[2] == 0u
+            : computeCopy[0] == 0u && computeCopy[1] == 0u &&
+              computeCopy[2] == 255u && computeScale[0] == 0u &&
+              computeScale[1] == 0u && computeScale[2] == 255u;
+        require(computePixels,
+                "00862 compute UAV camera Copy and scaled Stretch preserve separate native eye pixels");
         const bool distinctColor = eyeIndex == 0u
             ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
