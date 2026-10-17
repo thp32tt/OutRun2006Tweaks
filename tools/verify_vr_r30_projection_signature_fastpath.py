@@ -142,11 +142,27 @@ def source_contract(renderer=RENDERER, r30=R30, semantic=SEMANTICS):
     for token in ("EffectiveScope() != RenderScope::SceneEffect",
                   "GetLastRawGameWvpWrite(", "R29OwnerCurrentShaderEpoch(",
                   "GetLastGameWvpPoseEpoch()", "R29OwnerTopLevelDrawSerial() + 1u",
-                  "SceneEffectWvp::OwnsOriginalWorldWvp({", "R29OwnerInvertMatrix(",
+                  "SceneEffectWvp::OwnsOriginalWorldWvp({", "R30InvertBaseProjectionCached(",
                   "R29OwnerMultiplyMatrix(gameWvp, inverseProjection)",
                   "affineError <= 0.02f", "depth >= 1.25f",
                   "clipW > 0.05f"):
         require(token in helper, "source-owned spatial veto missing: " + token)
+
+    # The spatial WVP veto uses the same exact game inverse calculation via
+    # the native R84 cache wrapper. Verify that the wrapper still delegates to
+    # the original finite R29 inversion and invalidates on failed input; a
+    # mere function rename must not bypass source/pose/queue admission.
+    inverse_wrapper = r30.split("bool R30InvertBaseProjectionCached(", 1)
+    require(len(inverse_wrapper) == 2, "missing native R84 inverse owner")
+    inverse_wrapper = inverse_wrapper[1].split(
+        "// Independent Quest-inspired DX9Ex opt-in.", 1)[0]
+    for token in ("R30BaseProjectionInverseCache.get(",
+                  "R29OwnerMatrixFinite(base)",
+                  "R30BaseProjectionInverseCache.invalidate();",
+                  "R29OwnerInvertMatrix(source, result)",
+                  "R29OwnerMatrixFinite(result)"):
+        require(token in inverse_wrapper,
+                "original inverse/cache fail-closed guarantee missing: " + token)
 
     # The original 12-draw age check moved into a pure C++ source-ownership
     # contract, not deleted. Keep verifying the numerical veto AND the newly
@@ -351,6 +367,24 @@ def negative_mutations():
         pass
     else:
         raise AssertionError("swapped projection classification survived")
+    # The spatial original SceneEffect owner must actually use the exact
+    # projection-cache wrapper; its use cannot be replaced by a stale/raw
+    # matrix or a constant true without detection.
+    spatial_start = R30.index("bool R30SpatialSceneEffectNeedsWorldRouting()")
+    spatial_end = R30.index("R30ScreenSpaceKind R30ClassifyScreenSpacePass(",
+                            spatial_start)
+    spatial_body = R30[spatial_start:spatial_end]
+    require(spatial_body.count("R30InvertBaseProjectionCached(") == 1,
+            "missing unique spatial inverse mutation target")
+    broken = spatial_body.replace("R30InvertBaseProjectionCached(",
+                                  "R29OwnerInvertMatrix(", 1)
+    try:
+        source_contract(r30=R30[:spatial_start] + broken +
+                        R30[spatial_end:])
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("uncached spatial projection mutation survived")
     # Test the separate canonical declaration, not only its call site.
     physical_start = SEMANTICS.index("struct PhysicalDrawCommand final")
     physical_end = SEMANTICS.index(
