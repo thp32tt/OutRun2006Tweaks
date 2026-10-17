@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00889",
+  "production_id": "CONVERSION-DX11-00889",
+  "event_id": "CONVERSION-DX11-00889-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00889",
+  "feature_id": "DX11:HOST_NATIVE_EYE_SPARSE_MRT_PS_CS_UAV_RESTORE",
+  "work_key": "DX11:NATIVE_EYE_COPY:HOST_SPARSE_MRT_PS_CS_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "score_note": "Retry C6/CI failure repair is not an independent feature or score event. Any credit for the existing 00889 material source commit must remain deduplicated in the separate AI_SCOREBOARD SSOT.",
+  "full_dx11_renderer_complete": false,
+  "base_sha": "f16e27c2976fd593fe2b74b7b576a2d6aacd74f1",
+  "material_result_sha": "ba804e8daffa6eab1afb02c8de1f82512520b866",
+  "validation_bearing_result_sha": "686b8c9975503618f8cd5b65839e94d0bedde16e",
+  "ci_repair_commit_sha": "686b8c9975503618f8cd5b65839e94d0bedde16e",
+  "feature_contract": {
+    "feature_id": "DX11:HOST_NATIVE_EYE_SPARSE_MRT_PS_CS_UAV_RESTORE",
+    "goal": "Maintain sparse MRT/DSV and legal PS UAV tail plus independent CS UAV bindings and append/consume counters across host native stereo game-eye GPU hold and OpenXR array copies, while retaining unsupported-source SBS/D3D9 input fallback.",
+    "acceptance_items": [
+      {
+        "id": "sparse_om",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_host_native_eye_sparse_mrt_ps_uav",
+        "expected_behavior": "Preserve highest occupied MRT index including holes while querying and restoring only legal nonoverlapping pixel UAV tail."
+      },
+      {
+        "id": "gpu_eye_copy_restore",
+        "category": "end_to_end_behavior",
+        "behavior_area": "host_native_eye_gpu_hold_projection_cs_om_restore",
+        "expected_behavior": "Copy two independent game-eye textures into host hold and OpenXR array and preserve OM RTV/DSV, PS UAV and CS UAV resources and UAV counters."
+      },
+      {
+        "id": "fallback_regression",
+        "category": "fallback_regression",
+        "behavior_area": "native_source_alias_fallback",
+        "expected_behavior": "Reject stale or aliased native stereo source and retain safe SBS/D3D9 fallback with game input and FFB unaffected."
+      },
+      {
+        "id": "five_exact_gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_dx11_actions_exact_sha",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR architecture and HUD Inspector all finish SUCCESS at one exact source-bearing validation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "sparse_om": "PASS_BUILD_SOURCE_AND_256_MASK_REGRESSION",
+    "gpu_eye_copy_restore": "PASS_HOST_X64_NATIVE_GPU_SMOKE_AND_CI",
+    "fallback_regression": "PASS_BUILD_NEGATIVE_SBS_FALLBACK",
+    "five_exact_gates": "PASS_EXACT_SHA_5_OF_5",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Previously intercepted and opt-in native D3D11 game eye source is selected for native L/R host handoff",
+      "Host copies distinct GPU eye sources into persistent holds and OpenXR array under saved sparse MRT/DSV PS UAV/CS UAV scope",
+      "Restore exact output-merger/compute binding state and counters before the next original D3D9/HUD frame"
+    ],
+    "batch_components": [
+      "Native D3D11 host scoped sparse OM RTV plus pixel/compute UAV preservation around eye hold and projection copy",
+      "256-mask slot planning and WARP sparse MRT, direct stereo, and SBS rejection negative regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing source material ba804e8d native host eye implementation; exact-SHA OpenXR x64 host build and source identity tests, plus required five GitHub Gates SUCCESS at 686b8c99.",
+      "negative_regression": "Source test verifies sparse RTV1 gap, exact PS UAV3 restoration and alias/SBS fallback; game/HMD actual runtime output UNTESTED.",
+      "component_integration": "Host-scoped OM/CS state save -> stereo game-eye CopyResource and OpenXR array CopySubresourceRegion -> exact MRT/DSV/PS/CS restore; original D3D9/gamepad/FFB untouched."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_EYE_COPY:HOST_SPARSE_MRT_PS_CS_STATE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI proves source and WARP/host transfer behavior, not actual menu/car/race Quest3 HMD output; runtime remains UNTESTED.",
+    "activation_guard_and_fallback": "Only guarded opt-in validated distinct native GPU eyes; on failure retain original SBS shader compositor, DX9Ex/D3D9 frame and input/FFB fallback."
+  },
+  "validation_evidence": {
+    "validation_sha": "686b8c9975503618f8cd5b65839e94d0bedde16e",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39056055778,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39056055773,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39056058436,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39056058444,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39056058452,
+        "conclusion": "success"
+      }
+    ],
+    "previous_failed_backend_run": 39055813848,
+    "previous_failed_fast_run": 39055813850,
+    "failure_cause": "00888 existing run JSON missing development_strategy; policy acceptance failed before game/host compile.",
+    "exact_sha_ci_repair": "686b8c9975503618f8cd5b65839e94d0bedde16e",
+    "source_material_unchanged_by_retry": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read GitHub HEAD ba804e8daffa6eab1afb02c8de1f82512520b866, material source diff and failed Backend run 39055813848; 00889 C6 run JSON absent.",
+    "C1_REVIEW": "Class B exact-SHA GitHub acceptance failure in previously completed 00888 C6 record; latest run validator requires original development_strategy; no source compile failure identified.",
+    "C2_IMPLEMENT": "Existing actual native host C++ eye copy and sparse MRT/PS/CS UAV restore already committed at ba804e8d. Repair related 00888 policy metadata under same 00889 CI-failure recovery; do not duplicate material commit.",
+    "C3_VALIDATE": "At exact SHA 686b8c9975503618f8cd5b65839e94d0bedde16e, five mandatory GitHub CI runs SUCCESS, native host and Win32 build success; HMD UNTESTED.",
+    "C4_COMMIT": "C++ material ba804e8d; CI cause repair 686b8c99; this C6 record is separate bookkeeping, not validation-bearing.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA at 686b8c99, exact five required Gates SUCCESS; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
+  },
+  "next_action": "Existing 00889 feature BUILD_VERIFIED and needs matching Quest3/VDXR HMD/gamepad menu/vehicle/race runtime validation. Do not repeat CI, rewrite material source, or award duplicate score. Controller may assign another nonconflicting DX11 source integration feature."
+}
