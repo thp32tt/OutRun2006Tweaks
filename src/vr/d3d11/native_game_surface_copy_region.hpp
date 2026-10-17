@@ -37,7 +37,12 @@ struct GameNativeSurfaceCopyRegion {
         std::uint32_t destWidth, std::uint32_t destHeight) noexcept {
         if (srcLeft < 0 || srcTop < 0 || srcRight <= srcLeft ||
             srcBottom <= srcTop || srcRight > sourceWidth ||
-            srcBottom > sourceHeight || destX < 0 || destY < 0)
+            srcBottom > sourceHeight || destX < 0 || destY < 0 ||
+            destX > destWidth || destY > destHeight ||
+            // Verify remaining destination extent BEFORE signed addition,
+            // including malicious LONG_MAX/INT64_MAX origins.
+            (srcRight-srcLeft) > std::int64_t(destWidth)-destX ||
+            (srcBottom-srcTop) > std::int64_t(destHeight)-destY)
             return {};
         return destination(destX, destY, destX + (srcRight-srcLeft),
                            destY + (srcBottom-srcTop), destWidth, destHeight);
