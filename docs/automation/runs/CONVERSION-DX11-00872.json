@@ -10,9 +10,9 @@
   "work_key": "DX11:HOST_NATIVE_STEREO_OM_PIXEL_UAV_REPLAY",
   "feature_id": "DX11:HOST_NATIVE_STEREO_OM_PIXEL_UAV_REPLAY",
   "target_branch": "vr-dx11-native-r71",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -90,10 +90,11 @@
     "C3_VALIDATE": "PENDING exact SHA mandatory GitHub Actions",
     "C4_COMMIT": "PENDING material result",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Evaluate exact material GitHub SHA mandatory five CI; repair causal failure in the same task, then separately seal C6 without scoring until feature verified."
+  "next_action": "Evaluate exact material GitHub SHA mandatory five CI; repair causal failure in the same task, then separately seal C6 without scoring until feature verified.",
+  "validation_bearing_result_sha": "d08be87622f559427f9973180f025020aabc4d40"
 }
