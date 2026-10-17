@@ -400,10 +400,29 @@ int main()
     const float blue[] = {0.f, 0.f, 1.f, 1.f};
     d3d.context->ClearRenderTargetView(leftView, red);
     d3d.context->ClearRenderTargetView(rightView, blue);
+    // Real game postpasses commonly leave both camera MRTs bound when
+    // submitting the GPU-only stereo copy. Prove the producer unbinds them
+    // for the transfer and restores the complete output set afterward.
+    ID3D11RenderTargetView* boundGameMrt[2] = {leftView, rightView};
+    d3d.context->OMSetRenderTargets(2u, boundGameMrt, nullptr);
     require(ring.submit_eye_pair(
                 d3d.context, stereoSlot, 20, leftSource, rightSource) &&
             ring.slot_state(stereoSlot) == SharedEyeSlotState::ProducerPending,
-            "R306 both native game eyes copied and producer GPU EVENT armed");
+            "00858 game MRT0/RT1 bound source stereo GPU copy and EVENT armed");
+    ID3D11RenderTargetView* restoredGameMrt[2]{};
+    ID3D11DepthStencilView* restoredGameDepth = nullptr;
+    d3d.context->OMGetRenderTargets(
+        2u, restoredGameMrt, &restoredGameDepth);
+    const bool preservedMrt =
+        restoredGameMrt[0] == leftView &&
+        restoredGameMrt[1] == rightView &&
+        restoredGameDepth == nullptr;
+    if (restoredGameMrt[0]) restoredGameMrt[0]->Release();
+    if (restoredGameMrt[1]) restoredGameMrt[1]->Release();
+    if (restoredGameDepth) restoredGameDepth->Release();
+    d3d.context->OMSetRenderTargets(0u, nullptr, nullptr);
+    require(preservedMrt,
+            "00858 stereo submission restores live game camera MRT bindings");
     publish_bounded(ring, d3d.context, stereoSlot, 20);
     NativeSharedEyePublication stereoPublication{};
     require(ring.snapshot_published_frame(

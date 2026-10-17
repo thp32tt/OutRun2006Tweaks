@@ -439,6 +439,34 @@ namespace outrun::vr::dx11
                 owned)) {
             return false;
         }
+        // Game camera RT0/RT1 can still be OM-bound at the native eye
+        // handoff (menu and vehicle postpasses do not necessarily unbind).
+        // Unbind ALL producer outputs before CopyResource/ResolveSubresource,
+        // then restore the exact MRT/depth attachments for the next game
+        // Draw or the original D3D9Ex fallback. Never leave a source RTV
+        // bound while scheduling its GPU transfer to the shared-eye ring.
+        struct ScopedStereoSourceOutputs final {
+            ID3D11DeviceContext* context{};
+            ID3D11RenderTargetView* targets[
+                D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+            ID3D11DepthStencilView* depth{};
+            explicit ScopedStereoSourceOutputs(ID3D11DeviceContext* ctx) noexcept
+                : context(ctx) {
+                context->OMGetRenderTargets(
+                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                    targets, &depth);
+                context->OMSetRenderTargets(0u, nullptr, nullptr);
+            }
+            ~ScopedStereoSourceOutputs() noexcept {
+                context->OMSetRenderTargets(
+                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                    targets, depth);
+                for (auto* target : targets)
+                    if (target) target->Release();
+                if (depth) depth->Release();
+            }
+        } sourceOutputs{context};
+
         // All rejection paths precede both GPU commands. After this point
         // a failed fence arm must quarantine, not cancel/reissue, the slot:
         // the D3D11 command stream may still write either shared eye.

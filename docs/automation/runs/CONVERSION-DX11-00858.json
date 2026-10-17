@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00858",
+  "production_id": "CONVERSION-DX11-00858",
+  "event_id": "CONVERSION-DX11-00858-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:STEREO_SOURCE_MRT_UNBIND_RESTORE",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "IMPLEMENTED_PENDING_FULL_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Integrate real game-authored multi-render-target camera source frames into the native D3D11 stereo producer without an OM copy/resolve hazard, preserve exact D3D11 MRT/depth binding across GPU transport and original D3D9Ex menu, vehicle, race input/FFB fallback; complete visible OpenXR parity remains outstanding.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_stereo_gpu_copy",
+        "expected_behavior": "With independently rendered left/right game source RTVs both bound, queue two GPU eye copies then fence and publish distinct WARP pixels."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_om_depth_input_fallback",
+        "expected_behavior": "Restore exact game MRT and depth attachment after native handoff; prior invalid source/identity/frame submissions remain fail closed and D3D9Ex input/FFB untouched."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_full_backend_matrix",
+        "expected_behavior": "Preserve DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD mandatory CI at a single validation-bearing commit; Quest3 gameplay runtime remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp source RTV MRT unbind before shared L/R GPU copies and RAII exact D3D11 OM restore",
+      "tools/dx11_native_transport_probe.cpp bound-two-camera-RTV WARP GPU copy/pixel and original MRT preservation regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Added two-bound-source MRT producer-to-shared-eye pixel test; actual same-SHA Windows WARP execution pending.",
+      "negative_regression": "Existing wrong-device, identical-eye, wrong-dimensions, shared-resource and ACK guards remain enabled; original D3D9 fallback preserved.",
+      "component_integration": "Native game Draw producer MRT0/1 -> output unbind -> GPU-only stereo copy/resolve -> exact GPU EVENT -> OM restore -> OpenXR shared eye L/R reader."
+    },
+    "conflict_keys": [
+      "DX11:STEREO_SOURCE_MRT_UNBIND_RESTORE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "Source integration checkpoint only; full menu/vehicle/race and Quest3 visual/gamepad parity UNTESTED.",
+    "activation_guard_and_fallback": "No gameplay activation; native ring admission/producer fence and D3D9Ex Draw, Present, gamepad, FFB and DXVK freeze unchanged."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "end2end": "PENDING_WARP",
+    "fallback": "PENDING_WARP",
+    "gates": "PENDING_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest GitHub branch HEAD, 00857 C6 and owned source checked.",
+    "C1_REVIEW": "PASS: bound producer source MRT0/1 previously remained attached while ring CopyResource/ResolveSubresource executed.",
+    "C2_IMPLEMENT": "PASS: actual D3D11 GPU handoff OM unbind/restore and integrated WARP source-bound regression authored.",
+    "C3_VALIDATE": "PENDING GitHub Actions exact-SHA source verification; hardware not available.",
+    "C4_COMMIT": "PENDING material commit, no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Check exact material SHA five mandatory GitHub Actions gates; repair real failures on this same TASK_ID; record C6 only after exact-SHA full PASS."
+}
