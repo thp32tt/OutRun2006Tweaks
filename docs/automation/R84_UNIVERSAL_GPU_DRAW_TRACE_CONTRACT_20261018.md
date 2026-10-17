@@ -52,3 +52,22 @@ Auto-analysis must flag: only-left or only-right, zero/duplicate GPU submissions
 One test session should visit: main menu → options → car selection → race start/GO! → speed/rank/vehicle marker → stage extension +TIME → GOAL/time/results → ESC/pause → F11 → sky/lens head turns → re-center/resize/reset where safe. Some events require multiple runs or game progression; one run is **not proof of all code paths**. If none occurred, label NOT_OBSERVED.
 
 Required tests: generated synthetic mixed producers/duplicate IDs/node pointer reuse/reentrant draw/partial D3DX flush/left success right veto; route coverage of R30 FVF 0x142, R33 four Draw*, R29 raw fallback, StateBlock, Present and host; mutation/negative regressions; exact-SHA DX9Ex Win32 Active, Domain Isolation, HUD Inspector, Full Source CI; Quest3 optical results only after user tests. Ship instrumented build alongside regular default OFF build. No scoring for spec-only changes.
+
+
+## Integrated telemetry implementation, 2026-10-18
+
+**Already implemented in GitHub source (not an HMD PASS):**
+- `src/vr/game/universal_draw_trace.hpp`: diagnostics-only named physical owners + append-only family IDs, including +TIME, 6th/6 (rank display), GOAL/result, source-tagged HUD digits, projected rank markers, pause arrows, car shadow, world particles, reflection, SceneFX, WorldBillboard, native screen overlay, SkyGlow, lens families, UNKNOWN and unproven lens. Token + scope must both corroborate a name; never label an arbitrary SCREEN_OVERLAY as Main Menu or car selection.
+- `src/vr/d3d9/stereo_renderer_r33.cpp`: four Draw hooks, bounded atomic per-family/per-API/per-route counters; R30 FVF142 and XYZRHW, R33 HUD/world, R29 lower, original preserved, StateBlock raw; R33 HUD left/right/restore evidence, unverified-other eye cases, producer/scope/queueEpoch and lost queue/unknown token counts. Aggregates emitted every five seconds when R33/VRTelemetry enabled; no synchronous game-thread file writes.
+- `tools/analyze_vr_screen_traces.py`: parse HUD Inspector original EXE callsite CSV and physical Draw aggregate logs from one collector folder; output JSON with observed/investigate/NOT_OBSERVED and explicit diagnostic/optical gaps.
+- `tools/test_analyze_vr_screen_traces.py`: synthetic fault/unit tests, included in DX9Ex Active CI policy.
+- `tools/Collect-OutRunVRLogs.ps1`: optional standard-library-only Python analyzer runs during collector, if Python and script exist. Missing Python does not block or discard logs. Output: `OutRunVR-screen-trace-summary.json` in test ZIP.
+- Tests run in N100 C++17 fixture and Python synthetic fixture. Windows exact-SHA CI must still pass. Quest 3 HMD `RUNTIME_VALIDATION=UNTESTED` until tested.
+
+**Known limitations and next automation work (not to be misreported as done):**
+- These are *per-family 5-second aggregates*, not a complete original `source_serial` → all `SpriteNode` → exact physical DrawID → OpenXR swapchain trace. Need bounded on-fault source-generation event sampling before declaring end-to-end attribution.
+- F11 ImGui lives outside original-game D3D9 path: instrument the host/overlay and join on session/frame timestamp separately, else label NOT_OBSERVED/EXTERNAL_HOST_UNCORRELATED. Do not call GPU draw success a Quest3 optical PASS.
+- Native Main Menu, car selector and pause shell without exact source tokens are `SCREEN_OVERLAY`. Combine original HUD Inspector `mode/stage/call_rva` and texture replacement DDS owner to disambiguate; do not rename all generic overlays MENU.
+- A route value of `r30OrUnknownEye` does NOT prove mono; need concrete lower R30 two-eye write evidence. Unvisited modes are NOT_OBSERVED, not fixed.
+- Head-locked sky/world, 2D UI aspect/UV/crop, double +TIME, right-eye-only/missing rank, duplicate lens, depth/StateBlock and input/hitbox faults need separately validated real VR optics and actual source-level repair, not an automatic change from trace-classification.
+- Preserve existing live leased DX9Ex task ID and R84 safe split. Do not score this as user-visible visual-fix completion solely from instrumentation or a report.
