@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00892",
   "feature_id": "DX11:FULLFRAME_TYPED_CAMERA_RECT_CLEAR_STEREO",
   "work_key": "DX11:FULLFRAME:CAMERA_TARGET_RECT_TO_NATIVE_LR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -20,7 +20,7 @@
   "full_dx11_renderer_complete": false,
   "base_sha": "2ae93b0b276e7994a5aefbaecc2663c3c972441a",
   "material_result_sha": "b063ca06672662f623e39d69f902b6350c5f7bde",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "863c49ac626641397042d97a53bdd570850a2d89",
   "feature_contract": {
     "feature_id": "DX11:FULLFRAME_TYPED_CAMERA_RECT_CLEAR_STEREO",
     "goal": "Replay real game offscreen and stereo TARGET rectangle Clears at full resolution using actual typed D3D11 RTV formats, with guarded original D3D9Ex fallback.",
@@ -82,10 +82,10 @@
     "activation_guard_and_fallback": "Native diagnostic opt-in/fail closed; original D3D9Ex game/input/FFB retained and DXVK frozen"
   },
   "acceptance_results": {
-    "native_typed_camera_partial_clear": "SOURCE_IMPLEMENTED_AWAIT_GATE",
-    "native_typed_stereo_eye_partial_clear": "SOURCE_IMPLEMENTED_AWAIT_GATE",
-    "original_d3d9_safe_fallback": "STATIC_NEGATIVE_AWAIT_GATE",
-    "same_sha_gates": "PENDING_EXACT_SHA",
+    "native_typed_camera_partial_clear": "PASS_STATIC_TYPED_RTV_AND_WARP_GAME_CAMERA",
+    "native_typed_stereo_eye_partial_clear": "PASS_TWO_EYE_FORMAT_PREFLIGHT_AND_GPU_RECT_CLEAR",
+    "original_d3d9_safe_fallback": "PASS_FAIL_CLOSED_STATIC_NEGATIVE_REGRESSION",
+    "same_sha_gates": "PASS_EXACT_SHA_5_OF_5",
     "quest3_vdxr": "UNTESTED"
   },
   "changed_files": [
@@ -103,15 +103,53 @@
       "Static source auditor retained obsolete RGBA8-only exact-string checks"
     ],
     "runtime_validation": "UNTESTED",
-    "ci_retry_failure": "Run 39063041101 rejected source checkpoint because previous milestone/full-frame label implied unverified live D3D9 callsite; exact R30 callsite remains unproven."
+    "ci_retry_failure": "Run 39063041101 rejected source checkpoint because previous milestone/full-frame label implied unverified live D3D9 callsite; exact R30 callsite remains unproven.",
+    "validation_sha": "863c49ac626641397042d97a53bdd570850a2d89",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39063114345,
+        "conclusion": "success",
+        "validation_sha": "863c49ac626641397042d97a53bdd570850a2d89"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39063114174,
+        "conclusion": "success",
+        "validation_sha": "863c49ac626641397042d97a53bdd570850a2d89"
+      },
+      {
+        "name": "Build",
+        "run_id": 39063117721,
+        "conclusion": "success",
+        "validation_sha": "863c49ac626641397042d97a53bdd570850a2d89"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39063117708,
+        "conclusion": "success",
+        "validation_sha": "863c49ac626641397042d97a53bdd570850a2d89"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39063117750,
+        "conclusion": "success",
+        "validation_sha": "863c49ac626641397042d97a53bdd570850a2d89"
+      }
+    ],
+    "isolated_native_warp_sha": "9bb071835f7f1cffedfa56217c9d0c6727e853f4",
+    "isolated_native_warp_run_id": 39063041057,
+    "isolated_native_warp_conclusion": "success"
   },
   "pipeline": {
     "C0_RECOVER": "00891 exact-SHA PASS and C6 complete; new 00892 material b063ca06672662f623e39d69f902b6350c5f7bde",
     "C1_REVIEW": "Backend/Fast current 00891 missing blocking_evidence and Windows Build stale RGBA8 source static audit",
     "C2_IMPLEMENT": "Typed RTV GPU format checking for offscreen plus native eye and exact preflight with safe D3D9Ex fallback",
-    "C3_VALIDATE": "Exact-SHA CI for initial repair 9bb07183 failed task-policy due unproven LIVE_D3D9_CALLSITE stage; corrected to bounded native stereo source pending Gate. Original gameplay/hardware output still UNTESTED.",
-    "C4_COMMIT": "Material b063ca06672662f623e39d69f902b6350c5f7bde and same-task CI source/audit correction in next validation-bearing commit",
+    "C3_VALIDATE": "DX11 Fast #39063114345, Backend #39063114174, Build #39063117721, OpenXR #39063117708, HUD Inspector #39063117750 all exact 863c49ac SUCCESS (5/5). Isolated source WARP #39063041057 SUCCESS. Quest3/VDXR/gamepad UNTESTED.",
+    "C4_COMMIT": "Original material C++ b063ca06672662f623e39d69f902b6350c5f7bde; same-task C++/audit fix 9bb071835f7f1cffedfa56217c9d0c6727e853f4; validated contract repair 863c49ac626641397042d97a53bdd570850a2d89. C6 is separate bookkeeping.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING"
-  }
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA 5/5 at validation-bearing 863c49ac; SOURCE-stage native stereo typed GPU Clear only, full OutRun gameplay and HMD untested; no duplicate score for retry/C6."
+  },
+  "ci_repair_commit_sha": "9bb071835f7f1cffedfa56217c9d0c6727e853f4",
+  "policy_repair_commit_sha": "863c49ac626641397042d97a53bdd570850a2d89"
 }
