@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_CI_PENDING",
-  "automation_validation": "PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "8f70c8694ecb120a1e98a54ec9eff81264e4ee28",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "092e2c41b7ec776f032fd0f9cde4d78fdd64e31b",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "vrhost/tests/goal_progress_owner_smoke.cpp"
@@ -82,5 +82,5 @@
     "eye_ownership": "Exact GOAL source uses one latched pose, two separate R84 eye projection matrices and atomic two-eye ProjectPixelPairAcrossViewports; no per-eye transform is derived from a previous world/HUD draw."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check final exact-SHA Windows GitHub Actions on material source commit; repair true CI failures only under this TASK_ID. Quest3/VDXR HMD visual outcome remains UNTESTED, no asserted runtime pass."
+  "next_action": "Exact-SHA CI SUCCESS recorded at C6; Quest3/VDXR HMD binocular GOAL progress and result rendering remains UNTESTED. No source changes, CI reruns or duplicate score for C6."
 }
