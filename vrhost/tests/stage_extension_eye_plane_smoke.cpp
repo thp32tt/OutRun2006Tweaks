@@ -11,6 +11,72 @@ bool Near(float a,float b,float eps=1e-4f) {
 int main() {
     using OutRunVR::StageExtensionPlane::ProjectPixel;
     using OutRunVR::StageExtensionPlane::BuildStageEyePoses;
+    // Two independent original +TIME SpriteNodes can share the same
+    // ScreenHud/StageExtensionTime token. They must not share one delayed
+    // GPU submission: R33 binds each left/right pair to a queue node/epoch.
+    // Keep one native batch per node, never one Flush per D3DX Draw.
+    {
+        using namespace OutRunVR::GameSemantic;
+        const int firstNode=1, secondNode=2;
+        const auto check = [&](bool active, const void* outgoing,
+                               const void* incoming, RenderScope outScope,
+                               ProducerToken outToken, RenderScope inScope,
+                               ProducerToken inToken) {
+            return CanIsolateD3DXStageQueueNodeTransition(
+                active, outgoing, incoming,
+                outScope, outToken, inScope, inToken);
+        };
+        if (!check(true, &firstNode, &secondNode,
+                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime))
+            return 60;
+        // No split within one SpriteNode, outside a live queue, or with
+        // incomplete node identity, to preserve original texture batching.
+        if (check(true, &firstNode, &firstNode,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            check(false, &firstNode, &secondNode,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            check(true, nullptr, &secondNode,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            check(true, &firstNode, nullptr,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime))
+            return 61;
+        // GOAL, F11, generic HUD and projected/world effects have their
+        // own original boundaries and cannot acquire +TIME's GPU owner.
+        if (check(true, &firstNode, &secondNode,
+                  RenderScope::ScreenHud, ProducerToken::GoalTime020,
+                  RenderScope::ScreenHud, ProducerToken::GoalTime020) ||
+            check(true, &firstNode, &secondNode,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenHud, ProducerToken::GoalTime150) ||
+            check(true, &firstNode, &secondNode,
+                  RenderScope::WorldBillboard, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            check(true, &firstNode, &secondNode,
+                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                  RenderScope::ScreenOverlay2D, ProducerToken::StageExtensionTime))
+            return 62;
+        // A verified old homogeneous GPU batch must still pass the existing
+        // pre-queue fence; mixed/foreign batches cannot be relabelled.
+        if (!CanFlushD3DXPreQueueStageBatch(
+                true, false, true,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            CanFlushD3DXPreQueueStageBatch(
+                true, false, false,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            CanFlushD3DXPreQueueStageBatch(
+                true, false, true,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                RenderScope::ScreenHud, ProducerToken::ResultProgress))
+            return 63;
+    }
+
     const float identity[16]={1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
     float x=0,y=0;
     if(!ProjectPixel(identity,320,240,0,0,640,480,1,x,y) ||

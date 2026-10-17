@@ -144,6 +144,24 @@ namespace OutRunVR::GameSemantic
             pendingProducer == outgoingProducer;
     }
 
+    // R33's physical stereo source is one SpriteNode + queue epoch, not
+    // merely one producer token. Two +TIME nodes with identical ScreenHud
+    // semantics may each register a deferred D3DX batch: the previous
+    // node's triangles must be submitted BEFORE selecting the next node.
+    // Preserve native D3DX batching within each node (no per-Draw Flush).
+    inline constexpr bool CanIsolateD3DXStageQueueNodeTransition(
+        bool queueActive, const void* outgoingNode, const void* incomingNode,
+        RenderScope outgoingScope, ProducerToken outgoingProducer,
+        RenderScope incomingScope, ProducerToken incomingProducer) noexcept
+    {
+        return queueActive && outgoingNode != nullptr &&
+            incomingNode != nullptr && outgoingNode != incomingNode &&
+            outgoingScope == RenderScope::ScreenHud &&
+            incomingScope == RenderScope::ScreenHud &&
+            outgoingProducer == ProducerToken::StageExtensionTime &&
+            incomingProducer == ProducerToken::StageExtensionTime;
+    }
+
     // The source E8 can return before its registered D3DX triangles reach
     // the GPU. On the very FIRST SpriteNode, QueueRenderActive is still false
     // and there is no outgoing queue owner to compare. An unrelated incoming

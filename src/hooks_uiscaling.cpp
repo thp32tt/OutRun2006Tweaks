@@ -3016,7 +3016,20 @@ public:
             (enteringGoal != leavingGoal) ||
             (enteringGoal && leavingGoal &&
              nextProducer != CurrentRenderProducerToken());
-        if (enteringStage == leavingStage && !goalBoundary)
+        // The outgoing and incoming +TIME sprites can carry the SAME
+        // ScreenHud/StageExtensionTime token while belonging to distinct
+        // queue nodes. R33 validates queueNode and queueEpoch for each GPU
+        // submission, so flushing only on producer changes can submit the
+        // earlier node with the next one's identity (lost stereo/headlock).
+        // Drain the old homogeneous batch under its old queue node first.
+        // The normal owner/mixed/live-sprite checks below still fail closed.
+        const bool stageNodeBoundary =
+            CanIsolateD3DXStageQueueNodeTransition(
+                QueueRenderActive(), CurrentQueueNode(), nextNode,
+                EffectiveScope(), CurrentRenderProducerToken(),
+                nextScope, nextProducer);
+        if (enteringStage == leavingStage && !goalBoundary &&
+            !stageNodeBoundary)
             return;
 
         void* sprite = *Module::exe_ptr<void*>(0x55B218);

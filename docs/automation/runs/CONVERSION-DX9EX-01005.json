@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01005",
+  "production_id": "CONVERSION-DX9EX-01005",
+  "event_id": "CONVERSION-DX9EX-01005-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_SOURCE_IMPLEMENTED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "663701c657696488949a3ecc8ce2292ad45199dc",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01005.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve the complete stage +TIME animated sprite and numeric glyphs as binocular, source-owned HUD when separate original SpriteNodes with identical producer tokens defer GPU drawing between queue selections.",
+    "scope_boundary": "Only the existing R84 exact StageExtensionTime ScreenHud SpriteNode D3DX queue transition; no GOAL, gameplay timer, F11, rank, outer lens discs, SkyGlow, original input/FFB, native desktop fallback, R26_SAFE or frozen DXVK changes.",
+    "trace_stages": [
+      "Original six EXE +TIME sprite and numeric E8 callers register exact ScreenHud ownership onto each newly allocated SpriteNode.",
+      "ID3DXSprite Draw can retain triangles into a later GPU Flush; the R64 queue preselection code previously split only producer changes, even between distinct StageExtensionTime queue node identities.",
+      "R84 R33 checks queueNode and queueEpoch for stereo submission while R30 applies independently projected finite +TIME eye coordinates, so a prior node batch must flush under its own queued owner."
+    ],
+    "subcomponents": [
+      "Split an outgoing proven homogeneous +TIME D3DX GPU batch at a distinct incoming +TIME SpriteNode while preserving source ownership during native Flush and preserving batching inside a single node.",
+      "Prove positive same-producer two-node transitions and negative same-node, absent queue, mixed, GOAL, unrelated HUD, world and sprite-provenance boundaries through compiled host smoke regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_same_producer_node_gpu_boundary",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original stage extension queued sprites and numeric stereo",
+        "expected_behavior": "Two different queued +TIME SpriteNodes using the identical stage token submit their own homogeneous deferred D3DX GPU batches before source ownership switches; R33 sees the original node and queue epoch."
+      },
+      {
+        "id": "stage_native_batch_and_fallback_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "D3DX batching, GOAL, native desktop and protected scene effects",
+        "expected_behavior": "One node retains native texture batching and no per-draw flush; mixed, unknown, foreign, non-live, GOAL, overlay and world batches are never promoted into +TIME ownership."
+      },
+      {
+        "id": "stage_r84_exact_sha_windows_host_and_domain",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA DX9Ex R84 build and isolated regressions",
+        "expected_behavior": "Changed-area C++ smoke passes and the final exact result SHA completes required DX9Ex Active Win32 game/full-chain/R26 rollback/x64 host/package, Domain and affected source/HUD regression gates; physical Quest3/VDXR remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_same_producer_node_gpu_boundary": "PENDING_CI",
+    "stage_native_batch_and_fallback_isolation": "PENDING_CI",
+    "stage_r84_exact_sha_windows_host_and_domain": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "BeforeQueueNode returned whenever enteringStage == leavingStage and goalBoundary was false. Adjacent StageExtensionTime SpriteNodes have identical producer and scope, so the queued D3DX batch for the previous node was not drained before R33 switched queue node/epoch. R33 validates physical stereo by per-node identity rather than just the homogeneous producer.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp StageExtensionEnter/Leave and TagAppendedNodes",
+      "src/hooks_uiscaling.cpp VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode and DX9ExD3DXSpriteLifetime::CanFlush",
+      "src/vr/d3d9/stereo_renderer_r33.cpp captureStageSource / SameAfterNativeLeft"
+    ],
+    "alternatives_rejected": [
+      "No duplicate six-call producer hook or global D3DX per-Draw Flush; those are already present or would change unrelated GPU ordering."
+    ],
+    "evidence_limit": "Source and deterministic transition condition proven; Quest3 binocular effect not yet measured."
+  },
+  "runtime_validation_notes": "No Quest3/VDXR HMD or game runtime session executed for this result."
+}
