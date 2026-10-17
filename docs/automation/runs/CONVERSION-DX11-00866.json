@@ -8,7 +8,7 @@
   "attempt": "1/3",
   "owner_id": "ChatGPT2",
   "work_key": "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY",
-  "feature_id": null,
+  "feature_id": "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY",
   "target_branch": "vr-dx11-native-r71",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
@@ -22,7 +22,7 @@
   "validation_bearing_result_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
   "result_sha": "1052ad57a28241db107a815f9269ff54344f92d4",
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY",
     "goal": "Preserve caller D3D11 output-merger pixel UAV, MRT/DSV and compute UAV state during native stereoscopic game-eye replay and GPU copy/stretch postpasses without resetting UAV append/consume counters or altering dormant-native D3D9Ex/input/FFB fallback.",
     "acceptance_items": [
       {
@@ -50,9 +50,9 @@
     "tools/dx11_native_transport_probe.cpp"
   ],
   "acceptance_results": {
-    "end2end": "SOURCE_REGRESSION_ADDED_AND_CI_SUCCESS; REAL_GAME_UNTESTED",
-    "fallback": "SOURCE_GUARD_AND_WARP_REGRESSION_ADDED; RUNTIME_UNTESTED",
-    "gates": "PASS_EXACT_SHA_USER_CONFIRMED",
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
     "real_game_and_quest3": "UNTESTED"
   },
   "pipeline": {
@@ -81,7 +81,43 @@
       },
       "note": "Combined commit status API reported no statuses; commit workflow lookup returns a subset of runs. Full exact-SHA CI SUCCESS supplied by user, not independently re-executed.",
       "runtime_validation": "UNTESTED"
-    }
+    },
+    "c6_policy_repair": "00867 causal CI repair: prior 00866 record restored from missing-file C6 without mandatory development_strategy and non-null feature ID. Material/validation SHA and runtime status unchanged; no new score or source result claimed."
   },
-  "next_action": "C6 bookkeeping recorded only. Continue unfinished native DX11 gameplay/HMD integration in a separate development task; avoid duplicate scoring or repeated CI for this result."
+  "next_action": "C6 bookkeeping recorded only. Continue unfinished native DX11 gameplay/HMD integration in a separate development task; avoid duplicate scoring or repeated CI for this result.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Source game Draw/DrawIndexed native eye callback",
+      "Shared D3D11 OM/CS UAV copy/stretch across independent eye targets",
+      "Producer fence and separate OpenXR consumer publication"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP callback runs separate L/R native eye draws with caller OM pixel UAV and postpass CS UAV bound, then reads source-native eye pixels",
+      "negative_regression": "Foreign/unsupported source GPU aliases and active D3D9Ex fallback remain fail-closed; UAV counters preserved across pixel/compute restoration",
+      "component_integration": "Two eye RTV/DSV outputs, GPU copy/stretch, and producer/consumer fence are covered by the exact-SHA game-eye source regression"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_OM_PIXEL_UAV_STEREO_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI validates source-stage WARP L/R pixel provenance and transport; physical menu/race and Quest3 output remain UNTESTED",
+    "activation_guard_and_fallback": "Native D3D11 stereo stays opt-in with D3D9Ex default, original input/FFB and DXVK branch isolated"
+  },
+  "historical_acceptance_results": {
+    "end2end": "SOURCE_REGRESSION_ADDED_AND_CI_SUCCESS; REAL_GAME_UNTESTED",
+    "fallback": "SOURCE_GUARD_AND_WARP_REGRESSION_ADDED; RUNTIME_UNTESTED",
+    "gates": "PASS_EXACT_SHA_USER_CONFIRMED",
+    "real_game_and_quest3": "UNTESTED"
+  }
 }
