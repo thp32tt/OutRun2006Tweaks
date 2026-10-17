@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01021",
+  "production_id": "CONVERSION-DX9EX-01021",
+  "event_id": "CONVERSION-DX9EX-01021-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "fff7db2b3780a8a720b8c317bce16d5d2889cf32",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "vrhost/tests/pause_menu_eye_affine_smoke.cpp",
+    "tools/verify_vr_pause_menu_eye_affine.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Keep the original ESC/pause menu shell, queued child text and YES/NO option arrows together on one correctly scaled, vertically offset stereo optical plane under headset motion without changing gameplay HUD.",
+    "scope_boundary": "R84 paused ESC menu source-owned shader and XYZRHW rendering only. Do not alter generic menus, world/sky, SkyGlow, gameplay UI, F11, rank, GOAL/+TIME, original game input, FFB, or R26_SAFE.",
+    "trace_stages": [
+      "Game STATE_SMPAUSEMENU produces original queued generic overlay text and exact pause-arrow ScreenHud with a distinct native SpriteNode.",
+      "R84 R30ClassifyScreenSpacePass admits only the live queued ESC owner and R30GetRecentOriginalHudWvp validates original same-node/pose/shader WVP.",
+      "R30BuildScreenSpaceEyeConstants reconstructs a finite per-eye HUD plane and applies the identical pause scale and post-projection offset to ESC text and arrows."
+    ],
+    "subcomponents": [
+      "Admit only source-proven paused generic queued text to the existing ESC shader optical scale after exact WVP lifetime verification.",
+      "Apply the same pause vertical clip shift as the exact shader-owned option arrows and protect unrelated producer modes through negative C++ and source-mutation regression tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_shell_child_text",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ESC menu original queued text and exact arrows optical convergence",
+        "expected_behavior": "Both the queued pause text and ScreenHud arrows use a common responsive pause optical size and post-eye vertical shift on the real R84 shader GPU path."
+      },
+      {
+        "id": "esc_nonpause_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Non-pause menu/world/gameplay HUD and invalid source WVP",
+        "expected_behavior": "Generic unqueued or non-pause overlay cannot gain pause transforms; bad source identity preserves the original single draw."
+      },
+      {
+        "id": "esc_full_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Source-integrated Windows game and host packaging",
+        "expected_behavior": "Same validation-bearing Git SHA passes DX9Ex Active, Domain Isolation, HUD Inspector, Full Source Impact without CI skip and HMD remains separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "esc_shell_child_text": "PENDING_CI",
+    "esc_nonpause_negative": "PENDING_CI",
+    "esc_full_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "The existing R84 finite HUD shader case admits both exact ScreenHud and source-proven queued ScreenOverlay2D, but exactPauseShaderOwner was exactHud && R30IsPauseMenuElement(), so queued ESC text used R30HudScaleValue and zero pause vertical shift while exact pause arrows used separate menu controls.",
+    "source_trace": [
+      "In SMPAUSEMENU an exact producer tags option arrow ScreenHud but generic queued shell/child text remains ScreenOverlay2D.",
+      "R30ClassifyScreenSpacePass conditionally admits only same-node queued perspective generic pause overlay and R30GetRecentOriginalHudWvp requires current shader, pose and original game WVP.",
+      "R30BuildScreenSpaceEyeConstants uses exactPauseShaderOwner to choose pause scale and post-eye shift; generic queued path previously set it false."
+    ],
+    "root_cause": "Pause shader transform permission covered ScreenHud arrows but excluded the independently source-proven queued ScreenOverlay2D ESC text even when both entered the same finite stereo plane.",
+    "alternatives_rejected": [
+      "Do not broaden all ScreenOverlay2D, generic non-pause overlays or F11 into finite eye HUD owner.",
+      "Do not duplicate existing D3DX deferred producer hooks, suppress sprites or globally flush native queues.",
+      "Do not modify the R26_SAFE fallback or weaken shader/pose/WVP provenance checks."
+    ],
+    "fix_evidence": "C++ R84 pause finite-plane permission includes genericQueuedHud while retaining R30IsPauseMenuElement; five-way static smoke cases and negative mutation guard cover external/nonpause/untagged cases.",
+    "eye_ownership": "Existing R30 per-eye pose/projection and post-projection pause offset remain unchanged; both exact arrow and source-verified queue child now use the same pause size/shift owner.",
+    "evidence_limit": "No Quest3/VDXR visual test. Not a claim that every ESC controller-navigation/hitbox scenario is fully accepted; only the identified text/shell stereo mismatch is a source-fix candidate."
+  },
+  "ci_evidence": {
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "exact_sha": "PENDING",
+    "blocker": "Prior 01020 exact-SHA CI running while candidate authored; do not cancel, do not fake green."
+  }
+}
