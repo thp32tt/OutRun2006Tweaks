@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """R33 mono/aux draw bypass: never probe R30 XYZRHW outside the stereo raster guard."""
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 R33 = ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -55,7 +56,14 @@ def check(r33, r29):
             assert "R32ReviewCurrentVertexShaderIdentity() == 0);" in draw
             assert "const HRESULT xyzrhw = tryXyzrhw\n                    ? " + probe in draw
             assert ": E_NOTIMPL;" in draw
-            assert "if (xyzrhw != E_NOTIMPL)\n                    return xyzrhw;" in draw
+            # Route instrumentation is observational and remains inside
+            # the same resync-gated R30 XYZRHW branch.
+            assert re.search(
+                r"if\s*\(xyzrhw != E_NOTIMPL\)\s*\{\s*"
+                r"if\s*\(telemetry\)\s*"
+                r"OutRunVR::UniversalTrace::ScopedDraw::RecordRoute\(\s*"
+                r"OutRunVR::UniversalTrace::Route::R30Xyzrhw\);\s*"
+                r"return xyzrhw;\s*\}", draw)
             assert "R32ReviewCallRaw" + raw + "(" in draw
             assert "R32ReviewCallLower" + raw + "(" in draw
             assert "R33GuardStereoRasterState(" in draw
