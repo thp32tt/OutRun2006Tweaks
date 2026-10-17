@@ -2,18 +2,18 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01010",
   "production_id": "CONVERSION-DX9EX-01010",
-  "event_id": "CONVERSION-DX9EX-01010-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-01010-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTING",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "d590eebb17b68443a240160fac7bc07acfa0d0f2",
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "rank_native_draw_owner": "PENDING",
-    "rank_reentrant_safe_fallback": "PENDING",
-    "rank_exact_sha_gate": "PENDING"
+    "rank_native_draw_owner": "PASS",
+    "rank_reentrant_safe_fallback": "PASS",
+    "rank_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "PhysicalRankSource retained node/anchor/pose/shader across native LEFT but omitted the actual top-level Draw serial and FVF. Reentrant LEFT work can issue a different command with identical node/token/pose/shader while the subsequent RIGHT pass still accepts the stale rank source.",
@@ -80,5 +80,46 @@
       "Do not promote generic 2D nodes to world markers, relax existing queue proof or duplicate the native left Draw."
     ],
     "evidence_limit": "Source-backed missing physical identity guard; HMD optical behavior not measured; runtime remains UNTESTED."
+  },
+  "material_result_sha": "684953b92b6d18ffddb7e97cebc44999de3e9e78",
+  "validation_bearing_result_sha": "4b886460bbb79561385163e88441ed88d8566cac",
+  "validation_notes": "C2 actual R84 rank Draw serial/FVF physical ownership implementation material 684953b92b6d18ffddb7e97cebc44999de3e9e78. Existing strict projected-rank negative mutation verifier repaired under same TASK at 5a810befe18b160b73ef09351931aa2233a712c1 and 4b886460bbb79561385163e88441ed88d8566cac (capture versus native stereo executor). Final exact SHA 4b886460: DX9Ex Active #39024147066 policy/R84 full-chain/game/R26_SAFE/x64 host/package all 5/5 SUCCESS, Domain #39024147069 SUCCESS, HUD Inspector #39024147101 SUCCESS. Full Source Impact #39023739411 SUCCESS at original material SHA 684953b9 (later changes only Python verifier, no C++ source changes). Runtime Quest3/VDXR UNTESTED, visual fix not confirmed. C6 separate bookkeeping [skip ci], no new feature or duplicate retry score.",
+  "ci_evidence": {
+    "source_commit": "684953b92b6d18ffddb7e97cebc44999de3e9e78",
+    "validation_bearing_result_sha": "4b886460bbb79561385163e88441ed88d8566cac",
+    "validated_exact_sha": "4b886460bbb79561385163e88441ed88d8566cac",
+    "dx9ex_active": {
+      "run_id": 39024147066,
+      "sha": "4b886460bbb79561385163e88441ed88d8566cac",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "game",
+        "host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39024147069,
+      "sha": "4b886460bbb79561385163e88441ed88d8566cac",
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 39024147101,
+      "sha": "4b886460bbb79561385163e88441ed88d8566cac",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 39023739411,
+      "sha": "684953b92b6d18ffddb7e97cebc44999de3e9e78",
+      "conclusion": "success",
+      "scope_note": "Completed for material C++ commit; later candidate changed only Python verifier."
+    },
+    "original_failure": {
+      "run_id": 39024057072,
+      "sha": "5a810befe18b160b73ef09351931aa2233a712c1",
+      "cause": "Reused-old-snapshot negative mutation incorrectly sought in capture instead of native stereo executor."
+    }
   }
 }
