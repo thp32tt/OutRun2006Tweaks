@@ -1249,6 +1249,7 @@ int main()
         ID3D11UnorderedAccessView* gameComputeViews[2]{};
         bool replayedComputeCopyStretch[2]{};
         bool preservedComputeOutputs[2]{};
+        bool inheritedComputeState[2]{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
@@ -1482,6 +1483,24 @@ int main()
         ctx->RSGetState(&boundRaster);
         ctx->OMGetBlendState(&boundBlend, boundBlendFactor, &boundSampleMask);
         ctx->OMGetDepthStencilState(&boundDepthState, &boundStencilRef);
+        ID3D11ShaderResourceView* csResource = nullptr;
+        ID3D11SamplerState* csSampler = nullptr;
+        ID3D11Buffer* csConstants = nullptr;
+        ID3D11UnorderedAccessView* csOutputs[2]{};
+        ctx->CSGetShaderResources(0u, 1u, &csResource);
+        ctx->CSGetSamplers(0u, 1u, &csSampler);
+        ctx->CSGetConstantBuffers(0u, 1u, &csConstants);
+        ctx->CSGetUnorderedAccessViews(0u, 2u, csOutputs);
+        fixture.inheritedComputeState[eyeIndex] =
+            csResource == fixture.originalResource &&
+            csSampler == fixture.originalSampler &&
+            csConstants == fixture.originalConstants &&
+            csOutputs[0] == fixture.gameComputeViews[0] &&
+            csOutputs[1] == fixture.gameComputeViews[1];
+        if (csResource) csResource->Release();
+        if (csSampler) csSampler->Release();
+        if (csConstants) csConstants->Release();
+        for (auto* output : csOutputs) if (output) output->Release();
 
         ID3D11ShaderResourceView *gsResource = nullptr, *hsResource = nullptr, *dsResource = nullptr;
         ID3D11SamplerState *gsSampler = nullptr, *hsSampler = nullptr, *dsSampler = nullptr;
@@ -1948,7 +1967,18 @@ int main()
         for (auto* target : afterCopyMrt)
             if (target) target->Release();
         if (afterCopyDepth) afterCopyDepth->Release();
-        if (!fixture.rejectedInvalidClear[eyeIndex] ||
+        // A game compute camera callback can replace stage bindings after
+        // postpass dispatch. Verify next eye and caller recover their inputs.
+        ID3D11ShaderResourceView* detachedComputeResource = nullptr;
+        ID3D11SamplerState* detachedComputeSampler = nullptr;
+        ID3D11Buffer* detachedComputeConstants = nullptr;
+        ID3D11UnorderedAccessView* detachedComputeOutputs[2]{};
+        ctx->CSSetShaderResources(0u, 1u, &detachedComputeResource);
+        ctx->CSSetSamplers(0u, 1u, &detachedComputeSampler);
+        ctx->CSSetConstantBuffers(0u, 1u, &detachedComputeConstants);
+        ctx->CSSetUnorderedAccessViews(0u, 2u, detachedComputeOutputs, nullptr);
+        if (!fixture.inheritedComputeState[eyeIndex] ||
+            !fixture.rejectedInvalidClear[eyeIndex] ||
             !fixture.replayedMidSceneClear[eyeIndex] ||
             !fixture.replayedPartialDepthStencil[eyeIndex] ||
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
@@ -2028,6 +2058,9 @@ int main()
     gameEyeFixture.gameComputeViews[1] = gameComputeViews[1];
     d3d.context->CSSetUnorderedAccessViews(
         0u, 2u, gameComputeViews, nullptr);
+    d3d.context->CSSetShaderResources(0u, 1u, &gameSampleView);
+    d3d.context->CSSetSamplers(0u, 1u, &gameSampler);
+    d3d.context->CSSetConstantBuffers(0u, 1u, &gameConstants);
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -2101,6 +2134,8 @@ int main()
             gameEyeFixture.replayedComputeCopyStretch[1] &&
             gameEyeFixture.preservedComputeOutputs[0] &&
             gameEyeFixture.preservedComputeOutputs[1] &&
+            gameEyeFixture.inheritedComputeState[0] &&
+            gameEyeFixture.inheritedComputeState[1] &&
             gameEyeFixture.replayedGpuOnlyArrayCopy[0] &&
             gameEyeFixture.replayedGpuOnlyArrayCopy[1] &&
             gameEyeFixture.replayedGpuOnlyArrayStretch[0] &&

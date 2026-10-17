@@ -519,6 +519,14 @@ public:
         context_->DSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedDSResources_);
         context_->DSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedDSSamplers_);
         context_->DSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedDSConstants_);
+        // Real menu/race camera postpasses may use CS shader inputs and UAV
+        // outputs between the two game eyes. The second eye must start with
+        // the same compute pipeline, and the desktop/host caller must retain it.
+        context_->CSGetShader(&savedCS_, savedCSClasses_, &savedCSClassCount_);
+        context_->CSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedCSResources_);
+        context_->CSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedCSSamplers_);
+        context_->CSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedCSConstants_);
+        context_->CSGetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, savedCSOutputs_);
         viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetViewports(&viewportCount_, savedViewports_);
         scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
@@ -553,6 +561,9 @@ public:
         if (savedGS_) savedGS_->Release();
         if (savedHS_) savedHS_->Release();
         if (savedDS_) savedDS_->Release();
+        if (savedCS_) savedCS_->Release();
+        for (UINT i = 0; i < savedCSClassCount_; ++i)
+            if (savedCSClasses_[i]) savedCSClasses_[i]->Release();
         for (UINT i = 0; i < savedVSClassCount_; ++i)
             if (savedVSClasses_[i]) savedVSClasses_[i]->Release();
         for (UINT i = 0; i < savedPSClassCount_; ++i)
@@ -580,6 +591,10 @@ public:
         for (auto* p : savedDSSamplers_) if (p) p->Release();
         for (auto* p : savedDSConstants_) if (p) p->Release();
         for (auto* p : savedPSConstants_) if (p) p->Release();
+        for (auto* p : savedCSResources_) if (p) p->Release();
+        for (auto* p : savedCSSamplers_) if (p) p->Release();
+        for (auto* p : savedCSConstants_) if (p) p->Release();
+        for (auto* p : savedCSOutputs_) if (p) p->Release();
     }
     ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
     ScopedNativeGameEyeOutput& operator=(const ScopedNativeGameEyeOutput&) = delete;
@@ -652,6 +667,17 @@ private:
         context_->GSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedGSResources_);
         context_->GSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedGSSamplers_);
         context_->GSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedGSConstants_);
+        // Restore real compute camera programs/inputs as well as all UAV
+        // outputs without resetting append/consume counters. A callback may
+        // change them for eye L, but eye R must see the source game's state.
+        context_->CSSetShader(savedCS_, savedCSClasses_, savedCSClassCount_);
+        context_->CSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedCSResources_);
+        context_->CSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedCSSamplers_);
+        context_->CSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedCSConstants_);
+        UINT preserveCounters[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+        for (auto& count : preserveCounters) count = UINT(-1);
+        context_->CSSetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT,
+                                            savedCSOutputs_, preserveCounters);
     }
     ID3D11DeviceContext* context_{};
     std::uint32_t width_{}, height_{};
@@ -676,6 +702,11 @@ private:
     ID3D11GeometryShader* savedGS_{};
     ID3D11HullShader* savedHS_{};
     ID3D11DomainShader* savedDS_{};
+    ID3D11ComputeShader* savedCS_{};
+    ID3D11ShaderResourceView* savedCSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11SamplerState* savedCSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
+    ID3D11Buffer* savedCSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
+    ID3D11UnorderedAccessView* savedCSOutputs_[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     ID3D11ShaderResourceView* savedVSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
     ID3D11ShaderResourceView* savedPSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
     ID3D11SamplerState* savedVSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
@@ -696,6 +727,8 @@ private:
     ID3D11ClassInstance* savedGSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     ID3D11ClassInstance* savedHSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     ID3D11ClassInstance* savedDSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    ID3D11ClassInstance* savedCSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
+    UINT savedCSClassCount_{D3D11_SHADER_MAX_INTERFACES};
     UINT savedVSClassCount_{D3D11_SHADER_MAX_INTERFACES};
     UINT savedPSClassCount_{D3D11_SHADER_MAX_INTERFACES};
     UINT savedGSClassCount_{D3D11_SHADER_MAX_INTERFACES};
