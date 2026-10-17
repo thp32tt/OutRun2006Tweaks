@@ -1,5 +1,6 @@
 #include "native_shared_eye_ring.hpp"
 #include "native_game_eye_pair_sources.hpp"
+#include "native_game_om_slots.hpp"
 
 #include <dxgi.h>
 
@@ -459,6 +460,7 @@ namespace outrun::vr::dx11
             ID3D11RenderTargetView* targets[
                 D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
             ID3D11DepthStencilView* depth{};
+            NativeGameOmSlots outputSlots{};
             // Game camera color may also be bound as a compute UAV by a
             // postpass. A native eye GPU copy must not read a live UAV output;
             // preserve ALL caller compute outputs, including unrelated slots.
@@ -470,10 +472,22 @@ namespace outrun::vr::dx11
                 D3D11_PS_CS_UAV_REGISTER_COUNT]{};
             explicit ScopedStereoSourceOutputs(ID3D11DeviceContext* ctx) noexcept
                 : context(ctx) {
-                context->OMGetRenderTargetsAndUnorderedAccessViews(
-                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-                    targets, &depth, 0u,
-                    D3D11_PS_CS_UAV_REGISTER_COUNT, pixelOutputs);
+                // RTVs and pixel UAVs share output slots. The former 8-RTV,
+                // UAV-start=0 query overlapped every populated RTV and could
+                // silently fail to capture a game's PS UAV state. First read
+                // RTV/DSV, then query only the legally unoccupied UAV tail.
+                context->OMGetRenderTargets(
+                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth);
+                std::uint32_t occupied = 0u;
+                for (UINT index = 0; index < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+                     ++index) {
+                    if (targets[index]) occupied |= (1u << index);
+                }
+                outputSlots = NativeGameOmSlots::from_rtv_mask(occupied);
+                if (outputSlots.uavCount != 0u)
+                    context->OMGetRenderTargetsAndUnorderedAccessViews(
+                        0u, nullptr, nullptr, outputSlots.uavStart,
+                        outputSlots.uavCount, pixelOutputs + outputSlots.uavStart);
                 context->CSGetUnorderedAccessViews(
                     0u, D3D11_PS_CS_UAV_REGISTER_COUNT, computeOutputs);
                 ID3D11UnorderedAccessView* unbound[
@@ -490,17 +504,16 @@ namespace outrun::vr::dx11
                 // Restore the occupied RT prefix and the remaining OM UAV
                 // slots in one D3D11 OM operation. Binding RTVs alone would
                 // erase the game's PS UAV postpass state between eye frames.
-                UINT rtCount = 0u;
-                for (UINT i = 0u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
-                    if (targets[i]) rtCount = i + 1u;
+                const UINT rtCount = outputSlots.rtvCount;
                 UINT keepCounters[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
                 for (auto& counter : keepCounters) counter = UINT(-1);
-                const UINT uavCount = D3D11_PS_CS_UAV_REGISTER_COUNT - rtCount;
+                // Restore the exact prefix that was captured, including
+                // sparse RTV holes, then the PS UAV tail without overlap.
                 context->OMSetRenderTargetsAndUnorderedAccessViews(
                     rtCount, rtCount ? targets : nullptr, depth,
-                    rtCount, uavCount,
-                    uavCount ? pixelOutputs + rtCount : nullptr,
-                    uavCount ? keepCounters + rtCount : nullptr);
+                    outputSlots.uavStart, outputSlots.uavCount,
+                    outputSlots.uavCount ? pixelOutputs + outputSlots.uavStart : nullptr,
+                    outputSlots.uavCount ? keepCounters + outputSlots.uavStart : nullptr);
                 // Preserve append/consume counters in both OM and CS stages.
                 context->CSSetUnorderedAccessViews(
                     0u, D3D11_PS_CS_UAV_REGISTER_COUNT,

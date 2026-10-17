@@ -291,3 +291,5 @@ jobs:
           # submission; keep negative tamper and source-RECT regressions live.
           python tools/test_dx11_eye_partial_depth_activation.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_cpu_surface_replay_probe_00887.cpp -o /tmp/dx11_cpu_surface_replay_00887 && /tmp/dx11_cpu_surface_replay_00887
+          # Native eye GPU Copy restores legally non-overlapping RTV/PS-UAV slots.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_eye_om_slots_probe_00888.cpp -o /tmp/dx11_game_eye_om_slots_00888 && /tmp/dx11_game_eye_om_slots_00888
