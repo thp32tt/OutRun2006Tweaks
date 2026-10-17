@@ -46,17 +46,28 @@ assert audit_native_partial_depth_clear(
     source, probe.replace(
         "!encoder.clear_depth_stencil(0.5f, 0u, true, true, &badRect)", ""
     )), "bad-RECT regression removal slipped through"
+# Keep the negative mutation on the TRUE eye encoder. An auxiliary game
+# camera has a separate clear route, so a first-occurrence global replace
+# would mutate only that camera and silently stop testing eye admission.
+def tamper_eye(method, original, replacement):
+    anchor = "bool NativeGameEyeDrawEncoder::" + method + "("
+    prefix, body = source.split(anchor, 1)
+    assert original in body, "eye GPU route missing: " + method
+    return prefix + anchor + body.replace(original, replacement, 1)
+
 # Reject a real partial HUD/menu Clear being widened into a whole-eye
 # DSV operation, and reject deleting the malformed two-eye preflight.
 assert audit_native_partial_depth_clear(
-    source.replace(
+    tamper_eye(
+        "clear_depth_stencil",
         "route == live_game_stereo::NativeDepthClearRoute::PartialRaster",
-        "route == live_game_stereo::NativeDepthClearRoute::FullDsv", 1),
+        "route == live_game_stereo::NativeDepthClearRoute::FullDsv"),
     probe), "cropped depth-region widening slipped through"
 assert audit_native_partial_depth_clear(
-    source.replace(
+    tamper_eye(
+        "clear_depth_stencil",
         "route == live_game_stereo::NativeDepthClearRoute::Reject",
-        "route == live_game_stereo::NativeDepthClearRoute::FullDsv", 1),
+        "route == live_game_stereo::NativeDepthClearRoute::FullDsv"),
     probe), "invalid depth-region admission slipped through"
 # The caller still owns the boundary: an unauthorized Draw is not made
 # legitimate by the narrowly reviewed depth-only callback.
@@ -80,9 +91,10 @@ assert audit_native_partial_color_clear(
         "ds.DepthEnable = FALSE;", "ds.DepthEnable = TRUE;", 1),
 ), "inherited depth test tamper slipped through"
 assert audit_native_partial_color_clear(
-    source.replace(
+    tamper_eye(
+        "clear_target_argb",
         "case live_game_stereo::NativeColorClearRoute::ShaderRaster:",
-        "case live_game_stereo::NativeColorClearRoute::FullRtv:", 1),
+        "case live_game_stereo::NativeColorClearRoute::FullRtv:"),
 ), "cropped TARGET clear widened into full-eye Clear"
 assert audit_native_partial_color_clear(
     source.replace(
