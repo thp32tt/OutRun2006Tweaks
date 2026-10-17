@@ -680,6 +680,13 @@ public:
         context_->RSSetScissorRects(1u, &scissor);
         return true;
     }
+    // A camera callback may leave an OpenXR/host predicate or SO writer
+    // active after its final geometry. The producer still owns pending game
+    // Clear/Copy/Stretch events at the same last Draw ordinal; those commands
+    // must not be conditionally discarded before this eye is sealed.
+    void prepare_source_timeline_tail() noexcept {
+        if (active_) isolate_game_draw_outputs();
+    }
     [[nodiscard]] bool valid() const noexcept { return active_; }
 private:
     void isolate_game_draw_outputs() noexcept {
@@ -1575,8 +1582,16 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                 invocation.partialTargetClear, eyeIndex);
             if (!invocation.callback(invocation.user, ctx,
                                      targets[eyeIndex], eyeIndex,
-                                     invocation.eye[eyeIndex], encoder) ||
-                !encoder.finish_source_clear_timeline())
+                                     invocation.eye[eyeIndex], encoder))
+                return false;
+            // The callback is finished, but source-authored Clears and GPU
+            // postpasses can be scheduled at the final Draw ordinal. Strip
+            // any callback predicate/SO binding before finishing that tail:
+            // e.g. right-eye menu HUD Clear at draw ordinal six must render
+            // even if a host postpass left an unready occlusion predicate.
+            // ScopedNativeGameEyeOutput restores caller state on every exit.
+            output.prepare_source_timeline_tail();
+            if (!encoder.finish_source_clear_timeline())
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
             if (!encoder.draw_count() || !encoder.color_draw_count() ||
