@@ -5,6 +5,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/texture_pack_cursor.hpp"
 #include "vr/game/dds_alpha_mask_policy.hpp"
+#include "vr/game/dds_fast_loader_request.hpp"
 #include "vr/game/sprite_uv_transaction.hpp"
 #include <fstream>
 #include <xxhash.h>
@@ -359,6 +360,12 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (Height > header->data.dwHeight)
 		Height = header->data.dwHeight;
 
+	// The fast uploader only copies mip levels that are present in the file.
+	// An explicit auto-generated chain (0) or more mips than the DDS contains
+	// requires D3DX's real filtering/allocation path, not a silent truncation.
+	if (!OutRunVR::DdsFastLoad::RequestedMipCountSupported(
+		MipLevels, max(1U, header->data.dwMipMapCount), D3DX_DEFAULT))
+		return E_FAIL;
 	MipLevels = (MipLevels != D3DX_DEFAULT) ? MipLevels : header->data.dwMipMapCount;
 	if (MipLevels > header->data.dwMipMapCount)
 		MipLevels = header->data.dwMipMapCount;
@@ -419,6 +426,16 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	// rather than asking CreateTexture/LockRect for a 3-byte GPU surface.
 	if (format_orig == D3DFMT_R8G8B8)
 		format_present = D3DFMT_X8R8G8B8;
+	// A caller can request an alpha-bearing or otherwise different D3D9 format.
+	// Silently creating an X8 or compressed texture instead can make original
+	// car-selector/menu artwork white or invisible when downstream alpha state
+	// expects the requested format. Let native D3DX convert it faithfully.
+	if (!OutRunVR::DdsFastLoad::RequestedFormatSupported(
+		static_cast<std::uint32_t>(Format),
+		static_cast<std::uint32_t>(format_present),
+		static_cast<std::uint32_t>(D3DX_DEFAULT),
+		static_cast<std::uint32_t>(D3DX_FROM_FILE)))
+		return E_FAIL;
 
 #ifdef _DEBUG
 	spdlog::info("Texture {}x{} mips {} fmt {}", Width, Height, MipLevels, (int)format_orig);

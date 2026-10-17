@@ -1,0 +1,62 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01024",
+  "production_id": "CONVERSION-DX9EX-01024",
+  "event_id": "CONVERSION-DX9EX-01024-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_branch": "feature/dx9ex-01024-dds-request-contract",
+  "feature_base_sha": "2d9bc76aba242a6aa5f7af38f89d5e1b6eacdede",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT_WHITE_OR_MISSING",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/dds_fast_loader_request.hpp",
+    "vrhost/tests/dds_fast_loader_request_smoke.cpp",
+    "tools/verify_vr_dds_fast_load_contract.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "goal": "Preserve caller-requested D3D9 texture resource semantics for original vehicle-select and menu DDS replacements, allowing original native D3DX conversion or mip generation when the fast-copy path cannot honor them.",
+    "acceptance_items": [
+      {
+        "id": "format_fidelity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "RGBA/XRGB/BC D3D9 output",
+        "expected_behavior": "Fast path only returns matching caller format or D3DX sentinel, otherwise original D3DX creates requested texture."
+      },
+      {
+        "id": "mip_fidelity",
+        "category": "fallback_regression",
+        "behavior_area": "Declared mip, autogen and unsupported mip requests",
+        "expected_behavior": "Exact existing mip copied; explicit auto/oversized mip count falls back to original loader; original UV, FFB and world unaffected."
+      },
+      {
+        "id": "ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex R84 package, host, source impact",
+        "expected_behavior": "Portable smoke, mutation guard and exact GitHub full mandatory CI after branch integration; Quest3 remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "format_fidelity": "SOURCE_IMPLEMENTED",
+    "mip_fidelity": "SOURCE_IMPLEMENTED",
+    "ci": "PENDING_CI"
+  },
+  "validation_command": [
+    "c++ -std=c++17 -Wall -Wextra vrhost/tests/dds_fast_loader_request_smoke.cpp -o /tmp/dds-smoke && /tmp/dds-smoke",
+    "python tools/verify_vr_dds_fast_load_contract.py",
+    "GitHub exact-SHA DX9Ex Active + Domain + HUD Inspector + Full Source Impact"
+  ],
+  "notes": "C2 material candidate built on isolated feature branch while independent target CI is running. Do not fast-forward target or mark C6 until all exact SHA gates pass. D3DX request divergence is source-confirmed; connection to observed HMD white sprites remains unproven. No runtime HMD test."
+}
