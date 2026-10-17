@@ -1,0 +1,113 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00886",
+  "production_id": "CONVERSION-DX11-00886",
+  "event_id": "CONVERSION-DX11-00886-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_branch": "feature/dx11-00886-game-surface-mutation-replay",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00886",
+  "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:POSTDRAW_COPY_REPLAY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "28f54969560fb90b07d99a1d902ce4099aa24e9e",
+  "material_result_sha": "23ef2949e93959a8c5f208b9dde0b1f04059a3cf",
+  "feature_last_head": "8090e3ada5c5262baa60940fb0d607608dada469",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
+    "goal": "After genuine game D3D9 Draw/DrawIndexed, mirror a successfully authored StretchRect/UpdateSurface backbuffer postpass into the already native D3D11 full-size game RTV through a diagnostic bounded readback->GPU copy. Keep DX9Ex frame/input fallback, reject foreign/invalid regions. This hybrid path is NOT zero-copy full native gameplay or stereo XR proof.",
+    "acceptance_items": [
+      {
+        "id": "live_surface_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_draw_stretch_rect_update_surface_to_native_full_frame",
+        "expected_behavior": "Real successful D3D9 post-Draw destination pixels are read back, region copied to native D3D11 texture and further native game draws maintain source order."
+      },
+      {
+        "id": "source_region",
+        "category": "end_to_end_behavior",
+        "behavior_area": "cropped_postpass_source_ownership",
+        "expected_behavior": "Exact UpdateSurface source+destination and StretchRect destination region bounded, X8 alpha forced opaque, original full frame intact."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_input_draw_present",
+        "expected_behavior": "Failed D3D9 mutation, unsupported surface/format, device loss, malformed rectangle or out-of-budget event abort optional native publication without changing original game HRESULT, Draw, DX9Ex input, HMD routing."
+      },
+      {
+        "id": "five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "feature_ci_exact_sha",
+        "expected_behavior": "Windows compile and all five mandatory DX11 gates pass at same SHA before target compare/fast-forward."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_surface_copy": "PENDING_EXACT_SHA",
+    "source_region": "PASS_STATIC_LOCAL_SOURCE_ONLY",
+    "fallback": "PENDING_EXACT_SHA",
+    "five_gates": "PENDING_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_surface_copy_region.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_game_surface_copy_region_probe_00886.cpp",
+    "tools/test_dx11_game_surface_copy_00886.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Actual game authored D3D9 Draw/DrawIndexed -> existing native D3D11 geometry frame.",
+      "Successful original game UpdateSurface/StretchRect -> bounded current D3D9 destination readback -> D3D11 GPU CopySubresourceRegion preserving native output chronology -> existing Present bridge."
+    ],
+    "batch_components": [
+      "D3D9 source hooks + native frame bridge C++ replay",
+      "portable destination region + C++ and Python negative source tests + fast CI wiring"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Local reconstructed portable C++17 source-region probe passed; source-link static checks passed. Remote Windows GPU runtime not run.",
+      "negative_regression": "Malformed rectangles, offset overflow, unsupported source/owner, stale/failed native replay fail closed; source-level mutation contracts added, Windows gate pending.",
+      "component_integration": "Real post-Draw game surface source bytes -> full-size D3D11 texture copy, no synthetic geometry evidence. DX9Ex original HRESULT/input and fallback retained."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME:POSTDRAW_COPY_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D9_GAME_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "D3D9_ORIGINAL_POSTDRAW_SURFACE_COPY",
+      "D3D11_GPU_COPY",
+      "GAME_PRESENT"
+    ],
+    "visible_frame_acceptance": "Hybrid diagnostic source bridge only; menu/car/race full-frame usability, GPU performance, Quest3/HMD untested.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 and OUTRUN_DX11_FULL_GAME_FRAME=1 explicit; no default promotion, original D3D9 Draw/Present/input unchanged."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: target 28f54969, controller 00:00 periodic checkpoint and prior 00885 ownership confirmed, 00886 record absent.",
+    "C1_REVIEW": "PASS_ONCE: 00885 owns offscreen camera eye clears, 00477 R175 complete. Selected distinct real-game main-backbuffer postpass integration.",
+    "C2_IMPLEMENT": "PASS_SOURCE: D3D9 UpdateSurface/StretchRect original output -> cached SYS staging -> owned D3D11 scratch -> CopySubresourceRegion full-size native color RTV, bounded regions, X8 alpha, OM restore, original fallback.",
+    "C3_VALIDATE": "LOCAL_PORTABLE_SOURCE_ONLY: representative C++17 region geometry and GitHub source token checks passed. Windows build/GPU and exact-SHA Actions not executed.",
+    "C4_COMMIT": "PASS_FEATURE_BRANCH: material C++ commit 23ef2949 and source/test/workflow commit 8090e3ad; target intentionally unchanged.",
+    "C5_PACKAGE": "NOT_REQUIRED; no runtime HMD build/package",
+    "C6_STATE": "PENDING_FIVE_EXACT_SHA_ACTIONS_AND_TARGET_FAST_FORWARD"
+  },
+  "next_action": "Run actual feature Windows CI and five mandatory exact-SHA checks without redundant earlier task revalidation; repair failures, recheck target behind=0 expected HEAD, force=false promotion only after PASS. Actual game/HMD testing remains separate. Do not mark FEATURE_READY/COMPLETE on portable probe only."
+}
