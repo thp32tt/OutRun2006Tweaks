@@ -1,4 +1,5 @@
 #include "../../src/vr/game/lens_centre_upload_transaction.hpp"
+#include "../../src/vr/d3d9/lens_centre_source_provenance.hpp"
 #include <cassert>
 
 int main()
@@ -37,5 +38,30 @@ int main()
     auto absent = original;
     absent.uploadGeneration = 0;
     assert(!SameSourceAfterNativeUpload(original, absent));
+    // Production R33 must not send C993 to the right eye after an
+    // intervening native left Draw changes its exact physical source.
+    const StereoDrawSource left{7, 40, 11, 9, 0x100, true};
+    assert(SameStereoDrawSource(left, left));
+    auto inner = left;
+    inner.centreCall = 8;
+    assert(!SameStereoDrawSource(left, inner));
+    inner = left;
+    inner.drawSerial = 41;
+    assert(!SameStereoDrawSource(left, inner));
+    inner = left;
+    inner.shaderEpoch = 12;
+    assert(!SameStereoDrawSource(left, inner));
+    inner = left;
+    inner.shader = 0x200;
+    assert(!SameStereoDrawSource(left, inner));
+    inner = left;
+    inner.poseSequence = 10;
+    assert(!SameStereoDrawSource(left, inner));
+    inner = left;
+    inner.exactDirectCentre = false;
+    assert(!SameStereoDrawSource(left, inner));
+    inner = left;
+    inner.centreCall = 0;
+    assert(!SameStereoDrawSource(left, inner));
     return 0;
 }

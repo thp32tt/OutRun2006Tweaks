@@ -1,0 +1,96 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00991",
+  "production_id": "CONVERSION-DX9EX-00991",
+  "event_id": "CONVERSION-DX9EX-00991-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING_EXACT_SHA",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_EXACT_SHA_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "7d944f6c273fd86398eda5250f364c850cdaa7f0",
+  "material_result_sha": "8e77b9d466be26913488cad52d424c1684dbf164",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00991.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Protect R84 central C993 lens flare physical left-to-right stereo source identity across a reentrant native game draw, preventing a new flare/ring/foreign object or stale shader from borrowing the original centre right-eye projection.",
+    "scope_boundary": "Exact direct D3A5/C993 central sun R84 R33 stereo physical GPU submission only; preserve CABE outer halos, SkyGlow, F11/ESC, +TIME, GOAL, car shadows, original input/FFB, R26_SAFE rollback and frozen DXVK.",
+    "trace_stages": [
+      "Canonical EXE D3A5 enters the C993 exact world billboard producer scope and uploads source-owned original c64 WVP via the game hook.",
+      "R84 R30 builds centre left and right head-relative eye constants before R33 physically invokes the original left GPU Draw; nested draw may change producer, shader epoch, pose or draw serial.",
+      "R84 R33 either submits the same proven C993 source to the second eye or restores original native c64, marks stereo frame unusable and does not replay the left Draw; OpenXR host accepts no falsely completed two-eye frame."
+    ],
+    "subcomponents": [
+      "Capture exact centre producer call, physical draw serial, pose sequence and shader epoch/identity before and after real native left-eye Draw, rejecting a changed or unknown source.",
+      "Restore original c64 and invalidate incomplete stereo instead of submitting foreign right-eye geometry; compile and execute portable positive/negative regressions as part of mandatory host build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_centre_same_draw_binocular_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "C993 producer through R84 physical left/right GPU Draw",
+        "expected_behavior": "Only an unchanged exact original C993 producer, shader and pose may reuse prepared right-eye constants after a native left-eye submission."
+      },
+      {
+        "id": "native_draw_reentrant_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Nested game draw, original shader state and outer halos",
+        "expected_behavior": "Changed producer/draw/shader/pose after left submission never enters right-eye Draw, restores native original WVP and maintains original left HRESULT while invalidating the incomplete stereo frame."
+      },
+      {
+        "id": "full_exact_sha_windows_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game, x64 OpenXR host, package and Windows gate matrix",
+        "expected_behavior": "Exact SHA DX9Ex Active, Domain, Inspector and Full Source Impact compile and verify on unchanged source; Quest3 optics remain UNTESTED unless physically verified."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "lens_centre_same_draw_binocular_source": "PENDING_WINDOWS_CI",
+    "native_draw_reentrant_fallback": "PENDING_WINDOWS_CI",
+    "full_exact_sha_windows_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R33TryHud builds and uploads both eye C993 matrices but invokes a native original left-eye game Draw with potential renderer reentrancy; previously no source identity recheck before dispatching the prepared right-eye matrix.",
+    "original_evidence": "The actual R84 stereo_renderer_r33.cpp R33TryHud performs actualDraw() for the left eye and then submits the right-eye pass without re-sampling the physical C993 source/shader identity; R30's prior raw c64 proof predates the left physical draw.",
+    "source_trace": [
+      "Original D3A5 producer tags direct C993 and game c64 upload as centre world billboard.",
+      "R30 proves the raw stock WVP and builds asymmetric headset eye constants.",
+      "R33's raw left Draw is a native callback boundary; pre/post centre source stamp now gates subsequent right-eye submission."
+    ],
+    "alternatives_rejected": [
+      "No C993 E8 reinstall, no generic alpha/WorldBillboard widening, no global D3DX Flush, no SkyGlow/halo modification and no claim that a C993 optical root cause has been verified on HMD."
+    ],
+    "eye_ownership": "Original left eye uses the native C993 Draw; right eye is submitted only with the same direct-centre call, shader generation, draw serial and pose. Source mutation marks the stereo frame incomplete and restores original game c64.",
+    "fix_evidence": "Integrated R84 R33 direct draw guard checks exact source before and after native left Draw and fails closed without a second game Draw if reentered.",
+    "negative_test_evidence": "Portable x64 host lens-upload transaction smoke extended with unchanged and eight producer/shader/draw/pose/invalid negatives; still awaiting exact-SHA CI."
+  },
+  "score_delta_this_attempt": 0,
+  "local_validation": {
+    "cpp17_smoke": "NOT_RUN_LOCAL_CONTAINER_NO_NETWORK",
+    "required_host_smoke": "outrun-vr-lens-upload-transaction-smoke"
+  },
+  "next_action": "Resolve exact-SHA CI; if successful record C6 separately without duplicate task/feature score. Quest3/VDXR runtime acceptance stays NEED_HMD_TEST."
+}
