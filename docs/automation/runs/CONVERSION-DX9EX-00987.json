@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00987",
+  "production_id": "CONVERSION-DX9EX-00987",
+  "event_id": "CONVERSION-DX9EX-00987-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
+  "material_result_sha": "29bbbb99256aff1111ab1b1afcf09b68547a623d",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/texture_pack_cursor.hpp",
+    "vrhost/tests/texture_pack_cursor_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/texture_pack_cursor.hpp",
+    "vrhost/tests/texture_pack_cursor_smoke.cpp",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00987.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Keep original game car-selector and menu DDS replacement graphics consistent with the first actual gamepad layout across desktop/VR gameplay, controller disconnect, reconnect and forced-pad transitions, without producing mixed/white UI art.",
+    "scope_boundary": "Only UI controller-specific DDS pack selection and exact session identity; do not modify 3D scene textures, SkyGlow, R84 stereo transforms, original inputs/FFB, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original gamepad CurrentPadType/ForcedPadType selects the first known PC or console family during native replacement texture load.",
+      "HandleTexture resolves the original DDS hash, UI texture-pack ordinal and pad-specific optional directory with one immutable session owner.",
+      "The existing D3DX sprite and game R84 menu/car-select renderers consume a consistent DDS family; the Windows host CI executes actual portable reconnect/forced-source regression."
+    ],
+    "subcomponents": [
+      "Freeze first valid gamepad family including PC-as-no-directory and preserve native forced preference on first selection.",
+      "Use the exact locked family at the live texture replacement directory resolver, with executable None/PC/Xbox/forced reconnect regressions in required host build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "ui_first_pad_family_end_to_end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original car selector DDS path through session pad family and UI sprite source",
+        "expected_behavior": "First PC or console selection stays bound to a single UI pack even when forced/current pad changes during a later texture lookup."
+      },
+      {
+        "id": "original_fallback_and_scene_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Original game None/default texture path and unaffected scene XMT, input/FFB owner",
+        "expected_behavior": "None does not latch, first forced selection wins, PC uses no pad-specific directory, and scene cursor plus original controller input remain unchanged."
+      },
+      {
+        "id": "exact_sha_windows_host_and_hmd_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84/R26 and x64 host executable regression with source-specific mandatory Gates",
+        "expected_behavior": "Active/Domain/HUD/Full Source final exact-SHA Gates run and Windows host executes real session-pad regression; Quest3 runtime stays untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "ui_first_pad_family_end_to_end": "PENDING_EXACT_SHA",
+    "original_fallback_and_scene_isolation": "PENDING_EXACT_SHA",
+    "exact_sha_windows_host_and_hmd_separation": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "HandleTexture stored padType only when non-PC, interpreting the valid first PC family as undecided. A later Xbox/PS attachment selected a pad-specific directory while current UI sprites still belonged to the PC pack.",
+    "original_evidence": "src/hooks_textures.cpp contained an explicit developer TODO warning about Xbox-to-PC controller-disconnect texture corruption and the padType == nullptr guard did not latch initial PC.",
+    "source_trace": [
+      "Game CurrentPadType/ForcedPadType observed at first UI-specific DDS hash lookup.",
+      "The mutable padType pointer was null both before selection and after a valid PC selection, allowing a later lookup to change family.",
+      "UI texture resolver probes multiple filesystem DDS replacement paths using padType, and game/UI sprite draws consume the chosen asset."
+    ],
+    "alternatives_rejected": [
+      "No change to gamepad input or FFB, DDS pixels/alpha, 3D scene packs, or global renderer states; family is immutable only after actual known selection."
+    ],
+    "eye_ownership": "This controls the source image family for car-selector/menu texture sprites across both R84 eye compositions; it does not assert corrected stereo eye placement without HMD evidence."
+  },
+  "local_validation": {
+    "cpp17_smoke": "CI_EXECUTION_PENDING",
+    "planned": "Exact SHA DX9Ex Active Windows x64 host smoke target outrun-vr-texture-pack-cursor-smoke.exe"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify exact-SHA four mandatory Gates and host texture smoke; then C6-only bookkeeping if green. Quest3/VDXR remains UNTESTED."
+}
