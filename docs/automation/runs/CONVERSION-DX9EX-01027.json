@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01027",
+  "production_id": "CONVERSION-DX9EX-01027",
+  "event_id": "CONVERSION-DX9EX-01027-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C2_IMPLEMENTED",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep the moving vehicle and rival projected ordinal marker physically attached to the same Calc3D2D 3D source across both R84 shader/c64 stereo eye submissions, without borrowing a fixed 6th/6 gameplay HUD or another car's marker.",
+    "scope_boundary": "Only the R84 R33 shader c64 projected car/rival physical GPU eye pair and its authoritative per-car producer/queue/pose/shader/vertex layout; exclude fixed 6th/6 ScreenHud, GOAL/+TIME, F11, lens centre, SkyGlow, input and FFB, R26 fallback, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original 0x004BAD20 vehicle marker calls Calc3D2D 0x00449940 and queues its own sprite/clip glyphs at EXE RVA 0xBB0FB..0xBB2D0.",
+      "Game per-car ProjectedMarkerInfo survives exact producer and SpriteNode replay to R30 shader/c64 stereo eye matrix selection.",
+      "R33 physical GPU owner rechecks the same marker, queue node/epoch, shader epoch, draw serial, vertex state and pose across native LEFT and RIGHT submissions; host receives only a coherent eye pair."
+    ],
+    "subcomponents": [
+      "Before native LEFT verify live shader rank source and exclude unowned or ScreenHud 6th/6 and unrelated world producers, leaving stock draw when proof is missing.",
+      "After native LEFT verify exact same car marker source and fail closed before RIGHT eye, restore original c64 and flag stereo frame unhealthy upon reentrant source change."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_shader_physical_eye_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Two physical GPU eyes of a single car-attached projected marker",
+        "expected_behavior": "One exact live projected vehicle or rival marker survives native left callback and is required for right eye; other car, HUD or new queue cannot inherit its precomputed c64."
+      },
+      {
+        "id": "rank_native_fallback_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Fixed ScreenHud 6th/6 and original device shader/pose restore",
+        "expected_behavior": "Invalid queue, missing pose, FVF or shader change or unrelated native HUD must not receive the car's right eye; stock single draw remains when pre-left evidence is absent."
+      },
+      {
+        "id": "rank_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 source build and host/package with mandatory guard CI",
+        "expected_behavior": "Exact validation-bearing result SHA passes DX9Ex Active x86 game, x64 OpenXR host and package, Domain Isolation, HUD Inspector and Full Source Impact; HMD separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_shader_physical_eye_pair": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "rank_native_fallback_isolation": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "rank_exact_sha_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Read-only original executable 2026-10-18 Ghidra producer evidence: 0x004BAD20 car-attached rank 0x00449940 Calc3D2D and clip/sprani; 6th/6 is independent 0x004B9D80 screen source.",
+    "source_trace": [
+      "RankMarker_Sprani/clip producer and SpriteNode preserve individual view-space anchor through render_semantics.hpp.",
+      "R30BuildScreenSpaceEyeConstants already selects original rank WVP and two asymmetric-eye constants, but does not enforce post-left source identity inside R33 shader Draw.",
+      "R33TryHud previously guarded C993, +TIME, GOAL, car shadow and native HUD across left/right but omitted ProjectedWorldMarker2D shader source stamp despite R30 XYZRHW already checking same rank helper."
+    ],
+    "root_cause": "The physical R33 shader rank path can prepare a right-eye projection from one Calc3D2D vehicle then run a reentrant original left GPU Draw that switches the queue marker/pose/shader before the right eye is submitted; unlike R30 fixedfn/XYZRHW path, R33 lacked a before/after projected-rank owner transaction.",
+    "alternatives_rejected": [
+      "Do not flatten vehicle markers into native 6th/6 ScreenHud or infer source from FVF/alpha alone.",
+      "No runtime claim: the static source identity bug is demonstrable from missing post-left check, but visible optical failure still needs matching HMD tests."
+    ],
+    "fix_evidence": "R33 shader GPU physical rank stamp validates producer, queue node/epoch, per-vehicle marker, shader epoch, vertex layout and pose before and after original LEFT; changed owner skips RIGHT and restores original c64.",
+    "negative_test_evidence": "Expanded portable rank_marker_physical_source_smoke to exercise shader queued/direct success, cross-car changes, stale queue/pose, changed draw, shader, FVF and native 6th/6 rejection; exact SHA CI pending.",
+    "eye_ownership": "Two eye projections may only originate from one live per-car Calc3D2D marker, never a stale Shader c64 from another producer; failed right ownership invalidates frame for stereo publication."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "New real C++ rank shader physical-source repair, separate from fixed ScreenHud 6th/6 and existing XYZ/RHW/fixedfn rank routes. HMD untested, no CI completion or scoring declared."
+}

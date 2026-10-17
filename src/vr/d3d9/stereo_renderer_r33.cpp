@@ -33,6 +33,7 @@
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/goal_progress_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
+#include "../game/rank_marker_physical_source.hpp"
 #include "../game/hud_native_source_transaction.hpp"
 #include "../core/r29_owner_api.hpp"
 
@@ -1062,6 +1063,38 @@ namespace OutRunVRStereo
             };
             const auto goalCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            // The original Calc3D2D car/rival glyph is a *projected world*
+            // marker, never the native 6th/6 ScreenHud. R30 validates its
+            // source when building c64, but the native LEFT shader Draw may
+            // synchronously switch queue node, marker, FVF, shader or pose.
+            // Revalidate that exact physical command before submitting RIGHT.
+            const bool exactRankEye =
+                screenKind == R32ReviewScreenSpaceKind::ProjectedWorldMarker2D;
+            auto captureRankSource = [&]() noexcept {
+                const auto cmd =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                const auto* marker =
+                    OutRunVR::GameSemantic::CurrentProjectedMarker();
+                if (!marker || !marker->valid)
+                    return OutRunVR::RankMarker::PhysicalRankSource{};
+                DWORD fvf = 0;
+                if (FAILED(device->GetFVF(&fvf)))
+                    return OutRunVR::RankMarker::PhysicalRankSource{};
+                std::uintptr_t shader = 0;
+                std::uint64_t shaderEpoch = 0;
+                if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) ||
+                    shader == 0)
+                    return OutRunVR::RankMarker::PhysicalRankSource{};
+                return OutRunVR::RankMarker::PhysicalRankSource{
+                    cmd.scope, cmd.producer, cmd.queued,
+                    cmd.queueNode, cmd.queueEpoch, *marker,
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    R29OwnerTopLevelDrawSerial(), fvf, shader, shaderEpoch
+                };
+            };
+            const auto rankBeforeLeft = exactRankEye
+                ? captureRankSource()
+                : OutRunVR::RankMarker::PhysicalRankSource{};
             // The full original +TIME family has a distinct physical owner
             // from GOAL, including direct numeric glyphs and queued sprites.
             // R30 checks fixedfn/XYZRHW, but shader/c64 uses this R33 path;
@@ -1129,6 +1162,8 @@ namespace OutRunVRStereo
             if ((exactCentreEye &&
                  !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
                      centreBeforeLeft, centreRawBeforeLeft)) ||
+                (exactRankEye &&
+                 !OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)) ||
                 (exactNativeHud &&
                  !OutRunVR::HudNativeSource::IsExactHudSource(hudBeforeLeft)) ||
                 (exactShadowEye &&
@@ -1150,7 +1185,8 @@ namespace OutRunVRStereo
                 {
                     R32ReviewMarkFrameRightDrawFailed();
                     R32ReviewNoteRestoreFailure(
-                        exactCentreEye ? "R33 C993 pre-left c64 rollback"
+                        exactRankEye ? "R33 projected rank pre-left c64 rollback"
+                        : exactCentreEye ? "R33 C993 pre-left c64 rollback"
                         : exactShadowEye ? "R33 car shadow pre-left c64 rollback"
                         : exactStageEye ? "R33 +TIME pre-left c64 rollback"
                                        : "R33 GOAL pre-left c64 rollback");
@@ -1216,9 +1252,12 @@ namespace OutRunVRStereo
             const bool nativeHudSourceChanged = exactNativeHud &&
                 !OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(
                     hudBeforeLeft, captureNativeHudSource());
+            const bool rankSourceChanged = exactRankEye &&
+                !OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
+                    rankBeforeLeft, captureRankSource());
             if (centreSourceChanged || shadowSourceChanged ||
                 goalSourceChanged || stageSourceChanged ||
-                nativeHudSourceChanged)
+                nativeHudSourceChanged || rankSourceChanged)
             {
                 // Left native Draw already ran once; never replay it.
                 // Restore the game's original GPU c64 without submitting
@@ -1235,7 +1274,8 @@ namespace OutRunVRStereo
                 R32ReviewReportStereoFailure(
                     restored ? OutRunVR::StereoFailureRightStateFailed
                              : OutRunVR::StereoFailureRestoreFailed,
-                    shadowSourceChanged ? "R33/car-shadow-source-changed"
+                    rankSourceChanged ? "R33/rank-marker-source-changed"
+                        : shadowSourceChanged ? "R33/car-shadow-source-changed"
                         : goalSourceChanged ? "R33/GOAL-source-changed"
                         : stageSourceChanged ? "R33/+TIME-source-changed"
                         : nativeHudSourceChanged ? "R33/HUD-source-changed"
@@ -1243,7 +1283,9 @@ namespace OutRunVRStereo
                     E_FAIL);
                 if (!restored)
                     R32ReviewNoteRestoreFailure(
-                        shadowSourceChanged
+                        rankSourceChanged
+                            ? "R33 rank marker original c64 rollback"
+                        : shadowSourceChanged
                             ? "R33 car shadow original c64 rollback"
                           : goalSourceChanged
                             ? "R33 GOAL original c64 rollback"

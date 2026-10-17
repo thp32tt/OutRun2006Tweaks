@@ -73,6 +73,39 @@ int main()
     m = direct; m.fvf = 0u;
     if (SameRankSourceAfterNativeLeft(direct, m)) return 27;
     if (!SameRankSourceAfterNativeLeft(queued, queued)) return 28;
+
+    // R33 shader-c64 route must pair both eyes to the SAME moving vehicle
+    // after the native LEFT callback. This is independent from R30's
+    // fixed-function/XYZRHW owner already using this physical stamp.
+    auto shaderQueued = shaderRank;
+    shaderQueued.fvf = 0u; // declaration-only shader path
+    if (!SameRankSourceAfterNativeLeft(shaderQueued, shaderQueued)) return 29;
+    m = shaderQueued; m.marker.viewX += 0.1f;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 30;
+    m = shaderQueued; m.queueNode = &otherNode;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 31;
+    m = shaderQueued; ++m.queueEpoch;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 32;
+    m = shaderQueued; m.poseEpoch = 0;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 33;
+    m = shaderQueued; m.scope = GameSemantic::RenderScope::ScreenHud;
+    m.producer = GameSemantic::ProducerToken::DispRankClipSprite;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 34;
+    m = shaderQueued; ++m.drawSerial;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 35;
+    m = shaderQueued; m.fvf = 0x142u;
+    if (SameRankSourceAfterNativeLeft(shaderQueued, m)) return 36;
+    // Shader-mediated direct rival marker must not borrow the 6th/6 HUD
+    // or an unrelated direct world-effect producer.
+    auto shaderDirect = direct;
+    shaderDirect.shader = 0x1234;
+    shaderDirect.shaderEpoch = 9;
+    shaderDirect.fvf = 0u;
+    if (!SameRankSourceAfterNativeLeft(shaderDirect, shaderDirect)) return 37;
+    m = shaderDirect; m.producer = GameSemantic::ProducerToken::DispRankFirst;
+    if (SameRankSourceAfterNativeLeft(shaderDirect, m)) return 38;
+    m = shaderDirect; ++m.shaderEpoch;
+    if (SameRankSourceAfterNativeLeft(shaderDirect, m)) return 39;
     std::cout << "R84 physical projected rank source transaction PASS\n";
     return 0;
 }
