@@ -193,6 +193,45 @@ int main() {
     if (!reject(directStage,altered)) return 35;
     altered = queuedStage; altered.poseEpoch = 24;
     if (!reject(queuedStage,altered)) return 36;
+    // R84 shader/c64 +TIME has a separate physical owner from GOAL,
+    // even when a native callback reenters a second numeric glyph or
+    // queued sprite with the same ScreenHud classification.
+    Source shaderStage{RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime, false, nullptr, 0,
+        127, 991, 0x1234, 14};
+    if (!SameAfterNativeLeft(shaderStage, shaderStage))
+        return 38;
+    auto duringLeft = shaderStage;
+    ++duringLeft.topLevelDrawSerial;
+    if (SameAfterNativeLeft(shaderStage, duringLeft))
+        return 39;
+    duringLeft = shaderStage;
+    ++duringLeft.shaderEpoch;
+    if (SameAfterNativeLeft(shaderStage, duringLeft))
+        return 40;
+    duringLeft = shaderStage;
+    duringLeft.producer = ProducerToken::ResultProgress;
+    if (SameAfterNativeLeft(shaderStage, duringLeft))
+        return 41;
+    duringLeft = shaderStage;
+    duringLeft.queued = true;
+    duringLeft.node = &stageNode;
+    duringLeft.queueEpoch = 42;
+    if (SameAfterNativeLeft(shaderStage, duringLeft))
+        return 42;
+    duringLeft = shaderStage;
+    ++duringLeft.poseEpoch;
+    if (SameAfterNativeLeft(shaderStage, duringLeft))
+        return 43;
+    // Fixedfn/null-VS queued sprites remain eligible but a newly selected
+    // R84 shader or queue node may never borrow their prepared right eye.
+    if (!SameAfterNativeLeft(queuedStage, queuedStage))
+        return 44;
+    duringLeft = queuedStage;
+    duringLeft.shader = 0x1234;
+    duringLeft.shaderEpoch = 14;
+    if (SameAfterNativeLeft(queuedStage, duringLeft))
+        return 45;
     // Original HUD/GOAL/rival/SkyGlow and untagged native draws are
     // never admitted by this exact stage-only transaction.
     if (IsValid(Source{}) ||

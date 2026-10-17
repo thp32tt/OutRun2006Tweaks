@@ -31,6 +31,7 @@
 #include "lens_centre_source_provenance.hpp"
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/goal_progress_physical_source.hpp"
+#include "../game/stage_extension_physical_source.hpp"
 #include "../core/r29_owner_api.hpp"
 
 namespace OutRunVRRenderer {
@@ -984,12 +985,39 @@ namespace OutRunVRStereo
             };
             const auto goalCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
-            const bool exactGoalEye = goalCommand.IsExactFiniteResultHud() &&
-                goalCommand.producer !=
+            // The full original +TIME family has a distinct physical owner
+            // from GOAL, including direct numeric glyphs and queued sprites.
+            // R30 checks fixedfn/XYZRHW, but shader/c64 uses this R33 path;
+            // the native left GPU Draw must not reenter a foreign producer
+            // before the right eye is submitted.
+            auto captureStageSource = [&]() noexcept {
+                const auto cmd =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                std::uintptr_t shader = 0;
+                std::uint64_t shaderEpoch = 0;
+                if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                    R29OwnerCurrentVertexShaderIdentity() != 0)
+                    return OutRunVR::StageExtensionPhysical::Source{};
+                return OutRunVR::StageExtensionPhysical::Source{
+                    cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,
+                    cmd.queueEpoch,
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+            };
+            const bool exactStageEye = goalCommand.IsExactFiniteResultHud() &&
+                goalCommand.producer ==
                     OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
+            const auto stageBeforeLeft = exactStageEye
+                ? captureStageSource()
+                : OutRunVR::StageExtensionPhysical::Source{};
+            const bool exactGoalEye = goalCommand.IsExactFiniteResultHud() &&
+                !exactStageEye;
             const auto goalBeforeLeft = exactGoalEye
                 ? captureGoalSource() : OutRunVR::GoalPhysical::Source{};
-            if (exactGoalEye && !OutRunVR::GoalPhysical::IsValid(goalBeforeLeft))
+            if ((exactStageEye &&
+                 !OutRunVR::StageExtensionPhysical::IsValid(stageBeforeLeft)) ||
+                (exactGoalEye &&
+                 !OutRunVR::GoalPhysical::IsValid(goalBeforeLeft)))
             {
                 // Temporary left c64 already uploaded; preserve original
                 // game Draw only after rolling back the uploaded matrix.
@@ -1001,7 +1029,9 @@ namespace OutRunVRStereo
                 if (!restored)
                 {
                     R32ReviewMarkFrameRightDrawFailed();
-                    R32ReviewNoteRestoreFailure("R33 GOAL pre-left c64 rollback");
+                    R32ReviewNoteRestoreFailure(
+                        exactStageEye ? "R33 +TIME pre-left c64 rollback"
+                                      : "R33 GOAL pre-left c64 rollback");
                     R32ReviewArmStereoRecoverySafety();
                     return {true, E_FAIL};
                 }
@@ -1043,7 +1073,11 @@ namespace OutRunVRStereo
             const bool goalSourceChanged = exactGoalEye &&
                 !OutRunVR::GoalPhysical::SameAfterNativeLeft(
                     goalBeforeLeft, captureGoalSource());
-            if (centreSourceChanged || shadowSourceChanged || goalSourceChanged)
+            const bool stageSourceChanged = exactStageEye &&
+                !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+                    stageBeforeLeft, captureStageSource());
+            if (centreSourceChanged || shadowSourceChanged ||
+                goalSourceChanged || stageSourceChanged)
             {
                 // Left native Draw already ran once; never replay it.
                 // Restore the game's original GPU c64 without submitting
@@ -1062,6 +1096,7 @@ namespace OutRunVRStereo
                              : OutRunVR::StereoFailureRestoreFailed,
                     shadowSourceChanged ? "R33/car-shadow-source-changed"
                         : goalSourceChanged ? "R33/GOAL-source-changed"
+                        : stageSourceChanged ? "R33/+TIME-source-changed"
                                             : "R33/C993-centre-source-changed",
                     E_FAIL);
                 if (!restored)
@@ -1070,6 +1105,8 @@ namespace OutRunVRStereo
                             ? "R33 car shadow original c64 rollback"
                           : goalSourceChanged
                             ? "R33 GOAL original c64 rollback"
+                          : stageSourceChanged
+                            ? "R33 +TIME original c64 rollback"
                             : "R33 C993 original c64 rollback");
                 R32ReviewArmStereoRecoverySafety();
                 return result;

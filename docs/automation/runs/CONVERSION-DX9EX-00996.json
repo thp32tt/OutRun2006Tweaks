@@ -1,0 +1,79 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00996",
+  "production_id": "CONVERSION-DX9EX-00996",
+  "event_id": "CONVERSION-DX9EX-00996-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C5_WAIT_EXACT_SHA",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "0fc9e695d36bbc546ceff03ab798be1ed65bab91",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00996.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Complete original stage +TIME direct numeric glyph and queued sprite physical source protection across independent R84 shader/c64 right-eye submission, complementing previously build-verified R30 XYZRHW route under the same visual symptom.",
+    "scope_boundary": "Exact StageExtensionTime only; unchanged GOAL, lens C993, car shadow, R26_SAFE, SkyGlow, input/FFB, frozen DXVK; no D3DX batch-wide flush or game timer change.",
+    "trace_stages": [
+      "Six original stage extension E8 sprite and numeric producer tags propagate StageExtensionTime ScreenHud to physical GPU Draw.",
+      "Previously completed 00994 R30 checks +TIME fixedfn/XYZRHW native left reentrancy but shader/c64 R33 excluded +TIME from its GOAL provenance guard.",
+      "New R33 captures source/queue, pose, native draw and shader epoch before left; rejects alienated right eye after left, rolls original c64 back and prevents stereo success.",
+      "Host stage eye-plane smoke covers direct/queued and shader-epoch, pose, producer, native serial and queue mutation without an HMD."
+    ],
+    "subcomponents": [
+      "Live R84 R33 shader/c64 left/right physical source transaction and safe c64 restoration under failure.",
+      "Host-compiled stage extension smoke positive and mutation-negative regression for direct numeric and queued sprite paths."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_r33_shader_direct_queued",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original six +TIME parent sources through R84 shader/c64 GPU eye submission",
+        "expected_behavior": "Direct glyph and queued +TIME source remain identical across both submitted GPU eyes."
+      },
+      {
+        "id": "stage_r33_native_reentry_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Producer/node/queue/pose/native Draw and shader mutation after native left",
+        "expected_behavior": "No foreign right-eye submission or repeated original left Draw; game's original WVP restored and incomplete stereo vetoed."
+      },
+      {
+        "id": "stage_r33_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84/R26_SAFE plus host/package/Domain/affected Inspector/Full Source Gate",
+        "expected_behavior": "Mandatory exact-SHA GitHub Actions pass; physical Quest3 validation remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_r33_shader_direct_queued": "PENDING_WINDOWS_CI",
+    "stage_r33_native_reentry_fallback": "PENDING_WINDOWS_CI",
+    "stage_r33_exact_sha_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R33TryHud shader/c64 path captures GOAL source and excludes StageExtensionTime, while +TIME's same physical transaction exists only in R30 fixedfn/XYZRHW path.",
+    "existing_feature": "CONVERSION-DX9EX-00994 R30 +TIME shader route excluded by its feature scope; same feature_id reused, no duplicate score for earlier outcome."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check mandatory GitHub Actions on exact material result SHA; if a real failure occurs repair under this TASK_ID without CI skip; HMD remains UNTESTED."
+}
