@@ -1,0 +1,95 @@
+{
+  "schema": "outrun-ab-imagegen-only-staged-v1",
+  "timezone": "Asia/Seoul",
+  "schedule": [
+    "A00",
+    "B10",
+    "A20",
+    "B30",
+    "A40",
+    "B50"
+  ],
+  "N100_root": "/home/chatgpt-runner2/work/outrun-ab-imagegen-only",
+  "preflight": {
+    "schedule": [
+      [
+        0,
+        "A"
+      ],
+      [
+        10,
+        "B"
+      ],
+      [
+        20,
+        "A"
+      ],
+      [
+        30,
+        "B"
+      ],
+      [
+        40,
+        "A"
+      ],
+      [
+        50,
+        "B"
+      ]
+    ],
+    "roles": {
+      "A": [
+        {
+          "task_id": "OUTRUN-KR-IMAGEONLY-A-Q053-01-06-20261017",
+          "slots": 6,
+          "size": 592776,
+          "sha256": "070228ac456539310c819775d244a45bf0788345fba88129070829eee24f874e",
+          "status": "READY"
+        },
+        {
+          "task_id": "OUTRUN-KR-IMAGEONLY-A-Q054-01-06-20261017",
+          "slots": 6,
+          "size": 169732,
+          "sha256": "2f93f50eea0de1de5bd9cdcb424031bcdf16523b1f66c570302c2212e318bf12",
+          "status": "READY"
+        },
+        {
+          "task_id": "OUTRUN-KR-IMAGEONLY-A-Q054-07-12-20261017",
+          "slots": 6,
+          "size": 185334,
+          "sha256": "7115ef6f0c1239ba773aaa25a1f0e390c251fe4aa51cddb16a8a16c5984547f2",
+          "status": "READY"
+        }
+      ],
+      "B": [
+        {
+          "task_id": "OUTRUN-KR-IMAGEONLY-B-Q057-01-07-20261017",
+          "slots": 7,
+          "size": 669901,
+          "sha256": "9223d2d62e406341a7791d0a72f8f6c3ca6d3b5c1c727fd3695abfda00504888",
+          "status": "READY"
+        },
+        {
+          "task_id": "OUTRUN-KR-IMAGEONLY-B-Q060-01-04-20261017",
+          "slots": 4,
+          "size": 159993,
+          "sha256": "120d6305c025715ebfbc0a236e424e082fd6ca0debeefeef07a4e3bfd769bd76",
+          "status": "READY"
+        },
+        {
+          "task_id": "OUTRUN-KR-IMAGEONLY-B-Q060-05-07-20261017",
+          "slots": 3,
+          "size": 224379,
+          "sha256": "e0af476d90fa6dee17c6a9db68a93f5821c8aa1915e402939a50e70ab48b3fb1",
+          "status": "READY"
+        }
+      ]
+    },
+    "status": "PREFLIGHT_PASS_NOT_DOCKER_LIVE"
+  },
+  "docker_runtime": "NOT_VERIFIED_MANUAL_PORTAINER_REDEPLOY_REQUIRED",
+  "generated_png_count": 0,
+  "dds_or_clean_untouched": true,
+  "legacy_ab_paused": true,
+  "c_source_cropping_unchanged": true
+}
