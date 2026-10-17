@@ -188,7 +188,7 @@ def main() -> None:
                 "bool NativeGameEyeDrawEncoder::draw_instanced(",
                 "bool NativeGameEyeDrawEncoder::draw_indexed_instanced(",
                 "if (!live_game_stereo::may_issue_instanced(",
-                "if (!eye_output_bound() || !replay_due_source_clears())",
+                "!eye_output_bound() || !replay_due_source_clears())",
                 "context_->DrawInstanced(",
                 "context_->DrawIndexedInstanced(",
                 # Color evidence is invalid for a Draw discarded by an
