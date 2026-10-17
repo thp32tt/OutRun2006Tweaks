@@ -99,8 +99,12 @@ namespace Settings
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,
 		"VR gameplay camera near plane in game units. Overrides the 2D Z-precision fix while positional tracking is active so dashboard/driver geometry is not clipped by the normal 1.0 near plane.", Range<float>{ 0.03f, 0.50f } };
-	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", false,
+	Setting<bool> VRDriverSeatView{ "VR", "DriverSeatView", true,
 		"Experimental test view: reuses the native bumper camera timing/smoothing, shows the full player car, hides the driver robot and offsets the VR camera into the cockpit." };
+    Setting<float> VRDriverSeatVehicleScale{ "VR", "DriverSeatVehicleScale", 1.15f,
+        "Experimental cockpit-only player-car visual model scale. 1.0 preserves stock geometry; affects neither game physics nor original asset bytes. F11 adjustable after shader-safe player-car draw identification.", Range<float>{ 0.85f, 1.35f } };
+    Setting<float> VRDriverSeatGlassOpacity{ "VR", "DriverSeatGlassOpacity", 0.30f,
+        "Requested cockpit glass material opacity (0.10 to 0.90). A live renderer change requires a verified player-windshield material identity; currently diagnostic only and DOES NOT recolor unrelated materials.", Range<float>{ 0.10f, 0.90f } };
     Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", false,
         "Restart-required read-only bounded canonical PMT material probe; logs candidate blend/material IDs, never changes any glass or world opacity." };
 	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", false,
