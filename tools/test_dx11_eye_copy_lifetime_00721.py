@@ -58,6 +58,8 @@ def preserves_game_pixel_uavs(source: str) -> bool:
         and portion.count("CSSetUnorderedAccessViews(") == 2
     )
 
+submit = ring[ring.index("bool NativeSharedEyeRing::submit_eye_pair("):
+              ring.index("bool NativeSharedEyeRing::render_eye_pair(")]
 assert preserves_game_pixel_uavs(submit), "native eye copy lost OM/CS UAV restoration"
 for old, replacement in [
     ("OMGetRenderTargetsAndUnorderedAccessViews(", "OMGetRenderTargets("),
@@ -71,8 +73,6 @@ for old, replacement in [
 assert linked(ring, slot), "native stereo GPU command or cancellation link missing"
 # The mandatory Backend Conversion verifier must accept the guarded EVENT
 # producer and reject destructive changes to GPU ownership/fence semantics.
-submit = ring[ring.index("bool NativeSharedEyeRing::submit_eye_pair("):
-              ring.index("bool NativeSharedEyeRing::render_eye_pair(")]
 verify_eye_pair_submission(submit)
 for label, before, after in [
     ("missing GPU-queued ownership", "entry.gpu_copy_queued = true;", "/* unsafe */"),
