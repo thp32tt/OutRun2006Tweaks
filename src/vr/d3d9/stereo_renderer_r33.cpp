@@ -947,11 +947,11 @@ namespace OutRunVRStereo
                     OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
                         writtenScope, queueEpoch, queueNode, writtenProducer) &&
                     R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
-                    writtenScope ==
-                        OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
-                    writtenProducer ==
-                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre &&
-                    queueNode == nullptr && command.lensCentreCallEpoch != 0 &&
+                    OutRunVR::LensCentre::AdmitsCentreRawSourceScope(
+                        writtenScope, writtenProducer, queueNode,
+                        command.lensCentreCallEpoch, writtenCall,
+                        R29OwnerTopLevelDrawSerial() + 1u, writtenDraw) &&
+                    command.lensCentreCallEpoch != 0 &&
                     command.lensCentreCallEpoch == writtenCall &&
                     pose != 0 && pose == writtenPose &&
                     writtenShader != 0 && writtenShader == shader &&

@@ -2582,7 +2582,11 @@ namespace OutRunVRStereo
                 R29OwnerTopLevelDrawSerial() + 1u, writeDraw,
                 currentShader, writeShader,
                 currentShaderEpoch, writeShaderEpoch,
-                sourceScope == RenderScope::WorldBillboard,
+                OutRunVR::LensCentre::AdmitsCentreRawSourceScope(
+                    sourceScope, sourceProducer, queueNode,
+                    drawCommand.lensCentreCallEpoch,
+                    OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch(),
+                    R29OwnerTopLevelDrawSerial() + 1u, writeDraw),
                 sourceProducer == ProducerToken::LensFlareCentre,
                 queueNode == nullptr
             });

@@ -90,5 +90,30 @@ int main()
     changed = rawOriginal;
     changed.writeSerial = 0;
     assert(!SameRawStereoSource(rawOriginal, changed));
+    // The exact D3A5 parent may upload the raw C993 matrix while a nested
+    // SceneEffect scope is temporarily active. Only the immediately following
+    // physical draw on the same sun call may consume those game constants.
+    using OutRunVR::GameSemantic::RenderScope;
+    using OutRunVR::GameSemantic::ProducerToken;
+    assert(AdmitsCentreRawSourceScope(RenderScope::WorldBillboard,
+        ProducerToken::LensFlareCentre, nullptr, 11,11,130,2));
+    assert(AdmitsCentreRawSourceScope(RenderScope::SceneEffect,
+        ProducerToken::LensFlareCentre, nullptr, 11,11,3,2));
+    assert(!AdmitsCentreRawSourceScope(RenderScope::SceneEffect,
+        ProducerToken::LensFlareCentre, nullptr, 11,11,4,2));
+    assert(!AdmitsCentreRawSourceScope(RenderScope::SceneEffect,
+        ProducerToken::LensFlareCentre, nullptr, 11,12,3,2));
+    assert(!AdmitsCentreRawSourceScope(RenderScope::SceneEffect,
+        ProducerToken::None, nullptr, 11,11,3,2));
+    assert(!AdmitsCentreRawSourceScope(RenderScope::SceneEffect,
+        ProducerToken::LensFlareCentre, &rawOriginal, 11,11,3,2));
+    assert(!AdmitsCentreRawSourceScope(RenderScope::ScreenHud,
+        ProducerToken::LensFlareCentre, nullptr, 11,11,3,2));
+    assert(!AdmitsCentreRawSourceScope(RenderScope::SceneEffect,
+        ProducerToken::LensFlareCentre, nullptr, 11,11,2,2));
+    // Admission is just one layer: every raw WVP still needs the same
+    // shader, latched pose and exact producer call to reach stereo.
+    assert(!OwnsRawWvp({11,12,9,9,3,2,0x100,0x100,2,2,
+        true,true,true}));
     return 0;
 }

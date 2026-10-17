@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "../game/render_semantics.hpp"
 
 namespace OutRunVR::LensCentre
 {
@@ -12,6 +13,30 @@ namespace OutRunVR::LensCentre
         std::uint64_t shaderEpoch, writtenShaderEpoch;
         bool spatialCentreSource, exactCentreProducer, noQueue;
     };
+    // A C993 sun's D3A5 parent owns the source before its direct GPU draw.
+    // The original game may upload c64 inside a nested SceneEffect helper
+    // and restore WorldBillboard only for the later physical sun draw. Keep
+    // that exact same-call transition, but never grant a nested helper a
+    // multi-draw c64 lease: it could belong to another SceneEffect object.
+    // A native WorldBillboard upload retains its existing bounded batching.
+    constexpr bool AdmitsCentreRawSourceScope(
+        GameSemantic::RenderScope writtenScope,
+        GameSemantic::ProducerToken writtenProducer,
+        const void* writtenQueueNode,
+        std::uint64_t currentCall, std::uint64_t writtenCall,
+        std::uint64_t nextDraw, std::uint64_t writtenDraw) noexcept
+    {
+        using namespace GameSemantic;
+        if (writtenProducer != ProducerToken::LensFlareCentre ||
+            writtenQueueNode != nullptr || currentCall == 0 ||
+            currentCall != writtenCall || nextDraw <= writtenDraw)
+            return false;
+        if (writtenScope == RenderScope::WorldBillboard)
+            return true;
+        return writtenScope == RenderScope::SceneEffect &&
+            nextDraw - writtenDraw == 1u;
+    }
+
     constexpr bool OwnsRawWvp(const RawWvpEvidence& e) noexcept
     {
         return e.currentCall != 0 && e.currentCall == e.writtenCall &&
@@ -85,6 +110,22 @@ namespace OutRunVR::LensCentre
             before.shaderEpoch != 0 &&
             before.shaderEpoch == after.shaderEpoch;
     }
+    static_assert(AdmitsCentreRawSourceScope(
+        GameSemantic::RenderScope::WorldBillboard,
+        GameSemantic::ProducerToken::LensFlareCentre, nullptr,
+        31,31,151,23));
+    static_assert(AdmitsCentreRawSourceScope(
+        GameSemantic::RenderScope::SceneEffect,
+        GameSemantic::ProducerToken::LensFlareCentre, nullptr,
+        31,31,24,23));
+    static_assert(!AdmitsCentreRawSourceScope(
+        GameSemantic::RenderScope::SceneEffect,
+        GameSemantic::ProducerToken::LensFlareCentre, nullptr,
+        31,31,25,23));
+    static_assert(!AdmitsCentreRawSourceScope(
+        GameSemantic::RenderScope::SceneEffect,
+        GameSemantic::ProducerToken::LensFlareCentre, nullptr,
+        31,32,24,23));
     static_assert(SameRawStereoSource(
         {21, 11, 7, 7, 9, 9, 0x100, 3, true},
         {21, 11, 7, 7, 9, 9, 0x100, 3, true}));

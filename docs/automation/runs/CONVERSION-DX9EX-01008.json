@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01008",
+  "production_id": "CONVERSION-DX9EX-01008",
+  "event_id": "CONVERSION-DX9EX-01008-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "BUILD_PENDING",
+  "phase": "C2_IMPLEMENTED",
+  "checkpoint": "C2_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "4de1d61597cfebcacb78c935d60947fbe5b0d650",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_upload_transaction_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01008.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Restore a source-owned, spatial, stereo central C993 lens sun when its original D3A5 caller uploads c64 under a nested SceneEffect before the immediate physical draw, while leaving accepted CABE outer discs and SkyGlow untouched.",
+    "scope_boundary": "Only the original same-call LensFlareCentre producer's R84 raw shader c64 provenance and physical R30/R33 stereo submission. Unrelated SceneEffect, outer lens, SkyGlow, GOAL/+TIME, input/FFB, R26_SAFE and frozen DXVK unchanged.",
+    "trace_stages": [
+      "Original EXE D3A5 parent acquires LensFlareCentre call epoch and original WorldBillboard; nested SceneEffect can own a raw game shader upload ahead of exact C993 original Draw.",
+      "R23 game WVP capture records written scope, original producer, call/pose, shader epoch and draw serial; R30 requires the exact raw matrix before reconstructing a spatial finite eye WVP.",
+      "R33 must independently re-prove the same bounded original source before emitting second eye and restore original GPU c64; outer CABE emitter is untouched."
+    ],
+    "subcomponents": [
+      "Use one shared R84 source-scope decision for both R30 and R33: native WorldBillboard remains eligible, nested SceneEffect requires the next physical draw of the same centre call and queue-free original producer.",
+      "Preserve exact call/pose/shader/native write generation, finite spatial affine/depth rejection and positive and negative compiled regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_nested_original_c64_stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original central flare C993 raw WVP passes nested producer handoff through R30 and R33",
+        "expected_behavior": "Only an immediately following original C993 GPU draw with exact same parent call and shader/pose can use nested SceneEffect c64 to build spatial, binocular per-eye WVP."
+      },
+      {
+        "id": "lens_outer_effect_and_stale_guard",
+        "category": "fallback_regression",
+        "behavior_area": "Other effects, queued SceneEffect, stale or changed c64, outer rings and original game fallback",
+        "expected_behavior": "Reject foreign producer, queue, past or future draw, different call, shader, pose, flattened HUD and unproven matrices; preserve CABE outer discs and safe mono without global stereo widening."
+      },
+      {
+        "id": "lens_r84_exact_sha_integrated",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game, R26_SAFE, x64 OpenXR host, package, Domain and affected inspector/source workflows",
+        "expected_behavior": "All mandatory GitHub Actions for the precise material result SHA report SUCCESS; Quest3/VDXR optical acceptance stays separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "lens_nested_original_c64_stereo": "PENDING_EXACT_SHA",
+    "lens_outer_effect_and_stale_guard": "PENDING_EXACT_SHA",
+    "lens_r84_exact_sha_integrated": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R30 and R33 only admitted raw c64 stamped WorldBillboard, although the original C993 D3A5 source persists through nested SceneEffect helper writes. This can discard otherwise original source-owned matrix and fall back to an uncorrected mono draw; exact runtime frequency not yet measured.",
+    "source_trace": [
+      "src/hooks_graphics.cpp D3A5/C993, ScopedExactLensCentreGpuDraw and nested SceneEffect call lifetime",
+      "src/vr/d3d9/stereo_renderer_r30.cpp R30HasExactLensCentreRawWvp, eye WVP builder",
+      "src/vr/d3d9/stereo_renderer_r33.cpp captureCentreRawSource and SameRawStereoSource"
+    ],
+    "alternatives_rejected": [
+      "Never grant generic SceneEffect/WorldBillboard HUD ownership, extend c64 lease over multiple nested-scoped draw submissions, or remove exact call/pose/shader/affine validation."
+    ],
+    "evidence_limit": "Source-level scope handoff candidate with deterministic negative and positive acceptance tests; no physical HMD screen proof and no assertion this is the sole optical cause."
+  },
+  "runtime_validation_notes": "No Quest3/VDXR runtime test performed; display correction is a candidate pending exact package runtime testing.",
+  "result_notes": "Material source + compiled smoke change, not review-only. Exact CI outcome and C6 remain pending; any policy repair stays under this task, without duplicate score."
+}
