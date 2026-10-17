@@ -59,6 +59,30 @@ static_assert(!ShouldCropConfiguredMenu(3, 1));
 static_assert(!ShouldCropConfiguredMenu(1, 3));
 
 
+// The menu -> Ferrari selector -> selector-exit/reset chain retains
+// *all* source UV pixels at native 16:9/21:9 even if the user left the
+// historical 4:3 A/B override active. Title and menu alone may use its
+// explicitly requested source crop; unknown/gameplay fail closed.
+using OutRunVrMenuAspect::IsWideVehicleSelector;
+using OutRunVrMenuAspect::PlanStateSafeMenuCrop;
+static_assert(IsWideVehicleSelector(0x0Au));
+static_assert(IsWideVehicleSelector(0x0Bu));
+static_assert(IsWideVehicleSelector(0x0Cu));
+static_assert(!IsWideVehicleSelector(0x04u));
+static_assert(!IsWideVehicleSelector(0x09u));
+static_assert(PlanStateSafeMenuCrop(0x04u, true, false, true, false));
+static_assert(PlanStateSafeMenuCrop(0x09u, true, false, true, false));
+static_assert(PlanStateSafeMenuCrop(0x04u, true, true, false, false));
+static_assert(!PlanStateSafeMenuCrop(0x04u, true, false, false, false));
+static_assert(!PlanStateSafeMenuCrop(0x04u, true, true, true, true));
+static_assert(!PlanStateSafeMenuCrop(0x0Au, true, true, true, false));
+static_assert(!PlanStateSafeMenuCrop(0x0Bu, true, true, true, false));
+static_assert(!PlanStateSafeMenuCrop(0x0Cu, true, true, true, false));
+static_assert(!PlanStateSafeMenuCrop(0xFFFFFFFFu, true, true, true, false));
+static_assert(!PlanStateSafeMenuCrop(0x12u, true, true, true, false));
+static_assert(!PlanStateSafeMenuCrop(0x04u, false, false, false, false));
+static_assert(!PlanStateSafeMenuCrop(0x0Au, false, false, true, false));
+
 constexpr auto native43 = PlanCenteredContent(4.0f / 3.0f, 4.0f / 3.0f);
 static_assert(!native43.crop && native43.width == 1.0f &&
     native43.offsetX == 0.0f);
@@ -146,6 +170,21 @@ int main()
     const float ultraWide = 3440.f / 1440.f;
     const float wide = 1920.f / 1080.f;
     const float fourThree = 4.f / 3.f;
+    // The opt-in crop that was safe for a menu cannot truncate the Ferrari,
+    // right-side selector list or exit/reset UI. Preserve uncropped native
+    // authored aspect for every selector state and both desktop widths.
+    for (unsigned state : {0x0Au, 0x0Bu, 0x0Cu})
+    {
+        if (PlanStateSafeMenuCrop(state, true, true, true, false) ||
+            !IsWideVehicleSelector(state) ||
+            PlanUncroppedAuthoredMenuAspect(
+                ultraWide, ultraWide, true, true, false,
+                IsWideVehicleSelector(state), true) != ultraWide ||
+            PlanUncroppedAuthoredMenuAspect(
+                wide, wide, true, true, false,
+                IsWideVehicleSelector(state), true) != wide)
+            return 48;
+    }
     if (std::fabs(PlanUncroppedAuthoredMenuAspect(
             ultraWide, ultraWide, true, true, false, false, true) -
             fourThree) > 1e-5f ||

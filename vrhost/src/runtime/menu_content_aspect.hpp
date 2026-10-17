@@ -30,6 +30,32 @@ namespace OutRunVrMenuAspect
         return configuredLetterbox && imageMatteVerified;
     }
 
+    // Quest3 A/B: the whole Ferrari/list selector spans the captured 16:9
+    // or 21:9 client. A title-oriented manual 4:3 crop must never carry
+    // into selector/exit/reset (or an unknown transition) and truncate the
+    // right-side options. Default remains no crop until source matte is
+    // independently verified, with explicit title/menu A/B opt-in only.
+    constexpr bool IsWideVehicleSelector(std::uint32_t state) noexcept
+    {
+        return state == 0x0Au || state == 0x0Bu || state == 0x0Cu;
+    }
+
+    constexpr bool PlanStateSafeMenuCrop(
+        std::uint32_t state, bool configuredLetterbox,
+        bool imageMatteVerified, bool requestedCrop,
+        bool requestedNoCrop) noexcept
+    {
+        if (IsWideVehicleSelector(state) || requestedNoCrop)
+            return false;
+        // Unknown, gameplay and transition states cannot prove a 4:3
+        // authored matte, even if the previous title enabled A/B cropping.
+        if (state != 0x04u && state != 0x09u)
+            return false;
+        return requestedCrop ||
+            ShouldAutoCropVerifiedFourThree(
+                configuredLetterbox, imageMatteVerified);
+    }
+
     // OutRun may restart with a recycled numeric HWND but a new game PID.
     // A cached 4:3 crop must never be reused for another process.
     // Preserve the bounded INI polling interval within the same process.

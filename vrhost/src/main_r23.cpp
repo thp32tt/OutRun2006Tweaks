@@ -1574,8 +1574,12 @@ namespace
         // Keep the uncropped menu at its captured physical aspect until a
         // real frame-matte verifier has supplied positive evidence.
         constexpr bool imageMatteVerified = false;
-        bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(
-            gameConfiguredLetterbox, imageMatteVerified);
+        // Do not infer crop permission from an old title-menu INI setting
+        // while the game has advanced into the fully authored wide Ferrari
+        // selector. Resolve state and both manual A/B options as one source
+        // contract before changing any captured UV or optical rectangle.
+        bool requestedCrop = false;
+        bool requestedNoCrop = false;
         // Roll back physical 4:3 normalization independently of the older
         // crop override, keeping every menu/car-selection pixel available.
         const char* nativeMenuAspect =
@@ -1586,10 +1590,16 @@ namespace
                 std::getenv("OUTRUN_VR_MENU_CENTER_4_3"))
         {
             if (std::strcmp(overrideValue, "1") == 0)
-                cropCentered43 = true;
+                requestedCrop = true;
             else if (std::strcmp(overrideValue, "0") == 0)
-                cropCentered43 = false;
+                requestedNoCrop = true;
         }
+        const bool wideVehicleSelector =
+            OutRunVrMenuAspect::IsWideVehicleSelector(clientGameState);
+        const bool cropCentered43 =
+            OutRunVrMenuAspect::PlanStateSafeMenuCrop(
+                clientGameState, gameConfiguredLetterbox,
+                imageMatteVerified, requestedCrop, requestedNoCrop);
         // The entire native-aspect menu, not just letterboxed 4:3,
         // is the reference optical plane. A partially off-output vanilla
         // window otherwise zooms/recentres title and car-selection pixels.
@@ -1640,7 +1650,8 @@ namespace
                 std::fabs(sampledPixelsTall - clientHeight) <= 1.0f;
             sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(
                 sourceAspect, clientAspect, gameConfiguredLetterbox,
-                completeClient, cropCentered43, useNativeMenuAspect,
+                completeClient, cropCentered43,
+                useNativeMenuAspect || wideVehicleSelector,
                 imageMatteVerified);
             // A confirmed title/main-menu game state is distinct from the
             // full-width car selector: correct native authored 4:3 *optics*
@@ -1649,7 +1660,8 @@ namespace
             sourceAspect = OutRunVrMenuAspect::PlanStateSensitiveMenuAspect(
                 sourceAspect, clientAspect, clientGameState,
                 gameConfiguredLetterbox, completeClient,
-                cropCentered43, useNativeMenuAspect);
+                cropCentered43,
+                useNativeMenuAspect || wideVehicleSelector);
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
         // projections. Center LOCAL-fixed menu content on the optical ray,
