@@ -107,8 +107,8 @@ namespace Settings
         "Requested cockpit glass material opacity (0.10 to 0.90). A live renderer change requires a verified player-windshield material identity; currently diagnostic only and DOES NOT recolor unrelated materials.", Range<float>{ 0.10f, 0.90f } };
     Setting<bool> VRDriverSeatGlassMaterialTrace{ "VR", "DriverSeatGlassMaterialTrace", true,
         "Restart-required read-only bounded canonical PMT material probe; logs candidate blend/material IDs, never changes any glass or world opacity." };
-	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", true,
-        "Experimental: align cockpit camera offsets to the player's car matrix_B0 rather than camera yaw. Invalid/sideways body transforms fall back to validated native-camera pose; test each vehicle in HMD." };
+	Setting<bool> VRDriverSeatCarSpaceBasis{ "VR", "DriverSeatCarSpaceBasis", false,
+        "Experimental OPT-IN: align cockpit offsets to player matrix_B0. Quest3 field report 2026-10-17 observed severe cockpit/third-person zoom oscillation; default to the uninterrupted native camera basis to avoid per-frame car-space-to-native fallback switches. Enable only for separate A/B diagnosis." };
 	Setting<int> VRDriverSeatNativeMode{ "VR", "DriverSeatNativeMode", 1,
 		"Native camera mode used as the synchronized base for DriverSeatView. Default 1 is the bumper/in-car camera discovered from the canonical EXE.", Range<int>{ 0, 2 } };
 	Setting<float> VRDriverSeatForward{ "VR", "DriverSeatForward", -1.35f,
