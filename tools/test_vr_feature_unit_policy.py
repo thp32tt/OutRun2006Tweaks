@@ -154,22 +154,24 @@ if rank_run_path.is_file():
 # a later successful check previously hid "run record missing" at exact HEAD.
 workflow = (POLICY.parents[2] / ".github/workflows/vr-dx9ex-active.yml").read_text(encoding="utf-8")
 step = workflow.split("- name: Enforce feature-sized DX9Ex autonomous completion", 1)[1].split("- name:", 1)[0]
-for command in (
+guarded_commands = (
     "python tools/test_vr_feature_unit_policy.py",
     "python tools/test_dx9ex_function_dispatch.py",
     "python tools/verify_vr_feature_unit_policy.py --check-head",
+    "python tools/verify_vr_dds_fast_load_contract.py",
     "python tools/verify_vr_hud_edge_transition.py",
     "python tools/verify_vr_r30_positiont_decl.py",
     "python tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     "python tools/verify_vr_skyglow_capture_boundary.py",
-):
+)
+for command in guarded_commands:
     pos = step.index(command)
     rest = step[pos + len(command):].split("\n", 2)
     assert len(rest) > 1 and "if ($LASTEXITCODE -ne 0)" in rest[1], command
 # Keep the expected guard count tied to the enumerated commands. A new
 # verifier must be guarded too, without making this mutation test stale.
 guard_count = step.count("if ($LASTEXITCODE -ne 0)")
-assert guard_count == 7, "all seven policy verifiers must fail closed"
+assert guard_count == len(guarded_commands), "every policy verifier must fail closed"
 mutant = step.replace("if ($LASTEXITCODE -ne 0)", "# swallow verifier errors", 1)
 assert mutant.count("if ($LASTEXITCODE -ne 0)") == guard_count - 1
 print(f"DX9Ex full-function/visual-defect policy PASS: {len(features)} feature classes, 10+ negative cases, terminal root-cause gate, legacy and performance")
