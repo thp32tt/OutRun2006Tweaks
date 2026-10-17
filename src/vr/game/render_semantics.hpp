@@ -889,6 +889,11 @@ namespace OutRunVR::GameSemantic
     inline std::atomic<std::uint64_t> SpriteNodeSemanticConsumed{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticStaleCleared{ 0 };
     inline thread_local std::uint64_t SpriteQueueSemanticCutoff = 0;
+    // Guarded by SpriteNodeSemanticMutex: a producer can be on another thread
+    // while the renderer drains the previous generation of this SAME address.
+    // A 0x2D710 partial queue consume may also precede the full frame consume.
+    inline std::uint64_t SpriteNodeSemanticActiveQueueCutoff = 0;
+    inline std::atomic<std::uint64_t> SpriteNodeSemanticProtectedDrops{ 0 };
 
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
     // Monotonic per-thread identity for the canonical queue node currently
@@ -1192,6 +1197,13 @@ namespace OutRunVR::GameSemantic
         {
             if (SpriteNodeSemanticTags[i].node == node)
             {
+                // Do not overwrite a tag visible to the renderer's current
+                // serial snapshot. A next-frame registration reusing this
+                // original ring-buffer pointer needs a separate entry.
+                if (SpriteNodeSemanticActiveQueueCutoff != 0 &&
+                    SpriteNodeSemanticTags[i].serial <=
+                        SpriteNodeSemanticActiveQueueCutoff)
+                    continue;
                 SpriteNodeSemanticTags[i].scope = scope;
                 SpriteNodeSemanticTags[i].producer = producer;
                 SpriteNodeSemanticTags[i].serial = serial;
@@ -1221,12 +1233,25 @@ namespace OutRunVR::GameSemantic
         // Exact producers are sparse. If a broken frame fills the bounded
         // table, replace the oldest tag rather than silently losing semantic
         // ownership for the remainder of the run.
-        std::size_t oldest = 0;
-        for (std::size_t i = 1; i < SpriteNodeSemanticCount; ++i)
+        std::size_t oldest = SpriteNodeSemanticCount;
+        for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
         {
-            if (SpriteNodeSemanticTags[i].serial <
-                SpriteNodeSemanticTags[oldest].serial)
+            // Under saturation prefer dropping a speculative NEW tag to
+            // destroying an already snapshotted +TIME/rank queue producer.
+            if (SpriteNodeSemanticActiveQueueCutoff != 0 &&
+                SpriteNodeSemanticTags[i].serial <=
+                    SpriteNodeSemanticActiveQueueCutoff)
+                continue;
+            if (oldest == SpriteNodeSemanticCount ||
+                SpriteNodeSemanticTags[i].serial <
+                    SpriteNodeSemanticTags[oldest].serial)
                 oldest = i;
+        }
+        if (oldest == SpriteNodeSemanticCount)
+        {
+            SpriteNodeSemanticProtectedDrops.fetch_add(
+                1, std::memory_order_relaxed);
+            return;
         }
         SpriteNodeSemanticForgetHint(SpriteNodeSemanticTags[oldest].node);
         SpriteNodeSemanticTags[oldest] =
@@ -1266,7 +1291,7 @@ namespace OutRunVR::GameSemantic
             // Keep that tag intact for the next queue walk's cutoff.
             if (SpriteQueueDepth != 0 &&
                 SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff)
-                return fallback;
+                continue;
             if (producer)
                 *producer = SpriteNodeSemanticTags[i].producer;
             if (projectedMarker)
@@ -1312,7 +1337,7 @@ namespace OutRunVR::GameSemantic
             // on today's GPU draw or erase its hash hint prematurely.
             if (SpriteQueueDepth != 0 &&
                 SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff)
-                return fallback;
+                continue;
             const RenderScope scope = SpriteNodeSemanticTags[i].scope;
             if (exactTag)
                 *exactTag = true;
@@ -1345,6 +1370,8 @@ namespace OutRunVR::GameSemantic
                 const std::uint64_t next =
                     SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
                 SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
+                SpriteNodeSemanticActiveQueueCutoff =
+                    SpriteQueueSemanticCutoff;
             }
             // Runtime ea7c322d proved queue->SCREEN_HUD is too strong, while
             // runtime 9554272a proved queue->NONE leaves 2D content duplicated
@@ -1373,6 +1400,8 @@ namespace OutRunVR::GameSemantic
                 const std::uint64_t next =
                     SpriteNodeSemanticNextSerial.load(std::memory_order_acquire);
                 SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
+                SpriteNodeSemanticActiveQueueCutoff =
+                    SpriteQueueSemanticCutoff;
             }
         }
         CurrentSpriteQueueNode = node;
@@ -1429,6 +1458,7 @@ namespace OutRunVR::GameSemantic
                 SpriteNodeSemanticTags[--SpriteNodeSemanticCount] = {};
             SpriteNodeSemanticPublishedCount.store(
                 SpriteNodeSemanticCount, std::memory_order_release);
+            SpriteNodeSemanticActiveQueueCutoff = 0;
             SpriteQueueSemanticCutoff = 0;
         }
     }

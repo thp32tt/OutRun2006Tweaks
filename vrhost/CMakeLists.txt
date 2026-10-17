@@ -185,6 +185,18 @@ add_custom_command(TARGET outrun-vr-menu-custom-quad-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-menu-custom-quad-smoke>"
     COMMENT "Run native menu custom quad reset/21:9/portrait containment regression"
     VERBATIM)
+# Source-generation correctness for original x86 SpriteNode ring reuse.
+# Exercise actual shared registry and cross-thread producer on the mandatory
+# x64 host build, without any game data, HMD or Direct3D calls.
+add_executable(outrun-vr-sprite-generation-smoke
+    tests/sprite_node_generation_smoke.cpp)
+target_include_directories(outrun-vr-sprite-generation-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-sprite-generation-smoke)
+add_custom_command(TARGET outrun-vr-sprite-generation-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-sprite-generation-smoke>"
+    COMMENT "Verify source generation across queued x86 ring reuse"
+    VERBATIM)
 # Build the real game CalcBall3D2D correction without a Windows game or HMD.
 add_executable(outrun-vr-stage-edge-cull-smoke tests/stage_edge_cull_smoke.cpp)
 target_include_directories(outrun-vr-stage-edge-cull-smoke PRIVATE
