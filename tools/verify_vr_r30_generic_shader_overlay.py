@@ -22,7 +22,14 @@ def check(code, h):
     assert "R30GetRecentOriginalHudWvp(rawGameWvp)" in block
     assert block.index("if (exactHud || genericQueuedHud)") < block.index(
         "R30GetRecentOriginalHudWvp(rawGameWvp)")
-    assert "exactHud && R30IsPauseMenuElement()" in block
+    # The source-verified queued ESC text shares the pause optical plane with
+    # exact ScreenHud arrows only inside the original pause state.  The older
+    # exactHud-only assertion rejected this intentional source fix.
+    assert "const bool exactPauseShaderOwner =" in block
+    assert "OutRunVrPauseEye::OwnsPauseShaderPlane(" in block
+    assert "exactHud, genericQueuedHud, R30IsPauseMenuElement());" in block
+    assert block.index("R30GetRecentOriginalHudWvp(rawGameWvp)") < block.index(
+        "OutRunVrPauseEye::OwnsPauseShaderPlane(")
     owner=code.split("bool R30GetRecentOriginalHudWvp(",1)[1].split(
         "bool R30SpatialSceneEffectNeedsWorldRouting(",1)[0]
     assert "OwnsGenericQueuedOverlay(provenance)" in owner
@@ -43,6 +50,8 @@ assert "'outrun-vr-hud-original-wvp-smoke.exe'," in workflow
 assert "outrun-vr-hud-original-wvp-smoke " in workflow
 for removed in (
     "if (exactHud || genericQueuedHud)",
+    "exactHud, genericQueuedHud, R30IsPauseMenuElement());",
+    "OutRunVrPauseEye::OwnsPauseShaderPlane(",
     "OwnsGenericQueuedOverlay(provenance)",
     "ExternalOverlaySemanticDepth == 0",
 ):
