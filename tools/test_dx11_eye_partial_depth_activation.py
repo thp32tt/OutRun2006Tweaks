@@ -17,11 +17,12 @@ assert not audit_native_partial_depth_clear(source, probe), "valid DSV audit fai
 # negative companion must actually lie outside the eye (not an old valid box).
 assert "invalidPartialDepth.entries[1][0].rect = {-1, 1, 4, 4};" in probe
 assert "zRect.kind = SourceClear::Kind::FullDepthStencil;" in probe
-# Guard all nine reviewed GPU dispatches: two offscreen game camera Draws,
-# four true eye commands and three non-evidence color/depth/stretch triangles.
+# Guard all eleven reviewed GPU dispatches: four offscreen game camera
+# Draw forms, four true eye commands and three non-evidence GPU triangles.
 # A new source Draw still requires explicit owner/activation audit.
 expected_dispatches = [
     "->Draw(", "->DrawIndexed(",  # genuine offscreen game source RTV
+    "->DrawInstanced(", "->DrawIndexedInstanced(",  # source instanced cameras
     "->Draw(", "->DrawIndexed(",  # genuine eye RTV
     "->DrawInstanced(", "->DrawIndexedInstanced(",
     "->Draw(", "->Draw(", "->Draw(",
@@ -114,4 +115,20 @@ assert audit_native_offscreen_game_draw(
 assert audit_native_offscreen_game_draw(
     source, probe.replace("fixture.offscreenGameColor, &offscreenPatch,", "", 1)
 ), "missing offscreen camera-to-eye GPU copy proof slipped through"
+# Offscreen instancing MUST validate the real game RT and preserve a single
+# chronological source command per call, without creating direct eye color.
+assert audit_native_offscreen_game_draw(
+    source.replace(
+        "verticesPerInstance, instanceCount, drawCount_) ||\n"
+        "        !prepare_offscreen_game_draw(gameTarget))",
+        "verticesPerInstance, instanceCount, drawCount_) ||\n"
+        "        false)", 1), probe
+), "instanced source target preflight bypass slipped through"
+assert audit_native_offscreen_game_draw(
+    source.replace(
+        "indicesPerInstance, instanceCount, startIndex,\n"
+        "        baseVertex, startInstance);\n    ++drawCount_;",
+        "indicesPerInstance, instanceCount, startIndex,\n"
+        "        baseVertex, startInstance);\n    ++colorDrawCount_;", 1), probe
+), "indexed instanced phantom eye color slipped through"
 print("DX11 partial DSV/TARGET and game offscreen Draw: PASS (positive + negative tamper)")

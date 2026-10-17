@@ -238,7 +238,7 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
 
 
 def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[str]:
-    """Admit exactly two source-owned camera geometry draws, not eye evidence.
+    """Admit four exact source-owned camera draw forms, not eye evidence.
 
     These are real D3D11 Draws and must remain under the same frame/pose
     submission owner. They only advance chronological source draw ordinals:
@@ -258,6 +258,12 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "\nbool NativeGameEyeDrawEncoder::draw_offscreen_indexed(")
     indexed = section(
         "bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(",
+        "\nbool NativeGameEyeDrawEncoder::draw_offscreen_instanced(")
+    instanced = section(
+        "bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(",
+        "\nbool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(")
+    indexed_instanced = section(
+        "bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(",
         "\nvoid NativeGameEyeDrawEncoder::set_source_clear_timeline(")
 
     source_guards = [
@@ -305,6 +311,23 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
         "++drawCount_;",
     ]
+    instanced_guards = [
+        "if (!live_game_stereo::may_issue_instanced(",
+        "verticesPerInstance, instanceCount, drawCount_) ||",
+        "!prepare_offscreen_game_draw(gameTarget))",
+        "context_->DrawInstanced(",
+        "verticesPerInstance, instanceCount, startVertex, startInstance);",
+        "++drawCount_;",
+    ]
+    indexed_instanced_guards = [
+        "if (!live_game_stereo::may_issue_instanced(",
+        "indicesPerInstance, instanceCount, drawCount_) ||",
+        "!prepare_offscreen_game_draw(gameTarget))",
+        "context_->DrawIndexedInstanced(",
+        "indicesPerInstance, instanceCount, startIndex,",
+        "baseVertex, startInstance);",
+        "++drawCount_;",
+    ]
     proof = [
         "encoder.draw_offscreen(gameOffscreen, 3u, 0u)",
         "encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0)",
@@ -317,6 +340,12 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "fixture.offscreenGameColor, &offscreenPatch,",
         "gameEyeFixture.replayedOffscreenGameDraw[0] &&",
         "gameEyeFixture.replayedOffscreenGameDraw[1] &&",
+        "instancedCamera.draw_offscreen_instanced(",
+        "instancedCamera.draw_offscreen_indexed_instanced(",
+        "instancedCamera.draw_count() == 2u",
+        "instancedCamera.color_draw_count() == 0u",
+        "gameEyeFixture.replayedInstancedOffscreenCamera[0] &&",
+        "gameEyeFixture.replayedInstancedOffscreenCamera[1] &&",
     ]
     missing = [
         "offscreen-target:" + token for token in source_guards if token not in target
@@ -333,6 +362,14 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         if token not in indexed
     ]
     missing += [
+        "offscreen-instanced:" + token for token in instanced_guards
+        if token not in instanced
+    ]
+    missing += [
+        "offscreen-indexed-instanced:" + token for token in indexed_instanced_guards
+        if token not in indexed_instanced
+    ]
+    missing += [
         "offscreen-probe:" + token for token in proof if token not in transport_probe
     ]
     for label, block, calls in (
@@ -340,6 +377,8 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         ("timeline", preflight, []),
         ("draw", plain, ["->Draw("]),
         ("indexed", indexed, ["->DrawIndexed("]),
+        ("instanced", instanced, ["->DrawInstanced("]),
+        ("indexed-instanced", indexed_instanced, ["->DrawIndexedInstanced("]),
     ):
         if not block or DRAW_DISPATCH.findall(block) != calls:
             missing.append("offscreen-" + label + ": unexpected GPU Draw dispatch")
@@ -552,6 +591,7 @@ def main() -> None:
             dispatches = [match.group(0).replace(" ", "") for match in matches]
             if missing or dispatches != [
                     "->Draw(", "->DrawIndexed(",  # game-created offscreen RTV
+                    "->DrawInstanced(", "->DrawIndexedInstanced(",  # same game RTV
                     "->Draw(", "->DrawIndexed(",  # actual XR eye RTV
                     "->DrawInstanced(", "->DrawIndexedInstanced(",
                     "->Draw(", "->Draw(", "->Draw("]:
