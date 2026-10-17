@@ -804,7 +804,10 @@ print("PASS binocular menu frustum: symmetric/asymmetric, disjoint X/Y and 4 mut
 
 
 def verify_visible_menu_fragment(code: str) -> None:
-    body = code.split("bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(", 1)[1].split(
+    # Use the stable captured-window source boundary rather than the old
+    # exact crop-variable declaration: the selector-safe host now resolves
+    # game-state ownership before assigning its immutable crop decision.
+    body = code.split("const bool gameConfiguredLetterbox =", 1)[1].split(
         "std::uint32_t image = 0;", 1)[0]
     required = [
         "PlanVisibleCenteredContent(",
@@ -814,8 +817,11 @@ def verify_visible_menu_fragment(code: str) -> None:
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
         "const RECT& fullClient = capturedClient;",
         "sourceAspect = authoredAspect;",
-        "gameConfiguredLetterbox, imageMatteVerified);",
-        "completeClient, cropCentered43, useNativeMenuAspect,\n                imageMatteVerified);",
+        "clientGameState, gameConfiguredLetterbox,",
+        "imageMatteVerified, requestedCrop, requestedNoCrop);",
+        "completeClient, cropCentered43,",
+        "useNativeMenuAspect || wideVehicleSelector,",
+        "imageMatteVerified);",
         'OutRunVrMenuAspect::ResolveMenuOpticalCoverage(',
         'std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"));',
         "common, sourceAspect, opticalCoverage);",
@@ -843,11 +849,17 @@ def verify_visible_menu_fragment(code: str) -> None:
     assert ("const bool gameConfiguredLetterbox =\n"
             "            R23GameMenuIsLetterboxed(c.hwnd_);") in code
     prelude = code.split("const bool gameConfiguredLetterbox =", 1)[1].split(
-        "bool cropCentered43 =", 1)[0]
+        "const bool cropCentered43 =", 1)[0]
     assert "constexpr bool imageMatteVerified = false;" in prelude
-    assert "gameConfiguredLetterbox, imageMatteVerified);" in body
-    assert ("completeClient, cropCentered43, useNativeMenuAspect,\n"
-            "                imageMatteVerified);") in body
+    # State must veto the destructive source crop even for an explicitly
+    # requested A/B 4:3 title crop after entering Ferrari selector.
+    assert ("const bool cropCentered43 =\n"
+            "            OutRunVrMenuAspect::PlanStateSafeMenuCrop(") in body
+    assert "OutRunVrMenuAspect::IsWideVehicleSelector(clientGameState)" in body
+    assert "clientGameState, gameConfiguredLetterbox," in body
+    assert "imageMatteVerified, requestedCrop, requestedNoCrop);" in body
+    assert "useNativeMenuAspect || wideVehicleSelector," in body
+    assert "completeClient, cropCentered43," in body
     assert "sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(" in body
     assert "sourceAspect, clientAspect, gameConfiguredLetterbox," in body
     # Recover the complete authored menu plane for BOTH 4:3 and native
@@ -912,12 +924,18 @@ for old, bad in (
      "RECT fullClient{}; c.GetGameClientOutputRect(fullClient);"),
     ("constexpr bool imageMatteVerified = false;",
      "constexpr bool imageMatteVerified = true;"),
-    ("gameConfiguredLetterbox, imageMatteVerified);",
-     "gameConfiguredLetterbox, true);"),
-    ("completeClient, cropCentered43, useNativeMenuAspect,\n"
-     "                imageMatteVerified);",
-     "completeClient, cropCentered43, useNativeMenuAspect,\n"
-     "                true);"),
+    ("imageMatteVerified, requestedCrop, requestedNoCrop);",
+     "true, requestedCrop, requestedNoCrop);"),
+    ("clientGameState, gameConfiguredLetterbox,",
+     "0x04u, gameConfiguredLetterbox,"),
+    ("OutRunVrMenuAspect::IsWideVehicleSelector(clientGameState)",
+     "OutRunVrMenuAspect::IsWideVehicleSelector(0x04u)"),
+    ("useNativeMenuAspect || wideVehicleSelector,",
+     "useNativeMenuAspect,"),
+    ("const bool cropCentered43 =\n"
+     "            OutRunVrMenuAspect::PlanStateSafeMenuCrop(",
+     "const bool cropCentered43 =\n"
+     "            OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree("),
     ("R23GameMenuIsLetterboxed(c.hwnd_);",
      "false;"),
     ("sourceAspect, clientAspect, gameConfiguredLetterbox,",
