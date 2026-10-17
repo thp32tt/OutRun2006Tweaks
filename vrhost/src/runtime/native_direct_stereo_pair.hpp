@@ -195,9 +195,14 @@ namespace OutRunVrNativeEyePair
         const D3D11_TEXTURE2D_DESC& right,
         const D3D11_TEXTURE2D_DESC& projection) noexcept
     {
+        // Exact-format full-eye GPU copies also cover genuine 10:10:10:2
+        // game render targets and matching native XR array images. Unlike a
+        // shader blit this is bit-exact; do not promote sRGB or floating-point
+        // sources, where the compositor's transfer/white-scale is required.
         const bool exactColor =
             left.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
-            left.Format == DXGI_FORMAT_R8G8B8A8_UNORM;
+            left.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+            left.Format == DXGI_FORMAT_R10G10B10A2_UNORM;
         const auto source = [&](const D3D11_TEXTURE2D_DESC& d) noexcept {
             return d.Width != 0u && d.Height != 0u &&
                 d.Width == left.Width && d.Height == left.Height &&
@@ -250,7 +255,14 @@ namespace OutRunVrNativeEyePair
             !TextureOwnedByDevice(right, device) ||
             !TextureOwnedByDevice(projection, device) ||
             !DistinctSourceAllocations<Canonical>(
-                left, right, unknownIid))
+                left, right, unknownIid) ||
+            // An XR runtime may recycle/open a shared allocation under a
+            // different texture interface. Never queue a copy from an eye to
+            // its own OpenXR destination or overwrite the second source.
+            !DistinctSourceAllocations<Canonical>(
+                left, projection, unknownIid) ||
+            !DistinctSourceAllocations<Canonical>(
+                right, projection, unknownIid))
             return false;
         D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{}, xrDesc{};
         left->GetDesc(&leftDesc);

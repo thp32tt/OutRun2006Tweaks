@@ -210,6 +210,86 @@ int main()
         return 1;
     right = left;
 
+    // Native GPU L/R->XR now also accepts *matching* 10:10:10:2 game
+    // camera/vehicle/race color; a format or dimension change must stay on
+    // the original color-correct projection shader. Validate real WARP
+    // CopySubresourceRegion eye pixels, not just a descriptor enum.
+    {
+        auto game10 = left;
+        game10.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
+        auto xr10 = game10;
+        xr10.ArraySize = 2u;
+        auto staging10 = xr10;
+        staging10.Usage = D3D11_USAGE_STAGING;
+        staging10.BindFlags = 0u;
+        staging10.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        if (!require(
+                OutRunVrNativeEyePair::CopyToStereoSwapchainCompatible(
+                    game10, game10, xr10),
+                "full-size 10-bit stereo must use the matched XR GPU copy"))
+            return 1;
+        auto incompatible10 = xr10;
+        incompatible10.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        if (!require(!OutRunVrNativeEyePair::CopyToStereoSwapchainCompatible(
+                         game10, game10, incompatible10),
+                     "10-bit to RGBA8 requires shader color conversion"))
+            return 1;
+        ID3D11Texture2D* native10[2]{};
+        ID3D11Texture2D* projection10 = nullptr;
+        ID3D11Texture2D* readback10 = nullptr;
+        ID3D11RenderTargetView* rtv10[2]{};
+        const bool allocated =
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &game10, nullptr, &native10[0])) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &game10, nullptr, &native10[1])) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &xr10, nullptr, &projection10)) &&
+            SUCCEEDED(warpDevice->CreateTexture2D(
+                &staging10, nullptr, &readback10)) &&
+            SUCCEEDED(warpDevice->CreateRenderTargetView(
+                native10[0], nullptr, &rtv10[0])) &&
+            SUCCEEDED(warpDevice->CreateRenderTargetView(
+                native10[1], nullptr, &rtv10[1]));
+        bool two10BitEyes = false;
+        if (allocated) {
+            const float red[4]{1.f, 0.f, 0.f, 1.f};
+            const float green[4]{0.f, 1.f, 0.f, 1.f};
+            warpContext->ClearRenderTargetView(rtv10[0], red);
+            warpContext->ClearRenderTargetView(rtv10[1], green);
+            if (OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    warpContext, warpDevice, native10[0], native10[1],
+                    projection10, true, true, true, IID_IUnknown)) {
+                warpContext->CopyResource(readback10, projection10);
+                std::uint32_t pixels[2]{};
+                bool mappedBoth = true;
+                for (UINT eye = 0u; eye < 2u; ++eye) {
+                    D3D11_MAPPED_SUBRESOURCE mapped{};
+                    if (FAILED(warpContext->Map(readback10, eye,
+                            D3D11_MAP_READ, 0u, &mapped)) || !mapped.pData) {
+                        mappedBoth = false;
+                        break;
+                    }
+                    std::memcpy(&pixels[eye], mapped.pData,
+                                sizeof(pixels[eye]));
+                    warpContext->Unmap(readback10, eye);
+                }
+                two10BitEyes = mappedBoth &&
+                    (pixels[0] & 0x3ffu) == 0x3ffu &&
+                    ((pixels[0] >> 10u) & 0x3ffu) == 0u &&
+                    ((pixels[1] >> 10u) & 0x3ffu) == 0x3ffu &&
+                    (pixels[1] & 0x3ffu) == 0u;
+            }
+        }
+        for (auto*& view : rtv10) if (view) view->Release();
+        for (auto*& texture : native10) if (texture) texture->Release();
+        if (readback10) readback10->Release();
+        if (projection10) projection10->Release();
+        if (!require(two10BitEyes,
+                     "10-bit native GPU copy must preserve separate red/green XR eye pixels"))
+            return 1;
+    }
+
     // WARP executes the same two GPU CopySubresourceRegion calls as the
     // production R23 source route. Verify eye 0 and eye 1 retain independent
     // red/green pixels in the XR array instead of sharing a mono slice.
