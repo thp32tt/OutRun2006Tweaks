@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01002",
+  "production_id": "CONVERSION-DX9EX-01002",
+  "event_id": "CONVERSION-DX9EX-01002-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_CI_PENDING",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "c1b62b9d14f05e02bc9023d3177cdf462bbd9cbd",
+  "material_result_sha": "a15f65c9db05dd5c4f5e001bddd909d5ad733abc",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/overlay/f11_responsive_fit.hpp",
+    "src/overlay/overlay.cpp",
+    "vrhost/tests/f11_shell_containment_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/overlay/f11_responsive_fit.hpp",
+    "src/overlay/overlay.cpp",
+    "vrhost/tests/f11_shell_containment_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01002.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Keep the complete F11 user settings flow readable and operable at high Quest3 eye-density, including sharp atlas-scaled main tabs, resizeable input hitboxes, first-run guide navigation and persistent confirmation, without losing native Windows gamepad/keyboard settings or saved user font size.",
+    "scope_boundary": "Only external F11 ImGui modal/shell presentation and its existing input/persistence contract; do not modify gameplay HUD/ESC, +TIME, GOAL, rank, lens, 3D, DXVK, DX11, FFB, SkyGlow or R26_SAFE renderer ownership.",
+    "trace_stages": [
+      "Native F11 key/overlay input goes through Win32 forwarding and original game WndProc with protected hotkey, focus and Alt routing.",
+      "Sharp source-side ImGui font atlas density and F11 shell/modal budget place child scroll content, slider hitboxes and persistent confirmation before DX9 draw submission.",
+      "External overlay SCREEN_OVERLAY_2D draw scope is retained for the two-eye R84 stereo hook and OpenXR host; Desktop and non-game presentation keep the original native window."
+    ],
+    "subcomponents": [
+      "Bound XR first-run popup geometry and independent font scaling from the live render viewport while preserving the main F11 sharp-atlas and user font scale policies.",
+      "Move first-run guidance/slider into a separately scrollable body so confirmation remains outside the scroll child and reachable during Quest3 gamepad or mouse use; retain original settings finalizer and desktop Win32 fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "f11_first_run_xr_accessible",
+        "category": "end_to_end_behavior",
+        "behavior_area": "XR F11 popup typography and confirmation hitbox",
+        "expected_behavior": "Quest3 3440x1440 source and native portrait eye atlas fit the first-run popup without cropped giant text, with long guide/slider scrollable and the confirmation button always outside scrolling guide content."
+      },
+      {
+        "id": "f11_native_keyboard_scale_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop native input and saved F11 settings",
+        "expected_behavior": "On low-resolution, source-eye mismatch and corrupt/zero reset extents, the portable modal computation fails closed, while existing F11 Win32/gamepad focus, user font preference, atlas quality and unchanged desktop popup/shell persist."
+      },
+      {
+        "id": "f11_r84_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows game and host package, cross-domain source and policy",
+        "expected_behavior": "Final exact validation-bearing SHA compiles Win32 game plus x64 OpenXR host, runs portable F11 layout regression and all applicable DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector required gates; Quest3 optical acceptance remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "f11_first_run_xr_accessible": "PENDING_CI",
+    "f11_native_keyboard_scale_fallback": "PENDING_CI",
+    "f11_r84_exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The main F11 settings shell used XR density with a per-window font fit and scrolling child tabs, but the independent first-run welcome popup kept full atlas font pixels and placed a confirmation action after a long help body in the same scrollable popup. Height caps therefore cannot ensure the action remains accessible for Quest3 gamepad-only navigation.",
+    "original_evidence": "The pre-edit overlay.cpp render_shell applied responsiveFit.fontScale, while render_first_run_intro only capped popupHeight and appended the Let's go button after all help and slider text under a single popup scroll owner. At high density/limited mirror heights that footer could be scrolled away rather than remaining reachable.",
+    "source_trace": [
+      "Legacy F11 preflight hooks_overlay.cpp calculates VR atlas multiplier and routes keyboard/gamepad input; no original WndProc or FFB code was changed.",
+      "New F11 first-run per-popup ComputeFirstRunModal uses the source viewport and XR font density and applies SetWindowFontScale before body/control construction.",
+      "First-run child scroll owns guide/slider only; confirmation is placed after EndChild in its parent modal, all submitted in the existing external ImGui ScreenOverlay2D stereo scope."
+    ],
+    "alternatives_rejected": [
+      "Changing game HUD scale or OpenXR eye resolution cannot repair the first-run ImGui window's local overflow and would risk working stereo/FFB/SkyGlow; rebuilding the already-sharp atlas or enlarging the full popup cannot reserve a fixed actionable footer."
+    ],
+    "eye_ownership": "No new stereo classification or per-eye FOV change. ImGui submits one source-space F11 popup with a stable fixed footer through the existing explicitly owned external ScreenOverlay2D draw, leaving R84/host two-eye projection unchanged."
+  },
+  "ci_evidence": {
+    "first_material_candidate": {
+      "head_sha": "a15f65c9db05dd5c4f5e001bddd909d5ad733abc",
+      "dx9ex_active": {
+        "run_id": 39012627792,
+        "conclusion": "failure",
+        "reason": "missing required feature record before compile"
+      },
+      "domain_isolation": {
+        "run_id": 39012627753,
+        "conclusion": "success"
+      },
+      "full_source_impact": {
+        "run_id": 39012627752,
+        "conclusion": "in_progress"
+      }
+    }
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run all required GitHub Actions on the new validation-bearing exact SHA that includes this feature record. Repair only actual identified failures under the same TASK_ID; then record C6 without re-executing identical SHA CI. Quest3/VDXR runtime remains UNTESTED."
+}
