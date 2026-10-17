@@ -340,6 +340,18 @@ add_custom_command(TARGET outrun-vr-driver-seat-car-space-smoke POST_BUILD
     COMMENT "Run car-body-aware cockpit camera correction regression"
     VERBATIM)
 
+# Native Quest-style cockpit vehicle size calibration touches only the
+# player's temporary render transform. Always execute negative input guards.
+add_executable(outrun-vr-driver-seat-vehicle-scale-smoke
+    tests/driver_seat_vehicle_scale_smoke.cpp)
+target_include_directories(outrun-vr-driver-seat-vehicle-scale-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-driver-seat-vehicle-scale-smoke)
+add_custom_command(TARGET outrun-vr-driver-seat-vehicle-scale-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-driver-seat-vehicle-scale-smoke>"
+    COMMENT "Run player-car temporary matrix scaling and invalid-input regression"
+    VERBATIM)
+
 # Native driver workId + optional chrset source selection.
 add_executable(outrun-vr-driver-occupant-smoke
     tests/driver_seat_occupant_smoke.cpp)
