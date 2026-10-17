@@ -80,6 +80,16 @@ def check(text):
     assert "R30ReleaseCom(R30SkyGlow.savedGameState);" in present, "mono eligibility must shed captured refs"
     lifetime = text.split("void R30ReleaseSkyGlowResources()", 1)[1].split("bool R30CompilePixelShader", 1)[0]
     assert "R30ReleaseCom(R30SkyGlow.savedGameState);" in lifetime
+    # Recreating reduced eye textures discards the pre-HUD GPU snapshot.
+    # If this happens within the same Present, the post-HUD framebuffer is
+    # contaminated: do not use it as an implicit SkyGlow fallback.
+    assert "R30SkyGlowSceneCaptureEpoch = 0;" in lifetime, "resize retained stale pre-HUD capture"
+    after_ensure = apply.split("if (!R30EnsureSkyGlowResources(device))", 1)[1].split(
+        "// Create once per SkyGlow resource epoch", 1)[0]
+    assert "R30SkyGlowScreenDrawEpoch == frame.presentEpoch &&" in after_ensure
+    assert "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch" in after_ensure
+    assert "++R30SkyGlowUiCaptureSkips;" in after_ensure
+    assert "return true;" in after_ensure, "SkyGlow must fail closed after lost pre-HUD source"
     for fragment in (
         "if (!R30SkyGlow.savedGameState)",
         "D3DSBT_ALL, &R30SkyGlow.savedGameState",
@@ -112,6 +122,8 @@ mutations = (
     ("remove saved state allocation", "IDirect3DStateBlock9* savedGameState = nullptr;"),
     ("remove mono/stereo-off cleanup", "// If stereo eligibility or SkyGlow is switched off"),
     ("remove saved state release", "R30ReleaseCom(R30SkyGlow.savedGameState);"),
+    ("retain lost pre-HUD resource epoch", "R30SkyGlowSceneCaptureEpoch = 0;"),
+    ("ignore pre-HUD resource recreation", "R30SkyGlowScreenDrawEpoch == frame.presentEpoch &&\n                R30SkyGlowSceneCaptureEpoch != frame.presentEpoch"),
     ("remove once-per-resource creation gate", "if (!R30SkyGlow.savedGameState)"),
     ("disable per-frame Capture", "else if (FAILED(R30SkyGlow.savedGameState->Capture()))"),
     ("disable D3DSBT_ALL full-state snapshot", "D3DSBT_ALL, &R30SkyGlow.savedGameState"),
@@ -148,4 +160,4 @@ for label, token in mutations:
     except (AssertionError, IndexError, ValueError):
         continue
     raise AssertionError("mutation survived: " + label)
-print("PASS R30 SkyGlow per-Present depth/shader/viewport coalescing and 27 destructive regressions")
+print("PASS R30 SkyGlow state/viewport and 29 mutations including pre-HUD resource-recreation guard; HMD UNTESTED")
