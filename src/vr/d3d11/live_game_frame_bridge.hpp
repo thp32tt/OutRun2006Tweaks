@@ -75,6 +75,13 @@ void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
 void observe_game_surface_mutation(IDirect3DDevice9* gameDevice,
                                    IDirect3DSurface9* destination,
                                    HRESULT originalResult) noexcept;
+// Optional mirror of a successful game-authored UpdateSurface/StretchRect
+// destination into the native full-size frame. Never replaces the original
+// HRESULT or DX9Ex render/input path; invalid/unsupported regions fail closed.
+bool preserve_game_surface_copy(IDirect3DDevice9* gameDevice,
+                                IDirect3DSurface9* destination,
+                                const RECT* changedArea,
+                                HRESULT originalResult) noexcept;
 // Replay verified whole ColorFill as a native clear seed/RTV clear, or a
 // bounded partial ColorFill in an active native frame through D3D11.1 ClearView.
 // Unknown/unsupported writes still invalidate and retain original D3D9 output.

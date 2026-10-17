@@ -8,6 +8,15 @@ root = Path(__file__).resolve().parents[1]
 bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text(encoding="utf-8")
 hooks = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
 region = (root / "src/vr/d3d11/native_game_surface_copy_region.hpp").read_text(encoding="utf-8")
+api_header = (root / "src/vr/d3d11/live_game_frame_bridge.hpp").read_text(encoding="utf-8")
+# The R30 game UpdateSurface/StretchRect detours compile against the public
+# declaration. A cpp-only definition used to pass default Build yet break
+# the OpenXR C2 R30 translation unit with MSVC C2039/C3861.
+assert "bool preserve_game_surface_copy(IDirect3DDevice9* gameDevice," in api_header
+assert "IDirect3DSurface9* destination," in api_header
+assert "const RECT* changedArea," in api_header
+assert "HRESULT originalResult) noexcept;" in api_header
+
 
 
 def linked(b, h, r):
