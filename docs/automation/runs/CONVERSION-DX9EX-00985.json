@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:RENDER:WORLD_WVP_NATIVE_REENTRANCY",
   "symptom_id": "DX9EX:SYMPTOM:WORLD_WVP_NATIVE_REENTRANCY",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C4_MATERIAL_COMMITTED_C5_EXACT_CI",
-  "checkpoint": "C5_VALIDATE",
-  "automation_validation": "IN_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "070ec2d7942b77b2c3da2a62e2e18eaed407ed85",
@@ -99,5 +99,6 @@
     "cause": "Missing required docs/automation/runs/CONVERSION-DX9EX-00985.json in feature-sized DX9Ex Gate; not a C++ compiler failure."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Record the feature contract for policy recovery, run required exact-SHA CI without skip; if PASS, perform separate C6 bookkeeping while retaining material SHA. Quest3 HMD stays UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA recorded at immutable validation-bearing SHA; actual Quest3/VDXR headset validation remains NEED_HMD_TEST.",
+  "validation_bearing_result_sha": "0607e66b229bb81c0fd035a58b02cee53562c62d"
 }
