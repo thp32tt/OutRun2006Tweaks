@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e7c8104c0d5c442813b7de59d3e9e1aa94bad185",
   "material_result_sha": "dc97d283b63d5570bb905089ac398987b434730e",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f0c21164c3999f29542427f614226deae77adbfa",
   "source_paths": [
     "src/hooks_textures.cpp",
     "src/vr/game/sprite_uv_transaction.hpp",
@@ -70,7 +70,7 @@
   "acceptance_results": {
     "original_game_sprite_uv_transaction": "PASS_LOCAL_PORTABLE",
     "mask_nested_and_legacy_fallback": "PASS_LOCAL_PORTABLE",
-    "required_exact_sha_r84_integration": "PENDING_EXACT_SHA"
+    "required_exact_sha_r84_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Original put_sprite_ex/ex2 hooks multiply and divide the game's mutable SPRARGS/SPRARGS2 UV and scale fields directly, and mask child UV likewise, without restoring the input after native submission. Reusing an original sprite argument can compound replacements each call. This static source hazard is confirmed; attribution to any specific Quest3 white selector report remains unproven.",
@@ -87,5 +87,11 @@
     "eye_ownership": "Existing R84 renderer performs source-aware physical stereo, no per-eye matrix routes were modified by UV transaction; original game sprite submission and stereo output remain under existing owners.",
     "evidence_limit": "No actual car-selector HMD test or confirmed correction of observed white textures; the change addresses a source-proven repeated input mutation and preserves RUNTIME_VALIDATION=UNTESTED."
   },
-  "validation_notes": "CI policy on material SHA dc97d283 failed solely because this required TASK run record was absent; record registered under same task rather than weakening feature policy. Material source SHA remains unchanged and will not be scored twice."
+  "validation_notes": "C6 PASS_EXACT_SHA: exact validation-bearing GitHub commit f0c21164c3999f29542427f614226deae77adbfa reported CI SUCCESS. Material source commit dc97d283b63d5570bb905089ac398987b434730e and feature contract/portable smoke acceptance preserved. This is separate [skip ci] result bookkeeping only; no source edit, rebuild, workflow rerun, or duplicate AI score credit. Quest3 HMD runtime remains UNTESTED.",
+  "ci_evidence": {
+    "validated_exact_sha": "f0c21164c3999f29542427f614226deae77adbfa",
+    "conclusion": "success",
+    "verification_basis": "User-confirmed GitHub CI SUCCESS at exact SHA; no CI jobs rerun",
+    "runtime_validation": "UNTESTED"
+  }
 }
