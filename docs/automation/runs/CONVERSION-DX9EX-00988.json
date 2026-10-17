@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00988",
+  "production_id": "CONVERSION-DX9EX-00988",
+  "event_id": "CONVERSION-DX9EX-00988-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "895145048611417637398b6a6a887a7668118feb",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/goal_result_parent_provenance.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/goal_result_parent_provenance.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00988.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Route original GOAL 0-99 percent course/time record direct D3DX Draw triangles to exact dual-eye ScreenHud without modifying unsafe result E8 return sites, while preserving the separate queued glyph pipeline.",
+    "scope_boundary": "Only the canonical original B9200 GOAL frame and unowned direct Draw; exclude stage +TIME, completed final results, foreign UI, live queue, original input/FFB, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original EXE 19 B9200 E8 return fingerprints remain intact and are stack-proven at their genuine caller.",
+      "Direct nonqueue D3DX Draw GPU sink tags original GOAL source into the existing native Draw/Flush batch ledger.",
+      "R84 R30 and R33 stereo renderer consumes exact ScreenHud semantic and x64 host emits per-eye OpenXR presentation."
+    ],
+    "subcomponents": [
+      "Reuse exact B9200 original return-stack proof across existing put_sprite_ex glyph producer and distinct direct D3DX GPU sink.",
+      "At native Draw scope only, protect existing producer/queue and flush outgoing owned batch under original source, with portable positive and negative regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_direct_d3dx_end_to_end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL B9200 direct source through per-eye HUD",
+        "expected_behavior": "A proven B9200 original direct D3DX Draw takes ResultTextB9200 ScreenHud owner without installing unsafe EXE return-site midhooks."
+      },
+      {
+        "id": "original_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Non-GOAL desktop, queued sibling, foreign and competing exact owner",
+        "expected_behavior": "All unknown/queued/non-GOAL desktop or previously owned Draws remain on native behavior; ordinary stage time, world and result helper ownership is preserved."
+      },
+      {
+        "id": "final_sha_game_host_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 and R26_SAFE game plus x64 host/package",
+        "expected_behavior": "Existing GOAL host smoke and mandatory exact-SHA Active, Domain, Full Source and affected Inspector gates succeed, with Quest3 runtime separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_direct_d3dx_end_to_end": "PENDING_EXACT_SHA",
+    "original_native_fallback": "PENDING_EXACT_SHA",
+    "final_sha_game_host_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "The existing exact B9200 caller-stack proof covered the put_sprite_ex glyph wrapper only; the separate native D3DX direct Draw sink sampled potentially unowned context without exact original result source.",
+    "original_evidence": "Existing src/hooks_uiscaling.cpp TextGlyph_putSprite checks exact B9200 stack while VRProjectedD3DXSpriteIsolationR64::DrawDest previously read only EffectiveScope/CurrentRenderProducerToken. Old 19 post-CALL midhooks have known crash EIPs.",
+    "source_trace": [
+      "Original GOAL original 19 B9200 E8 parent return stack proof.",
+      "Direct native D3DX Draw and pending GPU batch submitted under exact owner.",
+      "R84 dual-eye HUD projection with original R26 safe/native fallback."
+    ],
+    "alternatives_rejected": [
+      "Never restore unsafe E8+5 hooks, globally promote unknown screen draws, force a native Flush for every GPU draw, or modify game timer logic."
+    ],
+    "eye_ownership": "Original GOAL text source is restricted to direct ScreenHud GPU command ownership, sent through existing R84 independent per-eye renderer; HMD optical acceptance remains UNTESTED."
+  },
+  "local_validation": {
+    "structural_patch_checks": "PASS",
+    "cpp17_smoke": "GITHUB_CI_PENDING"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check exact-SHA mandatory GitHub Actions and write C6 independently after success; runtime headset not tested."
+}

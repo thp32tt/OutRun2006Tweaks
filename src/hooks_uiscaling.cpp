@@ -189,6 +189,25 @@ static void FlushD3DXAtDirectStageSourceExit() noexcept;
 static void FlushD3DXBeforeDirectGoalSource() noexcept;
 static void FlushD3DXAtDirectGoalSourceExit() noexcept;
 
+// Preserve the original nineteen B9200 E8 CALLs: prior +5 return-site
+// trampolines corrupted legal branch targets. The glyph producer and direct
+// D3DX GPU sink share stack-only exact parent proof instead.
+static bool OriginalB9200GoalStackActive() noexcept
+{
+    if (!Settings::VREnabled || !Game::current_mode ||
+        *Game::current_mode != GameState::STATE_GOAL)
+        return false;
+    void* frames[24]{};
+    const USHORT count = RtlCaptureStackBackTrace(
+        0, static_cast<ULONG>(std::size(frames)), frames, nullptr);
+    const auto base = reinterpret_cast<std::uintptr_t>(Module::exe_ptr(0));
+    for (USHORT i = 0; i < count; ++i)
+        if (OutRunVR::GoalResult::IsOriginalB9200ParentReturn(
+                base, reinterpret_cast<std::uintptr_t>(frames[i])))
+            return true;
+    return false;
+}
+
 class UIScaling : public Hook
 {
 	const static int D3DXMatrixTransformation2D_Addr = 0x39400;
@@ -1662,18 +1681,7 @@ class UIScaling : public Hook
     // Unknown/FPO-unwind-failed frames use the original glyph path.
     static bool IsOriginalB9200GoalGlyph() noexcept
     {
-        if (!Settings::VREnabled || !Game::current_mode ||
-            *Game::current_mode != GameState::STATE_GOAL)
-            return false;
-        void* frames[24]{};
-        const USHORT count = RtlCaptureStackBackTrace(
-            0, static_cast<ULONG>(std::size(frames)), frames, nullptr);
-        const auto base = reinterpret_cast<std::uintptr_t>(Module::exe_ptr(0));
-        for (USHORT i = 0; i < count; ++i)
-            if (OutRunVR::GoalResult::IsOriginalB9200ParentReturn(
-                    base, reinterpret_cast<std::uintptr_t>(frames[i])))
-                return true;
-        return false;
+        return OriginalB9200GoalStackActive();
     }
 
 	using TextGlyphPutSpriteFn = int(__cdecl*)(SPRARGS*, float);
@@ -3114,6 +3122,26 @@ private:
         // an earlier GPU batch. A changed same-generation native session is
         // revoked, while a newer Begin is left untouched.
         using namespace OutRunVR::GameSemantic;
+        // Some original B9200 result triangles enter native D3DX Draw
+        // directly, bypassing the already source-tagged put_sprite_ex glyph
+        // path. Bind ONLY a stack-proven GOAL result with no queue or owner.
+        const bool unownedDirectGoal = Settings::VREnabled &&
+            Game::current_mode && *Game::current_mode == GameState::STATE_GOAL &&
+            !QueueRenderActive() &&
+            CurrentRenderProducerToken() == ProducerToken::None;
+        const bool exactB9200Direct = unownedDirectGoal &&
+            OutRunVR::GoalResult::CanBindDirectB9200D3DXDraw(
+                true, true, false, true, OriginalB9200GoalStackActive());
+        std::optional<ScopedExactProducerSemantic> directB9200Owner;
+        if (exactB9200Direct)
+        {
+            // Drain a proven previous-owner batch BEFORE switching scope;
+            // the existing native Draw/Flush ledger owns the new batch.
+            FlushD3DXBeforeDirectGoalSource();
+            directB9200Owner.emplace(
+                RenderScope::ScreenHud, nullptr, true,
+                ProducerToken::ResultTextB9200);
+        }
         const auto scope = EffectiveScope();
         const auto source = CurrentRenderProducerToken();
         const auto submission = HudBatch.snapshot();

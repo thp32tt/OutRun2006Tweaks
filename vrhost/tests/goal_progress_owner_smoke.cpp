@@ -1,4 +1,5 @@
 #include "../../src/vr/game/render_semantics.hpp"
+#include "../../src/vr/game/goal_result_parent_provenance.hpp"
 #include <iostream>
 
 using namespace OutRunVR::GameSemantic;
@@ -143,8 +144,21 @@ static bool CheckVerifiedB9200GpuOwnership()
                RenderScope::None, ProducerToken::None);
 }
 
+static bool CheckB9200DirectGpuSource()
+{
+    using OutRunVR::GoalResult::CanBindDirectB9200D3DXDraw;
+    return CanBindDirectB9200D3DXDraw(true, true, false, true, true) &&
+        !CanBindDirectB9200D3DXDraw(false, true, false, true, true) &&
+        !CanBindDirectB9200D3DXDraw(true, false, false, true, true) &&
+        !CanBindDirectB9200D3DXDraw(true, true, true, true, true) &&
+        !CanBindDirectB9200D3DXDraw(true, true, false, false, true) &&
+        !CanBindDirectB9200D3DXDraw(true, true, false, true, false) &&
+        OutRunVR::GoalResult::CheckParentReturnProvenance();
+}
+
 int main()
 {
+    if (!CheckB9200DirectGpuSource()) return 7;
     if (!CheckVerifiedB9200GpuOwnership()) return 6;
     if (!CheckStagePrintfBatch()) return 4;
     if (!CheckQueuedGoalBatch()) return 5;

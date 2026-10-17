@@ -29,6 +29,16 @@ namespace OutRunVR::GoalResult
         return false;
     }
 
+    // Only unowned, original B9200 direct D3DX draws may carry the result
+    // source across native texture-batch submission. Fail closed otherwise.
+    constexpr bool CanBindDirectB9200D3DXDraw(
+        bool vrEnabled, bool inGoal, bool queueActive,
+        bool noCompetingProducer, bool exactParentOnStack) noexcept
+    {
+        return vrEnabled && inGoal && !queueActive &&
+            noCompetingProducer && exactParentOnStack;
+    }
+
     constexpr bool CheckParentReturnProvenance() noexcept
     {
         constexpr std::uintptr_t base = 0x400000u;
