@@ -410,16 +410,18 @@ int main()
             ring.slot_state(stereoSlot) == SharedEyeSlotState::ProducerPending,
             "00858 game MRT0/RT1 bound source stereo GPU copy and EVENT armed");
     ID3D11RenderTargetView* restoredGameMrt[2]{};
-    ID3D11DepthStencilView* restoredGameDepth = nullptr;
+    // Keep this snapshot local to the 00858 MRT-bound producer case:
+    // the full eye-renderer state regression below has its own DSV snapshot.
+    ID3D11DepthStencilView* restoredSourceMrtDepth = nullptr;
     d3d.context->OMGetRenderTargets(
-        2u, restoredGameMrt, &restoredGameDepth);
+        2u, restoredGameMrt, &restoredSourceMrtDepth);
     const bool preservedMrt =
         restoredGameMrt[0] == leftView &&
         restoredGameMrt[1] == rightView &&
-        restoredGameDepth == nullptr;
+        restoredSourceMrtDepth == nullptr;
     if (restoredGameMrt[0]) restoredGameMrt[0]->Release();
     if (restoredGameMrt[1]) restoredGameMrt[1]->Release();
-    if (restoredGameDepth) restoredGameDepth->Release();
+    if (restoredSourceMrtDepth) restoredSourceMrtDepth->Release();
     d3d.context->OMSetRenderTargets(0u, nullptr, nullptr);
     require(preservedMrt,
             "00858 stereo submission restores live game camera MRT bindings");
