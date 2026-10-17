@@ -2,23 +2,23 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01009",
   "production_id": "CONVERSION-DX9EX-01009",
-  "event_id": "CONVERSION-DX9EX-01009-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-01009-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "BUILD_PENDING",
-  "phase": "C2_IMPLEMENTED",
-  "checkpoint": "C2_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "62e97a2b1bc6baeedec49e9eafd0112836131a7f",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "c2655e32bcf7e5bdf73cd25406a527a695a77d6a",
+  "validation_bearing_result_sha": "c4d0c68af1f9b4dd20ee1c777311f9745f4c80df",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
     "src/vr/game/hud_command_batch.hpp",
@@ -32,7 +32,9 @@
     "src/hooks_uiscaling.cpp",
     "vrhost/tests/hud_command_batch_smoke.cpp",
     "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-01009.json"
+    "docs/automation/runs/CONVERSION-DX9EX-01009.json",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:EXTENDED_TIME",
@@ -71,9 +73,9 @@
     ]
   },
   "acceptance_results": {
-    "exttime_direct_to_same_source_queue": "PENDING_EXACT_SHA",
-    "exttime_queue_node_epoch_and_fallback": "PENDING_EXACT_SHA",
-    "exttime_r84_exact_sha_integrated": "PENDING_EXACT_SHA"
+    "exttime_direct_to_same_source_queue": "PASS",
+    "exttime_queue_node_epoch_and_fallback": "PASS",
+    "exttime_r84_exact_sha_integrated": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The first-queue direct-result drain previously required an incoming producer/scope difference. Original direct +TIME numeric glyphs and the next queued +TIME sprani share ScreenHud/StageExtensionTime, so the matching first queue bypassed the drain; the command ledger also recorded only semantic token, not physical queued node/epoch, allowing separate original SpriteNodes to appear homogeneous.",
@@ -86,7 +88,57 @@
     "alternatives_rejected": [
       "No global per-D3DX-Draw Flush, no expanded semantic scope for generic HUD, no replacement of native D3DX texture/session behavior, no GOAL time logic modifications."
     ],
-    "evidence_limit": "Source-lifetime and compiled positive/negative regression proof; no claim of observed physical Quest3 optical correction."
+    "evidence_limit": "Source-lifetime and compiled positive/negative regression proof; no claim of observed physical Quest3 optical correction.",
+    "fix_evidence": "Original feature C++ material commit c2655e32 remains unchanged. Strict physical batch ownership policy aligned with current queue node/epoch logic in 0b804339, and Windows MSVC C2607 obsolete direct-vs-queue same-token static_assert corrected with both positive direct and negative stale-queued assertions in c4d0c68a.",
+    "negative_test_evidence": "Changed-area native +TIME queue-ledger C++ smoke and destructive Python guard mutations; final Windows x64 host static/assert smoke, R84 Win32, R26_SAFE, package and Domain/Full Source all PASS at c4d0c68a.",
+    "eye_ownership": "Direct +TIME numeric glyphs must flush under saved ScreenHud producer prior to first queued SpriteNode even when tokens match; queued child node+epoch is separate GPU owner. Physical Quest3/VDXR optic verification not executed."
   },
-  "validation_notes": "Changed-area g++ -std=c++17 -O0 -Wall -Wextra hud_command_batch_smoke and stage_extension_eye_plane_smoke compile+run PASS via N100 local helper; Windows exact-SHA GitHub gates pending. HMD RUNTIME_VALIDATION=UNTESTED."
+  "validation_notes": "C2 source material c2655e32bcf7e5bdf73cd25406a527a695a77d6a; C3 failure repairs 0b804339 (strict physical queue verifier) and c4d0c68af1f9b4dd20ee1c777311f9745f4c80df (correct obsolete MSVC static assert, direct positive/queued negative). Validation-bearing exact c4d0c68af1f9b4dd20ee1c777311f9745f4c80df Active #39022837877 5/5 SUCCESS, Domain #39022837966 SUCCESS, Full Source #39022837899 3/3 SUCCESS; HUD Inspector material #39022222321 SUCCESS. C6 is [skip ci] bookkeeping only, no new implementation or repeated points. RUNTIME_VALIDATION=UNTESTED; NEED_HMD_TEST.",
+  "ci_evidence": {
+    "source_commit": "c2655e32bcf7e5bdf73cd25406a527a695a77d6a",
+    "validation_bearing_result_sha": "c4d0c68af1f9b4dd20ee1c777311f9745f4c80df",
+    "validated_exact_sha": "c4d0c68af1f9b4dd20ee1c777311f9745f4c80df",
+    "failed_initial_active": {
+      "run_id": 39022222270,
+      "sha": "c2655e32bcf7e5bdf73cd25406a527a695a77d6a",
+      "job": "policy",
+      "cause": "Old strict verifier required token-only ledger expression rather than physical queue node/epoch safety"
+    },
+    "failed_repair_active": {
+      "run_id": 39022544224,
+      "sha": "0b804339354ff9762f103018f234211b8f990e13",
+      "job": "host",
+      "cause": "Outdated C++ static_assert rejected direct-to-queued +TIME when semantic token matched"
+    },
+    "dx9ex_active": {
+      "run_id": 39022837877,
+      "conclusion": "success",
+      "includes": [
+        "policy",
+        "R84 Win32 full-chain",
+        "game Win32 R26_SAFE and active build",
+        "x64 OpenXR host with smoke",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39022837966,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 39022837899,
+      "conclusion": "success",
+      "includes": [
+        "source-cross-domain",
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host"
+      ]
+    },
+    "hud_inspector": {
+      "run_id": 39022222321,
+      "conclusion": "success",
+      "head_sha": "c2655e32bcf7e5bdf73cd25406a527a695a77d6a",
+      "scope_note": "Passed on original material C++ source; no HUD Inspector job triggered for subsequent verifier/static-test-only validation SHA."
+    }
+  }
 }
