@@ -1,0 +1,111 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01019",
+  "production_id": "CONVERSION-DX9EX-01019",
+  "event_id": "CONVERSION-DX9EX-01019-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-01019-skyglow",
+  "feature_base_sha": "0e8b1933f3cc1a6caf47dbab293bc80b0a086482",
+  "feature_stage": "IN_PROGRESS",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C2_IMPLEMENT",
+  "feature_id": "DX9EX:BLOCKER:SKYGLOW_CAPTURE_RESIZE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "material_result_sha": "1f41383fe36d658de3c2d86047ac05840a5def4f",
+  "candidate_head_sha": "07201acaf5ca68e55096a98af24dd14f8263eb71",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_skyglow_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-01019.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:BLOCKER:SKYGLOW_CAPTURE_RESIZE",
+    "goal": "Preserve exactly one clean world SkyGlow input for both stereo eyes across in-frame reduced-texture reconstruction so pause/ESC overlays can never be rebloomed from the rendered backbuffer.",
+    "scope_boundary": "Only the DX9Ex R30 stereo SkyGlow reduced-texture lifetime, pre-HUD source snapshot, and contaminated Present fallback; no generic scene sky policy, ESC geometry, DX11/DXVK or original game changes.",
+    "special_work_evidence": "Direct source audit: R30ReleaseSkyGlowResources discarded GPU reducedSurface without clearing R30SkyGlowSceneCaptureEpoch; R30ApplyStereoSkyGlow checked the UI boundary before R30EnsureSkyGlowResources, which may recreate surfaces afterward.",
+    "trace_stages": [
+      "Original game active glow flags and R33 source-owned HUD draw route into R30 pre-HUD capture.",
+      "R30 clean left/right StretchRect into reduced textures, then generation loss via SkyGlowFactor or recommended eye size updates.",
+      "R30 Present SkyGlow per-eye source selection must reject any post-HUD fallback after an invalidated same-frame capture."
+    ],
+    "subcomponents": [
+      "Invalidate stale capture identity on reduced-texture destruction or resize.",
+      "Repeat UI-contamination fail-closed guard after resource allocation and test destructive mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "capture_epoch_lifetime",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Pre-HUD left/right reduced-surface capture lifetime",
+        "expected_behavior": "Discarding resized reduced GPU textures immediately invalidates the previous pre-HUD capture epoch."
+      },
+      {
+        "id": "post_hud_fallback_safety",
+        "category": "fallback_regression",
+        "behavior_area": "Stereo Present after ESC/HUD capture boundary",
+        "expected_behavior": "When the clean pair was discarded in the same Present, no post-HUD left/right eye copy can enter SkyGlow."
+      },
+      {
+        "id": "exact_sha_dx9ex_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Native x86 renderer, VR host, domain and source gates",
+        "expected_behavior": "The final promoted GitHub exact SHA must pass required DX9Ex Active, Domain, HUD Inspector and Full Source Impact CI."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "capture_epoch_lifetime": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "tools/verify_vr_r30_skyglow_fastpath.py"
+      ],
+      "validation_command": "python3 tools/verify_vr_r30_skyglow_fastpath.py"
+    },
+    "post_hud_fallback_safety": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "tools/verify_vr_r30_skyglow_fastpath.py"
+      ],
+      "validation_command": "python3 tools/verify_vr_r30_skyglow_fastpath.py && python3 tools/verify_vr_pause_sky_source_owner.py"
+    },
+    "exact_sha_dx9ex_ci": {
+      "status": "PENDING_CI",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "tools/verify_vr_r30_skyglow_fastpath.py"
+      ],
+      "validation_command": "GitHub DX9Ex Active/Domain/HUD Inspector/Full Source Impact exact-SHA pending"
+    }
+  },
+  "diagnosis": {
+    "original_evidence": "2026-10-17 Quest3 report: sky follows the head and is optically doubled after renderer reorganization; only the isolated same-frame SkyGlow source-loss case is addressed here, not full sky geometry.",
+    "source_trace": [
+      "Original SkyGlow original EXE flags are sampled by R30GameGlowActive.",
+      "R30CaptureSkyGlowSceneBeforeHud uses eyeSurface[2] and pre-HUD StretchRect into reducedSurface[2].",
+      "R30EnsureSkyGlowResources may release/recreate reduced textures during R30ApplyStereoSkyGlow following the earlier HUD boundary check."
+    ],
+    "root_cause": "The same-frame valid capture epoch could outlive the D3D9 textures that actually held the clean world pixels, permitting a post-UI fallback or uninitialized reduced source.",
+    "alternatives_rejected": [
+      "Never force a second dirty post-HUD StretchRect because it reintroduces ESC/UI and sky twice.",
+      "Do not change original game source or disable all SkyGlow as a workaround."
+    ],
+    "fix_evidence": "Added source epoch invalidation and second post-allocation fail-closed guard; N100 isolated checkout passed 29 destructive source-mutation regressions plus pause/sky negative checks.",
+    "eye_ownership": "Both eye reduced surfaces share the same captured present epoch; if either is discarded, skip per-eye SkyGlow for that Present.",
+    "evidence_limit": "No Quest3 runtime and no final GitHub exact-SHA CI evidence yet."
+  },
+  "validation_evidence": {
+    "targeted_1": "PASS: python3 tools/verify_vr_r30_skyglow_fastpath.py (29 mutations)",
+    "targeted_2": "PASS: python3 tools/verify_vr_pause_sky_source_owner.py (6 mutations)",
+    "ci": "PENDING"
+  },
+  "next_action": "Check candidate CI exact SHA; if successful and behind=0 promote only with expected target HEAD and force=false; run required target CI and C6.",
+  "resumption": "E003 rollover retains ATTEMPT=1/3 and no duplicate material scoring."
+}
