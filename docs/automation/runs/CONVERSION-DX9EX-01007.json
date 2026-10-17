@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_distinct_same_producer_node_gpu_boundary": "PENDING_EXACT_SHA",
-    "goal_native_batch_rollback_protection": "PENDING_EXACT_SHA",
-    "goal_exact_sha_r84_game_host_domain": "PENDING_EXACT_SHA"
+    "goal_distinct_same_producer_node_gpu_boundary": "PASS",
+    "goal_native_batch_rollback_protection": "PASS",
+    "goal_exact_sha_r84_game_host_domain": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "BeforeQueueNode's goalBoundary isolated GOAL producer token changes only; two different queued GOAL SpriteNodes may carry the identical ResultProgress/GoalTime/OutRunStagePrintf/ResultTextB9200 token while their D3DX Draw batches are physically deferred. The prior batch may therefore submit after queue selection under the next node/epoch, conflicting with R33 binocular source identity.",
@@ -101,11 +101,43 @@
         "package",
         "domain-isolation",
         "build-hud-inspector",
+        "static-exe-analysis",
         "validate",
-        "source-cross-domain"
+        "source-cross-domain",
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host"
       ],
-      "observation_note": "Required DX9Ex build and verification jobs succeeded at exact SHA. Auxiliary msvc-analyze-active-game was still in_progress when checked; no claim of all jobs completed."
+      "observation_note": "All four required workflows and their component jobs have now finished SUCCESS at immutable validation SHA 8e393d72561a3ba0ee4a12841522e3cf6b7a247b. HMD runtime remains UNTESTED."
+    },
+    "validated_exact_sha": "8e393d72561a3ba0ee4a12841522e3cf6b7a247b",
+    "dx9ex_active": {
+      "run_id": 39019155884,
+      "conclusion": "success",
+      "includes": [
+        "policy",
+        "game",
+        "full-chain-compile",
+        "host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39019155897,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 39019155983,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 39019155915,
+      "conclusion": "success",
+      "includes": [
+        "source-cross-domain",
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host"
+      ]
     }
   },
-  "result_notes": "C++ material result is fb62ea40...; the next record-bearing exact-SHA CI repair is not an independent feature or score. HMD UNTESTED. C6 PASS_EXACT_SHA recorded on validated 8e393d72; original material SHA and feature acceptance contract retained. C6 bookkeeping has zero additional AI score."
+  "result_notes": "Original GOAL source material fb62ea40; exact CI result 8e393d72 all required workflows SUCCESS; bookkeeping C6 not a separate feature, score or CI. Quest3/VDXR UNTESTED."
 }
