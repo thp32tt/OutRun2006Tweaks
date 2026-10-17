@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00890",
+  "production_id": "CONVERSION-DX11-00890",
+  "event_id": "CONVERSION-DX11-00890-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00890",
+  "feature_id": "DX11:GAME_EYE_SPARSE_MRT_PIXEL_UAV_GPU_REPLAY",
+  "work_key": "DX11:GAME_EYE:SPARSE_MRT_PIXEL_UAV_POSTPASS",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_SOURCE_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "score_note": "One independent C++ source result per TASK_ID; CI repairs, same-SHA rerun and C6 bookkeeping do not earn extra credit. Scoreboard updated only after completed exact-SHA result.",
+  "full_dx11_renderer_complete": false,
+  "base_sha": "1d97461906f43770beaf6ffa55316283981068b4",
+  "material_result_sha": "09b626bc3a1853e2539e5ed7483f943c1f1b751f",
+  "ci_repair_commit_sha": "c34c5313f94758ad4802be7d227e18597a8d0739",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:GAME_EYE_SPARSE_MRT_PIXEL_UAV_GPU_REPLAY",
+    "goal": "Preserve genuine D3D11 game camera sparse MRT/DSV and legal PS UAV output bindings across native full-frame eye Draw/DrawIndexed and post-draw GPU Copy/Stretch, while preserving distinct eye pixels, MSAA composition and original DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_sparse_eye_copy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_native_eye_rendering_and_gpu_postpass",
+        "expected_behavior": "Capture sparse original RT0/RT2/DSV and legal pixel UAV3 after game camera Draw; perform genuine GPU Copy into separate L/R native eye RTs without losing state."
+      },
+      {
+        "id": "native_stereo_pipeline",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_eye_source_and_full_frame_openxr_transport",
+        "expected_behavior": "Preserve real native full-eye GPU source color, MSAA resolved pixels and independent L/R submission without changing frame publication or source pose generation."
+      },
+      {
+        "id": "dx9_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_dx9ex_original_inputs_and_rejected_gpu_copy",
+        "expected_behavior": "Reject invalid game source GPU copy, retain original sparse MRT and PS UAV outputs, and leave DX9Ex desktop Draw and input/FFB fallback untouched."
+      },
+      {
+        "id": "same_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "git_actions_dx11_full_same_sha",
+        "expected_behavior": "Five original GitHub exact-SHA gates must succeed at the one final validation-bearing result SHA; additional isolated real WARP native transport regression should pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_sparse_eye_copy": "PASS_WARP_SPARSE_MRT_RT0_RT2_UAV3",
+    "native_stereo_pipeline": "PASS_WARP_NATIVE_EYE_MSAA_PIXELS",
+    "dx9_fallback": "PASS_WARP_INVALID_GPU_COPY_AND_DX9_INPUT_SAFE",
+    "same_sha_gates": "PENDING_EXACT_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Live D3D9 source game eye Draw/DrawIndexed preserves game RT and original OM/DSV/PS/CS output state",
+      "Native full-size stereo eye per-eye Draw and GPU Copy/Stretch temporarily detach aliases, restore sparse MRT/PS UAV tail and compute UAV counters",
+      "Native two-eye source ring and host OpenXR projection copy continue unchanged, with DX9Ex/gamepad/FFB fail-closed fallback"
+    ],
+    "batch_components": [
+      "Native game stereo C++ sparse OM output snapshot and restoration for RT0/RT2 plus PS UAV3 and last-slot RTV7",
+      "True Win32 WARP left/right GPU Copy positive, negative and exact MSAA readback regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Isolated WARP native transport #39058073253 SUCCESS at c34c5313; original 00890 material 09b626bc. Native game postpass preserves RTV/DSV and pixel UAV with authentic L/R GPU color pixels.",
+      "negative_regression": "Previously WARP MSAA failure #39057814969 traced to overlap y54/55 from new pixel fixture; changed new test copy to y46..53, preserved strict original MSAA and negative fallback assertions; WARP now SUCCESS.",
+      "component_integration": "The live stereo encoder's post-Draw copy and eye replay save only legal PS UAV tail, restore full sparse OM/DSV, while native GPU per-eye source and XR ring remain unchanged."
+    },
+    "conflict_keys": [
+      "DX11:GAME_EYE:SPARSE_MRT_PIXEL_UAV_POSTPASS"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Actual native game-camera GPU color and WARP eye pixels verified in isolated CI, not real OutRun menu/vehicle/race or Quest3 HMD.",
+    "activation_guard_and_fallback": "Opt-in only native eye publication; rejected or unsupported game GPU sources remain on original DX9Ex/D3D9 desktop draw, input and FFB; DXVK remains frozen."
+  },
+  "validation_evidence": {
+    "warp_run_id": 39058073253,
+    "warp_conclusion": "success",
+    "precheckpoint_ci_sha": "c34c5313f94758ad4802be7d227e18597a8d0739",
+    "precheckpoint_gates": {
+      "backend": 39058073225,
+      "build": 39058076800,
+      "openxr": 39058076691,
+      "hud": 39058076670
+    },
+    "hmd_test": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read exact GitHub HEAD and 00889 COMPLETE run; confirm current 00890 no run record and previous owners inactive.",
+    "C1_REVIEW": "Class A real native eye game-camera OM copy state bug: GetRTV8+GetUAV0..7 illegal overlap with sparse MRT; original game/camera state and fallback must survive.",
+    "C2_IMPLEMENT": "Actual game D3D11 C++ native postpass+eye scoped sparse MRT and PS UAV capture/restore plus WARP GPU post-draw copy on L/R, no gameplay promotion.",
+    "C3_VALIDATE": "WARP exact c34c5313 SUCCESS after real failure repair; final exact-SHA 5 required gates still in progress until confirmation.",
+    "C4_COMMIT": "Material source 09b626bc, bounded source-test repairs db676b59 and c34c5313; this checkpoint documents the one cohesive task.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING_EXACT_SHA_AND_C6_SEAL"
+  }
+}
