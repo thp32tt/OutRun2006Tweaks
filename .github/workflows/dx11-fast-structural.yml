@@ -19,6 +19,9 @@ on:
       # Native stereo producer contract repairs must trigger a fresh exact-SHA Fast Gate.
       - 'tools/verify_dx11_native_transport_contract.py'
       - 'tools/test_dx11_*.py'
+      # The real desktop GPU output restoration probe must trigger exact-SHA Fast.
+      - 'tools/dx11_native_desktop_gpu_output_probe.cpp'
+      - '.github/workflows/dx11-native-transport-isolated.yml'
       # Source-graph activation verifier revisions also need fresh same-SHA Fast checks.
       - 'tools/verify_dx11_first_game_frame_boundary.py'
       # Native eye Draw activation checker and its source-graph entrypoint

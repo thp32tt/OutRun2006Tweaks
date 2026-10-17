@@ -17,6 +17,7 @@ on:
       - cmake.toml
       - CMakeLists.txt
       - tools/verify_dx11_native_transport_contract.py
+      - .github/workflows/dx11-fast-structural.yml
       - .github/workflows/dx11-native-transport-isolated.yml
   workflow_dispatch:
 
