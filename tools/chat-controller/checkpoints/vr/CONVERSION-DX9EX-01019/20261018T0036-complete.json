@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_terminal_checkpoint",
+  "task_id": "CONVERSION-DX9EX-01019",
+  "production_id": "CONVERSION-DX9EX-01019",
+  "event_id": "CONVERSION-DX9EX-01019-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:BLOCKER:SKYGLOW_CAPTURE_RESIZE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "material_result_sha": "1f41383fe36d658de3c2d86047ac05840a5def4f",
+  "validation_bearing_result_sha": "5c322b326d3ea5db7410e7165d06a92f6c6ba62f",
+  "c6_bookkeeping_sha": "bba78feae72e108830d06c6cf0c2bb03ecd4d2eb",
+  "target_head_at_result": "bba78feae72e108830d06c6cf0c2bb03ecd4d2eb",
+  "feature_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-01019-skyglow",
+  "pr_number": 135,
+  "pr_state": "closed_merged",
+  "exact_sha_required_ci": {
+    "active": 39044982964,
+    "domain": 39044982970,
+    "hud": 39044982946,
+    "full_source": 39044982977,
+    "conclusion": "4/4_SUCCESS"
+  },
+  "run_record": "docs/automation/runs/CONVERSION-DX9EX-01019.json",
+  "runtime_validation": "UNTESTED",
+  "score": {
+    "ai": "AI 2 ChatGPT2",
+    "previous": 1483,
+    "delta": 1,
+    "new_total": 1484,
+    "scoreboard_commit": "5c21ee88987a0937f070afefdf340a3a01ec2d5f",
+    "run_key": "CONVERSION-DX9EX-01019"
+  },
+  "next_action": "No duplicate source/CI/C6/score. Only user-run Quest3/VDXR runtime optical validation, if requested. Move controller to next distinct task.",
+  "is_terminal": true
+}
