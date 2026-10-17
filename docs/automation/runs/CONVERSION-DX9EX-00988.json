@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "895145048611417637398b6a6a887a7668118feb",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/goal_result_parent_provenance.hpp",
@@ -88,5 +88,5 @@
     "cpp17_smoke": "GITHUB_CI_PENDING"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check exact-SHA mandatory GitHub Actions and write C6 independently after success; runtime headset not tested."
+  "next_action": "Exact-SHA mandatory GitHub CI SUCCESS reported for a15b32c65adbf493f7bca1303e254d851c46beb4; C6 PASS_EXACT_SHA recorded. Quest3/VDXR HMD runtime remains UNTESTED."
 }
