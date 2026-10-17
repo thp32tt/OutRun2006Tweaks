@@ -116,6 +116,7 @@ on:
       - 'tools/verify_vr_r30_viewport_reciprocal_hotpath.py'
       - 'tools/verify_vr_r30_flat_effect_geometry_fastpath.py'
       - 'tools/verify_vr_r30_hud_contain_draw_fastpath.py'
+      - 'tools/verify_vr_r30_2d_xr_hud_uniform.py'
       - 'tools/verify_vr_r30_responsive_hud_anchor.py'
       - 'tools/verify_vr_hud_edge_transition.py'
       - 'src/vr/d3d9/hud_edge_transition.hpp'
@@ -356,6 +357,7 @@ jobs:
             'tools/verify_vr_r30_viewport_reciprocal_hotpath.py',
             'tools/verify_vr_r30_flat_effect_geometry_fastpath.py',
             'tools/verify_vr_r30_hud_contain_draw_fastpath.py',
+            'tools/verify_vr_r30_2d_xr_hud_uniform.py',
             'tools/verify_vr_r30_responsive_hud_anchor.py',
             'tools/verify_vr_pause_menu_eye_affine.py',
             'tools/verify_vr_r30_hud_present_cache.py',
