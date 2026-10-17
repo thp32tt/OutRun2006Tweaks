@@ -53,6 +53,26 @@ static_assert(native_game_stretch_source_transfer(
     1u, 1u, 0u, false, false, true, true, false) ==
     NativeGameStretchSourceTransfer::Reject);
 
+// A game-authored GPU Copy/Stretch can use an RT/SRV, a single-sample
+// compute UAV, or a DEFAULT copy-only texture with no bind flags. The last
+// two cases require a private sampled D3D11 intermediate for format-converting
+// point/linear postpasses; admitting them is NOT mono-to-stereo duplication.
+// Source format/owner/mip/array/crop and MSAA resolve are checked separately.
+[[nodiscard]] constexpr bool native_game_postpass_gpu_source(
+    std::uint32_t flags, std::uint32_t samples,
+    std::uint32_t rtv, std::uint32_t srv, std::uint32_t uav) noexcept {
+    if (samples == 0u || samples > 32u) return false;
+    if ((flags & (rtv | srv)) != 0u) return true;
+    return samples == 1u && (flags == 0u || (flags & uav) != 0u);
+}
+static_assert(native_game_postpass_gpu_source(0u,1u,0x20u,0x8u,0x80u));
+static_assert(native_game_postpass_gpu_source(0x80u,1u,0x20u,0x8u,0x80u));
+static_assert(native_game_postpass_gpu_source(0x20u,4u,0x20u,0x8u,0x80u));
+static_assert(!native_game_postpass_gpu_source(0u,4u,0x20u,0x8u,0x80u));
+static_assert(!native_game_postpass_gpu_source(0x80u,8u,0x20u,0x8u,0x80u));
+static_assert(!native_game_postpass_gpu_source(0u,0u,0x20u,0x8u,0x80u));
+static_assert(!native_game_postpass_gpu_source(0x2u,1u,0x20u,0x8u,0x80u));
+
 // Game-authored Copy/Resolve may start off the LEFT/TOP as well as extend
 // beyond the RIGHT/BOTTOM edge during menu and car transitions. D3D11's
 // destination is unsigned: move the source box by exactly the negative

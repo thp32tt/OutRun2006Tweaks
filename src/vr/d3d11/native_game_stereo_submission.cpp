@@ -390,11 +390,10 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // identical-format CopySubresourceRegion. Shader conversion still needs
     // an RTV or SRV and multisample sources still need an RTV for resolve.
     // Game compute outputs may be UAV-only but are still GPU copyable.
-    const bool gpuCopyOnlySource = sourceDesc.BindFlags == 0u &&
-        sourceDesc.SampleDesc.Count == 1u;
-    const bool gpuComputeSource =
-        (sourceDesc.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u &&
-        sourceDesc.SampleDesc.Count == 1u;
+    const bool gpuSourceBindable = native_game_postpass_gpu_source(
+        sourceDesc.BindFlags, sourceDesc.SampleDesc.Count,
+        D3D11_BIND_RENDER_TARGET, D3D11_BIND_SHADER_RESOURCE,
+        D3D11_BIND_UNORDERED_ACCESS);
     constexpr UINT sharedFlags =
         D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
@@ -413,9 +412,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         eyeDesc.SampleDesc.Count != 1u ||
         sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
         sourceDesc.CPUAccessFlags != 0u ||
-        (!gpuCopyOnlySource && !gpuComputeSource &&
-         (sourceDesc.BindFlags &
-          (D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE)) == 0u) ||
+        !gpuSourceBindable ||
         (sourceDesc.MiscFlags & sharedFlags) != 0u ||
         eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;
@@ -977,11 +974,10 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         ed.SampleDesc.Count != 1u || ed.SampleDesc.Quality != 0u ||
         sd.Usage != D3D11_USAGE_DEFAULT ||
         sd.CPUAccessFlags != 0u || (sd.MiscFlags & shared) != 0u ||
-        ((sd.BindFlags & (D3D11_BIND_RENDER_TARGET |
-                          D3D11_BIND_SHADER_RESOURCE)) == 0u &&
-         !((sd.BindFlags == 0u ||
-            (sd.BindFlags & D3D11_BIND_UNORDERED_ACCESS) != 0u) &&
-            sd.SampleDesc.Count == 1u)) ||
+        !native_game_postpass_gpu_source(
+            sd.BindFlags, sd.SampleDesc.Count,
+            D3D11_BIND_RENDER_TARGET, D3D11_BIND_SHADER_RESOURCE,
+            D3D11_BIND_UNORDERED_ACCESS) ||
         ed.Width != targetWidth_ || ed.Height != targetHeight_ ||
         srcBox.front != 0u || srcBox.back != 1u ||
         srcBox.left >= srcBox.right || srcBox.top >= srcBox.bottom ||
@@ -1369,16 +1365,11 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         (desc.MiscFlags & sharedMask) != 0u ||
                         event.sourceArraySlice >= desc.ArraySize ||
                         desc.MipLevels == 0u ||
-                        ((desc.BindFlags &
-                          (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET |
-                           D3D11_BIND_UNORDERED_ACCESS)) == 0u &&
-                         !(desc.BindFlags == 0u &&
-                           desc.SampleDesc.Count == 1u &&
-                           (event.kind ==
-                                NativeGameEyePartialTargetClear::Kind::SourceStretch ||
-                            (event.kind ==
-                                NativeGameEyePartialTargetClear::Kind::SourceCopy &&
-                             desc.Format == ring_.format())))) ||
+                        !native_game_postpass_gpu_source(
+                            desc.BindFlags, desc.SampleDesc.Count,
+                            D3D11_BIND_RENDER_TARGET,
+                            D3D11_BIND_SHADER_RESOURCE,
+                            D3D11_BIND_UNORDERED_ACCESS) ||
                         b.front != 0u || b.back != 1u ||
                         b.left >= b.right || b.top >= b.bottom ||
                         b.right > desc.Width || b.bottom > desc.Height)
