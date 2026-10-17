@@ -66,29 +66,29 @@ int main()
 
     // Counterexample: native nested game c64 replacement with an unchanged
     // producer, physical draw, shader and headset pose passes the old guard.
-    const RawStereoSource original{101, 39, 7, 7, 9, 9, 0x100, 11, true};
+    const RawStereoSource rawOriginal{101, 39, 7, 7, 9, 9, 0x100, 11, true};
     assert(SameStereoDrawSource(left, left));
-    assert(SameRawStereoSource(original, original));
-    auto changed = original;
+    assert(SameRawStereoSource(rawOriginal, rawOriginal));
+    auto changed = rawOriginal;
     changed.writeSerial++;
-    assert(!SameRawStereoSource(original, changed));
-    changed = original;
+    assert(!SameRawStereoSource(rawOriginal, changed));
+    changed = rawOriginal;
     changed.writtenDraw++;
-    assert(!SameRawStereoSource(original, changed));
-    changed = original;
+    assert(!SameRawStereoSource(rawOriginal, changed));
+    changed = rawOriginal;
     changed.writtenCentreCall++;
-    assert(!SameRawStereoSource(original, changed));
-    changed = original;
+    assert(!SameRawStereoSource(rawOriginal, changed));
+    changed = rawOriginal;
     changed.writtenPoseEpoch++;
-    assert(!SameRawStereoSource(original, changed));
-    changed = original;
+    assert(!SameRawStereoSource(rawOriginal, changed));
+    changed = rawOriginal;
     changed.shaderEpoch++;
-    assert(!SameRawStereoSource(original, changed));
-    changed = original;
+    assert(!SameRawStereoSource(rawOriginal, changed));
+    changed = rawOriginal;
     changed.exactDirectRaw = false;
-    assert(!SameRawStereoSource(original, changed));
-    changed = original;
+    assert(!SameRawStereoSource(rawOriginal, changed));
+    changed = rawOriginal;
     changed.writeSerial = 0;
-    assert(!SameRawStereoSource(original, changed));
+    assert(!SameRawStereoSource(rawOriginal, changed));
     return 0;
 }
