@@ -486,6 +486,10 @@ public:
         context_->GSGetShader(&savedGS_, savedGSClasses_, &savedGSClassCount_);
         context_->HSGetShader(&savedHS_, savedHSClasses_, &savedHSClassCount_);
         context_->DSGetShader(&savedDS_, savedDSClasses_, &savedDSClassCount_);
+        // Preserve programmable bindings for VS/PS and inherited GS/HS/DS
+        // across left/right game replay and the OpenXR caller's next frame.
+        // A game postpass or injected callback can change these resources;
+        // restoring shaders alone leaves stale SRVs, samplers and CBs.
         // Preserve shader inputs for both game camera draws. The first eye
         // can swap or unbind resources; the second must start from the same
         // source game state, including vertex texture fetch and constant data.
@@ -495,6 +499,15 @@ public:
         context_->PSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedPSSamplers_);
         context_->VSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedVSConstants_);
         context_->PSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedPSConstants_);
+        context_->GSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedGSResources_);
+        context_->GSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedGSSamplers_);
+        context_->GSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedGSConstants_);
+        context_->HSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedHSResources_);
+        context_->HSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedHSSamplers_);
+        context_->HSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedHSConstants_);
+        context_->DSGetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedDSResources_);
+        context_->DSGetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedDSSamplers_);
+        context_->DSGetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedDSConstants_);
         viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
         context_->RSGetViewports(&viewportCount_, savedViewports_);
         scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
@@ -546,6 +559,15 @@ public:
         for (auto* p : savedVSSamplers_) if (p) p->Release();
         for (auto* p : savedPSSamplers_) if (p) p->Release();
         for (auto* p : savedVSConstants_) if (p) p->Release();
+        for (auto* p : savedGSResources_) if (p) p->Release();
+        for (auto* p : savedGSSamplers_) if (p) p->Release();
+        for (auto* p : savedGSConstants_) if (p) p->Release();
+        for (auto* p : savedHSResources_) if (p) p->Release();
+        for (auto* p : savedHSSamplers_) if (p) p->Release();
+        for (auto* p : savedHSConstants_) if (p) p->Release();
+        for (auto* p : savedDSResources_) if (p) p->Release();
+        for (auto* p : savedDSSamplers_) if (p) p->Release();
+        for (auto* p : savedDSConstants_) if (p) p->Release();
         for (auto* p : savedPSConstants_) if (p) p->Release();
     }
     ScopedNativeGameEyeOutput(const ScopedNativeGameEyeOutput&) = delete;
@@ -610,6 +632,15 @@ private:
         context_->PSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedPSSamplers_);
         context_->VSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedVSConstants_);
         context_->PSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedPSConstants_);
+        context_->DSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedDSResources_);
+        context_->DSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedDSSamplers_);
+        context_->DSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedDSConstants_);
+        context_->HSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedHSResources_);
+        context_->HSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedHSSamplers_);
+        context_->HSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedHSConstants_);
+        context_->GSSetShaderResources(0u, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, savedGSResources_);
+        context_->GSSetSamplers(0u, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, savedGSSamplers_);
+        context_->GSSetConstantBuffers(0u, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, savedGSConstants_);
     }
     ID3D11DeviceContext* context_{};
     std::uint32_t width_{}, height_{};
@@ -640,6 +671,15 @@ private:
     ID3D11SamplerState* savedPSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
     ID3D11Buffer* savedVSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
     ID3D11Buffer* savedPSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
+    ID3D11ShaderResourceView* savedGSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11SamplerState* savedGSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
+    ID3D11Buffer* savedGSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
+    ID3D11ShaderResourceView* savedHSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11SamplerState* savedHSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
+    ID3D11Buffer* savedHSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
+    ID3D11ShaderResourceView* savedDSResources_[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    ID3D11SamplerState* savedDSSamplers_[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT]{};
+    ID3D11Buffer* savedDSConstants_[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT]{};
     ID3D11ClassInstance* savedVSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     ID3D11ClassInstance* savedPSClasses_[D3D11_SHADER_MAX_INTERFACES]{};
     ID3D11ClassInstance* savedGSClasses_[D3D11_SHADER_MAX_INTERFACES]{};

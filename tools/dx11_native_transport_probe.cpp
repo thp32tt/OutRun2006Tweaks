@@ -1309,8 +1309,40 @@ int main()
         ctx->RSGetState(&boundRaster);
         ctx->OMGetBlendState(&boundBlend, boundBlendFactor, &boundSampleMask);
         ctx->OMGetDepthStencilState(&boundDepthState, &boundStencilRef);
+
+        ID3D11ShaderResourceView *gsResource = nullptr, *hsResource = nullptr, *dsResource = nullptr;
+        ID3D11SamplerState *gsSampler = nullptr, *hsSampler = nullptr, *dsSampler = nullptr;
+        ID3D11Buffer *gsConstants = nullptr, *hsConstants = nullptr, *dsConstants = nullptr;
+        ctx->GSGetShaderResources(0u, 1u, &gsResource);
+        ctx->HSGetShaderResources(0u, 1u, &hsResource);
+        ctx->DSGetShaderResources(0u, 1u, &dsResource);
+        ctx->GSGetSamplers(0u, 1u, &gsSampler);
+        ctx->HSGetSamplers(0u, 1u, &hsSampler);
+        ctx->DSGetSamplers(0u, 1u, &dsSampler);
+        ctx->GSGetConstantBuffers(0u, 1u, &gsConstants);
+        ctx->HSGetConstantBuffers(0u, 1u, &hsConstants);
+        ctx->DSGetConstantBuffers(0u, 1u, &dsConstants);
+        const bool inheritedStagesIntact =
+            gsResource == fixture.originalResource &&
+            hsResource == fixture.originalResource &&
+            dsResource == fixture.originalResource &&
+            gsSampler == fixture.originalSampler &&
+            hsSampler == fixture.originalSampler &&
+            dsSampler == fixture.originalSampler &&
+            gsConstants == fixture.originalConstants &&
+            hsConstants == fixture.originalConstants &&
+            dsConstants == fixture.originalConstants;
+        if (gsResource) gsResource->Release();
+        if (hsResource) hsResource->Release();
+        if (dsResource) dsResource->Release();
+        if (gsSampler) gsSampler->Release();
+        if (hsSampler) hsSampler->Release();
+        if (dsSampler) dsSampler->Release();
+        if (gsConstants) gsConstants->Release();
+        if (hsConstants) hsConstants->Release();
+        if (dsConstants) dsConstants->Release();
         const bool originalGameShaderInputs =
-            isolatedEyeGeometry &&
+            isolatedEyeGeometry && inheritedStagesIntact &&
             boundPSResource == fixture.originalResource &&
             boundPSSampler == fixture.originalSampler &&
             boundPSConstants == fixture.originalConstants &&
@@ -1394,6 +1426,18 @@ int main()
         ctx->PSSetShaderResources(0u, 1u, &nullResource);
         ctx->PSSetSamplers(0u, 1u, &nullSampler);
         ctx->PSSetConstantBuffers(0u, 1u, &nullConstants);
+
+        // Exercise real callback pollution. Right-eye Draw must recover all
+        // inherited host stage bindings; scene exit must restore them again.
+        ctx->GSSetShaderResources(0u, 1u, &nullResource);
+        ctx->HSSetShaderResources(0u, 1u, &nullResource);
+        ctx->DSSetShaderResources(0u, 1u, &nullResource);
+        ctx->GSSetSamplers(0u, 1u, &nullSampler);
+        ctx->HSSetSamplers(0u, 1u, &nullSampler);
+        ctx->DSSetSamplers(0u, 1u, &nullSampler);
+        ctx->GSSetConstantBuffers(0u, 1u, &nullConstants);
+        ctx->HSSetConstantBuffers(0u, 1u, &nullConstants);
+        ctx->DSSetConstantBuffers(0u, 1u, &nullConstants);
         // Deliberate shader-stage mutation: the right eye must begin clean.
         ctx->GSSetShader(fixture.callerGeometryShader, nullptr, 0u);
         // Simulate a real per-eye Draw that rebinds the vertex/index path;
@@ -1767,6 +1811,20 @@ int main()
     auto invalidEventCapacity = partialGameClear;
     invalidEventCapacity.count[1] =
         SourceClear::kMaxRectsPerEye + 1u;
+
+    // Preserve the original host geometry/tessellation inputs when native
+    // menu/car/race eye callbacks borrow the immediate graphics context.
+    // These stages are disabled for actual D3D9 Draws but their bindings
+    // must survive for the next OpenXR/desktop pass.
+    d3d.context->GSSetShaderResources(0u, 1u, &gameSampleView);
+    d3d.context->GSSetSamplers(0u, 1u, &gameSampler);
+    d3d.context->GSSetConstantBuffers(0u, 1u, &gameConstants);
+    d3d.context->HSSetShaderResources(0u, 1u, &gameSampleView);
+    d3d.context->HSSetSamplers(0u, 1u, &gameSampler);
+    d3d.context->HSSetConstantBuffers(0u, 1u, &gameConstants);
+    d3d.context->DSSetShaderResources(0u, 1u, &gameSampleView);
+    d3d.context->DSSetSamplers(0u, 1u, &gameSampler);
+    d3d.context->DSSetConstantBuffers(0u, 1u, &gameConstants);
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -1896,8 +1954,26 @@ int main()
     d3d.context->PSGetConstantBuffers(0u, 1u, &restoredConstants);
     ID3D11GeometryShader* restoredGeometry = nullptr;
     d3d.context->GSGetShader(&restoredGeometry, nullptr, nullptr);
+    ID3D11ShaderResourceView *restoredGSResource = nullptr, *restoredHSResource = nullptr, *restoredDSResource = nullptr;
+    ID3D11SamplerState *restoredGSSampler = nullptr, *restoredHSSampler = nullptr, *restoredDSSampler = nullptr;
+    ID3D11Buffer *restoredGSConstants = nullptr, *restoredHSConstants = nullptr, *restoredDSConstants = nullptr;
+    d3d.context->GSGetShaderResources(0u, 1u, &restoredGSResource);
+    d3d.context->HSGetShaderResources(0u, 1u, &restoredHSResource);
+    d3d.context->DSGetShaderResources(0u, 1u, &restoredDSResource);
+    d3d.context->GSGetSamplers(0u, 1u, &restoredGSSampler);
+    d3d.context->HSGetSamplers(0u, 1u, &restoredHSSampler);
+    d3d.context->DSGetSamplers(0u, 1u, &restoredDSSampler);
+    d3d.context->GSGetConstantBuffers(0u, 1u, &restoredGSConstants);
+    d3d.context->HSGetConstantBuffers(0u, 1u, &restoredHSConstants);
+    d3d.context->DSGetConstantBuffers(0u, 1u, &restoredDSConstants);
+    const bool originalHostStagesRestored =
+        restoredGSResource == gameSampleView && restoredHSResource == gameSampleView &&
+        restoredDSResource == gameSampleView && restoredGSSampler == gameSampler &&
+        restoredHSSampler == gameSampler && restoredDSSampler == gameSampler &&
+        restoredGSConstants == gameConstants && restoredHSConstants == gameConstants &&
+        restoredDSConstants == gameConstants;
     const bool restoredGameState =
-        restoredGeometry == originalGeometryShader &&
+        originalHostStagesRestored && restoredGeometry == originalGeometryShader &&
         restoredResource == gameSampleView &&
         restoredSampler == gameSampler &&
         restoredConstants == gameConstants &&
@@ -1927,6 +2003,15 @@ int main()
         restoredScissor.top == preservedScissor.top &&
         restoredScissor.right == preservedScissor.right &&
         restoredScissor.bottom == preservedScissor.bottom;
+    if (restoredGSResource) restoredGSResource->Release();
+    if (restoredHSResource) restoredHSResource->Release();
+    if (restoredDSResource) restoredDSResource->Release();
+    if (restoredGSSampler) restoredGSSampler->Release();
+    if (restoredHSSampler) restoredHSSampler->Release();
+    if (restoredDSSampler) restoredDSSampler->Release();
+    if (restoredGSConstants) restoredGSConstants->Release();
+    if (restoredHSConstants) restoredHSConstants->Release();
+    if (restoredDSConstants) restoredDSConstants->Release();
     if (restoredResource) restoredResource->Release();
     if (restoredSampler) restoredSampler->Release();
     if (restoredConstants) restoredConstants->Release();
@@ -1953,6 +2038,15 @@ int main()
     d3d.context->PSSetShaderResources(0u, 1u, &nullGameResource);
     d3d.context->PSSetSamplers(0u, 1u, &nullGameSampler);
     d3d.context->PSSetConstantBuffers(0u, 1u, &nullGameConstants);
+    d3d.context->GSSetShaderResources(0u, 1u, &nullGameResource);
+    d3d.context->HSSetShaderResources(0u, 1u, &nullGameResource);
+    d3d.context->DSSetShaderResources(0u, 1u, &nullGameResource);
+    d3d.context->GSSetSamplers(0u, 1u, &nullGameSampler);
+    d3d.context->HSSetSamplers(0u, 1u, &nullGameSampler);
+    d3d.context->DSSetSamplers(0u, 1u, &nullGameSampler);
+    d3d.context->GSSetConstantBuffers(0u, 1u, &nullGameConstants);
+    d3d.context->HSSetConstantBuffers(0u, 1u, &nullGameConstants);
+    d3d.context->DSSetConstantBuffers(0u, 1u, &nullGameConstants);
     d3d.context->GSSetShader(nullptr, nullptr, 0u);
     d3d.context->VSSetShader(nullptr, nullptr, 0u);
     d3d.context->PSSetShader(nullptr, nullptr, 0u);
