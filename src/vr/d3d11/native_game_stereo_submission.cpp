@@ -219,12 +219,18 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                                    clear.destX, clear.destY,
                                    clear.sourceArraySlice))
                 return false;
+            // Game-authored offscreen menu/car/race compositing can write
+            // real eye color even when its on-eye geometry only updates Z.
+            // Count ONLY successfully replayed, source-timeline GPU copies;
+            // arbitrary callback copies cannot certify an OpenXR frame.
+            ++authoredColorPostpassCount_;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice))
                 return false;
+            ++authoredColorPostpassCount_;
         } else {
             return false; // Reject unrecognized source commands, never fabricate a Clear.
         }
@@ -1640,7 +1646,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             if (!encoder.finish_source_clear_timeline())
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
-            if (!encoder.draw_count() || !encoder.color_draw_count() ||
+            if (!live_game_stereo::authored_color_output_ready(
+                    encoder.draw_count(), encoder.color_draw_count(),
+                    encoder.authored_color_postpass_count()) ||
                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||

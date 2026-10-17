@@ -84,6 +84,12 @@ public:
     // Depth-only and color-masked game Draws still execute and contribute to
     // the command stream, but cannot by themselves certify a visible XR eye.
     [[nodiscard]] std::uint64_t color_draw_count() const noexcept { return colorDrawCount_; }
+    // Completed game-authored GPU Copy/Stretch timeline events may provide
+    // the eye's real color while on-eye Draws update only depth. These
+    // events never increment the genuine geometry draw-count contract.
+    [[nodiscard]] std::uint32_t authored_color_postpass_count() const noexcept {
+        return authoredColorPostpassCount_;
+    }
 private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
@@ -96,6 +102,7 @@ private:
     UINT targetWidth_{}, targetHeight_{};
     std::uint64_t drawCount_{};
     std::uint64_t colorDrawCount_{};
+    std::uint32_t authoredColorPostpassCount_{};
     const NativeGameEyePartialTargetClear* sourceClears_{};
     std::uint32_t sourceClearEye_{}, sourceClearCursor_{};
 };
