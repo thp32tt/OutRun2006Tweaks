@@ -90,8 +90,12 @@
   "ci_evidence": {
     "source_commit": "7bf80e2857270da753a206e196da3da0c640f072",
     "exact_sha": "PENDING",
-    "gates": "PENDING_REVALIDATION_AFTER_MISSING_FEATURE_CONTRACT",
+    "gates": "PENDING_FINAL_EXACT_SHA",
     "hmd": "UNTESTED",
-    "initial_material_sha_gates": "Domain/Inspector SUCCESS; Active feature record missing FAILURE; Full Source cancelled by concurrent HEAD."
-  }
+    "initial_material_sha_gates": "Domain/Inspector SUCCESS; Active feature record missing FAILURE; Full Source cancelled by concurrent HEAD.",
+    "initial_policy_failure": "Material commit lacked whole-feature JSON; next validation-bearing commit passed feature policy, but ran a stale cockpit glass source-edit assertion superseded by the concurrently adopted immutable original-model runtime diagnostic policy.",
+    "cause_limited_fix_commit": "8326eb5efe8d82ab541530c8e3acb2416ac4f831",
+    "cause_limited_fix": "tools/Test-OutRunVRTestPolicy.ps1 now positively verifies that G_COCKPIT cannot invoke unproven original PMT/file editors, while retaining verified driver-seat, particle, runtime profile and original game file protection. VR Test Policy #39030761606 SUCCESS; awaiting complete same-SHA R84/R26_SAFE/host and all four required workflow gates."
+  },
+  "validation_notes": "Same TASK 01015; original GOAL C++ material remains 7bf80e28. Initial and validation candidate showed a separate cockpit policy assertion failure caused by concurrent immutability guardrails, repaired under this TASK without touching cockpit game code; current update activates all required exact-SHA gates. CI repair and bookkeeping are NOT independent work or score. Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
 }
