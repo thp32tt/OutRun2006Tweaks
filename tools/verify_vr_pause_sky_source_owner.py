@@ -56,6 +56,34 @@ def check(r30, r7, r26, semantic):
     assert "if (rotationOnly)" in r7fixed
     assert "appliedHeadInverse._41 = 0.0f" in r7fixed
     assert "eyeOffset[0] = eyeOffset[1] = eyeOffset[2] = 0.0f" in r7fixed
+    # R26's old DrawPrimitive/Indexed/UP pre-screen callback also covered
+    # HUD routed back to native original Draw. R84 R33 must now stamp and
+    # capture before the fallback, NOT only after a successful R30 eye draw.
+    r33=(ROOT/"src/vr/d3d9/stereo_renderer_r33.cpp").read_text(
+        encoding="utf-8-sig")
+    api=(ROOT/"src/vr/core/r30_support_api.hpp").read_text(
+        encoding="utf-8-sig")
+    assert "R30SupportBeforeScreenDrawForSkyGlow(device," in r33
+    assert r33.index("R30SupportBeforeScreenDrawForSkyGlow(device,") < (
+        r33.index("if (!resyncAlreadyFlushed)",r33.index(
+            "const auto drawCommand =",r33.index("HRESULT R33Dispatch("))))
+    assert "IsSkyGlowPreHudBoundary(" in r33
+    assert "void R30SupportBeforeScreenDrawForSkyGlow(" in api
+    capture=r30.split("void R30SupportBeforeScreenDrawForSkyGlow(",1)[1].split(
+        "R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(",1)[0]
+    for flag in ("R29OwnerIsGameDevice(device)",
+                 "R29OwnerInternalStereoPassActive()",
+                 "R29OwnerTargetIsBackBuffer()",
+                 "R30SkyGlowScreenDrawEpoch == frame.presentEpoch",
+                 "R30CaptureSkyGlowSceneBeforeHud(device)"):
+        assert flag in capture
+    sky=r30.split("bool R30ApplyStereoSkyGlow(",1)[1].split(
+        "ULONGLONG R30LastTelemetryMs",1)[0]
+    for flag in ("STATE_WARP","STATE_RESTART","STATE_GOAL",
+                 "STATE_TIMEUP","STATE_LINK_TIMEUP","STATE_GIVEUP",
+                 "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch",
+                 "R30SkyGlowScreenDrawEpoch == frame.presentEpoch"):
+        assert flag in sky
     assert "scope == RenderScope::SkyGlow" in semantic
     assert "scope == RenderScope::ScreenOverlay2D" in semantic
     return True
