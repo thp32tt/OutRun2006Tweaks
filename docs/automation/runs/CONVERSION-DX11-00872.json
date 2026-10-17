@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00872",
+  "production_id": "CONVERSION-DX11-00872",
+  "event_id": "CONVERSION-DX11-00872-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:HOST_NATIVE_STEREO_OM_PIXEL_UAV_REPLAY",
+  "feature_id": "DX11:HOST_NATIVE_STEREO_OM_PIXEL_UAV_REPLAY",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "development_strategy": {
+    "work_class": "safety_regression",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Game-authored D3D11 menu/vehicle/race native stereo texture pair arrives in the x64 host with OM RTV/DSV, PS UAV and CS UAV outputs still bound",
+      "CopyDirectEyesToHold snapshots and unbinds all writable outputs, copies two independent live native GPU game eyes and restores exact pixel UAV/MRT/compute binding",
+      "CopyDirectEyesToStereoArray reuses this restore path for native OpenXR two-slice projection; rejected stereo pair or selected SBS source leaves game and input fallback unchanged"
+    ],
+    "batch_components": [
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real D3D11 WARP two-eye host staging and XR array projection preserve original OM pixel UAV slot 2 plus both RTVs and distinct RGBA eye pixels.",
+      "negative_regression": "Aliased eye and SBS/direct-route rejection produce no GPU transfer or OM binding damage; original D3D9Ex gamepad/FFB/fallback is not modified.",
+      "component_integration": "ScopedNativeEyeCopyBindings now snapshots and restores OM PS UAV + CS UAV for both CopyDirectEyesToHold and CopyDirectEyesToStereoArray, tested using the actual host WARP helper."
+    },
+    "conflict_keys": [
+      "DX11:HOST_NATIVE_STEREO_OM_PIXEL_UAV_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native host per-eye OM pixel UAV state and full-size two-eye GPU pixels must survive OpenXR host transfer; source CI only, no Quest3/VDXR visual result.",
+    "activation_guard_and_fallback": "Native direct transfer remains opt-in and two-eye validated; invalid game eye, host device, route or alias rejects before GPU copy. Preserve original D3D9Ex Draw, Present, FFB, input and DXVK freeze.",
+    "blocking_evidence": "Existing ScopedNativeEyeCopyBindings snapshots only OMGetRenderTargets and restores OMSetRenderTargets, erasing live PS/OM pixel UAV outputs during both x64 host GPU eye transfer paths despite producer fix 00870."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:HOST_NATIVE_STEREO_OM_PIXEL_UAV_REPLAY",
+    "goal": "Preserve game-authored OM pixel UAV plus MRT/depth and compute outputs across both actual x64 host stereo GPU holding and XR presentation copies without corrupting game framebuffer fallback.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "host_native_stereo_gpu_handoff",
+        "expected_behavior": "Both native GPU host hold and XR array copy restore original PS UAV and MRT output bindings while preserving two separate eye pixels."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_and_safe_sbs_return",
+        "expected_behavior": "Aliased eyes or inactive direct route reject without modifying output bindings, D3D9 game Draw or input/FFB."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_mandatory_exact_sha_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector succeed for the same material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PENDING_CI",
+    "fallback": "PENDING_CI",
+    "gates": "PENDING_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD 45d0918c; prior 00871 C6 sealed, different host file.",
+    "C1_REVIEW": "PASS confirmed host OMSetRenderTargets drops pixel UAV outputs; producer 00870 fixed separate x86 path.",
+    "C2_IMPLEMENT": "PASS SOURCE: host OM PS UAV capture/detach/restore in both GPU eye copy routes plus WARP positive/rejection regression.",
+    "C3_VALIDATE": "PENDING exact SHA mandatory GitHub Actions",
+    "C4_COMMIT": "PENDING material result",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Evaluate exact material GitHub SHA mandatory five CI; repair causal failure in the same task, then separately seal C6 without scoring until feature verified."
+}

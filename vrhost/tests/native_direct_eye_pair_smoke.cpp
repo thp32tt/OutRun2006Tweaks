@@ -336,6 +336,9 @@ int main()
                 computeSource[0], nullptr, &gameComputeUav));
         bool computeStageCopied = false, computeProjectionCopied = false;
         bool stageUavRestored = false, projectionUavRestored = false;
+        bool pixelStageCopied = false, pixelProjectionCopied = false;
+        bool pixelStageRestored = false, pixelProjectionRestored = false;
+        bool pixelFallbackSafe = false, pixelMrtRestored = false;
         bool computePixelsDistinct = false;
         if (computeReady) {
             const float computeRed[4]{1.f, 0.f, 0.f, 1.f};
@@ -362,6 +365,49 @@ int main()
             projectionUavRestored = computeBindingRestored();
             ID3D11UnorderedAccessView* unbind = nullptr;
             warpContext->CSSetUnorderedAccessViews(0u, 1u, &unbind, nullptr);
+            // The live menu/car/race producer can leave a pixel UAV bound at
+            // OM slot 2 after MRT0/MRT1. Exercise BOTH x64 host GPU copies
+            // against that real output state, not just compute UAV fixtures.
+            ID3D11RenderTargetView* gameMrt[2]{nativeLeftRtv, nativeRightRtv};
+            warpContext->OMSetRenderTargetsAndUnorderedAccessViews(
+                2u, gameMrt, nullptr, 2u, 1u, &gameComputeUav, nullptr);
+            const auto pixelBindingsRestored = [&]() {
+                ID3D11RenderTargetView* observedRt[2]{};
+                ID3D11DepthStencilView* observedDepth = nullptr;
+                ID3D11UnorderedAccessView* observedPixel = nullptr;
+                warpContext->OMGetRenderTargetsAndUnorderedAccessViews(
+                    2u, observedRt, &observedDepth, 2u, 1u, &observedPixel);
+                const bool exact = observedRt[0] == nativeLeftRtv &&
+                    observedRt[1] == nativeRightRtv &&
+                    observedDepth == nullptr && observedPixel == gameComputeUav;
+                for (auto*& rtv : observedRt) if (rtv) rtv->Release();
+                if (observedDepth) observedDepth->Release();
+                if (observedPixel) observedPixel->Release();
+                return exact;
+            };
+            pixelStageCopied = stageEyes(warpContext, warpDevice,
+                computeHold[0], computeHold[1],
+                computeSource[0], computeSource[1]);
+            pixelStageRestored = pixelBindingsRestored();
+            pixelProjectionCopied =
+                OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    warpContext, warpDevice, computeHold[0], computeHold[1],
+                    computeArray, true, true, true, IID_IUnknown);
+            pixelProjectionRestored = pixelBindingsRestored();
+            // A failed native pair and a selected SBS fallback must issue no
+            // copy and must not destroy the game's OM pixel output bindings.
+            pixelFallbackSafe =
+                !stageEyes(warpContext, warpDevice,
+                    computeHold[0], computeHold[1],
+                    computeSource[0], computeSource[0]) &&
+                !OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    warpContext, warpDevice, computeHold[0], computeHold[1],
+                    computeArray, true, false, true, IID_IUnknown) &&
+                pixelBindingsRestored();
+            pixelMrtRestored = pixelBindingsRestored();
+            ID3D11UnorderedAccessView* clearPixel[8]{};
+            warpContext->OMSetRenderTargetsAndUnorderedAccessViews(
+                0u, nullptr, nullptr, 0u, 8u, clearPixel, nullptr);
             auto computeReadDesc = computeArrayDesc;
             computeReadDesc.Usage = D3D11_USAGE_STAGING;
             computeReadDesc.BindFlags = 0u;
@@ -398,8 +444,11 @@ int main()
         if (computeReadback) computeReadback->Release();
         if (!require(computeReady && computeStageCopied &&
                      computeProjectionCopied && stageUavRestored &&
-                     projectionUavRestored && computePixelsDistinct,
-                     "native host compute camera UAV state and independent L/R pixels must survive both GPU copy paths"))
+                     projectionUavRestored && computePixelsDistinct &&
+                     pixelStageCopied && pixelProjectionCopied &&
+                     pixelStageRestored && pixelProjectionRestored &&
+                     pixelFallbackSafe && pixelMrtRestored,
+                     "native host OM pixel/compute UAV, MRT and independent L/R pixels must survive both GPU copy paths"))
             return 1;
         const bool holdCopyWithMrt = stageEyes(
             warpContext, warpDevice, holdLeft, holdRight, gpuLeft, gpuRight);

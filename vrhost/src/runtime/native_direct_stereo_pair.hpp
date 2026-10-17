@@ -103,20 +103,35 @@ namespace OutRunVrNativeEyePair
         explicit ScopedNativeEyeCopyBindings(Context* context) noexcept
             : context_(context)
         {
-            context_->OMGetRenderTargets(kRenderSlots, targets_, &depth_);
+            // Keep the game's pixel UAV outputs as well as its MRT/depth and
+            // compute UAV state while both eyes are transferred to the XR host.
+            // A plain OMGet/OMSetRenderTargets round trip loses PS UAV bindings.
+            context_->OMGetRenderTargetsAndUnorderedAccessViews(
+                kRenderSlots, targets_, &depth_, 0u, kComputeSlots, pixel_);
             context_->CSGetUnorderedAccessViews(0u, kComputeSlots, compute_);
             ID3D11UnorderedAccessView* empty[kComputeSlots]{};
             context_->CSSetUnorderedAccessViews(0u, kComputeSlots, empty, nullptr);
-            context_->OMSetRenderTargets(0u, nullptr, nullptr);
+            context_->OMSetRenderTargetsAndUnorderedAccessViews(
+                0u, nullptr, nullptr, 0u, kComputeSlots, empty, nullptr);
         }
 
         ~ScopedNativeEyeCopyBindings() noexcept
         {
-            context_->OMSetRenderTargets(kRenderSlots, targets_, depth_);
+            // Pixel UAV slots start after the last occupied RTV. Restoring
+            // the full eight RTV slots first would silently evict OM UAVs.
+            // Preserve append/consume counters in both shader stages.
+            unsigned int renderCount = 0u;
+            for (unsigned int i = 0u; i < kRenderSlots; ++i)
+                if (targets_[i]) renderCount = i + 1u;
             // Use the ABI-equivalent unsigned integral type: descriptor-only
             // DXGI contract fixtures intentionally omit the Windows UINT name.
             unsigned int preserveCounters[kComputeSlots]{};
             for (auto& counter : preserveCounters) counter = ~0u;
+            const unsigned int pixelCount = kComputeSlots - renderCount;
+            context_->OMSetRenderTargetsAndUnorderedAccessViews(
+                renderCount, renderCount ? targets_ : nullptr, depth_,
+                renderCount, pixelCount, pixelCount ? pixel_ + renderCount : nullptr,
+                pixelCount ? preserveCounters + renderCount : nullptr);
             context_->CSSetUnorderedAccessViews(
                 0u, kComputeSlots, compute_, preserveCounters);
             const auto release = [](auto*& view) noexcept {
@@ -124,6 +139,7 @@ namespace OutRunVrNativeEyePair
             };
             for (auto*& target : targets_) release(target);
             release(depth_);
+            for (auto*& output : pixel_) release(output);
             for (auto*& output : compute_) release(output);
         }
 
@@ -135,6 +151,7 @@ namespace OutRunVrNativeEyePair
         Context* context_{};
         ID3D11RenderTargetView* targets_[kRenderSlots]{};
         ID3D11DepthStencilView* depth_{};
+        ID3D11UnorderedAccessView* pixel_[kComputeSlots]{};
         ID3D11UnorderedAccessView* compute_[kComputeSlots]{};
     };
 
