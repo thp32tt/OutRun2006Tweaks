@@ -211,7 +211,10 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert re.search(r"if\s*\(\s*exactResultHud\s*\|\|\s*"
                      r"directCarShadow\s*\|\|\s*" +
                      re.escape(centre) +
-                     r".*?\)\s*\{\s*if\s*\(telemetry\)\s*"
+                     r".*?\)\s*\{\s*"
+                     r"(?:OutRunVR::UniversalTrace::ScopedDraw::RecordRoute\(\s*"
+                     r"OutRunVR::UniversalTrace::Route::OriginalPreserved\);\s*)?"
+                     r"if\s*\(telemetry\)\s*"
                      r"R32ReviewNoteDispatchFallback\(\);\s*"
                      r"return actualDraw\(\);\s*\}\s*"
                      r"return fallbackToR29\(\);", early, re.S), (
