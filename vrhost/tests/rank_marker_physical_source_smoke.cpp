@@ -1,4 +1,5 @@
 #include "vr/game/rank_marker_physical_source.hpp"
+#include "vr/game/hud_native_source_transaction.hpp"
 #include <limits>
 #include <iostream>
 using namespace OutRunVR;
@@ -106,6 +107,51 @@ int main()
     if (SameRankSourceAfterNativeLeft(shaderDirect, m)) return 38;
     m = shaderDirect; ++m.shaderEpoch;
     if (SameRankSourceAfterNativeLeft(shaderDirect, m)) return 39;
+    // Native FVF142 fixed-function 6th/6 rank, NOT the car-rank marker.
+    HudNativeSource::FixedFnRankHudStamp rankHud{{
+        GameSemantic::RenderScope::ScreenHud,
+        GameSemantic::ProducerToken::DispRankFirst,
+        &node, 8u, true, 0u}, 31u, 41u, 0x142u, true};
+    if (!HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud, rankHud)) return 40;
+    auto hudChanged = rankHud;
+    hudChanged.command.queueNode = &otherNode;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 41;
+    hudChanged = rankHud; ++hudChanged.command.queueEpoch;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 42;
+    hudChanged = rankHud; hudChanged.command.producer =
+        GameSemantic::ProducerToken::DispRankClipSprite;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 43;
+    hudChanged = rankHud; ++hudChanged.poseEpoch;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 44;
+    hudChanged = rankHud; ++hudChanged.drawSerial;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 45;
+    hudChanged = rankHud; hudChanged.fvf = 0x144u;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 46;
+    hudChanged = rankHud; hudChanged.vertexShaderAbsent = false;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 47;
+    hudChanged = rankHud; hudChanged.command.scope =
+        GameSemantic::RenderScope::ProjectedWorldMarker2D;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 48;
+    hudChanged = rankHud; hudChanged.command.producer =
+        GameSemantic::ProducerToken::StageExtensionTime;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 49;
+    hudChanged = rankHud; hudChanged.command.producer =
+        GameSemantic::ProducerToken::None;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 50;
+    hudChanged = rankHud; hudChanged.command.queueNode = nullptr;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(rankHud,hudChanged)) return 51;
+    auto directHud = rankHud;
+    directHud.command.queued = false;
+    directHud.command.queueNode = nullptr;
+    directHud.command.queueEpoch = 0;
+    directHud.command.producer = GameSemantic::ProducerToken::DispRankClipSprite;
+    if (!HudNativeSource::SameFixedFnRankHudAfterLeft(directHud,directHud)) return 52;
+    hudChanged = directHud; hudChanged.command.queueEpoch = 1;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(directHud,hudChanged)) return 53;
+    hudChanged = directHud; hudChanged.command.producer =
+        GameSemantic::ProducerToken::RivalMarkerSprani;
+    if (HudNativeSource::SameFixedFnRankHudAfterLeft(directHud,hudChanged)) return 54;
+    std::cout << "R84 FVF142 physical DispRank 6th/6 command fence PASS\n";
     std::cout << "R84 physical projected rank source transaction PASS\n";
     return 0;
 }

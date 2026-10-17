@@ -66,4 +66,52 @@ namespace OutRunVR::HudNativeSource
             before.shaderEpoch == after.shaderEpoch &&
             before.drawSerial == after.drawSerial;
     }
+    // The original 6th/6 FVF142 SpriteNode (kind-1 plus eight clipped
+    // digits) has no shader. R33's shader HUD fence does not cover it.
+    struct FixedFnRankHudStamp final
+    {
+        GameSemantic::PhysicalDrawCommand command{};
+        std::uint64_t poseEpoch = 0;
+        std::uint64_t drawSerial = 0;
+        std::uint32_t fvf = 0;
+        bool vertexShaderAbsent = false;
+    };
+
+    constexpr bool IsExactFixedFnRankHud(
+        const FixedFnRankHudStamp& s) noexcept
+    {
+        const auto p = s.command.producer;
+        if (!s.vertexShaderAbsent || s.fvf != 0x142u ||
+            !s.poseEpoch || !s.drawSerial ||
+            s.command.scope != RenderScope::ScreenHud ||
+            (p != ProducerToken::DispRankFirst &&
+             p != ProducerToken::DispRankClipSprite))
+            return false;
+        return s.command.queued
+            ? s.command.queueNode != nullptr && s.command.queueEpoch != 0
+            : s.command.queueNode == nullptr && s.command.queueEpoch == 0;
+    }
+
+    constexpr bool SameFixedFnRankHudAfterLeft(
+        const FixedFnRankHudStamp& before,
+        const FixedFnRankHudStamp& after) noexcept
+    {
+        return IsExactFixedFnRankHud(before) &&
+            IsExactFixedFnRankHud(after) &&
+            before.command.scope == after.command.scope &&
+            before.command.producer == after.command.producer &&
+            before.command.queued == after.command.queued &&
+            before.command.queueNode == after.command.queueNode &&
+            before.command.queueEpoch == after.command.queueEpoch &&
+            before.poseEpoch == after.poseEpoch &&
+            before.drawSerial == after.drawSerial &&
+            before.fvf == after.fvf &&
+            before.vertexShaderAbsent == after.vertexShaderAbsent;
+    }
+
+    static_assert(!IsExactFixedFnRankHud({}));
+    static_assert(!IsExactFixedFnRankHud({
+        {RenderScope::ProjectedWorldMarker2D,
+         ProducerToken::RankMarkerClipSprite, nullptr, 0, false, 0},
+        1, 1, 0x142u, true}));
 }

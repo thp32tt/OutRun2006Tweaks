@@ -41,6 +41,7 @@
 #include "../game/rank_marker_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
 #include "../game/goal_progress_physical_source.hpp"
+#include "../game/hud_native_source_transaction.hpp"
 #include "../game/rank_marker_fixedfn_r62.hpp"
 #include <cstring>
 #include <cstdlib>
@@ -5605,7 +5606,7 @@ namespace OutRunVRStereo
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
-            const char* site)
+            const char* site, bool protectFixedFnRankHud = false)
         {
             // R26+HUD protected the lens centre from prematurely freezing
             // the pre-HUD SkyGlow source. The independent R84 renderer must
@@ -5652,6 +5653,36 @@ namespace OutRunVRStereo
             if (exactGoal && !R30CaptureGoalPhysicalSource(goalBefore))
                 return E_NOTIMPL; // no native GPU draw submitted yet
 
+            // Only the exact fixed-function 6th/6 producer opts in here.
+            // Shader HUD, projected car rank, +TIME and GOAL have separate
+            // native-left physical source transactions already.
+            const auto captureFixedRankHud = [&]() noexcept {
+                OutRunVR::HudNativeSource::FixedFnRankHudStamp stamp{};
+                stamp.command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                stamp.poseEpoch =
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch();
+                stamp.drawSerial = R29OwnerTopLevelDrawSerial();
+                DWORD fvf = 0;
+                if (FAILED(device->GetFVF(&fvf)))
+                    return OutRunVR::HudNativeSource::FixedFnRankHudStamp{};
+                stamp.fvf = fvf;
+                IDirect3DVertexShader9* liveShader = nullptr;
+                if (FAILED(device->GetVertexShader(&liveShader)))
+                    return OutRunVR::HudNativeSource::FixedFnRankHudStamp{};
+                stamp.vertexShaderAbsent = liveShader == nullptr;
+                if (liveShader)
+                    liveShader->Release();
+                return stamp;
+            };
+            const auto fixedRankBefore = protectFixedFnRankHud
+                ? captureFixedRankHud()
+                : OutRunVR::HudNativeSource::FixedFnRankHudStamp{};
+            if (protectFixedFnRankHud &&
+                !OutRunVR::HudNativeSource::IsExactFixedFnRankHud(
+                    fixedRankBefore))
+                return E_NOTIMPL; // no physical eye submitted yet
+
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
             {
@@ -5662,6 +5693,21 @@ namespace OutRunVRStereo
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
+                R29OwnerArmMonoSafety();
+                return leftHr;
+            }
+
+            if (protectFixedFnRankHud &&
+                !OutRunVR::HudNativeSource::SameFixedFnRankHudAfterLeft(
+                    fixedRankBefore, captureFixedRankHud()))
+            {
+                // LEFT already ran. Never replay it or borrow a different
+                // original SpriteNode for RIGHT. Enclosing FVF142 restores
+                // the game's original projection on this path too.
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerReportStereoFailure(
+                    OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
                 R29OwnerArmMonoSafety();
                 return leftHr;
             }
@@ -6346,7 +6392,10 @@ namespace OutRunVRStereo
                 [&]() { return drawEye(1); },
                 projected ? "R84/R62-FVF142-ProjectedCarRank"
                           : (pauseOverlay ? "R84/R62-FVF142-PauseOverlay"
-                                          : "R84/R62-FVF142-NativeScreenHud"));
+                                          : "R84/R62-FVF142-NativeScreenHud"),
+                exactHud && (pauseCommand.producer ==
+                    ProducerToken::DispRankFirst ||
+                    pauseCommand.producer == ProducerToken::DispRankClipSprite));
             bool restored = false;
             {
                 R30ScopedInternalPass guard;
