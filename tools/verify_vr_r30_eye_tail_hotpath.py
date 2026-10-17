@@ -129,7 +129,7 @@ def verify(source: str):
     assert configure.index("state.rhwDepthEvidence =") < configure.index(
         "if (!state.worldEffect)") < configure.index("geometryCacheHit")
     assert configure.index("geometryCache.valid = false;") < configure.index(
-        "R29OwnerInvertMatrix(baseProjection, state.inverseBaseProjection)")
+        "R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection)")
     assert configure.index("!R29OwnerMatrixFinite(state.eyeTail[eye])") < configure.index(
         "geometryCache.valid = true;")
     # No second 4x4 multiplication may remain inside the particle loop.
@@ -410,6 +410,8 @@ def main():
     else:
         raise AssertionError("Reset invalidation mutation escaped")
     geometry_mutations = (
+        ("R30InvertBaseProjectionCached(baseProjection, state.inverseBaseProjection)",
+         "R29OwnerInvertMatrix(baseProjection, state.inverseBaseProjection)"),
         ("geometryCache.worldScale == worldScale", "true"),
         ("geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence", "true"),
         ("std::memcmp(&geometryCache.geometry.baseProjection,", "std::memcmp(&state.baseProjection,"),
