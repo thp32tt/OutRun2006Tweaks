@@ -53,8 +53,8 @@
   },
   "development_strategy": {
     "work_class": "blocker_resolution",
-    "milestone_id": "full_resolution_native_stereo_game_frame",
-    "gameplay_delivery_target": "MENU_CAR_RACE_REAL_GAME_EYE_COLOR_EVIDENCE",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "full_gate_plan": "one_validation_bearing_sha",
     "conflict_keys": [
       "DX11:FULLFRAME:STEREO_DEPTH_STENCIL_FRAGMENT_REJECT"
@@ -62,7 +62,7 @@
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "NATIVE_STEREO_EYE_OUTPUT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "batch_components": [
       "D3D11 real depth-stencil-state readback in NativeGameEyeDrawEncoder::eye_color_writable",
@@ -70,7 +70,17 @@
       "real Win32 WARP stereo GPU negative Draw and DrawIndexed source ordinal fixture"
     ],
     "activation_guard_and_fallback": "NativeDrawPathActive explicit opt-in, original D3D9Ex Draw/Present/input/FFB and preserved source no-output ordinals, strict ring GPU stereo publication and DXVK frozen",
-    "visible_frame_acceptance": "Only BUILD_VERIFIED DX11 native eye fragment reject color evidence in genuine GPU encoder, not an entire converted game, real game menu/car/race screen, HMD, input or 72Hz runtime."
+    "visible_frame_acceptance": "Only BUILD_VERIFIED DX11 native eye fragment reject color evidence in genuine GPU encoder, not an entire converted game, real game menu/car/race screen, HMD, input or 72Hz runtime.",
+    "integration_path": [
+      "Real game source Draw/DrawIndexed ordering through native D3D11 left/right eye GPU recorder",
+      "Active depth/stencil comparison -> conservative native eye-color publication evidence -> generation-owned OpenXR GPU ring source, while runtime screen remains untested"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00896 real Win32 WARP eye GPU Draw/DrawIndexed, positive disabled-depth and one-sided stencil case; immutable validation SHA ecf98eeb and WARP run 39069283061 SUCCESS.",
+      "negative_regression": "Both-sided stencil NEVER and depth NEVER suppress false eye color without skipping authentic D3D11 Draw; per-eye 00896 native GPU negative fixture SUCCESS.",
+      "component_integration": "src/vr/d3d11/native_game_stereo_submission.cpp and native_game_stereo_draw_evidence.hpp, tools/dx11_native_transport_probe.cpp; 00896 five recorded exact-SHA Gates SUCCESS; preserves original D3D9Ex fallback."
+    },
+    "blocking_evidence": "Previous native eye publication could certify color from successful GPU Draws even when depth ALWAYS rejected or both faces stencil NEVER; 00896 material source ecf98eeb with five Gates and WARP green repairs this false output evidence. Physical Quest3/VDXR still UNTESTED."
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
