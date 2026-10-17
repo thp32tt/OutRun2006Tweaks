@@ -7,6 +7,19 @@
 
 int main()
 {
+    // Every possible RTV occupancy mask must map to a disjoint UAV tail.
+    for (std::uint32_t mask = 0u; mask < 256u; ++mask) {
+        const auto slots = OutRunVrNativeEyePair::PlanNativeEyeOmSlots(mask);
+        unsigned int expected = 0u;
+        for (unsigned int i = 0u; i < 8u; ++i)
+            if ((mask & (1u << i)) != 0u) expected = i + 1u;
+        if (slots.rtvCount != expected || slots.pixelUavStart != expected ||
+            slots.pixelUavCount != 8u - expected ||
+            slots.pixelUavStart + slots.pixelUavCount != 8u) {
+            std::cerr << "host eye RTV/UAV tail overlap\n";
+            return 1;
+        }
+    }
     D3D11_TEXTURE2D_DESC left{};
     left.Width = 96;
     left.Height = 96;
@@ -339,6 +352,9 @@ int main()
         bool pixelStageCopied = false, pixelProjectionCopied = false;
         bool pixelStageRestored = false, pixelProjectionRestored = false;
         bool pixelFallbackSafe = false, pixelMrtRestored = false;
+        bool sparseHoldCopied = false, sparseProjectionCopied = false;
+        bool sparseHoldRestored = false, sparseProjectionRestored = false;
+        bool sparseFallbackSafe = false;
         bool computePixelsDistinct = false;
         if (computeReady) {
             const float computeRed[4]{1.f, 0.f, 0.f, 1.f};
@@ -405,6 +421,41 @@ int main()
                     computeArray, true, false, true, IID_IUnknown) &&
                 pixelBindingsRestored();
             pixelMrtRestored = pixelBindingsRestored();
+            // Sparse live MRT0/MRT2 and PS UAV3: both GPU transfers must
+            // restore the hole and the independently bound pixel UAV.
+            ID3D11RenderTargetView* sparseMrt[3]{
+                nativeLeftRtv, nullptr, nativeRightRtv};
+            warpContext->OMSetRenderTargetsAndUnorderedAccessViews(
+                3u, sparseMrt, nullptr, 3u, 1u, &gameComputeUav, nullptr);
+            const auto sparseRestored = [&]() {
+                ID3D11RenderTargetView* observed[3]{};
+                ID3D11DepthStencilView* depth = nullptr;
+                ID3D11UnorderedAccessView* pixel = nullptr;
+                warpContext->OMGetRenderTargetsAndUnorderedAccessViews(
+                    3u, observed, &depth, 3u, 1u, &pixel);
+                const bool exact = observed[0] == nativeLeftRtv &&
+                    observed[1] == nullptr &&
+                    observed[2] == nativeRightRtv &&
+                    depth == nullptr && pixel == gameComputeUav;
+                for (auto*& v : observed) if (v) v->Release();
+                if (depth) depth->Release();
+                if (pixel) pixel->Release();
+                return exact;
+            };
+            sparseHoldCopied = stageEyes(
+                warpContext, warpDevice, computeHold[0], computeHold[1],
+                computeSource[0], computeSource[1]);
+            sparseHoldRestored = sparseRestored();
+            sparseProjectionCopied =
+                OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    warpContext, warpDevice, computeHold[0], computeHold[1],
+                    computeArray, true, true, true, IID_IUnknown);
+            sparseProjectionRestored = sparseRestored();
+            sparseFallbackSafe =
+                !OutRunVrNativeEyePair::CopyDirectEyesToStereoArray<IUnknown>(
+                    warpContext, warpDevice, computeHold[0], computeHold[1],
+                    computeArray, true, false, true, IID_IUnknown) &&
+                sparseRestored();
             ID3D11UnorderedAccessView* clearPixel[8]{};
             warpContext->OMSetRenderTargetsAndUnorderedAccessViews(
                 0u, nullptr, nullptr, 0u, 8u, clearPixel, nullptr);
@@ -452,8 +503,11 @@ int main()
                      projectionUavRestored && computePixelsDistinct &&
                      pixelStageCopied && pixelProjectionCopied &&
                      pixelStageRestored && pixelProjectionRestored &&
-                     pixelFallbackSafe && pixelMrtRestored,
-                     "native host OM pixel/compute UAV, MRT and independent L/R pixels must survive both GPU copy paths"))
+                     pixelFallbackSafe && pixelMrtRestored &&
+                     sparseHoldCopied && sparseProjectionCopied &&
+                     sparseHoldRestored && sparseProjectionRestored &&
+                     sparseFallbackSafe,
+                     "native host sparse/dense MRT and PS/CS UAV must survive L/R GPU copy and SBS fallback"))
             return 1;
         const bool holdCopyWithMrt = stageEyes(
             warpContext, warpDevice, holdLeft, holdRight, gpuLeft, gpuRight);

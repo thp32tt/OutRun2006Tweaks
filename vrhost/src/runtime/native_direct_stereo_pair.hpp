@@ -91,6 +91,24 @@ namespace OutRunVrNativeEyePair
     }
 
 
+    // RTVs and pixel UAVs share D3D11's eight OM output slots.
+    // For sparse MRTs the highest occupied RTV, not the count of views,
+    // determines where the legal pixel-UAV tail starts.
+    struct NativeEyeOmSlots {
+        unsigned int rtvCount{}, pixelUavStart{}, pixelUavCount{};
+    };
+    [[nodiscard]] constexpr NativeEyeOmSlots PlanNativeEyeOmSlots(
+        std::uint32_t occupiedRtvMask) noexcept
+    {
+        NativeEyeOmSlots out{};
+        for (unsigned int i = 0u; i < 8u; ++i)
+            if ((occupiedRtvMask & (1u << i)) != 0u)
+                out.rtvCount = i + 1u;
+        out.pixelUavStart = out.rtvCount;
+        out.pixelUavCount = 8u - out.rtvCount;
+        return out;
+    }
+
     // Live DirectGPU game eye sources may still be bound as CS UAVs after
     // native camera compute postpasses. D3D11 GPU copies must detach both
     // those writable aliases and the full host OM MRT/DSV attachments, then
@@ -106,8 +124,17 @@ namespace OutRunVrNativeEyePair
             // Keep the game's pixel UAV outputs as well as its MRT/depth and
             // compute UAV state while both eyes are transferred to the XR host.
             // A plain OMGet/OMSetRenderTargets round trip loses PS UAV bindings.
-            context_->OMGetRenderTargetsAndUnorderedAccessViews(
-                kRenderSlots, targets_, &depth_, 0u, kComputeSlots, pixel_);
+            // Request no overlapping RTV/UAV output slots on the host path.
+            context_->OMGetRenderTargets(kRenderSlots, targets_, &depth_);
+            std::uint32_t mask = 0u;
+            for (unsigned int i = 0u; i < kRenderSlots; ++i)
+                if (targets_[i]) mask |= (1u << i);
+            outputSlots_ = PlanNativeEyeOmSlots(mask);
+            if (outputSlots_.pixelUavCount != 0u)
+                context_->OMGetRenderTargetsAndUnorderedAccessViews(
+                    0u, nullptr, nullptr,
+                    outputSlots_.pixelUavStart, outputSlots_.pixelUavCount,
+                    pixel_ + outputSlots_.pixelUavStart);
             context_->CSGetUnorderedAccessViews(0u, kComputeSlots, compute_);
             ID3D11UnorderedAccessView* empty[kComputeSlots]{};
             context_->CSSetUnorderedAccessViews(0u, kComputeSlots, empty, nullptr);
@@ -120,18 +147,21 @@ namespace OutRunVrNativeEyePair
             // Pixel UAV slots start after the last occupied RTV. Restoring
             // the full eight RTV slots first would silently evict OM UAVs.
             // Preserve append/consume counters in both shader stages.
-            unsigned int renderCount = 0u;
-            for (unsigned int i = 0u; i < kRenderSlots; ++i)
-                if (targets_[i]) renderCount = i + 1u;
-            // Use the ABI-equivalent unsigned integral type: descriptor-only
-            // DXGI contract fixtures intentionally omit the Windows UINT name.
+            // Preserve append/consume counters and sparse RTV holes.
             unsigned int preserveCounters[kComputeSlots]{};
             for (auto& counter : preserveCounters) counter = ~0u;
-            const unsigned int pixelCount = kComputeSlots - renderCount;
-            context_->OMSetRenderTargetsAndUnorderedAccessViews(
-                renderCount, renderCount ? targets_ : nullptr, depth_,
-                renderCount, pixelCount, pixelCount ? pixel_ + renderCount : nullptr,
-                pixelCount ? preserveCounters + renderCount : nullptr);
+            if (outputSlots_.pixelUavCount == 0u) {
+                // All 8 RTV slots occupied: there is no legal PS UAV tail.
+                context_->OMSetRenderTargets(
+                    outputSlots_.rtvCount, targets_, depth_);
+            } else {
+                context_->OMSetRenderTargetsAndUnorderedAccessViews(
+                    outputSlots_.rtvCount,
+                    outputSlots_.rtvCount ? targets_ : nullptr, depth_,
+                    outputSlots_.pixelUavStart, outputSlots_.pixelUavCount,
+                    pixel_ + outputSlots_.pixelUavStart,
+                    preserveCounters + outputSlots_.pixelUavStart);
+            }
             context_->CSSetUnorderedAccessViews(
                 0u, kComputeSlots, compute_, preserveCounters);
             const auto release = [](auto*& view) noexcept {
@@ -149,6 +179,7 @@ namespace OutRunVrNativeEyePair
     private:
         enum : unsigned { kRenderSlots = 8u, kComputeSlots = 8u };
         Context* context_{};
+        NativeEyeOmSlots outputSlots_{};
         ID3D11RenderTargetView* targets_[kRenderSlots]{};
         ID3D11DepthStencilView* depth_{};
         ID3D11UnorderedAccessView* pixel_[kComputeSlots]{};
