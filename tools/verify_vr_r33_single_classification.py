@@ -225,8 +225,20 @@ def check_mono_aux_fastpath(text: str) -> None:
                      r"R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld;", dispatch), (
         "car shadow stereo must require its own exact classifier"
     )
+    # Preserve the original branch predicates/return oracle. Bounded diagnostics
+    # may run before the telemetry counter, but must not affect routing.
+    preserved_raw_trace = (
+        r"(?:OutRunVR::UniversalTrace::ScopedDraw::RecordRoute\(\s*"
+        r"OutRunVR::UniversalTrace::Route::OriginalPreserved\);\s*)?"
+    )
+    handled_hud_trace = (
+        r"(?:\{\s*OutRunVR::UniversalTrace::ScopedDraw::RecordRoute\(\s*"
+        r"OutRunVR::UniversalTrace::Route::R33HudStereo\);\s*"
+        r"return hud.hr;\s*\}|return hud.hr;)"
+    )
     assert re.search(r"if\s*\(directCarShadow\s*&&\s*"
-                     r"!provenCarShadowStereo\)\s*\{\s*"
+                     r"!provenCarShadowStereo\)\s*\{\s*" +
+                     preserved_raw_trace +
                      r"if\s*\(telemetry\)\s*"
                      r"R32ReviewNoteDispatchFallback\(\);\s*"
                      r"return actualDraw\(\);", dispatch), (
@@ -240,9 +252,11 @@ def check_mono_aux_fastpath(text: str) -> None:
                      r"directCarShadow\)\s*&&\s*"
                      r"screenKind\s*==\s*R32ReviewScreenSpaceKind::None\)",
                      dispatch), "unclassified result/shadow was sent to world"
-    assert re.search(r"if\s*\(hud.handled\)\s*return hud.hr;\s*"
-                     r".*?if\s*\(exactResultHud\s*\|\|\s*"
-                     r"\(directCarShadow\s*&&\s*!hud.handled\)\)\s*\{\s*"
+    assert re.search(r"if\s*\(hud.handled\)\s*" +
+                     handled_hud_trace +
+                     r"\s*.*?if\s*\(exactResultHud\s*\|\|\s*"
+                     r"\(directCarShadow\s*&&\s*!hud.handled\)\)\s*\{\s*" +
+                     preserved_raw_trace +
                      r"if\s*\(telemetry\)\s*R32ReviewNoteDispatchFallback\(\);\s*"
                      r"return actualDraw\(\);",
                      dispatch, re.S), "unhandled result/shadow leaked to R29"
