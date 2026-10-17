@@ -73,7 +73,13 @@
       "NATIVE_STEREO_EYE_OUTPUT"
     ],
     "visible_frame_acceptance": "Sample-zero color admission BUILD_VERIFIED; full OutRun menu/car/race and Quest3/VDXR runtime UNTESTED; live R30 callback integration not proven.",
-    "activation_guard_and_fallback": "Existing explicit native opt-in and fail-closed eye publication; original DX9Ex Draw/Present/gamepad/FFB unchanged; DXVK frozen."
+    "activation_guard_and_fallback": "Existing explicit native opt-in and fail-closed eye publication; original DX9Ex Draw/Present/gamepad/FFB unchanged; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "00894 C++ genuine D3D11 1x stereo draw color admission requires sample-zero OM mask; native WARP GPU sample-mask fixture success run 39065841800, validated source SHA 90a1ad66bb78426439bdc3303eb40c8771dd1648.",
+      "negative_regression": "00894 WARP sample-mask 0xfffffffe high-bits-only regression must not certify native eye color; original D3D9Ex Draw/Present chronology, input and FFB left unchanged.",
+      "component_integration": "00894 native_game_stereo_submission.cpp + native_game_stereo_draw_evidence.hpp + dx11_native_transport_probe.cpp coupled GPU eye evidence and real WARP readback, mandatory exact-SHA 5/5 success at 90a1ad66; actual OutRun and Quest3/VDXR UNTESTED."
+    },
+    "blocking_evidence": "00894 concrete source defect: single-sample OM mask 0xfffffffe is nonzero yet sample bit zero is disabled. Earlier code treated it as native color evidence; material 90a1ad66 fixes bit-zero admission with a real WARP negative pixel test, 5 exact SHA Gates success."
   },
   "acceptance_results": {
     "sample_zero_eye_gpu_color_evidence": "PASS_CPP_1X_MASK_BIT_ZERO",
