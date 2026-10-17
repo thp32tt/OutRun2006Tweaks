@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C2_IMPLEMENTED",
-  "checkpoint": "C5_EXACT_SHA_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "5580cb2df863f80e618d7a396321837bf3b6e2c5",
   "material_result_sha": "b92c12f83507463620976eeefc7229fd3b15c50a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "273d979941593d3a76ed1e020345db222bed8fe1",
   "source_paths": [
     "src/vr/game/stage_extension_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -98,5 +98,5 @@
     "actual_error": "Run record omitted feature_contract.symptom_id, trace_stages, subcomponents and acceptance behavior_area; no Windows compile attempted.",
     "source_code_change": "NONE_IN_THIS_REPAIR"
   },
-  "next_action": "Revalidate exact SHA of this same task after correcting mandatory feature-contract record. The existing material source SHA remains b92c12f; HMD optical acceptance remains UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA recorded for exact validation-bearing commit 273d979941593d3a76ed1e020345db222bed8fe1. Material source SHA b92c12f83507463620976eeefc7229fd3b15c50a preserved; no source change, CI rerun, or duplicate scoring. Quest3/HMD runtime remains UNTESTED."
 }
