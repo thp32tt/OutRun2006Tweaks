@@ -1,3 +1,16 @@
+## 2026-10-17 GitHub/Portainer C 슬롯 — 최신 사용자 지시
+
+- **C 영문 원본 크롭은 단독 Docker Compose 금지**. 이 GitOps 스택의 `outrun-c-english-native-crop` 서비스만 사용합니다. 배포 이름 `outrun-localization-c-english-crop` (기존 독립 컨테이너 `outrun-c-original-english-crop`와 별개).
+- 고정 Git 리포지토리: `thp32tt/OutRun2006Tweaks`, 브랜치 `localization-controller-recovery-20260928`, Compose `tools/chat-controller/localization-recovery-v1/docker-compose.yml`.
+- C용 Docker 빌드: `c_english_crop/Dockerfile`. Tesseract+Pillow+NumPy, GitHub에 고정한 `loop.py`, `ocr_hd108.py`, `ocr_recognize.py`, `discover.py` 및 원본 검증/크롭 모듈을 포함. Compose 서비스는 포트를 열지 않고 `network_mode:none`, `user=1002:1002`, 읽기전용 소스, 별도 기존 C 결과 폴더에만 쓰기.
+- N100에서 이미 검증한 분할 전 원본 HD PNG **108/108개** 위치: `/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified`. `hd108_import_receipt.json`과 `hd108_ocr/cursor.json`, 이전 `hd108_outputs`, DDS `outputs`, `queue_specs`, 255건 아카이브를 새로 만들거나 덮어쓰지 않습니다.
+- C는 108개 원본 PNG를 두 개씩 순환 검사하고, 기존 SHA/DDS 검증 원본 그룹 네 개씩을 별도 검사합니다. 공식 검토 영문 OCR 신뢰도/중복/잘림 검사 통과만 원본 네이티브 픽셀 그대로 크롭. **GAME_RUNTIME=UNTESTED**. 기존 986 타일/이미지생성 결과/한글 합성/DDS 출력/VR은 실행하지 않습니다.
+- **A/B는 계속 중지**: `AUTO_SEND=false`, `SCHEDULE_MINUTES=""`, `restart=no`; C는 독립 서비스로 `restart=unless-stopped`이므로 서버 재시작 뒤에 복구됩니다. A/B의 ChatGPT 슬롯 수는 2이며 C는 웹 탭이 아닌 배포용 C 작업 서비스입니다.
+- 기존 별도 컨테이너 `outrun-c-original-english-crop`는 원복하거나 켜지 말고 **새 Portainer GitOps C 배포 이전에 정지/재시작 정책 해제**합니다. 새 C는 기존 파일과 체크포인트를 사용하므로 중복 컨테이너 실행은 금지합니다.
+- 이 문서/깃허브 커밋은 **실제 배포 완료 증빙이 아닙니다**. Portainer에서 같은 스택을 **Pull latest + Rebuild + Redeploy**해야 반영됩니다. C 상태는 `outrun-localization-c-english-crop` 로그와 `hd108_ocr/last_scan.json` 갱신 시각으로 확인합니다. `--no-build`로 재배포하면 C 이미지는 존재하지 않을 수 있으므로 사용하지 마세요.
+
+---
+
 > **2026-10-16 v2 Docker STOP/FAIL-CLOSED:** all scheduled localization sends and retired C-SALVAGE are disabled. See [V2_DOCKER_AUTOMATION_POLICY_20261016.md](V2_DOCKER_AUTOMATION_POLICY_20261016.md). The 2026-10-14 A/B 986-tile schedule below is **HISTORICAL ONLY**, not current production. No Portainer restart/deploy was performed.
 
 > **Next deployment profile (GitHub-only until user manually redeploys Portainer; 2026-10-14):**
