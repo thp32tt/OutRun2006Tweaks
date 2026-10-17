@@ -254,6 +254,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex dispatcher tests failed' }
           python tools/verify_vr_feature_unit_policy.py --check-head
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex exact-HEAD feature record missing or invalid' }
+          python tools/verify_vr_dds_fast_load_contract.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex fast DDS request fallback regression failed' }
           python tools/verify_vr_hud_edge_transition.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex HUD edge contract failed' }
           python tools/verify_vr_r30_positiont_decl.py

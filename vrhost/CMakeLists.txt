@@ -378,6 +378,16 @@ add_custom_command(TARGET outrun-vr-driver-seat-camera-smoke POST_BUILD
 
 # RGB-only car-selector/menu DDS may retain an A8-shaped high-byte mask.
 # Exercise the actual source classifier in Release before building the host.
+# Preserve explicit D3DX format and mip requests in the R84 DDS uploader.
+add_executable(outrun-vr-dds-fast-request-smoke tests/dds_fast_loader_request_smoke.cpp)
+target_include_directories(outrun-vr-dds-fast-request-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-dds-fast-request-smoke)
+add_custom_command(TARGET outrun-vr-dds-fast-request-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-dds-fast-request-smoke>"
+    COMMENT "Check requested DDS format and mip generation native fallback"
+    VERBATIM)
+
 add_executable(outrun-vr-dds-alpha-mask-smoke tests/dds_alpha_mask_smoke.cpp)
 target_include_directories(outrun-vr-dds-alpha-mask-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src")
@@ -542,6 +552,7 @@ foreach(target
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-menu-content-aspect-smoke
     outrun-vr-texture-pack-cursor-smoke
+    outrun-vr-dds-fast-request-smoke
     outrun-vr-stage-edge-cull-smoke
     outrun-vr-driver-seat-camera-smoke
     outrun-vr-driver-occupant-smoke
