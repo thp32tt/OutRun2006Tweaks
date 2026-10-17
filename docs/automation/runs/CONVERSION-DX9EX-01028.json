@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01028",
+  "production_id": "CONVERSION-DX9EX-01028",
+  "event_id": "CONVERSION-DX9EX-01028-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "NEEDS_VALIDATION",
+  "checkpoint": "C3_VALIDATE",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "e52b953d762c1169373d6d9af568236430966e35",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/hud_native_source_transaction.hpp",
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Preserve the original 6th/6 rank HUD's fixed-function animation and clip digits on one physical D3D9 FVF142 GPU source across left and right XR eye submissions, even if the original native LEFT callback reenters.",
+    "scope_boundary": "Only original fixed-function FVF142 DispRank first and eight clip siblings; exclude projected car markers, GOAL, +TIME, lens, F11, SkyGlow, generic sprites, DX11/DXVK and original FFB/input.",
+    "trace_stages": [
+      "Original game 0x004B9D80 DispRank emits first animation at 0xB9DA6 followed by eight kind-0 clips at 0xB9F3A..0xBA052.",
+      "Exact game hook tags DispRankFirst and DispRankClipSprite through real SpriteNode queue; R30 original fixed-function FVF142 chooses separate eye projection.",
+      "Before LEFT and after the game callback, R30 checks queue node/epoch, producer, shader absence, FVF, pose and GPU draw serial before submitting RIGHT."
+    ],
+    "subcomponents": [
+      "Capture exact original fixed-function SpriteNode plus pose, FVF and draw serial at native left GPU boundary and reject inapplicable sources before GPU writes.",
+      "Reject a changed producer or queue node after native LEFT without replaying LEFT; preserve projection restoration and mono fail-safe for an invalid RIGHT.",
+      "Add portable positive and negative source-mutation regressions for queued/direct kind-1 and clipped siblings, foreign world, FVF and stage."
+    ],
+    "acceptance_items": [
+      {
+        "id": "disprank_physical_eye_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Real original 6th/6 GPU eye pair",
+        "expected_behavior": "Original queued or direct exact rank animation and clip number retain their physical command identity across both eyes."
+      },
+      {
+        "id": "disprank_mixed_owner_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Projected car rank, HUD and mono fallback safety",
+        "expected_behavior": "Foreign GPU producer, new queue node, changed epoch, FVF, pose or shader cannot borrow 6th/6 right eye or defeat projection restore."
+      },
+      {
+        "id": "disprank_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 game, host, package and cross-domain checks",
+        "expected_behavior": "Final integrated source SHA passes DX9Ex Active full chain, Domain Isolation, HUD Inspector and Full Source Impact independently of runtime acceptance."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "disprank_physical_eye_pair": "PENDING_CI",
+    "disprank_mixed_owner_fallback": "PENDING_CI",
+    "disprank_exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Original game's Ghidra/static resource map in docs/automation/OUTRUN_VR_REA_RESOURCE_EVIDENCE_20261018.md confirms the 0x004B9D80 fixed 6th/6 UI versus unrelated moving vehicle 0x004BAD20 marker.",
+    "source_trace": [
+      "hooks_uiscaling.cpp tags 0xB9DA6 kind-1 first SpriteNode as DispRankFirst and eight later original clip sites as DispRankClipSprite.",
+      "R30TryFixedFunctionOriginalSpriteStereo accepts exact ScreenHud with original FVF142, restores game projection, and calls R30ExecuteXyzrhwStereo.",
+      "R30ExecuteXyzrhwStereo already fenced projected car marker, +TIME and GOAL across LEFT, but lacked the equivalent fixed 6th/6 screen command fence."
+    ],
+    "root_cause": "Nested native original-game left Draw could reenter a different fixed-function SpriteNode or producer after preparing eye projection, causing a mismatched right-eye GPU command.",
+    "alternatives_rejected": [
+      "Car Calc3D2D world-rank marker is a different source and cannot classify fixed 6th/6 ScreenHud.",
+      "Do not promote all FVF142, effect or unknown sprites or claim HMD visual PASS from a static gate."
+    ],
+    "fix_evidence": "Added FixedFnRankHudStamp to mod game header and R30 before/after native-left GPU source validation for original DispRank producers only; unchanged game projection restore, depth error reporting and device fallback.",
+    "negative_test_evidence": "Extended rank_marker_physical_source_smoke.cpp with positive queued/direct 6th/6 and negative queue, producer, pose, serial, FVF, shader, world and stage mutations; exact build pending.",
+    "eye_ownership": "Both eyes must use one exact game 6th/6 SpriteNode command and one pose; changed after LEFT vetoes RIGHT without resubmitting LEFT."
+  },
+  "ci_evidence": {
+    "status": "PENDING",
+    "material_sha": "e52b953d762c1169373d6d9af568236430966e35",
+    "first_attempt": {
+      "run_id": 39064982722,
+      "conclusion": "failure",
+      "reason": "Exact-head feature record missing; policy gate blocked builds."
+    },
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Same-task CI prerequisite repair only; original 6th/6 material source SHA remains e52b953d. Do not count metadata, retry or C6 as independent material result. Quest3/VDXR not tested."
+}
