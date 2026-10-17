@@ -85,6 +85,31 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
     ]
     missing += ["timeline:" + needle for needle in source_requirements
                 if needle not in source]
+    # Never accept an encoder mutation just because the two-eye preflight
+    # still contains the same token (or vice versa). Both independent entry
+    # points must reject invalid game regions before they touch the DSV.
+    encoder_depth = source.partition(
+        "bool NativeGameEyeDrawEncoder::clear_depth_stencil("
+    )[2].partition("\n// Copy a genuine GPU-resident")[0]
+    preflight_depth = source.partition(
+        "bool NativeGameStereoSubmission::render_game_eye_passes("
+    )[2].partition("\n    // Allocate separate, full-size native depth")[0]
+    encoder_guards = [
+        "const auto route = live_game_stereo::depth_clear_route(",
+        "route == live_game_stereo::NativeDepthClearRoute::Reject",
+        "route == live_game_stereo::NativeDepthClearRoute::PartialRaster",
+        "return raster_partial_eye_depth_clear(",
+        "context_->ClearDepthStencilView(eyeDepth_, flags,",
+    ]
+    preflight_guards = [
+        "const bool hasRect = rect.left || rect.top ||",
+        "const auto route = live_game_stereo::depth_clear_route(",
+        "route == live_game_stereo::NativeDepthClearRoute::Reject",
+    ]
+    missing += ["depth-encoder:" + needle for needle in encoder_guards
+                if needle not in encoder_depth]
+    missing += ["depth-preflight:" + needle for needle in preflight_guards
+                if needle not in preflight_depth]
     test_requirements = [
         # Retain the old clipped GPU Copy and eighth scaled postpass, then
         # require a longer mixed Copy/Stretch/Clear scene in both eyes.
