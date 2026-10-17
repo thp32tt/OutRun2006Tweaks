@@ -31,6 +31,7 @@
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
 #include "native_game_source_mutation.hpp"
+#include "native_game_surface_copy_region.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_gpu_handoff.hpp"
 #include "native_game_shared_desktop.hpp"
@@ -1062,6 +1063,20 @@ struct State {
     GameNativeClearColor clearColor{};
     GameNativePreDrawFills preDrawFills{};
     std::uint64_t outputGeneration = 0u;
+    // Successful game StretchRect/UpdateSurface postpasses are replayed into
+    // the real full-size native texture, never treated as geometry Draws.
+    // This bounded diagnostic compatibility path reads the CURRENT original
+    // D3D9 backbuffer, then GPU-copies only the affected region. It does not
+    // falsely claim zero-copy D3D9->D3D11 or native offscreen Draw parity.
+    ComPtr<IDirect3DSurface9> surfaceReplayReadback;
+    std::uintptr_t surfaceReplayOwner = 0u;
+    UINT surfaceReplayWidth = 0u, surfaceReplayHeight = 0u;
+    D3DFORMAT surfaceReplayFormat = D3DFMT_UNKNOWN;
+    ComPtr<ID3D11Texture2D> surfaceReplayScratch;
+    ComPtr<ID3D11Device> surfaceReplayScratchDevice;
+    UINT surfaceReplayScratchWidth = 0u, surfaceReplayScratchHeight = 0u;
+    std::vector<std::uint8_t> surfaceReplayPixels;
+    std::uint32_t surfaceReplayCount = 0u;
     NativeBackend backend;
     // Persistent native D3D11 upload buffers for a whole real game frame.
     // Re-upload every Draw to preserve game-authored mutable VB/IB content.
@@ -5561,6 +5576,155 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
     }
 }
 
+
+bool preserve_game_surface_copy(
+    IDirect3DDevice9* game, IDirect3DSurface9* destination,
+    const RECT* changedArea, HRESULT originalResult) noexcept {
+    // This is invoked AFTER the original D3D9 StretchRect/UpdateSurface has
+    // succeeded. The game-visible fallback always keeps its original HRESULT.
+    // Only active full-resolution real-game native Draw batches are eligible.
+    if (nativeOutputUploadDepth != 0u || !diagnostic_enabled() ||
+        !env_full_game_opt_in() || !game || !destination ||
+        FAILED(originalResult)) return false;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        if (s.sourceGameDevice != owner || !s.frameBatch.publishable(s.pending) ||
+            s.surfaceReplayCount >= 8u || !s.backend.ready() ||
+            !s.backend.device() || !s.backend.context() ||
+            !s.backend.color_texture()) return false;
+
+        ComPtr<IDirect3DSurface9> backbuffer;
+        ComPtr<IUnknown> actualIdentity, backbufferIdentity;
+        D3DSURFACE_DESC desc{};
+        if (FAILED(game->GetBackBuffer(0u, 0u, D3DBACKBUFFER_TYPE_MONO,
+                                      backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(destination->GetDesc(&desc)) ||
+            FAILED(destination->QueryInterface(
+                IID_PPV_ARGS(actualIdentity.GetAddressOf()))) ||
+            FAILED(backbuffer.As(&backbufferIdentity)) || !actualIdentity ||
+            !backbufferIdentity ||
+            actualIdentity.Get() != backbufferIdentity.Get() ||
+            !s.clearColor.matches(
+                owner, reinterpret_cast<std::uintptr_t>(actualIdentity.Get())) ||
+            desc.Pool != D3DPOOL_DEFAULT ||
+            desc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+            (desc.Format != D3DFMT_A8R8G8B8 &&
+             desc.Format != D3DFMT_X8R8G8B8) ||
+            desc.Width != s.nativeWidth || desc.Height != s.nativeHeight)
+            return false;
+
+        const auto region = changedArea
+            ? GameNativeSurfaceCopyRegion::destination(
+                changedArea->left, changedArea->top,
+                changedArea->right, changedArea->bottom,
+                desc.Width, desc.Height)
+            : GameNativeSurfaceCopyRegion::destination(
+                0, 0, desc.Width, desc.Height, desc.Width, desc.Height);
+        if (!region.valid) return false;
+
+        // GetRenderTargetData synchronizes real D3D9 pixels. It is explicitly
+        // diagnostic/opt-in, never silently promoted as a performant shared
+        // GPU transport. Reuse the staging allocation for sustained gameplay.
+        if (!s.surfaceReplayReadback || s.surfaceReplayOwner != owner ||
+            s.surfaceReplayWidth != desc.Width ||
+            s.surfaceReplayHeight != desc.Height ||
+            s.surfaceReplayFormat != desc.Format) {
+            s.surfaceReplayReadback.Reset();
+            s.surfaceReplayOwner = 0u;
+            if (FAILED(game->CreateOffscreenPlainSurface(
+                    desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM,
+                    s.surfaceReplayReadback.GetAddressOf(), nullptr)) ||
+                !s.surfaceReplayReadback) return false;
+            s.surfaceReplayOwner = owner;
+            s.surfaceReplayWidth = desc.Width;
+            s.surfaceReplayHeight = desc.Height;
+            s.surfaceReplayFormat = desc.Format;
+        }
+        if (FAILED(game->GetRenderTargetData(
+                destination, s.surfaceReplayReadback.Get()))) return false;
+        D3DLOCKED_RECT locked{};
+        if (FAILED(s.surfaceReplayReadback->LockRect(
+                &locked, nullptr, D3DLOCK_READONLY))) return false;
+        const std::size_t rowBytes = std::size_t(region.width()) * 4u;
+        const bool readable = locked.pBits && locked.Pitch > 0 &&
+            std::uint64_t(locked.Pitch) >= std::uint64_t(desc.Width) * 4u;
+        if (readable) {
+            s.surfaceReplayPixels.resize(
+                rowBytes * std::size_t(region.height()));
+            const auto* bytes = static_cast<const std::uint8_t*>(locked.pBits);
+            for (UINT y = 0u; y < region.height(); ++y) {
+                auto* dst = s.surfaceReplayPixels.data() +
+                            std::size_t(y) * rowBytes;
+                const auto* src = bytes +
+                    std::size_t(region.top + y) * std::size_t(locked.Pitch) +
+                    std::size_t(region.left) * 4u;
+                std::memcpy(dst, src, rowBytes);
+                if (desc.Format == D3DFMT_X8R8G8B8) {
+                    // D3D9 X8 has no defined alpha. Never copy its X byte
+                    // into a native BGRA8 RTV as visible alpha.
+                    for (std::size_t x = 3u; x < rowBytes; x += 4u)
+                        dst[x] = 0xffu;
+                }
+            }
+        }
+        const HRESULT unlocked = s.surfaceReplayReadback->UnlockRect();
+        if (!readable || FAILED(unlocked)) return false;
+
+        auto* device = s.backend.device();
+        auto* context = s.backend.context();
+        if (!s.surfaceReplayScratch ||
+            s.surfaceReplayScratchDevice.Get() != device ||
+            s.surfaceReplayScratchWidth != region.width() ||
+            s.surfaceReplayScratchHeight != region.height()) {
+            s.surfaceReplayScratch.Reset();
+            s.surfaceReplayScratchDevice.Reset();
+            D3D11_TEXTURE2D_DESC scratch{};
+            scratch.Width = region.width();
+            scratch.Height = region.height();
+            scratch.MipLevels = 1u;
+            scratch.ArraySize = 1u;
+            scratch.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+            scratch.SampleDesc.Count = 1u;
+            scratch.Usage = D3D11_USAGE_DEFAULT;
+            // The transient source is GPU copy-only; never sample it as
+            // fictional game geometry, nor allocate a CPU-readable DX11 RT.
+            scratch.BindFlags = 0u;
+            if (FAILED(device->CreateTexture2D(
+                    &scratch, nullptr,
+                    s.surfaceReplayScratch.GetAddressOf())) ||
+                !s.surfaceReplayScratch) return false;
+            s.surfaceReplayScratchDevice = device;
+            s.surfaceReplayScratchWidth = region.width();
+            s.surfaceReplayScratchHeight = region.height();
+        }
+        if (FAILED(device->GetDeviceRemovedReason())) return false;
+        context->UpdateSubresource(s.surfaceReplayScratch.Get(), 0u,
+            nullptr, s.surfaceReplayPixels.data(),
+            static_cast<UINT>(rowBytes), 0u);
+        // A D3D11 RTV cannot remain a writable output while it is the
+        // destination of CopySubresourceRegion. Restore its native Z/OM
+        // bindings so the next real game Draw retains depth chronology.
+        ID3D11RenderTargetView* oldColor = nullptr;
+        ID3D11DepthStencilView* oldDepth = nullptr;
+        context->OMGetRenderTargets(1u, &oldColor, &oldDepth);
+        context->OMSetRenderTargets(0u, nullptr, nullptr);
+        context->CopySubresourceRegion(
+            s.backend.color_texture(), 0u, region.left, region.top, 0u,
+            s.surfaceReplayScratch.Get(), 0u, nullptr);
+        context->OMSetRenderTargets(1u, &oldColor, oldDepth);
+        if (oldColor) oldColor->Release();
+        if (oldDepth) oldDepth->Release();
+        ++s.surfaceReplayCount;
+        // Neither a CPU readback nor its D3D11 GPU copy counts as a native
+        // Draw/DrawIndexed or supplies invented left/right eye evidence.
+        return true;
+    } catch (...) {
+        return false; // next mutation observer aborts native publication
+    }
+}
+
 void observe_game_surface_mutation(
     IDirect3DDevice9* game, IDirect3DSurface9* destination,
     HRESULT originalResult) noexcept {
@@ -7039,6 +7203,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
+        s.surfaceReplayCount = 0u;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became
         // visible in the game's backbuffer. Log both missing links explicitly.
@@ -7063,6 +7228,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.sourceDrawsThisFrame = 0u;
     s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
+        s.surfaceReplayCount = 0u;
         s.previousOutput = {};
         s.clearColor.discard();
         s.preDrawFills.discard();
@@ -7104,6 +7270,15 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.clearColor.discard();
     s.preDrawFills.discard();
     s.outputGeneration = 0u;
+    s.surfaceReplayReadback.Reset();
+    s.surfaceReplayOwner = 0u;
+    s.surfaceReplayWidth = s.surfaceReplayHeight = 0u;
+    s.surfaceReplayFormat = D3DFMT_UNKNOWN;
+    s.surfaceReplayScratch.Reset();
+    s.surfaceReplayScratchDevice.Reset();
+    s.surfaceReplayScratchWidth = s.surfaceReplayScratchHeight = 0u;
+    s.surfaceReplayPixels.clear();
+    s.surfaceReplayCount = 0u;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.insetSurfaceDevice = 0u;
     s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
