@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "4759c59affed68b10a34a89266f661f46c5679a6",
-  "status": "CI_REPAIR_IN_PROGRESS",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "FAILED_EXACT_SHA_POLICY_METADATA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -43,9 +43,9 @@
     ]
   },
   "acceptance_results": {
-    "end2end": "PENDING_EXACT_SHA",
-    "fallback": "PENDING_EXACT_SHA",
-    "gates": "PENDING_EXACT_SHA"
+    "end2end": "PASS_BUILD",
+    "fallback": "PASS_STATIC_AND_WARP_NEGATIVE_REGRESSION",
+    "gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -85,21 +85,21 @@
     "tools/dx11_native_transport_probe.cpp"
   ],
   "material_result_sha": "8e392194e555b8779d97011a22dffbb9f40f8a13",
-  "validation_bearing_result_sha": null,
-  "result_sha": "8e392194e555b8779d97011a22dffbb9f40f8a13",
+  "validation_bearing_result_sha": "a23e1c433b5bb95479a90baf133a505c3eceea95",
+  "result_sha": "a23e1c433b5bb95479a90baf133a505c3eceea95",
   "pipeline": {
     "C0_RECOVER": "PASS: source commit at 8e392194, GitHub failure runs inspected",
     "C1_REVIEW": "PASS: exact Fast and Backend failure refers to 00851 missing feature contract",
     "C2_IMPLEMENT": "PASS: existing substantive source 8e392194 retained; no duplicate rewrite",
-    "C3_VALIDATE": "BLOCKED: Fast 38985553014 / Backend 38985552993 fail policy metadata; source WARP 38985552984 SUCCESS",
-    "C4_COMMIT": "PASS: material source already committed without CI skip; CI metadata repair pending",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5 required GitHub Actions SUCCESS at a23e1c433b5bb95479a90baf133a505c3eceea95; source WARP SUCCESS at material 8e392194",
+    "C4_COMMIT": "PASS: substantive 8e392194 C++/WARP source; CI failure repair a23e1c433b5bb95479a90baf133a505c3eceea95 restoring 00851 feature acceptance, both without CI-skip",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA: original material 8e392194, validation-bearing a23e1c433b5bb95479a90baf133a505c3eceea95; Quest3/VDXR and real gameplay UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Repair 00851 historical feature contract without weakening policy, verify final repair SHA mandatory five Actions; then C6 bookkeeping separately. Do not assert Quest3 runtime and do not award duplicate score.",
+  "next_action": "Do not retry/re-score 00852. Existing signed left/top eye GPU postpass source is build verified at exact SHA; real Quest3/VDXR menu->vehicle->race, HUD/FFB/input and frame parity remain NEED_HMD_TEST; continue independent DX11 source work under controller lease.",
   "evidence": {
     "failure_context_backend_run_id": 38985552993,
     "failure_context_fast_run_id": 38985553014,
@@ -107,6 +107,20 @@
     "native_transport_warp_run_id": 38985552984,
     "native_transport_warp_conclusion": "success",
     "game_quest3_vdxr": "UNTESTED",
-    "material_sha": "8e392194e555b8779d97011a22dffbb9f40f8a13"
-  }
+    "material_sha": "8e392194e555b8779d97011a22dffbb9f40f8a13",
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38986285247,
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38986285284,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38986289301,
+    "openxr_conclusion": "success",
+    "openxr_run_id": 38986289171,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38986289266,
+    "validation_bearing_sha": "a23e1c433b5bb95479a90baf133a505c3eceea95",
+    "native_visual_parity": "NEED_HMD_TEST",
+    "gamepad_input": "UNTESTED"
+  },
+  "full_dx11_renderer_complete": false
 }
