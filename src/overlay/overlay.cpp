@@ -812,18 +812,6 @@ static void render_first_run_intro()
 	// Continue button below the HMD-visible viewport.
 	const bool vrModal = Game::is_vr_gameplay_presentation();
 	const Overlay::ContentRect content = Overlay::content_rect();
-	const float density = vrModal
-		? std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f) : 1.0f;
-	// The first-run popup is a separate ImGui window from the F11 shell.
-	// Its height must track live font-size edits too: at a low transient
-	// XR eye density a 4x font otherwise clips the confirmation controls
-	// into a 700px viewport even after the main shell has been resized.
-	// Use the shipped 2.0 font as 1x, and never change desktop sizing.
-	const float modalFontFactor = vrModal
-		? std::clamp(Overlay::GlobalFontScale / 2.0f, 0.5f, 2.5f)
-		: 1.0f;
-	const float usableWidth = (std::max)(1.0f, content.width * 0.90f);
-	const float usableHeight = (std::max)(1.0f, content.height * 0.90f);
 	const ImVec2 center = vrModal
 		? ImVec2(content.x + content.width * 0.5f,
 			content.y + content.height * 0.5f)
@@ -841,11 +829,11 @@ static void render_first_run_intro()
 	if (!ImGui::BeginPopupModal(Title, nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
 		return;
 
+	// Dear ImGui retains this per-window scale across frames and popups.
+	// Restore desktop/invalid-eye at 1x to prevent carrying over XR shrink.
+	ImGui::SetWindowFontScale(useVrModalFit ? modalFit.fontScale : 1.0f);
 	if (useVrModalFit)
 	{
-		// Unlike the main shell, this popup does not inherit its per-window
-		// font fit. Adjust glyph and hitbox metrics before laying out controls.
-		ImGui::SetWindowFontScale(modalFit.fontScale);
 		const float footerReserve = ImGui::GetFrameHeightWithSpacing() +
 			ImGui::GetStyle().ItemSpacing.y;
 		const float bodyHeight = (std::max)(1.0f,

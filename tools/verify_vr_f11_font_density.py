@@ -811,7 +811,7 @@ def check_first_run_vr_modal(font: str) -> None:
         "ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));",
         "ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));",
         "if (useVrModalFit)",
-        "ImGui::SetWindowFontScale(modalFit.fontScale);",
+        "ImGui::SetWindowFontScale(useVrModalFit ? modalFit.fontScale : 1.0f);",
         "const float footerReserve = ImGui::GetFrameHeightWithSpacing() +",
         "ImGui::GetContentRegionAvail().y - footerReserve",
         'ImGui::BeginChild("##vr_first_run_scroll"',
@@ -823,7 +823,7 @@ def check_first_run_vr_modal(font: str) -> None:
         assert token in modal, "F11 modal owner missing: " + token
     assert modal.index("ComputeFirstRunModal(") < modal.index(
         "ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));")
-    assert modal.index("ImGui::SetWindowFontScale(modalFit.fontScale);") < modal.index(
+    assert modal.index("ImGui::SetWindowFontScale(useVrModalFit ? modalFit.fontScale : 1.0f);") < modal.index(
         'ImGui::BeginChild("##vr_first_run_scroll"')
     assert modal.index('ImGui::BeginChild("##vr_first_run_scroll"') < modal.index(
         "ImGui::PushTextWrapPos(0.0f);")
@@ -878,8 +878,10 @@ def check_first_run_vr_modal(font: str) -> None:
     for original, bad in (
         ("const bool useVrModalFit = vrModal && modalFit.valid;",
          "const bool useVrModalFit = false;"),
-        ("ImGui::SetWindowFontScale(modalFit.fontScale);",
+        ("ImGui::SetWindowFontScale(useVrModalFit ? modalFit.fontScale : 1.0f);",
          "ImGui::SetWindowFontScale(1.0f);"),
+        ("ImGui::SetWindowFontScale(useVrModalFit ? modalFit.fontScale : 1.0f);",
+         "ImGui::SetWindowFontScale(modalFit.fontScale);"),
         ('ImGui::BeginChild("##vr_first_run_scroll"',
          'ImGui::BeginChild("##removed_scroll"'),
         ("ImGuiWindowFlags_AlwaysVerticalScrollbar", "ImGuiWindowFlags_None"),
