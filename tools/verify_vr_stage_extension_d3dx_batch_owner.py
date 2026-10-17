@@ -819,11 +819,16 @@ def check_r30_stage_raw_wvp(renderer: str) -> list[str]:
     if plane_begin < 0 or plane_end <= plane_begin:
         return errors + ["R30 +TIME source-eye plane boundary missing"]
     plane = renderer[plane_begin:plane_end]
-    # Merely seeing StageExtensionTime on an unrelated world producer cannot
-    # grant source-game ScreenHud pixel extents to an XR viewport.
-    if ("const bool stagePresentationPixels =" not in plane or
-        "resultDraw.IsExactFiniteResultHud() &&" not in plane or
-        "resultDraw.producer ==" not in plane or
+    # Check only the stage producer predicate itself: GOAL has its own
+    # legitimate IsExactFiniteResultHud and must never conceal a removed
+    # +TIME scope check in this negative mutation.
+    stage_begin = plane.find("const bool stagePresentationPixels =")
+    stage_end = plane.find("const bool goalPresentationPixels =", stage_begin)
+    stage_predicate = plane[stage_begin:stage_end] if (
+        stage_begin >= 0 and stage_end > stage_begin) else ""
+    if ("resultDraw.IsExactFiniteResultHud() &&" not in stage_predicate or
+        "resultDraw.producer ==" not in stage_predicate or
+        "ProducerToken::StageExtensionTime" not in stage_predicate or
         "if ((stagePresentationPixels || goalPresentationPixels ||" not in plane):
         errors.append("physical +TIME ScreenHud pixel-space admission missing")
     if ("if ((OutRunVR::GameSemantic::CurrentRenderProducerToken() ==" in plane):
