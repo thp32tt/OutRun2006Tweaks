@@ -64,7 +64,8 @@ s=[p.read_text(encoding="utf-8-sig") for p in (R30,R7,R26,SEM)]
 assert check(*s)
 mutations=[
     (0,"drawCommand.queueEpoch != 0","false /* no queue generation */"),
-    (0,"R30ScreenSpaceKind::Hud2D\n                    : R30ScreenSpaceKind::None","R30ScreenSpaceKind::None\n                    : R30ScreenSpaceKind::None"),
+    (0,"drawCommand.queueEpoch != 0\n                    ? R30ScreenSpaceKind::Hud2D",
+     "drawCommand.queueEpoch != 0\n                    ? R30ScreenSpaceKind::None"),
     (0,"pauseCommand.queueNode &&","true &&"),
     (0,"R84/R62-FVF142-PauseOverlay","R84/R62-FVF142-WorldSky"),
     (1,".DeniesGenericWorldFallback()",".IsDirectWorldLensCentre()"),
