@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_GATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e11d98bb2677f624c60b24479f5cf80c3f51cc75",
   "material_result_sha": "837747de9a822eaa5a79e98b3f3507d482698a6d",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "a1948b07c65f5431e4d92f78430305330e35ed5f",
   "source_paths": [
     "src/vr/d3d9/stage_extension_eye_plane.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -94,5 +94,5 @@
     "resolution": "Add exact-task run record as validation-input repair; retain original C++ material SHA and all existing required GitHub Actions gates."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Check the new exact SHA mandatory GitHub Actions gates, fix real failures under the same TASK_ID, then record C6 as separate bookkeeping without replacing original material_result_sha. Quest3/VDXR optical runtime testing remains untested."
+  "next_action": "C6 PASS_EXACT_SHA recorded for user-confirmed SUCCESS on validation-bearing SHA a1948b07c65f5431e4d92f78430305330e35ed5f. Quest3/HMD runtime remains UNTESTED; do not rerun build/CI or double-score this task."
 }
