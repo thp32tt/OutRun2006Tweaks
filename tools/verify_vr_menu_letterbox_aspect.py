@@ -1065,3 +1065,40 @@ for base, user, expected in (
 ):
     assert effective_crop(base, user) == expected, (base, user)
 print("PASS game/host default parity, absent-key/user-INI precedence and six destructive mutations")
+
+
+# R84 main-menu bars were previously untagged external GPU Draw calls.
+# The original game's one-shot HUD/effect scope could then be consumed by a
+# plugin bar, or its cached world WVP reused for a 2D black rail. The two bars
+# share exactly one external ScreenOverlay2D scope, with RAII restoration
+# before ImGui and no wrapping of the underlying original game drawing.
+def verify_gpu_letterbox_eye_owner(code: str) -> None:
+    scope = code.split("d3ddev->SetStreamSource(0, LetterboxVertex", 1)[1].split(
+        "// Restore before all subsequent game/ImGui draws", 1)[0]
+    assert scope.count("ScopedExternalOverlaySemantic letterboxScope(") == 1
+    assert "RenderScope::ScreenOverlay2D" in scope
+    assert scope.index("ScopedExternalOverlaySemantic letterboxScope(") < scope.index(
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);") < scope.index(
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);")
+    assert scope.count("d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP") == 2
+    # A lexical block confines ownership to exactly the two GPU submissions.
+    assert scope.index("{") < scope.index("ScopedExternalOverlaySemantic")
+    assert scope.rstrip().endswith("}")
+    assert "RenderScope::WorldBillboard" not in scope
+    assert "RenderScope::ScreenHud" not in scope
+
+verify_gpu_letterbox_eye_owner(src)
+for removed in (
+    "ScopedExternalOverlaySemantic letterboxScope(",
+    "RenderScope::ScreenOverlay2D",
+    "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);",
+):
+    assert removed in src
+    broken = src.replace(removed, "// missing original GPU overlay owner", 1)
+    try:
+        verify_gpu_letterbox_eye_owner(broken)
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("external menu GPU owner mutation survived: " + removed)
+print("PASS R84 native menu bar two-draw screen owner and 3 negative mutations")

@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01026",
+  "production_id": "CONVERSION-DX9EX-01026",
+  "event_id": "CONVERSION-DX9EX-01026-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C2_IMPLEMENTED",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/overlay/hooks_overlay.cpp",
+    "tools/verify_vr_menu_letterbox_aspect.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep the original 4:3 main menu at correct widescreen and portrait aspect in both XR eyes without letting plugin-generated black letterbox rails inherit a world draw or consume the original game's HUD/effect source.",
+    "scope_boundary": "Only plugin source-backbuffer native menu letterbox GPU Draw ownership and its checked side/top-bottom geometry. Exclude F11 ImGui submission, gameplay HUD, GOAL, SkyGlow, lens flare and original game sprites.",
+    "trace_stages": [
+      "Original 4:3 native front-end and car-selection sprites are rasterized by the game before the plugin EndScene callback.",
+      "BuildMenuBarGeometry selects identical source-backbuffer side or top-bottom rails; hooks_overlay.cpp submits two direct D3D9 TRIANGLESTRIP primitives.",
+      "ScopedExternalOverlaySemantic brackets only those two R84 DrawPrimitive hook submissions as ScreenOverlay2D for stereo screen-space projection, then restores original game/F11 semantic state."
+    ],
+    "subcomponents": [
+      "Give both plugin-owned source-rect rails one scoped external two-eye route rather than letting them borrow the prior world cached WVP.",
+      "Preserve desktop/mono native behavior, the aspect/reset geometry, original one-shot GPU owner tokens, and normal game/F11 source isolation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "xr_main_menu_letterbox_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Physical main-menu GPU rails and XR screen plane",
+        "expected_behavior": "Side and portrait top/bottom GPU strips share a ScreenOverlay2D owner across both native DrawPrimitive submissions in a bounded scope."
+      },
+      {
+        "id": "original_menu_and_desktop_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original game menu scene and F11/input safety",
+        "expected_behavior": "Both source native draws, state restoration and original desktop/mono path remain unchanged; injected scope cannot borrow WorldBillboard or ScreenHud semantics."
+      },
+      {
+        "id": "main_menu_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Integrated R84 x86 game and x64 host build",
+        "expected_behavior": "Last material exact SHA passes Active Windows game/host/package plus Domain Isolation, HUD Inspector and Full Source Impact; HMD remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "xr_main_menu_letterbox_owner": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "original_menu_and_desktop_fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "main_menu_exact_sha_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Observed native hook D3DEndScene generates two independent 4:3 rail DrawPrimitive calls without any game or external overlay scope; GPU R84 dispatch bases stereo route on capture of current semantic.",
+    "source_trace": [
+      "src/vr/ui/menu_letterbox_geometry.hpp generates side/top-bottom geometry from original source dimensions.",
+      "src/overlay/hooks_overlay.cpp submits plugin-owned primitives after the original scene and before optional ImGui.",
+      "src/vr/game/render_semantics.hpp ScopedExternalOverlaySemantic preserves pending game tokens; R84 R30/R33 accepts explicit ScreenOverlay2D semantics."
+    ],
+    "root_cause": "The two plugin-generated black-bar primitives previously lacked an explicit external ScreenOverlay2D owner at the physical D3D9 Draw boundary, so R84 could evaluate stale game/world semantic context rather than treating them as a single stereo screen overlay.",
+    "alternatives_rejected": [
+      "Do not modify original game EXE or globally tag ScreenHud/SkyGlow/world draws; do not change menu geometry/aspect maths which are independently guarded.",
+      "Static ownership and CI do not prove visible HMD menu correctness."
+    ],
+    "fix_evidence": "The two existing TRIANGLESTRIP submissions now execute under one RAII ScopedExternalOverlaySemantic; negative source verifier rejects lost scope, wrong owner or missing second GPU submission.",
+    "negative_test_evidence": "tools/verify_vr_menu_letterbox_aspect.py checks both draws and three destructive negative mutations, in addition to 4:3/16:9/21:9/portrait geometry and reset coverage.",
+    "eye_ownership": "Only an external screen overlay can be selected for the native bar Draw and mirrored into two R84 eyes; native or non-stereo fallback remains unchanged.",
+    "evidence_limit": "Static source path and targeted CI only; no matching Quest3/VDXR physical optical verification."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ]
+  },
+  "notes": "Material source scope in main-menu letterbox path, not a new F11 or gameplay HUD claim; build and HMD conclusions pending."
+}

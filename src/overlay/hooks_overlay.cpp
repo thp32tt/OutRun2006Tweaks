@@ -296,11 +296,21 @@ class D3DHooks : public Hook
 				d3ddev->SetFVF(CUSTOMFVF);
 				d3ddev->SetStreamSource(0, LetterboxVertex, 0, sizeof(CUSTOMVERTEX));
 
-				// Draw left border
-				d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-
-				// Draw right border
-				d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+				// Letterbox rails are plugin-generated 2D screen geometry,
+				// NOT a game SpriteNode, sky or world effect. The two physical
+				// GPU draws must share one external ScreenOverlay2D lifetime so
+				// R84 can place both rails on the same XR screen plane and neither
+				// draw consumes a pending original-game HUD/GOAL/flare token.
+				// This is scoped to the bars: game and F11 ownership resume
+				// immediately, and desktop/non-stereo uses original D3D9 draws.
+				{
+					OutRunVR::GameSemantic::ScopedExternalOverlaySemantic letterboxScope(
+						OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D);
+					// The geometry helper chooses side or top/bottom rails from
+					// source aspect; neither viewport nor scene FVF is changed here.
+					d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+					d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
+				}
 
 				// Restore before all subsequent game/ImGui draws; a latched mask
 				// from the previous scene must neither clip the bars nor be lost.
