@@ -1,0 +1,117 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00863",
+  "production_id": "CONVERSION-DX11-00863",
+  "event_id": "CONVERSION-DX11-00863-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_COMPUTE_CAMERA_DIRECT_RING",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "SOURCE_INTEGRATION_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "047dd549e68c5e8e74888a3f6fa00b94c5805f55",
+  "validation_bearing_result_sha": null,
+  "result_sha": "047dd549e68c5e8e74888a3f6fa00b94c5805f55",
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Carry two independent compute-generated UAV-only full-sized game camera surfaces from the native DX11 capture path into the exact-generation OpenXR shared eye ring and producer fence/consumer ACK flow while restoring caller compute state and preserving original D3D9Ex rendering and input.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "gpu_compute_camera_to_stereo_openxr_ring",
+        "expected_behavior": "GPU-produced separate eye slices are accepted by live native stereo capture and passed into independent shared left/right color targets, retaining their actual color identity without production CPU staging."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_source_provenance_and_original_game_compute_state",
+        "expected_behavior": "Reject a duplicated physical eye slice or shared/foreign producer before a GPU copy, preserve all caller CS UAV bindings and existing D3D9Ex Draw/Present/input/FFB fallback."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_dx11_fast_backend_build_openxr_hud",
+        "expected_behavior": "Validate native transport on WARP and require all five GitHub Actions at the final exact result SHA; never interpret CI as Quest3/VDXR gameplay PASS."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Target: actual menu/vehicle/race full-frame stereo colors and native OpenXR handoff; source unit WARP is not proof of real-game visible output and remains UNTESTED.",
+    "activation_guard_and_fallback": "Runtime native activation remains opt-in and fail-closed; reject foreign/shared/mono-aliased eye sources, preserve original D3D9Ex game Draw/Present, input, FFB and DXVK freeze.",
+    "batch_components": [
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp: admit local single-sample UAV-only per-eye GPU camera resource.",
+      "src/vr/d3d11/native_shared_eye_ring.cpp: copy physical compute camera array slices into generation-owned stereo OpenXR eye allocations.",
+      "src/vr/d3d11/native_game_stereo_submission.cpp: accept live UAV-only producer eyes at capture and submit.",
+      "tools/dx11_native_transport_probe.cpp: exercise two computed GPU eye colors, CS UAV restore, mono slice rejection and exact-frame ACK."
+    ],
+    "acceptance_proof": {
+      "positive_probe": "WARP native transport probe contains dual compute-UAV camera GPU color test; CI result pending.",
+      "negative_regression": "Reject duplicate mono physical slices and preserve original CS UAV outputs without runtime backend promotion.",
+      "component_integration": "D3D11 game compute camera -> NativeGameStereoSubmission -> NativeSharedEyeRing copy -> shared L/R GPU textures -> generation fence/ACK; actual menu/race/Quest3 remains UNTESTED.",
+      "activation_guard_and_fallback": "Original D3D9Ex renderer and input continue as the authoritative fallback."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_COMPUTE_CAMERA_DIRECT_RING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "acceptance_results": {
+    "end2end": "PENDING_WARP",
+    "fallback": "PENDING_WARP",
+    "gates": "PENDING_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub branch HEAD, AGENTS, policy and 00862 C6 inspected; no identical active 00863 work found.",
+    "C1_REVIEW": "PASS: compute UAV-only D3D11 game source was rejected at direct shared-eye ring/capture boundary, independent of 00862 shader postpass.",
+    "C2_IMPLEMENT": "PASS: 4 source/targeted WARP-regression files in 047dd549e68c5e8e74888a3f6fa00b94c5805f55.",
+    "C3_VALIDATE": "IN_PROGRESS: initial material SHA DX11 Fast blocked by 00862 latest-record policy mismatch; create 00863 honest current run record, do not mark original SHA CI PASS.",
+    "C4_COMMIT": "PASS material 047dd549e68c5e8e74888a3f6fa00b94c5805f55; non-CI-skip, actual renderer/transport source changes.",
+    "C5_PACKAGE": "NOT_REQUIRED: no user HMD/game validation.",
+    "C6_STATE": "PENDING: wait for five exact-SHA required CI Gates, no Quest3/VDXR runtime claim."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "047dd549e68c5e8e74888a3f6fa00b94c5805f55",
+    "initial_material_dx11_fast_run_id": 39003282400,
+    "initial_material_dx11_fast_conclusion": "failure",
+    "initial_material_ci_blocker": "Prior highest numbered 00862 record lacked policy gameplay acceptance fields despite previously recorded PASS SHA. New honest 00863 record is added without rewriting earlier material/validation or granting score.",
+    "native_transport_warp_run_id": 39003282392,
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "score_policy": "No points for CI metadata repair; new code award deferred until exact-SHA valid Gates and scoreboard SSOT dedupe."
+  },
+  "next_action": "Check exact-SHA five CI gates and WARP result; repair only concrete same-task failures. Real menu/car/race/Quest3 gameplay and input remain UNTESTED; continue full renderer source integration."
+}
