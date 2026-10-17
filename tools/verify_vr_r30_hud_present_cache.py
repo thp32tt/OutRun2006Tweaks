@@ -42,17 +42,18 @@ def verify(source: str) -> None:
         "const bool pauseResponsive = R30IsPauseMenuElement() &&",
         "std::isfinite(Settings::VRPauseMenuScale.get()) &&",
         "R30HudContain.pauseResponsive = pauseResponsive;",
-        "const float opticalScale = userScale;",
-        # The HMD-rejected second pause boost must stay absent.
-
-        "scaleX = opticalScale;",
-        "scaleY = opticalScale / sourceOverTarget;",
-        "scaleX = opticalScale * sourceOverTarget;",
-        "scaleY = opticalScale;",
+        # R84 C2 ESC shell/arrow parity now shares a real helper instead
+        # of a local opticalScale copied into four branch assignments.
+        "const auto contained = OutRunVrPauseEye::ContainNativePauseScale(",
+        "userScale, sourceOverTarget, pauseResponsive);",
+        "scaleX = contained.x;",
+        "scaleY = contained.y;",
     ):
         assert required in body, required
     assert "OutRunVrPauseEye::ResponsiveMenuScale(" not in body
-    assert body.count("const float opticalScale = userScale;") == 1
+    assert body.count("const auto contained = OutRunVrPauseEye::ContainNativePauseScale(") == 1
+    assert body.count("scaleX = contained.x;") == 1
+    assert body.count("scaleY = contained.y;") == 1
     assert body.index("R30HudContain.valid = false;") < body.index(
         "R30HudAspectCompensation(\n                    stereo, frame.width, frame.height, eyeExtent)") < body.index(
         "R30HudContain.valid = true;")
@@ -110,12 +111,12 @@ if __name__ == "__main__":
         ("R30HudContain.valid = true;", "// no publication"),
         ("R30HudContain.pauseResponsive = pauseResponsive;",
          "R30HudContain.pauseResponsive = false;"),
-        ("const float opticalScale = userScale;",
-         "const float opticalScale = 2.0f * userScale;"),
-        ("scaleX = opticalScale;", "scaleX = userScale;"),
-        ("scaleY = opticalScale / sourceOverTarget;", "scaleY = userScale / sourceOverTarget;"),
-        ("scaleX = opticalScale * sourceOverTarget;", "scaleX = userScale * sourceOverTarget;"),
-        ("scaleY = opticalScale;", "scaleY = userScale;"),
+        ("const auto contained = OutRunVrPauseEye::ContainNativePauseScale(",
+         "const auto contained = OutRunVrPauseEye::AspectContainedScale("),
+        ("userScale, sourceOverTarget, pauseResponsive);",
+         "userScale, sourceOverTarget, false);"),
+        ("scaleX = contained.x;", "scaleX = userScale;"),
+        ("scaleY = contained.y;", "scaleY = userScale;"),
     )
     for original, broken in mutations:
         assert original in content, original
