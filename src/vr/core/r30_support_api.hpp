@@ -48,6 +48,11 @@ namespace OutRunVRStereo
     // R30 owns the four XYZRHW paths and four R29 lower replay families.
     HRESULT R30SupportTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept;
+    // R62 exact original-game car-above-rank FVF=0x142 bridge.
+    // Not a generic screen HUD, VS effect or world mesh dispatcher.
+    HRESULT R30SupportTryFixedFunctionProjectedRankIndexed(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept;
     HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept;

@@ -20,6 +20,7 @@
 #include "stereo_renderer_r32.cpp"
 #endif
 #include "../core/r32_review_api.hpp"
+#include "../core/r30_support_api.hpp"
 #include "hook_mgr.hpp"
 #include "../game/render_semantics.hpp"
 #include "../runtime_eligibility.hpp"
@@ -1292,6 +1293,18 @@ namespace OutRunVRStereo
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
                     (!OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
+                // R62's working car-attached 4th/5th D3DXSprite batch is
+                // fixed-function indexed XYZ FVF=0x142, NOT POSITIONT.
+                // Only exact source-owned projected markers may use it.
+                // The upper raster/pose guard has already resynchronized.
+                if (tryXyzrhw)
+                {
+                    const HRESULT r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
+                        device, type, baseVertexIndex, minVertexIndex,
+                        numVertices, startIndex, primitiveCount);
+                    if (r62 != E_NOTIMPL)
+                        return r62;
+                }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveVB(
                     device, type, baseVertexIndex, minVertexIndex,

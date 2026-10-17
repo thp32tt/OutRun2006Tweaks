@@ -37,6 +37,7 @@
 #include "../game/projected_rank_stereo.hpp"
 #include "../game/rank_marker_sparse.hpp"
 #include "../game/rank_marker_raw_wvp.hpp"
+#include "../game/rank_marker_fixedfn_r62.hpp"
 #include <cstring>
 #include <cstdlib>
 #include "../state/state_block_tracker.hpp"
@@ -5816,6 +5817,128 @@ namespace OutRunVRStereo
             return hr;
         }
 
+
+        // Original R62 HMD-confirmed 4th/5th rank-owner route, omitted from
+        // the R84 independent split. It is NOT POSITIONT/XYZRHW: D3DXSprite
+        // uses indexed XYZ+DIFFUSE+TEX1 FVF=0x142, with no vertex shader.
+        // Admit only an exact current Calc3D2D vehicle-marker semantic.
+        // Inapplicable/unproven input returns E_NOTIMPL BEFORE any GPU write.
+        HRESULT R30TryFixedFunctionProjectedRankIndexed(
+            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+            UINT startIndex, UINT primitiveCount)
+        {
+            using namespace OutRunVR::GameSemantic;
+            if (!device || type != D3DPT_TRIANGLELIST ||
+                !R29OwnerTargetIsBackBuffer() ||
+                !R29OwnerStableStereoBase(device) ||
+                !CorroboratesProjectedWorldMarker(EffectiveScope()))
+                return E_NOTIMPL;
+            const auto* marker = CurrentProjectedMarker();
+            if (!marker || !marker->valid ||
+                R29OwnerCurrentVertexShaderIdentity() != 0)
+                return E_NOTIMPL;
+            IDirect3DVertexShader9* liveShader = nullptr;
+            if (FAILED(device->GetVertexShader(&liveShader)))
+                return E_NOTIMPL;
+            if (liveShader)
+            {
+                liveShader->Release();
+                return E_NOTIMPL;
+            }
+            DWORD fvf = 0;
+            if (FAILED(device->GetFVF(&fvf)) ||
+                !OutRunVR::RankMarker::ExactR62FixedFnRankRoute(
+                    true, true, true, fvf, true, true))
+                return E_NOTIMPL;
+
+            R30XyzrhwState state{};
+            if (!R29OwnerEnsureStereoResources(device) ||
+                (!R29OwnerTryGetTrackedViewport(state.viewport) &&
+                 FAILED(device->GetViewport(&state.viewport))) ||
+                !state.viewport.Width || !state.viewport.Height ||
+                !OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
+                !state.stereo.poseSequence ||
+                (R29OwnerFrameStereoPoseSequence() != 0 &&
+                 R29OwnerFrameStereoPoseSequence() !=
+                    state.stereo.poseSequence) ||
+                !R30BuildEyeAffine(state.stereo,
+                    state.eyeScale, state.eyeOffset) ||
+                !R30ConfigureXyzrhwWorldEffect(
+                    device, nullptr, 0u, 0u, state) ||
+                !state.projectedWorldMarker)
+                return E_NOTIMPL;
+
+            D3DMATRIX originalProjection{};
+            if (FAILED(device->GetTransform(
+                    D3DTS_PROJECTION, &originalProjection)) ||
+                !R29OwnerMatrixFinite(originalProjection))
+                return E_NOTIMPL;
+            D3DMATRIX eyeProjection[2]{};
+            const float requestedScale = Settings::VRHudScale.get();
+            if (!std::isfinite(requestedScale))
+                return E_NOTIMPL;
+            const float markerScale =
+                std::clamp(requestedScale, 0.30f, 1.20f);
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                D3DMATRIX clipShift = R29OwnerIdentityMatrix();
+                clipShift._11 = markerScale;
+                clipShift._22 = markerScale;
+                clipShift._41 =
+                    state.projectedRank.deltaX[eye] +
+                    (1.0f - markerScale) * state.projectedRank.baseX;
+                clipShift._42 =
+                    state.projectedRank.deltaY[eye] +
+                    (1.0f - markerScale) * state.projectedRank.baseY;
+                eyeProjection[eye] =
+                    R29OwnerMultiplyMatrix(originalProjection, clipShift);
+                if (!R29OwnerMatrixFinite(eyeProjection[eye]))
+                    return E_NOTIMPL;
+            }
+            // Exactly two eyes; same original fixed-function XYZ vertices,
+            // same vehicle anchor, distinct eye FOV/pose. Preserve original
+            // game PROJECTION after either success or failure.
+            const auto drawEye = [&](int eye) -> HRESULT {
+                R30ScopedInternalPass guard;
+                const HRESULT set = device->SetTransform(
+                    D3DTS_PROJECTION, &eyeProjection[eye]);
+                if (FAILED(set)) return set;
+                return R29OwnerCallRawDrawIndexedPrimitive(device, type,
+                    baseVertexIndex, minVertexIndex, numVertices,
+                    startIndex, primitiveCount);
+            };
+            const HRESULT hr = R30ExecuteXyzrhwStereo(
+                device, state,
+                [&]() { return drawEye(0); },
+                [&]() { return drawEye(1); },
+                "R84/R62-FVF142-ProjectedCarRank");
+            bool restored = false;
+            {
+                R30ScopedInternalPass guard;
+                restored = SUCCEEDED(device->SetTransform(
+                    D3DTS_PROJECTION, &originalProjection));
+            }
+            if (!restored)
+            {
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerNoteRestoreFailure(
+                    "R84 R62 projected rank PROJECTION restore");
+                R29OwnerArmMonoSafety();
+            }
+            if (Settings::VRTelemetry && SUCCEEDED(hr) && restored)
+            {
+                static std::atomic<std::uint64_t> hits{0};
+                const auto count =
+                    hits.fetch_add(1, std::memory_order_relaxed) + 1u;
+                if ((count & (count - 1u)) == 0u)
+                    spdlog::info(
+                        "VR R84 R62 FVF142 CAR-RANK stereo: hits={} marker={} primitive={}",
+                        count, marker->valid ? 1 : 0, primitiveCount);
+            }
+            return hr;
+        }
+
         HRESULT R30TryXyzrhwIndexedPrimitiveVB(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
@@ -7229,6 +7352,12 @@ namespace OutRunVRStereo
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     {
         return R30TryXyzrhwPrimitiveVB(d,t,s,p);
+    }
+    HRESULT R30SupportTryFixedFunctionProjectedRankIndexed(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept
+    {
+        return R30TryFixedFunctionProjectedRankIndexed(d,t,b,m,n,s,p);
     }
     HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,

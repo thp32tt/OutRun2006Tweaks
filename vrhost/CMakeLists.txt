@@ -401,6 +401,8 @@ add_custom_command(TARGET outrun-vr-r30-particle-gpu-fallback-smoke POST_BUILD
     VERBATIM)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
+add_executable(outrun-vr-r62-rank-route-1000-smoke tests/r62_rank_route_1000_smoke.cpp)
+
 add_executable(outrun-vr-r30-early-rhw-shadow-smoke tests/r30_early_rhw_shadow_smoke.cpp)
 add_executable(outrun-vr-r30-indexed-up-bounds-smoke tests/r30_indexed_up_bounds_smoke.cpp)
 add_executable(outrun-vr-r30-shadow-ranges-smoke tests/r30_shadow_ranges_smoke.cpp)
@@ -477,6 +479,7 @@ foreach(target
     outrun-vr-render-command-snapshot-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-rank-marker-fraction-smoke
+    outrun-vr-r62-rank-route-1000-smoke
     outrun-vr-r30-early-rhw-shadow-smoke
     outrun-vr-r30-indexed-up-bounds-smoke
     outrun-vr-r30-particle-gpu-fallback-smoke

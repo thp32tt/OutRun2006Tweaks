@@ -16,7 +16,10 @@ def require(condition: bool, context: str = "ESC source invariant") -> None:
 
 def check(s: str, h: str) -> None:
     require('#include "pause_menu_eye_affine.hpp"' in s)
-    require('ExternalOverlaySemanticDepth == 0' in s)
+    # Other HUD paths also gate F11: check the specific ESC owner.
+    exact_pause = s[s.index('bool R30IsPauseMenuElement()'):
+                    s.index('constexpr float R30PauseShaderPlaneScale(')]
+    require('ExternalOverlaySemanticDepth == 0' in exact_pause)
     require('GameState::STATE_SMPAUSEMENU' in s)
     require('R30IsPauseMenuExactArrow()' in s)
     arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuElement()')]
@@ -107,8 +110,12 @@ for mutant_index, mutant in enumerate((
                    'rightDst[1] = transformedLeftY;', 1),
     source.replace('clipCorrection._42 = pauseVertical.offset[eye] -',
                    'clipCorrection._42 =', 1),
-    source.replace('ExternalOverlaySemanticDepth == 0',
-                   'ExternalOverlaySemanticDepth != 0', 1),
+    source.replace(
+        s if False else 'not_used', 'not_used', 0) if False else
+    source[:source.index('bool R30IsPauseMenuElement()')] +
+    source[source.index('bool R30IsPauseMenuElement()'):].replace(
+        'ExternalOverlaySemanticDepth == 0',
+        'ExternalOverlaySemanticDepth != 0', 1),
     source.replace('std::isfinite(Settings::VRPauseMenuScale.get()) &&',
                    'true &&', 1),
     source.replace('Settings::VRPauseMenuScale.get() > 0.0f;',
