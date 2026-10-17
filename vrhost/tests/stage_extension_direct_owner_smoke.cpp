@@ -1,4 +1,5 @@
 #include "../../src/vr/game/render_semantics.hpp"
+#include "../../src/vr/game/stage_extension_physical_source.hpp"
 #include "../../src/vr/game/sprite_queue_tail_proof.hpp"
 #include "../../src/vr/d3d9/lens_centre_relative_eye_pose.hpp"
 #include <iostream>
@@ -8,6 +9,60 @@
 int main()
 {
     using namespace OutRunVR::GameSemantic;
+    // Physical +TIME GPU source: an original c64 write during LEFT must
+    // quarantine RIGHT even when producer/queue/shader/pose stay unchanged.
+    // Both direct numeric and queued sprite routes share this same guard.
+    {
+        using namespace OutRunVR::StageExtensionPhysical;
+        Source direct{RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+            false, nullptr, 0, 7, 11, 0, 0, 41, 11};
+        if (!IsValid(direct) || !SameAfterNativeLeft(direct, direct))
+            return 94;
+        Source changed = direct;
+        ++changed.rawWvpWriteSerial;
+        if (!IsValid(changed) || SameAfterNativeLeft(direct, changed))
+            return 95; // original shader c64 changed during native LEFT
+        changed = direct;
+        ++changed.rawWvpDrawSerial;
+        if (SameAfterNativeLeft(direct, changed))
+            return 96; // original game draw generation also belongs to source
+        changed = direct;
+        changed.rawWvpDrawSerial = 0;
+        if (IsValid(changed) || SameAfterNativeLeft(direct, changed))
+            return 97; // partial raw WVP pair must never be admitted
+        changed = direct;
+        changed.rawWvpWriteSerial = 0;
+        changed.rawWvpDrawSerial = 0;
+        if (!IsValid(changed))
+            return 98; // unavailable raw tracker keeps legacy safe fallback
+        int first = 0, second = 0;
+        Source queued = direct;
+        queued.queued = true;
+        queued.node = &first;
+        queued.queueEpoch = 3;
+        if (!IsValid(queued) || !SameAfterNativeLeft(queued, queued))
+            return 99;
+        changed = queued;
+        changed.node = &second;
+        if (SameAfterNativeLeft(queued, changed))
+            return 100;
+        changed = queued;
+        changed.queueEpoch = 4;
+        if (SameAfterNativeLeft(queued, changed))
+            return 101;
+        changed = queued;
+        ++changed.rawWvpWriteSerial;
+        if (SameAfterNativeLeft(queued, changed))
+            return 102; // queued sprite cannot borrow another raw c64
+        changed = queued;
+        changed.producer = ProducerToken::GoalTime020;
+        if (IsValid(changed) || SameAfterNativeLeft(queued, changed))
+            return 103; // GOAL stays separate from +TIME
+        changed = queued;
+        changed.scope = RenderScope::WorldBillboard;
+        if (IsValid(changed) || SameAfterNativeLeft(queued, changed))
+            return 104; // world / lens cannot become a screen HUD
+    }
     // The real sprite priority head uses itself as tail_4 when empty.
     // When +TIME is the first exact producer in that priority, retain ALL
     // of its appended sprite and numeric nodes, not just later siblings.
