@@ -83,6 +83,40 @@ VERIFIED = {
  }
 }
 
+# Verified additional full-HD originals, staged from canonical HD DDS files or
+# SHA-pinned original-DDS archive. Only admission script writes this registry.
+AUTO_REGISTRY = BASE / "docker" / "source_registry_auto.json"
+
+def load_auto_sources():
+ if not AUTO_REGISTRY.exists():return {}
+ data=json.loads(AUTO_REGISTRY.read_text(encoding="utf-8"))
+ if data.get("schema")!="outrun-dds-pixel-verified-native-HD-sources-v1":
+  raise ValueError("HOLD_AUTO_SOURCE_REGISTRY_SCHEMA")
+ accepted={}
+ for q,item in data.get("entries",{}).items():
+  if (not isinstance(q,str) or len(q)!=4 or not q.startswith("Q")
+      or not q[1:].isdigit() or not isinstance(item,dict)):
+   raise ValueError("HOLD_AUTO_SOURCE_REGISTRY_ID")
+  if (item.get("native_scale")!=4 or
+      item.get("status")!="SOURCE_VERIFIED_CROP_TEST_ONLY" or
+      item.get("admission_provenance") not in (
+       "GIT_PINNED_CANONICAL_HD_SOURCE","ORIGINAL_BINARY_COMPARE_ARCHIVE")):
+   raise ValueError("HOLD_AUTO_SOURCE_PROVENANCE")
+  for key in ("png","dds"):
+   v=item.get(key)
+   if not isinstance(v,str) or Path(v).name!=v or not v.startswith(q.lower() if key=="png" else q+"_"):
+    raise ValueError("HOLD_AUTO_SOURCE_BASENAME")
+  for key in ("png_sha256","dds_sha256"):
+   value=item.get(key)
+   if not isinstance(value,str) or len(value)!=64 or any(c not in "0123456789abcdef" for c in value):
+    raise ValueError("HOLD_AUTO_SOURCE_SHA")
+  if q in VERIFIED:
+   continue
+  accepted[q]=item
+ return accepted
+
+VERIFIED.update(load_auto_sources())
+
 def sha(path):
  h=hashlib.sha256()
  with path.open("rb") as f:
