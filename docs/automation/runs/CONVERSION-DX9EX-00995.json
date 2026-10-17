@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING_EXACT_SHA",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_REPAIRED_VALIDATOR",
-  "automation_validation": "PENDING_NEW_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "fd0c9ec1104418a54e7a51a003708b923becee16",
   "material_result_sha": "fcc25739f5632d1bc307bfd29c1e76e0aa09f885",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "30a7943eb2355a0f57e71cfc3c6aeb32d56f7f85",
   "source_paths": [
     "src/vr/game/goal_progress_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -98,5 +98,5 @@
     "full_windows_ci": "PENDING"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Revalidate mandatory GitHub workflows on CI verifier repair SHA only; preserve GOAL C++ material SHA. HMD runtime UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA recorded against exact DX9Ex Active Validation SUCCESS commit 30a7943eb2355a0f57e71cfc3c6aeb32d56f7f85. Original material source SHA fcc25739f5632d1bc307bfd29c1e76e0aa09f885 preserved. No source change, CI rerun, or duplicate score. Full Source Impact Review game MSVC analysis was still IN_PROGRESS at C6 read and must not be treated as passed until complete. HMD runtime remains UNTESTED."
 }
