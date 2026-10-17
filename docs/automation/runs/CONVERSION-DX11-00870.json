@@ -8,7 +8,7 @@
   "attempt": "1/3",
   "owner_id": "ChatGPT2",
   "work_key": "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE",
-  "feature_id": null,
+  "feature_id": "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE",
   "target_branch": "vr-dx11-native-r71",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
@@ -23,7 +23,7 @@
   "result_sha": "a0c2137ff898a352b399e936e610b1e17c1634a4",
   "development_strategy": {
     "work_class": "safety_regression",
-    "milestone_id": "native_stereo_game_eye_gpu_submission",
+    "milestone_id": "native_stereo_eye_transport",
     "integration_path": [
       "Live D3D11 game menu/car/race color and pixel/compute UAV postpasses before native OpenXR L/R GPU copy",
       "Capture and detach OM MRT/depth/pixel UAV plus CS UAV outputs before same-frame eye CopyResource/ResolveSubresource",
@@ -42,18 +42,17 @@
       "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
-    "gameplay_delivery_target": "MENU_TO_RACE_STEREO_EYE_SOURCE",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "live_game_draw_path": [
-      "LIVE_D3D11_COLOR_SOURCE",
-      "GPU_LEFT_RIGHT_EYE_COPY",
-      "OPENXR_EYE_RING"
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
     ],
     "visible_frame_acceptance": "OM/CS UAV state preservation has source- and five-gate CI proof only; real OutRun menu/car/race stereo pixels and Quest3/VDXR gamepad session remain untested.",
     "activation_guard_and_fallback": "Native L/R ring GPU ownership/fence and original D3D9Ex Draw/Present/input/FFB fallback are preserved; DXVK lane untouched.",
     "blocking_evidence": "Previous native stereo game-eye source restoration used RTV-only OMSetRenderTargets, which could discard OM pixel UAV postpass bindings. Existing material commit corrects this GPU output-state regression."
   },
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:STEREO_GAME_OM_PIXEL_UAV_RESTORE",
     "goal": "Preserve live game OM pixel UAV, MRT/depth and CS UAV bindings plus unchanged UAV append counters across native GPU left/right OpenXR eye CopyResource/ResolveSubresource.",
     "acceptance_items": [
       {
