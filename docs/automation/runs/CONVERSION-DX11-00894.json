@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00894",
+  "production_id": "CONVERSION-DX11-00894",
+  "event_id": "CONVERSION-DX11-00894-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00894",
+  "feature_id": "DX11:NATIVE_STEREO_SINGLE_SAMPLE_COLOR_EVIDENCE",
+  "work_key": "DX11:FULLFRAME:NATIVE_STEREO_SAMPLE_ZERO_COLOR_EVIDENCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "88a05e00dddae47f1c1214a7aa6300c33c2d32c9",
+  "material_result_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648",
+  "validation_bearing_result_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_SINGLE_SAMPLE_COLOR_EVIDENCE",
+    "goal": "Correct real Draw/DrawIndexed per-eye color evidence for the single-sample native OpenXR RTV. A nonzero D3D11 OM mask with sample-zero disabled must not publish blank game stereo color; preserve authentic draw chronology, DX9Ex fallback and isolated WARP regression.",
+    "acceptance_items": [
+      {
+        "id": "sample_zero_eye_gpu_color_evidence",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_eye_game_draw_submission",
+        "expected_behavior": "True 1x GPU eye color draw certification requires D3D11 OM sample mask bit zero, never merely a nonzero high bit."
+      },
+      {
+        "id": "authentic_draw_and_legacy_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9ex_game_input_ffb_safe_fallback",
+        "expected_behavior": "Source game Draw/DrawIndexed still issue and preserve draw ordinal, previous GPU eye color counts remain zero on masked-out samples, original D3D9Ex Draw/Present/input and FFB unchanged."
+      },
+      {
+        "id": "real_native_gpu_negative_regression",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_warp_gpu_stereo_pixels",
+        "expected_behavior": "A nonzero sample mask 0xfffffffe executes the genuine isolated GPU Draw but cannot claim eye color; positive masks and negative no-PS/no-color-write behavior preserved."
+      },
+      {
+        "id": "five_same_sha_automation_gates",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_exact_sha",
+        "expected_behavior": "DX11 Fast, Backend, Windows Build, OpenXR and HUD all success on the same exact SHA; separate native WARP test success."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Authentic D3D9 game per-eye Draw/DrawIndexed callback -> D3D11 1x RTV sample zero color write -> live XR eye color evidence",
+      "Preserve source Draw chronology, original D3D9Ex game control and FFB, and isolate frozen DXVK",
+      "WARP real GPU sample-mask negative regression + one exact-SHA five-Gate integration"
+    ],
+    "batch_components": [
+      "C++ D3D11 per-eye actual GPU color evidence fault fix and header static-contract assertions",
+      "Existing WARP real native eye Draw negative sample-mask regression strengthened from zero mask to nonzero 0xfffffffe"
+    ],
+    "conflict_keys": [
+      "DX11:FULLFRAME:NATIVE_STEREO_SAMPLE_ZERO_COLOR_EVIDENCE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Sample-zero color admission BUILD_VERIFIED; full OutRun menu/car/race and Quest3/VDXR runtime UNTESTED; live R30 callback integration not proven.",
+    "activation_guard_and_fallback": "Existing explicit native opt-in and fail-closed eye publication; original DX9Ex Draw/Present/gamepad/FFB unchanged; DXVK frozen."
+  },
+  "acceptance_results": {
+    "sample_zero_eye_gpu_color_evidence": "PASS_CPP_1X_MASK_BIT_ZERO",
+    "authentic_draw_and_legacy_fallback": "PASS_SOURCE_DRAW_CHRONOLOGY_FALLBACK_UNCHANGED",
+    "real_native_gpu_negative_regression": "PASS_NATIVE_WARP_GPU_SAMPLE_MASK_REGRESSION",
+    "five_same_sha_automation_gates": "PASS_EXACT_SHA_5_OF_5",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "validation_evidence": {
+    "material_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648",
+    "validation_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39065841795,
+        "conclusion": "success",
+        "validation_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39065841806,
+        "conclusion": "success",
+        "validation_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648"
+      },
+      {
+        "name": "Build",
+        "run_id": 39065846513,
+        "conclusion": "success",
+        "validation_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39065846519,
+        "conclusion": "success",
+        "validation_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39065846514,
+        "conclusion": "success",
+        "validation_sha": "90a1ad66bb78426439bdc3303eb40c8771dd1648"
+      }
+    ],
+    "isolated_native_warp_run_id": 39065841800,
+    "isolated_native_warp_conclusion": "success",
+    "runtime_validation": "UNTESTED",
+    "blocking_evidence": "The actual R30 full-game menu->car->race stereo callback/source integration remains unproven; no real-game/HMD visual or input test was performed. This bounded color-evidence repair cannot certify the integrated renderer."
+  },
+  "pipeline": {
+    "C0_RECOVER": "00893 material/validation C6 PASS; current branch HEAD 88a05e00; no competing lease for these sample evidence/helper/probe paths.",
+    "C1_REVIEW": "Found a concrete source logic defect: sampleMask != 0u credited false native 1x eye color on high-bit-only masks.",
+    "C2_IMPLEMENT": "Changed C++ per-eye color admission to require mask bit zero, constant-evaluated positive/negative cases; strengthened real WARP Draw nonzero-mask negative fixture without altering gameplay draw submission.",
+    "C3_VALIDATE": "Same validation-bearing material SHA passed five required GitHub Actions and standalone native WARP; physical Quest3/VDXR/gamepad UNTESTED.",
+    "C4_COMMIT": "Material C++/test commit 90a1ad66; C6 separately records exact SHA, no unrelated code or new scored microfeature.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "BUILD_VERIFIED only for native 1x stereo mask color evidence, not full game renderer; no double-scoring of bounded/CI/C6 work; HMD UNTESTED."
+  }
+}
