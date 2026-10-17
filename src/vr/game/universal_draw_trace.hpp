@@ -18,11 +18,20 @@ namespace OutRunVR::UniversalTrace
     enum class Family : std::uint8_t {
         CentreC993, OuterCABEProjectedCandidate, OtherProjectedEffect,
         SkyGlow, GameplayHud, ProjectedRank, ScreenOverlay, World, Unknown,
-        Count
+        // Append-only diagnostic categories. Never grant GPU stereo ownership
+        // from these labels; they solely distinguish failure investigations.
+        StageExtension, RankDisplay, GoalAndResult, HudGlyph,
+        PauseArrow, CarShadow, WorldParticles, Reflections, SceneFx,
+        WorldBillboards, UnprovenLensCentre, Count
     };
     enum class DrawApi : std::uint8_t {
         Primitive, Indexed, PrimitiveUP, IndexedUP, Count
     };
+    enum class Route : std::uint8_t {
+        NoRouteEvidence, R30FixedSprite, R30Xyzrhw, R33HudStereo,
+        R33FastWorld, R29Fallback, OriginalPreserved, StateBlockRaw, Count
+    };
+    constexpr std::size_t RouteCount = static_cast<std::size_t>(Route::Count);
     constexpr std::size_t FamilyCount = static_cast<std::size_t>(Family::Count);
     constexpr std::size_t ApiCount = static_cast<std::size_t>(DrawApi::Count);
 
@@ -30,23 +39,55 @@ namespace OutRunVR::UniversalTrace
     {
         if (cmd.IsDirectWorldLensCentre())
             return Family::CentreC993;
+        // Lost original-lens call/c64 ownership must remain distinguishable
+        // from a successfully proven C993 stereo source.
+        if (cmd.producer == ProducerToken::LensFlareCentre)
+            return Family::UnprovenLensCentre;
         if (cmd.scope == RenderScope::ProjectedScreenEffect2D)
             return !cmd.queued
                 ? Family::OuterCABEProjectedCandidate
                 : Family::OtherProjectedEffect;
         if (cmd.scope == RenderScope::SkyGlow)
             return Family::SkyGlow;
-        if (cmd.scope == RenderScope::ScreenHud)
-            return Family::GameplayHud;
+        if (cmd.scope == RenderScope::ScreenHud) {
+            switch (cmd.producer) {
+            case ProducerToken::StageExtensionTime:
+                return Family::StageExtension;
+            case ProducerToken::DispRankFirst:
+            case ProducerToken::DispRankClipSprite:
+                return Family::RankDisplay;
+            case ProducerToken::GoalTimeHelper:
+            case ProducerToken::GoalTime020:
+            case ProducerToken::GoalTime150:
+            case ProducerToken::ResultProgress:
+            case ProducerToken::ResultTextB9200:
+                return Family::GoalAndResult;
+            case ProducerToken::OutRunHudText:
+            case ProducerToken::OutRunHudPeripheralText:
+            case ProducerToken::TextGlyphPutSprite:
+            case ProducerToken::OutRunStagePrintf:
+            case ProducerToken::ExactScreenHudClipSprite:
+                return Family::HudGlyph;
+            default:
+                return Family::GameplayHud;
+            }
+        }
         if (cmd.scope == RenderScope::ProjectedWorldMarker2D)
             return Family::ProjectedRank;
         if (cmd.scope == RenderScope::ScreenOverlay2D)
-            return Family::ScreenOverlay;
-        if (cmd.scope == RenderScope::WorldBillboard ||
-            cmd.scope == RenderScope::WorldParticle ||
-            cmd.scope == RenderScope::SceneEffect ||
-            cmd.scope == RenderScope::ReflectionCube)
-            return Family::World;
+            return cmd.producer == ProducerToken::PauseOptionArrow
+                ? Family::PauseArrow : Family::ScreenOverlay;
+        if (cmd.scope == RenderScope::WorldParticle)
+            return cmd.producer == ProducerToken::CarBaseShadow
+                ? Family::CarShadow : Family::WorldParticles;
+        if (cmd.scope == RenderScope::ReflectionCube)
+            return Family::Reflections;
+        if (cmd.scope == RenderScope::SceneEffect)
+            return Family::SceneFx;
+        if (cmd.scope == RenderScope::WorldBillboard)
+            return Family::WorldBillboards;
+        // World is a retained legacy bucket for future source scopes.
+        // Do not infer menu vs car-select vs F11 from unlabeled draws.
         return Family::Unknown;
     }
 
@@ -62,6 +103,17 @@ namespace OutRunVR::UniversalTrace
             case Family::ScreenOverlay: return "SCREEN_OVERLAY";
             case Family::World: return "WORLD";
             case Family::Unknown: return "UNKNOWN";
+            case Family::StageExtension: return "STAGE_PLUS_TIME";
+            case Family::RankDisplay: return "RANK_6TH_OF_6";
+            case Family::GoalAndResult: return "GOAL_RESULT_TIMER";
+            case Family::HudGlyph: return "HUD_TEXT_DIGITS";
+            case Family::PauseArrow: return "PAUSE_OPTION_ARROW";
+            case Family::CarShadow: return "PLAYER_CAR_SHADOW";
+            case Family::WorldParticles: return "WORLD_PARTICLES";
+            case Family::Reflections: return "REFLECTIONS";
+            case Family::SceneFx: return "SCENE_FX";
+            case Family::WorldBillboards: return "WORLD_BILLBOARD";
+            case Family::UnprovenLensCentre: return "LENS_CENTRE_UNPROVEN";
             default: return "INVALID";
         }
     }
@@ -69,7 +121,7 @@ namespace OutRunVR::UniversalTrace
         ProducerToken::LensFlareCentre,nullptr,0,false,9}) ==
         Family::CentreC993);
     static_assert(Classify({RenderScope::WorldBillboard,
-        ProducerToken::None,nullptr,0,false,0}) == Family::World);
+        ProducerToken::None,nullptr,0,false,0}) == Family::WorldBillboards);
     static_assert(Classify({RenderScope::ProjectedScreenEffect2D,
         ProducerToken::None,nullptr,0,false,0}) ==
         Family::OuterCABEProjectedCandidate);
@@ -78,6 +130,33 @@ namespace OutRunVR::UniversalTrace
         Family::OtherProjectedEffect);
     static_assert(Classify({RenderScope::SkyGlow,
         ProducerToken::None,nullptr,0,false,0}) == Family::SkyGlow);
+
+
+    // Producer identity from game semantics, not texture/FVF heuristics.
+    static_assert(Classify({RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,nullptr,0,false,0}) ==
+        Family::StageExtension);
+    static_assert(Classify({RenderScope::ScreenHud,
+        ProducerToken::DispRankFirst,nullptr,0,false,0}) ==
+        Family::RankDisplay);
+    static_assert(Classify({RenderScope::ScreenHud,
+        ProducerToken::GoalTime020,nullptr,0,false,0}) ==
+        Family::GoalAndResult);
+    static_assert(Classify({RenderScope::ProjectedWorldMarker2D,
+        ProducerToken::RankMarkerSprani,nullptr,0,false,0}) ==
+        Family::ProjectedRank);
+    static_assert(Classify({RenderScope::ScreenOverlay2D,
+        ProducerToken::PauseOptionArrow,nullptr,0,false,0}) ==
+        Family::PauseArrow);
+    static_assert(Classify({RenderScope::WorldParticle,
+        ProducerToken::CarBaseShadow,nullptr,0,false,0}) ==
+        Family::CarShadow);
+    static_assert(Classify({RenderScope::ScreenHud,
+        ProducerToken::None,nullptr,0,false,0}) ==
+        Family::GameplayHud);
+    static_assert(Classify({RenderScope::WorldBillboard,
+        ProducerToken::LensFlareCentre,nullptr,0,false,0}) ==
+        Family::UnprovenLensCentre);
 
     struct Counters
     {
@@ -90,6 +169,13 @@ namespace OutRunVR::UniversalTrace
         // don't pass the R33 HUD-specific eye-pair callback. NOT "mono".
         std::atomic<std::uint64_t> noR33EyeEvidence{0};
         std::array<std::atomic<std::uint64_t>,ApiCount> api{};
+        std::array<std::atomic<std::uint64_t>,RouteCount> route{};
+        std::atomic<std::uint64_t> queued{0};
+        std::atomic<std::uint64_t> unknownProducer{0};
+        std::atomic<std::uint64_t> badQueueProvenance{0};
+        std::atomic<std::uint64_t> lastQueueEpoch{0};
+        std::atomic<unsigned> lastProducer{0};
+        std::atomic<unsigned> lastScope{0};
         std::atomic<std::uint64_t> latestDrawId{0};
         std::atomic<std::uint64_t> latestCentreCall{0};
     };
@@ -103,6 +189,10 @@ namespace OutRunVR::UniversalTrace
         std::uint64_t r33BothEyes = 0, r33EyeOrRestoreFailed = 0;
         std::uint64_t noR33EyeEvidence = 0;
         std::array<std::uint64_t,ApiCount> api{};
+        std::array<std::uint64_t,RouteCount> route{};
+        std::uint64_t queued = 0, unknownProducer = 0, badQueueProvenance = 0;
+        std::uint64_t lastQueueEpoch = 0;
+        unsigned lastProducer = 0, lastScope = 0;
         std::uint64_t latestDrawId = 0, latestCentreCall = 0;
     };
 
@@ -125,6 +215,16 @@ namespace OutRunVR::UniversalTrace
                 src.noR33EyeEvidence.exchange(0,std::memory_order_relaxed);
             for (std::size_t j=0;j<ApiCount;++j)
                 w.api[j] = src.api[j].exchange(0,std::memory_order_relaxed);
+            for (std::size_t j=0;j<RouteCount;++j)
+                w.route[j] = src.route[j].exchange(0,std::memory_order_relaxed);
+            w.queued = src.queued.exchange(0,std::memory_order_relaxed);
+            w.unknownProducer = src.unknownProducer.exchange(
+                0,std::memory_order_relaxed);
+            w.badQueueProvenance = src.badQueueProvenance.exchange(
+                0,std::memory_order_relaxed);
+            w.lastQueueEpoch = src.lastQueueEpoch.load(std::memory_order_relaxed);
+            w.lastProducer = src.lastProducer.load(std::memory_order_relaxed);
+            w.lastScope = src.lastScope.load(std::memory_order_relaxed);
             w.latestDrawId = src.latestDrawId.load(std::memory_order_relaxed);
             w.latestCentreCall = src.latestCentreCall.load(std::memory_order_relaxed);
         }
@@ -140,6 +240,7 @@ namespace OutRunVR::UniversalTrace
         bool succeeded_ = false;
         bool paired_ = false;
         bool pairOk_ = false;
+        Route route_ = Route::NoRouteEvidence;
         Family family_ = Family::Unknown;
         inline static thread_local ScopedDraw* current_ = nullptr;
     public:
@@ -150,6 +251,18 @@ namespace OutRunVR::UniversalTrace
             family_ = Classify(cmd);
             auto& ctr = Counts[static_cast<std::size_t>(family_)];
             ctr.attempts.fetch_add(1,std::memory_order_relaxed);
+            if (cmd.queued) {
+                ctr.queued.fetch_add(1,std::memory_order_relaxed);
+                if (!cmd.queueNode || !cmd.queueEpoch)
+                    ctr.badQueueProvenance.fetch_add(1,std::memory_order_relaxed);
+            }
+            if (cmd.producer == ProducerToken::None)
+                ctr.unknownProducer.fetch_add(1,std::memory_order_relaxed);
+            ctr.lastQueueEpoch.store(cmd.queueEpoch,std::memory_order_relaxed);
+            ctr.lastProducer.store(static_cast<unsigned>(cmd.producer),
+                                   std::memory_order_relaxed);
+            ctr.lastScope.store(static_cast<unsigned>(cmd.scope),
+                                std::memory_order_relaxed);
             ctr.api[static_cast<std::size_t>(api)].fetch_add(
                 1,std::memory_order_relaxed);
             ctr.latestDrawId.store(
@@ -168,6 +281,8 @@ namespace OutRunVR::UniversalTrace
         {
             if (!active_) return;
             auto& ctr = Counts[static_cast<std::size_t>(family_)];
+            ctr.route[static_cast<std::size_t>(route_)].fetch_add(
+                1,std::memory_order_relaxed);
             (succeeded_ ? ctr.success : ctr.failure).fetch_add(
                 1,std::memory_order_relaxed);
             if (paired_) {
@@ -180,6 +295,11 @@ namespace OutRunVR::UniversalTrace
             current_=previous_;
         }
         void SetResult(bool succeeded) noexcept { succeeded_=succeeded; }
+        static void RecordRoute(Route route) noexcept
+        {
+            if (current_ && current_->active_)
+                current_->route_=route;
+        }
         static void RecordR33EyePair(bool leftOk,bool rightOk,
                                     bool restored) noexcept
         {
