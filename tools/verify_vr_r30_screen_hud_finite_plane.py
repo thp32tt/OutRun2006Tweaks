@@ -8,6 +8,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 r84 = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8-sig")
+r30 = r84  # Same R30 source; structural R84 FVF route checks below use r30.
 r26 = (root / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(encoding="utf-8-sig")
 r29 = (root / "src/vr/d3d9/stereo_renderer_r29.cpp").read_text(encoding="utf-8-sig")
 
