@@ -91,11 +91,11 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "D3D9_GAME_DRAW",
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
       "D3D9_ORIGINAL_POSTDRAW_SURFACE_COPY",
       "D3D11_GPU_COPY",
-      "GAME_PRESENT"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Hybrid diagnostic source bridge only; menu/car/race full-frame usability, GPU performance, Quest3/HMD untested.",
     "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 and OUTRUN_DX11_FULL_GAME_FRAME=1 explicit; no default promotion, original D3D9 Draw/Present/input unchanged."
