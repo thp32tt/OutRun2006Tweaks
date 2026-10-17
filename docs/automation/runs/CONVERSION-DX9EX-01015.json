@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01015",
+  "production_id": "CONVERSION-DX9EX-01015",
+  "event_id": "CONVERSION-DX9EX-01015-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "ebf912c39fc34bd9d6efff2258da4fefa6b76ee8",
+  "material_result_sha": "7bf80e2857270da753a206e196da3da0c640f072",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01015.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve the complete GOAL progress 0–99%, time/title and original result presentation by binding both R84 shader/c64 stereo eye submissions to the same original game c64 matrix writer across direct B9200 glyph and queued GOAL sprite batches, without changing original GOAL logic or final result semantics.",
+    "scope_boundary": "Only source-proven GOAL ScreenHud GPU submissions, including ResultProgress, GoalTime020, GoalTime150, OutRunStagePrintf and ResultTextB9200; exclude +TIME, gameplay HUD, F11/pause, rank, lenses, SkyGlow, world/FFB/input, R26_SAFE rollback and frozen DXVK.",
+    "trace_stages": [
+      "Original OutRun GOAL 0–99% and final result producers, including canonical B9200 return-address whitelist, stage-printf, time helpers and direct/queued SpriteNode D3DX ownership.",
+      "R84 R33 captures physical ScreenHud source token, queue node/epoch, pose and shader across native LEFT GPU Draw and the original game's raw c64 WVP writer generation, which is distinct from R32 temporary eye uploads.",
+      "R84 independently projects native LEFT/RIGHT only when physical source and original c64 generation agree; previous native fallback and R30 fixed-function/XYZRHW finite HUD plane plus x64 OpenXR host remain intact."
+    ],
+    "subcomponents": [
+      "Add source-proven original game c64 write/draw generations to all five GOAL producer families and require a complete stamp pair while preserving legacy no-evidence fallback.",
+      "Fence the existing native R84 shader-stereo transaction after LEFT Draw so a nested original writer cannot inherit the GOAL RIGHT projection under unchanged queue, shader and pose.",
+      "Exercise all five producer families as queued and direct physical draws using executable C++ smoke with positive, write-generation, draw-generation, partial-stamp and unchanged-fallback mutations; integrate exact-SHA Windows gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_original_wvp_eye_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL 0–99%, time/title/result glyph and sprite GPU source through R84 native shader/c64 left/right stereo",
+        "expected_behavior": "Matching original game c64 write/draw generations retain both GOAL stereo eyes for all five direct/queued producer families, while reentrant writers cannot reuse the already prepared RIGHT projection."
+      },
+      {
+        "id": "goal_native_fallback_and_regression",
+        "category": "fallback_regression",
+        "behavior_area": "Source identity negatives, incomplete original c64 generations, original Draw fallback, +TIME/HUD/rank/world and R26_SAFE unchanged",
+        "expected_behavior": "Wrong or partial original WVP generations fail closed; both absent stamps keep prior conservative source eligibility, and other producers, untouched input, FFB and SkyGlow do not gain GOAL ownership."
+      },
+      {
+        "id": "goal_exact_sha_windows_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 x86 game, R26_SAFE x86 fallback, x64 host smoke and deployment package, Domain, HUD Inspector, Full Source Impact Gates",
+        "expected_behavior": "One final validation-bearing exact GitHub SHA passes all existing required game/host/package and policy/Inspector gates; Quest3/VDXR visual acceptance is independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_original_wvp_eye_owner": "PENDING_EXACT_SHA",
+    "goal_native_fallback_and_regression": "PENDING_EXACT_SHA",
+    "goal_exact_sha_windows_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Canonical original GOAL B9200 E8 return whitelist has nineteen entries; five GOAL producer classes route exact ScreenHud glyph/sprite children and GOAL 0–99% animation through R84 direct/queued D3DX ownership. No new runtime capture was performed.",
+    "root_cause": "Before this edit R84 GOAL physical source admitted a RIGHT GPU draw when queue, source token, pose, shader and top-level Draw serial matched, even though a nested original game SetVertexShaderConstantF(c64) could replace the actual source WVP during LEFT and leave these identities unchanged.",
+    "source_trace": [
+      "Original OutRun GOAL B9200 return proof in src/vr/game/goal_result_parent_provenance.hpp, direct/queued D3DX GOAL tagging and ScreenHud producers.",
+      "R84 src/vr/d3d9/stereo_renderer_r33.cpp captureGoalSource around native LEFT, retrieving game raw c64 write/draw generations through OutRunVRRenderer::GetLastRawGameWvpWrite (excluding R32 eye uploads).",
+      "src/vr/game/goal_progress_physical_source.hpp SameAfterNativeLeft and vrhost/tests/goal_progress_owner_smoke.cpp all five direct/queued positive and negative mutations; R30 fallback and x64 host projection preserved."
+    ],
+    "alternatives_rejected": [
+      "Do not globally flush D3DX sprite batches or suppress a duplicated GOAL effect: this changes legitimate queue semantics and risks missing GOAL progress glyphs; do not infer source from live stereo-modified c64."
+    ],
+    "fix_evidence": "Concrete production C++ and host smoke implemented at 7bf80e2857270da753a206e196da3da0c640f072. Static owner race removed by exact original game c64 generation comparison. No claim of HMD visual resolution.",
+    "negative_test_evidence": "Executable GOAL smoke includes five producer families × direct and queued positive identity, write serial changed, draw generation changed, half-missing stamps, existing zero-pair fallback, stale node/queue/shader/pose negatives.",
+    "eye_ownership": "R84 LEFT and RIGHT projections share a single source original WVP generation; internal stereo eye shader uploads do not advance game writer serial, while a nested original c64 write invalidates the prepared RIGHT before GPU submission.",
+    "evidence_limit": "This eliminates a concrete nested-writer provenance hazard in native shader GOAL path, not yet the entire Quest3/VDXR optical symptom; fixed-function and source-layout GOAL code was not altered."
+  },
+  "ci_evidence": {
+    "source_commit": "7bf80e2857270da753a206e196da3da0c640f072",
+    "exact_sha": "PENDING",
+    "gates": "PENDING_REVALIDATION_AFTER_MISSING_FEATURE_CONTRACT",
+    "hmd": "UNTESTED",
+    "initial_material_sha_gates": "Domain/Inspector SUCCESS; Active feature record missing FAILURE; Full Source cancelled by concurrent HEAD."
+  }
+}
