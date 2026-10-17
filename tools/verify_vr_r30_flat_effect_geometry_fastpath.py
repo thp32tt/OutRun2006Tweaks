@@ -33,7 +33,7 @@ def validate(source: str) -> None:
     ):
         assert key in cache, key
     assert "cache.valid = false;" in cache and "next.valid = true;" in cache
-    assert "R29OwnerInvertMatrix(baseProjection, next.inverseBaseProjection)" in cache
+    assert "!R30InvertBaseProjectionCached(baseProjection, next.inverseBaseProjection)" in cache
     assert "R29OwnerInverseRigid(eyePose)" in cache
     assert "R29OwnerProjectionFromFov(" in cache
     assert "R29OwnerMatrixFinite(next.eyeInverse[eye])" in cache
@@ -91,7 +91,8 @@ def negative_mutations(source: str) -> int:
         ("std::memcmp(cache.eyeOffset, stereo.eyeOffset", "std::memcmp(cache.eyeOffset, cache.eyeOffset"),
         ("std::memcmp(cache.eyeFov, stereo.eyeFov", "std::memcmp(cache.eyeFov, cache.eyeFov"),
         ("R30FlatEffectGeometry = {};", "/* incorrect: reset cache retained */"),
-        ("R29OwnerInvertMatrix(baseProjection, next.inverseBaseProjection)", "R29OwnerInvertMatrix(baseProjection, next.baseProjection)"),
+        ("!R30InvertBaseProjectionCached(baseProjection, next.inverseBaseProjection)",
+         "!R29OwnerInvertMatrix(baseProjection, next.inverseBaseProjection)"),
         ("geometry->eyeProjection[eye]", "baseProjection"),
         ("R29OwnerMultiplyMatrix(commonViewPlane, headInverse)",
          "R29OwnerMultiplyMatrix(commonViewPlane, stockWvp)"),
