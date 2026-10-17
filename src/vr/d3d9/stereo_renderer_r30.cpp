@@ -6086,24 +6086,31 @@ namespace OutRunVRStereo
         }
 
 
-        // Original R62 HMD-confirmed 4th/5th rank-owner route, omitted from
-        // the R84 independent split. It is NOT POSITIONT/XYZRHW: D3DXSprite
-        // uses indexed XYZ+DIFFUSE+TEX1 FVF=0x142, with no vertex shader.
-        // Admit only an exact current Calc3D2D vehicle-marker semantic.
-        // Inapplicable/unproven input returns E_NOTIMPL BEFORE any GPU write.
+        // R62 Quest3 known-good had TWO disjoint original D3DXSprite FVF142
+        // owners: projected 4th/5th car marker and native ScreenHud (6th/6,
+        // direct rank/text). R84 previously ported the marker branch only;
+        // actual ScreenHud indexed sprites fell back to the single left eye.
+        // Restore the exact producer-scoped fixed-function HUD branch using
+        // R84's already-coherent finite optical +TIME/GOAL/ScreenHud plane.
+        // Never promote untagged/foreign, world, external ImGui or SkyGlow.
+        // Inapplicable/unproven input returns E_NOTIMPL before GPU writes.
         HRESULT R30TryFixedFunctionProjectedRankIndexed(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
             using namespace OutRunVR::GameSemantic;
+            const auto sourceScope = EffectiveScope();
+            const bool projected = CorroboratesProjectedWorldMarker(sourceScope);
+            const bool exactHud = CorroboratesHud(sourceScope) &&
+                ExternalOverlaySemanticDepth == 0;
             if (!device || type != D3DPT_TRIANGLELIST ||
                 !R29OwnerTargetIsBackBuffer() ||
                 !R29OwnerStableStereoBase(device) ||
-                !CorroboratesProjectedWorldMarker(EffectiveScope()))
+                (!projected && !exactHud))
                 return E_NOTIMPL;
             const auto* marker = CurrentProjectedMarker();
-            if (!marker || !marker->valid ||
+            if ((projected && (!marker || !marker->valid)) ||
                 R29OwnerCurrentVertexShaderIdentity() != 0)
                 return E_NOTIMPL;
             IDirect3DVertexShader9* liveShader = nullptr;
@@ -6115,7 +6122,11 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
             DWORD fvf = 0;
-            if (FAILED(device->GetFVF(&fvf)) ||
+            if (FAILED(device->GetFVF(&fvf)) || fvf != 0x00000142u)
+                return E_NOTIMPL;
+            // Rank marker must still prove its captured Calc3D2D source.
+            // Native HUD uses its separate exact ScreenHud queue producer.
+            if (projected &&
                 !OutRunVR::RankMarker::ExactR62FixedFnRankRoute(
                     true, true, true, fvf, true, true))
                 return E_NOTIMPL;
@@ -6134,7 +6145,8 @@ namespace OutRunVRStereo
                     state.eyeScale, state.eyeOffset) ||
                 !R30ConfigureXyzrhwWorldEffect(
                     device, nullptr, 0u, 0u, state) ||
-                !state.projectedWorldMarker)
+                (projected && !state.projectedWorldMarker) ||
+                (exactHud && !state.stageExtensionEyePlane))
                 return E_NOTIMPL;
 
             D3DMATRIX originalProjection{};
@@ -6150,17 +6162,49 @@ namespace OutRunVRStereo
                 std::clamp(requestedScale, 0.30f, 1.20f);
             for (int eye = 0; eye < 2; ++eye)
             {
-                D3DMATRIX clipShift = R29OwnerIdentityMatrix();
-                clipShift._11 = markerScale;
-                clipShift._22 = markerScale;
-                clipShift._41 =
-                    state.projectedRank.deltaX[eye] +
-                    (1.0f - markerScale) * state.projectedRank.baseX;
-                clipShift._42 =
-                    state.projectedRank.deltaY[eye] +
-                    (1.0f - markerScale) * state.projectedRank.baseY;
-                eyeProjection[eye] =
-                    R29OwnerMultiplyMatrix(originalProjection, clipShift);
+                if (projected)
+                {
+                    D3DMATRIX clipShift = R29OwnerIdentityMatrix();
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 =
+                        state.projectedRank.deltaX[eye] +
+                        (1.0f - markerScale) * state.projectedRank.baseX;
+                    clipShift._42 =
+                        state.projectedRank.deltaY[eye] +
+                        (1.0f - markerScale) * state.projectedRank.baseY;
+                    eyeProjection[eye] =
+                        R29OwnerMultiplyMatrix(originalProjection, clipShift);
+                }
+                else
+                {
+                    // The input fixed-function projection has already turned
+                    // the original D3DXSprite XYZ vertices into GAME NDC.
+                    // R84's finite plane reconstructs this NDC at z=-2.50,
+                    // removes the shared head pose ONCE, and applies each
+                    // independent XR eye pose/projection (same proven path
+                    // as exact ScreenHud XYZRHW).
+                    D3DMATRIX contentScale = R29OwnerIdentityMatrix();
+                    contentScale._11 = state.stageExtensionScale;
+                    contentScale._22 = state.stageExtensionScale;
+                    const D3DMATRIX optical =
+                        R29OwnerMultiplyMatrix(contentScale,
+                            state.stageExtensionClipFromGameNdc[eye]);
+                    eyeProjection[eye] =
+                        R29OwnerMultiplyMatrix(originalProjection, optical);
+                    // Pause menu text/arrows share one *post-eye* vertical
+                    // shift, separate from gameplay HUD size/position.
+                    if (state.stageExtensionPostEyeVerticalPixels != 0.0f)
+                    {
+                        D3DMATRIX pauseShift = R29OwnerIdentityMatrix();
+                        pauseShift._42 =
+                            -2.0f * state.stageExtensionPostEyeVerticalPixels /
+                                static_cast<float>(state.viewport.Height);
+                        eyeProjection[eye] =
+                            R29OwnerMultiplyMatrix(eyeProjection[eye],
+                                pauseShift);
+                    }
+                }
                 if (!R29OwnerMatrixFinite(eyeProjection[eye]))
                     return E_NOTIMPL;
             }
@@ -6180,7 +6224,8 @@ namespace OutRunVRStereo
                 device, state,
                 [&]() { return drawEye(0); },
                 [&]() { return drawEye(1); },
-                "R84/R62-FVF142-ProjectedCarRank");
+                projected ? "R84/R62-FVF142-ProjectedCarRank"
+                          : "R84/R62-FVF142-NativeScreenHud");
             bool restored = false;
             {
                 R30ScopedInternalPass guard;
@@ -6201,8 +6246,10 @@ namespace OutRunVRStereo
                     hits.fetch_add(1, std::memory_order_relaxed) + 1u;
                 if ((count & (count - 1u)) == 0u)
                     spdlog::info(
-                        "VR R84 R62 FVF142 CAR-RANK stereo: hits={} marker={} primitive={}",
-                        count, marker->valid ? 1 : 0, primitiveCount);
+                        "VR R84 R62 FVF142 stereo: owner={} hits={} marker={} primitive={}",
+                        projected ? "CAR_RANK" : "SCREEN_HUD",
+                        count, projected && marker && marker->valid ? 1 : 0,
+                        primitiveCount);
             }
             return hr;
         }
