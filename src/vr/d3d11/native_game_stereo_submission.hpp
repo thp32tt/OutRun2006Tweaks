@@ -52,7 +52,7 @@ public:
     // no foreign desktop RTV and no manufactured Draw evidence.
     [[nodiscard]] bool copy_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
-        UINT destX, UINT destY,
+        std::int64_t destX, std::int64_t destY,
         UINT sourceArraySlice = 0u) noexcept;
     // Per-eye native GPU replay for actual game StretchRect source crops
     // and changed-size destination rectangles (point or linear filter).
@@ -126,7 +126,8 @@ struct NativeGameEyePartialTargetClear {
         ID3D11Texture2D* source{};
         D3D11_BOX sourceBox{};
         D3D11_RECT destination{};
-        UINT destX{}, destY{}, sourceArraySlice{};
+        std::int64_t destX{}, destY{};
+        UINT sourceArraySlice{};
         bool linearFilter{};
     };
     std::uint32_t count[2]{};

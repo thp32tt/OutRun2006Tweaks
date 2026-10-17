@@ -254,7 +254,8 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
 // when source format, dimensions, ownership or resolve support is invalid.
 bool NativeGameEyeDrawEncoder::copy_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
-    UINT destX, UINT destY, UINT sourceArraySlice) noexcept
+    std::int64_t destX, std::int64_t destY,
+    UINT sourceArraySlice) noexcept
 {
     if (!source || !eye_targets_bound() || !targetWidth_ || !targetHeight_)
         return false;
@@ -288,6 +289,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     const D3D11_BOX box{
         clippedCopy.sourceLeft, clippedCopy.sourceTop, 0u,
         clippedCopy.sourceRight, clippedCopy.sourceBottom, 1u};
+    const UINT eyeDestX = clippedCopy.destX;
+    const UINT eyeDestY = clippedCopy.destY;
     // D3D9 StretchRect also performs format conversion for unscaled
     // menu/vehicle postpasses. CopySubresourceRegion cannot do that. Replay
     // the caller's exact mip-zero source rectangle with a native point-sampled
@@ -300,16 +303,16 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         const UINT height = box.bottom - box.top;
         const UINT maxLong = static_cast<UINT>(
             (std::numeric_limits<LONG>::max)());
-        if (destX > targetWidth_ || destY > targetHeight_ ||
-            width > targetWidth_ - destX ||
-            height > targetHeight_ - destY ||
-            destX > maxLong || destY > maxLong ||
-            width > maxLong - destX || height > maxLong - destY)
+        if (eyeDestX > targetWidth_ || eyeDestY > targetHeight_ ||
+            width > targetWidth_ - eyeDestX ||
+            height > targetHeight_ - eyeDestY ||
+            eyeDestX > maxLong || eyeDestY > maxLong ||
+            width > maxLong - eyeDestX || height > maxLong - eyeDestY)
             return false;
         const D3D11_RECT destination{
-            static_cast<LONG>(destX), static_cast<LONG>(destY),
-            static_cast<LONG>(destX + width),
-            static_cast<LONG>(destY + height)};
+            static_cast<LONG>(eyeDestX), static_cast<LONG>(eyeDestY),
+            static_cast<LONG>(eyeDestX + width),
+            static_cast<LONG>(eyeDestY + height)};
         // Unlike CopySubresourceRegion this path temporarily replaces
         // the entire OM/viewport/shader state to draw a conversion triangle.
         // A successful GPU postpass must also restore THIS native eye's
@@ -375,7 +378,7 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     const bool fullResolve = needsResolve &&
         box.left == 0u && box.top == 0u &&
         box.right == sourceDesc.Width && box.bottom == sourceDesc.Height &&
-        destX == 0u && destY == 0u &&
+        eyeDestX == 0u && eyeDestY == 0u &&
         sourceDesc.Width == eyeDesc.Width &&
         sourceDesc.Height == eyeDesc.Height;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> resolved;
@@ -425,12 +428,12 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
                 0u, source, sourceSubresource, sourceDesc.Format);
             if (!fullResolve) {
                 context_->CopySubresourceRegion(
-                    eyeColor.Get(), 0u, destX, destY, 0u,
+                    eyeColor.Get(), 0u, eyeDestX, eyeDestY, 0u,
                     resolved.Get(), 0u, &box);
             }
         } else {
             context_->CopySubresourceRegion(
-                eyeColor.Get(), 0u, destX, destY, 0u,
+                eyeColor.Get(), 0u, eyeDestX, eyeDestY, 0u,
                 source, sourceSubresource, &box);
         }
     }

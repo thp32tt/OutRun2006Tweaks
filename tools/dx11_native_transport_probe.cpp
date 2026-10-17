@@ -1050,6 +1050,9 @@ int main()
         bool replayedClippedSurfaceCopy[2]{};
         bool replayedClippedConvertedCopy[2]{};
         bool replayedClippedMsaaResolve[2]{};
+        bool replayedNegativeTopSurfaceCopy[2]{};
+        bool replayedNegativeTopConvertedCopy[2]{};
+        bool replayedNegativeLeftMsaaResolve[2]{};
         bool replayedScaledPostpass[2]{};
         bool replayedScaledArrayEye[2]{};
         bool preservedPostDrawMrt[2]{};
@@ -1511,6 +1514,30 @@ int main()
                 fixture.gameMultisample, &sourcePatch, 62u, 58u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Game menu/camera postpasses may begin LEFT or ABOVE the XR eye.
+        // Exercise real GPU Copy, typed format conversion and MSAA resolve
+        // with source-box trimming (no rescale, no synthetic Draw evidence).
+        fixture.replayedNegativeTopSurfaceCopy[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameEyeArray, &sourcePatch, 30u, -3, eyeIndex) &&
+            !encoder.copy_game_surface(
+                fixture.gameEyeArray, &sourcePatch, -8, 38, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        fixture.replayedNegativeTopConvertedCopy[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, 55u, -4, eyeIndex) &&
+            !encoder.copy_game_surface(
+                fixture.gameConvertedArray, &sourcePatch, 55u, -8, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        fixture.replayedNegativeLeftMsaaResolve[eyeIndex] =
+            encoder.copy_game_surface(
+                fixture.gameMultisample, &sourcePatch, -4, 52u) &&
+            !encoder.copy_game_surface(
+                fixture.gameMultisample, &sourcePatch, -9, 52u) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         // A real game StretchRect scales 8x8 GPU pixels into a 12x5
         // menu/vehicle eye region, not a CPU/desktop intermediate.
         const D3D11_RECT scaledDest{
@@ -1576,6 +1603,9 @@ int main()
             !fixture.replayedClippedSurfaceCopy[eyeIndex] ||
             !fixture.replayedClippedConvertedCopy[eyeIndex] ||
             !fixture.replayedClippedMsaaResolve[eyeIndex] ||
+            !fixture.replayedNegativeTopSurfaceCopy[eyeIndex] ||
+            !fixture.replayedNegativeTopConvertedCopy[eyeIndex] ||
+            !fixture.replayedNegativeLeftMsaaResolve[eyeIndex] ||
             !fixture.replayedScaledPostpass[eyeIndex] ||
             !fixture.replayedScaledArrayEye[eyeIndex] ||
             !encoder.color_draw_count()) return false;
@@ -1920,6 +1950,28 @@ int main()
         require(expectedSourceEdge && expectedConvertedEdge &&
                 expectedMsaaEdge,
                 "00851 real GPU clipped Copy/convert/Resolve left/right edge pixels");
+        // Read back the actual partially visible GPU pixels, independently
+        // for each camera. Existing top-left scene color and right/bottom
+        // clipped postpass samples remain unchanged.
+        const auto* negativeTopCopy = pixel + 1u * mapped.RowPitch + 31u * 4u;
+        const auto* negativeTopConvert =
+            pixel + 1u * mapped.RowPitch + 56u * 4u;
+        const auto* negativeLeftMsaa =
+            pixel + 53u * mapped.RowPitch + 1u * 4u;
+        const bool actualNegativeCopy = eyeIndex == 0u
+            ? negativeTopCopy[0] == 0x11u &&
+              negativeTopCopy[1] == 0u && negativeTopCopy[2] == 0xccu
+            : negativeTopCopy[0] == 0x33u &&
+              negativeTopCopy[1] == 0xbbu && negativeTopCopy[2] == 0x22u;
+        const bool actualNegativeConvert = eyeIndex == 0u
+            ? negativeTopConvert[0] == 255u &&
+              negativeTopConvert[1] == 0u && negativeTopConvert[2] == 0u
+            : negativeTopConvert[0] == 0u &&
+              negativeTopConvert[1] == 255u && negativeTopConvert[2] == 0u;
+        require(actualNegativeCopy && actualNegativeConvert &&
+                negativeLeftMsaa[0] == 255u &&
+                negativeLeftMsaa[1] == 0u && negativeLeftMsaa[2] == 255u,
+                "00852 left/top clipped GPU Copy/convert/resolve both-eye pixels");
         const UINT mipX = eyeIndex == 0u ? 18u : 50u;
         const auto* mipPixel = pixel + 34u * mapped.RowPitch + mipX * 4u;
         const bool actualMipZeroCopy =

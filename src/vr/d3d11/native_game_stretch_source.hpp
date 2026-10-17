@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <algorithm>
 #include <limits>
 
 namespace outrun::vr::dx11 {
@@ -38,12 +39,12 @@ native_game_stretch_source_transfer(
         ? NativeGameStretchSourceTransfer::DirectSample
         : NativeGameStretchSourceTransfer::CopyToSampled;
 }
-// An unscaled game GPU Copy/Resolve can overlap the right/bottom of an XR
-// eye. D3D11 CopySubresourceRegion rejects an oversize destination; preserve
-// the visible game pixels by shortening only the source box, NOT stretching
-// the remaining texels. Fully offscreen/invalid copies still fail closed.
-// The same clip is used by the bilateral source timeline preflight and by
-// both ordinary Copy and format-converted / MSAA eye replay.
+// Game-authored Copy/Resolve may start off the LEFT/TOP as well as extend
+// beyond the RIGHT/BOTTOM edge during menu and car transitions. D3D11's
+// destination is unsigned: move the source box by exactly the negative
+// destination offset and emit a nonnegative eye destination. No scaling.
+// Use signed 64-bit input so unsigned legacy callers cannot wrap to a
+// plausible negative coordinate; reject fully invisible transfers.
 struct NativeGameCopyClippedRegion {
     std::uint32_t sourceLeft{}, sourceTop{}, sourceRight{}, sourceBottom{};
     std::uint32_t destX{}, destY{};
@@ -55,27 +56,53 @@ native_game_copy_clipped_region(
     std::uint32_t sourceLeft, std::uint32_t sourceTop,
     std::uint32_t sourceRight, std::uint32_t sourceBottom,
     std::uint32_t targetWidth, std::uint32_t targetHeight,
-    std::uint32_t destX, std::uint32_t destY) noexcept
+    std::int64_t destX, std::int64_t destY) noexcept
 {
     if (!sourceWidth || !sourceHeight || !targetWidth || !targetHeight ||
         sourceLeft >= sourceRight || sourceTop >= sourceBottom ||
-        sourceRight > sourceWidth || sourceBottom > sourceHeight ||
-        destX >= targetWidth || destY >= targetHeight) return {};
-    const auto width = sourceRight - sourceLeft;
-    const auto height = sourceBottom - sourceTop;
-    const auto clippedWidth = width < targetWidth - destX
-        ? width : targetWidth - destX;
-    const auto clippedHeight = height < targetHeight - destY
-        ? height : targetHeight - destY;
-    return {sourceLeft, sourceTop, sourceLeft + clippedWidth,
-            sourceTop + clippedHeight, destX, destY, true};
+        sourceRight > sourceWidth || sourceBottom > sourceHeight)
+        return {};
+    const std::uint32_t width = sourceRight - sourceLeft;
+    const std::uint32_t height = sourceBottom - sourceTop;
+    // Compare before negating to guard INT64_MIN, and before converting
+    // an unsigned game coordinate back into an eye destination.
+    if (destX <= -static_cast<std::int64_t>(width) ||
+        destY <= -static_cast<std::int64_t>(height) ||
+        destX >= static_cast<std::int64_t>(targetWidth) ||
+        destY >= static_cast<std::int64_t>(targetHeight))
+        return {};
+    const auto trimLeft = destX < 0 ? static_cast<std::uint32_t>(-destX) : 0u;
+    const auto trimTop = destY < 0 ? static_cast<std::uint32_t>(-destY) : 0u;
+    const auto eyeX = destX < 0 ? 0u : static_cast<std::uint32_t>(destX);
+    const auto eyeY = destY < 0 ? 0u : static_cast<std::uint32_t>(destY);
+    const auto visibleWidth = (std::min)(width - trimLeft, targetWidth - eyeX);
+    const auto visibleHeight = (std::min)(height - trimTop, targetHeight - eyeY);
+    if (!visibleWidth || !visibleHeight) return {};
+    return {sourceLeft + trimLeft, sourceTop + trimTop,
+            sourceLeft + trimLeft + visibleWidth,
+            sourceTop + trimTop + visibleHeight,
+            eyeX, eyeY, true};
 }
 static_assert(native_game_copy_clipped_region(
-    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 62u, 61u).sourceRight == 4u);
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 62, 61).sourceRight == 4u);
 static_assert(native_game_copy_clipped_region(
-    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 62u, 61u).sourceBottom == 6u);
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 62, 61).sourceBottom == 6u);
 static_assert(!native_game_copy_clipped_region(
-    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 64u, 61u).valid);
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, 64, 61).valid);
+static_assert(native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, -3, -4).sourceLeft == 5u);
+static_assert(native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, -3, -4).sourceTop == 7u);
+static_assert(native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, -3, -4).destX == 0u);
+static_assert(!native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u, -8, 12).valid);
+static_assert(!native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u,
+    (std::numeric_limits<std::int64_t>::min)(), 12).valid);
+static_assert(!native_game_copy_clipped_region(
+    16u, 16u, 2u, 3u, 10u, 11u, 64u, 64u,
+    (std::numeric_limits<std::uint32_t>::max)(), 12).valid);
 
 // Region packing for the real menu/vehicle/race GPU postpass HLSL.
  // A cropped StretchRect samples only texels inside the game-authored box:
