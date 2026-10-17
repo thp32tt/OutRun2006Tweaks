@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C5_WAIT_EXACT_SHA",
-  "automation_validation": "PENDING_GITHUB_ACTIONS_AFTER_CAUSE_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "0fc9e695d36bbc546ceff03ab798be1ed65bab91",
   "material_result_sha": "19914a652e6ad9ff5505889e4e169aa9d76af195",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "fc84505c07f3b71f4d730ecc834ec3beb266d9b5",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "src/vr/game/stage_extension_physical_source.hpp",
@@ -78,13 +78,15 @@
     "ci_repair": "Update original verifier to require four-source final guard, independent StageExtension physical source and negative mutations that delete just +TIME or GOAL fencing. Preserve lens/C993 and GOAL mutations, no test disabled."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Exact-SHA Windows CI for verifier cause repair; retain earlier material_result_sha, no HMD claim or duplicate score.",
+  "next_action": "C6 PASS_EXACT_SHA: GitHub CI SUCCESS at exact validation-bearing SHA fc84505c07f3b71f4d730ecc834ec3beb266d9b5 (user-confirmed); preserve original material SHA and acceptance records, no source or CI rerun, no duplicate score. Quest3/VDXR HMD runtime remains NEED_HMD_TEST.",
   "local_validation": {
-    "status": "CAUSE_IDENTIFIED_POLICY_STRING_CONTRACT",
+    "status": "GITHUB_CI_SUCCESS_USER_CONFIRMED",
     "failed_validation_sha": "19914a652e6ad9ff5505889e4e169aa9d76af195",
     "workflow_id": 39004599517,
     "failed_step": "verify_dx9ex_r84_lens_source.py",
     "actual_error": "AssertionError: C993/GOAL composite source fence missing",
-    "new_windows_ci": "PENDING"
+    "new_windows_ci": "SUCCESS_EXACT_SHA",
+    "exact_validation_sha": "fc84505c07f3b71f4d730ecc834ec3beb266d9b5",
+    "hmd_runtime": "UNTESTED"
   }
 }
