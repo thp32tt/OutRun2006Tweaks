@@ -32,6 +32,7 @@
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/goal_progress_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
+#include "../game/hud_native_source_transaction.hpp"
 #include "../core/r29_owner_api.hpp"
 
 namespace OutRunVRRenderer {
@@ -1061,7 +1062,27 @@ namespace OutRunVRStereo
                 !exactStageEye;
             const auto goalBeforeLeft = exactGoalEye
                 ? captureGoalSource() : OutRunVR::GoalPhysical::Source{};
-            if ((exactStageEye &&
+            // Native shader HUD must preserve the same physical owner across
+            // both eye draws. A left Draw callback may reenter a different
+            // original SpriteNode without changing its shader or render state.
+            const bool exactNativeHud = goalCommand.IsSourceProvenHud() &&
+                !exactStageEye && !exactGoalEye;
+            auto captureNativeHudSource = [&]() noexcept {
+                const auto cmd = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                std::uintptr_t shader = 0;
+                std::uint64_t shaderEpoch = 0;
+                if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch))
+                    return OutRunVR::HudNativeSource::SourceStamp{};
+                return OutRunVR::HudNativeSource::StampPhysicalCommand(
+                    cmd, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    shader, shaderEpoch, R29OwnerTopLevelDrawSerial());
+            };
+            const auto hudBeforeLeft = exactNativeHud
+                ? captureNativeHudSource()
+                : OutRunVR::HudNativeSource::SourceStamp{};
+            if ((exactNativeHud &&
+                 !OutRunVR::HudNativeSource::IsExactHudSource(hudBeforeLeft)) ||
+                (exactStageEye &&
                  !OutRunVR::StageExtensionPhysical::IsValid(stageBeforeLeft)) ||
                 (exactGoalEye &&
                  !OutRunVR::GoalPhysical::IsValid(goalBeforeLeft)))
@@ -1125,8 +1146,12 @@ namespace OutRunVRStereo
             const bool stageSourceChanged = exactStageEye &&
                 !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
                     stageBeforeLeft, captureStageSource());
+            const bool nativeHudSourceChanged = exactNativeHud &&
+                !OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(
+                    hudBeforeLeft, captureNativeHudSource());
             if (centreSourceChanged || shadowSourceChanged ||
-                goalSourceChanged || stageSourceChanged)
+                goalSourceChanged || stageSourceChanged ||
+                nativeHudSourceChanged)
             {
                 // Left native Draw already ran once; never replay it.
                 // Restore the game's original GPU c64 without submitting
@@ -1146,7 +1171,8 @@ namespace OutRunVRStereo
                     shadowSourceChanged ? "R33/car-shadow-source-changed"
                         : goalSourceChanged ? "R33/GOAL-source-changed"
                         : stageSourceChanged ? "R33/+TIME-source-changed"
-                                            : "R33/C993-centre-source-changed",
+                        : nativeHudSourceChanged ? "R33/HUD-source-changed"
+                                                 : "R33/C993-centre-source-changed",
                     E_FAIL);
                 if (!restored)
                     R32ReviewNoteRestoreFailure(
@@ -1156,6 +1182,8 @@ namespace OutRunVRStereo
                             ? "R33 GOAL original c64 rollback"
                           : stageSourceChanged
                             ? "R33 +TIME original c64 rollback"
+                          : nativeHudSourceChanged
+                            ? "R33 HUD original c64 rollback"
                             : "R33 C993 original c64 rollback");
                 R32ReviewArmStereoRecoverySafety();
                 return result;

@@ -23,6 +23,18 @@ namespace OutRunVR::HudNativeSource
         std::uint64_t drawSerial = 0;
     };
 
+    // Converts R33's immutable physical GPU owner into a typed source stamp.
+    // The runtime captures shader/pose/draw identity at the same boundary.
+    constexpr SourceStamp StampPhysicalCommand(
+        const OutRunVR::GameSemantic::PhysicalDrawCommand& command,
+        std::uint64_t poseEpoch, std::uintptr_t shader,
+        std::uint64_t shaderEpoch, std::uint64_t drawSerial) noexcept
+    {
+        return { command.queued, command.scope, command.producer,
+                 command.queueNode, command.queueEpoch, poseEpoch,
+                 shader, shaderEpoch, drawSerial };
+    }
+
     constexpr bool IsExactHudSource(const SourceStamp& s) noexcept
     {
         if (s.scope != RenderScope::ScreenHud ||

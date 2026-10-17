@@ -8,6 +8,27 @@ int main()
     int first=1, second=2;
     SourceStamp q{true,RenderScope::ScreenHud,ProducerToken::OutRunHudText,
         &first,3,5,0x1234,7,9};
+    // Real physical command mapping: same-node passes, foreign glyphs,
+    // changed queue, missing exact token/pose/shader are rejected.
+    PhysicalDrawCommand cmd{};
+    cmd.scope = RenderScope::ScreenHud;
+    cmd.producer = ProducerToken::OutRunHudText;
+    cmd.queued = true;
+    cmd.queueNode = &first;
+    cmd.queueEpoch = 3;
+    CHECK(SameSourceAfterNativeUpload(q,
+        StampPhysicalCommand(cmd,5,0x1234,7,9)));
+    cmd.queueNode = &second;
+    CHECK(!SameSourceAfterNativeUpload(q,
+        StampPhysicalCommand(cmd,5,0x1234,7,9)));
+    cmd.queueNode = &first; cmd.queueEpoch++;
+    CHECK(!SameSourceAfterNativeUpload(q,
+        StampPhysicalCommand(cmd,5,0x1234,7,9)));
+    cmd.queueEpoch = 3; cmd.producer = ProducerToken::None;
+    CHECK(!IsExactHudSource(StampPhysicalCommand(cmd,5,0x1234,7,9)));
+    cmd.producer = ProducerToken::OutRunHudText;
+    CHECK(!IsExactHudSource(StampPhysicalCommand(cmd,0,0x1234,7,9)));
+    CHECK(!IsExactHudSource(StampPhysicalCommand(cmd,5,0x1234,0,9)));
     CHECK(IsExactHudSource(q));
     CHECK(SameSourceAfterNativeUpload(q,q));
     SourceStamp changed=q;
@@ -34,6 +55,14 @@ int main()
     CHECK(!SameSourceAfterNativeUpload(changed,q));
     SourceStamp direct{false,RenderScope::ScreenHud,
         ProducerToken::OutRunHudPeripheralText,nullptr,0,5,0x1234,7,9};
+    PhysicalDrawCommand directCmd{};
+    directCmd.scope = RenderScope::ScreenHud;
+    directCmd.producer = ProducerToken::OutRunHudPeripheralText;
+    CHECK(SameSourceAfterNativeUpload(direct,
+        StampPhysicalCommand(directCmd,5,0x1234,7,9)));
+    directCmd.scope = RenderScope::WorldBillboard;
+    CHECK(!SameSourceAfterNativeUpload(direct,
+        StampPhysicalCommand(directCmd,5,0x1234,7,9)));
     CHECK(IsExactHudSource(direct));
     CHECK(SameSourceAfterNativeUpload(direct,direct));
     changed=direct; changed.producer=ProducerToken::OutRunHudText;
