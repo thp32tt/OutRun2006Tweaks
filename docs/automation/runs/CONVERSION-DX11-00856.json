@@ -84,7 +84,7 @@
     "tools/test_dx11_gpu_only_handoff_00856.py"
   ],
   "acceptance_results": {
-    "end2end": "PASS_CPP_BEHAVIOR_AND_ACTUAL_CALLSITE_CI; HMD_REAL_GAME_UNTESTED",
+    "end2end": "PASS_CPP_BEHAVIOR_AND_ACTUAL_CALLSITE_CI",
     "fallback": "PASS_NEGATIVE_GUARDS_AND_DESKTOP_FALLBACK_CI",
     "gates": "PASS_EXACT_SHA_5_OF_5",
     "real_game_and_quest3": "UNTESTED"
@@ -96,7 +96,7 @@
     "C3_VALIDATE": "PASS_EXACT_SHA: 0c16308e1f554ca075a87b550b9dae96d55e7cf9; DX11 Fast 38992794518, Backend 38992794497, Windows Build 38992797775, OpenXR 38992797747, HUD 38992797752 all SUCCESS.",
     "C4_COMMIT": "PASS: material 7c80593b05c0b0ce54e5d6be8b22461822e12172 and validation-bearing 0c16308e1f554ca075a87b550b9dae96d55e7cf9 exist on GitHub target branch; both carry [AUTO:CONVERSION-DX11-00856].",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PASS_EXACT_SHA: 5/5 mandatory CI SUCCESS at unchanged validation-bearing SHA; bookkeeping only [skip ci]; HMD/gamepad UNTESTED."
+    "C6_STATE": "PASS_EXACT_SHA: 00856 original five Gates successful at 0c16308e; subsequent 00857 Fast checker required prior end2end build PASS token separate from HMD UNTESTED. Metadata-only correction, no new 00856 material or point."
   },
   "packaging": {
     "status": "NOT_REQUIRED"
@@ -119,7 +119,8 @@
     "original_record_status": "RUN_RECORD_NOT_FOUND",
     "original_record_history": "No commits found for docs/automation/runs/CONVERSION-DX11-00856.json",
     "contract_source": "Reconstructed from exact task material and validation commits; no original feature_contract/acceptance_results file existed to preserve.",
-    "score_policy": "C6 bookkeeping only; no additional points; no duplicate TASK_ID scoring."
+    "score_policy": "C6 bookkeeping only; no additional points; no duplicate TASK_ID scoring.",
+    "acceptance_record_repair": "00857 exact-SHA DX11 Fast 38994202627 found invalid mixed build/runtime string in prior 00856 C6 record. Keep build-verifiable acceptance PASS and Quest3/gamepad UNTESTED separately. This is a causal 00856 bookkeeping correction with score_change=0, not a new renderer feature."
   },
   "next_action": "C6 bookkeeping complete; no source modification, full CI rerun, HMD PASS claim or duplicate scoring. Future real Quest3/VDXR gameplay requires a separate runtime test."
 }
