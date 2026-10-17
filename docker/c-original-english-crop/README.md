@@ -6,9 +6,7 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
 
 - Source: SHA-pinned full original HD PNG under
   `work/c_salvage_text_roi/source_full_20261012`; image mount **read-only**.
-- Provenance: the existing `c_crop_only_runner.check_original()` verifies
-  registry identity, native original DDS bytes and full PNG pixel equality.
-  New originals require independent review and a verified allowlist change.
+- Provenance: `c_crop_only_runner.check_original()` verifies exact source DDS SHA,\n  complete native DDS decode, source PNG SHA, native dimensions, and full pixel equality.\n  Additional DDS sources are admitted only by SHA/pixel-verified source inventory.
 - Input queue: `work/c_salvage_text_roi/c_original_hd_crop_only/queue_specs/*.json`.
   Each spec has exactly one complete phrase, original-source SHA + DDS SHA
   and exact reviewed bbox; use schema `outrun-c-n100-hd-original-crop-v1`.
@@ -17,13 +15,11 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
 - Guard: 255 archived crops are immutable, matching archived queue + XYXY
   is skipped, old output never overwritten, no source tiles accepted.
 - Schedule: 60 seconds per poll, up to 10 *new verified queued* crops/cycle.
-  Every 600 seconds, the same worker runs `ocr_recognize.py` over the SHA- and
-  DDS-pixel-proven source registry (currently six sources).
+  The worker runs bounded English OCR batches once per 60-second poll; each\n  batch rotates through up to four verified complete HD sources. The\n  checkpoint `auto_discovery/ocr_source_cursor.json` preserves progress.
 - Automatic geometry discovery: non-destructive alpha/connected-component
   analysis proposes possible text bboxes in `auto_discovery/Q*_candidates.json`.
   Each proposal is deduplicated against the 255 archived native crops and the
-  queue. **No OCR is installed; automatic candidates have no validated English
-  text, may contain non-text artwork, and remain HOLD until visual review.**
+  queue. Alpha-only candidates are diagnostic HOLD; Tesseract OCR is now\n  installed separately and is the active production detector.
 - Autonomous acceptance of prior-reviewed isolated English rectangles:
   `reviewed_regions.json` supplies exact text, tested original pixel provenance
   and reviewed bbox. `discover.py` checks those against the official original
@@ -33,14 +29,12 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
 - Smoke test (2026-10-17): 2 pinned DDS sources verified, 11 candidates on
   review HOLD, 1 newly enqueued and actually cropped as TEST_ONLY:
   Q060 `IN...` (310x105 pixels) with source/crop SHA manifest.
-- To scale beyond Q051/Q060, obtain and independently prove each genuine
-  complete original DDS and full PNG before adding to source allowlist.
-  No legacy 986 tile or reassembly is eligible.
+- Existing HD sources already on N100 are admitted with\n  `admit_existing_hd_originals_20261017.py`, which matches the exact official\n  original DDS paths in the project's `transcriptions.jsonl`. It prioritizes\n  the pinned canonical `localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a`\n  and then the previously archived `binary_compare/original/*.zip` original DDS.\n  The original comparison ZIP contains 79 DDS: **39 actual 4x native HD** and\n  40 standard-resolution variants, which are excluded. The canonical source\n  directory contains 18 original full DDS. Their union covers **49 unique\n  transcribed native-HD source groups** (plus separately pinned Q212).\n  Staged records are in `docker/source_registry_auto.json`; source PNG + DDS\n  full pixel equality is mandatory before the OCR worker reads new files.\n  No prior 986 tile or reassembled images are ever eligible.
 - Evidence: `docker_last_run.json`, `docker_run_audit.jsonl`,
   `docker_holds/*.json`; every result remains `TEST_ONLY`.
 - OCR engine: Tesseract 5 with English traineddata bundled in a dedicated
   `outrun-c-english-ocr:20261017` image (built via `Dockerfile.ocr`).
-  OCR runs locally/offline in the C container every 600 seconds and takes
+  OCR runs locally/offline on small rotating source batches and takes
   the 16+ reviewed English transcriptions as a strict phrase allowlist.
   `ocr_recognize.py` automatically accepts only high-confidence exact English
   matches, outside the 255/archive/queue, with non-clipped native bbox and
@@ -67,3 +61,4 @@ CLEAN, DDS modification, or VR services. No external network or exposed ports.
 **2026-10-17 performance policy:** the older alpha-only geometry candidate sweep is
 retained for offline diagnostics but no longer runs periodically in production.
 Tesseract supplies phrase text and native coordinates in the same bounded pass.
+2026-10-17 validation: the C worker processed new Q044 and Q047 original HD\nsource records, OCR automatically queued 10 previously unknown English ROIs,\nand emitted new TEST_ONLY native PNG crops with verified SHA. There is no\nimplicit game/runtime PASS, and historic 255 crops remain unchanged.\n
