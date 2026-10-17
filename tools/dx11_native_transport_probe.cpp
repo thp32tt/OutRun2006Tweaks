@@ -2226,10 +2226,14 @@ int main()
         ctx->OMSetRenderTargetsAndUnorderedAccessViews(
             3u, sparseMrt, fixture.eyeDepth[eyeIndex],
             3u, 1u, &fixture.gameOmView, nullptr);
+        // Keep this 8-row replay at y=46..53: the existing game MSAA
+        // resolve owns y=54..61. Placing a late sparse copy at y=48 would
+        // overwrite genuine resolved pixels at y=54/55 and manufacture a
+        // failure unrelated to OM/UAV restoration.
         const bool sparseCopy = encoder.copy_game_surface(
-            fixture.gameShaderIntermediate, &sourcePatch, destX, 48u);
+            fixture.gameShaderIntermediate, &sourcePatch, destX, 46u);
         const bool sparseNegative = !encoder.copy_game_surface(
-            nullptr, &sourcePatch, destX, 48u);
+            nullptr, &sourcePatch, destX, 46u);
         ID3D11RenderTargetView* sparseAfter[3]{};
         ID3D11DepthStencilView* sparseDepth = nullptr;
         ID3D11UnorderedAccessView* sparseUav = nullptr;
