@@ -72,6 +72,12 @@ def check(s: str, h: str) -> None:
     require('inline float ResponsiveMenuScale(' in h)
     require('menuScale * std::sqrt(boundedAspect)' in h)
     require('constexpr float shoulder = 1.95f;' in h)
+    require('const bool exactPauseShaderOwner =\n                    OutRunVrPauseEye::OwnsPauseShaderPlane(' in s)
+    require('exactHud, genericQueuedHud, R30IsPauseMenuElement());' in s)
+    require('constexpr bool OwnsPauseShaderPlane(' in h)
+    require('return originalPause && (sourceHud || sourceQueuedOverlay);' in h)
+    require('OwnsPauseShaderPlane(false, true, true)' in tests)
+    require('OwnsPauseShaderPlane(false, false, true)' in tests)
     require('const bool pauseResponsive = R30IsPauseMenuElement() &&' in s)
     require('if (!std::isfinite(requested) || requested <= 0.0f)' in s)
     require('std::isfinite(Settings::VRPauseMenuScale.get()) &&' in s)
@@ -131,6 +137,8 @@ for mutant_index, mutant in enumerate((
                    'R30HudContain.pauseResponsive = false;', 1),
     source.replace('scaleY = contained.y;',
                    'scaleY = contained.x;', 1),
+    source.replace('exactHud, genericQueuedHud, R30IsPauseMenuElement());',
+                   'exactHud, false, R30IsPauseMenuElement());', 1),
     source.replace('if (exactPauseShaderOwner)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);',
                    'if (false)\n                    R30HudContainScale(stereo, shaderPauseX, shaderPauseY);', 1),
 )):
@@ -140,6 +148,10 @@ for mutant_index, mutant in enumerate((
         continue
     raise AssertionError(f"unsafe ESC mutation #{mutant_index} escaped verification")
 for bad_helper in (
+    helper.replace('originalPause && (sourceHud || sourceQueuedOverlay)',
+                   'originalPause && sourceHud'),
+    helper.replace('originalPause && (sourceHud || sourceQueuedOverlay)',
+                   'sourceHud || sourceQueuedOverlay'),
     helper.replace('pauseOwned ? commonScale * eyeFovScale : commonScale',
                    'commonScale'),
     helper.replace('pauseOwned ? commonScale * eyeFovScale : commonScale',

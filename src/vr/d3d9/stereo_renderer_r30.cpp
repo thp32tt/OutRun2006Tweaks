@@ -6873,8 +6873,14 @@ namespace OutRunVRStereo
                 // optical scale. Do not apply a second source/portrait
                 // aspect compensation to text/gauges on this world plane.
                 D3DMATRIX hudScale = R29OwnerIdentityMatrix();
+                // The original paused ESC shell and its queued child text
+                // may retain ScreenOverlay2D with the SAME SpriteNode-owned
+                // raw c64, while option arrows are exact ScreenHud. Both
+                // branches must share pause size and post-eye vertical offset.
+                // No generic non-pause, unqueued or external overlay is admitted.
                 const bool exactPauseShaderOwner =
-                    exactHud && R30IsPauseMenuElement();
+                    OutRunVrPauseEye::OwnsPauseShaderPlane(
+                        exactHud, genericQueuedHud, R30IsPauseMenuElement());
                 const float rawPauseScale =
                     Settings::VRPauseMenuScale.get();
                 const float pauseScale = std::isfinite(rawPauseScale)

@@ -110,6 +110,17 @@ int main()
         ExactArrowOwner(false, true) || ExactArrowOwner(false, false))
         return 18;
 
+    // Previously only exact ScreenHud arrows received the pause optical
+    // scale/offset. Queued ESC text with a separately proven same-node raw
+    // WVP was left at the gameplay HudScale and drifted away from the shell.
+    // Neither plain overlays nor unrelated source-owned HUD gain this path.
+    if (!OwnsPauseShaderPlane(true, false, true) ||
+        !OwnsPauseShaderPlane(false, true, true) ||
+        OwnsPauseShaderPlane(false, false, true) ||
+        OwnsPauseShaderPlane(false, true, false) ||
+        OwnsPauseShaderPlane(true, false, false))
+        return 22;
+
     // ESC shell (VS) and original YES/NO arrows (XYZRHW) must agree in
     // both eyes even when the headset's horizontal FOV differs per eye.
     const float eyeScale[2]{0.87f, 1.14f};

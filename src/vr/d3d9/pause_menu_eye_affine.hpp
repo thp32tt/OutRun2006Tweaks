@@ -14,6 +14,21 @@ namespace OutRunVrPauseEye
         return screenHud && exactProducer;
     }
 
+    // R84 native ESC producer -> queued child text -> shader GPU sink.
+    // The caller has already established exact ScreenHud or a live
+    // same-node/epoch ScreenOverlay2D WVP. Pause state is mandatory in BOTH
+    // cases; unrelated menus, F11, world and +TIME never inherit the slider.
+    constexpr bool OwnsPauseShaderPlane(
+        bool sourceHud, bool sourceQueuedOverlay, bool originalPause) noexcept
+    {
+        return originalPause && (sourceHud || sourceQueuedOverlay);
+    }
+    static_assert(OwnsPauseShaderPlane(true, false, true));
+    static_assert(OwnsPauseShaderPlane(false, true, true));
+    static_assert(!OwnsPauseShaderPlane(false, false, true));
+    static_assert(!OwnsPauseShaderPlane(false, true, false));
+    static_assert(!OwnsPauseShaderPlane(true, false, false));
+
     struct VerticalAffine
     {
         float scale[2]{1.0f, 1.0f};
