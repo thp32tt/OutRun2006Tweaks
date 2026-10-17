@@ -490,6 +490,7 @@ foreach(target
     outrun-vr-projection-blit-upload-smoke
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-menu-content-aspect-smoke
+    outrun-vr-texture-pack-cursor-smoke
     outrun-vr-stage-edge-cull-smoke
     outrun-vr-driver-seat-camera-smoke
     outrun-vr-driver-occupant-smoke
