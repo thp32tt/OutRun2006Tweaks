@@ -60,6 +60,7 @@ assert (world_c64.index("ScopedFrame uploadFrame(")
         < world_c64.index("SetVertexShaderConstantFHook.stdcall<HRESULT>(")
         < world_c64.index("MayPublishReturnedWvp("))
 assert "if (SUCCEEDED(result))" not in world_c64.split("if (prepared)", 1)[1]
+assert "else if (FAILED(result))" in world_c64.split("if (prepared)", 1)[1]  # A superseded native success is not a D3D9 failure.
 
 assert "if (needView)" in renderer
 assert "(!needView || MatrixFinite(view))" in renderer

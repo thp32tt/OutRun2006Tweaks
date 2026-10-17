@@ -2038,7 +2038,10 @@ namespace OutRunVRRenderer
 						spdlog::info("VR renderer inject: HEAD TRACKING ACTIVE after successful VS c64 upload");
 					}
 				}
-				else
+				// Superseded success is NOT a native upload failure. A
+				// reentrant c64 write replaced this source, but the original
+				// D3D9 HRESULT and later producer remain authoritative.
+				else if (FAILED(result))
 				{
 					++WvpUploadFailedCalls;
 					FrameTelemetryFlags |= ClientRendererUploadFailed;
