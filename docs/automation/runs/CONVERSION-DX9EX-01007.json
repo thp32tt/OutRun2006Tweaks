@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01007",
+  "production_id": "CONVERSION-DX9EX-01007",
+  "event_id": "CONVERSION-DX9EX-01007-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "WAITING_FOR_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "ffba764b466721434ed780e0d3ed08e028b2bf4f",
+  "material_result_sha": "fb62ea40f05179f61bab60d52d8645bcf3ed0cdc",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01007.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve the entire GOAL 0–99% progress, stage elapsed time and result glyph visual family as separately stereo-projected, source-owned GPU submissions even when multiple original SpriteNodes share a single producer token.",
+    "scope_boundary": "Exact original GOAL progress and result D3DX deferred batches in R84's active ScreenHud queue; unrelated +TIME, ESC/pause/F11, rank, world/lens/SkyGlow, input/FFB, R26_SAFE rollback, DX11 and frozen DXVK must remain unchanged.",
+    "trace_stages": [
+      "Original GOAL 0x97BE4/0x97DEC progress E8, 0xBEA5A/0xBEA5F time helpers, 0x975EE/0x97727/0x977FB prints and parent-proven B9200 glyphs register ScreenHud tokens on per-priority SpriteNodes.",
+      "Game queue R64 calls BeforeQueueNode prior to SelectSpriteQueueNode, and ID3DXSprite Draw may defer physical triangle submission into native Flush or End; previous GOAL boundary compared producer token but not SpriteNode identity.",
+      "R84 R33 captureGoalSource and SameAfterNativeLeft bind physical GPU left/right submissions to queue node, queue epoch and pose; R30 finite result HUD eye plane projects original 2D source pixels separately for each eye."
+    ],
+    "subcomponents": [
+      "Provide a GOAL-only same-token distinct-SpriteNode physical batch transition guard and submit only homogeneous tracked GPU batches under the original outgoing queue node before selecting the next.",
+      "Add compiled positive/negative GOAL source tests across five progress/elapsed/print/result producers, rejecting same-node, queue-inactive, missing node, foreign owner, cross-producer, +TIME, pause and F11/unknown."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_distinct_same_producer_node_gpu_boundary",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Physical D3DX result/progress GPU submission and both-eye node identity",
+        "expected_behavior": "A previous GOAL 0–99/progress/elapsed/result D3DX batch on one original SpriteNode is submitted under its unchanged token and queue epoch before a distinct SpriteNode with the same producer becomes current."
+      },
+      {
+        "id": "goal_native_batch_rollback_protection",
+        "category": "fallback_regression",
+        "behavior_area": "Original multi-Draw texture batching and non-result desktop/VR paths",
+        "expected_behavior": "Same-node texture batches remain grouped; untracked, mixed, invalid queue, unknown producer, pause/F11, +TIME, world and SkyGlow are not promoted to a GOAL owner; original desktop and explicit R26_SAFE remain unchanged."
+      },
+      {
+        "id": "goal_exact_sha_r84_game_host_domain",
+        "category": "integrated_validation",
+        "behavior_area": "One validation-bearing SHA for Win32 game, host, package and domain",
+        "expected_behavior": "Compiled GOAL queue-transition regression and the same final SHA's DX9Ex Active R84/Win32 game/full-chain, R26 fallback, x64 host, package, Domain Isolation, Full Source Impact and relevant HUD Inspector workflows finish SUCCESS; separate Quest3 runtime remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_distinct_same_producer_node_gpu_boundary": "PENDING_EXACT_SHA",
+    "goal_native_batch_rollback_protection": "PENDING_EXACT_SHA",
+    "goal_exact_sha_r84_game_host_domain": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "BeforeQueueNode's goalBoundary isolated GOAL producer token changes only; two different queued GOAL SpriteNodes may carry the identical ResultProgress/GoalTime/OutRunStagePrintf/ResultTextB9200 token while their D3DX Draw batches are physically deferred. The prior batch may therefore submit after queue selection under the next node/epoch, conflicting with R33 binocular source identity.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp original ResultProgress/GoalTime/OutRunStagePrintf sources, TagAppendedNodes and R64 BeforeQueueNode",
+      "src/vr/game/render_semantics.hpp CanReprojectFiniteResultHudPlane and new same-producer node boundary",
+      "src/vr/game/goal_progress_physical_source.hpp Source node/queueEpoch and stereo_renderer_r33.cpp captureGoalSource / SameAfterNativeLeft"
+    ],
+    "alternatives_rejected": [
+      "The existing +TIME queue-node guard applies only StageExtensionTime; blindly broadening Stage to GOAL or globally forcing D3DX Flush per Draw would alter original batching and unrelated visuals."
+    ],
+    "evidence_limit": "Source transition contract and changed-area compiled tests are not equivalent to a Quest3/VDXR physical stereo playback or an observed HMD visual fix.",
+    "original_evidence": "Canonical exact GOAL original E8 caller list, result progress and time helper producer tags, 0x97xxx parent provenance already trace to queued ScreenHud nodes.",
+    "eye_ownership": "R84 R33 records per-eye physical GPU Draw with source node, queue epoch and latched pose, while R30 projects GOAL result quads into distinct finite left/right HUD planes."
+  },
+  "runtime_validation_notes": "No Quest3/VDXR physical HMD or game runtime session executed. No runtime PASS implied by compiler or CI.",
+  "ci_evidence": {
+    "failed_initial_material_sha": "fb62ea40f05179f61bab60d52d8645bcf3ed0cdc",
+    "failed_active_run_id": 39018921976,
+    "failed_job": "policy",
+    "failed_reason": "Required same-TASK_ID run record absent at initial material HEAD; source not reverted. Correct same-task CI failure repair commit must carry this record before exact-SHA validation."
+  },
+  "result_notes": "C++ material result is fb62ea40...; the next record-bearing exact-SHA CI repair is not an independent feature or score. HMD UNTESTED."
+}
