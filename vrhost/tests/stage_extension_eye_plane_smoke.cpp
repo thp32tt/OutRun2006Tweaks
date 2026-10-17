@@ -99,6 +99,43 @@ int main() {
                          -1.f,oldLx,oldLy,oldRx,oldRy) ||
         oldLx!=17 || oldLy!=19 || oldRx!=23 || oldRy!=29)
         return 13;
+    // Original 2D +TIME sprite and numeric glyphs retain the SAME
+    // source ray when game output is 3440x1440 but R84 RT is 2496x2688.
+    using OutRunVR::StageExtensionPlane::ProjectPixelPairAcrossViewports;
+    {
+        const float eL[16]{1,0,0,0,0,1,0,0,0,0,1,0,-0.04f,0,0,1};
+        const float eR[16]{1,0,0,0,0,1,0,0,0,0,1,0,0.04f,0,0,1};
+        float a=0,b=0,c=0,d=0;
+        if (!ProjectPixelPairAcrossViewports(eL,eR,1720,720,
+                0,0,3440,1440,0,0,2496,2688,1,a,b,c,d) ||
+            !Near(a,1198.08f,.01f) || !Near(c,1297.92f,.01f) ||
+            !Near(b,1344.f) || !Near(d,1344.f))
+            return 46;
+        if (!ProjectPixelPairAcrossViewports(eL,eR,1720,720,
+                0,0,3440,1440,73,41,2496,2688,.55f,a,b,c,d) ||
+            !Near(a,73.f+1198.08f,.01f) ||
+            !Near(c,73.f+1297.92f,.01f) ||
+            !Near(b,1385.f) || !Near(d,1385.f))
+            return 47;
+        const float oldA=a,oldB=b,oldC=c,oldD=d;
+        const float bad[16]{};
+        if (ProjectPixelPairAcrossViewports(eL,bad,1720,720,
+                0,0,3440,1440,0,0,2496,2688,1,a,b,c,d) ||
+            ProjectPixelPairAcrossViewports(eL,eR,1720,720,
+                0,0,0,1440,0,0,2496,2688,1,a,b,c,d) ||
+            ProjectPixelPairAcrossViewports(eL,eR,1720,720,
+                0,0,3440,1440,0,0,0,2688,1,a,b,c,d) ||
+            !Near(a,oldA) || !Near(b,oldB) ||
+            !Near(c,oldC) || !Near(d,oldD))
+            return 48;
+        float la=0,lb=0,ra=0,rb=0;
+        if (!ProjectPixelPair(eL,eR,320,240,0,0,640,480,.55f,
+                la,lb,ra,rb) ||
+            !ProjectPixelPairAcrossViewports(eL,eR,320,240,
+                0,0,640,480,0,0,640,480,.55f,a,b,c,d) ||
+            !Near(a,la) || !Near(b,lb) || !Near(c,ra) || !Near(d,rb))
+            return 49;
+    }
     // R84 paused ESC shell (queued ScreenOverlay2D) and exact option
     // arrows (ScreenHud) share one optical plane but use the independent
     // pause slider/offset. The +TIME/GOAL path supplies zero shift.

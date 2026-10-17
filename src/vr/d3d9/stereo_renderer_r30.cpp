@@ -3066,6 +3066,8 @@ namespace OutRunVRStereo
             // Never enable this on generic ScreenOverlay2D or smoke/world.
             bool stageExtensionEyePlane = false;
             float stageExtensionScale = 1.0f;
+            float stageSource2DWidth = 0.0f;
+            float stageSource2DHeight = 0.0f;
             // The paused ESC shell and its exact arrows use an independent
             // post-projection vertical slider, not the +TIME/GOAL plane.
             float stageExtensionPostEyeVerticalPixels = 0.0f;
@@ -3401,6 +3403,24 @@ namespace OutRunVRStereo
                 return false;
             state.stageExtensionScale = hudScale;
             state.stageExtensionPostEyeVerticalPixels = postEyeVerticalPixels;
+            // Six exact +TIME producer calls use game presentation pixels.
+            // The physical XR viewport may have a different aspect/extent.
+            // Only +TIME adopts separate input coordinates. All other HUD,
+            // GOAL, pause, SkyGlow and generic scene sprites stay untouched.
+            if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime &&
+                Game::screen_resolution)
+            {
+                const float gameWidth = Game::screen_resolution->x;
+                const float gameHeight = Game::screen_resolution->y;
+                if (std::isfinite(gameWidth) && std::isfinite(gameHeight) &&
+                    gameWidth >= 320.f && gameWidth <= 16384.f &&
+                    gameHeight >= 240.f && gameHeight <= 16384.f)
+                {
+                    state.stageSource2DWidth = gameWidth;
+                    state.stageSource2DHeight = gameHeight;
+                }
+            }
             state.stageExtensionEyePlane = true;
             return true;
         }
@@ -5113,14 +5133,30 @@ namespace OutRunVRStereo
                             // Source pixel is now already optical NDC.
                             sourceScale = 1.0f;
                         }
-                        if (!OutRunVR::StageExtensionPlane::ProjectPixelPair(
-                                reinterpret_cast<const float*>(
-                                    &state.stageExtensionClipFromGameNdc[0]),
-                                reinterpret_cast<const float*>(
-                                    &state.stageExtensionClipFromGameNdc[1]),
-                                sourceX, sourceY, x0, y0, width,
-                                height, sourceScale,
-                                leftX, leftY, rightX, rightY) ||
+                        const float* lclip = reinterpret_cast<const float*>(
+                            &state.stageExtensionClipFromGameNdc[0]);
+                        const float* rclip = reinterpret_cast<const float*>(
+                            &state.stageExtensionClipFromGameNdc[1]);
+                        // Same-resolution desktop/R84 path remains exactly
+                        // unchanged, including HUD/GOAL and the original
+                        // two-eye projection. Only verified source-produced
+                        // +TIME quads can change input viewport dimensions.
+                        const bool separate2D =
+                            state.stageSource2DWidth > 0.f &&
+                            state.stageSource2DHeight > 0.f &&
+                            (std::fabs(state.stageSource2DWidth-width) > 0.5f ||
+                             std::fabs(state.stageSource2DHeight-height) > 0.5f);
+                        const bool projected = separate2D
+                            ? OutRunVR::StageExtensionPlane::ProjectPixelPairAcrossViewports(
+                                lclip, rclip, sourceX, sourceY, 0.f, 0.f,
+                                state.stageSource2DWidth, state.stageSource2DHeight,
+                                x0, y0, width, height, sourceScale,
+                                leftX, leftY, rightX, rightY)
+                            : OutRunVR::StageExtensionPlane::ProjectPixelPair(
+                                lclip, rclip, sourceX, sourceY,
+                                x0, y0, width, height, sourceScale,
+                                leftX, leftY, rightX, rightY);
+                        if (!projected ||
                             !OutRunVR::StageExtensionPlane::
                                 ApplyPostEyeVerticalShiftPair(
                                     state.stageExtensionPostEyeVerticalPixels,

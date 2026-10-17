@@ -160,4 +160,42 @@ namespace OutRunVR::StageExtensionPlane
         rightY = py[1];
         return true;
     }
+
+    // +TIME's native 2D sprite coordinates are independent of the XR
+    // render-target size. Decode in the game's presentation viewport and
+    // only THEN map both already-projected eyes to the physical RT viewport.
+    // The input and all four outputs are transactional on error.
+    inline bool ProjectPixelPairAcrossViewports(
+        const float leftClip[16], const float rightClip[16],
+        float x, float y, float sx, float sy, float sw, float sh,
+        float dx, float dy, float dw, float dh, float scale,
+        float& lx, float& ly, float& rx, float& ry) noexcept
+    {
+        if (!std::isfinite(dx) || !std::isfinite(dy) ||
+            !std::isfinite(dw) || !std::isfinite(dh) ||
+            dw <= 0.f || dh <= 0.f)
+            return false;
+        float a, b, c, d;
+        if (!ProjectPixelPair(leftClip, rightClip, x, y,
+                sx, sy, sw, sh, scale, a, b, c, d))
+            return false;
+        const double tx = static_cast<double>(dw) / sw;
+        const double ty = static_cast<double>(dh) / sh;
+        const double result[4]{
+            double(dx) + (double(a) - sx) * tx,
+            double(dy) + (double(b) - sy) * ty,
+            double(dx) + (double(c) - sx) * tx,
+            double(dy) + (double(d) - sy) * ty };
+        float out[4]{};
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            if (!std::isfinite(result[i]))
+                return false;
+            out[i] = static_cast<float>(result[i]);
+            if (!std::isfinite(out[i]))
+                return false;
+        }
+        lx = out[0]; ly = out[1]; rx = out[2]; ry = out[3];
+        return true;
+    }
 }
