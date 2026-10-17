@@ -731,9 +731,21 @@ for label, original, broken in (
 ):
     if original not in r84:
         fail("R84 rank native mutation input missing: " + label)
+    # Inject into the actual capture function, not the earlier
+    # R30HasXyzrhwInputLayout GetFVF probe. A file-wide replace changes
+    # the wrong callsite and leaves this physical-rank guard untouched.
+    capture_marker = "bool R30CaptureProjectedRankPhysicalSource("
+    capture = function_body(r84, capture_marker)
+    if original not in capture:
+        fail("R84 rank capture mutation input missing: " + label)
+    capture_start = r84.find(capture, r84.find(capture_marker))
+    if capture_start < 0:
+        fail("R84 rank capture mutation source span missing: " + label)
+    modified_capture = capture.replace(original, broken, 1)
+    mutant = (r84[:capture_start] + modified_capture +
+              r84[capture_start + len(capture):])
     try:
-        require_r84_physical_rank_transaction(
-            rank_physical, r84.replace(original, broken, 1))
+        require_r84_physical_rank_transaction(rank_physical, mutant)
     except SystemExit:
         pass
     else:
