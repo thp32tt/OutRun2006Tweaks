@@ -5748,7 +5748,8 @@ bool preserve_game_surface_copy(
 
 
 bool begin_game_surface_cpu_write(IDirect3DDevice9* game,
-    IDirect3DSurface9* destination, const RECT* rect) noexcept {
+    IDirect3DSurface9* destination, const RECT* rect,
+    bool fromGdi) noexcept {
     if (nativeOutputUploadDepth || !diagnostic_enabled() ||
         !env_full_game_opt_in() || !game || !destination) return false;
     try {
@@ -5791,12 +5792,13 @@ bool begin_game_surface_cpu_write(IDirect3DDevice9* game,
         return s.cpuSurfaceReplay.begin(owner,
             reinterpret_cast<std::uintptr_t>(identity.Get()),
             region.left, region.top, region.right, region.bottom,
-            desc.Width, desc.Height);
+            desc.Width, desc.Height, fromGdi);
     } catch (...) { return false; }
 }
 
 void finish_game_surface_cpu_write(IDirect3DDevice9* game,
-    IDirect3DSurface9* destination, HRESULT originalResult) noexcept {
+    IDirect3DSurface9* destination, HRESULT originalResult,
+    bool fromGdi) noexcept {
     if (!game || !destination) return;
     try {
         ComPtr<IUnknown> identity;
@@ -5807,7 +5809,7 @@ void finish_game_surface_cpu_write(IDirect3DDevice9* game,
         {
             State& s = state();
             std::lock_guard<std::mutex> lock(s.mutex);
-            if (!s.cpuSurfaceReplay.active() ||
+            if (!s.cpuSurfaceReplay.permits_finish(fromGdi) ||
                 s.cpuSurfaceReplay.owner != owner ||
                 s.cpuSurfaceReplay.surface !=
                     reinterpret_cast<std::uintptr_t>(identity.Get()))

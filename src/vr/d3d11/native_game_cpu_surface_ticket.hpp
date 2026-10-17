@@ -6,13 +6,18 @@ namespace outrun::vr::dx11::live_game_frame {
 struct GameNativeCpuSurfaceTicket {
     std::uintptr_t owner{}, surface{};
     std::uint32_t left{}, top{}, right{}, bottom{};
+    bool gdiWrite = false; // Distinguish LockRect from a GDI DC acquisition.
     [[nodiscard]] constexpr bool active() const noexcept { return owner && surface; }
+    [[nodiscard]] constexpr bool permits_finish(bool fromGdi) const noexcept {
+        return active() && gdiWrite == fromGdi;
+    }
     [[nodiscard]] constexpr bool begin(std::uintptr_t device, std::uintptr_t identity,
         std::uint32_t l, std::uint32_t t, std::uint32_t r, std::uint32_t b,
-        std::uint32_t w, std::uint32_t h) noexcept {
+        std::uint32_t w, std::uint32_t h, bool fromGdi = false) noexcept {
         if (active() || !device || !identity || !w || !h ||
             l >= r || t >= b || r > w || b > h) return false;
         owner=device; surface=identity; left=l; top=t; right=r; bottom=b;
+        gdiWrite=fromGdi;
         return true;
     }
     [[nodiscard]] constexpr bool matches(std::uintptr_t device,

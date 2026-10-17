@@ -12,9 +12,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00886",
   "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
   "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:POSTDRAW_COPY_REPLAY",
-  "status": "COMPLETE_BUILD_VERIFIED",
+  "status": "BUILD_VERIFICATION_INCOMPLETE",
   "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA",
+  "automation_validation": "FAIL_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -107,7 +107,7 @@
     "C3_VALIDATE": "LOCAL_PORTABLE_SOURCE_ONLY: representative C++17 region geometry and GitHub source token checks passed. Windows build/GPU and exact-SHA Actions not executed.",
     "C4_COMMIT": "PASS_FEATURE_BRANCH: native Draw/game postpass C++ material e0d791ae; source tests+workflow 8090e3ad; source implementation intentionally not target-promoted.",
     "C5_PACKAGE": "NOT_REQUIRED; no runtime HMD build/package",
-    "C6_STATE": "PASS_EXACT_SHA: validation-bearing result e49f7f191ecd2749340d68aaa161bd6ce56e7069; mandatory CI SUCCESS as confirmed by task instruction; bookkeeping completion only, no source/build/CI rerun; terminal-status-only hold TERMINAL_STATUS_NOT_COMPLETE resolved. HMD runtime UNTESTED."
+    "C6_STATE": "CORRECTED: OpenXR run 39046627003 failed at exact SHA e49f7f191ecd2749340d68aaa161bd6ce56e7069: Win32 C2 missing preserve_game_surface_copy declaration. Previously asserted terminal PASS_EXACT_SHA invalid. Existing acceptance_results remain pending; HMD UNTESTED."
   },
-  "next_action": "C6 terminal bookkeeping complete; preserve validated SHA and material commit. HMD/game runtime validation remains UNTESTED pending separate user test. Do not rerun CI or double-count score."
+  "next_action": "Validate actual repaired source with all five mandatory exact-SHA gates before restoring terminal status; preserve original acceptance results and material SHA."
 }

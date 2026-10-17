@@ -78,9 +78,9 @@ void observe_game_surface_mutation(IDirect3DDevice9* gameDevice,
 // A writable original game LockRect/GetDC is mirrored only after a matching
 // successful UnlockRect/ReleaseDC. Native Present cannot cross an open write.
 bool begin_game_surface_cpu_write(IDirect3DDevice9*, IDirect3DSurface9*,
-    const RECT*) noexcept;
+    const RECT*, bool fromGdi) noexcept;
 void finish_game_surface_cpu_write(IDirect3DDevice9*, IDirect3DSurface9*,
-    HRESULT) noexcept;
+    HRESULT, bool fromGdi) noexcept;
 bool preserve_game_surface_copy(IDirect3DDevice9*, IDirect3DSurface9*,
     const RECT*, HRESULT, bool completingCpuWrite = false) noexcept;
 // Replay verified whole ColorFill as a native clear seed/RTV clear, or a

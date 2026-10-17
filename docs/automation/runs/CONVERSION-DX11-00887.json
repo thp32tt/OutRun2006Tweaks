@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00887",
+  "production_id": "CONVERSION-DX11-00887",
+  "event_id": "CONVERSION-DX11-00887-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00887",
+  "feature_id": "DX11:REAL_GAME_CPU_GDI_POSTDRAW_BACKBUFFER_REPLAY",
+  "work_key": "DX11:FULL_RESOLUTION_GAME_FRAME:CPU_GDI_BACKBUFFER_REPLAY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "11634e679b4a153ec2660c0a40b62c8bb5852221",
+  "material_result_sha": "11634e679b4a153ec2660c0a40b62c8bb5852221",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_CPU_GDI_POSTDRAW_BACKBUFFER_REPLAY",
+    "goal": "Pair game LockRect/UnlockRect and GetDC/ReleaseDC writable acquisitions and replay completed original D3D9 main-backbuffer pixels into the full-size native D3D11 game frame while preserving D3D9 gameplay and input.",
+    "acceptance_items": [
+      {
+        "id": "lockrect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_lockrect_cpu_backbuffer_native_replay",
+        "expected_behavior": "Actual writable LockRect/UnlockRect complete before native GPU copy of the changed region."
+      },
+      {
+        "id": "getdc",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_gdi_getdc_releasedc_native_replay",
+        "expected_behavior": "Original GDI DC writes finish through matching ReleaseDC before native GPU copy."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_draw_input_safe_fallback",
+        "expected_behavior": "Mismatched completion kind and invalid foreign or failed writes cannot publish incomplete native pixels or change original game input."
+      },
+      {
+        "id": "exact_gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_dx11_actions_exact_sha",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Build, OpenXR and HUD Inspector must pass for same material result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "lockrect": "PENDING_EXACT_SHA",
+    "getdc": "PENDING_EXACT_SHA",
+    "fallback": "PENDING_EXACT_SHA",
+    "exact_gates": "PENDING_EXACT_SHA",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_cpu_surface_ticket.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_cpu_surface_replay_probe_00887.cpp"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Game-authored D3D9 Draw and CPU/GDI backbuffer surface write",
+      "R30 hook pairs acquisition with exact correct-type completion and native D3D11 GPU copy",
+      "Full-size native frame output retains unchanged original D3D9 Draw, Present, gamepad and FFB fallback"
+    ],
+    "batch_components": [
+      "D3D9 R30 hooks and kind-paired source completion",
+      "Native D3D11 ticket and GPU surface replay with portable negative regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++ ticket test covers lock/GDI paired acquisition and completion, Windows Gates pending.",
+      "negative_regression": "Wrong completion kind, owner/identity mismatch, overlapping writes and malformed regions cannot release write ticket; original game output remains authoritative.",
+      "component_integration": "Live game main D3D9 writable surface -> native frame write ticket -> D3D9 readback -> D3D11 GPU CopySubresourceRegion -> game-sized frame."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_GAME_FRAME:CPU_GDI_BACKBUFFER_REPLAY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GAME_CPU_GDI_POSTDRAW_REPLAY",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Hybrid full-resolution diagnostic frame source; Quest3 and actual menu/car/race parity UNTESTED.",
+    "activation_guard_and_fallback": "Explicit OUTRUN_DX11_FIRST_GAME_FRAME/OUTRUN_DX11_FULL_GAME_FRAME opt-in; unchanged original game Draw/Present/input/FFB."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Backend run 39049915543 and Fast run 39049915525 failed due to 00886 false terminal status with PENDING acceptance; earlier 00886 OpenXR build fails missing bridge header declaration, already added by material 00887.",
+    "C1_REVIEW": "Same 00887 work key; GameNativeCpuSurfaceTicket lacked write acquisition kind.",
+    "C2_IMPLEMENT": "Distinct LockRect vs GetDC acquisition/completion through R30 and native D3D11 replay path; portable negative tests.",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "Material follow-up to 11634e67 with source-level completion repair.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_CI"
+  },
+  "next_action": "Verify all five unmodified GitHub Actions Gate conclusions on exact new material SHA; keep runtime UNTESTED and no new score until complete."
+}

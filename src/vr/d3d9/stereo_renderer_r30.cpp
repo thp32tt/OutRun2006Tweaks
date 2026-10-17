@@ -660,7 +660,7 @@ namespace OutRunVRStereo
         // bytes; a failed/READONLY acquisition cannot invalidate a frame.
         void R30ObserveCpuSurfaceWrite(
             IDirect3DSurface9* surface, HRESULT hr, bool readOnly,
-            const RECT* region)
+            const RECT* region, bool fromGdi)
         {
             if (!surface) return;
             D3DSURFACE_DESC desc{};
@@ -676,20 +676,21 @@ namespace OutRunVRStereo
             if (SUCCEEDED(surface->GetDevice(&sourceDevice)) && sourceDevice)
             {
                 if (!outrun::vr::dx11::live_game_frame::
-                        begin_game_surface_cpu_write(sourceDevice, surface, region))
+                        begin_game_surface_cpu_write(sourceDevice, surface, region, fromGdi))
                     outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
                         sourceDevice, surface, hr);
                 sourceDevice->Release();
             }
         }
 
-        void R30FinishCpuSurfaceWrite(IDirect3DSurface9* surface, HRESULT hr)
+        void R30FinishCpuSurfaceWrite(IDirect3DSurface9* surface, HRESULT hr,
+                                     bool fromGdi)
         {
             if (!surface) return;
             IDirect3DDevice9* device = nullptr;
             if (SUCCEEDED(surface->GetDevice(&device)) && device) {
                 outrun::vr::dx11::live_game_frame::finish_game_surface_cpu_write(
-                    device, surface, hr);
+                    device, surface, hr, fromGdi);
                 device->Release();
             }
         }
@@ -701,14 +702,14 @@ namespace OutRunVRStereo
             const HRESULT hr = R30SurfaceLockRectHook.stdcall<HRESULT>(
                 surface, locked, rect, flags);
             R30ObserveCpuSurfaceWrite(
-                surface, hr, (flags & D3DLOCK_READONLY) != 0u, rect);
+                surface, hr, (flags & D3DLOCK_READONLY) != 0u, rect, false);
             return hr;
         }
 
         HRESULT __stdcall R30SurfaceUnlockRectDest(IDirect3DSurface9* surface)
         {
             const HRESULT hr = R30SurfaceUnlockRectHook.stdcall<HRESULT>(surface);
-            R30FinishCpuSurfaceWrite(surface, hr);
+            R30FinishCpuSurfaceWrite(surface, hr, false);
             return hr;
         }
 
@@ -719,7 +720,7 @@ namespace OutRunVRStereo
                 R30SurfaceGetDCHook.stdcall<HRESULT>(surface, dc);
             // A successful DC permits writes before ReleaseDC; do not wait
             // until after the modified pixels could reach Present.
-            R30ObserveCpuSurfaceWrite(surface, hr, false, nullptr);
+            R30ObserveCpuSurfaceWrite(surface, hr, false, nullptr, true);
             return hr;
         }
 
@@ -727,7 +728,7 @@ namespace OutRunVRStereo
             IDirect3DSurface9* surface, HDC dc)
         {
             const HRESULT hr = R30SurfaceReleaseDCHook.stdcall<HRESULT>(surface, dc);
-            R30FinishCpuSurfaceWrite(surface, hr);
+            R30FinishCpuSurfaceWrite(surface, hr, true);
             return hr;
         }
 
