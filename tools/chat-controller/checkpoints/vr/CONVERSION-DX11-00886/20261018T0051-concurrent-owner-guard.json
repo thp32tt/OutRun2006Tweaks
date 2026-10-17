@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_concurrent_owner_guard",
+  "captured_at_kst": "2026-10-18T00:51:00+09:00",
+  "task_id": "CONVERSION-DX11-00886",
+  "event_id": "CONVERSION-DX11-00886-E005",
+  "attempt": "1/3",
+  "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
+  "feature_branch": "feature/dx11-00886-game-surface-mutation-replay",
+  "feature_head": "59ce5b256e2ae9d8a18b68d795a6b50f865a0840",
+  "feature_build": {
+    "run_id": 39046215562,
+    "conclusion": "success"
+  },
+  "target_branch": "vr-dx11-native-r71",
+  "target_head": "e49f7f191ecd2749340d68aaa161bd6ce56e7069",
+  "target_new_commits": [
+    "2674410c09a590f1d0412e00f8a9082417f02549",
+    "1412f14a2c2bb07dc99e7540297645bb884ca0e7",
+    "e49f7f191ecd2749340d68aaa161bd6ce56e7069"
+  ],
+  "same_task_concurrent_owner": true,
+  "compare_at_capture": {
+    "behind": 3,
+    "ahead": 1
+  },
+  "safe_promotion": "ABORT; feature 59ce is stale and duplicates stage fix already integrated at 2674410c. Never move target backwards or replay same task without refreshed lease.",
+  "fast_target": {
+    "run_id": 39046623128,
+    "head_sha": "e49f7f191ecd2749340d68aaa161bd6ce56e7069",
+    "conclusion": "success"
+  },
+  "incomplete_acceptance": [
+    "Backend, Build, OpenXR, HUD exact-SHA not yet all SUCCESS at target HEAD",
+    "C6 not confirmed",
+    "Quest3/runtime UNTESTED"
+  ],
+  "next_action": "Read latest target HEAD and 00886 run JSON; if same TASK concurrent owner continues, avoid duplicate source and commits. Observe actual five Actions. Only after durable exact-SHA PASS can C6 and one-time score be considered. Do not promote obsolete feature head 59ce.",
+  "score_change": 0,
+  "runtime_validation": "UNTESTED"
+}
