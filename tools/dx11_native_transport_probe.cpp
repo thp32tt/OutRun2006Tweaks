@@ -1360,6 +1360,7 @@ int main()
         bool replayedGpuOnlyArrayCopy[2]{};
         bool replayedGpuOnlyArrayStretch[2]{};
         bool replayedPostDrawMipZeroCopy[2]{};
+        bool replayedCameraMipGpuCopyStretch[2]{};
         bool replayedDistinctArrayEyeCopy[2]{};
         bool replayedFormatConvertedArrayCopy[2]{};
         bool replayedPostDrawMsaaResolve[2]{};
@@ -2181,6 +2182,63 @@ int main()
                 fixture.gameMipIntermediate, &sourcePatch, destX, 32u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // Native game offscreen camera mip 1 contains green pixels, while
+        // mip 0 contains a different picture. Both unscaled Copy and scaled
+        // shader Stretch must consume exactly the game-selected subresource.
+        const D3D11_BOX mipBox{0u, 0u, 0u, 8u, 8u, 1u};
+        const D3D11_BOX invalidMipBox{28u, 0u, 0u, 36u, 8u, 1u};
+        const D3D11_RECT mipDest{
+            static_cast<LONG>(destX), 32,
+            static_cast<LONG>(destX + 8u), 40};
+        const bool mipRejects =
+            !encoder.copy_game_surface(
+                fixture.gameMipIntermediate, &mipBox, destX, 32u, 0u, 3u) &&
+            !encoder.copy_game_surface(
+                fixture.gameMipIntermediate, &invalidMipBox,
+                destX, 32u, 0u, 1u) &&
+            !encoder.stretch_game_surface(
+                fixture.gameMipIntermediate, invalidMipBox, mipDest,
+                true, 0u, 1u);
+        const bool mipCopies = encoder.copy_game_surface(
+            fixture.gameMipIntermediate, &mipBox, destX, 32u, 0u, 1u);
+        const bool mipStretches = encoder.stretch_game_surface(
+            fixture.gameMipIntermediate, mipBox, mipDest, true, 0u, 1u);
+        Microsoft::WRL::ComPtr<ID3D11Resource> eyeMipResource;
+        eyeTarget->GetResource(eyeMipResource.GetAddressOf());
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> eyeMipTexture;
+        if (!eyeMipResource ||
+            FAILED(eyeMipResource.As(&eyeMipTexture)) || !eyeMipTexture)
+            return false;
+        D3D11_TEXTURE2D_DESC readDesc{};
+        eyeMipTexture->GetDesc(&readDesc);
+        readDesc.Usage = D3D11_USAGE_STAGING;
+        readDesc.BindFlags = 0u;
+        readDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        readDesc.MiscFlags = 0u;
+        Microsoft::WRL::ComPtr<ID3D11Device> mipOwner;
+        ctx->GetDevice(mipOwner.GetAddressOf());
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> mipReadback;
+        if (!mipOwner || FAILED(mipOwner->CreateTexture2D(
+                &readDesc, nullptr, mipReadback.GetAddressOf()))) return false;
+        ctx->OMSetRenderTargets(0u, nullptr, nullptr);
+        ctx->CopyResource(mipReadback.Get(), eyeMipTexture.Get());
+        D3D11_MAPPED_SUBRESOURCE mipMap{};
+        if (FAILED(ctx->Map(mipReadback.Get(), 0u, D3D11_MAP_READ,
+                            0u, &mipMap))) return false;
+        const auto* px = static_cast<const std::uint8_t*>(mipMap.pData) +
+            34u * mipMap.RowPitch + (destX + 2u) * 4u;
+        const bool correctMipPixel =
+            px[0] == 0u && px[1] == 255u && px[2] == 0u && px[3] == 255u;
+        ctx->Unmap(mipReadback.Get(), 0u);
+        const bool recoveredEye = encoder.bind_eye_output();
+        const bool restoredMipZero = recoveredEye &&
+            encoder.copy_game_surface(
+                fixture.gameMipIntermediate, &sourcePatch, destX, 32u);
+        fixture.replayedCameraMipGpuCopyStretch[eyeIndex] =
+            mipRejects && mipCopies && mipStretches && correctMipPixel &&
+            restoredMipZero && encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        if (!fixture.replayedCameraMipGpuCopyStretch[eyeIndex]) return false;
         // Choose exactly one game-authored eye array slice. A foreign slice
         // is rejected before GPU mutation and never counts as a stereo draw.
         fixture.replayedDistinctArrayEyeCopy[eyeIndex] =
@@ -2609,6 +2667,8 @@ int main()
             gameEyeFixture.replayedGpuOnlyArrayStretch[1] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[0] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[1] &&
+            gameEyeFixture.replayedCameraMipGpuCopyStretch[0] &&
+            gameEyeFixture.replayedCameraMipGpuCopyStretch[1] &&
             gameEyeFixture.replayedDistinctArrayEyeCopy[0] &&
             gameEyeFixture.replayedDistinctArrayEyeCopy[1] &&
             gameEyeFixture.replayedFormatConvertedArrayCopy[0] &&

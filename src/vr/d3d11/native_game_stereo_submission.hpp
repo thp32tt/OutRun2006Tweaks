@@ -100,7 +100,7 @@ public:
     [[nodiscard]] bool copy_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
         std::int64_t destX, std::int64_t destY,
-        UINT sourceArraySlice = 0u) noexcept;
+        UINT sourceArraySlice = 0u, UINT sourceMipSlice = 0u) noexcept;
     // Per-eye native GPU replay for actual game StretchRect source crops
     // and changed-size destination rectangles (point or linear filter).
     // This never counts as a game-authored geometry draw.
@@ -110,7 +110,7 @@ public:
     [[nodiscard]] bool stretch_game_surface(
         ID3D11Texture2D* source, const D3D11_BOX& sourceRegion,
         const D3D11_RECT& destination, bool linearFilter,
-        UINT sourceArraySlice = 0u) noexcept;
+        UINT sourceArraySlice = 0u, UINT sourceMipSlice = 0u) noexcept;
     // Game-origin TARGET/depth Clears and GPU Copy/Stretch postpasses are
     // replayed together after N real per-eye Draw/DrawIndexed calls in order.
     // A zero ordinal retains original pre-geometry Clear behavior.
@@ -206,6 +206,7 @@ struct NativeGameEyePartialTargetClear {
         D3D11_RECT destination{};
         std::int64_t destX{}, destY{};
         UINT sourceArraySlice{};
+        UINT sourceMipSlice{}; // captured game camera mip, defaults to zero
         bool linearFilter{};
     };
     std::uint32_t count[2]{};

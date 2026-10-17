@@ -606,7 +606,7 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                    NativeGameEyePartialTargetClear::Kind::SourceCopy) {
             if (!copy_game_surface(clear.source, &clear.sourceBox,
                                    clear.destX, clear.destY,
-                                   clear.sourceArraySlice))
+                                   clear.sourceArraySlice, clear.sourceMipSlice))
                 return false;
             // Game-authored offscreen menu/car/race compositing can write
             // real eye color even when its on-eye geometry only updates Z.
@@ -617,7 +617,7 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
-                                      clear.sourceArraySlice))
+                                      clear.sourceArraySlice, clear.sourceMipSlice))
                 return false;
             ++authoredColorPostpassCount_;
         } else {
@@ -778,7 +778,7 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
 bool NativeGameEyeDrawEncoder::copy_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX* sourceRegion,
     std::int64_t destX, std::int64_t destY,
-    UINT sourceArraySlice) noexcept
+    UINT sourceArraySlice, UINT sourceMipSlice) noexcept
 {
     if (!source || !eye_targets_bound() || !targetWidth_ || !targetHeight_)
         return false;
@@ -795,17 +795,22 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     D3D11_TEXTURE2D_DESC sourceDesc{}, eyeDesc{};
     source->GetDesc(&sourceDesc);
     eyeColor->GetDesc(&eyeDesc);
+    if (!sourceDesc.MipLevels || sourceMipSlice >= sourceDesc.MipLevels ||
+        sourceMipSlice >= 32u ||
+        (sourceMipSlice && sourceDesc.SampleDesc.Count != 1u)) return false;
+    const UINT mipWidth = (std::max)(1u, sourceDesc.Width >> sourceMipSlice);
+    const UINT mipHeight = (std::max)(1u, sourceDesc.Height >> sourceMipSlice);
     // Clip a game-origin unscaled postpass at the native eye edge, while
     // preserving the original pixel-to-pixel map. This must be done BEFORE
     // choosing Copy, shader format conversion, or MSAA Resolve. All of them
     // must see the same nonempty game source box.
     const D3D11_BOX requested = sourceRegion
         ? *sourceRegion
-        : D3D11_BOX{0u, 0u, 0u, sourceDesc.Width, sourceDesc.Height, 1u};
+        : D3D11_BOX{0u, 0u, 0u, mipWidth, mipHeight, 1u};
     if (requested.front != 0u || requested.back != 1u)
         return false;
     const auto clippedCopy = native_game_copy_clipped_region(
-        sourceDesc.Width, sourceDesc.Height,
+        mipWidth, mipHeight,
         requested.left, requested.top, requested.right, requested.bottom,
         targetWidth_, targetHeight_, destX, destY);
     if (!clippedCopy.valid) return false;
@@ -843,7 +848,8 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         // If restoration fails, reject the frame (the producer quarantines
         // any already queued GPU writes) instead of publishing stale eyes.
         if (!stretch_game_surface(
-                source, box, destination, false, sourceArraySlice))
+                source, box, destination, false, sourceArraySlice,
+                sourceMipSlice))
             return false;
         return eye_targets_bound();
     }
@@ -892,14 +898,15 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
             (support & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
             return false;
     }
-    if (box.right > sourceDesc.Width || box.bottom > sourceDesc.Height ||
+    if (box.right > mipWidth || box.bottom > mipHeight ||
         eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;
 
     // Only mip zero of the caller-proven camera eye slice enters the native
     // shared RTV. Whole-array CopyResource would mismatch a single-eye target.
     const UINT sourceSubresource =
-        D3D11CalcSubresource(0u, sourceArraySlice, sourceDesc.MipLevels);
+        D3D11CalcSubresource(sourceMipSlice, sourceArraySlice,
+                             sourceDesc.MipLevels);
     // Never use CopyResource for a full mip chain into a one-mip XR eye.
     // A full-source MSAA resolve can write directly into the full-size eye.
     // Cropped menu/vehicle postpasses must not overwrite unaffected pixels:
@@ -1540,8 +1547,8 @@ private:
 bool NativeGameEyeDrawEncoder::stretch_game_surface(
     ID3D11Texture2D* source, const D3D11_BOX& srcBox,
     const D3D11_RECT& dest, bool linearFilter,
-    UINT sourceArraySlice) noexcept {
-    if (!source || !context_ || !eye_targets_bound()) return false;
+    UINT sourceArraySlice, UINT sourceMipSlice) noexcept {
+    if (!source || !context_ || !eye_targets_bound() return false;
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
     eyeTarget_->GetResource(resource.GetAddressOf());
     Microsoft::WRL::ComPtr<ID3D11Texture2D> eye;
@@ -1554,6 +1561,11 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     D3D11_TEXTURE2D_DESC sd{}, ed{};
     source->GetDesc(&sd);
     eye->GetDesc(&ed);
+    if (!sd.MipLevels || sourceMipSlice >= sd.MipLevels ||
+        sourceMipSlice >= 32u ||
+        (sourceMipSlice && sd.SampleDesc.Count != 1u)) return false;
+    const UINT mipWidth = (std::max)(1u, sd.Width >> sourceMipSlice);
+    const UINT mipHeight = (std::max)(1u, sd.Height >> sourceMipSlice);
     constexpr UINT shared = D3D11_RESOURCE_MISC_SHARED |
         D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
@@ -1572,9 +1584,9 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         ed.Width != targetWidth_ || ed.Height != targetHeight_ ||
         srcBox.front != 0u || srcBox.back != 1u ||
         srcBox.left >= srcBox.right || srcBox.top >= srcBox.bottom ||
-        srcBox.right > sd.Width || srcBox.bottom > sd.Height) return false;
+        srcBox.right > mipWidth || srcBox.bottom > mipHeight) return false;
     const auto clipped = native_game_stretch_clipped_region(
-        sd.Width, sd.Height, srcBox.left, srcBox.top,
+        mipWidth, mipHeight, srcBox.left, srcBox.top,
         srcBox.right, srcBox.bottom, targetWidth_, targetHeight_,
         dest.left, dest.top, dest.right, dest.bottom);
     if (!clipped.valid) return false;
@@ -1696,12 +1708,14 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     // mips or the other eye would be incorrect and needlessly expensive.
     const bool directSingleSlice =
         transfer == NativeGameStretchSourceTransfer::DirectSample &&
-        sd.ArraySize == 1u;
+        sd.ArraySize == 1u && sourceMipSlice == 0u;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> sampled;
     if (directSingleSlice)
         sampled = source;
     else {
         D3D11_TEXTURE2D_DESC desc = sd;
+        desc.Width = mipWidth;
+        desc.Height = mipHeight;
         desc.MipLevels = 1u;
         desc.ArraySize = 1u;
         desc.SampleDesc.Count = 1u;
@@ -1745,7 +1759,8 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
         // color. This also handles multisampled color and multi-mip
         // RTV-only postpasses without ever copying unrelated eye pixels.
         const UINT sourceSubresource =
-            D3D11CalcSubresource(0u, sourceArraySlice, sd.MipLevels);
+            D3D11CalcSubresource(sourceMipSlice, sourceArraySlice,
+                                 sd.MipLevels);
         if (transfer == NativeGameStretchSourceTransfer::ResolveToSampled)
             context_->ResolveSubresource(
                 sampled.Get(), 0u, source, sourceSubresource, sd.Format);
@@ -1978,6 +1993,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         (desc.MiscFlags & sharedMask) != 0u ||
                         event.sourceArraySlice >= desc.ArraySize ||
                         desc.MipLevels == 0u ||
+                        event.sourceMipSlice >= desc.MipLevels ||
+                        event.sourceMipSlice >= 32u ||
+                        (event.sourceMipSlice && desc.SampleDesc.Count != 1u) ||
                         !native_game_postpass_gpu_source(
                             desc.BindFlags, desc.SampleDesc.Count,
                             D3D11_BIND_RENDER_TARGET,
@@ -1985,7 +2003,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                             D3D11_BIND_UNORDERED_ACCESS) ||
                         b.front != 0u || b.back != 1u ||
                         b.left >= b.right || b.top >= b.bottom ||
-                        b.right > desc.Width || b.bottom > desc.Height)
+                        b.right > (std::max)(1u, desc.Width >> event.sourceMipSlice) ||
+                        b.bottom > (std::max)(1u, desc.Height >> event.sourceMipSlice))
                         return false;
                     if (event.kind ==
                         NativeGameEyePartialTargetClear::Kind::SourceCopy) {
