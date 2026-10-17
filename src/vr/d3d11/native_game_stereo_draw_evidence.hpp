@@ -3,6 +3,22 @@
 #include <limits>
 
 namespace outrun::vr::dx11::live_game_stereo {
+// D3D9 full-TARGET rectangles are real full-eye GPU Clears, not partial
+// ClearView operations. D3D11.0 ClearRenderTargetView supports these without
+// requiring ID3D11DeviceContext1; only bounded regions need D3D11.1.
+[[nodiscard]] constexpr bool full_eye_target_rect(
+    std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight) noexcept {
+    return eyeWidth != 0u && eyeHeight != 0u &&
+        left == 0 && top == 0 &&
+        right == static_cast<std::int64_t>(eyeWidth) &&
+        bottom == static_cast<std::int64_t>(eyeHeight);
+}
+static_assert(full_eye_target_rect(0, 0, 1920, 1080, 1920u, 1080u));
+static_assert(!full_eye_target_rect(0, 0, 1920, 1079, 1920u, 1080u));
+static_assert(!full_eye_target_rect(1, 0, 1920, 1080, 1920u, 1080u));
+static_assert(!full_eye_target_rect(0, 0, 0, 1080, 0u, 1080u));
 // Hardware instancing is a single source-authored command/clear ordinal.
 // A zero-instance call writes no pixels and cannot establish an XR eye.
 [[nodiscard]] constexpr bool may_issue_instanced(

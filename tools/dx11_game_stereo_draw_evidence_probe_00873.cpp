@@ -5,6 +5,7 @@
 using outrun::vr::dx11::live_game_stereo::may_issue_instanced;
 using outrun::vr::dx11::live_game_stereo::color_certifiable;
 using outrun::vr::dx11::live_game_stereo::authored_color_output_ready;
+using outrun::vr::dx11::live_game_stereo::full_eye_target_rect;
 int main() {
     // Menu/car/race native eye callback: both indexed and non-indexed
     // multi-instance commands preserve ONE genuine source draw ordinal.
@@ -22,6 +23,15 @@ int main() {
     static_assert(color_certifiable(true, true));
     static_assert(!color_certifiable(true, false));
     static_assert(!color_certifiable(false, true));
+    // Full-size TARGET rectangles take D3D11.0 ClearRenderTargetView on both
+    // eyes, so native game scene replay can run without a D3D11.1 context.
+    // Cropped menu/HUD rectangles continue to require ClearView and fail
+    // closed if the extension is missing; zero-sized targets cannot clear.
+    static_assert(full_eye_target_rect(0, 0, 3440, 1440, 3440u, 1440u));
+    static_assert(!full_eye_target_rect(0, 0, 3440, 1439, 3440u, 1440u));
+    static_assert(!full_eye_target_rect(3, 0, 3440, 1440, 3440u, 1440u));
+    static_assert(!full_eye_target_rect(-1, 0, 3440, 1440, 3440u, 1440u));
+    static_assert(!full_eye_target_rect(0, 0, 3440, 1440, 0u, 1440u));
     // Original D3D9 TARGET Clear is authentic eye color, not fabricated
     // geometry. Admit depth-only draws following a full seed, while rejecting
     // a terminal Clear that erased the last native game geometry.

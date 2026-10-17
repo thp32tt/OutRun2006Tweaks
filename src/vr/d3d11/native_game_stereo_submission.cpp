@@ -208,9 +208,10 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             // ClearView ignores the prior per-draw color-write masks.
             // A captured full-eye TARGET Clear replaces earlier color Draws
             // and source Copy/Stretch, but can seed later depth-only geometry.
-            if (clear.rect.left == 0 && clear.rect.top == 0 &&
-                clear.rect.right == static_cast<LONG>(targetWidth_) &&
-                clear.rect.bottom == static_cast<LONG>(targetHeight_)) {
+            if (live_game_stereo::full_eye_target_rect(
+                    clear.rect.left, clear.rect.top,
+                    clear.rect.right, clear.rect.bottom,
+                    targetWidth_, targetHeight_)) {
                 colorDrawCount_ = 0u;
                 authoredColorPostpassCount_ = 0u;
                 ++authoredFullColorClearCount_;
@@ -326,23 +327,30 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
     // An offscreen menu RT must never be mistaken for the owned OpenXR eye.
     if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
-    if (region) {
-        if (region->left < 0 || region->top < 0 ||
-            region->right <= region->left ||
-            region->bottom <= region->top ||
-            static_cast<std::uint32_t>(region->right) > targetWidth_ ||
-            static_cast<std::uint32_t>(region->bottom) > targetHeight_ ||
-            FAILED(context_->QueryInterface(
-                IID_PPV_ARGS(rectContext.GetAddressOf()))) || !rectContext)
-            return false;
-    }
+    if (region &&
+        (region->left < 0 || region->top < 0 ||
+         region->right <= region->left ||
+         region->bottom <= region->top ||
+         static_cast<std::uint32_t>(region->right) > targetWidth_ ||
+         static_cast<std::uint32_t>(region->bottom) > targetHeight_))
+        return false;
+    const bool requiresClearView = region &&
+        !live_game_stereo::full_eye_target_rect(
+            region->left, region->top, region->right, region->bottom,
+            targetWidth_, targetHeight_);
+    // A real game-authored full-size rectangle Clear must work on D3D11.0.
+    // Query the 11.1 extension only when genuine cropped eye pixels need it.
+    if (requiresClearView &&
+        (FAILED(context_->QueryInterface(
+            IID_PPV_ARGS(rectContext.GetAddressOf()))) || !rectContext))
+        return false;
     constexpr float kByte = 1.0f / 255.0f;
     const float rgba[4]{
         static_cast<float>((argb >> 16) & 0xffu) * kByte,
         static_cast<float>((argb >> 8) & 0xffu) * kByte,
         static_cast<float>(argb & 0xffu) * kByte,
         static_cast<float>((argb >> 24) & 0xffu) * kByte};
-    if (region)
+    if (requiresClearView)
         rectContext->ClearView(eyeTarget_, rgba, region, 1u);
     else
         context_->ClearRenderTargetView(eyeTarget_, rgba);
@@ -1373,7 +1381,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
     // silent whole-RT fallback is allowed for an unsupported game Clear.
     Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectClearContext;
     if (partialTargetClear) {
-        bool hasRects = false;
+        bool needsClearView = false;
         for (std::uint32_t eye = 0u; eye < 2u; ++eye) {
             const std::uint32_t count = partialTargetClear->count[eye];
             if (count > NativeGameEyePartialTargetClear::kMaxRectsPerEye)
@@ -1392,7 +1400,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         rect.right > static_cast<LONG>(ring_.width()) ||
                         rect.bottom > static_cast<LONG>(ring_.height()))
                         return false;
-                    hasRects = true;
+                    needsClearView |= !live_game_stereo::full_eye_target_rect(
+                        rect.left, rect.top, rect.right, rect.bottom,
+                        ring_.width(), ring_.height());
                 } else if (event.kind ==
                            NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
                     // Empty RECT means whole DSV. Otherwise rasterize only
@@ -1542,7 +1552,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                 }
             }
         }
-        if (hasRects &&
+        if (needsClearView &&
             FAILED(context_->QueryInterface(
                 IID_PPV_ARGS(rectClearContext.GetAddressOf()))))
             return false;
