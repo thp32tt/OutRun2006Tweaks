@@ -1,3 +1,13 @@
+## 2026-10-17 — 사용자 정정: 원본 HD 파일은 이미 N100에 보관돼 있음
+
+원본을 새로 확보해야 한다는 종전 보고는 **오류**다. 기존 N100 저장소 `work/c_roi_q060_easy_git_20261016_0533/localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a`에 원본 DDS 18개가 있고, `localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip` 내부 원본 DDS 79개 중 파일명 기준 해상도의 정확히 4배인 네이티브 HD DDS가 39개다(기본 해상도 40개는 신규 HD OCR에서 제외). 실제 사용자 번역 표와 원본 경로를 대조한 HD 원본 대상은 중복 제거 후 49개 자산 그룹이며, 다른 경로에서 독립 검증한 Q212는 별도로 유지한다.
+
+`docker/c-original-english-crop/admit_existing_hd_originals_20261017.py`를 통해 **기존 원본 그대로** SHA256, DDS 크기, 실제 DDS 디코딩 픽셀과 정방향 1:1 PNG의 픽셀 동등성을 확인한 후 `source_full_20261012`의 C 전용 입력 경로로 등록한다. SOURCE 매니페스트 `source_registry_auto.json`에는 DDS 원본 경로/해시/크기/출처를 기록하고 모든 OCR 크롭 전 원본을 재검증한다. 기존 6개 수동 등록 검증 출처는 보존한다.
+
+OCR은 60초 폴링에 최대 **검증된 원본 4개씩 순환**하고 `auto_discovery/ocr_source_cursor.json`에 진행 위치를 기록한다. 공식 원문 일치, OCR confidence, 기존 255건 좌표/기존 출력 중복 및 효과 잘림 검사 통과한 문구만 자동으로 크롭한다. 최초 확장 시 Q044/Q047 OCR에서 신규 큐 10건 등록 및 Q044 `LOSE` 원본 크롭 PNG 생성(예비 TEST_ONLY). 영문 전용 원본 네이티브 크롭만 허용하며 타일 986개, 이전 A/B 이미지 생성 출력, 클린 플레이트, 한글/DDS 합성 및 VR 작업은 계속 금지한다. ChatGPT 시간당 예약 작업도 중지 유지.
+
+---
+
 ## 2026-10-17 — 영문 OCR 자동 인식과 자동 크롭 추가 승인
 
 사용자가 수동 영역 검토 병목 제거를 위해 OCR까지 명시적으로 추가 지시했다. C 전용 N100 Docker 컨테이너만 수정/재기동했고 기존 A/B/C1/VR 동작과 ChatGPT 예약 작업은 중지 유지한다.
