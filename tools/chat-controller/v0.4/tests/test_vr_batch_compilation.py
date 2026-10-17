@@ -27,6 +27,7 @@ def prefix(lane, continuous=False):
         },
         "json": json, "re": re,
         "MAX_TASK_ATTEMPTS": 3,
+        "DEVELOPMENT_TARGET_PERCENT": 70,
         "VR_CONTINUOUS_30M_ENABLED": continuous,
         "LOCALIZATION_EXECUTION_POLICY": "LOCALIZATION_EXECUTION_POLICY_ONLY",
     }
@@ -77,25 +78,26 @@ class BatchCompilePolicy(unittest.TestCase):
         for lane in ("DX11", "DX9EX"):
             with self.subTest(lane=lane):
                 content = prefix(lane, continuous=True)
-                for marker in ("DEVELOPMENT_FIRST_20261015=ON", "C2 최우선",
+                for marker in ("DEVELOPMENT_FOCUS_20261017=ON", "≥70%",
                                "같은 TASK_ID/FEATURE_ID", "validation-bearing exact SHA",
                                "RUNTIME_VALIDATION=UNTESTED", "DXVK 동결"):
                     self.assertIn(marker, content)
                 prompt = (ROOT / ("conversion_continuous_dx11.md" if lane == "DX11"
                                   else "conversion_continuous_dx9ex.md")).read_text(encoding="utf-8")
-                self.assertIn("DEVELOPMENT_FIRST_20261015", prompt)
+                self.assertIn("SOURCE_IMPLEMENTATION_70_PERCENT", prompt)
                 self.assertIn("필수 GitHub Actions 전체 Gate", prompt)
 
     def test_development_first_is_not_dependent_on_30m_mode(self):
         for lane in ("DX11", "DX9EX"):
             text = prefix(lane, continuous=False)
-            self.assertIn("DEVELOPMENT_FIRST_20261015=ON", text)
+            self.assertIn("DEVELOPMENT_FOCUS_20261017=ON", text)
             self.assertIn("필수 GitHub Actions 전체 Gate", text)
+            self.assertIn("DEVELOPMENT_FOCUS_20261017=ON", text)
             self.assertIn("이미 PASS인 동일 SHA", text)
 
     def test_development_first_does_not_activate_frozen_dxvk(self):
-        self.assertNotIn("DEVELOPMENT_FIRST_20261015=ON", prefix("DXVK", continuous=True))
-        self.assertNotIn("DEVELOPMENT_FIRST_20261015=ON", prefix("LOCALIZATION_A", continuous=True))
+        self.assertNotIn("DEVELOPMENT_FOCUS_20261017=ON", prefix("DXVK", continuous=True))
+        self.assertNotIn("DEVELOPMENT_FOCUS_20261017=ON", prefix("LOCALIZATION_A", continuous=True))
 
     def test_source_syntax(self):
         source = (ROOT / "src-vr-v2" / "controller.py.part00").read_text(encoding="utf-8")

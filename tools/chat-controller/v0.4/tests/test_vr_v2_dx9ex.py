@@ -284,7 +284,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertEqual(active['attempt'], 1)
 
 
-    def test_vr_five_minute_checkpoint_and_30_minute_rollover_contract(self):
+    def test_vr_batched_checkpoint_and_30_minute_rollover_contract(self):
         from zoneinfo import ZoneInfo
         tree = ast.parse(SOURCE)
         wanted = {'vr_checkpoint_path', 'vr_checkpoint_payload', 'vr_forced_rollover_due', 'vr_unconditional_resume_due'}
@@ -293,6 +293,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         ns = {'datetime': datetime, 're': re, 'CONTROLLER_MODE': 'conversion',
               'VR_FORCE_ROLLOVER_SECONDS': 1800, 'VR_UNCONDITIONAL_RESUME_SECONDS': 2400,
               'VR_CHECKPOINT_BRANCH': 'chat-controller-downloads',
+              'VR_CHECKPOINT_PERIOD_MINUTES': 15,
               '_parse_iso': lambda stamp: datetime.fromisoformat(stamp) if stamp else None}
         exec(compile(ast.Module(body=functions, type_ignores=[]), '<checkpoint>', 'exec'), ns)
         now = datetime(2026, 10, 9, 19, 30, tzinfo=ZoneInfo('Asia/Seoul'))
