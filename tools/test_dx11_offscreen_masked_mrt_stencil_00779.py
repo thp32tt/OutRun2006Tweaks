@@ -18,7 +18,9 @@ def integrated(b, h, c):
         "GetRenderTarget(i, extra.GetAddressOf())" in b,
         "if (hr == D3DERR_NOTFOUND) continue;" in b,
         "GetRenderState(extraColorMasks[i - 1u], &mask)" in b,
-        "no_main_stencil_write(" in b,
+        "const bool stencilReadOnly = game_stencil_is_read_only(" in b,
+        "stencilEnabled, stencilMaskKnown, stencilWriteMask" in b,
+        "(stencilReadOnly ||" in b,
         "inactive_extra_mrt(maskKnown, mask)" in b,
         "noExtraRenderTargets, s.frameBatch.stopped" in b,
         "if (isolated && depthWrites && isolatedDepthWrite)" in b,
@@ -36,7 +38,7 @@ for original, replacement in (
     ("GetRenderState(extraColorMasks[i - 1u], &mask)",
      "GetRenderState(D3DRS_COLORWRITEENABLE, &mask)"),
     ("inactive_extra_mrt(maskKnown, mask)", "inactive_extra_mrt(true, 0u)"),
-    ("no_main_stencil_write(", "allow_stencil_writes("),
+    ("stencilReadOnly ||", "true || /* bypassed writable stencil */"),
     ("noExtraRenderTargets, s.frameBatch.stopped", "true, s.frameBatch.stopped"),
 ):
     assert original in offscreen, original
