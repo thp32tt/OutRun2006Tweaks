@@ -197,6 +197,37 @@ int main()
             ultraWide, std::numeric_limits<float>::infinity(),
             true, true, false, false) != ultraWide)
         return 41;
+    // A/B whole-feature regression: a fully captured 21:9/16:9 title
+    // needs authored 4:3 optical proportions WITHOUT trimming its texture.
+    // Car choice, transitions, other modes and invalid snapshots must remain
+    // full-width; explicit rollback and original crop stay authoritative.
+    using OutRunVrMenuAspect::PlanStateSensitiveMenuAspect;
+    auto stateAspect = [](float sampled, float client, unsigned state,
+        bool letterbox=true, bool complete=true, bool cropped=false,
+        bool native=false) {
+        return PlanStateSensitiveMenuAspect(sampled, client, state,
+            letterbox, complete, cropped, native);
+    };
+    if (std::fabs(stateAspect(ultraWide, ultraWide, 0x04) - fourThree) > 1.e-5f ||
+        std::fabs(stateAspect(wide, wide, 0x09) - fourThree) > 1.e-5f ||
+        stateAspect(ultraWide, ultraWide, 0x0A) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x0B) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x0C) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x10) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x16) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0xFFFFFFFFu) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x04, false) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x04, true, false) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x04, true, true, true) != ultraWide ||
+        stateAspect(ultraWide, ultraWide, 0x04, true, true, false, true) != ultraWide ||
+        stateAspect(fourThree, fourThree, 0x04) != fourThree ||
+        stateAspect(2496.f/2688.f,2496.f/2688.f,0x09) != 2496.f/2688.f ||
+        stateAspect(ultraWide, wide, 0x04) != ultraWide ||
+        !std::isnan(stateAspect(std::numeric_limits<float>::quiet_NaN(),
+            ultraWide,0x04)) ||
+        stateAspect(ultraWide,std::numeric_limits<float>::infinity(),
+            0x04) != ultraWide)
+        return 47;
     using OutRunVrMenuAspect::PlanCapturedAspect;
     constexpr float desktopAspect = 3440.0f / 1440.0f;
     // Fully visible 21:9 and 4:3 mirrors keep exact source proportions.

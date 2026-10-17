@@ -478,6 +478,15 @@ namespace
                 ? OutRunVR::PresentationGameplay : OutRunVR::PresentationTheater;
         }
 
+        // The original game publishes this stable GameState enum into an
+        // existing v2 reserved word. Unknown/old host identity must never
+        // authorize a guessed 4:3 title layout in the XR menu compositor.
+        std::uint32_t GameState() const noexcept
+        {
+            if (!HeaderValid()) return 0xFFFFFFFFu;
+            return state_->reserved[OutRunVR::ClientGameStateIndex];
+        }
+
         ClientStereoMeta ReadStereoMeta() const
         {
             ClientStereoMeta out{};

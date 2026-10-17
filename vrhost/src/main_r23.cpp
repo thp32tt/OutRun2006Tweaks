@@ -1515,7 +1515,7 @@ namespace
 
     bool R23RenderWorldLockedMenuProjection(
         StereoCompositor& c, const std::array<XrView, 2>& views,
-        const XrPosef& menuAnchor,
+        const XrPosef& menuAnchor, std::uint32_t clientGameState,
         std::array<XrCompositionLayerProjectionView, 2>& pv)
     {
         R23Pixels.TryConsume(c.context_);
@@ -1642,6 +1642,14 @@ namespace
                 sourceAspect, clientAspect, gameConfiguredLetterbox,
                 completeClient, cropCentered43, useNativeMenuAspect,
                 imageMatteVerified);
+            // A confirmed title/main-menu game state is distinct from the
+            // full-width car selector: correct native authored 4:3 *optics*
+            // without clipping any source UV. The game itself already
+            // publishes its exact state through ClientGameStateIndex.
+            sourceAspect = OutRunVrMenuAspect::PlanStateSensitiveMenuAspect(
+                sourceAspect, clientAspect, clientGameState,
+                gameConfiguredLetterbox, completeClient,
+                cropCentered43, useNativeMenuAspect);
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
         // projections. Center LOCAL-fixed menu content on the optical ray,
@@ -2604,6 +2612,7 @@ int main(int argc, char** argv)
         std::array<XrCompositionLayerProjectionView, 2>
             cachedMenuProjectionViews{};
         bool cachedMenuProjectionValid = false;
+        std::uint32_t cachedMenuGameState = 0xFFFFFFFFu;
         bool awaitingFirstGameplayStereo = false;
         XrPosef menuProjectionAnchor{};
         menuProjectionAnchor.orientation.w = 1.0f;
@@ -3442,6 +3451,16 @@ int main(int argc, char** argv)
                     // receive identical desktop pixels and zero virtual IPD;
                     // only the reference space changes so the menu remains at
                     // the recentered world orientation while the head moves.
+                    // A title->selector or selector->title transition changes
+                    // authored optical aspect even if Desktop Duplication
+                    // reports an unchanged/stale source frame. Do not reuse
+                    // the previous state's cached two-eye menu projection.
+                    const std::uint32_t clientGameState = shared.GameState();
+                    if (cachedMenuGameState != clientGameState)
+                    {
+                        cachedMenuGameState = clientGameState;
+                        cachedMenuProjectionValid = false;
+                    }
                     if (capture.available &&
                         menuProjectionAnchorValid &&
                         (!cachedMenuProjectionValid || capture.fresh))
@@ -3450,7 +3469,7 @@ int main(int argc, char** argv)
                             refreshed{};
                         if (R23RenderWorldLockedMenuProjection(
                                 compositor, views, menuProjectionAnchor,
-                                refreshed))
+                                clientGameState, refreshed))
                         {
                             cachedMenuProjectionViews = refreshed;
                             cachedMenuProjectionValid = true;
