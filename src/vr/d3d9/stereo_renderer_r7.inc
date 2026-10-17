@@ -801,6 +801,21 @@ namespace OutRunVRStereo
 					return EyeBuildResult::NonWorld;
 				}
 
+				// R84 regression: a paused ESC/option/menu D3DXSprite can
+				// bind fixed-function XYZ, perspective projection and disable
+				// depth, exactly like the heuristic SkyRotationOnly signature.
+				// R26's dedicated source-owned 2D path must win first; when
+				// its original-c64/eye proof is missing, preserve a single
+				// original UI draw rather than misroute the fallback as 3D sky.
+				// SkyGlow here means the *post-process* blur, not the original
+				// world sky sphere. Untagged genuine sky keeps the original
+				// rotation-only path; F11/rank/world shadow stay separate.
+				if (OutRunVR::GameSemantic::CapturePhysicalDrawCommand()
+				        .DeniesGenericWorldFallback())
+				{
+					++FixedFunctionNonWorldDraws;
+					return EyeBuildResult::NonWorld;
+				}
 				// Car-select and other theater/menu previews also use
 				// fixed-function perspective XYZ. They are not VR world geometry
 				// and must not receive the headset inverse/eye transforms.
