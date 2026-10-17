@@ -36,6 +36,24 @@ namespace OutRunVR::HudOriginalWvp
             e.currentNodeEpoch == e.writtenNodeEpoch;
     }
 
+    // R26_SAFE's source-queue ScreenOverlay2D drew on the same finite HUD
+    // plane as exact rank/6th text; R84 retained only tagged ScreenHud.
+    // Re-admit an untagged overlay *only* with a live same-node/epoch c64
+    // original, not a coincidentally matching shader or stale world matrix.
+    // A missing original source keeps the one-draw R33 native fallback.
+    constexpr bool OwnsGenericQueuedOverlay(const Provenance& e) noexcept
+    {
+        return e.currentScope == RenderScope::ScreenOverlay2D &&
+            e.writtenScope == RenderScope::ScreenOverlay2D &&
+            e.currentProducer == ProducerToken::None &&
+            e.writtenProducer == ProducerToken::None &&
+            e.queueActive &&
+            e.currentNode != nullptr &&
+            e.currentNode == e.writtenNode &&
+            e.currentNodeEpoch != 0 &&
+            e.currentNodeEpoch == e.writtenNodeEpoch;
+    }
+
     constexpr Provenance DirectHud{
         RenderScope::ScreenHud, RenderScope::ScreenHud,
         ProducerToken::OutRunHudPeripheralText,

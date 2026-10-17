@@ -2664,7 +2664,11 @@ namespace OutRunVRStereo
         bool R30GetRecentOriginalHudWvp(float out[16]) noexcept
         {
             using namespace OutRunVR::GameSemantic;
-            if (!out || !CorroboratesHud(EffectiveScope()))
+            const bool genericQueueOverlay =
+                EffectiveScope() == RenderScope::ScreenOverlay2D &&
+                QueueRenderActive() && ExternalOverlaySemanticDepth == 0;
+            if (!out || (!CorroboratesHud(EffectiveScope()) &&
+                !genericQueueOverlay))
                 return false;
             std::uint64_t writeSerial = 0, writeDrawSerial = 0;
             std::uintptr_t writeShader = 0, currentShader = 0;
@@ -2692,11 +2696,15 @@ namespace OutRunVRStereo
             // raw game c64 belongs to this HUD SpriteNode. Do not project a
             // road/rival/prior-glyph WVP onto both eye HUD planes. The caller
             // retains its conservative original draw when proof is missing.
-            if (!OutRunVR::HudOriginalWvp::OwnsProducer({
+            const OutRunVR::HudOriginalWvp::Provenance provenance{
                     EffectiveScope(), writtenScope,
                     CurrentRenderProducerToken(), writtenProducer,
                     QueueRenderActive(), CurrentQueueNode(), writtenNode,
-                    CurrentQueueNodeEpoch(), writtenQueueEpoch }))
+                    CurrentQueueNodeEpoch(), writtenQueueEpoch };
+            const bool ownsOriginal = genericQueueOverlay
+                ? OutRunVR::HudOriginalWvp::OwnsGenericQueuedOverlay(provenance)
+                : OutRunVR::HudOriginalWvp::OwnsProducer(provenance);
+            if (!ownsOriginal)
                 return false;
             const std::uint64_t nextDraw =
                 R29OwnerTopLevelDrawSerial() + 1u;
@@ -6288,7 +6296,18 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::EffectiveScope()) &&
                 (screenKind == R30ScreenSpaceKind::Hud2D ||
                  screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect);
-            if (exactHud)
+            // R26 also admitted source-queued generic orthographic sprites
+            // to the finite world-locked HUD plane. R84's remaining clip-only
+            // correction causes those glyphs to follow head yaw. Preserve
+            // the exact producer path; additionally require the ORIGINAL
+            // same-SpriteNode/epoch game c64 for generic overlays.
+            const bool genericQueuedHud =
+                screenKind == R30ScreenSpaceKind::Hud2D &&
+                OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
+                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0;
+            if (exactHud || genericQueuedHud)
             {
                 // R26 screen HUD is world-locked at a finite, recentered
                 // view-plane depth. R84's clip-only Hud2D route followed
@@ -6322,7 +6341,7 @@ namespace OutRunVRStereo
                 // aspect compensation to text/gauges on this world plane.
                 D3DMATRIX hudScale = R29OwnerIdentityMatrix();
                 const bool exactPauseShaderOwner =
-                    R30IsPauseMenuElement();
+                    exactHud && R30IsPauseMenuElement();
                 const float rawPauseScale =
                     Settings::VRPauseMenuScale.get();
                 const float pauseScale = std::isfinite(rawPauseScale)

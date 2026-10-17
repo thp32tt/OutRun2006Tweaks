@@ -106,6 +106,7 @@ on:
       - 'tools/verify_vr_r30_world_seed_fastpath.py'
       - 'tools/verify_vr_r30_screen_hud_finite_plane.py'
       - 'tools/verify_vr_r30_queue_overlay_hud_plane.py'
+      - 'tools/verify_vr_r30_generic_shader_overlay.py'
       - 'tools/verify_vr_r30_sparse_population_fastpath.py'
       - 'tools/verify_vr_r30_hud_sparse_visit.py'
       - 'tools/verify_vr_r30_depth_signature_memo.py'
@@ -345,6 +346,7 @@ jobs:
             'tools/verify_vr_r30_world_seed_fastpath.py',
             'tools/verify_vr_r30_screen_hud_finite_plane.py',
             'tools/verify_vr_r30_queue_overlay_hud_plane.py',
+            'tools/verify_vr_r30_generic_shader_overlay.py',
             'tools/verify_vr_r30_sparse_population_fastpath.py',
             'tools/verify_vr_r30_hud_sparse_visit.py',
             'tools/verify_vr_r30_depth_signature_memo.py',
@@ -472,7 +474,7 @@ jobs:
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-r30-early-rhw-shadow-smoke outrun-vr-r30-indexed-up-bounds-smoke outrun-vr-r30-shadow-ranges-smoke outrun-vr-host outrun-vr-cadence-presented-wait-smoke outrun-vr-cadence-schedule-smoke outrun-vr-eye-extent-smoke outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-projection-blit-upload-smoke outrun-vr-menu-projection-copy-smoke outrun-vr-menu-content-aspect-smoke outrun-vr-pause-eye-affine-smoke outrun-vr-stage-extension-owner-smoke outrun-vr-goal-progress-owner-smoke outrun-vr-semantic-tag-hint-smoke outrun-vr-r84-dispatch-10000-smoke outrun-vr-capture-descriptor-smoke outrun-vr-direct-ack-device-epoch-smoke outrun-vr-direct-ring-latest-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+          cmake --build build-host --config Release --target outrun-vr-r30-early-rhw-shadow-smoke outrun-vr-r30-indexed-up-bounds-smoke outrun-vr-r30-shadow-ranges-smoke outrun-vr-host outrun-vr-cadence-presented-wait-smoke outrun-vr-cadence-schedule-smoke outrun-vr-eye-extent-smoke outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-projection-blit-upload-smoke outrun-vr-menu-projection-copy-smoke outrun-vr-menu-content-aspect-smoke outrun-vr-pause-eye-affine-smoke outrun-vr-stage-extension-owner-smoke outrun-vr-goal-progress-owner-smoke outrun-vr-hud-original-wvp-smoke outrun-vr-semantic-tag-hint-smoke outrun-vr-r84-dispatch-10000-smoke outrun-vr-capture-descriptor-smoke outrun-vr-direct-ack-device-epoch-smoke outrun-vr-direct-ring-latest-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
           if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
       - name: Run deterministic no-HMD host smoke tests
         shell: pwsh
@@ -489,6 +491,7 @@ jobs:
             'outrun-vr-r30-shadow-ranges-smoke.exe',
             'outrun-vr-stage-extension-owner-smoke.exe',
             'outrun-vr-goal-progress-owner-smoke.exe',
+            'outrun-vr-hud-original-wvp-smoke.exe',
             'outrun-vr-semantic-tag-hint-smoke.exe',
             'outrun-vr-r84-dispatch-10000-smoke.exe',
             'outrun-vr-capture-descriptor-smoke.exe',
