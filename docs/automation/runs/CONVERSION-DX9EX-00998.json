@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00998",
+  "production_id": "CONVERSION-DX9EX-00998",
+  "event_id": "CONVERSION-DX9EX-00998-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING",
+  "phase": "C5_VALIDATION",
+  "checkpoint": "C5_STATE",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "82bdc915b42fd0451b1da726f7ec317c93a4c0c8",
+  "material_result_sha": "1c15b258a7d98c35be234e2505be7455dc3aed17",
+  "validation_bearing_result_sha": "PENDING",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/hud_native_source_transaction.hpp",
+    "vrhost/tests/hud_native_source_transaction_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/hud_native_source_transaction.hpp",
+    "vrhost/tests/hud_native_source_transaction_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00998.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Prevent double or head-locked original gameplay ScreenHud shader glyphs caused by native left/right GPU stereo using different queued or direct physical HUD sources after a synchronous game callback.",
+    "scope_boundary": "Only source-tagged R84 native shader ScreenHud; no change to untagged overlays, fixed function, GOAL, +TIME, lens C993, SkyGlow, car world, R26_SAFE rollback, original gamepad or FFB.",
+    "trace_stages": [
+      "Original OutRun game HUD producer and optional SpriteNode tag form exact physical GPU DrawCommand scope, producer, queue pointer and epoch.",
+      "R84 R30 builds source-screen left/right constants at the shader c64 rendering boundary; native R33 left Draw can reenter another original HUD producer.",
+      "R84 R33 captures physical owner, live shader, pose epoch and native draw serial before left and repeats after successful left prior to right-eye upload.",
+      "On mismatch, R33 restores the original game's vertex constants, fails the stereo frame and preserves original single left Draw HRESULT."
+    ],
+    "subcomponents": [
+      "Native R84 GPU stereo physical HUD source capture and right-eye veto with original c64 restore and no replay.",
+      "Portable typed original physical-command conversion and reentrant queue/direct positive/negative HUD tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_native_same_physical_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original direct and queued glyph source through native shader HUD GPU eyes",
+        "expected_behavior": "Both eyes use one physical source identity including same producer, SpriteNode, shader, pose and draw serial."
+      },
+      {
+        "id": "hud_native_callback_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign reentrant SpriteNode and shader native callback, GOAL, world and R26 rollback",
+        "expected_behavior": "If HUD owner changes, restore original GPU c64, do not issue a foreign right Draw and preserve normal original left draw return."
+      },
+      {
+        "id": "hud_native_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86/x64 and original scene/host package",
+        "expected_behavior": "All required exact SHA GitHub Actions policy, game, host, full-chain, package, Domain, HUD Inspector and Full Source gates pass; Quest3 hardware remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_native_same_physical_owner": "PENDING_WINDOWS_CI",
+    "hud_native_callback_fallback": "PENDING_WINDOWS_CI",
+    "hud_native_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R84 R33TryHud already enforced native left/right source comparison for lens C993, player shadow and stage +TIME/GOAL, but lacked corresponding validation for normal source-proven ScreenHud shader draws even though the HudNativeSource predicate existed only in portable tests.",
+    "original_evidence": "At exact baseline 82bdc915b42fd0451b1da726f7ec317c93a4c0c8, R33TryHud follows native left actualDraw with four specialized source predicates, with no generic exact ScreenHud source predicate before right-eye c64 upload.",
+    "source_trace": [
+      "GameSemantic::CapturePhysicalDrawCommand owns the tagged physical HUD glyph and optional queued SpriteNode epoch.",
+      "R30BuildScreenSpaceEyeConstants constructs the left and right eye vertex constants.",
+      "R33TryHud invokes original left actualDraw, where native callbacks can mutate producer, shader, queue and pose before right eye."
+    ],
+    "alternatives_rejected": [
+      "Do not adopt global ScreenOverlay ownership, disable original drawing, flush D3DX in every draw or rescale all HUD without source evidence."
+    ],
+    "eye_ownership": "A complete native source stamp must remain identical across both R33 physical HUD eyes; a changed source after left disallows right-eye draw and triggers restoration."
+  },
+  "last_ci_failure": {
+    "sha": "1c15b258a7d98c35be234e2505be7455dc3aed17",
+    "workflow": "DX9Ex Active Validation",
+    "job": "policy",
+    "cause": "Run record was absent at exact material HEAD; verify_vr_feature_unit_policy.py --check-head requires a per-function source/acceptance contract.",
+    "resolution": "Create the matching run record at validation-bearing commit without changing visual rendering source or suppressing any Gate."
+  },
+  "score_delta_this_attempt": 0,
+  "local_validation": "PORTABLE_SMOKE_CI_PENDING",
+  "next_action": "Run required exact SHA Gate once; on actual failure repair same TASK_ID; HMD Quest3/VDXR remains UNTESTED."
+}
