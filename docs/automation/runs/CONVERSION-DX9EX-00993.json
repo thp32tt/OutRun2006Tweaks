@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C2_IMPLEMENTED_C3_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_LOCAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "8bcde14c339a5badf22c8e75d52cc8b8612fce28",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "e4228cfae48150d2e09bde69c7a1ae52f179034b",
   "source_paths": [
     "src/vr/game/car_base_shadow_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -90,5 +90,5 @@
     "full_windows_ci": "PENDING"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Verify exact SHA Active, Domain Isolation, Inspector and Full Source Actions; no runtime PASS without Quest3 test."
+  "next_action": "C6 PASS_EXACT_SHA recorded for validation-bearing commit e4228cfae48150d2e09bde69c7a1ae52f179034b. No source edits, CI rerun or duplicate scoring. HMD runtime remains UNTESTED; separate Quest3/VDXR test needed."
 }
