@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00868",
+  "production_id": "CONVERSION-DX11-00868",
+  "event_id": "CONVERSION-DX11-00868-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_GAME_CPU_UPLOAD_ROLLBACK",
+  "feature_id": "DX11:NATIVE_GAME_CPU_UPLOAD_ROLLBACK",
+  "target_branch": "vr-dx11-native-r71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
+  "validation_bearing_result_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
+  "result_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
+  "development_strategy": {
+    "work_class": "failure_repair",
+    "milestone_id": "native_game_cpu_frame_transactional_fallback",
+    "integration_path": [
+      "Game-origin native menu/vehicle/race CPU frame upload via D3D9 UpdateSurface",
+      "Exact full, cropped, partial or multi-dirty destination region GPU snapshot",
+      "Restore original D3D9 game backbuffer pixels if native upload fails or partially writes"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_cpu_upload_plan.hpp",
+      "src/vr/d3d11/native_game_cpu_upload_transaction.hpp",
+      "tests/vr/dx11_native_game_cpu_upload_plan.cpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact-region CPU upload plan compile-time assertions and simulated partial-write pixel restoration regression are present in the material source and pass required exact-SHA CI.",
+      "negative_regression": "Reject invalid or out-of-bounds region plans; abort upload when original backbuffer snapshot fails; quarantine failed restore until output reset; preserve original D3D9Ex game/input/FFB and DXVK paths.",
+      "component_integration": "live_game_frame_bridge invokes GPU capture before UpdateSurface, commits on success, restores on failure and retires rollback on output generation change or Reset."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_CPU_UPLOAD_ROLLBACK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_GAME_CPU_FRAME_FALLBACK",
+    "live_game_draw_path": [
+      "D3D9EX_GAME_DRAW_FALLBACK",
+      "NATIVE_CPU_FRAME_UPDATE_SURFACE"
+    ],
+    "visible_frame_acceptance": "Source and CI-backed rollback regression only; physical menu/car/race rendering on user device and Quest3/VDXR visual output remain UNTESTED.",
+    "activation_guard_and_fallback": "Native CPU publication remains opt-in; original D3D9Ex rendering, controller/FFB, native GPU route and DXVK lane are not modified by this C6 result."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_CPU_UPLOAD_ROLLBACK",
+    "goal": "Prevent failed or partial native D3D9 UpdateSurface CPU fallback upload from corrupting original game backbuffer pixels in full, cropped, partial and multi-dirty menu/vehicle/race frame paths.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_cpu_upload_original_game_pixel_rollback",
+        "expected_behavior": "The affected game backbuffer region is GPU-snapshotted before native CPU UpdateSurface, and a failed or partially completed upload restores original pixels."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "cpu_upload_fail_closed_and_d3d9ex_input_unchanged",
+        "expected_behavior": "Invalid region and failed snapshot do not upload, failed restore quarantines until reset, and native GPU plus original D3D9Ex/input/FFB/DXVK behavior is not altered."
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "same_source_sha_github_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion Gate, Windows Build, OpenXR and HUD CI all conclude success at the exact source SHA; no real HMD test inferred."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
+    "real_game_and_quest3": "UNTESTED"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_cpu_upload_plan.hpp",
+    "src/vr/d3d11/native_game_cpu_upload_transaction.hpp",
+    "tests/vr/dx11_native_game_cpu_upload_plan.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub target HEAD equals exact validation SHA; task run JSON returned NOT_FOUND (404) at HEAD. This is a newly reconstructed run record, not an overwrite of prior feature_contract/acceptance_results.",
+    "C1_REVIEW": "SOURCE_EVIDENCE_ONLY: existing material commit shows exact-region GPU backup and restoration for failed native CPU frame publication; no fresh source review or modification claimed by C6.",
+    "C2_IMPLEMENT": "EXISTING_SOURCE_ONLY: existing material commit e623986fd60acf3bea9e33913fe94c3313540c3b contains CPU upload transaction and partial-write regression; C6 does not implement or modify source.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: all five required GitHub Actions workflow runs independently observed completed SUCCESS at exact material SHA; also second OpenXR run succeeded. No CI rerun or actual HMD session.",
+    "C4_COMMIT": "PASS_EXISTING_SOURCE: existing source-bearing commit e623986fd60acf3bea9e33913fe94c3313540c3b includes [AUTO:CONVERSION-DX11-00868] without skip-ci; C6 creates only independent bookkeeping commit.",
+    "C5_PACKAGE": "NOT_REQUIRED: bookkeeping only, no new deployment/runtime package or HMD test.",
+    "C6_STATE": "PASS_EXACT_SHA: missing run record restored by separate [skip ci] bookkeeping commit; original validation-bearing SHA unchanged and no duplicate score awarded."
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "evidence": {
+    "material_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
+    "validation_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
+    "source_commit_message": "fix(dx11): restore original D3D9 game pixels on failed native CPU frame upload [AUTO:CONVERSION-DX11-00868]",
+    "run_record_recovery": "RUN_RECORD_NOT_FOUND: requested JSON absent on target branch at source SHA. feature_contract and acceptance_results source-evidence reconstructed; no existing fields were overwritten.",
+    "exact_sha_ci": {
+      "validation_sha": "e623986fd60acf3bea9e33913fe94c3313540c3b",
+      "github_directly_observed_successful_workflows": {
+        "dx11_fast": 39010249595,
+        "backend_conversion": 39010249584,
+        "windows_build": 39010254444,
+        "openxr": 39010254433,
+        "hud_inspector": 39010254460,
+        "additional_openxr": 39010249599
+      },
+      "excluded_optional_workflow": {
+        "name": "VR PC Fast Test Build",
+        "run_id": 39010249616,
+        "conclusion": "skipped"
+      },
+      "user_confirmed_all_required_success": true,
+      "note": "Read-only GitHub Actions exact-head_sha query; workflows not rerun. The optional skipped run is not represented as SUCCESS.",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "next_action": "C6 is completed for source-verified native CPU frame rollback only. Separate task required for physical game/HMD testing and any unfinished DX11 gameplay integration; do not rescore this task."
+}
