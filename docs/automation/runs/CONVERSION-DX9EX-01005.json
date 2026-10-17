@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_SOURCE_IMPLEMENTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "663701c657696488949a3ecc8ce2292ad45199dc",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "bc9b4e4c84d6028060ff1795ef36d048f0aa9084",
+  "validation_bearing_result_sha": "bc9b4e4c84d6028060ff1795ef36d048f0aa9084",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_uiscaling.cpp",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_same_producer_node_gpu_boundary": "PENDING_CI",
-    "stage_native_batch_and_fallback_isolation": "PENDING_CI",
-    "stage_r84_exact_sha_windows_host_and_domain": "PENDING_CI"
+    "stage_same_producer_node_gpu_boundary": "PASS",
+    "stage_native_batch_and_fallback_isolation": "PASS",
+    "stage_r84_exact_sha_windows_host_and_domain": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "BeforeQueueNode returned whenever enteringStage == leavingStage and goalBoundary was false. Adjacent StageExtensionTime SpriteNodes have identical producer and scope, so the queued D3DX batch for the previous node was not drained before R33 switched queue node/epoch. R33 validates physical stereo by per-node identity rather than just the homogeneous producer.",
@@ -82,5 +82,33 @@
     ],
     "evidence_limit": "Source and deterministic transition condition proven; Quest3 binocular effect not yet measured."
   },
-  "runtime_validation_notes": "No Quest3/VDXR HMD or game runtime session executed for this result."
+  "runtime_validation_notes": "No Quest3/VDXR HMD or game runtime session executed for this result.",
+  "ci_evidence": {
+    "validated_exact_sha": "bc9b4e4c84d6028060ff1795ef36d048f0aa9084",
+    "source_commit": "bc9b4e4c84d6028060ff1795ef36d048f0aa9084",
+    "dx9ex_active": {
+      "run_id": 39016568149,
+      "conclusion": "success",
+      "includes": [
+        "policy",
+        "R84 full-chain Win32",
+        "R26_SAFE Win32",
+        "x64 OpenXR host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39016568164,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 39016568324,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 39016568246,
+      "conclusion": "success"
+    }
+  },
+  "result_notes": "One functional C++ +TIME source fix on exact result SHA; C6 bookkeeping not separately scored. Quest3/VDXR HMD/game runtime not executed."
 }
