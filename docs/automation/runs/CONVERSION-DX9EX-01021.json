@@ -2,24 +2,26 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01021",
   "production_id": "CONVERSION-DX9EX-01021",
-  "event_id": "CONVERSION-DX9EX-01021-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-01021-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "fff7db2b3780a8a720b8c317bce16d5d2889cf32",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "43f9106626371e8ae957bb30a1718c8d091ac9ee",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/pause_menu_eye_affine.hpp",
     "vrhost/tests/pause_menu_eye_affine_smoke.cpp",
-    "tools/verify_vr_pause_menu_eye_affine.py"
+    "tools/verify_vr_pause_menu_eye_affine.py",
+    "tools/verify_vr_r30_generic_shader_overlay.py",
+    "tools/verify_vr_pause_sky_source_owner.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:ESC_MENU",
@@ -57,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "esc_shell_child_text": "PENDING_CI",
-    "esc_nonpause_negative": "PENDING_CI",
-    "esc_full_gate": "PENDING_CI"
+    "esc_shell_child_text": "BUILD_VERIFIED_NEED_HMD_TEST",
+    "esc_nonpause_negative": "PASS_SOURCE_AND_NATIVE_SMOKE",
+    "esc_full_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "The existing R84 finite HUD shader case admits both exact ScreenHud and source-proven queued ScreenOverlay2D, but exactPauseShaderOwner was exactHud && R30IsPauseMenuElement(), so queued ESC text used R30HudScaleValue and zero pause vertical shift while exact pause arrows used separate menu controls.",
@@ -85,8 +87,7 @@
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
     ],
-    "exact_sha": "PENDING",
-    "blocker": "Prior 01020 exact-SHA CI running while candidate authored; do not cancel, do not fake green.",
+    "exact_sha": "43f9106626371e8ae957bb30a1718c8d091ac9ee",
     "initial_validation_candidate_sha": "aff36029355eadbe4f0ab8d2f932d60d8d90d4c9",
     "integrated_source_and_ci_repair_sha": "c765048f0c24fb2aef064470301ea03a886a7c63",
     "initial_stale_verifier_failures": [
@@ -99,7 +100,40 @@
       "verify_vr_r30_generic_shader_overlay.py source/mutation PASS",
       "verify_vr_feature_unit_policy.py --check-head PASS"
     ],
-    "integrated_validation": "PENDING_ALL_FOUR_EXACT_SHA",
-    "caution": "This candidate re-requests all four exact-SHA gates with one consolidated run record; neither previous successful individual jobs nor HMD absence is counted as final PASS."
-  }
+    "integrated_validation": "PASS_4_OF_4_EXACT_SHA",
+    "caution": "This candidate re-requests all four exact-SHA gates with one consolidated run record; neither previous successful individual jobs nor HMD absence is counted as final PASS.",
+    "mandatory_gates": {
+      "dx9ex_active": {
+        "run_id": 39048503720,
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "game",
+          "host",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      "domain_isolation": {
+        "run_id": 39048503698,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39048503647,
+        "conclusion": "success"
+      },
+      "full_source_impact": {
+        "run_id": 39048503524,
+        "conclusion": "success",
+        "jobs": [
+          "source-cross-domain",
+          "msvc-analyze-active-game",
+          "msvc-analyze-openxr-host"
+        ]
+      }
+    },
+    "required_result": "4/4 PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "c6_exact_sha_success": true
 }
