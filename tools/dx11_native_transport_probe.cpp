@@ -959,6 +959,22 @@ int main()
     d3d.context->UpdateSubresource(
         gameEyeArray, D3D11CalcSubresource(0u, 1u, 2u), nullptr,
         rightEyePixels.data(), 64u * sizeof(UINT), 0u);
+    // CopyResource also produces GPU-only DEFAULT intermediates that have
+    // neither RTV nor SRV bindings. They are still valid for unscaled native
+    // CopySubresourceRegion, including independently authored stereo slices.
+    D3D11_TEXTURE2D_DESC copyOnlyDesc = gameSurfaceDesc;
+    copyOnlyDesc.ArraySize = 2u;
+    copyOnlyDesc.BindFlags = 0u;
+    ID3D11Texture2D* gameCopyOnlyArray = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &copyOnlyDesc, nullptr, &gameCopyOnlyArray)) &&
+            gameCopyOnlyArray,
+            "00853 game CopyResource-only stereo GPU intermediate allocated");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        d3d.context->CopySubresourceRegion(
+            gameCopyOnlyArray, eye, 0u, 0u, 0u, gameEyeArray,
+            D3D11CalcSubresource(0u, eye, eyeArrayDesc.MipLevels), nullptr);
+    }
     // True game menu and vehicle postpasses can use BGRA camera arrays even
     // when the native OpenXR eye target uses RGBA. Preserve each camera's
     // pixels through a GPU point-sampled color conversion (no CPU readback).
@@ -1037,12 +1053,14 @@ int main()
         ID3D11Texture2D* gameShaderIntermediate{};
         ID3D11Texture2D* gameMipIntermediate{};
         ID3D11Texture2D* gameEyeArray{};
+        ID3D11Texture2D* gameCopyOnlyArray{};
         ID3D11Texture2D* gameConvertedArray{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
+        bool replayedGpuOnlyArrayCopy[2]{};
         bool replayedPostDrawMipZeroCopy[2]{};
         bool replayedDistinctArrayEyeCopy[2]{};
         bool replayedFormatConvertedArrayCopy[2]{};
@@ -1098,6 +1116,7 @@ int main()
     gameEyeFixture.gameShaderIntermediate = gameShaderIntermediate;
     gameEyeFixture.gameMipIntermediate = mipGameIntermediate;
     gameEyeFixture.gameEyeArray = gameEyeArray;
+    gameEyeFixture.gameCopyOnlyArray = gameCopyOnlyArray;
     gameEyeFixture.gameConvertedArray = gameConvertedArray;
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
@@ -1157,7 +1176,7 @@ int main()
         auto& edgeCopy = partialGameClear.entries[eye][6];
         edgeCopy.kind = SourceClear::Kind::SourceCopy;
         edgeCopy.afterDrawOrdinal = eye == 0u ? 5u : 6u;
-        edgeCopy.source = gameEyeArray;
+        edgeCopy.source = gameCopyOnlyArray;
         edgeCopy.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
         edgeCopy.destX = 62u;
         edgeCopy.destY = 20u;
@@ -1448,6 +1467,20 @@ int main()
                 fixture.gameShaderIntermediate, &sourcePatch, destX, 48u) &&
             encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
+        // The no-RTV/no-SRV intermediate is GPU-written by CopyResource;
+        // its camera slice must still be replayed without a shader blit.
+        // An invalid slice or fully off-eye destination must fail closed.
+        const UINT copyOnlyX = eyeIndex == 0u ? 26u : 34u;
+        fixture.replayedGpuOnlyArrayCopy[eyeIndex] =
+            !encoder.copy_game_surface(
+                fixture.gameCopyOnlyArray, &sourcePatch, copyOnlyX, 56u, 2u) &&
+            !encoder.copy_game_surface(
+                fixture.gameCopyOnlyArray, &sourcePatch, 64, 56u, eyeIndex) &&
+            encoder.copy_game_surface(
+                fixture.gameCopyOnlyArray, &sourcePatch,
+                copyOnlyX, 56u, eyeIndex) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
         // Copy the real mip-0 full-resolution game pixels from a multi-mip
         // GPU postpass. Do not accidentally use the green mip-1 or increase
         // the native Draw evidence; preserve RT0, MRT1 and both eye Z owners.
@@ -1596,6 +1629,7 @@ int main()
             !fixture.rejectedInvalidSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawSurfaceCopy[eyeIndex] ||
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
+            !fixture.replayedGpuOnlyArrayCopy[eyeIndex] ||
             !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
             !fixture.replayedDistinctArrayEyeCopy[eyeIndex] ||
             !fixture.replayedFormatConvertedArrayCopy[eyeIndex] ||
@@ -1634,6 +1668,10 @@ int main()
     invalidSourceSlice.entries[1][1].sourceArraySlice = 2u;
     auto invalidStretchSource = partialGameClear;
     invalidStretchSource.entries[1][3].source = nullptr;
+    // A bindless DEFAULT texture permits GPU-only same-format Copy,
+    // never shader Stretch; reject right-eye input before any eye writes.
+    auto invalidCopyOnlyStretch = partialGameClear;
+    invalidCopyOnlyStretch.entries[1][3].source = gameCopyOnlyArray;
     auto invalidStretchBounds = partialGameClear;
     invalidStretchBounds.entries[1][3].destination = {65, 26, 71, 30};
     require(directSubmit.begin(d3d.context, 24, 33) &&
@@ -1663,6 +1701,9 @@ int main()
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster, &invalidStretchSource) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidCopyOnlyStretch) &&
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster, &invalidStretchBounds) &&
@@ -1696,6 +1737,8 @@ int main()
             gameEyeFixture.replayedPostDrawSurfaceCopy[1] &&
             gameEyeFixture.replayedPostDrawShaderCopy[0] &&
             gameEyeFixture.replayedPostDrawShaderCopy[1] &&
+            gameEyeFixture.replayedGpuOnlyArrayCopy[0] &&
+            gameEyeFixture.replayedGpuOnlyArrayCopy[1] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[0] &&
             gameEyeFixture.replayedPostDrawMipZeroCopy[1] &&
             gameEyeFixture.replayedDistinctArrayEyeCopy[0] &&
@@ -1831,6 +1874,7 @@ int main()
     gameShaderIntermediate->Release();
     mipGameIntermediate->Release();
     gameEyeArray->Release();
+    gameCopyOnlyArray->Release();
     gameConvertedArray->Release();
     gameMultisampleView->Release();
     gameMultisample->Release();
@@ -1892,6 +1936,26 @@ int main()
         require(chronologicalCopy && chronologicalStretch &&
                 chronologicalRtOnly,
                 "00849 GPU source Copy/Stretch/RT-only chronological pixels");
+        // SourceCopy on the chronological game timeline used a DEFAULT
+        // GPU-only resource with BindFlags=0. A separate post-draw copy uses
+        // the same GPU-only per-eye source: both must preserve actual pixels.
+        const UINT copyOnlyX = eyeIndex == 0u ? 27u : 35u;
+        const auto* timelineGpuOnly =
+            pixel + 21u * mapped.RowPitch + 63u * 4u;
+        const auto* copiedGpuOnly =
+            pixel + 57u * mapped.RowPitch + copyOnlyX * 4u;
+        const bool gpuOnlyCameraPixels =
+            eyeIndex == 0u
+                ? (timelineGpuOnly[0] == 0x11u &&
+                   timelineGpuOnly[1] == 0u && timelineGpuOnly[2] == 0xccu &&
+                   copiedGpuOnly[0] == 0x11u &&
+                   copiedGpuOnly[1] == 0u && copiedGpuOnly[2] == 0xccu)
+                : (timelineGpuOnly[0] == 0x33u &&
+                   timelineGpuOnly[1] == 0xbbu && timelineGpuOnly[2] == 0x22u &&
+                   copiedGpuOnly[0] == 0x33u &&
+                   copiedGpuOnly[1] == 0xbbu && copiedGpuOnly[2] == 0x22u);
+        require(gpuOnlyCameraPixels,
+                "00853 GPU-only CopyResource camera pixels survive timeline and native L/R postpass");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
         const UINT arrayX = eyeIndex == 0u ? 18u : 50u;

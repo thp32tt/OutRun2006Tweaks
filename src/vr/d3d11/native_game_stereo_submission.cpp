@@ -328,7 +328,13 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     // intermediate before the eye compositor samples it. D3D11 GPU copy
     // accepts either owned RT or SRV texture as source; do not require a
     // redundant RTV merely for an unscaled, same-format CopySubresourceRegion.
-    // CPU/staging, shared handles and UAV-only textures stay inadmissible.
+    // GPU-only DEFAULT CopyResource destinations have no RTV/SRV bind flag.
+    // They remain real, device-local game postpass sources for an unscaled,
+    // identical-format CopySubresourceRegion. Shader conversion still needs
+    // an RTV or SRV and multisample sources still need an RTV for resolve.
+    // Do not admit UAV-only, CPU/staging or shared textures through this path.
+    const bool gpuCopyOnlySource = sourceDesc.BindFlags == 0u &&
+        sourceDesc.SampleDesc.Count == 1u;
     constexpr UINT sharedFlags =
         D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
@@ -347,8 +353,9 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
         eyeDesc.SampleDesc.Count != 1u ||
         sourceDesc.Usage != D3D11_USAGE_DEFAULT ||
         sourceDesc.CPUAccessFlags != 0u ||
-        (sourceDesc.BindFlags &
-         (D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE)) == 0u ||
+        (!gpuCopyOnlySource &&
+         (sourceDesc.BindFlags &
+          (D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE)) == 0u) ||
         (sourceDesc.MiscFlags & sharedFlags) != 0u ||
         eyeDesc.Width != targetWidth_ || eyeDesc.Height != targetHeight_)
         return false;
@@ -1189,8 +1196,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         (desc.MiscFlags & sharedMask) != 0u ||
                         event.sourceArraySlice >= desc.ArraySize ||
                         desc.MipLevels == 0u ||
-                        (desc.BindFlags &
-                         (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET)) == 0u ||
+                        ((desc.BindFlags &
+                          (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET)) == 0u &&
+                         !(event.kind ==
+                               NativeGameEyePartialTargetClear::Kind::SourceCopy &&
+                           desc.BindFlags == 0u &&
+                           desc.Format == ring_.format() &&
+                           desc.SampleDesc.Count == 1u)) ||
                         b.front != 0u || b.back != 1u ||
                         b.left >= b.right || b.top >= b.bottom ||
                         b.right > desc.Width || b.bottom > desc.Height)
