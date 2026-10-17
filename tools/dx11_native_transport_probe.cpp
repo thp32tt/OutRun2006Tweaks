@@ -2238,7 +2238,23 @@ int main()
             mipRejects && mipCopies && mipStretches && correctMipPixel &&
             restoredMipZero && encoder.draw_count() == beforeCopyDraws &&
             encoder.color_draw_count() == beforeCopyColorDraws;
-        if (!fixture.replayedCameraMipGpuCopyStretch[eyeIndex]) return false;
+        if (!fixture.replayedCameraMipGpuCopyStretch[eyeIndex]) {
+            // This real GPU eye regression is also part of the much larger
+            // R116 aggregate. Report exact failing evidence so a broken
+            // selected-mip shader/copy cannot be misdiagnosed as eye routing.
+            std::cerr << "00899 camera-mip eye=" << eyeIndex
+                      << " reject=" << mipRejects
+                      << " copy=" << mipCopies
+                      << " stretch=" << mipStretches
+                      << " greenPixel=" << correctMipPixel
+                      << " recoveredEye=" << recoveredEye
+                      << " restoredMipZero=" << restoredMipZero
+                      << " drawCount=" << encoder.draw_count()
+                      << "/" << beforeCopyDraws
+                      << " colorDrawCount=" << encoder.color_draw_count()
+                      << "/" << beforeCopyColorDraws << '\\n';
+            return false;
+        }
         // Choose exactly one game-authored eye array slice. A foreign slice
         // is rejected before GPU mutation and never counts as a stereo draw.
         fixture.replayedDistinctArrayEyeCopy[eyeIndex] =
