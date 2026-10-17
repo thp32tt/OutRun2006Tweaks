@@ -29,6 +29,7 @@
 #include "gpu_water_profiler.hpp"
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "../game/universal_draw_trace.hpp"
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/goal_progress_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
@@ -1299,6 +1300,10 @@ namespace OutRunVRStereo
                     device, savedRt, savedDepth, savedViewport, original, true, depthlessPass, skipSavedViewportRestore);
             }
 
+            // Pair only physical R33 HUD submissions; R30 early routes
+            // remain explicitly UNVERIFIED (not mislabelled mono).
+            OutRunVR::UniversalTrace::ScopedDraw::RecordR33EyePair(
+                SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk);
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
@@ -1589,6 +1594,8 @@ namespace OutRunVRStereo
         {
             // No cross-TU workload observer call when diagnostics are off.
             const bool telemetry = R33TelemetryEnabled();
+            OutRunVR::UniversalTrace::ScopedDraw drawTrace(
+                telemetry, OutRunVR::UniversalTrace::DrawApi::Primitive);
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&](bool resyncAlreadyFlushed) {
@@ -1638,6 +1645,7 @@ namespace OutRunVRStereo
                 device, call, "R33/DrawPrimitive/raster-state");
             if (gpuTimed)
                 GpuWaterProbe::instance().afterDraw(true);
+            drawTrace.SetResult(SUCCEEDED(hr));
             return hr;
         }
 
@@ -1648,6 +1656,8 @@ namespace OutRunVRStereo
         {
             // No cross-TU workload observer call when diagnostics are off.
             const bool telemetry = R33TelemetryEnabled();
+            OutRunVR::UniversalTrace::ScopedDraw drawTrace(
+                telemetry, OutRunVR::UniversalTrace::DrawApi::Indexed);
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&](bool resyncAlreadyFlushed) {
@@ -1709,6 +1719,7 @@ namespace OutRunVRStereo
                 device, call, "R33/DrawIndexedPrimitive/raster-state");
             if (gpuTimed)
                 GpuWaterProbe::instance().afterDraw(true);
+            drawTrace.SetResult(SUCCEEDED(hr));
             return hr;
         }
 
@@ -1718,6 +1729,8 @@ namespace OutRunVRStereo
         {
             // No cross-TU workload observer call when diagnostics are off.
             const bool telemetry = R33TelemetryEnabled();
+            OutRunVR::UniversalTrace::ScopedDraw drawTrace(
+                telemetry, OutRunVR::UniversalTrace::DrawApi::PrimitiveUP);
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&](bool resyncAlreadyFlushed) {
@@ -1767,6 +1780,7 @@ namespace OutRunVRStereo
                 device, call, "R33/DrawPrimitiveUP/raster-state");
             if (gpuTimed)
                 GpuWaterProbe::instance().afterDraw(true);
+            drawTrace.SetResult(SUCCEEDED(hr));
             return hr;
         }
 
@@ -1778,6 +1792,8 @@ namespace OutRunVRStereo
         {
             // No cross-TU workload observer call when diagnostics are off.
             const bool telemetry = R33TelemetryEnabled();
+            OutRunVR::UniversalTrace::ScopedDraw drawTrace(
+                telemetry, OutRunVR::UniversalTrace::DrawApi::IndexedUP);
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&](bool resyncAlreadyFlushed) {
@@ -1832,6 +1848,7 @@ namespace OutRunVRStereo
                 device, call, "R33/DrawIndexedPrimitiveUP/raster-state");
             if (gpuTimed)
                 GpuWaterProbe::instance().afterDraw(true);
+            drawTrace.SetResult(SUCCEEDED(hr));
             return hr;
         }
 
@@ -1906,6 +1923,24 @@ namespace OutRunVRStereo
                 R33DepthStencilReadFailures - R33Perf.readFail,
                 R33ResetSuccesses - R33Perf.resetOk,
                 R33ResetFailures - R33Perf.resetFail);
+
+            // Emit per-family aggregates at Present (no Draw hotpath I/O).
+            // The CABE ring label is only a projected-effect candidate.
+            for (const auto& entry : OutRunVR::UniversalTrace::DrainWindow())
+            {
+                if (!entry.attempts) continue;
+                spdlog::info(
+                    "VR R84 DRAW TRACE 5s: family={} total={} ok={} failed={} "
+                    "r33Both={} r33EyeFail={} r30OrUnknownEye={} "
+                    "api[dp={},dip={},dpup={},dipup={}] "
+                    "lastDraw={} centreCallEpoch={}",
+                    OutRunVR::UniversalTrace::Name(entry.family),
+                    entry.attempts, entry.success, entry.failure,
+                    entry.r33BothEyes, entry.r33EyeOrRestoreFailed,
+                    entry.noR33EyeEvidence,
+                    entry.api[0], entry.api[1], entry.api[2], entry.api[3],
+                    entry.latestDrawId, entry.latestCentreCall);
+            }
 
             R33Perf.lastLogMs = now;
             R33Perf.syncs = R33DepthStencilSyncs;
