@@ -20,6 +20,12 @@ namespace OutRunVR::HudCommandBatch
         unsigned drawCount = 0;
         Scope scope = Scope::None;
         Producer producer = Producer::None;
+        // A queued SpriteNode is a distinct physical producer even when
+        // two nodes (or a direct glyph and a node) share +TIME's token.
+        // Never mix them into a homogeneous delayed native D3DX batch.
+        bool queued = false;
+        const void* queueNode = nullptr;
+        std::uint64_t queueEpoch = 0;
         std::uint64_t generation = 0;
         // Every native Begin/Draw/Flush/End transition must be tied to the
         // batch that was active BEFORE the D3DX call. The original D3DX
@@ -90,7 +96,10 @@ namespace OutRunVR::HudCommandBatch
         bool completeNativeDraw(const NativeSnapshot& previous,
                                 bool succeeded, Scope drawScope,
                                 Producer drawProducer,
-                                bool sourceStillMatches = true) noexcept
+                                bool sourceStillMatches = true,
+                                bool drawQueued = false,
+                                const void* drawQueueNode = nullptr,
+                                std::uint64_t drawQueueEpoch = 0) noexcept
         {
             if (!sameGeneration(previous))
                 return false;
@@ -122,7 +131,8 @@ namespace OutRunVR::HudCommandBatch
                     return false;
                 }
             }
-            recordDraw(drawScope, drawProducer);
+            recordDraw(drawScope, drawProducer,
+                drawQueued, drawQueueNode, drawQueueEpoch);
             return true;
         }
 
@@ -161,18 +171,29 @@ namespace OutRunVR::HudCommandBatch
 
         // CPU-side Draw only records commands; no GPU submission occurs here.
         // Unknown or mixed producer batches must never be promoted to HUD.
-        void recordDraw(Scope newScope, Producer newProducer) noexcept
+        void recordDraw(Scope newScope, Producer newProducer,
+                        bool drawQueued = false,
+                        const void* drawQueueNode = nullptr,
+                        std::uint64_t drawQueueEpoch = 0) noexcept
         {
             if (!active)
                 return;
             lastSuccessfulFlushMutationSerial = 0;
+            const bool validQueue = !drawQueued ||
+                (drawQueueNode != nullptr && drawQueueEpoch != 0);
             if (drawCount == 0)
             {
                 scope = newScope;
                 producer = newProducer;
-                homogeneous = true;
+                queued = drawQueued;
+                queueNode = drawQueued ? drawQueueNode : nullptr;
+                queueEpoch = drawQueued ? drawQueueEpoch : 0;
+                homogeneous = validQueue;
             }
-            else if (scope != newScope || producer != newProducer)
+            else if (!validQueue || scope != newScope ||
+                     producer != newProducer || queued != drawQueued ||
+                     (drawQueued && (queueNode != drawQueueNode ||
+                                     queueEpoch != drawQueueEpoch)))
             {
                 homogeneous = false;
             }
@@ -189,6 +210,9 @@ namespace OutRunVR::HudCommandBatch
             homogeneous = true;
             scope = Scope::None;
             producer = Producer::None;
+            queued = false;
+            queueNode = nullptr;
+            queueEpoch = 0;
         }
 
         // Successful physical Flush leaves Begin active for the next batch.

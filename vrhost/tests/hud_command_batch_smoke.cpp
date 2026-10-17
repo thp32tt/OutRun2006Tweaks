@@ -257,5 +257,45 @@ int main()
         l.producer != ProducerToken::StageExtensionTime)
         return 36;
 
+    // Same original +TIME token across two distinct SpriteNodes is NOT one
+    // native GPU submission owner. The first queue node cannot absorb direct
+    // numeric glyphs nor borrow the previous node's eye/pose epoch.
+    l.begin(&spriteA, true);
+    const int nodeA = 10, nodeB = 20;
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime);
+    if (l.queued || l.queueNode || l.queueEpoch != 0 ||
+        !l.exactUniformOwner())
+        return 37;
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                 true, &nodeA, 41);
+    if (l.homogeneous || l.exactUniformOwner())
+        return 38;
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                 true, &nodeA, 41);
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                 true, &nodeA, 41);
+    if (!l.exactUniformOwner() || !l.queued || l.queueNode != &nodeA ||
+        l.queueEpoch != 41 || l.drawCount != 2)
+        return 39;
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                 true, &nodeB, 42);
+    if (l.homogeneous || l.exactUniformOwner())
+        return 40;
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                 true, nullptr, 42);
+    if (l.exactUniformOwner())
+        return 41;
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                 true, &nodeA, 0);
+    if (l.exactUniformOwner())
+        return 42;
+    l.onFlushSuccess();
+    l.recordDraw(RenderScope::ScreenHud, ProducerToken::StageExtensionTime);
+    if (!l.exactUniformOwner() || l.queued || l.queueNode || l.queueEpoch)
+        return 43;
+
     return 0;
 }

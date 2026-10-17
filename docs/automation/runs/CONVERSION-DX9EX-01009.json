@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01009",
+  "production_id": "CONVERSION-DX9EX-01009",
+  "event_id": "CONVERSION-DX9EX-01009-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "BUILD_PENDING",
+  "phase": "C2_IMPLEMENTED",
+  "checkpoint": "C2_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "62e97a2b1bc6baeedec49e9eafd0112836131a7f",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01009.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep all six original +TIME numeric and sprite producers optically paired through the first native D3DX queued submission even when direct and queued sources carry the same semantic token. Physically separate direct glyph batches from queued SpriteNodes and isolate queued node/epoch identities through Draw, implicit Flush, normal Flush and End.",
+    "scope_boundary": "Only the exact ScreenHud +TIME direct-to-queued D3DX handoff and source-tagged R84 command-batch ledger; preserve other GOAL, F11, pause, rank, world and SkyGlow producers, native texture batching, original HRESULT, R26_SAFE, input/FFB and frozen DXVK.",
+    "trace_stages": [
+      "Six original 0x989xx sprite and numeric E8 +TIME parent scopes capture direct D3DX glyph registration before post-call queue tagging.",
+      "Before first SpriteNode selection the direct D3DX batch must submit under its original source even if the first queue child is also ScreenHud/StageExtensionTime. A native D3DX batch records queue node and epoch in addition to token, rejecting a different physical child.",
+      "R84 R30 finite per-eye HUD plane and R33 StageExtensionPhysical source fence preserve original left/right source, pose and shader over final physical GPU submission."
+    ],
+    "subcomponents": [
+      "Separate proven direct +TIME/GOAL homogeneous D3DX batch at first queued node regardless of incoming token, but never flush a queued/unknown batch as if it were direct.",
+      "Stamp each successful D3DX native Draw with its physical queue node/epoch and invalidate homogeneous source when reentrant Draw changes queue identity; retain ordinary same-node texture batching, deferred native Flush/End and lifecycle fallbacks.",
+      "Compile and execute changed-area queue and command-ledger positive/negative C++ smoke tests before one exact-SHA R84 Win32 game/host/package and required GitHub CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "exttime_direct_to_same_source_queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Direct numeric +TIME and first queued +TIME sprite physical D3DX submission",
+        "expected_behavior": "Direct source-owned glyph triangles are submitted before selecting the first queued sprite, including when its token matches; queued siblings remain stereo-eligible under their own original node."
+      },
+      {
+        "id": "exttime_queue_node_epoch_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Distinct queued SpriteNodes, native implicit texture Flush, Reset and unrelated original visuals",
+        "expected_behavior": "Identical-token queued nodes with different identity/epoch cannot share a homogeneous GPU batch; same-node multi-Draw stays batched. Unknown, mixed, stale, failed or foreign batches preserve fail-closed original behavior."
+      },
+      {
+        "id": "exttime_r84_exact_sha_integrated",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game/full-chain, R26_SAFE, x64 OpenXR host, launch package, Domain, HUD Inspector and Full Source Impact",
+        "expected_behavior": "Every applicable required GitHub Actions Gate for exactly the committed source SHA succeeds; physical Quest3/VDXR binocular +TIME sprite and digits remain separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "exttime_direct_to_same_source_queue": "PENDING_EXACT_SHA",
+    "exttime_queue_node_epoch_and_fallback": "PENDING_EXACT_SHA",
+    "exttime_r84_exact_sha_integrated": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "The first-queue direct-result drain previously required an incoming producer/scope difference. Original direct +TIME numeric glyphs and the next queued +TIME sprani share ScreenHud/StageExtensionTime, so the matching first queue bypassed the drain; the command ledger also recorded only semantic token, not physical queued node/epoch, allowing separate original SpriteNodes to appear homogeneous.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp StageExtensionEnter/Leave and VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode/DrawDest",
+      "src/vr/game/render_semantics.hpp CanDrainDirectResultBeforeFirstQueueNode",
+      "src/vr/game/hud_command_batch.hpp native D3DX Draw/Flush/End ledger and physical queue source",
+      "src/vr/d3d9/stereo_renderer_r30.cpp finite per-eye stage path; stereo_renderer_r33.cpp stage source/pose identity"
+    ],
+    "alternatives_rejected": [
+      "No global per-D3DX-Draw Flush, no expanded semantic scope for generic HUD, no replacement of native D3DX texture/session behavior, no GOAL time logic modifications."
+    ],
+    "evidence_limit": "Source-lifetime and compiled positive/negative regression proof; no claim of observed physical Quest3 optical correction."
+  },
+  "validation_notes": "Changed-area g++ -std=c++17 -O0 -Wall -Wextra hud_command_batch_smoke and stage_extension_eye_plane_smoke compile+run PASS via N100 local helper; Windows exact-SHA GitHub gates pending. HMD RUNTIME_VALIDATION=UNTESTED."
+}

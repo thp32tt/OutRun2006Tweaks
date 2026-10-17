@@ -191,7 +191,8 @@ namespace OutRunVR::GameSemantic
         bool queueAlreadyActive, bool batchActive, bool exactLiveSprite,
         unsigned pendingDraws, bool homogeneous,
         RenderScope pendingScope, ProducerToken pendingProducer,
-        RenderScope incomingScope, ProducerToken incomingProducer) noexcept
+        RenderScope incomingScope, ProducerToken incomingProducer,
+        bool pendingBatchDirect = true) noexcept
     {
         if (queueAlreadyActive || !batchActive || !exactLiveSprite ||
             !homogeneous || pendingDraws == 0u ||
@@ -204,9 +205,13 @@ namespace OutRunVR::GameSemantic
             pendingProducer == ProducerToken::ResultProgress ||
             pendingProducer == ProducerToken::OutRunStagePrintf ||
             pendingProducer == ProducerToken::PauseOptionArrow;
-        return knownResult &&
-            (incomingScope != pendingScope ||
-             incomingProducer != pendingProducer);
+        // A direct numeric +TIME batch and the first queued +TIME sprite
+        // may have IDENTICAL semantic tokens but different GPU owners.
+        // Drain the direct batch before its first queued node is selected,
+        // even in the same-producer case. Never relabel a stale queued batch.
+        (void)incomingScope;
+        (void)incomingProducer;
+        return knownResult && pendingBatchDirect;
     }
     static_assert(CanDrainDirectResultBeforeFirstQueueNode(
         false, true, true, 2, true,
@@ -228,10 +233,16 @@ namespace OutRunVR::GameSemantic
         false, true, true, 1, true,
         RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
         RenderScope::None, ProducerToken::None));
+    static_assert(CanDrainDirectResultBeforeFirstQueueNode(
+        false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        true)); // direct numeric -> first queued sprite, same +TIME token
     static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
         false, true, true, 2, true,
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
-        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        false)); // an orphaned old queued batch is not direct
     static_assert(!CanDrainDirectResultBeforeFirstQueueNode(
         true, true, true, 2, true,
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime,

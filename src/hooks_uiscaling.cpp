@@ -2975,7 +2975,9 @@ public:
                 DX9ExD3DXSpriteLifetime::CanFlush(
                     firstQueueSprite, HudBatch.sprite, firstQueueSprite),
                 HudBatch.drawCount, HudBatch.homogeneous,
-                HudBatch.scope, HudBatch.producer, nextScope, nextProducer))
+                HudBatch.scope, HudBatch.producer, nextScope, nextProducer,
+                !HudBatch.queued && HudBatch.queueNode == nullptr &&
+                    HudBatch.queueEpoch == 0))
         {
             const auto outgoingScope = HudBatch.scope;
             const auto outgoingProducer = HudBatch.producer;
@@ -3165,8 +3167,9 @@ private:
                 RenderScope::ScreenHud, nullptr, true,
                 ProducerToken::ResultTextB9200);
         }
-        const auto scope = EffectiveScope();
-        const auto source = CurrentRenderProducerToken();
+        const auto command = CapturePhysicalDrawCommand();
+        const auto scope = command.scope;
+        const auto source = command.producer;
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
@@ -3175,13 +3178,18 @@ private:
         // Draw is the FIRST command of the next texture batch, not a failed
         // reentrant batch. The ledger checks the exact Flush mutation and
         // original scope, while changed/foreign callbacks remain fail closed.
+        const auto afterNative = CapturePhysicalDrawCommand();
         const bool sameSourceAfterNative =
-            EffectiveScope() == scope &&
-            CurrentRenderProducerToken() == source;
+            afterNative.scope == command.scope &&
+            afterNative.producer == command.producer &&
+            afterNative.queued == command.queued &&
+            afterNative.queueNode == command.queueNode &&
+            afterNative.queueEpoch == command.queueEpoch;
         if (self && self == submission.sprite &&
             !HudBatch.completeNativeDraw(
                 submission, SUCCEEDED(hr), scope, source,
-                sameSourceAfterNative))
+                sameSourceAfterNative, command.queued,
+                command.queueNode, command.queueEpoch))
             return hr;
         if (FAILED(hr) || !self)
             return hr;

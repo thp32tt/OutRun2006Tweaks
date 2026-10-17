@@ -45,6 +45,21 @@ int main() {
                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime))
             return 61;
+        // Direct numeric +TIME registration must drain BEFORE the first
+        // queued +TIME sprite even if both bear the same semantic token.
+        // An old queued batch lacking an exit Flush is never reclassified
+        // as a new direct owner, including with a different queue epoch.
+        if (!CanDrainDirectResultBeforeFirstQueueNode(
+                false, true, true, 2, true,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                true) ||
+            CanDrainDirectResultBeforeFirstQueueNode(
+                false, true, true, 2, true,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                false))
+            return 68;
         // GOAL, F11, generic HUD and projected/world effects have their
         // own original boundaries and cannot acquire +TIME's GPU owner.
         if (check(true, &firstNode, &secondNode,
