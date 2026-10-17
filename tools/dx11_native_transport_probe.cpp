@@ -2244,8 +2244,15 @@ int main()
         for (auto* target : sparseAfter) if (target) target->Release();
         if (sparseDepth) sparseDepth->Release();
         if (sparseUav) sparseUav->Release();
-        // Restore the original dense game output before the remaining
-        // compute and full-resolution eye postpasses run.
+        // A sparse postpass leaves UAV3 intentionally bound. Before
+        // resuming the older RTV0/RTV1 + UAV2 test, explicitly detach ALL
+        // pixel UAVs: rebinding only UAV2 does not guarantee that UAV3 is
+        // evicted and a stale UAV can affect later GPU postprocess output.
+        ID3D11UnorderedAccessView* noPixelUavs[
+            D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            0u, nullptr, nullptr, 0u,
+            D3D11_PS_CS_UAV_REGISTER_COUNT, noPixelUavs, nullptr);
         ctx->OMSetRenderTargetsAndUnorderedAccessViews(
             2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex],
             2u, 1u, &fixture.gameOmView, nullptr);
@@ -2992,6 +2999,22 @@ int main()
         const bool scaledGpuPixel =
             scaled[0] == 0u && scaled[1] == 0u &&
             scaled[2] == 255u && scaled[3] == 255u;
+        if (!gameSurfaceCopied || !gameShaderIntermediateCopied ||
+            !gameMsaaResolved || !scaledGpuPixel) {
+            std::cerr << "00890 eye=" << eyeIndex
+                      << " RT=" << gameSurfaceCopied
+                      << " SRV=" << gameShaderIntermediateCopied
+                      << " MSAA=" << gameMsaaResolved
+                      << " scaled=" << scaledGpuPixel
+                      << " rtRGBA=" << unsigned(copied[0]) << ","
+                      << unsigned(copied[1]) << ","
+                      << unsigned(copied[2]) << ","
+                      << unsigned(copied[3])
+                      << " srvRGBA=" << unsigned(shaderCopied[0]) << ","
+                      << unsigned(shaderCopied[1]) << ","
+                      << unsigned(shaderCopied[2]) << ","
+                      << unsigned(shaderCopied[3]) << '\n';
+        }
         d3d.context->Unmap(readback, 0);
         require(distinctColor && scaledGpuPixel && actualPartialClear &&
                 orderedAfterDrawClear && gameSurfaceCopied &&
