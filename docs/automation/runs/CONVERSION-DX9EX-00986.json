@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00986",
+  "production_id": "CONVERSION-DX9EX-00986",
+  "event_id": "CONVERSION-DX9EX-00986-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "11b03e118195a6d883c9d80c66f6b67a15b606e4",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00986.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve both the stage +TIME sprite and numeric glyph screen-HUD producer through original D3DX texture transitions, deferred CPU Draw, physical GPU Flush and R84 per-eye composition, without inheriting an older batch.",
+    "scope_boundary": "Only the shared stage/GOAL D3DX command lifetime ledger and original Draw callback, not lens/SceneEffect, road WVP, SkyGlow, input/FFB, DXVK or R26_SAFE semantics.",
+    "trace_stages": [
+      "Original stage +TIME three sprani and three numeric source E8 calls tag their exact GPU producer before D3DX Draw.",
+      "The original ID3DXSprite Draw may internally flush an earlier texture batch before registering the incoming sprite; track the new command in the same live Begin generation.",
+      "R84 R30/R33 receives the new exact ScreenHud producer at real GPU Draw/Flush instead of losing it when the outer native Draw observes the completed nested Flush."
+    ],
+    "subcomponents": [
+      "Track the exact last successful internal native Flush transition in the live command ledger and conditionally accept only the new, empty homogeneous batch.",
+      "Preserve both outgoing and incoming producer scope across D3DX reentry and reject changed source, Begin, failed Flush or nested Draw with actual portable C++ negative regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_sprite_glyph_native_texture_transition",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original +TIME sprite/glyph source to R84 D3DX native GPU batches",
+        "expected_behavior": "A completed implicit texture-transition Flush must not revoke the new original Draw's exact stage or GOAL sprite producer on the same native Begin."
+      },
+      {
+        "id": "foreign_batch_native_failure_rejection",
+        "category": "fallback_regression",
+        "behavior_area": "Native HRESULT/reentry Reset and mixed/foreign owner protection",
+        "expected_behavior": "Changed producer, failed Flush, nested Draw, superseding Begin and unknown owner must not publish an exact HUD batch or change the original native HRESULT."
+      },
+      {
+        "id": "exact_sha_win32_hmd_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84/R26_SAFE x64 host and exact-SHA CI versus Quest3 optical acceptance",
+        "expected_behavior": "New portable C++ regression executes during required host build while final exact-SHA Windows game/host/package Domain HUD and Full Source gates complete; HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_sprite_glyph_native_texture_transition": "PENDING_EXACT_SHA",
+    "foreign_batch_native_failure_rejection": "PENDING_EXACT_SHA",
+    "exact_sha_win32_hmd_separation": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Ledger::completeNativeDraw currently treats any mutation during native Draw as a failed GPU transaction. A successful hooked Flush from D3DXSprite::Draw itself changes that serial, causing the returning successful texture draw to be discarded as an exact +TIME/GOAL owner.",
+    "original_evidence": "The live original DrawDest calls Draw_hk.stdcall then completeNativeDraw against the pre-call snapshot. FlushDest calls completeNativeFlush, which clears the command ledger on success and advances mutationSerial before outer Draw returns.",
+    "source_trace": [
+      "Original E8 and Sumo queue assign exact StageExtensionTime and result producer before native ID3DXSprite::Draw.",
+      "A D3DX texture transition can internally invoke native Flush, clearing prior commands in the live ledger without ending the same Begin generation.",
+      "The outer successful Draw then adds the next texture's first command, whose exact ownership must survive to Flush/End and R84 eye classification."
+    ],
+    "alternatives_rejected": [
+      "Unknown, mixed, failed or foreign D3DX work is not promoted, and no per-Draw global Flush is introduced.",
+      "No claim that this particular internal texture transition has yet been captured in Quest3 gameplay; hardware confirmation remains outstanding."
+    ],
+    "eye_ownership": "Loss of the exact ScreenHud producer can route +TIME sprite or numeric glyph into generic overlay behavior rather than R84's finite binocular HUD plane."
+  },
+  "local_validation": {
+    "cpp17_smoke": "NOT_RUN_LOCALLY",
+    "planned": "Existing portable hud_command_batch_smoke compiled and executed by mandatory x64 host CI"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Wait for final exact-SHA required CI; then C6-only bookkeeping update if green. Quest3/VDXR optics still UNTESTED."
+}

@@ -26,6 +26,11 @@ namespace OutRunVR::HudCommandBatch
         // implementation may reenter a hooked callback or start a fresh
         // texture batch. A stale outer return must not erase that new owner.
         std::uint64_t mutationSerial = 0;
+        // A successful native Flush may be invoked INSIDE D3DXSprite::Draw
+        // on a texture transition. Its new, empty batch is still live; the
+        // returning Draw owns the first command in that new batch.
+        // Other reentrant mutations must never inherit this permission.
+        std::uint64_t lastSuccessfulFlushMutationSerial = 0;
         struct NativeSnapshot final
         {
             void* sprite;
@@ -84,14 +89,34 @@ namespace OutRunVR::HudCommandBatch
 
         bool completeNativeDraw(const NativeSnapshot& previous,
                                 bool succeeded, Scope drawScope,
-                                Producer drawProducer) noexcept
+                                Producer drawProducer,
+                                bool sourceStillMatches = true) noexcept
         {
             if (!sameGeneration(previous))
                 return false;
-            if (!unchanged(previous) || !succeeded)
+            if (!succeeded)
             {
                 onFlushFailure();
                 return false;
+            }
+            if (!unchanged(previous))
+            {
+                // Native Draw can internally Flush the previous texture and
+                // then enqueue its own new texture. The Flush hook has reset
+                // drawCount and stamped the exact final mutation. Admit only
+                // this completed transition: never reattribute reentrant
+                // Draw/Begin, mixed commands, failed Flush or changed source.
+                const bool cleanInternalFlush =
+                    sourceStillMatches && active && drawCount == 0 &&
+                    homogeneous && scope == Scope::None &&
+                    producer == Producer::None &&
+                    lastSuccessfulFlushMutationSerial != 0 &&
+                    lastSuccessfulFlushMutationSerial == mutationSerial;
+                if (!cleanInternalFlush)
+                {
+                    onFlushFailure();
+                    return false;
+                }
             }
             recordDraw(drawScope, drawProducer);
             return true;
@@ -105,6 +130,7 @@ namespace OutRunVR::HudCommandBatch
             sprite = exactSprite;
             active = succeeded;
             boundaryReady = false;
+            lastSuccessfulFlushMutationSerial = 0;
             forget();
             if (succeeded && generation != UINT64_MAX)
                 ++generation;
@@ -135,6 +161,7 @@ namespace OutRunVR::HudCommandBatch
         {
             if (!active)
                 return;
+            lastSuccessfulFlushMutationSerial = 0;
             if (drawCount == 0)
             {
                 scope = newScope;
@@ -165,12 +192,16 @@ namespace OutRunVR::HudCommandBatch
         {
             forget();
             boundaryReady = false;
+            // Mark this exact mutation only. A later Draw, End or Begin
+            // revokes recovery of an outer native Draw return.
+            lastSuccessfulFlushMutationSerial = mutationSerial;
         }
 
         // Failed GPU draw/Flush cannot prove that pending commands survived.
         // Preserve HRESULT handling and make the current batch ineligible.
         void onFlushFailure() noexcept
         {
+            lastSuccessfulFlushMutationSerial = 0;
             active = false;
             boundaryReady = false;
             // A failed GPU batch cannot retain the previous +TIME/GOAL
@@ -180,6 +211,7 @@ namespace OutRunVR::HudCommandBatch
 
         void end() noexcept
         {
+            lastSuccessfulFlushMutationSerial = 0;
             active = false;
             boundaryReady = false;
             forget();

@@ -161,5 +161,80 @@ int main()
     if (l.completeNativeFlush(beforeReset,true) ||
         !l.exactUniformOwner())
         return 26;
+    // D3DXSprite::Draw may implicitly Flush an older texture during the
+    // original Draw call. A successful nested Flush starts a fresh batch;
+    // the returning Draw MUST retain its incoming +TIME/GOAL GPU owner.
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    const auto beforeImplicitFlushDraw = l.snapshot();
+    const auto implicitFlush = l.snapshot();
+    if (!l.completeNativeFlush(implicitFlush,true) ||
+        l.drawCount != 0 || !l.active)
+        return 27;
+    if (!l.completeNativeDraw(beforeImplicitFlushDraw,true,
+            RenderScope::ScreenHud,ProducerToken::GoalTime020,true) ||
+        !l.exactUniformOwner() || l.drawCount != 1 ||
+        l.producer != ProducerToken::GoalTime020 ||
+        l.lastSuccessfulFlushMutationSerial != 0)
+        return 28;
+
+    // The same native ordering also applies to another +TIME sprite after
+    // D3DX changes its source texture; neither native Begin nor extra Flush
+    // is injected by the mod into the common same-texture path.
+    const auto nextDraw = l.snapshot();
+    if (!l.completeNativeDraw(nextDraw,true,
+            RenderScope::ScreenHud,ProducerToken::GoalTime020,true) ||
+        l.drawCount != 2 || !l.homogeneous)
+        return 29;
+    const auto nativeSecondFlush = l.snapshot();
+    if (!l.completeNativeFlush(nativeSecondFlush,true) ||
+        !l.active || l.drawCount)
+        return 30;
+
+    // A caller that changes producer inside the native callback cannot
+    // claim an old Flush's clean-batch recovery token.
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::GoalTime150);
+    const auto changedSourceDraw = l.snapshot();
+    const auto changedSourceFlush = l.snapshot();
+    if (!l.completeNativeFlush(changedSourceFlush,true) ||
+        l.completeNativeDraw(changedSourceDraw,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime,false) ||
+        l.active || l.exactUniformOwner())
+        return 31;
+
+    // A failed implicit GPU Flush still invalidates the synthetic owner
+    // and must never publish the returning Draw as an exact ScreenHud batch.
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::StageExtensionTime);
+    const auto beforeFailedInternalFlush = l.snapshot();
+    const auto failingFlush = l.snapshot();
+    if (l.completeNativeFlush(failingFlush,false) ||
+        l.completeNativeDraw(beforeFailedInternalFlush,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime,true) ||
+        l.active || l.exactUniformOwner())
+        return 32;
+
+    // An inner Draw in the same generation is NOT an internal native Flush;
+    // the returning older callback may not steal that queued producer.
+    l.begin(&spriteA,true);
+    const auto reentrantDraw = l.snapshot();
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::GoalTime150);
+    if (l.completeNativeDraw(reentrantDraw,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime,true) ||
+        l.active || l.exactUniformOwner())
+        return 33;
+
+    // A newly successful Begin supersedes the original Draw even if the
+    // pointer is recycled. A stale callback must not own the next session.
+    l.begin(&spriteA,true);
+    const auto oldGenerationDraw = l.snapshot();
+    l.begin(&spriteA,true);
+    l.recordDraw(RenderScope::ScreenHud,ProducerToken::GoalTime020);
+    if (l.completeNativeDraw(oldGenerationDraw,true,
+            RenderScope::ScreenHud,ProducerToken::StageExtensionTime,true) ||
+        !l.exactUniformOwner() ||
+        l.producer != ProducerToken::GoalTime020)
+        return 34;
+
     return 0;
 }

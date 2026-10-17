@@ -3119,9 +3119,18 @@ private:
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
+        // D3DXSprite::Draw can call its own hooked Flush before returning.
+        // If that native Flush completed successfully, the newly queued
+        // Draw is the FIRST command of the next texture batch, not a failed
+        // reentrant batch. The ledger checks the exact Flush mutation and
+        // original scope, while changed/foreign callbacks remain fail closed.
+        const bool sameSourceAfterNative =
+            EffectiveScope() == scope &&
+            CurrentRenderProducerToken() == source;
         if (self && self == submission.sprite &&
             !HudBatch.completeNativeDraw(
-                submission, SUCCEEDED(hr), scope, source))
+                submission, SUCCEEDED(hr), scope, source,
+                sameSourceAfterNative))
             return hr;
         if (FAILED(hr) || !self)
             return hr;
