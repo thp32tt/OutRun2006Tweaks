@@ -74,7 +74,17 @@ def verify(hook: str, r30: str, r33: str, budget: str) -> None:
     assert "*Module::exe_ptr<int>(0x4A8C40) != 0" in active
     capture = between(r30, "bool R30CaptureSkyGlowSceneBeforeHud(", "bool R30ApplyStereoSkyGlow(")
     composite = between(r30, "bool R30ApplyStereoSkyGlow(", "ULONGLONG R30LastTelemetryMs")
-    assert capture.index("!R30GameGlowActive()") < capture.index("R29OwnerCaptureFrameSnapshot()")
+    # A previously captured clean stereo pair returns without a fresh snapshot.
+    # On the first screen draw, however, snapshot and stamp the contamination
+    # boundary even with glow OFF. This blocks later mid-Present OFF->ON bloom
+    # of already painted HUD/ESC pixels without doing GPU work while disabled.
+    assert (capture.index("R29OwnerSkyGlowCaptureStillValid(") <
+            capture.index("R29OwnerCaptureFrameSnapshot()") <
+            capture.index("R30SkyGlowScreenDrawEpoch = frame.presentEpoch;") <
+            capture.index("!R30GameGlowActive()") <
+            capture.index("device->StretchRect("))
+    assert capture.count("R29OwnerCaptureFrameSnapshot()") == 1
+    assert "GetSurfaceLevel(" not in capture
     assert capture.index("R29OwnerCaptureFrameSnapshot()") < capture.index("device->StretchRect(")
     assert composite.index("!R30GameGlowActive()") < composite.index("R29OwnerCaptureFrameSnapshot()")
     assert "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch" in composite
