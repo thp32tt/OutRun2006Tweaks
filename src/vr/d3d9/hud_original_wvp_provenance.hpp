@@ -29,7 +29,14 @@ namespace OutRunVR::HudOriginalWvp
             e.currentProducer != e.writtenProducer)
             return false;
         if (!e.queueActive)
-            return e.writtenNode == nullptr;
+        {
+            // A direct original-game HUD upload must not inherit a selected
+            // SpriteNode from a just-finished/reentrant queue submission.
+            // Queue epochs are historical and may remain nonzero after
+            // leaving the queue, but the live node must be absent on BOTH
+            // sides of the direct c64 -> physical draw transaction.
+            return e.currentNode == nullptr && e.writtenNode == nullptr;
+        }
         return e.currentNode != nullptr &&
             e.currentNode == e.writtenNode &&
             e.currentNodeEpoch != 0 &&
@@ -60,7 +67,46 @@ namespace OutRunVR::HudOriginalWvp
         ProducerToken::OutRunHudPeripheralText,
         false, nullptr, nullptr, 0, 0
     };
+    // Real producer/queue transaction regressions compiled in the R84
+    // game and host: a stale selected node must never turn a direct HUD
+    // upload into a source-proven stereo eye. A nonzero historical epoch
+    // alone is not a live node and must not suppress valid direct text.
+    inline constexpr unsigned char QueuedNodeOne = 1;
+    inline constexpr unsigned char QueuedNodeTwo = 2;
     static_assert(OwnsProducer(DirectHud));
+    static_assert(OwnsProducer({
+        RenderScope::ScreenHud, RenderScope::ScreenHud,
+        ProducerToken::OutRunHudPeripheralText,
+        ProducerToken::OutRunHudPeripheralText,
+        false, nullptr, nullptr, 11, 9
+    }));
+    static_assert(!OwnsProducer({
+        RenderScope::ScreenHud, RenderScope::ScreenHud,
+        ProducerToken::OutRunHudPeripheralText,
+        ProducerToken::OutRunHudPeripheralText,
+        false, &QueuedNodeOne, nullptr, 11, 9
+    }));
+    static_assert(!OwnsProducer({
+        RenderScope::ScreenHud, RenderScope::ScreenHud,
+        ProducerToken::OutRunHudPeripheralText,
+        ProducerToken::OutRunHudPeripheralText,
+        false, nullptr, &QueuedNodeOne, 11, 9
+    }));
+    static_assert(OwnsProducer({
+        RenderScope::ScreenHud, RenderScope::ScreenHud,
+        ProducerToken::OutRunHudText, ProducerToken::OutRunHudText,
+        true, &QueuedNodeOne, &QueuedNodeOne, 12, 12
+    }));
+    static_assert(!OwnsProducer({
+        RenderScope::ScreenHud, RenderScope::ScreenHud,
+        ProducerToken::OutRunHudText, ProducerToken::OutRunHudText,
+        true, &QueuedNodeTwo, &QueuedNodeOne, 13, 12
+    }));
+    static_assert(!OwnsProducer({
+        RenderScope::ScreenHud, RenderScope::ScreenHud,
+        ProducerToken::OutRunHudText, ProducerToken::OutRunHudText,
+        true, &QueuedNodeOne, &QueuedNodeOne, 13, 12
+    }));
     static_assert(!OwnsProducer({
         RenderScope::ScreenHud, RenderScope::WorldBillboard,
         DirectHud.currentProducer, DirectHud.writtenProducer,
