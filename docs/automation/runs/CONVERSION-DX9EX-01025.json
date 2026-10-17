@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01025",
+  "production_id": "CONVERSION-DX9EX-01025",
+  "event_id": "CONVERSION-DX9EX-01025-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "C5_GATE_PENDING",
+  "checkpoint": "C5_VALIDATION",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "bc62f7d34af3cc55e186fedb0e560c0507f3f7ae",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/hud_command_batch.hpp",
+    "vrhost/tests/hud_command_batch_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve the complete original +TIME sprite and numeric glyph sequence as a correctly owned per-eye HUD at deferred D3DX GPU submission, without letting the stage source ownership migrate into a recycled queue node, a direct batch, a foreign draw or GOAL source.",
+    "scope_boundary": "Only the R84 DX9Ex +TIME stage direct versus queued D3DXSprite Draw/Flush/End ownership and batch-lifetime transitions; exclude timer logic, GOAL content, original input/FFB, SkyGlow and world rendering, menu/HUD repositioning, DX11, frozen DXVK and R26 rollback.",
+    "trace_stages": [
+      "Original stage extension function 0x00498670 produces animation and numeric glyph families (three sprite and three numeric native call sites), tagged as exact StageExtensionTime rather than generic HUD.",
+      "src/hooks_uiscaling.cpp attaches source-specific ScreenHud producer scope to native D3DX Draw, direct and SpriteNode queue paths and records lifetime in HudCommandBatch through native Flush/End boundaries.",
+      "src/vr/game/hud_command_batch.hpp compares queue node identity and selection epoch, or exact direct batch owner, before a deferred GPU Flush/End may inherit the original stage producer; R84 eye routing consumes only proven screen-owner draws."
+    ],
+    "subcomponents": [
+      "Guard all direct +TIME and GOAL separation, early queue transitions, scope restore and foreign Draw drain against exact direct GPU batch ownership.",
+      "Guard queued stage boundary replay with matching live SpriteNode identity and epoch and negative regressions for stale epochs, recycled nodes, mixed buffers, failed flush and invalid metadata."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_deferred_both_eye_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original stage sprites and numeric glyph GPU submission",
+        "expected_behavior": "Only a live exact +TIME D3DX batch can retain its producer from source call through delayed GPU flush and eye processing; queue identity and epoch must match when queued."
+      },
+      {
+        "id": "stage_batch_isolation_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Direct/queue transition and foreign GOAL or world batch separation",
+        "expected_behavior": "A stale/recycled queued owner, malformed direct metadata, mixed or foreign Draw, and failed Flush must not become a stage screen-HUD owner or forcibly drain unrelated effects."
+      },
+      {
+        "id": "stage_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game and host compiled with package and required CI",
+        "expected_behavior": "The final exact validation-bearing SHA passes DX9Ex Active policy/game/host/full-chain/package plus Domain Isolation, HUD Inspector and Full Source Impact gates; Quest3 runtime is separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_deferred_both_eye_owner": "PENDING_CI",
+    "stage_batch_isolation_fallback": "PENDING_CI",
+    "stage_exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original-game read-only resource/decompilation mapping in docs/automation/OUTRUN_VR_REA_RESOURCE_EVIDENCE_20261018.md identifies stage producer 0x00498670 and distinct sprite/numeric branches; Quest3 runtime outcome has not been demonstrated.",
+    "source_trace": [
+      "Stage animation and numeric original call families reach scoped producer identification and the exact sprite source in src/hooks_uiscaling.cpp.",
+      "HudCommandBatch tracks active D3DXSprite Draw provenance, queued flag, queueNode and queueEpoch across source-scope boundaries and deferred Flush/End.",
+      "The R84 render path's source admission can become incorrect if an old queued D3DX GPU batch is treated as a later direct or differently queued owner during deferred physical GPU execution."
+    ],
+    "root_cause": "The previous deferred D3DX source exit and stage/GOAL queue boundary guards checked producer, scope and flushability without additionally requiring the physical batch's queue-node/epoch ownership to match the current submission mode. Source-scope lifetime alone could not prove GPU-batch ownership.",
+    "alternatives_rejected": [
+      "Do not globally flush queued D3DXSprite calls at every source exit or convert all world/GOAL draws to stage ScreenHud; unproven mixed batches must preserve original fallback.",
+      "Do not infer binocular HMD correctness from static source instrumentation or Windows CI; Quest3 physical evidence is still required."
+    ],
+    "fix_evidence": "Original material SHA bc62f7d3 added HudBatch.matchesGpuOwner guards to direct stage/GOAL exit, scope restore, foreign draw and queue-boundary seams; hud_command_batch_smoke.cpp includes both positive and stale/mixed/failed-flush negatives.",
+    "negative_test_evidence": "Source regression scenarios are present in vrhost/tests/hud_command_batch_smoke.cpp; exact-SHA Windows CI is pending after policy failure. No PASS for this attempt is asserted.",
+    "eye_ownership": "The fix only authorizes exact owner source metadata at physical D3DX batch isolation boundaries; actual left/right optic correctness and eye composition remain hardware unverified.",
+    "evidence_limit": "Read-only original static trace and GitHub material source evidence are not a headset runtime measurement."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_sha": "bc62f7d34af3cc55e186fedb0e560c0507f3f7ae",
+    "previous_failure": {
+      "run_id": 39060416912,
+      "exact_sha": "bc62f7d34af3cc55e186fedb0e560c0507f3f7ae",
+      "workflow": "DX9Ex Active Validation",
+      "job": "policy",
+      "error": "verify_vr_feature_unit_policy.py --check-head: run record missing"
+    },
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Same TASK_ID retry: original C++ material commit retained; this run record repairs the actual missing exact-HEAD feature policy input and is not a new feature or score. No CI skip on validation-bearing commit."
+}
