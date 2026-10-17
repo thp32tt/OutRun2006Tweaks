@@ -12,7 +12,8 @@ region = (root / "src/vr/d3d11/native_game_surface_copy_region.hpp").read_text(e
 
 def linked(b, h, r):
     start = b.find("bool preserve_game_surface_copy(")
-    end = b.find("void observe_game_surface_mutation(", start)
+    # Verify the post-Draw copy itself, not later CPU/GDI ticket helpers.
+    end = b.find("bool begin_game_surface_cpu_write(", start)
     if start < 0 or end <= start:
         return False
     replay = b[start:end]
