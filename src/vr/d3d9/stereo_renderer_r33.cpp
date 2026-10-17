@@ -1026,10 +1026,27 @@ namespace OutRunVRStereo
                 if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                     R29OwnerCurrentVertexShaderIdentity() != 0)
                     return OutRunVR::GoalPhysical::Source{};
+                // GOAL 0-99 and result child draws can reenter another
+                // original c64 writer without changing queue, shader or
+                // current pose. Keep native LEFT and RIGHT on that writer.
+                // R32's temporary stereo eye uploads are excluded here.
+                float originalRawWvp[16]{};
+                std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
+                std::uintptr_t rawShader = 0;
+                std::uint64_t rawShaderEpoch = 0;
+                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        originalRawWvp, rawWriteSerial, rawDrawSerial,
+                        rawShader, rawShaderEpoch) ||
+                    rawWriteSerial == 0 || rawDrawSerial == 0)
+                {
+                    rawWriteSerial = 0;
+                    rawDrawSerial = 0;
+                }
                 return OutRunVR::GoalPhysical::Source{
                     cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,
                     cmd.queueEpoch, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
+                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch,
+                    rawWriteSerial, rawDrawSerial};
             };
             const auto goalCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();

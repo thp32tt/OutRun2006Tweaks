@@ -174,6 +174,36 @@ static bool CheckGoalPhysicalBothEyeSources()
             8, 15, 0x1234, 11};
         if (!SameAfterNativeLeft(queued, queued) ||
             !SameAfterNativeLeft(direct, direct)) return false;
+        // All five original result families must retain original GPU c64
+        // ownership for direct glyph and queued sprite submission.
+        auto stampedQueued = queued;
+        stampedQueued.rawWvpWriteSerial = 701;
+        stampedQueued.rawWvpDrawSerial = 41;
+        auto stampedDirect = direct;
+        stampedDirect.rawWvpWriteSerial = 702;
+        stampedDirect.rawWvpDrawSerial = 42;
+        if (!SameAfterNativeLeft(stampedQueued, stampedQueued) ||
+            !SameAfterNativeLeft(stampedDirect, stampedDirect)) return false;
+        auto changedRaw = stampedQueued;
+        ++changedRaw.rawWvpWriteSerial;
+        if (SameAfterNativeLeft(stampedQueued, changedRaw)) return false;
+        changedRaw = stampedQueued;
+        ++changedRaw.rawWvpDrawSerial;
+        if (SameAfterNativeLeft(stampedQueued, changedRaw)) return false;
+        changedRaw = stampedDirect;
+        ++changedRaw.rawWvpWriteSerial;
+        if (SameAfterNativeLeft(stampedDirect, changedRaw)) return false;
+        changedRaw = stampedDirect;
+        ++changedRaw.rawWvpDrawSerial;
+        if (SameAfterNativeLeft(stampedDirect, changedRaw)) return false;
+        changedRaw = stampedQueued;
+        changedRaw.rawWvpDrawSerial = 0;
+        if (IsValid(changedRaw) || SameAfterNativeLeft(stampedQueued, changedRaw)) return false;
+        changedRaw = stampedDirect;
+        changedRaw.rawWvpWriteSerial = 0;
+        if (IsValid(changedRaw) || SameAfterNativeLeft(stampedDirect, changedRaw)) return false;
+        // Both absent stamps retain existing native fallback eligibility.
+        if (!IsValid(queued) || !IsValid(direct)) return false;
         auto changed = queued;
         changed.node = &nodeB;
         if (SameAfterNativeLeft(queued, changed)) return false;

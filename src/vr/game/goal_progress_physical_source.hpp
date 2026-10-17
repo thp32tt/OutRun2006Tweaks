@@ -19,6 +19,10 @@ namespace OutRunVR::GoalPhysical
         std::uint64_t drawSerial = 0;
         std::uintptr_t shader = 0;
         std::uint64_t shaderEpoch = 0;
+        // The ORIGINAL game c64 generation (not stereo eye uploads).
+        // A complete zero/zero pair preserves missing-evidence fallback.
+        std::uint64_t rawWvpWriteSerial = 0;
+        std::uint64_t rawWvpDrawSerial = 0;
     };
     constexpr bool IsGoal(const Source& s) noexcept
     {
@@ -29,6 +33,7 @@ namespace OutRunVR::GoalPhysical
     {
         return IsGoal(s) && s.poseEpoch != 0 && s.drawSerial != 0 &&
             (s.shader == 0 || s.shaderEpoch != 0) &&
+            ((s.rawWvpWriteSerial == 0) == (s.rawWvpDrawSerial == 0)) &&
             (s.queued ? s.node != nullptr && s.queueEpoch != 0
                       : s.node == nullptr && s.queueEpoch == 0);
     }
@@ -38,7 +43,9 @@ namespace OutRunVR::GoalPhysical
             a.producer == b.producer && a.queued == b.queued &&
             a.node == b.node && a.queueEpoch == b.queueEpoch &&
             a.poseEpoch == b.poseEpoch && a.drawSerial == b.drawSerial &&
-            a.shader == b.shader && a.shaderEpoch == b.shaderEpoch;
+            a.shader == b.shader && a.shaderEpoch == b.shaderEpoch &&
+            a.rawWvpWriteSerial == b.rawWvpWriteSerial &&
+            a.rawWvpDrawSerial == b.rawWvpDrawSerial;
     }
     static_assert(!IsGoal(Source{}));
     static_assert(!IsGoal(Source{GameSemantic::RenderScope::ScreenHud,
