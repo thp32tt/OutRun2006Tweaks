@@ -2037,6 +2037,20 @@ namespace OutRunVRStereo
                 Settings::VRHudResponsiveLayout.get() &&
                 std::isfinite(Settings::VRPauseMenuScale.get()) &&
                 Settings::VRPauseMenuScale.get() > 0.0f;
+
+            // R26_SAFE HMD baseline: gameplay HUD and F11 use uniform native
+            // HudScale. Their game-space view plane is already reprojected
+            // through the OpenXR eye projection; multiplying by the ratio
+            // of 2D Present aspect and XR portrait pixel aspect a second time
+            // distorts rank/glyphs (3440x1440 -> 2496x2688: Y .55 -> .214).
+            // Only explicitly owned, responsive ESC pause sprites receive
+            // the independent 2D-to-XR contain correction below.
+            if (!pauseResponsive)
+            {
+                scaleX = userScale;
+                scaleY = userScale;
+                return;
+            }
             const float fov[8]{
                 stereo.eyeFov[0].angleLeft,
                 stereo.eyeFov[0].angleRight,
