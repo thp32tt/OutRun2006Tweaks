@@ -9,6 +9,7 @@
 #include "native_game_shared_desktop_rollback.hpp"
 #include "native_game_shared_desktop_backup.hpp"
 #include "native_game_shared_desktop_source.hpp"
+#include "native_game_gpu_output_preserve.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // One process-local, opt-in, GPU-only game-frame presentation route.
@@ -204,6 +205,16 @@ public:
         // incurred a full 3440x1440 GPU CopyResource on every frame.
         // Source/destination are identically sized BGRA textures; source_
         // pixels outside this region are never exposed by StretchRect.
+        const bool entire = regionCount == 1u &&
+            visibleRegions[0].left == 0 && visibleRegions[0].top == 0 &&
+            static_cast<std::uint32_t>(visibleRegions[0].right) == width &&
+            static_cast<std::uint32_t>(visibleRegions[0].bottom) == height;
+        // Suspend the game's live MRT/DSV and PS/CS UAV outputs while
+        // ResolveSubresource/CopyResource read its full-resolution camera.
+        // Exact caller output state is restored before fence and D3D9Ex
+        // Present, including early failures creating a resolve intermediate.
+        {
+        ScopedNativeGameGpuTransferOutputs scopedOutputs(context);
         ID3D11Texture2D* readySource = source;
         if (transfer == NativeSharedDesktopSourceTransfer::Resolve) {
             // Cache one non-MSAA GPU intermediate per output generation. The
@@ -228,10 +239,6 @@ public:
                 resolvedSource_.Get(), 0u, source, 0u, desc.Format);
             readySource = resolvedSource_.Get();
         }
-        const bool entire = regionCount == 1u &&
-            visibleRegions[0].left == 0 && visibleRegions[0].top == 0 &&
-            static_cast<std::uint32_t>(visibleRegions[0].right) == width &&
-            static_cast<std::uint32_t>(visibleRegions[0].bottom) == height;
         if (entire) {
             context->CopyResource(source_.Get(), readySource);
         } else {
@@ -246,6 +253,7 @@ public:
                     source_.Get(), 0u, region.left, region.top, 0u,
                     readySource, 0u, &region);
             }
+        }
         }
         context->End(fence_.Get());
         context->Flush();

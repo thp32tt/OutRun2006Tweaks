@@ -7,11 +7,15 @@ on:
     paths:
       - src/vr/d3d11/native_shared_eye_ring.cpp
       - src/vr/d3d11/native_shared_eye_ring.hpp
+      - src/vr/d3d11/native_game_shared_desktop.hpp
+      - src/vr/d3d11/native_game_gpu_output_preserve.hpp
+      - tools/dx11_native_desktop_gpu_output_probe.cpp
       - tools/dx11_native_transport_probe.cpp
       - src/vr/d3d11/native_game_stereo_submission.cpp
       - src/vr/d3d11/native_game_stereo_submission.hpp
       # cmkr regenerates CMakeLists from this authoritative source manifest.
       - cmake.toml
+      - CMakeLists.txt
       - tools/verify_dx11_native_transport_contract.py
       - .github/workflows/dx11-native-transport-isolated.yml
   workflow_dispatch:
@@ -64,3 +68,15 @@ jobs:
           if (-not $probe) { throw "DX11 isolated native transport probe executable missing" }
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 isolated native transport WARP probe failed with exit code $LASTEXITCODE" }
+
+      - name: Build shared-desktop GPU source output isolation probe
+        shell: pwsh
+        run: cmake --build build-transport --config Release --target dx11_native_desktop_gpu_output_probe
+
+      - name: Execute real WARP GPU copy and restored MRT/PS-CS UAV regression
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-transport -Recurse -Filter dx11_native_desktop_gpu_output_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 desktop GPU output isolation probe missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 desktop GPU output isolation WARP probe failed: $LASTEXITCODE" }

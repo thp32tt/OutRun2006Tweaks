@@ -482,6 +482,14 @@ compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3d11.lib", "dxgi.lib", "dxguid.lib"]
 
+[target.dx11_native_desktop_gpu_output_probe]
+type = "executable"
+sources = ["tools/dx11_native_desktop_gpu_output_probe.cpp"]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
 [target.dx11_surface_mirror_probe]
 type = "executable"
 sources = [

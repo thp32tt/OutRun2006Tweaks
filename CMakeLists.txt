@@ -1020,6 +1020,20 @@ target_link_libraries(dx11_native_transport_probe PUBLIC
     dxguid.lib
 )
 
+# Target: dx11_native_desktop_gpu_output_probe
+set(dx11_native_desktop_gpu_output_probe_SOURCES
+    "tools/dx11_native_desktop_gpu_output_probe.cpp"
+)
+add_executable(dx11_native_desktop_gpu_output_probe)
+target_sources(dx11_native_desktop_gpu_output_probe PRIVATE
+    ${dx11_native_desktop_gpu_output_probe_SOURCES})
+target_compile_features(dx11_native_desktop_gpu_output_probe PUBLIC cxx_std_20)
+target_compile_options(dx11_native_desktop_gpu_output_probe PUBLIC "/GS" "/utf-8")
+target_include_directories(dx11_native_desktop_gpu_output_probe PUBLIC
+    "src/" "shared/" "include/")
+target_link_libraries(dx11_native_desktop_gpu_output_probe PUBLIC
+    d3d11.lib dxgi.lib dxguid.lib)
+
 # Target: dx11_surface_mirror_probe
 set(dx11_surface_mirror_probe_SOURCES
     "tools/dx11_surface_mirror_probe.cpp"
