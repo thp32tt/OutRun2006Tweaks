@@ -138,6 +138,11 @@ public:
     }
 private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
+    // Native geometry may write only its designated XR eye or offscreen
+    // camera RT0. Extra MRTs and pixel UAVs are game/host outputs, not
+    // independent eye attachments; source Draws must not mutate them.
+    [[nodiscard]] bool geometry_outputs_isolated(
+        ID3D11RenderTargetView* target) const noexcept;
     [[nodiscard]] bool game_source_target_bound(
         ID3D11RenderTargetView* gameTarget) const noexcept;
     [[nodiscard]] bool prepare_offscreen_game_draw(

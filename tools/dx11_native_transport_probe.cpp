@@ -1970,6 +1970,18 @@ int main()
             encoder.color_draw_count() == clearEyeColor;
         if (!fixture.replayedOffscreenGamePartialClears[eyeIndex])
             return false;
+        // A camera RT0 plus XR eye as MRT1 would silently draw into BOTH
+        // surfaces. Reject native offscreen source geometry before GPU issue;
+        // restore a single camera RT and replay the authentic Draw below.
+        ID3D11RenderTargetView* mixedCameraMrt[2]{gameOffscreen, eyeTarget};
+        ctx->OMSetRenderTargets(2u, mixedCameraMrt, gameOffscreenDepth);
+        const bool rejectsCameraMrt =
+            !encoder.draw_offscreen(gameOffscreen, 3u, 0u) &&
+            !encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0) &&
+            encoder.draw_count() == beforeOffscreen &&
+            encoder.color_draw_count() == beforeOffscreenEyeColor;
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
+        if (!rejectsCameraMrt) return false;
         const bool issuedOffscreen = eyeIndex == 0u
             ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
             : encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0);
@@ -2073,6 +2085,27 @@ int main()
         ctx->OMSetRenderTargetsAndUnorderedAccessViews(
             2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex],
             2u, 1u, &fixture.gameOmView, nullptr);
+        // A direct eye Draw must not mutate camera MRT1, nor a host PS UAV.
+        // Copy/Stretch below remain legitimate multi-output state-preserving
+        // postpasses, but geometry is strictly a single-target eye command.
+        const bool rejectsEyeMrt =
+            !encoder.draw(3u, 0u) &&
+            !encoder.draw_indexed(3u, 0u, 0) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        ID3D11RenderTargetView* oneEye = eyeTarget;
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            1u, &oneEye, fixture.eyeDepth[eyeIndex],
+            1u, 1u, &fixture.gameOmView, nullptr);
+        const bool rejectsEyeUav =
+            !encoder.draw(3u, 0u) &&
+            !encoder.draw_indexed(3u, 0u, 0) &&
+            encoder.draw_count() == beforeCopyDraws &&
+            encoder.color_draw_count() == beforeCopyColorDraws;
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex],
+            2u, 1u, &fixture.gameOmView, nullptr);
+        if (!rejectsEyeMrt || !rejectsEyeUav) return false;
         fixture.replayedPostDrawSurfaceCopy[eyeIndex] =
             encoder.copy_game_surface(
                 fixture.gameSurface, &sourcePatch, destX, 38u) &&

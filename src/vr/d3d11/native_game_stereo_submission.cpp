@@ -151,8 +151,38 @@ bool NativeGameEyeDrawEncoder::eye_targets_bound() const noexcept {
     return matches;
 }
 
+// A source game Draw can inherit a menu MRT1 or a PS UAV from an unrelated
+// camera/host pass while RT0 still matches our eye. D3D11 would write BOTH
+// outputs on Draw/DrawIndexed; those extra pixels bypass XR ownership and
+// potentially overwrite the other eye. Postpass Copy/Stretch deliberately
+// support MRT/UAV save+restore; this restriction is only for geometry writes.
+// Query UAV slots 1..7 only after proving RTV0 is the sole color attachment:
+// RTV and PS UAV slots overlap on D3D11 and querying an occupied RTV range
+// as UAV would be invalid. Balance all Get* COM references on every path.
+bool NativeGameEyeDrawEncoder::geometry_outputs_isolated(
+    ID3D11RenderTargetView* target) const noexcept {
+    if (!context_ || !target) return false;
+    ID3D11RenderTargetView* bound[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
+    context_->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                                  bound, nullptr);
+    bool sole = bound[0] == target;
+    for (UINT i = 1u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        if (bound[i]) sole = false;
+    for (auto* view : bound) if (view) view->Release();
+    if (!sole) return false;
+    ID3D11UnorderedAccessView* uavs[D3D11_PS_CS_UAV_REGISTER_COUNT - 1u]{};
+    context_->OMGetRenderTargetsAndUnorderedAccessViews(
+        0u, nullptr, nullptr, 1u,
+        D3D11_PS_CS_UAV_REGISTER_COUNT - 1u, uavs);
+    for (auto* view : uavs) {
+        if (view) { sole = false; view->Release(); }
+    }
+    return sole;
+}
+
 bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
-    if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
+    if (!eye_targets_bound() || !targetWidth_ || !targetHeight_ ||
+        !geometry_outputs_isolated(eyeTarget_)) return false;
 
     // A correct OM eye target with an off-eye viewport still produces no
     // game pixels. It must not count as a real stereo source Draw.
@@ -323,6 +353,7 @@ bool NativeGameEyeDrawEncoder::game_source_target_bound(
 bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
     ID3D11RenderTargetView* gameTarget) noexcept {
     if (!game_source_target_bound(gameTarget) ||
+        !geometry_outputs_isolated(gameTarget) ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     // Real game TARGET Clears and Copy/Stretch events scheduled at the
@@ -338,7 +369,8 @@ bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
         context_->OMSetRenderTargets(1u, &eye, eyeDepth_);
         if (!replay_due_source_clears()) return false;
     }
-    return game_source_target_bound(gameTarget);
+    return game_source_target_bound(gameTarget) &&
+        geometry_outputs_isolated(gameTarget);
 }
 
 bool NativeGameEyeDrawEncoder::draw_offscreen(
