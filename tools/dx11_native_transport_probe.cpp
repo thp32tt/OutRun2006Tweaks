@@ -1225,7 +1225,10 @@ int main()
         followArray.afterDrawOrdinal = followCopy.afterDrawOrdinal;
         followArray.source = gameEyeArray;
         followArray.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
-        followArray.destX = eye == 0u ? 0 : 32;
+        // Keep this late copy clear of the callback's typed-format GPU
+        // postpass at x=0..7/32..39, y=42..49. It runs after the source
+        // timeline and would otherwise legitimately overwrite our sample.
+        followArray.destX = eye == 0u ? 8 : 40;
         followArray.destY = 48;
         followArray.sourceArraySlice = eye;
     }
@@ -2056,7 +2059,8 @@ int main()
         const auto* lateCopy = pixel + 21u * mapped.RowPitch + longEyeX * 4u;
         const auto* lateScale = pixel + 14u * mapped.RowPitch +
             (longEyeX + 1u) * 4u;
-        const auto* lateArray = pixel + 49u * mapped.RowPitch + longEyeX * 4u;
+        const UINT lateArrayX = eyeIndex == 0u ? 9u : 41u;
+        const auto* lateArray = pixel + 49u * mapped.RowPitch + lateArrayX * 4u;
         const auto* lateClear = pixel + 22u * mapped.RowPitch + lateClearX * 4u;
         const auto expectedCamera =
             [&](const std::uint8_t* p) noexcept {
