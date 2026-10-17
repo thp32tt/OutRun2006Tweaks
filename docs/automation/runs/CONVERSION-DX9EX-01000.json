@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:ESC_MENU",
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_CI_PENDING",
-  "automation_validation": "PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "127b56143d1af65a44152faaa0679d6453e516ed",
   "material_result_sha": "558921cda8a9c50648d565964b5623aaf3fe4057",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "60c458ca730d98f175c9e9ad0ca5dcb6ce69802f",
   "source_paths": [
     "src/vr/d3d9/pause_menu_eye_affine.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -85,7 +85,35 @@
     ],
     "eye_ownership": "Source +TIME/GOAL and generic HUD never opt in. Only the two R84 ESC eye submissions of an exact paused ScreenHud source reuse common native pixel scaling while preserving their independent eye pose and projection."
   },
-  "ci_evidence": {},
+  "ci_evidence": {
+    "dx9ex_active": {
+      "run_id": 39010592679,
+      "conclusion": "success",
+      "head_sha": "60c458ca730d98f175c9e9ad0ca5dcb6ce69802f",
+      "job_results": {
+        "policy": "success",
+        "full_chain_compile": "success",
+        "game": "success",
+        "host": "success",
+        "package": "success"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 39010592643,
+      "conclusion": "success",
+      "head_sha": "60c458ca730d98f175c9e9ad0ca5dcb6ce69802f"
+    },
+    "prior_failure": {
+      "run_id": 39010123658,
+      "conclusion": "failure",
+      "root_cause": "obsolete opticalScale source assertions after C2 ESC shared containment refactor",
+      "repair_commits": [
+        "6c9d1b38f078054ef0e75f8799233a733d2c07a2",
+        "029c26a999347a58e49b0eca752bbb834c9fd3a4",
+        "60c458ca730d98f175c9e9ad0ca5dcb6ce69802f"
+      ]
+    }
+  },
   "score_delta_this_attempt": 0,
-  "next_action": "Inspect mandatory Actions for validation-bearing exact SHA; repair any actual failed gate under this TASK_ID. After complete SUCCESS record C6 without repeat CI. HMD Quest3/VDXR remains UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA: DX9Ex Active 39010592679 (policy/full-chain/game/host/package SUCCESS) and Domain 39010592643 SUCCESS on validation-bearing 60c458ca. Original ESC material 558921cd preserved. Quest3/VDXR stereo optics and menu visibility RUNTIME_VALIDATION=UNTESTED; obtain real HMD evidence before optical acceptance. Same TASK_ID is complete at build-verified level; do not duplicate CI or task scoring."
 }
