@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01022",
+  "production_id": "CONVERSION-DX9EX-01022",
+  "event_id": "CONVERSION-DX9EX-01022-E001",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_branch": "feature/dx9ex-01022-stage-raw-wvp-guard",
+  "feature_base_sha": "5fc13f23e15b9c22d3d48a8d4879397792b030f7",
+  "feature_last_head": "e8fe8195146bb1a3ee1f1b40d15bfc80de77bbb7",
+  "status": "FEATURE_CANDIDATE_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "0bc94f6bc8da279c979c9ea3025f6315935b838a",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve native +TIME animation and numeric glyphs as one correctly reprojected binocular HUD during a stage extension transition, detecting original WVP changes during native left draws without promoting world or unrelated GOAL sources.",
+    "scope_boundary": "Only R84 independent R30 stage-extension physical source and original-game 2D viewport ownership, leaving R33, GOAL, ranked vehicle world markers, pause, F11, world/SkyGlow, input, FFB and R26_SAFE unchanged.",
+    "trace_stages": [
+      "Original six verified EXE stage extension sprite and numeric callers 0x9898E/0x98A36/0x98AC6 and 0x989AD/0x98A89/0x98A10 publish StageExtensionTime semantics.",
+      "Native D3DX queue and direct glyph GPU draws enter R84 R30 XYZ/XYZRHW physical source capture, with GPU submission potentially reentering an original c64 writer.",
+      "R30 finite stereo eye plane uses exact ScreenHud source for original pixel extents, R30/R33 compare native-left source generations before right-eye submission."
+    ],
+    "subcomponents": [
+      "Carry tracked original raw game WVP write/draw serials in the R30 physical StageExtensionTime source stamp across native left GPU Draw, matching R33 shader eye guards.",
+      "Require physical ScreenHud stage draw ownership rather than a producer token alone before borrowing original-game source pixel extent for R84 per-eye XYZRHW presentation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_both_eye_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Direct +TIME glyph and queued stage sprite under native-left original c64 reentry",
+        "expected_behavior": "One valid stage screen source is eligible for both eyes; changed original c64 generation or queue node during LEFT rejects foreign right-eye reuse."
+      },
+      {
+        "id": "stage_foreign_world_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign world, GOAL, queued marker and unavailable raw-WVP source",
+        "expected_behavior": "Non-stage scene and GOAL remain outside stage source; mismatched or partial raw WVP serials do not authorize right eye; zero/zero unavailable tracker keeps conservative fallback."
+      },
+      {
+        "id": "stage_integrated_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game/host/package, Domain isolation, HUD inspector, Full Source impact",
+        "expected_behavior": "Changed-area smoke/mutation tests plus all required CI gates pass on one immutable validation-bearing SHA; runtime HMD remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_both_eye_source": "PENDING_FEATURE_CI",
+    "stage_foreign_world_fallback": "PENDING_FEATURE_CI",
+    "stage_integrated_exact_sha": "PENDING_EXACT_SHA"
+  },
+  "evidence_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
+  ],
+  "validation_command": [
+    "python tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "cmake --build build-host --config Release --target outrun-vr-stage-extension-owner-smoke",
+    "build-host/bin/outrun-vr-stage-extension-owner-smoke.exe",
+    "GitHub DX9Ex Active + Domain Isolation + HUD Inspector + Full Source Impact exact SHA"
+  ],
+  "validation_execution": "PENDING_FEATURE_CI; commands are planned, not claimed executed",
+  "diagnosis": {
+    "original_evidence": "2026-10-18 read-only original EXE/Ghidra evidence identified original 0x00498670 mixed sprani and numeric producer; no Quest3 run is asserted.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp exact stage E8 scopes and queued sprite ownership supply StageExtensionTime.",
+      "src/vr/d3d9/stereo_renderer_r30.cpp R30CaptureStagePhysicalSource originally initialized raw WVP serials to zero/zero, unlike R33 captureStageSource.",
+      "R30BuildStageExtensionXyzrhwEyePlane previously allowed producer-only StageExtensionTime to import source-game 2D extents."
+    ],
+    "root_cause": "R30 native XYZRHW source stamps omitted original raw c64 write generation and game pixel extent admitted a stage producer token without verifying physical ScreenHud scope; both permit stale/foreign stage ownership under native reentry.",
+    "alternatives_rejected": [
+      "No generic FVF/alpha HUD conversion or global D3DX Flush; original stage direct/queue boundary hooks already exist.",
+      "No unproven HMD rendering success or changes to world-lens, SkyGlow and unrelated GOAL producers."
+    ],
+    "fix_evidence": "R30 source stamps original c64 generation and reuses StageExtensionPhysical::SameAfterNativeLeft; exact physical ScreenHud source gates game pixel extents; smoke + destructive mutation gates added.",
+    "negative_test_evidence": "Queued node/epoch change, partial WVP serial, GOAL/world substitution and deliberate removal of capture/admission are represented in new smoke/mutation tests; actual execution pending CI.",
+    "eye_ownership": "Right eye must retain same stage source, queue/pose/shader epoch and raw original WVP write/draw pair as native left; no double submission if mismatch."
+  },
+  "ci_evidence": {
+    "status": "PENDING",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ]
+  },
+  "notes": "Roll-over is not a retry; existing attempt remains 1/3. This is a material feature candidate, not final HMD proof or a scored completion."
+}
