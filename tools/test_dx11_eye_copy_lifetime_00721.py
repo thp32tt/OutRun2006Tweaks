@@ -49,10 +49,16 @@ def preserves_game_pixel_uavs(source: str) -> bool:
         return False
     portion = source[begin:end]
     return (
-        "OMGetRenderTargetsAndUnorderedAccessViews(" in portion
+        # Read the actual bound RTV prefix before requesting pixel UAVs;
+        # OM UAV registers overlap RTVs and must start after the last RTV.
+        "OMGetRenderTargets(" in portion
+        and "NativeGameOmSlots::from_rtv_mask(occupied)" in portion
+        and "OMGetRenderTargetsAndUnorderedAccessViews(" in portion
+        and "0u, nullptr, nullptr, outputSlots.uavStart" in portion
+        and "outputSlots.uavCount, pixelOutputs + outputSlots.uavStart" in portion
         and portion.count("OMSetRenderTargetsAndUnorderedAccessViews(") == 2
-        and "pixelOutputs + rtCount" in portion
-        and "D3D11_PS_CS_UAV_REGISTER_COUNT - rtCount" in portion
+        and "outputSlots.uavCount ? pixelOutputs + outputSlots.uavStart : nullptr" in portion
+        and "outputSlots.uavCount ? keepCounters + outputSlots.uavStart : nullptr" in portion
         and "counter = UINT(-1)" in portion
         and "for (auto* output : pixelOutputs)" in portion
         and portion.count("CSSetUnorderedAccessViews(") == 2
@@ -62,9 +68,15 @@ submit = ring[ring.index("bool NativeSharedEyeRing::submit_eye_pair("):
               ring.index("bool NativeSharedEyeRing::render_eye_pair(")]
 assert preserves_game_pixel_uavs(submit), "native eye copy lost OM/CS UAV restoration"
 for old, replacement in [
+    ("OMGetRenderTargets(", "OMGetRenderTargetsAndUnorderedAccessViews("),
     ("OMGetRenderTargetsAndUnorderedAccessViews(", "OMGetRenderTargets("),
+    ("NativeGameOmSlots::from_rtv_mask(occupied)",
+     "NativeGameOmSlots::from_rtv_mask(0u)"),
+    ("outputSlots.uavCount, pixelOutputs + outputSlots.uavStart",
+     "outputSlots.uavCount, pixelOutputs"),
     ("OMSetRenderTargetsAndUnorderedAccessViews(", "OMSetRenderTargets("),
-    ("pixelOutputs + rtCount", "computeOutputs + rtCount"),
+    ("outputSlots.uavCount ? pixelOutputs + outputSlots.uavStart : nullptr",
+     "outputSlots.uavCount ? computeOutputs + outputSlots.uavStart : nullptr"),
     ("counter = UINT(-1)", "counter = 0u"),
 ]:
     assert old in submit
