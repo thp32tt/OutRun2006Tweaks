@@ -795,72 +795,112 @@ def check_external_vr_f11_canvas(font: str) -> None:
     print("PASS F11 VR font-independent full-source canvas, desktop/menu 4:3 preserved, 5 sizes and 4 mutants")
 
 def check_first_run_vr_modal(font: str) -> None:
-    """The first-run F11 popup follows XR glyph density and is viewport bounded."""
+    """The actual XR first-run popup uses the portable modal fit and a fixed footer."""
     modal = font.split("static void render_first_run_intro()", 1)[1].split(
         "void ForceShowCursor", 1)[0]
-    tokens = (
+    helper = FIT.read_text(encoding="utf-8").split(
+        "inline ModalLayout ComputeFirstRunModal(", 1)[1].split(
+        "inline Budget Compute(", 1)[0]
+    required = (
         "const bool vrModal = Game::is_vr_gameplay_presentation();",
         "const Overlay::ContentRect content = Overlay::content_rect();",
-        "std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f)",
-        "content.width * 0.90f",
-        "content.height * 0.90f",
-        "384.0f * Overlay::GlobalFontScale * density",
-        "384.0f * Overlay::GlobalFontScale;",
-        "const float modalFontFactor = vrModal",
-        "std::clamp(Overlay::GlobalFontScale / 2.0f, 0.5f, 2.5f)",
-        "700.0f * density * modalFontFactor, usableHeight",
-        "(std::min)(384.0f * Overlay::GlobalFontScale * density,",
+        "OutRunF11ResponsiveFit::ComputeFirstRunModal(",
+        "const bool useVrModalFit = vrModal && modalFit.valid;",
+        "const float popupWidth = useVrModalFit",
+        "const float popupHeight = useVrModalFit ? modalFit.height : 0.0f;",
         "ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));",
         "ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));",
-        "const float popupHeight = vrModal",
-        ": 0.0f;",
+        "if (useVrModalFit)",
+        "ImGui::SetWindowFontScale(modalFit.fontScale);",
+        "const float footerReserve = ImGui::GetFrameHeightWithSpacing() +",
+        "ImGui::GetContentRegionAvail().y - footerReserve",
+        'ImGui::BeginChild("##vr_first_run_scroll"',
+        "ImGuiWindowFlags_AlwaysVerticalScrollbar",
+        'ImGui::EndChild();',
+        'ImGui::Button("Let\\'s go"',
     )
-    for token in tokens:
-        assert token in modal, token
-    assert modal.index("const bool vrModal =") < modal.index("const float popupWidth =")
-    assert modal.index("const float popupHeight =") < modal.index("ImGui::BeginPopupModal(")
+    for token in required:
+        assert token in modal, "F11 modal owner missing: " + token
+    assert modal.index("ComputeFirstRunModal(") < modal.index(
+        "ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));")
+    assert modal.index("ImGui::SetWindowFontScale(modalFit.fontScale);") < modal.index(
+        'ImGui::BeginChild("##vr_first_run_scroll"')
+    assert modal.index('ImGui::BeginChild("##vr_first_run_scroll"') < modal.index(
+        "ImGui::PushTextWrapPos(0.0f);")
+    assert modal.index("ImGui::PopTextWrapPos();") < modal.index("ImGui::EndChild();")
+    assert modal.index("ImGui::EndChild();") < modal.index('ImGui::Button("Let\\'s go"')
+    assert "Overlay::FontScaleCommitRequested = true;" in modal
+    h_required = (
+        "std::isfinite(viewportWidth)", "std::isfinite(requestedFontScale)",
+        "std::isfinite(requestedEyeDensity)", "viewportWidth <= 0.f",
+        "const float userScale = std::clamp(requestedFontScale, 0.5f, 5.f);",
+        "const float eyeDensity = std::clamp(requestedEyeDensity, 1.f, 3.f);",
+        "const float uiFactor = std::clamp(userScale / 2.f, 0.5f, 2.5f);",
+        "const float desiredWidth = 384.f * userScale * eyeDensity;",
+        "const float desiredHeight = 700.f * eyeDensity * uiFactor;",
+        "viewportWidth * 0.90f", "viewportHeight * 0.90f",
+        "height / (7.f * glyphHeight)", "std::clamp(fit, 0.25f, 1.f)",
+    )
+    for token in h_required:
+        assert token in helper, "F11 modal budget missing: " + token
 
     def geometry(w, h, scale, density, vr):
         if not vr:
-            return 384.0 * scale, 0.0
+            return 384.0 * scale, 0.0, 1.0
+        if not all(math.isfinite(x) and x > 0 for x in (w, h, scale, density)):
+            return 0.0, 0.0, 1.0
+        user = min(max(scale, 0.5), 5.0)
         atlas = min(max(density, 1.0), 3.0)
-        font_factor = min(max(scale / 2.0, 0.5), 2.5)
-        return (min(384.0 * scale * atlas, max(1.0, w * 0.90)),
-                min(700.0 * atlas * font_factor, max(1.0, h * 0.90)))
+        factor = min(max(user / 2.0, 0.5), 2.5)
+        desired_w = 384.0 * user * atlas
+        desired_h = 700.0 * atlas * factor
+        pw = min(desired_w, w * 0.90)
+        ph = min(desired_h, h * 0.90)
+        font_fit = min(1.0, pw / desired_w, ph / (7.0 * 13.0 * user * atlas))
+        return pw, ph, min(max(font_fit, 0.25), 1.0)
 
     for w, h in ((1024, 768), (1920, 1080), (3440, 1440),
-                 (2560, 1080), (2496, 2688), (768, 1024),
-                 (1, 1)):
+                 (2560, 1080), (2496, 2688), (768, 1024), (1, 1)):
         for density in (1.0, 2.0, 2.75, 3.0):
             for scale in (0.5, 1.0, 2.0, 3.5, 5.0):
-                pw, ph = geometry(w, h, scale, density, True)
-                assert 0.0 < pw <= max(1.0, w * 0.9)
-                assert 0.0 < ph <= max(1.0, h * 0.9)
-            assert geometry(w, h, 2.0, density, False) == (768.0, 0.0)
-    # At 1080p and temporarily 1x XR atlas density, large live font
-    # edits must grow the first-run dialog rather than clip its controls.
+                pw, ph, fs = geometry(w, h, scale, density, True)
+                assert 0.0 < pw <= w * .9 and 0.0 < ph <= h * .9
+                assert .25 <= fs <= 1.0
+            assert geometry(w, h, 2.0, density, False) == (768.0, 0.0, 1.0)
     assert geometry(1920, 1080, 4.0, 1.0, True)[1] == 972.0
     assert geometry(1920, 1080, 4.0, 1.0, True)[1] > geometry(1920, 1080, 2.0, 1.0, True)[1]
-    assert geometry(1920, 1080, 4.0, 1.0, False) == (1536.0, 0.0)
-    assert geometry(3440, 1440, 2.0, 2.75, True)[0] > 768.0
-    assert geometry(3440, 1440, 2.0, 2.75, True)[1] <= 1296.0
+    assert geometry(3440, 1440, 2.0, 2.75, True)[0] == 2112.0
+    assert geometry(3440, 1440, 2.0, 2.75, True)[1] == 1296.0
+    assert geometry(1280, 720, 4.0, 3.0, True)[2] < 1.0
+    assert geometry(float("nan"), 1080, 2.0, 2.0, True)[0] == 0.0
+
+    # Mutations must invalidate live owners rather than just numeric fixtures.
     for original, bad in (
-        ("std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f)", "1.0f"),
-        ("content.width * 0.90f", "content.width * 4.0f"),
-        ("content.height * 0.90f", "content.height * 4.0f"),
-        ("384.0f * Overlay::GlobalFontScale * density",
-         "384.0f * Overlay::GlobalFontScale"),
-        ("700.0f * density * modalFontFactor, usableHeight",
-         "700.0f * density, usableHeight"),
-        ("700.0f * density * modalFontFactor, usableHeight",
-         "700.0f * density * modalFontFactor, 99999.0f"),
-        ("const bool vrModal = Game::is_vr_gameplay_presentation();",
-         "const bool vrModal = false;"),
+        ("const bool useVrModalFit = vrModal && modalFit.valid;",
+         "const bool useVrModalFit = false;"),
+        ("ImGui::SetWindowFontScale(modalFit.fontScale);",
+         "ImGui::SetWindowFontScale(1.0f);"),
+        ('ImGui::BeginChild("##vr_first_run_scroll"',
+         'ImGui::BeginChild("##removed_scroll"'),
+        ("ImGuiWindowFlags_AlwaysVerticalScrollbar", "ImGuiWindowFlags_None"),
+        ("ImGui::EndChild();", "// remove child before footer"),
+        ("ImGui::GetContentRegionAvail().y - footerReserve",
+         "ImGui::GetContentRegionAvail().y"),
     ):
         assert original in modal
         mutated = modal.replace(original, bad, 1)
-        assert any(token not in mutated for token in tokens), original
-    print("PASS first-run F11 modal XR+font density, 7 viewport sizes, 5 font scales, scroll limit and 7 mutants")
+        assert any(x not in mutated for x in required), original
+    for original, bad in (
+        ("viewportWidth * 0.90f", "viewportWidth * 4.f"),
+        ("viewportHeight * 0.90f", "viewportHeight * 4.f"),
+        ("height / (7.f * glyphHeight)", "height / glyphHeight"),
+        ("std::clamp(fit, 0.25f, 1.f)", "1.f"),
+        ("std::isfinite(requestedEyeDensity)", "true"),
+    ):
+        assert original in helper
+        mutated = helper.replace(original, bad, 1)
+        assert any(x not in mutated for x in h_required), original
+    print("PASS first-run F11 native modal geometry and font fit: 7 viewports, 5 scales, 4 densities, fixed footer, 11 source mutations")
 
 
 
