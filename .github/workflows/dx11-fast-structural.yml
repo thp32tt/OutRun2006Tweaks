@@ -116,6 +116,10 @@ jobs:
           python tools/test_dx11_output_mode_transition_00739.py
           python tools/test_dx11_source_owner_handoff_00740.py
           python tools/test_dx11_source_reset_00741.py
+          # Real game UpdateSurface/StretchRect -> native full-frame GPU region
+          # replay, including strict source-ownership and fallback checks.
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_surface_copy_region_probe_00886.cpp -o /tmp/dx11_surface_copy_00886 && /tmp/dx11_surface_copy_00886
+          python tools/test_dx11_game_surface_copy_00886.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_reset_probe_00741.cpp -o /tmp/dx11_source_reset_00741 && /tmp/dx11_source_reset_00741
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py
