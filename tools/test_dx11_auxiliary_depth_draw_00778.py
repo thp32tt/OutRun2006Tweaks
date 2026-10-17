@@ -24,7 +24,6 @@ def integrated(source, depth):
         "const bool stencilReadOnly = game_stencil_is_read_only(" in source,
         "stencilEnabled, stencilMaskKnown, stencilWriteMask" in source,
         "(stencilReadOnly ||" in source,
-        "stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask)" in source,
         "noExtraRenderTargets, s.frameBatch.stopped" in source,
         "if (isolated && depthWrites && isolatedDepthWrite)" in source,
         "if (isolated && depthWrites && isolatedDepthWrite)\n        s.clearColor.note_auxiliary_depth_write()" in source,
