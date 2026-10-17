@@ -2220,17 +2220,44 @@ int main()
         Microsoft::WRL::ComPtr<ID3D11Texture2D> mipReadback;
         if (!mipOwner || FAILED(mipOwner->CreateTexture2D(
                 &readDesc, nullptr, mipReadback.GetAddressOf()))) return false;
+        // This readback is ONLY a WARP regression probe, never a game
+        // CPU readback. The game has an additional MRT1 plus a pixel UAV:
+        // detaching OM for CopyResource must restore all of them. Calling
+        // bind_eye_output here would silently erase the game postpass
+        // attachments and invalidate the very next genuine game Draw.
+        ID3D11RenderTargetView* mipSavedTargets[2]{};
+        ID3D11DepthStencilView* mipSavedDepth = nullptr;
+        ID3D11UnorderedAccessView* mipSavedUav = nullptr;
+        ctx->OMGetRenderTargetsAndUnorderedAccessViews(
+            2u, mipSavedTargets, &mipSavedDepth, 2u, 1u, &mipSavedUav);
         ctx->OMSetRenderTargets(0u, nullptr, nullptr);
         ctx->CopyResource(mipReadback.Get(), eyeMipTexture.Get());
         D3D11_MAPPED_SUBRESOURCE mipMap{};
-        if (FAILED(ctx->Map(mipReadback.Get(), 0u, D3D11_MAP_READ,
-                            0u, &mipMap))) return false;
-        const auto* px = static_cast<const std::uint8_t*>(mipMap.pData) +
-            34u * mipMap.RowPitch + (destX + 2u) * 4u;
-        const bool correctMipPixel =
-            px[0] == 0u && px[1] == 255u && px[2] == 0u && px[3] == 255u;
-        ctx->Unmap(mipReadback.Get(), 0u);
-        const bool recoveredEye = encoder.bind_eye_output();
+        const HRESULT mappedMip = ctx->Map(
+            mipReadback.Get(), 0u, D3D11_MAP_READ, 0u, &mipMap);
+        bool correctMipPixel = false;
+        if (SUCCEEDED(mappedMip)) {
+            const auto* px = static_cast<const std::uint8_t*>(mipMap.pData) +
+                34u * mipMap.RowPitch + (destX + 2u) * 4u;
+            correctMipPixel =
+                px[0] == 0u && px[1] == 255u &&
+                px[2] == 0u && px[3] == 255u;
+            ctx->Unmap(mipReadback.Get(), 0u);
+        }
+        const UINT preserveUavCounter = UINT(-1);
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            2u, mipSavedTargets, mipSavedDepth,
+            2u, 1u, &mipSavedUav, &preserveUavCounter);
+        const bool recoveredEye =
+            mipSavedTargets[0] == eyeTarget &&
+            mipSavedTargets[1] == fixture.gameSurfaceView &&
+            mipSavedDepth == fixture.eyeDepth[eyeIndex] &&
+            mipSavedUav == fixture.gameOmView;
+        for (auto*& target : mipSavedTargets) {
+            if (target) { target->Release(); target = nullptr; }
+        }
+        if (mipSavedDepth) mipSavedDepth->Release();
+        if (mipSavedUav) mipSavedUav->Release();
         const bool restoredMipZero = recoveredEye &&
             encoder.copy_game_surface(
                 fixture.gameMipIntermediate, &sourcePatch, destX, 32u);
