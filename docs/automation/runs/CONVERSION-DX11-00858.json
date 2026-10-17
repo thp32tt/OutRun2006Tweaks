@@ -10,16 +10,16 @@
   "work_key": "DX11:STEREO_SOURCE_MRT_UNBIND_RESTORE",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
-  "status": "IMPLEMENTED_PENDING_FULL_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "score_change": 0,
   "full_dx11_renderer_complete": false,
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d215591145f55cb302caf159cc79a1ef2cf4b7f7",
   "result_sha": null,
   "feature_contract": {
     "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
@@ -92,7 +92,7 @@
     "C3_VALIDATE": "PENDING GitHub Actions exact-SHA source verification; hardware not available.",
     "C4_COMMIT": "PENDING material commit, no CI skip.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS_EXACT_SHA: five required GitHub CI checks SUCCESS at d215591145f55cb302caf159cc79a1ef2cf4b7f7; C6 bookkeeping-only [skip ci]. Quest3/VDXR HMD and gamepad runtime UNTESTED."
   },
   "next_action": "Check exact material SHA five mandatory GitHub Actions gates; repair real failures on this same TASK_ID; record C6 only after exact-SHA full PASS."
 }
