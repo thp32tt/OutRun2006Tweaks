@@ -104,3 +104,37 @@ for token in ("nativeScreenHudPixels ||", "queuedOriginalHudPixels) &&",
     else:
         raise AssertionError("game/source viewport negative mutation survived: " + token)
 print("PASS R84 original game-pixel HUD to XR-eye viewport; native/queue/goal ownership and rollback negatives")
+
+# R84's original FVF142 Draw families must not be left-eye-only when the
+# native EXE submits a source-proven sprite through a non-indexed/UP path.
+# This is a structural mutation oracle, not Quest3 optical evidence.
+r33 = (root / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8-sig")
+api = (root / "src/vr/core/r30_support_api.hpp").read_text(encoding="utf-8-sig")
+policy = (root / "src/vr/game/rank_marker_fixedfn_r62.hpp").read_text(encoding="utf-8-sig")
+routes = {
+    "DrawPrimitiveDestR33(": "R30SupportTryFixedFunctionOriginalSpritePrimitive(",
+    "DrawIndexedPrimitiveDestR33(": "R30SupportTryFixedFunctionProjectedRankIndexed(",
+    "DrawPrimitiveUPDestR33(": "R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(",
+    "DrawIndexedPrimitiveUPDestR33(": "R30SupportTryFixedFunctionOriginalSpriteIndexedUP(",
+}
+for entry, owner in routes.items():
+    assert owner in api or owner == "R30SupportTryFixedFunctionProjectedRankIndexed("
+    assert owner in r30 and owner in r33
+    section = r33.split("HRESULT __stdcall " + entry, 1)[1].split(
+        "R33GuardStereoRasterState(", 1)[0]
+    assert section.index(owner) < section.index("const HRESULT xyzrhw")
+    assert "if (resyncAlreadyFlushed)" in section
+    assert "if (exact != E_NOTIMPL) return exact;" in section or (
+        "if (r62 != E_NOTIMPL)" in section)
+    mutated = section.replace(owner, "BROKEN_MISSING_FVF142_ROUTE(", 1)
+    assert owner not in mutated  # negative mutation must fail the route check
+assert "ExactR84FixedFnSpriteOwner(" in r30
+assert "ExactR84FixedFnSpriteOwner(" in policy
+assert "R30ExecuteXyzrhwStereo(" in r30
+for mode in ("RawDraw&& rawDraw", "return rawDraw();",
+             "R29OwnerCallRawDrawPrimitiveUP(",
+             "R29OwnerCallRawDrawIndexedPrimitiveUP(",
+             "if (!data || stride < 24u)",
+             "format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32"):
+    assert mode in r30, mode
+print("PASS R84 0x142 source-owned stereo DrawPrimitive/Indexed/UP routes; Quest3 UNTESTED")

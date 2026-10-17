@@ -1602,6 +1602,15 @@ namespace OutRunVRStereo
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
                     (!OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
+                // FVF142 original sprite sources are not XYZRHW. Do not
+                // depend on the cached VS shadow: R30 checks live FVF/VS,
+                // exact producer, target and stereo pose before GPU writes.
+                if (resyncAlreadyFlushed)
+                {
+                    const HRESULT exact = R30SupportTryFixedFunctionOriginalSpritePrimitive(
+                        device, type, startVertex, primitiveCount);
+                    if (exact != E_NOTIMPL) return exact;
+                }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount)
@@ -1722,6 +1731,15 @@ namespace OutRunVRStereo
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
                     (!OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
+                // FVF142 original sprite sources are not XYZRHW. Do not
+                // depend on the cached VS shadow: R30 checks live FVF/VS,
+                // exact producer, target and stereo pose before GPU writes.
+                if (resyncAlreadyFlushed)
+                {
+                    const HRESULT exact = R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
+                        device, type, primitiveCount, data, stride);
+                    if (exact != E_NOTIMPL) return exact;
+                }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride)
@@ -1773,6 +1791,16 @@ namespace OutRunVRStereo
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
                     (!OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
+                // FVF142 original sprite sources are not XYZRHW. Do not
+                // depend on the cached VS shadow: R30 checks live FVF/VS,
+                // exact producer, target and stereo pose before GPU writes.
+                if (resyncAlreadyFlushed)
+                {
+                    const HRESULT exact = R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
+                        device, type, minVertexIndex, numVertices, primitiveCount,
+                        indexData, indexFormat, vertexData, stride);
+                    if (exact != E_NOTIMPL) return exact;
+                }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,

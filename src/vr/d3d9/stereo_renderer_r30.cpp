@@ -6203,10 +6203,10 @@ namespace OutRunVRStereo
         // R84's already-coherent finite optical +TIME/GOAL/ScreenHud plane.
         // Never promote untagged/foreign, world, external ImGui or SkyGlow.
         // Inapplicable/unproven input returns E_NOTIMPL before GPU writes.
-        HRESULT R30TryFixedFunctionProjectedRankIndexed(
+        template <typename RawDraw>
+        HRESULT R30TryFixedFunctionOriginalSpriteStereo(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
+            UINT primitiveCount, RawDraw&& rawDraw)
         {
             using namespace OutRunVR::GameSemantic;
             const auto sourceScope = EffectiveScope();
@@ -6248,9 +6248,9 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             // Rank marker must still prove its captured Calc3D2D source.
             // Native HUD uses its separate exact ScreenHud queue producer.
-            if (projected &&
-                !OutRunVR::RankMarker::ExactR62FixedFnRankRoute(
-                    true, true, true, fvf, true, true))
+            if (!OutRunVR::RankMarker::ExactR84FixedFnSpriteOwner(
+                    projected, marker && marker->valid, exactHud,
+                    pauseOverlay, true, fvf, true, true))
                 return E_NOTIMPL;
 
             R30XyzrhwState state{};
@@ -6338,9 +6338,7 @@ namespace OutRunVRStereo
                 const HRESULT set = device->SetTransform(
                     D3DTS_PROJECTION, &eyeProjection[eye]);
                 if (FAILED(set)) return set;
-                return R29OwnerCallRawDrawIndexedPrimitive(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
+                return rawDraw();
             };
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state,
@@ -6376,6 +6374,54 @@ namespace OutRunVRStereo
                         primitiveCount);
             }
             return hr;
+        }
+
+
+        // The EXE may submit the same tagged 0x142 sprite family by indexed
+        // VB, non-indexed VB, or immediate UP. Native left + right must share
+        // one physical source and the same fixed-function projection restore.
+        HRESULT R30TryFixedFunctionProjectedRankIndexed(
+            IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+            INT b, UINT m, UINT n, UINT s, UINT p)
+        {
+            return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
+                return R29OwnerCallRawDrawIndexedPrimitive(d,t,b,m,n,s,p);
+            });
+        }
+
+        HRESULT R30TryFixedFunctionOriginalSpritePrimitive(
+            IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p)
+        {
+            return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
+                return R29OwnerCallRawDrawPrimitive(d,t,s,p);
+            });
+        }
+
+        HRESULT R30TryFixedFunctionOriginalSpritePrimitiveUP(
+            IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+            const void* data, UINT stride)
+        {
+            // XYZ + DIFFUSE + TEX1 is 12+4+8 bytes. Never read a partial
+            // application-owned UP quad or alter unowned geometry.
+            if (!data || stride < 24u) return E_NOTIMPL;
+            return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
+                return R29OwnerCallRawDrawPrimitiveUP(d,t,p,data,stride);
+            });
+        }
+
+        HRESULT R30TryFixedFunctionOriginalSpriteIndexedUP(
+            IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+            UINT minVertex, UINT vertexCount, UINT p,
+            const void* indices, D3DFORMAT format,
+            const void* vertices, UINT stride)
+        {
+            if (!indices || !vertices || stride < 24u ||
+                (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
+                return E_NOTIMPL;
+            return R30TryFixedFunctionOriginalSpriteStereo(d, t, p, [&] {
+                return R29OwnerCallRawDrawIndexedPrimitiveUP(d,t,
+                    minVertex,vertexCount,p,indices,format,vertices,stride);
+            });
         }
 
         HRESULT R30TryXyzrhwIndexedPrimitiveVB(
@@ -7830,6 +7876,26 @@ namespace OutRunVRStereo
         INT b, UINT m, UINT n, UINT s, UINT p) noexcept
     {
         return R30TryFixedFunctionProjectedRankIndexed(d,t,b,m,n,s,p);
+    }
+
+    HRESULT R30SupportTryFixedFunctionOriginalSpritePrimitive(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
+    {
+        return R30TryFixedFunctionOriginalSpritePrimitive(d,t,s,p);
+    }
+    HRESULT R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT p,
+        const void* data, UINT stride) noexcept
+    {
+        return R30TryFixedFunctionOriginalSpritePrimitiveUP(d,t,p,data,stride);
+    }
+    HRESULT R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT m, UINT n, UINT p,
+        const void* indices, D3DFORMAT format,
+        const void* vertices, UINT stride) noexcept
+    {
+        return R30TryFixedFunctionOriginalSpriteIndexedUP(
+            d,t,m,n,p,indices,format,vertices,stride);
     }
     HRESULT R30SupportTryXyzrhwIndexedPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t,

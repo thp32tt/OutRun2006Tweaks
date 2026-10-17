@@ -29,6 +29,33 @@ int main()
         if(candidate)++accepted;else++rejected;
     }
     if(accepted!=100 || rejected!=900) return 1001;
+    // Each physical Draw* family shares these same exact producer gates.
+    // A projected marker with no anchor must NOT gain screen-HUD authority.
+    for(int mode=0;mode<12;++mode)
+    {
+        bool projected=false, anchor=false, hud=false, pause=false;
+        bool noShader=true, backbuffer=true, triangle=true;
+        std::uint32_t fvf=0x142u;
+        switch(mode)
+        {
+        case 0: projected=true; anchor=true; break;
+        case 1: hud=true; break;
+        case 2: pause=true; break;
+        case 3: projected=true; hud=true; break;  // no anchor: fail closed
+        case 4: projected=true; anchor=false; break;
+        case 5: break;                           // untagged
+        case 6: hud=true; noShader=false; break; // live shader
+        case 7: hud=true; fvf=0x144u; break;      // XYZRHW
+        case 8: pause=true; backbuffer=false; break;
+        case 9: hud=true; triangle=false; break;
+        case 10: projected=true; anchor=true; fvf=0x112u; break;
+        case 11: projected=true; anchor=true; noShader=false; break;
+        }
+        const bool expected=mode<=2;
+        const bool route=OutRunVR::RankMarker::ExactR84FixedFnSpriteOwner(
+            projected,anchor,hud,pause,noShader,fvf,triangle,backbuffer);
+        if(route != expected) return 1100+mode;
+    }
     std::cout<<"PASS R62->R84 exact car-rank FVF142 1000 cases, "
         <<accepted<<" accepted, "<<rejected<<" rejected\n";
     return 0;
