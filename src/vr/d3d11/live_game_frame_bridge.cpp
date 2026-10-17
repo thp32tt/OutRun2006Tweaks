@@ -5650,27 +5650,32 @@ bool preserve_game_surface_copy(
         const std::size_t rowBytes = std::size_t(region.width()) * 4u;
         const bool readable = locked.pBits && locked.Pitch > 0 &&
             std::uint64_t(locked.Pitch) >= std::uint64_t(desc.Width) * 4u;
+        bool copied = readable;
         if (readable) {
-            s.surfaceReplayPixels.resize(
-                rowBytes * std::size_t(region.height()));
-            const auto* bytes = static_cast<const std::uint8_t*>(locked.pBits);
-            for (UINT y = 0u; y < region.height(); ++y) {
-                auto* dst = s.surfaceReplayPixels.data() +
-                            std::size_t(y) * rowBytes;
-                const auto* src = bytes +
-                    std::size_t(region.top + y) * std::size_t(locked.Pitch) +
-                    std::size_t(region.left) * 4u;
-                std::memcpy(dst, src, rowBytes);
-                if (desc.Format == D3DFMT_X8R8G8B8) {
-                    // D3D9 X8 has no defined alpha. Never copy its X byte
-                    // into a native BGRA8 RTV as visible alpha.
-                    for (std::size_t x = 3u; x < rowBytes; x += 4u)
-                        dst[x] = 0xffu;
+            // Always unlock D3D9 staging even when vector growth fails.
+            // A dangling LockRect would poison later gameplay readbacks.
+            try {
+                s.surfaceReplayPixels.resize(
+                    rowBytes * std::size_t(region.height()));
+                const auto* bytes = static_cast<const std::uint8_t*>(locked.pBits);
+                for (UINT y = 0u; y < region.height(); ++y) {
+                    auto* dst = s.surfaceReplayPixels.data() +
+                                std::size_t(y) * rowBytes;
+                    const auto* src = bytes +
+                        std::size_t(region.top + y) * std::size_t(locked.Pitch) +
+                        std::size_t(region.left) * 4u;
+                    std::memcpy(dst, src, rowBytes);
+                    if (desc.Format == D3DFMT_X8R8G8B8) {
+                        // D3D9 X8 has no defined alpha. Never copy its X byte
+                        // into a native BGRA8 RTV as visible alpha.
+                        for (std::size_t x = 3u; x < rowBytes; x += 4u)
+                            dst[x] = 0xffu;
+                    }
                 }
-            }
+            } catch (...) { copied = false; }
         }
         const HRESULT unlocked = s.surfaceReplayReadback->UnlockRect();
-        if (!readable || FAILED(unlocked)) return false;
+        if (!copied || FAILED(unlocked)) return false;
 
         auto* device = s.backend.device();
         auto* context = s.backend.context();
