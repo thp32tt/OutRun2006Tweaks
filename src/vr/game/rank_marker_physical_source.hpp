@@ -18,6 +18,10 @@ namespace OutRunVR::RankMarker
         std::uint64_t queueEpoch;
         GameSemantic::ProjectedMarkerInfo marker;
         std::uint64_t poseEpoch;
+        // Reentrant native left Draw may select the same node under another
+        // draw or FVF. RIGHT must retain the original physical command.
+        std::uint64_t drawSerial;
+        std::uint32_t fvf;
         std::uintptr_t shader;
         std::uint64_t shaderEpoch;
     };
@@ -33,7 +37,7 @@ namespace OutRunVR::RankMarker
             std::isfinite(s.marker.viewX) &&
             std::isfinite(s.marker.viewY) &&
             std::isfinite(s.marker.viewZ) &&
-            s.poseEpoch != 0 &&
+            s.poseEpoch != 0 && s.drawSerial != 0 &&
             (s.shader == 0 || s.shaderEpoch != 0) &&
             (s.queued ? (s.queueNode && s.queueEpoch != 0) :
                         (!s.queueNode && s.queueEpoch == 0));
@@ -53,6 +57,8 @@ namespace OutRunVR::RankMarker
             before.marker.viewY == after.marker.viewY &&
             before.marker.viewZ == after.marker.viewZ &&
             before.poseEpoch == after.poseEpoch &&
+            before.drawSerial == after.drawSerial &&
+            before.fvf == after.fvf &&
             before.shader == after.shader &&
             before.shaderEpoch == after.shaderEpoch;
     }

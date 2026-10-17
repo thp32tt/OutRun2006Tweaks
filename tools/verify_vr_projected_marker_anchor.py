@@ -7,6 +7,8 @@ UI = ROOT / "src/hooks_uiscaling.cpp"
 RANK_FRACTION = ROOT / "src/vr/game/rank_marker_fraction.hpp"
 FRAMERATE = ROOT / "src/hooks_framerate.cpp"
 R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
+R84 = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
+RANK_PHYSICAL = ROOT / "src/vr/game/rank_marker_physical_source.hpp"
 
 
 def fail(message: str) -> None:
@@ -46,6 +48,8 @@ ui = read(UI)
 rank_fraction = read(RANK_FRACTION)
 framerate = read(FRAMERATE)
 r30 = read(R30)
+r84 = read(R84)
+rank_physical = read(RANK_PHYSICAL)
 
 # Exact projected rank/rival markers must carry a recovered game-view anchor.
 for marker in (
@@ -665,5 +669,74 @@ for name, old, new in (
         pass
     else:
         fail("rank correction negative mutation escaped: " + name)
+
+
+# R84 physical left/right rank source is distinct from the R26_SAFE fallback.
+# Guard identical SpriteNode and Calc3D2D markers against intervening native
+# Draw and fixed-function input-layout changes before publishing RIGHT.
+def require_r84_physical_rank_transaction(header: str, renderer: str) -> None:
+    for token in (
+        "std::uint64_t drawSerial;", "std::uint32_t fvf;",
+        "s.drawSerial != 0", "before.drawSerial == after.drawSerial",
+        "before.fvf == after.fvf",
+    ):
+        if token not in header:
+            fail("R84 rank source identity lost: " + token)
+    capture = function_body(renderer, "bool R30CaptureProjectedRankPhysicalSource(")
+    for token in (
+        "device->GetFVF(&fvf)",
+        "R29OwnerTopLevelDrawSerial(), fvf, shader, shaderEpoch",
+        "ValidRankSource(source)",
+    ):
+        if token not in capture:
+            fail("R84 physical rank capture lost: " + token)
+    physical = function_body(renderer, "HRESULT R30ExecuteXyzrhwStereo(")
+    for token in (
+        "R30CaptureProjectedRankPhysicalSource(device, rankBefore)",
+        "const HRESULT leftHr = leftDraw();",
+        "R30CaptureProjectedRankPhysicalSource(device, rankAfter)",
+        "SameRankSourceAfterNativeLeft(",
+        "R29OwnerMarkRightDrawFailed();", "R29OwnerArmMonoSafety();",
+    ):
+        if token not in physical:
+            fail("R84 native rank stereo gate lost: " + token)
+    if not (physical.index("R30CaptureProjectedRankPhysicalSource(device, rankBefore)") <
+            physical.index("const HRESULT leftHr = leftDraw();") <
+            physical.index("R30CaptureProjectedRankPhysicalSource(device, rankAfter)") <
+            physical.index("SameRankSourceAfterNativeLeft(")):
+        fail("R84 rank physical after-native-left source gate misordered")
+
+require_r84_physical_rank_transaction(rank_physical, r84)
+for label, original, broken in (
+    ("same-node next Draw", "before.drawSerial == after.drawSerial",
+     "before.drawSerial != after.drawSerial"),
+    ("fixedfn FVF switch", "before.fvf == after.fvf", "true"),
+    ("unknown draw", "s.drawSerial != 0", "true"),
+):
+    if original not in rank_physical:
+        fail("R84 rank mutation input missing: " + label)
+    try:
+        require_r84_physical_rank_transaction(
+            rank_physical.replace(original, broken, 1), r84)
+    except SystemExit:
+        pass
+    else:
+        fail("R84 rank mutation escaped: " + label)
+for label, original, broken in (
+    ("lost native Draw identity", "R29OwnerTopLevelDrawSerial(), fvf, shader, shaderEpoch",
+     "0u, fvf, shader, shaderEpoch"),
+    ("lost native FVF", "device->GetFVF(&fvf)", "device->GetFVF(nullptr)"),
+    ("reused old snapshot", "R30CaptureProjectedRankPhysicalSource(device, rankAfter)",
+     "R30CaptureProjectedRankPhysicalSource(device, rankBefore)"),
+):
+    if original not in r84:
+        fail("R84 rank native mutation input missing: " + label)
+    try:
+        require_r84_physical_rank_transaction(
+            rank_physical, r84.replace(original, broken, 1))
+    except SystemExit:
+        pass
+    else:
+        fail("R84 physical rank mutation escaped: " + label)
 
 print("VR projected marker anchor contract PASS")

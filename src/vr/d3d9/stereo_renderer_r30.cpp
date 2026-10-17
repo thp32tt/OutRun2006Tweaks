@@ -5443,12 +5443,16 @@ namespace OutRunVRStereo
         // primitive, not the previous tick's SpriteNode or cached rank WVP.
         // Fixed-function FVF 0x142 legitimately has a null vertex shader.
         bool R30CaptureProjectedRankPhysicalSource(
+            IDirect3DDevice9* device,
             OutRunVR::RankMarker::PhysicalRankSource& source) noexcept
         {
             using namespace OutRunVR::GameSemantic;
             const auto draw = CapturePhysicalDrawCommand();
             const auto* marker = CurrentProjectedMarker();
-            if (!marker || !marker->valid)
+            if (!marker || !marker->valid || !device)
+                return false;
+            DWORD fvf = 0;
+            if (FAILED(device->GetFVF(&fvf)))
                 return false;
             std::uintptr_t shader = 0;
             std::uint64_t shaderEpoch = 0;
@@ -5459,7 +5463,7 @@ namespace OutRunVRStereo
                 draw.scope, draw.producer, draw.queued,
                 draw.queueNode, draw.queueEpoch, *marker,
                 OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                shader, shaderEpoch
+                R29OwnerTopLevelDrawSerial(), fvf, shader, shaderEpoch
             };
             return OutRunVR::RankMarker::ValidRankSource(source);
         }
@@ -5490,7 +5494,7 @@ namespace OutRunVRStereo
             OutRunVR::RankMarker::PhysicalRankSource rankBefore{};
             const bool exactRank = state.projectedWorldMarker;
             if (exactRank &&
-                !R30CaptureProjectedRankPhysicalSource(rankBefore))
+                !R30CaptureProjectedRankPhysicalSource(device, rankBefore))
                 return E_NOTIMPL; // no physical GPU draw yet
 
             // A queued +TIME sprite or direct numeric glyph must retain
@@ -5568,7 +5572,7 @@ namespace OutRunVRStereo
             if (exactRank)
             {
                 OutRunVR::RankMarker::PhysicalRankSource rankAfter{};
-                if (!R30CaptureProjectedRankPhysicalSource(rankAfter) ||
+                if (!R30CaptureProjectedRankPhysicalSource(device, rankAfter) ||
                     !OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
                         rankBefore, rankAfter))
                 {

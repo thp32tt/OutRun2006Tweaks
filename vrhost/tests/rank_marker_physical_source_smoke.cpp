@@ -11,7 +11,7 @@ int main()
         GameSemantic::RenderScope::ProjectedWorldMarker2D,
         GameSemantic::ProducerToken::RankMarkerClipSprite,
         true, &node, 8u, {true, 2.5f, -3.0f, -17.0f},
-        31u, 0u, 0u}; // Original fixed-function FVF 0x142, no VS.
+        31u, 41u, 0x142u, 0u, 0u}; // Original fixed-function FVF 0x142, no VS.
     if (!SameRankSourceAfterNativeLeft(queued, queued)) return 1;
     const auto rejects = [&](const PhysicalRankSource& changed) {
         return !SameRankSourceAfterNativeLeft(queued, changed);
@@ -50,7 +50,7 @@ int main()
         GameSemantic::RenderScope::ProjectedWorldMarker2D,
         GameSemantic::ProducerToken::RivalMarkerSprani,
         false, nullptr, 0, {true, -1.f, 2.f, -12.f},
-        7, 0, 0};
+        7, 11, 0x142u, 0, 0};
     if (!SameRankSourceAfterNativeLeft(direct,direct)) return 18;
     m = direct; m.queueNode = &node;
     if (SameRankSourceAfterNativeLeft(direct,m)) return 19;
@@ -60,6 +60,19 @@ int main()
     if (SameRankSourceAfterNativeLeft(direct,m)) return 21;
     m = direct; m.producer = GameSemantic::ProducerToken::LensFlareCentre;
     if (SameRankSourceAfterNativeLeft(direct,m)) return 22;
+    // Even with unchanged node, marker and shader, do not submit a second
+    // physical command or a different fixed-function vertex layout to RIGHT.
+    m = queued; ++m.drawSerial;
+    if (!rejects(m)) return 23;
+    m = queued; m.drawSerial = 0;
+    if (!rejects(m)) return 24;
+    m = queued; m.fvf = 0x144u;
+    if (!rejects(m)) return 25;
+    m = direct; ++m.drawSerial;
+    if (SameRankSourceAfterNativeLeft(direct, m)) return 26;
+    m = direct; m.fvf = 0u;
+    if (SameRankSourceAfterNativeLeft(direct, m)) return 27;
+    if (!SameRankSourceAfterNativeLeft(queued, queued)) return 28;
     std::cout << "R84 physical projected rank source transaction PASS\n";
     return 0;
 }

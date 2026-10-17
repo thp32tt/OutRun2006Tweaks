@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01010",
+  "production_id": "CONVERSION-DX9EX-01010",
+  "event_id": "CONVERSION-DX9EX-01010-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "d590eebb17b68443a240160fac7bc07acfa0d0f2",
+  "source_paths": [
+    "src/vr/game/rank_marker_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/rank_marker_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp",
+    "tools/verify_vr_projected_marker_anchor.py",
+    "docs/automation/runs/CONVERSION-DX9EX-01010.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Prevent projected car/rival rank markers from borrowing the wrong physical Draw or fixed-function vertex layout across native left/right R84 eye submissions, preserving car-relative original Calc3D2D anchors and fallback.",
+    "scope_boundary": "R84 physical projected-rank Draw transaction only. Keep original direct/queued sprite sources, fixedfn FVF 0x142 and original mono on uncertain state; never affect world shaders, +TIME/GOAL, lens/SkyGlow, gamepad/FFB or R26_SAFE.",
+    "trace_stages": [
+      "Original car/rival Calc3D2D marker attaches view-space anchor to rank clip and sprani SpriteNode.",
+      "R84 R30 samples queue owner, pose, shader, physical top-level Draw serial and fixed-function FVF before native left primitive.",
+      "Immediately after original left primitive, R30 re-proves same exact node/anchor/draw/FVF before right-eye projection; changed producer requires right-eye failure and mono safety."
+    ],
+    "subcomponents": [
+      "Lock Draw serial and original fixed-function FVF to the exact rank GPU command across native left submission.",
+      "Preserve queued/direct and fixedfn/shader positive paths; fail closed when nested rank draws, unknown serial, FVF changes, node/pose/shader changes or malformed anchor.",
+      "Compiled C++ physical source smoke, Python destructive rank mutation verification and exact-SHA active game/host/package, Domain, HUD and Full Source gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_native_draw_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original rank/rival per-eye GPU physical command",
+        "expected_behavior": "R84 renders RIGHT using the same physical Draw serial, fixedfn input state, original marker node and pose proven before native LEFT."
+      },
+      {
+        "id": "rank_reentrant_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Reentrant nested rank calls and unrelated original controls",
+        "expected_behavior": "Same-node nested command, FVF switch and stale identity reject stereo RIGHT and preserve original left, mono safety, normal rank and shader fallback without affecting +TIME/GOAL, SkyGlow or R26."
+      },
+      {
+        "id": "rank_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84/R26 game, x64 OpenXR host, package, domain, HUD and Full Source",
+        "expected_behavior": "All required GitHub Actions succeed for a single exact validation-bearing SHA; real Quest3 HMD verification remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_native_draw_owner": "PENDING",
+    "rank_reentrant_safe_fallback": "PENDING",
+    "rank_exact_sha_gate": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "PhysicalRankSource retained node/anchor/pose/shader across native LEFT but omitted the actual top-level Draw serial and FVF. Reentrant LEFT work can issue a different command with identical node/token/pose/shader while the subsequent RIGHT pass still accepts the stale rank source.",
+    "source_trace": [
+      "src/vr/game/rank_marker_physical_source.hpp",
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "vrhost/tests/rank_marker_physical_source_smoke.cpp"
+    ],
+    "alternatives_rejected": [
+      "Do not promote generic 2D nodes to world markers, relax existing queue proof or duplicate the native left Draw."
+    ],
+    "evidence_limit": "Source-backed missing physical identity guard; HMD optical behavior not measured; runtime remains UNTESTED."
+  }
+}
