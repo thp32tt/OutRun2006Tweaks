@@ -592,11 +592,24 @@ def verify_goal_b9200_source(ui_source, semantic_source, disasm_source):
     # B9200 formerly crashed when a +5 midhook overwrote a legal branch
     # target. Its exact E8-parent source is now recovered INSIDE the existing
     # 2C808/2C9DB glyph call wrapper, without patching the nineteen CALLs.
-    trace = function_body(ui_source, 'static bool IsOriginalB9200GoalGlyph(')
+    # One exact original-call stack discriminator now serves both glyph
+    # emission and native D3DX direct Draw. Verify source proof in the shared
+    # helper and verify that BOTH GPU paths actually call that helper.
+    trace = function_body(ui_source, 'static bool OriginalB9200GoalStackActive(')
+    glyph_trace = function_body(ui_source, 'static bool IsOriginalB9200GoalGlyph(')
+    draw = function_body(ui_source, 'static HRESULT __stdcall DrawDest(')
     glyph = function_body(ui_source, 'static int __cdecl TextGlyph_putSprite(')
     for part in ('STATE_GOAL', 'RtlCaptureStackBackTrace(',
                  'GoalResult::IsOriginalB9200ParentReturn('):
         require(part, trace, 'safe original GOAL result text stack proof')
+    require('return OriginalB9200GoalStackActive();', glyph_trace,
+            'B9200 glyph must retain exact GOAL original caller proof')
+    for part in ('CurrentRenderProducerToken() == ProducerToken::None',
+                 '!QueueRenderActive()', 'OriginalB9200GoalStackActive()',
+                 'FlushD3DXBeforeDirectGoalSource();',
+                 'directB9200Owner.emplace(',
+                 'ProducerToken::ResultTextB9200'):
+        require(part, draw, 'direct B9200 D3DX GPU owner must stay exact')
     for part in ('const bool exactGoalResult = IsOriginalB9200GoalGlyph();',
                  'ScopedExactProducerSemantic', 'ResultTextB9200',
                  'if (exactGoalResult)', 'ProducerToken::TextGlyphPutSprite'):
