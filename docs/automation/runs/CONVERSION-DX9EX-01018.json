@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01018",
+  "production_id": "CONVERSION-DX9EX-01018",
+  "event_id": "CONVERSION-DX9EX-01018-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-01018-main-menu",
+  "feature_base_sha": "496d18a51a4fc59ead8585669337172b34454211",
+  "feature_stage": "IMPLEMENTED_VALIDATION_PENDING",
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "checkpoint": "C2_SOURCE",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-01018.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Repair the complete Quest3 title/main menu optical undersize in R84 without stretching captured source artwork, clipping full-width car selection, or altering stereo gameplay/UI.",
+    "scope_boundary": "Only DX9Ex R84 title and main menu state-dependent optical coverage after game capture; untouched world, camera, F11, ESC, HUD, DX11, DXVK, original game content.",
+    "trace_stages": [
+      "Original game TITLE/MENU/SELECTOR game state published via SharedPose client state.",
+      "R23 host captures source pixels/UV/aspect and resolves optical coverage from exact game state before binocular placement.",
+      "Host common left/right OpenXR tangent FOV intersection uniformly fits both axes, preserving original physical image aspect."
+    ],
+    "subcomponents": [
+      "R23 state-owned title/main default coverage with unchanged selector rollback and exact explicit environment override.",
+      "Executable host C++ regression for title/menu/selector/unknown/invalid values, plus the unchanged common FOV and crop safety tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "main_menu_state_placement",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native main menu capture and stereo optical presentation",
+        "expected_behavior": "Exact TITLE 0x04 and MENU 0x09 default to full safe binocular optical rect instead of 0.78 inset without changing image UV or aspect."
+      },
+      {
+        "id": "selector_and_override_regression",
+        "category": "fallback_regression",
+        "behavior_area": "Full-width vehicle select, unknown states, invalid and explicit overrides",
+        "expected_behavior": "Selector, exit, reset and unknown states retain 0.78; valid user overrides win, malformed ones safely fallback per state."
+      },
+      {
+        "id": "main_menu_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Native Windows x86 game, x64 host, packaging and required CI",
+        "expected_behavior": "Committed integrated exact SHA passes required Windows DX9Ex Active, Domain, HUD Inspector and Full Source checks; Quest3 visual validation separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "main_menu_state_placement": "PENDING_CI",
+    "selector_and_override_regression": "PENDING_CI",
+    "main_menu_exact_sha_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Latest Quest3 report 2026-10-17: R84 main menu has correct proportions but appears about 75% of desired display size.",
+    "source_trace": [
+      "SharedPose publishes canonical game-state values TITLE 0x04 and MENU 0x09.",
+      "R23 full-client menu capture uses native source UV and aspect before optical presentation.",
+      "ResolveMenuOpticalCoverage originally selected 0.78 uniformly, and PlanOpticallyCenteredClip scales both eyes by that amount."
+    ],
+    "root_cause": "A single 0.78 optical default originally calibrated for a full-width selection screen also shrinks correctly proportioned title and main menu states.",
+    "alternatives_rejected": [
+      "Source UV crop or anisotropic scaling risks hiding Ferrari list/art and reintroducing widescreen distortion."
+    ],
+    "fix_evidence": "Bounded per-state default policy and R23 call-site, integrated into existing executable Windows host regression suite.",
+    "eye_ownership": "Single shared common-FOV optical quad for both eyes, no eye-specific camera or stereo-world mutation.",
+    "evidence_limit": "No Quest3 runtime executed; candidate source not yet confirmed by CI."
+  },
+  "validation_evidence": {
+    "changed_area_test": "outrun-vr-menu-content-aspect-smoke in mandatory x64 host post-build",
+    "exact_sha_ci": "PENDING"
+  },
+  "next_action": "Check candidate exact-sha smoke/CI, safely fast-forward after behind=0 with expected_sha and force=false, then final exact-sha target workflows and C6. No HMD test."
+}

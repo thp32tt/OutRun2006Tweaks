@@ -124,6 +124,27 @@ static_assert(!ShouldRefreshMenuLetterboxConfig(
 
 int main()
 {
+    // Main title/menu no longer inherit the 0.78 inset from the wide
+    // selector. Physical menu aspect/UV, overrides and safe fallback remain.
+    using OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState;
+    auto nearCoverage = [](float a, float b) {
+        return std::isfinite(a) && std::fabs(a-b) < 1.e-5f;
+    };
+    if (!nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0x04u),1.f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0x09u),1.f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0x0Au),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0x0Bu),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0x0Cu),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0xFFFFFFFFu),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState(nullptr,0x01u),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("0.78",0x04u),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("0.90",0x09u),.90f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("1.0",0x0Au),1.f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("bad",0x04u),1.f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("0.49",0x09u),1.f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("1.01",0x0Au),.78f) ||
+        !nearCoverage(ResolveMenuOpticalCoverageForState("NaN",0x0Cu),.78f))
+        return 73;
     // Original 2D game sprite corners: native 4:3, 16:9, 21:9, VDXR
     // portrait and protected non-front-end fallback all remain separated.
     using OutRunVrMenuQuad::BuildPixelMap;

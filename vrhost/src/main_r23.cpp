@@ -1667,18 +1667,19 @@ namespace
         // projections. Center LOCAL-fixed menu content on the optical ray,
         // then preserve its physical aspect within BOTH clipped FOV margins.
         // Reject invalid/stale publications rather than stretching a menu.
-        // User A/B: non-cropped 21:9 must NOT inflate back to a full-FOV
-        // theater without an explicit opt-in. Preserve the previous 0.78
-        // menu coverage default, while OUTRUN_VR_MENU_OPTICAL_COVERAGE
-        // can compare 0.78/0.90/1.0 at the same VD/Quest profile.
+        // 2026-10-17 Quest3: title/main menu was correctly proportioned
+        // but 75%-sized. Fit those states to the safe binocular optical
+        // boundary; keep full-width selector/exit/reset at historical 0.78.
+        // OUTRUN_VR_MENU_OPTICAL_COVERAGE explicitly overrides either default.
         // Apply one symmetric optical margin to complete native-aspect
         // menu and explicit 4:3 crop. The existing
         // tangent-space containment retains a uniform physical aspect,
         // optical centre, both-eye placement and clipped-fragment geometry.
         // Gameplay stereo HUD, F11 and desktop presentation are untouched.
         const float opticalCoverage =
-            OutRunVrMenuAspect::ResolveMenuOpticalCoverage(
-                std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"));
+            OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(
+                std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),
+                clientGameState);
         const auto placement =
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(
                 common, sourceAspect, opticalCoverage);

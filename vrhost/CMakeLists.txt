@@ -168,6 +168,12 @@ add_custom_command(TARGET outrun-vr-f11-shell-containment-smoke POST_BUILD
     COMMENT "Run native XR F11 drag/resize and reset fallback regressions"
     VERBATIM)
 add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smoke.cpp)
+# Run the real menu state/optical regression when the mandatory host builds.
+add_dependencies(outrun-vr-host outrun-vr-menu-content-aspect-smoke)
+add_custom_command(TARGET outrun-vr-menu-content-aspect-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-menu-content-aspect-smoke>"
+    COMMENT "Run DX9Ex main-menu/selector optical coverage regression"
+    VERBATIM)
 # Contained menu/custom-sprite mapping must honor live viewport bounds
 # when the original game's scale cache lags a D3D9Ex Reset/resize.
 # Compile AND execute native source geometry in mandatory host Release CI.

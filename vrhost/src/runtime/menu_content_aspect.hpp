@@ -157,15 +157,17 @@ namespace OutRunVrMenuAspect
         float halfWidth = 0.0f, halfHeight = 0.0f;
     };
 
-    // The 0.78 HMD default protects users who found a full-FOV theater
-    // excessive. Some VD Low/High captures have a separately smaller inner
-    // 16:9 panel. Allow a bounded per-session A/B without changing the
-    // eye FOV, native captured aspect, UV, game window or stereo world.
-    // Malformed/nonfinite values fail to the proven default, never stretch.
+    // The latest Quest3 observation found a correctly proportioned
+    // title/main menu approximately 75% undersized. Only those exact
+    // game states increase default optical coverage to 1.0; wide vehicle
+    // selection and unknown states retain the verified 0.78 rollback.
+    // All cases keep common binocular FOV containment and explicit A/B.
     inline float ResolveMenuOpticalCoverage(
-        const char* requested) noexcept
+        const char* requested, float defaultCoverage = 0.78f) noexcept
     {
-        constexpr float defaultCoverage = 0.78f;
+        if (!std::isfinite(defaultCoverage) ||
+            defaultCoverage < 0.50f || defaultCoverage > 1.0f)
+            defaultCoverage = 0.78f;
         if (!requested || !*requested)
             return defaultCoverage;
         char* end = nullptr;
@@ -174,6 +176,16 @@ namespace OutRunVrMenuAspect
             !std::isfinite(parsed) || parsed < 0.50f || parsed > 1.0f)
             return defaultCoverage;
         return parsed;
+    }
+
+    // GameState is source-published by the original game, not inferred
+    // from the captured window's aspect. Do not resize the Ferrari selector.
+    inline float ResolveMenuOpticalCoverageForState(
+        const char* requested, std::uint32_t gameState) noexcept
+    {
+        const float fallback =
+            gameState == 0x04u || gameState == 0x09u ? 1.0f : 0.78f;
+        return ResolveMenuOpticalCoverage(requested, fallback);
     }
 
     inline OpticalClipPlan PlanOpticallyCenteredClip(
