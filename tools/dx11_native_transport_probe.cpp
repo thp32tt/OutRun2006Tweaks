@@ -1317,6 +1317,7 @@ int main()
         ID3D11Predicate* callerPredicate{};
         ID3D11Buffer* callerStreamOutput{};
         bool isolatedConditionalOutput[2]{};
+        bool endedOnOffscreenTarget[2]{};
     } gameEyeFixture{{}, {}, preservedDepthView,
                      originalGameBuffer, alternateEyeBuffer,
                      gameSampleView, gameSampler, gameConstants,
@@ -2069,6 +2070,19 @@ int main()
         evidence.drawCount = encoder.draw_count();
         evidence.viewSignature = eyeIndex == 0u ? 0x303u : 0x404u;
         evidence.sourcePoseSequence = 33u;
+        // Actual menu/car compositing may leave the final game Draw on an
+        // auxiliary RT with a viewport completely outside the XR eye.
+        // The final source-authored GPU Copy/Stretch/rect-Clear timeline must
+        // nevertheless be replayed into the real native eye, not this RTV.
+        ctx->OMSetRenderTargets(1u, &fixture.callerColor, fixture.callerDepth);
+        const D3D11_VIEWPORT offscreenViewport{
+            80.0f, 80.0f, 12.0f, 12.0f, 0.0f, 1.0f};
+        ctx->RSSetViewports(1u, &offscreenViewport);
+        ID3D11RenderTargetView* liveOffscreen = nullptr;
+        ctx->OMGetRenderTargets(1u, &liveOffscreen, nullptr);
+        fixture.endedOnOffscreenTarget[eyeIndex] =
+            liveOffscreen == fixture.callerColor;
+        if (liveOffscreen) liveOffscreen->Release();
         // Simulate a game camera postpass changing conditional-output state.
         // Eye R and the original desktop host must not inherit eye L's SO
         // writer or occlusion predicate even after native GPU Stretch.
@@ -2205,6 +2219,8 @@ int main()
                 &gameRaster, &partialGameClear) &&
             directSubmit.in_flight() && !directSubmit.cancel() &&
             gameEyeFixture.sawBoundEye[0] && gameEyeFixture.sawBoundEye[1] &&
+            gameEyeFixture.endedOnOffscreenTarget[0] &&
+            gameEyeFixture.endedOnOffscreenTarget[1] &&
             gameEyeFixture.rejectedDetachedDraw[0] &&
             gameEyeFixture.rejectedDetachedDraw[1] &&
             gameEyeFixture.rejectedForeignDraw[0] &&

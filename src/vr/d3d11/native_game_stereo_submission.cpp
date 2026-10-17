@@ -1823,6 +1823,21 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             // e.g. right-eye menu HUD Clear at draw ordinal six must render
             // even if a host postpass left an unready occlusion predicate.
             // ScopedNativeGameEyeOutput restores caller state on every exit.
+            // The authentic last game Draw may finish on a menu/vehicle
+            // intermediate RTV with an off-eye viewport. Chronological
+            // source Clears/Copy/Stretch at that final Draw ordinal still
+            // target the game's OWN full-resolution stereo eye. Rebind the
+            // ring RTV/DSV and original camera raster before replaying the
+            // tail; otherwise a legitimate offscreen last pass drops both
+            // native XR eyes or silently clips the final HUD composite.
+            // Restoring the recorded IA/shader state here is safe: the game
+            // callback has already issued all source geometry, and the
+            // remaining commands carry their own actual GPU source resources.
+            // Failure quarantines prior GPU writes through render_eye_pair.
+            if (!output.bind(targets[eyeIndex],
+                             invocation.depth[eyeIndex],
+                             invocation.gameRaster, eyeIndex))
+                return false;
             output.prepare_source_timeline_tail();
             if (!encoder.finish_source_clear_timeline())
                 return false;
