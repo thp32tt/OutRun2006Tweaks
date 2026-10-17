@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "phase": "C6_RESULT",
-  "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA",
+  "status": "BUILD_VERIFIED_AFFECTED_EXACT_SHA_GATES_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_AFFECTED_GATES_EXACT_SHA_PENDING",
+  "automation_validation": "PARTIAL_EXACT_SHA_ACTIVE_DOMAIN_PASS",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "914254175da074e6cd170fcb93d0ee27c3f36566",
@@ -64,8 +64,8 @@
     ]
   },
   "acceptance_results": {
-    "stage_sprite_and_number_exact_gpu_owner": "PENDING_EXACT_SHA",
-    "foreign_source_and_native_begin_fallback": "PENDING_EXACT_SHA",
+    "stage_sprite_and_number_exact_gpu_owner": "PASS_BUILD",
+    "foreign_source_and_native_begin_fallback": "PASS_BUILD",
     "exact_sha_windows_and_hmd_separation": "PENDING_EXACT_SHA"
   },
   "diagnosis": {
@@ -93,7 +93,7 @@
     "compiler_executed": false
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 exact-SHA CI reconciliation completed; do not rerun CI or duplicate scoring. Quest3/VDXR visual runtime evidence is still required independently.",
+  "next_action": "Obtain Full Source Impact/HUD Inspector GitHub Actions SUCCESS on validation-bearing exact SHA a40147833c53e8db271fd41c769f5421e995f64f (not another C++ change or duplicate Active/Domain build), then C6-only bookkeeping with acceptance_results PASS_BUILD/PASS_EXACT_SHA. Quest3/VDXR remains UNTESTED; score +0.",
   "ci_evidence": {
     "validation_bearing_result_sha": "a40147833c53e8db271fd41c769f5421e995f64f",
     "required_workflows": [
@@ -112,7 +112,25 @@
         "conclusion": "success"
       }
     ],
-    "note": "Exact-SHA Active Windows R84/R26_SAFE game/host/package and Domain guard were observed SUCCESS. Other workflow identities should not be inferred from a prior SHA."
+    "note": "Exact-SHA Active Windows R84/R26_SAFE game/host/package and Domain guard were observed SUCCESS. Other workflow identities should not be inferred from a prior SHA.",
+    "affected_other_sha": [
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "sha": "cc90f810108c5cc49c300111db364ce0beb27da1",
+        "run_id": 38995856716,
+        "conclusion": "success",
+        "exact_validation_sha_match": false
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "sha": "cc90f810108c5cc49c300111db364ce0beb27da1",
+        "run_id": 38995856742,
+        "conclusion": "success",
+        "exact_validation_sha_match": false
+      }
+    ],
+    "c6_completed": false,
+    "exact_sha_gap": "Full Source Impact and HUD Inspector completed SUCCESS for same C++ source tree at cc90f810, not exact a4014783. The existing terminal C6 had pending acceptance_results, so never assert PASS_EXACT_SHA until the exact-SHA acceptance contract is truly satisfied."
   },
   "c6_result": {
     "checkpoint": "C6_STATE",
