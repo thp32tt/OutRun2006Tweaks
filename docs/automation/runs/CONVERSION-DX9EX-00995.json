@@ -69,9 +69,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_gpu_full_routes": "PENDING_WINDOWS_CI",
-    "goal_reentrant_fallback": "PENDING_WINDOWS_CI",
-    "goal_full_exact_sha": "PENDING_EXACT_SHA"
+    "goal_gpu_full_routes": "PASS",
+    "goal_reentrant_fallback": "PASS",
+    "goal_full_exact_sha": "PASS"
   },
   "diagnosis": {
     "root_cause": "R84 R30ExecuteXyzrhwStereo guards rank and +TIME after native left draw, but GOAL percent/time/result source lacked the same GPU-eye lifetime; R33TryHud guards centre lens/car shadow but not exact native shader GOAL left/right callback reentrancy.",
@@ -89,14 +89,17 @@
     "negative_test_evidence": "Required x64 host GOAL smoke five producer families and original direct/queued shader/pose/queue mutation."
   },
   "local_validation": {
-    "status": "CI_POLICY_STRING_ASSERTION_REPAIRED",
-    "failed_validation_sha": "fcc25739f5632d1bc307bfd29c1e76e0aa09f885",
-    "run_id": 39003323458,
-    "failed_step": "Verify R84 C993 original-WVP source proof and conservative optics",
-    "actual_error": "Stale two-source literal assertion excludes new third GOAL post-left source fence; no game or host Windows compile performed on failed Active pipeline.",
-    "source_code_change": "NONE_IN_THIS_REPAIR",
-    "full_windows_ci": "PENDING"
+    "status": "GITHUB_ALL_REQUIRED_GATES_SUCCESS",
+    "exact_validation_sha": "30a7943eb2355a0f57e71cfc3c6aeb32d56f7f85",
+    "github_action_runs": {
+      "DX9Ex Active Validation": 39003614952,
+      "Domain Isolation Guard": 39003615001,
+      "OutRun EXE HUD Inspector CI": 39003614920,
+      "DX9Ex Full Source Impact Review": 39003615804
+    },
+    "original_material_sha": "fcc25739f5632d1bc307bfd29c1e76e0aa09f885",
+    "hmd_runtime": "UNTESTED"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA recorded against exact DX9Ex Active Validation SUCCESS commit 30a7943eb2355a0f57e71cfc3c6aeb32d56f7f85. Original material source SHA fcc25739f5632d1bc307bfd29c1e76e0aa09f885 preserved. No source change, CI rerun, or duplicate score. Full Source Impact Review game MSVC analysis was still IN_PROGRESS at C6 read and must not be treated as passed until complete. HMD runtime remains UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA and all required Active/Domain/HUD/Full Source runs SUCCESS for 30a7943eb2355a0f57e71cfc3c6aeb32d56f7f85. GOAL material fcc25739f5632d1bc307bfd29c1e76e0aa09f885 preserved; no repeated validation, duplicate C6 award, or HMD claims. Quest3/VDXR remains NEED_HMD_TEST."
 }
