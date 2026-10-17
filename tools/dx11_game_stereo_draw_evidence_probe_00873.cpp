@@ -1,9 +1,10 @@
-#include "../../src/vr/d3d11/native_game_stereo_draw_evidence.hpp"
+#include "../src/vr/d3d11/native_game_stereo_draw_evidence.hpp"
 #include <cassert>
 #include <cstdint>
 #include <limits>
 using outrun::vr::dx11::live_game_stereo::may_issue_instanced;
 using outrun::vr::dx11::live_game_stereo::color_certifiable;
+using outrun::vr::dx11::live_game_stereo::authored_color_output_ready;
 int main() {
     // Menu/car/race native eye callback: both indexed and non-indexed
     // multi-instance commands preserve ONE genuine source draw ordinal.
@@ -21,6 +22,16 @@ int main() {
     static_assert(color_certifiable(true, true));
     static_assert(!color_certifiable(true, false));
     static_assert(!color_certifiable(false, true));
+    // Original D3D9 TARGET Clear is authentic eye color, not fabricated
+    // geometry. Admit depth-only draws following a full seed, while rejecting
+    // a terminal Clear that erased the last native game geometry.
+    static_assert(authored_color_output_ready(5u, 0u, 0u, 1u, 0u));
+    static_assert(authored_color_output_ready(5u, 0u, 0u, 2u, 4u));
+    static_assert(!authored_color_output_ready(5u, 0u, 0u, 2u, 5u));
+    static_assert(!authored_color_output_ready(0u, 0u, 0u, 1u, 0u));
+    static_assert(authored_color_output_ready(5u, 0u, 1u, 2u, 5u));
     assert(color_certifiable(true,true) &&
-           !color_certifiable(false,false));
+           !color_certifiable(false,false) &&
+           authored_color_output_ready(5u, 0u, 0u, 1u, 0u) &&
+           !authored_color_output_ready(5u, 0u, 0u, 1u, 5u));
 }

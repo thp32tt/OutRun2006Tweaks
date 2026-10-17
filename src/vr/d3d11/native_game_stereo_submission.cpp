@@ -205,6 +205,17 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
         if (clear.afterDrawOrdinal < drawCount_) return false;
         if (clear.kind == NativeGameEyePartialTargetClear::Kind::TargetRect) {
             if (!clear_target_argb(clear.argb, &clear.rect)) return false;
+            // ClearView ignores the prior per-draw color-write masks.
+            // A captured full-eye TARGET Clear replaces earlier color Draws
+            // and source Copy/Stretch, but can seed later depth-only geometry.
+            if (clear.rect.left == 0 && clear.rect.top == 0 &&
+                clear.rect.right == static_cast<LONG>(targetWidth_) &&
+                clear.rect.bottom == static_cast<LONG>(targetHeight_)) {
+                colorDrawCount_ = 0u;
+                authoredColorPostpassCount_ = 0u;
+                ++authoredFullColorClearCount_;
+                lastFullClearDrawOrdinal_ = drawCount_;
+            }
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
             const bool partial = clear.rect.left || clear.rect.top ||
@@ -1629,7 +1640,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     ? invocation.gameRaster->stencilClear[eyeIndex] : 0u);
             NativeGameEyeDrawEncoder encoder(
                 ctx, targets[eyeIndex], invocation.depth[eyeIndex],
-                invocation.width, invocation.height);
+                invocation.width, invocation.height,
+                invocation.fullTargetClear != nullptr);
             encoder.set_source_clear_timeline(
                 invocation.partialTargetClear, eyeIndex);
             if (!invocation.callback(invocation.user, ctx,
@@ -1648,7 +1660,9 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             const auto& evidence = invocation.eye[eyeIndex];
             if (!live_game_stereo::authored_color_output_ready(
                     encoder.draw_count(), encoder.color_draw_count(),
-                    encoder.authored_color_postpass_count()) ||
+                    encoder.authored_color_postpass_count(),
+                    encoder.authored_full_color_clear_count(),
+                    encoder.last_full_clear_draw_ordinal()) ||
                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||

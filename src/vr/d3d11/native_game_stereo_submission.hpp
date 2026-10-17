@@ -17,9 +17,11 @@ public:
     explicit NativeGameEyeDrawEncoder(
         ID3D11DeviceContext* context, ID3D11RenderTargetView* eyeTarget,
         ID3D11DepthStencilView* eyeDepth,
-        UINT targetWidth, UINT targetHeight) noexcept
+        UINT targetWidth, UINT targetHeight,
+        bool gameAuthoredFullColorSeed = false) noexcept
         : context_(context), eyeTarget_(eyeTarget), eyeDepth_(eyeDepth),
-          targetWidth_(targetWidth), targetHeight_(targetHeight) {}
+          targetWidth_(targetWidth), targetHeight_(targetHeight),
+          authoredFullColorClearCount_(gameAuthoredFullColorSeed ? 1u : 0u) {}
     NativeGameEyeDrawEncoder(const NativeGameEyeDrawEncoder&) = delete;
     NativeGameEyeDrawEncoder& operator=(const NativeGameEyeDrawEncoder&) = delete;
 
@@ -90,6 +92,15 @@ public:
     [[nodiscard]] std::uint32_t authored_color_postpass_count() const noexcept {
         return authoredColorPostpassCount_;
     }
+    // Only the submission owner can supply the original D3D9 full TARGET
+    // seed. Later full-size game rectangle clears supersede prior eye color;
+    // partial TARGET clears never seed an entire native eye.
+    [[nodiscard]] std::uint32_t authored_full_color_clear_count() const noexcept {
+        return authoredFullColorClearCount_;
+    }
+    [[nodiscard]] std::uint64_t last_full_clear_draw_ordinal() const noexcept {
+        return lastFullClearDrawOrdinal_;
+    }
 private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
@@ -103,6 +114,8 @@ private:
     std::uint64_t drawCount_{};
     std::uint64_t colorDrawCount_{};
     std::uint32_t authoredColorPostpassCount_{};
+    std::uint32_t authoredFullColorClearCount_{};
+    std::uint64_t lastFullClearDrawOrdinal_{};
     const NativeGameEyePartialTargetClear* sourceClears_{};
     std::uint32_t sourceClearEye_{}, sourceClearCursor_{};
 };

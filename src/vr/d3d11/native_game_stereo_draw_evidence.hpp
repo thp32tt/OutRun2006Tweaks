@@ -23,12 +23,25 @@ namespace outrun::vr::dx11::live_game_stereo {
 // validated view/pose evidence; postpasses do NOT fabricate Draw ordinals.
 [[nodiscard]] constexpr bool authored_color_output_ready(
     std::uint64_t geometryDraws, std::uint64_t directColorDraws,
-    std::uint32_t authoredColorPostpasses) noexcept {
+    std::uint32_t authoredColorPostpasses,
+    std::uint32_t authoredFullColorClears = 0u,
+    std::uint64_t lastFullClearDrawOrdinal = 0u) noexcept {
+    // A genuine game TARGET clear provides eye color even if later
+    // menu/car/race geometry writes only depth. A real draw AFTER the
+    // latest full clear is needed: a blank or stale cleared frame is not
+    // game geometry evidence. A later GPU postpass is independently valid.
     return geometryDraws != 0u &&
-           (directColorDraws != 0u || authoredColorPostpasses != 0u);
+           (directColorDraws != 0u || authoredColorPostpasses != 0u ||
+            (authoredFullColorClears != 0u &&
+             geometryDraws > lastFullClearDrawOrdinal));
 }
 static_assert(authored_color_output_ready(2u, 0u, 1u));
 static_assert(authored_color_output_ready(1u, 1u, 0u));
 static_assert(!authored_color_output_ready(0u, 0u, 1u));
 static_assert(!authored_color_output_ready(4u, 0u, 0u));
+static_assert(authored_color_output_ready(2u, 0u, 0u, 1u, 0u));
+static_assert(authored_color_output_ready(3u, 0u, 0u, 1u, 2u));
+static_assert(!authored_color_output_ready(0u, 0u, 0u, 1u, 0u));
+static_assert(!authored_color_output_ready(2u, 0u, 0u, 1u, 2u));
+static_assert(authored_color_output_ready(2u, 0u, 1u, 1u, 2u));
 } // namespace outrun::vr::dx11::live_game_stereo
