@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01020",
+  "production_id": "CONVERSION-DX9EX-01020",
+  "event_id": "CONVERSION-DX9EX-01020-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "feature_id": "DX9EX:BLOCKER:SKYGLOW_MIDFRAME_TOGGLE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "material_result_sha": "c5f528892c0556799ce622ea258d66e85ea4fe9c",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_skyglow_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-01020.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:BLOCKER:SKYGLOW_MIDFRAME_TOGGLE",
+    "goal": "Prevent post-HUD left/right backbuffers from being fed into SkyGlow when the user SkyGlow setting or the original game's active-glow flag transitions from OFF to ON after the first screen draw in the same Present.",
+    "scope_boundary": "Only the R84 R30 first source-owned HUD/ESC draw boundary and stereo SkyGlow scene input; no HUD layout, world sky transforms, bloom intensity, FFB, DX11, DXVK, or R26_SAFE changes.",
+    "special_work_evidence": "Previously R30CaptureSkyGlowSceneBeforeHud returned immediately while SkyGlowFactor<=0 or game-glow inactive, before stamping R30SkyGlowScreenDrawEpoch. R30ApplyStereoSkyGlow can then copy post-HUD eye buffers after a mid-frame OFF-to-ON transition, producing duplicate head-fixed bloom.",
+    "trace_stages": [
+      "Original user SkyGlowFactor setting and game R30GameGlowActive render flags at first HUD/ESC screen producer.",
+      "R84 R33 pre-screen path and R30 original ScreenHud and XYZRHW eye capture source boundary on physical D3D9 Draw.",
+      "R30ApplyStereoSkyGlow at Present samples two clean reduced eye inputs, or fails closed when source was contaminated."
+    ],
+    "subcomponents": [
+      "Record the first screen-draw present epoch before live glow-enable checks, including when actual pre-HUD copy is disabled.",
+      "Continue preserving exact per-eye capture, resource-epoch invalidation and Present fallback veto through enable changes."
+    ],
+    "acceptance_items": [
+      {
+        "id": "toggle_screen_boundary",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Screen producer to bilateral bloom input across OFF to ON",
+        "expected_behavior": "The first eligible ScreenHud or pause/ESC draw records its Present screen boundary even while user or game glow is disabled."
+      },
+      {
+        "id": "clean_eye_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "SkyGlow Present under absent capture and Reset/resize",
+        "expected_behavior": "If no clean left and right SkyGlow source was acquired before HUD, the Present path skips bloom without sampling post-HUD buffers and preserves untouched original draw."
+      },
+      {
+        "id": "exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows game x86 x64 host source and packaging integration",
+        "expected_behavior": "Final validation-bearing exact SHA passes DX9Ex Active, Domain Isolation, HUD Inspector, and Full Source Impact gates without CI skip or Quest3 claims."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "toggle_screen_boundary": "PENDING_CI",
+    "clean_eye_fallback": "PENDING_CI",
+    "exact_sha_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "R30CaptureSkyGlowSceneBeforeHud original source checked SkyGlowFactor and R30GameGlowActive before recording the screen epoch, while R30ApplyStereoSkyGlow supports post-screen fallback when no boundary is recorded.",
+    "source_trace": [
+      "ScreenHud and pause overlay producer enters R33 pre-screen/canonical XYZRHW physical draw.",
+      "R30CaptureSkyGlowSceneBeforeHud previously returns on disabled glow before R30SkyGlowScreenDrawEpoch assignment.",
+      "R30ApplyStereoSkyGlow at Present can see enabled glow and, without epoch veto, copy the now-painted left/right game backbuffers."
+    ],
+    "root_cause": "Glow enable-state sampling and scene contamination source-boundary lifetime were coupled: an OFF first-UI frame transition lost the boundary identity needed for later Present fail-closed.",
+    "alternatives_rejected": [
+      "Do not globally disable SkyGlow or blur, which would change accepted game visuals.",
+      "Do not perform a delayed post-HUD StretchRect or force GPU Flush, which would bloom ESC/score text.",
+      "Do not extend the source to all world billboards or untagged SkyGlow effects."
+    ],
+    "fix_evidence": "Material renderer change at c5f52889 moves screen-epoch stamp before glow setting and game flag checks; mutation contract in existing source guard asserts stamping order and clean-eye fallback.",
+    "eye_ownership": "The pre-HUD capture source remains two independent per-eye reduced textures. Without both clean sources, either eye cannot use a later HUD-painted backbuffer as bloom input.",
+    "evidence_limit": "Source-owned OFF-to-ON within-Present case only; no claim to repair other sky WVP/headlock defects; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
+  },
+  "ci_evidence": {
+    "first_sha": "c5f528892c0556799ce622ea258d66e85ea4fe9c",
+    "first_dx9ex_active_run": 39046128907,
+    "first_gate_failure": "Required task record absent before game jobs; same TASK_ID repair, no production rescore.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "exact_sha": "PENDING"
+  }
+}
