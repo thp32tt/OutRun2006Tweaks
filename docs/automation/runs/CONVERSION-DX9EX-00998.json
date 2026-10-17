@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING",
-  "phase": "C5_VALIDATION",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "IN_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "82bdc915b42fd0451b1da726f7ec317c93a4c0c8",
   "material_result_sha": "1c15b258a7d98c35be234e2505be7455dc3aed17",
-  "validation_bearing_result_sha": "PENDING",
+  "validation_bearing_result_sha": "f33ef5414307988087d04422c2ad371aa2e3e90b",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     "src/vr/game/hud_native_source_transaction.hpp",
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "hud_native_same_physical_owner": "PENDING_WINDOWS_CI",
-    "hud_native_callback_fallback": "PENDING_WINDOWS_CI",
-    "hud_native_exact_sha_gates": "PENDING_EXACT_SHA"
+    "hud_native_same_physical_owner": "PASS_EXACT_SHA",
+    "hud_native_callback_fallback": "PASS_EXACT_SHA",
+    "hud_native_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R84 R33TryHud already enforced native left/right source comparison for lens C993, player shadow and stage +TIME/GOAL, but lacked corresponding validation for normal source-proven ScreenHud shader draws even though the HudNativeSource predicate existed only in portable tests.",
@@ -92,6 +92,68 @@
     "resolution": "Create the matching run record at validation-bearing commit without changing visual rendering source or suppressing any Gate."
   },
   "score_delta_this_attempt": 0,
-  "local_validation": "PORTABLE_SMOKE_CI_PENDING",
-  "next_action": "Run required exact SHA Gate once; on actual failure repair same TASK_ID; HMD Quest3/VDXR remains UNTESTED."
+  "local_validation": {
+    "status": "CI_PASS_EXACT_SHA_CORE_WITH_AFFECTED_SOURCE_GATE_ANCESTORS",
+    "windows_game": "SUCCESS",
+    "windows_host": "SUCCESS",
+    "win32_r84_independent_full_chain": "SUCCESS",
+    "package": "SUCCESS",
+    "hmd_runtime": "UNTESTED",
+    "last_failed_check": "tools/verify_vr_r30_queue_overlay_hud_plane.py comment-scope mutation",
+    "last_repair_sha": "f33ef5414307988087d04422c2ad371aa2e3e90b"
+  },
+  "next_action": "C6 finished for exact Active+Domain Gate SHA; inspect Quest3/VDXR optical behavior before any runtime PASS. Source-bearing Inspector/FullSource evidence passed on separate candidate SHAs and is not misrepresented as exact final-SHA runs. No retry or duplicate scoring.",
+  "ci_evidence": {
+    "exact_validation_sha": "f33ef5414307988087d04422c2ad371aa2e3e90b",
+    "exact_sha_required_gates": [
+      {
+        "workflow": "DX9Ex Active Validation",
+        "run_id": 39008028461,
+        "result": "SUCCESS",
+        "jobs": [
+          "policy",
+          "game",
+          "host",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      {
+        "workflow": "Domain Isolation Guard",
+        "run_id": 39008028448,
+        "result": "SUCCESS",
+        "jobs": [
+          "domain-isolation"
+        ]
+      }
+    ],
+    "affected_source_gate_evidence": [
+      {
+        "workflow": "DX9Ex Full Source Impact Review",
+        "run_id": 39007737355,
+        "source_sha": "99e84cc6518cc38e5c0c2ede07524a97fed350ac",
+        "result": "SUCCESS",
+        "same_as_final_validation_sha": false
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 39007540199,
+        "source_sha": "4a0c26a3108e39cc3dae31f78630fa8f87891675",
+        "result": "SUCCESS",
+        "same_as_final_validation_sha": false
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 39007611413,
+        "source_sha": "bba9f6865fac21d6caf18b080af5903cb2e7e818",
+        "result": "SUCCESS",
+        "same_as_final_validation_sha": false
+      }
+    ],
+    "nonrequired_skipped": [
+      "VR PC Fast Test Build",
+      "VR Evening Unified Test Build"
+    ],
+    "caveat": "Workflow path filters did not dispatch Full Source Impact or HUD Inspector directly on the final policy-only repair SHA; their separately triggered source-containing candidate runs passed. Exact f33 Active and Domain gates fully passed. No Quest3/VDXR runtime test."
+  }
 }
