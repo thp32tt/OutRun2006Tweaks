@@ -38,7 +38,7 @@ def check(src):
         (gui, r"\$effectivePath=if\(\$cfg\.Backend -eq 'd3d9' -and \(\$slot -eq 'R84_TEST' -or \$slot -eq 'R26_SAFE'\)\)", "GUI dedicated R26 and R84 payload gating"),
         (gui, r"\$actualVariant=if\(\$cfg\.Contains\('Variant'\)\)", "A/B/C alias uses canonical G_COCKPIT variant"),
         (gui, r"\}\s*elseif\(\$cfg\.Backend -eq 'd3d9'\)\s*\{.*?\$backendPath", "other GUI DX9Ex entries use main payload"),
-        (gui, r'(?m)^[ \t]*&[ \t]+\$selector -Backend \$cfg\.Backend -TestProfile \$cfg\.Profile -VariantId \$actualVariant[ \t]*
+        (gui, r'(?m)^[ \t]*&[ \t]+\$selector -Backend \$cfg\.Backend -TestProfile \$cfg\.Profile -VariantId \$actualVariant[ \t]*$', "GUI installer propagates errors"),
         (gui, r'\$session\.SessionId -eq \$previousSessionId', "stale sessions are rejected"),
         (gui, r'\$session\.VariantId -ne \$actualVariant', "selected variant identity must be checked"),
         (gui, r'\$quotedRunner\s*=\s*\x27"\x27 \+ \$runner \+ \x27"\x27', "quoted launcher path"),
