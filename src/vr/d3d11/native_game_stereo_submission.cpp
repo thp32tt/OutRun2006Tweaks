@@ -1070,11 +1070,16 @@ bool NativeGameStereoSubmission::source_is_live(
         desc.SampleDesc.Count != 0u &&
         (desc.SampleDesc.Count == 1u || desc.MipLevels == 1u) &&
         desc.Usage == D3D11_USAGE_DEFAULT && desc.CPUAccessFlags == 0u &&
-        native_game_eye_local_render_target_admitted(
+        (native_game_eye_local_render_target_admitted(
             desc.BindFlags, desc.MiscFlags, D3D11_BIND_RENDER_TARGET,
             D3D11_RESOURCE_MISC_SHARED |
             D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
-            D3D11_RESOURCE_MISC_SHARED_NTHANDLE);
+            D3D11_RESOURCE_MISC_SHARED_NTHANDLE) ||
+         native_game_eye_gpu_copy_only_source_admitted(
+            desc.BindFlags, desc.MiscFlags, desc.SampleDesc.Count,
+            D3D11_RESOURCE_MISC_SHARED |
+            D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+            D3D11_RESOURCE_MISC_SHARED_NTHANDLE));
 }
 
 bool NativeGameStereoSubmission::capture_eye(

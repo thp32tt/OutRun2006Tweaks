@@ -349,12 +349,17 @@ namespace outrun::vr::dx11
                 desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
                 // Accept only a locally owned color target, not a shared handle
                 // that could alias an in-flight OpenXR ring eye allocation.
-                !native_game_eye_local_render_target_admitted(
+                !(native_game_eye_local_render_target_admitted(
                     desc.BindFlags, desc.MiscFlags,
                     D3D11_BIND_RENDER_TARGET,
                     D3D11_RESOURCE_MISC_SHARED |
                     D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
-                    D3D11_RESOURCE_MISC_SHARED_NTHANDLE))
+                    D3D11_RESOURCE_MISC_SHARED_NTHANDLE) ||
+                  native_game_eye_gpu_copy_only_source_admitted(
+                    desc.BindFlags, desc.MiscFlags, desc.SampleDesc.Count,
+                    D3D11_RESOURCE_MISC_SHARED |
+                    D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+                    D3D11_RESOURCE_MISC_SHARED_NTHANDLE)))
 
                 return false;
             Microsoft::WRL::ComPtr<ID3D11Device> owner;

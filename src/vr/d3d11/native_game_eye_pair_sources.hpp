@@ -19,6 +19,17 @@ namespace outrun::vr::dx11 {
 // resolve, never a CopyResource into a single-sample allocation. Reject
 // mismatched eye sample modes and missing format resolve support before any
 // GPU commands, leaving the acquired slot and original D3D9 frame intact.
+// D3D9 camera postpasses may copy into a local GPU-only DEFAULT texture
+// (BindFlags=0). Single-sample D3D11 CopyResource/CopySubresourceRegion
+// accepts it as a source, unlike RTV-bound multisample ResolveSubresource.
+// Shared, UAV-only and multisampled bindless sources must remain rejected.
+// This is GPU source admission, never proof of a rendered stereo camera.
+[[nodiscard]] constexpr bool native_game_eye_gpu_copy_only_source_admitted(
+    std::uint32_t bindFlags, std::uint32_t miscFlags,
+    std::uint32_t sampleCount, std::uint32_t sharedFlags) noexcept {
+    return bindFlags == 0u && sampleCount == 1u &&
+           (miscFlags & sharedFlags) == 0u;
+}
 enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
 // Same-generation cumulative ACKs may retire frames with lower frame IDs.
 // Disallow frame-ID reuse or a new ID already covered by a supplied ACK:
