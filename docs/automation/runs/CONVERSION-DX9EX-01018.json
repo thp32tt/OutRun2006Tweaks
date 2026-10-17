@@ -9,15 +9,15 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-01018-main-menu",
   "feature_base_sha": "496d18a51a4fc59ead8585669337172b34454211",
-  "feature_stage": "IMPLEMENTED_VALIDATION_PENDING",
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "checkpoint": "C2_SOURCE",
+  "feature_stage": "COMPLETE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "246b87ccfb9fbd3a558de94dc85833475e8abee9",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "changed_files": [
@@ -84,7 +84,31 @@
   },
   "validation_evidence": {
     "changed_area_test": "outrun-vr-menu-content-aspect-smoke in mandatory x64 host post-build",
-    "exact_sha_ci": "PENDING"
+    "exact_sha_ci": "PASS_EXACT_SHA",
+    "dx9ex_active_validation": {
+      "run_id": 39040459814,
+      "sha": "246b87ccfb9fbd3a558de94dc85833475e8abee9",
+      "conclusion": "success",
+      "workflow": "DX9Ex Active Validation"
+    },
+    "domain_isolation_guard": {
+      "run_id": 39040459791,
+      "sha": "246b87ccfb9fbd3a558de94dc85833475e8abee9",
+      "conclusion": "success",
+      "workflow": "Domain Isolation Guard"
+    },
+    "hud_inspector": {
+      "run_id": 39040459861,
+      "sha": "246b87ccfb9fbd3a558de94dc85833475e8abee9",
+      "conclusion": "success",
+      "workflow": "OutRun EXE HUD Inspector CI"
+    },
+    "full_source_impact_review": {
+      "run_id": 39040459786,
+      "sha": "246b87ccfb9fbd3a558de94dc85833475e8abee9",
+      "conclusion": "success",
+      "workflow": "DX9Ex Full Source Impact Review"
+    }
   },
-  "next_action": "Check candidate exact-sha smoke/CI, safely fast-forward after behind=0 with expected_sha and force=false, then final exact-sha target workflows and C6. No HMD test."
+  "next_action": "C6 exact-SHA CI verified. Quest3 HMD runtime visual testing remains UNTESTED; no source/build/CI rerun."
 }
