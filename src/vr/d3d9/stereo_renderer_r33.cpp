@@ -1644,10 +1644,11 @@ namespace OutRunVRStereo
                 const bool tryXyzrhw = resyncAlreadyFlushed &&
                     (!OutRunVR::State::StateBlockTracker::Reliable() ||
                      R32ReviewCurrentVertexShaderIdentity() == 0);
-                // R62's working car-attached 4th/5th D3DXSprite batch is
-                // fixed-function indexed XYZ FVF=0x142, NOT POSITIONT.
-                // Only exact source-owned projected markers may use it.
-                // The upper raster/pose guard has already resynchronized.
+                // R62's working D3DXSprite FVF=0x142 (XYZ, NOT POSITIONT)
+                // has two exact-source owners: 4th/5th projected rank and
+                // native ScreenHud 6th/6/text. The R30 check rejects unknown,
+                // external ImGui, SkyGlow and all ordinary world primitives;
+                // the upper raster/pose guard already resynchronized.
                 if (tryXyzrhw)
                 {
                     const HRESULT r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
