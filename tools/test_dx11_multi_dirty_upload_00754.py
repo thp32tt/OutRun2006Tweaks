@@ -53,7 +53,18 @@ for before,after in (
     ("s.insetSurface.Get(), &sourceTiles,","s.insetSurface.Get(), nullptr,"),
     ("!copied || FAILED(unlockStatus)","FAILED(unlockStatus)"),
 ):
-    variant=src.replace(before,after,1)
+    if before == "game->GetRenderTargetData(":
+        # 00886 added a separate real D3D9 post-Draw replay readback.
+        # The 00754 negative control must remove the game-Present gap seed,
+        # never an earlier unrelated resource's readback.
+        present_at = src.index("void before_game_present(")
+        multi_at = src.index(
+            "const auto multiDirty = GameNativeMultiDirtyUpload::select(",
+            present_at)
+        mutation_at = src.index(before, multi_at)
+        variant = src[:mutation_at] + after + src[mutation_at + len(before):]
+    else:
+        variant=src.replace(before,after,1)
     assert variant!=src and not connected(variant,hdr), before
 for before,after in (
     ("r.left < p.right && p.left < r.right","false /* overlap */"),
