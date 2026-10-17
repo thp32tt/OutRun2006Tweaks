@@ -203,12 +203,13 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         # composite guard rather than requiring an obsolete two-term string.
     ):
         assert marker in physical, "C993 binocular source fence missing: " + marker
-    # All five independent physical sources must keep their same-draw
-    # ownership between the native left callback and right-eye submission.
+    # Rank shader/c64 is a sixth physical GPU source alongside C993,
+    # shadow, GOAL, +TIME and ordinary native HUD. Preserve ALL vetoes:
+    # the original left callback may reenter a different vehicle marker.
     guard_marker = ("if (centreSourceChanged || shadowSourceChanged ||" +
                     chr(10) + "                goalSourceChanged || stageSourceChanged ||" +
-                    chr(10) + "                nativeHudSourceChanged)")
-    assert guard_marker in physical, "C993/GOAL/+TIME/HUD composite fence missing"
+                    chr(10) + "                nativeHudSourceChanged || rankSourceChanged)")
+    assert guard_marker in physical, "C993/GOAL/+TIME/HUD/rank composite fence missing"
     assert "const bool goalSourceChanged = exactGoalEye &&" in physical
     assert "OutRunVR::GoalPhysical::SameAfterNativeLeft(" in physical
     assert "const bool stageSourceChanged = exactStageEye &&" in physical
@@ -221,6 +222,18 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "const bool nativeHudSourceChanged = exactNativeHud &&" in physical
     assert "OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(" in physical
     assert "R33/HUD-source-changed" in physical
+    for marker in (
+        "const bool exactRankEye =",
+        "screenKind == R32ReviewScreenSpaceKind::ProjectedWorldMarker2D;",
+        "const auto rankBeforeLeft = exactRankEye",
+        "OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)",
+        "const bool rankSourceChanged = exactRankEye &&",
+        "OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(",
+        "rankBeforeLeft, captureRankSource());",
+        "R33/rank-marker-source-changed",
+        "R33 rank marker original c64 rollback",
+    ):
+        assert marker in physical, "projected rank physical GPU fence missing: " + marker
     left_draw = physical.index("R32ReviewOwnedResult result{ true, actualDraw() };")
     after_left = physical.index(guard_marker)
     right_eye = physical.index("IDirect3DSurface9* rightEye =")
@@ -237,6 +250,10 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
             "C993 coherent source pair veto lost: " + label)
     assert "centreBeforeLeft, centreRawBeforeLeft)) ||" in before_native_left
     assert "centreAfterLeft, centreRawAfterLeft));" in after_native_left
+    assert "OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)" in before_native_left
+    assert "const bool rankSourceChanged = exactRankEye &&" in after_native_left
+    assert physical.index("const auto rankBeforeLeft = exactRankEye") < left_draw
+    assert physical.index("const bool rankSourceChanged = exactRankEye &&") < after_left
     assert physical.index("const bool centreSourceChanged = exactCentreEye &&") < after_left
     assert physical.index("OutRunVR::LensCentre::SameStereoDrawSource(") < after_left
     assert physical.index("OutRunVR::LensCentre::SameRawStereoSource(") < after_left
@@ -427,9 +444,16 @@ def main():
              "const bool disabledCentreEye ="),
         (7, "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
              "                goalSourceChanged || stageSourceChanged ||" + chr(10) +
-             "                nativeHudSourceChanged)",
+             "                nativeHudSourceChanged || rankSourceChanged)",
              "if (centreSourceChanged || shadowSourceChanged ||" + chr(10) +
-             "                goalSourceChanged || stageSourceChanged)"),
+             "                goalSourceChanged || stageSourceChanged ||" + chr(10) +
+             "                nativeHudSourceChanged)"),
+        (7, "const bool rankSourceChanged = exactRankEye &&",
+             "const bool rankSourceChanged = false &&"),
+        (7, "OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(",
+             "OutRunVR::RankMarker::NeverCheckPhysicalRankSource("),
+        (7, "OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)",
+             "OutRunVR::RankMarker::NeverCheckPreLeftRankSource(rankBeforeLeft)"),
         (7, "const bool nativeHudSourceChanged = exactNativeHud &&",
              "const bool nativeHudSourceChanged = false &&"),
         (7, "OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(",
