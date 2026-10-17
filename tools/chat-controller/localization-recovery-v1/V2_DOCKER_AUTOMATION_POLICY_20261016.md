@@ -1,3 +1,5 @@
+> **2026-10-17 C 슬롯 변경(최신 사용자 지시)**: 과거 C를 단독 Docker에서 실행하도록 분리한 방식을 취소했습니다. C는 이 저장소의 `tools/chat-controller/localization-recovery-v1/docker-compose.yml`에 있는 **`outrun-c-english-native-crop`** 서비스로 GitHub/Portainer 스택에 편입됩니다. 기존 독립 `outrun-c-original-english-crop` 컨테이너를 실행·중복 재시작하지 않습니다. C만 N100 원본 108개 전체 HD PNG/검증 DDS의 영문 원문 네이티브 크롭을 자동 수행합니다. A/B 브라우저 이미지생성·한글 합성·DDS 릴리스는 여전히 PAUSED입니다. C 원본 크롭은 `TEST_ONLY`, 실게임 검증은 `UNTESTED`입니다. GitHub 커밋은 실제 Portainer 배포가 아니며, 재배포 시 C용 이미지를 빌드해야 합니다.
+
 # OutRun 2006 KR v2 — Docker automatic execution policy (2026-10-16)
 
 Basis: user-approved Astra v2 planning review TASK_ID OUTRUN-KR-PLAN-REVIEW-20261016-094508; active OutRun asset policy dated 2026-10-16.
