@@ -67,7 +67,8 @@
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/dx11_game_surface_copy_region_probe_00886.cpp",
     "tools/test_dx11_game_surface_copy_00886.py",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -91,11 +92,12 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "D3D9_GAME_DRAW",
+      "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
       "D3D9_ORIGINAL_POSTDRAW_SURFACE_COPY",
       "D3D11_GPU_COPY",
-      "GAME_PRESENT"
+      "GAME_PRESENT",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Hybrid diagnostic source bridge only; menu/car/race full-frame usability, GPU performance, Quest3/HMD untested.",
     "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 and OUTRUN_DX11_FULL_GAME_FRAME=1 explicit; no default promotion, original D3D9 Draw/Present/input unchanged."
@@ -104,10 +106,10 @@
     "C0_RECOVER": "PASS: target 28f54969, controller 00:00 periodic checkpoint and prior 00885 ownership confirmed, 00886 record absent.",
     "C1_REVIEW": "PASS_ONCE: 00885 owns offscreen camera eye clears, 00477 R175 complete. Selected distinct real-game main-backbuffer postpass integration.",
     "C2_IMPLEMENT": "PASS_SOURCE: D3D9 UpdateSurface/StretchRect original output -> cached SYS staging -> owned D3D11 scratch -> CopySubresourceRegion full-size native color RTV, bounded regions, X8 alpha, OM restore, original fallback.",
-    "C3_VALIDATE": "LOCAL_PORTABLE_SOURCE_ONLY: representative C++17 region geometry and GitHub source token checks passed. Windows build/GPU and exact-SHA Actions not executed.",
+    "C3_VALIDATE": "Windows feature Build #39045711948 PASS at 269368a4 after scoped negative mutation repair; target Fast #39046094096 failed on incorrect run-record path-stage aliases (not C++). Real stage token names aligned with enforced policy; new exact-SHA mandatory gates pending.",
     "C4_COMMIT": "PASS_FEATURE_BRANCH: native Draw/game postpass C++ material e0d791ae; source tests+workflow 8090e3ad; source implementation intentionally not target-promoted.",
     "C5_PACKAGE": "NOT_REQUIRED; no runtime HMD build/package",
     "C6_STATE": "PENDING_FIVE_EXACT_SHA_ACTIONS_AND_TARGET_FAST_FORWARD"
   },
-  "next_action": "Run actual feature Windows CI and five mandatory exact-SHA checks without redundant earlier task revalidation; repair failures, recheck target behind=0 expected HEAD, force=false promotion only after PASS. Actual game/HMD testing remains separate. Do not mark FEATURE_READY/COMPLETE on portable probe only."
+  "next_action": "Build current exact feature SHA, safely fast-forward target after Build success and behind=0 expected_sha, then verify Fast/Backend/Build/OpenXR/HUD all SUCCESS on exact SHA; game and Quest3 runtime UNTESTED. No new task or score for same feature CI repair."
 }
