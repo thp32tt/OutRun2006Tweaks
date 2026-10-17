@@ -1389,6 +1389,8 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled())
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::RecordingRaw);
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::StateBlockRaw);
                 return actualDraw();
             }
 
@@ -1405,6 +1407,8 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled())
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::R29Fallback);
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::R29Fallback);
                 return R32ReviewRunLowerFailClosed(device,
                     std::forward<LowerR29Draw>(lowerR29Draw));
             };
@@ -1446,6 +1450,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
                 if (exactResultHud || directCarShadow ||
@@ -1454,6 +1460,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
                 // No stereo eligibility: never let a screen/HUD/SkyGlow
@@ -1463,6 +1471,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
                 return fallbackToR29();
@@ -1486,6 +1496,8 @@ namespace OutRunVRStereo
             {
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::OriginalPreserved);
                 return actualDraw();
             }
             // R30 cannot establish a source-owned HUD/marker eye plane.
@@ -1499,6 +1511,8 @@ namespace OutRunVRStereo
             {
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::OriginalPreserved);
                 return actualDraw();
             }
             if ((exactResultHud || directCarShadow) &&
@@ -1506,6 +1520,8 @@ namespace OutRunVRStereo
             {
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::OriginalPreserved);
                 return actualDraw();
             }
             if (OutRunVR::LensCentre::PreserveOriginalAtUpperDispatch(
@@ -1516,6 +1532,8 @@ namespace OutRunVRStereo
                 // suppressed or borrowed road/particle WVP submitted.
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::OriginalPreserved);
                 return actualDraw();
             }
             if (screenKind != R32ReviewScreenSpaceKind::None)
@@ -1525,8 +1543,11 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled() && hud.handled)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::ScreenHud);
-                if (hud.handled)
+                if (hud.handled) {
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R33HudStereo);
                     return hud.hr;
+                }
                 // HUD classification alone is not proof of physical stereo.
                 // Missing GPU-eye resources, pose or c64 must leave the
                 // exact original +TIME/GOAL path alone, not hand it to R29.
@@ -1534,6 +1555,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
                 if (exactResultHud ||
@@ -1541,6 +1564,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
                 // A fully source-proven C993 centre whose stereo path was
@@ -1550,6 +1575,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
             }
@@ -1563,6 +1590,8 @@ namespace OutRunVRStereo
                 {
                     if (telemetry)
                         R32ReviewNoteDispatchFallback();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::OriginalPreserved);
                     return actualDraw();
                 }
                 const auto fast = R33TryFastWorld(device,
@@ -1570,8 +1599,11 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled() && fast.handled)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::FastWorld);
-                if (fast.handled)
+                if (fast.handled) {
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R33FastWorld);
                     return fast.hr;
+                }
             }
 
             // A screen classifier may recognize an effect whose R30 eye
@@ -1581,6 +1613,8 @@ namespace OutRunVRStereo
             {
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                    OutRunVR::UniversalTrace::Route::OriginalPreserved);
                 return actualDraw();
             }
 
@@ -1616,6 +1650,9 @@ namespace OutRunVRStereo
                 {
                     const HRESULT exact = R30SupportTryFixedFunctionOriginalSpritePrimitive(
                         device, type, startVertex, primitiveCount);
+                    if (telemetry && exact != E_NOTIMPL)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30FixedSprite);
                     if (exact != E_NOTIMPL) return exact;
                 }
                 const HRESULT xyzrhw = tryXyzrhw
@@ -1625,8 +1662,12 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL)
+                if (xyzrhw != E_NOTIMPL) {
+                    if (telemetry)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawPrimitive(
@@ -1685,8 +1726,12 @@ namespace OutRunVRStereo
                     const HRESULT r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
                         device, type, baseVertexIndex, minVertexIndex,
                         numVertices, startIndex, primitiveCount);
-                    if (r62 != E_NOTIMPL)
+                    if (r62 != E_NOTIMPL) {
+                        if (telemetry)
+                            OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                                OutRunVR::UniversalTrace::Route::R30FixedSprite);
                         return r62;
+                    }
                 }
                 const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveVB(
@@ -1696,8 +1741,12 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL)
+                if (xyzrhw != E_NOTIMPL) {
+                    if (telemetry)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawIndexedPrimitive(device, type,
@@ -1751,6 +1800,9 @@ namespace OutRunVRStereo
                 {
                     const HRESULT exact = R30SupportTryFixedFunctionOriginalSpritePrimitiveUP(
                         device, type, primitiveCount, data, stride);
+                    if (telemetry && exact != E_NOTIMPL)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30FixedSprite);
                     if (exact != E_NOTIMPL) return exact;
                 }
                 const HRESULT xyzrhw = tryXyzrhw
@@ -1760,8 +1812,12 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL)
+                if (xyzrhw != E_NOTIMPL) {
+                    if (telemetry)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawPrimitiveUP(
@@ -1815,6 +1871,9 @@ namespace OutRunVRStereo
                     const HRESULT exact = R30SupportTryFixedFunctionOriginalSpriteIndexedUP(
                         device, type, minVertexIndex, numVertices, primitiveCount,
                         indexData, indexFormat, vertexData, stride);
+                    if (telemetry && exact != E_NOTIMPL)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30FixedSprite);
                     if (exact != E_NOTIMPL) return exact;
                 }
                 const HRESULT xyzrhw = tryXyzrhw
@@ -1825,8 +1884,12 @@ namespace OutRunVRStereo
                 if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
                     GpuWaterProbe::instance().noteRoute(device, 
                         GpuWaterProbe::DrawRoute::Xyzrhw);
-                if (xyzrhw != E_NOTIMPL)
+                if (xyzrhw != E_NOTIMPL) {
+                    if (telemetry)
+                        OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                            OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawIndexedPrimitiveUP(device, type,
@@ -1930,14 +1993,24 @@ namespace OutRunVRStereo
             {
                 if (!entry.attempts) continue;
                 spdlog::info(
-                    "VR R84 DRAW TRACE 5s: family={} total={} ok={} failed={} "
-                    "r33Both={} r33EyeFail={} r30OrUnknownEye={} "
+                    "VR R84 DRAW TRACE 5s: family={} total={} ok={} fail={} "
+                    "eyes[both={},failed={},unverified={}] "
+                    "source[queued={},unknown={},badQueue={},scope={},producer={},qEpoch={}] "
+                    "route[none={},r30Fvf={},r30Xyz={},r33Hud={},r33World={},r29={},raw={},sbRaw={}] "
                     "api[dp={},dip={},dpup={},dipup={}] "
                     "lastDraw={} centreCallEpoch={}",
                     OutRunVR::UniversalTrace::Name(entry.family),
                     entry.attempts, entry.success, entry.failure,
                     entry.r33BothEyes, entry.r33EyeOrRestoreFailed,
                     entry.noR33EyeEvidence,
+                    entry.queued, entry.unknownProducer, entry.badQueueProvenance,
+                    OutRunVR::GameSemantic::Name(static_cast<
+                        OutRunVR::GameSemantic::RenderScope>(entry.lastScope)),
+                    OutRunVR::GameSemantic::Name(static_cast<
+                        OutRunVR::GameSemantic::ProducerToken>(entry.lastProducer)),
+                    entry.lastQueueEpoch,
+                    entry.route[0], entry.route[1], entry.route[2], entry.route[3],
+                    entry.route[4], entry.route[5], entry.route[6], entry.route[7],
                     entry.api[0], entry.api[1], entry.api[2], entry.api[3],
                     entry.latestDrawId, entry.latestCentreCall);
             }
