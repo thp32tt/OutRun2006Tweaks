@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_implementation_checkpoint",
+  "task_id": "CONVERSION-DX9EX-01019",
+  "production_id": "CONVERSION-DX9EX-01019",
+  "event_id": "CONVERSION-DX9EX-01019-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-01019-skyglow",
+  "feature_id": "DX9EX:BLOCKER:SKYGLOW_CAPTURE_RESIZE",
+  "feature_base_sha": "0e8b1933f3cc1a6caf47dbab293bc80b0a086482",
+  "material_result_sha": "1f41383fe36d658de3c2d86047ac05840a5def4f",
+  "feature_validation_head": "5c322b326d3ea5db7410e7165d06a92f6c6ba62f",
+  "integrated_target_sha": "5c322b326d3ea5db7410e7165d06a92f6c6ba62f",
+  "feature_stage": "C5_TARGET_INTEGRATED_C6_PENDING",
+  "target_expected_sha_at_promotion": "0e8b1933f3cc1a6caf47dbab293bc80b0a086482",
+  "compare_before_promotion": {
+    "behind": 0,
+    "ahead": 4
+  },
+  "promotion": {
+    "force": false,
+    "success": true
+  },
+  "feature_ci": {
+    "exact_sha": "5c322b326d3ea5db7410e7165d06a92f6c6ba62f",
+    "dx9ex_active": {
+      "id": 39044396167,
+      "conclusion": "success"
+    },
+    "domain": {
+      "id": 39044396100,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "id": 39044396160,
+      "conclusion": "success"
+    }
+  },
+  "target_ci": {
+    "exact_sha": "5c322b326d3ea5db7410e7165d06a92f6c6ba62f",
+    "dx9ex_active": {
+      "id": 39044982964,
+      "status": "in_progress"
+    },
+    "domain": {
+      "id": 39044982970,
+      "status": "success"
+    },
+    "hud_inspector": {
+      "id": 39044982946,
+      "status": "in_progress"
+    },
+    "full_source_impact": {
+      "id": 39044982977,
+      "status": "in_progress"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "unfinished_acceptance": [
+    "Exact target SHA DX9Ex Active game + R29-R33 full-chain + package success",
+    "Exact target SHA HUD Inspector build success",
+    "Exact target SHA Full Source active game MSVC /analyze success",
+    "Write C6 exact-SHA verified result and record score exactly once after confirmed target checks"
+  ],
+  "validation_commands": [
+    "python3 tools/verify_vr_r30_skyglow_fastpath.py",
+    "python3 tools/verify_vr_pause_sky_source_owner.py",
+    "python3 tools/verify_vr_skyglow_capture_boundary.py",
+    "python3 tools/verify_vr_feature_unit_policy.py --check-run docs/automation/runs/CONVERSION-DX9EX-01019.json"
+  ],
+  "next_action": "Read target HEAD, run record and four push-triggered workflow results; if all success at exact 5c322b326d3ea5db7410e7165d06a92f6c6ba62f, write C6 with [skip ci] and consider one new AI2 score only after SSOT freshness and duplicate RUN_KEY guard; do not reimplement/revalidate passed candidate.",
+  "do_not_duplicate": true
+}
