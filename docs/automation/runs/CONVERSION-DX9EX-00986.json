@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_EXACT_SHA_CANDIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "11b03e118195a6d883c9d80c66f6b67a15b606e4",
   "material_result_sha": "b9ae958884d87c32b74ee873826d34504a03dae8",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
   "source_paths": [
     "src/vr/game/hud_command_batch.hpp",
     "src/hooks_uiscaling.cpp",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_sprite_glyph_native_texture_transition": "PASS_GITHUB_HOST_CPP17",
-    "foreign_batch_native_failure_rejection": "PASS_GITHUB_HOST_CPP17",
-    "exact_sha_win32_hmd_separation": "PENDING_ALL_FOUR_GATES"
+    "stage_sprite_glyph_native_texture_transition": "PASS",
+    "foreign_batch_native_failure_rejection": "PASS",
+    "exact_sha_win32_hmd_separation": "PASS"
   },
   "diagnosis": {
     "root_cause": "Ledger::completeNativeDraw currently treats any mutation during native Draw as a failed GPU transaction. A successful hooked Flush from D3DXSprite::Draw itself changes that serial, causing the returning successful texture draw to be discarded as an exact +TIME/GOAL owner.",
@@ -86,11 +86,11 @@
   },
   "local_validation": {
     "cpp17_smoke": "PASS_GITHUB_ACTIONS_HOST",
-    "verified_on_sha": "165ed79a10011d58248ecd33ada6a420ce491b41",
+    "verified_on_sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
     "platform": "WINDOWS_X64_CMAKE_HOST"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Require one final validation-bearing SHA with all four required GitHub Actions exact-match successes. C6 must be separate [skip ci] bookkeeping; Quest3 UNTESTED.",
+  "next_action": "Exactly four final-sha mandatory gates SUCCESS; C6 recorded in separate [skip ci] bookkeeping commit. Quest3/VDXR +TIME sprite/numeric visual acceptance and source-specific eye optics remain UNTESTED/NEED_HMD_TEST. No duplicate 00986 CI or score.",
   "ci_preflight": {
     "source_implementation_sha": "b9ae958884d87c32b74ee873826d34504a03dae8",
     "policy_sha": "165ed79a10011d58248ecd33ada6a420ce491b41",
@@ -107,5 +107,38 @@
     "run_id": 38991513644,
     "job": "policy",
     "cause": "Existing D3DX static mutation verifier required four-argument native Draw and old strict unchanged callback; incompatible with the actual new successful internal Flush transaction. Verifier corrected without reducing original failure checks."
+  },
+  "ci_evidence": {
+    "validation_bearing_result_sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38992168434,
+        "sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38992168437,
+        "sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38992168471,
+        "sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38992168462,
+        "sha": "f6b817c9161f8856d7ff59f5b6495df609258c8d",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ]
   }
 }
