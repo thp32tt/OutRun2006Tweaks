@@ -23,8 +23,44 @@ assert "if (ctx.edi == D3DSAMP_MINFILTER)" in destination2
 assert "ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER" not in destination2
 assert "PreserveScreenTextureFiltering()" in destination2
 
-assert "static thread_local float patchedData[256 * 4];" in renderer
-assert "float patchedData[256 * 4];" in renderer
+# The old one-frame TLS world WVP storage was unsafe across synchronous
+# SetVertexShaderConstantF reentry. Preserve the *allocation-free* hotpath
+# invariant while verifying the actual bounded per-callback native buffer and
+# generation fence, not an obsolete literal declaration.
+assert "static thread_local float patchedData[256 * 4];" not in renderer
+assert "float patchedData[256 * 4];" not in renderer
+assert '#include "vr/game/game_wvp_native_upload.hpp"' in renderer
+native_upload = (ROOT / "src/vr/game/game_wvp_native_upload.hpp").read_text(encoding="utf-8")
+for invariant in [
+    "constexpr std::size_t ScratchFrameCount = 4u;",
+    "float rows[ScratchFrameCount][ScratchFloats]{};",
+    "if (bank_.depth < ScratchFrameCount)",
+    "return acquired_ ? bank_.rows[index_] : nullptr;",
+    "enteredGeneration == currentGeneration;",
+]:
+    assert invariant in native_upload, invariant
+world_c64 = renderer.split(
+    "// The subsequent game world write supersedes a queued HUD", 1
+)[1].split("bool InstallD3D9Hooks(", 1)[0]
+for invariant in [
+    "static thread_local OutRunVR::GameWvpNative::ScratchBank uploadScratch{};",
+    "OutRunVR::GameWvpNative::ScopedFrame uploadFrame(uploadScratch);",
+    "float* patchedData = uploadFrame.data();",
+    "const bool prepared = patchedData && TryPrepareOutRunWvp(",
+    "const float* uploadedData = prepared ? patchedData : constantData;",
+    "device, startRegister, uploadedData, vector4fCount);",
+    "OutRunVR::GameWvpNative::MayPublishReturnedWvp(",
+    "SUCCEEDED(result), uploadGeneration,",
+    "LensCentreUploadGeneration);",
+    "if (nativeSourceCurrent)",
+    "RecordVerifiedWvp(patchedData + wvpOffsetRegisters * 4);",
+]:
+    assert invariant in world_c64, invariant
+assert (world_c64.index("ScopedFrame uploadFrame(")
+        < world_c64.index("SetVertexShaderConstantFHook.stdcall<HRESULT>(")
+        < world_c64.index("MayPublishReturnedWvp("))
+assert "if (SUCCEEDED(result))" not in world_c64.split("if (prepared)", 1)[1]
+
 assert "if (needView)" in renderer
 assert "(!needView || MatrixFinite(view))" in renderer
 assert "Settings::VRMatrixOrder != 0))" in renderer
