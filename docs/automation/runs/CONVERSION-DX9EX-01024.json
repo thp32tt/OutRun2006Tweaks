@@ -10,7 +10,7 @@
   "feature_branch": "feature/dx9ex-01024-dds-request-contract",
   "feature_base_sha": "2d9bc76aba242a6aa5f7af38f89d5e1b6eacdede",
   "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
+  "checkpoint": "C5_VALIDATE",
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
@@ -69,8 +69,8 @@
     "python tools/verify_vr_dds_fast_load_contract.py",
     "GitHub exact-SHA DX9Ex Active + Domain + HUD Inspector + Full Source Impact"
   ],
-  "notes": "C2 material candidate built on isolated feature branch while independent target CI is running. Do not fast-forward target or mark C6 until all exact SHA gates pass. D3DX request divergence is source-confirmed; connection to observed HMD white sprites remains unproven. No runtime HMD test.",
-  "feature_last_head": "3f7641dfa0d47fa18492b30596a52f971be9ceb7",
+  "notes": "C2 material source commit 3f7641... and source regression wiring 7e59a4... are integrated. CI test negative guard count fixed under 770cdee8...; one exact SHA all gates requested via this bookkeeping/validation-input commit. This is not a new score or HMD PASS.",
+  "feature_last_head": "770cdee8ecdbae6a25dd94fd4a81e1e5ea1c891a",
   "diagnosis": {
     "original_evidence": "2026-10-18 original game sprite map shows SELECTOR_CVT (31 DDS) and SUMO_FE_CVT (111 DDS), but source-only evidence cannot prove these specific textures exercise the unsupported request path.",
     "source_trace": [
@@ -85,5 +85,23 @@
     "fix_evidence": "A constexpr request admission helper rejects unsupported mip/Format requests before GPU allocation so native D3DX handles them, plus portable positive/negative C++ smoke and destructive mutation verification.",
     "negative_test_evidence": "Portable smoke and mutation verifier authored; remote CI and matching Quest3 are pending.",
     "eye_ownership": "The original texture resource is consumed by the existing per-eye R84 sprite pipeline unchanged; no promoted eye ownership or HMD assertion."
+  },
+  "ci_evidence": {
+    "status": "IN_PROGRESS",
+    "first_validation_sha": "7e59a4d3a1f92e7660bccd312b4bd4479c75a626",
+    "initial_failure": {
+      "gate": "DX9Ex Active Validation",
+      "run_id": 39057937307,
+      "job": "policy",
+      "cause": "New mandatory guarded DDS verifier changed required fail-closed count from seven to eight; repaired under same TASK_ID in 770cdee8... without suppressing a single negative guard."
+    },
+    "latest_repair_sha": "770cdee8ecdbae6a25dd94fd4a81e1e5ea1c891a",
+    "mandatory_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "note": "This unchanged-source run record change requests all 4 path-filtered workflows on a single new exact SHA. All in-progress older workflows retain cancel-in-progress:false. Quest3/VDXR still UNTESTED."
   }
 }
