@@ -813,7 +813,22 @@ def check_r30_stage_raw_wvp(renderer: str) -> list[str]:
         ("StageExtensionPhysical::IsValid(source)",
          "R30 must validate the stamped stage source"),
     )
-    return [msg for needle, msg in evidence if needle not in stage]
+    errors = [msg for needle, msg in evidence if needle not in stage]
+    plane_begin = renderer.find("        bool R30BuildStageExtensionXyzrhwEyePlane(")
+    plane_end = renderer.find("        bool R30XyzrhwHasProjectedDepthSignature(", plane_begin)
+    if plane_begin < 0 or plane_end <= plane_begin:
+        return errors + ["R30 +TIME source-eye plane boundary missing"]
+    plane = renderer[plane_begin:plane_end]
+    # Merely seeing StageExtensionTime on an unrelated world producer cannot
+    # grant source-game ScreenHud pixel extents to an XR viewport.
+    if ("const bool stagePresentationPixels =" not in plane or
+        "resultDraw.IsExactFiniteResultHud() &&" not in plane or
+        "resultDraw.producer ==" not in plane or
+        "if ((stagePresentationPixels || goalPresentationPixels ||" not in plane):
+        errors.append("physical +TIME ScreenHud pixel-space admission missing")
+    if ("if ((OutRunVR::GameSemantic::CurrentRenderProducerToken() ==" in plane):
+        errors.append("producer-only +TIME viewport admission reintroduced")
+    return errors
 
 
 def main_current_ledger(code: str, header: str) -> int:
@@ -841,11 +856,28 @@ def main_current_ledger(code: str, header: str) -> int:
          "rawWriteSerial == 0 || rawDrawSerial == 0", "false"),
         ("missing-right-eye-c64-stamp",
          "rawWriteSerial, rawDrawSerial};", "0, 0};"),
+        ("missing-c64-stamp-pair-fallback",
+         "rawWriteSerial = 0;\n                rawDrawSerial = 0;",
+         "rawWriteSerial = 0;"),
     ):
         changed = captured.replace(before, after, 1)
         mutant = renderer[:capture_begin] + changed + renderer[capture_end:]
         if changed == captured or not check_r30_stage_raw_wvp(mutant):
             print("DX9Ex +TIME R30 FAIL: source mutation not detected:", label)
+            return 1
+    # A stale stage token on a world pass must not import ScreenHud's
+    # original game pixel extent. Scope must be proven at the GPU source.
+    for label, before, after in (
+        ("unproven-stage-viewport",
+         "resultDraw.IsExactFiniteResultHud() &&\n                resultDraw.producer ==",
+         "true &&\n                resultDraw.producer =="),
+        ("stage-pixel-admission-deleted",
+         "if ((stagePresentationPixels || goalPresentationPixels ||",
+         "if ((goalPresentationPixels ||"),
+    ):
+        modified = renderer.replace(before, after, 1)
+        if modified == renderer or not check_r30_stage_raw_wvp(modified):
+            print("DX9Ex +TIME R30 FAIL: plane mutation not detected:", label)
             return 1
     # Every mutation must materially modify an existing live source, and
     # the validator must detect its exact missing safety condition. This
