@@ -187,7 +187,7 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
     for original, mutant in (
         ("shadowBeforeLeft, shadowAfterLeft", "shadowBeforeLeft, shadowBeforeLeft"),
         ("OutRunVR::CarShadowStereo::OwnsDirectGameWvp({",
-         "false && OutRunVR::CarShadowStereo::OwnsDirectGameWvp({"),
+         "false /* mutated original owner */ && RejectedShadowOwner({"),
         ("CarShadowStereo::IsCoherentBeforeNativeLeft(",
          "CarShadowStereo::BypassNativeShadowProvenance("),
         ("centreSourceChanged || shadowSourceChanged", "centreSourceChanged || false"),
@@ -203,7 +203,7 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
         ("OwnsDirectGameWvp({", "false /*bypass*/ && OwnsDirectGameWvp({"),
         ("(directCarShadow && !hud.handled)", "false"),
         ("OutRunVR::CarShadowStereo::OwnsDirectGameWvp({",
-         "false && OutRunVR::CarShadowStereo::OwnsDirectGameWvp({"),
+         "false /* mutated original owner */ && RejectedShadowOwner({"),
         ("CarShadowStereo::IsCoherentBeforeNativeLeft(",
          "CarShadowStereo::BypassNativeShadowProvenance("),
     ):
