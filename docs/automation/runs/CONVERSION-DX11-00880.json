@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "work_key": "DX11:NATIVE_STEREO_EYE_SLOT_DEPTH_RESIDENCY",
   "feature_id": "DX11:NATIVE_STEREO_EYE_SLOT_DEPTH_RESIDENCY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -34,8 +34,8 @@
       "tools/dx11_native_transport_probe.cpp"
     ],
     "acceptance_proof": {
-      "positive_probe": "Windows WARP native transport probe validates distinct real GPU depth views and same-slot reuse after frame recycle.",
-      "negative_regression": "Foreign-context, wrong-frame and producer-pending depth admission reject without modifying returned pointers. DX9Ex Draw/Present/input and DXVK frozen untouched.",
+      "positive_probe": "Windows WARP native transport probe validates distinct real GPU depth views and same-slot reuse after frame recycle. Native Transport isolated WARP SUCCESS #39030225851 on material SHA.",
+      "negative_regression": "Foreign-context, wrong-frame and producer-pending depth admission reject without modifying returned pointers. DX9Ex Draw/Present/input and DXVK frozen untouched. Five exact-SHA mandatory CI SUCCESS.",
       "component_integration": "Stereo game-eye render dispatch uses the transport slot-owned depth pair; native ring GPU fence/ACK and destructor govern attachment lifetime."
     },
     "conflict_keys": [
@@ -46,7 +46,7 @@
       "D3D11_NATIVE_DRAW",
       "NATIVE_STEREO_EYE_OUTPUT"
     ],
-    "visible_frame_acceptance": "Runtime menu/car/race and Quest3 pixel matching not yet observed.",
+    "visible_frame_acceptance": "DX11 Native C++ source + exact-SHA 5/5 GitHub CI verified only; no real OutRun menu/car/race camera R30 runtime, Quest3 stereo pixels or FPS observed.",
     "activation_guard_and_fallback": "Production DX11 remains opt-in; preserve original DX9Ex rendering and original gamepad/FFB."
   },
   "feature_contract": {
@@ -74,9 +74,9 @@
     ]
   },
   "acceptance_results": {
-    "native_eye_depth": "PENDING_CI",
-    "fallback": "PENDING_CI",
-    "gates": "PENDING_CI",
+    "native_eye_depth": "PASS_SOURCE_CI",
+    "fallback": "PASS_SOURCE_CI",
+    "gates": "PASS_EXACT_SHA",
     "real_game_and_quest3": "UNTESTED"
   },
   "changed_files": [
@@ -89,12 +89,57 @@
     "C0_RECOVER": "PASS: checked GitHub HEAD and completed 00879 record",
     "C1_REVIEW": "PASS: confirmed per-frame per-eye CreateTexture2D/CreateDepthStencilView in stereo recorder",
     "C2_IMPLEMENT": "PASS: ring-slot-owned GPU depth pair and WARP regression",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_MATERIAL_SHA",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5/5 mandatory native DX11 Fast/Backend/Win32 Build/OpenXR/HUD all SUCCESS on exact repair SHA 6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a; Native Transport WARP SUCCESS on material SHA 93cef16465b77933c15356bbd0fcdd06d94812a6.",
+    "C4_COMMIT": "PASS: material GPU C++ & WARP regression 93cef16465b77933c15356bbd0fcdd06d94812a6; policy-only causal repair/validation-bearing 6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a.",
+    "C5_PACKAGE": "NOT_REQUIRED: native stereo source stage is not runtime promoted; no untested HMD package.",
+    "C6_STATE": "PASS_EXACT_SHA: exact final SHA five mandatory gate SUCCESS; no additional feature score; GAME/Quest3 RUNTIME_VALIDATION=UNTESTED."
   },
   "packaging": {
     "status": "NOT_REQUIRED"
+  },
+  "material_result_sha": "93cef16465b77933c15356bbd0fcdd06d94812a6",
+  "validation_bearing_result_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a",
+  "result_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a",
+  "evidence": {
+    "material_sha": "93cef16465b77933c15356bbd0fcdd06d94812a6",
+    "validation_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a",
+    "native_warp": {
+      "name": "DX11 Native Transport Isolated WARP",
+      "id": 39030225851,
+      "conclusion": "success",
+      "head_sha": "93cef16465b77933c15356bbd0fcdd06d94812a6"
+    },
+    "five_mandatory_exact_sha_runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39030455261,
+        "conclusion": "success",
+        "head_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39030455273,
+        "conclusion": "success",
+        "head_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a"
+      },
+      {
+        "name": "Build",
+        "id": 39030459134,
+        "conclusion": "success",
+        "head_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39030459181,
+        "conclusion": "success",
+        "head_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39030459122,
+        "conclusion": "success",
+        "head_sha": "6aafd4a615894bb3a5bdd9145a6e57a2e27e5a5a"
+      }
+    ]
   }
 }
