@@ -17,7 +17,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "895145048611417637398b6a6a887a7668118feb",
-  "material_result_sha": null,
+  "material_result_sha": "5cfd214836e0a0b0d2a2499b98cbba820578f1ca",
   "validation_bearing_result_sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_direct_d3dx_end_to_end": "PENDING_EXACT_SHA",
-    "original_native_fallback": "PENDING_EXACT_SHA",
-    "final_sha_game_host_gates": "PENDING_EXACT_SHA"
+    "goal_direct_d3dx_end_to_end": "PASS",
+    "original_native_fallback": "PASS",
+    "final_sha_game_host_gates": "PASS"
   },
   "diagnosis": {
     "root_cause": "The existing exact B9200 caller-stack proof covered the put_sprite_ex glyph wrapper only; the separate native D3DX direct Draw sink sampled potentially unowned context without exact original result source.",
@@ -81,12 +81,52 @@
     "alternatives_rejected": [
       "Never restore unsafe E8+5 hooks, globally promote unknown screen draws, force a native Flush for every GPU draw, or modify game timer logic."
     ],
-    "eye_ownership": "Original GOAL text source is restricted to direct ScreenHud GPU command ownership, sent through existing R84 independent per-eye renderer; HMD optical acceptance remains UNTESTED."
+    "eye_ownership": "Original GOAL text source is restricted to direct ScreenHud GPU command ownership, sent through existing R84 independent per-eye renderer; HMD optical acceptance remains UNTESTED.",
+    "fix_evidence": "C++ Direct GOAL B9200 D3DX Draw source and shared exact-stack helper committed in material SHA 5cfd214, with exact original E8 sites protected. Static HUD Inspector, Domain, Win32 game and x64 host builds, package and Full Source MSVC analyze on validation-bearing SHA a15b32c all SUCCESS; no Quest3 optical proof.",
+    "negative_test_evidence": "Native GOAL owner smoke checks five negative policy mutations (VR disabled, non-GOAL state, live SpriteNode queue, competing exact producer, non-B9200 stack) plus exact return-address allowlist; existing unsafe original +5 detour mutation/EXE inspector tests remain mandatory and pass on validation-bearing SHA."
   },
   "local_validation": {
     "structural_patch_checks": "PASS",
-    "cpp17_smoke": "GITHUB_CI_PENDING"
+    "cpp17_smoke": "GITHUB_CI_PENDING",
+    "github_ci": "4/4_SUCCESS_EXACT_SHA",
+    "automated_game_build": "SUCCESS",
+    "automated_host_build": "SUCCESS",
+    "automated_package": "SUCCESS",
+    "hmd": "UNTESTED"
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Exact-SHA mandatory GitHub CI SUCCESS reported for a15b32c65adbf493f7bca1303e254d851c46beb4; C6 PASS_EXACT_SHA recorded. Quest3/VDXR HMD runtime remains UNTESTED."
+  "next_action": "C6 terminal record reconciled against exact SHA 4/4 SUCCESS; maintain material source SHA and separate Quest3 VDXR optical HMD acceptance. No further CI rerun or C6 score.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38994581377,
+        "sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38994581383,
+        "sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38994581393,
+        "sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38994581380,
+        "sha": "a15b32c65adbf493f7bca1303e254d851c46beb4",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ]
+  }
 }
