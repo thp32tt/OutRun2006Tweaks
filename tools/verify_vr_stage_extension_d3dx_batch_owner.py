@@ -743,9 +743,9 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
     # cannot inherit a clean texture-transition stamp.
     ledger_flush_success = scope(ledger, "void onFlushSuccess()", "void onFlushFailure()")
     need("if (!sameGeneration(previous))" in cd and
-         "if (!succeeded)" in cd and
+         "if (!succeeded || !sourceStillMatches)" in cd and
          "if (!unchanged(previous))" in cd and
-         "sourceStillMatches && active && drawCount == 0" in cd and
+         "active && drawCount == 0" in cd and
          "homogeneous && scope == Scope::None" in cd and
          "producer == Producer::None" in cd and
          "lastSuccessfulFlushMutationSerial != 0" in cd and
@@ -753,7 +753,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "if (!cleanInternalFlush)" in cd and
          "onFlushFailure();" in cd and
          "recordDraw(drawScope, drawProducer);" in cd and
-         cd.find("if (!succeeded)") < cd.find("if (!unchanged(previous))") <
+         cd.find("if (!succeeded || !sourceStillMatches)") < cd.find("if (!unchanged(previous))") <
          cd.find("if (!cleanInternalFlush)") <
          cd.rfind("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer);") and
          "lastSuccessfulFlushMutationSerial = mutationSerial;" in ledger_flush_success and
@@ -808,10 +808,10 @@ def main_current_ledger(code: str, header: str) -> int:
         ("successful-draw-untracked", "ledger", "recordDraw(drawScope, drawProducer);", "(void)drawScope; (void)drawProducer;"),
         ("texture-flush-stamp-lost", "ledger", "lastSuccessfulFlushMutationSerial = mutationSerial;", "lastSuccessfulFlushMutationSerial = 0;"),
         ("texture-flush-stamp-ignored", "ledger", "lastSuccessfulFlushMutationSerial == mutationSerial", "true"),
-        ("texture-flush-promotes-source-switch", "ledger", "sourceStillMatches && active && drawCount == 0", "true && active && drawCount == 0"),
+        ("texture-flush-promotes-source-switch", "ledger", "if (!succeeded || !sourceStillMatches)", "if (!succeeded)"),
         ("texture-flush-source-check-unused", "code", "sameSourceAfterNative))", "true))"),
         ("texture-flush-wrong-mutation", "ledger", "if (!unchanged(previous))", "if (false)"),
-        ("texture-flush-draw-failure-promoted", "ledger", "if (!succeeded)", "if (false)"),
+        ("texture-flush-draw-failure-promoted", "ledger", "if (!succeeded || !sourceStillMatches)", "if (!sourceStillMatches)"),
 
         ("failed-draw-keeps", "code", "HudBatch.completeNativeDraw(", "HudBatch.completeNativeUnsafeDraw("),
 
