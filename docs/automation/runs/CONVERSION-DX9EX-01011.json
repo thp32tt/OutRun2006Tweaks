@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_POLICY_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "8985282c6be1674792f02b287b82d6fa52c0bb0b",
@@ -65,7 +65,7 @@
   "acceptance_results": {
     "direct_original_hud_owner": "PASS",
     "queue_reentrant_safe_fallback": "PASS",
-    "source_integrated_exact_sha": "PENDING"
+    "source_integrated_exact_sha": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "OwnsProducer on the direct ScreenHud raw WVP path checked only writtenNode for null and ignored a selected currentNode. A reentrant or just-finished queue cursor could be misinterpreted as original direct HUD c64 despite a stale physical queue selection.",
@@ -81,5 +81,46 @@
     "negative_test_evidence": "C++ compile-time constexpr positive direct and queued tests with negative current-node, written-node, foreign node and node-epoch mutations; Windows exact-SHA integrated gate pending.",
     "eye_ownership": "Both XR HUD eye matrices may consume one original direct ScreenHud c64 only when source and current physical draw are provably direct; unsafe requests keep one original mono GPU submission.",
     "evidence_limit": "Deterministic semantic admission bug is source-confirmed. No matching Quest3 optical failure or visual correction is claimed; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "validation_bearing_result_sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+  "validation_notes": "C6 exact-SHA result: R84 original white HUD c64 source ownership source material e32f2fd18cfbcf871732acb8d48383ae8926cb28; exact validation-bearing record SHA b2030f41fa7ba7f3f3f50381e765d8c32c5692d3. DX9Ex Active Validation #39025208210 policy/full-chain-compile/game/host/package SUCCESS; Domain Isolation #39025208291 SUCCESS; HUD Inspector #39025208242 SUCCESS. Full Source Impact Review #39025112214 SUCCESS for C++ material SHA; #39025208245 still IN_PROGRESS at validation SHA at C6 verification time, with only run-record JSON changed between the material and validation SHAs. Quest3/VDXR headset runtime UNTESTED. Separate [skip ci] C6 bookkeeping only; no source rebuild/re-run or repeat score.",
+  "ci_evidence": {
+    "source_commit": "e32f2fd18cfbcf871732acb8d48383ae8926cb28",
+    "validation_bearing_result_sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+    "validated_exact_sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+    "dx9ex_active": {
+      "run_id": 39025208210,
+      "sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "game",
+        "host",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 39025208291,
+      "sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 39025208242,
+      "sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+      "conclusion": "success"
+    },
+    "full_source_impact_material": {
+      "run_id": 39025112214,
+      "sha": "e32f2fd18cfbcf871732acb8d48383ae8926cb28",
+      "conclusion": "success",
+      "scope_note": "Full source impact verified on actual C++ material SHA; validation-bearing commit changes run-record JSON only."
+    },
+    "full_source_impact_validation": {
+      "run_id": 39025208245,
+      "sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
+      "conclusion": "in_progress_at_c6_check",
+      "scope_note": "Not reported as SUCCESS pending GitHub workflow completion."
+    }
   }
 }
