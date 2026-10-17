@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00888",
+  "production_id": "CONVERSION-DX11-00888",
+  "event_id": "CONVERSION-DX11-00888-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00888",
+  "feature_id": "DX11:NATIVE_EYE_COPY_OM_RTV_PIXEL_UAV_STATE_RESTORE",
+  "work_key": "DX11:NATIVE_EYE_COPY:OM_RTV_PS_UAV_RESTORE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "score_note": "C6 bookkeeping only. No new score awarded or scoreboard changed; any prior material-work credit is preserved externally.",
+  "full_dx11_renderer_complete": false,
+  "base_sha": "184c30708402a222dcf6d7cdbd66da881234963a",
+  "material_result_sha": "693df35aea41cfef1c71234f3206cd62e32c6779",
+  "validation_bearing_result_sha": "c8fb990d0a2c6e6b59fad585b443c37f19b6d414",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_EYE_COPY_OM_RTV_PIXEL_UAV_STATE_RESTORE",
+    "goal": "Preserve original game D3D11 output-merger RTV/DSV, pixel-shader UAV and compute UAV bindings across native L/R eye GPU copy. Never request overlapping RTV/PS-UAV slots; restore state and UAV counters without altering the original game output/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "legal_om_slots",
+        "category": "end_to_end_behavior",
+        "behavior_area": "rtv_aware_pixel_uav_capture",
+        "expected_behavior": "Detect the highest occupied RTV slot including sparse MRT gaps, and query only the non-overlapping PS UAV tail."
+      },
+      {
+        "id": "state_restore",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_eye_copy_om_cs_state_lifetime",
+        "expected_behavior": "Preserve MRT, DSV, PS UAV and CS UAV bindings and append/consume counters across native eye GPU copy."
+      },
+      {
+        "id": "negative_regression",
+        "category": "fallback_regression",
+        "behavior_area": "256_rtv_mask_and_negative_source_mutations",
+        "expected_behavior": "All 256 RTV-occupancy masks satisfy legal OM slot layout; source mutations that overlap or discard UAV state must be rejected."
+      },
+      {
+        "id": "exact_gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_dx11_actions_exact_sha",
+        "expected_behavior": "Required DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector gates report SUCCESS at one validation-bearing SHA."
+      }
+    ]
+  },
+  "feature_contract_provenance": "Reconstructed from committed C++ source and focused regression tests because the 00888 run JSON was absent; not a verbatim restoration of an unavailable previous JSON.",
+  "acceptance_results": {
+    "legal_om_slots": "PASS_BUILD_SOURCE_AND_256_MASK_CPP_REGRESSION",
+    "state_restore": "PASS_BUILD_SOURCE_STRUCTURAL",
+    "negative_regression": "PASS_SOURCE_MUTATION_TEST",
+    "exact_gates": "PASS_EXACT_SHA_5_OF_5_USER_CONFIRMED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_om_slots.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_game_eye_om_slots_probe_00888.cpp",
+    "tools/test_dx11_eye_copy_lifetime_00721.py"
+  ],
+  "validation_evidence": {
+    "validation_sha": "c8fb990d0a2c6e6b59fad585b443c37f19b6d414",
+    "user_reported_ci": "SUCCESS",
+    "github_connector_confirmed_success": [
+      {
+        "workflow": "Build",
+        "run_id": 39052869546
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 39052869536
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "run_id": 39052869574
+      }
+    ],
+    "caveat": "The available commit-workflow lookup returned three individually verified successful runs; the user explicitly confirmed exact-SHA CI SUCCESS for the remaining gates. No CI was re-run."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Target branch HEAD matched exact validation SHA. 00888 run JSON was missing (RUN_RECORD_NOT_FOUND); identified predecessor 184c3070, material 693df35a, and test-fix validation c8fb990d from Git history.",
+    "C1_REVIEW": "Reconstructed original scope from 693df35a C++ diff and 00888 portable 256-mask probe; no source edits in C6.",
+    "C2_IMPLEMENT": "Already committed in 693df35aea41cfef1c71234f3206cd62e32c6779: RTV-aware PS UAV capture and exact OM/CS restoration.",
+    "C3_VALIDATE": "PASS_EXACT_SHA c8fb990d0a2c6e6b59fad585b443c37f19b6d414; user confirmed CI success, and GitHub confirmed Build/HUD/OpenXR success. HMD/gamepad runtime not tested.",
+    "C4_COMMIT": "Existing material 693df35aea41cfef1c71234f3206cd62e32c6779; existing focused regression repair c8fb990d0a2c6e6b59fad585b443c37f19b6d414; neither changed during C6.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA at c8fb990d0a2c6e6b59fad585b443c37f19b6d414; COMPLETE_BUILD_VERIFIED. Separate docs-only bookkeeping [skip ci] commit; RUNTIME_VALIDATION=UNTESTED. No score duplication."
+  },
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "next_action": "C6 BUILD_VERIFIED; do not rerun CI or modify source for this C6. Quest3/VDXR real-game runtime remains UNTESTED."
+}
