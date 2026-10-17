@@ -4951,6 +4951,11 @@ bool observe_source_frame_mode(State& s, bool fullMode) noexcept {
 // An offscreen D3D9 Draw must not be counted as a native backbuffer Draw.
 // Check the current COM backbuffer identity, Z/stencil and all extra MRTs;
 // a failed query, shared main RT or depth/stencil write aborts the native batch.
+// Defined beside the full-frame no-write source observer below. Shared by
+// native offscreen camera isolation and main RT0 no-output game Draws.
+bool game_stencil_is_read_only(IDirect3DDevice9* game, DWORD enabled,
+                               bool maskKnown, DWORD writeMask) noexcept;
+
 bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
     if (!env_full_game_opt_in() || !game || s.frameBatch.stopped) return false;
     const auto owner = reinterpret_cast<std::uintptr_t>(game);
