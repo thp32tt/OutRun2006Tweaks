@@ -1356,6 +1356,7 @@ int main()
         bool replayedScaledPostpass[2]{};
         bool replayedScaledArrayEye[2]{};
         bool preservedPostDrawMrt[2]{};
+        bool preservedSparsePostDrawMrt[2]{};
         ID3D11Predicate* callerPredicate{};
         ID3D11Buffer* callerStreamOutput{};
         bool isolatedConditionalOutput[2]{};
@@ -2216,6 +2217,38 @@ int main()
         for (auto* target : afterCopyMrt)
             if (target) target->Release();
         if (afterCopyDepth) afterCopyDepth->Release();
+        // Real menu/vehicle cameras may retain RT0 + RT2 with RT1 absent
+        // and a pixel UAV at slot 3. Replay a genuine game post-Draw GPU
+        // Copy through the native eye, then prove that all three output
+        // slots, the hole, the depth and the pixel UAV survive unchanged.
+        ID3D11RenderTargetView* sparseMrt[3]{
+            eyeTarget, nullptr, fixture.gameSurfaceView};
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            3u, sparseMrt, fixture.eyeDepth[eyeIndex],
+            3u, 1u, &fixture.gameOmView, nullptr);
+        const bool sparseCopy = encoder.copy_game_surface(
+            fixture.gameShaderIntermediate, &sourcePatch, destX, 48u);
+        const bool sparseNegative = !encoder.copy_game_surface(
+            nullptr, &sourcePatch, destX, 48u);
+        ID3D11RenderTargetView* sparseAfter[3]{};
+        ID3D11DepthStencilView* sparseDepth = nullptr;
+        ID3D11UnorderedAccessView* sparseUav = nullptr;
+        ctx->OMGetRenderTargetsAndUnorderedAccessViews(
+            3u, sparseAfter, &sparseDepth, 3u, 1u, &sparseUav);
+        fixture.preservedSparsePostDrawMrt[eyeIndex] =
+            sparseCopy && sparseNegative &&
+            sparseAfter[0] == eyeTarget && sparseAfter[1] == nullptr &&
+            sparseAfter[2] == fixture.gameSurfaceView &&
+            sparseDepth == fixture.eyeDepth[eyeIndex] &&
+            sparseUav == fixture.gameOmView;
+        for (auto* target : sparseAfter) if (target) target->Release();
+        if (sparseDepth) sparseDepth->Release();
+        if (sparseUav) sparseUav->Release();
+        // Restore the original dense game output before the remaining
+        // compute and full-resolution eye postpasses run.
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            2u, beforeCopyMrt, fixture.eyeDepth[eyeIndex],
+            2u, 1u, &fixture.gameOmView, nullptr);
         // A game compute camera callback can replace stage bindings after
         // postpass dispatch. Verify next eye and caller recover their inputs.
         ID3D11ShaderResourceView* detachedComputeResource = nullptr;
@@ -2235,6 +2268,7 @@ int main()
             !fixture.replayedPostDrawShaderCopy[eyeIndex] ||
             !fixture.replayedComputeCopyStretch[eyeIndex] ||
             !fixture.preservedComputeOutputs[eyeIndex] ||
+            !fixture.preservedSparsePostDrawMrt[eyeIndex] ||
             !fixture.replayedGpuOnlyArrayCopy[eyeIndex] ||
             !fixture.replayedGpuOnlyArrayStretch[eyeIndex] ||
             !fixture.replayedPostDrawMipZeroCopy[eyeIndex] ||
@@ -2462,6 +2496,8 @@ int main()
             gameEyeFixture.replayedClippedMsaaResolve[1] &&
             gameEyeFixture.preservedPostDrawMrt[0] &&
             gameEyeFixture.preservedPostDrawMrt[1] &&
+            gameEyeFixture.preservedSparsePostDrawMrt[0] &&
+            gameEyeFixture.preservedSparsePostDrawMrt[1] &&
             gameEyeFixture.isolatedConditionalOutput[0] &&
             gameEyeFixture.isolatedConditionalOutput[1],
             "00826 only bound native eye Draw/DrawIndexed count; detached and foreign OM cannot publish XR");

@@ -21,6 +21,29 @@ namespace {
     std::uint32_t, std::uint32_t, const D3D11_RECT&,
     const float (&)[4]) noexcept;
 
+// Capture the full RTV/DSV state before querying the legal pixel UAV tail.
+// OM RTV and pixel UAV registers overlap; querying all eight RTV slots AND
+// UAV slots 0..7 as a single range is not legal with live sparse MRTs.
+// The highest occupied RTV (not the number of non-null RTVs) sets the start.
+// Preserve gaps such as RT0/RT2 + UAV3 across real camera Copy/Stretch and
+// eye replay, including the last-RT7 case with NO available pixel UAV slots.
+void capture_native_om_outputs(
+    ID3D11DeviceContext* ctx,
+    ID3D11RenderTargetView** targets,
+    ID3D11DepthStencilView** depth,
+    ID3D11UnorderedAccessView** unordered) noexcept {
+    ctx->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+                            targets, depth);
+    UINT occupiedPrefix = 0u;
+    for (UINT i = 0u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+        if (targets[i]) occupiedPrefix = i + 1u;
+    if (occupiedPrefix < D3D11_PS_CS_UAV_REGISTER_COUNT)
+        ctx->OMGetRenderTargetsAndUnorderedAccessViews(
+            0u, nullptr, nullptr,
+            occupiedPrefix, D3D11_PS_CS_UAV_REGISTER_COUNT - occupiedPrefix,
+            unordered + occupiedPrefix);
+}
+
 // D3D11 OM UAVs share the output merger with MRT/DSV. A game/host
 // postpass can leave a pixel-stage UAV bound while the native camera
 // copies or replays its eye. Restore the occupied RTV prefix and every
@@ -37,10 +60,14 @@ void restore_native_om_outputs(
     UINT keep[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     for (auto& value : keep) value = UINT(-1);
     const UINT remaining = D3D11_PS_CS_UAV_REGISTER_COUNT - rtCount;
-    ctx->OMSetRenderTargetsAndUnorderedAccessViews(
-        rtCount, rtCount ? targets : nullptr, depth,
-        rtCount, remaining, remaining ? unordered + rtCount : nullptr,
-        remaining ? keep + rtCount : nullptr);
+    if (!remaining) {
+        // RTV7 occupied: UAVStartSlot=8 is not a D3D11 pixel UAV slot.
+        ctx->OMSetRenderTargets(rtCount, targets, depth);
+    } else {
+        ctx->OMSetRenderTargetsAndUnorderedAccessViews(
+            rtCount, rtCount ? targets : nullptr, depth,
+            rtCount, remaining, unordered + rtCount, keep + rtCount);
+    }
 }
 
 // Native GPU game postpasses may sample compute-produced camera textures.
@@ -53,9 +80,7 @@ struct ScopedNativePostpassOutputs final {
     ID3D11UnorderedAccessView* om[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     ID3D11UnorderedAccessView* compute[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     explicit ScopedNativePostpassOutputs(ID3D11DeviceContext* c) noexcept : ctx(c) {
-        ctx->OMGetRenderTargetsAndUnorderedAccessViews(
-            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, targets, &depth,
-            0u, D3D11_PS_CS_UAV_REGISTER_COUNT, om);
+        capture_native_om_outputs(ctx, targets, &depth, om);
         ctx->CSGetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, compute);
         ID3D11UnorderedAccessView* empty[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
         ctx->CSSetUnorderedAccessViews(0u, D3D11_PS_CS_UAV_REGISTER_COUNT, empty, nullptr);
@@ -853,10 +878,8 @@ public:
                               std::uint32_t height) noexcept
         : context_(context), width_(width), height_(height) {
         if (!context_ || !width_ || !height_) return;
-        context_->OMGetRenderTargetsAndUnorderedAccessViews(
-            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-            savedTargets_, &savedDepth_, 0u,
-            D3D11_PS_CS_UAV_REGISTER_COUNT, savedOmOutputs_);
+        capture_native_om_outputs(
+            context_, savedTargets_, &savedDepth_, savedOmOutputs_);
         context_->OMGetBlendState(&savedBlend_, savedBlendFactors_, &savedSampleMask_);
         context_->OMGetDepthStencilState(&savedDepthState_, &savedStencilRef_);
         context_->RSGetState(&savedRasterizer_);
