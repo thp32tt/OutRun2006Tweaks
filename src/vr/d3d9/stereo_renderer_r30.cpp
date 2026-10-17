@@ -15,6 +15,7 @@
 #include "vr/d3d11/runtime_census.hpp"
 #include "vr/d3d11/live_game_frame_bridge.hpp"
 #include "vr/d3d11/native_game_source_mutation.hpp"
+#include "vr/d3d11/native_game_surface_copy_region.hpp"
 #include "vr/d3d11/live_game_primitive_span.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -733,8 +734,37 @@ namespace OutRunVRStereo
                 device, source, sourceRect, destination, destinationPoint);
             outrun::vr::dx11::observe_update_surface(
                 source, destination, hr);
-            outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
-                device, destination, hr);
+            // An actual successful game UpdateSurface can follow native Draws
+            // (menus, car textures, postpasses). Replay exactly its destination
+            // pixels into the existing full-sized D3D11 frame; retain original
+            // fallback when format, owner or readback cannot be proved.
+            bool replayed = false;
+            if (SUCCEEDED(hr) && source && destination) {
+                D3DSURFACE_DESC sourceDesc{}, destDesc{};
+                if (SUCCEEDED(source->GetDesc(&sourceDesc)) &&
+                    SUCCEEDED(destination->GetDesc(&destDesc))) {
+                    const POINT origin = destinationPoint ? *destinationPoint : POINT{0, 0};
+                    const auto changed = outrun::vr::dx11::live_game_frame::
+                        GameNativeSurfaceCopyRegion::update_surface(
+                            sourceRect ? sourceRect->left : 0,
+                            sourceRect ? sourceRect->top : 0,
+                            sourceRect ? sourceRect->right : sourceDesc.Width,
+                            sourceRect ? sourceRect->bottom : sourceDesc.Height,
+                            sourceDesc.Width, sourceDesc.Height,
+                            origin.x, origin.y, destDesc.Width, destDesc.Height);
+                    if (changed.valid) {
+                        const RECT rect{static_cast<LONG>(changed.left),
+                                        static_cast<LONG>(changed.top),
+                                        static_cast<LONG>(changed.right),
+                                        static_cast<LONG>(changed.bottom)};
+                        replayed = outrun::vr::dx11::live_game_frame::
+                            preserve_game_surface_copy(device, destination, &rect, hr);
+                    }
+                }
+            }
+            if (!replayed)
+                outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                    device, destination, hr);
             return hr;
         }
 
@@ -746,8 +776,33 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30StretchRectHook.stdcall<HRESULT>(
                 device, source, sourceRect, destination, destRect, filter);
-            outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
-                device, destination, hr);
+            // The D3D9 filter/scaling has already run. Copy the ORIGINAL
+            // destination pixels (not an approximation of the source filter)
+            // into native BGRA8 in the same chronological post-draw slot.
+            bool replayed = false;
+            if (SUCCEEDED(hr) && destination) {
+                D3DSURFACE_DESC desc{};
+                if (SUCCEEDED(destination->GetDesc(&desc))) {
+                    const auto changed = outrun::vr::dx11::live_game_frame::
+                        GameNativeSurfaceCopyRegion::destination(
+                            destRect ? destRect->left : 0,
+                            destRect ? destRect->top : 0,
+                            destRect ? destRect->right : desc.Width,
+                            destRect ? destRect->bottom : desc.Height,
+                            desc.Width, desc.Height);
+                    if (changed.valid) {
+                        const RECT rect{static_cast<LONG>(changed.left),
+                                        static_cast<LONG>(changed.top),
+                                        static_cast<LONG>(changed.right),
+                                        static_cast<LONG>(changed.bottom)};
+                        replayed = outrun::vr::dx11::live_game_frame::
+                            preserve_game_surface_copy(device, destination, &rect, hr);
+                    }
+                }
+            }
+            if (!replayed)
+                outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                    device, destination, hr);
             return hr;
         }
 
