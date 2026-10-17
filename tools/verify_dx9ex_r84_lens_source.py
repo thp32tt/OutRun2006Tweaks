@@ -193,9 +193,11 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "const auto centreBeforeLeft = exactCentreEye",
         "const bool centreSourceChanged = exactCentreEye &&",
         "OutRunVR::LensCentre::SameStereoDrawSource(",
-        "captureCentreSource()) ||",
+        "centreBeforeLeft, centreAfterLeft) ||",
         "OutRunVR::LensCentre::SameRawStereoSource(",
-        "centreRawBeforeLeft, captureCentreRawSource()));",
+        "centreRawBeforeLeft, centreRawAfterLeft) ||",
+        "OutRunVR::LensCentre::IsCoherentNativeCentrePair(",
+        "centreAfterLeft, centreRawAfterLeft));",
         # The GOAL result owns an additional independent post-left fence.
         # Keep the C993 centre and car-shadow checks mandatory in that same
         # composite guard rather than requiring an obsolete two-term string.
@@ -223,6 +225,18 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     after_left = physical.index(guard_marker)
     right_eye = physical.index("IDirect3DSurface9* rightEye =")
     assert left_draw < after_left < right_eye
+    # Assert both actual physical draw ownership checks, not unrelated HUD.
+    before_native_left = physical[:left_draw]
+    after_native_left = physical[left_draw:after_left]
+    for marker in ("const auto centreAfterLeft = exactCentreEye",
+                   "const auto centreRawAfterLeft = exactCentreEye"):
+        assert marker in after_native_left, "C993 post-left snapshot lost: " + marker
+    for section, label in ((before_native_left, "pre-left"),
+                           (after_native_left, "post-left")):
+        assert "!OutRunVR::LensCentre::IsCoherentNativeCentrePair(" in section, (
+            "C993 coherent source pair veto lost: " + label)
+    assert "centreBeforeLeft, centreRawBeforeLeft)) ||" in before_native_left
+    assert "centreAfterLeft, centreRawAfterLeft));" in after_native_left
     assert physical.index("const bool centreSourceChanged = exactCentreEye &&") < after_left
     assert physical.index("OutRunVR::LensCentre::SameStereoDrawSource(") < after_left
     assert physical.index("OutRunVR::LensCentre::SameRawStereoSource(") < after_left
@@ -399,8 +413,12 @@ def main():
              "OutRunVR::LensCentre::NeverOwnSource("),
         (7, "OutRunVR::LensCentre::SameRawStereoSource(",
              "OutRunVR::LensCentre::NeverOwnRawSource("),
-        (7, "centreRawBeforeLeft, captureCentreRawSource()));",
-             "centreRawBeforeLeft, centreRawBeforeLeft));"),
+        (7, "centreRawBeforeLeft, centreRawAfterLeft) ||",
+             "centreRawBeforeLeft, centreRawBeforeLeft) ||"),
+        (7, "centreAfterLeft, centreRawAfterLeft));",
+             "centreAfterLeft, centreRawBeforeLeft));"),
+        (7, "centreBeforeLeft, centreRawBeforeLeft)) ||",
+             "centreBeforeLeft, centreRawAfterLeft)) ||"),
         (7, "OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch()",
              "0 /* no matching original sun c64 source */"),
         (7, "writtenShaderEpoch == shaderEpoch",
