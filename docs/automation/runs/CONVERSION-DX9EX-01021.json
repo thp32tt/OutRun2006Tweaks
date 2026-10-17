@@ -86,6 +86,20 @@
       "DX9Ex Full Source Impact Review"
     ],
     "exact_sha": "PENDING",
-    "blocker": "Prior 01020 exact-SHA CI running while candidate authored; do not cancel, do not fake green."
+    "blocker": "Prior 01020 exact-SHA CI running while candidate authored; do not cancel, do not fake green.",
+    "initial_validation_candidate_sha": "aff36029355eadbe4f0ab8d2f932d60d8d90d4c9",
+    "integrated_source_and_ci_repair_sha": "c765048f0c24fb2aef064470301ea03a886a7c63",
+    "initial_stale_verifier_failures": [
+      "#39047544609 policy: verify_vr_r30_generic_shader_overlay.py source-string drift",
+      "#39047846915 policy: verify_vr_pause_sky_source_owner.py source-string drift"
+    ],
+    "implemented_local_evidence": [
+      "g++ -std=c++17 pause_menu_eye_affine_smoke.cpp: compile and binary PASS",
+      "verify_vr_pause_menu_eye_affine.py source/mutation PASS",
+      "verify_vr_r30_generic_shader_overlay.py source/mutation PASS",
+      "verify_vr_feature_unit_policy.py --check-head PASS"
+    ],
+    "integrated_validation": "PENDING_ALL_FOUR_EXACT_SHA",
+    "caution": "This candidate re-requests all four exact-SHA gates with one consolidated run record; neither previous successful individual jobs nor HMD absence is counted as final PASS."
   }
 }
