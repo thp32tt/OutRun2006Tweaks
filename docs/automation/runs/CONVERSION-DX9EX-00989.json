@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "914254175da074e6cd170fcb93d0ee27c3f36566",
   "material_result_sha": "080d058e1016f730c4fdff6aff574292fe524fec",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "a40147833c53e8db271fd41c769f5421e995f64f",
   "source_paths": [
     "src/vr/game/hud_command_batch.hpp",
     "vrhost/tests/hud_command_batch_smoke.cpp"
@@ -93,5 +93,33 @@
     "compiler_executed": false
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Verify the single resulting validation-bearing exact SHA with mandatory GitHub Actions. Correct proven failures under the same TASK_ID; C6 bookkeeping only after all gates pass, keeping material SHA and Quest3 runtime UNTESTED."
+  "next_action": "C6 exact-SHA CI reconciliation completed; do not rerun CI or duplicate scoring. Quest3/VDXR visual runtime evidence is still required independently.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "a40147833c53e8db271fd41c769f5421e995f64f",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38995955217,
+        "sha": "a40147833c53e8db271fd41c769f5421e995f64f",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38995955241,
+        "sha": "a40147833c53e8db271fd41c769f5421e995f64f",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "note": "Exact-SHA Active Windows R84/R26_SAFE game/host/package and Domain guard were observed SUCCESS. Other workflow identities should not be inferred from a prior SHA."
+  },
+  "c6_result": {
+    "checkpoint": "C6_STATE",
+    "result": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "a40147833c53e8db271fd41c769f5421e995f64f",
+    "bookkeeping_only": true,
+    "runtime_validation": "UNTESTED",
+    "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+  }
 }
