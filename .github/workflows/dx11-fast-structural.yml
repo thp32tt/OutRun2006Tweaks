@@ -18,6 +18,8 @@ on:
       - 'cmake.toml'
       # Native stereo producer contract repairs must trigger a fresh exact-SHA Fast Gate.
       - 'tools/verify_dx11_native_transport_contract.py'
+      # A changed WARP proof must receive the same exact-SHA fast gate.
+      - 'tools/dx11_native_transport_probe.cpp'
       - 'tools/test_dx11_*.py'
       # Source-graph activation verifier revisions also need fresh same-SHA Fast checks.
       - 'tools/verify_dx11_first_game_frame_boundary.py'
