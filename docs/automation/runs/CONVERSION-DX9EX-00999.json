@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00999",
+  "production_id": "CONVERSION-DX9EX-00999",
+  "event_id": "CONVERSION-DX9EX-00999-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_GATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e11d98bb2677f624c60b24479f5cf80c3f51cc75",
+  "material_result_sha": "837747de9a822eaa5a79e98b3f3507d482698a6d",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00999.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Make the complete original stage +TIME sprite and numeric glyph producer render on an identical source ray in both R84 XR eyes even when native 2D game presentation pixels differ in size or aspect from the physical stereo render target.",
+    "scope_boundary": "Only exact producer-tagged +TIME stage sprite and numeric GPU quads receive separate source and XR destination viewport mapping; unchanged-resolution and all non-stage ScreenHud, GOAL, lens C993/CABE, SkyGlow, original input/FFB and R26_SAFE rollback remain unchanged.",
+    "trace_stages": [
+      "Original OutRun stage extension six sprite and number callsites supply producer-stamped game presentation screen pixel coordinates.",
+      "R84 R30 identifies producer-tagged stage ScreenHud GPU draws and captures Game::screen_resolution independently of the physical XR target viewport.",
+      "R30 transforms source rays via StageExtensionPlane for left/right clips before mapping coordinates to XR target pixels, without leaking side effects to unrelated draws.",
+      "Portable cross-viewport smoke covers both eyes, 3440x1440 versus 2496x2688, non-unit HUD scale, malformed matrices and atomic fallback."
+    ],
+    "subcomponents": [
+      "R30 physical stage sprite and numeric glyph producer path captures native game presentation width/height separately from XR render target dimensions.",
+      "Typed shared +TIME StageExtensionPlane viewport adapter maps both projected eyes atomically and includes portable positive/negative unchanged-size cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_time_native_pixels_both_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Stage extension sprite and numeric glyph source projection",
+        "expected_behavior": "Exactly tagged +TIME graphics project both eyes from native 3440x1440 source pixels into XR 2496x2688 RT coordinates without source/aspect confusion."
+      },
+      {
+        "id": "stage_time_invalid_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Failed bilateral projection and original non-stage GPU drawing",
+        "expected_behavior": "Invalid source or XR viewport cannot publish partial eye coordinates; untouched same-size paths and original GOAL, world and rollback maintain old rendering."
+      },
+      {
+        "id": "stage_time_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game host and package source-level CI integration",
+        "expected_behavior": "Exact SHA DX9Ex Active, Domain, affected HUD Inspector and Full Source gates succeed without disabling protection; Quest3 runtime remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_time_native_pixels_both_eyes": "PENDING_CI",
+    "stage_time_invalid_fallback": "PENDING_CI",
+    "stage_time_exact_sha_integration": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Native +TIME stage producer submitted 2D game presentation pixel coordinates, while R30 stage eye-plane projection used the physical stereo render-target width and height for both source decode and XR destination mapping, changing source rays at mismatched resolution.",
+    "original_evidence": "The material 837747de commit introduces stageSource2DWidth/Height captured from Game::screen_resolution only under exact StageExtensionTime ownership, and cross-viewport two-eye projection with 3440x1440 source and 2496x2688 XR target smoke cases.",
+    "source_trace": [
+      "Original six StageExtensionTime producer callsites stamp +TIME sprite and numeric source geometry in the game screen coordinate system.",
+      "R30 stage draw state captures tagged source dimensions before R84 per-eye dispatch, preserving original source as a separate value.",
+      "R30 calls StageExtensionPlane::ProjectPixelPairAcrossViewports and commits left/right only when both projections succeed.",
+      "R84 physical GPU state and host consume already-mapped XR coordinates without changing the original source semantics."
+    ],
+    "alternatives_rejected": [
+      "Globally treating all ScreenHud or GOAL quads as game source pixels would change non-stage HUD and protected desktop rendering; rescaling only one eye or ignoring invalid sizes could introduce binocular inconsistency."
+    ],
+    "eye_ownership": "Both R84 eyes derive from identical tagged +TIME 2D source coordinates, independently clip per eye and map both to the same physical target viewport atomically."
+  },
+  "last_ci_failure": {
+    "run_id": 39008600761,
+    "sha": "837747de9a822eaa5a79e98b3f3507d482698a6d",
+    "workflow": "DX9Ex Active Validation",
+    "job": "policy",
+    "cause": "tools/verify_vr_feature_unit_policy.py --check-head exited because docs/automation/runs/CONVERSION-DX9EX-00999.json did not exist.",
+    "resolution": "Add exact-task run record as validation-input repair; retain original C++ material SHA and all existing required GitHub Actions gates."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Check the new exact SHA mandatory GitHub Actions gates, fix real failures under the same TASK_ID, then record C6 as separate bookkeeping without replacing original material_result_sha. Quest3/VDXR optical runtime testing remains untested."
+}
