@@ -95,8 +95,10 @@ VR_FORCE_ROLLOVER_SECONDS = max(300, int(os.getenv("VR_FORCE_ROLLOVER_SECONDS", 
 VR_UNCONDITIONAL_RESUME_SECONDS = max(VR_FORCE_ROLLOVER_SECONDS, int(os.getenv("VR_UNCONDITIONAL_RESUME_SECONDS", "2400")))
 VR_CHECKPOINT_ENABLED = os.getenv("VR_CHECKPOINT_ENABLED", "true").lower() == "true"
 VR_CHECKPOINT_BRANCH = os.getenv("VR_CHECKPOINT_BRANCH", "chat-controller-downloads").strip()
-# Continuous developer dispatch is deliberately independent of completed/blocked
-# feature queues. TASK_ID remains audit identity, never a dispatch prerequisite.
+VR_CHECKPOINT_PERIOD_MINUTES = max(5, int(os.getenv("VR_CHECKPOINT_PERIOD_MINUTES", "15")))
+DEVELOPMENT_TARGET_PERCENT = max(70, min(90, int(os.getenv("DEVELOPMENT_TARGET_PERCENT", "70"))))
+# Historic feature backlogs do not block dispatch; an active TASK_ID is never
+# replaced by the 30-minute timer until the lane is terminal.
 VR_CONTINUOUS_30M_ENABLED = os.getenv("VR_CONTINUOUS_30M_ENABLED", "false").lower() == "true"
 VR_CONTINUOUS_INTERVAL_SECONDS = max(300, int(os.getenv("VR_CONTINUOUS_INTERVAL_SECONDS", "1800")))
 
@@ -1137,7 +1139,7 @@ def queue_dynamic_prefix() -> str:
     ]
     if lane in {"DX11", "DX9EX"}:
         lines += [
-            "DEVELOPMENT_FIRST_20261015=ON. 기능 단위 실제 C++/HLSL/후킹/host·입력 소스 구현을 C2 최우선으로 한다. 이미 PASS인 동일 SHA 검증·C6 기록·상태 문서·CI 스크립트 정비만으로 신규 기능 또는 점수를 만들지 마.",
+            f"DEVELOPMENT_FOCUS_20261017=ON. 유효 작업시간 중 실제 C++/HLSL/후킹/host·입력 소스 구현·실제 실패 원인 수리 ≥{DEVELOPMENT_TARGET_PERCENT}%, 분석 ≤15%, 변경 관련 검증·최종 CI 조정 ≤10%, C6·기록 ≤5%를 목표로 해. CI 원격 대기시간은 별도이고 실제 측정 없으면 달성했다고 주장하지 마. 필수 최종 CI는 보존해.",
             "분류 먼저: (A) 미완료 사용자 가시 기능/실제 결함 → 현재 TASK_ID/FEATURE_ID에서 소스 구현, (B) 정확한 필수 CI 실패 → 동일 TASK_ID에서 실패 원인 한정 수리, (C) 과거 PASS/기록 미완료 → 중복 CI 없이 최소 C6 정합화. 새로운 TASK_ID를 테스트/메타데이터/한 가지 enum 변형용으로 소모하지 마.",
             "소스+관련 회귀를 가능한 하나의 응집된 배치에 묶고 개발 중 변경 영역 테스트만 실행해. 기능 후보의 최종 validation-bearing exact SHA에서 필수 GitHub Actions 전체 Gate를 유지하며, 실제 실패 수리로 SHA가 달라진 경우만 새 SHA를 검증해. 안전성/빌드/음성 회귀 검증을 무력화하지 마.",
             "C6·checkpoint·롤오버·기존 테스트 문자열/정규식 조정은 독립 개발 성과가 아니다. 같은 TASK_ID/FEATURE_ID에 귀속하고 구현 커밋 vs 검사·기록 커밋을 최종 보고에서 구분해. HMD 실기 미실행이면 RUNTIME_VALIDATION=UNTESTED.",
@@ -1146,8 +1148,8 @@ def queue_dynamic_prefix() -> str:
     if VR_CONTINUOUS_30M_ENABLED and lane in {"DX11", "DX9EX"}:
         lines += [
             "CONTINUOUS_DEVELOPMENT=ON. TASK_ID는 커밋·이력·점수 중복 방지 식별자일 뿐이며 이전 TASK 완료/C6, FEATURE_CONTRACT, backlog 상태는 다음 개발 착수의 선행 조건이 아니다.",
-            "매 30분 독립 새 채팅 개발 배정. GitHub 최신 HEAD와 기존 작업·실패를 확인한 후 이미 완료된 구현을 반복하지 말고 실제 미완료 코드와 회귀를 바로 수정해.",
-            "이전 대화/태스크가 미완료여도 다른 구현 가능한 코드 영역을 먼저 작업해. 동일 파일 충돌은 회피하고, 강제 Git push/CI-skip을 하지 마.",
+            "30분은 기존 미완료 TASK_ID의 진행 확인·동일 ID 대화 재개 기준이다. 이 시간에 새 TASK_ID를 발급해 구현을 교체하지 마.",
+            "이전 대화의 미완료 구현은 동일 TASK_ID/FEATURE_ID로 완성해. 실제 terminal 이후에만 다른 기능을 시작하고, 동일 파일 충돌·강제 push/CI-skip 금지.",
             "HMD 테스트를 못 했으면 RUNTIME_VALIDATION=UNTESTED로 남기되 새로운 게임 코드 개발을 멈추지 마.",
         ]
     if lane in {"DX11", "DXVK", "DX9EX"}:

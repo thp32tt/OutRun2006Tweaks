@@ -142,71 +142,52 @@ class Progression(unittest.TestCase):
         self.assertFalse(ns['vr_reconcile_durable_blocked_outcomes'](self.backlog, 'DX11', q))
         self.assertEqual(q['feature_outcomes'][feature_id]['terminal'], 'BLOCKED')
 
-    def test_continuous_cadence_does_not_wait_for_blocked_or_c6(self):
+    def test_continuous_cadence_keeps_live_owner_until_terminal(self):
         ns = self.ns
-        ns["VR_CONTINUOUS_INTERVAL_SECONDS"] = 1800
-        ns["_parse_iso"] = lambda raw: datetime.fromisoformat(raw) if raw else None
         now = datetime(2026, 10, 11, 12, 30, tzinfo=timezone.utc)
-        q = {
-            "feature_outcomes": {"DX11:FIRST_GAME_DRAW_FRAME": {
-                "terminal": "BLOCKED", "task_id": "CONVERSION-DX11-00537"}},
-            "active_by_lane": {"A": {"task_id": "CONVERSION-DX11-00538",
-                                      "sent_at": datetime(2026, 10, 11, 12, 0, tzinfo=timezone.utc).isoformat()}},
-        }
+        q = {"active_by_lane": {
+            "A": {"task_id": "CONVERSION-DX11-00538", "phase": "WAIT_CHAT"},
+            "C": {"task_id": "CONVERSION-DX9EX-00593", "phase": "WAIT_ACTIONS"}}}
         due = ns["vr_continuous_dispatch_due"]
-        self.assertTrue(due(q, "A", now))
-        self.assertFalse(due(q, "B", now))
-        self.assertTrue(due(q, "C", now))  # no C worker, no backlog prerequisite
-        q["vr_continuous_last_dispatch_at"] = {"A": now.isoformat()}
         self.assertFalse(due(q, "A", now))
-        self.assertTrue(due(q, "A", now + __import__("datetime").timedelta(minutes=30)))
+        self.assertFalse(due(q, "C", now))
+        self.assertFalse(due(q, "B", now))
+        q["active_by_lane"]["A"]["phase"] = "DONE"
+        self.assertTrue(due(q, "A", now))
+        del q["active_by_lane"]["C"]
+        self.assertTrue(due(q, "C", now))
 
-    def test_continuous_forced_restart_archives_previous_and_retries_failed_send(self):
+    def test_continuous_processing_never_replaces_live_production(self):
         from unittest.mock import AsyncMock, Mock
         ns = self.ns
-        ns["VR_CONTINUOUS_INTERVAL_SECONDS"] = 1800
-        ns["CONVERSION_DX11_ENABLED"] = True
-        ns["CONVERSION_DX9EX_ENABLED"] = True
-        ns["CONVERSION_ONLY_SLOT"] = ""
-        ns["TZ"] = timezone.utc
-        ns["_parse_iso"] = lambda raw: datetime.fromisoformat(raw) if raw else None
+        ns.update(CONVERSION_DX11_ENABLED=True, CONVERSION_DX9EX_ENABLED=True,
+                  CONVERSION_ONLY_SLOT="", TZ=timezone.utc)
         ns["save_queue_state"] = Mock()
         ns["write_runtime"] = Mock()
         ns["log"] = __import__("logging").getLogger("vr-continuous-test")
-        ns["vr_persist_checkpoint"] = AsyncMock(return_value=True)
+        ns["conversion_process_lane"] = AsyncMock()
+        ns["vr_checkpoint_and_rollover"] = AsyncMock(return_value=False)
         calls = []
         async def sender(_context, _pages, q, lane, *, force_fresh_chat=False):
             calls.append((lane, force_fresh_chat))
-            if lane == "C" and len(calls) == 2:
-                return False  # transient failed send keeps original identity
-            q.setdefault("active_by_lane", {})[lane] = {
-                "task_id": "CONVERSION-" + ("DX11" if lane == "A" else "DX9EX") + "-00999",
-                "lane": "DX11" if lane == "A" else "DX9EX",
-                "phase": "WAIT_CHAT", "sent_at": datetime.now(timezone.utc).isoformat()}
+            q["active_by_lane"][lane] = {"task_id": "NEW-" + lane, "phase": "WAIT_CHAT",
+                                          "sent_at": datetime.now(timezone.utc).isoformat()}
             return True
         ns["conversion_send_lane_task"] = sender
-        ns["conversion_process_lane"] = AsyncMock()
-        old_time = datetime(2026, 10, 10, 6, 0, tzinfo=timezone.utc).isoformat()
         q = {"active_by_lane": {
-            "A": {"task_id": "CONVERSION-DX11-00537", "phase": "WAIT_ACTIONS",
-                  "lane": "DX11", "sent_at": old_time, "result_sha": "a"*40},
-            "C": {"task_id": "CONVERSION-DX9EX-00593", "phase": "WAIT_CHAT",
-                  "lane": "DX9EX", "sent_at": old_time}}}
+            "A": {"task_id": "OLD-A", "phase": "WAIT_ACTIONS"},
+            "C": {"task_id": "OLD-C", "phase": "WAIT_CHAT"}}}
         asyncio.run(ns["vr_continuous_conversion_cycle"](None, {}, q, datetime.now(timezone.utc)))
-        self.assertEqual(calls, [("A", True), ("C", True)])
-        self.assertEqual(q["active_by_lane"]["C"]["task_id"], "CONVERSION-DX9EX-00593")
-        self.assertEqual(q["active_by_lane"]["A"]["task_id"], "CONVERSION-DX11-00999")
-        self.assertEqual(q["vr_continuous_superseded"][0]["task_id"], "CONVERSION-DX11-00537")
-        self.assertNotIn("C", q["vr_continuous_last_dispatch_at"])
+        self.assertEqual(calls, [])
+        self.assertEqual(q["active_by_lane"]["A"]["task_id"], "OLD-A")
+        self.assertEqual(q["active_by_lane"]["C"]["task_id"], "OLD-C")
+        ns["vr_checkpoint_and_rollover"].assert_awaited_once()
+        self.assertNotIn("vr_continuous_superseded", q)
+        q["active_by_lane"]["A"]["phase"] = "DONE"
         asyncio.run(ns["vr_continuous_conversion_cycle"](None, {}, q, datetime.now(timezone.utc)))
-        self.assertEqual(q["active_by_lane"]["C"]["task_id"], "CONVERSION-DX9EX-00999")
-        self.assertEqual(len(q["vr_continuous_superseded"]), 2)
-        self.assertEqual([x["task_id"] for x in q["vr_continuous_superseded"]],
-                         ["CONVERSION-DX11-00537", "CONVERSION-DX9EX-00593"])
-        # Do not re-send within 30m of success.
-        calls_before = len(calls)
-        asyncio.run(ns["vr_continuous_conversion_cycle"](None, {}, q, datetime.now(timezone.utc)))
-        self.assertEqual(len(calls), calls_before)
+        self.assertEqual(calls, [("A", True)])
+        self.assertEqual(q["active_by_lane"]["A"]["task_id"], "NEW-A")
+        self.assertEqual(q["active_by_lane"]["C"]["task_id"], "OLD-C")
 
     def test_dx11_existing_runtime_untested_acceptance_schema(self):
         contract = copy.deepcopy(self.backlog['features'][0])
