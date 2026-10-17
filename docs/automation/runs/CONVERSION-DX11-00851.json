@@ -88,5 +88,34 @@
     "native_visual_parity": "NEED_HMD_TEST",
     "material_sha": "11532bbd1afb6a441b3afcf1bd9f5abf47bc46da",
     "validation_bearing_sha": "9220f43ca3f9b6611a9e5ef8f6414790b1b28cde"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+    "goal": "Keep source-ordered actual game GPU postpass pixels visible at the clipped right/bottom edge in both native D3D11 eyes, across Copy, typed conversion, MSAA resolve and protected DX9Ex fallback; full game/HMD parity remains untested.",
+    "acceptance_items": [
+      {
+        "id": "end2end",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_per_eye_gpu_postpass",
+        "expected_behavior": "Both native eye targets preserve visible right/bottom crop pixels through GPU source Copy, typed format conversion and MSAA resolve without an extra geometry Draw"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_lifetime_and_input_safety",
+        "expected_behavior": "Invalid or fully offscreen source/destination and invalid camera slices fail closed; original D3D9 render path, gamepad and FFB remain unchanged"
+      },
+      {
+        "id": "gates",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_build_matrix",
+        "expected_behavior": "At validation SHA 9220f43 the DX11 Fast, Backend, Win32 Build, OpenXR and HUD Inspector workflows conclude success"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "end2end": "PASS_BUILD",
+    "fallback": "PASS_STATIC_AND_WARP_NEGATIVE_REGRESSION",
+    "gates": "PASS_EXACT_SHA_5_OF_5"
   }
 }
