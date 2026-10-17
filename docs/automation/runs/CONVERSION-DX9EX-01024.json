@@ -12,9 +12,9 @@
   "status": "IMPLEMENTED_PENDING_CI",
   "checkpoint": "C4_COMMIT",
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
-  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT_WHITE_OR_MISSING",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "material_result_sha": null,
+  "material_result_sha": "3f7641dfa0d47fa18492b30596a52f971be9ceb7",
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -46,6 +46,17 @@
         "behavior_area": "DX9Ex R84 package, host, source impact",
         "expected_behavior": "Portable smoke, mutation guard and exact GitHub full mandatory CI after branch integration; Quest3 remains untested."
       }
+    ],
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "scope_boundary": "Original menu and Ferrari vehicle-selection replacement DDS upload only; preserve source DDS alpha intent, old UV paths, original game FFB/input, R84 render eye ownership and SkyGlow, and R26_SAFE fallback.",
+    "trace_stages": [
+      "Original XST or external DDS replacement source enters TextureReplacement hook and native D3DXCreateTextureFromFileInMemoryEx request, including Width/Height/MipLevels/Format.",
+      "Independent R84 fast DDS loader resolves original DDS format, source row stride, packed mip payload and destination D3D9 texture allocation.",
+      "Original vehicle selector/menus consume the resulting texture and sprite UV on both R84 eye submissions; unsupported requested conversions revert to native D3DX call rather than silently returning another texture format."
+    ],
+    "subcomponents": [
+      "Validate caller-requested mip level/generation semantics before fast texture allocation, allowing native D3DX to generate additional levels.",
+      "Validate caller-requested GPU texture format after raw DDS BGRA/24-bit conversion selection; preserve native fallback for mismatches without altering legitimate alpha/opaque texture interpretation."
     ]
   },
   "acceptance_results": {
@@ -58,5 +69,21 @@
     "python tools/verify_vr_dds_fast_load_contract.py",
     "GitHub exact-SHA DX9Ex Active + Domain + HUD Inspector + Full Source Impact"
   ],
-  "notes": "C2 material candidate built on isolated feature branch while independent target CI is running. Do not fast-forward target or mark C6 until all exact SHA gates pass. D3DX request divergence is source-confirmed; connection to observed HMD white sprites remains unproven. No runtime HMD test."
+  "notes": "C2 material candidate built on isolated feature branch while independent target CI is running. Do not fast-forward target or mark C6 until all exact SHA gates pass. D3DX request divergence is source-confirmed; connection to observed HMD white sprites remains unproven. No runtime HMD test.",
+  "feature_last_head": "3f7641dfa0d47fa18492b30596a52f971be9ceb7",
+  "diagnosis": {
+    "original_evidence": "2026-10-18 original game sprite map shows SELECTOR_CVT (31 DDS) and SUMO_FE_CVT (111 DDS), but source-only evidence cannot prove these specific textures exercise the unsupported request path.",
+    "source_trace": [
+      "src/hooks_textures.cpp intercepts game D3DXCreateTextureFromFileInMemoryEx and tries copying DDS rows directly to D3D9 CreateTexture.",
+      "Fast loader previously ignored explicit Format and used parsed DDS format; RGBA/opaque and 24-bit conversions selected a different physical texture than requested by caller.",
+      "Fast loader clamped explicit mip requests to DDS count and replaced autogen zero with 1, violating requested texture semantics when native D3DX would convert or generate."
+    ],
+    "root_cause": "Fast-path texture request/response contract violation: D3D9 actual output format could differ from the exact Format requested, while explicit mip generation or extra levels were discarded. This is a confirmed loader semantics defect, not yet a proven cause of Quest3 white sprites.",
+    "alternatives_rejected": [
+      "Do not change DDS on-disk files, UV scaling transactions, selection artwork hashing, SkyGlow, R84 output eye layout or native input/FFB; preserve original D3DX fallback and declared RGBA alpha."
+    ],
+    "fix_evidence": "A constexpr request admission helper rejects unsupported mip/Format requests before GPU allocation so native D3DX handles them, plus portable positive/negative C++ smoke and destructive mutation verification.",
+    "negative_test_evidence": "Portable smoke and mutation verifier authored; remote CI and matching Quest3 are pending.",
+    "eye_ownership": "The original texture resource is consumed by the existing per-eye R84 sprite pipeline unchanged; no promoted eye ownership or HMD assertion."
+  }
 }
