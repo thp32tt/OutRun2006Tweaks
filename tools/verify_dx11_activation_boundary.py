@@ -559,7 +559,9 @@ def main() -> None:
                 # Legacy code rejected every partially-offscreen destination.
                 # The real game now clips the viewport AND adjusts source UVs;
                 # rejecting the old guard is not permission to bypass bounds.
-                "srcBox.right > sd.Width || srcBox.bottom > sd.Height) return false;",
+                "srcBox.right > mipWidth || srcBox.bottom > mipHeight) return false;",
+                "sourceMipSlice >= sd.MipLevels ||",
+                "const UINT mipWidth = (std::max)(1u, sd.Width >> sourceMipSlice);",
                 "const auto clipped = native_game_stretch_clipped_region(",
                 "dest.left, dest.top, dest.right, dest.bottom);",
                 "if (!clipped.valid) return false;",
@@ -582,7 +584,8 @@ def main() -> None:
                 "if (transfer == NativeGameStretchSourceTransfer::Reject)",
                 "sampled.Get() != source",
                 "context_->CopySubresourceRegion(",
-                "sourceArraySlice, sd.MipLevels",
+                "D3D11CalcSubresource(sourceMipSlice, sourceArraySlice,",
+                "sourceMipSlice == 0u;",
                 "ScopedNativeGameEyeOutput restore(context_, targetWidth_, targetHeight_);",
                 "if (!restore.valid()) return false;",
                 "context_->OMSetRenderTargets(1u, &target, nullptr);",
