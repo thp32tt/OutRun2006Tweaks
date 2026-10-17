@@ -1,0 +1,99 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01012",
+  "production_id": "CONVERSION-DX9EX-01012",
+  "event_id": "CONVERSION-DX9EX-01012-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R84_NATIVE_PROJECTION_INVERSE_REUSE",
+  "symptom_id": "DX9EX:SYMPTOM:FRAME_PACING",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "d60d5e409cb8aaaa9502507a87377f57b7e7ff0a",
+  "material_result_sha": "92b2066af8035c24088550730b775a6dc0f52b19",
+  "validation_bearing_result_sha": "92b2066af8035c24088550730b775a6dc0f52b19",
+  "source_paths": [
+    "src/vr/d3d9/r30_projection_inverse_cache.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/r30_projection_inverse_cache_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/r30_projection_inverse_cache.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/r30_projection_inverse_cache_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-01012.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R84_NATIVE_PROJECTION_INVERSE_REUSE",
+    "goal": "Reduce repeated matrix inversion in the active R84 per-native-Draw HUD, projected scene effect, GOAL/+TIME and flare geometry routes, without reducing eye quality, draw submission, or fallback correctness.",
+    "scope_boundary": "Only the real R84 R30 base-projection inverse input shared by six live code paths; preserve R26_SAFE, stereo WVP matrix order and native draw count, world/SkyGlow/camera, input/FFB, device Reset and DXVK freeze.",
+    "special_work_evidence": "Quest3 session 2026-10-09 logged 88 R28 lower-Present latency windows, 63 with max >11.111ms at 90Hz (max 29.917ms). This establishes frame pacing stalls but does NOT attribute them to inversions. Source inspection confirms six R84 R30 original-base projection inversion sites, executed on frequently selected HUD/effect paths. The CPU reduction is not yet measured on the HMD.",
+    "trace_stages": [
+      "Original OutRun game projection and pose change at FOV/recenter/menu-stage boundaries supply the full base-projection matrix on each real GPU source path.",
+      "R84 R30 physical shader HUD, GOAL/+TIME, rank/effect and lens geometry callers request the identical original-game projection inverse and reuse only exact same input matrix bytes.",
+      "R84 original WVP eye builder computes left/right projection with the unchanged inverse arithmetic and native Draw/RT submission while invalid, changing or non-finite matrices preserve the normal fail-closed route."
+    ],
+    "subcomponents": [
+      "Integrate the exact-input, finite, failed-inversion-invalidating thread-local C++ matrix-inverse cache into all six active R30 projection source paths; preserve the preexisting inverse algorithm and multiplication order.",
+      "Add and locally compile portable source-level C++ smoke covering identical repeated projections, changed FOV/depth, signed-zero input, failed inverse invalidation and explicit invalidate without any hardware access.",
+      "Execute exact candidate SHA native Windows R84 game/R26_SAFE, x64 host and package plus Domain, HUD Inspector and Full Source Impact Gates; keep unmeasured Quest3 FPS unclaimed."
+    ],
+    "acceptance_items": [
+      {
+        "id": "r84_live_per_draw_reuse",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original projection matrix through R84 R30 native HUD/world-effect/GOAL stereo builders",
+        "expected_behavior": "All six projection inversions share one cache per exact byte-equal source matrix, preserving each original eye constant and avoiding repeated CPU inversions."
+      },
+      {
+        "id": "dynamic_projection_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "FOV/depth mutation, failed inversion, per-thread isolation, world/SkyGlow/rollback and original native output",
+        "expected_behavior": "Any changed matrix input recomputes, a non-finite or failed inversion refuses reuse and invalidates old result, and unchanged R26_SAFE and eye draw paths retain original behavior."
+      },
+      {
+        "id": "r84_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84/R26_SAFE full-chain compile, x64 OpenXR host package and exact-SHA GitHub policies/inspectors",
+        "expected_behavior": "Final validation-bearing result commit passes DX9Ex Active full-chain Win32, Domain Isolation, HUD Inspector and Full Source Impact; Quest3 frame-time measurement remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "r84_live_per_draw_reuse": "PASS",
+    "dynamic_projection_and_fallback": "PASS_LOCAL_PORTABLE",
+    "r84_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Source-backed redundant per-draw inversion of the same unmodified original base projection in six independent R84 rendering paths. The prior system recomputed the inverse on each caller despite repeated identical current game projection. Whether this specific CPU operation dominates the measured HMD latency is unproven.",
+    "source_trace": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp R30BuildScreenSpaceEyeConstants obtains the original base projection and computes HUD/GOAL/+TIME per-eye planes.",
+      "src/vr/d3d9/stereo_renderer_r30.cpp exact C993 lens, projected world marker and world-effect geometry compute inverse base projection on additional physical draw paths.",
+      "src/vr/d3d9/r30_projection_inverse_cache.hpp ExactInverseCache receives unchanged native D3DMATRIX bytes, computes via R29OwnerInvertMatrix and supplies existing eye math."
+    ],
+    "alternatives_rejected": [
+      "Do not cache only by pose or frame epoch, approximate projection matrices, alter stereo eye count, lower render resolution or assume a GPU bottleneck; original full 16-float bytes must match and failures invalidate."
+    ],
+    "fix_evidence": "Actual code source commit 92b2066af8035c24088550730b775a6dc0f52b19 changes the R84 per-draw implementation and portable C++ test; source was committed without CI skip.",
+    "negative_test_evidence": "Portable C++17 test covers 5000 repetitions, FOV/depth changes, signed zero, inversion failure and explicit invalidate; exact-SHA Windows R84 gate still pending.",
+    "eye_ownership": "Source input is the unmodified original base projection; the inverse is math shared without promoting any producer. Native left/right game Draw and eye matrices retain the existing owner and fallback semantics.",
+    "evidence_limit": "No direct attribution of October 9 frame drops to matrix inverse or Quest3 FPS gain; performance is an implementation candidate pending exact SHA Windows build and matched hardware benchmark."
+  },
+  "ci_evidence": {
+    "source_commit": "92b2066af8035c24088550730b775a6dc0f52b19",
+    "original_policy_failure": {
+      "run_id": 39026428632,
+      "failed_job": "policy",
+      "cause": "missing exact TASK_ID run record",
+      "code_changed": false
+    },
+    "next_gate": "CI for next exact commit containing this record; runtime UNTESTED"
+  }
+}
