@@ -10,7 +10,7 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00892",
   "feature_id": "DX11:FULLFRAME_TYPED_CAMERA_RECT_CLEAR_STEREO",
   "work_key": "DX11:FULLFRAME:CAMERA_TARGET_RECT_TO_NATIVE_LR",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATES",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
   "checkpoint": "C4_MATERIAL",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -53,8 +53,8 @@
   },
   "development_strategy": {
     "work_class": "integration",
-    "milestone_id": "full_resolution_native_game_frame",
-    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "integration_path": [
       "Real game menu/vehicle camera TARGET Rect -> native typed offscreen RTV GPU raster",
       "Real game source Copy/Stretch and full-size stereo LEFT/RIGHT RTV typed GPU raster -> native shared ring -> OpenXR frame fence/ACK",
@@ -102,13 +102,14 @@
       "00891 completed run record missing new mandatory blocking_evidence, encountered by --check-latest until 00892 run exists",
       "Static source auditor retained obsolete RGBA8-only exact-string checks"
     ],
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "ci_retry_failure": "Run 39063041101 rejected source checkpoint because previous milestone/full-frame label implied unverified live D3D9 callsite; exact R30 callsite remains unproven."
   },
   "pipeline": {
     "C0_RECOVER": "00891 exact-SHA PASS and C6 complete; new 00892 material b063ca06672662f623e39d69f902b6350c5f7bde",
     "C1_REVIEW": "Backend/Fast current 00891 missing blocking_evidence and Windows Build stale RGBA8 source static audit",
     "C2_IMPLEMENT": "Typed RTV GPU format checking for offscreen plus native eye and exact preflight with safe D3D9Ex fallback",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_GATES",
+    "C3_VALIDATE": "Exact-SHA CI for initial repair 9bb07183 failed task-policy due unproven LIVE_D3D9_CALLSITE stage; corrected to bounded native stereo source pending Gate. Original gameplay/hardware output still UNTESTED.",
     "C4_COMMIT": "Material b063ca06672662f623e39d69f902b6350c5f7bde and same-task CI source/audit correction in next validation-bearing commit",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_RESULT": "PENDING"
