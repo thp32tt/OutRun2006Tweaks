@@ -1083,7 +1083,7 @@ int main()
         {0xff00ffffu, 0xffffff00u}}; // actual per-eye game TARGET Clear colors
     outrun::vr::dx11::NativeGameEyeRasterState gameRaster{};
     outrun::vr::dx11::NativeGameEyePartialTargetClear partialGameClear{};
-    partialGameClear.count[0] = partialGameClear.count[1] = 8u;
+    partialGameClear.count[0] = partialGameClear.count[1] = 12u;
     // Game-origin full Z/stencil Clear after three masked geometry Draws,
     // followed by per-eye HUD TARGET Clears after the remaining geometry.
     // Chronological replay must preserve BOTH independent eye command lists.
@@ -1192,6 +1192,42 @@ int main()
             ? D3D11_RECT{24, 30, 28, 32}
             : D3D11_RECT{56, 30, 60, 32};
         gpuScale.sourceArraySlice = eye;
+        // Sustained game scenes may issue MORE than eight chronological
+        // post-draw commands before Present. Replay four additional GPU-only
+        // and array-sliced camera operations without dropping either eye.
+        auto& followCopy = partialGameClear.entries[eye][8];
+        followCopy.kind = SourceClear::Kind::SourceCopy;
+        followCopy.afterDrawOrdinal = eye == 0u ? 5u : 6u;
+        followCopy.source = gameCopyOnlyArray;
+        followCopy.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        followCopy.destX = eye == 0u ? 0 : 32;
+        followCopy.destY = 20;
+        followCopy.sourceArraySlice = eye;
+        auto& followScale = partialGameClear.entries[eye][9];
+        followScale.kind = SourceClear::Kind::SourceStretch;
+        followScale.afterDrawOrdinal = followCopy.afterDrawOrdinal;
+        followScale.source = gameCopyOnlyArray;
+        followScale.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        followScale.destination = eye == 0u
+            ? D3D11_RECT{0, 12, 8, 16}
+            : D3D11_RECT{32, 12, 40, 16};
+        followScale.linearFilter = false;
+        followScale.sourceArraySlice = eye;
+        auto& followClear = partialGameClear.entries[eye][10];
+        followClear.kind = SourceClear::Kind::TargetRect;
+        followClear.afterDrawOrdinal = followCopy.afterDrawOrdinal;
+        followClear.argb = 0xff4488ccu;
+        followClear.rect = eye == 0u
+            ? D3D11_RECT{12, 20, 16, 24}
+            : D3D11_RECT{44, 20, 48, 24};
+        auto& followArray = partialGameClear.entries[eye][11];
+        followArray.kind = SourceClear::Kind::SourceCopy;
+        followArray.afterDrawOrdinal = followCopy.afterDrawOrdinal;
+        followArray.source = gameEyeArray;
+        followArray.sourceBox = {0u, 0u, 0u, 8u, 8u, 1u};
+        followArray.destX = eye == 0u ? 0 : 32;
+        followArray.destY = 48;
+        followArray.sourceArraySlice = eye;
     }
 
     std::cerr << "R178-DIAG stereo fixture ready\n";
@@ -1700,6 +1736,13 @@ int main()
     invalidCopyOnlyStretch.entries[1][7].sourceArraySlice = 2u;
     auto invalidStretchBounds = partialGameClear;
     invalidStretchBounds.entries[1][3].destination = {65, 26, 71, 30};
+    // Neither a late unordered race postpass nor an oversized event stream
+    // may write eye L before the bad eye R timeline is rejected.
+    auto invalidLateOrder = partialGameClear;
+    invalidLateOrder.entries[1][11].afterDrawOrdinal = 2u;
+    auto invalidEventCapacity = partialGameClear;
+    invalidEventCapacity.count[1] =
+        SourceClear::kMaxRectsPerEye + 1u;
     require(directSubmit.begin(d3d.context, 24, 33) &&
             !directSubmit.render_game_eye_passes(nullptr, &gameEyeFixture, 33) &&
             !directSubmit.render_game_eye_passes(gameEyePass, &gameEyeFixture, 32) &&
@@ -1733,6 +1776,12 @@ int main()
             !directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
                 &gameRaster, &invalidStretchBounds) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidLateOrder) &&
+            !directSubmit.render_game_eye_passes(
+                gameEyePass, &gameEyeFixture, 33, &fullGameClear,
+                &gameRaster, &invalidEventCapacity) &&
             !ring.synchronization_faulted() &&
             directSubmit.render_game_eye_passes(
                 gameEyePass, &gameEyeFixture, 33, &fullGameClear,
@@ -1999,6 +2048,28 @@ int main()
                gpuScaleDirect[2] == 0x22u);
         require(realGpuScale,
                 "00854 GPU-only scaled game postpass actual L/R eye pixels");
+        // All four late commands must land AFTER the eighth event, with
+        // camera-specific pixels and an interleaved real TargetRect Clear.
+        // A stale eight-event limit or mono source silently fails these.
+        const UINT longEyeX = eyeIndex == 0u ? 1u : 33u;
+        const UINT lateClearX = eyeIndex == 0u ? 13u : 45u;
+        const auto* lateCopy = pixel + 21u * mapped.RowPitch + longEyeX * 4u;
+        const auto* lateScale = pixel + 14u * mapped.RowPitch +
+            (longEyeX + 1u) * 4u;
+        const auto* lateArray = pixel + 49u * mapped.RowPitch + longEyeX * 4u;
+        const auto* lateClear = pixel + 22u * mapped.RowPitch + lateClearX * 4u;
+        const auto expectedCamera =
+            [&](const std::uint8_t* p) noexcept {
+                return eyeIndex == 0u
+                    ? (p[0] == 0x11u && p[1] == 0x00u && p[2] == 0xccu)
+                    : (p[0] == 0x33u && p[1] == 0xbbu && p[2] == 0x22u);
+            };
+        require(expectedCamera(lateCopy) &&
+                expectedCamera(lateScale) &&
+                expectedCamera(lateArray) &&
+                lateClear[0] == 0xccu && lateClear[1] == 0x88u &&
+                lateClear[2] == 0x44u,
+                "00855 twelve-event source timeline actual L/R GPU pixels and Clear order");
         // Mip 1 was deliberately green, but the unscaled eye transfer must
         // preserve blue mip-0 pixels in both independent GPU eye targets.
         const UINT arrayX = eyeIndex == 0u ? 18u : 50u;

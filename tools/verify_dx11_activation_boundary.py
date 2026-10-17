@@ -79,10 +79,17 @@ def audit_native_partial_depth_clear(source: str, transport_probe: str) -> list[
     missing += ["timeline:" + needle for needle in source_requirements
                 if needle not in source]
     test_requirements = [
-        # Keep the seventh eye-specific clipped GPU Copy and eighth
-        # CopyResource-only scaled postpass, plus partial Z/stencil evidence.
-        # Require WARP real eye pixels and wrong-camera negative admission.
-        "partialGameClear.count[0] = partialGameClear.count[1] = 8u;",
+        # Retain the old clipped GPU Copy and eighth scaled postpass, then
+        # require a longer mixed Copy/Stretch/Clear scene in both eyes.
+        # Real WARP pixels and invalid late-event preflight stay mandatory.
+        "partialGameClear.count[0] = partialGameClear.count[1] = 12u;",
+        "followCopy.kind = SourceClear::Kind::SourceCopy;",
+        "followScale.kind = SourceClear::Kind::SourceStretch;",
+        "followClear.kind = SourceClear::Kind::TargetRect;",
+        "followArray.sourceArraySlice = eye;",
+        "invalidLateOrder.entries[1][11].afterDrawOrdinal = 2u;",
+        "invalidEventCapacity.count[1] =",
+        "require(expectedCamera(lateCopy) &&",
         "gpuScale.kind = SourceClear::Kind::SourceStretch;",
         "gpuScale.source = gameCopyOnlyArray;",
         "gpuScale.sourceArraySlice = eye;",

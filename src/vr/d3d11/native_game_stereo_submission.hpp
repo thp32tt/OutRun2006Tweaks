@@ -109,7 +109,10 @@ struct NativeGameEyeColorSeed {
 // This is source-authored GPU command replay, not synthetic Draw evidence.
 // Unsupported source resources/partial depth clears fail closed.
 struct NativeGameEyePartialTargetClear {
-    static constexpr std::uint32_t kMaxRectsPerEye = 8u;
+    // A sustained menu -> selection -> race camera can issue more than eight
+    // ordered GPU Copy/Stretch/clear postpasses between game Draws. Keep a
+    // bounded per-eye command stream rather than dropping the entire frame.
+    static constexpr std::uint32_t kMaxRectsPerEye = 32u;
     enum class Kind : std::uint8_t { TargetRect, FullDepthStencil, SourceCopy, SourceStretch };
     struct Entry {
         D3D11_RECT rect{};

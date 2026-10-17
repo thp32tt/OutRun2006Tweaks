@@ -1215,6 +1215,53 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         return false;
                     if (event.kind ==
                         NativeGameEyePartialTargetClear::Kind::SourceCopy) {
+                        // Validate source format, GPU sample mode and conversion
+                        // for BOTH cameras before recording the first eye.
+                        // Otherwise eye L can write a live XR ring slot before
+                        // a late eye R conversion/resolve is found unsupported.
+                        if (desc.SampleDesc.Count == 0u ||
+                            desc.SampleDesc.Count > 32u ||
+                            (desc.SampleDesc.Count == 1u &&
+                             desc.SampleDesc.Quality != 0u) ||
+                            (desc.SampleDesc.Count > 1u &&
+                             (desc.MipLevels != 1u ||
+                              (desc.BindFlags &
+                               D3D11_BIND_RENDER_TARGET) == 0u)))
+                            return false;
+                        if (desc.Format != ring_.format()) {
+                            // Unscaled D3D9 StretchRect permits format
+                            // conversion; the native encoder implements it
+                            // via the same point-sampled GPU shader as Stretch.
+                            UINT sourceSupport = 0u, eyeSupport = 0u;
+                            if (FAILED(producer->CheckFormatSupport(
+                                    desc.Format, &sourceSupport)) ||
+                                FAILED(producer->CheckFormatSupport(
+                                    ring_.format(), &eyeSupport)) ||
+                                native_game_stretch_source_transfer(
+                                    desc.MipLevels, desc.SampleDesc.Count,
+                                    desc.SampleDesc.Quality,
+                                    (desc.BindFlags &
+                                     D3D11_BIND_RENDER_TARGET) != 0u,
+                                    (desc.BindFlags &
+                                     D3D11_BIND_SHADER_RESOURCE) != 0u,
+                                    (sourceSupport &
+                                     D3D11_FORMAT_SUPPORT_SHADER_SAMPLE) != 0u,
+                                    (eyeSupport &
+                                     D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u,
+                                    (sourceSupport &
+                                     D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u,
+                                    desc.BindFlags == 0u &&
+                                    desc.SampleDesc.Count == 1u) ==
+                                    NativeGameStretchSourceTransfer::Reject)
+                                return false;
+                        } else if (desc.SampleDesc.Count > 1u) {
+                            UINT support = 0u;
+                            if (FAILED(producer->CheckFormatSupport(
+                                    desc.Format, &support)) ||
+                                (support &
+                                 D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) == 0u)
+                                return false;
+                        }
                         // Preflight both eyes with the exact same GPU Copy
                         // clipping as the encoder. A fully offscreen copy
                         // remains invalid before any eye queues GPU work.
