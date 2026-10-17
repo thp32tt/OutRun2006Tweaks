@@ -450,17 +450,37 @@ namespace outrun::vr::dx11
             ID3D11RenderTargetView* targets[
                 D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT]{};
             ID3D11DepthStencilView* depth{};
+            // Game camera color may also be bound as a compute UAV by a
+            // postpass. A native eye GPU copy must not read a live UAV output;
+            // preserve ALL caller compute outputs, including unrelated slots.
+            ID3D11UnorderedAccessView* computeOutputs[
+                D3D11_PS_CS_UAV_REGISTER_COUNT]{};
             explicit ScopedStereoSourceOutputs(ID3D11DeviceContext* ctx) noexcept
                 : context(ctx) {
                 context->OMGetRenderTargets(
                     D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
                     targets, &depth);
+                context->CSGetUnorderedAccessViews(
+                    0u, D3D11_PS_CS_UAV_REGISTER_COUNT, computeOutputs);
+                ID3D11UnorderedAccessView* unbound[
+                    D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+                context->CSSetUnorderedAccessViews(
+                    0u, D3D11_PS_CS_UAV_REGISTER_COUNT, unbound, nullptr);
                 context->OMSetRenderTargets(0u, nullptr, nullptr);
             }
             ~ScopedStereoSourceOutputs() noexcept {
                 context->OMSetRenderTargets(
                     D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
                     targets, depth);
+                // Keep UAV append/counter state; this native transfer did not
+                // author any game compute dispatch or counter reset.
+                UINT keepCounters[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
+                for (auto& counter : keepCounters) counter = UINT(-1);
+                context->CSSetUnorderedAccessViews(
+                    0u, D3D11_PS_CS_UAV_REGISTER_COUNT,
+                    computeOutputs, keepCounters);
+                for (auto* output : computeOutputs)
+                    if (output) output->Release();
                 for (auto* target : targets)
                     if (target) target->Release();
                 if (depth) depth->Release();

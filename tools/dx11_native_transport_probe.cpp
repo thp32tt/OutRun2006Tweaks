@@ -381,6 +381,73 @@ int main()
                 &sourceDesc, nullptr, &foreignSource)),
             "R306 foreign-device source created");
 
+    // A real menu/vehicle compute postpass can leave its camera color
+    // bound as a CS UAV. Copying directly from that live output races the
+    // producer. The native eye ring must detach the UAV, copy BOTH GPU eyes,
+    // restore the exact caller binding and publish only after its EVENT.
+    D3D11_TEXTURE2D_DESC computeSourceDesc = sourceDesc;
+    computeSourceDesc.BindFlags =
+        D3D11_BIND_RENDER_TARGET | D3D11_BIND_UNORDERED_ACCESS;
+    ID3D11Texture2D* computeCamera = nullptr;
+    ID3D11RenderTargetView* computeCameraRtv = nullptr;
+    ID3D11UnorderedAccessView* computeCameraUav = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &computeSourceDesc, nullptr, &computeCamera)) &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                computeCamera, nullptr, &computeCameraRtv)) &&
+            SUCCEEDED(d3d.device->CreateUnorderedAccessView(
+                computeCamera, nullptr, &computeCameraUav)),
+            "00861 real camera postpass UAV/RTV source created");
+    const float computeYellow[4] = {1.f, 1.f, 0.f, 1.f};
+    const float computeCyan[4] = {0.f, 1.f, 1.f, 1.f};
+    d3d.context->ClearRenderTargetView(computeCameraRtv, computeYellow);
+    d3d.context->ClearRenderTargetView(rightView, computeCyan);
+    d3d.context->CSSetUnorderedAccessViews(0u, 1u, &computeCameraUav, nullptr);
+    std::uint32_t computeSlot = 99u;
+    require(ring.try_acquire_slot(d3d.context, 19u, nullptr, computeSlot) &&
+            ring.submit_eye_pair(d3d.context, computeSlot, 19u,
+                                 computeCamera, rightSource) &&
+            ring.slot_state(computeSlot) == SharedEyeSlotState::ProducerPending,
+            "00861 CS UAV-bound camera enters native L/R GPU eye copy");
+    ID3D11UnorderedAccessView* restoredComputeUav = nullptr;
+    d3d.context->CSGetUnorderedAccessViews(0u, 1u, &restoredComputeUav);
+    const bool computeRestored = restoredComputeUav == computeCameraUav;
+    if (restoredComputeUav) restoredComputeUav->Release();
+    require(computeRestored, "00861 original game CS UAV output restored");
+    ID3D11UnorderedAccessView* nullComputeUav = nullptr;
+    d3d.context->CSSetUnorderedAccessViews(0u, 1u, &nullComputeUav, nullptr);
+    publish_bounded(ring, d3d.context, computeSlot, 19u);
+    D3D11_TEXTURE2D_DESC computeReadbackDesc = sourceDesc;
+    computeReadbackDesc.Usage = D3D11_USAGE_STAGING;
+    computeReadbackDesc.BindFlags = 0u;
+    computeReadbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Texture2D* computeReadback = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &computeReadbackDesc, nullptr, &computeReadback)),
+            "00861 GPU L/R eye copy staging for WARP evidence");
+    for (std::uint32_t eye = 0u; eye < 2u; ++eye) {
+        d3d.context->CopyResource(computeReadback, ring.eye(computeSlot, eye));
+        D3D11_MAPPED_SUBRESOURCE pixels{};
+        require(SUCCEEDED(d3d.context->Map(
+                    computeReadback, 0u, D3D11_MAP_READ, 0u, &pixels)),
+                "00861 WARP eye copy mapped");
+        const auto* color = static_cast<const std::uint8_t*>(pixels.pData);
+        const bool expected = eye == 0u
+            ? color[0] == 255u && color[1] == 255u &&
+              color[2] == 0u && color[3] == 255u
+            : color[0] == 0u && color[1] == 255u &&
+              color[2] == 255u && color[3] == 255u;
+        d3d.context->Unmap(computeReadback, 0u);
+        require(expected, "00861 source UAV hazard-free L/R game pixels");
+    }
+    require(ring.retire_acknowledged(
+                make_ack(ring.identity(), computeSlot, 19u)),
+            "00861 exact GPU eye ACK retires compute-camera pair");
+    computeReadback->Release();
+    computeCameraUav->Release();
+    computeCameraRtv->Release();
+    computeCamera->Release();
+
     std::uint32_t stereoSlot = 99;
     require(ring.try_acquire_slot(d3d.context, 20, nullptr, stereoSlot),
             "R306 acquire native game eye frame");
