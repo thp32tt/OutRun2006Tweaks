@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_MATERIAL_CANDIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "a0deb331dafc542e6469c2f3d4143231d434fd1d",
-  "material_result_sha": "PENDING_MATERIAL_COMMIT",
-  "validation_bearing_result_sha": "PENDING_EXACT_SHA",
+  "material_result_sha": "d94d92ebc596723e3f59bb74182beee66860b680",
+  "validation_bearing_result_sha": "b476be3929e4a62f0462df70a1a79684f8fa305c",
   "source_paths": [
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "centre_same_gpu_source_both_eyes": "PENDING_EXACT_SHA",
-    "centre_fallback_and_other_effects": "PENDING_EXACT_SHA",
-    "centre_exact_sha_integration": "PENDING_EXACT_SHA"
+    "centre_same_gpu_source_both_eyes": "PASS",
+    "centre_fallback_and_other_effects": "PASS",
+    "centre_exact_sha_integration": "PASS"
   },
   "diagnosis": {
     "original_evidence": "Original game 0xD3A5 -> 0xC993 central lens producer is already tagged, and R30 rejects unowned raw WVP. R33 uploaded temporary left c64 and then checked pre-left source proofs only for HUD, stage +TIME and GOAL, not the exact central lens.",
@@ -86,5 +86,33 @@
     ],
     "fix_evidence": "C++ direct-source pair guard runs before native LEFT and after native LEFT, with source-wide C++ smoke mutation; no HMD run.",
     "evidence_limit": "Correctness proof is source/compile only. The user's previously observed central lens double image is NOT claimed runtime solved without Quest3/VDXR visual test."
-  }
+  },
+  "ci_gates": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 39034958008,
+      "conclusion": "success",
+      "head_sha": "b476be3929e4a62f0462df70a1a79684f8fa305c"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 39034957997,
+      "conclusion": "success",
+      "head_sha": "b476be3929e4a62f0462df70a1a79684f8fa305c"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 39034957979,
+      "conclusion": "success",
+      "head_sha": "b476be3929e4a62f0462df70a1a79684f8fa305c"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 39034957987,
+      "conclusion": "success",
+      "head_sha": "b476be3929e4a62f0462df70a1a79684f8fa305c"
+    }
+  ],
+  "result_summary": "Source-owned R84 C993 native LEFT/RIGHT stereo GPU owner cross-generation/source coherence guard and executable negative regressions are incorporated in the material commit; exact-sha Windows game/host/R26-safe/package, Domain, HUD Inspector and Full Source Impact succeeded at validation-bearing SHA. HMD visuals untested.",
+  "score_policy": "NO_DUPLICATE_CREDIT_EXISTING_LENS_CENTRE_FEATURE"
 }
