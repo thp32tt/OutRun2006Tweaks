@@ -113,8 +113,10 @@ namespace OutRunVrNativeEyePair
         ~ScopedNativeEyeCopyBindings() noexcept
         {
             context_->OMSetRenderTargets(kRenderSlots, targets_, depth_);
-            UINT preserveCounters[kComputeSlots]{};
-            for (auto& counter : preserveCounters) counter = UINT(-1);
+            // Use the ABI-equivalent unsigned integral type: descriptor-only
+            // DXGI contract fixtures intentionally omit the Windows UINT name.
+            unsigned int preserveCounters[kComputeSlots]{};
+            for (auto& counter : preserveCounters) counter = ~0u;
             context_->CSSetUnorderedAccessViews(
                 0u, kComputeSlots, compute_, preserveCounters);
             const auto release = [](auto*& view) noexcept {
