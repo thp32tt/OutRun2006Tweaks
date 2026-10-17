@@ -31,6 +31,7 @@ static bool run_probe() {
         FAILED(device->CreateRenderTargetView(source.Get(), nullptr, &first)) ||
         FAILED(device->CreateRenderTargetView(other.Get(), nullptr, &second)))
         return false;
+    std::fputs("00900 WARP: created color RTV\n", stderr);
     const float red[] = {1.f, 0.f, 0.f, 1.f};
     context->ClearRenderTargetView(first.Get(), red);
 
@@ -46,14 +47,17 @@ static bool run_probe() {
         FAILED(device->CreateUnorderedAccessView(
             psResource.Get(), nullptr, &psUav)))
         return false;
+    std::fputs("00900 WARP: created PS and CS UAV\n", stderr);
     ID3D11RenderTargetView* attachments[] = {first.Get(), second.Get()};
     ID3D11UnorderedAccessView* ps[] = {psUav.Get()};
     ID3D11UnorderedAccessView* cs[] = {csUav.Get()};
     context->OMSetRenderTargetsAndUnorderedAccessViews(
         2u, attachments, nullptr, 2u, 1u, ps, nullptr);
     context->CSSetUnorderedAccessViews(0u, 1u, cs, nullptr);
+    std::fputs("00900 WARP: bound game MRT/UAV outputs\n", stderr);
     bool detached = false;
     {
+    std::fputs("00900 WARP: before GPU source detach\n", stderr);
         ScopedNativeGameGpuTransferOutputs outputs(context.Get());
         ID3D11RenderTargetView* actual[2]{};
         ID3D11UnorderedAccessView* actualCS = nullptr;
@@ -69,8 +73,10 @@ static bool run_probe() {
         if (!detached) return false;
         // Real GPU copy from still-game-owned RTV0 to a separate frame
         // texture, while both MRTs and PS/CS UAV outputs are suspended.
+    std::fputs("00900 WARP: detached output, starting real GPU copy\n", stderr);
         context->CopyResource(dest.Get(), source.Get());
     }
+    std::fputs("00900 WARP: output restored\n", stderr);
     ID3D11RenderTargetView* restored[2]{};
     ID3D11UnorderedAccessView* restoredPS = nullptr;
     ID3D11UnorderedAccessView* restoredCS = nullptr;
@@ -84,6 +90,7 @@ static bool run_probe() {
     if (restoredPS) restoredPS->Release();
     if (restoredCS) restoredCS->Release();
 
+    std::fputs("00900 WARP: checked GPU output bindings\n", stderr);
     D3D11_TEXTURE2D_DESC staging = desc;
     staging.Usage = D3D11_USAGE_STAGING;
     staging.BindFlags = 0u;
@@ -99,8 +106,10 @@ static bool run_probe() {
     const bool copied = pixel && pixel[0] == 0u && pixel[1] == 0u &&
         pixel[2] == 255u && pixel[3] == 255u;
     context->Unmap(readable.Get(), 0u);
+    std::fputs("00900 WARP: pixel Map/Unmap passed\n", stderr);
     context->OMSetRenderTargets(0u, nullptr, nullptr);
-    context->CSSetUnorderedAccessViews(0u, 1u, nullptr, nullptr);
+    ID3D11UnorderedAccessView* unbound = nullptr;
+    context->CSSetUnorderedAccessViews(0u, 1u, &unbound, nullptr);
     return preserved && copied;
 }
 int main() {
