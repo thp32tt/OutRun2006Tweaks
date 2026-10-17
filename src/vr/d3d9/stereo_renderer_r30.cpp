@@ -1472,19 +1472,25 @@ namespace OutRunVRStereo
         bool R30CaptureSkyGlowSceneBeforeHud(
             IDirect3DDevice9* device)
         {
-            if (!device || Settings::SkyGlowFactor <= 0 ||
-                !R30GameGlowActive())
+            if (!device)
+                return false;
+            // A source-owned screen/ESC draw consumes the clean-world capture
+            // boundary even when the user's SkyGlow setting or the original
+            // game's glow flag is OFF at that instant. If either turns ON
+            // later in this SAME Present, there is no uncontaminated scene
+            // left to sample. Tag first, and let Present skip the bloom
+            // rather than copying HUD/text into BOTH eye glow inputs.
+            const auto frame = R29OwnerCaptureFrameSnapshot();
+            R30SkyGlowScreenDrawEpoch = frame.presentEpoch;
+            if (Settings::SkyGlowFactor <= 0 || !R30GameGlowActive())
                 return false;
             // Most HUD draws arrive after the first successful scene copy.
             // Recheck *all* live R29 eligibility flags, not just the epoch:
             // a right-eye failure in this Present must invalidate reuse.
             if (R29OwnerSkyGlowCaptureStillValid(R30SkyGlowSceneCaptureEpoch))
                 return true;
-            const auto frame = R29OwnerCaptureFrameSnapshot();
-            // This is the exact FIRST eligible screen/HUD boundary. If the
-            // clean left/right scene cannot be copied now, never reuse
-            // post-HUD backbuffers as SkyGlow input at Present.
-            R30SkyGlowScreenDrawEpoch = frame.presentEpoch;
+            // A screen boundary is already latched above, regardless of
+            // mid-frame effect toggles or an unsuccessful eye copy.
             if (!frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
                 frame.rightDrawFailed || frame.stereoIncomplete ||
                 !frame.backBuffer || !frame.rightEyeSurface)

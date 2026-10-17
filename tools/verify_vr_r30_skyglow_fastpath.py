@@ -39,6 +39,21 @@ def check(text):
     capture = text.split("bool R30CaptureSkyGlowSceneBeforeHud(", 1)[1].split("bool R30ApplyStereoSkyGlow(", 1)[0]
     apply = text.split("bool R30ApplyStereoSkyGlow(", 1)[1].split("ULONGLONG R30LastTelemetryMs", 1)[0]
     pass_fn = text.split("bool R30DrawSkyGlowPass(", 1)[1].split("bool R30CaptureSkyGlowSceneBeforeHud(", 1)[0]
+    # A mid-frame OFF->ON setting transition MUST NOT allow a post-HUD
+    # backbuffer copy. This screen-boundary stamp precedes BOTH live
+    # enable checks, while the actual clean-eye capture remains conditional.
+    boundary = "R30SkyGlowScreenDrawEpoch = frame.presentEpoch;"
+    assert capture.count(boundary) == 1, "screen boundary not recorded exactly once"
+    assert (capture.index("if (!device)") <
+            capture.index("const auto frame = R29OwnerCaptureFrameSnapshot();") <
+            capture.index(boundary) <
+            capture.index("Settings::SkyGlowFactor <= 0") <
+            capture.index("R30GameGlowActive()") <
+            capture.index("R29OwnerSkyGlowCaptureStillValid(")), (
+                "SkyGlow mid-frame enable could reuse post-HUD pixels")
+    assert "R30SkyGlowSceneCaptureEpoch = frame.presentEpoch;" in capture
+    assert "R30SkyGlowScreenDrawEpoch == frame.presentEpoch" in apply
+    assert "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch" in apply
     need("for (int eye = 0; eye < 2; ++eye)", allocation)
     assert "GetSurfaceLevel(" not in capture and "GetSurfaceLevel(" not in apply, "per-frame surface getters"
     assert apply.count("device, passState,") == 4, "all four eye/pass calls must share one Present cache"
@@ -124,6 +139,8 @@ mutations = (
     ("remove saved state release", "R30ReleaseCom(R30SkyGlow.savedGameState);"),
     ("retain lost pre-HUD resource epoch",
      "// that a capture from the discarded resource is still valid.\n            R30SkyGlowSceneCaptureEpoch = 0;"),
+    ("drop screen boundary for off-to-on SkyGlow in one Present",
+     "R30SkyGlowScreenDrawEpoch = frame.presentEpoch;"),
     ("ignore pre-HUD resource recreation", "R30SkyGlowScreenDrawEpoch == frame.presentEpoch &&\n                R30SkyGlowSceneCaptureEpoch != frame.presentEpoch"),
     ("remove once-per-resource creation gate", "if (!R30SkyGlow.savedGameState)"),
     ("disable per-frame Capture", "else if (FAILED(R30SkyGlow.savedGameState->Capture()))"),
