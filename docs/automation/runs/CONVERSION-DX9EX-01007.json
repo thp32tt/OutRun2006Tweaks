@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "WAITING_FOR_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ffba764b466721434ed780e0d3ed08e028b2bf4f",
   "material_result_sha": "fb62ea40f05179f61bab60d52d8645bcf3ed0cdc",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "8e393d72561a3ba0ee4a12841522e3cf6b7a247b",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_uiscaling.cpp",
@@ -89,7 +89,23 @@
     "failed_initial_material_sha": "fb62ea40f05179f61bab60d52d8645bcf3ed0cdc",
     "failed_active_run_id": 39018921976,
     "failed_job": "policy",
-    "failed_reason": "Required same-TASK_ID run record absent at initial material HEAD; source not reverted. Correct same-task CI failure repair commit must carry this record before exact-SHA validation."
+    "failed_reason": "Required same-TASK_ID run record absent at initial material HEAD; source not reverted. Correct same-task CI failure repair commit must carry this record before exact-SHA validation.",
+    "validation_bearing_result_sha": "8e393d72561a3ba0ee4a12841522e3cf6b7a247b",
+    "exact_sha_c6": {
+      "head_sha": "8e393d72561a3ba0ee4a12841522e3cf6b7a247b",
+      "required_completed_success": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package",
+        "domain-isolation",
+        "build-hud-inspector",
+        "validate",
+        "source-cross-domain"
+      ],
+      "observation_note": "Required DX9Ex build and verification jobs succeeded at exact SHA. Auxiliary msvc-analyze-active-game was still in_progress when checked; no claim of all jobs completed."
+    }
   },
-  "result_notes": "C++ material result is fb62ea40...; the next record-bearing exact-SHA CI repair is not an independent feature or score. HMD UNTESTED."
+  "result_notes": "C++ material result is fb62ea40...; the next record-bearing exact-SHA CI repair is not an independent feature or score. HMD UNTESTED. C6 PASS_EXACT_SHA recorded on validated 8e393d72; original material SHA and feature acceptance contract retained. C6 bookkeeping has zero additional AI score."
 }
