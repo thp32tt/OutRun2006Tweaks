@@ -19,8 +19,13 @@ assert "GameNativeGpuHandoff::gpu_frame_output_ready(" in present[gpu_start:gpu_
 assert "monoNativePublicationAllowed" in present[gpu_start:gpu_call]
 assert "backbufferKnown && outputNow.valid()" in present[gpu_start:gpu_call]
 assert "nativeExtentMatches, fullPlacement.valid" in present[gpu_start:gpu_call]
-assert "fullMode, complete, gpuOutputAdmissible" in present[gpu_call:cpu_fallback]
-assert "fullMode, complete, outputWritable" not in present[gpu_call:cpu_fallback]
+# Bound the native sink assertion to the GPU call, not the later shared
+# desktop path: the latter MUST still require writable D3D9 backbuffer pixels.
+gpu_call_end = present.index(")) {", gpu_call) + len(")) {")
+assert gpu_call < gpu_call_end < cpu_fallback
+assert "fullMode, complete, gpuOutputAdmissible" in present[gpu_call:gpu_call_end]
+assert "outputWritable" not in present[gpu_call:gpu_call_end]
+assert "fullMode, complete, outputWritable" in present[gpu_call_end:cpu_fallback]
 assert "outputWritable" in present[cpu_fallback:]
 assert "monoPublicationAllowed && outputKnown" in header
 assert "nativeExtentMatches && fullPlacementValid" in header
