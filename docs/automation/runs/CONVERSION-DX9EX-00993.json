@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00993",
+  "production_id": "CONVERSION-DX9EX-00993",
+  "event_id": "CONVERSION-DX9EX-00993-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C2_IMPLEMENTED_C3_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_LOCAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "8bcde14c339a5badf22c8e75d52cc8b8612fce28",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_start_shadow_world_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00993.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Keep the original player's contact-shadow world transform attached to its exact car across both physical R84 eye draws, preventing a right-eye ghost shadow after reentrant native callbacks overwrite the game WVP or shader.",
+    "scope_boundary": "Exact original direct CarBaseShadow/WorldParticle geometry in R84; preserve original car and road, centre lens, GOAL/+TIME, input, FFB, SkyGlow, R26_SAFE rollback and DXVK freeze.",
+    "trace_stages": [
+      "CalcPeraShadow emits player car matrix and exact WorldParticle original-game shadow producer.",
+      "R23 publishes original game shader WVP upload identity with producer, pose and shader, while R30 proves shadow and builds binocular transforms.",
+      "R33 submits original left GPU Draw, which may reenter a different producer, shader, game WVP or Reset.",
+      "R33 checks original source identity after the native left Draw before binding the right eye and fails closed with original c64 restore when identity changed."
+    ],
+    "subcomponents": [
+      "Implement original-game source transaction with WVP write/producer/shader/pose/draw continuity in the physical R84 contact-shadow eye draw.",
+      "Compile positive and eight negative car-source mutation checks on x86 game and extend required physical-shadow verifier to enforce right RT after post-left source validation and restored fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "shadow_car_eye_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original CalcPeraShadow game c64 through R84 physical two-eye pipeline",
+        "expected_behavior": "Only one unchanged original car contact-shadow WVP may submit both physical eyes."
+      },
+      {
+        "id": "shadow_source_mutation_rollback",
+        "category": "fallback_regression",
+        "behavior_area": "reentrant source, shader, pose and Draw after original left-eye submission",
+        "expected_behavior": "A changed original source prevents foreign right-eye draw, retains original left HRESULT, and restores game GPU state without repeating left."
+      },
+      {
+        "id": "shadow_exact_sha_validation",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 and R26_SAFE, x64 host, package, Domain and Full Source",
+        "expected_behavior": "Exact-SHA required Actions pass after source changes; Quest3/VDXR remains untested separately."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "shadow_car_eye_source": "PENDING_WINDOWS_CI",
+    "shadow_source_mutation_rollback": "PENDING_WINDOWS_CI",
+    "shadow_exact_sha_validation": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R33TryHud checks original contact-shadow raw game WVP once in R30 before the first GPU Draw but only C993 lens has a post-left native source fence. A nested callback may change the car WVP or shader before the right submission.",
+    "original_evidence": "R30HasExactCarBaseShadowRawWvp captures original WVP and shader provenance during initial classification. R33TryHud physical native left Draw previously used no car-specific reentrancy validation.",
+    "source_trace": [
+      "Original CalcPeraShadow matrix/WorldParticle producer drives R23 original c64 shader.",
+      "R30 exact car shadow builds left and right perspective transforms.",
+      "R33 fences the same game WVP writer, shader, pose and draw before right RT after native left Draw."
+    ],
+    "alternatives_rejected": [
+      "No global alpha/particle reclassification, no effect suppression, no extra native Draw, no input/FFB/SkyGlow or DXVK changes."
+    ],
+    "eye_ownership": "Only one matching original world WVP write serial and owner, pose, draw and shader may drive both eyes; invalid source cancels right eye and marks the stereo frame incomplete.",
+    "fix_evidence": "New R33 post-left shadow source sample and car_base_shadow_stereo.hpp immutable comparison.",
+    "negative_test_evidence": "Real game-compiled positive/negative static assertions for upload/Draw/pose/shader/producer fields and shadow physical-order regression verifier."
+  },
+  "local_validation": {
+    "status": "SOURCE_STATIC_PREFLIGHT",
+    "full_windows_ci": "PENDING"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Verify exact SHA Active, Domain Isolation, Inspector and Full Source Actions; no runtime PASS without Quest3 test."
+}

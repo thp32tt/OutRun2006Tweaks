@@ -29,8 +29,20 @@
 #include "gpu_water_profiler.hpp"
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "../game/car_base_shadow_stereo.hpp"
 #include "../core/r29_owner_api.hpp"
 
+namespace OutRunVRRenderer {
+    std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
+    std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
+    bool GetLastRawGameWvpWrite(float outConstants[16],
+        std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+        std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
+    bool GetLastGameWvpSemanticProvenance(
+        OutRunVR::GameSemantic::RenderScope& semanticScope,
+        std::uint64_t& queueNodeEpoch, const void*& queueNode,
+        OutRunVR::GameSemantic::ProducerToken& producerToken) noexcept;
+}
 namespace OutRunVRD3D9ExUpgradeR13
 {
     bool IsCompatDevice(IDirect3DDevice9* device) noexcept;
@@ -909,6 +921,51 @@ namespace OutRunVRStereo
                 ? captureCentreSource()
                 : OutRunVR::LensCentre::StereoDrawSource{};
 
+            // Only the original player shadow's game WVP may feed the right
+            // eye. Native left Draw may synchronously reenter another producer,
+            // overwrite game c64, switch shader or invalidate the latched pose.
+            // Never use the already eye-corrected live GPU c64 as evidence.
+            auto captureShadowSource = [&]() noexcept {
+                const auto command =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                float rawGameWvp[16]{};
+                std::uint64_t uploadSerial=0, uploadDraw=0;
+                std::uint64_t writeShaderEpoch=0, shaderEpoch=0;
+                std::uintptr_t writeShader=0, shader=0;
+                std::uint64_t queueEpoch=0;
+                const void* queueNode=nullptr;
+                OutRunVR::GameSemantic::RenderScope writtenScope =
+                    OutRunVR::GameSemantic::RenderScope::None;
+                OutRunVR::GameSemantic::ProducerToken writtenProducer =
+                    OutRunVR::GameSemantic::ProducerToken::None;
+                const bool sourceOwned =
+                    OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        rawGameWvp, uploadSerial, uploadDraw,
+                        writeShader, writeShaderEpoch) &&
+                    OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                        writtenScope, queueEpoch, queueNode, writtenProducer) &&
+                    R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                    writeShader == shader && writeShaderEpoch == shaderEpoch &&
+                    writtenScope ==
+                        OutRunVR::GameSemantic::RenderScope::WorldParticle &&
+                    writtenProducer ==
+                        OutRunVR::GameSemantic::ProducerToken::CarBaseShadow &&
+                    queueNode == nullptr;
+                return OutRunVR::CarShadowStereo::StereoDrawSource{
+                    uploadSerial, uploadDraw,
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                    R29OwnerTopLevelDrawSerial(), shaderEpoch, shader,
+                    (stereo && stereo->valid) ? stereo->poseSequence : 0u,
+                    command.IsDirectCarBaseShadow() && sourceOwned
+                };
+            };
+            const bool exactShadowEye =
+                screenKind == R32ReviewScreenSpaceKind::ExactCarBaseShadowWorld;
+            const auto shadowBeforeLeft = exactShadowEye
+                ? captureShadowSource()
+                : OutRunVR::CarShadowStereo::StereoDrawSource{};
+
             R32ReviewNoteStereoDrawWithoutMonoBackup();
             if (mayWriteDepth || mayWriteStencil)
                 R32ReviewNoteMainDepthContentWrite();
@@ -935,9 +992,13 @@ namespace OutRunVRStereo
                 return result;
             }
 
-            if (exactCentreEye &&
+            const bool centreSourceChanged = exactCentreEye &&
                 !OutRunVR::LensCentre::SameStereoDrawSource(
-                    centreBeforeLeft, captureCentreSource()))
+                    centreBeforeLeft, captureCentreSource());
+            const bool shadowSourceChanged = exactShadowEye &&
+                !OutRunVR::CarShadowStereo::SameStereoDrawSource(
+                    shadowBeforeLeft, captureShadowSource());
+            if (centreSourceChanged || shadowSourceChanged)
             {
                 // Left native Draw already ran once; never replay it.
                 // Restore the game's original GPU c64 without submitting
@@ -954,10 +1015,14 @@ namespace OutRunVRStereo
                 R32ReviewReportStereoFailure(
                     restored ? OutRunVR::StereoFailureRightStateFailed
                              : OutRunVR::StereoFailureRestoreFailed,
-                    "R33/C993-centre-source-changed", E_FAIL);
+                    shadowSourceChanged ? "R33/car-shadow-source-changed"
+                                        : "R33/C993-centre-source-changed",
+                    E_FAIL);
                 if (!restored)
                     R32ReviewNoteRestoreFailure(
-                        "R33 C993 original c64 rollback");
+                        shadowSourceChanged
+                            ? "R33 car shadow original c64 rollback"
+                            : "R33 C993 original c64 rollback");
                 R32ReviewArmStereoRecoverySafety();
                 return result;
             }

@@ -162,6 +162,25 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
               "(directCarShadow && !hud.handled)",
               "return actualDraw();"):
         assert s in physical, s
+    # Exact physical player-shadow source must survive the native LEFT draw.
+    # If a synchronous game callback changes c64/shader/pose/producer,
+    # the RIGHT render target must never receive the stale original WVP.
+    assert "captureShadowSource" in physical
+    assert "shadowBeforeLeft, captureShadowSource()" in physical
+    assert "centreSourceChanged || shadowSourceChanged" in physical
+    assert 'shadowSourceChanged ? "R33/car-shadow-source-changed"' in physical
+    assert "R32ReviewMarkFrameRightDrawFailed();" in physical
+    assert "R32ReviewSetWvpBatch(device, original);" in physical
+    assert (physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") <
+            physical.index("shadowBeforeLeft, captureShadowSource()") <
+            physical.index("IDirect3DSurface9* savedRt ="))
+    for original, mutant in (
+        ("shadowBeforeLeft, captureShadowSource()", "shadowBeforeLeft, shadowBeforeLeft"),
+        ("centreSourceChanged || shadowSourceChanged", "centreSourceChanged || false"),
+    ):
+        altered = physical.replace(original, mutant, 1)
+        assert original in physical and original not in altered
+
     # Real producer->raw-c64->R84 physical Draw path, not a new token/enum-only
     # assertion. Mutating any independent source proof or fallback must fail.
     for before, after in (

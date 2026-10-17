@@ -53,6 +53,50 @@ constexpr bool OwnsDirectGameWvp(const DirectGameWvpOwner& owner) noexcept
         owner.uploadedQueueNode == nullptr;
 }
 
+// Only one original player-car shadow source can own both native eye draws.
+// A nested callback may overwrite game c64, shader or latched pose after the
+// left draw. Guard the right-eye submission without repeating the left draw.
+struct StereoDrawSource
+{
+    std::uint64_t uploadSerial = 0, uploadDraw = 0;
+    std::uint64_t poseEpoch = 0, uploadPoseEpoch = 0;
+    std::uint64_t drawSerial = 0, shaderEpoch = 0;
+    std::uintptr_t shader = 0;
+    std::uint32_t poseSequence = 0;
+    bool exactSource = false;
+};
+constexpr bool SameStereoDrawSource(
+    const StereoDrawSource& a, const StereoDrawSource& b) noexcept
+{
+    return a.exactSource && b.exactSource &&
+        a.uploadSerial != 0 && a.uploadSerial == b.uploadSerial &&
+        a.uploadDraw == b.uploadDraw &&
+        a.poseEpoch != 0 && a.poseEpoch == a.uploadPoseEpoch &&
+        a.poseEpoch == b.poseEpoch && b.poseEpoch == b.uploadPoseEpoch &&
+        a.drawSerial != 0 && a.drawSerial == b.drawSerial &&
+        a.shaderEpoch != 0 && a.shaderEpoch == b.shaderEpoch &&
+        a.shader != 0 && a.shader == b.shader &&
+        a.poseSequence != 0 && a.poseSequence == b.poseSequence;
+}
+static_assert(SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,30,30,40,50,0x100,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {12,20,30,30,40,50,0x100,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,21,30,30,40,50,0x100,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,31,31,40,50,0x100,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,30,30,41,50,0x100,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,30,30,40,51,0x100,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,30,30,40,50,0x200,60,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,30,30,40,50,0x100,61,true}));
+static_assert(!SameStereoDrawSource(
+    {11,20,30,30,40,50,0x100,60,true}, {11,20,30,30,40,50,0x100,60,false}));
+
 constexpr bool CanUseSpatialShadow(
     GameSemantic::ProducerToken producer, GameSemantic::RenderScope scope,
     bool queued, bool verifiedOriginalWvp, bool depthDisabled,
