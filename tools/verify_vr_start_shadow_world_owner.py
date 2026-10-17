@@ -166,16 +166,30 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
     # If a synchronous game callback changes c64/shader/pose/producer,
     # the RIGHT render target must never receive the stale original WVP.
     assert "captureShadowSource" in physical
-    assert "shadowBeforeLeft, captureShadowSource()" in physical
+    # Verify the original-game WVP pre-left guard and the independently
+    # re-sampled post-left source, not an obsolete exact code string.
+    for source_proof in (
+        "OutRunVR::CarShadowStereo::OwnsDirectGameWvp({",
+        "uploadSerial != 0",
+        "shadowBeforeLeft = exactShadowEye",
+        "shadowAfterLeft = exactShadowEye",
+        "CarShadowStereo::IsCoherentBeforeNativeLeft(",
+        "shadowBeforeLeft, shadowAfterLeft",
+    ):
+        assert source_proof in physical, source_proof
     assert "centreSourceChanged || shadowSourceChanged" in physical
     assert 'shadowSourceChanged ? "R33/car-shadow-source-changed"' in physical
     assert "R32ReviewMarkFrameRightDrawFailed();" in physical
     assert "R32ReviewSetWvpBatch(device, original);" in physical
     assert (physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") <
-            physical.index("shadowBeforeLeft, captureShadowSource()") <
+            physical.index("shadowBeforeLeft, shadowAfterLeft") <
             physical.index("IDirect3DSurface9* savedRt ="))
     for original, mutant in (
-        ("shadowBeforeLeft, captureShadowSource()", "shadowBeforeLeft, shadowBeforeLeft"),
+        ("shadowBeforeLeft, shadowAfterLeft", "shadowBeforeLeft, shadowBeforeLeft"),
+        ("OutRunVR::CarShadowStereo::OwnsDirectGameWvp({",
+         "false && OutRunVR::CarShadowStereo::OwnsDirectGameWvp({"),
+        ("CarShadowStereo::IsCoherentBeforeNativeLeft(",
+         "CarShadowStereo::BypassNativeShadowProvenance("),
         ("centreSourceChanged || shadowSourceChanged", "centreSourceChanged || false"),
     ):
         altered = physical.replace(original, mutant, 1)
@@ -188,6 +202,10 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
         ("R30HasExactCarBaseShadowRawWvp(rawShadow)", "true"),
         ("OwnsDirectGameWvp({", "false /*bypass*/ && OwnsDirectGameWvp({"),
         ("(directCarShadow && !hud.handled)", "false"),
+        ("OutRunVR::CarShadowStereo::OwnsDirectGameWvp({",
+         "false && OutRunVR::CarShadowStereo::OwnsDirectGameWvp({"),
+        ("CarShadowStereo::IsCoherentBeforeNativeLeft(",
+         "CarShadowStereo::BypassNativeShadowProvenance("),
     ):
         sources = [semantic, r30, r33]
         owner = next(i for i, source in enumerate(sources) if before in source)
@@ -206,6 +224,10 @@ def check_r84_shadow_route_shape(semantic, r30, r33, r32, support, review):
     assert "return OutRunVR::CarShadowStereo::OwnsDirectGameWvp({" in r30
     assert "(directCarShadow && !hud.handled)" in r33
     assert "if (directCarShadow && !provenCarShadowStereo)" in r33
+    assert "OutRunVR::CarShadowStereo::OwnsDirectGameWvp({" in r33
+    assert "uploadSerial != 0" in r33
+    assert "CarShadowStereo::IsCoherentBeforeNativeLeft(" in r33
+    assert "shadowBeforeLeft, shadowAfterLeft" in r33
     assert all("ExactCarBaseShadowWorld" in x for x in (r30, r32, support, review))
 
 
