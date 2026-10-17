@@ -509,11 +509,19 @@ namespace outrun::vr::dx11
                 for (auto& counter : keepCounters) counter = UINT(-1);
                 // Restore the exact prefix that was captured, including
                 // sparse RTV holes, then the PS UAV tail without overlap.
-                context->OMSetRenderTargetsAndUnorderedAccessViews(
-                    rtCount, rtCount ? targets : nullptr, depth,
-                    outputSlots.uavStart, outputSlots.uavCount,
-                    outputSlots.uavCount ? pixelOutputs + outputSlots.uavStart : nullptr,
-                    outputSlots.uavCount ? keepCounters + outputSlots.uavStart : nullptr);
+                // RTV7 consumes the last OM slot. UAVStartSlot=8 cannot
+                // designate a legal D3D11 pixel UAV register even when its
+                // requested UAV count is zero. Restore full/sparse eight-RTV
+                // game output through the RTV-only API in that case.
+                if (outputSlots.uavCount == 0u) {
+                    context->OMSetRenderTargets(rtCount, targets, depth);
+                } else {
+                    context->OMSetRenderTargetsAndUnorderedAccessViews(
+                        rtCount, rtCount ? targets : nullptr, depth,
+                        outputSlots.uavStart, outputSlots.uavCount,
+                        pixelOutputs + outputSlots.uavStart,
+                        keepCounters + outputSlots.uavStart);
+                }
                 // Preserve append/consume counters in both OM and CS stages.
                 context->CSSetUnorderedAccessViews(
                     0u, D3D11_PS_CS_UAV_REGISTER_COUNT,

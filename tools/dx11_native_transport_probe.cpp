@@ -582,28 +582,44 @@ int main()
     // Real game postpasses commonly leave both camera MRTs bound when
     // submitting the GPU-only stereo copy. Prove the producer unbinds them
     // for the transfer and restores the complete output set afterward.
-    ID3D11RenderTargetView* boundGameMrt[2] = {leftView, rightView};
-    d3d.context->OMSetRenderTargets(2u, boundGameMrt, nullptr);
+    // Menu/vehicle/race may leave a sparse MRT with RT7 populated.
+    // Its highest occupied slot consumes all eight D3D11 OM registers and
+    // permits NO pixel UAV tail. The producer's GPU Copy must detach/restore
+    // that exact set, including the gaps, without losing either camera eye.
+    ID3D11Texture2D* tailColor = nullptr;
+    ID3D11RenderTargetView* tailView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &sourceDesc, nullptr, &tailColor)) && tailColor &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                tailColor, nullptr, &tailView)) && tailView,
+            "00891 create game camera sparse MRT7 GPU output");
+    ID3D11RenderTargetView* boundGameMrt[8] = {
+        leftView, rightView, nullptr, nullptr,
+        nullptr, nullptr, nullptr, tailView};
+    d3d.context->OMSetRenderTargets(8u, boundGameMrt, nullptr);
     require(ring.submit_eye_pair(
                 d3d.context, stereoSlot, 20, leftSource, rightSource) &&
             ring.slot_state(stereoSlot) == SharedEyeSlotState::ProducerPending,
-            "00858 game MRT0/RT1 bound source stereo GPU copy and EVENT armed");
-    ID3D11RenderTargetView* restoredGameMrt[2]{};
-    // Keep this snapshot local to the 00858 MRT-bound producer case:
-    // the full eye-renderer state regression below has its own DSV snapshot.
+            "00891 real GPU L/R Copy with sparse MRT7 and EVENT armed");
+    ID3D11RenderTargetView* restoredGameMrt[8]{};
     ID3D11DepthStencilView* restoredSourceMrtDepth = nullptr;
     d3d.context->OMGetRenderTargets(
-        2u, restoredGameMrt, &restoredSourceMrtDepth);
-    const bool preservedMrt =
+        8u, restoredGameMrt, &restoredSourceMrtDepth);
+    bool preservedMrt =
         restoredGameMrt[0] == leftView &&
         restoredGameMrt[1] == rightView &&
+        restoredGameMrt[7] == tailView &&
         restoredSourceMrtDepth == nullptr;
-    if (restoredGameMrt[0]) restoredGameMrt[0]->Release();
-    if (restoredGameMrt[1]) restoredGameMrt[1]->Release();
+    for (UINT i = 2u; i < 7u; ++i)
+        preservedMrt = preservedMrt && restoredGameMrt[i] == nullptr;
+    for (auto* target : restoredGameMrt)
+        if (target) target->Release();
     if (restoredSourceMrtDepth) restoredSourceMrtDepth->Release();
     d3d.context->OMSetRenderTargets(0u, nullptr, nullptr);
+    tailView->Release();
+    tailColor->Release();
     require(preservedMrt,
-            "00858 stereo submission restores live game camera MRT bindings");
+            "00891 native eye submission restores sparse RT0/RT1/RT7 and empty slots");
     publish_bounded(ring, d3d.context, stereoSlot, 20);
     NativeSharedEyePublication stereoPublication{};
     require(ring.snapshot_published_frame(
