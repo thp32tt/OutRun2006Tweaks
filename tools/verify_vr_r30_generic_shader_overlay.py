@@ -46,7 +46,17 @@ for removed in (
     "OwnsGenericQueuedOverlay(provenance)",
     "ExternalOverlaySemanticDepth == 0",
 ):
-    mutant=current.replace(removed,"REGRESSION_DELETED",1)
+    # The source contains several independent exact HUD/F11 guards.
+    # Mutate the real shader/owner function, not the first unrelated match.
+    if removed == "ExternalOverlaySemanticDepth == 0":
+        start=current.index("bool R30GetRecentOriginalHudWvp(")
+        end=current.index("bool R30SpatialSceneEffectNeedsWorldRouting(",start)
+        region=current[start:end]
+        assert removed in region
+        mutant=current[:start]+region.replace(
+            removed,"REGRESSION_DELETED",1)+current[end:]
+    else:
+        mutant=current.replace(removed,"REGRESSION_DELETED",1)
     try: check(mutant,proof)
     except AssertionError: pass
     else: raise AssertionError(f"source mutation escaped: {removed}")
