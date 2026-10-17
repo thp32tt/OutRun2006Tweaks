@@ -363,9 +363,13 @@ def check_projection(renderer: str, semantic: str) -> None:
     assert "const bool pauseResponsive = R30IsPauseMenuElement() &&" in contain
     assert "R30HudContain.pauseResponsive == pauseResponsive" in contain
     assert "OutRunVrPauseEye::ResponsiveMenuScale(" not in contain
-    assert "const float opticalScale = userScale;" in contain
-    assert "scaleY = opticalScale / sourceOverTarget;" in contain
-    assert "scaleX = opticalScale * sourceOverTarget;" in contain
+    # R84 physical ESC and exact shader arrows share one contained-scale
+    # helper. F11 remains outside pauseResponsive and must not inherit the
+    # ESC's source/eye aspect shrink or previously rejected extra boost.
+    assert "const auto contained = OutRunVrPauseEye::ContainNativePauseScale(" in contain
+    assert "userScale, sourceOverTarget, pauseResponsive);" in contain
+    assert "scaleX = contained.x;" in contain
+    assert "scaleY = contained.y;" in contain
     for marker in (
         "inline thread_local unsigned ExternalOverlaySemanticDepth = 0;",
         "++ExternalOverlaySemanticDepth;",
@@ -386,8 +390,10 @@ def check_projection_mutations(renderer: str, semantic: str) -> None:
          "R30HudContain.userScale == 1.0f"),
         ("R30HudContain.pauseResponsive == pauseResponsive",
          "R30HudContain.pauseResponsive == true"),
-        ("const float opticalScale = userScale;",
-         "const float opticalScale = userScale * 2.0f;"),
+        ("userScale, sourceOverTarget, pauseResponsive);",
+         "userScale, sourceOverTarget, true);"),
+        ("scaleX = contained.x;", "scaleX = userScale * 2.0f;"),
+        ("scaleY = contained.y;", "scaleY = userScale * 2.0f;"),
     )
     # Mutate the owning function, never an earlier unrelated occurrence
     # of a generic token (e.g. 'return 1.0f;' in the aspect helper).
