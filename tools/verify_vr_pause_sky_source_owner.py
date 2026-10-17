@@ -37,7 +37,7 @@ def check(r30, r7, r26, semantic):
     assert "exactHud, genericQueuedHud, R30IsPauseMenuElement());" in shader
     assert shader.index("R30GetRecentOriginalHudWvp(rawGameWvp)") < shader.index(
         "OutRunVrPauseEye::OwnsPauseShaderPlane(")
-    fixed=r30.split("HRESULT R30TryFixedFunctionProjectedRankIndexed(",1)[1].split(
+    fixed=r30.split("HRESULT R30TryFixedFunctionOriginalSpriteStereo(",1)[1].split(
         "HRESULT R30TryXyzrhwIndexedPrimitiveVB(",1)[0]
     for flag in ("const bool pauseOverlay =", "sourceScope == RenderScope::ScreenOverlay2D",
                  "R30IsPauseMenuElement()", "pauseCommand.queued",
