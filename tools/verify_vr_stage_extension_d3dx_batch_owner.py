@@ -758,7 +758,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "lastSuccessfulFlushMutationSerial = mutationSerial;" in ledger_flush_success and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_draw and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_begin and
-         "lastSuccessfulFlushMutationSerial = 0;" in ledger_failure and
+         "lastSuccessfulFlushMutationSerial = 0;" in ledger_fail and
          "lastSuccessfulFlushMutationSerial = 0;" in ledger_end,
          "native Draw must preserve only successful internal texture Flush and reject all unsafe reentry")
     need("vtable[8]" in h and "vtable[9]" in h and "vtable[10]" in h and
