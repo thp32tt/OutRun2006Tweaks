@@ -102,6 +102,39 @@ struct ScopedNativePostpassOutputs final {
     ScopedNativePostpassOutputs(const ScopedNativePostpassOutputs&) = delete;
     ScopedNativePostpassOutputs& operator=(const ScopedNativePostpassOutputs&) = delete;
 };
+
+// A native D3D9 TARGET rectangle Clear on a D3D11.0 device must rasterize
+// into the *typed RTV*, not infer its format from the backing texture. Real
+// menu/vehicle intermediates may use TYPELESS allocations with UNORM/float
+// camera views, and 10-bit/half-float targets also need the same bounded GPU
+// Clear. Integer/typeless/depth views cannot consume our float4 pixel shader.
+// The device must actually advertise RTV writes for the selected typed format.
+[[nodiscard]] bool native_game_partial_color_shader_rtv(
+    ID3D11DeviceContext* context, ID3D11RenderTargetView* target) noexcept {
+    if (!context || !target) return false;
+    D3D11_RENDER_TARGET_VIEW_DESC view{};
+    target->GetDesc(&view);
+    switch (view.Format) {
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case DXGI_FORMAT_R10G10B10A2_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_FLOAT:
+    case DXGI_FORMAT_R11G11B10_FLOAT:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_B5G5R5A1_UNORM:
+        break;
+    default:
+        return false;
+    }
+    Microsoft::WRL::ComPtr<ID3D11Device> device;
+    context->GetDevice(device.GetAddressOf());
+    UINT support = 0u;
+    return device &&
+        SUCCEEDED(device->CheckFormatSupport(view.Format, &support)) &&
+        (support & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u;
+}
 }
 
 // Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
@@ -368,9 +401,8 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
             IID_PPV_ARGS(rectContext.GetAddressOf()));
     // A D3D11.0 device needs a bounded shader Draw rather than silently
     // clearing the complete menu/vehicle source camera.
-    const bool shaderSupported =
-        desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
-        desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;
+    const bool shaderSupported = cropped && !rectContext &&
+        native_game_partial_color_shader_rtv(context_, gameTarget);
     const auto route = live_game_stereo::color_clear_route(
         region != nullptr, region ? region->left : 0,
         region ? region->top : 0, region ? region->right : 0,
@@ -596,21 +628,10 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         static_cast<float>((argb >> 8) & 0xffu) * kByte,
         static_cast<float>(argb & 0xffu) * kByte,
         static_cast<float>((argb >> 24) & 0xffu) * kByte};
-    // Only actual game-owned, rect-bounded commands may take the shader
-    // fallback. For incompatible eye color formats retain original D3D9.
-    bool shaderSupported = false;
-    if (cropped && !rectContext) {
-        Microsoft::WRL::ComPtr<ID3D11Resource> resource;
-        Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-        eyeTarget_->GetResource(resource.GetAddressOf());
-        D3D11_TEXTURE2D_DESC desc{};
-        if (resource && SUCCEEDED(resource.As(&texture)) && texture) {
-            texture->GetDesc(&desc);
-            shaderSupported =
-                desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
-                desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;
-        }
-    }
+    // Full RTV/ClearView routes are unchanged. D3D11.0's shader route
+    // explicitly checks the typed output view and preserves DX9Ex fallback.
+    const bool shaderSupported = cropped && !rectContext &&
+        native_game_partial_color_shader_rtv(context_, eyeTarget_);
     const auto route = live_game_stereo::color_clear_route(
         region != nullptr, region ? region->left : 0,
         region ? region->top : 0, region ? region->right : 0,

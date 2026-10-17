@@ -207,4 +207,50 @@ assert not offscreen_rect_contract(source, probe.replace(
     "rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible",
     "true"))
 
+# Both independent game-camera and ring-eye Clear paths must admit a real
+# float color shader only for compatible typed D3D11 render-target views.
+# The backing allocation can be TYPELESS, but a typeless/integer RTV must
+# not be silently accepted or clear the complete camera on D3D11.0.
+def typed_partial_color_admission(code):
+    part = code.split(
+        "[[nodiscard]] bool native_game_partial_color_shader_rtv(", 1)
+    if len(part) != 2:
+        return False
+    helper = part[1].split("\n}\n", 1)[0]
+    camera = code.split(
+        "bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(", 1)[1].split(
+        "bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[0]
+    eye = code.split(
+        "bool NativeGameEyeDrawEncoder::clear_target_argb(", 1)[1].split(
+        "bool NativeGameEyeDrawEncoder::clear_depth_stencil(", 1)[0]
+    return all(token in helper for token in (
+        "target->GetDesc(&view);",
+        "switch (view.Format)",
+        "DXGI_FORMAT_R10G10B10A2_UNORM",
+        "DXGI_FORMAT_R16G16B16A16_FLOAT",
+        "DXGI_FORMAT_R11G11B10_FLOAT",
+        "default:",
+        "return false;",
+        "CheckFormatSupport(view.Format, &support)",
+        "D3D11_FORMAT_SUPPORT_RENDER_TARGET",
+    )) and all(token in body for body in (camera, eye) for token in (
+        "cropped && !rectContext",
+        "native_game_partial_color_shader_rtv(context_,",
+        "live_game_stereo::color_clear_route(",
+        "case live_game_stereo::NativeColorClearRoute::ShaderRaster:",
+        "raster_partial_eye_color_clear(",
+    ))
+assert typed_partial_color_admission(source), "typed RTV color Clear missing"
+assert not typed_partial_color_admission(source.replace(
+    "target->GetDesc(&view);", "", 1)), "backing-format fallback accepted"
+assert not typed_partial_color_admission(source.replace(
+    "(support & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u;",
+    "true;", 1)), "unsupported GPU target accepted"
+assert not typed_partial_color_admission(source.replace(
+    "native_game_partial_color_shader_rtv(context_, eyeTarget_)",
+    "false", 1)), "ring-eye Clear lost"
+assert not typed_partial_color_admission(source.replace(
+    "native_game_partial_color_shader_rtv(context_, gameTarget)",
+    "false", 1)), "offscreen camera Clear lost"
+
 print("DX11 owned offscreen camera color/depth + Draw/Copy: PASS")
