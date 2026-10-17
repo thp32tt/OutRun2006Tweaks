@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00897",
+  "production_id": "CONVERSION-DX11-00897",
+  "event_id": "CONVERSION-DX11-00897-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": 2,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00897",
+  "feature_id": "DX11:NATIVE_GAME_STEREO_GEOMETRY_OM_ISOLATION",
+  "work_key": "DX11:FULLFRAME:GAME_STEREO_GEOMETRY_MRT_UAV_ISOLATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 1,
+  "full_dx11_renderer_complete": false,
+  "base_sha": "1023fbf2f673691262eb9f308f75ffcff2fb588f",
+  "material_result_sha": "06dc8afd4413f130c334d23098fa41ca7ed349e2",
+  "validation_bearing_result_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_STEREO_GEOMETRY_OM_ISOLATION",
+    "goal": "Real native D3D11 stereo eye and offscreen game camera Draw/DrawIndexed/instanced submissions must not silently write another MRT or inherited pixel UAV while OpenXR producer resources retain generation ownership; preserve real GPU Copy/Stretch postpass outputs and original D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_eye_output_isolated",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_game_gpu_draw",
+        "expected_behavior": "L/R game eye Draw/DrawIndexed reject when MRT1 or PS UAV would also receive native geometry; sole owned ring eye RT0 remains valid."
+      },
+      {
+        "id": "offscreen_camera_output_isolated",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_vehicle_offscreen_camera_draw",
+        "expected_behavior": "A game camera RT0 paired with foreign second MRT is not permitted to issue source geometry, while a single owned camera RT accepts the real Draw."
+      },
+      {
+        "id": "game_copy_stretch_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9ex_input_and_native_postpass",
+        "expected_behavior": "Legitimate multi-output GPU Copy/Stretch preserve RTV/DSV/UAV state; original D3D9Ex Present/input/FFB and frozen DXVK remain intact."
+      },
+      {
+        "id": "exact_source_build_and_warp",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_github_gates",
+        "expected_behavior": "Native Win32 WARP positive/negative eye/camera GPU source proves output ownership and five unchanged mandatory GitHub Actions pass at a single exact SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "blocker_resolution",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Game source menu/vehicle/race per-eye callback -> local auxiliary camera or ring eye geometry output selection -> real D3D11 Draw/DrawIndexed/instancing",
+      "Render-target and pixel-UAV ownership exclusion -> native stereo GPU eye recorder -> ring producer fence, without weakening original D3D9Ex Present and input fallback"
+    ],
+    "batch_components": [
+      "C++ native game encoder pre-Draw geometry MRT/UAV ownership inspection and single-owner output rule",
+      "Source camera Draw+Indexed+instanced isolation and native eye Draw+Indexed live command checks",
+      "Real Win32 WARP GPU regression of foreign MRT1 and PS UAV rejection with existing source Copy/Stretch GPU output preservation"
+    ],
+    "conflict_keys": [
+      "DX11:FULLFRAME:GAME_STEREO_GEOMETRY_MRT_UAV_ISOLATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED for actual source-ordered D3D11 geometry MRT/UAV output isolation and existing native stereo producer chain only. This is NOT proof of full DX11 game-frame conversion, real menu/car/race visuals, Quest3 stereo or frame pacing.",
+    "activation_guard_and_fallback": "NativeDrawPathActive explicit opt-in; all rejected native geometry returns without GPU dispatch; retained original D3D9Ex Draw/Present/gamepad/FFB and DXVK freeze.",
+    "blocking_evidence": "Real encoder previously checked only OM RT0 and DSV; a game/offscreen callback could retain an extra color MRT or pixel UAV, causing native Draw/DrawIndexed to mutate another camera or shared eye despite owned RTV0. WARP material 06dc8afd now proves rejection and valid copy/stretches.",
+    "acceptance_proof": {
+      "positive_probe": "WARP run 39070727564 SUCCESS for source material 06dc8afd: owned camera single RTV, distinct eye GPU commands and source GPU Copy/Stretch remain runnable. Original native GPU operations compile and execute.",
+      "negative_regression": "WARP same run: game camera RT0 plus eye MRT1, eye RT0 plus foreign MRT1, and eye RT0 plus pixel UAV reject Draw/Indexed before enqueuing, without incrementing source geometry/color counters.",
+      "component_integration": "src/vr/d3d11/native_game_stereo_submission.hpp and .cpp, tools/dx11_native_transport_probe.cpp, strengthened tools/verify_dx11_activation_boundary.py; five full required GitHub Actions succeeded on exact 1a776f4922ec, 00896 historical C6 proof corrected under same 00897 CI repair."
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00896.json"
+  ],
+  "acceptance_results": {
+    "native_eye_output_isolated": "PASS_WARP_AND_BUILD",
+    "offscreen_camera_output_isolated": "PASS_WARP_AND_BUILD",
+    "game_copy_stretch_and_fallback": "PASS_WARP_AND_SOURCE",
+    "exact_source_build_and_warp": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "material_sha": "06dc8afd4413f130c334d23098fa41ca7ed349e2",
+    "validation_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39070995023,
+        "conclusion": "success",
+        "validation_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39070994927,
+        "conclusion": "success",
+        "validation_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f"
+      },
+      {
+        "name": "Build",
+        "run_id": 39070998831,
+        "conclusion": "success",
+        "validation_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39070998819,
+        "conclusion": "success",
+        "validation_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39070998835,
+        "conclusion": "success",
+        "validation_sha": "1a776f4922ec487b8ae72b32e8b78a32ec54098f"
+      }
+    ],
+    "isolated_native_warp_run_id": 39070727564,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_sha": "06dc8afd4413f130c334d23098fa41ca7ed349e2",
+    "runtime_validation": "UNTESTED",
+    "blocking_evidence": "No Quest3/VDXR HMD, OutRun menu/car/race visual or gamepad/FFB runtime test. No complete native renderer promotion."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Head 1023fbf2 with 00896 completed source/CI; chose independent native per-eye geometry output isolation without DXVK changes.",
+    "C1_REVIEW": "Confirmed RT0-only native on-eye and game offscreen source validation allowed foreign MRT1 and PS UAV geometry mutation.",
+    "C2_IMPLEMENT": "Actual C++ eye/camera output isolation plus Win32 WARP source positive/negative geometry tests at material 06dc8afd.",
+    "C3_VALIDATE": "Original material WARP 39070727564 SUCCESS. Initial validation blocked by 00896 C6 policy drift and strict activation string; repaired same 00897, final exact SHA 1a776f passed mandatory GitHub Gate 5/5.",
+    "C4_COMMIT": "Material source 06dc8afd, CI-causal record repair cd3833af and activation contract fix 1a776f; no CI-skip on any result-bearing Gate commit.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "Only owned MRT/UAV native stereo game geometry source portion BUILD_VERIFIED; full renderer unfinished and Quest3/VDXR runtime untested. Score eligibility single RUN_KEY=CONVERSION-DX11-00897, retries/C6 do not count twice."
+  }
+}
