@@ -158,5 +158,40 @@ assert not camera_clear_contract(source.replace(
     "context_->ClearRenderTargetView(gameTarget, rgba);", "", 1))
 assert "gameEyeFixture.replayedOffscreenGameClears[0] &&" in probe
 assert "gameEyeFixture.replayedOffscreenGameClears[1] &&" in probe
+assert "gameEyeFixture.replayedOffscreenGamePartialClears[0] &&" in probe
+assert "gameEyeFixture.replayedOffscreenGamePartialClears[1] &&" in probe
 assert "encoder.copy_game_surface(" in probe
+# Camera rectangle must have the same bounded GPU route and preserved
+# offscreen RTV/DSV owner, not an accidental whole-camera wipe.
+def offscreen_rect_contract(code, fixture):
+    color = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(", 1)[1].split(
+        "bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[0]
+    depth = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[1].split(
+        "bool NativeGameEyeDrawEncoder::replay_due_source_clears(", 1)[0]
+    return all(x in color for x in (
+        "prepare_offscreen_game_draw(gameTarget)",
+        "live_game_stereo::color_clear_route(", 
+        "rectContext->ClearView(gameTarget, rgba, region, 1u);",
+        "raster_partial_eye_color_clear(",
+        "context_->ClearRenderTargetView(gameTarget, rgba);",
+    )) and all(x in depth for x in (
+        "boundDepth.Get() != gameDepth",
+        "dd.Width != cd.Width",
+        "live_game_stereo::depth_clear_route(",
+        "raster_partial_eye_depth_clear(",
+        "context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);",
+    )) and all(x in fixture for x in (
+        "rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible",
+        "ctx->CopyResource(cameraReadback.Get(), fixture.offscreenGameColor);",
+        "ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);",
+    ))
+assert offscreen_rect_contract(source, probe)
+assert not offscreen_rect_contract(source.replace(
+    "rectContext->ClearView(gameTarget, rgba, region, 1u);", "", 1), probe)
+assert not offscreen_rect_contract(source.replace(
+    "raster_partial_eye_depth_clear(", "missing_partial_depth(", 1), probe)
+assert not offscreen_rect_contract(source, probe.replace(
+    "rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible",
+    "true"))
+
 print("DX11 owned offscreen camera color/depth + Draw/Copy: PASS")

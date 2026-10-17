@@ -66,12 +66,17 @@ public:
         INT baseVertex, UINT startInstance) noexcept;
     // Native game-owned auxiliary camera Clears are GPU source commands,
     // not XR-eye Clears or direct-eye Draw/color evidence.
+    // D3D9 camera TARGET and Z/stencil rectangle Clears affect ONLY the
+    // named source area; never widen a clipped camera Clear to its full RT.
+    // Null region preserves original full-camera Clear behavior. All regions
+    // are checked against the actual game-owned offscreen resource bounds.
     [[nodiscard]] bool clear_offscreen_game_color(
-        ID3D11RenderTargetView* gameTarget, std::uint32_t argb) noexcept;
+        ID3D11RenderTargetView* gameTarget, std::uint32_t argb,
+        const D3D11_RECT* region = nullptr) noexcept;
     [[nodiscard]] bool clear_offscreen_game_depth_stencil(
         ID3D11RenderTargetView* gameTarget, ID3D11DepthStencilView* gameDepth,
         bool clearDepth, float depth, bool clearStencil,
-        std::uint8_t stencil) noexcept;
+        std::uint8_t stencil, const D3D11_RECT* region = nullptr) noexcept;
     // Replay a game-authored TARGET Clear at its exact position between
     // menu/vehicle/race eye Draws, never as fabricated draw evidence. Partial
     // clears require D3D11.1 ClearView (no implicit full-eye fallback).

@@ -1335,6 +1335,7 @@ int main()
         ID3D11RenderTargetView* offscreenGameRtv{};
         ID3D11DepthStencilView* offscreenGameDsv{};
         bool replayedOffscreenGameClears[2]{};
+        bool replayedOffscreenGamePartialClears[2]{};
         bool replayedOffscreenGameDraw[2]{};
         bool replayedInstancedOffscreenCamera[2]{};
         bool rejectedInvalidSurfaceCopy[2]{};
@@ -1848,6 +1849,59 @@ int main()
             encoder.draw_count() == clearDraws &&
             encoder.color_draw_count() == clearEyeColor;
         if (!fixture.replayedOffscreenGameClears[eyeIndex]) return false;
+
+        // Test actual GPU camera TARGET and DSV rectangle Clears before the
+        // real source Draw/Copy. Readback is isolated to this WARP probe;
+        // production stereo submission remains GPU-only and input-safe.
+        D3D11_TEXTURE2D_DESC cameraDesc{};
+        fixture.offscreenGameColor->GetDesc(&cameraDesc);
+        const D3D11_RECT cameraRect{4, 4, 8, 8};
+        const D3D11_RECT badCameraRect{
+            static_cast<LONG>(cameraDesc.Width) - 2, 4,
+            static_cast<LONG>(cameraDesc.Width) + 2, 8};
+        const bool rejectsCameraRegion =
+            !encoder.clear_offscreen_game_color(
+                gameOffscreen, 0xff336699u, &badCameraRect) &&
+            !encoder.clear_offscreen_game_depth_stencil(
+                gameOffscreen, gameOffscreenDepth, true, 0.1f, true, 2u,
+                &badCameraRect);
+        const bool clearsCameraRegion =
+            encoder.clear_offscreen_game_color(
+                gameOffscreen, eyeIndex == 0u ? 0xff11ee22u : 0xff44dd66u,
+                &cameraRect) &&
+            encoder.clear_offscreen_game_depth_stencil(
+                gameOffscreen, gameOffscreenDepth, true,
+                eyeIndex == 0u ? 0.6f : 0.4f, true,
+                static_cast<std::uint8_t>(eyeIndex + 7u), &cameraRect);
+        cameraDesc.Usage = D3D11_USAGE_STAGING;
+        cameraDesc.BindFlags = 0u;
+        cameraDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        cameraDesc.MiscFlags = 0u;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> cameraReadback;
+        if (FAILED(fixture.device->CreateTexture2D(
+                &cameraDesc, nullptr, cameraReadback.GetAddressOf())))
+            return false;
+        ctx->OMSetRenderTargets(0u, nullptr, nullptr);
+        ctx->CopyResource(cameraReadback.Get(), fixture.offscreenGameColor);
+        D3D11_MAPPED_SUBRESOURCE cameraMap{};
+        if (FAILED(ctx->Map(cameraReadback.Get(), 0u, D3D11_MAP_READ,
+                            0u, &cameraMap))) return false;
+        const auto* pixels = static_cast<const std::uint8_t*>(cameraMap.pData);
+        const auto* outside = pixels + cameraMap.RowPitch + 4u;
+        const auto* inside = pixels + 5u * cameraMap.RowPitch + 5u * 4u;
+        const bool cameraPatchVisible =
+            cameraDesc.Format == DXGI_FORMAT_R8G8B8A8_UNORM &&
+            (outside[0] != inside[0] || outside[1] != inside[1] ||
+             outside[2] != inside[2]) &&
+            outside[3] == 255u && inside[3] == 255u;
+        ctx->Unmap(cameraReadback.Get(), 0u);
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
+        fixture.replayedOffscreenGamePartialClears[eyeIndex] =
+            rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible &&
+            encoder.draw_count() == clearDraws &&
+            encoder.color_draw_count() == clearEyeColor;
+        if (!fixture.replayedOffscreenGamePartialClears[eyeIndex])
+            return false;
         const bool issuedOffscreen = eyeIndex == 0u
             ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
             : encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0);
@@ -2352,6 +2406,8 @@ int main()
             gameEyeFixture.rejectedDetachedDraw[1] &&
             gameEyeFixture.replayedOffscreenGameClears[0] &&
             gameEyeFixture.replayedOffscreenGameClears[1] &&
+            gameEyeFixture.replayedOffscreenGamePartialClears[0] &&
+            gameEyeFixture.replayedOffscreenGamePartialClears[1] &&
             gameEyeFixture.replayedOffscreenGameDraw[0] &&
             gameEyeFixture.replayedOffscreenGameDraw[1] &&
             gameEyeFixture.replayedInstancedOffscreenCamera[0] &&

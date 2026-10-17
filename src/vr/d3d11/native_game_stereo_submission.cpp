@@ -324,16 +324,52 @@ void NativeGameEyeDrawEncoder::set_source_clear_timeline(
 // own target before source Draw/DrawIndexed and chronological GPU Copy/Stretch.
 // Never convert them into direct-eye color evidence.
 bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
-    ID3D11RenderTargetView* gameTarget, std::uint32_t argb) noexcept {
+    ID3D11RenderTargetView* gameTarget, std::uint32_t argb,
+    const D3D11_RECT* region) noexcept {
     if (!prepare_offscreen_game_draw(gameTarget)) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    gameTarget->GetResource(resource.GetAddressOf());
+    if (!resource || FAILED(resource.As(&texture)) || !texture) return false;
+    D3D11_TEXTURE2D_DESC desc{};
+    texture->GetDesc(&desc);
+    const bool cropped = region &&
+        !live_game_stereo::full_eye_target_rect(
+            region->left, region->top, region->right, region->bottom,
+            desc.Width, desc.Height);
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
+    if (cropped)
+        (void)context_->QueryInterface(
+            IID_PPV_ARGS(rectContext.GetAddressOf()));
+    // A D3D11.0 device needs a bounded shader Draw rather than silently
+    // clearing the complete menu/vehicle source camera.
+    const bool shaderSupported =
+        desc.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+        desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM;
+    const auto route = live_game_stereo::color_clear_route(
+        region != nullptr, region ? region->left : 0,
+        region ? region->top : 0, region ? region->right : 0,
+        region ? region->bottom : 0, desc.Width, desc.Height,
+        rectContext != nullptr, shaderSupported);
     constexpr float scale = 1.0f / 255.0f;
     const float rgba[4]{
         static_cast<float>((argb >> 16) & 0xffu) * scale,
         static_cast<float>((argb >> 8) & 0xffu) * scale,
         static_cast<float>(argb & 0xffu) * scale,
         static_cast<float>((argb >> 24) & 0xffu) * scale};
-    context_->ClearRenderTargetView(gameTarget, rgba);
-    return true;
+    switch (route) {
+    case live_game_stereo::NativeColorClearRoute::FullRtv:
+        context_->ClearRenderTargetView(gameTarget, rgba);
+        return true;
+    case live_game_stereo::NativeColorClearRoute::ClearView:
+        rectContext->ClearView(gameTarget, rgba, region, 1u);
+        return true;
+    case live_game_stereo::NativeColorClearRoute::ShaderRaster:
+        return raster_partial_eye_color_clear(
+            context_, gameTarget, desc.Width, desc.Height, *region, rgba);
+    default:
+        return false; // malformed region or unsupported target; DX9Ex owns it
+    }
 }
 
 // The game's offscreen DSV must be actively bound on the SAME context and
@@ -342,7 +378,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
 bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
     ID3D11RenderTargetView* gameTarget, ID3D11DepthStencilView* gameDepth,
     bool clearDepth, float depth, bool clearStencil,
-    std::uint8_t stencil) noexcept {
+    std::uint8_t stencil, const D3D11_RECT* region) noexcept {
     if (!gameDepth || gameDepth == eyeDepth_ ||
         (!clearDepth && !clearStencil) ||
         (clearDepth && (!std::isfinite(depth) || depth < 0.f || depth > 1.f)) ||
@@ -374,6 +410,16 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
         dd.SampleDesc.Quality != cd.SampleDesc.Quality ||
         dd.Usage != D3D11_USAGE_DEFAULT || dd.CPUAccessFlags ||
         (dd.BindFlags & D3D11_BIND_DEPTH_STENCIL) == 0u) return false;
+    const auto route = live_game_stereo::depth_clear_route(
+        region != nullptr, region ? region->left : 0,
+        region ? region->top : 0, region ? region->right : 0,
+        region ? region->bottom : 0, cd.Width, cd.Height);
+    if (route == live_game_stereo::NativeDepthClearRoute::Reject)
+        return false;
+    if (route == live_game_stereo::NativeDepthClearRoute::PartialRaster)
+        return raster_partial_eye_depth_clear(
+            context_, gameDepth, cd.Width, cd.Height, *region,
+            depth, stencil, clearDepth, clearStencil);
     const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
                        (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
     context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);
