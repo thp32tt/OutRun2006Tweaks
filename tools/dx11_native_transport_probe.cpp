@@ -1257,6 +1257,28 @@ int main()
     constexpr float multisampleMagenta[4]{1.f, 0.f, 1.f, 1.f};
     d3d.context->ClearRenderTargetView(
         gameMultisampleView, multisampleMagenta);
+    // A real game-owned auxiliary camera target, separate from the XR ring,
+    // receives an actual offscreen Draw before a GPU copy into the eye.
+    D3D11_TEXTURE2D_DESC offscreenDesc{};
+    gameSurface->GetDesc(&offscreenDesc);
+    offscreenDesc.MipLevels = 1u;
+    offscreenDesc.ArraySize = 1u;
+    offscreenDesc.SampleDesc.Count = 1u;
+    offscreenDesc.SampleDesc.Quality = 0u;
+    offscreenDesc.Usage = D3D11_USAGE_DEFAULT;
+    offscreenDesc.CPUAccessFlags = 0u;
+    offscreenDesc.MiscFlags = 0u;
+    offscreenDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    ID3D11Texture2D* offscreenGameColor = nullptr;
+    ID3D11RenderTargetView* offscreenGameRtv = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &offscreenDesc, nullptr, &offscreenGameColor)) &&
+            offscreenGameColor &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                offscreenGameColor, nullptr, &offscreenGameRtv)) &&
+            offscreenGameRtv,
+            "00882 game-created offscreen camera RTV");
+
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
@@ -1296,6 +1318,9 @@ int main()
         bool inheritedComputeState[2]{};
         ID3D11Texture2D* gameMultisample{};
         ID3D11RenderTargetView* gameSurfaceView{};
+        ID3D11Texture2D* offscreenGameColor{};
+        ID3D11RenderTargetView* offscreenGameRtv{};
+        bool replayedOffscreenGameDraw[2]{};
         bool rejectedInvalidSurfaceCopy[2]{};
         bool replayedPostDrawSurfaceCopy[2]{};
         bool replayedPostDrawShaderCopy[2]{};
@@ -1364,6 +1389,8 @@ int main()
     gameEyeFixture.gameConvertedArray = gameConvertedArray;
     gameEyeFixture.gameMultisample = gameMultisample;
     gameEyeFixture.gameSurfaceView = gameSurfaceView;
+    gameEyeFixture.offscreenGameColor = offscreenGameColor;
+    gameEyeFixture.offscreenGameRtv = offscreenGameRtv;
     // Two game-created GPU postpasses run between the REAL eye Draw calls:
     // an unscaled per-camera array-slice copy followed by a format-converting
     // scaled source overlay AFTER the original TARGET Clear. Later callback
@@ -1770,6 +1797,37 @@ int main()
                 : encoder.draw(3u, 0u);
             if (!issued) return false;
         }
+        // The source camera's own offscreen Draw participates in authentic
+        // game command ordering, but does not fabricate an XR-eye color Draw.
+        // The targeted GPU copy is the real offscreen->eye compositor path.
+        const auto beforeOffscreen = encoder.draw_count();
+        const auto beforeOffscreenEyeColor = encoder.color_draw_count();
+        ID3D11RenderTargetView* gameOffscreen = fixture.offscreenGameRtv;
+        ctx->OMSetRenderTargets(1u, &gameOffscreen, nullptr);
+        const float offscreenClear[4]{
+            eyeIndex == 0u ? 0.75f : 0.25f, 0.5f, 0.25f, 1.f};
+        ctx->ClearRenderTargetView(gameOffscreen, offscreenClear);
+        const bool issuedOffscreen = eyeIndex == 0u
+            ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
+            : encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0);
+        const bool rejectedForeign =
+            !encoder.draw_offscreen(eyeTarget, 3u, 0u) &&
+            !encoder.draw_offscreen(nullptr, 3u, 0u) &&
+            !encoder.draw(3u, 0u);
+        ctx->RSSetViewports(1u, &viewport);
+        ctx->RSSetScissorRects(1u, &scissor);
+        const bool rebound = encoder.bind_eye_output();
+        const D3D11_BOX offscreenPatch{0u, 0u, 0u, 8u, 8u, 1u};
+        fixture.replayedOffscreenGameDraw[eyeIndex] =
+            issuedOffscreen && rejectedForeign && rebound &&
+            encoder.draw_count() == beforeOffscreen + 1u &&
+            encoder.color_draw_count() == beforeOffscreenEyeColor &&
+            encoder.copy_game_surface(
+                fixture.offscreenGameColor, &offscreenPatch,
+                eyeIndex == 0u ? 12u : 44u, 0u) &&
+            encoder.draw_count() == beforeOffscreen + 1u &&
+            encoder.color_draw_count() == beforeOffscreenEyeColor;
+        if (!fixture.replayedOffscreenGameDraw[eyeIndex]) return false;
         // A game menu/HUD can Clear a TARGET rectangle AFTER real geometry.
         // Validate ordered eye pixels, selected Z/stencil and no phantom draw.
         const D3D11_RECT badRect{63, 24, 68, 30};
@@ -2223,6 +2281,8 @@ int main()
             gameEyeFixture.endedOnOffscreenTarget[1] &&
             gameEyeFixture.rejectedDetachedDraw[0] &&
             gameEyeFixture.rejectedDetachedDraw[1] &&
+            gameEyeFixture.replayedOffscreenGameDraw[0] &&
+            gameEyeFixture.replayedOffscreenGameDraw[1] &&
             gameEyeFixture.rejectedForeignDraw[0] &&
             gameEyeFixture.rejectedForeignDraw[1] &&
             gameEyeFixture.rejectedOffscreenViewport[0] &&
@@ -2448,6 +2508,8 @@ int main()
     }
     preservedDepthView->Release();
     preservedDepthTexture->Release();
+    offscreenGameRtv->Release();
+    offscreenGameColor->Release();
     gameSurfaceView->Release();
     gameShaderIntermediate->Release();
     mipGameIntermediate->Release();

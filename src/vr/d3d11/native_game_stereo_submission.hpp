@@ -32,6 +32,17 @@ public:
     [[nodiscard]] bool draw(UINT vertexCount, UINT startVertex) noexcept;
     [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,
                                     INT baseVertex) noexcept;
+    // Replay a genuine game-authored offscreen camera Draw. Unlike the
+    // ordinary on-eye Draw, this advances only source chronology: a later
+    // authentic game SourceCopy/Stretch must move its pixels into the eye.
+    // The target must be the explicitly verified game RT0, not the XR eye
+    // or an arbitrary borrowed desktop/foreign-device color attachment.
+    [[nodiscard]] bool draw_offscreen(
+        ID3D11RenderTargetView* gameTarget,
+        UINT vertexCount, UINT startVertex) noexcept;
+    [[nodiscard]] bool draw_offscreen_indexed(
+        ID3D11RenderTargetView* gameTarget,
+        UINT indexCount, UINT startIndex, INT baseVertex) noexcept;
     // Game-origin instanced geometry is a single ordered GPU draw command,
     // independent of its instance count. These paths use the SAME bound eye
     // target, source Clear timeline and original D3D9 fail-closed evidence
@@ -103,6 +114,10 @@ public:
     }
 private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
+    [[nodiscard]] bool game_source_target_bound(
+        ID3D11RenderTargetView* gameTarget) const noexcept;
+    [[nodiscard]] bool prepare_offscreen_game_draw(
+        ID3D11RenderTargetView* gameTarget) noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;

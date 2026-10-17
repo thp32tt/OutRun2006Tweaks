@@ -192,6 +192,94 @@ bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
     return eye_output_bound();
 }
 
+// A menu/vehicle game camera can draw into its private offscreen GPU RT
+// before a chronological game StretchRect composites that image into an
+// independently rendered XR eye. Admit only an explicitly source-proven
+// attached texture. Its geometry MUST NOT count as direct eye color.
+bool NativeGameEyeDrawEncoder::game_source_target_bound(
+    ID3D11RenderTargetView* gameTarget) const noexcept {
+    if (!context_ || !eyeTarget_ || !gameTarget || gameTarget == eyeTarget_)
+        return false;
+    ID3D11RenderTargetView* actual = nullptr;
+    context_->OMGetRenderTargets(1u, &actual, nullptr);
+    const bool bound = actual == gameTarget;
+    if (actual) actual->Release();
+    if (!bound) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> sourceResource, eyeResource;
+    gameTarget->GetResource(sourceResource.GetAddressOf());
+    eyeTarget_->GetResource(eyeResource.GetAddressOf());
+    if (!sourceResource || !eyeResource ||
+        sourceResource.Get() == eyeResource.Get()) return false;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> source;
+    if (FAILED(sourceResource.As(&source)) || !source) return false;
+    Microsoft::WRL::ComPtr<ID3D11Device> producer, sourceOwner;
+    context_->GetDevice(producer.GetAddressOf());
+    source->GetDevice(sourceOwner.GetAddressOf());
+    if (!producer || producer.Get() != sourceOwner.Get()) return false;
+    D3D11_TEXTURE2D_DESC desc{};
+    source->GetDesc(&desc);
+    constexpr UINT sharedFlags =
+        D3D11_RESOURCE_MISC_SHARED |
+        D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+        D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+    if (!desc.Width || !desc.Height || desc.Usage != D3D11_USAGE_DEFAULT ||
+        desc.CPUAccessFlags || (desc.MiscFlags & sharedFlags) ||
+        (desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u)
+        return false;
+    UINT count = 1u;
+    D3D11_VIEWPORT view{};
+    context_->RSGetViewports(&count, &view);
+    return count == 1u &&
+        std::isfinite(view.TopLeftX) && std::isfinite(view.TopLeftY) &&
+        std::isfinite(view.Width) && std::isfinite(view.Height) &&
+        view.Width > 0.f && view.Height > 0.f &&
+        view.TopLeftX < static_cast<float>(desc.Width) &&
+        view.TopLeftY < static_cast<float>(desc.Height) &&
+        view.TopLeftX + view.Width > 0.f &&
+        view.TopLeftY + view.Height > 0.f;
+}
+
+bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
+    ID3D11RenderTargetView* gameTarget) noexcept {
+    if (!game_source_target_bound(gameTarget) ||
+        drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
+        return false;
+    // Real game TARGET Clears and Copy/Stretch events scheduled at the
+    // preceding ordinal belong to the XR eye, even if its next game Draw
+    // switches to an auxiliary camera. Temporarily replay into the ring RTV,
+    // preserving original MRTs/DSV/compute and pixel UAV bindings.
+    if (sourceClears_ &&
+        sourceClearCursor_ < sourceClears_->count[sourceClearEye_] &&
+        sourceClears_->entries[sourceClearEye_][sourceClearCursor_]
+            .afterDrawOrdinal <= drawCount_) {
+        ScopedNativePostpassOutputs restore(context_);
+        ID3D11RenderTargetView* eye = eyeTarget_;
+        context_->OMSetRenderTargets(1u, &eye, eyeDepth_);
+        if (!replay_due_source_clears()) return false;
+    }
+    return game_source_target_bound(gameTarget);
+}
+
+bool NativeGameEyeDrawEncoder::draw_offscreen(
+    ID3D11RenderTargetView* gameTarget,
+    UINT vertexCount, UINT startVertex) noexcept {
+    if (!vertexCount || !prepare_offscreen_game_draw(gameTarget))
+        return false;
+    context_->Draw(vertexCount, startVertex);
+    ++drawCount_; // source ordinal, NEVER direct XR color evidence
+    return true;
+}
+
+bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
+    ID3D11RenderTargetView* gameTarget,
+    UINT indexCount, UINT startIndex, INT baseVertex) noexcept {
+    if (!indexCount || !prepare_offscreen_game_draw(gameTarget))
+        return false;
+    context_->DrawIndexed(indexCount, startIndex, baseVertex);
+    ++drawCount_;
+    return true;
+}
+
 void NativeGameEyeDrawEncoder::set_source_clear_timeline(
     const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept {
     sourceClears_ = (clears && eye < 2u) ? clears : nullptr;
