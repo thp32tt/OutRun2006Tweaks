@@ -30,6 +30,16 @@ public:
     [[nodiscard]] bool draw(UINT vertexCount, UINT startVertex) noexcept;
     [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,
                                     INT baseVertex) noexcept;
+    // Game-origin instanced geometry is a single ordered GPU draw command,
+    // independent of its instance count. These paths use the SAME bound eye
+    // target, source Clear timeline and original D3D9 fail-closed evidence
+    // policy as Draw/DrawIndexed; instances never synthesize extra ordinals.
+    [[nodiscard]] bool draw_instanced(
+        UINT verticesPerInstance, UINT instanceCount,
+        UINT startVertex, UINT startInstance) noexcept;
+    [[nodiscard]] bool draw_indexed_instanced(
+        UINT indicesPerInstance, UINT instanceCount, UINT startIndex,
+        INT baseVertex, UINT startInstance) noexcept;
     // Replay a game-authored TARGET Clear at its exact position between
     // menu/vehicle/race eye Draws, never as fabricated draw evidence. Partial
     // clears require D3D11.1 ClearView (no implicit full-eye fallback).
@@ -78,6 +88,7 @@ private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
+    [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
     [[nodiscard]] bool replay_due_source_clears() noexcept;
     ID3D11DeviceContext* context_{};
     ID3D11RenderTargetView* eyeTarget_{};

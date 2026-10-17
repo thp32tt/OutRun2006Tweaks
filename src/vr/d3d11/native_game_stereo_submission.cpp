@@ -1,6 +1,7 @@
 #include "native_game_stereo_submission.hpp"
 #include "native_game_eye_pair_sources.hpp"
 #include "native_game_stretch_source.hpp"
+#include "native_game_stereo_draw_evidence.hpp"
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -164,6 +165,22 @@ bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
     return writable && hasShaders;
 }
 
+// A game postpass can bind an occlusion predicate after the eye scope
+// initially detached inherited host predicates. The D3D11 draw API returns
+// success even when GPU predication discards all fragments. Its async query
+// result is not evidence of a visible XR eye. Issue the authentic command
+// for its depth/order history, but never certify color without a known
+// unpredicated source draw; the original D3D9 game remains authoritative.
+bool NativeGameEyeDrawEncoder::unpredicated_color_evidence() const noexcept {
+    if (!context_) return false;
+    ID3D11Predicate* predicate = nullptr;
+    BOOL comparison = FALSE;
+    context_->GetPredication(&predicate, &comparison);
+    const bool clear = predicate == nullptr;
+    if (predicate) predicate->Release();
+    return clear;
+}
+
 bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
     if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
     ID3D11RenderTargetView* target = eyeTarget_;
@@ -228,7 +245,8 @@ bool NativeGameEyeDrawEncoder::draw(
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     if (!replay_due_source_clears()) return false;
-    const bool colorWritable = eye_color_writable();
+    const bool colorWritable = live_game_stereo::color_certifiable(
+        eye_color_writable(), unpredicated_color_evidence());
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
     if (colorWritable) ++colorDrawCount_;
@@ -241,8 +259,45 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     if (!replay_due_source_clears()) return false;
-    const bool colorWritable = eye_color_writable();
+    const bool colorWritable = live_game_stereo::color_certifiable(
+        eye_color_writable(), unpredicated_color_evidence());
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
+    ++drawCount_;
+    if (colorWritable) ++colorDrawCount_;
+    return true;
+}
+
+// D3D9 game instancing is one authored primitive command, not N separate
+// source ordinals. Reuse the same timeline, bound eye verification and
+// fail-closed color evidence for both non-indexed and indexed instances.
+bool NativeGameEyeDrawEncoder::draw_instanced(
+    UINT verticesPerInstance, UINT instanceCount,
+    UINT startVertex, UINT startInstance) noexcept {
+    if (!live_game_stereo::may_issue_instanced(
+            verticesPerInstance, instanceCount, drawCount_) ||
+        !eye_output_bound() || !replay_due_source_clears())
+        return false;
+    const bool colorWritable = live_game_stereo::color_certifiable(
+        eye_color_writable(), unpredicated_color_evidence());
+    context_->DrawInstanced(
+        verticesPerInstance, instanceCount, startVertex, startInstance);
+    ++drawCount_;
+    if (colorWritable) ++colorDrawCount_;
+    return true;
+}
+
+bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
+    UINT indicesPerInstance, UINT instanceCount, UINT startIndex,
+    INT baseVertex, UINT startInstance) noexcept {
+    if (!live_game_stereo::may_issue_instanced(
+            indicesPerInstance, instanceCount, drawCount_) ||
+        !eye_output_bound() || !replay_due_source_clears())
+        return false;
+    const bool colorWritable = live_game_stereo::color_certifiable(
+        eye_color_writable(), unpredicated_color_evidence());
+    context_->DrawIndexedInstanced(
+        indicesPerInstance, instanceCount, startIndex,
+        baseVertex, startInstance);
     ++drawCount_;
     if (colorWritable) ++colorDrawCount_;
     return true;
