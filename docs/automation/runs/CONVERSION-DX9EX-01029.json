@@ -7,13 +7,13 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "VALIDATION_PENDING",
-  "checkpoint": "C5_EXACT_SHA_GATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "1f5383ba9ef905ab07dff175dae4b0946a193bf8",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_original_c64_gpu_eye_pair": "PENDING_CI",
-    "goal_unknown_and_foreign_fallback": "PENDING_CI",
-    "goal_win32_host_exact_sha_gate": "PENDING_CI"
+    "goal_original_c64_gpu_eye_pair": "PASS_BUILD",
+    "goal_unknown_and_foreign_fallback": "PASS_BUILD",
+    "goal_win32_host_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original game original GOAL sprite and numeric sources are distinct from 0x00498670 +TIME, as documented in docs/automation/OUTRUN_VR_REA_RESOURCE_EVIDENCE_20261018.md and GOAL physical provenance source.",
@@ -75,23 +75,52 @@
       "Do not change GOAL game timers, alpha effects, global D3DX Flush frequency, generic FVF sprites, world or successful R33 shader GOAL drawing."
     ],
     "fix_evidence": "R30 now reads the R23 tracked original-game c64 generation and includes it in the GOAL source used by before/after native-left eye validation; a small shared stamp helper retains conservative unknown tracker fallback.",
-    "negative_test_evidence": "goal_progress_owner_smoke.cpp adds same GOAL producer/node/shader raw write-serial and draw-serial mutations, absent/partial tracker fallback, foreign +TIME/world negative isolation across all five GOAL source families; exact GitHub CI pending.",
+    "negative_test_evidence": "Exact-SHA Active host goal_progress_owner_smoke regression passes native GOAL positive and negative c64 serial mutations, unknown/partial fallback and +TIME/world isolation. Active Windows x86 game, x64 host, R84 full-chain, packaging, Domain, HUD Inspector and Full Source Impact all SUCCESS; HMD runtime remains UNTESTED.",
     "eye_ownership": "Native R30 GOAL left/right must inherit the same precise original game producer, queue, pose, shader and raw c64 generation; after-left mismatch prevents unsafe right submission and allows existing frame invalidation and original state restoration."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "material_sha": "1f5383ba9ef905ab07dff175dae4b0946a193bf8",
+    "exact_sha": "c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7",
     "first_attempt": {
       "run_id": 39066400129,
       "conclusion": "failure",
-      "reason": "C5 policy gate requires a per-TASK feature record; no game/host build executed in this attempt"
+      "reason": "Required 01029 JSON feature contract absent before any game/host build; same-task exact-head policy input repaired without disabled gate"
     },
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
-    ]
+    ],
+    "mandatory_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39066571595,
+        "conclusion": "success",
+        "exact_sha": "c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39066571762,
+        "conclusion": "success",
+        "exact_sha": "c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39066571651,
+        "conclusion": "success",
+        "exact_sha": "c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39066571610,
+        "conclusion": "success",
+        "exact_sha": "c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7"
+      }
+    ],
+    "runtime_validation": "UNTESTED"
   },
-  "notes": "C5 validation-bearing candidate only; no claim of CI PASS, user-visible optical fix or HMD. Same-task mandatory policy-input repair, not separate score."
+  "notes": "C6 bookkeeping after exact-SHA 4/4 SUCCESS for validation-bearing c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7; original functional C++ material 1f5383ba9ef905ab07dff175dae4b0946a193bf8 distinct. This bookkeeping [skip ci] commit is no new feature/score; Quest3 runtime UNTESTED.",
+  "validation_bearing_result_sha": "c849f55e9d7ddcfddcec8bf9bc668a3cd43692f7"
 }
