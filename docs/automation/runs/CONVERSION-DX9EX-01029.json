@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01029",
+  "production_id": "CONVERSION-DX9EX-01029",
+  "event_id": "CONVERSION-DX9EX-01029-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "VALIDATION_PENDING",
+  "checkpoint": "C5_EXACT_SHA_GATE",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "1f5383ba9ef905ab07dff175dae4b0946a193bf8",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Keep original GOAL progress, title/time and result glyphs physically paired across both R84 XR eyes even when the game's original c64 writer changes during native LEFT GPU submission.",
+    "scope_boundary": "Only exact GOAL progress 0-99 and named GOAL time/title/result producer families in R84 R30 fixed-function/XYZRHW source ownership; preserve +TIME, rank, lens, SkyGlow, normal game result timing, R26_SAFE rollback, DX11/DXVK and original input/FFB.",
+    "trace_stages": [
+      "Original game GOAL 0-99 source and time/title helper or parent glyph producer creates directly submitted D3DX triangles or queued SpriteNodes with exact ScreenHud provenance.",
+      "R84 R30 fixed-function/XYZRHW stereo finite optical plane captures GOAL source at the physical left GPU draw including pose, queue, shader, and original-game raw c64 generation.",
+      "After native LEFT callback, re-capture exact original generation before submitting RIGHT; mismatch prevents foreign GOAL glyph borrowing while keeping original projection/RT/depth restoration and safe fallback."
+    ],
+    "subcomponents": [
+      "Carry original game c64 upload write/draw serial into R30 GOAL physical source identity, matching existing R33 shader/c64 protection without counting private stereo eye writes.",
+      "Reject a newly written native-left game matrix for same GOAL producer even if queue node/epoch, pose, shader and top-level draw serial are unchanged; preserve unknown/partial tracker zero/zero fallback.",
+      "Exercise direct and queued GOAL family mutation tests with same-token c64 changes and negative +TIME/world borrowing."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_original_c64_gpu_eye_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GOAL progress/title per-eye GPU source",
+        "expected_behavior": "Physical original c64 write/draw generation remains identical for native GOAL left and right eye submission."
+      },
+      {
+        "id": "goal_unknown_and_foreign_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GOAL native recovery, unrelated source protection",
+        "expected_behavior": "Incomplete c64 tracker, +TIME and world producer never borrow GOAL source, while unknown tracker keeps conservative pre-existing fallback."
+      },
+      {
+        "id": "goal_win32_host_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 plus rollback host/package and source safety",
+        "expected_behavior": "One final exact SHA passes DX9Ex Active Win32 game and host/package, Domain Isolation, HUD Inspector and Full Source Impact."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_original_c64_gpu_eye_pair": "PENDING_CI",
+    "goal_unknown_and_foreign_fallback": "PENDING_CI",
+    "goal_win32_host_exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Original game original GOAL sprite and numeric sources are distinct from 0x00498670 +TIME, as documented in docs/automation/OUTRUN_VR_REA_RESOURCE_EVIDENCE_20261018.md and GOAL physical provenance source.",
+    "source_trace": [
+      "hooks_uiscaling.cpp exact GoalTime helpers, ResultProgress parent, Sumo_Printf and B9200 text provide ScreenHud direct or queued source tokens at their native GPU producers.",
+      "R30ConfigureXyzrhwWorldEffect + R30ExecuteXyzrhwStereo use original fixed-function and XYZRHW source selection through a native LEFT and RIGHT GPU submission.",
+      "R30CaptureGoalPhysicalSource previously recorded GOAL scope, producer, queue, pose, draw serial, shader only, leaving existing rawWvpWriteSerial/rawWvpDrawSerial as zero even when R23 tracker possessed original matrix generation.",
+      "R33 shader/c64 exact GOAL source already tracked both original raw c64 serials, confirming the protection gap was R30-specific."
+    ],
+    "root_cause": "R84 R30 GOAL source construction omitted the original game c64 write/draw serial in the source stamp. A reentrant native-left original matrix write could keep the same GOAL node/producer/shader while changing the physical right-eye source without triggering the after-left fence.",
+    "alternatives_rejected": [
+      "Do not treat the earlier +TIME deferred batching implementation as missing; separate previous exact-SHA repairs 01022/01025 already exist.",
+      "Do not change GOAL game timers, alpha effects, global D3DX Flush frequency, generic FVF sprites, world or successful R33 shader GOAL drawing."
+    ],
+    "fix_evidence": "R30 now reads the R23 tracked original-game c64 generation and includes it in the GOAL source used by before/after native-left eye validation; a small shared stamp helper retains conservative unknown tracker fallback.",
+    "negative_test_evidence": "goal_progress_owner_smoke.cpp adds same GOAL producer/node/shader raw write-serial and draw-serial mutations, absent/partial tracker fallback, foreign +TIME/world negative isolation across all five GOAL source families; exact GitHub CI pending.",
+    "eye_ownership": "Native R30 GOAL left/right must inherit the same precise original game producer, queue, pose, shader and raw c64 generation; after-left mismatch prevents unsafe right submission and allows existing frame invalidation and original state restoration."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_sha": "1f5383ba9ef905ab07dff175dae4b0946a193bf8",
+    "first_attempt": {
+      "run_id": 39066400129,
+      "conclusion": "failure",
+      "reason": "C5 policy gate requires a per-TASK feature record; no game/host build executed in this attempt"
+    },
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ]
+  },
+  "notes": "C5 validation-bearing candidate only; no claim of CI PASS, user-visible optical fix or HMD. Same-task mandatory policy-input repair, not separate score."
+}
