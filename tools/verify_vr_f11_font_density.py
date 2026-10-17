@@ -817,7 +817,7 @@ def check_first_run_vr_modal(font: str) -> None:
         'ImGui::BeginChild("##vr_first_run_scroll"',
         "ImGuiWindowFlags_AlwaysVerticalScrollbar",
         'ImGui::EndChild();',
-        'ImGui::Button("Let\\'s go"',
+        "ImGui::Button(\"Let's go\"",
     )
     for token in required:
         assert token in modal, "F11 modal owner missing: " + token
@@ -828,7 +828,7 @@ def check_first_run_vr_modal(font: str) -> None:
     assert modal.index('ImGui::BeginChild("##vr_first_run_scroll"') < modal.index(
         "ImGui::PushTextWrapPos(0.0f);")
     assert modal.index("ImGui::PopTextWrapPos();") < modal.index("ImGui::EndChild();")
-    assert modal.index("ImGui::EndChild();") < modal.index('ImGui::Button("Let\\'s go"')
+    assert modal.index("ImGui::EndChild();") < modal.index("ImGui::Button(\"Let's go\"")
     assert "Overlay::FontScaleCommitRequested = true;" in modal
     h_required = (
         "std::isfinite(viewportWidth)", "std::isfinite(requestedFontScale)",
