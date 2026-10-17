@@ -1,3 +1,13 @@
+## 2026-10-17 최신 사용자 지시 — GitHub/Portainer 기존 C 슬롯으로 통합
+
+기존 단독 작업 `outrun-c-original-english-crop` Docker Compose는 **폐기(기본 profile 비활성화·자동 재시작 없음)**하고, 별도의 Stack을 더 만들지 않는다. 새 C는 기존 GitHub Portainer 스택 `thp32tt/OutRun2006Tweaks` 브랜치 `localization-controller-recovery-20260928`의 `tools/chat-controller/localization-recovery-v1/docker-compose.yml`에 포함된 `outrun-c-english-native-crop`으로만 실행한다. GitHub에 C 코드, 빌드 의존성, 안전한 원본 마운트를 함께 고정한다.
+
+N100의 `/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/hd_original_108_verified` 전체 원본 HD PNG **108/108** SHA·매니페스트 검증 완료. ZIP 5개도 동일 폴더의 수신 저장소에 보존. C 슬롯은 `hd108_ocr/cursor.json`, `hd108_outputs/`, 기존 DDS 기반 `outputs/`, 검증된 큐와 `MASTER_CROP_MANIFEST_255.json`을 이어받아 중복 기록하지 않는다. 옛 986 분할 타일, 이전 ImageGen 결과, 한글 합성 및 DDS 변환은 불가하다. A/B 자동 발송도 PAUSED 유지. C 결과는 항상 `TEST_ONLY`, 실게임 `UNTESTED`.
+
+GitHub 소스/Compose 검증 통과는 배포 검증과 다르다. 기존 Portainer GitOps Stack에서 **Pull latest / Rebuild / Redeploy**를 실행한 후 `outrun-localization-c-english-crop` 컨테이너와 OCR 로그를 확인해야 한다. 배포 전旧 단독 컨테이너가 재개되지 않도록 정지/재시작 정책을 반드시 확인한다.
+
+---
+
 ## 2026-10-17 — 사용자 정정: 원본 HD 파일은 이미 N100에 보관돼 있음
 
 원본을 새로 확보해야 한다는 종전 보고는 **오류**다. 기존 N100 저장소 `work/c_roi_q060_easy_git_20261016_0533/localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a`에 원본 DDS 18개가 있고, `localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip` 내부 원본 DDS 79개 중 파일명 기준 해상도의 정확히 4배인 네이티브 HD DDS가 39개다(기본 해상도 40개는 신규 HD OCR에서 제외). 실제 사용자 번역 표와 원본 경로를 대조한 HD 원본 대상은 중복 제거 후 49개 자산 그룹이며, 다른 경로에서 독립 검증한 Q212는 별도로 유지한다.
