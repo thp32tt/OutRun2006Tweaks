@@ -1824,7 +1824,7 @@ int main()
             encoder.color_draw_count() == beforeOffscreenEyeColor &&
             encoder.copy_game_surface(
                 fixture.offscreenGameColor, &offscreenPatch,
-                eyeIndex == 0u ? 12u : 44u, 0u) &&
+                12u, 0u) &&
             encoder.draw_count() == beforeOffscreen + 1u &&
             encoder.color_draw_count() == beforeOffscreenEyeColor;
         if (!fixture.replayedOffscreenGameDraw[eyeIndex]) return false;
