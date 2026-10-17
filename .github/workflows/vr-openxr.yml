@@ -20,6 +20,11 @@ on:
       - 'docs/VR_ARCHITECTURE.md'
       - 'tools/package_dx11_first_game_frame.py'
       - 'tools/test_package_dx11_first_game_frame.py'
+      - 'tools/dx11_autodev_policy.py'
+      - 'tools/test_dx11_autodev_policy.py'
+      - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      - '.github/workflows/build.yml'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
       - '.github/workflows/vr-openxr.yml'
   pull_request:
     paths:
@@ -52,6 +57,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
 
       - name: Verify reconstructed VR architecture boundaries
         run: |

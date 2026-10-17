@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches-ignore: [ vr-d3d9ex-focus, vr-dx11-native-r71, vr-dxvk-r71-disasm, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
+    branches-ignore: [ vr-d3d9ex-focus, vr-dxvk-r71-disasm, 'vr-d3d9ex-candidate/**', 'vr-d3d9ex-review-*' ]
   pull_request:
 
 concurrency:
@@ -22,6 +22,14 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           submodules: recursive
+
+      - name: Verify exact pushed DX11 source checkout
+        if: github.event_name == 'push' && github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $actual = (git rev-parse HEAD).Trim()
+          $expected = '${{ github.sha }}'
+          if ($actual -ne $expected) { throw "DX11 exact-SHA checkout mismatch: $actual != $expected" }
 
       - name: Verify HMD-proven VR baseline
         shell: pwsh
