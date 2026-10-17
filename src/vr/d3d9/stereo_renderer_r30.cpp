@@ -6203,9 +6203,12 @@ namespace OutRunVRStereo
                 (!projected && !exactHud && !pauseOverlay))
                 return E_NOTIMPL;
             const auto* marker = CurrentProjectedMarker();
-            if ((projected && (!marker || !marker->valid)) ||
-                R29OwnerCurrentVertexShaderIdentity() != 0)
+            if (projected && (!marker || !marker->valid))
                 return E_NOTIMPL;
+            // The R29 setter/StateBlock identity is only a hotpath hint,
+            // never proof that the current real D3D9 draw binds a shader.
+            // R33 may reach this exact R62 path despite a stale shadow; the
+            // live COM getter below is the definitive fixed-function test.
             IDirect3DVertexShader9* liveShader = nullptr;
             if (FAILED(device->GetVertexShader(&liveShader)))
                 return E_NOTIMPL;
