@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTING",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_IMPLEMENT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "f21e2b69ffe4d33312deba386f06346c4ef6c471",
@@ -67,5 +67,45 @@
     ]
   },
   "acceptance_results": {},
-  "next_action": "Validate material game source exact SHA in GitHub DX9Ex Active and Domain Isolation; Quest3/VDXR remains NEED_HMD_TEST, score +0 until proven feature acceptance."
+  "next_action": "C6 COMPLETE_BUILD_VERIFIED: exact SHA GitHub DX9Ex Active, Domain Isolation and Full Source Impact SUCCESS; Quest3/VDXR HMD visual and controller validation remains UNTESTED. Do not rerun passed SHA or credit bookkeeping as new material work.",
+  "validation_bearing_result_sha": "da3ac4481e2905069a176828d26d2e01b8d22780",
+  "material_result_sha": "da3ac4481e2905069a176828d26d2e01b8d22780",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "da3ac4481e2905069a176828d26d2e01b8d22780",
+    "dx9ex_active": {
+      "run_id": 38984581747,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38984581647,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38984581719,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38984581708,
+      "conclusion": "success"
+    },
+    "quest3_vdxr": "UNTESTED"
+  },
+  "c6_exact_sha_gate": {
+    "validation_bearing_result_sha": "da3ac4481e2905069a176828d26d2e01b8d22780",
+    "dx9ex_active_run_id": 38984581747,
+    "dx9ex_active_conclusion": "success",
+    "domain_run_id": 38984581647,
+    "domain_conclusion": "success",
+    "full_source_run_id": 38984581719,
+    "full_source_conclusion": "success",
+    "material_result_sha": "da3ac4481e2905069a176828d26d2e01b8d22780",
+    "quest3_vdxr": "UNTESTED"
+  }
 }
