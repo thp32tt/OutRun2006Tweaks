@@ -83,7 +83,7 @@
     "evidence_limit": "Deterministic semantic admission bug is source-confirmed. No matching Quest3 optical failure or visual correction is claimed; RUNTIME_VALIDATION=UNTESTED."
   },
   "validation_bearing_result_sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
-  "validation_notes": "C6 exact-SHA result: R84 original white HUD c64 source ownership source material e32f2fd18cfbcf871732acb8d48383ae8926cb28; exact validation-bearing record SHA b2030f41fa7ba7f3f3f50381e765d8c32c5692d3. DX9Ex Active Validation #39025208210 policy/full-chain-compile/game/host/package SUCCESS; Domain Isolation #39025208291 SUCCESS; HUD Inspector #39025208242 SUCCESS. Full Source Impact Review #39025112214 SUCCESS for C++ material SHA; #39025208245 still IN_PROGRESS at validation SHA at C6 verification time, with only run-record JSON changed between the material and validation SHAs. Quest3/VDXR headset runtime UNTESTED. Separate [skip ci] C6 bookkeeping only; no source rebuild/re-run or repeat score.",
+  "validation_notes": "C6 exact-SHA result: R84 original white HUD c64 source ownership source material e32f2fd18cfbcf871732acb8d48383ae8926cb28; exact validation-bearing record SHA b2030f41fa7ba7f3f3f50381e765d8c32c5692d3. DX9Ex Active Validation #39025208210 policy/full-chain-compile/game/host/package SUCCESS; Domain Isolation #39025208291 SUCCESS; HUD Inspector #39025208242 SUCCESS. Full Source Impact Review #39025112214 SUCCESS for C++ material SHA; #39025208245 still IN_PROGRESS at validation SHA at C6 verification time, with only run-record JSON changed between the material and validation SHAs. Quest3/VDXR headset runtime UNTESTED. Separate [skip ci] C6 bookkeeping only; no source rebuild/re-run or repeat score. Full Source Impact #39025208245 subsequently completed 3/3 SUCCESS at validation-bearing SHA b2030f41; original C6 snapshot had correctly recorded it as in progress.",
   "ci_evidence": {
     "source_commit": "e32f2fd18cfbcf871732acb8d48383ae8926cb28",
     "validation_bearing_result_sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
@@ -119,8 +119,8 @@
     "full_source_impact_validation": {
       "run_id": 39025208245,
       "sha": "b2030f41fa7ba7f3f3f50381e765d8c32c5692d3",
-      "conclusion": "in_progress_at_c6_check",
-      "scope_note": "Not reported as SUCCESS pending GitHub workflow completion."
+      "conclusion": "success",
+      "scope_note": "Full Source Impact completed 3/3 SUCCESS at validation-bearing exact SHA, verified after the original C6 bookkeeping snapshot."
     }
   }
 }
