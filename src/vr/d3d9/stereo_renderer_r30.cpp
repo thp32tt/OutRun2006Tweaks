@@ -3522,6 +3522,13 @@ namespace OutRunVRStereo
             // Equal extents retain the original one-viewport projection.
             const auto resultDraw =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            // A +TIME token alone is not proof of an original ScreenHud
+            // 2D source. The same physical stage owner used for stereo Draw
+            // is required before original game pixel extents may be borrowed.
+            const bool stagePresentationPixels =
+                resultDraw.IsExactFiniteResultHud() &&
+                resultDraw.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
             const bool goalPresentationPixels =
                 resultDraw.IsExactFiniteResultHud() &&
                 OutRunVR::GoalPhysical::IsGoal(
@@ -3534,10 +3541,8 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::QueueOverlayNeedsFiniteHudPlane(
                     resultDraw.scope, resultDraw.queued,
                     OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0);
-            if ((OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
-                 goalPresentationPixels || nativeScreenHudPixels ||
-                 queuedOriginalHudPixels) &&
+            if ((stagePresentationPixels || goalPresentationPixels ||
+                 nativeScreenHudPixels || queuedOriginalHudPixels) &&
                 Game::screen_resolution)
             {
                 const float gameWidth = Game::screen_resolution->x;
