@@ -7684,6 +7684,25 @@ namespace OutRunVRStereo
     // R32-to-R30 structural seam: preserve the current live lower-owner
     // classification, XYZRHW fallback and hook dispatch without transferring
     // any physical hook or shadow device state into R32.
+    void R30SupportBeforeScreenDrawForSkyGlow(
+        IDirect3DDevice9* device, bool exactScreenBoundary) noexcept
+    {
+        // Restore the R26 pre-draw source boundary for screens that R33
+        // eventually delegates to an unmodified native fallback. Recording
+        // this transaction before physical Draw prevents Present from using
+        // ESC/lettering-painted backbuffers as the sky's second bloom source.
+        // Never capture during a non-game / internal eye or auxiliary pass.
+        if (!exactScreenBoundary || !device ||
+            !R29OwnerIsGameDevice(device) ||
+            R29OwnerInternalStereoPassActive() ||
+            !R29OwnerTargetIsBackBuffer())
+            return;
+        const auto frame = R29OwnerCaptureFrameSnapshot();
+        if (R30SkyGlowScreenDrawEpoch == frame.presentEpoch)
+            return;
+        R30CaptureSkyGlowSceneBeforeHud(device);
+    }
+
     R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(
         IDirect3DDevice9* device) noexcept
     {
