@@ -1,0 +1,96 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00992",
+  "production_id": "CONVERSION-DX9EX-00992",
+  "event_id": "CONVERSION-DX9EX-00992-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "MATERIAL_COMMITTED_VALIDATION_PENDING",
+  "phase": "C2_IMPLEMENTED",
+  "checkpoint": "C2_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "4803aab430b8bfd2e3769d3be04f324728348dfd",
+  "material_result_sha": "PENDING_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_COMMIT_SHA",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/rank_marker_physical_source.hpp",
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/rank_marker_physical_source.hpp",
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    "docs/automation/runs/CONVERSION-DX9EX-00992.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep car/rival ordinal rank glyphs attached to their exact Calc3D2D vehicle anchor during R84 per-eye GPU submission; never reuse a producer modified by a nested original-game Draw.",
+    "scope_boundary": "R84 projected vehicle/rival rank XYZRHW and FVF0x142 indexed native Draw; protect world, C993 lens, ordinary HUD, +TIME, GOAL, SkyGlow, input, R26_SAFE and frozen DXVK.",
+    "trace_stages": [
+      "Original ordinal/rival Calc3D2D registers view-space anchor on exact source and queued SpriteNodes.",
+      "R30 converts the projected rank anchor into both eye projections and physically submits the first native GPU Draw.",
+      "Nested game callbacks may modify the active projected marker, queue node, producer, pose or shader between first and second eye.",
+      "Recheck the same physical rank source after left Draw and before right RT submission; fail incomplete stereo closed without repeating the original Draw."
+    ],
+    "subcomponents": [
+      "Apply immutable physical rank source transaction to the shared R84 projected XYZRHW and original FVF0x142 route.",
+      "Preserve original left HRESULT, GL state restoration owner, mono-safety and negative source-mutation coverage in required host build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_marker_native_two_eye_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 Calc3D2D indexed rank and XYZRHW projected sibling",
+        "expected_behavior": "Only the same physical queue/direct source and view anchor may submit both eye rank glyphs."
+      },
+      {
+        "id": "rank_marker_reentrant_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original native left draw, nested queue/shader/pose and FVF0x142",
+        "expected_behavior": "Changed owner invalidates incomplete right stereo without retrying native left, leaking fixed-function projection or changing original HRESULT."
+      },
+      {
+        "id": "rank_marker_integrated_sha",
+        "category": "integrated_validation",
+        "behavior_area": "x86 game R84/R26_SAFE, x64 host smoke, package and Domain/Inspector/Full Source",
+        "expected_behavior": "Run exact-SHA required Actions workflows with no skip; HMD evidence remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_marker_native_two_eye_ownership": "PENDING_WINDOWS_CI",
+    "rank_marker_reentrant_fallback": "PENDING_WINDOWS_CI",
+    "rank_marker_integrated_sha": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R30ExecuteXyzrhwStereo performed native left Draw then immediately submitted a prepared projected rank right-eye Draw without checking live producer/queue/Calc3D2D anchor, shader or pose after reentrancy.",
+    "original_evidence": "R30ExecuteXyzrhwStereo shared by R84 projected XYZRHW and FVF0x142 rank submits physical left before R29 snapshot/right RT and lacked a post-left original rank identity comparison.",
+    "source_trace": [
+      "Exact Calc3D2D producer -> SpriteNode + projected anchor",
+      "R30BuildProjectedRankDelta -> native left draw",
+      "Post-left identity fence -> right-eye draw only on stable original marker source"
+    ],
+    "alternatives_rejected": [
+      "No global D3DX Flush, no untagged alpha promotion, no injected FFB/input changes, no native left retry, no DXVK changes."
+    ],
+    "eye_ownership": "Both eye rank draws must share the exact original queue/direct rank source, immutable view anchor, latched pose and shader epoch; unknown or changed source suppresses right eye and marks frame incomplete.",
+    "fix_evidence": "R30 shared physical projected rank transaction validates and revalidates exact original source around native left Draw.",
+    "negative_test_evidence": "Portable host test exercises direct/queued positive plus queue, producer, view point, shader/epoch, pose and invalid marker negatives."
+  },
+  "local_validation": {
+    "cpp17_smoke": "PENDING",
+    "platform": "WINDOWS_X64_HOST"
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run final exact-SHA required GitHub Gates once, record C6 separately if successful; confirm projected rank attachment on matching Quest3/VDXR build before optical PASS."
+}

@@ -434,6 +434,16 @@ add_custom_command(TARGET outrun-vr-r30-particle-gpu-fallback-smoke POST_BUILD
     VERBATIM)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
+add_executable(outrun-vr-rank-physical-source-smoke
+    tests/rank_marker_physical_source_smoke.cpp)
+target_include_directories(outrun-vr-rank-physical-source-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-rank-physical-source-smoke)
+add_custom_command(TARGET outrun-vr-rank-physical-source-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-rank-physical-source-smoke>"
+    COMMENT "Run physical rank left/right native callback source regression"
+    VERBATIM)
+
 add_executable(outrun-vr-r62-rank-route-1000-smoke tests/r62_rank_route_1000_smoke.cpp)
 
 add_executable(outrun-vr-r30-early-rhw-shadow-smoke tests/r30_early_rhw_shadow_smoke.cpp)

@@ -37,6 +37,7 @@
 #include "../game/projected_rank_stereo.hpp"
 #include "../game/rank_marker_sparse.hpp"
 #include "../game/rank_marker_raw_wvp.hpp"
+#include "../game/rank_marker_physical_source.hpp"
 #include "../game/rank_marker_fixedfn_r62.hpp"
 #include <cstring>
 #include <cstdlib>
@@ -5312,6 +5313,31 @@ namespace OutRunVRStereo
         }
 
         template <typename LeftDraw, typename RightDraw>
+        // Sample the actual producer/queue/Calc3D2D identity at the GPU
+        // primitive, not the previous tick's SpriteNode or cached rank WVP.
+        // Fixed-function FVF 0x142 legitimately has a null vertex shader.
+        bool R30CaptureProjectedRankPhysicalSource(
+            OutRunVR::RankMarker::PhysicalRankSource& source) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            const auto draw = CapturePhysicalDrawCommand();
+            const auto* marker = CurrentProjectedMarker();
+            if (!marker || !marker->valid)
+                return false;
+            std::uintptr_t shader = 0;
+            std::uint64_t shaderEpoch = 0;
+            if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
+                R29OwnerCurrentVertexShaderIdentity() != 0)
+                return false;
+            source = {
+                draw.scope, draw.producer, draw.queued,
+                draw.queueNode, draw.queueEpoch, *marker,
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                shader, shaderEpoch
+            };
+            return OutRunVR::RankMarker::ValidRankSource(source);
+        }
+
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
@@ -5331,6 +5357,15 @@ namespace OutRunVRStereo
                 R29OwnerLeftDrawMayWriteStencil(device))
                 R29OwnerNoteMainDepthContentWrite();
 
+            // Unlike a generic HUD/particle, the projected car/rival marker
+            // has one exact CPU Calc3D2D anchor shared by BOTH physical eyes.
+            // Native left Draw may re-enter the game's queue/shader producer.
+            OutRunVR::RankMarker::PhysicalRankSource rankBefore{};
+            const bool exactRank = state.projectedWorldMarker;
+            if (exactRank &&
+                !R30CaptureProjectedRankPhysicalSource(rankBefore))
+                return E_NOTIMPL; // no physical GPU draw yet
+
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
             {
@@ -5343,6 +5378,26 @@ namespace OutRunVRStereo
                     site, leftHr);
                 R29OwnerArmMonoSafety();
                 return leftHr;
+            }
+
+            if (exactRank)
+            {
+                OutRunVR::RankMarker::PhysicalRankSource rankAfter{};
+                if (!R30CaptureProjectedRankPhysicalSource(rankAfter) ||
+                    !OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
+                        rankBefore, rankAfter))
+                {
+                    // Left eye is already native-submitted: do NOT retry it,
+                    // borrow a foreign marker for the right eye, or publish a
+                    // completed stereo frame. Fixed-function projection
+                    // restoration remains with the enclosing rank call.
+                    R29OwnerMarkRightDrawFailed();
+                    R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R29OwnerReportStereoFailure(
+                        OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
+                    R29OwnerArmMonoSafety();
+                    return leftHr;
+                }
             }
 
             // Capture after the left-eye draw; reuse one coherent R29 owner view.
