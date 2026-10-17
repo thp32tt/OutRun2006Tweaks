@@ -19,6 +19,35 @@ static_assert(full_eye_target_rect(0, 0, 1920, 1080, 1920u, 1080u));
 static_assert(!full_eye_target_rect(0, 0, 1920, 1079, 1920u, 1080u));
 static_assert(!full_eye_target_rect(1, 0, 1920, 1080, 1920u, 1080u));
 static_assert(!full_eye_target_rect(0, 0, 0, 1080, 0u, 1080u));
+// D3D9 Z/stencil Clears with an explicit whole-eye RECT must use the real
+// D3D11.0 ClearDepthStencilView, just like an implicit whole-surface Clear.
+// Sending those through the partial rectangle rasterizer consumes an extra
+// shader Draw per eye and can fail when d3dcompiler_47 is absent. Keep cropped
+// HUD/menu clears confined to their game-authored rectangle instead.
+enum class NativeDepthClearRoute : std::uint8_t { Reject, FullDsv, PartialRaster };
+[[nodiscard]] constexpr NativeDepthClearRoute depth_clear_route(
+    bool hasRegion, std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight) noexcept {
+    if (!eyeWidth || !eyeHeight) return NativeDepthClearRoute::Reject;
+    if (!hasRegion) return NativeDepthClearRoute::FullDsv;
+    if (left < 0 || top < 0 || right <= left || bottom <= top ||
+        right > static_cast<std::int64_t>(eyeWidth) ||
+        bottom > static_cast<std::int64_t>(eyeHeight))
+        return NativeDepthClearRoute::Reject;
+    return full_eye_target_rect(left, top, right, bottom, eyeWidth, eyeHeight)
+        ? NativeDepthClearRoute::FullDsv : NativeDepthClearRoute::PartialRaster;
+}
+static_assert(depth_clear_route(false, 0, 0, 0, 0, 1920u, 1080u) ==
+    NativeDepthClearRoute::FullDsv);
+static_assert(depth_clear_route(true, 0, 0, 1920, 1080, 1920u, 1080u) ==
+    NativeDepthClearRoute::FullDsv);
+static_assert(depth_clear_route(true, 0, 0, 1919, 1080, 1920u, 1080u) ==
+    NativeDepthClearRoute::PartialRaster);
+static_assert(depth_clear_route(true, 0, 0, 0, 0, 1920u, 1080u) ==
+    NativeDepthClearRoute::Reject);
+static_assert(depth_clear_route(true, 0, 0, 1921, 1080, 1920u, 1080u) ==
+    NativeDepthClearRoute::Reject);
 // Hardware instancing is a single source-authored command/clear ordinal.
 // A zero-instance call writes no pixels and cannot establish an XR eye.
 [[nodiscard]] constexpr bool may_issue_instanced(

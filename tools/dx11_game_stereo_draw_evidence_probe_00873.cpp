@@ -6,6 +6,8 @@ using outrun::vr::dx11::live_game_stereo::may_issue_instanced;
 using outrun::vr::dx11::live_game_stereo::color_certifiable;
 using outrun::vr::dx11::live_game_stereo::authored_color_output_ready;
 using outrun::vr::dx11::live_game_stereo::full_eye_target_rect;
+using outrun::vr::dx11::live_game_stereo::NativeDepthClearRoute;
+using outrun::vr::dx11::live_game_stereo::depth_clear_route;
 int main() {
     // Menu/car/race native eye callback: both indexed and non-indexed
     // multi-instance commands preserve ONE genuine source draw ordinal.
@@ -32,6 +34,26 @@ int main() {
     static_assert(!full_eye_target_rect(3, 0, 3440, 1440, 3440u, 1440u));
     static_assert(!full_eye_target_rect(-1, 0, 3440, 1440, 3440u, 1440u));
     static_assert(!full_eye_target_rect(0, 0, 3440, 1440, 0u, 1440u));
+    // Game camera Z/stencil command replay: implicit and explicit full-eye
+    // rectangles clear the actual per-eye DSV on D3D11.0 without a fabricated
+    // Draw or shader; cropped menu/HUD rectangles retain bounded rasterization.
+    // Invalid source coordinates are rejected before either eye is recorded.
+    static_assert(depth_clear_route(false, 0, 0, 0, 0, 3440u, 1440u) ==
+        NativeDepthClearRoute::FullDsv);
+    static_assert(depth_clear_route(true, 0, 0, 3440, 1440, 3440u, 1440u) ==
+        NativeDepthClearRoute::FullDsv);
+    static_assert(depth_clear_route(true, 0, 0, 1920, 1080, 3440u, 1440u) ==
+        NativeDepthClearRoute::PartialRaster);
+    static_assert(depth_clear_route(true, 1, 0, 3440, 1440, 3440u, 1440u) ==
+        NativeDepthClearRoute::PartialRaster);
+    static_assert(depth_clear_route(true, 0, 0, 0, 0, 3440u, 1440u) ==
+        NativeDepthClearRoute::Reject);
+    static_assert(depth_clear_route(true, -1, 0, 3440, 1440, 3440u, 1440u) ==
+        NativeDepthClearRoute::Reject);
+    static_assert(depth_clear_route(true, 0, 0, 3441, 1440, 3440u, 1440u) ==
+        NativeDepthClearRoute::Reject);
+    static_assert(depth_clear_route(true, 0, 0, 3440, 1440, 0u, 1440u) ==
+        NativeDepthClearRoute::Reject);
     // Original D3D9 TARGET Clear is authentic eye color, not fabricated
     // geometry. Admit depth-only draws following a full seed, while rejecting
     // a terminal Clear that erased the last native game geometry.

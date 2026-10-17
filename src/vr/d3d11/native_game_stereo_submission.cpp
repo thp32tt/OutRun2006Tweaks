@@ -364,17 +364,19 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
         (clearDepth && (!std::isfinite(depth) ||
                         depth < 0.0f || depth > 1.0f)))
         return false;
-    if (region) {
-        if (region->left < 0 || region->top < 0 ||
-            region->right <= region->left ||
-            region->bottom <= region->top ||
-            static_cast<std::uint32_t>(region->right) > targetWidth_ ||
-            static_cast<std::uint32_t>(region->bottom) > targetHeight_)
-            return false;
+    const auto route = live_game_stereo::depth_clear_route(
+        region != nullptr, region ? region->left : 0,
+        region ? region->top : 0, region ? region->right : 0,
+        region ? region->bottom : 0, targetWidth_, targetHeight_);
+    if (route == live_game_stereo::NativeDepthClearRoute::Reject)
+        return false;
+    if (route == live_game_stereo::NativeDepthClearRoute::PartialRaster)
         return raster_partial_eye_depth_clear(
             context_, eyeDepth_, targetWidth_, targetHeight_, *region,
             depth, stencil, clearDepth, clearStencil);
-    }
+    // Full-eye game RECT and implicit full Z/stencil Clear are the same
+    // GPU operation. The base D3D11.0 API handles both directly, independently
+    // on the left/right DSV, without a shader or diagnostic geometry Draw.
     const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
                        (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
     context_->ClearDepthStencilView(eyeDepth_, flags,
@@ -1405,23 +1407,21 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         ring_.width(), ring_.height());
                 } else if (event.kind ==
                            NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
-                    // Empty RECT means whole DSV. Otherwise rasterize only
-                    // the original game's bounded Z/stencil clear pixels.
-                    // Reject malformed coordinates BEFORE either eye queues
-                    // GPU work, retaining the original D3D9 fallback.
+                    // Empty RECT or an explicit entire-eye RECT maps
+                    // to base D3D11.0 ClearDepthStencilView. Only cropped
+                    // source regions need the bounded depth/stencil raster.
+                    // Preflight the same route for BOTH eyes before commands.
                     const auto& rect = event.rect;
-                    const bool partial = rect.left || rect.top ||
+                    const bool hasRect = rect.left || rect.top ||
                         rect.right || rect.bottom;
+                    const auto route = live_game_stereo::depth_clear_route(
+                        hasRect, rect.left, rect.top, rect.right, rect.bottom,
+                        ring_.width(), ring_.height());
                     if ((!event.clearDepth && !event.clearStencil) ||
                         (event.clearDepth &&
                          (!std::isfinite(event.depth) ||
                           event.depth < 0.0f || event.depth > 1.0f)) ||
-                        (partial &&
-                         (rect.left < 0 || rect.top < 0 ||
-                          rect.right <= rect.left ||
-                          rect.bottom <= rect.top ||
-                          rect.right > static_cast<LONG>(ring_.width()) ||
-                          rect.bottom > static_cast<LONG>(ring_.height()))))
+                        route == live_game_stereo::NativeDepthClearRoute::Reject)
                         return false;
                 } else if (event.kind ==
                                NativeGameEyePartialTargetClear::Kind::SourceCopy ||
