@@ -1,0 +1,41 @@
+{
+  "schema": 2,
+  "kind": "feature_checkpoint",
+  "task_id": "CONVERSION-DX9EX-01018",
+  "production_id": "CONVERSION-DX9EX-01018",
+  "event_id": "CONVERSION-DX9EX-01018-E003",
+  "event_type": "rollover",
+  "attempt": 1,
+  "rollover_count": 2,
+  "branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "feature_branch": "vr-d3d9ex-candidate/CONVERSION-DX9EX-01018-main-menu",
+  "feature_base_sha": "496d18a51a4fc59ead8585669337172b34454211",
+  "feature_material_sha": "9bc19ea3e7209497e00cd72efc4497bdbfb60758",
+  "feature_last_head": "246b87ccfb9fbd3a558de94dc85833475e8abee9",
+  "feature_stage": "C3_FINAL_CI_PENDING",
+  "feature_status": "IMPLEMENTED_VALIDATION_PENDING",
+  "target_preserved_at_merge_sha": "eabf3078a36ed01d90dee2f8a0c978bb793b2aab",
+  "behind_at_commit": 0,
+  "validation": {
+    "dx9ex_active_run_id": 39039864125,
+    "hud_inspector_run_id": 39039864122,
+    "state": "IN_PROGRESS",
+    "previous_policy_failure": "old ResolveMenuOpticalCoverage assertion",
+    "repair_path": "tools/verify_vr_menu_letterbox_aspect.py"
+  },
+  "source_paths": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "vrhost/CMakeLists.txt"
+  ],
+  "pending_acceptance": [
+    "main_menu_state_placement: confirm x64 host C++ smoke and package",
+    "selector_and_override_regression: compile and optical test then HMD test separately",
+    "main_menu_exact_sha_ci: final exact SHA Active/Domain/HUD/Full source then C6"
+  ],
+  "next_action": "Check candidate SHA 246b87cc exact Windows Active + HUD Inspector CI (do not redispatch); if PASS verify target compare behind=0 and expected_sha/force=false before promotion. If target advanced concurrently reconcile nonoverlapping changes first and revalidate integrated SHA. After target 4 required exact SHA workflows SUCCESS, persist C6 run record. Quest3/VDXR runtime UNTESTED.",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0
+}
