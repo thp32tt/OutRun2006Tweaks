@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00982",
+  "production_id": "CONVERSION-DX9EX-00982",
+  "event_id": "CONVERSION-DX9EX-00982-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTING",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_IMPLEMENT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "f21e2b69ffe4d33312deba386f06346c4ef6c471",
+  "source_paths": [
+    "src/vr/d3d9/hud_edge_transition.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/hud_edge_transition_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/hud_edge_transition.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/hud_edge_transition_smoke.cpp",
+    "tools/verify_vr_hud_edge_transition.py"
+  ],
+  "score_delta_this_attempt": 0,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Repair original gameplay gear, speed, running-time and rank text peripheral responsive enlargement and placement on the actual R84 finite binocular HUD draw path, preserving independent eye projections.",
+    "scope_boundary": "Original-callsite BA9D0 OutRunHudPeripheralText only on R84 ScreenHud finite XYZRHW, excluding GOAL, +TIME, F11, lens, world markers, original input, FFB, SkyGlow, R26_SAFE and DXVK.",
+    "special_work_evidence": "R84 original ScreenHud enters stageExtensionEyePlane and returned before the old downstream R30GetExactHudEdgeAnchor and R30ExactPeripheralHudBoost; responsive source groups therefore retained the smaller centre-convergent HUD scale despite correct original semantic tagging.",
+    "trace_stages": [
+      "Native OutRun BA9D0 exact gameplay glyph callsite tags original queue and direct physical draw with peripheral ScreenHud producer.",
+      "R30 physical XYZRHW source checks fully visible original sprite group bounds and prepares a common optical NDC peripheral enlargement prior to finite-stage stereo return.",
+      "Two separately canted OpenXR eye matrices consume exactly the same prepared gameplay position without post-eye disparity changes; unrelated owners keep original source pixels."
+    ],
+    "subcomponents": [
+      "Move fully source-proven gameplay HUD group bounds and optical peripheral boost to the live finite-eye stage without widening the original semantic producer whitelist.",
+      "Perform a double-precision source NDC remap shared across both OpenXR eyes and preserve colour, RHW, UV, Z and fail-closed native fallback.",
+      "Add portable C++ multi-aspect and binocular symmetry smoke and static call-order verification to protect actual physical finite draw route."
+    ],
+    "acceptance_items": [
+      {
+        "id": "source_to_eye_hud",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original running-game text source to R84 physical OpenXR stereo submission",
+        "expected_behavior": "The exact peripheral running HUD glyph family receives its intended responsive optical size and screen edge location on the normal finite-screen stereo route rather than missing the opt-in correction."
+      },
+      {
+        "id": "optical_symmetry_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Bilateral optics and protected unknown or result screen owners",
+        "expected_behavior": "Source remap is atomic and symmetric with invalid input retaining original one-draw behavior; GOAL, +TIME, F11, world and SkyGlow remain in their established routes."
+      },
+      {
+        "id": "ci_and_headset_separation",
+        "category": "integrated_validation",
+        "behavior_area": "Portable C++ math plus Windows game DLL and host CI package",
+        "expected_behavior": "Run affected portable smoke then required full exact-SHA Active and Domain isolation gates; real Quest3/VDXR acceptance remains untested until matching headset run."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "next_action": "Validate material game source exact SHA in GitHub DX9Ex Active and Domain Isolation; Quest3/VDXR remains NEED_HMD_TEST, score +0 until proven feature acceptance."
+}

@@ -68,4 +68,42 @@ namespace OutRunVrHudEdge
             return lower;
         return lower + (upper - lower) * std::clamp(weight, 0.0f, 1.0f);
     }
+
+    // R84 exact peripheral gameplay HUD enters the finite binocular path
+    // before the legacy 2D affine anchor code. Form source NDC only once:
+    // independent per-eye projection must consume the SAME shifted pixel.
+    // No generic ScreenHud, +TIME, GOAL, world or external F11 admission.
+    inline bool RemapFiniteHudPixel(
+        float x, float y, float vx, float vy, float width, float height,
+        float hudScale, float boost, float anchorX, float anchorY,
+        float& outX, float& outY) noexcept
+    {
+        if (!std::isfinite(x) || !std::isfinite(y) ||
+            !std::isfinite(vx) || !std::isfinite(vy) ||
+            !std::isfinite(width) || !std::isfinite(height) ||
+            !std::isfinite(hudScale) || !std::isfinite(boost) ||
+            !std::isfinite(anchorX) || !std::isfinite(anchorY) ||
+            width <= 0.f || height <= 0.f || hudScale <= 0.f ||
+            boost < 1.f || boost > 3.f ||
+            std::fabs(anchorX) > .82f || std::fabs(anchorY) > .78f)
+            return false;
+        const double cx = double(vx) + double(width) * .5;
+        const double cy = double(vy) + double(height) * .5;
+        const double scale = double(hudScale) * double(boost);
+        const double ndcX = (double(x) - cx) * (2. / double(width));
+        const double ndcY = (cy - double(y)) * (2. / double(height));
+        const double px = cx + double(width) * .5 *
+            (scale * ndcX + (1. - scale) * double(anchorX));
+        const double py = cy - double(height) * .5 *
+            (scale * ndcY + (1. - scale) * double(anchorY));
+        if (!std::isfinite(px) || !std::isfinite(py))
+            return false;
+        const float stagedX = static_cast<float>(px);
+        const float stagedY = static_cast<float>(py);
+        if (!std::isfinite(stagedX) || !std::isfinite(stagedY))
+            return false;
+        outX = stagedX;
+        outY = stagedY;
+        return true;
+    }
 }

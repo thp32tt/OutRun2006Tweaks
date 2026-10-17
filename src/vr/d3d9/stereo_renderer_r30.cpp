@@ -5014,6 +5014,14 @@ namespace OutRunVRStereo
                     std::memcpy(left.data(), source, bytes);
                     std::memcpy(right.data(), source, bytes);
                 }
+                // Proven peripheral HUD must be checked BEFORE the R84
+                // finite-head early return. Nonperipheral scope/producer
+                // returns a neutral anchor without scanning vertices.
+                const R30HudEdgeAnchor exactHudAnchor =
+                    R30GetExactHudEdgeAnchor(source, vertexCount, stride,
+                        x0, y0, width, height, usedMask, touched, knownUsedCount);
+                const float finiteHudBoost = state.stageExtensionEyePlane
+                    ? R30ExactPeripheralHudBoost(exactHudAnchor) : 1.0f;
                 if (state.stageExtensionEyePlane)
                 {
                     // Exact +TIME/GOAL D3DXSprite::Draw can be deferred to
@@ -5058,13 +5066,34 @@ namespace OutRunVRStereo
                         // projections succeed. Reuse one original pixel->NDC
                         // conversion for the +TIME sprite, numeric glyph and
                         // GOAL result, rather than decoding it twice per eye.
+                        // The old early return bypassed the responsive
+                        // optical anchor for original BA9D0 peripheral HUD.
+                        // Apply its FULL source-group transform before the
+                        // atomic independently canted left/right eye mapping.
+                        // GOAL/+TIME, F11, generic/world sprites keep their
+                        // existing exact pixel and scale without change.
+                        float sourceX = stagePixel[0], sourceY = stagePixel[1];
+                        float sourceScale = state.stageExtensionScale;
+                        if (exactHudAnchor.hasBounds &&
+                            (exactHudAnchor.x != 0.0f ||
+                             exactHudAnchor.y != 0.0f))
+                        {
+                            if (!OutRunVrHudEdge::RemapFiniteHudPixel(
+                                    sourceX, sourceY, x0, y0, width, height,
+                                    sourceScale, finiteHudBoost,
+                                    exactHudAnchor.x, exactHudAnchor.y,
+                                    sourceX, sourceY))
+                                return false;
+                            // Source pixel is now already optical NDC.
+                            sourceScale = 1.0f;
+                        }
                         if (!OutRunVR::StageExtensionPlane::ProjectPixelPair(
                                 reinterpret_cast<const float*>(
                                     &state.stageExtensionClipFromGameNdc[0]),
                                 reinterpret_cast<const float*>(
                                     &state.stageExtensionClipFromGameNdc[1]),
-                                stagePixel[0], stagePixel[1], x0, y0, width,
-                                height, state.stageExtensionScale,
+                                sourceX, sourceY, x0, y0, width,
+                                height, sourceScale,
                                 leftX, leftY, rightX, rightY) ||
                             !OutRunVR::StageExtensionPlane::
                                 ApplyPostEyeVerticalShiftPair(
@@ -5090,9 +5119,6 @@ namespace OutRunVRStereo
                 // once per draw. This skips repeated NDC conversions and an
                 // eye-conditional branch for every indexed/UP HUD vertex.
                 // Z/RHW, UV, color and sparse source coverage stay unchanged.
-                const R30HudEdgeAnchor exactHudAnchor =
-                    R30GetExactHudEdgeAnchor(source, vertexCount, stride,
-                        x0, y0, width, height, usedMask, touched, knownUsedCount);
                 // Per-draw only: keep both eyes' sprite aspect and FOV bias
                 // paired, without touching a shared/cached gameplay scale.
                 float peripheralBoost =

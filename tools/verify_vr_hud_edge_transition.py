@@ -145,3 +145,17 @@ for width in (640.,1920.,3440.):
     assert visible(0.,width)==0.
     assert visible(.015*width,width)==1.
 print('PASS HUD source-boundary visibility ramp + 3 negative mutations')
+
+# R84 00982: source-owned gameplay HUD finite plane was returning before
+# any responsive 2D affine anchor. Do not regress to head-centred 0.55 HUD.
+finite = src[src.index("if (state.stageExtensionEyePlane)"):src.index("float hudScaleX = 1.0f;",src.index("if (state.stageExtensionEyePlane)"))]
+assert "RemapFiniteHudPixel(" in finite
+assert finite.index("RemapFiniteHudPixel(") < finite.index("ProjectPixelPair(")
+assert "sourceScale = 1.0f;" in finite
+assert "exactHudAnchor.hasBounds" in finite
+assert src.index("const R30HudEdgeAnchor exactHudAnchor =") < src.index("if (state.stageExtensionEyePlane)")
+assert src.count("R30GetExactHudEdgeAnchor(") == 2
+assert "inline bool RemapFiniteHudPixel(" in hdr
+assert "RemapFiniteHudPixel(" in smoke and "protectedX!=111.f" in smoke
+assert "stagePixel[0], stagePixel[1], x0, y0, width" not in finite
+print("PASS R84 exact source peripheral finite-eye HUD versus protected GOAL +TIME")

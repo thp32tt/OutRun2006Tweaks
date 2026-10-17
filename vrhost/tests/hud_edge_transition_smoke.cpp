@@ -91,6 +91,37 @@ int main()
        !Near(FullyVisibleWeight(10.f,10.f,10.f,10.f,-1.f,480.f),0.f) ||
        !Near(FullyVisibleWeight(10.f,10.f,10.f,10.f,640.f,0.f),0.f))
         return 10;
+
+    // Real R84 finite-eye ScreenHud must not return before the edge anchor.
+    // One source-space remap feeds both independent eye projections.
+    for (float aspect : {4.0f/3.0f,16.0f/9.0f,21.0f/9.0f})
+    {
+        const float w=768.f*aspect, h=768.f, scale=.55f;
+        const float anchorX=PeripheralAnchor(.70f,.82f);
+        const float anchorY=PeripheralAnchor(.70f,.78f);
+        const float boost=.90f/scale;
+        float x=-1.f,y=-1.f;
+        if (!RemapFiniteHudPixel(w*.85f,h*.15f,0.f,0.f,w,h,
+                scale,boost,anchorX,anchorY,x,y)) return 21;
+        const float nx=2.f*x/w-1.f,ny=1.f-2.f*y/h;
+        if (!Near(nx,.90f*.70f+.10f*anchorX,.0002f) ||
+            !Near(ny,.90f*.70f+.10f*anchorY,.0002f) ||
+            Near(nx,scale*.70f,.01f)) return 22;
+        float oppositeX=0.f,oppositeY=0.f;
+        if (!RemapFiniteHudPixel(w*.15f,h*.85f,0.f,0.f,w,h,
+                scale,boost,-anchorX,-anchorY,oppositeX,oppositeY) ||
+            !Near(2.f*oppositeX/w-1.f,-nx,.0002f) ||
+            !Near(1.f-2.f*oppositeY/h,-ny,.0002f)) return 23;
+    }
+    // No output from a malformed/offscreen producer is published.
+    float protectedX=111.f,protectedY=222.f;
+    if (RemapFiniteHudPixel(2.f,3.f,0.f,0.f,0.f,768.f,.55f,1.6f,.6f,.6f,
+            protectedX,protectedY) ||
+        RemapFiniteHudPixel(2.f,3.f,0.f,0.f,1024.f,768.f,nan,1.6f,.6f,.6f,
+            protectedX,protectedY) ||
+        RemapFiniteHudPixel(2.f,3.f,0.f,0.f,1024.f,768.f,.55f,1.6f,1.f,.6f,
+            protectedX,protectedY) ||
+        protectedX!=111.f || protectedY!=222.f) return 24;
     std::cout<<"DX9Ex gameplay HUD continuous anchor/zoom PASS\n";
     return 0;
 }
