@@ -2,13 +2,15 @@ name: outrun-c-original-english-crop
 
 services:
   c-english-original-crop:
+    # RETIRED: migrated into localization-recovery GitOps Portainer C slot.
+    profiles: ["retired-standalone-do-not-run"]
     image: outrun-c-english-ocr:20261017
     container_name: outrun-c-original-english-crop
     user: "1002:1002"  # N100 source/output owner; no root in container
     # Reuse N100's cached Pillow image; override all salvage entrypoints.
-    entrypoint: ["python3", "/app/loop.py"]
+    entrypoint: ["/bin/sh", "-c", "echo OUTRUN_C_GITOPS_ONLY_STANDALONE_RETIRED >&2; exit 64"]
     command: ["--interval-seconds", "60", "--max-per-cycle", "10"]
-    restart: unless-stopped
+    restart: "no"
     network_mode: none
     read_only: true
     cap_drop: [ALL]
