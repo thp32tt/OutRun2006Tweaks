@@ -1,6 +1,7 @@
 #include "../src/vr/d3d11/native_game_masked_draw.hpp"
 #include "../src/vr/d3d11/native_game_frame_batch.hpp"
 #include "../src/vr/d3d11/native_game_scissor_clip.hpp"
+#include "../src/vr/d3d11/native_game_offscreen_pass.hpp"
 #include <cassert>
 #include <cstdint>
 
@@ -70,7 +71,34 @@ constexpr bool missingShadowClippedSourceContinues() {
 }
 static_assert(missingShadowClippedSourceContinues());
 
+// Source-authored front/CCW KEEP states remain pixel-neutral even when the
+// source D3D9 write-mask is nonzero; a single REPLACE/INCR on either face
+// must never allow a skipped GPU stencil mutation.
+static_assert(GameNativeOffscreenPass::all_stencil_ops_keep(
+    1u, 1u, 1u, false, 0u, 0u, 0u));
+static_assert(GameNativeOffscreenPass::all_stencil_ops_keep(
+    1u, 1u, 1u, true, 1u, 1u, 1u));
+static_assert(!GameNativeOffscreenPass::all_stencil_ops_keep(
+    1u, 1u, 1u, true, 1u, 2u, 1u));
+static_assert(!GameNativeOffscreenPass::all_stencil_ops_keep(
+    1u, 3u, 1u, false, 1u, 1u, 1u));
+constexpr bool stencilReadOnlyGameDrawSequence() {
+    if (!GameNativeOffscreenPass::all_stencil_ops_keep(
+            1u, 1u, 1u, true, 1u, 1u, 1u)) return false;
+    GameNativeFrameBatch frame{};
+    // The first game menu Draw with front/CCW read-only stencil makes no
+    // color or Z writes; it is a SOURCE call, not a fabricated native Draw.
+    if (!frame.absorb_empty_source_draw(0u, true) ||
+        frame.publishable_full(true, 1u) ||
+        !frame.accepts_full_seeded(1u, true)) return false;
+    frame.succeeded(true);
+    frame.record_source_draw(1u); // genuine GPU native game DrawIndexed
+    return frame.publishable_full(true, 2u);
+}
+static_assert(stencilReadOnlyGameDrawSequence());
+
 int main() {
+    assert(stencilReadOnlyGameDrawSequence());
     assert(missingShadowClippedSourceContinues());
     assert(menuCarRaceSequence());
     assert(noClearCannotRescue());

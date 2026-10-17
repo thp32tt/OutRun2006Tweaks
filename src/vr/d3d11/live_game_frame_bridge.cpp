@@ -5020,7 +5020,9 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
     // both COM identities before absorbing the original source ordinal:
     // matching/unknown main Z must still abort native full-frame output.
     const bool depthWrites = zEnabled != D3DZB_FALSE && zWriteEnabled != FALSE;
-    const bool stencilWrites = stencilEnabled != FALSE && stencilWriteMask != 0u;
+    const bool stencilReadOnly = game_stencil_is_read_only(
+        game, stencilEnabled, stencilMaskKnown, stencilWriteMask);
+    const bool stencilWrites = stencilEnabled != FALSE && !stencilReadOnly;
     bool isolatedDepthWrite = false;
     if ((depthWrites && s.clearColor.mainDepthIdentity != 0u) ||
         (stencilWrites && s.clearColor.mainDepthIdentity != 0u)) {
@@ -5037,11 +5039,10 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
         targetIdentity.Get() != backbufferIdentity.Get(),
         GameNativeOffscreenPass::no_main_depth_write(
             zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE, isolatedDepthWrite),
-        (GameNativeOffscreenPass::no_main_stencil_write(
-            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask) ||
+        (stencilReadOnly ||
          GameNativeOffscreenPass::isolated_auxiliary_stencil_write(
-            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask,
-            isolatedDepthWrite)),
+             stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask,
+             isolatedDepthWrite)),
         noExtraRenderTargets, s.frameBatch.stopped);
     // The original D3D9 Draw has now changed the auxiliary Z surface. A
     // subsequent backbuffer depth Draw must rebind the seeded MAIN depth
@@ -5051,6 +5052,35 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
     if (isolated && stencilWrites && isolatedDepthWrite)
         s.clearColor.note_auxiliary_depth_write();
     return isolated;
+}
+
+// Read a real D3D9 stencil state, not a guessed draw-side flag. A nonzero
+// write mask with all front/CCW KEEP operations is still a pure stencil TEST.
+// This allows menu/vehicle/race no-output Draw ordinals to remain contiguous
+// without submitting an artificial D3D11 Draw or mutating the main Z/S.
+bool game_stencil_is_read_only(IDirect3DDevice9* game,
+                               DWORD enabled, bool maskKnown,
+                               DWORD writeMask) noexcept {
+    if (enabled == FALSE) return true;
+    if (!game || !maskKnown) return false;
+    if (writeMask == 0u) return true;
+    DWORD frontFail = 0u, frontZFail = 0u, frontPass = 0u;
+    DWORD twoSided = TRUE;
+    if (FAILED(game->GetRenderState(D3DRS_STENCILFAIL, &frontFail)) ||
+        FAILED(game->GetRenderState(D3DRS_STENCILZFAIL, &frontZFail)) ||
+        FAILED(game->GetRenderState(D3DRS_STENCILPASS, &frontPass)) ||
+        FAILED(game->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)) ||
+        (twoSided != FALSE && twoSided != TRUE))
+        return false;
+    DWORD backFail = 0u, backZFail = 0u, backPass = 0u;
+    if (twoSided == TRUE &&
+        (FAILED(game->GetRenderState(D3DRS_CCW_STENCILFAIL, &backFail)) ||
+         FAILED(game->GetRenderState(D3DRS_CCW_STENCILZFAIL, &backZFail)) ||
+         FAILED(game->GetRenderState(D3DRS_CCW_STENCILPASS, &backPass))))
+        return false;
+    return GameNativeOffscreenPass::all_stencil_ops_keep(
+        frontFail, frontZFail, frontPass, twoSided == TRUE,
+        backFail, backZFail, backPass);
 }
 
 // Preserve the complete game Draw/DrawIndexed source stream when a successful
@@ -5102,7 +5132,9 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
     if (!GameNativeOffscreenPass::no_main_stencil_write(
             stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask))
         return false;
-    const bool stencilWrites = stencilEnabled != FALSE && stencilWriteMask != 0u;
+    const bool stencilWrites = stencilEnabled != FALSE &&
+        !game_stencil_is_read_only(
+            game, stencilEnabled, stencilMaskKnown, stencilWriteMask);
     ComPtr<IDirect3DSurface9> target, backbuffer;
     ComPtr<IUnknown> targetIdentity, identity;
     D3DSURFACE_DESC targetDesc{}, backbufferDesc{};

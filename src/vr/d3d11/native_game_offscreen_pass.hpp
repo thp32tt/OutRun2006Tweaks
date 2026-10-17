@@ -48,6 +48,22 @@ struct GameNativeOffscreenPass {
         bool stencilEnabled, bool maskKnown, std::uint32_t writeMask) noexcept {
         return !stencilEnabled || (maskKnown && writeMask == 0u);
     }
+    // D3DSTENCILOP_KEEP is 1. Real menu/car/race stencil tests can be
+    // read-only despite a nonzero STENCILWRITEMASK when every enabled face
+    // leaves the value unchanged on fail, depth fail and pass. In D3D9
+    // two-sided mode the CCW operations MUST also be KEEP; front-only
+    // inspection would incorrectly drop later native game Draws.
+    [[nodiscard]] static constexpr bool all_stencil_ops_keep(
+        std::uint32_t frontFail, std::uint32_t frontZFail,
+        std::uint32_t frontPass, bool twoSided,
+        std::uint32_t backFail, std::uint32_t backZFail,
+        std::uint32_t backPass) noexcept {
+        constexpr std::uint32_t keep = 1u;
+        return frontFail == keep && frontZFail == keep &&
+            frontPass == keep &&
+            (!twoSided || (backFail == keep && backZFail == keep &&
+                           backPass == keep));
+    }
     // A bound auxiliary MRT writes no main color only if its own D3D9
     // COLORWRITEENABLEn mask was successfully read and is exactly zero.
     // Unlike Draw, Clear ignores COLORWRITEENABLEn and stays strict.
