@@ -7,6 +7,7 @@
 #include "vr/game/dds_alpha_mask_policy.hpp"
 #include "vr/game/dds_fast_loader_request.hpp"
 #include "vr/game/sprite_uv_transaction.hpp"
+#include "vr/game/sprite_queue_tail_proof.hpp"
 #include <fstream>
 #include <xxhash.h>
 #include <d3d9.h>
@@ -916,6 +917,38 @@ class TextureReplacement : public Hook
 	using VrSpriteTailSnapshot =
 		std::array<SpriteNode*, Game::SpritePriorityCount>;
 
+    // Direct put_sprite_ex / put_sprite_ex2 can also invoke a nested queue
+    // rebuild. Snapshot pointers are identities only, never dereferenceable
+    // evidence of a currently linked tail.
+    struct DirectTailFixture { DirectTailFixture* next_0 = nullptr; };
+    static constexpr bool TestDirectTailReachability() noexcept
+    {
+        DirectTailFixture root{}, old{}, first{}, last{}, detached{};
+        root.next_0 = &old;
+        old.next_0 = &first;
+        first.next_0 = &last;
+        using OutRunVR::SpriteQueue::FirstVerifiedAppendedNode;
+        if (FirstVerifiedAppendedNode(&root, &old, &last, 3) != &first ||
+            FirstVerifiedAppendedNode(&root, &old, &last, 2) != nullptr ||
+            FirstVerifiedAppendedNode(&root, &old, &old, 3) != nullptr ||
+            FirstVerifiedAppendedNode(&root, &detached, &last, 3) != nullptr)
+            return false;
+        // A nested producer discards the old chain or reuses its old tail.
+        root.next_0 = &first;
+        if (FirstVerifiedAppendedNode(&root, &old, &last, 3) != nullptr ||
+            FirstVerifiedAppendedNode(&root, &last, &last, 3) != nullptr)
+            return false;
+        // A priority that was empty when captured uses the root sentinel.
+        if (FirstVerifiedAppendedNode(&root, &root, &last, 3) != &first)
+            return false;
+        // The bounded walk may not cross a cycle or an unrelated new tail.
+        first.next_0 = &first;
+        return FirstVerifiedAppendedNode(&root, &old, &last, 3) == nullptr &&
+               FirstVerifiedAppendedNode(&root, &root, &last, 1) == nullptr;
+    }
+    static_assert(TestDirectTailReachability(),
+        "Direct sprite tagging must prove live queue reachability before tagging");
+
 	static VrSpriteTailSnapshot SnapshotVrSpriteTails()
 	{
 		VrSpriteTailSnapshot before{};
@@ -976,8 +1009,12 @@ class TextureReplacement : public Hook
 			if (!root || !tailAfter || tailAfter == before[prio])
 				continue;
 
-			SpriteNode* node = before[prio]
-				? before[prio]->next_0 : root->next_0;
+			// Unlike a captured tail pointer, the root is a live traversal
+			// boundary. Do not read oldTail->next_0 after producer execution.
+			// This deliberately leaves rebuilt/unknown queues untagged instead
+			// of misclassifying an unrelated node as HUD or WorldBillboard.
+			SpriteNode* node = OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
+				root, before[prio], tailAfter, Game::SpriteNodeMax);
 			for (unsigned guard = 0;
 				node && guard < Game::SpriteNodeMax; ++guard)
 			{

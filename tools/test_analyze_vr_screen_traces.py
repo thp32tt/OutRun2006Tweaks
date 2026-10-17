@@ -29,5 +29,31 @@ with tempfile.TemporaryDirectory() as d:
  assert data['families']['RANK_6TH_OF_6']['status']=='OBSERVED_NEEDS_QUEST3_OPTICAL_VALIDATION'
  assert data['families']['PAUSE_OPTION_ARROW']['status']=='NOT_OBSERVED'
  assert data['families']['STAGE_PLUS_TIME']['hud_source_rows']==1
+ assert data['families']['STAGE_PLUS_TIME']['source_site_coverage']['status']=='PARTIAL_CAPTURE_NOT_RUNTIME_FAILURE'
+ assert len(data['families']['STAGE_PLUS_TIME']['source_site_coverage']['not_captured_call_rvas'])==5
  assert data['known_gaps']['f11'].startswith('Separate host')
- print('PASS aggregate screen diagnostics, named producers, unknown/eye flags, NOT_OBSERVED, HUD crosswalk')
+ # A native GPU failure without an R33 eye-specific failure was invisible
+ # to the previous analyzer. It must be investigated, not optical-validated.
+ native=root/'only_native'
+ native.mkdir()
+ (native/'OutRun2006Tweaks.log').write_text(
+  'VR R84 DRAW TRACE 5s: family=WORLD total=5 ok=3 fail=2 '
+  'eyes[both=0,failed=0,unverified=5] source[queued=0,unknown=0,badQueue=0]\\n')
+ native_result=t.analyze(native)
+ assert native_result['families']['WORLD']['status']=='INVESTIGATE'
+ assert 'NATIVE_DRAW_FAILED' in native_result['families']['WORLD']['flags']
+ # The original +TIME producer can execute even if its physical-family
+ # counters are absent: that is missing attribution, NOT a stereo failure.
+ source=root/'source_only'
+ source.mkdir()
+ with (source/'OutRun2006Tweaks-hudtrace.csv').open('w',newline='') as f:
+  w=csv.DictWriter(f,fieldnames=['call_rva','event','semantic'])
+  w.writeheader()
+  for rva in ['0x9898E','0x98A36','0x98AC6','0x989AD','0x98A10','0x98A89']:
+   w.writerow({'call_rva':rva,'event':'sprite','semantic':'STAGE'})
+ source_result=t.analyze(source)
+ assert source_result['families']['STAGE_PLUS_TIME']['status']=='SOURCE_ONLY_GPU_NOT_ATTRIBUTED'
+ assert source_result['families']['STAGE_PLUS_TIME']['source_site_coverage']['status']=='ALL_KNOWN_SITES_CAPTURED'
+ assert not source_result['families']['STAGE_PLUS_TIME']['source_site_coverage']['not_captured_call_rvas']
+ assert source_result['families']['WORLD']['status']=='NOT_OBSERVED'
+ print('PASS native GPU failure, queue provenance, six +TIME callsites, source-only/no-eye attribution')

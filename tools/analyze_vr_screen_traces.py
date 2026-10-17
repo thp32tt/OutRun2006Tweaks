@@ -79,6 +79,7 @@ def parse_original_hud(csvs):
     result=collections.defaultdict(collections.Counter)
     samples=collections.defaultdict(list)
     invalid=0
+    observed_sites=collections.defaultdict(set)
     for path in csvs:
         with path.open("r",encoding="utf-8-sig",errors="replace",newline="") as f:
             for row in csv.DictReader(f):
@@ -98,22 +99,25 @@ def parse_original_hud(csvs):
                     else:labels=["OTHER_CALLS"]
                 for label in labels:
                     result[label]["observed_rows"]+=1
+                    if label in RVA_GROUPS:
+                        observed_sites[label].add(value)
                     if len(samples[label])<12:
                         samples[label].append({"call_rva":row.get("call_rva"),
                             "event":row.get("event"),"semantic":row.get("semantic"),
                             "mode":row.get("mode"),"stage":row.get("stage"),
                             "arg0":row.get("arg0")})
-    return result,samples,invalid
+    return result,samples,invalid,observed_sites
 
 def analyze(root: Path):
     logs,csvs=collect_files(root)
     counters,windows,meta=parse_logs(logs)
-    hud,hud_samples,invalid=parse_original_hud(csvs)
+    hud,hud_samples,invalid,observed_sites=parse_original_hud(csvs)
     families={}
     for family in FAMILIES:
         nums=dict(counters[family])
         count=windows[family]
         flags=[]
+        if nums.get("fail",0):flags.append("NATIVE_DRAW_FAILED")
         if nums.get("failed",0):flags.append("R33_EYE_OR_RESTORE_FAILED")
         if nums.get("badQueue",0):flags.append("QUEUE_IDENTITY_INCOMPLETE")
         if nums.get("none",0):flags.append("DRAW_ROUTE_UNCLASSIFIED")
@@ -122,13 +126,27 @@ def analyze(root: Path):
             flags.append("ORIGINAL_OR_FALLBACK_REVIEW_NOT_AUTOMATIC_BUG")
         if nums.get("unknown",0):flags.append("SOURCE_TOKEN_NOT_PROVEN")
         if count==0:
-            status="NOT_OBSERVED"   # not PASS and not implicitly broken
-        elif any(x in flags for x in ("R33_EYE_OR_RESTORE_FAILED",
+            status=("SOURCE_ONLY_GPU_NOT_ATTRIBUTED" if hud[family]["observed_rows"]
+                    else "NOT_OBSERVED")
+        elif any(x in flags for x in ("NATIVE_DRAW_FAILED",
+                                     "R33_EYE_OR_RESTORE_FAILED",
                                      "QUEUE_IDENTITY_INCOMPLETE")):
             status="INVESTIGATE"
         else:
             status="OBSERVED_NEEDS_QUEST3_OPTICAL_VALIDATION"
+        # A source callsite observed in a HUD CSV is not proof that the
+        # physical R84 family routed to both eyes. A missing callsite may
+        # simply mean the player did not visit that stage/animation branch.
+        expected=RVA_GROUPS.get(family,set())
+        seen=observed_sites.get(family,set())
+        coverage={"status":("NOT_CAPTURED" if not seen else
+                             "ALL_KNOWN_SITES_CAPTURED" if expected <= seen else
+                             "PARTIAL_CAPTURE_NOT_RUNTIME_FAILURE"),
+                  "expected_call_rvas":[f"0x{r:X}" for r in sorted(expected)],
+                  "observed_call_rvas":[f"0x{r:X}" for r in sorted(seen)],
+                  "not_captured_call_rvas":[f"0x{r:X}" for r in sorted(expected-seen)]}
         families[family]={"status":status,"windows":count,"counters":nums,
+                          "source_site_coverage":coverage,
                           "last_owner":meta.get(family,{}),
                           "hud_source_rows":hud[family]["observed_rows"],
                           "example_callers":hud_samples.get(family,[]),
@@ -138,6 +156,7 @@ def analyze(root: Path):
     return {
         "schema":1,
         "interpretation":"static producer CSV and 5s GPU counters are not a one-to-one per-draw chain",
+        "mixed_log_warning":("MULTIPLE_LOG_FILES_NOT_A_SINGLE_PROVEN_SESSION" if len(logs)>1 else None),
         "runtime_validation":"UNTESTED unless matching Quest3/HMD evidence is provided",
         "input_logs":[str(p) for p in logs],"input_hud_csv":[str(p) for p in csvs],
         "invalid_hud_call_rows":invalid,
@@ -148,7 +167,8 @@ def analyze(root: Path):
            "f11":"Separate host/ImGui UI; in-game D3D9 Draw capture cannot prove host overlay",
            "lens_outer":"CABE PROJECTED_SCREEN_EFFECT is still a candidate, not an exact source",
            "openxr":"Compositor eye visibility needs host matching-frame evidence",
-           "unvisited_scenes":"NOT_OBSERVED is never a PASS or a failure",
+           "unvisited_scenes":"NOT_OBSERVED/NOT_CAPTURED is never a PASS or failure",
+           "source_only":"CSV caller does not prove a GPU family or left/right submission",
            "identity":"5s aggregate not exact source_serial->GPU draw lifetime, requires detailed bounded events",
         },
     }
