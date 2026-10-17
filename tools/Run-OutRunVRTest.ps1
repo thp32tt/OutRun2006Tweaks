@@ -5,6 +5,7 @@ param(
     [ValidateSet('OFF','ON')]
     [string]$GpuDiagnostics = 'OFF',
     [ValidateSet('DEFAULT','1.00','1.15','1.30')][string]$CockpitVehicleScale = 'DEFAULT',
+    [ValidateSet('DEFAULT','NATIVE','CAR')][string]$CockpitCameraBasis = 'DEFAULT',
     [ValidateSet('DEFAULT','0.20','0.30','0.50','0.80')][string]$CockpitGlassProbeOpacity = 'DEFAULT',
     [ValidateSet('DEFAULT','ON','OFF')][string]$GpuLabTransparency = 'DEFAULT',
     [ValidateSet('DEFAULT','512','1024')][string]$GpuLabReflection = 'DEFAULT',
@@ -148,6 +149,26 @@ if($backend -eq 'd3d9'){
     }
 }
 
+# Quest3 2026-10-17: transient car matrix_B0 eligibility can alternate
+# between car-space and native-camera basis, causing severe zoom/seat jumps.
+# Use ONE uninterrupted native-camera basis for all normal cockpit probes.
+# Explicit CAR is retained for developer-only side-by-side investigation.
+if($CockpitCameraBasis -ne 'DEFAULT' -and
+   ($backend -ne 'd3d9' -or $TestProfile -ne 'COCKPIT_PARTICLES')){
+    throw 'Cockpit camera basis override requires DX9Ex COCKPIT_PARTICLES.'
+}
+$cockpitEffectiveBasis='DEFAULT'
+if($backend -eq 'd3d9' -and $TestProfile -eq 'COCKPIT_PARTICLES'){
+    $cockpitEffectiveBasis=if($CockpitCameraBasis -eq 'CAR'){'CAR'}else{'NATIVE'}
+    $gameArgs=@($gameArgs|Where-Object{$_ -notmatch '^-DriverSeatCarSpaceBasis='})
+    $cameraBasisArg=if($cockpitEffectiveBasis -eq 'CAR'){
+        '-DriverSeatCarSpaceBasis=true'
+    }else{
+        '-DriverSeatCarSpaceBasis=false'
+    }
+    $gameArgs+=$cameraBasisArg
+}
+
 # A/B/C cockpit presets are runtime settings, never original EXE/PMT edits.
 # Each session records the exact choice; glass opacity is diagnostic only until
 # the real PC windshield material has been positively identified.
@@ -230,6 +251,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "profile=$TestProfile"
     "gpuDiagnostics=$GpuDiagnostics"
     "cockpitVehicleScale=$CockpitVehicleScale"
+    "cockpitCameraBasis=$cockpitEffectiveBasis"
     "cockpitGlassProbeOpacity=$CockpitGlassProbeOpacity"
     "cockpitGlassActualTransparency=NOT_IMPLEMENTED"
     "gpuLabTransparency=$GpuLabTransparency"
