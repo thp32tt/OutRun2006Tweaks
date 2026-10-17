@@ -17,6 +17,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
+#include "vr/game/render_semantics.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "vr/state/state_block_tracker.hpp"
