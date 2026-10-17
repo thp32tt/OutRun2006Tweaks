@@ -828,19 +828,35 @@ static void render_first_run_intro()
 		? ImVec2(content.x + content.width * 0.5f,
 			content.y + content.height * 0.5f)
 		: ImVec2(display.x * 0.5f, display.y * 0.5f);
-	const float popupWidth = vrModal
-		? (std::min)(384.0f * Overlay::GlobalFontScale * density,
-			usableWidth)
-		: 384.0f * Overlay::GlobalFontScale;
-	const float popupHeight = vrModal
-		? (std::min)(700.0f * density * modalFontFactor, usableHeight) : 0.0f;
+	const auto modalFit = OutRunF11ResponsiveFit::ComputeFirstRunModal(
+		content.width, content.height, Overlay::GlobalFontScale,
+		Overlay::VrFontMultiplier);
+	const bool useVrModalFit = vrModal && modalFit.valid;
+	const float popupWidth = useVrModalFit
+		? modalFit.width : 384.0f * Overlay::GlobalFontScale;
+	const float popupHeight = useVrModalFit ? modalFit.height : 0.0f;
 	ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));
 
 	if (!ImGui::BeginPopupModal(Title, nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
 		return;
 
-	// 0 wraps at the window's right edge.
+	if (useVrModalFit)
+	{
+		// Unlike the main shell, this popup does not inherit its per-window
+		// font fit. Adjust glyph and hitbox metrics before laying out controls.
+		ImGui::SetWindowFontScale(modalFit.fontScale);
+		const float footerReserve = ImGui::GetFrameHeightWithSpacing() +
+			ImGui::GetStyle().ItemSpacing.y;
+		const float bodyHeight = (std::max)(1.0f,
+			ImGui::GetContentRegionAvail().y - footerReserve);
+		// Keep long help/slider content scrollable independently of the always
+		// visible 'Let's go' action, including Quest gamepad-only navigation.
+		ImGui::BeginChild("##vr_first_run_scroll", ImVec2(0.f, bodyHeight),
+			false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+	}
+
+	// 0 wraps at the current (XR child or desktop popup) window's right edge.
 	ImGui::PushTextWrapPos(0.0f);
 
 	ImGui::SeparatorText("Welcome to the OutRun2006Tweaks overlay!");
@@ -913,6 +929,8 @@ static void render_first_run_intro()
 	ImGui::TextDisabled("- emoose");
 
 	ImGui::PopTextWrapPos();
+	if (useVrModalFit)
+		ImGui::EndChild();
 
 	ImGui::Spacing();
 	ImGui::Separator();

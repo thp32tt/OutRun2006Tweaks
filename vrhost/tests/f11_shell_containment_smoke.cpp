@@ -47,5 +47,26 @@ int main()
             true, false, true, true, false, false) ||
         !OutRunF11Input::ShouldForwardToImGui(
             false, false, true, false, false)) return 8;
+    // First-run VR popup and footer: live Quest3, low-res mirror, invalid
+    // Reset frames and desktop-equivalent font density.
+    const auto xrModal=OutRunF11ResponsiveFit::ComputeFirstRunModal(
+        3440.f,1440.f,2.f,2.75f);
+    if (!xrModal.valid || xrModal.width!=2112.f ||
+        xrModal.height!=1296.f || xrModal.fontScale!=1.f) return 9;
+    const auto mirrorModal=OutRunF11ResponsiveFit::ComputeFirstRunModal(
+        1280.f,720.f,4.f,3.f);
+    if (!mirrorModal.valid || mirrorModal.width>1152.f ||
+        mirrorModal.height>648.f || mirrorModal.fontScale>=1.f ||
+        mirrorModal.fontScale<0.25f) return 10;
+    const auto badModal=OutRunF11ResponsiveFit::ComputeFirstRunModal(
+        1920.f,1080.f,std::numeric_limits<float>::quiet_NaN(),2.f);
+    if (badModal.valid ||
+        OutRunF11ResponsiveFit::ComputeFirstRunModal(0.f,1080.f,2.f,2.f).valid ||
+        OutRunF11ResponsiveFit::ComputeFirstRunModal(1920.f,1080.f,2.f,0.f).valid)
+        return 11;
+    const auto nativeModal=OutRunF11ResponsiveFit::ComputeFirstRunModal(
+        1920.f,1080.f,2.f,1.f);
+    if (!nativeModal.valid || nativeModal.width!=768.f ||
+        nativeModal.height!=700.f || nativeModal.fontScale!=1.f) return 12;
     return 0;
 }

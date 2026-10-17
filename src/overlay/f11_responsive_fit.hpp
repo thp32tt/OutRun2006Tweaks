@@ -50,6 +50,45 @@ namespace OutRunF11ResponsiveFit
             width != observed.width || height != observed.height};
     }
 
+    // VR first-run guidance is a different ImGui window from the F11 shell.
+    // Keep the already rasterized XR-density font and fit its window scale,
+    // preserving both a scrollable help body and a fixed confirmation footer.
+    struct ModalLayout
+    {
+        float width = 0.f;
+        float height = 0.f;
+        float fontScale = 1.f;
+        bool valid = false;
+    };
+
+    inline ModalLayout ComputeFirstRunModal(float viewportWidth,
+        float viewportHeight, float requestedFontScale,
+        float requestedEyeDensity) noexcept
+    {
+        if (!std::isfinite(viewportWidth) || !std::isfinite(viewportHeight) ||
+            !std::isfinite(requestedFontScale) || !std::isfinite(requestedEyeDensity) ||
+            viewportWidth <= 0.f || viewportHeight <= 0.f ||
+            requestedFontScale <= 0.f || requestedEyeDensity <= 0.f)
+            return {};
+
+        const float userScale = std::clamp(requestedFontScale, 0.5f, 5.f);
+        const float eyeDensity = std::clamp(requestedEyeDensity, 1.f, 3.f);
+        const float uiFactor = std::clamp(userScale / 2.f, 0.5f, 2.5f);
+        const float desiredWidth = 384.f * userScale * eyeDensity;
+        const float desiredHeight = 700.f * eyeDensity * uiFactor;
+        const float width = (std::min)(desiredWidth, viewportWidth * 0.90f);
+        const float height = (std::min)(desiredHeight, viewportHeight * 0.90f);
+        // Seven glyph-height rows keep title, slider and fixed button usable;
+        // the full guide must scroll rather than shrinking the font to fit.
+        const float glyphHeight = 13.f * userScale * eyeDensity;
+        const float fit = (std::min)({1.f, width / desiredWidth,
+            height / (7.f * glyphHeight)});
+        if (!std::isfinite(width) || !std::isfinite(height) ||
+            !std::isfinite(fit) || width <= 0.f || height <= 0.f)
+            return {};
+        return {width, height, std::clamp(fit, 0.25f, 1.f), true};
+    }
+
     inline Budget Compute(float availableWidth, float availableHeight,
         float requestedDensity) noexcept
     {
