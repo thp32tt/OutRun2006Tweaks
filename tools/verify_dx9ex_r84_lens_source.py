@@ -191,15 +191,18 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "const bool exactCentreEye =",
         "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;",
         "const auto centreBeforeLeft = exactCentreEye",
-        "if (exactCentreEye &&",
+        "const bool centreSourceChanged = exactCentreEye &&",
         "OutRunVR::LensCentre::SameStereoDrawSource(",
-        "captureCentreSource()))",
+        "captureCentreSource());",
+        "if (centreSourceChanged || shadowSourceChanged)",
     ):
         assert marker in physical, "C993 binocular source fence missing: " + marker
     left_draw = physical.index("R32ReviewOwnedResult result{ true, actualDraw() };")
-    after_left = physical.index("if (exactCentreEye &&")
+    after_left = physical.index("if (centreSourceChanged || shadowSourceChanged)")
     right_eye = physical.index("IDirect3DSurface9* rightEye =")
     assert left_draw < after_left < right_eye
+    assert physical.index("const bool centreSourceChanged = exactCentreEye &&") < after_left
+    assert physical.index("OutRunVR::LensCentre::SameStereoDrawSource(") < after_left
     fenced = physical[after_left:physical.index(
         "IDirect3DSurface9* savedRt", after_left)]
     for marker in (
