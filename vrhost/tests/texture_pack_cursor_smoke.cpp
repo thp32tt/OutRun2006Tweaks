@@ -17,6 +17,36 @@
 int main()
 {
     using OutRunVR::TexturePacks::Cursor;
+    using OutRunVR::TexturePacks::SessionPadFamily;
+    constexpr int none = -1, pc = 0, xbox = 1, playstation = 2;
+
+    // First-known-family decisions must protect complete replacement packs:
+    // None is undecided; PC is a genuine family without an extra directory.
+    SessionPadFamily desktop;
+    desktop.Observe(none, none, none);
+    CHECK(!desktop.Locked());
+    desktop.Observe(pc, none, none);
+    CHECK(desktop.Locked() && desktop.Type() == pc);
+    desktop.Observe(xbox, none, none); // reconnect after PC input
+    desktop.Observe(playstation, xbox, none);
+    CHECK(desktop.Type() == pc);
+
+    SessionPadFamily console;
+    console.Observe(none, none, none);
+    console.Observe(xbox, none, none);
+    console.Observe(pc, none, none);
+    CHECK(console.Locked() && console.Type() == xbox);
+
+    SessionPadFamily forced;
+    forced.Observe(xbox, playstation, none);
+    CHECK(forced.Locked() && forced.Type() == playstation);
+    forced.Observe(pc, pc, none);
+    CHECK(forced.Type() == playstation);
+    SessionPadFamily delayed;
+    delayed.Observe(none, none, none);
+    delayed.Observe(playstation, pc, none);
+    CHECK(delayed.Locked() && delayed.Type() == pc);
+
     Cursor ui;
     char mutableName[32] = "spr_selector.xst";
     CHECK(ui.Select(mutableName, 3));

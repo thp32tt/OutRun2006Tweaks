@@ -17,6 +17,30 @@ namespace OutRunVR::TexturePacks
     static_assert(!SameSource("selector.xst", 3, "selector.xst", 4));
     static_assert(!SameSource("selector.xst", 3, "car.xst", 3));
 
+    // Freeze the first known gamepad family for the entire texture session.
+    // PC has no pad subdirectory but is still a real selection. If that
+    // initial selection is not latched, later hot-plugging Xbox/PS can load
+    // half the UI replacement sprites from a different family.
+    class SessionPadFamily final
+    {
+        int selected_ = 0;
+        bool locked_ = false;
+    public:
+        constexpr void Observe(int current, int forced, int none) noexcept
+        {
+            if (locked_)
+                return;
+            const int candidate = forced != none ? forced : current;
+            if (candidate != none)
+            {
+                selected_ = candidate;
+                locked_ = true;
+            }
+        }
+        constexpr bool Locked() const noexcept { return locked_; }
+        constexpr int Type() const noexcept { return selected_; }
+    };
+
     // UI xstset and scene xmtset each own a Cursor. Reentering the same pack
     // continues its indexed DDS sequence; new path/slot restarts at zero.
     // The scene caller passes a constant slot because its XmtIndex denotes

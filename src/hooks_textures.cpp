@@ -1097,6 +1097,7 @@ class TextureReplacement : public Hook
 		}
 	};
 
+	inline static OutRunVR::TexturePacks::SessionPadFamily padFamily{};
 	inline static const char* padType = nullptr;
 
 	static void HandleTexture(
@@ -1130,15 +1131,15 @@ class TextureReplacement : public Hook
 		bool usePadDirectory = false;
 		if (isUITexture && (hash == 0x455717B2 || hash == 0x1F77CB88 || hash == 0xFA7BBB13 || hash == 0x39229D64 || hash == 0xACF61D7C || hash == 0x31C58963)) [[unlikely]]
 		{
-			// TODO: switching textures during gameplay (eg. from Xbox -> PC due to controller disconnect) will cause corruption ;_;
-			// instead we'll have to track the first pad-type we switched to, and always use that for the session
-			if (padType == nullptr && (Game::CurrentPadType != Game::GamepadType::None || Game::ForcedPadType != Game::GamepadType::None))
-			{
-				auto type = (Game::ForcedPadType != Game::GamepadType::None) ? Game::ForcedPadType : Game::CurrentPadType;
-				if (type != Game::GamepadType::PC)
-					padType = Game::PadTypes[int(type)];
-			}
-
+			// Lock the first known family, including PC (no subdirectory).
+			// A later hot-plug or changed forced pad cannot mix DDS variants
+			// already loaded by the original car selector/menu.
+			padFamily.Observe(static_cast<int>(Game::CurrentPadType),
+				static_cast<int>(Game::ForcedPadType),
+				static_cast<int>(Game::GamepadType::None));
+			if (padFamily.Locked() &&
+				padFamily.Type() != static_cast<int>(Game::GamepadType::PC))
+				padType = Game::PadTypes[padFamily.Type()];
 			usePadDirectory = padType != nullptr;
 		}
 
