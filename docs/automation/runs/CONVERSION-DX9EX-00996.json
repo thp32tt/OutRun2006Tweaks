@@ -67,26 +67,81 @@
     ]
   },
   "acceptance_results": {
-    "stage_r33_shader_direct_queued": "PENDING_WINDOWS_CI",
-    "stage_r33_native_reentry_fallback": "PENDING_WINDOWS_CI",
-    "stage_r33_exact_sha_integration": "PENDING_EXACT_SHA"
+    "stage_r33_shader_direct_queued": "PASS_EXACT_SHA",
+    "stage_r33_native_reentry_fallback": "PASS_EXACT_SHA",
+    "stage_r33_exact_sha_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R84 R33TryHud shader/c64 path captures GOAL source and excludes StageExtensionTime, while +TIME's same physical transaction exists only in R30 fixedfn/XYZRHW path.",
     "existing_feature": "CONVERSION-DX9EX-00994 R30 +TIME shader route excluded by its feature scope; same feature_id reused, no duplicate score for earlier outcome.",
     "ci_policy_failure": "Exact material SHA 19914a652e6ad9ff5505889e4e169aa9d76af195 Active policy step failed: stale three-source literal in R84 lens verifier after adding distinct +TIME fourth physical source; C++ compilation not attempted on this SHA.",
-    "ci_repair": "Update original verifier to require four-source final guard, independent StageExtension physical source and negative mutations that delete just +TIME or GOAL fencing. Preserve lens/C993 and GOAL mutations, no test disabled."
+    "ci_repair": "Update original verifier to require four-source final guard, independent StageExtension physical source and negative mutations that delete just +TIME or GOAL fencing. Preserve lens/C993 and GOAL mutations, no test disabled.",
+    "original_evidence": "At exact pre-implementation branch SHA 0fc9e695d36bbc546ceff03ab798be1ed65bab91, the R84 R33 shader/c64 GPU-eye path guarded original GOAL but explicitly excluded StageExtensionTime, while independent R30 XYZRHW covered StageExtensionTime.",
+    "source_trace": [
+      "Six original stage extension E8 parents tag the direct numeric glyph and queued sprites as StageExtensionTime ScreenHud.",
+      "Game D3DX batch selection and SpriteQueue preserve direct or queued source identity to the physical R84 R33 shader/c64 native GPU draw.",
+      "R33 captures source, queue node/epoch, latched pose, top-level native Draw serial and shader identity/epoch on the original left Draw.",
+      "Immediately after left and before right-eye GPU submission, the new fence rejects any mutated +TIME producer and rolls original c64 back without resubmitting left."
+    ],
+    "alternatives_rejected": [
+      "Do not broaden all ScreenHud/generic overlay ownership, force D3DX Flush on all Draws, change the game's stage timer, or reproduce the already-verified R30 fixed-function fence."
+    ],
+    "eye_ownership": "Both shader/c64 GPU-eye Draws must share the unchanged same exact StageExtensionTime provenance; changed source after native left invalidates the right eye/stereo frame while keeping the original left HRESULT and restoring c64.",
+    "fix_evidence": "C++ R33 stage source pre-left capture/validity and post-left SameAfterNativeLeft gate are in material SHA 19914a652e6ad9ff5505889e4e169aa9d76af195, with identical source in validation-bearing SHA fc84505c07f3b71f4d730ecc834ec3beb266d9b5.",
+    "negative_test_evidence": "vrhost/tests/stage_extension_eye_plane_smoke.cpp exercises positive direct/queued stage sources and native callback mutations to node, queue epoch, producer, pose epoch, shader/epoch and draw serial; DX9Ex Active host smoke completed SUCCESS on exact SHA. tools/verify_dx9ex_r84_lens_source.py has destructive tests for removing stage, GOAL and C993 GPU-eye fences; Active policy SUCCESS."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA: GitHub CI SUCCESS at exact validation-bearing SHA fc84505c07f3b71f4d730ecc834ec3beb266d9b5 (user-confirmed); preserve original material SHA and acceptance records, no source or CI rerun, no duplicate score. Quest3/VDXR HMD runtime remains NEED_HMD_TEST.",
+  "next_action": "C6 completion on exact GitHub Actions SUCCESS SHA; Quest3/VDXR same-SHA stereo optical and +TIME behavior remains NEED_HMD_TEST. Do not score C6/retry again or re-run identical CI.",
   "local_validation": {
-    "status": "GITHUB_CI_SUCCESS_USER_CONFIRMED",
+    "status": "CAUSE_REPAIRED_AND_EXACT_SHA_GATES_SUCCESS",
     "failed_validation_sha": "19914a652e6ad9ff5505889e4e169aa9d76af195",
     "workflow_id": 39004599517,
     "failed_step": "verify_dx9ex_r84_lens_source.py",
     "actual_error": "AssertionError: C993/GOAL composite source fence missing",
-    "new_windows_ci": "SUCCESS_EXACT_SHA",
+    "new_windows_ci": "PASS_EXACT_SHA",
     "exact_validation_sha": "fc84505c07f3b71f4d730ecc834ec3beb266d9b5",
-    "hmd_runtime": "UNTESTED"
+    "hmd_runtime": "UNTESTED",
+    "validation_bearing_result_sha": "fc84505c07f3b71f4d730ecc834ec3beb266d9b5"
+  },
+  "ci_evidence": {
+    "exact_validation_sha": "fc84505c07f3b71f4d730ecc834ec3beb266d9b5",
+    "gate_results": [
+      {
+        "workflow": "DX9Ex Active Validation",
+        "run_id": 39004726426,
+        "result": "SUCCESS",
+        "jobs": [
+          "policy",
+          "host",
+          "game",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      {
+        "workflow": "Domain Isolation Guard",
+        "run_id": 39004726441,
+        "result": "SUCCESS"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "run_id": 39004726423,
+        "result": "SUCCESS"
+      },
+      {
+        "workflow": "DX9Ex Full Source Impact Review",
+        "run_id": 39004726428,
+        "result": "SUCCESS",
+        "jobs": [
+          "source-cross-domain",
+          "msvc-analyze-openxr-host",
+          "msvc-analyze-active-game"
+        ]
+      }
+    ],
+    "nonrequired_skipped": [
+      "VR PC Fast Test Build",
+      "VR Evening Unified Test Build"
+    ]
   }
 }
