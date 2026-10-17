@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "hud_game_extent_binocular_layout": "PENDING_CI",
-    "hud_fallback_world_semantic_isolation": "PENDING_CI",
-    "hud_r84_required_exact_sha_gates": "PENDING_CI"
+    "hud_game_extent_binocular_layout": "PASS_BUILD",
+    "hud_fallback_world_semantic_isolation": "PASS_BUILD",
+    "hud_r84_required_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "R84 stage finite-HUD originally sourced 2D pixels from game screen_resolution only for +TIME and GOAL; source-owned ordinary native and queued gameplay HUD decoded 2D positions and peripheral anchoring against the physically different XR render target extent, leading to mispositioned/mis-sized HUD groups when source and eye resolutions differed.",
@@ -104,8 +104,39 @@
         "status": "in_progress_at_initial_recovery"
       }
     },
-    "next_exact_sha": "ac9f5a0fdd79de0d60e89f6737564549db02c7a6"
+    "next_exact_sha": "ac9f5a0fdd79de0d60e89f6737564549db02c7a6",
+    "final_exact_sha": {
+      "head_sha": "ac9f5a0fdd79de0d60e89f6737564549db02c7a6",
+      "dx9ex_active": {
+        "run_id": 39015267089,
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "full-chain-compile",
+          "game",
+          "host",
+          "package"
+        ]
+      },
+      "domain_isolation": {
+        "run_id": 39015267075,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39015267087,
+        "conclusion": "success"
+      },
+      "full_source_impact": {
+        "run_id": 39015267091,
+        "conclusion": "success",
+        "jobs": [
+          "msvc-analyze-active-game",
+          "msvc-analyze-openxr-host",
+          "source-cross-domain"
+        ]
+      }
+    }
   },
   "score_delta_this_attempt": 0,
-  "next_action": "C6 PASS_EXACT_SHA recorded for the user-confirmed successful GitHub CI on the exact validation-bearing SHA; physical Quest3/VDXR HMD validation remains UNTESTED. No source changes, CI reruns or duplicate scoring."
+  "next_action": "C6 PASS_EXACT_SHA reflects all four independently verified exact-SHA GitHub workflow runs and required policy/game/host/package jobs. Quest3/VDXR HMD and measured performance remain UNTESTED; no CI rerun, source changes or duplicate C6 score."
 }
