@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "feature_id": "DX9EX:BLOCKER:SKYGLOW_MIDFRAME_TOGGLE",
   "feature_class": "CRITICAL_BLOCKER",
   "material_result_sha": "c5f528892c0556799ce622ea258d66e85ea4fe9c",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "00d74ca432c3dcd37cb0e3ba09101eea182b9d0e",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -55,9 +55,9 @@
     ]
   },
   "acceptance_results": {
-    "toggle_screen_boundary": "PENDING_CI",
-    "clean_eye_fallback": "PENDING_CI",
-    "exact_sha_ci": "PENDING_CI"
+    "toggle_screen_boundary": "PASS_EXACT_SHA",
+    "clean_eye_fallback": "PASS_EXACT_SHA",
+    "exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R30CaptureSkyGlowSceneBeforeHud original source checked SkyGlowFactor and R30GameGlowActive before recording the screen epoch, while R30ApplyStereoSkyGlow supports post-screen fallback when no boundary is recorded.",
@@ -74,30 +74,42 @@
     ],
     "fix_evidence": "Material renderer change at c5f52889 moves screen-epoch stamp before glow setting and game flag checks; mutation contract in existing source guard asserts stamping order and clean-eye fallback.",
     "eye_ownership": "The pre-HUD capture source remains two independent per-eye reduced textures. Without both clean sources, either eye cannot use a later HUD-painted backbuffer as bloom input.",
-    "evidence_limit": "Source-owned OFF-to-ON within-Present case only; no claim to repair other sky WVP/headlock defects; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
+    "evidence_limit": "Source-owned OFF-to-ON within-Present case only; no claim to repair other sky WVP/headlock defects; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED.",
+    "negative_test_evidence": "R30 SkyGlow 29 destructive source mutations including missing first-screen boundary and stale resource-epoch guard; hotpath regression guard, dense-scene performance and R26/R84 source-isolation tests pass on exact CI SHA."
   },
   "ci_evidence": {
-    "first_sha": "c5f528892c0556799ce622ea258d66e85ea4fe9c",
-    "first_dx9ex_active_run": 39046128907,
-    "first_gate_failure": "Required task record absent before game jobs; same TASK_ID repair, no production rescore.",
-    "required_gates": [
-      "DX9Ex Active Validation",
-      "Domain Isolation Guard",
-      "OutRun EXE HUD Inspector CI",
-      "DX9Ex Full Source Impact Review"
+    "source_material_sha": "c5f528892c0556799ce622ea258d66e85ea4fe9c",
+    "validation_bearing_result_sha": "00d74ca432c3dcd37cb0e3ba09101eea182b9d0e",
+    "source_fix_lineage": [
+      "c5f528892c0556799ce622ea258d66e85ea4fe9c",
+      "00b519dc85f2a26da943d86f0fd8d0de348eea2a",
+      "165c6f1f89d58baa437d5bdaf455db29719b5a0b"
     ],
-    "exact_sha": "PENDING",
-    "source_integrated_sha": "165c6f1f89d58baa437d5bdaf455db29719b5a0b",
-    "policy_on_source_sha": "SUCCESS #39046639845 policy",
-    "domain_on_source_sha": "SUCCESS #39046639967",
-    "full_exact_sha_required": [
-      "DX9Ex Active Validation x86 R84/R26_SAFE, x64 host, package",
-      "Domain Isolation Guard",
-      "OutRun EXE HUD Inspector CI",
-      "DX9Ex Full Source Impact Review"
-    ],
-    "integrated_validation": "PENDING_ALL_FOUR_EXACT_SHA",
-    "remark": "Follow-up source/testing repair from the same TASK_ID is included in ancestry. This pending run record triggers the four exact-SHA push workflows; it does not assert HMD or CI success."
+    "results": {
+      "DX9Ex Active Validation": {
+        "run_id": 39046921627,
+        "conclusion": "SUCCESS",
+        "jobs": "policy game full-chain-compile host package 5/5"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39046921619,
+        "conclusion": "SUCCESS",
+        "jobs": "domain-isolation 1/1"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39046921628,
+        "conclusion": "SUCCESS",
+        "jobs": "static-exe-analysis build-hud-inspector 2/2"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39046921630,
+        "conclusion": "SUCCESS",
+        "jobs": "source-cross-domain msvc-analyze-active-game msvc-analyze-openxr-host 3/3"
+      }
+    },
+    "hmd_runtime": "UNTESTED",
+    "final_classification": "BUILD_VERIFIED_NEED_HMD_TEST",
+    "explanation": "SkyGlow mid-frame OFF-to-ON source-order fix and regression proof, all four required GitHub gates exact same validation SHA. No headset visual result."
   },
   "candidate_head_sha": "165c6f1f89d58baa437d5bdaf455db29719b5a0b"
 }
