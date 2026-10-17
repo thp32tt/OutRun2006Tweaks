@@ -103,5 +103,18 @@ int main()
         return 13;
     if (!near(SafeNearPlane(0.08f,0.05f,0.15f),0.08f))
         return 14;
+    // Independent original camera mode counters (+0x340/+0x344) must
+    // settle before any synthetic seat camera can be admitted.
+    using OutRunVR::DriverSeatCamera::NativeViewTransitionSettled;
+    if (!NativeViewTransitionSettled(0, 0) ||
+        NativeViewTransitionSettled(1, 0) ||
+        NativeViewTransitionSettled(0, 1) ||
+        NativeViewTransitionSettled(5, 2) ||
+        NativeViewTransitionSettled(0xffff, 0))
+        return 15;
+    if (!NativeViewTransitionSettled(0, 0) ||
+        !CameraAndBodyEligible(true, true, 0.f, 1, 1,
+            nativePos, nativeLook, -1.35f, -0.32f, 0.65f))
+        return 16;
     return 0;
 }

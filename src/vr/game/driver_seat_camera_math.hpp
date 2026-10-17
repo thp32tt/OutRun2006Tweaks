@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 
 namespace OutRunVR::DriverSeatCamera
 {
@@ -97,6 +98,16 @@ namespace OutRunVR::DriverSeatCamera
             return boundedFallback;
         return requested < minimum ? minimum :
             (requested > maximum ? maximum : requested);
+    }
+
+    // Canonical EXE RVA 0x84A40 uses camera+0x340 and +0x344 as
+    // native mode-transition counters. Mode +0x34A may already equal the
+    // selected bumper view while the original transition is still pending.
+    // The independent legacy +0x364 timer check is retained below.
+    inline bool NativeViewTransitionSettled(std::uint16_t switchTicks,
+        std::uint16_t delayedSwitchTicks) noexcept
+    {
+        return switchTicks == 0 && delayedSwitchTicks == 0;
     }
 
     // Separate the original game's camera-mode/transition gate from the
