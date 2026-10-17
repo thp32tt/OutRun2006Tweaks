@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_ai_resume_checkpoint",
+  "captured_at_kst": "2026-10-18T00:45:00+09:00",
+  "task_id": "CONVERSION-DX11-00886",
+  "production_id": "CONVERSION-DX11-00886",
+  "event_id": "CONVERSION-DX11-00886-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_at_capture": "269368a4cf2bad048a086e3e9e617dd23d221c26",
+  "feature_id": "DX11:REAL_GAME_POSTDRAW_SURFACE_COPY_TO_NATIVE_FRAME",
+  "feature_branch": "feature/dx11-00886-game-surface-mutation-replay",
+  "feature_head_at_capture": "59ce5b256e2ae9d8a18b68d795a6b50f865a0840",
+  "material_source_sha": "e0d791ae2ba8d4a3270fd584698ce8137849b892",
+  "previous_windows_build_pass": {
+    "sha": "269368a4cf2bad048a086e3e9e617dd23d221c26",
+    "run_id": 39045711948
+  },
+  "current_feature_ci": {
+    "run_id": 39046215562,
+    "status": "IN_PROGRESS_AT_CAPTURE",
+    "required": "PASS_EXACT_SHA"
+  },
+  "last_failing_gates": {
+    "sha": "269368a4cf2bad048a086e3e9e617dd23d221c26",
+    "fast": 39046094096,
+    "backend": 39046094115,
+    "cause": "run record integration-path stage names mismatched policy",
+    "repair_commit": "59ce5b256e2ae9d8a18b68d795a6b50f865a0840"
+  },
+  "incomplete_acceptance": [
+    "new exact-SHA feature Windows Build result",
+    "recheck target behind=0 and expected_sha before force=false fast-forward",
+    "five exact-SHA mandatory target Actions",
+    "C6 result evidence, runtime UNTESTED",
+    "score only once after new feature terminal success"
+  ],
+  "next_action": "Read feature Build 39046215562, repair same TASK if failure, or promote 59ce5b... with compare/expected_sha/force=false then inspect Fast Backend Build OpenXR HUD exact SHA; do not duplicate previous source.",
+  "runtime_validation": "UNTESTED",
+  "score_change": 0
+}
