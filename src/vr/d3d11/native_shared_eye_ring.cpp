@@ -460,32 +460,51 @@ namespace outrun::vr::dx11
             // Game camera color may also be bound as a compute UAV by a
             // postpass. A native eye GPU copy must not read a live UAV output;
             // preserve ALL caller compute outputs, including unrelated slots.
+            // Preserve PS/OM pixel UAVs as well as CS outputs across the
+            // actual game-eye Copy/Resolve; RTV-only restore drops them.
+            ID3D11UnorderedAccessView* pixelOutputs[
+                D3D11_PS_CS_UAV_REGISTER_COUNT]{};
             ID3D11UnorderedAccessView* computeOutputs[
                 D3D11_PS_CS_UAV_REGISTER_COUNT]{};
             explicit ScopedStereoSourceOutputs(ID3D11DeviceContext* ctx) noexcept
                 : context(ctx) {
-                context->OMGetRenderTargets(
+                context->OMGetRenderTargetsAndUnorderedAccessViews(
                     D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-                    targets, &depth);
+                    targets, &depth, 0u,
+                    D3D11_PS_CS_UAV_REGISTER_COUNT, pixelOutputs);
                 context->CSGetUnorderedAccessViews(
                     0u, D3D11_PS_CS_UAV_REGISTER_COUNT, computeOutputs);
                 ID3D11UnorderedAccessView* unbound[
                     D3D11_PS_CS_UAV_REGISTER_COUNT]{};
                 context->CSSetUnorderedAccessViews(
                     0u, D3D11_PS_CS_UAV_REGISTER_COUNT, unbound, nullptr);
-                context->OMSetRenderTargets(0u, nullptr, nullptr);
+                // Detach both writable GPU stages before copying game
+                // source textures into the independently rendered XR eyes.
+                context->OMSetRenderTargetsAndUnorderedAccessViews(
+                    0u, nullptr, nullptr, 0u,
+                    D3D11_PS_CS_UAV_REGISTER_COUNT, unbound, nullptr);
             }
             ~ScopedStereoSourceOutputs() noexcept {
-                context->OMSetRenderTargets(
-                    D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
-                    targets, depth);
-                // Keep UAV append/counter state; this native transfer did not
-                // author any game compute dispatch or counter reset.
+                // Restore the occupied RT prefix and the remaining OM UAV
+                // slots in one D3D11 OM operation. Binding RTVs alone would
+                // erase the game's PS UAV postpass state between eye frames.
+                UINT rtCount = 0u;
+                for (UINT i = 0u; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+                    if (targets[i]) rtCount = i + 1u;
                 UINT keepCounters[D3D11_PS_CS_UAV_REGISTER_COUNT]{};
                 for (auto& counter : keepCounters) counter = UINT(-1);
+                const UINT uavCount = D3D11_PS_CS_UAV_REGISTER_COUNT - rtCount;
+                context->OMSetRenderTargetsAndUnorderedAccessViews(
+                    rtCount, rtCount ? targets : nullptr, depth,
+                    rtCount, uavCount,
+                    uavCount ? pixelOutputs + rtCount : nullptr,
+                    uavCount ? keepCounters + rtCount : nullptr);
+                // Preserve append/consume counters in both OM and CS stages.
                 context->CSSetUnorderedAccessViews(
                     0u, D3D11_PS_CS_UAV_REGISTER_COUNT,
                     computeOutputs, keepCounters);
+                for (auto* output : pixelOutputs)
+                    if (output) output->Release();
                 for (auto* output : computeOutputs)
                     if (output) output->Release();
                 for (auto* target : targets)

@@ -39,6 +39,35 @@ def linked(source: str, header: str) -> bool:
         and signal > first_copy and fault > signal
     )
 
+# Real menu/car/race pixel UAV state must survive native L/R GPU eye copy.
+# Two OM calls are needed: detach writable source aliases, then restore
+# MRT/depth/pixel UAV prefix with -1 counter preservation.
+def preserves_game_pixel_uavs(source: str) -> bool:
+    begin = source.find("struct ScopedStereoSourceOutputs final {")
+    end = source.find("} sourceOutputs{context};", begin)
+    if begin < 0 or end < 0:
+        return False
+    portion = source[begin:end]
+    return (
+        "OMGetRenderTargetsAndUnorderedAccessViews(" in portion
+        and portion.count("OMSetRenderTargetsAndUnorderedAccessViews(") == 2
+        and "pixelOutputs + rtCount" in portion
+        and "D3D11_PS_CS_UAV_REGISTER_COUNT - rtCount" in portion
+        and "counter = UINT(-1)" in portion
+        and "for (auto* output : pixelOutputs)" in portion
+        and portion.count("CSSetUnorderedAccessViews(") == 2
+    )
+
+assert preserves_game_pixel_uavs(submit), "native eye copy lost OM/CS UAV restoration"
+for old, replacement in [
+    ("OMGetRenderTargetsAndUnorderedAccessViews(", "OMGetRenderTargets("),
+    ("OMSetRenderTargetsAndUnorderedAccessViews(", "OMSetRenderTargets("),
+    ("pixelOutputs + rtCount", "computeOutputs + rtCount"),
+    ("counter = UINT(-1)", "counter = 0u"),
+]:
+    assert old in submit
+    assert not preserves_game_pixel_uavs(submit.replace(old, replacement))
+
 assert linked(ring, slot), "native stereo GPU command or cancellation link missing"
 # The mandatory Backend Conversion verifier must accept the guarded EVENT
 # producer and reject destructive changes to GPU ownership/fence semantics.
