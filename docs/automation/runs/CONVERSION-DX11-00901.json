@@ -8,15 +8,15 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00901",
   "feature_id": "DX11:NATIVE_GAME_SRV_POSTPASS_STEREO_GPU_SOURCE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "full_dx11_renderer_complete": false,
   "score_change": 0,
   "material_result_sha": "8ae53af43932df39b9c14ed6b22a081e6cb06bf3",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e",
   "feature_contract": {
     "feature_id": "DX11:NATIVE_GAME_SRV_POSTPASS_STEREO_GPU_SOURCE",
     "goal": "Carry independent full-sized shader-readable game postpass camera left and right GPU sources through native D3D11 stereo eye ring, correct source generation and exact OpenXR ACK, retaining game SRV bindings and original D3D9 fallback.",
@@ -42,9 +42,9 @@
     ]
   },
   "acceptance_results": {
-    "game_srv_postpass_native_stereo_capture": "PENDING_CI",
-    "game_srv_postpass_safety_fallback": "PENDING_CI",
-    "exact_sha_native_gpu_pixel_and_gates": "PENDING_CI"
+    "game_srv_postpass_native_stereo_capture": "PASS_WARP_INDEPENDENT_EYE_GPU_PIXELS",
+    "game_srv_postpass_safety_fallback": "PASS_WARP_SRV_BINDING_AND_FALLBACK",
+    "exact_sha_native_gpu_pixel_and_gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -70,9 +70,9 @@
     "activation_guard_and_fallback": "Native D3D11 camera forwarding is opt-in/fail-closed; original D3D9Ex rendering, gamepad, FFB and native unsupported shader/texture fallback remain unmodified.",
     "blocking_evidence": "Live shader-readable postpass camera slices produced after last game Draw were formerly rejected by RTV/UAV-only source admission; native eye ring needed real game SRV-only input.",
     "acceptance_proof": {
-      "positive_probe": "Material 8ae53af: real game-owned SRV-only GPU camera source accepted by stereo ring; WARP independent L/R pixel fixture introduced; exact CI still pending.",
-      "negative_regression": "Material 8ae53af: rejects out-of-range mip/slices, same-slice mono eye, shared source and stale ACK while retaining original game PS SRV and DX9Ex fallback.",
-      "component_integration": "native_game_eye_pair_sources.hpp + native_game_stereo_submission.cpp + native_shared_eye_ring.cpp + tools/dx11_native_transport_probe.cpp. Backend CI failure 39078771411 is prior 00900 malformed C6 record; same 00901 repair branch corrects CI policy and historical record without changing unrelated C++."
+      "positive_probe": "Real Win32 GPU WARP isolated native transport run #39078771430 SUCCESS on original unchanged game C++ material SHA 8ae53af43932df39b9c14ed6b22a081e6cb06bf3; physical red/blue independently generated eye pixels through game-owned SRV-only postpass array and shared XR ring.",
+      "negative_regression": "Real Win32 WARP #39078771430 SUCCESS on material SHA: invalid out-of-bounds array slice and same-slice mono alias rejected, original PS SRV remains bound, exact transport slot/generation ACK retirement and safe D3D9Ex fallback unchanged.",
+      "component_integration": "Source material 8ae53af43932df39b9c14ed6b22a081e6cb06bf3 plus inherited C6 policy repair 0a01d088daafa1b872a7c5105e0c2a220036006e; all five mandatory exact-SHA actions SUCCESS without CI-skip: Fast 39079264660, Backend 39079264624, Windows Build 39079268985, OpenXR 39079268952, HUD 39079268955; independent real Win32 WARP 39078771430 SUCCESS on unchanged native source. No gameplay/HMD observation."
     }
   },
   "changed_files": [
@@ -87,7 +87,63 @@
   "ci_blocker": {
     "run_id": 39078771411,
     "failed_step": "Verify DX11 integration-first auto-development acceptance",
-    "failure_cause": "Historical C6 00900 lacked feature identity, contained mixed PASS/UNTESTED acceptance text and unrecognized source-only native GPU desktop stage; preserve source-stage honesty with bounded policy + negative tests"
+    "failure_cause": "Historical C6 00900 lacked feature identity, contained mixed PASS/UNTESTED acceptance text and unrecognized source-only native GPU desktop stage; preserve source-stage honesty with bounded policy + negative tests",
+    "resolved": true,
+    "repair_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e",
+    "repair_result": "Fast and Backend policy pass on repaired exact SHA, with all other mandatory gates also SUCCESS."
   },
-  "runtime_validation_note": "Live OutRun game / Quest3 / VDXR not executed in this automation turn; WARP pixels are not gameplay evidence."
+  "runtime_validation_note": "Live OutRun game / Quest3 / VDXR not executed in this automation turn; WARP pixels are not gameplay evidence.",
+  "validation_evidence": {
+    "material_sha": "8ae53af43932df39b9c14ed6b22a081e6cb06bf3",
+    "validation_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e",
+    "isolated_native_warp_run_id": 39078771430,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_material_sha": "8ae53af43932df39b9c14ed6b22a081e6cb06bf3",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39079264660,
+        "conclusion": "success",
+        "validation_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39079264624,
+        "conclusion": "success",
+        "validation_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e"
+      },
+      {
+        "name": "Build",
+        "run_id": 39079268985,
+        "conclusion": "success",
+        "validation_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39079268952,
+        "conclusion": "success",
+        "validation_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39079268955,
+        "conclusion": "success",
+        "validation_sha": "0a01d088daafa1b872a7c5105e0c2a220036006e"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "full_gameplay_renderer_complete": false,
+    "source_only_build_verified": true,
+    "source_phase": "GAME_GPU_SRV_POSTPASS_TO_STEREO_OPENXR_SHARED_EYE_RING",
+    "blocking_evidence": "Live menu, vehicle selection, sustained race, Quest3/VDXR HMD, gamepad/FFB and frame pacing were not run here; CI cannot establish these runtime properties."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Branch at 77d5abb4; 00900 had earlier exact-SHA C6 validation but a reconstructed record introduced policy mismatches.",
+    "C1_REVIEW": "Detected local shader-readable-only game postpass eye source rejected by source capture and native ring even though GPU copy is legal.",
+    "C2_IMPLEMENT": "Three real D3D11 C++ source files and Win32 WARP integrated source-to-two-eyes GPU regression at 8ae53af43932df39b9c14ed6b22a081e6cb06bf3",
+    "C3_VALIDATE": "WARP 39078771430 successful on native source, previous inherited 00900 C6 record acceptance corrected causally, all five mandatory GitHub gates successful on exact 0a01d088daafa1b872a7c5105e0c2a220036006e",
+    "C4_COMMIT": "Material 8ae53af43932df39b9c14ed6b22a081e6cb06bf3; same 00901 task validation-bearing inherited C6 policy repair 0a01d088daafa1b872a7c5105e0c2a220036006e; separate [skip ci] result bookkeeping after gates.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA source-only GPU handoff; runtime UNTESTED, no new score or HMD promotion."
+  }
 }
