@@ -5312,7 +5312,6 @@ namespace OutRunVRStereo
             return ok;
         }
 
-        template <typename LeftDraw, typename RightDraw>
         // Sample the actual producer/queue/Calc3D2D identity at the GPU
         // primitive, not the previous tick's SpriteNode or cached rank WVP.
         // Fixed-function FVF 0x142 legitimately has a null vertex shader.
@@ -5338,6 +5337,7 @@ namespace OutRunVRStereo
             return OutRunVR::RankMarker::ValidRankSource(source);
         }
 
+        template <typename LeftDraw, typename RightDraw>
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
