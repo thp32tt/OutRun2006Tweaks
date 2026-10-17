@@ -7,14 +7,14 @@
   "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "C5_GATE_PENDING",
-  "checkpoint": "C5_VALIDATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "bc62f7d34af3cc55e186fedb0e560c0507f3f7ae",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "cb35f3243ab106ce65fbbb3213d9a7c725e62488",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_deferred_both_eye_owner": "PENDING_CI",
-    "stage_batch_isolation_fallback": "PENDING_CI",
-    "stage_exact_sha_gate": "PENDING_EXACT_SHA"
+    "stage_deferred_both_eye_owner": "PASS_BUILD",
+    "stage_batch_isolation_fallback": "PASS_BUILD",
+    "stage_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original-game read-only resource/decompilation mapping in docs/automation/OUTRUN_VR_REA_RESOURCE_EVIDENCE_20261018.md identifies stage producer 0x00498670 and distinct sprite/numeric branches; Quest3 runtime outcome has not been demonstrated.",
@@ -74,12 +74,12 @@
       "Do not infer binocular HMD correctness from static source instrumentation or Windows CI; Quest3 physical evidence is still required."
     ],
     "fix_evidence": "Original material SHA bc62f7d3 added HudBatch.matchesGpuOwner guards to direct stage/GOAL exit, scope restore, foreign draw and queue-boundary seams; hud_command_batch_smoke.cpp includes both positive and stale/mixed/failed-flush negatives.",
-    "negative_test_evidence": "Source regression scenarios are present in vrhost/tests/hud_command_batch_smoke.cpp; exact-SHA Windows CI is pending after policy failure. No PASS for this attempt is asserted.",
+    "negative_test_evidence": "Final exact-SHA DX9Ex Active policy/game/host/full-chain/package and dependent guard stages PASS. hud_command_batch_smoke.cpp contains queue node/epoch, mixed direct/queued, stale and invalidation negatives. Source-level protection verified, no Quest3 display evidence.",
     "eye_ownership": "The fix only authorizes exact owner source metadata at physical D3DX batch isolation boundaries; actual left/right optic correctness and eye composition remain hardware unverified.",
     "evidence_limit": "Read-only original static trace and GitHub material source evidence are not a headset runtime measurement."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "material_sha": "bc62f7d34af3cc55e186fedb0e560c0507f3f7ae",
     "previous_failure": {
       "run_id": 39060416912,
@@ -94,7 +94,31 @@
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
     ],
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "exact_sha": "cb35f3243ab106ce65fbbb3213d9a7c725e62488",
+    "mandatory_gates": {
+      "dx9ex_active": {
+        "run_id": 39060700399,
+        "conclusion": "success",
+        "exact_sha": "cb35f3243ab106ce65fbbb3213d9a7c725e62488"
+      },
+      "domain_isolation": {
+        "run_id": 39060700419,
+        "conclusion": "success",
+        "exact_sha": "cb35f3243ab106ce65fbbb3213d9a7c725e62488"
+      },
+      "hud_inspector": {
+        "run_id": 39060700497,
+        "conclusion": "success",
+        "exact_sha": "cb35f3243ab106ce65fbbb3213d9a7c725e62488"
+      },
+      "full_source_impact": {
+        "run_id": 39060700464,
+        "conclusion": "success",
+        "exact_sha": "cb35f3243ab106ce65fbbb3213d9a7c725e62488"
+      }
+    },
+    "hmd_runtime": "UNTESTED"
   },
-  "notes": "Same TASK_ID retry: original C++ material commit retained; this run record repairs the actual missing exact-HEAD feature policy input and is not a new feature or score. No CI skip on validation-bearing commit."
+  "notes": "C6 bookkeeping only after exact-SHA four-gate SUCCESS. Original material SHA bc62f7d3 remains distinct from cb35f324 validation-bearing record fix and this [skip ci] checkpoint. No runtime visual certification and no duplicate TASK_ID score."
 }
