@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00924",
+  "production_id": "CONVERSION-DX11-00924",
+  "event_id": "CONVERSION-DX11-00924-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00924",
+  "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SAMPLER_BINDING",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SAMPLER_BINDING",
+    "goal": "Connect real game ps_3_0 sampler declarations and TEXLD to D3D11 shader tN/sN samples, then bind live game resources and produce complete native menu/car/race Draw with original game fallback",
+    "acceptance_items": [
+      {
+        "id": "real_game_sampled_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_ps_sampler_resource_native_gpu_draw",
+        "expected_behavior": "Live D3D9 sN and TEXLD shader binds matching D3D11 SRV+sampler and native Draw/DrawIndexed outputs complete game frames"
+      },
+      {
+        "id": "sampler_fallback_regression",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_draw_input_ffb_safety",
+        "expected_behavior": "Undeclared, cube/volume, projected/bias and malformed PS sampler references reject natively, preserving D3D9 rendering/input/FFB"
+      },
+      {
+        "id": "five_gates_same_sha",
+        "category": "integrated_validation",
+        "behavior_area": "source_graph_build_backend_openxr_hud_ci",
+        "expected_behavior": "Sampler translation positive/negative regression and all five mandatory GitHub Actions pass at one exact validation-bearing SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "first_live_game_draw",
+    "integration_path": [
+      "live D3D9 SM3 DCL sampler/TEXLD source",
+      "D3D11 native HLSL Texture2D/SamplerState source generation",
+      "bound original game SRV/sampler at GPU Draw/DrawIndexed",
+      "full game frame plus fail-closed D3D9 fallback"
+    ],
+    "batch_components": [
+      "native_backend.cpp SM3 shader TEXLD translation",
+      "native_sm3_texture_codegen.hpp HLSL sampling emitter",
+      "dx11_sm3_constant_codegen_probe.cpp positive negative translation tests",
+      "verify_dx11_source_graph.py exact source graph requirements"
+    ],
+    "conflict_keys": [
+      "DX11:REAL_GAME_DRAW",
+      "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
+      "DX11:SAMPLER_BINDING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FIRST_GAME_DRAW_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NOT_ACHIEVED: native game SRV/sampler binding and real Draw/frames not yet observed",
+    "activation_guard_and_fallback": "Translated shader TEXLD does not prove live resource binding; D3D9 input/FFB/render fail closed; DXVK frozen",
+    "acceptance_proof": {
+      "positive_probe": "2D sampler s0 and s15 and native tN/sN/sample masked output",
+      "negative_regression": "No DCL, non-2D, projected or bias TEXLD and invalid mask/coordinate fail closed",
+      "component_integration": "Actual SM3 instruction decoder now emits native 2D texture and sampler HLSL source under existing programmable shader DXBC materialization"
+    }
+  },
+  "acceptance_results": {
+    "real_game_sampled_draw": "PENDING_NATIVE_SRV_BIND_AND_GAME_DRAW",
+    "sampler_fallback_regression": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "five_gates_same_sha": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+    "tools/dx11_sm3_constant_codegen_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Branch HEAD 4a15fcab, 00923 exact-SHA source-stage build proved but live game programmable native Draw unfinished",
+    "C1_REVIEW": "Actual SM3 TEXLD was unsupported in R283",
+    "C2_IMPLEMENT": "Source shader TEXLD and sampler translation material f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
+    "C3_VALIDATE": "Initial exact-SHA gates failed stale 00923 terminal acceptance and source graph V5 contract; causal repair staged",
+    "C4_COMMIT": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING_EXACT_SHA"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Game-authored texture/sampler SRV and sampler states not yet bound to native programmable GPU draw",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
+  "NEXT_IMPLEMENTATION_ACTION": "Bind D3D9 source sampler snapshots to D3D11 tN/sN at native programmable draw, measure real Draw+frame counts before enabling"
+}
