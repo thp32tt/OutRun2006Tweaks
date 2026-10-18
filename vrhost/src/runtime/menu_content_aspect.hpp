@@ -51,7 +51,19 @@ namespace OutRunVrMenuAspect
         // authored matte, even if the previous title enabled A/B cropping.
         if (state != 0x04u && state != 0x09u)
             return false;
-        return requestedCrop ||
+        // The original game already has an explicit authored 4:3
+        // title/main-menu layout when both UI scaling and letterboxing
+        // are configured. The earlier host required an unavailable live
+        // matte verifier even for those two exact game states, so the
+        // Quest menu remained the full ultrawide desktop capture. This
+        // keeps native source pixels and aspect together: callers crop
+        // the same 4:3 source region AND project that cropped region at
+        // 4:3, never squeeze an uncropped wide texture into a 4:3 quad.
+        //
+        // This is a configuration-backed title/menu contract, NOT a
+        // claim of per-frame pixel-matte verification. Unknown states,
+        // Ferrari selector and explicit no-crop remain untouched.
+        return requestedCrop || configuredLetterbox ||
             ShouldAutoCropVerifiedFourThree(
                 configuredLetterbox, imageMatteVerified);
     }

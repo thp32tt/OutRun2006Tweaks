@@ -1,0 +1,80 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01050",
+  "production_id": "CONVERSION-DX9EX-01050",
+  "event_id": "CONVERSION-DX9EX-01050-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "checkpoint": "C2_SOURCE",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Restore the original authored 4:3 R84 title and main-menu source with matching 4:3 GPU capture UV and binocular OpenXR optical size while preserving uncropped full-width Ferrari car-selection content and safe user rollback.",
+    "scope_boundary": "Only original OutRun game states 0x04/0x09 with configured 4:3 UI letterboxing; preserve native wide 0x0A..0x0C selector, ordinary game/HUD/F11, unknown states, explicit no-crop override, partial desktop capture, DX9Ex R26_SAFE, input, FFB, SkyGlow, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original 4:3 game menu D3DX sprites render into a captured 16:9 or 21:9 desktop client with UI scaling and letterboxing configured.",
+      "R23 host chooses state-specific source UV intersection: 4:3 title/menu crop versus full-width Ferrari selector and exact original client fragment handling.",
+      "OpenXR binocular menu projection uses the same cropped source aspect and full safe optical contain, without restoring ultrawide reference shrink; host rollback/unknown fall back to native screen."
+    ],
+    "subcomponents": [
+      "Make the configured 4:3 title/menu source contract effective even without unimplemented pixel-matte telemetry while disallowing any automatic crop for Ferrari/unknown states.",
+      "Keep OUTRUN_VR_MENU_NATIVE_ASPECT=1 and explicit no-crop A/B precedence, make cropped UV and OpenXR optical aspect a single transaction.",
+      "Add host source-level positive and mutation-negative assertions for exact 4:3 crop size, full optical 4:3 height, selector/unknown safety and rollback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_menu_four_three",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Title and main-menu 4:3 original sprite source, crop UV, stereo OpenXR optical projection",
+        "expected_behavior": "Configured title/main source is projected as uncropped-authored 4:3 pixels at full binocular-safe contain without second ultrawide shrink."
+      },
+      {
+        "id": "selector_and_rollback_preserved",
+        "category": "fallback_regression",
+        "behavior_area": "Ferrari selector wide textures, native-aspect explicit override, incomplete desktop client, gameplay/F11/HUD",
+        "expected_behavior": "No unintended 4:3 crop or stretched texture for selector/unknown/disabled states, user opt-outs and incomplete capture use bounded original fallback."
+      },
+      {
+        "id": "menu_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA DX9Ex Active Windows x86 game, x64 OpenXR host/package, Domain, HUD Inspector and Full Source Impact",
+        "expected_behavior": "All four required workflows succeed on one exact material result SHA; hardware optical acceptance remains UNTESTED until same-SHA Quest3/VDXR evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_menu_four_three": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "selector_and_rollback_preserved": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "menu_exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Main-menu 4:3 source expectation is user-confirmed; host game UI flags encode 4:3 layout while 0x0A..0x0C Ferrari selector has full-width authored right-side content.",
+    "root_cause": "Host PlanStateSafeMenuCrop returned false unless imageMatteVerified even though matte is hardcoded false; thus exact configured 4:3 title/menu never reached its matched cropped UV and the full optical 4:3 placement path.",
+    "alternatives_rejected": [
+      "Never compress an uncropped 3440x1440 source into 4:3 in isolation.",
+      "Never crop vehicle-selection states, change game physics/UI-input coordinate plane, fabricate Quest3 optical PASS or claim pixel matte sampling."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "C2 host native 4:3 title/main-menu source+UV+OpenXR contain correction and affected host regression. Original game capture and device/FFB untouched. GitHub exact-SHA CI pending. Source-layout authority comes from configured game UI and restricted states, not a sampled matte. Quest3 HMD not run."
+}

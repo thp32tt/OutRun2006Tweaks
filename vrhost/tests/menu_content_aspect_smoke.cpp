@@ -73,7 +73,16 @@ static_assert(!IsWideVehicleSelector(0x09u));
 static_assert(PlanStateSafeMenuCrop(0x04u, true, false, true, false));
 static_assert(PlanStateSafeMenuCrop(0x09u, true, false, true, false));
 static_assert(PlanStateSafeMenuCrop(0x04u, true, true, false, false));
-static_assert(!PlanStateSafeMenuCrop(0x04u, true, false, false, false));
+static_assert(PlanStateSafeMenuCrop(0x04u, true, false, false, false));
+static_assert(PlanStateSafeMenuCrop(0x09u, true, false, false, false));
+// Configured 4:3 title/main is enough for this exact source-layout
+// rule; it is not permission to crop Ferrari, unknown or gameplay.
+// Both native-aspect A/B and explicit no-crop override it.
+static_assert(!PlanStateSafeMenuCrop(0x04u, true, false, false, true));
+static_assert(!PlanStateSafeMenuCrop(0x09u, true, false, false, true));
+static_assert(!PlanStateSafeMenuCrop(0x0Au, true, false, false, false));
+static_assert(!PlanStateSafeMenuCrop(0x0Bu, true, false, false, false));
+static_assert(!PlanStateSafeMenuCrop(0x0Cu, true, false, false, false));
 static_assert(!PlanStateSafeMenuCrop(0x04u, true, true, true, true));
 static_assert(!PlanStateSafeMenuCrop(0x0Au, true, true, true, false));
 static_assert(!PlanStateSafeMenuCrop(0x0Bu, true, true, true, false));
@@ -144,6 +153,33 @@ int main()
         !nearCoverage(ResolveMenuOpticalCoverageForState("0.90",0x0Bu),.90f) ||
         !nearCoverage(ResolveMenuOpticalCoverageForState("1.0",0x0Au),1.f))
         return 73;
+    // A configured title/main 4:3 source must crop its UV and then use
+    // the full binocular-safe 4:3 optical area, without silently
+    // reapplying the old wide-screen reference-height cap.
+    {
+        using OutRunVrMenuAspect::CommonFovTangents;
+        using OutRunVrMenuAspect::PlanVisibleCenteredContent;
+        using OutRunVrMenuAspect::PlanOpticallyCenteredClip;
+        using OutRunVrMenuAspect::StabilizeMenuToReference3440x1440;
+        const auto sourceCrop = PlanVisibleCenteredContent(
+            0.f,0.f,3440.f,1440.f,3440.f,1440.f,
+            0.f,0.f,1.f,1.f,4.f/3.f);
+        const CommonFovTangents common{true,-1.f,1.f,-1.f,1.f};
+        const auto fullFourThree =
+            PlanOpticallyCenteredClip(common,4.f/3.f,1.f);
+        const auto oldCap =
+            StabilizeMenuToReference3440x1440(common,fullFourThree);
+        if (!sourceCrop.crop ||
+            std::fabs(sourceCrop.width - 1920.f/3440.f) > 0.001f ||
+            std::fabs(sourceCrop.offsetX -
+                (1.f-1920.f/3440.f)*0.5f) > 0.001f ||
+            !fullFourThree.valid || !oldCap.valid ||
+            !(fullFourThree.halfHeight > oldCap.halfHeight) ||
+            std::fabs(fullFourThree.halfWidth /
+                fullFourThree.halfHeight - 4.f/3.f) > 0.0001f)
+            return 86;
+    }
+
     // 3440x1440 is the verified desktop UI size. When VR switches to
     // 2496x2688 or other source extents, hold angular menu height at the
     // baseline while preserving physical source aspect/UV and bilateral FOV.

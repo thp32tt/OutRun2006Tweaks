@@ -1559,20 +1559,21 @@ namespace
         float visibleOffsetX = 0.0f, visibleOffsetY = 0.0f;
         float visibleWidthScale = 1.0f, visibleHeightScale = 1.0f;
 
-        // Quest3 native menu/car-select A/B: requested 4:3 letterbox
-        // flags do not prove the surrounding pixels are matte. The Ferrari
-        // and right-hand selection list extend outside that region, so
-        // automatic 4:3 cropping loses authored content. Until a live image
-        // matte check exists, use the complete native-aspect client.
-        // OUTRUN_VR_MENU_CENTER_4_3=1 explicitly opts into the historical
-        // centre crop; =0 forces the uncut complete-client view.
-        // Both eyes use the same UV and menu projection.
+        // R84 title/main-menu letterboxing is an original game layout
+        // contract (state 0x04/0x09), not a per-frame matte measurement:
+        // crop its 4:3 authored source AND update the stereo optical
+        // aspect together. Ferrari/selector content spans the wide
+        // client and must stay uncropped in states 0x0A..0x0C.
+        // The user can reverse the menu-only crop with
+        // OUTRUN_VR_MENU_CENTER_4_3=0 or
+        // OUTRUN_VR_MENU_NATIVE_ASPECT=1. Both eyes use one UV/clip.
+        // A stale/partially captured client still uses the established
+        // intersection and fragment placement safety checks.
         const bool gameConfiguredLetterbox =
             R23GameMenuIsLetterboxed(c.hwnd_);
-        // A configured letterbox is not a verified pixel matte: car-select
-        // artwork can occupy the side regions even in this mode.
-        // Keep the uncropped menu at its captured physical aspect until a
-        // real frame-matte verifier has supplied positive evidence.
+        // A configured letterbox is not a verified pixel matte. Apply
+        // this source-layout rule only to the exact title/main states;
+        // car-select remains wide and no-crop overrides take precedence.
         constexpr bool imageMatteVerified = false;
         // Do not infer crop permission from an old title-menu INI setting
         // while the game has advanced into the fully authored wide Ferrari
@@ -1599,10 +1600,11 @@ namespace
         const bool cropCentered43 =
             OutRunVrMenuAspect::PlanStateSafeMenuCrop(
                 clientGameState, gameConfiguredLetterbox,
-                imageMatteVerified, requestedCrop, requestedNoCrop);
-        // The entire native-aspect menu, not just letterboxed 4:3,
-        // is the reference optical plane. A partially off-output vanilla
-        // window otherwise zooms/recentres title and car-selection pixels.
+                imageMatteVerified, requestedCrop,
+                requestedNoCrop || useNativeMenuAspect);
+        // Exact title/main-menu 4:3 content uses its own authored
+        // reference optical plane. The selector keeps native wide aspect.
+        // A partially off-output window retains fragment identity.
         // Both paths use one validated original client/UV intersection.
         // One physical HWND snapshot owns UV, output rect and authored aspect.
         const RECT& fullClient = capturedClient;
@@ -1682,10 +1684,11 @@ namespace
         const auto requestedPlacement =
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(
                 common, sourceAspect, opticalCoverage);
-        // Source dimensions may switch from the 3440x1440 desktop mirror
-        // to a 2496x2688 OpenXR eye backbuffer. Keep the reference menu
-        // height constant in binocular tangent space, adjusting both X/Y
-        // identically instead of enlarging the portrait menu to fill XR.
+        // Source dimensions may switch between desktop capture and XR.
+        // Exact title/main 4:3 source cropping must NOT inherit the
+        // ultrawide 3440x1440 optical-height cap: that silently shrinks
+        // the corrected 4:3 menu again. The uncropped selector retains
+        // reference-height stabilization during eye/backbuffer resizing.
         // The measured source aspect, UV and FOV containment are preserved.
         const auto placement = cropCentered43
             ? requestedPlacement // Explicit source crop remains user's A/B.
