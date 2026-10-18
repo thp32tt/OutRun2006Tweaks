@@ -1,49 +1,38 @@
-# OutRun 2006 C-slot original HD English crop — QA & Q057 rework
-As of 2026-10-18 KST. GitOps service: `outrun-c-english-native-crop`.
-All changes below are QA/rework artifacts. **No A/B, no image generation, no DDS writes, no runtime PASS.**
+# OutRun 2006 C GitOps — native HD English crop QA and source-only rework
+Date: 2026-10-18 KST. **Do not treat any QA result below as a released Korean DDS.**
 
-## Input and evidence
-- 108 unsplit native-HD source PNGs from 5 SHA256-pinned Library ZIPs; manifest 108/108.
-- One-pass OCR v2 completed: 108/108 source records, 107 SCANNED, 1 NO_REVIEWED_OFFICIAL_PHRASES.
-- Existing native original crops: 242, including 166 initial and 76 edge-warning candidates.
-- Full crop pixel comparison with source original: **242/242 PASS**, crop SHA: **242/242 PASS**.
-- Original source pixel integrity is not equal to glyph isolation approval. In-game validation **UNTESTED**.
-- Six visual contact sheets inspected in N100: `qa_review_20261018/EDGE_REVIEW_CONTACT_01_of_06.jpg` through `06_of_06.jpg`.
+## Verified inputs and technical QA
+- Native, unsplit source HD PNG: 108 originals across 5 SHA-pinned ZIPs; all 108 source-record scans finished.
+- Existing original-native crop files: **242**. All crop SHA256, source SHA256, dimensions and original-region RGBA equality **242/242 PASS**.
+- The original 242, 255 historic master, 108 full-source images, active C queue, A/B/C1/C3 state are **untouched**.
+- Visual QA on 76 edge-flagged crops, with six N100 contact sheets; 10 legible candidates, 20 plate/underline-review cases, **39 obvious neighboring-art cases and 7 punctuation/truncation risk cases**.
+- Thus 46/76 originally needed native rework; text completeness for index 041 is correct (contact sheet displayed only shortened label); corrected in the recorded triage.
 
-## Visual triage of 76 edge-warning crops
-- 9 visually legible candidate regions (not final PASS).
-- 20 text with original plate/underline/decoration requiring further separation/approval.
-- 39 original regions include unrelated neighboring sprite/vehicle/UI artwork.
-- 8 have punctuation clipping or transcription/adjacent glyph risk.
-- **47 require rework**; none is automatically promoted into game use.
-- 23/76 candidate bboxes have neighboring crop collision if blindly expanded, so automatic edge expansion is not safe.
+## Performed: 42 non-destructive native rework candidates
+1. Q057 five platforms x [SPECIAL REQUEST, Target, Technical Bonus]: **15** outputs. Preview `Q057_REWORK_15_CANDIDATES.jpg`.
+2. Additional punctuation, stray graphics and UI-neighbor fixes: **12** outputs. Preview `MORE_REWORK_PROTOTYPES.jpg`.
+3. More native crop bboxes from original atlas (Ranking, Sector4, FRIEND REQUEST, Rival, Start, Goal, INTERMEDIATE B, SELECT LICENSE, COMPLETE, DRIVE TIME, VS RANK, WIN RATIO, GIANT STATUES, SETUP): **15** outputs. Previews `FINAL_REWORK_PROTOTYPE_01.jpg` and `_02.jpg`.
+- **42/42** original SHA and saved output SHA verified; every output copied from the exact native original RGBA bbox, no generated pixels, source modification, rescaling, or alpha redraw.
+- Stored on N100 in `qa_review_20261018/reworked_q057_test_only/`, `reworked_12_test_only/`, `reworked_15_followup_test_only/`.
+- Every output is **CROP_TEST_ONLY_VISUAL_QA_REQUIRED**, not automatic C1/C3/game PASS.
 
-## Performed: 15 Q057 native-HD rework candidates
-- 5 platform atlases × `SPECIAL REQUEST`, `Target`, `Technical Bonus` = **15 test-only corrected pixel crops**.
-- Fixed native XYXY bboxes:
-  - SPECIAL REQUEST: [2210,377,3215,485]
-  - Target: [2631,541,2810,598]
-  - Technical Bonus: [2400,118,3630,267]
-- Old broad crops contained cars and UI. Test candidate contact sheet confirms reduced unrelated artwork.
-- 15/15 source SHA pass, 15/15 original-region RGBA byte-identical and crop SHA verified.
-- Original 242, 255 historic master, queue/checkpoints, translations, C1/C3 results all untouched.
-- Alternative outputs are under N100 `qa_review_20261018/reworked_q057_test_only/`.
-- Preview `qa_review_20261018/Q057_REWORK_15_CANDIDATES.jpg`.
-- **32 rework items remain**, recorded in `rework_remaining_32.json`, with no automatic dispatch or guessed success.
-
-## Next gate
-Review the 15 Q057 candidates at full native resolution, evaluate remaining 32 rework requests,
-and independently approve plate/underline candidates before downstream alpha/Korean stage.
-Do not equate these TEST_ONLY QA steps with actual game acceptance.
+## Four still unresolved by rectangular native crop alone
+- QA #012: **Leader!** (Q051_FF2462BB_BASE_READABLE_FLIPY.png) — Black vertical UI element included.
+- QA #036: **HARD** (Q062_33491F83_BASE_READABLE_FLIPY.png) — White/green adjacent plate parts protrude from HARD crop.
+- QA #049: **SELECT LICENSE** (Q154_4D38BBB0_BASE_READABLE_FLIPY.png) — Duplicated adjacent SELECT LICENSE text.
+- QA #059: **CONIFEROUS FOREST** (Q201_A9ABD877_BASE_READABLE_FLIPY.png) — Coniferous Forest meets adjacent text at right edge.
 
 
-## Additional 12 rework candidates, source-only
-- Individually visually compared native crop versus narrowed/expanded original-HD region.
-- 12 exact pixel crops stored in N100 `qa_review_20261018/reworked_12_test_only/`.
-- Fixed IDs from six-sheet visual triage: 002, 005, 006, 016, 037, 038, 039, 042, 044, 045, 047, 058.
-- Restored punctuation, removed neighboring UI fragments when isolation is possible.
-- Native RGBA byte equality and original source SHA **12/12 PASS**, output SHA **12/12 PASS**.
-- Comparison `qa_review_20261018/MORE_REWORK_PROTOTYPES.jpg`.
-- Aggregate Q057 15 + additional 12 = **27 unapproved rework candidates**, **20 still require rework**.
-- All 242 previous original crops and 255 legacy baseline remain immutable; zero DDS/image generation.
-- Neither visual candidate nor technical crop proof is an in-game PASS.
+Those cases need manual glyph isolation or carefully protected sprite/art separation.
+Do not release or replace existing PNG/DDS while full visual QA or game proof is absent.
+
+## Artifacts and handoff
+N100 base: `/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/`.
+- `STAGE_COMPLETE_20261018.json` — deterministic final source/crop counts.
+- `triage_for_github_76.csv` — every visual judgment and rework candidate state.
+- `rework_remaining_4.json` — remaining highest-risk crops.
+- `EDGE_REVIEW_CONTACT_01_of_06.jpg` through `06_of_06.jpg` — original crop/source context comparisons.
+- `Q057_REWORK_15_CANDIDATES.jpg`, `MORE_REWORK_PROTOTYPES.jpg`,
+  `FINAL_REWORK_PROTOTYPE_01.jpg`, `FINAL_REWORK_PROTOTYPE_02.jpg`.
+
+**Next gate:** Native-size detailed QA for 42 candidates plus 10 text-legible and 20 text/plate candidates; isolate four unresolved title/UI sprites; never assume runtime game pass.
