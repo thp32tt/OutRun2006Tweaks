@@ -1,3 +1,5 @@
+> **2026-10-19 최신 후속 작업:** 당시 보류했던 2개(Q062 HARD, Q201 CONIFEROUS FOREST)는 **원본 PNG 네이티브 픽셀 Q201 1건**과 **검증된 상위 PSD 독립 레이어 Q062 1건**의 서로 다른 방식으로 검토용 후보를 생성했습니다. 재크롭 후보 46/46건 확보(이 중 45건 원본 픽셀 일치, 1건 PSD 레이어 기반으로 평탄화 원본과 픽셀 차이 존재). **새 전체 결과 및 범위 제한은 [OUTRUN_C_NATIVE_ENGLISH_46_FINAL_20261019.md](OUTRUN_C_NATIVE_ENGLISH_46_FINAL_20261019.md)를 우선 적용**합니다. C 결과는 여전히 TEST_ONLY, 실게임 검증 및 최종 승인 미실시. 기존 A/B·DDS·255건 마스터 미변경.
+
 # OutRun 2006 native-HD source English crop: last four, 2026-10-19
 
 ## Scope
