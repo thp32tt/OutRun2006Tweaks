@@ -117,11 +117,15 @@ int main() {
             if (!isolated(true, &firstNode, &secondNode,
                           RenderScope::ScreenHud, producer))
                 return 64;
-            // Keep native multi-Draw batching within one node; never borrow
-            // the old producer after a queue reset or an unrelated source.
-            if (isolated(true, &firstNode, &firstNode,
-                         RenderScope::ScreenHud, producer) ||
-                isolated(false, &firstNode, &secondNode,
+            // A recycled pointer is a NEW queue selection/epoch, even
+            // when its address and source token equal the old node.
+            // Fail-before fixture: old code incorrectly returned false.
+            if (!isolated(true, &firstNode, &firstNode,
+                          RenderScope::ScreenHud, producer))
+                return 65;
+            // Queue inactive/null or a foreign screen/world source still
+            // retains the original End path, with no GOAL eye ownership.
+            if (isolated(false, &firstNode, &secondNode,
                          RenderScope::ScreenHud, producer) ||
                 isolated(true, nullptr, &secondNode,
                          RenderScope::ScreenHud, producer) ||
