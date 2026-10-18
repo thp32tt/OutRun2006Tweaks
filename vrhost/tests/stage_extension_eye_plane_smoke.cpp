@@ -480,6 +480,36 @@ int main() {
     auto unpaired = stampedQueued;
     unpaired.rawWvpDrawSerial = 0;
     if (IsValid(unpaired)) return 75;
+    // Test the LAST owner fence too. A right-eye RT/viewport/c64 setter
+    // can reenter another game call after an already valid left submission.
+    for (const Source& before : {stampedQueued, stampedDirect}) {
+        Source afterLeft = before;
+        Source beforeRight = before;
+        if (!SameAfterNativeLeft(before, afterLeft) ||
+            !SameAfterNativeLeft(before, beforeRight))
+            return 76;
+        ++beforeRight.rawWvpWriteSerial;
+        if (SameAfterNativeLeft(before, beforeRight))
+            return 77; // original game c64 changed during right setters
+        beforeRight = before;
+        ++beforeRight.poseEpoch;
+        if (SameAfterNativeLeft(before, beforeRight))
+            return 78; // recenter after left
+        beforeRight = before;
+        ++beforeRight.topLevelDrawSerial;
+        if (SameAfterNativeLeft(before, beforeRight))
+            return 79; // foreign nested draw
+        beforeRight = before;
+        beforeRight.producer = ProducerToken::ResultProgress;
+        if (SameAfterNativeLeft(before, beforeRight))
+            return 80; // GOAL cannot become stage
+        if (before.queued) {
+            beforeRight = before;
+            ++beforeRight.queueEpoch;
+            if (SameAfterNativeLeft(before, beforeRight))
+                return 81; // recycled SpriteNode in a new queue epoch
+        }
+    }
 
     // Original HUD/GOAL/rival/SkyGlow and untagged native draws are
     // never admitted by this exact stage-only transaction.

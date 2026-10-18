@@ -5819,6 +5819,21 @@ namespace OutRunVRStereo
                         device, savedDepth ? frame.rightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&state.viewport);
+                // Native setters after LEFT can reenter a new +TIME queue
+                // node or original c64 writer. RIGHT's already transformed
+                // vertices must belong to the same physical source.
+                if (SUCCEEDED(rightHr) && exactStage)
+                {
+                    OutRunVR::StageExtensionPhysical::Source atRight{};
+                    if (!R30CaptureStagePhysicalSource(atRight) ||
+                        !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+                            stageBefore, atRight))
+                    {
+                        rightFailure =
+                            OutRunVR::StereoFailureRightStateFailed;
+                        rightHr = E_FAIL;
+                    }
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure =
@@ -7415,6 +7430,19 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            // The six +TIME sprite/numeric original producers may use this
+            // shader finite-eye path rather than XYZRHW. Capture the native
+            // physical command, not just its HUD projection classification.
+            const auto stageCommand =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool exactStage = screenKind == R30ScreenSpaceKind::Hud2D &&
+                stageCommand.IsExactFiniteResultHud() &&
+                stageCommand.producer ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
+            OutRunVR::StageExtensionPhysical::Source stageBefore{};
+            if (exactStage && !R30CaptureStagePhysicalSource(stageBefore))
+                return E_NOTIMPL;
+
             // The shader C993 path is an exact WORLD centre, not the outer
             // CABE flare discs or an arbitrary alpha HUD sprite. R33 has a
             // physical native-left owner transaction; R30's independently
@@ -7579,6 +7607,32 @@ namespace OutRunVRStereo
                 }
             }
 
+            if (exactStage)
+            {
+                OutRunVR::StageExtensionPhysical::Source afterLeft{};
+                if (!R30CaptureStagePhysicalSource(afterLeft) ||
+                    !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+                        stageBefore, afterLeft))
+                {
+                    // LEFT already ran once. Roll back private c64 and
+                    // invalidate this pair; never replay that GPU draw.
+                    bool restored = false;
+                    {
+                        R30ScopedInternalPass guard;
+                        restored = R29OwnerSetWvpOneRegisterAtATime(
+                            device, original);
+                    }
+                    R29OwnerMarkRightDrawFailed();
+                    R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                    R29OwnerReportStereoFailure(
+                        OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
+                    if (!restored)
+                        R29OwnerNoteRestoreFailure("R30 +TIME post-left c64");
+                    R29OwnerArmMonoSafety();
+                    return leftHr;
+                }
+            }
+
             // Game left-eye draw may update tracked surfaces.
             frame = R29OwnerCaptureFrameSnapshot();
             IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
@@ -7622,6 +7676,20 @@ namespace OutRunVRStereo
                             atRight.draw, atRight.raw))
                     {
                         rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                        rightHr = E_FAIL;
+                    }
+                }
+                // RIGHT RT/depth/viewport/c64 setters may replace the
+                // physical +TIME source after its LEFT Draw succeeded.
+                if (SUCCEEDED(rightHr) && exactStage)
+                {
+                    OutRunVR::StageExtensionPhysical::Source atRight{};
+                    if (!R30CaptureStagePhysicalSource(atRight) ||
+                        !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+                            stageBefore, atRight))
+                    {
+                        rightFailure =
+                            OutRunVR::StereoFailureRightStateFailed;
                         rightHr = E_FAIL;
                     }
                 }

@@ -1358,6 +1358,17 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightStateFailed;
                     rightHr = E_FAIL;
                 }
+                // Native shader HUD shares +TIME with direct numeric and
+                // queued sprite producers. Reentrant state setters may
+                // replace the original raw c64, pose or SpriteNode epoch.
+                // Do not grant the prepared RIGHT eye to that foreign draw.
+                if (SUCCEEDED(rightHr) && exactStageEye &&
+                    !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+                        stageBeforeLeft, captureStageSource()))
+                {
+                    rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                    rightHr = E_FAIL;
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
