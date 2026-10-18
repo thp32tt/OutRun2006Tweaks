@@ -1002,7 +1002,7 @@ class UIScaling : public Hook
                    ProducerToken::ResultProgress, 9, 8) &&
                !PreserveNestedExactSpriteOwner(
                    ProducerToken::RankMarkerSprani,
-                   ProducerToken::ResultProgress, 8, 8) &&
+                   ProducerToken::ResultProgress, 7, 8) &&
                !PreserveNestedExactSpriteOwner(
                    ProducerToken::RankMarkerSprani,
                    ProducerToken::ResultProgress, 9, 0);
