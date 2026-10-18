@@ -50,7 +50,13 @@ def verify_stage_source_hook_boundary(source: str) -> None:
     safe = "callRva == 0x98A10 ? 0x98A18 : callRva + 5"
     assert safe in source, "unsafe 0x98A10 post-CALL hook mapping"
     assert "Module::exe_ptr(StageExtensionLeaveHookRva(rva)), StageExtensionLeave" in source
-    assert "0x9898E, 0x98A36, 0x98AC6" in source
+    from re import search
+    group = search(r"StageExtensionSpraniCalls\[\]\s*=\s*\{([^}]*)\}", source)
+    assert group is not None, "stage animation source array is missing"
+    values = tuple(int(x.strip(), 16) for x in group.group(1).split(",") if x.strip())
+    assert values == (0x9898E, 0x98A36), (
+        "REA mode-2 0x98AC6 must NOT inherit +TIME ScreenHud ownership")
+    assert "0x98AC6" in source, "REA mode-2 source separation context missing"
     assert "0x989AD, 0x98A10, 0x98A89" in source
 
 
