@@ -595,5 +595,38 @@ int main() {
             return 93; // preserve existing missing-WVP native fallback
     }
 
+    // Real +TIME/GOAL GPU-eye projection uses the same source coordinates
+    // for both native D3DX sprite and numeric glyph callbacks. Large BUT
+    // finite viewport edges must not overflow intermediate float *2 and
+    // incorrectly revoke an otherwise finite left/right GPU projection.
+    {
+        constexpr float large = 3.0e38f;
+        float lx = 17.f, ly = 19.f, rx = 23.f, ry = 29.f;
+        if (!ProjectPixelPair(left, right, large, 0.f,
+                0.f, 0.f, large, large, 1.f, lx, ly, rx, ry) ||
+            !std::isfinite(lx) || !std::isfinite(rx) ||
+            !(lx < large && rx > large) ||
+            !Near(ly, 0.f) || !Near(ry, 0.f))
+            return 94;
+        float oneX = 7.f, oneY = 9.f;
+        if (!ProjectPixel(left, large, 0.f,
+                0.f, 0.f, large, large, 1.f, oneX, oneY) ||
+            std::fabs(static_cast<double>(oneX) - lx) > large * 1.e-5 ||
+            !Near(oneY, ly))
+            return 95;
+        // A mathematically valid double output can still exceed the
+        // actual float pixel API range. Fail closed for BOTH eye outputs.
+        lx = 17.f; ly = 19.f; rx = 23.f; ry = 29.f;
+        if (ProjectPixelPair(identity, identity, large, 0.f,
+                large, 0.f, large, large, 1.f, lx, ly, rx, ry) ||
+            lx != 17.f || ly != 19.f || rx != 23.f || ry != 29.f)
+            return 96;
+        // No rescue for zero, NaN, bad clip W or malformed right eye.
+        float rightInvalid[16]{};
+        if (ProjectPixelPair(identity, rightInvalid, large, 0.f,
+                0.f, 0.f, large, large, 1.f, lx, ly, rx, ry) ||
+            lx != 17.f || rx != 23.f)
+            return 97;
+    }
     return 0;
 }

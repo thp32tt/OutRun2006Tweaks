@@ -49,41 +49,76 @@ namespace OutRunVR::StageExtensionPlane
                 relativeOffsets, relativeOrientations);
     }
 
+    // R84 stage +TIME and GOAL sprite/glyph sources use GAME pixels.
+    // Keep the source-to-NDC calculation in double precision: two finite
+    // viewport endpoints can overflow float during the *intermediate*
+    // (source-origin)*2 step, even when the final binocular pixel is valid.
+    // Do not accept NaN/Inf, empty viewports or non-positive optical scale.
+    inline bool SourcePixelNdc(
+        float sourceX, float sourceY, float viewportX, float viewportY,
+        float viewportWidth, float viewportHeight, float hudScale,
+        double& nx, double& ny) noexcept
+    {
+        if (!std::isfinite(sourceX) || !std::isfinite(sourceY) ||
+            !std::isfinite(viewportX) || !std::isfinite(viewportY) ||
+            !std::isfinite(viewportWidth) || !std::isfinite(viewportHeight) ||
+            !std::isfinite(hudScale) || viewportWidth <= 0.0f ||
+            viewportHeight <= 0.0f || hudScale <= 0.0f)
+            return false;
+        const double x = ((static_cast<double>(sourceX) - viewportX) *
+            2.0 / viewportWidth - 1.0) * hudScale;
+        const double y = (1.0 - (static_cast<double>(sourceY) - viewportY) *
+            2.0 / viewportHeight) * hudScale;
+        if (!std::isfinite(x) || !std::isfinite(y))
+            return false;
+        nx = x;
+        ny = y;
+        return true;
+    }
+
+    // One native physical eye. Preserve the caller's previous values when
+    // its clip W, matrix, destination float range or source is unprovable.
+    inline bool ProjectNdcEye(
+        const float clip[16], double nx, double ny,
+        float vx, float vy, float vw, float vh,
+        float& eyeX, float& eyeY) noexcept
+    {
+        if (!clip)
+            return false;
+        const double x = nx * clip[0] + ny * clip[4] + clip[12];
+        const double y = nx * clip[1] + ny * clip[5] + clip[13];
+        const double w = nx * clip[3] + ny * clip[7] + clip[15];
+        if (!std::isfinite(x) || !std::isfinite(y) ||
+            !std::isfinite(w) || w <= 1.0e-5)
+            return false;
+        const double projectedX = static_cast<double>(vx) +
+            (x / w + 1.0) * 0.5 * vw;
+        const double projectedY = static_cast<double>(vy) +
+            (1.0 - y / w) * 0.5 * vh;
+        if (!std::isfinite(projectedX) || !std::isfinite(projectedY))
+            return false;
+        const float outX = static_cast<float>(projectedX);
+        const float outY = static_cast<float>(projectedY);
+        if (!std::isfinite(outX) || !std::isfinite(outY))
+            return false;
+        eyeX = outX;
+        eyeY = outY;
+        return true;
+    }
+
     inline bool ProjectPixel(
         const float clipFromGameNdc[16], float sourceX, float sourceY,
         float viewportX, float viewportY, float viewportWidth,
         float viewportHeight, float hudScale,
         float& eyeX, float& eyeY) noexcept
     {
-        if (!clipFromGameNdc || !std::isfinite(sourceX) ||
-            !std::isfinite(sourceY) || !std::isfinite(viewportX) ||
-            !std::isfinite(viewportY) || !std::isfinite(viewportWidth) ||
-            !std::isfinite(viewportHeight) || !std::isfinite(hudScale) ||
-            viewportWidth <= 0.0f || viewportHeight <= 0.0f ||
-            hudScale <= 0.0f)
+        double nx = 0.0, ny = 0.0;
+        if (!SourcePixelNdc(sourceX, sourceY, viewportX, viewportY,
+                viewportWidth, viewportHeight, hudScale, nx, ny))
             return false;
-        const float nx = ((sourceX - viewportX) * 2.0f /
-                          viewportWidth - 1.0f) * hudScale;
-        const float ny = (1.0f - (sourceY - viewportY) * 2.0f /
-                          viewportHeight) * hudScale;
-        const float x = nx * clipFromGameNdc[0] +
-            ny * clipFromGameNdc[4] + clipFromGameNdc[12];
-        const float y = nx * clipFromGameNdc[1] +
-            ny * clipFromGameNdc[5] + clipFromGameNdc[13];
-        const float w = nx * clipFromGameNdc[3] +
-            ny * clipFromGameNdc[7] + clipFromGameNdc[15];
-        if (!std::isfinite(x) || !std::isfinite(y) ||
-            !std::isfinite(w) || w <= 1.0e-5f)
-            return false;
-        const float newX = viewportX + (x / w + 1.0f) *
-            0.5f * viewportWidth;
-        const float newY = viewportY + (1.0f - y / w) *
-            0.5f * viewportHeight;
-        if (!std::isfinite(newX) || !std::isfinite(newY))
-            return false;
-        eyeX = newX;
-        eyeY = newY;
-        return true;
+        return ProjectNdcEye(clipFromGameNdc, nx, ny,
+            viewportX, viewportY, viewportWidth, viewportHeight,
+            eyeX, eyeY);
     }
 
     // Apply the ESC pause slider AFTER binocular projection, just like the
@@ -124,40 +159,21 @@ namespace OutRunVR::StageExtensionPlane
         float viewportHeight, float hudScale,
         float& leftX, float& leftY, float& rightX, float& rightY) noexcept
     {
-        if (!leftClip || !rightClip || !std::isfinite(sourceX) ||
-            !std::isfinite(sourceY) || !std::isfinite(viewportX) ||
-            !std::isfinite(viewportY) || !std::isfinite(viewportWidth) ||
-            !std::isfinite(viewportHeight) || !std::isfinite(hudScale) ||
-            viewportWidth <= 0.0f || viewportHeight <= 0.0f ||
-            hudScale <= 0.0f)
+        double nx = 0.0, ny = 0.0;
+        if (!leftClip || !rightClip ||
+            !SourcePixelNdc(sourceX, sourceY, viewportX, viewportY,
+                viewportWidth, viewportHeight, hudScale, nx, ny))
             return false;
-
-        const float nx = ((sourceX - viewportX) * 2.0f /
-                          viewportWidth - 1.0f) * hudScale;
-        const float ny = (1.0f - (sourceY - viewportY) * 2.0f /
-                          viewportHeight) * hudScale;
-        const float* eyes[2]{ leftClip, rightClip };
-        float px[2]{}, py[2]{};
-        for (int eye = 0; eye < 2; ++eye)
-        {
-            const float* clip = eyes[eye];
-            const float x = nx * clip[0] + ny * clip[4] + clip[12];
-            const float y = nx * clip[1] + ny * clip[5] + clip[13];
-            const float w = nx * clip[3] + ny * clip[7] + clip[15];
-            if (!std::isfinite(x) || !std::isfinite(y) ||
-                !std::isfinite(w) || w <= 1.0e-5f)
-                return false;
-            px[eye] = viewportX + (x / w + 1.0f) *
-                0.5f * viewportWidth;
-            py[eye] = viewportY + (1.0f - y / w) *
-                0.5f * viewportHeight;
-            if (!std::isfinite(px[eye]) || !std::isfinite(py[eye]))
-                return false;
-        }
-        leftX = px[0];
-        leftY = py[0];
-        rightX = px[1];
-        rightY = py[1];
+        float lx = 0.0f, ly = 0.0f, rx = 0.0f, ry = 0.0f;
+        // +TIME's sprite and three numeric print callers must agree on
+        // the SAME game NDC and both complete eye projections. Never
+        // publish a successful LEFT when RIGHT fails (or vice versa).
+        if (!ProjectNdcEye(leftClip, nx, ny, viewportX, viewportY,
+                viewportWidth, viewportHeight, lx, ly) ||
+            !ProjectNdcEye(rightClip, nx, ny, viewportX, viewportY,
+                viewportWidth, viewportHeight, rx, ry))
+            return false;
+        leftX = lx; leftY = ly; rightX = rx; rightY = ry;
         return true;
     }
 
