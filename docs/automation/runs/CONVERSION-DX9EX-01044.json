@@ -7,18 +7,19 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "BUILD_VALIDATION_PENDING",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
-    "src/vr/game/render_semantics.hpp"
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
   ],
   "material_result_sha": "d7a1c693fc0da498c004d96a6bd381ee0206a02f",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
     "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
@@ -56,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_full_visual_route": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "goal_safe_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "goal_exact_sha_gates": "PENDING_EXACT_SHA"
+    "goal_full_visual_route": "PASS_EXACT_SHA",
+    "goal_safe_fallback": "PASS_EXACT_SHA",
+    "goal_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original GOAL progress sprites and 0x4B9200-family result text can submit multiple SpriteNodes under one source token, with D3DX Draw→Flush delayed relative to native producer.",
@@ -73,8 +74,8 @@
     ],
     "eye_ownership": "Only homogeneous exact GOAL ScreenHud D3DX batches flush under their previous SpriteNode/epoch before the next queue selection; matching eye GPU submissions still undergo conservative R84 per-eye validation.",
     "root_cause": "GOAL queue node transition predicate requires outgoingNode != incomingNode despite a guaranteed queue-epoch increment for every selection, allowing an old deferred batch to inherit the newly selected GOAL queue epoch in pointer-reuse cases.",
-    "fix_evidence": "material_result_sha d7a1c693fc0da498c004d96a6bd381ee0206a02f includes active C++ fix and 11 constexpr positive/negative regressions. Exact Windows CI still pending; HMD untested.",
-    "negative_test_evidence": "Compile-time checks cover distinct and identical GOAL node pointers, GOAL/result numeric tokens, null/inactive queue, foreign GOAL producer, +TIME, ScreenOverlay2D, WorldBillboard and unknown."
+    "fix_evidence": "Material C++ source d7a1c693fc0da498c004d96a6bd381ee0206a02f; same TASK contract e52c45de2775e226368b8a303ad536ee958293b9 and native smoke CI repair 185faf6da87ba3163efe5c4877ae0f6f397298f1. Exact SHA mandatory Actions 4/4 SUCCESS. Quest3/VDXR UNTESTED.",
+    "negative_test_evidence": "GOAL native C++ smoke fixture exits 65 on missing same-pointer queue fence in fail-before source; after material correction now asserts identical reused pointer is a new queued epoch. All queue-disabled, null, foreign, +TIME, world and generic-overlay negative cases retained. Exact SHA Win32/x64 Actions all SUCCESS."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -87,6 +88,50 @@
     "failed_run_id": 39130417983,
     "failed_step": "Policy run record missing",
     "repair": "Add required same-TASK feature run contract without changing the active renderer C++ fix",
-    "final_exact_sha_gates": "PENDING"
+    "final_exact_sha_gates": "PASS_EXACT_SHA",
+    "first_failed_exact_sha": "d7a1c693fc0da498c004d96a6bd381ee0206a02f",
+    "first_failed_run_id": 39130417983,
+    "second_failed_exact_sha": "e52c45de2775e226368b8a303ad536ee958293b9",
+    "second_failed_run_id": 39130573171,
+    "smoke_failure": "Original native GOAL eye smoke returned exit 65 because reused node had old negative expectation; same TASK_ID updated actual smoke and preserved other negative regressions",
+    "repair_commit_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+    "validation_bearing_result_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+    "verified_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39131003134,
+        "head_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39131003111,
+        "head_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39131003079,
+        "head_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39131003047,
+        "head_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+        "conclusion": "success"
+      }
+    ],
+    "build_validation": "BUILD_VERIFIED",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Same TASK_ID: GOAL source-backed D3DX node queue generation correction, C++ constexpr source positives/negatives and x64 native smoke fixture. Material SHA d7a1c693, validation-bearing repair SHA 185faf6; required exact SHA 4/4 SUCCESS. HMD not run, NEED_HMD_TEST. No new material/score for C6.",
+  "c6_evidence": {
+    "result": "PASS_EXACT_SHA",
+    "head_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+    "material_result_sha": "d7a1c693fc0da498c004d96a6bd381ee0206a02f",
+    "validation_bearing_result_sha": "185faf6da87ba3163efe5c4877ae0f6f397298f1",
+    "record_only": true,
+    "ci_skipped_in_checkpoint": true
   }
 }
