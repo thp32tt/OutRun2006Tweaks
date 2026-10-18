@@ -870,9 +870,12 @@ bool NativeGameEyeDrawEncoder::draw_instanced(
     UINT startVertex, UINT startInstance) noexcept {
     if (!live_game_stereo::may_issue_instanced(
             verticesPerInstance, instanceCount, drawCount_) ||
-        !eye_output_bound() || !replay_due_source_clears() ||
-        !eye_output_bound())
+        !eye_output_bound() || !replay_due_source_clears())
         return false;
+    // A native GPU SourceCopy/Stretch can temporarily rebind OM. Preserve
+    // the audited pre-replay guard AND recheck this actual XR-eye raster
+    // after chronological postpasses, before the game GPU Draw is issued.
+    if (!eye_output_bound()) return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool eligible = unpredicated &&
         raster_primitive_possible(verticesPerInstance);
@@ -894,9 +897,12 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
     INT baseVertex, UINT startInstance) noexcept {
     if (!live_game_stereo::may_issue_instanced(
             indicesPerInstance, instanceCount, drawCount_) ||
-        !eye_output_bound() || !replay_due_source_clears() ||
-        !eye_output_bound())
+        !eye_output_bound() || !replay_due_source_clears())
         return false;
+    // A native GPU SourceCopy/Stretch can temporarily rebind OM. Preserve
+    // the audited pre-replay guard AND recheck this actual XR-eye raster
+    // after chronological postpasses, before the game GPU Draw is issued.
+    if (!eye_output_bound()) return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool eligible = unpredicated &&
         raster_primitive_possible(indicesPerInstance);
