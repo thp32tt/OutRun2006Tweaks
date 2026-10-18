@@ -33,6 +33,7 @@
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
 #include "../game/render_semantics.hpp"
+#include "../game/universal_draw_trace.hpp"
 #include "../game/scene_effect_wvp_provenance.hpp"
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/projected_rank_stereo.hpp"
@@ -5709,6 +5710,8 @@ namespace OutRunVRStereo
                 R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 R29OwnerArmMonoSafety();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                    false, false, false);
                 return leftHr;
             }
 
@@ -5724,6 +5727,8 @@ namespace OutRunVRStereo
                 R29OwnerReportStereoFailure(
                     OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
                 R29OwnerArmMonoSafety();
+                OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                    true, false, false);
                 return leftHr;
             }
 
@@ -5742,6 +5747,8 @@ namespace OutRunVRStereo
                     R29OwnerReportStereoFailure(
                         OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
                     R29OwnerArmMonoSafety();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                        true, false, false);
                     return leftHr;
                 }
             }
@@ -5759,6 +5766,8 @@ namespace OutRunVRStereo
                     R29OwnerReportStereoFailure(
                         OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
                     R29OwnerArmMonoSafety();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                        true, false, false);
                     return leftHr;
                 }
             }
@@ -5779,6 +5788,8 @@ namespace OutRunVRStereo
                     R29OwnerReportStereoFailure(
                         OutRunVR::StereoFailureRightStateFailed, site, E_FAIL);
                     R29OwnerArmMonoSafety();
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                        true, false, false);
                     return leftHr;
                 }
             }
@@ -5818,6 +5829,9 @@ namespace OutRunVRStereo
                         device, savedRt, savedDepth, state.viewport, nullptr, false);
             }
 
+            // Left success does not prove the right GPU Draw/restore.
+            OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk);
             // Never publish a completed stereo draw or its pose metadata
             // before BOTH physical eyes and the game render state are valid.
             if (OutRunVR::StereoCompletion::CanPublishStereoDraw(

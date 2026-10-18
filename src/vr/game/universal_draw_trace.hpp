@@ -165,8 +165,9 @@ namespace OutRunVR::UniversalTrace
         std::atomic<std::uint64_t> failure{0};
         std::atomic<std::uint64_t> r33BothEyes{0};
         std::atomic<std::uint64_t> r33EyeOrRestoreFailed{0};
-        // This includes successful R30 early-exit stereo draws, as those
-        // don't pass the R33 HUD-specific eye-pair callback. NOT "mono".
+        std::atomic<std::uint64_t> r30BothEyes{0};
+        std::atomic<std::uint64_t> r30EyeOrRestoreFailed{0};
+        // No proven R30 OR R33 physical eye-pair outcome: unknown, NOT mono.
         std::atomic<std::uint64_t> noR33EyeEvidence{0};
         std::array<std::atomic<std::uint64_t>,ApiCount> api{};
         std::array<std::atomic<std::uint64_t>,RouteCount> route{};
@@ -187,6 +188,7 @@ namespace OutRunVR::UniversalTrace
         Family family = Family::Unknown;
         std::uint64_t attempts = 0, success = 0, failure = 0;
         std::uint64_t r33BothEyes = 0, r33EyeOrRestoreFailed = 0;
+        std::uint64_t r30BothEyes = 0, r30EyeOrRestoreFailed = 0;
         std::uint64_t noR33EyeEvidence = 0;
         std::array<std::uint64_t,ApiCount> api{};
         std::array<std::uint64_t,RouteCount> route{};
@@ -211,6 +213,9 @@ namespace OutRunVR::UniversalTrace
             w.r33BothEyes = src.r33BothEyes.exchange(0,std::memory_order_relaxed);
             w.r33EyeOrRestoreFailed =
                 src.r33EyeOrRestoreFailed.exchange(0,std::memory_order_relaxed);
+            w.r30BothEyes = src.r30BothEyes.exchange(0,std::memory_order_relaxed);
+            w.r30EyeOrRestoreFailed =
+                src.r30EyeOrRestoreFailed.exchange(0,std::memory_order_relaxed);
             w.noR33EyeEvidence =
                 src.noR33EyeEvidence.exchange(0,std::memory_order_relaxed);
             for (std::size_t j=0;j<ApiCount;++j)
@@ -238,18 +243,32 @@ namespace OutRunVR::UniversalTrace
         ScopedDraw* previous_ = nullptr;
         bool active_ = false;
         bool succeeded_ = false;
+        bool initialized_ = false;
+        bool pairFromR30_ = false;
+        DrawApi api_ = DrawApi::Primitive;
         bool paired_ = false;
         bool pairOk_ = false;
         Route route_ = Route::NoRouteEvidence;
         Family family_ = Family::Unknown;
         inline static thread_local ScopedDraw* current_ = nullptr;
     public:
-        ScopedDraw(bool enabled, DrawApi api) noexcept
+        ScopedDraw(bool enabled, DrawApi api) noexcept : api_(api)
         {
-            if (!enabled) return; // no semantic snapshot in release mode
+            if (!enabled) return;
+            // Physical provenance is selected by R33Guard's ConsumeForDraw.
+            // The pre-consumption one-shot scope may belong to an old Draw.
+            previous_=current_;
+            current_=this;
+            active_=true;
+        }
+        static void RefreshAfterSemanticSelection() noexcept
+        {
+            if (!current_ || !current_->active_ || current_->initialized_)
+                return;
+            auto& self = *current_;
             const auto cmd = GameSemantic::CapturePhysicalDrawCommand();
-            family_ = Classify(cmd);
-            auto& ctr = Counts[static_cast<std::size_t>(family_)];
+            self.family_ = Classify(cmd);
+            auto& ctr = Counts[static_cast<std::size_t>(self.family_)];
             ctr.attempts.fetch_add(1,std::memory_order_relaxed);
             if (cmd.queued) {
                 ctr.queued.fetch_add(1,std::memory_order_relaxed);
@@ -263,32 +282,36 @@ namespace OutRunVR::UniversalTrace
                                    std::memory_order_relaxed);
             ctr.lastScope.store(static_cast<unsigned>(cmd.scope),
                                 std::memory_order_relaxed);
-            ctr.api[static_cast<std::size_t>(api)].fetch_add(
+            ctr.api[static_cast<std::size_t>(self.api_)].fetch_add(
                 1,std::memory_order_relaxed);
             ctr.latestDrawId.store(
                 NextDrawId.fetch_add(1,std::memory_order_relaxed),
                 std::memory_order_relaxed);
-            if (family_ == Family::CentreC993)
+            if (self.family_ == Family::CentreC993)
                 ctr.latestCentreCall.store(
                     cmd.lensCentreCallEpoch,std::memory_order_relaxed);
-            previous_=current_;
-            current_=this;
-            active_=true;
+            self.initialized_ = true;
         }
         ScopedDraw(const ScopedDraw&)=delete;
         ScopedDraw& operator=(const ScopedDraw&)=delete;
         ~ScopedDraw() noexcept
         {
             if (!active_) return;
+            if (!initialized_) { current_ = previous_; return; }
             auto& ctr = Counts[static_cast<std::size_t>(family_)];
             ctr.route[static_cast<std::size_t>(route_)].fetch_add(
                 1,std::memory_order_relaxed);
             (succeeded_ ? ctr.success : ctr.failure).fetch_add(
                 1,std::memory_order_relaxed);
             if (paired_) {
-                (pairOk_ ? ctr.r33BothEyes :
-                    ctr.r33EyeOrRestoreFailed).fetch_add(
-                    1,std::memory_order_relaxed);
+                if (pairFromR30_)
+                    (pairOk_ ? ctr.r30BothEyes :
+                        ctr.r30EyeOrRestoreFailed).fetch_add(
+                        1,std::memory_order_relaxed);
+                else
+                    (pairOk_ ? ctr.r33BothEyes :
+                        ctr.r33EyeOrRestoreFailed).fetch_add(
+                        1,std::memory_order_relaxed);
             } else {
                 ctr.noR33EyeEvidence.fetch_add(1,std::memory_order_relaxed);
             }
@@ -303,8 +326,19 @@ namespace OutRunVR::UniversalTrace
         static void RecordR33EyePair(bool leftOk,bool rightOk,
                                     bool restored) noexcept
         {
-            if (!current_ || !current_->active_) return;
+            if (!current_ || !current_->initialized_) return;
             current_->paired_=true;
+            current_->pairFromR30_=false;
+            current_->pairOk_=leftOk && rightOk && restored;
+        }
+        // R30 early stereo reports both actual eye/restore outcomes;
+        // the outer native HRESULT remains the game's left-eye HRESULT.
+        static void RecordR30EyePair(bool leftOk,bool rightOk,
+                                    bool restored) noexcept
+        {
+            if (!current_ || !current_->initialized_) return;
+            current_->paired_=true;
+            current_->pairFromR30_=true;
             current_->pairOk_=leftOk && rightOk && restored;
         }
     };

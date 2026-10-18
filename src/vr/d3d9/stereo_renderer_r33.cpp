@@ -259,6 +259,9 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            // Bind diagnostic identity AFTER ConsumeForDraw; never use the
+            // previous one-shot HUD semantic to label the new physical draw.
+            OutRunVR::UniversalTrace::ScopedDraw::RefreshAfterSemanticSelection();
 
             if (!gameDevice || internalPass ||
                 OutRunVR::State::StateBlockTracker::Recording() ||
@@ -2036,7 +2039,7 @@ namespace OutRunVRStereo
                 if (!entry.attempts) continue;
                 spdlog::info(
                     "VR R84 DRAW TRACE 5s: family={} total={} ok={} fail={} "
-                    "eyes[both={},failed={},unverified={}] "
+                    "eyes[both={},failed={},unverified={},r30Both={},r30Failed={}] "
                     "source[queued={},unknown={},badQueue={},scope={},producer={},qEpoch={}] "
                     "route[none={},r30Fvf={},r30Xyz={},r33Hud={},r33World={},r29={},raw={},sbRaw={}] "
                     "api[dp={},dip={},dpup={},dipup={}] "
@@ -2044,7 +2047,8 @@ namespace OutRunVRStereo
                     OutRunVR::UniversalTrace::Name(entry.family),
                     entry.attempts, entry.success, entry.failure,
                     entry.r33BothEyes, entry.r33EyeOrRestoreFailed,
-                    entry.noR33EyeEvidence,
+                    entry.noR33EyeEvidence, entry.r30BothEyes,
+                    entry.r30EyeOrRestoreFailed,
                     entry.queued, entry.unknownProducer, entry.badQueueProvenance,
                     OutRunVR::GameSemantic::Name(static_cast<
                         OutRunVR::GameSemantic::RenderScope>(entry.lastScope)),

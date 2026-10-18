@@ -56,4 +56,16 @@ with tempfile.TemporaryDirectory() as d:
  assert source_result['families']['STAGE_PLUS_TIME']['source_site_coverage']['status']=='ALL_KNOWN_SITES_CAPTURED'
  assert not source_result['families']['STAGE_PLUS_TIME']['source_site_coverage']['not_captured_call_rvas']
  assert source_result['families']['WORLD']['status']=='NOT_OBSERVED'
- print('PASS native GPU failure, queue provenance, six +TIME callsites, source-only/no-eye attribution')
+ # R30 returns the native LEFT HRESULT even when RIGHT/restore fails:
+ # the diagnostic must detect this failure from physical-eye counters.
+ r30=root/'r30_early'
+ r30.mkdir()
+ (r30/'OutRun2006Tweaks.log').write_text(
+  'VR R84 DRAW TRACE 5s: family=RANK_6TH_OF_6 total=3 ok=3 fail=0 '
+  'eyes[both=0,failed=0,unverified=1,r30Both=1,r30Failed=1] '
+  'route[r30Fvf=2,raw=1]\\n')
+ r30_result=t.analyze(r30)
+ assert r30_result['families']['RANK_6TH_OF_6']['status']=='INVESTIGATE'
+ assert r30_result['families']['RANK_6TH_OF_6']['counters']['r30Both']==1
+ assert 'R30_EYE_OR_RESTORE_FAILED' in r30_result['families']['RANK_6TH_OF_6']['flags']
+ print('PASS native and R30 eye failure, source-only/queue provenance and six +TIME callsites')

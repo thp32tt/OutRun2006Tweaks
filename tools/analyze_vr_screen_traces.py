@@ -23,7 +23,8 @@ FAMILIES = (
 )
 FIELD_NAMES = ("total","ok","fail","both","failed","unverified",
                "queued","unknown","badQueue","none","r30Fvf","r30Xyz",
-               "r33Hud","r33World","r29","raw","sbRaw","dp","dip","dpup","dipup")
+               "r33Hud","r33World","r29","raw","sbRaw","dp","dip","dpup","dipup",
+               "r30Both","r30Failed")
 CHECKED_SOURCE_FAMILIES = {
     "STAGE_PLUS_TIME","RANK_6TH_OF_6","GOAL_RESULT_TIMER",
     "HUD_TEXT_DIGITS","PROJECTED_RANK","PAUSE_OPTION_ARROW","PLAYER_CAR_SHADOW",
@@ -119,6 +120,7 @@ def analyze(root: Path):
         flags=[]
         if nums.get("fail",0):flags.append("NATIVE_DRAW_FAILED")
         if nums.get("failed",0):flags.append("R33_EYE_OR_RESTORE_FAILED")
+        if nums.get("r30Failed",0):flags.append("R30_EYE_OR_RESTORE_FAILED")
         if nums.get("badQueue",0):flags.append("QUEUE_IDENTITY_INCOMPLETE")
         if nums.get("none",0):flags.append("DRAW_ROUTE_UNCLASSIFIED")
         if nums.get("unverified",0):flags.append("STEREO_OUTCOME_UNVERIFIED_NOT_MONO_PROOF")
@@ -129,6 +131,7 @@ def analyze(root: Path):
             status=("SOURCE_ONLY_GPU_NOT_ATTRIBUTED" if hud[family]["observed_rows"]
                     else "NOT_OBSERVED")
         elif any(x in flags for x in ("NATIVE_DRAW_FAILED",
+                                     "R30_EYE_OR_RESTORE_FAILED",
                                      "R33_EYE_OR_RESTORE_FAILED",
                                      "QUEUE_IDENTITY_INCOMPLETE")):
             status="INVESTIGATE"
