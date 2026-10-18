@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00907",
+  "production_id": "CONVERSION-DX11-00907",
+  "event_id": "CONVERSION-DX11-00907-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00907",
+  "feature_id": "DX11:OFFSCREEN_GAME_CAMERA_DRAW_RASTER_STEREO_INTEGRITY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:OFFSCREEN_GAME_CAMERA_DRAW_RASTER_STEREO_INTEGRITY",
+    "goal": "Keep live menu, car selection and race offscreen D3D11 auxiliary camera Draw/Indexed/instancing in exact physical viewport/scissor raster coverage before native L/R GPU postpass, without false source chronology or disabling original input and DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "camera_draw_coverage_and_gpu_postpass",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_native_game_camera_geometry_and_openxr_stereo",
+        "expected_behavior": "Actual game offscreen Draw and Indexed/instanced replay only advances source chronology if its physical camera RTV mip intersects viewport and enabled scissor, while valid geometry continues to native L/R eye GPU Copy."
+      },
+      {
+        "id": "no_stale_eye_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "physical_scissor_non_draw_and_game_fallback",
+        "expected_behavior": "No-coverage source Draw does not advance eye ordinals or source timeline and cannot certify stale eye pixels; clipped no-op Clear remains separate; original D3D9Ex/input/FFB and inactive DXVK unchanged."
+      },
+      {
+        "id": "gpu_warp_and_final_gate",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_camera_draw_replay_and_exact_sha_ci",
+        "expected_behavior": "Win32 WARP genuine offscreen Draw/Indexed/instancing rejects disjoint viewport/scissor and keeps in-target source copy accepted; all 5 exact-SHA gates pass; Quest3 untested."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Live game menu/vehicle/race auxiliary camera physical RTV mip and RS viewport/scissor -> native D3D11 Draw/Indexed/instanced geometry chronology",
+      "Bounded GPU camera postpass Copy/Stretch -> independent L/R OpenXR eye targets with strict original D3D9Ex fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_camera_view.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO:CAMERA_DRAW_RASTER_COVERAGE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY; physical WARP no-coverage/positive replay is not real OutRun menu, vehicle, race or Quest3 proof.",
+    "activation_guard_and_fallback": "Native opt-in fail-closed; original DX9Ex frame, input/FFB and SkyGlow preserved; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "WARP physical on-camera Draw/Indexed and camera-to-L/R GPU postpass retained in same regression.",
+      "negative_regression": "WARP disjoint real camera viewport+scissor rejects all 4 geometry APIs before draw chronology while preserving original DX9Ex fallbacks.",
+      "component_integration": "Native camera view physical coverage helper and actual stereo encoder source replay, narrow GPU WARP regression plus exact-SHA CI."
+    }
+  },
+  "acceptance_results": {
+    "camera_draw_coverage_and_gpu_postpass": "IMPLEMENTED_PENDING_CI",
+    "no_stale_eye_and_fallback": "IMPLEMENTED_PENDING_CI",
+    "gpu_warp_and_final_gate": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_camera_view.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "runtime_validation_note": "Quest3/VDXR and real OutRun game input/visual/performance not executed. Original D3D9Ex source untouched.",
+  "pipeline": {
+    "C0_RECOVER": "latest branch ca9e65e00160f8f6da4733e843cfc2c69f12cd88; prior 00906 C6 complete; no 00907 prior record",
+    "C1_REVIEW": "Confirmed offscreen draw accepted disjoint physical viewport/scissor whereas direct eye already rejects; source may be copied after no-pixel geometry.",
+    "C2_IMPLEMENT": "Physical selected RTV view intersection, four offscreen Draw entrypoints, WARP negative and positive source replay",
+    "C3_VALIDATE": "PENDING exact-SHA mandatory DX11 Fast/Backend/Build/OpenXR/HUD",
+    "C4_COMMIT": "MATERIAL_SOURCE",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_CI"
+  }
+}

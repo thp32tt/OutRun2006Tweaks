@@ -98,6 +98,36 @@ native_game_camera_dsv_extent(
         colorSampleQuality == depthSampleQuality;
 }
 
+// Unlike a Clear, a native camera Draw with zero raster intersection must
+// not advance the authentic geometry chronology: copying the untouched
+// offscreen camera later could otherwise advertise a stale menu/car eye.
+// Use the selected RTV mip/array PHYSICAL extent, not the allocation extent.
+// Fractional viewports are valid for D3D11; compute intersections in double
+// so a finite but very large float cannot overflow when adding its size.
+[[nodiscard]] inline bool native_game_camera_draw_coverage(
+    UINT width, UINT height, const D3D11_VIEWPORT& viewport,
+    bool scissorEnabled, const D3D11_RECT* scissor) noexcept {
+    if (!width || !height ||
+        !std::isfinite(viewport.TopLeftX) ||
+        !std::isfinite(viewport.TopLeftY) ||
+        !std::isfinite(viewport.Width) ||
+        !std::isfinite(viewport.Height) ||
+        viewport.Width <= 0.f || viewport.Height <= 0.f)
+        return false;
+    const double left = (std::max)(0.0, double(viewport.TopLeftX));
+    const double top = (std::max)(0.0, double(viewport.TopLeftY));
+    const double right = (std::min)(double(width),
+        double(viewport.TopLeftX) + double(viewport.Width));
+    const double bottom = (std::min)(double(height),
+        double(viewport.TopLeftY) + double(viewport.Height));
+    if (right <= left || bottom <= top) return false;
+    if (!scissorEnabled) return true;
+    return scissor && double(scissor->right) > left &&
+        double(scissor->bottom) > top &&
+        double(scissor->left) < right &&
+        double(scissor->top) < bottom;
+}
+
 // D3D9 Clear is clipped to the current game viewport and (when enabled)
 // scissor as well as to explicit pRects. D3D11 ClearRTV/DSV and ClearView
 // ignore RS clipping. Compute the exact single-camera GPU clear rectangle

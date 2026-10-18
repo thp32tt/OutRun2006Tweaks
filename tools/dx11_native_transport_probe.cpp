@@ -2189,6 +2189,51 @@ int main()
             encoder.color_draw_count() == beforeOffscreenEyeColor;
         ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
         if (!rejectsBorrowedEyeDepth) return false;
+        // An auxiliary camera Draw outside its physical target must not
+        // advance source chronology or contaminate a future OpenXR eye Copy.
+        // Confirm identical behavior for DrawIndexed and both instanced paths.
+        const D3D11_VIEWPORT outsideCameraViewport{
+            80.f, 80.f, 8.f, 8.f, 0.f, 1.f};
+        ctx->RSSetViewports(1u, &outsideCameraViewport);
+        const bool rejectsOffscreenViewport =
+            !encoder.draw_offscreen(gameOffscreen, 3u, 0u) &&
+            !encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0) &&
+            !encoder.draw_offscreen_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0u) &&
+            !encoder.draw_offscreen_indexed_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0, 0u) &&
+            encoder.draw_count() == beforeOffscreen;
+        ctx->RSSetViewports(1u, &viewport);
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState> previousCameraRaster;
+        ctx->RSGetState(previousCameraRaster.GetAddressOf());
+        Microsoft::WRL::ComPtr<ID3D11Device> cameraRasterDevice;
+        ctx->GetDevice(cameraRasterDevice.GetAddressOf());
+        D3D11_RASTERIZER_DESC cameraRasterDesc{};
+        cameraRasterDesc.FillMode = D3D11_FILL_SOLID;
+        cameraRasterDesc.CullMode = D3D11_CULL_NONE;
+        cameraRasterDesc.ScissorEnable = TRUE;
+        cameraRasterDesc.DepthClipEnable = TRUE;
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState> cameraRaster;
+        if (!cameraRasterDevice || FAILED(cameraRasterDevice->CreateRasterizerState(
+                &cameraRasterDesc, cameraRaster.GetAddressOf())))
+            return false;
+        ctx->RSSetState(cameraRaster.Get());
+        const D3D11_RECT outsideCameraScissor{80, 80, 88, 88};
+        ctx->RSSetScissorRects(1u, &outsideCameraScissor);
+        const bool rejectsOffscreenScissor =
+            !encoder.draw_offscreen(gameOffscreen, 3u, 0u) &&
+            !encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0) &&
+            !encoder.draw_offscreen_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0u) &&
+            !encoder.draw_offscreen_indexed_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0, 0u) &&
+            encoder.draw_count() == beforeOffscreen;
+        // Restore exactly the source viewport, scissor and caller raster
+        // before testing the genuine in-target game Draw and GPU postpass.
+        ctx->RSSetScissorRects(1u, &scissor);
+        ctx->RSSetState(previousCameraRaster.Get());
+        if (!rejectsOffscreenViewport || !rejectsOffscreenScissor)
+            return false;
         const bool issuedOffscreen = eyeIndex == 0u
             ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
             : encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0);

@@ -146,7 +146,8 @@ private:
     [[nodiscard]] bool game_source_target_bound(
         ID3D11RenderTargetView* gameTarget) const noexcept;
     [[nodiscard]] bool prepare_offscreen_game_draw(
-        ID3D11RenderTargetView* gameTarget) noexcept;
+        ID3D11RenderTargetView* gameTarget,
+        bool requireDrawableRaster) noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;

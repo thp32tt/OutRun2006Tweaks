@@ -169,6 +169,35 @@ struct ScopedNativePostpassOutputs final {
 }
 }
 
+// Real Draws have to overlap the selected camera's physical pixel area.
+// Clear and copy chronology use their own coverage rules, so a clipped
+// no-op game Clear remains successful without fabricating a geometry Draw.
+[[nodiscard]] bool camera_draw_coverage(
+    ID3D11DeviceContext* ctx, UINT width, UINT height) noexcept {
+    if (!ctx) return false;
+    D3D11_VIEWPORT viewport{};
+    UINT viewportCount = 1u;
+    ctx->RSGetViewports(&viewportCount, &viewport);
+    if (viewportCount != 1u) return false;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer;
+    ctx->RSGetState(rasterizer.GetAddressOf());
+    bool scissorEnabled = false;
+    if (rasterizer) {
+        D3D11_RASTERIZER_DESC desc{};
+        rasterizer->GetDesc(&desc);
+        scissorEnabled = desc.ScissorEnable != FALSE;
+    }
+    D3D11_RECT scissor{};
+    if (scissorEnabled) {
+        UINT count = 1u;
+        ctx->RSGetScissorRects(&count, &scissor);
+        if (count != 1u) return false;
+    }
+    return native_game_camera_draw_coverage(
+        width, height, viewport, scissorEnabled,
+        scissorEnabled ? &scissor : nullptr);
+}
+
 // Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
 // A callback may unbind OM to render a menu texture; counting that Draw
 // would publish an unchanged/stale XR eye although the GPU issued commands.
@@ -432,11 +461,27 @@ bool NativeGameEyeDrawEncoder::game_source_target_bound(
 }
 
 bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
-    ID3D11RenderTargetView* gameTarget) noexcept {
+    ID3D11RenderTargetView* gameTarget,
+    bool requireDrawableRaster) noexcept {
     if (!game_source_target_bound(gameTarget) ||
         !geometry_outputs_isolated(gameTarget) ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
+    if (requireDrawableRaster) {
+        Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+        gameTarget->GetResource(resource.GetAddressOf());
+        if (!resource || FAILED(resource.As(&texture)) || !texture)
+            return false;
+        D3D11_TEXTURE2D_DESC allocation{};
+        D3D11_RENDER_TARGET_VIEW_DESC selected{};
+        texture->GetDesc(&allocation);
+        gameTarget->GetDesc(&selected);
+        const auto camera = native_game_camera_rtv_extent(allocation, selected);
+        if (!camera.valid ||
+            !camera_draw_coverage(context_, camera.width, camera.height))
+            return false;
+    }
     // Real game TARGET Clears and Copy/Stretch events scheduled at the
     // preceding ordinal belong to the XR eye, even if its next game Draw
     // switches to an auxiliary camera. Temporarily replay into the ring RTV,
@@ -457,7 +502,7 @@ bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
 bool NativeGameEyeDrawEncoder::draw_offscreen(
     ID3D11RenderTargetView* gameTarget,
     UINT vertexCount, UINT startVertex) noexcept {
-    if (!vertexCount || !prepare_offscreen_game_draw(gameTarget))
+    if (!vertexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
@@ -467,7 +512,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen(
 bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
     ID3D11RenderTargetView* gameTarget,
     UINT indexCount, UINT startIndex, INT baseVertex) noexcept {
-    if (!indexCount || !prepare_offscreen_game_draw(gameTarget))
+    if (!indexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
@@ -484,7 +529,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
     UINT instanceCount, UINT startVertex, UINT startInstance) noexcept {
     if (!live_game_stereo::may_issue_instanced(
             verticesPerInstance, instanceCount, drawCount_) ||
-        !prepare_offscreen_game_draw(gameTarget))
+        !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
@@ -498,7 +543,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
     UINT startInstance) noexcept {
     if (!live_game_stereo::may_issue_instanced(
             indicesPerInstance, instanceCount, drawCount_) ||
-        !prepare_offscreen_game_draw(gameTarget))
+        !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
@@ -520,7 +565,7 @@ void NativeGameEyeDrawEncoder::set_source_clear_timeline(
 bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
     ID3D11RenderTargetView* gameTarget, std::uint32_t argb,
     const D3D11_RECT* region) noexcept {
-    if (!prepare_offscreen_game_draw(gameTarget)) return false;
+    if (!prepare_offscreen_game_draw(gameTarget, false)) return false;
     Microsoft::WRL::ComPtr<ID3D11Resource> resource;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
     gameTarget->GetResource(resource.GetAddressOf());
@@ -582,7 +627,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
     if (!gameDepth || gameDepth == eyeDepth_ ||
         (!clearDepth && !clearStencil) ||
         (clearDepth && (!std::isfinite(depth) || depth < 0.f || depth > 1.f)) ||
-        !prepare_offscreen_game_draw(gameTarget)) return false;
+        !prepare_offscreen_game_draw(gameTarget, false)) return false;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> boundDepth;
     context_->OMGetRenderTargets(0u, nullptr, boundDepth.GetAddressOf());
     if (boundDepth.Get() != gameDepth) return false;
