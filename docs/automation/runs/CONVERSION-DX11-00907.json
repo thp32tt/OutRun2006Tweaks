@@ -72,9 +72,9 @@
     }
   },
   "acceptance_results": {
-    "camera_draw_coverage_and_gpu_postpass": "IMPLEMENTED_PENDING_CI",
-    "no_stale_eye_and_fallback": "IMPLEMENTED_PENDING_CI",
-    "gpu_warp_and_final_gate": "PENDING_EXACT_SHA"
+    "camera_draw_coverage_and_gpu_postpass": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "no_stale_eye_and_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "gpu_warp_and_final_gate": "PASS_EXACT_SHA_MANDATORY_5_OF_5"
   },
   "changed_files": [
     "src/vr/d3d11/native_game_camera_view.hpp",
