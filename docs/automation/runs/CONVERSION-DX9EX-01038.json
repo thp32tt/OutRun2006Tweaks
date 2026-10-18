@@ -12,7 +12,7 @@
   "feature_id": "DX9EX:R84:PRE_DRAW_FRAME_STATE_CORRUPTION",
   "feature_class": "CRITICAL_BLOCKER",
   "symptom_id": "DX9EX:R84:PRE_DRAW_FRAME_STATE_CORRUPTION",
-  "material_result_sha": null,
+  "material_result_sha": "8b9df32c6736fc18fad001e32aa9b9de0aabfbe2",
   "validation_bearing_result_sha": "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "xyzhw_no_phantom_draw": "SOURCE_ORDER_STATIC_PASS_PENDING_CI",
-    "shader_c64_failure_preserves_backup": "SOURCE_ORDER_STATIC_PASS_PENDING_CI",
-    "r84_exact_sha_integrated_ci": "PENDING_CI"
+    "xyzhw_no_phantom_draw": "PASS_EXACT_SHA",
+    "shader_c64_failure_preserves_backup": "PASS_EXACT_SHA",
+    "r84_exact_sha_integrated_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Confirmed by native source code, not an observed Quest3 frame; compiler-level/behavioral fault is pre-submit state accounting before admission and WVP upload.",
@@ -80,5 +80,45 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "Material source correction and P0 verifier with negative mutations staged for final exact-SHA CI. 01037 GOAL work remains independent. No CI/HMD PASS claimed before matching evidence."
+  "notes": "C6 confirmed exact-SHA mandatory 4/4 SUCCESS. Source implementation recorded under original material commit; subsequent same-TASK verifier repairs and C6 bookkeeping carry no duplicate score. R84 GPU pre-draw state is build/static-verified only; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED. DXVK frozen, R26_SAFE/input/FFB/SkyGlow protected.",
+  "latest_event_id": "CONVERSION-DX9EX-01038-E003",
+  "latest_event_type": "retry",
+  "latest_attempt": "2/3",
+  "ci_evidence": {
+    "head_sha": "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33",
+    "verified_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39120167130,
+        "head_sha": "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39120167128,
+        "head_sha": "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39120167186,
+        "head_sha": "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39120167100,
+        "head_sha": "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33",
+        "conclusion": "success"
+      }
+    ],
+    "build_validation": "BUILD_VERIFIED",
+    "runtime_validation": "UNTESTED",
+    "original_material_source_sha": "8b9df32c6736fc18fad001e32aa9b9de0aabfbe2",
+    "ci_repair_shas": [
+      "f9a6201b227440ecbf3d54c93e2c5958ae80f458",
+      "2feb11928e7dcd9952bd11bbf781f0fe0a22046c",
+      "ad33913bdc4357bba17eb34dfc5e98ce68bbbc33"
+    ]
+  }
 }
