@@ -1230,14 +1230,20 @@ if "R9DrawCallCount()" not in r20:
 if "R9DrawCallCount()" not in r9:
     errors.append("R9 missing draw-count owner query API")
 
+# R84's accepted physical left draw now accounts only AFTER source/FVF
+# admission and a successful shader c64 upload. An early E_NOTIMPL must not
+# decrement a count which was never incremented, or leave the mono-backup gap
+# poisoned. Preserve the separate R26_SAFE rollback and the R9 owner API.
 for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
     if "--R9DrawCalls;" in source:
         errors.append(f"{rel} retained direct R9 draw-count rollback")
-    expected = ("R29OwnerUndoStereoDrawCount();" if
-                R84_MODERN_OWNER_LAYOUT and rel == "R30" else
-                "R9UndoStereoDrawCount();")
-    if expected not in source:
-        errors.append(f"{rel} missing draw-count rollback owner API: {expected}")
+    if R84_MODERN_OWNER_LAYOUT and rel == "R30":
+        for obsolete in ("R29OwnerUndoStereoDrawCount();",
+                         "R9UndoStereoDrawCount();"):
+            if obsolete in source:
+                errors.append("R84 R30 reintroduced a pre-GPU rollback: " + obsolete)
+    elif "R9UndoStereoDrawCount();" not in source:
+        errors.append(f"{rel} missing draw-count rollback owner API: R9UndoStereoDrawCount();")
 if "R9UndoStereoDrawCount()" not in r9:
     errors.append("R9 missing draw-count rollback owner API")
 

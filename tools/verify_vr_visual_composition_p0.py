@@ -3140,6 +3140,8 @@ def check_r30_pre_draw_accounting(xyz, shader):
         ('R30 shader ScreenHud/SceneEffect', shader,
          'if (!leftWvpOk)', 'const HRESULT leftHr = actualDraw();'),
     ):
+        if 'R29OwnerUndoStereoDrawCount(' in body:
+            raise SystemExit(f'{label}: retired pre-GPU rollback returned')
         for token in ('R29OwnerNoteStereoDrawWithoutMonoBackup();',
                       'R29OwnerNoteMainDepthContentWrite();'):
             if body.count(token) != 1:
@@ -3179,6 +3181,10 @@ for desc, mutant_xyz, mutant_shader in (
                          'if (!leftWvpOk)', 1)),
     ('missing shader depth generation', xyz_body,
      screen_body.replace('R29OwnerNoteMainDepthContentWrite();', '', 1)),
+    ('spurious native pre-draw undo', xyz_body,
+     screen_body.replace('const HRESULT leftHr = actualDraw();',
+                         'R29OwnerUndoStereoDrawCount();\n'
+                         'const HRESULT leftHr = actualDraw();', 1)),
 ):
     try:
         check_r30_pre_draw_accounting(mutant_xyz, mutant_shader)
