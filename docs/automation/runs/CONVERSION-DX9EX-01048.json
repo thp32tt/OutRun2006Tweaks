@@ -2,20 +2,20 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01048",
   "production_id": "CONVERSION-DX9EX-01048",
-  "event_id": "CONVERSION-DX9EX-01048-E003",
+  "event_id": "CONVERSION-DX9EX-01048-E004",
   "event_type": "retry",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
-  "checkpoint": "C5_GATE_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "2dcb484071a5681fb5599c9e4690057bd2d68548",
-  "validation_bearing_result_sha": "PENDING_CI",
+  "validation_bearing_result_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -58,9 +58,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_owner_exact_both_eyes": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "stage_owner_fail_closed": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "stage_owner_exact_sha_ci": "PENDING_EXACT_SHA"
+    "stage_owner_exact_both_eyes": "PASS_EXACT_SHA",
+    "stage_owner_fail_closed": "PASS_EXACT_SHA",
+    "stage_owner_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "+TIME native presentation has three original sprite and three numeric producer calls; D3DX replay and the R30/R33 physical HUD GPU paths are separate from producer hook lifetime.",
@@ -89,7 +89,49 @@
     "initial_active_conclusion": "failure",
     "initial_active_failure": "EXACT_HEAD_RUN_RECORD_MISSING",
     "run_record_correction": "CREATE_MISSING_RECORD",
+    "runtime_validation": "UNTESTED",
+    "validation_bearing_result_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301",
+    "final_exact_sha_gates": "SUCCESS_4_OF_4",
+    "gate_results": {
+      "DX9Ex Active Validation": {
+        "run_id": 39141290437,
+        "conclusion": "success",
+        "head_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39141290526,
+        "conclusion": "success",
+        "head_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39141290440,
+        "conclusion": "success",
+        "head_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39141290561,
+        "conclusion": "success",
+        "head_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301"
+      }
+    }
+  },
+  "notes": "Retry E003 repairs missing exact-HEAD feature run record that stopped Active policy before compilation. Original implementation remains material commit 2dcb484071a5681fb5599c9e4690057bd2d68548; this is a separate record/validation-enabling commit, not new C++ implementation or score. No Quest3/VDXR execution. E004 C6: all four exact-SHA Windows GitHub gates succeeded on validation-bearing 77b26e0a819cf9bd6a2264420865dbeb500bc301. Preserve 2dcb4840 original source material. This record-only checkpoint contains no new renderer implementation, does not claim Quest3 behavior or add another score, and does not repeat GitHub CI.",
+  "acceptance_evidence_scope": {
+    "stage_owner_exact_both_eyes": "PASS_EXACT_SHA reflects native C++ changed-path smoke plus Windows x86 R84 build gates only; headset visual single-image remains UNTESTED",
+    "stage_owner_fail_closed": "PASS_EXACT_SHA reflects physical source mismatch negative smoke and 4/4 exact SHA automated gates, not game runtime verification",
+    "stage_owner_exact_sha_ci": "Four required GitHub workflows all concluded SUCCESS against the identical validation-bearing exact SHA",
+    "hmd_acceptance": "NEED_HMD_TEST",
     "runtime_validation": "UNTESTED"
   },
-  "notes": "Retry E003 repairs missing exact-HEAD feature run record that stopped Active policy before compilation. Original implementation remains material commit 2dcb484071a5681fb5599c9e4690057bd2d68548; this is a separate record/validation-enabling commit, not new C++ implementation or score. No Quest3/VDXR execution."
+  "c6_evidence": {
+    "result": "PASS_EXACT_SHA",
+    "original_material_sha": "2dcb484071a5681fb5599c9e4690057bd2d68548",
+    "validation_bearing_result_sha": "77b26e0a819cf9bd6a2264420865dbeb500bc301",
+    "required_gate_count": 4,
+    "passed_gate_count": 4,
+    "record_only": true,
+    "runtime_validation": "UNTESTED",
+    "hmd_optical_status": "NEED_HMD_TEST",
+    "preserve_active_windows_ci": true
+  }
 }
