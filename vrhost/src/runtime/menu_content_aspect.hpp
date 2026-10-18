@@ -293,6 +293,37 @@ namespace OutRunVrMenuAspect
         return static_cast<float>(aspect);
     }
 
+    // Quest 3 2026-10-19 screenshot: the ORIGINAL game's complete
+    // widescreen front-end is anamorphic. The main menu was projected at
+    // 3440/1440 without undoing its horizontal raster stretch. Its labels
+    // and Ferrari were wide/vertically crushed inside a short center band.
+    // Keep the FULL captured UV (no Ferrari clipping), but project the
+    // complete main-menu texture onto a 4:3 optical plane. The menu fits
+    // HEIGHT first, without the previous wide-screen height stabilizer.
+    // Only the original title/main states can do this; the car selector
+    // has genuine authored content wider than 4:3.
+    inline constexpr bool RestoreFullMainMenuFourThree(
+        std::uint32_t gameState, bool completeClient,
+        bool explicitNativeAspect, bool wideVehicleSelector,
+        bool croppedFragment) noexcept
+    {
+        return (gameState == 0x04u || gameState == 0x09u) &&
+            completeClient && !explicitNativeAspect &&
+            !wideVehicleSelector && !croppedFragment;
+    }
+    static_assert(RestoreFullMainMenuFourThree(
+        0x04u, true, false, false, false));
+    static_assert(RestoreFullMainMenuFourThree(
+        0x09u, true, false, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x0Au, true, false, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x04u, false, false, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x04u, true, true, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x04u, true, false, true, false));
+
     // Do not restore a 4:3 optical aspect from game state alone.
     // The whole captured 3440x1440/1920x1080 image has that physical
     // aspect even if its native menu artwork is already letterboxed.
