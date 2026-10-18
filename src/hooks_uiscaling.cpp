@@ -964,6 +964,52 @@ class UIScaling : public Hook
 		return original(arg);
 	}
 
+    // GOAL 0-99%, completed title/time helpers and verified B9200 glyphs
+    // must not stamp a fresh queue from a recycled native priority root.
+    // Compile-time negative cases: detached/reused tail, new root, bounded
+    // traversal, newly nested GOAL/rank token, stale serial and unknown.
+    struct GoalQueueFixture { GoalQueueFixture* next_0 = nullptr; };
+    static constexpr bool TestGoalProgressQueueOwners() noexcept
+    {
+        using OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot;
+        using namespace OutRunVR::GameSemantic;
+        GoalQueueFixture root{}, previous{}, newGlyph{}, tail{}, otherRoot{};
+        root.next_0 = &previous;
+        previous.next_0 = &newGlyph;
+        newGlyph.next_0 = &tail;
+        if (FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &root, &previous, &tail, 3) != &newGlyph ||
+            FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &otherRoot, &previous, &tail, 3) != nullptr ||
+            FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &root, &previous, &tail, 2) != nullptr)
+            return false;
+        root.next_0 = &newGlyph; // old tail has been unlinked/reused.
+        if (FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &root, &previous, &tail, 3) != nullptr)
+            return false;
+        return PreserveNestedExactSpriteOwner(
+                   ProducerToken::RankMarkerSprani,
+                   ProducerToken::ResultProgress, 9, 8) &&
+               PreserveNestedExactSpriteOwner(
+                   ProducerToken::StageExtensionTime,
+                   ProducerToken::ResultTextB9200, 9, 8) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::None,
+                   ProducerToken::ResultProgress, 9, 8) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::ResultProgress,
+                   ProducerToken::ResultProgress, 9, 8) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::RankMarkerSprani,
+                   ProducerToken::ResultProgress, 8, 8) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::RankMarkerSprani,
+                   ProducerToken::ResultProgress, 9, 0);
+    }
+    static_assert(TestGoalProgressQueueOwners(),
+        "GOAL SpriteNodes require stable priority root and nested owner proof");
+
 	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
 	// position as floats, so the discarded fraction goes straight back on.
 	static void TagAppendedNodes(
@@ -1233,13 +1279,22 @@ class UIScaling : public Hook
     inline static thread_local std::uint64_t ResultProgressCompletedCalls = 0;
 	inline static thread_local
 		std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressTailsBefore{};
+    inline static thread_local
+        std::array<SpriteNode*, Game::SpritePriorityCount> ResultProgressRootsBefore{};
+    inline static thread_local std::uint64_t ResultProgressEntrySerial = 0;
 	static void ResultProgressEnter(safetyhook::Context&)
 	{
 		if (ResultProgressDepth++ != 0)
 			return;
+        // Queue ownership belongs to this exact 0-99% parent ONLY if the
+        // priority root is still the same after the native E8 returns.
+        ResultProgressEntrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            ResultProgressRootsBefore[prio] = root;
 			ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
         // 0x97BE4/0x97DEC submit synchronous animated digits plus queued
@@ -1281,7 +1336,8 @@ class UIScaling : public Hook
         }
 		TagAppendedNodes(ResultProgressTailsBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+			OutRunVR::GameSemantic::ProducerToken::ResultProgress,
+            nullptr, &ResultProgressRootsBefore, ResultProgressEntrySerial);
         // D3DXSprite::Draw can defer submission past this original E8.
         // Submit only a proven homogeneous ResultProgress batch while its
         // exact source is live, before restoring the previous semantic.
@@ -1298,6 +1354,8 @@ class UIScaling : public Hook
                 Game::game_mode ? *Game::game_mode : -1);
         }
 		ResultProgressTailsBefore = {};
+        ResultProgressRootsBefore = {};
+        ResultProgressEntrySerial = 0;
 	}
 
     inline static SafetyHookMid StageExtensionEnterHooks[
@@ -1455,9 +1513,14 @@ class UIScaling : public Hook
 	static void GoalTime_TagHelper(int helperRva)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
+        const auto entrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            rootsBefore[prio] = root;
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 		// Current R84 queue authority has no ScopedProducerSemantic class.
@@ -1494,7 +1557,8 @@ class UIScaling : public Hook
             FlushD3DXAtDirectGoalSourceExit();
         goalDirectDrawOwner.reset();
 		TagAppendedNodes(before,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer,
+            nullptr, &rootsBefore, entrySerial);
 	}
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
@@ -1749,17 +1813,23 @@ class UIScaling : public Hook
 		// glyph-generation CALLs both reach put_sprite_ex at 0x2CFE0.
 		// Sumo_Printf (including stage/result 0x975EE / 0x97727 /
 		// 0x977FB) can emit a group, not just the final priority tail.
+        // Capture exact B9200 parent provenance before it can reenter the
+        // native glyph routine. Generic text keeps its original fast path.
+        const bool exactGoalResult = IsOriginalB9200GoalGlyph();
+        const auto entrySerial = exactGoalResult
+            ? OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire) : 0;
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            if (exactGoalResult)
+                rootsBefore[prio] = root;
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
-        // Source verification happens BEFORE the original game allocates
-        // nodes or submits direct glyphs. A verified B9200 caller must
-        // survive into R84's queued SpriteNode and GPU-eye plane; unrelated
-        // HUD/GOAL helpers keep the old TextGlyphPutSprite provenance.
-        const bool exactGoalResult = IsOriginalB9200GoalGlyph();
+        // Only verified original B9200 callers carry the stable-root and
+        // nested-serial proof; unverified glyphs retain native fallback.
         const bool directGoalResult = exactGoalResult &&
             !OutRunVR::GameSemantic::QueueRenderActive();
         std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
@@ -1787,7 +1857,8 @@ class UIScaling : public Hook
         {
             TagAppendedNodes(tailsBefore,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+                OutRunVR::GameSemantic::ProducerToken::ResultTextB9200,
+                nullptr, &rootsBefore, entrySerial);
         }
         else
         {
