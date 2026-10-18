@@ -18,6 +18,8 @@ namespace OutRunVR::DirectSpriteSource
         ProducerToken producer = ProducerToken::None;
         bool queueActive = false;
         bool externalOverlay = false;
+        // Preserve the exact native source-entry registration generation.
+        std::uint64_t registrationSerial = 0;
     };
 
     inline Snapshot Capture() noexcept
@@ -25,7 +27,9 @@ namespace OutRunVR::DirectSpriteSource
         return { GameSemantic::CurrentScope,
                  GameSemantic::CurrentDirectExactProducer,
                  GameSemantic::QueueRenderActive(),
-                 GameSemantic::ExternalOverlaySemanticDepth != 0 };
+                 GameSemantic::ExternalOverlaySemanticDepth != 0,
+                 GameSemantic::SpriteNodeSemanticNextSerial.load(
+                     std::memory_order_acquire) };
     }
 
     constexpr ProducerToken ProvenScreenHudProducer(
@@ -57,6 +61,36 @@ namespace OutRunVR::DirectSpriteSource
             return ProducerToken::None;
         }
     }
+
+    // The native sprite call can reenter another exact source. Keep those
+    // newly registered children, but allow unknown, same, and old tags to
+    // inherit the proven enclosing source through the existing queue path.
+    constexpr bool TestNestedDirectSpriteOwner() noexcept
+    {
+        const Snapshot entry{
+            RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+            false, false, 42 };
+        return GameSemantic::PreserveNestedExactSpriteOwner(
+                   ProducerToken::GoalTime020,
+                   entry.producer, 43, entry.registrationSerial) &&
+               GameSemantic::PreserveNestedExactSpriteOwner(
+                   ProducerToken::RankMarkerSprani,
+                   ProducerToken::None, 44, entry.registrationSerial) &&
+               !GameSemantic::PreserveNestedExactSpriteOwner(
+                   ProducerToken::None,
+                   entry.producer, 45, entry.registrationSerial) &&
+               !GameSemantic::PreserveNestedExactSpriteOwner(
+                   entry.producer,
+                   entry.producer, 46, entry.registrationSerial) &&
+               !GameSemantic::PreserveNestedExactSpriteOwner(
+                   ProducerToken::GoalTime020,
+                   entry.producer, 41, entry.registrationSerial) &&
+               !GameSemantic::PreserveNestedExactSpriteOwner(
+                   ProducerToken::GoalTime020,
+                   entry.producer, 43, 0);
+    }
+    static_assert(TestNestedDirectSpriteOwner(),
+        "Native direct SpriteNodes must preserve exact nested producers");
 
     constexpr Snapshot Hud(ProducerToken token) noexcept
     {

@@ -1026,6 +1026,8 @@ class TextureReplacement : public Hook
 			// appended by this unrelated HUD producer. The helper also
 			// verifies both tails using a bounded walk from the live root.
 			// Unknown/rebuilt queues stay untagged; do not read old tail.
+			// A nested exact GOAL/rank/HUD child owns its newer producer.
+			// Do not erase it when the enclosing native put_sprite returns.
 			SpriteNode* node = OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
 				before[prio].root, root, before[prio].tail,
 				tailAfter, Game::SpriteNodeMax);
@@ -1033,7 +1035,8 @@ class TextureReplacement : public Hook
 				node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope, producer);
+					node, scope, producer, nullptr,
+					sourceBefore.registrationSerial);
 				if (node == tailAfter)
 					break;
 				node = node->next_0;

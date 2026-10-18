@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01035",
+  "production_id": "CONVERSION-DX9EX-01035",
+  "event_id": "CONVERSION-DX9EX-01035-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_MATERIAL_COMMITTED_CI_PENDING",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/game/direct_sprite_source_provenance.hpp",
+    "src/hooks_textures.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Preserve original native HUD, result GOAL, and projected rank SpriteNode identity when direct put_sprite_ex or put_sprite_ex2 is reentered by distinct exact producers so a native ScreenHud draw cannot erase the child physical source.",
+    "scope_boundary": "Only native put_sprite_ex and put_sprite_ex2 source-capture/post-call queue tagging; preserve all existing D3DX batch ordering, R84 shader veto, SkyGlow, lens, game input/FFB, DXVK freeze and R26_SAFE.",
+    "trace_stages": [
+      "Original put_sprite_ex/ex2 source enters with its return RVA, exact parent semantics and an atomic SpriteNode semantic entry serial.",
+      "Nested native producers may register a different exact GOAL/rank SpriteNode while the outer original call continues on the same live priority queue.",
+      "Bounded stable-root reachability selects newly appended children, and preserved identity continues through R84 physical left and right D3D9 GPU Draw or native fail-closed fallback."
+    ],
+    "subcomponents": [
+      "Capture semantic registration source entry generation alongside the original exact HUD source token and queue/external scope on both native hook entry paths.",
+      "Retain newer other-exact nested source tags through the existing semantic registry's serial guard while tagging unknown, same and stale native SpriteNodes normally.",
+      "Apply compile-time negative regressions for GOAL/rank, unknown/same, stale serial and no entry proof, preserving D3D9/R84 queue/fallback isolation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_direct_parent_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original native put_sprite_ex/ex2 SpriteNode queue and R84 left/right physical draw",
+        "expected_behavior": "Direct original parent tags unknown and matching HUD children without overriding any distinct nested exact source tag."
+      },
+      {
+        "id": "nested_goal_rank_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Nested exact GOAL and rank, stale recycled pointers, same/unknown source and queue fallback",
+        "expected_behavior": "Newer GOAL and projected rank tags survive, older/stale/unknown/same owners are eligible, and stable-root queue proof remains active."
+      },
+      {
+        "id": "required_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 x86 source, host x64, rollback/package, Domain, HUD Inspector and Full Source gate",
+        "expected_behavior": "All mandatory GitHub Actions succeed at one exact validation-bearing SHA; Quest3 runtime remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_direct_parent_ownership": "PENDING_CI",
+    "nested_goal_rank_isolation": "PENDING_CI",
+    "required_exact_sha_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "The original native put_sprite_ex/ex2 may enqueue multiple children and reenter exact HUD, GOAL, or vehicle rank producers before returning; original callsite and bounded tails are already known.",
+    "source_trace": [
+      "The native hook captures original semantic scope and priority-list tails before calling the original producer.",
+      "The nested original producer may register its own exact source and token before the outer native source returns.",
+      "The common post-call direct tagger previously registered scope/token without the semantic registry's preserveNewerExactSince entry serial.",
+      "That registration could clobber newer nested source identity before the existing R84 queue picks the physical draw owner."
+    ],
+    "root_cause": "The direct post-call tagger did not pass the exact original entry registration serial into RegisterSpriteNodeScope, so it could erase another distinct newer exact producer published by a nested native call.",
+    "alternatives_rejected": [
+      "Do not globally change unknown sprites to HUD, force a D3DX Flush, bypass root/tail reachability, inherit stale world WVP or alter the right-eye renderer."
+    ],
+    "fix_evidence": "Capture the SpriteNode semantic next serial with the original entry Snapshot and give it to the shared mutex-held exact nested producer guard when registering direct native siblings.",
+    "negative_test_evidence": "Native constexpr tests exercise newer GOAL and rank against outer +TIME/unknown, None and same-source, stale/reused generation and zero entry serial.",
+    "eye_ownership": "R84 will still use its existing selected SpriteNode queue identity for left/right or original fallback. Exact HMD stereoscopic output is not proven without matching runtime evidence."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "Class A structural native HUD producer-collision repair; baseline 2be4f0729f3d82fb548cb012ce96a3fd44ca5d89; compile-time regression in changed header; no Quest3 test. Material commit SHA will be recorded after the actual SHA exists."
+}
