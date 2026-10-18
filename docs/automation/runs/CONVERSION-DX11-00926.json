@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00926",
+  "production_id": "CONVERSION-DX11-00926",
+  "event_id": "CONVERSION-DX11-00926-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00926",
+  "feature_id": "DX11:REAL_GAME_SM3_CULL_ALPHA_NATIVE_COMPOSITE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 1,
+  "score_run_key": "CONVERSION-DX11-00926",
+  "score_ssot_repo": "thp32tt/ai-dev-lab",
+  "score_ssot_path": "AI_SCOREBOARD.md",
+  "score_ssot_commit": "e15266729c065320871ab073fa9f3acfd8d8591a",
+  "material_result_sha": "e8f8acc7b63df0f21387eb00c0dadecc98f0cc61",
+  "validation_bearing_result_sha": "d3ade48dc58db4cd42a09756bd0d667b236e563f",
+  "source_repair_shas": [
+    "9512e591faccbbaad8436ad1324e8c2db177a977",
+    "d3ade48dc58db4cd42a09756bd0d667b236e563f"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_SM3_CULL_ALPHA_NATIVE_COMPOSITE",
+    "goal": "Preserve game-authored programmable SM3 native Draw/DrawIndexed triangle winding and four exact D3D9 alpha composite equations with source-owned D3D11 raster/OM state; fail closed to original D3D9 for unrepresentable blending and states.",
+    "acceptance_items": [
+      {
+        "id": "real_sm3_native_cull_blend_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_shader_draw_indexed_gpu_raster_om",
+        "expected_behavior": "Real game opt-in D3D9 SM3 draw issues D3D11 Draw/DrawIndexed with source CW/CCW and four known blend combinations."
+      },
+      {
+        "id": "unsupported_state_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_render_input_ffb_fallback",
+        "expected_behavior": "Unsupported blend op/factors/separate alpha, depth, stencil, fog and raster state never promote to native draw and original D3D9 Draw/input/FFB survives."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "source_build_dx11_openxr_hud_ci",
+        "expected_behavior": "All five mandatory GitHub Actions gates succeed on exactly one final validation-bearing source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_sm3_native_cull_blend_draw": "SOURCE_AND_GPU_PATH_BUILT_NO_LIVE_GAME_PIXEL_EVIDENCE",
+    "unsupported_state_fallback": "SOURCE_NEGATIVE_REGRESSION_AND_FAST_PASS_RUNTIME_UNTESTED",
+    "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "actual live D3D9 SM3 Draw/DrawIndexed source state",
+      "D3D9 cull/alpha->D3D11 rasterizer and blend owner",
+      "actual native GPU Draw and guarded frame publication with D3D9 fallback"
+    ],
+    "batch_components": [
+      "live SM3 C++ raster/compositing path",
+      "D3D9 blend semantics portable C++ contract",
+      "source negative regression",
+      "Win32 MSVC failed helper forward-declaration repair"
+    ],
+    "conflict_keys": [
+      "DX11:REAL_GAME_DRAW",
+      "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "DX11:SM3_CULL_BLEND"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha_after_causal_failed_build_repair",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED; REAL_GAME_NATIVE_DRAW_COUNT_AND_MENU_CAR_RACE_PIXELS_UNTESTED",
+    "activation_guard_and_fallback": "Native full-game path requires explicit opt-in; all unsupported blend, depth, stencil, fog, scissor and source ownership fail closed; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "SM3 live GPU Draw/DrawIndexed source link with correct raster+OM blend; Windows Build and Backend gates PASS exact SHA",
+      "negative_regression": "Unsupported D3D9 states reject native candidate; legacy cull destructive mutation still rejects; DX11 Fast PASS",
+      "component_integration": "Live D3D9 programmable shader & state->D3D11 IA/VS/PS/Raster/OM->native Draw->original D3D9 guaranteed fallback"
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_composite.hpp",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/test_dx11_game_cull_draw_00649.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Base HEAD 0fe1de24; 00925 source-only programmable sampler path; cull and alpha native SM3 draw unsupported.",
+    "C1_REVIEW": "Treat actual unsupported raster and alpha composite of game shader Draws as feature-sized live rendering gap.",
+    "C2_IMPLEMENT": "Native SM3 cull and four blend pairs implemented at material e8f8acc7b63df0f21387eb00c0dadecc98f0cc61.",
+    "C3_VALIDATE": "First SHA failed legacy cull negative mutation; 9512e591 repaired same owner scoping; second SHA failed actual MSVC missing helper declaration; fixed at d3ade48dc58db4cd42a09756bd0d667b236e563f. Five mandatory GitHub Actions all SUCCESS on exact final SHA; no Quest3/gameplay.",
+    "C4_COMMIT": "e8f8acc7b63df0f21387eb00c0dadecc98f0cc61; repair 9512e591; final validation-bearing d3ade48dc58db4cd42a09756bd0d667b236e563f.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA 5/5 on d3ade48dc58db4cd42a09756bd0d667b236e563f; COMPLETE_BUILD_VERIFIED source-stage only; gameplay/menu/car/race and HMD UNTESTED. Score 1528+1=1529, RUN_KEY once."
+  },
+  "validation_evidence": {
+    "scope": "SOURCE_NATIVE_SM3_CULL_ALPHA_GPU_DRAW_BUILT_NOT_RUNTIME_VERIFIED",
+    "exact_sha": "d3ade48dc58db4cd42a09756bd0d667b236e563f",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39149900315,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39149900356,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39149900338,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39149900321,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39149900359,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No matching live-menu/car/race in-game native draw pixel/frame evidence; SM3 opcode and depth/stencil coverage remain restricted.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "d3ade48dc58db4cd42a09756bd0d667b236e563f",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller to choose next disjoint real full-game native render feature; actual desktop game and Quest3/VDXR session needed to prove native draws/frames. No DXVK work.",
+  "hold_reason": "NEED_HMD_TEST_FOR_RUNTIME_PROMOTION_ONLY"
+}
