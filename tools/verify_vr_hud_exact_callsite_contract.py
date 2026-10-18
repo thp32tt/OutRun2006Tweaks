@@ -407,12 +407,23 @@ def check(ui, manifest, fraction_header=None):
                 "if (!sourceRoot || sourceRoot != currentRoot)",
                 "currentRoot, oldTail, newTail, bound, dx, dy);",
                 "if (!first)",
-                "for (Node* node = first; node && bound != 0; --bound)",
-                "RestoreFraction(*node, dx, dy)",
+                "bool reachedTail = false;",
+                "for (Node* node = first; node && count < bound; node = node->next_0)",
+                "if (!FractionCandidate(*node, dx, dy, x, y))",
                 "if (node == newTail)",
+                "if (!reachedTail)",
+                "for (unsigned i = 0; i < count; ++i)",
+                "RestoreFraction(*node, dx, dy);",
             ):
                 if needle not in fraction_header:
                     fail("rank fractional queue proof lost: " + needle)
+            ordered(fraction_header, "rank atomic preflight must precede all siblings commit",
+                    "bool reachedTail = false;",
+                    "for (Node* node = first; node && count < bound; node = node->next_0)",
+                    "if (!FractionCandidate(*node, dx, dy, x, y))",
+                    "if (!reachedTail)",
+                    "for (unsigned i = 0; i < count; ++i)",
+                    "RestoreFraction(*node, dx, dy);")
             for needle in (
                 "if (node.kind_C == 0u)",
                 "x = &node.args_10.float24;",
@@ -424,8 +435,12 @@ def check(ui, manifest, fraction_header=None):
                 "const float nextX = *x + dx;",
                 "const float nextY = *y + dy;",
                 "if (!std::isfinite(nextX) || !std::isfinite(nextY))",
-                "*x = nextX;",
-                "*y = nextY;",
+                "candidateX = nextX;",
+                "candidateY = nextY;",
+                "node.args_10.float24 = x;",
+                "node.args_10.float28 = y;",
+                "node.args2_58.mtx_14._41 = x;",
+                "node.args2_58.mtx_14._42 = y;",
             ):
                 if needle not in fraction_header:
                     fail("rank kind0/kind1 guarded coordinate bridge lost: " + needle)
@@ -561,8 +576,24 @@ def test_mutations(ui, manifest):
                   "UnverifiedAppendedNode(", 1))
     must_fail("rank sibling traversal bound lost",
               changed_fraction=fraction.replace(
-                  "node && bound != 0; --bound",
-                  "node; --bound", 1))
+                  "node && count < bound",
+                  "node", 1))
+    must_fail("rank sibling preflight bypassed",
+              changed_fraction=fraction.replace(
+                  "if (!FractionCandidate(*node, dx, dy, x, y))",
+                  "if (false)", 1))
+    must_fail("rank truncated sibling chain accepted",
+              changed_fraction=fraction.replace(
+                  "if (!reachedTail)",
+                  "if (false)", 1))
+    must_fail("rank sibling group commit disabled",
+              changed_fraction=fraction.replace(
+                  "RestoreFraction(*node, dx, dy);",
+                  "(void)node;", 1))
+    must_fail("rank sibling mutation before preflight",
+              changed_fraction=fraction.replace(
+                  "if (!FractionCandidate(*node, dx, dy, x, y))",
+                  "if (!RestoreFraction(*node, dx, dy))", 1))
     must_fail("rank kind1 X mapped onto old kind0",
               changed_fraction=fraction.replace(
                   "x = &node.args2_58.mtx_14._41;",
