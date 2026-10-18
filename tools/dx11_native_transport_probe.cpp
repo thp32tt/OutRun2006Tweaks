@@ -12,6 +12,7 @@
 
 #include "vr/d3d11/native_shared_eye_ring.hpp"
 #include "vr/d3d11/native_game_stereo_submission.hpp"
+#include "vr/d3d11/native_game_camera_view.hpp"
 
 namespace
 {

@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00906",
+  "production_id": "CONVERSION-DX11-00906",
+  "event_id": "CONVERSION-DX11-00906-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00906",
+  "feature_id": "DX11:NATIVE_GAME_CAMERA_DEPTH_PARITY_STEREO_DRAW_CLEAR",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "ff3d059a063469d8483ec50cbb4c5ec79f3ecead",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_CAMERA_DEPTH_PARITY_STEREO_DRAW_CLEAR",
+    "goal": "Keep real D3D9 menu/vehicle/race auxiliary camera native Draw and DrawIndexed depth/stencil attachments physically compatible with selected RTV mip/array views and preserve safe subsequent GPU stereo eye Copy/Clear, including strict DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "camera_draw_dsv_physical_parity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "selected_native_camera_d3d11_draw_depth",
+        "expected_behavior": "Offscreen native game Draw/Indexed admission reads actual bound camera DSV mip/array physical extent and MSAA sample properties before submitting GPU geometry."
+      },
+      {
+        "id": "camera_clear_and_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "clear_depth_stencil_and_dx9ex_fallback",
+        "expected_behavior": "Genuine camera Clear uses identical physical RTV/DSV constraints; mismatched/borrowed eye depth is rejected without altering original D3D9Ex or gamepad/FFB."
+      },
+      {
+        "id": "warp_and_mandatory_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "physical_warp_gpu_stereo_and_ci",
+        "expected_behavior": "Win32 WARP camera selected mip GPU regression and all five mandatory exact-SHA GitHub Actions succeed, while physical Quest3 runtime remains separately untested."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Live D3D9 menu/vehicle/race auxiliary camera Draw/DrawIndexed -> native D3D11 RTV/DSV selected physical mip and array admission",
+      "Real camera Clear and depth/stencil ordered GPU source -> native independent L/R OpenXR eye Copy without overwriting original fallback"
+    ],
+    "batch_components": [
+      "native_game_camera_view.hpp C++ physical RTV/DSV compatibility shared by Draw and Clear",
+      "native_game_stereo_submission.cpp real GPU Draw/Indexed and Clear admission with same selected depth/RT physical footprint",
+      "dx11_native_transport_probe.cpp physical WARP mip1 positive and mismatched DSV negative regression"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO:CAMERA_DEPTH_PARITY_DRAW_CLEAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY; synthetic WARP physical camera GPU path is not yet live OutRun visible menu/car/race/Quest3 proof.",
+    "activation_guard_and_fallback": "Native opt-in remains fail-closed, original D3D9Ex menu/gamepad/FFB/SkyGlow and frozen DXVK remain untouched.",
+    "acceptance_proof": {
+      "positive_probe": "C++ camera source selected physical RTV/DSV matching mip acceptance and WARP GPU camera clear and eye readback test; final exact SHA probe still pending.",
+      "negative_regression": "Mismatched physical 64x64 DSV versus selected 32x32 camera mip1 rejected before native GPU Draw; mismatched/sample properties and original fallback preserved.",
+      "component_integration": "C++ real game auxiliary Draw/DrawIndexed with bound DSV physical admission, Clear route and real Win32 WARP probe; mandatory final exact-SHA matrix pending."
+    }
+  },
+  "acceptance_results": {
+    "camera_draw_dsv_physical_parity": "PENDING_CI",
+    "camera_clear_and_safe_fallback": "PENDING_CI",
+    "warp_and_mandatory_exact_sha_ci": "PENDING_CI"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_camera_view.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp"
+  ],
+  "ci_repairs": [
+    {
+      "cause": "DX11 Fast 39089885082 and Backend 39089885067: prior 00905 lacks development_strategy, latest run 00906 absent; publish 00906 strategy-compliant SOURCE_IMPLEMENTED_CI_PENDING record",
+      "category": "run-acceptance-contract",
+      "result": "PENDING"
+    },
+    {
+      "cause": "Win32 WARP 39089885083: C2039/C3861 missing camera view function declarations in probe translation unit",
+      "category": "actual-cpp-compile",
+      "result": "PENDING"
+    }
+  ],
+  "previous_exact_sha_runs": {
+    "DX11_Fast": 39089885082,
+    "Backend_Conversion_Gate": 39089885067,
+    "Win32_WARP": 39089885083
+  },
+  "runtime_validation_note": "Real OutRun game menu, vehicle, race, Quest3/VDXR visual, input and FPS UNTESTED; no gameplay promotion.",
+  "pipeline": {
+    "C0_RECOVER": "Resumed same 00906 task at exact material ff3d059a, restored owner and branch.",
+    "C1_REVIEW": "Separate Fast+Backend old latest-record acceptance failure and physical WARP C++ missing include.",
+    "C2_IMPLEMENT": "Already committed physical camera DSV parity to native Draw and Clear; same task WARP include repair.",
+    "C3_VALIDATE": "Re-run final mandatory exact-SHA Gates only on corrected validation-bearing source SHA.",
+    "C4_COMMIT": "ff3d059a material source, pending same-task focused repair commit.",
+    "C5_PACKAGE": "NOT_REQUIRED_PENDING_FINAL_BUILD",
+    "C6_STATE": "PENDING_EXACT_SHA; keep RUNTIME_VALIDATION=UNTESTED."
+  }
+}
