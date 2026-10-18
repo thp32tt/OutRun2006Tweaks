@@ -2148,9 +2148,11 @@ namespace
         }
 
         bool GetGameUv(UvRect& uv, bool requireFullyVisible = false,
-            RECT* capturedClient = nullptr)
+            RECT* capturedClient = nullptr,
+            bool* capturedClientFullyVisible = nullptr)
         {
             if (capturedClient) *capturedClient = {};
+            if (capturedClientFullyVisible) *capturedClientFullyVisible = false;
             if (!sourceWidth_ || !sourceHeight_ || !IsWindow(hwnd_))
                 return false;
             RECT client{};
@@ -2173,6 +2175,8 @@ namespace
             uv.w = plan.width; uv.h = plan.height;
             if (capturedClient)
                 *capturedClient = {left, top, right, bottom};
+            if (capturedClientFullyVisible)
+                *capturedClientFullyVisible = plan.fullyVisible;
             return true;
         }
 

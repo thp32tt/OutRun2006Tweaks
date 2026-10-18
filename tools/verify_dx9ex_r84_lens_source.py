@@ -43,7 +43,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "GetLastGameWvpLensCentreCallEpoch()",
         "GetCurrentLatchedPoseEpoch()",
         "GetLastGameWvpPoseEpoch(),",
-        "R29OwnerTopLevelDrawSerial() + 1u",
+        "R29OwnerTopLevelDrawSerial()",
         "OutRunVR::LensCentre::AdmitsCentreRawSourceScope(",
         "sourceProducer == ProducerToken::LensFlareCentre",
         "queueNode == nullptr",
@@ -394,7 +394,7 @@ def main():
         (2, "sourceProducer == ProducerToken::LensFlareCentre", "true"),
         (2, "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)", "true"),
         (2, "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),", "0,"),
-        (2, "R29OwnerTopLevelDrawSerial() + 1u", "0"),
+        (2, "R29OwnerTopLevelDrawSerial()", "0"),
         (2, "if (ownedLensCentre)\n            {", "if (false)\n            {"),
         (2, "SelectWorldRoute(true, owned)", "SelectWorldRoute(true, true)"),
         (2, "return R30ScreenSpaceKind::ExactLensCentreWorld;", "return R30ScreenSpaceKind::None;"),
@@ -496,16 +496,17 @@ def main():
             "!drawCommand.IsDirectWorldLensCentre()",
             "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
             "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),",
-            "R29OwnerTopLevelDrawSerial() + 1u",
+            "R29OwnerTopLevelDrawSerial()",
             "sourceProducer == ProducerToken::LensFlareCentre",
         ):
             start = mod[2].index("bool R30HasExactLensCentreRawWvp(")
             end = mod[2].index("bool R30HasExactCarBaseShadowRawWvp(", start)
             owned = mod[2][start:end]
             assert old in owned, "C993 provenance mutant missing exact owner: " + old
-            # R30 consumes the same next draw in BOTH source-age and
+            # R23 has already incremented the physical Draw serial before
+            # R30/R33. R30 consumes that CURRENT serial in BOTH source-age and
             # nested SceneEffect provenance checks. Mutate both callsites.
-            if old == "R29OwnerTopLevelDrawSerial() + 1u":
+            if old == "R29OwnerTopLevelDrawSerial()":
                 assert owned.count(old) == 2
                 owned = owned.replace(old, new)
             else:

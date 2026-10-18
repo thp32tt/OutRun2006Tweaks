@@ -754,6 +754,28 @@ int main()
         return 12;
 
 
+    // TITLE/MAIN keeps the complete source UV but restores the authored
+    // 4:3 optical plane only when the same capture transaction proves the
+    // client is fully visible. Wide selector/exit/reset and rollback stay native.
+    using OutRunVrMenuAspect::RestoreFullMainMenuFourThree;
+    if (!RestoreFullMainMenuFourThree(
+            0x04u, true, false, false, false) ||
+        !RestoreFullMainMenuFourThree(
+            0x09u, true, false, false, false) ||
+        RestoreFullMainMenuFourThree(
+            0x0Au, true, false, true, false) ||
+        RestoreFullMainMenuFourThree(
+            0x0Bu, true, false, true, false) ||
+        RestoreFullMainMenuFourThree(
+            0x0Cu, true, false, true, false) ||
+        RestoreFullMainMenuFourThree(
+            0x09u, false, false, false, false) ||
+        RestoreFullMainMenuFourThree(
+            0x09u, true, true, false, false) ||
+        RestoreFullMainMenuFourThree(
+            0x09u, true, false, false, true))
+        return 63;
+
     // Mono recovery theater is a distinct path from the shared-eye menu
     // projection. A partially off-output window must retain the original
     // content's physical pixel scale and camera-local fragment position.

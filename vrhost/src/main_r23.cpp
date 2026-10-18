@@ -1522,7 +1522,10 @@ namespace
         if (!c.haveFrame_ || !c.sourceSrv_) return false;
         UvRect whole{};
         RECT capturedClient{};
-        if (!c.GetGameUv(whole, false, &capturedClient)) return false;
+        bool capturedClientFullyVisible = false;
+        if (!c.GetGameUv(
+                whole, false, &capturedClient, &capturedClientFullyVisible))
+            return false;
 
         // Issue #119: intersect the two eyes' tangent-plane FOV extents.
         // Mean eye edges can extend outside one real eye frustum and clip
@@ -1618,6 +1621,7 @@ namespace
             static_cast<float>(c.sourceWidth_),
             static_cast<float>(c.sourceHeight_),
             whole.x, whole.y, whole.w, whole.h, authoredAspect);
+        bool fullFourThreeMainMenu = false;
         if (plan.crop)
         {
             const float previousWidth = whole.w;
@@ -1655,6 +1659,16 @@ namespace
                 completeClient, cropCentered43,
                 useNativeMenuAspect || wideVehicleSelector,
                 imageMatteVerified);
+            // ClipClient already determined full visibility from the same
+            // client snapshot/UV. Use that authoritative bit instead of the
+            // old <=1px floating-point reconstruction, which can reject a
+            // valid complete window under desktop/DPI scaling.
+            fullFourThreeMainMenu =
+                OutRunVrMenuAspect::RestoreFullMainMenuFourThree(
+                    clientGameState, capturedClientFullyVisible,
+                    useNativeMenuAspect, wideVehicleSelector, false);
+            if (fullFourThreeMainMenu)
+                sourceAspect = 4.0f / 3.0f;
             // Source UV is still the COMPLETE client here. It must retain
             // the physical aspect of those actual captured pixels. Forcing
             // this 3440x1440/1920x1080 rectangle into a 4:3 optical quad
@@ -1690,12 +1704,25 @@ namespace
         // the corrected 4:3 menu again. The uncropped selector retains
         // reference-height stabilization during eye/backbuffer resizing.
         // The measured source aspect, UV and FOV containment are preserved.
-        const auto placement = cropCentered43
-            ? requestedPlacement // Explicit source crop remains user's A/B.
+        const auto placement = (cropCentered43 || fullFourThreeMainMenu)
+            ? requestedPlacement
             : OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
                 common, requestedPlacement);
         if (!placement.valid)
             return false;
+
+        static std::uint32_t lastMenuDecisionState = 0xFFFFFFFFu;
+        if (lastMenuDecisionState != clientGameState)
+        {
+            lastMenuDecisionState = clientGameState;
+            spdlog::info(
+                "VR MENU ASPECT: state={} fullVisible={} fourThree={} crop43={} wideSelector={} nativeAspect={} sourceAspect={:.4f} uv={:.4f},{:.4f},{:.4f},{:.4f} placementHalf={:.4f},{:.4f}",
+                clientGameState, capturedClientFullyVisible ? 1 : 0,
+                fullFourThreeMainMenu ? 1 : 0, cropCentered43 ? 1 : 0,
+                wideVehicleSelector ? 1 : 0, useNativeMenuAspect ? 1 : 0,
+                sourceAspect, whole.x, whole.y, whole.w, whole.h,
+                placement.halfWidth, placement.halfHeight);
+        }
         const float visibleCenterX =
             placement.centerX + placement.halfWidth * visibleOffsetX;
         const float visibleCenterY =

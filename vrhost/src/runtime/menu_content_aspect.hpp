@@ -305,6 +305,30 @@ namespace OutRunVrMenuAspect
         return static_cast<float>(aspect);
     }
 
+    // TITLE/MAIN is authored as a 4:3 optical composition even when the
+    // complete front-end raster is stretched across a wide desktop client.
+    // Keep the full UV (side artwork is real), but undo that anamorphic stretch
+    // in the headset. Selector/exit/reset are genuinely wide and stay native.
+    inline constexpr bool RestoreFullMainMenuFourThree(
+        std::uint32_t gameState, bool fullyVisibleCapture,
+        bool explicitNativeAspect, bool wideVehicleSelector,
+        bool croppedFragment) noexcept
+    {
+        return (gameState == 0x04u || gameState == 0x09u) &&
+            fullyVisibleCapture && !explicitNativeAspect &&
+            !wideVehicleSelector && !croppedFragment;
+    }
+    static_assert(RestoreFullMainMenuFourThree(
+        0x04u, true, false, false, false));
+    static_assert(RestoreFullMainMenuFourThree(
+        0x09u, true, false, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x0Au, true, false, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x09u, false, false, false, false));
+    static_assert(!RestoreFullMainMenuFourThree(
+        0x09u, true, true, false, false));
+
     // Do not restore a 4:3 optical aspect from game state alone.
     // The whole captured 3440x1440/1920x1080 image has that physical
     // aspect even if its native menu artwork is already letterboxed.

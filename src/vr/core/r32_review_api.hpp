@@ -191,6 +191,10 @@ namespace OutRunVRStereo
         float eyeScale[2], float eyeOffset[2]) noexcept;
     void R32ReviewNoteScreenSpaceFovDraw() noexcept;
 
+    HRESULT R32ReviewTryExternalImGuiIndexed(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount) noexcept;
     HRESULT R32ReviewTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
         UINT startVertex, UINT primitiveCount) noexcept;

@@ -1051,6 +1051,11 @@ namespace OutRunVRStereo
         R30SupportNoteScreenSpaceFovDraw();
     }
 
+    HRESULT R32ReviewTryExternalImGuiIndexed(
+        IDirect3DDevice9* d, D3DPRIMITIVETYPE t,
+        INT b, UINT m, UINT n, UINT s, UINT p) noexcept
+    { return R30SupportTryExternalImGuiIndexed(d,t,b,m,n,s,p); }
+
     HRESULT R32ReviewTryXyzrhwPrimitiveVB(
         IDirect3DDevice9* d, D3DPRIMITIVETYPE t, UINT s, UINT p) noexcept
     { return R30SupportTryXyzrhwPrimitiveVB(d,t,s,p); }

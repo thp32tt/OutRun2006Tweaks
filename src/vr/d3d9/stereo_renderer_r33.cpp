@@ -955,7 +955,9 @@ namespace OutRunVRStereo
                     OutRunVR::LensCentre::AdmitsCentreRawSourceScope(
                         writtenScope, writtenProducer, queueNode,
                         command.lensCentreCallEpoch, writtenCall,
-                        R29OwnerTopLevelDrawSerial() + 1u, writtenDraw) &&
+                        // R23 already incremented the physical hook serial
+                        // before this R33 dispatch; do not advance it twice.
+                        R29OwnerTopLevelDrawSerial(), writtenDraw) &&
                     command.lensCentreCallEpoch != 0 &&
                     command.lensCentreCallEpoch == writtenCall &&
                     pose != 0 && pose == writtenPose &&
@@ -1812,6 +1814,20 @@ namespace OutRunVRStereo
                 // The ordinary XYZRHW hotpath keeps its cached-state gate.
                 if (resyncAlreadyFlushed)
                 {
+                    // External F11 is fixed-function XYZ rather than XYZRHW.
+                    // The active split R84 chain must own it before game
+                    // fixed-sprite and generic geometry fallback paths.
+                    const HRESULT f11 =
+                        R32ReviewTryExternalImGuiIndexed(
+                            device, type, baseVertexIndex, minVertexIndex,
+                            numVertices, startIndex, primitiveCount);
+                    if (f11 != E_NOTIMPL) {
+                        if (telemetry)
+                            OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                                OutRunVR::UniversalTrace::Route::R30FixedSprite);
+                        return f11;
+                    }
+
                     const HRESULT r62 = R30SupportTryFixedFunctionProjectedRankIndexed(
                         device, type, baseVertexIndex, minVertexIndex,
                         numVertices, startIndex, primitiveCount);
