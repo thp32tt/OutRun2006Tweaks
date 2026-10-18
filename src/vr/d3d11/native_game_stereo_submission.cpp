@@ -967,7 +967,8 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
             const bool proven = offscreen_color_source_proven(
-                clear.source, clear.sourceArraySlice, clear.sourceMipSlice);
+                clear.source, clear.sourceArraySlice, clear.sourceMipSlice,
+                clear.sourceBox);
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice, clear.sourceMipSlice))
