@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00912",
+  "production_id": "CONVERSION-DX11-00912",
+  "event_id": "CONVERSION-DX11-00912-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00912",
+  "feature_id": "DX11:NATIVE_STEREO_UNPREDICATED_GAME_GEOMETRY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_UNPREDICATED_GAME_GEOMETRY",
+    "goal": "Require actual unpredicated game-owned native D3D11 direct and offscreen geometry after OpenXR-eye full TARGET Clears and stereo Copy/Stretch before publishing menu, vehicle selection, or race eye color, without disturbing input/FFB or DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_draw_and_eye_history",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_eye_direct_offscreen_game_draw_and_full_target_clear",
+        "expected_behavior": "Game Draw/DrawIndexed and instanced offscreen native geometry independently track unpredicated source chronology and invalidate predicated-only full-Clear eye certification."
+      },
+      {
+        "id": "safe_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "menu_vehicle_race_native_optin_and_d3d9ex_input_ffb",
+        "expected_behavior": "Preserve opt-in native activation and unchanged original D3D9Ex draw, controls, gamepad, FFB, SkyGlow, and DXVK freeze."
+      },
+      {
+        "id": "source_graph_and_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_stereo_cpp_regression_plus_github_backend_build_openxr_hud",
+        "expected_behavior": "Compile-time positive and negative stereo chronology regressions and mandatory GitHub Fast, Backend, Build, OpenXR and HUD Gates validate one exact repair commit SHA without CI skip."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_EYE_OUTPUT:00912"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: offline native stereo eye-source geometry chronology only; no live menu, vehicle, race, Quest3/VDXR or full OpenXR publication observation.",
+    "activation_guard_and_fallback": "No opt-in promotion; retain all guarded game native Draw submission checks and DX9Ex input/gamepad/FFB fallback; DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Existing stereo native constexpr coverage confirms unpredicated game geometry after full Clear can qualify eye-source color, including genuine postpass chronology.",
+      "negative_regression": "Native evidence rejects predicated-only Draw ordinal advances and Copy/Stretch-only output; C++ source graph keeps eye_color_writable and unpredicated_color_evidence validation intact.",
+      "component_integration": "Same TASK original material b64007607843a44cb3b89646f9250c028c989aad updated for actual source syntax and protected safety guard, pending final exact-SHA GitHub Gates."
+    }
+  },
+  "acceptance_results": {
+    "source_draw_and_eye_history": "PENDING_EXACT_SHA",
+    "safe_game_fallback": "PENDING_EXACT_SHA",
+    "source_graph_and_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+  ],
+  "material_result_sha": "b64007607843a44cb3b89646f9250c028c989aad",
+  "validation_bearing_result_sha": null,
+  "blocking_evidence": "CI 39118986352 fails legacy 00911 policy acceptance; 39118986460 fails source graph because 00912 cached predicate without required literal expression; 00912 C++ also omitted semicolon.",
+  "runtime_validation_note": "No Quest3/VDXR game or HMD tests performed; RUNTIME_VALIDATION=UNTESTED."
+}

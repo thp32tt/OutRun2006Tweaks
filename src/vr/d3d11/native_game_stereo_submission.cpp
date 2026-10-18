@@ -500,7 +500,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen(
     const bool eligible = unpredicated_color_evidence();
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
-    if (eligible) ++unpredicatedGameDrawCount_
+    if (eligible) ++unpredicatedGameDrawCount_;
     return true;
 }
 
@@ -743,7 +743,7 @@ bool NativeGameEyeDrawEncoder::draw(
     if (!replay_due_source_clears()) return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated);
+        eye_color_writable(), unpredicated_color_evidence());
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
     if (unpredicated) ++unpredicatedGameDrawCount_;
@@ -759,7 +759,7 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
     if (!replay_due_source_clears()) return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated);
+        eye_color_writable(), unpredicated_color_evidence());
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
     if (unpredicated) ++unpredicatedGameDrawCount_;
@@ -779,7 +779,7 @@ bool NativeGameEyeDrawEncoder::draw_instanced(
         return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated);
+        eye_color_writable(), unpredicated_color_evidence());
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
@@ -797,7 +797,7 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
         return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated);
+        eye_color_writable(), unpredicated_color_evidence());
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
