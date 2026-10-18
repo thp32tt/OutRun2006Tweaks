@@ -9,6 +9,7 @@
 
 #include "r13_bridge.hpp"
 #include "stereo_renderer.cpp"
+#include "../game/render_semantics.hpp"
 
 namespace OutRunVRStereo
 {
@@ -424,6 +425,14 @@ namespace OutRunVRStereo
         HRESULT __stdcall ResetDestR13(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
+#if defined(OUTRUN_VR_SAFE_DRAW_COMPARE) || \
+    defined(OUTRUN_VR_R26_HUD_COMPARE) || \
+    defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
+            // R33 is absent in comparison builds. Reset invalidates the
+            // original SpriteNode ring even if no normal Present ran.
+            if (IsGameDevice(device))
+                OutRunVR::GameSemantic::EndSpriteQueueFrame(true);
+#endif
             if (!R13OverlayReady.load(std::memory_order_acquire))
                 return R13ResetR9Hook.stdcall<HRESULT>(device, params);
 
@@ -712,14 +721,30 @@ namespace OutRunVRStereo
         {
             if (!R13OverlayReady.load(std::memory_order_acquire))
             {
-                return R13PresentR9Hook.stdcall<HRESULT>(device,
+                const HRESULT hr = R13PresentR9Hook.stdcall<HRESULT>(device,
                     sourceRect, destRect, destWindowOverride, dirtyRegion);
+#if defined(OUTRUN_VR_SAFE_DRAW_COMPARE) || \
+    defined(OUTRUN_VR_R26_HUD_COMPARE) || \
+    defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
+                if (IsGameDevice(device))
+                    OutRunVR::GameSemantic::EndSpriteQueueFrame();
+#endif
+                return hr;
             }
 
             const HRESULT hr = R13PresentR9Hook.stdcall<HRESULT>(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
             if (IsGameDevice(device))
+            {
                 R13ForceMonoShadow = false;
+#if defined(OUTRUN_VR_SAFE_DRAW_COMPARE) || \
+    defined(OUTRUN_VR_R26_HUD_COMPARE) || \
+    defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
+                // No R33 in R26_SAFE/C1/C2: retire old tags only after
+                // the lower original Present has completed.
+                OutRunVR::GameSemantic::EndSpriteQueueFrame();
+#endif
+            }
             return hr;
         }
 

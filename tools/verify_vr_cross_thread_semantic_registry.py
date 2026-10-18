@@ -196,6 +196,40 @@ for label, text, token in (
         fail(f"{label}: frame-fence negative mutation escaped")
 print("VR original priority queue => R33 Present/Reset boundary wiring PASS")
 
+# Comparison-only R26_SAFE/C1/C2 compile without R33. The R13 lower
+# owner must supply the SAME true frame/reset fence, including the early
+# overlay-not-ready branch, while R84 keeps its sole R33 fence.
+r13 = read(ROOT / "src/vr/d3d9/stereo_renderer_r13.cpp")
+compare_present = function_body(r13, "HRESULT __stdcall PresentDestR13(")
+compare_reset = function_body(r13, "HRESULT __stdcall ResetDestR13(")
+compare_guard = (
+    "defined(OUTRUN_VR_SAFE_DRAW_COMPARE)",
+    "defined(OUTRUN_VR_R26_HUD_COMPARE)",
+    "defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)",
+)
+for name, body, expected in (
+    ("R13 Present", compare_present, "EndSpriteQueueFrame();"),
+    ("R13 Reset", compare_reset, "EndSpriteQueueFrame(true);"),
+):
+    if any(k not in body for k in compare_guard):
+        fail(f"{name}: missing R26_SAFE/C1/C2 owner isolation")
+    if expected not in body:
+        fail(f"{name}: comparison rollback no longer closes producer generation")
+if compare_present.count("EndSpriteQueueFrame();") != 2:
+    fail("R13 Present must close the frame in ready and not-ready branches")
+if compare_reset.count("EndSpriteQueueFrame(true);") != 1:
+    fail("R13 Reset comparison invalidation must be single-count")
+for name, body, marker in (
+    ("R13 Ready Present", compare_present, "EndSpriteQueueFrame();"),
+    ("R13 Reset", compare_reset, "EndSpriteQueueFrame(true);"),
+):
+    if marker not in body or marker in body.replace(marker, "", 1):
+        # The ready Present has another guarded early branch, so its count
+        # is independently asserted above. Reset has only one occurrence.
+        if name == "R13 Reset":
+            fail("comparison frame-fence mutation coverage lost")
+print("VR R84 + R26_SAFE/C1/C2 native Present/Reset frame fence PASS")
+
 # Diagnostic/render-thread state should stay local; making these shared would
 # broaden synchronization and semantic authority beyond the proven fix.
 for marker in (
