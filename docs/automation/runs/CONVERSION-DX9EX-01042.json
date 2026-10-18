@@ -87,7 +87,15 @@
     "failed_run_id": 39126228807,
     "failed_step": "policy: run record missing; full-chain game/host/package skipped",
     "final_exact_sha_gates": "PENDING",
-    "head_sha": "PENDING"
+    "head_sha": "PENDING",
+    "first_policy_repair_sha": "64a3561672924924571ac83c6f1549ba0383dd11",
+    "host_smoke_failed_sha": "64a3561672924924571ac83c6f1549ba0383dd11",
+    "host_smoke_failed_run_id": 39126404829,
+    "host_smoke_failed_job_id": 117672501804,
+    "host_smoke_failure": "stage_extension_eye_plane_smoke returned 61: obsolete same-pointer denial contradicted the corrected queue-epoch selection semantics",
+    "host_smoke_repair_sha": "33a7ea7bf3e0282e68383598aa8d5322118eb864",
+    "host_smoke_repair_validation": "GitHub exact-SHA host job success within DX9Ex Active Validation #39126748372",
+    "hud_gate_coverage_repair": "HUD Inspector push and PR path filters now watch vrhost/tests/stage_extension_eye_plane_smoke.cpp; previous 33a7ea7 did not dispatch this required gate."
   },
-  "notes": "Same TASK_ID B exact CI policy failure repair only. Run record addition changes no native game runtime; retain material source SHA and do not award an additional score. No HMD test performed."
+  "notes": "Same TASK_ID B exact CI policy failure repair only. Run record addition changes no native game runtime; retain material source SHA and do not award an additional score. No HMD test performed. Exact failure repairs: required feature-unit policy record, +TIME host smoke code-61 expectation, and missing HUD Inspector smoke path filter; retain material 1e2cef, no duplicate score. Exact-SHA 4-gate outcome pending, Quest3/VDXR untested."
 }
