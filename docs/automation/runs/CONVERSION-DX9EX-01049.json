@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01049",
+  "production_id": "CONVERSION-DX9EX-01049",
+  "event_id": "CONVERSION-DX9EX-01049-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
+  "checkpoint": "C5_GATE_PENDING",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "0d19687e2bfd04621bb63c2461cbaac44388be6e",
+  "validation_bearing_result_sha": "PENDING_CI",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve the original GOAL percentage, elapsed time, completed result panels and glyph GPU producer identity across native LEFT and RIGHT submissions, even when late right-eye D3D9 setters reenter a foreign callback.",
+    "scope_boundary": "R84 native GOAL original producer/queue/pose/raw c64 fences in R30 XYZRHW and R33 shader HUD; keep earlier LEFT checks, native device-state restore and original one-draw fallback; do not change +TIME, HUD ranks, menus, lens, SkyGlow, R26_SAFE, input/FFB, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original GOAL 0-99/result sprites and numbers enter exact ResultProgress/GoalTime*/OutRunStagePrintf/ResultTextB9200 ownership, queued SpriteNode epoch or direct glyph.",
+      "R30 XYZRHW and R33 shader native LEFT are already fenced; after RIGHT render-target/depth/viewport/c64 setters the live GOAL physical source must still match before-left capture.",
+      "Only the same original queue node, pose/draw, shader and raw WVP generation can reach RIGHT-eye GPU Draw; changed producer follows the existing failure/restore/invalidation path, not a foreign RIGHT submission."
+    ],
+    "subcomponents": [
+      "Add the missing post-state-setter exact GOAL source capture and fail-closed gate to R30 XYZRHW GPU path.",
+      "Add the matching final exact GOAL source stamp fence to R33 shader HUD GPU path after native right-eye setters.",
+      "Extend queued/direct GOAL physical-source host smoke with all five known producers, unchanged positive cases, and mutation negatives for raw c64, pose, nested draw, shader, queue epoch and foreign +TIME."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_native_both_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GOAL 0-99, elapsed time and final result glyphs across native R84 R30 XYZRHW/R33 shader physical LEFT/RIGHT",
+        "expected_behavior": "Both physical eyes submit the same original GOAL source after the last D3D9 state changes, never a reentered foreign glyph."
+      },
+      {
+        "id": "goal_foreign_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GOAL right state setters, queue pointer reuse, changing raw c64/pose/shader/draw, original native fallback",
+        "expected_behavior": "Reentrant or incomplete ownership fails closed, never repeats LEFT, retains ordinary original/mono safety restoration and other effects."
+      },
+      {
+        "id": "goal_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game+x64 OpenXR host/package, Domain, HUD Inspector, Full Source Impact at one exact validation SHA",
+        "expected_behavior": "All required GitHub Actions succeed for one exact SHA; Quest3/VDXR optical correctness remains UNTESTED without hardware evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_native_both_eyes": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "goal_foreign_source_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "goal_exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "GOAL progress, time and result sibling glyphs are separate from +TIME and originate from verified game calls; queued SpriteNode and direct numeric producers can share screen semantics while changing physical GPU ownership.",
+    "source_trace": [
+      "R84 R30 XYZRHW and R33 HUD already fence GOAL immediately after LEFT, but their later RIGHT D3D9 setters can reenter an original callback.",
+      "R30 stage +TIME and R33 +TIME are checked again before RIGHT native Draw, whereas GOAL was missing at precisely that last mutable boundary."
+    ],
+    "alternatives_rejected": [
+      "Do not flatten GOAL into generic overlay, force global D3DX Flush, suppress native effects, change the original result timer or assert HMD acceptance from a source guard."
+    ],
+    "root_cause": "GOAL physical-source validation stopped at post-LEFT while subsequent right-eye RT/depth/viewport/c64 setters could change original GPU owner before RIGHT actualDraw/rightDraw.",
+    "fix_evidence": "Original material source SHA 0d19687e2bfd04621bb63c2461cbaac44388be6e adds exact GOAL final setter-boundary source stamps in R30 and R33.",
+    "negative_test_evidence": "vrhost/tests/stage_extension_eye_plane_smoke.cpp contains queued/direct GOAL producer positives and source mutation negatives; Windows CI pending.",
+    "eye_ownership": "RIGHT is admitted only after live physical stamp matches captured LEFT source, retaining existing safety/restore on mismatch; hardware-only optical success not claimed."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "0d19687e2bfd04621bb63c2461cbaac44388be6e",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "E001 substantive C++ R84 GOAL right-eye owner correction, not CI/record-only score. HMD/Quest3 not tested. Material source SHA is separate from validation-bearing run-record commit."
+}
