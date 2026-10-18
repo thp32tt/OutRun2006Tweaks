@@ -49,3 +49,37 @@ assert "primitive >= 4u ? mode : 1u" in h
 assert "mode < 1u || mode > 3u" in h
 assert "game_native_cull_admission(mode,kind,c)" in p
 print("00649 live CW/CCW game Draw raster and DX9Ex fallback PASS")
+
+# 00928: Source SM3 fan topology -> native GPU IA/IB/DrawIndexed.
+# Portable indexed/unindexed fan winding and negative bounds are exercised
+# by dx11_game_primitive_span_probe.cpp in the unchanged Fast integration gate.
+def sm3_fan_connected(src):
+    live = src.split("bool submit_live_sm3_game_draw(", 1)[1].split(
+        "// Reuse geometric growth buffers", 1)[0]
+    return all(token in live for token in (
+        "type != D3DPT_TRIANGLEFAN",
+        "game_fan_to_triangle_list(expected - 2u, indices, indexCount,",
+        "nativeFanTriangles.size() > kMaxIndices",
+        "nativeIndices = nativeFanTriangles.data();",
+        "nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());",
+        "upload_full_game_stream(context, s.fullGameIndexUpload.Get(),",
+        "s.fullGameIndexCapacity, nativeIndices, indexBytes",
+        "type == D3DPT_TRIANGLESTRIP ?",
+        "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
+        "context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),",
+        "context->DrawIndexed(nativeIndexCount, 0u, 0);",
+        "else context->Draw(vertexCount, 0u);",
+        "liveBatch.record_source_draw(sourceOrdinal);",
+    ))
+assert sm3_fan_connected(c)
+for old, bad in (
+    ("type != D3DPT_TRIANGLEFAN", "type != D3DPT_TRIANGLELIST"),
+    ("nativeIndices = nativeFanTriangles.data();", "nativeIndices = indices;"),
+    ("nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());",
+     "nativeIndexCount = indexCount;"),
+    ("nativeFanTriangles.size() > kMaxIndices", "nativeFanTriangles.empty()"),
+    ("context->DrawIndexed(nativeIndexCount, 0u, 0);",
+     "context->DrawIndexed(indexCount, 0u, 0);"),
+):
+    altered = c.replace(old, bad, 1)
+    assert altered != c and not sm3_fan_connected(altered), old

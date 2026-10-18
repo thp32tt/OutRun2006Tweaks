@@ -4289,7 +4289,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                std::uint64_t sourceOrdinal) noexcept {
     if (!env_full_game_opt_in() || !game || !bytes || !stride ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
-        type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP)
+        type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
+        type != D3DPT_TRIANGLEFAN)
         return false;
     // The shared R30 observer has already validated the exact source
     // primitive element count. Reuse it rather than decoding twice.
@@ -4300,6 +4301,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         return false;
     if (static_cast<std::uint64_t>(stride) * vertexCount > (1ull << 25u))
         return false;
+    // The game's SM3 menu/vehicle TRIANGLEFAN has no D3D11 topology.
+    // Expand its authentic VB/IB/UP span to triangles BEFORE GPU mutation.
+    // On invalid or oversized source input, keep the original D3D9 renderer.
+    std::vector<std::uint32_t> nativeFanTriangles;
+    const std::uint32_t* nativeIndices = indices;
+    UINT nativeIndexCount = indexCount;
+    if (type == D3DPT_TRIANGLEFAN) {
+        if (expected < 3u ||
+            !game_fan_to_triangle_list(expected - 2u, indices, indexCount,
+                                       vertexCount, nativeFanTriangles) ||
+            nativeFanTriangles.size() > kMaxIndices)
+            return false;
+        nativeIndices = nativeFanTriangles.data();
+        nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());
+    }
     DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
     DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
@@ -4555,15 +4571,15 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         !upload_full_game_stream(context, s.fullGameVertexUpload.Get(),
                                  s.fullGameVertexCapacity, bytes, vertexBytes))
         return false;
-    if (indices) {
-        for (UINT i = 0; i < indexCount; ++i)
-            if (indices[i] >= vertexCount) return false;
-        const UINT indexBytes = indexCount * sizeof(std::uint32_t);
+    if (nativeIndices) {
+        for (UINT i = 0; i < nativeIndexCount; ++i)
+            if (nativeIndices[i] >= vertexCount) return false;
+        const UINT indexBytes = nativeIndexCount * sizeof(std::uint32_t);
         if (!ensure_full_game_upload_buffer(device, s.fullGameIndexUpload,
                                             s.fullGameIndexCapacity, indexBytes,
                                             D3D11_BIND_INDEX_BUFFER) ||
             !upload_full_game_stream(context, s.fullGameIndexUpload.Get(),
-                                     s.fullGameIndexCapacity, indices, indexBytes))
+                                     s.fullGameIndexCapacity, nativeIndices, indexBytes))
             return false;
     }
     if (liveBatch.first_draw()) {
@@ -4625,10 +4641,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ID3D11Buffer* stream = s.fullGameVertexUpload.Get();
     context->IASetInputLayout(pipeline.inputLayout.Get());
     context->IASetVertexBuffers(0u, 1u, &stream, &stride, &offset);
-    context->IASetPrimitiveTopology(type == D3DPT_TRIANGLELIST ?
-        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
-        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    if (indices)
+    context->IASetPrimitiveTopology(type == D3DPT_TRIANGLESTRIP ?
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP :
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    if (nativeIndices)
         context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
                                   DXGI_FORMAT_R32_UINT, 0u);
     else
@@ -4637,7 +4653,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     context->PSSetShader(pipeline.program.pixelShader.Get(), nullptr, 0u);
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
-    if (indices) context->DrawIndexed(indexCount, 0u, 0);
+    if (nativeIndices) context->DrawIndexed(nativeIndexCount, 0u, 0);
     else context->Draw(vertexCount, 0u);
     s.pending = true;
     ++s.issued;
