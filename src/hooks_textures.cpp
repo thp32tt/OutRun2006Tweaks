@@ -8,6 +8,7 @@
 #include "vr/game/dds_fast_loader_request.hpp"
 #include "vr/game/sprite_uv_transaction.hpp"
 #include "vr/game/sprite_queue_tail_proof.hpp"
+#include "vr/game/direct_sprite_source_provenance.hpp"
 #include <fstream>
 #include <xxhash.h>
 #include <d3d9.h>
@@ -987,7 +988,8 @@ class TextureReplacement : public Hook
 
 	static void TagDirectVrSpriteNodes(
 		const VrSpriteTailSnapshot& before,
-		const void* returnAddress) noexcept
+		const void* returnAddress,
+		OutRunVR::DirectSpriteSource::Snapshot sourceBefore) noexcept
 	{
 		if (!Settings::VREnabled)
 			return;
@@ -1008,6 +1010,10 @@ class TextureReplacement : public Hook
 			return;
 		}
 
+		// The original call may have reentered a distinct producer. Only
+		// carry a token from a stable, source-backed HUD parent scope.
+		const auto producer = OutRunVR::DirectSpriteSource::ProvenScreenHudProducer(
+			scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture());
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
@@ -1027,7 +1033,7 @@ class TextureReplacement : public Hook
 				node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope);
+					node, scope, producer);
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
@@ -1040,6 +1046,7 @@ class TextureReplacement : public Hook
 	{
 		const void* returnAddress = _ReturnAddress();
 		const auto vrTailsBefore = SnapshotVrSpriteTails();
+		const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();
 		OutRunVRHudInspector::TracePutSprite2(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 		// Original game input storage can be submitted again in the next menu
@@ -1093,7 +1100,7 @@ class TextureReplacement : public Hook
 		// Restore before any following producer reads the shared parent/mask.
 		maskUv.Restore();
 		originalUv.Restore();
-		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
+		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);
 		return result;
 	}
 
@@ -1102,6 +1109,7 @@ class TextureReplacement : public Hook
 	{
 		const void* returnAddress = _ReturnAddress();
 		const auto vrTailsBefore = SnapshotVrSpriteTails();
+		const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();
 		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 		OutRunVR::SpriteUV::ScopedSprArgsScale<SPRARGS> originalUv;
@@ -1117,7 +1125,7 @@ class TextureReplacement : public Hook
 		}
 		const int result = put_sprite_ex.call<int>(a1, a2);
 		originalUv.Restore();
-		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
+		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);
 		return result;
 	}
 
