@@ -9,16 +9,16 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00906",
   "feature_id": "DX11:NATIVE_GAME_CAMERA_DEPTH_PARITY_STEREO_DRAW_CLEAR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
   "score_change": 0,
   "material_result_sha": "ff3d059a063469d8483ec50cbb4c5ec79f3ecead",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6",
   "feature_contract": {
     "feature_id": "DX11:NATIVE_GAME_CAMERA_DEPTH_PARITY_STEREO_DRAW_CLEAR",
     "goal": "Keep real D3D9 menu/vehicle/race auxiliary camera native Draw and DrawIndexed depth/stencil attachments physically compatible with selected RTV mip/array views and preserve safe subsequent GPU stereo eye Copy/Clear, including strict DX9Ex fallback.",
@@ -67,15 +67,15 @@
     "visible_frame_acceptance": "SOURCE_STAGE_ONLY; synthetic WARP physical camera GPU path is not yet live OutRun visible menu/car/race/Quest3 proof.",
     "activation_guard_and_fallback": "Native opt-in remains fail-closed, original D3D9Ex menu/gamepad/FFB/SkyGlow and frozen DXVK remain untouched.",
     "acceptance_proof": {
-      "positive_probe": "C++ camera source selected physical RTV/DSV matching mip acceptance and WARP GPU camera clear and eye readback test; final exact SHA probe still pending.",
+      "positive_probe": "Native camera physical RTV/DSV parity source and Win32 WARP compile/regression checked with exact validation SHA a9bac966; mandatory 5/5 GitHub Actions SUCCESS. Actual gameplay/Quest3 untested.",
       "negative_regression": "Mismatched physical 64x64 DSV versus selected 32x32 camera mip1 rejected before native GPU Draw; mismatched/sample properties and original fallback preserved.",
-      "component_integration": "C++ real game auxiliary Draw/DrawIndexed with bound DSV physical admission, Clear route and real Win32 WARP probe; mandatory final exact-SHA matrix pending."
+      "component_integration": "material ff3d059a, same-task follow-on compiler/contract repairs through validation-bearing a9bac966; mandatory DX11 Fast/Backend/Build/OpenXR/HUD exact SHA 5/5 SUCCESS."
     }
   },
   "acceptance_results": {
-    "camera_draw_dsv_physical_parity": "PENDING_CI",
-    "camera_clear_and_safe_fallback": "PENDING_CI",
-    "warp_and_mandatory_exact_sha_ci": "PENDING_CI"
+    "camera_draw_dsv_physical_parity": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "camera_clear_and_safe_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "warp_and_mandatory_exact_sha_ci": "PASS_EXACT_SHA_MANDATORY_5_OF_5"
   },
   "changed_files": [
     "src/vr/d3d11/native_game_camera_view.hpp",
@@ -86,12 +86,12 @@
     {
       "cause": "DX11 Fast 39089885082 and Backend 39089885067: prior 00905 lacks development_strategy, latest run 00906 absent; publish 00906 strategy-compliant SOURCE_IMPLEMENTED_CI_PENDING record",
       "category": "run-acceptance-contract",
-      "result": "PENDING"
+      "result": "RESOLVED_SAME_TASK_AT_VALIDATION_SHA"
     },
     {
       "cause": "Win32 WARP 39089885083: C2039/C3861 missing camera view function declarations in probe translation unit",
       "category": "actual-cpp-compile",
-      "result": "PENDING"
+      "result": "RESOLVED_SAME_TASK_AT_VALIDATION_SHA"
     }
   ],
   "previous_exact_sha_runs": {
@@ -104,9 +104,55 @@
     "C0_RECOVER": "Resumed same 00906 task at exact material ff3d059a, restored owner and branch.",
     "C1_REVIEW": "Separate Fast+Backend old latest-record acceptance failure and physical WARP C++ missing include.",
     "C2_IMPLEMENT": "Already committed physical camera DSV parity to native Draw and Clear; same task WARP include repair.",
-    "C3_VALIDATE": "Re-run final mandatory exact-SHA Gates only on corrected validation-bearing source SHA.",
-    "C4_COMMIT": "ff3d059a material source, pending same-task focused repair commit.",
-    "C5_PACKAGE": "NOT_REQUIRED_PENDING_FINAL_BUILD",
-    "C6_STATE": "PENDING_EXACT_SHA; keep RUNTIME_VALIDATION=UNTESTED."
-  }
+    "C3_VALIDATE": "Exact validation SHA a9bac966: DX11 Fast #39090547273, Backend #39090547350, Build #39090547301, OpenXR #39090551396, HUD #39090551397 all SUCCESS; no duplicate CI.",
+    "C4_COMMIT": "C++ material ff3d059a; same-task validation-bearing a9bac966. Separate C6 bookkeeping-only [skip ci] commit after exact-SHA gates.",
+    "C5_PACKAGE": "NOT_REQUIRED; GitHub Windows Build action SUCCESS; no local deployment claim.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA at a9bac966; Quest3/VDXR, real game and inputs UNTESTED; score change +0."
+  },
+  "validation_evidence": {
+    "material_sha": "ff3d059a063469d8483ec50cbb4c5ec79f3ecead",
+    "validation_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6",
+    "mandatory_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39090547273,
+        "event": "push",
+        "conclusion": "success",
+        "validation_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39090547350,
+        "event": "push",
+        "conclusion": "success",
+        "validation_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6"
+      },
+      {
+        "name": "Build",
+        "run_id": 39090547301,
+        "event": "push",
+        "conclusion": "success",
+        "validation_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39090551396,
+        "event": "pull_request",
+        "conclusion": "success",
+        "validation_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39090551397,
+        "event": "pull_request",
+        "conclusion": "success",
+        "validation_sha": "a9bac966fd2bac7eb1b53a92fa370ffe1f1ba1b6"
+      }
+    ],
+    "required_gates_passed": "5/5",
+    "runtime_validation": "UNTESTED",
+    "scope": "SOURCE_STAGE_ONLY; not HMD/gameplay proven"
+  },
+  "c6_completed_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_bookkeeping_only": true
 }
