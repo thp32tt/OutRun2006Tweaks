@@ -1,0 +1,205 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00903",
+  "production_id": "CONVERSION-DX11-00903",
+  "event_id": "CONVERSION-DX11-00903-E003",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00903",
+  "feature_id": "DX11:NATIVE_GAME_STEREO_MIP_POSTPASS_GPU_BOUNDARY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "2b442769e32713d009a94de642b9713dcebb035b",
+  "validation_bearing_result_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_GAME_STEREO_MIP_POSTPASS_GPU_BOUNDARY",
+    "goal": "Validate actual game camera physical mip and array stereo GPU transfer to native OpenXR shared L/R eye ring with pose/ACK; MSAA source rejection and original DX9Ex fallback remain fail-closed.",
+    "acceptance_items": [
+      {
+        "id": "selected_game_camera_mip_gpu_stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_camera_mip_gpu_stereo_pair",
+        "expected_behavior": "Native game mip/array selected texture source produces independent left/right GPU eye pixels and exact host pose and ACK."
+      },
+      {
+        "id": "msaa_preflight_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "msaa_source_provenance_and_dx9ex_fallback",
+        "expected_behavior": "Reject invalid selected mip, array, aliased eye and unsafe MSAA source before GPU ownership; preserve original D3D9Ex/gamepad/FFB fallback."
+      },
+      {
+        "id": "warp_gpu_pixels_five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "physical_warp_gpu_pixel_and_ci",
+        "expected_behavior": "Physical Win32 WARP GPU pixel/ACK regression and all five exact-SHA GitHub CI gates pass, without claiming an actual OutRun frame or Quest3 runtime."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "selected_game_camera_mip_gpu_stereo": "PASS_WARP_INDEPENDENT_MIP1_PIXELS",
+    "msaa_preflight_and_original_fallback": "PASS_MSAA_FAIL_CLOSED_CHECKS",
+    "warp_gpu_pixels_five_exact_sha_gates": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Real game native D3D11 camera mip/array source -> selected CopySubresourceRegion L/R into shared XR eye ring",
+      "Physical GPU eyes -> OpenXR pose/generation publication and exact host ACK"
+    ],
+    "batch_components": [
+      "Native game source physical mip array capture and GPU Copy path in C++",
+      "WARP independent mip1 red/blue GPU pixel/ACK regression",
+      "Same task native transport and MSAA verifier repair"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO:MIP_ARRAY_COPY_STRETCH_AND_GPU_SHADER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: synthetic physical GPU WARP shows native stereo eye pixels, not actual OutRun native DX11 gameplay or Quest3/VDXR display.",
+    "activation_guard_and_fallback": "Fail-closed native opt-in and unchanged DX9Ex render/input/FFB fallback; R175 source ownership preserved.",
+    "blocking_evidence": "Actual OutRun live D3D9 Draw->D3D11 visible frame and HMD runtime not performed.",
+    "acceptance_proof": {
+      "positive_probe": "Native Isolated WARP #39083635867 SUCCESS on source-identical 0f5ddd28; selected independent mip1 L/R GPU pixels and ACK.",
+      "negative_regression": "MSAA and provenance destructive tests PASS at exact SHA 9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+      "component_integration": "Original C++ material 2b442769e32713d009a94de642b9713dcebb035b; two same-TASK CI repair commits 0f5ddd28 and 9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3; all mandatory exact SHA gates SUCCESS."
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py",
+    "tools/test_dx11_eye_msaa_resolve_00695.py"
+  ],
+  "ci_blocker": {
+    "initial_backend_failed_run": 39083314324,
+    "followup_fast_failed_run": 39083635701,
+    "cause": "Old exact_source(left_source, leftDesc) and mip0-only static/MSAA contract invalid after real selected mip/array GPU code.",
+    "resolved": true,
+    "repairs": [
+      "0f5ddd28685595833891f6ea9097bf662ab9c24e",
+      "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+    ]
+  },
+  "runtime_validation_note": "OutRun live game, Quest3 HMD, VDXR, FFB/gamepad and actual visible game frame UNTESTED; WARP pixels do not prove playability.",
+  "validation_evidence": {
+    "material_sha": "2b442769e32713d009a94de642b9713dcebb035b",
+    "validation_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39083722511,
+        "conclusion": "success",
+        "validation_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39083722454,
+        "conclusion": "success",
+        "validation_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      },
+      {
+        "name": "Build",
+        "run_id": 39083722541,
+        "conclusion": "success",
+        "validation_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39083726231,
+        "conclusion": "success",
+        "validation_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39083726234,
+        "conclusion": "success",
+        "validation_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      }
+    ],
+    "isolated_native_warp_run_id": 39083635867,
+    "isolated_native_warp_conclusion": "success",
+    "isolated_native_warp_sha": "0f5ddd28685595833891f6ea9097bf662ab9c24e",
+    "build_artifacts": [
+      {
+        "id": 12120240736,
+        "name": "wheel-source-9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      },
+      {
+        "id": 12119644229,
+        "name": "outrun2006tweaks-9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "full_gameplay_renderer_complete": false,
+    "blocking_evidence": "Real menu/car/race visible native DX11 game and Quest3/VDXR not executed."
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub target recovered at 2b442769; 09:30 controller checkpoint and 00903 record absence verified.",
+    "C1_REVIEW": "Backend 39083314324 and Fast 39083635701 stale contract signatures diagnosed.",
+    "C2_IMPLEMENT": "Original 00903 material C++ GPU selected mip 2b442769, same task test/tool repairs 0f5ddd28 and 9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+    "C3_VALIDATE": "Win32 WARP 39083635867 PASS; all 5 exact SHA mandatory CI SUCCESS at 9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+    "C4_COMMIT": "Three actual source/test commits; C6 separate [skip ci] after required CI PASS.",
+    "C5_PACKAGE": "NOT_REQUIRED; exact SHA Build artifacts generated.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED PASS_EXACT_SHA with runtime UNTESTED; score change +0."
+  },
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "acceptance_results": [
+      {
+        "id": "selected_game_camera_mip_gpu_stereo",
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/native_game_stereo_submission.cpp",
+          "src/vr/d3d11/native_game_stereo_submission.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.cpp",
+          "src/vr/d3d11/native_shared_eye_ring.hpp",
+          "tools/dx11_native_transport_probe.cpp"
+        ],
+        "validation_command": "GitHub Actions DX11 Native Transport Isolated WARP run 39083635867"
+      },
+      {
+        "id": "msaa_preflight_and_original_fallback",
+        "status": "PASS",
+        "evidence_paths": [
+          "src/vr/d3d11/native_game_stereo_submission.cpp",
+          "src/vr/d3d11/native_game_stereo_submission.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.cpp",
+          "src/vr/d3d11/native_shared_eye_ring.hpp",
+          "tools/verify_dx11_native_transport_contract.py",
+          "tools/test_dx11_eye_msaa_resolve_00695.py"
+        ],
+        "validation_command": "python tools/verify_dx11_native_transport_contract.py; python tools/test_dx11_eye_msaa_resolve_00695.py"
+      },
+      {
+        "id": "warp_gpu_pixels_five_exact_sha_gates",
+        "status": "PASS_FEATURE_CI",
+        "evidence_paths": [
+          "src/vr/d3d11/native_game_stereo_submission.cpp",
+          "src/vr/d3d11/native_game_stereo_submission.hpp",
+          "src/vr/d3d11/native_shared_eye_ring.cpp",
+          "src/vr/d3d11/native_shared_eye_ring.hpp",
+          "tools/dx11_native_transport_probe.cpp",
+          "tools/verify_dx11_native_transport_contract.py",
+          "tools/test_dx11_eye_msaa_resolve_00695.py"
+        ],
+        "validation_command": "GitHub Actions Fast 39083722511 Backend 39083722454 Build 39083722541 OpenXR 39083726231 HUD 39083726234"
+      }
+    ]
+  }
+}
