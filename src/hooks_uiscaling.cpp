@@ -1453,11 +1453,11 @@ class UIScaling : public Hook
     {
         if (StageExtensionDepth++ != 0)
             return;
+        // QueueRenderActive() is the original node dispatcher predicate
+        // (SpriteQueueDepth != 0). Snapshot that admission at source
+        // entry; the live depth guard remains at direct GPU ownership.
         StageExtensionAdmission = {
             Settings::VREnabled,
-            // QueueRenderActive() is the original node dispatcher predicate
-            // (SpriteQueueDepth != 0). Snapshot that admission at source
-            // entry; the live depth guard remains at direct GPU ownership.
             !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
         };
