@@ -75,19 +75,17 @@ int main()
         using OutRunVR::SpriteQueue::FirstVerifiedAppendedNode;
         if (FirstVerifiedAppendedNode(&root, &root, &secondGlyph, 2u)
                 != &firstGlyph ||
-            FirstVerifiedAppendedNode(&root, &root, &firstGlyph, 2u)
-                != &firstGlyph)
-            return 90; // empty-list sentinel must expose first +TIME node
+            FirstVerifiedAppendedNode(&root, &root, &firstGlyph, 2u))
+            return 90; // only the LIVE terminal tail proves a complete +TIME batch
         if (FirstVerifiedAppendedNode(&root, &root, &secondGlyph, 1u) ||
             FirstVerifiedAppendedNode(&root, &root, &stale, 2u) ||
             FirstVerifiedAppendedNode(&root, static_cast<Node*>(nullptr), &root, 2u) ||
             FirstVerifiedAppendedNode(&root, &root, &root, 2u))
             return 91; // truncated, stale and sentinel-as-data fail closed
-        if (FirstVerifiedAppendedNode(&root, static_cast<Node*>(nullptr), &secondGlyph, 2u)
-                != &firstGlyph ||
+        if (FirstVerifiedAppendedNode(&root, static_cast<Node*>(nullptr), &secondGlyph, 2u) ||
             FirstVerifiedAppendedNode(&root, &firstGlyph, &secondGlyph, 2u)
                 != &secondGlyph)
-            return 92; // empty-null and normal nonempty paths unchanged
+            return 92; // null snapshot is unproven; real linked old tail still works
         root.next_0 = &secondGlyph;
         if (FirstVerifiedAppendedNode(&root, &firstGlyph, &secondGlyph, 2u))
             return 93; // detached prior tail must not tag foreign queue
