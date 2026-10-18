@@ -350,7 +350,9 @@ def check(ui, manifest, fraction_header=None):
             if ("marker = projected ? &projectedAnchor : nullptr;" not in chunk or
                     "scope, marker, Settings::VREnabled," not in chunk or
                     "ProducerToken::RankMarkerSprani);" not in chunk or
-                    "ProducerToken::RankMarkerSprani, marker)" not in chunk):
+                    "ProducerToken::RankMarkerSprani," not in chunk or
+                    "marker, &rootsBefore);" not in chunk or
+                    "rootsBefore[prio] = root;" not in chunk):
                 fail("rank immediate draw and queued siblings must share frozen anchor")
             if "TagAppendedNodes(tailsBefore, scope," not in chunk:
                 fail("rank sprani lost all-node exact producer tagging")
@@ -369,13 +371,18 @@ def check(ui, manifest, fraction_header=None):
             # live-root tail proof as its post-call SpriteNode semantic tags.
             # Never accept an oldTail->next_0 walk after native producer E8.
             if ("OutRunVR::RankMarker::RestoreAppendedRankFractions(" not in chunk or
-                    "root, tailsBefore[prio], tailAfter, Game::SpriteNodeMax," not in chunk or
+                    "rootsBefore[prio], root, tailsBefore[prio]," not in chunk or
+                    "tailAfter, Game::SpriteNodeMax," not in chunk or
+                    "rootsBefore[prio] = root;" not in chunk or
+                    "projected ? &projectedAnchor : nullptr, &rootsBefore);" not in chunk or
                     "frozenFractionX, frozenFractionY);" not in chunk or
                     '#include "vr/game/rank_marker_fraction.hpp"' not in ui):
                 fail("4th+ digit siblings lost proven subpixel restoration")
             for needle in (
                 "FirstVerifiedAppendedNode(",
                 "root, oldTail, newTail, bound);",
+                "if (!sourceRoot || sourceRoot != currentRoot)",
+                "currentRoot, oldTail, newTail, bound, dx, dy);",
                 "if (!first)",
                 "for (Node* node = first; node && bound != 0; --bound)",
                 "RestoreFraction(*node, dx, dy)",
@@ -477,6 +484,16 @@ def test_mutations(ui, manifest):
     must_fail("rank correction call disconnected",
               ui.replace("OutRunVR::RankMarker::RestoreAppendedRankFractions(",
                          "OutRunVR::RankMarker::NoRestore(", 1))
+    must_fail("rank clip foreign root accepted",
+              ui.replace("rootsBefore[prio], root, tailsBefore[prio],",
+                         "root, root, tailsBefore[prio],", 1))
+    must_fail("rank sprani foreign root accepted",
+              ui.replace("marker, &rootsBefore);",
+                         "marker, nullptr);", 1))
+    must_fail("rank fraction root fence disabled",
+              changed_fraction=fraction.replace(
+                  "if (!sourceRoot || sourceRoot != currentRoot)",
+                  "if (false)", 1))
     must_fail("rank queue tail proof bypassed",
               changed_fraction=fraction.replace(
                   "FirstVerifiedAppendedNode(",

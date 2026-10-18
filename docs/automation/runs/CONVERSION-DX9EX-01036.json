@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01036",
+  "production_id": "CONVERSION-DX9EX-01036",
+  "event_id": "CONVERSION-DX9EX-01036-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_MATERIAL_COMMITTED_CI_REPAIR",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "26c6e7471fc85117081202aacec0de15d4c1fd30",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/rank_marker_fraction.hpp",
+    "vrhost/tests/rank_marker_fraction_smoke.cpp",
+    "tools/verify_vr_hud_exact_callsite_contract.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Prevent source queue sentinel replacement from relabeling a different vehicle's rank SpriteNode, while preserving frozen Calc3D2D offsets for original projected sprite, mask/animation siblings and strict ScreenHud NaviPub fallback.",
+    "scope_boundary": "Original rank first-three sprani and fourth-plus clip wrappers, stable priority root identity and existing queue proof; no owner route, shader, source crop, FX/GOAL, SkyGlow or input changes.",
+    "trace_stages": [
+      "Original car/rival Calc3D2D anchor is frozen at native RankMarker_sprani or put_clip_sprite source entry.",
+      "Native game producer can relink an old tail under a different priority root before post-call tag and fraction correction.",
+      "Per-priority root snapshot fences both fraction restoration and SpriteNode source-tag propagation; unchanged R84 R30/R33 consumes legitimate projected marker or original fallback."
+    ],
+    "subcomponents": [
+      "Capture each original priority root before rank native function call and reuse for both direct sprani all-child and clipped 4th+ GPU sprite tagging.",
+      "Reject recycled or reattached old tail on a new root before any kind0/1 native subpixel mutation, but preserve still-owned sibling fractions and projected marker tags.",
+      "Extend rank fraction Release smoke negative/positive tests and require root lease in exact-original HUD semantic contract including mutation cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_marker_source_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "rank Calc3D2D original producers and queued SpriteNode to R84",
+        "expected_behavior": "Native original rank SpriteNode siblings inherit only their own car anchor and preserve NaviPub ScreenHud."
+      },
+      {
+        "id": "rank_queue_root_fence",
+        "category": "fallback_regression",
+        "behavior_area": "priority-list root replacement and old tail reattachment",
+        "expected_behavior": "Foreign priority root never mutates kind0/1 offsets or stamps another vehicle owner; same-root sprites preserve fractional geometry and native fallback."
+      },
+      {
+        "id": "rank_required_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows game, x64 host, package, HUD Inspector, Domain and Full Source",
+        "expected_behavior": "Exact-SHA mandatory GitHub Actions succeed without bypass; Quest3 optical result remains separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_marker_source_ownership": "PENDING_CI",
+    "rank_queue_root_fence": "PENDING_CI",
+    "rank_required_exact_sha": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Original FUN_004BAD20 projected rank producer emits first-place sprani siblings via 0xBB0FB/133/16C/1A5 and fourth-plus clipped glyph calls 0xBB21F/241/271/2BC/2D0, with live Calc3D2D anchor.",
+    "source_trace": [
+      "RankMarker_sprani snapshots only old priority tails and registers all appended child nodes after original sprani_play_ae_auth_alpha returns.",
+      "RankMarker_putClipSprite snapshots only tails and RestoreAppendedRankFractions walks from current root before tagging queued sprite siblings.",
+      "FirstVerifiedAppendedNode proves old+new tail reachability but does not prove unchanged original root; a nested producer reattaching old tail to a different root may transfer rank ownership.",
+      "Stable original priority-root snapshots passed through both fraction correction and semantic registry ensure selected R84 queue owner cannot borrow foreign vehicle anchor."
+    ],
+    "root_cause": "Two rank original producer wrappers lacked source priority-list root identity; reachable recycled tail alone is insufficient proof before applying rank displacement or projected marker tags.",
+    "alternatives_rejected": [
+      "Do not rewrite R30 FVF142 projected rank path that is already implemented.",
+      "Do not globally classify all generic queue glyphs as ScreenHud or suppress native fallback/SkyGlow.",
+      "Protect matching root and still linked original child ownership; do not alter physical D3D Draw ordering."
+    ],
+    "fix_evidence": "Original and live root equality must hold before restoring kind0/1 subpixel native geometry and registering all appended rank sprites. Tests reject foreign-root old-tail reattachment and accept same-root sibling after safe bounded proof.",
+    "negative_test_evidence": "Release smoke exercise foreignRoot with reattached first/second, null source root, preserved offsets, stable root success, detached/cyclic old tails and nonfinite kind0/1 coordinates; Python HUD exact original gate enforces root lease and mutates wrong-root to negative failures.",
+    "eye_ownership": "R84 still chooses existing projected rank WorldBillboard/FVF142 per-eye GPU or original native fallback; no Quest3 runtime binocular claim."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "Material source SHA 26c6e7471fc85117081202aacec0de15d4c1fd30. Initial CI failed only because run record absent and verifier literal assumed old call signature; this follow-up fixes same-task contracts, retains stricter root proof and adds mutation checks. Quest3 HMD not run."
+}
