@@ -4,6 +4,7 @@
 #include "native_game_camera_view.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
+#include "native_game_raster_topology.hpp"
 #include <limits>
 #include <cmath>
 #include <algorithm>
@@ -399,6 +400,14 @@ bool NativeGameEyeDrawEncoder::unpredicated_color_evidence() const noexcept {
     return clear;
 }
 
+bool NativeGameEyeDrawEncoder::raster_primitive_possible(
+    UINT vertexOrIndexCount) const noexcept {
+    if (!context_) return false;
+    D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    context_->IAGetPrimitiveTopology(&topology);
+    return live_game_stereo::primitive_can_rasterize(topology, vertexOrIndexCount);
+}
+
 bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
     if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
     ID3D11RenderTargetView* target = eyeTarget_;
@@ -556,7 +565,8 @@ bool NativeGameEyeDrawEncoder::draw_offscreen(
     UINT vertexCount, UINT startVertex) noexcept {
     if (!vertexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
-    const bool eligible = unpredicated_color_evidence();
+    const bool eligible = unpredicated_color_evidence() &&
+        raster_primitive_possible(vertexCount);
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
     if (eligible) ++unpredicatedGameDrawCount_;
@@ -568,7 +578,8 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
     UINT indexCount, UINT startIndex, INT baseVertex) noexcept {
     if (!indexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
-    const bool eligible = unpredicated_color_evidence();
+    const bool eligible = unpredicated_color_evidence() &&
+        raster_primitive_possible(indexCount);
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
     if (eligible) ++unpredicatedGameDrawCount_;
@@ -587,7 +598,8 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
             verticesPerInstance, instanceCount, drawCount_) ||
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
-    const bool eligible = unpredicated_color_evidence();
+    const bool eligible = unpredicated_color_evidence() &&
+        raster_primitive_possible(verticesPerInstance);
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
@@ -603,7 +615,8 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
             indicesPerInstance, instanceCount, drawCount_) ||
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
-    const bool eligible = unpredicated_color_evidence();
+    const bool eligible = unpredicated_color_evidence() &&
+        raster_primitive_possible(indicesPerInstance);
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
@@ -801,11 +814,13 @@ bool NativeGameEyeDrawEncoder::draw(
         return false;
     if (!replay_due_source_clears()) return false;
     const bool unpredicated = unpredicated_color_evidence();
+    const bool eligible = unpredicated &&
+        raster_primitive_possible(vertexCount);
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), eligible);
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
-    if (unpredicated) {
+    if (eligible) {
         ++unpredicatedGameDrawCount_;
         ++unpredicatedEyeDrawCount_;
     }
@@ -820,11 +835,13 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
         return false;
     if (!replay_due_source_clears()) return false;
     const bool unpredicated = unpredicated_color_evidence();
+    const bool eligible = unpredicated &&
+        raster_primitive_possible(indexCount);
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), eligible);
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
-    if (unpredicated) {
+    if (eligible) {
         ++unpredicatedGameDrawCount_;
         ++unpredicatedEyeDrawCount_;
     }
@@ -843,12 +860,14 @@ bool NativeGameEyeDrawEncoder::draw_instanced(
         !eye_output_bound() || !replay_due_source_clears())
         return false;
     const bool unpredicated = unpredicated_color_evidence();
+    const bool eligible = unpredicated &&
+        raster_primitive_possible(verticesPerInstance);
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), eligible);
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
-    if (unpredicated) {
+    if (eligible) {
         ++unpredicatedGameDrawCount_;
         ++unpredicatedEyeDrawCount_;
     }
@@ -864,13 +883,15 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
         !eye_output_bound() || !replay_due_source_clears())
         return false;
     const bool unpredicated = unpredicated_color_evidence();
+    const bool eligible = unpredicated &&
+        raster_primitive_possible(indicesPerInstance);
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), eligible);
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
     ++drawCount_;
-    if (unpredicated) {
+    if (eligible) {
         ++unpredicatedGameDrawCount_;
         ++unpredicatedEyeDrawCount_;
     }

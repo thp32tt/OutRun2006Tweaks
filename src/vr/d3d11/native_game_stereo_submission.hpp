@@ -189,6 +189,10 @@ private:
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
+    // A real Draw still advances the source ordinal even if the current
+    // primitive topology cannot assemble a single point/line/triangle.
+    // Such a command must not certify visible OpenXR scene geometry.
+    [[nodiscard]] bool raster_primitive_possible(UINT vertexOrIndexCount) const noexcept;
     [[nodiscard]] bool replay_due_source_clears() noexcept;
     ID3D11DeviceContext* context_{};
     ID3D11RenderTargetView* eyeTarget_{};
