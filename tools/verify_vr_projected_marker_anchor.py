@@ -590,19 +590,26 @@ def require_rank_direct_isolation(source: str, helper: str = rank_fraction) -> N
     e = clip.find("frozenFractionX, frozenFractionY);", d)
     if min(a,b,c,d,e) < 0 or not (a < b < c < d < e):
         fail("nested 4th+ rank glyph offsets not snapshotted before live-queue correction")
-    # The helper must walk the CURRENT priority root, prove old/new tail
-    # reachability without touching a detached old tail, and bound all
-    # native kind0/kind1 fractional sibling writes.
+    # Original root/tail proof is unchanged. The source fix now preflights
+    # EVERY sibling before the second bounded commit pass; rejecting a bad
+    # later glyph must not leave a previously mutated vehicle-rank sprite.
     for required in (
         "FirstVerifiedAppendedNode(",
         "root, oldTail, newTail, bound);",
         "if (!first)",
-        "for (Node* node = first; node && bound != 0; --bound)",
-        "RestoreFraction(*node, dx, dy)",
+        "for (Node* node = first; node && count < bound; node = node->next_0)",
+        "if (!FractionCandidate(*node, dx, dy, x, y))",
         "if (node == newTail)",
+        "if (!reachedTail)",
+        "for (unsigned i = 0; i < count; ++i)",
+        "RestoreFraction(*node, dx, dy);",
     ):
         if required not in helper:
-            fail("rank live-root child proof changed: " + required)
+            fail("rank live-root/two-pass child proof changed: " + required)
+    preflight = helper.find("for (Node* node = first; node && count < bound;")
+    commit = helper.find("for (unsigned i = 0; i < count; ++i)")
+    if not (0 <= preflight < helper.find("if (!reachedTail)") < commit):
+        fail("rank siblings must be fully validated before any coordinate commit")
     if '#include "vr/game/rank_marker_fraction.hpp"' not in source:
         fail("rank caller not using shared two-layout correction")
     for required in (
@@ -617,11 +624,16 @@ def require_rank_direct_isolation(source: str, helper: str = rank_fraction) -> N
         "const float nextX = *x + dx;",
         "const float nextY = *y + dy;",
         "if (!std::isfinite(nextX) || !std::isfinite(nextY))",
-        "*x = nextX;",
-        "*y = nextY;",
+        "candidateX = nextX;",
+        "candidateY = nextY;",
+        "if (!FractionCandidate(node, dx, dy, x, y))",
+        "node.args_10.float24 = x;",
+        "node.args_10.float28 = y;",
+        "node.args2_58.mtx_14._41 = x;",
+        "node.args2_58.mtx_14._42 = y;",
     ):
         if required not in helper:
-            fail("rank affine/clip atomic correction changed: " + required)
+            fail("rank affine/clip candidate and atomic correction changed: " + required)
 
 require_rank_direct_isolation(ui)
 for name, original, replacement in (
@@ -641,11 +653,14 @@ for name, original, replacement in (
     else:
         fail("destructive marker owner mutant escaped: " + name)
 
-# Bypass of the live queue proof is a destructive mutation even when
-# the original two-layout fraction arithmetic remains untouched.
+# Destructive regressions guard both queue-root proof and the entire
+# preflight/commit transaction. No duplicate test-only task is created.
 for name, old, new in (
     ("rank queue proof removed", "FirstVerifiedAppendedNode(", "UnprovenAppendedNode("),
-    ("rank queue bound removed", "node && bound != 0; --bound", "node; --bound"),
+    ("rank queue bound removed", "node && count < bound", "node && count < 0"),
+    ("later sibling candidate bypassed", "if (!FractionCandidate(*node, dx, dy, x, y))", "if (false)"),
+    ("rank failed-tail gate removed", "if (!reachedTail)", "if (false)"),
+    ("rank commit pass dropped", "for (unsigned i = 0; i < count; ++i)", "for (unsigned i = count; i < count; ++i)"),
 ):
     changed = rank_fraction.replace(old, new, 1)
     if changed == rank_fraction:
