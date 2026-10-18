@@ -10,14 +10,14 @@
   "latest_attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C5_GATES_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "513434b63bc388cf92c0825f0315c3c1732d26aa",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "validation_bearing_result_sha": "449cf5145c4486cefd7db6b8e21710721e4cad99",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_textures.cpp",
@@ -60,9 +60,9 @@
     ]
   },
   "acceptance_results": {
-    "exact_direct_sprite_source": "SOURCE_ASSERTIONS_PENDING_CI",
-    "unknown_source_safe_fallback": "SOURCE_ASSERTIONS_PENDING_CI",
-    "exact_integrated_gates": "PENDING_CI"
+    "exact_direct_sprite_source": "PASS_EXACT_SHA",
+    "unknown_source_safe_fallback": "PASS_EXACT_SHA",
+    "exact_integrated_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Review of existing native producer call classification and original EXE caller RVA map; source semantics alone do not prove Quest3 eye output.",
@@ -93,7 +93,39 @@
       "hud_inspector_run_id": 39121583190,
       "full_source_impact_run_id": 39121583169
     },
-    "final_exact_sha_gates": "PENDING"
+    "final_exact_sha_gates": "PENDING",
+    "head_sha": "449cf5145c4486cefd7db6b8e21710721e4cad99",
+    "verified_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39122280427,
+        "head_sha": "449cf5145c4486cefd7db6b8e21710721e4cad99",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39122280552,
+        "head_sha": "449cf5145c4486cefd7db6b8e21710721e4cad99",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39122280457,
+        "head_sha": "449cf5145c4486cefd7db6b8e21710721e4cad99",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39122280489,
+        "head_sha": "449cf5145c4486cefd7db6b8e21710721e4cad99",
+        "conclusion": "success"
+      }
+    ],
+    "build_validation": "BUILD_VERIFIED",
+    "runtime_validation": "UNTESTED",
+    "ci_repair_shas": [
+      "449cf5145c4486cefd7db6b8e21710721e4cad99"
+    ]
   },
-  "notes": "Original E001 material source SHA is authoritative. This E003 run-record CI failure repair is not new functional code/score; no CI skip. Whole HUD optical defect is not claimed fixed. Quest3/VDXR runtime UNTESTED, DXVK frozen."
+  "notes": "C6 exact-SHA mandatory four Gate SUCCESS after restoring missing original 01039 feature record; original material 513434b6 retained. Game/host/package and affected CI static checks build-verified only. Quest3/VDXR HUD binocular optical acceptance untested; no full visible diplopia FIXED claim. E003 retry and C6 no extra AI score. DXVK frozen; fallback, SkyGlow, FFB/input protected."
 }
