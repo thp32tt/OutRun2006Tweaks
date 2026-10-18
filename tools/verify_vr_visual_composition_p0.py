@@ -670,15 +670,21 @@ for mutation in (
 
 # The in-game course-extension transient lives in the distinct 0x989xx
 # original sprani animation, not the GOAL 0x97xxx record/percentage.
-# Exactly three canonical E8 parents may tag their queued children.
+# Exactly TWO B4/B5 +TIME animation parents may tag their queued children; mode2 is separate.
 def verify_exact_time_extension_parent(ui_source, sem_source, analyzer):
     begin = ui_source.index('static constexpr int StageExtensionSpraniCalls[]')
     end = ui_source.index('};', begin)
     allowed = ui_source[begin:end]
-    for rva in (0x9898E, 0x98A36, 0x98AC6):
+    for rva in (0x9898E, 0x98A36):
         require(f'0x{rva:X}', allowed, 'lost exact stage-extension E8')
         require(f'0x{rva:08X}: 0x00029530', analyzer,
                 'stage extension E8 original EXE target not proven')
+    # REA mode switch at 0x498670: 0x498AC6 -> 0x429530 is
+    # 0x2C006C in mode=2, not a +TIME sprite. Never give it HUD ownership.
+    if '0x98AC6' in allowed:
+        raise SystemExit('mode2 0x2C006C erroneously inherits +TIME ScreenHud')
+    require('0x00098AC6: 0x00029530', analyzer,
+            'separate mode2 original sprani callsite evidence changed')
     print_start = ui_source.index('static constexpr int StageExtensionPrintCalls[]')
     print_end = ui_source.index('};', print_start)
     print_allow = ui_source[print_start:print_end]
@@ -701,7 +707,7 @@ def verify_exact_time_extension_parent(ui_source, sem_source, analyzer):
                   'ProducerToken::StageExtensionTime',
                   'StageExtensionBefore = {};')
     apply = function_body(ui_source, 'bool apply() override')
-    require_order(apply, 'extension 3 E8 enter/leave are atomic',
+    require_order(apply, 'extension 2 E8 enter/leave are atomic',
                   'StageExtensionEnterHooks[i] = safetyhook::create_mid(',
                   'Module::exe_ptr(rva), StageExtensionEnter',
                   'StageExtensionLeaveHooks[i] = safetyhook::create_mid(',
@@ -725,8 +731,11 @@ verify_exact_time_extension_parent(
     ui, sem, read('tools/analyze_outrun_exe.py'))
 for label, bad in (
     ('lost source parent', ui.replace(
-        '0x9898E, 0x98A36, 0x98AC6',
-        '0x9898E, 0x98A36, 0x98AC7', 1)),
+        '0x9898E, 0x98A36',
+        '0x9898E, 0x98A37', 1)),
+    ('mode2 incorrectly relabeled', ui.replace(
+        '0x9898E, 0x98A36',
+        '0x9898E, 0x98A36, 0x98AC6', 1)),
     ('missing numeric helper E8', ui.replace(
         '0x989AD, 0x98A10, 0x98A89',
         '0x989AD, 0x98A10, 0x98A8A', 1)),
@@ -800,7 +809,7 @@ verify_exact_call_window_hud_scope(ui)
 
 # The source-time +TIME ScreenHud scope alone is not enough when a previous
 # SpriteNode still has CurrentQueueExactScope/CurrentQueueProjectedMarker.
-# The six original 0x989xx producers must override that stale cursor for
+# The five original +TIME 0x989xx producers must override that stale cursor for
 # synchronous glyph draws WITHOUT stealing a currently drawn SpriteNode.
 def verify_stage_extension_direct_draw_owner(source, semantics):
     begin = function_body(source, 'static void StageExtensionEnter(')
