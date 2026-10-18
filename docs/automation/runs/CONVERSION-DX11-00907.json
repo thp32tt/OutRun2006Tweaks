@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00907",
   "feature_id": "DX11:OFFSCREEN_GAME_CAMERA_DRAW_RASTER_STEREO_INTEGRITY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -89,17 +89,59 @@
     "C0_RECOVER": "latest branch ca9e65e00160f8f6da4733e843cfc2c69f12cd88; prior 00906 C6 complete; no 00907 prior record",
     "C1_REVIEW": "Confirmed offscreen draw accepted disjoint physical viewport/scissor whereas direct eye already rejects; source may be copied after no-pixel geometry.",
     "C2_IMPLEMENT": "Physical selected RTV view intersection, four offscreen Draw entrypoints, WARP negative and positive source replay",
-    "C3_VALIDATE": "First material 6092eb7c source-graph static gate FAILED (literal signature drift). Updated source guard to demand actual physical viewport/scissor preflight, destructively tested removal; new exact validation-bearing SHA pending.",
-    "C4_COMMIT": "C++ material 6092eb7c, same-task exact-SHA contract repair pending",
+    "C3_VALIDATE": "PASS_EXACT_SHA 6f375c975c801da89ec50205c18c9b3c94f51e19; mandatory 5/5 GitHub Actions SUCCESS (Fast #39108313309, Backend #39108313299, Build #39108313307, OpenXR #39108317794, HUD #39108317816). Existing WARP material SHA #39108105996 SUCCESS; no CI rerun.",
+    "C4_COMMIT": "Material C++ 6092eb7cad0edd7f11d7f8798463a567b5189112; same-task exact validation-bearing 6f375c975c801da89ec50205c18c9b3c94f51e19. This C6 is separate bookkeeping-only [skip ci].",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA 6f375c975c801da89ec50205c18c9b3c94f51e19; original source material preserved; Quest3/VDXR, game and input RUNTIME_VALIDATION=UNTESTED; score change +0."
   },
   "ci_repairs": [
     {
       "cause": "Exact material 6092eb7c: DX11 Fast and Backend/Build source graph reject old literal prepare_offscreen_game_draw(gameTarget) after real offscreen geometry gained explicit requireDrawableRaster argument",
       "category": "stale-static-contract",
-      "result": "FIXED_EXPECTING_NEW_EXACT_SHA"
+      "result": "RESOLVED_SAME_TASK_AT_VALIDATION_SHA"
     }
   ],
-  "material_result_sha": "6092eb7cad0edd7f11d7f8798463a567b5189112"
+  "material_result_sha": "6092eb7cad0edd7f11d7f8798463a567b5189112",
+  "validation_bearing_result_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19",
+  "c6_completed_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_bookkeeping_only": true,
+  "validation_evidence": {
+    "material_sha": "6092eb7cad0edd7f11d7f8798463a567b5189112",
+    "validation_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19",
+    "mandatory_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39108313309,
+        "conclusion": "success",
+        "validation_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39108313299,
+        "conclusion": "success",
+        "validation_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19"
+      },
+      {
+        "name": "Build",
+        "run_id": 39108313307,
+        "conclusion": "success",
+        "validation_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39108317794,
+        "conclusion": "success",
+        "validation_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39108317816,
+        "conclusion": "success",
+        "validation_sha": "6f375c975c801da89ec50205c18c9b3c94f51e19"
+      }
+    ],
+    "required_gates_passed": "5/5",
+    "runtime_validation": "UNTESTED",
+    "scope": "SOURCE_STAGE_ONLY; real OutRun game/Quest3 runtime not observed"
+  }
 }
