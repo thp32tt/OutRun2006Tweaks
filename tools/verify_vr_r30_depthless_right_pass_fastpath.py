@@ -83,12 +83,35 @@ def main():
     ]
     for n, (old, new) in enumerate(mutations, 1):
         assert old in src, (n, old)
+        # The external F11 projection also uses a legitimate native restore
+        # before R30ExecuteXyzrhwStereo. Mutation 6 must damage the actual
+        # depthless XYZRHW right-eye fallback, not that unrelated F11 owner.
+        if old == "R29OwnerRestoreRightPassState(":
+            begin = src.index("HRESULT R30ExecuteXyzrhwStereo(")
+            at = src.index(old, begin)
+            altered = src[:at] + new + src[at + len(old):]
+        else:
+            altered = src.replace(old, new, 1)
         try:
-            check(src.replace(old, new, 1), r33)
+            check(altered, r33)
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"unsafe mutation survived: {n}")
-    print(f"PASS R30 XYZRHW/FOV depthless state restore + {len(mutations)} mutations")
+    # Reject removal of the native restore in EITHER right-eye route.
+    # A matching F11 helper elsewhere must never satisfy these checks.
+    for signature in ("HRESULT R30ExecuteXyzrhwStereo(",
+                      "HRESULT R30TryScreenSpaceFovDraw("):
+        begin = src.index(signature)
+        old = "R29OwnerRestoreRightPassState("
+        at = src.index(old, begin)
+        altered = src[:at] + "R29OwnerOmitFallback(" + src[at + len(old):]
+        try:
+            check(altered, r33)
+        except (AssertionError, ValueError):
+            pass
+        else:
+            raise AssertionError("right-eye native restore mutation escaped: " + signature)
+    print(f"PASS R30 XYZRHW/FOV depthless state restore + {len(mutations) + 2} mutations")
 
 
 if __name__ == "__main__":
