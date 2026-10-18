@@ -231,8 +231,9 @@ def offscreen_rect_contract(code, fixture):
         "context_->ClearRenderTargetView(gameTarget, rgba);",
     )) and all(x in depth for x in (
         "boundDepth.Get() != gameDepth",
-        "camera.width != cameraDepth.width",
-        "camera.height != cameraDepth.height",
+        "native_game_camera_rtv_extent(cd, colorViewDesc)",
+        "native_game_camera_dsv_extent(dd, depthViewDesc)",
+        "native_game_camera_depth_compatible(",
         "live_game_stereo::depth_clear_route(",
         "raster_partial_eye_depth_clear(",
         "context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);",
