@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
-  "checkpoint": "C5_GATE_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "0d19687e2bfd04621bb63c2461cbaac44388be6e",
-  "validation_bearing_result_sha": "PENDING_CI",
+  "validation_bearing_result_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -84,7 +84,50 @@
   ],
   "ci_evidence": {
     "material_source_sha": "0d19687e2bfd04621bb63c2461cbaac44388be6e",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "validation_bearing_result_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4",
+    "final_exact_sha_gates": "SUCCESS_4_OF_4",
+    "gate_results": {
+      "DX9Ex Active Validation": {
+        "run_id": 39142748389,
+        "conclusion": "success",
+        "head_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39142748383,
+        "conclusion": "success",
+        "head_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39142748353,
+        "conclusion": "success",
+        "head_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39142748330,
+        "conclusion": "success",
+        "head_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4"
+      }
+    },
+    "non_required_workflow_observation": {
+      "name": "Build",
+      "run_id": 39143829013,
+      "conclusion": "failure",
+      "required_gate": false
+    }
   },
-  "notes": "E001 substantive C++ R84 GOAL right-eye owner correction, not CI/record-only score. HMD/Quest3 not tested. Material source SHA is separate from validation-bearing run-record commit."
+  "notes": "E001 substantive C++ R84 GOAL right-eye owner correction, not CI/record-only score. HMD/Quest3 not tested. Material source SHA is separate from validation-bearing run-record commit. C6 result-only bookkeeping: all four required exact-SHA Windows CI gates succeeded on 83b368d9c6ed877c456010298d3b1258b4cb75a4. Separate non-required Build workflow #39143829013 failed; it is not one of the declared four required gates. No new source change, CI rerun, HMD PASS, or score increment.",
+  "c6_evidence": {
+    "result": "PASS_EXACT_SHA",
+    "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "original_material_sha": "0d19687e2bfd04621bb63c2461cbaac44388be6e",
+    "validation_bearing_result_sha": "83b368d9c6ed877c456010298d3b1258b4cb75a4",
+    "required_gate_count": 4,
+    "passed_gate_count": 4,
+    "record_only": true,
+    "compile_or_ci_rerun": false,
+    "runtime_validation": "UNTESTED",
+    "hmd_optical_status": "NEED_HMD_TEST",
+    "preserve_active_windows_ci": true
+  }
 }
