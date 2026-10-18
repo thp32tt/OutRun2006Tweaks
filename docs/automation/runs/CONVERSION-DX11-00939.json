@@ -122,7 +122,8 @@
   "NEXT_IMPLEMENTATION_ACTION": "Continue a separate non-conflicting native full-resolution game-frame feature; preserve exact-sha acceptance and record matching game/HMD pixels before any runtime promotion.",
   "score_policy": {
     "run_key": "CONVERSION-DX11-00939",
-    "scoreboard_recorded_separately": false,
-    "retry_additional_score": 0
+    "scoreboard_recorded_separately": true,
+    "retry_additional_score": 0,
+    "scoreboard_commit_sha": "40024080d722bc9cd5cc370a5595c53b12fcfd29"
   }
 }
