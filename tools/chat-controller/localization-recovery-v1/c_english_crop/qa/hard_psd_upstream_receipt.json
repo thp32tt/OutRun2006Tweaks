@@ -1,0 +1,10 @@
+{
+  "status": "UPSTREAM_PSD_GIT_BLOB_VERIFIED",
+  "file": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/upstream_psd_evidence/33491F83_512x256.psd",
+  "bytes": 8669875,
+  "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "git_blob_sha1": "e22ed4d6b9f7d8464fc40d724dd0b1d37e306104",
+  "file_sha256": "77fc9a45f47938735f30833061adfed45fa9786b2aebe0823691e368a4408ef6",
+  "QA_only": true,
+  "no_live_original_change": true
+}
