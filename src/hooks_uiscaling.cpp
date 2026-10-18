@@ -1638,11 +1638,11 @@ class UIScaling : public Hook
                    ProducerToken::ResultProgress,
                    ProducerToken::RivalMarkerSprani, 14, 0);
     }
-    static_assert(TestVehicleRankNestedQueueOwnership(),
-        "Rank marker source/queue lifetime must reject foreign nested owners");
-
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+        // Evaluate the constexpr fixture inside the complete class member.
+        static_assert(TestVehicleRankNestedQueueOwnership(),
+            "Rank marker source/queue lifetime must reject foreign nested owners");
         // Preserve this native source's registration boundary: a nested
         // exact producer must retain its newer SpriteNode stereo owner.
         const auto entrySerial =

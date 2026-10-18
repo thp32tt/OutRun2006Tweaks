@@ -374,7 +374,7 @@ def check(ui, manifest, fraction_header=None):
                     "scope, marker, Settings::VREnabled," not in chunk or
                     "ProducerToken::RankMarkerSprani);" not in chunk or
                     "ProducerToken::RankMarkerSprani," not in chunk or
-                    "marker, &rootsBefore);" not in chunk or
+                    not re.search(r"marker\s*,\s*&rootsBefore\s*,\s*entrySerial\s*\)", chunk) or
                     "rootsBefore[prio] = root;" not in chunk):
                 fail("rank immediate draw and queued siblings must share frozen anchor")
             if "TagAppendedNodes(tailsBefore, scope," not in chunk:
@@ -397,7 +397,7 @@ def check(ui, manifest, fraction_header=None):
                     "rootsBefore[prio], root, tailsBefore[prio]," not in chunk or
                     "tailAfter, Game::SpriteNodeMax," not in chunk or
                     "rootsBefore[prio] = root;" not in chunk or
-                    "projected ? &projectedAnchor : nullptr, &rootsBefore);" not in chunk or
+                    not re.search(r"projected\s*\?\s*&projectedAnchor\s*:\s*nullptr\s*,\s*&rootsBefore\s*,\s*entrySerial\s*\)", chunk) or
                     "frozenFractionX, frozenFractionY);" not in chunk or
                     '#include "vr/game/rank_marker_fraction.hpp"' not in ui):
                 fail("4th+ digit siblings lost proven subpixel restoration")
@@ -431,6 +431,14 @@ def check(ui, manifest, fraction_header=None):
                     fail("rank kind0/kind1 guarded coordinate bridge lost: " + needle)
         if "ProducerToken::" + token not in chunk:
             fail(func + " producer identity missing")
+    # The entry serial must be captured before native reentrancy, not inferred
+    # from the last child or assigned only to a preceding direct draw.
+    for source_name in ("RankMarker_sprani", "RankMarker_putClipSprite",
+                        "RivalMarker_sprani"):
+        body = function_body(ui, "static int __cdecl " + source_name + "(")
+        if ("const auto entrySerial =" not in body or
+                "SpriteNodeSemanticNextSerial.load(" not in body):
+            fail(source_name + " lost exact native producer entry serial")
     rank = function_body(ui, "static int __cdecl RankMarker_sprani(")
     if "TagAppendedNodes(tailsBefore, scope," not in rank:
         fail("multi-node rank producer not tagged")
@@ -442,6 +450,9 @@ def check(ui, manifest, fraction_header=None):
                   "TagAppendedNodes("):
         if token not in rival:
             fail("rival world marker lost " + token)
+    if ("rootsBefore[prio] = root;" not in rival or
+            not re.search(r"projected\s*\?\s*&projectedAnchor\s*:\s*nullptr\s*,\s*&rootsBefore\s*,\s*entrySerial\s*\)", rival)):
+        fail("rival marker lost stable native root or nested owner serial")
     rank_owner = function_body(ui, "static int __cdecl RankMarkerSub_dest(")
     ordered(rank_owner, "rank anchor must be cleared for each original sub_4BAD20",
             "RankMarkerProjectedInfo = {};",
@@ -517,10 +528,31 @@ def test_mutations(ui, manifest):
               ui.replace("rootsBefore[prio], root, tailsBefore[prio],",
                          "root, root, tailsBefore[prio],", 1))
     must_fail("rank sprani foreign root accepted",
-              ui.replace("marker, &rootsBefore);",
-                         "marker, nullptr);", 1))
-    must_fail("rank fraction root fence disabled",
-              changed_fraction=fraction.replace(
+              ui.replace("marker, &rootsBefore, entrySerial);",
+                         "marker, nullptr, entrySerial);", 1))
+    must_fail("rank sprani nested exact serial dropped", ui.replace(
+        "marker, &rootsBefore, entrySerial);",
+        "marker, &rootsBefore, 0);", 1))
+    # The RankMarker clip precedes RivalMarker, so limit mutation to the
+    # exact clipped-digit producer call instead of accidentally changing rival.
+    clip_start = ui.index("static int __cdecl RankMarker_putClipSprite(")
+    clip_end = ui.index("static int ExactScreenHud_putClipSpriteOwned(", clip_start)
+    clip_region = ui[clip_start:clip_end]
+    must_fail("rank clip nested exact serial dropped", ui[:clip_start] +
+              clip_region.replace("&rootsBefore, entrySerial);",
+                                  "&rootsBefore, 0);", 1) + ui[clip_end:])
+    rival_start = ui.index("static int __cdecl RivalMarker_sprani(")
+    rival_end = ui.index("static bool IsOriginalB9200GoalGlyph()", rival_start)
+    rival_region = ui[rival_start:rival_end]
+    must_fail("rival source stable root lost", ui[:rival_start] +
+              rival_region.replace("rootsBefore[prio] = root;",
+                                   "rootsBefore[prio] = nullptr;", 1) +
+              ui[rival_end:])
+    must_fail("rival nested exact serial dropped", ui[:rival_start] +
+              rival_region.replace("&rootsBefore, entrySerial);",
+                                   "&rootsBefore, 0);", 1) +
+              ui[rival_end:])
+    must_fail("rank fraction root fence disabled",              changed_fraction=fraction.replace(
                   "if (!sourceRoot || sourceRoot != currentRoot)",
                   "if (false)", 1))
     must_fail("rank queue tail proof bypassed",
