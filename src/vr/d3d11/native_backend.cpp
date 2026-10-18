@@ -1244,6 +1244,54 @@ HRESULT create_device(
 
 } // namespace
 
+bool compile_native_live_sm3_program(
+    ID3D11Device* device,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    NativeLiveSm3Program& output) noexcept {
+    output = {};
+    if (!device || !vertexSource.exact() || !pixelSource.exact())
+        return false;
+    try {
+        std::string vertexHlsl, pixelHlsl;
+        if (!build_r283_sm3_mov_shader_source(vertexSource, true, vertexHlsl) ||
+            !build_r283_sm3_mov_shader_source(pixelSource, false, pixelHlsl))
+            return false;
+        Microsoft::WRL::ComPtr<ID3DBlob> vertexDxbc, pixelDxbc;
+        if (!compile_shader_source(vertexHlsl, "live_sm3_vs", "vs_4_0", vertexDxbc) ||
+            !compile_shader_source(pixelHlsl, "live_sm3_ps", "ps_4_0", pixelDxbc) ||
+            !vertexDxbc || !pixelDxbc)
+            return false;
+        NativeLiveSm3Program candidate{};
+        if (FAILED(device->CreateVertexShader(
+                vertexDxbc->GetBufferPointer(), vertexDxbc->GetBufferSize(),
+                nullptr, candidate.vertexShader.GetAddressOf())) ||
+            FAILED(device->CreatePixelShader(
+                pixelDxbc->GetBufferPointer(), pixelDxbc->GetBufferSize(),
+                nullptr, candidate.pixelShader.GetAddressOf())))
+            return false;
+        const auto* begin = static_cast<const std::uint8_t*>(
+            vertexDxbc->GetBufferPointer());
+        candidate.vertexBytecode.assign(begin, begin + vertexDxbc->GetBufferSize());
+        candidate.vertexConstants =
+            vertexHlsl.find("cbuffer R283LiveConstants") != std::string::npos;
+        candidate.pixelConstants =
+            pixelHlsl.find("cbuffer R283LiveConstants") != std::string::npos;
+        for (unsigned slot = 0; slot < 16u; ++slot) {
+            const auto symbol = "r283_texture" + std::to_string(slot) +
+                                " : register(t" + std::to_string(slot) + ")";
+            if (pixelHlsl.find(symbol) != std::string::npos)
+                candidate.pixelSamplerMask |= static_cast<std::uint16_t>(1u << slot);
+        }
+        if (!candidate.ready()) return false;
+        output = std::move(candidate);
+        return true;
+    } catch (...) {
+        output = {};
+        return false;
+    }
+}
+
 bool NativeFixedFunctionTransformBuffer::initialize(
     ID3D11Device* device) noexcept {
 

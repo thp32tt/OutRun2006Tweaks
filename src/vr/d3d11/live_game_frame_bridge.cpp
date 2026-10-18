@@ -14,6 +14,7 @@
 #include "live_game_stage1_mirror_reuse.hpp"
 #include "live_game_blend_extrema.hpp"
 #include "native_backend.hpp"
+#include "pipeline_translation.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
 #include "live_game_rgb24_texture.hpp"
@@ -69,6 +70,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <spdlog/spdlog.h>
 
 namespace outrun::vr::dx11::live_game_frame {
@@ -1055,8 +1057,19 @@ struct ReadbackSlot {
     bool completeFullFrame = false;
     GameReadbackProvenance provenance{};
 };
+struct LiveSm3Pipeline {
+    NativeLiveSm3Program program;
+    ComPtr<ID3D11InputLayout> inputLayout;
+    ComPtr<ID3D11Buffer> vertexConstants;
+    ComPtr<ID3D11Buffer> pixelConstants;
+    std::vector<DWORD> vertexTokens, pixelTokens;
+    std::vector<D3DVERTEXELEMENT9> declaration;
+};
 struct State {
     std::mutex mutex;
+    // Shader bytecode+declaration keyed cache is bound to this backend's
+    // exact D3D11 device lifetime, and discarded on source Reset.
+    std::unordered_map<std::uint64_t, LiveSm3Pipeline> liveSm3Pipelines;
     // Non-owning identity only: reset at every Present/Reset. Never retain a
     // game D3D9 COM object or mix different device Draw calls in one GPU batch.
     std::uintptr_t sourceGameDevice = 0u;
@@ -1570,6 +1583,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.fullGameVertexUpload.Reset();
     s.fullGameIndexUpload.Reset();
     s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
+    s.liveSm3Pipelines.clear();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
@@ -4123,6 +4137,343 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     return create_game_sampler(dev, capture, levels, sampler);
 }
 
+
+bool capture_live_sm3_sampler(IDirect3DDevice9* game, unsigned slot,
+                              TextureCapture& out) noexcept {
+    if (!game || slot >= 16u) return false;
+    ComPtr<IDirect3DBaseTexture9> source;
+    if (FAILED(game->GetTexture(slot, source.GetAddressOf())) ||
+        !source || source->GetType() != D3DRTYPE_TEXTURE ||
+        FAILED(source.As(&out.texture))) return false;
+    DWORD u{}, v{}, mag{}, min{}, mip{}, maxMip{}, anisotropy{}, srgb{}, border{}, bias{};
+    if (FAILED(game->GetSamplerState(slot, D3DSAMP_ADDRESSU, &u)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_ADDRESSV, &v)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_MAGFILTER, &mag)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_MINFILTER, &min)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_MIPFILTER, &mip)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_MAXANISOTROPY, &anisotropy)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_SRGBTEXTURE, &srgb)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_BORDERCOLOR, &border)) ||
+        FAILED(game->GetSamplerState(slot, D3DSAMP_MIPMAPLODBIAS, &bias)))
+        return false;
+    DWORD addressW{};
+    // 2D sampling ignores W, but an unsupported U/V profile never clamps.
+    if (FAILED(game->GetSamplerState(slot, D3DSAMP_ADDRESSW, &addressW)))
+        return false;
+    out.enabled = true;
+    out.addressU = static_cast<D3DTEXTUREADDRESS>(u);
+    out.addressV = static_cast<D3DTEXTUREADDRESS>(v);
+    out.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
+    out.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
+    out.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
+    out.maxMipLevel = maxMip;
+    out.maxAnisotropy = anisotropy;
+    out.srgbTexture = srgb != FALSE;
+    out.borderColor = border;
+    std::memcpy(&out.mipLodBias, &bias, sizeof(bias));
+    return true;
+}
+
+std::uint64_t live_sm3_pipeline_identity(
+    const ProgrammableShaderFunctionSourceEvidence& vertex,
+    const ProgrammableShaderFunctionSourceEvidence& pixel,
+    const std::vector<D3DVERTEXELEMENT9>& declaration) noexcept {
+    if (!vertex.exact() || !pixel.exact() || declaration.empty()) return 0u;
+    std::uint64_t h = 1469598103934665603ull;
+    const auto hashBytes = [&](const void* value, std::size_t bytes) {
+        const auto* b = static_cast<const std::uint8_t*>(value);
+        for (std::size_t i = 0; i < bytes; ++i) {
+            h ^= b[i];
+            h *= 1099511628211ull;
+        }
+    };
+    hashBytes(vertex.tokens.data(), vertex.byteSize);
+    hashBytes(pixel.tokens.data(), pixel.byteSize);
+    hashBytes(declaration.data(), declaration.size() * sizeof(D3DVERTEXELEMENT9));
+    return h != 0u ? h : 1u;
+}
+
+// A real live D3D9 declaration drives the native IA, never an FVF-shaped
+// substitute. Source offsets and formats must fit the rebased game stream.
+bool live_sm3_input_layout(
+    const std::vector<D3DVERTEXELEMENT9>& declaration, UINT stride,
+    std::vector<D3D11_INPUT_ELEMENT_DESC>& layout) noexcept {
+    if (declaration.size() < 2u || stride == 0u) return false;
+    static constexpr const char* kPosition = "POSITION";
+    static constexpr const char* kTexcoord = "TEXCOORD";
+    static constexpr const char* kNormal = "NORMAL";
+    static constexpr const char* kColor = "COLOR";
+    for (std::size_t i = 0; i + 1u < declaration.size(); ++i) {
+        const auto& in = declaration[i];
+        if (in.Stream != 0u || in.Method != D3DDECLMETHOD_DEFAULT ||
+            in.UsageIndex >= 16u) return false;
+        DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+        UINT width = 0u;
+        switch (in.Type) {
+        case D3DDECLTYPE_FLOAT1: format = DXGI_FORMAT_R32_FLOAT; width = 4u; break;
+        case D3DDECLTYPE_FLOAT2: format = DXGI_FORMAT_R32G32_FLOAT; width = 8u; break;
+        case D3DDECLTYPE_FLOAT3: format = DXGI_FORMAT_R32G32B32_FLOAT; width = 12u; break;
+        case D3DDECLTYPE_FLOAT4: format = DXGI_FORMAT_R32G32B32A32_FLOAT; width = 16u; break;
+        default: return false;
+        }
+        if (static_cast<UINT>(in.Offset) + width > stride) return false;
+        const char* name = nullptr;
+        switch (in.Usage) {
+        case D3DDECLUSAGE_POSITION: name = kPosition; break;
+        case D3DDECLUSAGE_TEXCOORD: name = kTexcoord; break;
+        case D3DDECLUSAGE_NORMAL: name = kNormal; break;
+        case D3DDECLUSAGE_COLOR: name = kColor; break;
+        default: return false;
+        }
+        for (const auto& old : layout)
+            if (std::strcmp(old.SemanticName, name) == 0 &&
+                old.SemanticIndex == in.UsageIndex) return false;
+        D3D11_INPUT_ELEMENT_DESC element{};
+        element.SemanticName = name;
+        element.SemanticIndex = in.UsageIndex;
+        element.Format = format;
+        element.InputSlot = 0u;
+        element.AlignedByteOffset = in.Offset;
+        element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        layout.push_back(element);
+    }
+    const auto& end = declaration.back();
+    return !layout.empty() && end.Stream == 0xffu &&
+        end.Type == D3DDECLTYPE_UNUSED;
+}
+
+bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
+                           IDirect3DPixelShader9* pixelShader,
+                           ProgrammableShaderFunctionSourceEvidence& vertex,
+                           ProgrammableShaderFunctionSourceEvidence& pixel) noexcept {
+    if (!vertexShader || !pixelShader) return false;
+    UINT vb = 0u, pb = 0u;
+    if (FAILED(vertexShader->GetFunction(nullptr, &vb)) ||
+        FAILED(pixelShader->GetFunction(nullptr, &pb)) ||
+        vb < 8u || pb < 8u || vb > (1u << 20u) || pb > (1u << 20u) ||
+        (vb % 4u) != 0u || (pb % 4u) != 0u) return false;
+    std::vector<DWORD> v(vb / 4u), p(pb / 4u);
+    if (FAILED(vertexShader->GetFunction(v.data(), &vb)) ||
+        FAILED(pixelShader->GetFunction(p.data(), &pb))) return false;
+    vertex = capture_programmable_shader_function_source_evidence(v.data(), vb, true);
+    pixel = capture_programmable_shader_function_source_evidence(p.data(), pb, false);
+    return vertex.exact() && pixel.exact();
+}
+
+// Real programmable D3D9 game source -> SM3 HLSL/DXBC -> native D3D11
+// IA/VS/PS/tN/sN/b0/Draw. Deliberately restricted to proved opaque,
+// unscissored and depth-disabled passes until identical OM/Z state is modeled.
+bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
+                               D3DPRIMITIVETYPE type, UINT primitives,
+                               const void* bytes, UINT stride, UINT vertexCount,
+                               const std::uint32_t* indices, UINT indexCount,
+                               std::uint64_t sourceOrdinal) noexcept {
+    if (!env_full_game_opt_in() || !game || !bytes || !stride ||
+        vertexCount == 0u || vertexCount > kMaxVertices ||
+        type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP)
+        return false;
+    UINT expected = 0u;
+    if (!game_native_primitive_element_count(
+            static_cast<std::uint32_t>(type), primitives, expected) ||
+        (indices && (indexCount != expected || indexCount > kMaxIndices)) ||
+        (!indices && vertexCount != expected) ||
+        (indices && indexCount == 0u))
+        return false;
+    if (static_cast<std::uint64_t>(stride) * vertexCount > (1ull << 25u))
+        return false;
+    DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
+    DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
+    DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
+    D3DVIEWPORT9 viewport{};
+    if (FAILED(game->GetViewport(&viewport)) ||
+        FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
+        FAILED(game->GetRenderState(D3DRS_ALPHATESTENABLE, &alpha)) ||
+        FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencil)) ||
+        FAILED(game->GetRenderState(D3DRS_ZENABLE, &depth)) ||
+        FAILED(game->GetRenderState(D3DRS_FOGENABLE, &fog)) ||
+        FAILED(game->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)) ||
+        FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)) ||
+        FAILED(game->GetRenderState(D3DRS_FILLMODE, &fill)) ||
+        FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
+        FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
+        FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
+        blend || alpha || stencil || depth != D3DZB_FALSE ||
+        fog || scissor || clipPlanes || fill != D3DFILL_SOLID ||
+        cull != D3DCULL_NONE || colorMask != 0x0fu ||
+        srgbWrite != FALSE || !game_native_backbuffer_ready(game, viewport))
+        return false;
+    ComPtr<IDirect3DSurface9> target;
+    ComPtr<IUnknown> targetIdentity;
+    D3DSURFACE_DESC source{};
+    if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) ||
+        !target || FAILED(target->GetDesc(&source)) ||
+        FAILED(target.As(&targetIdentity)) || !targetIdentity ||
+        !s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
+             reinterpret_cast<std::uintptr_t>(targetIdentity.Get())) ||
+        !s.frameBatch.accepts_full_on_source_target(sourceOrdinal, true) ||
+        !s.frameBatch.accepts_source_draw(sourceOrdinal, true) ||
+        s.preDrawFills.count != 0u || viewport.Width == 0u ||
+        viewport.Height == 0u) return false;
+    ComPtr<IDirect3DVertexShader9> vertexShader;
+    ComPtr<IDirect3DPixelShader9> pixelShader;
+    ComPtr<IDirect3DVertexDeclaration9> sourceDecl;
+    if (FAILED(game->GetVertexShader(vertexShader.GetAddressOf())) ||
+        FAILED(game->GetPixelShader(pixelShader.GetAddressOf())) ||
+        FAILED(game->GetVertexDeclaration(sourceDecl.GetAddressOf())) ||
+        !vertexShader || !pixelShader || !sourceDecl) return false;
+    UINT count = MAXD3DDECLLENGTH;
+    std::vector<D3DVERTEXELEMENT9> declaration(count);
+    if (FAILED(sourceDecl->GetDeclaration(declaration.data(), &count)) ||
+        count < 2u || count > MAXD3DDECLLENGTH) return false;
+    declaration.resize(count);
+    std::vector<D3D11_INPUT_ELEMENT_DESC> input;
+    if (!live_sm3_input_layout(declaration, stride, input)) return false;
+    ProgrammableShaderFunctionSourceEvidence vertexEvidence, pixelEvidence;
+    if (!live_sm3_shader_bytes(vertexShader.Get(), pixelShader.Get(),
+                              vertexEvidence, pixelEvidence)) return false;
+    if (!ensure_pipeline(s, source.Width, source.Height)) return false;
+    auto* device = s.backend.device();
+    auto* context = s.backend.context();
+    if (!device || !context) return false;
+    const auto key = live_sm3_pipeline_identity(
+        vertexEvidence, pixelEvidence, declaration);
+    if (!key) return false;
+    auto it = s.liveSm3Pipelines.find(key);
+    if (it == s.liveSm3Pipelines.end()) {
+        // Bound the number of compiled game programs per device/Reset.
+        if (s.liveSm3Pipelines.size() >= 64u) return false;
+        LiveSm3Pipeline pipeline{};
+        if (!compile_native_live_sm3_program(
+                device, vertexEvidence, pixelEvidence, pipeline.program))
+            return false;
+        if (FAILED(device->CreateInputLayout(
+                input.data(), static_cast<UINT>(input.size()),
+                pipeline.program.vertexBytecode.data(),
+                pipeline.program.vertexBytecode.size(),
+                pipeline.inputLayout.GetAddressOf()))) return false;
+        D3D11_BUFFER_DESC cb{};
+        cb.ByteWidth = 256u * 4u * sizeof(float);
+        cb.Usage = D3D11_USAGE_DEFAULT;
+        cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        if ((pipeline.program.vertexConstants &&
+             FAILED(device->CreateBuffer(&cb, nullptr,
+                        pipeline.vertexConstants.GetAddressOf()))) ||
+            (pipeline.program.pixelConstants &&
+             FAILED(device->CreateBuffer(&cb, nullptr,
+                        pipeline.pixelConstants.GetAddressOf())))) return false;
+        pipeline.vertexTokens = vertexEvidence.tokens;
+        pipeline.pixelTokens = pixelEvidence.tokens;
+        pipeline.declaration = declaration;
+        it = s.liveSm3Pipelines.emplace(key, std::move(pipeline)).first;
+    }
+    auto& pipeline = it->second;
+    // A hash collision may never reuse shaders or a declaration from a
+    // different live game draw.
+    if (pipeline.vertexTokens != vertexEvidence.tokens ||
+        pipeline.pixelTokens != pixelEvidence.tokens ||
+        pipeline.declaration.size() != declaration.size() ||
+        std::memcmp(pipeline.declaration.data(), declaration.data(),
+                    declaration.size() * sizeof(D3DVERTEXELEMENT9)) != 0)
+        return false;
+    // Mirror only samplers used by the translated ps_3_0 TEXLD program.
+    // Every live tN/sN is bound on THIS D3D11 immediate context for THIS draw.
+    std::array<ComPtr<ID3D11ShaderResourceView>,16> views{};
+    std::array<ComPtr<ID3D11SamplerState>,16> samplers{};
+    std::array<ID3D11ShaderResourceView*,16> boundViews{};
+    std::array<ID3D11SamplerState*,16> boundSamplers{};
+    for (unsigned slot = 0; slot < 16u; ++slot) {
+        if ((pipeline.program.pixelSamplerMask & (1u << slot)) == 0u)
+            continue;
+        TextureCapture capture{};
+        if (!capture_live_sm3_sampler(game, slot, capture) ||
+            !mirror_texture(device, capture, views[slot], samplers[slot]))
+            return false;
+        boundViews[slot] = views[slot].Get();
+        boundSamplers[slot] = samplers[slot].Get();
+    }
+    std::array<float, 256u * 4u> vertexConstants{};
+    std::array<float, 256u * 4u> pixelConstants{};
+    if ((pipeline.program.vertexConstants &&
+         FAILED(game->GetVertexShaderConstantF(0, vertexConstants.data(), 256u))) ||
+        (pipeline.program.pixelConstants &&
+         FAILED(game->GetPixelShaderConstantF(0, pixelConstants.data(), 224u))))
+        return false;
+    const UINT vertexBytes = stride * vertexCount;
+    if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
+                                        s.fullGameVertexCapacity, vertexBytes,
+                                        D3D11_BIND_VERTEX_BUFFER) ||
+        !upload_full_game_stream(context, s.fullGameVertexUpload.Get(),
+                                 s.fullGameVertexCapacity, bytes, vertexBytes))
+        return false;
+    if (indices) {
+        for (UINT i = 0; i < indexCount; ++i)
+            if (indices[i] >= vertexCount) return false;
+        const UINT indexBytes = indexCount * sizeof(std::uint32_t);
+        if (!ensure_full_game_upload_buffer(device, s.fullGameIndexUpload,
+                                            s.fullGameIndexCapacity, indexBytes,
+                                            D3D11_BIND_INDEX_BUFFER) ||
+            !upload_full_game_stream(context, s.fullGameIndexUpload.Get(),
+                                     s.fullGameIndexCapacity, indices, indexBytes))
+            return false;
+    }
+    if (s.frameBatch.first_draw()) {
+        s.backend.begin_frame(s.clearColor.native_color(
+            reinterpret_cast<std::uintptr_t>(game),
+            reinterpret_cast<std::uintptr_t>(targetIdentity.Get()), kBackground));
+        s.preDrawFills.discard();
+    }
+    if (pipeline.program.vertexConstants)
+        context->UpdateSubresource(pipeline.vertexConstants.Get(), 0, nullptr,
+                                   vertexConstants.data(), 0, 0);
+    if (pipeline.program.pixelConstants)
+        context->UpdateSubresource(pipeline.pixelConstants.Get(), 0, nullptr,
+                                   pixelConstants.data(), 0, 0);
+    ID3D11Buffer* vsConstants = pipeline.vertexConstants.Get();
+    ID3D11Buffer* psConstants = pipeline.pixelConstants.Get();
+    context->VSSetConstantBuffers(0u, 1u, &vsConstants);
+    context->PSSetConstantBuffers(0u, 1u, &psConstants);
+    const D3D11_VIEWPORT nativeViewport{
+        static_cast<float>(viewport.X), static_cast<float>(viewport.Y),
+        static_cast<float>(viewport.Width), static_cast<float>(viewport.Height),
+        viewport.MinZ, viewport.MaxZ};
+    context->RSSetViewports(1u, &nativeViewport);
+    const D3D11_RECT rect{0,0,static_cast<LONG>(source.Width),
+                              static_cast<LONG>(source.Height)};
+    context->RSSetScissorRects(1u, &rect);
+    context->RSSetState(s.raster.Get());
+    ID3D11RenderTargetView* rtv = s.backend.color_rtv();
+    context->OMSetRenderTargets(1u, &rtv, nullptr);
+    context->OMSetDepthStencilState(nullptr, 0u);
+    context->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+    const UINT offset = 0u;
+    ID3D11Buffer* stream = s.fullGameVertexUpload.Get();
+    context->IASetInputLayout(pipeline.inputLayout.Get());
+    context->IASetVertexBuffers(0u, 1u, &stream, &stride, &offset);
+    context->IASetPrimitiveTopology(type == D3DPT_TRIANGLELIST ?
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST :
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    if (indices)
+        context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),
+                                  DXGI_FORMAT_R32_UINT, 0u);
+    else
+        context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
+    context->VSSetShader(pipeline.program.vertexShader.Get(), nullptr, 0u);
+    context->PSSetShader(pipeline.program.pixelShader.Get(), nullptr, 0u);
+    context->PSSetShaderResources(0u, 16u, boundViews.data());
+    context->PSSetSamplers(0u, 16u, boundSamplers.data());
+    if (indices) context->DrawIndexed(indexCount, 0u, 0);
+    else context->Draw(vertexCount, 0u);
+    s.pending = true;
+    ++s.issued;
+    ++s.eligible;
+    if (s.eligibleThisFrame != (std::numeric_limits<UINT>::max)())
+        ++s.eligibleThisFrame;
+    s.frameBatch.succeeded(false, false);
+    s.frameBatch.record_source_draw(sourceOrdinal);
+    return true;
+}
+
 // Reuse geometric growth buffers for the thousands of game-owned VB/IB
 // Draws in native full-frame mode. Uploads are submitted on the SAME
 // immediate context, preserving each Draw's source content and ordering.
@@ -5293,6 +5644,24 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                     sourceOrdinal, sameSourceFullClear))
                 s.frameBatch.abort();
             return;
+        }
+        // Actual game VS/PS must never be submitted as the diagnostic FVF
+        // fixed-function shader. Attempt the real SM3->DX11 IA/VS/PS path
+        // first, with original D3D9 rendering/input/FFB always authoritative.
+        if (fullMode) {
+            ComPtr<IDirect3DVertexShader9> liveVs;
+            ComPtr<IDirect3DPixelShader9> livePs;
+            if (SUCCEEDED(game->GetVertexShader(liveVs.GetAddressOf())) &&
+                SUCCEEDED(game->GetPixelShader(livePs.GetAddressOf())) &&
+                (liveVs || livePs)) {
+                if (!submit_live_sm3_game_draw(
+                        s, game, type, primitives, bytes, stride, vertexCount,
+                        indices, indexCount, sourceOrdinal)) {
+                    s.frameBatch.abort();
+                    ++s.failed;
+                }
+                return;
+            }
         }
         D3DVIEWPORT9 vp{};
         GameFvfLayout layout{};
@@ -7478,6 +7847,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.fullGameVertexUpload.Reset();
     s.fullGameIndexUpload.Reset();
     s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
+    s.liveSm3Pipelines.clear();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
 }

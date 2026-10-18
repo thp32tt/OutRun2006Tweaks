@@ -4774,6 +4774,25 @@ validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
     std::uint64_t snapshotToken) noexcept;
 
 
+// Actual game-owned SM3 objects. The optional live draw path only dispatches
+// with source vertex layout, shader constant payloads, and resource bindings.
+struct NativeLiveSm3Program {
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
+    std::vector<std::uint8_t> vertexBytecode;
+    std::uint16_t pixelSamplerMask{};
+    bool vertexConstants{};
+    bool pixelConstants{};
+    [[nodiscard]] bool ready() const noexcept {
+        return vertexShader && pixelShader && !vertexBytecode.empty();
+    }
+};
+[[nodiscard]] bool compile_native_live_sm3_program(
+    ID3D11Device* device,
+    const ProgrammableShaderFunctionSourceEvidence& vertexSource,
+    const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    NativeLiveSm3Program& output) noexcept;
+
 class NativeBackend final {
     // White-box WARP fixture validates transactional COM ownership without
     // enabling a native gameplay Draw or an extra production initialization API.
