@@ -213,7 +213,17 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "const bool goalSourceChanged = exactGoalEye &&" in physical
     assert "OutRunVR::GoalPhysical::SameAfterNativeLeft(" in physical
     assert "const bool stageSourceChanged = exactStageEye &&" in physical
-    assert "OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(" in physical
+    # Both independent stage fences are required: immediately after native
+    # LEFT and again after RIGHT RT/depth/viewport setters.  A one-shot
+    # mutation must not survive by matching the other intact callsite.
+    stage_fence = "OutRunVR::StageExtensionPhysical::SameAfterNativeLeft("
+    assert physical.count(stage_fence) == 2, (
+        "R33 +TIME post-LEFT and post-RIGHT-state physical fences missing")
+    right_stage_fence = (
+        "if (SUCCEEDED(rightHr) && exactStageEye &&" + chr(10) +
+        "                    !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(")
+    assert right_stage_fence in physical, (
+        "R33 +TIME source guard missing after native RIGHT state setters")
     assert "const bool exactStageEye = goalCommand.IsExactFiniteResultHud() &&" in physical
     assert "R33/+TIME-source-changed" in physical
     assert "const bool exactNativeHud = goalCommand.IsSourceProvenHud() &&" in physical
