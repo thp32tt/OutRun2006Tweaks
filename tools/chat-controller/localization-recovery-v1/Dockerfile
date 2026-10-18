@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     DISPLAY=:99
 
-RUN apt-get update && apt-get install -y --no-install-recommends xvfb x11vnc openbox novnc websockify tini curl ca-certificates gnupg wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends xvfb x11vnc openbox novnc websockify tini curl ca-certificates gnupg wget tesseract-ocr tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
 RUN wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && apt-get update && apt-get install -y --no-install-recommends google-chrome-stable && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/outrun
@@ -15,6 +15,9 @@ RUN python -m pip install --upgrade pip --index-url https://pypi.org/simple && p
 RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts && touch /opt/outrun/app/__init__.py
 COPY src/controller.py.part* /tmp/controller-parts/
 COPY chrome_maintenance.py /opt/outrun/app/chrome_maintenance.py
+RUN mkdir -p /opt/outrun/c_english_crop
+COPY c_english_crop/*.py /opt/outrun/c_english_crop/
+RUN python -m py_compile /opt/outrun/c_english_crop/*.py && tesseract --list-langs 2>&1 | grep -q eng
 COPY chrome-cache-clean.sh /opt/outrun/chrome-cache-clean.sh
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
@@ -49,4 +52,4 @@ COPY prompts/localization_C1.md /opt/outrun/prompts/localization_C1.md
 COPY prompts/localization_C2.md /opt/outrun/prompts/localization_C2.md
 
 RUN chmod +x /opt/outrun/entrypoint.sh /opt/outrun/chrome-cache-clean.sh
-ENTRYPOINT ["/usr/bin/tini","--","/opt/outrun/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini","-g","--","/opt/outrun/entrypoint.sh"]
