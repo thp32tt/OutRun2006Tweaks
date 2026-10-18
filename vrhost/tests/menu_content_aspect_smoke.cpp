@@ -264,7 +264,6 @@ int main()
     // Keep the existing 4:3-matte / explicit crop path separate.
     using OutRunVrMenuAspect::PlanCommonFovTangents;
     using OutRunVrMenuAspect::PlanOpticallyCenteredClip;
-    using OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState;
     const auto commonMenuFov = PlanCommonFovTangents(
         -.80f, .80f, -.80f, .80f, -.80f, .80f, -.80f, .80f);
     const auto titleSourceAspect = PlanUncroppedAuthoredMenuAspect(
