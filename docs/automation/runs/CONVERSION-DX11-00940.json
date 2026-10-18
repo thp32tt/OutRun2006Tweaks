@@ -69,8 +69,10 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "LIVE_D3D9_COLORFILL",
       "NATIVE_D3D11_CLEARVIEW",
+      "D3D11_NATIVE_DRAW",
       "D3D11_NATIVE_SM3_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
