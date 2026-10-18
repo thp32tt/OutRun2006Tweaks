@@ -2,19 +2,19 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01033",
   "production_id": "CONVERSION-DX9EX-01033",
-  "event_id": "CONVERSION-DX9EX-01033-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-01033-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C5_WAIT_REQUIRED_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "c9ac9c4ba6a81f4fdbf409b5fef065274ea48ec0",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "270c87de644eaca12b3944f3f191dca62b35ae4c",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "centre_two_eye_source_ownership": "PENDING",
-    "centre_reentry_fail_closed": "PENDING",
-    "centre_exact_sha_integrated_gate": "PENDING"
+    "centre_two_eye_source_ownership": "PASS_BUILD",
+    "centre_reentry_fail_closed": "PASS_BUILD",
+    "centre_exact_sha_integrated_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original SHA-pinned D3A5/C980/C993 source draws the central sun 0x570002 while CABE draws independent surrounding discs; R84 R30/R33 already validates original raw WVP and post-LEFT source identity.",
@@ -83,12 +83,42 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "Same TASK_ID policy-stage repair following first material c9ac9c4: initial DX9Ex Active Validation failed because the required feature-unit run record was missing. Keep original material commit distinct from this validation-bearing metadata correction. Do not count the record as another feature or assert HMD success.",
+  "notes": "Same TASK_ID policy-stage repair following first material c9ac9c4: initial DX9Ex Active Validation failed because the required feature-unit run record was missing. Keep original material commit distinct from this validation-bearing metadata correction. Do not count the record as another feature or assert HMD success. C6 E003 retry finalized after exact-SHA 4/4 SUCCESS at 270c87de; original C++ material c9ac9c4 preserved. This bookkeeping update is not an additional feature or score; Quest3/VDXR remains UNTESTED.",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "material_sha": "c9ac9c4ba6a81f4fdbf409b5fef065274ea48ec0",
-    "exact_sha": null,
-    "required_gates": [],
+    "exact_sha": "270c87de644eaca12b3944f3f191dca62b35ae4c",
+    "first_attempt": {
+      "run_id": 39112116770,
+      "conclusion": "failure",
+      "reason": "Missing mandatory feature run record, policy failed before game/host/package"
+    },
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39112289897,
+        "conclusion": "success",
+        "exact_sha": "270c87de644eaca12b3944f3f191dca62b35ae4c"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39112289842,
+        "conclusion": "success",
+        "exact_sha": "270c87de644eaca12b3944f3f191dca62b35ae4c"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39112289805,
+        "conclusion": "success",
+        "exact_sha": "270c87de644eaca12b3944f3f191dca62b35ae4c"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39112291101,
+        "conclusion": "success",
+        "exact_sha": "270c87de644eaca12b3944f3f191dca62b35ae4c"
+      }
+    ],
     "runtime_validation": "UNTESTED"
   }
 }
