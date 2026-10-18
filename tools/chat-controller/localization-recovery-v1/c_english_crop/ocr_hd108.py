@@ -84,7 +84,7 @@ def scan(max_sources=4,max_new=1000):
   name=r["png_filename"]; detail={"source":name}
   hardhold=[]
   try:
-   if Path(name).name!=name or not re.fullmatch(r"Q[0-9]{3}_[a-zA-Z0-9_]+\\.png",name):
+   if Path(name).name!=name or not re.fullmatch(r"Q[0-9]{3}_[a-zA-Z0-9_]+[.]png",name):
     raise ValueError("SOURCE_FILENAME_UNSAFE")
    src=SRC/name
    if not src.is_file() or src.is_symlink():
