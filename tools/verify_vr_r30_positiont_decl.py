@@ -5,9 +5,31 @@ ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"src/vr/d3d9/stereo_renderer_r30.cpp"
 FLOW=ROOT/".github/workflows/vr-dx9ex-active.yml"
 
+def function_body(source, signature):
+    """Bound a C++ function at its matching closing brace, not at an unrelated later function.
+
+    The R84 renderer now inserts independent stage, F11 and rank helpers
+    between the XYZRHW admission function and the depth-signature helper.
+    They may legitimately call GetFVF and must not be treated as part of
+    R30PrepareXyzrhwState's no-duplicate-driver-read contract.
+    """
+    start = source.index(signature)
+    opening = source.index("{", start + len(signature))
+    depth = 0
+    for index in range(opening, len(source)):
+        ch = source[index]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return source[opening:index + 1]
+    raise AssertionError("unbalanced C++ function body: " + signature)
+
+
 def check(s):
-    h=s.split("bool R30HasXyzrhwInputLayout(",1)[1].split("bool R30PrepareXyzrhwState(",1)[0]
-    p=s.split("bool R30PrepareXyzrhwState(",1)[1].split("bool R30XyzrhwHasProjectedDepthSignature(",1)[0]
+    h=function_body(s,"bool R30HasXyzrhwInputLayout(")
+    p=function_body(s,"bool R30PrepareXyzrhwState(")
     for token in ("FAILED(device->GetFVF(&fvf))", "if (fvf != 0)",
       "== D3DFVF_XYZRHW", "FAILED(device->GetVertexDeclaration(&declaration))",
       "declaration->GetDeclaration(elements, &count)", "declaration->Release();",
@@ -67,8 +89,27 @@ def main():
         try: check(s.replace(original,replacement,1))
         except AssertionError: pass
         else: raise AssertionError("mutation escaped: "+original)
+    # Mutation negative: a real GetFVF reintroduced inside the admission
+    # function must still FAIL, even though F11/rank helpers legitimately
+    # use the live getter elsewhere in the same translation unit.
+    admission = "            if (!R30HasXyzrhwInputLayout(device))"
+    assert admission in function_body(s, "bool R30PrepareXyzrhwState(")
+    regressed = s.replace(admission,
+        "            DWORD fvf = 0;\n"
+        "            if (FAILED(device->GetFVF(&fvf))) return false;\n"
+        + admission, 1)
+    try:
+        check(regressed)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("duplicate XYZRHW GetFVF admission mutation escaped")
+    # Independent F11's fixed-function draw identity is allowed to query
+    # the actual FVF. Never remove this evidence to satisfy an XYZRHW test.
+    assert "device->GetFVF(&fvf)" in function_body(
+        s, "bool R30PrepareExternalImGuiProjection(")
     flow=FLOW.read_text(encoding="utf-8")
     assert "python tools/verify_vr_r30_positiont_decl.py" in flow
     assert "'tools/verify_vr_r30_positiont_decl.py'" in flow
-    print("R30 POSITIONT FVF/decl model, 11 negative cases, 7 source mutations PASS")
+    print("R30 POSITIONT FVF/decl model, 11 negative cases, 8 source mutations PASS")
 if __name__=="__main__": main()
