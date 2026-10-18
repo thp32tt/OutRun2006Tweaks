@@ -1963,9 +1963,12 @@ int main()
         if (!mipCameraClears || !ordinalPreserved ||
             !encoder.bind_eye_output()) return false;
         const D3D11_BOX mipCameraBox{28u, 28u, 0u, 32u, 32u, 1u};
+        // Place the physical mip1 camera patch in a dedicated lower corner
+        // rather than overwriting the real game's full-TARGET seed at (0,0).
+        // The existing full-frame pixel checks must stay unchanged.
         const bool mipCameraCopied = encoder.copy_game_surface(
             fixture.mipCameraColor, &mipCameraBox,
-            eyeIndex == 0u ? 0 : 60, 0, 0u, 1u);
+            eyeIndex == 0u ? 0 : 60, 60, 0u, 1u);
         fixture.replayedMipCameraClearCopy[eyeIndex] =
             mipCameraCopied && encoder.draw_count() == beforeOffscreen &&
             encoder.color_draw_count() == beforeOffscreenEyeColor;
@@ -3029,6 +3032,23 @@ int main()
               computeScale[1] == 0u && computeScale[2] == 255u;
         require(computePixels,
                 "00862 compute UAV camera Copy and scaled Stretch preserve separate native eye pixels");
+        // Confirm the REAL mip1 RTV Clear and selected-mip GPU copy for
+        // two different cameras, after the entire source chronology.
+        // This is Win32 WARP readback only, never a CPU path in production.
+        const UINT mipCameraEyeX = eyeIndex == 0u ? 1u : 61u;
+        const auto* mipCameraEyePixel =
+            pixel + 61u * mapped.RowPitch + mipCameraEyeX * 4u;
+        const bool physicalCameraPixel = eyeIndex == 0u
+            ? mipCameraEyePixel[0] == 0xa0u &&
+              mipCameraEyePixel[1] == 0x30u &&
+              mipCameraEyePixel[2] == 0x10u &&
+              mipCameraEyePixel[3] == 0xffu
+            : mipCameraEyePixel[0] == 0x10u &&
+              mipCameraEyePixel[1] == 0x70u &&
+              mipCameraEyePixel[2] == 0xc0u &&
+              mipCameraEyePixel[3] == 0xffu;
+        require(physicalCameraPixel,
+                "00904 independent physical mip1 camera color reaches actual native L/R GPU eyes");
         const bool distinctColor = eyeIndex == 0u
             ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
