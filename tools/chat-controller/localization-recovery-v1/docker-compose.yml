@@ -66,6 +66,9 @@ services:
       RATE_LIMIT_BACKOFF_SECONDS: "120,300,600,1200"
       MIN_SEND_GAP_SECONDS: "60"
       SLOT_DEDUP_SECONDS: "180"
+      OUTRUN_CROP_ENABLED: "true"
+      OUTRUN_CROP_INTERVAL_SECONDS: "60"
+      OUTRUN_CROP_MAX_PER_CYCLE: "10"
     ports:
       - "6083:6080"
       - "8788:8787"
@@ -80,64 +83,23 @@ services:
         bind:
           create_host_path: false
       - outrun_chat_localization_recovery_logs:/logs
-
-
-  # Live GitHub/Portainer C slot. This is a member of THIS existing
-  # localization-recovery stack, not a standalone Compose/Portainer stack.
-  # A/B remain PAUSED; their browser schedules and state are untouched.
-  outrun-c-english-native-crop:
-    build:
-      context: .
-      dockerfile: c_english_crop/Dockerfile
-    pull_policy: build
-    container_name: outrun-localization-c-english-crop
-    restart: unless-stopped
-    init: true
-    network_mode: "none"
-    read_only: true
-    user: "1002:1002"
-    cap_drop: [ALL]
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 32
-    cpus: 1.5
-    mem_limit: 1g
-    tmpfs:
-      - /tmp:rw,nosuid,size=64m
-    environment:
-      PYTHONDONTWRITEBYTECODE: "1"
-      PYTHONUNBUFFERED: "1"
-      TZ: Asia/Seoul
-      # Explicit role guard; English source extraction only.
-      OUTRUN_C_ROLE: "UNSPLIT_HD_NATIVE_ENGLISH_CROP_ONLY"
-    command: ["--interval-seconds", "60", "--max-per-cycle", "10"]
-    volumes:
-      # Existing 108 SHA-verified unsplit originals, receipt, original ZIPs,
-      # C output/history and OCR position are in this SAME persisted tree.
       - type: bind
         source: /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
         target: /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
         bind:
           create_host_path: false
-      # Source DDS+PNG stay read-only; never write translated game textures.
       - type: bind
         source: /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012
         target: /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012
         read_only: true
         bind:
           create_host_path: false
-      # Existing 255-crop SSOT manifest is immutable input.
       - type: bind
         source: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
         target: /home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/MASTER_255_V2_20261016/MASTER_CROP_MANIFEST_255.json
         read_only: true
         bind:
           create_host_path: false
-    logging:
-      driver: json-file
-      options:
-        max-size: "2m"
-        max-file: "3"
 
 volumes:
   outrun_chat_localization_recovery_data:
