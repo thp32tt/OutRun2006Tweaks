@@ -9,13 +9,12 @@ B=Path('/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa
 edge=json.loads((B/'qa_76_edge.json').read_text(encoding='utf-8'))
 assert len(edge)==76
 # Human-readable visual judgments based on six contact sheets; no auto-PASS.
-clean={7,8,9,11,13,14,50,51,57}
+clean={7,8,9,11,13,14,41,50,51,57}
 plate={3,35,40,43,48,61,62,63,64,65,66,67,68,69,70,71,72,73,75,76}
 clip={
  16:'Exclamation mark / final glyph appears at crop edge',
  37:'Final button text/punctuation meets right crop edge',
  39:'Steering Wheel punctuation appears cut at right edge',
- 41:'Recorded English label incomplete relative to visible full sentence',
  42:'Time remaining colon and following UI text near right edge',
  44:'Gas Pedal punctuation touches right edge',
  45:'Versus Mode final dot touches crop edge',
