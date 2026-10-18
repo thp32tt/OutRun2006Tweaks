@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00939",
+  "production_id": "CONVERSION-DX11-00939",
+  "event_id": "CONVERSION-DX11-00939-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00939",
+  "feature_id": "DX11:LIVE_SM3_INERT_STENCIL_MRT_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "4e53e3755ce86024e9a17135b016071e9ab1e49f",
+  "validation_bearing_result_sha": "ab23a75079ab9e91723721640d33729e659d884b",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_INERT_STENCIL_MRT_NATIVE_DRAW",
+    "goal": "Connect source-authentic game menu/vehicle/race SM3 Draw/DrawIndexed inert stencil and inert RT1-3 states to full-resolution native D3D11 GPU frame while refusing conditional stencil or writable/unknown MRT and preserving D3D9 game/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_stencil_mrt_gpu_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_programmable_native_draw",
+        "expected_behavior": "Before actual game SM3 D3D11 Draw/DrawIndexed accept an ALWAYS/zero-write/one-sided stencil and masked-off extra D3D9 RT1-3 while preserving native RT0 and original game draw."
+      },
+      {
+        "id": "unsafe_stencil_mrt_preserves_d3d9",
+        "category": "fallback_regression",
+        "behavior_area": "game_state_and_input_fallback",
+        "expected_behavior": "Unknown or conditional stencil, any stencil write, two-sided mode, invalid MRT caps, unknown or writable extra RT safely refuse optional native frame without altering D3D9 Draw, gamepad, FFB or DX9Ex baseline."
+      },
+      {
+        "id": "five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "source_regressions_and_native_build",
+        "expected_behavior": "Source-linked and negative regression checks plus DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD CI all succeed at one exact commit SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Read original live game D3D9 programmable Draw stencil and bound MRT1-3 state",
+      "Prove effects are inert before any D3D11 resource mutation; reject unsafe game states",
+      "Submit full-resolution game-authored native SM3 Draw/DrawIndexed using existing opt-in, original D3D9 Draw/Present and input fallback"
+    ],
+    "batch_components": [
+      "Source-connected live SM3 game stencil and MRT admission in D3D11 bridge",
+      "Real-game fail-closed regression plus main-scene stencil regression causal maintenance"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live SM3 C++ bridge source binds RT0 and guarded native GPU Draw and exact Windows Build SUCCESS.",
+      "negative_regression": "Unsupported stencil compare/write/two-sided states and writable/unknown RT1-3 are rejected; source-linked negative tests and main Clear negative mutations remain enabled.",
+      "component_integration": "D3D9 game state -> native SM3 Draw/DrawIndexed -> full-size DX11 frame batch with DX9Ex fallback."
+    },
+    "conflict_keys": [
+      "DX11:SM3_INERT_STENCIL_MRT:CONVERSION-DX11-00939"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source integration and five exact-SHA CI gates only; real menu/vehicle/race frame pixels and Quest3/VDXR HMD remain UNTESTED.",
+    "activation_guard_and_fallback": "Production original D3D9/DX9Ex drawing, gamepad and FFB unchanged; optional native GPU Draw retains explicit diagnostic opt-in, unsafe states fail closed and DXVK remains frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/test_dx11_main_stencil_clear_game_frame_00781.py",
+    "docs/automation/runs/CONVERSION-DX11-00939.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "00938 complete and C6 preserved; checked latest HEAD/AGENTS/policy and no 00939 task record.",
+    "C1_REVIEW": "Live SM3 rejected inert stencil and omitted bound RT1-3 write safety before real native Draw.",
+    "C2_IMPLEMENT": "Actual C++ SM3 stencil/MRT source integration and source-linked negative regression.",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5 after two stale test-string/mutation scope repair batches; no safety probes bypassed.",
+    "C4_COMMIT": "4e53e3755ce86024e9a17135b016071e9ab1e49f",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA_5_OF_5; COMPLETE_BUILD_VERIFIED; Quest3, VDXR, gameplay and gamepad UNTESTED."
+  },
+  "acceptance_results": {
+    "live_sm3_stencil_mrt_gpu_draw": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "unsafe_stencil_mrt_preserves_d3d9": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "five_gate_exact_sha": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "head_sha": "ab23a75079ab9e91723721640d33729e659d884b",
+    "required_workflow_runs": {
+      "fast": 39174730480,
+      "backend": 39174730459,
+      "windows_build": 39174730406,
+      "openxr": 39174733530,
+      "hud": 39174733443
+    },
+    "all_required_gates": "SUCCESS",
+    "runtime": "UNTESTED",
+    "original_material_commit": "4e53e3755ce86024e9a17135b016071e9ab1e49f",
+    "ci_repair_commits": [
+      "e0da5e36c90a48d10fd50c98d1cda3d4eca6b334",
+      "3a9c5d6c61ee217f2d2d51b1059bde75466a9571",
+      "ab23a75079ab9e91723721640d33729e659d884b"
+    ]
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No Quest3/game-proven native Draw pixels or complete menu-vehicle-race frame at this exact source SHA; runtime needs matching game/VDXR test before promotion.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "ab23a75079ab9e91723721640d33729e659d884b",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue a separate non-conflicting native full-resolution game-frame feature; preserve exact-sha acceptance and record matching game/HMD pixels before any runtime promotion.",
+  "score_policy": {
+    "run_key": "CONVERSION-DX11-00939",
+    "scoreboard_recorded_separately": false,
+    "retry_additional_score": 0
+  }
+}
