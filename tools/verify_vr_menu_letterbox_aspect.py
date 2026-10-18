@@ -818,7 +818,7 @@ def verify_visible_menu_fragment(code: str) -> None:
         "const RECT& fullClient = capturedClient;",
         "sourceAspect = authoredAspect;",
         "clientGameState, gameConfiguredLetterbox,",
-        "imageMatteVerified, requestedCrop, requestedNoCrop);",
+        "imageMatteVerified, requestedCrop,\n                requestedNoCrop || useNativeMenuAspect);",
         "completeClient, cropCentered43,",
         "useNativeMenuAspect || wideVehicleSelector,",
         "imageMatteVerified);",
@@ -857,8 +857,10 @@ def verify_visible_menu_fragment(code: str) -> None:
             "            OutRunVrMenuAspect::PlanStateSafeMenuCrop(") in body
     assert "OutRunVrMenuAspect::IsWideVehicleSelector(clientGameState)" in body
     assert "clientGameState, gameConfiguredLetterbox," in body
-    assert "imageMatteVerified, requestedCrop, requestedNoCrop);" in body
+    assert "imageMatteVerified, requestedCrop,\n                requestedNoCrop || useNativeMenuAspect);" in body
     assert "useNativeMenuAspect || wideVehicleSelector," in body
+    # Both menu crop opt-outs belong to the same source crop veto.
+    assert "requestedNoCrop || useNativeMenuAspect);" in body
     assert "completeClient, cropCentered43," in body
     assert "sourceAspect = OutRunVrMenuAspect::PlanUncroppedAuthoredMenuAspect(" in body
     assert "sourceAspect, clientAspect, gameConfiguredLetterbox," in body
@@ -901,6 +903,15 @@ def verify_safe_menu_crop_source(code: str) -> None:
         "    // OutRun may restart", 1)[0]
     assert "configuredLetterbox && imageMatteVerified;" in owner
     assert "configuredLetterbox || imageMatteVerified;" not in owner
+    state_owner = code.split("constexpr bool PlanStateSafeMenuCrop(", 1)[1].split(
+        "    // OutRun may restart", 1)[0]
+    for token in (
+        "if (IsWideVehicleSelector(state) || requestedNoCrop)",
+        "if (state != 0x04u && state != 0x09u)",
+        "return requestedCrop || configuredLetterbox ||",
+        "ShouldAutoCropVerifiedFourThree(",
+    ):
+        assert token in state_owner, token
 
 verify_safe_menu_crop_source(menu_geometry)
 try:
@@ -911,6 +922,23 @@ except AssertionError:
     pass
 else:
     raise AssertionError("unverified menu crop OR mutation escaped")
+# A configured title/main menu must still crop; the negative vetoes are
+# restricted to exact original game states and explicit user opt-outs.
+for old, bad in (
+    ("if (IsWideVehicleSelector(state) || requestedNoCrop)",
+     "if (requestedNoCrop)"),
+    ("if (state != 0x04u && state != 0x09u)",
+     "if (state != 0x04u && state != 0x0Au)"),
+    ("return requestedCrop || configuredLetterbox ||",
+     "return requestedCrop ||"),
+):
+    assert old in menu_geometry, old
+    try:
+        verify_safe_menu_crop_source(menu_geometry.replace(old, bad, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("title/menu state or configured-crop mutation escaped: " + old)
 
 verify_visible_menu_fragment(r23)
 verify_visible_fragment_source(menu_geometry)
@@ -924,14 +952,18 @@ for old, bad in (
      "RECT fullClient{}; c.GetGameClientOutputRect(fullClient);"),
     ("constexpr bool imageMatteVerified = false;",
      "constexpr bool imageMatteVerified = true;"),
-    ("imageMatteVerified, requestedCrop, requestedNoCrop);",
-     "true, requestedCrop, requestedNoCrop);"),
+    ("imageMatteVerified, requestedCrop,\n                requestedNoCrop || useNativeMenuAspect);",
+     "true, requestedCrop,\n                requestedNoCrop || useNativeMenuAspect);"),
     ("clientGameState, gameConfiguredLetterbox,",
      "0x04u, gameConfiguredLetterbox,"),
     ("OutRunVrMenuAspect::IsWideVehicleSelector(clientGameState)",
      "OutRunVrMenuAspect::IsWideVehicleSelector(0x04u)"),
     ("useNativeMenuAspect || wideVehicleSelector,",
      "useNativeMenuAspect,"),
+    ("requestedNoCrop || useNativeMenuAspect);",
+     "requestedNoCrop);"),
+    ("requestedNoCrop || useNativeMenuAspect);",
+     "useNativeMenuAspect);"),
     ("const bool cropCentered43 =\n"
      "            OutRunVrMenuAspect::PlanStateSafeMenuCrop(",
      "const bool cropCentered43 =\n"
