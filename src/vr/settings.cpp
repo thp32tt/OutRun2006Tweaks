@@ -53,7 +53,7 @@ namespace Settings
 		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
-	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
+	Setting<float> VRHudScale{ "VR", "HudScale", 0.82f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
 	Setting<float> VRPauseMenuScale{ "VR", "PauseMenuScale", 1.0f,
 		"Independent centred ESC/pause menu size in VR; does not resize gameplay HUD, F11, the title menus, or world markers.", Range<float>{ 0.55f, 1.50f } };
