@@ -7,7 +7,8 @@ using OutRunVR::HudCommandBatch::Ledger;
 int main() {
     int sprite=0, other=0, queue=0;
     Ledger l;
-    const auto hud=RenderScope::ScreenHud, goal=ProducerToken::ResultTextB9200;
+    const auto hud=RenderScope::ScreenHud;
+    const auto goal=ProducerToken::ResultTextB9200;
     l.begin(&sprite,true);
     auto s=l.snapshot();
     assert(l.completeNativeDraw(s,true,hud,goal,true,false,nullptr,0,true));

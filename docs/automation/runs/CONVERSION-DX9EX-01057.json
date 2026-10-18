@@ -2,13 +2,13 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01057",
   "production_id": "CONVERSION-DX9EX-01057",
-  "event_id": "CONVERSION-DX9EX-01057-E002",
+  "event_id": "CONVERSION-DX9EX-01057-E003",
   "event_type": "retry",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "status": "VALIDATION_PENDING",
-  "checkpoint": "C3_CI_FAILURE_REPAIR",
+  "checkpoint": "C3_CI_REPAIR_PORTABLE_CXX20",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
@@ -71,7 +71,7 @@
     ],
     "eye_ownership": "Stack-confirmed direct GOAL source is preserved only until native physical GPU dispatch; R84 per-eye submission remains separately gated and HMD binocular correctness is unknown.",
     "fix_evidence": "Material C++ source commit b530057f1b582a6f886911f819c61c73be21bd78 implements ledger proof and D3DX deferred source restoration under exact original stack evidence.",
-    "negative_test_evidence": "Portable C++ behavior test tools/diagnostics/repro_b9200_direct_gpu_batch_20261019.cpp and native static assertions cover verified, unknown, mixed, queued, end/reset and pointer reuse."
+    "negative_test_evidence": "Targeted R84 ledger verifier passed 49 destructive source mutations on 10c4d8e8; portable C++20 test found incompatible enum types in one auto declaration and the test was corrected on the final validation candidate."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -80,17 +80,35 @@
     "DX9Ex Full Source Impact Review"
   ],
   "ci_evidence": {
-    "required_gates_state": "PENDING_AFTER_CI_POLICY_REPAIR",
-    "failed_run_id": 39162576531,
-    "failed_sha": "b530057f1b582a6f886911f819c61c73be21bd78",
-    "failure_cause": "DX9Ex Active policy step aborted because required run feature_contract JSON was missing, before Active game and package jobs started.",
+    "required_gates_state": "PENDING_FINAL_EXACT_SHA",
+    "validation_bearing_result_sha": null,
     "runtime_validation": "UNTESTED",
+    "prior_failed_runs": [
+      {
+        "id": 39162576531,
+        "cause": "feature record missing"
+      },
+      {
+        "id": 39162812517,
+        "cause": "strict +TIME ledger verifier original signature only"
+      },
+      {
+        "id": 39162939396,
+        "cause": "obsolete mutation fixture literal"
+      },
+      {
+        "id": 39163080779,
+        "cause": "obsolete source owner signature literal"
+      }
+    ],
+    "local_targeted_gate": "R84 +TIME/GOAL ledger 49 destructive negative mutations PASS on 10c4d8e8; portable C++20 test initial compile exposed mixed auto enum declaration, repaired in this commit",
     "required_workflows": []
   },
   "failure_repair": {
-    "failed_run_id": 39162576531,
+    "failed_run_id": 39162812517,
     "source_material_sha": "b530057f1b582a6f886911f819c61c73be21bd78",
-    "repair_reason": "Missing exact TASK_ID feature contract result record; no source or safety gates are removed."
+    "later_source_optimization_sha": "10c4d8e8ec4f6cdd1688e6d645f3bd341f3b517d",
+    "repair_reason": "Preserve exact GOAL provenance/source and repair strict verifier plus actual portable C++20 enum mixed-auto compilation, without weakening any safety check."
   },
   "acceptance_results": {
     "goal_exact_original_direct_gpu_ownership": "PENDING_EXACT_SHA",
