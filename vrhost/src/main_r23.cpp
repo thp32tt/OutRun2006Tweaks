@@ -1653,15 +1653,14 @@ namespace
                 completeClient, cropCentered43,
                 useNativeMenuAspect || wideVehicleSelector,
                 imageMatteVerified);
-            // A confirmed title/main-menu game state is distinct from the
-            // full-width car selector: correct native authored 4:3 *optics*
-            // without clipping any source UV. The game itself already
-            // publishes its exact state through ClientGameStateIndex.
-            sourceAspect = OutRunVrMenuAspect::PlanStateSensitiveMenuAspect(
-                sourceAspect, clientAspect, clientGameState,
-                gameConfiguredLetterbox, completeClient,
-                cropCentered43,
-                useNativeMenuAspect || wideVehicleSelector);
+            // Source UV is still the COMPLETE client here. It must retain
+            // the physical aspect of those actual captured pixels. Forcing
+            // this 3440x1440/1920x1080 rectangle into a 4:3 optical quad
+            // squeezed title/menu text even when the game had already
+            // letterboxed its sprite content in the original backbuffer.
+            // A verified 4:3 matte (or explicit A/B crop) is instead handled
+            // by the PlanVisibleCenteredContent branch above: UV AND aspect
+            // are changed together for BOTH eyes. Vehicle select is unchanged.
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
         // projections. Center LOCAL-fixed menu content on the optical ray,
