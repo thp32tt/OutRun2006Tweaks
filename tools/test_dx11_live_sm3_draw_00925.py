@@ -32,9 +32,9 @@ for condition in (
     check(condition in source, "missing real game source-to-GPU binding: " + condition)
 
 for rejection in (
-    "blend || alpha || stencil || depth != D3DZB_FALSE",
+    "alpha || stencil || depth != D3DZB_FALSE",
     "fog || scissor || clipPlanes || fill != D3DFILL_SOLID",
-    "cull != D3DCULL_NONE || colorMask != 0x0fu",
+    "colorMask != 0x0fu || srgbWrite != FALSE",
     "srgbWrite != FALSE", "if (indices[i] >= vertexCount) return false;",
     "if (s.liveSm3Pipelines.size() >= 64u) return false;",
     "if (pipeline.vertexTokens != vertexEvidence.tokens",
@@ -48,6 +48,27 @@ for token in ("D3DDECLTYPE_FLOAT1", "D3DDECLTYPE_FLOAT2",
               "default: return false;", "in.Stream != 0u",
               "static_cast<UINT>(in.Offset) + width > stride"):
     check(token in layout, "unsupported vertex declaration admitted: " + token)
+
+composite = (ROOT / "src/vr/d3d11/live_game_sm3_composite.hpp").read_text()
+for token in (
+    "game_native_cull_admission(", "D3DRS_SRCBLEND",
+    "D3DRS_DESTBLEND", "D3DRS_BLENDOP",
+    "D3DRS_SEPARATEALPHABLENDENABLE", "live_sm3_blend(",
+    "nativeBlend == LiveSm3Blend::unsupported", "context->RSSetState(liveRaster)",
+    "context->OMSetBlendState(liveBlend",
+    "s.diagnosticCullRasters[0].Get()", "s.diagnosticCullRasters[1].Get()",
+    "s.alphaBlend.Get()", "s.additiveBlend.Get()",
+    "s.sourceAlphaAddBlend.Get()", "s.premultipliedAlphaBlend.Get()",
+):
+    check(token in source, "live GPU raster/composite source missing: " + token)
+for token in (
+    "operation != 1u", "separateAlpha ||", "source == 5u && destination == 6u",
+    "source == 2u && destination == 2u",
+    "source == 5u && destination == 2u",
+    "source == 2u && destination == 6u",
+    "LiveSm3Blend::unsupported", "static_assert(",
+):
+    check(token in composite, "native D3D9 blend mapping/fallback missing: " + token)
 
 check("build_r283_sm3_mov_shader_source(vertexSource, true" in backend and
       "build_r283_sm3_mov_shader_source(pixelSource, false" in backend and

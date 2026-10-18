@@ -2,6 +2,7 @@
 #include "live_game_primitive_span.hpp"
 #include "live_game_depth_state.hpp"
 #include "live_game_cull_state.hpp"
+#include "live_game_sm3_composite.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
 #include "live_game_pixel_center.hpp"
@@ -120,6 +121,9 @@ static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
                kGameFvfTexcoordSize4_0 == D3DFVF_TEXCOORDSIZE4(0) &&
                kGameFvfTexcoordSize4_7 == D3DFVF_TEXCOORDSIZE4(7),
               "Portable FVF constants must match the D3D9 SDK");
+static_assert(D3DBLEND_ONE == 2 && D3DBLEND_SRCALPHA == 5 &&
+              D3DBLEND_INVSRCALPHA == 6 && D3DBLENDOP_ADD == 1,
+              "Portable SM3 blend admission must match D3D9 SDK");
 static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1SelectArg1 == D3DTOP_SELECTARG1 &&
               kStage1SelectArg2 == D3DTOP_SELECTARG2 &&
@@ -4262,8 +4266,9 @@ bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
 }
 
 // Real programmable D3D9 game source -> SM3 HLSL/DXBC -> native D3D11
-// IA/VS/PS/tN/sN/b0/Draw. Deliberately restricted to proved opaque,
-// unscissored and depth-disabled passes until identical OM/Z state is modeled.
+// IA/VS/PS/tN/sN/b0/Draw. Preserve live game CW/CCW culling and the
+// four exact D3D9 RGB+alpha blend equations already owned by the backend.
+// Scissor, alpha test, fog, depth, stencil and unknown factors remain D3D9.
 bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                D3DPRIMITIVETYPE type, UINT expected,
                                const void* bytes, UINT stride, UINT vertexCount,
@@ -4285,6 +4290,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
     DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
+    DWORD srcBlend = 0u, dstBlend = 0u, blendOp = 0u, separateAlpha = TRUE;
     D3DVIEWPORT9 viewport{};
     if (FAILED(game->GetViewport(&viewport)) ||
         FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
@@ -4298,11 +4304,26 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-        blend || alpha || stencil || depth != D3DZB_FALSE ||
+        alpha || stencil || depth != D3DZB_FALSE ||
         fog || scissor || clipPlanes || fill != D3DFILL_SOLID ||
-        cull != D3DCULL_NONE || colorMask != 0x0fu ||
-        srgbWrite != FALSE || !game_native_backbuffer_ready(game, viewport))
+        colorMask != 0x0fu || srgbWrite != FALSE ||
+        !game_native_backbuffer_ready(game, viewport))
         return false;
+    // Reject an unknown game raster winding before any D3D11 mutation.
+    GameNativeCullAdmission nativeCull{};
+    if (!game_native_cull_admission(
+            cull, static_cast<std::uint32_t>(type), nativeCull))
+        return false;
+    if (blend != FALSE &&
+        (FAILED(game->GetRenderState(D3DRS_SRCBLEND, &srcBlend)) ||
+         FAILED(game->GetRenderState(D3DRS_DESTBLEND, &dstBlend)) ||
+         FAILED(game->GetRenderState(D3DRS_BLENDOP, &blendOp)) ||
+         FAILED(game->GetRenderState(
+             D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha))))
+        return false;
+    const auto nativeBlend = live_sm3_blend(
+        blend != FALSE, srcBlend, dstBlend, blendOp, separateAlpha != FALSE);
+    if (nativeBlend == LiveSm3Blend::unsupported) return false;
     ComPtr<IDirect3DSurface9> target;
     ComPtr<IUnknown> targetIdentity;
     D3DSURFACE_DESC source{};
@@ -4442,11 +4463,28 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     const D3D11_RECT rect{0,0,static_cast<LONG>(source.Width),
                               static_cast<LONG>(source.Height)};
     context->RSSetScissorRects(1u, &rect);
-    context->RSSetState(s.raster.Get());
+    ID3D11RasterizerState* liveRaster =
+        nativeCull.d3d9Mode == D3DCULL_CW
+            ? s.diagnosticCullRasters[0].Get()
+            : nativeCull.d3d9Mode == D3DCULL_CCW
+                ? s.diagnosticCullRasters[1].Get() : s.raster.Get();
+    // Raster selection mirrors the source winding on both Draw/DrawIndexed.
+    context->RSSetState(liveRaster);
     ID3D11RenderTargetView* rtv = s.backend.color_rtv();
     context->OMSetRenderTargets(1u, &rtv, nullptr);
     context->OMSetDepthStencilState(nullptr, 0u);
-    context->OMSetBlendState(nullptr, nullptr, 0xffffffffu);
+    ID3D11BlendState* liveBlend = nullptr;
+    switch (nativeBlend) {
+    case LiveSm3Blend::disabled: break;
+    case LiveSm3Blend::straight_alpha: liveBlend = s.alphaBlend.Get(); break;
+    case LiveSm3Blend::additive: liveBlend = s.additiveBlend.Get(); break;
+    case LiveSm3Blend::source_alpha_add:
+        liveBlend = s.sourceAlphaAddBlend.Get(); break;
+    case LiveSm3Blend::premultiplied_alpha:
+        liveBlend = s.premultipliedAlphaBlend.Get(); break;
+    case LiveSm3Blend::unsupported: return false;
+    }
+    context->OMSetBlendState(liveBlend, nullptr, 0xffffffffu);
     const UINT offset = 0u;
     ID3D11Buffer* stream = s.fullGameVertexUpload.Get();
     context->IASetInputLayout(pipeline.inputLayout.Get());
