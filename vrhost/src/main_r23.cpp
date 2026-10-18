@@ -1687,8 +1687,9 @@ namespace
         // height constant in binocular tangent space, adjusting both X/Y
         // identically instead of enlarging the portrait menu to fill XR.
         // The measured source aspect, UV and FOV containment are preserved.
-        const auto placement =
-            OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
+        const auto placement = cropCentered43
+            ? requestedPlacement // Explicit source crop remains user's A/B.
+            : OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
                 common, requestedPlacement);
         if (!placement.valid)
             return false;
