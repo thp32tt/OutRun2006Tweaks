@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
+  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
+  "checkpoint": "C5_GATE_PENDING",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PASS_EXACT_SHA",
+  "automation_validation": "INCOMPLETE_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -84,19 +84,38 @@
   ],
   "ci_evidence": {
     "material_source_sha": "2dc620415309580220c4ee60161a73d04b35324a",
-    "final_exact_sha_gates": "PASS_EXACT_SHA",
+    "candidate_exact_sha": "fc5b86feda85f40b8d4d7630544d2e48558ae945",
+    "final_exact_sha_gates": "INCOMPLETE_3_OF_4",
     "runtime_validation": "UNTESTED",
-    "validation_bearing_result_sha": "fc5b86feda85f40b8d4d7630544d2e48558ae945",
-    "build_validation": "BUILD_VERIFIED"
+    "gate_results": {
+      "DX9Ex Active Validation": {
+        "run_id": 39135432787,
+        "conclusion": "success"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39135432835,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39135432795,
+        "conclusion": "success"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39135432806,
+        "conclusion": "cancelled"
+      }
+    },
+    "blocker": "MANDATORY_FULL_SOURCE_CANCELLED_ON_EXACT_SHA"
   },
-  "notes": "Initial source commit failed Active policy because this run record did not yet exist. This same-TASK repair supplies the required substantive function contract; it does not change the material source or claim runtime visual PASS.",
+  "notes": "Code material 2dc620415309580220c4ee60161a73d04b35324a compiled with 3/4 exact-SHA gates at candidate fc5b86feda85f40b8d4d7630544d2e48558ae945. Mandatory Full Source run 39135432806 was CANCELLED before jobs; prior C6 PASS was invalid and is retracted. Await a complete single-SHA four-Gate result; no runtime PASS and no new score. Preserve feature contract/source and unaffected other owners.",
   "c6_evidence": {
-    "result": "PASS_EXACT_SHA",
-    "head_sha": "fc5b86feda85f40b8d4d7630544d2e48558ae945",
-    "material_result_sha": "2dc620415309580220c4ee60161a73d04b35324a",
-    "validation_bearing_result_sha": "fc5b86feda85f40b8d4d7630544d2e48558ae945",
-    "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "result": "INVALIDATED_NO_FOUR_GATE_EXACT_SHA",
+    "earlier_bookkeeping_commit": "7074c11943a91fad40fce19fb67bfe55ca4ea169",
+    "earlier_candidate_sha": "fc5b86feda85f40b8d4d7630544d2e48558ae945",
+    "original_material_sha": "2dc620415309580220c4ee60161a73d04b35324a",
+    "reason": "GitHub Actions Full Source Impact run 39135432806 was cancelled at this SHA; the previous C6 PASS_EXACT_SHA record did not match the mandatory four-Gate evidence.",
     "record_only": true,
-    "ci_skipped_in_checkpoint": true
+    "ci_skipped_in_checkpoint": true,
+    "runtime_validation": "UNTESTED"
   }
 }
