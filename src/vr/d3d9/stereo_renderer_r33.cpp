@@ -1112,9 +1112,36 @@ namespace OutRunVRStereo
                     R29OwnerTopLevelDrawSerial(), fvf, shader, shaderEpoch
                 };
             };
+            // Hold R30's verified original game c64 owner across both GPU
+            // eyes, not only the prepared marker and bound vertex shader.
+            auto captureRankOriginalWvp = [&]() noexcept {
+                float raw[16]{};
+                std::uint64_t serial = 0, writtenDraw = 0;
+                std::uint64_t writtenEpoch = 0, queueEpoch = 0;
+                std::uintptr_t writtenShader = 0;
+                const void* queueNode = nullptr;
+                OutRunVR::GameSemantic::RenderScope scope =
+                    OutRunVR::GameSemantic::RenderScope::None;
+                OutRunVR::GameSemantic::ProducerToken producer =
+                    OutRunVR::GameSemantic::ProducerToken::None;
+                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        raw, serial, writtenDraw,
+                        writtenShader, writtenEpoch) ||
+                    !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                        scope, queueEpoch, queueNode, producer))
+                    return OutRunVR::RankMarker::OriginalRankWvpSource{};
+                return OutRunVR::RankMarker::OriginalRankWvpSource{
+                    serial, writtenDraw,
+                    OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                    writtenShader, writtenEpoch, scope, producer,
+                    queueNode, queueEpoch};
+            };
             const auto rankBeforeLeft = exactRankEye
                 ? captureRankSource()
                 : OutRunVR::RankMarker::PhysicalRankSource{};
+            const auto rankRawBeforeLeft = exactRankEye
+                ? captureRankOriginalWvp()
+                : OutRunVR::RankMarker::OriginalRankWvpSource{};
             // The full original +TIME family has a distinct physical owner
             // from GOAL, including direct numeric glyphs and queued sprites.
             // R30 checks fixedfn/XYZRHW, but shader/c64 uses this R33 path;
@@ -1194,7 +1221,8 @@ namespace OutRunVRStereo
                  !OutRunVR::LensCentre::IsCoherentNativeCentrePair(
                      centreBeforeLeft, centreRawBeforeLeft)) ||
                 (exactRankEye &&
-                 !OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)) ||
+                 !OutRunVR::RankMarker::CoherentOriginalRankWvp(
+                     rankBeforeLeft, rankRawBeforeLeft)) ||
                 (exactNativeHud &&
                  !OutRunVR::HudNativeSource::IsExactHudSource(hudBeforeLeft)) ||
                 (exactShadowEye &&
@@ -1283,9 +1311,19 @@ namespace OutRunVRStereo
             const bool nativeHudSourceChanged = exactNativeHud &&
                 !OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(
                     hudBeforeLeft, captureNativeHudSource());
+            const auto rankAfterLeft = exactRankEye
+                ? captureRankSource()
+                : OutRunVR::RankMarker::PhysicalRankSource{};
+            const auto rankRawAfterLeft = exactRankEye
+                ? captureRankOriginalWvp()
+                : OutRunVR::RankMarker::OriginalRankWvpSource{};
             const bool rankSourceChanged = exactRankEye &&
-                !OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
-                    rankBeforeLeft, captureRankSource());
+                (!OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
+                     rankBeforeLeft, rankAfterLeft) ||
+                 !OutRunVR::RankMarker::SameOriginalRankWvp(
+                     rankRawBeforeLeft, rankRawAfterLeft) ||
+                 !OutRunVR::RankMarker::CoherentOriginalRankWvp(
+                     rankAfterLeft, rankRawAfterLeft));
             if (centreSourceChanged || shadowSourceChanged ||
                 goalSourceChanged || stageSourceChanged ||
                 nativeHudSourceChanged || rankSourceChanged)
@@ -1411,6 +1449,24 @@ namespace OutRunVRStereo
                 {
                     rightFailure = OutRunVR::StereoFailureRightStateFailed;
                     rightHr = E_FAIL;
+                }
+                // RT/depth/viewport/c64 state setters can reenter another
+                // vehicle's original WVP after LEFT has already succeeded.
+                // Preserve LEFT; never submit the foreign marker to RIGHT.
+                if (SUCCEEDED(rightHr) && exactRankEye)
+                {
+                    const auto rankAtRight = captureRankSource();
+                    const auto rawAtRight = captureRankOriginalWvp();
+                    if (!OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
+                            rankBeforeLeft, rankAtRight) ||
+                        !OutRunVR::RankMarker::SameOriginalRankWvp(
+                            rankRawBeforeLeft, rawAtRight) ||
+                        !OutRunVR::RankMarker::CoherentOriginalRankWvp(
+                            rankAtRight, rawAtRight))
+                    {
+                        rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                        rightHr = E_FAIL;
+                    }
                 }
                 if (SUCCEEDED(rightHr))
                 {

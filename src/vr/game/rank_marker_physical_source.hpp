@@ -43,6 +43,53 @@ namespace OutRunVR::RankMarker
                         (!s.queueNode && s.queueEpoch == 0));
     }
 
+
+    // The original GPU c64 admitted by R30 must belong to the same car,
+    // SpriteNode, pose and shader at each R33 physical eye submission.
+    // Native Draw and right-eye state setters may synchronously reenter a
+    // different game c64 producer without changing the projected marker.
+    struct OriginalRankWvpSource
+    {
+        std::uint64_t writeSerial = 0;
+        std::uint64_t writtenDraw = 0;
+        std::uint64_t poseEpoch = 0;
+        std::uintptr_t shader = 0;
+        std::uint64_t shaderEpoch = 0;
+        GameSemantic::RenderScope scope = GameSemantic::RenderScope::None;
+        GameSemantic::ProducerToken producer = GameSemantic::ProducerToken::None;
+        const void* queueNode = nullptr;
+        std::uint64_t queueEpoch = 0;
+    };
+    inline bool CoherentOriginalRankWvp(
+        const PhysicalRankSource& physical,
+        const OriginalRankWvpSource& raw) noexcept
+    {
+        return ValidRankSource(physical) &&
+            physical.shader != 0 && physical.shaderEpoch != 0 &&
+            raw.writeSerial != 0 && raw.writtenDraw != 0 &&
+            raw.writtenDraw < physical.drawSerial &&
+            physical.drawSerial - raw.writtenDraw <= 12u &&
+            raw.poseEpoch == physical.poseEpoch &&
+            raw.shader == physical.shader &&
+            raw.shaderEpoch == physical.shaderEpoch &&
+            raw.scope == physical.scope &&
+            raw.producer == physical.producer &&
+            raw.queueNode == physical.queueNode &&
+            raw.queueEpoch == physical.queueEpoch;
+    }
+    inline bool SameOriginalRankWvp(
+        const OriginalRankWvpSource& a,
+        const OriginalRankWvpSource& b) noexcept
+    {
+        return a.writeSerial != 0 && a.writtenDraw != 0 &&
+            a.writeSerial == b.writeSerial &&
+            a.writtenDraw == b.writtenDraw &&
+            a.poseEpoch == b.poseEpoch &&
+            a.shader == b.shader && a.shaderEpoch == b.shaderEpoch &&
+            a.scope == b.scope && a.producer == b.producer &&
+            a.queueNode == b.queueNode && a.queueEpoch == b.queueEpoch;
+    }
+
     inline bool SameRankSourceAfterNativeLeft(
         const PhysicalRankSource& before,
         const PhysicalRankSource& after) noexcept

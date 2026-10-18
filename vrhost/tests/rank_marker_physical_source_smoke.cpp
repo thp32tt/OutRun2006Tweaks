@@ -151,6 +151,45 @@ int main()
     hudChanged = directHud; hudChanged.command.producer =
         GameSemantic::ProducerToken::RivalMarkerSprani;
     if (HudNativeSource::SameFixedFnRankHudAfterLeft(directHud,hudChanged)) return 54;
+    // Identical physical marker with a different ORIGINAL c64 writer is
+    // not the same moving car source (even if live GPU c64 was overwritten).
+    OriginalRankWvpSource rankRaw{
+        100u, 40u, 31u, 0x1234u, 4u,
+        GameSemantic::RenderScope::ProjectedWorldMarker2D,
+        GameSemantic::ProducerToken::RankMarkerSprani,
+        &node, 8u};
+    if (!CoherentOriginalRankWvp(shaderRank, rankRaw) ||
+        !SameOriginalRankWvp(rankRaw, rankRaw)) return 55;
+    auto rawChanged = rankRaw;
+    ++rawChanged.writeSerial;
+    if (SameOriginalRankWvp(rankRaw, rawChanged)) return 56;
+    rawChanged = rankRaw; ++rawChanged.writtenDraw;
+    if (SameOriginalRankWvp(rankRaw, rawChanged)) return 57;
+    rawChanged = rankRaw; ++rawChanged.poseEpoch;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 58;
+    rawChanged = rankRaw; rawChanged.shader = 0x4321;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 59;
+    rawChanged = rankRaw; ++rawChanged.shaderEpoch;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 60;
+    rawChanged = rankRaw; rawChanged.queueNode = &otherNode;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 61;
+    rawChanged = rankRaw; ++rawChanged.queueEpoch;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 62;
+    rawChanged = rankRaw;
+    rawChanged.producer = GameSemantic::ProducerToken::RivalMarkerSprani;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 63;
+    rawChanged = rankRaw;
+    rawChanged.scope = GameSemantic::RenderScope::ScreenHud;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 64;
+    rawChanged = rankRaw; rawChanged.writeSerial = 0;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 65;
+    rawChanged = rankRaw; rawChanged.writtenDraw = shaderRank.drawSerial;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 66;
+    rawChanged = rankRaw; rawChanged.writtenDraw = 28;
+    if (CoherentOriginalRankWvp(shaderRank, rawChanged)) return 67;
+    if (CoherentOriginalRankWvp(direct, rankRaw)) return 68;
+    if (!CoherentOriginalRankWvp(shaderQueued, rankRaw)) return 69;
+    std::cout << "R84 rank original c64 right-eye source fence PASS\n";
     std::cout << "R84 FVF142 physical DispRank 6th/6 command fence PASS\n";
     std::cout << "R84 physical projected rank source transaction PASS\n";
     return 0;
