@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01048",
+  "production_id": "CONVERSION-DX9EX-01048",
+  "event_id": "CONVERSION-DX9EX-01048-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
+  "checkpoint": "C5_GATE_PENDING",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "2dcb484071a5681fb5599c9e4690057bd2d68548",
+  "validation_bearing_result_sha": "PENDING_CI",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep the complete original stage +TIME sprite and numeric glyph presentation on one source-owned per-eye rendering transaction, preventing a changed physical source from being replayed as a foreign right-eye HUD draw.",
+    "scope_boundary": "Only the native R84 exact +TIME ScreenHud physical-source fences in R30 XYZRHW, R30 shader finite-eye plane and R33 native shader draw; preserve the original six producer calls and unchanged timer, GOAL, F11, world, FFB, SkyGlow, R26_SAFE, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original game six stage extension CALLs (three sprite and three number) retain exact StageExtensionTime ownership across direct and queued native command entry.",
+      "R84 R30 XYZRHW and shader finite-eye plus R33 shader paths capture native physical source, submit LEFT then reject a changed c64, pose, draw serial or SpriteNode queue epoch before RIGHT.",
+      "Only the same native physical producer can issue RIGHT-eye drawing and reach stereo host composition, while unsafe ownership follows existing fallback and R29 invalidation."
+    ],
+    "subcomponents": [
+      "Fence +TIME RIGHT draw after native D3D9 render-target, depth, viewport and c64 setters in both R30 fixed-function and shader screen-HUD branches.",
+      "Fence the corresponding R33 shader RIGHT after native state setters without transferring prior +TIME ownership to a nested or replaced draw.",
+      "Extend physical-source smoke for queued and direct producers with negative changes to raw WVP, pose epoch, top-level draw, GOAL producer and queue epoch."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_owner_exact_both_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "All six original +TIME sprite and numeric producers through native R84 R30/R33 GPU LEFT/RIGHT submission",
+        "expected_behavior": "The exact same physical stage owner survives all native state setters before RIGHT rendering; native LEFT and RIGHT keep ownership only for unchanged source."
+      },
+      {
+        "id": "stage_owner_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "Reentrant setter, foreign GOAL, stale native queue, device and safety fallback",
+        "expected_behavior": "A changed c64 write, pose epoch, nested draw, GOAL producer or recycled queue fails closed without granting the prepared RIGHT draw to another source."
+      },
+      {
+        "id": "stage_owner_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 game and x64 host full-chain/package plus Domain, HUD Inspector and Full Source gates",
+        "expected_behavior": "Required GitHub Actions pass for one validation-bearing exact SHA, while absent Quest3/VDXR evidence remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_owner_exact_both_eyes": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "stage_owner_fail_closed": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "stage_owner_exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "+TIME native presentation has three original sprite and three numeric producer calls; D3DX replay and the R30/R33 physical HUD GPU paths are separate from producer hook lifetime.",
+    "source_trace": [
+      "Original sprite/glyph StageExtensionTime token enters the R84 native R30 ScreenHud XYZRHW or shader finite-eye path through physical draw command metadata.",
+      "R30 can submit native LEFT then call D3D9 render-target/depth/viewport/WVP state setters that may reenter a different original game producer before RIGHT.",
+      "R33 has a parallel shader HUD native LEFT-to-RIGHT owner transaction, so its prepared RIGHT must also inspect the live physical source after state setup."
+    ],
+    "alternatives_rejected": [
+      "Do not globally classify stage sprites, force D3DX Flush, skip original LEFT, invent HMD pass, change GOAL timing or weaken unknown-producer and device-loss fallback."
+    ],
+    "root_cause": "Earlier R84 exact +TIME physical source checks did not consistently fence live source after all right-eye native D3D9 state setters across XYZRHW, shader finite plane and R33 shader HUD branches.",
+    "fix_evidence": "Material C++ commit 2dcb484071a5681fb5599c9e4690057bd2d68548 adds same-source physical validation at the R30 and R33 native right-eye state boundaries.",
+    "negative_test_evidence": "vrhost/tests/stage_extension_eye_plane_smoke.cpp tests queued and direct unchanged positive cases and negative mutations to WVP write serial, pose epoch, top-level draw, GOAL producer and queue epoch.",
+    "eye_ownership": "Original LEFT and prepared RIGHT must share the same live raw WVP, draw/pose/queue producer identity; a source change invalidates pair and leaves existing safe fallback. Quest3/VDXR not exercised."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "2dcb484071a5681fb5599c9e4690057bd2d68548",
+    "initial_active_run": 39140662437,
+    "initial_active_conclusion": "failure",
+    "initial_active_failure": "EXACT_HEAD_RUN_RECORD_MISSING",
+    "run_record_correction": "CREATE_MISSING_RECORD",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Retry E003 repairs missing exact-HEAD feature run record that stopped Active policy before compilation. Original implementation remains material commit 2dcb484071a5681fb5599c9e4690057bd2d68548; this is a separate record/validation-enabling commit, not new C++ implementation or score. No Quest3/VDXR execution."
+}
