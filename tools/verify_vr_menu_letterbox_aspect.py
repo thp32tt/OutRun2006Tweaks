@@ -840,7 +840,20 @@ def verify_visible_menu_fragment(code: str) -> None:
         assert token in body, token
     # Reject a secondary HWND read that could diverge from the UV snapshot.
     # Both physical client extents and capture UV must originate in one call.
-    assert "RECT capturedClient{};\n        if (!c.GetGameUv(whole, false, &capturedClient)) return false;" in code
+    # One authoritative ClipClient/GetGameUv snapshot now publishes both
+    # the client RECT and the full-visibility bit. Do not resurrect the
+    # older pixel-difference approximation for a partially captured menu.
+    visibility_call = (
+        "RECT capturedClient{};\\n"
+        "        bool capturedClientFullyVisible = false;\\n"
+        "        if (!c.GetGameUv(\\n"
+        "                whole, false, &capturedClient, &capturedClientFullyVisible))\\n"
+        "            return false;"
+    )
+    assert visibility_call in code
+    assert "clientGameState, capturedClientFullyVisible," in body
+    assert "OutRunVrMenuAspect::RestoreFullMainMenuFourThree(" in body
+    assert "if (!c.GetGameUv(whole, false, &capturedClient)) return false;" not in code
     assert "GetClientRect(c.hwnd_, &cr)" not in body
     assert "GetGameClientOutputRect(fullClient);" not in body
     # The source call is now bound once to a cached configured-letterbox
