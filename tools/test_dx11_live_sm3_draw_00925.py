@@ -42,7 +42,7 @@ for rejection in (
     "if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))",
     "if (scissor != FALSE)", "gameRect.right <= gameRect.left",
     "r <= l || b <= t",
-    "colorMask != 0x0fu || srgbWrite != FALSE",
+    "(colorMask & ~0x0fu) != 0u || srgbWrite != FALSE",
     "srgbWrite != FALSE", "if (nativeIndices[i] >= vertexCount) return false;",
     "if (s.liveSm3Pipelines.size() >= 64u) return false;",
     "pipeline.vertexTokens != vertexEvidence.tokens",
@@ -217,4 +217,22 @@ check("hashBytes(&alphaCompare, sizeof(alphaCompare))" in bridge and
       "pipeline.alphaCompare = alphaFunc;" in bridge and
       "UpdateSubresource(pipeline.alphaReference.Get()" in bridge,
       "live alpha compare must be cached and uploaded per real Draw")
+# Validate the actual real-game source-to-OM mask path and negative states.
+for token in (
+    "sm3_live_masked_blend_desc(", "D3DRS_COLORWRITEENABLE",
+    "b.RenderTargetWriteMask = static_cast<UINT8>(writeMask);",
+    "static_cast<std::uint64_t>(b.RenderTargetWriteMask) << 48u",
+    "static_cast<std::uint64_t>(b.BlendEnable != FALSE) << 56u",
+    "sm3_live_masked_blend_regression()",
+    "D3D11_COLOR_WRITE_ENABLE_ALPHA", "if (customBlend)",
+    "liveBlend = extendedBlend;",
+    "context->OMSetBlendState(liveBlend, nullptr, 0xffffffffu);",
+):
+    check(token in bridge, "masked real SM3 Draw GPU output missing: " + token)
+check("colorMask != 0x0fu || srgbWrite" not in source and
+      "(colorMask & ~0x0fu) != 0u || srgbWrite" in source,
+      "valid per-game-Draw partial channel mask still rejected")
+check("if (customBlend &&" in source and
+      "sm3_live_masked_blend_desc(" in source,
+      "native game draw must fail before GPU mutation for invalid OM states")
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")

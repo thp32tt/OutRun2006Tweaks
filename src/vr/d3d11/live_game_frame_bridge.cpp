@@ -267,6 +267,30 @@ constexpr bool sm3_live_blend_desc(
     out = b;
     return true;
 }
+// Real game SM3 Draw can update RGB only, alpha only, or depth only.
+// Preserve D3D9 RT0 channel writes across native D3D11 OM and Reset.
+constexpr bool sm3_live_masked_blend_desc(
+    bool enabled, DWORD writeMask,
+    DWORD sc, DWORD dc, DWORD oc, bool separate,
+    DWORD sa, DWORD da, DWORD oa, D3D11_RENDER_TARGET_BLEND_DESC& out) noexcept {
+    if ((writeMask & ~0x0fu) != 0u) return false;
+    D3D11_RENDER_TARGET_BLEND_DESC b{};
+    if (enabled) {
+        if (!sm3_live_blend_desc(sc, dc, oc, separate, sa, da, oa, b))
+            return false;
+    } else {
+        b.BlendEnable = FALSE;
+        b.SrcBlend = D3D11_BLEND_ONE;
+        b.DestBlend = D3D11_BLEND_ZERO;
+        b.BlendOp = D3D11_BLEND_OP_ADD;
+        b.SrcBlendAlpha = D3D11_BLEND_ONE;
+        b.DestBlendAlpha = D3D11_BLEND_ZERO;
+        b.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    }
+    b.RenderTargetWriteMask = static_cast<UINT8>(writeMask);
+    out = b;
+    return true;
+}
 constexpr std::uint64_t sm3_live_blend_key(
     const D3D11_RENDER_TARGET_BLEND_DESC& b) noexcept {
     return static_cast<std::uint64_t>(b.SrcBlend) |
@@ -274,8 +298,45 @@ constexpr std::uint64_t sm3_live_blend_key(
         (static_cast<std::uint64_t>(b.BlendOp) << 16u) |
         (static_cast<std::uint64_t>(b.SrcBlendAlpha) << 24u) |
         (static_cast<std::uint64_t>(b.DestBlendAlpha) << 32u) |
-        (static_cast<std::uint64_t>(b.BlendOpAlpha) << 40u);
+        (static_cast<std::uint64_t>(b.BlendOpAlpha) << 40u) |
+        (static_cast<std::uint64_t>(b.RenderTargetWriteMask) << 48u) |
+        (static_cast<std::uint64_t>(b.BlendEnable != FALSE) << 56u);
 }
+constexpr bool sm3_live_masked_blend_regression() noexcept {
+    D3D11_RENDER_TARGET_BLEND_DESC b{};
+    if (!sm3_live_masked_blend_desc(
+            false, D3D11_COLOR_WRITE_ENABLE_RED, 0u, 0u, 0u,
+            false, 0u, 0u, 0u, b) ||
+        b.BlendEnable != FALSE ||
+        b.RenderTargetWriteMask != D3D11_COLOR_WRITE_ENABLE_RED)
+        return false;
+    const auto redKey = sm3_live_blend_key(b);
+    if (!sm3_live_masked_blend_desc(
+            false, D3D11_COLOR_WRITE_ENABLE_ALL, 0u, 0u, 0u,
+            false, 0u, 0u, 0u, b) ||
+        sm3_live_blend_key(b) == redKey) return false;
+    if (!sm3_live_masked_blend_desc(
+            true, D3D11_COLOR_WRITE_ENABLE_ALPHA,
+            D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, D3DBLENDOP_ADD,
+            true, D3DBLEND_ONE, D3DBLEND_ZERO, D3DBLENDOP_ADD, b) ||
+        b.BlendEnable != TRUE ||
+        b.RenderTargetWriteMask != D3D11_COLOR_WRITE_ENABLE_ALPHA ||
+        b.SrcBlendAlpha != D3D11_BLEND_ONE ||
+        b.DestBlendAlpha != D3D11_BLEND_ZERO ||
+        sm3_live_blend_key(b) == redKey) return false;
+    const auto saved = b;
+    return !sm3_live_masked_blend_desc(
+                true, 0x10u, D3DBLEND_ONE, D3DBLEND_ZERO,
+                D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
+           !sm3_live_masked_blend_desc(
+                true, 0x0fu, D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,
+                D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
+           b.RenderTargetWriteMask == saved.RenderTargetWriteMask &&
+           b.BlendEnable == saved.BlendEnable;
+}
+static_assert(sm3_live_masked_blend_regression(),
+              "Live D3D9 SM3 RGB/alpha write masks must map to exact D3D11 OM");
+
 constexpr bool sm3_live_blend_regression() noexcept {
     D3D11_RENDER_TARGET_BLEND_DESC b{};
     if (!sm3_live_blend_desc(D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR,
@@ -4479,7 +4540,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
         stencil || fog || clipPlanes || fill != D3DFILL_SOLID ||
-        colorMask != 0x0fu || srgbWrite != FALSE ||
+        (colorMask & ~0x0fu) != 0u || srgbWrite != FALSE ||
         !game_native_backbuffer_ready(game, viewport))
         return false;
     // SM3 pixel alpha test is shader-side in D3D11, not a blend state.
@@ -4509,9 +4570,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         return false;
     const auto nativeBlend = live_sm3_blend(
         blend != FALSE, srcBlend, dstBlend, blendOp, separateAlpha != FALSE);
+    // Game menu/race fades may write only RGB or destination alpha.
+    // Never use a preset all-channel blend state for such a Draw.
+    const bool customBlend =
+        nativeBlend == LiveSm3Blend::unsupported || colorMask != 0x0fu;
     D3D11_RENDER_TARGET_BLEND_DESC extendedDesc{};
-    if (nativeBlend == LiveSm3Blend::unsupported &&
-        !sm3_live_blend_desc(srcBlend, dstBlend, blendOp,
+    if (customBlend &&
+        !sm3_live_masked_blend_desc(
+            blend != FALSE, colorMask, srcBlend, dstBlend, blendOp,
             separateAlpha != FALSE, srcBlendAlpha, dstBlendAlpha,
             blendOpAlpha, extendedDesc)) return false;
     ComPtr<IDirect3DSurface9> target;
@@ -4634,7 +4700,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     auto* context = s.backend.context();
     if (!device || !context) return false;
     ID3D11BlendState* extendedBlend = nullptr;
-    if (nativeBlend == LiveSm3Blend::unsupported) {
+    if (customBlend) {
         const auto blendKey = sm3_live_blend_key(extendedDesc);
         auto found = s.liveSm3BlendStates.find(blendKey);
         if (found == s.liveSm3BlendStates.end()) {
@@ -4866,6 +4932,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         liveBlend = extendedBlend;
         if (!liveBlend) return false;
         break;
+    }
+    // D3D11 BlendState cache key includes BlendEnable and RGBA channel mask.
+    // Invalid D3D9 state has already failed before the native Draw.
+    if (customBlend) {
+        if (!extendedBlend) return false;
+        liveBlend = extendedBlend;
     }
     context->OMSetBlendState(liveBlend, nullptr, 0xffffffffu);
     const UINT offset = 0u;

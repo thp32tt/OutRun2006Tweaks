@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00938",
+  "production_id": "CONVERSION-DX11-00938",
+  "event_id": "CONVERSION-DX11-00938-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00938",
+  "feature_id": "DX11:LIVE_SM3_RT_WRITE_MASK_AND_BLEND_CACHE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_RT_WRITE_MASK_AND_BLEND_CACHE",
+    "goal": "Connect actual game SM3 partial RGB and independent alpha write masks to native D3D11 Draw/DrawIndexed OM state with channel-aware cache/fail-closed fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_masked_om_gpu_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "full_game_sm3_native_render_output",
+        "expected_behavior": "Actual game RT0 write masks (RGB-only, alpha-only, depth-only) bind to native D3D11 OM during real Draw/DrawIndexed."
+      },
+      {
+        "id": "masked_blend_cache_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "per_device_blend_cache_and_safe_d3d9_fallback",
+        "expected_behavior": "Disabled, preset and independently blended RT0 states preserve correct mask; invalid masks and unsupported blend factors fail closed and cache clears at Reset."
+      },
+      {
+        "id": "masked_sm3_exact_sha_validation",
+        "category": "integrated_validation",
+        "behavior_area": "native_cpp_compile_static_regression_and_gates",
+        "expected_behavior": "Compile-time positive/negative C++ cases, source-bound integration regression, all five mandatory exact SHA gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Read original live D3D9 game Draw COLORWRITEENABLE",
+      "Translate RGB/alpha/disabled blend states and separate cache identity in native OM",
+      "Bind per-Draw mask-exact native D3D11 BlendState before Draw/DrawIndexed with game fallback"
+    ],
+    "batch_components": [
+      "Live SM3 game channel mask admission and per-Draw D3D11 OM binding",
+      "Blended/unblended masked cache key and Reset-safe lifetime",
+      "Native C++ constexpr and source-linked positive/negative regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native C++ constexpr masked blend regression plus exact SHA Windows compilation.",
+      "negative_regression": "Out-of-range mask and unsupported blend mode fail closed; unknown game state preserves D3D9 and DXVK freeze.",
+      "component_integration": "Live game D3D9 Draw COLORWRITEENABLE -> cache identity -> ID3D11BlendState -> OMSetBlendState -> native Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:SM3_MASKED_RT_OM:CONVERSION-DX11-00938"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI only; real game Draw pixels, complete frame and Quest3 remain UNTESTED.",
+    "activation_guard_and_fallback": "Native Draw opt-in, original D3D9/DX9Ex/gamepad/FFB/SkyGlow unchanged; DXVK branch frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "docs/automation/runs/CONVERSION-DX11-00938.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "00937 terminal C6 exact-SHA verified; 00938 has no prior run; HEAD a31838c2.",
+    "C1_REVIEW": "Real SM3 game Draw hard-rejected every partial RT0 write mask; native per-device blend cache lacked mask identity.",
+    "C2_IMPLEMENT": "Source SM3 masked Draw RT0 translation and cache/OM binding plus positive/negative regression.",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING_GIT_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No observed real-game native Draw/published full frame at this exact candidate; source and CI cannot assert native playability.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "PENDING_GIT_SHA",
+  "NEXT_IMPLEMENTATION_ACTION": "Inspect full final exact-SHA Fast/Backend/Windows Build/OpenXR/HUD. Repair causal failures on 00938; write C6 bookkeeping only after PASS.",
+  "acceptance_results": {
+    "live_sm3_masked_om_gpu_draw": "PENDING_EXACT_SHA",
+    "masked_blend_cache_and_fallback": "PENDING_EXACT_SHA",
+    "masked_sm3_exact_sha_validation": "PENDING_EXACT_SHA"
+  }
+}
