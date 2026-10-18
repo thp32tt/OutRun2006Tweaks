@@ -29,6 +29,10 @@ on:
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
       - 'docs/VR_HUD_SEMANTIC_BASELINE.md'
       - 'src/vr/d3d11/**'
+      # Exact pushed DX11 result SHA must retain the HUD inspector gate when
+      # a causal source-activation or packaging negative repair is committed.
+      - 'tools/verify_dx11_activation_boundary.py'
+      - 'tools/test_package_dx11_first_game_frame.py'
       - 'tools/dx11_autodev_policy.py'
       - 'tools/test_dx11_autodev_policy.py'
       - 'docs/automation/runs/CONVERSION-DX11-*.json'

@@ -84,8 +84,16 @@ def test_bundle_ci_route():
          "needs: [host-x64]", "missing game build dependency"),
     ):
         assert old in workflow, "negative test fixture absent: " + reason
+        # Mutate the exact bundle job, not an unrelated prior push gate.
+        # The negative fixture must prove this job rejects PR-only, foreign
+        # branch, missing build identity and missing game binary dependencies.
+        # A global first occurrence can hit another job and falsely PASS.
+        prefix, marker, bundle_job = workflow.partition(
+            "  dx11-first-game-frame-bundle:")
+        assert marker and old in bundle_job, (
+            "bundle negative fixture missing: " + reason)
         must_fail(lambda old=old, bad=bad: verify_bundle_ci_route(
-            workflow.replace(old, bad, 1)), reason)
+            prefix + marker + bundle_job.replace(old, bad, 1)), reason)
 
 
 def main():

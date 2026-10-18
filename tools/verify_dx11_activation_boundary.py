@@ -560,8 +560,15 @@ def main() -> None:
                 # The real game now clips the viewport AND adjusts source UVs;
                 # rejecting the old guard is not permission to bypass bounds.
                 "srcBox.right > mipWidth || srcBox.bottom > mipHeight) return false;",
-                "sourceMipSlice >= sd.MipLevels ||",
-                "const UINT mipWidth = (std::max)(1u, sd.Width >> sourceMipSlice);",
+                # Encoder source mip bounds now come from the SAME audited
+                # utility used by preflight for BOTH camera eyes. Removing
+                # these calls is never an activation relaxation.
+                "const auto sourceMip = native_game_postpass_mip_extent(",
+                "sd.Width, sd.Height, sd.MipLevels, sourceMipSlice,",
+                "sd.ArraySize, sourceArraySlice, sd.SampleDesc.Count);",
+                "if (!sourceMip.valid) return false;",
+                "const UINT mipWidth = sourceMip.width;",
+                "const UINT mipHeight = sourceMip.height;",
                 "const auto clipped = native_game_stretch_clipped_region(",
                 "dest.left, dest.top, dest.right, dest.bottom);",
                 "if (!clipped.valid) return false;",
@@ -618,9 +625,33 @@ def main() -> None:
                 ],
                 "DX11 clipped GPU StretchRect positive/negative regression",
             )
+            # Both authentic eyes must reject a cropped SourceCopy/Stretch
+            # outside its physical camera mip before the first GPU command.
+            # Audit the new *shared* C++ admission itself, not an obsolete
+            # inline string which used to be duplicated in two encoders.
+            mip_helper = require_text(
+                DX11 / "native_game_postpass_replay.hpp",
+                [
+                    "mip >= 32u || !arraySize || arraySlice >= arraySize ||",
+                    "!sampleCount || sampleCount > 32u ||",
+                    "(sampleCount != 1u && (mip != 0u || mipLevels != 1u))",
+                    "const auto w = width >> mip;",
+                    "const auto h = height >> mip;",
+                    "right > extent.width || bottom > extent.height) return {};",
+                ],
+                "DX11 actual game GPU camera mip/array and crop safety",
+            )
+            required_eye_replay_mip = [
+                "const auto sourceMip = native_game_postpass_source_box(",
+                "event.sourceMipSlice, desc.ArraySize,",
+                "sourceMip.width, sourceMip.height,",
+                "needsPostpassShader = true;",
+            ]
+            if any(token not in text for token in required_eye_replay_mip):
+                raise SystemExit("DX11 stereo camera source-mip preflight removed")
             # Kept separate from evidence counters: neither helper nor probe
             # is permitted to authorize a new game-geometry Draw.
-            del stretch_helper, stretch_regression
+            del stretch_helper, stretch_regression, mip_helper
             missing = [token for token in required_eye_contract if token not in text]
             depth_probe = (ROOT / "tools" / "dx11_native_transport_probe.cpp").read_text(
                 encoding="utf-8")
