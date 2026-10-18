@@ -36,6 +36,7 @@
 #include "../game/rank_marker_physical_source.hpp"
 #include "../game/hud_native_source_transaction.hpp"
 #include "../core/r29_owner_api.hpp"
+#include <cstdlib>
 
 namespace OutRunVRRenderer {
     std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
@@ -1595,6 +1596,32 @@ namespace OutRunVRStereo
                     directLensCentre, provenLensStereo, false) &&
                 !provenLensStereo)
             {
+                // Quest3 R84 trace: exact C993 centre ran 16,338 native
+                // left-only draws while CABE outer halos were stereo.
+                // EXPERIMENTAL opt-in: omit ONLY a source-proven mono C993
+                // draw with missing/stale game WVP. This hides its central
+                // flare rather than inventing a right-eye transform or
+                // reusing unrelated world c64. Keep old original-draw
+                // fallback as the production default and for all other
+                // effects. C test launcher enables the A/B opt-in.
+                const char* suppressMonoCentre =
+                    std::getenv("OUTRUN_VR_SUPPRESS_MONO_C993");
+                if (suppressMonoCentre &&
+                    suppressMonoCentre[0] == '1' &&
+                    suppressMonoCentre[1] == '\0')
+                {
+                    static thread_local bool loggedMonoCentre = false;
+                    if (!loggedMonoCentre)
+                    {
+                        loggedMonoCentre = true;
+                        spdlog::warn(
+                            "VR C993 A/B: suppressed unowned mono lens centre; "
+                            "CABE outer halo preserved, stereo WVP still unresolved");
+                    }
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::NoRouteEvidence);
+                    return D3D_OK;
+                }
                 // The game's exact original draw occurs once; no effect is
                 // suppressed or borrowed road/particle WVP submitted.
                 OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
