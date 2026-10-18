@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00923",
+  "production_id": "CONVERSION-DX11-00923",
+  "event_id": "CONVERSION-DX11-00923-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00923",
+  "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SHADER_INTEGRATION",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "a545bca522f987fe4073392bbc132b55a8d7caf2",
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SHADER_INTEGRATION",
+    "goal": "Bind actual game D3D9 programmable shader constants, vertex declarations and source buffers into native D3D11 Draw/DrawIndexed for complete menu, car selection and race frames while preserving exact fallback",
+    "acceptance_items": [
+      {
+        "id": "native_game_shader_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_programmable_vs_ps_bind_to_gpu_draw",
+        "expected_behavior": "Real D3D9 VS and PS with their authored c registers and vertex streams issue a native D3D11 GPU Draw into the real game frame"
+      },
+      {
+        "id": "fallback_and_constant_semantics",
+        "category": "fallback_regression",
+        "behavior_area": "game_render_input_and_ffb_safety",
+        "expected_behavior": "Shader local DEF overrides external c registers, unsupported constants and matrix source states reject safely, original D3D9 game input and rendering continue"
+      },
+      {
+        "id": "five_gates_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "source_shader_win32_backend_openxr_hud_ci",
+        "expected_behavior": "Constant and matrix translator source with positive and negative probes compiles with all five required Actions for one exact materialization SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "first_live_game_draw",
+    "integration_path": [
+      "live D3D9 programmable shader pair and c/DEF state",
+      "stage-specific constant and matrix HLSL to DXBC materializer",
+      "actual D3D11 IA/VS/PS/OM Draw/DrawIndexed and full game output"
+    ],
+    "batch_components": [
+      "native_backend.cpp D3D9 SM3 c/DEF/matrix translation",
+      "native_sm3_constant_codegen.hpp exact literal and matrix source emitter",
+      "dx11_sm3_constant_codegen_probe.cpp positive and negative regression"
+    ],
+    "conflict_keys": [
+      "DX11:REAL_GAME_DRAW",
+      "DX11:PROGRAMMABLE_SHADER_TRANSLATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FIRST_GAME_DRAW_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NOT_ACHIEVED: real game programmable shader draw and visible native frame not yet captured",
+    "activation_guard_and_fallback": "Materializer remains diagnostic only; no native GPU draw activation before actual VS/PS constant buffer upload, live input layout/texture linkage and bounded frame output; original D3D9 input, FFB and DX9Ex unchanged; DXVK frozen",
+    "acceptance_proof": {
+      "positive_probe": "SM3 float c register, shader-local DEF bit patterns, M4x4 and M3x3 row-ordered code emission covered by C++ regression; DXBC compile evaluated only in Windows Gate",
+      "negative_regression": "Out-of-range PS/VS constant, invalid 3x3 W mask, empty row/source and invalid register read reject; game Draw activation remains disabled",
+      "component_integration": "D3D9 SM3 shader bytecode decoder now feeds exact stage-local constants and matrix expressions through existing DX11 HLSL -> DXBC materializer, with original D3D9 Draw authoritative"
+    }
+  },
+  "acceptance_results": {
+    "native_game_shader_draw": "PENDING_REAL_GAME_DRAW_AND_CONSTANT_GPU_UPLOAD",
+    "fallback_and_constant_semantics": "PENDING_CI",
+    "five_gates_exact_sha": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+    "tools/dx11_sm3_constant_codegen_probe.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Inherited 00922 C6 exact-SHA build passed but live VS/PS native Draw remained unfinished; branch HEAD verified before source update",
+    "C1_REVIEW": "Actual programmable game shaders rejected while R283 translator had no c register, DEF literals or M4x4/M3x3 arithmetic",
+    "C2_IMPLEMENT": "Material source commit a545bca522f987fe4073392bbc132b55a8d7caf2 adds constant/matrix source translation and targeted regression",
+    "C3_VALIDATE": "PENDING exact SHA five required Gates; same-task repair recognizes changed compiler fingerprints; prior 00922 terminal record remains unchanged",
+    "C4_COMMIT": "Source material a545bca522f987fe4073392bbc132b55a8d7caf2; CI contract repair being committed",
+    "C5_PACKAGE": "NOT_REQUIRED: no user-playable native game draw yet",
+    "C6_RESULT": "PENDING"
+  },
+  "REAL_GAME_DRAW_BLOCKER": "Live gameplay draw path still rejects actual VS/PS in live_game_frame_bridge.cpp; shader constant capture/upload, vertex decl and actual native Draw binding not integrated",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "a545bca522f987fe4073392bbc132b55a8d7caf2",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Capture and upload actual D3D9 VS/PS float constants, bind translated semantic input layout, vertex streams and native shader objects before dispatching full-game D3D11 Draw/DrawIndexed"
+}
