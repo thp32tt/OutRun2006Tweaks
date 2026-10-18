@@ -47,6 +47,21 @@ enum class ScalingMode
 
 namespace
 {
+    // REA original EXE: 0x498958 JNZ -> 0x498A18. An E9 midhook at
+    // 0x498A15 (immediate post-CALL) overwrites 0x498A18, reproducing
+    // the same branch-into-detour failure as the retired GOAL text hooks.
+    // After 0x498A15 ADD ESP, 0x40, both fallthrough and original jump
+    // meet at the instruction boundary 0x498A18. A jump that skipped the
+    // E8 did not enter the producer, so StageExtensionLeave is a no-op.
+    constexpr int StageExtensionLeaveHookRva(int callRva) noexcept
+    {
+        return callRva == 0x98A10 ? 0x98A18 : callRva + 5;
+    }
+    static_assert(StageExtensionLeaveHookRva(0x98A10) == 0x98A18);
+    static_assert(StageExtensionLeaveHookRva(0x9898E) == 0x98993);
+    static_assert(StageExtensionLeaveHookRva(0x98A36) == 0x98A3B);
+    static_assert(StageExtensionLeaveHookRva(0x98AC6) == 0x98ACB);
+
     constexpr float CenterMultiSpriteAxis(
     	float pixel, float axisScale, float containScale,
     	float screenExtent, float originalExtent) noexcept
@@ -2450,7 +2465,7 @@ public:
             StageExtensionEnterHooks[i] = safetyhook::create_mid(
                 Module::exe_ptr(rva), StageExtensionEnter);
             StageExtensionLeaveHooks[i] = safetyhook::create_mid(
-                Module::exe_ptr(rva + 5), StageExtensionLeave);
+                Module::exe_ptr(StageExtensionLeaveHookRva(rva)), StageExtensionLeave);
             stageExtensionOk = stageExtensionOk &&
                 StageExtensionEnterHooks[i] && StageExtensionLeaveHooks[i];
         }
@@ -2460,7 +2475,7 @@ public:
             StageExtensionPrintEnterHooks[i] = safetyhook::create_mid(
                 Module::exe_ptr(rva), StageExtensionEnter);
             StageExtensionPrintLeaveHooks[i] = safetyhook::create_mid(
-                Module::exe_ptr(rva + 5), StageExtensionLeave);
+                Module::exe_ptr(StageExtensionLeaveHookRva(rva)), StageExtensionLeave);
             stageExtensionOk = stageExtensionOk &&
                 StageExtensionPrintEnterHooks[i] &&
                 StageExtensionPrintLeaveHooks[i];

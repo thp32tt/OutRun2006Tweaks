@@ -18,6 +18,15 @@ def check(code: str, header: str) -> list[str]:
     def need(ok: bool, name: str) -> None:
         if not ok:
             errors.append(name)
+    # REA original x86 JNZ from RVA 0x98958 lands at 0x98A18.
+    # The original post-0x98A10 midhook at 0x98A15 overwrote that
+    # destination. Never regress to a five-byte detour across it.
+    need("constexpr int StageExtensionLeaveHookRva(int callRva)" in code and
+         "callRva == 0x98A10 ? 0x98A18 : callRva + 5" in code and
+         code.count("Module::exe_ptr(StageExtensionLeaveHookRva(rva)), StageExtensionLeave);") == 2 and
+         "static_assert(StageExtensionLeaveHookRva(0x98A10) == 0x98A18);" in code and
+         "Module::exe_ptr(rva + 5), StageExtensionLeave);" not in code,
+         "REA branch-into-post-CALL detour 0x98A15..0x98A19 regressed")
     start = code.find("class VRProjectedD3DXSpriteIsolationR64 : public Hook")
     end = code.find("// VR semantic bridge for the game's canonical queued 2D renderer.", start)
     need(start >= 0 and end > start, "R64 exact sprite-hook owner missing")
