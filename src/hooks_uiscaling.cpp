@@ -974,7 +974,8 @@ class UIScaling : public Hook
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker =
 			nullptr,
         const std::array<SpriteNode*, Game::SpritePriorityCount>* sourceRoots =
-            nullptr)
+            nullptr,
+        std::uint64_t preserveNewerExactSince = 0)
 	{
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -1020,7 +1021,8 @@ class UIScaling : public Hook
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope, producer, projectedMarker);
+					node, scope, producer, projectedMarker,
+                    preserveNewerExactSince);
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
@@ -1314,6 +1316,7 @@ class UIScaling : public Hook
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         StageExtensionRootsBefore{};
     inline static thread_local std::uint64_t StageExtensionCompleted = 0;
+    inline static thread_local std::uint64_t StageExtensionEntrySerial = 0;
     // Bracket both immediate numeric glyph draws and the original sprite
     // producer. A previous queue node's ScreenHud/World scope must not
     // override the current exact +TIME source when it rasterizes directly.
@@ -1325,6 +1328,11 @@ class UIScaling : public Hook
     {
         if (StageExtensionDepth++ != 0)
             return;
+        // Snapshot before the original source call: preserve only nested
+        // exact tags created during this E8, never stale ring-buffer tags.
+        StageExtensionEntrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
         for (int p = 0; p < Game::SpritePriorityCount; ++p)
         {
             SpriteNode* root = Game::sprite_prio_root[p];
@@ -1363,7 +1371,7 @@ class UIScaling : public Hook
         TagAppendedNodes(StageExtensionBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
             OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
-            nullptr, &StageExtensionRootsBefore);
+            nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
         // D3DX Draw can defer triangles beyond the original numeric CALL.
         // Close only a still-homogeneous +TIME batch while the exact direct
         // source is alive, before restoring the previous shader/HUD owner.
@@ -1384,6 +1392,7 @@ class UIScaling : public Hook
                 Game::game_mode ? *Game::game_mode : -1);
         StageExtensionBefore = {};
         StageExtensionRootsBefore = {};
+        StageExtensionEntrySerial = 0;
     }
 
     // The original GOAL animations print the large white record and

@@ -1186,10 +1186,34 @@ namespace OutRunVR::GameSemantic
             const ScopedExactProducerSemantic&) = delete;
     };
 
+    // An outer +TIME producer must not overwrite a different exact producer
+    // registered by a nested source while its original E8 call was active.
+    // Older node tags (including recycled pointers) remain replaceable.
+    constexpr bool PreserveNestedExactSpriteOwner(
+        ProducerToken existing, ProducerToken incoming,
+        std::uint64_t existingSerial, std::uint64_t entrySerial) noexcept
+    {
+        return entrySerial != 0 && existingSerial >= entrySerial &&
+            existing != ProducerToken::None && existing != incoming;
+    }
+    static_assert(PreserveNestedExactSpriteOwner(
+        ProducerToken::GoalTime020, ProducerToken::StageExtensionTime, 12, 12));
+    static_assert(PreserveNestedExactSpriteOwner(
+        ProducerToken::RankMarkerSprani, ProducerToken::StageExtensionTime, 13, 12));
+    static_assert(!PreserveNestedExactSpriteOwner(
+        ProducerToken::None, ProducerToken::StageExtensionTime, 12, 12));
+    static_assert(!PreserveNestedExactSpriteOwner(
+        ProducerToken::StageExtensionTime, ProducerToken::StageExtensionTime, 12, 12));
+    static_assert(!PreserveNestedExactSpriteOwner(
+        ProducerToken::GoalTime020, ProducerToken::StageExtensionTime, 11, 12));
+    static_assert(!PreserveNestedExactSpriteOwner(
+        ProducerToken::GoalTime020, ProducerToken::StageExtensionTime, 12, 0));
+
     inline void RegisterSpriteNodeScope(
         const void* node, RenderScope scope,
         ProducerToken producer = ProducerToken::None,
-        const ProjectedMarkerInfo* projectedMarker = nullptr) noexcept
+        const ProjectedMarkerInfo* projectedMarker = nullptr,
+        std::uint64_t preserveNewerExactSince = 0) noexcept
     {
         if (!node || scope == RenderScope::None)
             return;
@@ -1210,6 +1234,11 @@ namespace OutRunVR::GameSemantic
                     SpriteNodeSemanticTags[i].serial <=
                         SpriteNodeSemanticActiveQueueCutoff)
                     continue;
+                if (PreserveNestedExactSpriteOwner(
+                        SpriteNodeSemanticTags[i].producer, producer,
+                        SpriteNodeSemanticTags[i].serial,
+                        preserveNewerExactSince))
+                    return;
                 SpriteNodeSemanticTags[i].scope = scope;
                 SpriteNodeSemanticTags[i].producer = producer;
                 SpriteNodeSemanticTags[i].serial = serial;

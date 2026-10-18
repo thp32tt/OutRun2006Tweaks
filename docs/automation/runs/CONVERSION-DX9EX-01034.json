@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01034",
+  "production_id": "CONVERSION-DX9EX-01034",
+  "event_id": "CONVERSION-DX9EX-01034-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATION_PENDING",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve all six original +TIME sprite and numeric source associations across native queue and deferred D3DX GPU dispatch without retagging exact nested foreign producers.",
+    "scope_boundary": "Only original six 0x989xx +TIME E8 source parent and the shared optional sprite-tag registration guard. No changes to GOAL timing, rank projection, lens, SkyGlow, R26_SAFE, DX11, DXVK, FFB/input or native D3DX flush order.",
+    "trace_stages": [
+      "Three original +TIME sprani parent E8 and three numeric caller E8 enter StageExtension and snapshot queue plus current registration serial.",
+      "Queued SpriteNodes produced by exact original nested calls can register a different semantic before the outer post-E8 +TIME appended-node traversal.",
+      "R84 queue, Sumo replay and existing D3DX Begin/Draw/Flush/End propagate the authoritative producer via physical R33/R30 Draw to GPU left/right eye or native fail-closed path."
+    ],
+    "subcomponents": [
+      "Use source-entry serial to preserve only newly registered different exact nested producers during all six source parent calls, under existing semantic table mutex.",
+      "Retain native +TIME SpriteNode ScreenHud stamping for unknown, stale/recycled and same-source nodes; preserve pre-existing bounded tail/root proof and deferred D3DX batch/eye route, with compile-time positive/negative mutation regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_sprite_and_numeric_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "All six +TIME original source entry and queued/numeric native GPU producer identity",
+        "expected_behavior": "Stage sprites and glyphs keep native queue and D3DX ScreenHud ownership through existing R84 stereo path without losing the exact +TIME classification."
+      },
+      {
+        "id": "nested_foreign_producer_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Nested exact GOAL/rank, generic and reused SpriteNode identity across source call",
+        "expected_behavior": "New exact nested foreign tag survives outer +TIME post-call queue walk; None, stale old serial or same +TIME remains eligible for native Stage ownership."
+      },
+      {
+        "id": "stage_integrated_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Required exact SHA R84 Windows x86, OpenXR x64 host, package and affected regression gates",
+        "expected_behavior": "Final exact material SHA passes DX9Ex Active, Domain, HUD Inspector and Full Source Impact without skip; hardware Quest3 is explicitly separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_sprite_and_numeric_ownership": "PENDING_CI",
+    "nested_foreign_producer_isolation": "STATIC_ASSERT_SOURCE",
+    "stage_integrated_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Canonical original EXE has three sprani +TIME source CALLs 0x9898E/0x98A36/0x98AC6 and three number CALLs 0x989AD/0x98A10/0x98A89.",
+    "source_trace": [
+      "StageExtensionEnter captures original priority root and tail, then obtains exact stage direct HUD owner.",
+      "A nested original producer can publish a different exact queue node tag while an outer +TIME E8 source is active.",
+      "StageExtensionLeave traverses all appended children and previously overwrote any such newer exact tag.",
+      "Current R84 queue and D3DX batching submit the selected producer via R30/R33; incorrect ownership could select a foreign HUD eye route."
+    ],
+    "root_cause": "Outer post-E8 +TIME node registration had no serial-aware check to protect newly registered different exact original source tags, creating a source ownership collision under reentrant nested producer calls.",
+    "alternatives_rejected": [
+      "Avoid blanket HUD relabeling, global D3DX flushing, changing GOAL helper E8 or SkyGlow and native texture alpha order.",
+      "An older exact tag on recycled SpriteNode memory is not source proof and remains replaceable."
+    ],
+    "fix_evidence": "Monotonic semantic registry serial captured at original source entry, optional mutex-held exact nested tag guard on registration; original same-stage/unknown/stale nodes still updated.",
+    "negative_test_evidence": "Compile-time static_assert cases for GOAL/rank newer exact, unknown producer, same-stage, older reused node and zero-snapshot.",
+    "eye_ownership": "R84 physical Draw consumes queue tag as before; new guard preserves a genuine different nested owner until eye selection without implying actual HMD binocular pass."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "New source candidate and compile-time regressions. Do not score until exact-SHA CI; no hardware/Quest3 evidence."
+}
