@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01062",
+  "production_id": "CONVERSION-DX9EX-01062",
+  "event_id": "CONVERSION-DX9EX-01062-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "113c97cf4b9d61c1352a6bd5318779bfb503e3de",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/rank_marker_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/rank_marker_physical_source_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Retain the original projected car and rival rank Calc3D2D vehicle anchor through both R84 physical shader GPU eyes, including the matching original-game c64 producer and final right-eye state setter lifetime.",
+    "scope_boundary": "Only exact original projected car/rival rank source-owned shader draws; preserve separate 6th/6 ScreenHud, GOAL, +TIME, world/SkyGlow, lens, FFB/input, R26_SAFE, DX11 independent and DXVK frozen.",
+    "trace_stages": [
+      "Original OutRun car/rival Calc3D2D producer creates projected view-space vehicle anchors and exact SpriteNode or direct rank source identity.",
+      "R30 validates original game raw c64 shader, queue, producer and pose before preparing R84 binocular rank eye matrices.",
+      "R33 validates that same original c64 upload generation and physical rank source before LEFT, after native LEFT reentry, and after right-eye RT/depth/viewport/c64 setters before the physical RIGHT GPU draw; x64 OpenXR presentation remains separate."
+    ],
+    "subcomponents": [
+      "Define native C++ original raw rank WVP evidence with physical shader/epoch, original write/draw serial, queue producer/epoch, and pose congruence; keep R30 original source selection unchanged.",
+      "Integrate three R33 physical eye lifetime fences with original game WVP restore and stereo-right invalidation on foreign rank producer or car matrix reentry.",
+      "Expand existing compiled rank source smoke tests to cover stable source and changed writer, draw age, queue, car producer, pose and shader negative cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_car_anchor_stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_Calc3D2D_car_rank_physical_GPU_eye_source",
+        "expected_behavior": "Prepared rank stereo eyes only submit when the same original car anchor and raw c64 shader/queue source remain coherent at LEFT and RIGHT boundaries."
+      },
+      {
+        "id": "rank_reentrant_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "foreign_car_node_c64_writer_pose_shader_epoch_original_restore",
+        "expected_behavior": "Reentrant native or eye state setters changing rank owner, raw WVP writer, queue node/epoch, pose or shader refuse foreign right-eye submission while preserving restoration and original fallback."
+      },
+      {
+        "id": "rank_final_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex_R84_Windows_game_host_package_Domain_HUD_Inspector_Full_Source",
+        "expected_behavior": "The exact final result SHA passes all required GitHub Windows game, OpenXR host, package, domain, inspector and full-source gates; physical Quest3/VDXR remains untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R30GetOwnedRankRawWvp verified original game c64 for Calc3D2D projected car/rival rank at stereo eye preparation, but R33 only stamped queue marker/shader before left and after left without original raw writer or right setter revalidation.",
+    "root_cause": "R33 native shader projected rank could reuse prepared right-eye projection after original game c64 writer changed, while the physical marker and shader remained the same, or after right pass setters reentered a different car/queue.",
+    "source_trace": [
+      "Exact rank producer retains marker and queue source through existing original game callbacks, distinct from HUD 6th/6 rank.",
+      "R30 prepares the original source-owned car WVP only for previously verified raw shader, pose, producer and queue evidence.",
+      "R33 now captures original upload generation and producer before native LEFT, after LEFT, and immediately before RIGHT, reverting to native state restoration when identity changes."
+    ],
+    "eye_ownership": "LEFT and RIGHT require the same car anchor and original raw shader-upload generation; static/CI verification cannot prove actual Quest3 binocular visuals.",
+    "alternatives_rejected": [
+      "Do not force vehicle markers into flat ScreenHud or borrow unrelated world c64 for missing original source.",
+      "Do not remove the conservative fallback or globally widen producer ownership.",
+      "Do not confuse native right GPU draw identity with generic R33 stereo route counters."
+    ],
+    "fix_evidence": "Material C++ changes and compiled rank_marker_physical_source_smoke.cpp negative regression cases in commit 113c97cf4b9d61c1352a6bd5318779bfb503e3de"
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "rank_car_anchor_stereo": "PENDING_EXACT_SHA",
+    "rank_reentrant_native_fallback": "PENDING_EXACT_SHA",
+    "rank_final_exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "failed_material_policy_run": 39175949718,
+    "note": "CI policy requires run record in validation-bearing commit; source material SHA remains distinct"
+  }
+}
