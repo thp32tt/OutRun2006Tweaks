@@ -153,6 +153,26 @@ struct GameNativePreDrawFills {
         return count != 0u && device != 0u && backbuffer != 0u &&
             currentDevice == device && currentBackbuffer == backbuffer;
     }
+    // A recorded ColorFill is replayable only on the exact source surface.
+    // Recheck after a resize/reset and before submitting any native pixels.
+    [[nodiscard]] constexpr bool replay_ready(
+        std::uintptr_t currentDevice, std::uintptr_t currentBackbuffer,
+        std::uint32_t width, std::uint32_t height) const noexcept {
+        if (count == 0u) return true;
+        if (!belongs_to(currentDevice, currentBackbuffer) ||
+            count > kCapacity || width == 0u || height == 0u ||
+            width > 0x7fffffffu || height > 0x7fffffffu)
+            return false;
+        for (std::uint32_t i = 0u; i < count; ++i) {
+            const auto& fill = entries[i];
+            if (fill.left < 0 || fill.top < 0 ||
+                fill.right <= fill.left || fill.bottom <= fill.top ||
+                fill.right > static_cast<std::int64_t>(width) ||
+                fill.bottom > static_cast<std::int64_t>(height))
+                return false;
+        }
+        return true;
+    }
     [[nodiscard]] constexpr bool record(
         std::uintptr_t currentDevice, std::uintptr_t currentBackbuffer,
         std::int64_t left, std::int64_t top,

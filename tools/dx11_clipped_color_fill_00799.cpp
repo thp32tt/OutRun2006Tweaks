@@ -45,8 +45,25 @@ constexpr bool clipped_game_color_fill_batch() {
         batch.count != 2 || batch.record(7, 99, 0, 0, 10, 10, 100, 80, 0u) ||
         batch.record(7, 11, 10, 20, 0, 30, 100, 80, 0u))
         return false;
+    if (!batch.replay_ready(7, 11, 100, 80) ||
+        batch.replay_ready(7, 99, 100, 80) ||
+        batch.replay_ready(9, 11, 100, 80) ||
+        batch.replay_ready(7, 11, 99, 79) ||
+        batch.replay_ready(7, 11, 0, 80) ||
+        batch.replay_ready(7, 11, 0x80000000u, 80))
+        return false;
+    auto corrupted = batch;
+    corrupted.entries[0].left = -1;
+    if (corrupted.replay_ready(7, 11, 100, 80)) return false;
+    corrupted = batch;
+    corrupted.entries[1].bottom = 81;
+    if (corrupted.replay_ready(7, 11, 100, 80)) return false;
+    corrupted = batch;
+    corrupted.count = GameNativePreDrawFills::kCapacity + 1;
+    if (corrupted.replay_ready(7, 11, 100, 80)) return false;
     batch.discard();
-    return batch.count == 0 && !batch.belongs_to(7, 11);
+    return batch.count == 0 && !batch.belongs_to(7, 11) &&
+           batch.replay_ready(7, 11, 100, 80);
 }
 static_assert(clipped_game_color_fill_batch());
 int main() { assert(clipped_game_color_fill_batch()); }

@@ -4626,7 +4626,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
              reinterpret_cast<std::uintptr_t>(targetIdentity.Get())) ||
         !liveBatch.accepts_full_on_source_target(sourceOrdinal, true) ||
         !liveBatch.accepts_source_draw(sourceOrdinal, true) ||
-        s.preDrawFills.count != 0u || viewport.Width == 0u ||
+        viewport.Width == 0u ||
         viewport.Height == 0u) return false;
     // Intercept the REAL programmable game Draw's Z contract. Depth history
     // is owned by the isolated native DSV, never by the game's D3D9 surface.
@@ -4734,6 +4734,22 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     auto* device = s.backend.device();
     auto* context = s.backend.context();
     if (!device || !context) return false;
+    // The original menu/vehicle game can ColorFill the main backbuffer
+    // after its full TARGET Clear and before the first programmable Draw.
+    // Preserve ordered fills before native SM3 submission, or fail closed.
+    ComPtr<ID3D11DeviceContext1> preDrawContext;
+    if (liveBatch.first_draw() && s.preDrawFills.count != 0u) {
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        const auto targetId = reinterpret_cast<std::uintptr_t>(targetIdentity.Get());
+        if (!s.clearColor.matches(owner, targetId) ||
+            !s.preDrawFills.replay_ready(owner, targetId,
+                                         source.Width, source.Height) ||
+            !s.backend.color_rtv() ||
+            FAILED(context->QueryInterface(
+                IID_PPV_ARGS(preDrawContext.GetAddressOf()))) ||
+            !preDrawContext)
+            return false;
+    }
     ID3D11BlendState* extendedBlend = nullptr;
     if (customBlend) {
         const auto blendKey = sm3_live_blend_key(extendedDesc);
@@ -4908,6 +4924,24 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         s.backend.begin_frame(s.clearColor.native_color(
             reinterpret_cast<std::uintptr_t>(game),
             reinterpret_cast<std::uintptr_t>(targetIdentity.Get()), kBackground));
+        if (preDrawContext) {
+            // D3D9 ColorFill ignores blend, scissor and channel write masks.
+            // D3D11.1 ClearView copies each source ColorFill in order.
+            constexpr float scale = 1.0f / 255.0f;
+            for (std::uint32_t i = 0u; i < s.preDrawFills.count; ++i) {
+                const auto& fill = s.preDrawFills.entries[i];
+                const float rgba[4]{
+                    float((fill.argb >> 16) & 255u) * scale,
+                    float((fill.argb >> 8) & 255u) * scale,
+                    float(fill.argb & 255u) * scale,
+                    s.clearColor.opaqueDestinationAlpha ? 1.0f :
+                        float((fill.argb >> 24) & 255u) * scale};
+                const D3D11_RECT rect{
+                    static_cast<LONG>(fill.left), static_cast<LONG>(fill.top),
+                    static_cast<LONG>(fill.right), static_cast<LONG>(fill.bottom)};
+                preDrawContext->ClearView(s.backend.color_rtv(), rgba, &rect, 1u);
+            }
+        }
         s.preDrawFills.discard();
     }
     if (pipeline.program.vertexConstants)

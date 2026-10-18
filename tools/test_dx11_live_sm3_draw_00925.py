@@ -92,6 +92,31 @@ for token in (
 ):
     check(token in source, "SM3 converted game index ownership missing: " + token)
 
+# SM3 first-Draw source ColorFill must be replayed as actual GPU ClearView
+# BEFORE native Draw and only after matching owner, extent and D3D11.1.
+check("s.preDrawFills.count != 0u || viewport.Width" not in source,
+      "real SM3 source ColorFill still rejected unconditionally")
+for token in (
+    "s.preDrawFills.replay_ready(", "s.clearColor.matches(owner, targetId)",
+    "IID_PPV_ARGS(preDrawContext.GetAddressOf())",
+    "preDrawContext->ClearView(s.backend.color_rtv(), rgba, &rect, 1u)",
+    "s.clearColor.opaqueDestinationAlpha ? 1.0f",
+    "s.preDrawFills.discard();",
+):
+    check(token in source, "live SM3 pre-Draw replay missing: " + token)
+check(source.index("s.preDrawFills.replay_ready(") <
+      source.index("upload_full_game_stream(") <
+      source.index("preDrawContext->ClearView(") <
+      source.index("context->DrawIndexed(nativeIndexCount"),
+      "SM3 pre-Draw validation/replay must precede GPU draw")
+fill_header = (ROOT / "src/vr/d3d11/native_game_source_mutation.hpp").read_text()
+for token in (
+    "constexpr bool replay_ready(", "!belongs_to(currentDevice, currentBackbuffer)",
+    "count > kCapacity", "fill.right > static_cast<std::int64_t>(width)",
+    "fill.bottom > static_cast<std::int64_t>(height)",
+):
+    check(token in fill_header, "unsafe pre-Draw ColorFill replay: " + token)
+
 # New live SM3 raster/DSV implementation must bind actual GPU state, not
 # merely lift the old unsupported-depth/scissor admission rejection. Preserve
 # source-owned depth identity, first/continued Z clears, per-draw raster
