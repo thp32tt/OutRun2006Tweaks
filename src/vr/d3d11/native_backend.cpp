@@ -479,6 +479,16 @@ bool build_r283_sm3_mov_shader_source(
                 opcode = NativeSm3ArithmeticOpcode::LinearInterpolate; sourceCount = 3u; break;
             case D3DSIO_NRM:
                 opcode = NativeSm3ArithmeticOpcode::Normalize3; sourceCount = 1u; break;
+            case D3DSIO_LIT:
+                // Vertex lighting is part of the live game VS, not a pixel
+                // shader instruction. Preserve D3D9's positive-dot tests.
+                if (!vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::Lighting; sourceCount = 1u; break;
+            case D3DSIO_DST:
+                // The original D3D9 distance-vector instruction has distinct
+                // source lane requirements for the two operands.
+                if (!vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::Distance; sourceCount = 2u; break;
             case D3DSIO_CRS:
                 opcode = NativeSm3ArithmeticOpcode::Cross3; sourceCount = 2u; break;
             case D3DSIO_DP2ADD:
@@ -685,7 +695,12 @@ bool build_r283_sm3_mov_shader_source(
                     const unsigned required =
                         native_sm3_swizzled_components(
                             logicalComponents, swizzle);
-                    if (required == 0u ||
+                    // VS LIT/DST may write literal-only destination lanes.
+                    // Such operands consume no TEMP component; all other
+                    // zero-read modes remain unsupported and fail closed.
+                    if ((required == 0u &&
+                         op.opcode != NativeSm3ArithmeticOpcode::Lighting &&
+                         op.opcode != NativeSm3ArithmeticOpcode::Distance) ||
                         (tempWritten[reg] & required) != required)
                         return false;
                     value = "r283_t" + std::to_string(reg);

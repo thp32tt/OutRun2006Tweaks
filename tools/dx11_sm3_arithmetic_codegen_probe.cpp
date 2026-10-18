@@ -39,6 +39,8 @@ int main() {
     assert(emit(NativeSm3ArithmeticOpcode::Normalize3, 7u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::Cross3, 7u, 2u));
     assert(emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 3u));
+    assert(emit(NativeSm3ArithmeticOpcode::Lighting, 15u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::Distance, 15u, 2u));
     assert(emit(NativeSm3ArithmeticOpcode::DerivativeX, 3u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::DerivativeY, 12u, 1u));
     assert(out.find("ddx(input.r0.xyzw)") != std::string::npos);
@@ -50,6 +52,8 @@ int main() {
     assert(out.find("normalize((input.r0.xyzw).xyz)") != std::string::npos);
     assert(out.find("cross((input.r0.xyzw).xyz") != std::string::npos);
     assert(out.find("dot((input.r0.xyzw).xy") != std::string::npos);
+    assert(out.find("clamp(((input.r0.xyzw).w), -127.9961f, 127.9961f)") != std::string::npos);
+    assert(out.find("((input.r0.xyzw).y * (r283_t0.yxwz).y)") != std::string::npos);
     assert(out.find("output.r0.xy = r283_value_1.xy;") != std::string::npos);
     assert(out.find("dot((input.r0.xyzw).xyz, (r283_t0.yxwz).xyz)") !=
            std::string::npos);
@@ -69,6 +73,24 @@ int main() {
     assert(!emit(NativeSm3ArithmeticOpcode::Normalize3, 15u, 1u));
     assert(!emit(NativeSm3ArithmeticOpcode::Cross3, 15u, 2u));
     assert(!emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 2u));
+    assert(!emit(NativeSm3ArithmeticOpcode::Lighting, 15u, 2u));
+    assert(!emit(NativeSm3ArithmeticOpcode::Distance, 15u, 1u));
+    // LIT ignores source.z; DST's two inputs consume distinct physical
+    // source swizzles and only the lanes needed by the output mask.
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Lighting, 15u, 0u) == 11u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Lighting, 2u, 0u) == 1u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Lighting, 9u, 0u) == 0u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Distance, 15u, 0u) == 6u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Distance, 15u, 1u) == 10u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Distance, 1u, 0u) == 0u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Distance, 4u, 1u) == 0u);
     std::string operand = "input.r0.xyzw";
     assert(append_native_sm3_source_modifier(operand, 11u));
     assert(operand == "abs(input.r0.xyzw)");

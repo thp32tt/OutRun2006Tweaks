@@ -171,4 +171,18 @@ for token in (
 ):
     check(token in backend, "matrix native path or fallback missing: " + token)
 
+# Vertex lighting/distance ops flow through the real game-created shader
+# bytecode decoder and the native GPU shader emitter, never through a
+# fixed-function dummy pixel path. Unsupported PS opcode still fails closed.
+arith = (ROOT / "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp").read_text()
+for opcode, kind in (("D3DSIO_LIT", "Lighting"), ("D3DSIO_DST", "Distance")):
+    check("case " + opcode + ":" in backend and
+          "NativeSm3ArithmeticOpcode::" + kind in backend and
+          "NativeSm3ArithmeticOpcode::" + kind in arith,
+          "missing live vertex shader lighting/distance operation: " + opcode)
+check(backend.count("if (!vertexStage) return false;") >= 2,
+      "vertex-only lighting/distance must fail closed for pixel shader")
+check("127.9961f" in arith and "destinationMask & 0x0au" in arith and
+      "sourceIndex == 0u" in arith,
+      "D3D9 lit power clamp or dst physical lane contract missing")
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")
