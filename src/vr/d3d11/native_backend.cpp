@@ -1262,6 +1262,10 @@ bool compile_native_live_sm3_program(
             !compile_shader_source(pixelHlsl, "live_sm3_ps", "ps_4_0", pixelDxbc) ||
             !vertexDxbc || !pixelDxbc)
             return false;
+        // Vertex texture fetch needs independent VS tN/sN bindings;
+        // reject rather than sampling the wrong pixel-stage resources.
+        if (vertexHlsl.find("r283_texture") != std::string::npos)
+            return false;
         NativeLiveSm3Program candidate{};
         if (FAILED(device->CreateVertexShader(
                 vertexDxbc->GetBufferPointer(), vertexDxbc->GetBufferSize(),

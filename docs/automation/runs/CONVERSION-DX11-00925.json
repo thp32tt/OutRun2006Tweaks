@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00925",
+  "production_id": "CONVERSION-DX11-00925",
+  "event_id": "CONVERSION-DX11-00925-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00925",
+  "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SAMPLER_BINDING",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "c604e73b2fa0fa39e59011c0b782b4f03cc79110",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SAMPLER_BINDING",
+    "goal": "Connect real game ps_3_0 sampler declarations and TEXLD to D3D11 shader tN/sN samples, then bind live game resources and produce complete native menu/car/race Draw with original game fallback",
+    "acceptance_items": [
+      {
+        "id": "real_game_sampled_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_ps_sampler_resource_native_gpu_draw",
+        "expected_behavior": "Live D3D9 sN and TEXLD shader binds matching D3D11 SRV+sampler and native Draw/DrawIndexed outputs complete game frames"
+      },
+      {
+        "id": "sampler_fallback_regression",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_draw_input_ffb_safety",
+        "expected_behavior": "Undeclared, cube/volume, projected/bias and malformed PS sampler references reject natively, preserving D3D9 rendering/input/FFB"
+      },
+      {
+        "id": "five_gates_same_sha",
+        "category": "integrated_validation",
+        "behavior_area": "source_graph_build_backend_openxr_hud_ci",
+        "expected_behavior": "Sampler translation positive/negative regression and all five mandatory GitHub Actions pass at one exact validation-bearing SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "first_live_game_draw",
+    "integration_path": [
+      "live game R30 D3D9 Draw VS/PS and vertex declaration source",
+      "SM3 HLSL DXBC compilation plus exact D3D11 IA/constant-register binding",
+      "live game D3D9 sampler sN texture mirror into D3D11 tN/sN",
+      "native Draw/DrawIndexed with game-origin target, source ownership and DX9Ex fallback"
+    ],
+    "batch_components": [
+      "native_backend.cpp live SM3 shader object compiler",
+      "live_game_frame_bridge.cpp live SM3 constant/texture/vertex binding and native dispatch",
+      "native_backend.hpp program device resource owner",
+      "source graph isolated programmable draw audit",
+      "negative source regression for fallback and malformed vertex states"
+    ],
+    "conflict_keys": [
+      "DX11:REAL_GAME_DRAW",
+      "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
+      "DX11:SAMPLER_BINDING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FIRST_GAME_DRAW_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY: D3D11 live SM3 Draw compiled and wired; no real menu/car/race or HMD evidence yet",
+    "activation_guard_and_fallback": "Only explicit full-game opt-in, verified source RT0, no stencil/blend/Z, strict shader and sampler admit; D3D9 input/FFB/output survive all rejection; DXVK frozen",
+    "acceptance_proof": {
+      "positive_probe": "Source-only actual shader compilation and GPU tN/sN, b0, IA and Draw/DrawIndexed wiring; exact CI gates required",
+      "negative_regression": "Unsupported D3D9 state/vertex/sampler and source ownership abort native GPU publication, leave original D3D9",
+      "component_integration": "Real R30 game Draw source -> shader/decl/constants/texture mirrors -> native GPU draw -> existing output/fallback"
+    }
+  },
+  "acceptance_results": {
+    "real_game_sampled_draw": "SOURCE_IMPLEMENTED_NEED_GAMEPLAY_EVIDENCE",
+    "sampler_fallback_regression": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "five_gates_same_sha": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Branch HEAD 4a15fcab, 00923 exact-SHA source-stage build proved but live game programmable native Draw unfinished",
+    "C1_REVIEW": "Actual SM3 TEXLD was unsupported in R283",
+    "C2_IMPLEMENT": "Source shader TEXLD and sampler translation material f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
+    "C3_VALIDATE": "Required DX11 Fast, Backend, Win32 Build, OpenXR and HUD 5/5 SUCCESS on same exact validation-bearing repair SHA 79c2723b65b01c8ca83eb8a6299ad5bd77c945af; original source-only material SHA retained; no HMD/gameplay runtime test",
+    "C4_COMMIT": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; COMPLETE_BUILD_VERIFIED (SOURCE_STAGE_ONLY), exact validation-bearing SHA 79c2723b65b01c8ca83eb8a6299ad5bd77c945af; required 5/5 GitHub Actions SUCCESS. TERMINAL_STATUS_NOT_COMPLETE prior hold addressed for terminal build verification only. Live native D3D11 SRV/sampler bindings and real game Draw/visible frames remain pending per preserved acceptance_results. HMD/gameplay UNTESTED. Bookkeeping-only [skip ci], no duplicate scoring."
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Source connection implemented, but real native GPU game draw count and full scene unverified; shader/state subset limited",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "c604e73b2fa0fa39e59011c0b782b4f03cc79110",
+  "NEXT_IMPLEMENTATION_ACTION": "Confirm exact-SHA GitHub five gates; then game Quest3/VDXR run to measure SM3 native_draws and pixels; expand supported depth/blend state under same feature",
+  "hold_reason": "EXACT_SHA_CI_PENDING",
+  "validation_evidence": {
+    "scope": "SOURCE_SM3_DRAW_IMPLEMENTED_NOT_RUNTIME_VERIFIED",
+    "exact_sha": "PENDING",
+    "ci_status": "PENDING",
+    "ci_gate_count": "0/5",
+    "github_exact_sha_workflow_runs_verified": false,
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  }
+}

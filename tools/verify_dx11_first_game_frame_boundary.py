@@ -2,7 +2,7 @@
 """Constrained activation review for the FIRST_GAME_DRAW_FRAME diagnostic.
 
 This is an admission check, NOT evidence that a game/HMD frame was drawn.
-Only a small live-game FVF path is admitted; any other D3D11 Draw* still fails
+Only the verified live FVF and bounded SM3 paths are admitted; other D3D11 Draw* still fail
 verify_dx11_activation_boundary.py.
 """
 from pathlib import Path
@@ -147,14 +147,36 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("bool initialize(const NativeBackendConfig& config)" in native and
             "ID3D11RenderTargetView* color_rtv()" in native,
             "native device and render target ownership missing")
-    # Explicit native Draw dispatch permitted only inside the submit body.
-    # Unrelated code must never obtain implicit native promotion.
+    # Native Draw dispatch is confined to two independently source-admitted
+    # functions. Do not globally bless extra Draw* just because the new
+    # programmable path exists: a third Draw must still fail this review.
     match = re.search(r"bool submit\s*\(.*?\) noexcept \{(.*?)\n\}\n\nbool observe_source_device\(", code, re.S)
-    require(match is not None, "isolated submit function missing")
+    sm3 = re.search(r"bool submit_live_sm3_game_draw\s*\(.*?\) noexcept \{(.*?)\n\}\n\n// Reuse geometric growth", code, re.S)
+    require(match is not None and sm3 is not None,
+            "both isolated FVF and SM3 source-owned GPU submits required")
     dispatch = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", code)
     scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", match.group(1))
-    require(len(dispatch) == len(scoped) == 2,
-            "native Draw escapes the explicitly admitted diagnostic submit")
+    sm3_scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", sm3.group(1))
+    require(len(dispatch) == len(scoped) + len(sm3_scoped) == 4 and
+            len(scoped) == 2 and len(sm3_scoped) == 2,
+            "native Draw escapes the two admitted game source submits")
+    require(all(token in sm3.group(1) for token in (
+                "env_full_game_opt_in()", "game_native_backbuffer_ready(game, viewport)",
+                "s.clearColor.matches(", "s.frameBatch.accepts_full_on_source_target(",
+                "s.frameBatch.accepts_source_draw(", "s.preDrawFills.count != 0u",
+                "GetVertexDeclaration(", "live_sm3_shader_bytes(",
+                "live_sm3_input_layout(", "GetVertexShaderConstantF(",
+                "GetPixelShaderConstantF(", "capture_live_sm3_sampler(",
+                "mirror_texture(", "context->VSSetShader(",
+                "context->PSSetShader(", "context->PSSetShaderResources(",
+                "context->PSSetSamplers(", "context->DrawIndexed(",
+                "context->Draw(", "s.frameBatch.succeeded(",
+                "s.frameBatch.record_source_draw(sourceOrdinal)")),
+            "SM3 live native draw must retain exact source/constant/resource/fallback gates")
+    require("if (!submit_live_sm3_game_draw(" in code and
+            "s.frameBatch.abort();" in
+                code.partition("if (!submit_live_sm3_game_draw(")[2][:300],
+            "rejected live SM3 draw must cancel native publication")
     # Default remains one real D3D9 game Draw. Explicit double opt-in admits
     # only eight contiguous game Draws; the full-scene cursor visits draws
     # beyond the former first-64 limit. Preserve bounds, Z and fallback.
