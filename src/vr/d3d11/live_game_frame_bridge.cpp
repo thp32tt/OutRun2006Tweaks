@@ -4539,10 +4539,45 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-        stencil || fog || clipPlanes || fill != D3DFILL_SOLID ||
+        fog || clipPlanes || fill != D3DFILL_SOLID ||
         (colorMask & ~0x0fu) != 0u || srgbWrite != FALSE ||
         !game_native_backbuffer_ready(game, viewport))
         return false;
+    // A real programmable game Draw can use ALWAYS/one-sided stencil with
+    // zero write mask; that is pixel-equivalent to disabled stencil. A
+    // conditional test or any possible write must stay on original D3D9.
+    DWORD stencilFunc = 0u, stencilWriteMask = 0xffffffffu, twoSided = TRUE;
+    const bool stencilKnown = stencil == FALSE ||
+        (SUCCEEDED(game->GetRenderState(D3DRS_STENCILFUNC, &stencilFunc)) &&
+         SUCCEEDED(game->GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)) &&
+         SUCCEEDED(game->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)));
+    if (!GameNativeInertStencilMrt::stencil_equivalent_to_disabled(
+            stencil != FALSE, stencilKnown, stencilFunc,
+            stencilWriteMask, twoSided != FALSE))
+        return false;
+    // The native SM3 frame has exactly one color output. Extra D3D9 game
+    // targets can remain bound across menu/car/race Draws, but only when
+    // provably write-disabled. Dropping a writable MRT would publish a
+    // misleading native frame; reject it before uploading GPU resources.
+    D3DCAPS9 caps{};
+    if (FAILED(game->GetDeviceCaps(&caps)) ||
+        !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
+        return false;
+    constexpr D3DRENDERSTATETYPE extraColorMasks[] = {
+        D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,
+        D3DRS_COLORWRITEENABLE3
+    };
+    for (DWORD slot = 1u; slot < caps.NumSimultaneousRTs; ++slot) {
+        ComPtr<IDirect3DSurface9> extra;
+        const HRESULT hr = game->GetRenderTarget(slot, extra.GetAddressOf());
+        if (hr == D3DERR_NOTFOUND) continue;
+        DWORD extraMask = 0xffffffffu;
+        if (FAILED(hr) || !extra ||
+            FAILED(game->GetRenderState(extraColorMasks[slot - 1u],
+                                        &extraMask)) ||
+            !GameNativeInertStencilMrt::extra_target_inert(true, extraMask))
+            return false;
+    }
     // SM3 pixel alpha test is shader-side in D3D11, not a blend state.
     // Preserve the exact live game's compare and 8-bit reference per Draw.
     if (alpha != FALSE &&

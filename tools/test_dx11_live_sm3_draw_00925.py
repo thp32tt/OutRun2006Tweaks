@@ -236,3 +236,37 @@ check("if (customBlend &&" in source and
       "sm3_live_masked_blend_desc(" in source,
       "native game draw must fail before GPU mutation for invalid OM states")
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")
+
+# Native programmable menu/car/race Draw: admit inert stencil and MRT without
+# ever losing a conditional stencil test or writable extra D3D9 target.
+# Keep this assertion scoped to the *real live SM3 submit*, not a helper or
+# the fixed-function probe, so accidental fallback-only wiring is detected.
+sm3 = bridge.split("bool submit_live_sm3_game_draw(", 1)[1].split(
+    "// Reuse geometric growth buffers", 1)[0]
+def inert_gpu_draw_linked(body):
+    return all(token in body for token in (
+        "GetRenderState(D3DRS_STENCILFUNC, &stencilFunc)",
+        "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)",
+        "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)",
+        "stencil_equivalent_to_disabled(",
+        "GetDeviceCaps(&caps)",
+        "valid_mrt_count(caps.NumSimultaneousRTs)",
+        "GetRenderTarget(slot, extra.GetAddressOf())",
+        "if (hr == D3DERR_NOTFOUND) continue;",
+        "GetRenderState(extraColorMasks[slot - 1u],",
+        "extra_target_inert(true, extraMask)",
+        "context->Draw(", "context->DrawIndexed(",
+    )) and "stencil || fog || clipPlanes" not in body
+check(inert_gpu_draw_linked(sm3), "live SM3 draw must check inert stencil and every extra MRT")
+for token in (
+    "stencil_equivalent_to_disabled(",
+    "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)",
+    "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)",
+    "valid_mrt_count(caps.NumSimultaneousRTs)",
+    "GetRenderTarget(slot, extra.GetAddressOf())",
+    "extra_target_inert(true, extraMask)",
+):
+    check(not inert_gpu_draw_linked(sm3.replace(token, "removed_guard(", 1)),
+          "SM3 live native fallback regression did not detect removal of " + token)
+
+print('DX11 live SM3 inert-stencil/MRT positive and negative source regression PASS')
