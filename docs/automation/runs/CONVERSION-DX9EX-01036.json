@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_MATERIAL_COMMITTED_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "26c6e7471fc85117081202aacec0de15d4c1fd30",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "rank_marker_source_ownership": "PENDING_CI",
-    "rank_queue_root_fence": "PENDING_CI",
-    "rank_required_exact_sha": "PENDING_CI"
+    "rank_marker_source_ownership": "PASS_BUILD",
+    "rank_queue_root_fence": "PASS_BUILD",
+    "rank_required_exact_sha": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original FUN_004BAD20 projected rank producer emits first-place sprani siblings via 0xBB0FB/133/16C/1A5 and fourth-plus clipped glyph calls 0xBB21F/241/271/2BC/2D0, with live Calc3D2D anchor.",
@@ -87,5 +87,41 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "Material source SHA 26c6e7471fc85117081202aacec0de15d4c1fd30. Initial CI failed only because run record absent and verifier literal assumed old call signature; this follow-up fixes same-task contracts, retains stricter root proof and adds mutation checks. Quest3 HMD not run."
+  "notes": "Material source SHA 26c6e7471fc85117081202aacec0de15d4c1fd30. Initial CI failed only because run record absent and verifier literal assumed old call signature; this follow-up fixes same-task contracts, retains stricter root proof and adds mutation checks. Quest3 HMD not run. Final C6: exact-SHA required GitHub Actions 4/4 SUCCESS at 16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673; material source 26c6e7471fc85117081202aacec0de15d4c1fd30 and verifier/record CI correction same TASK. Bookkeeping adds no independent work score; RUNTIME_VALIDATION=UNTESTED.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "26c6e7471fc85117081202aacec0de15d4c1fd30",
+    "exact_sha": "16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673",
+    "runtime_validation": "UNTESTED",
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39117092532,
+        "conclusion": "success",
+        "exact_sha": "16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39117092420,
+        "conclusion": "success",
+        "exact_sha": "16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39117092426,
+        "conclusion": "success",
+        "exact_sha": "16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39117092470,
+        "conclusion": "success",
+        "exact_sha": "16eb2c9b8b27b38fc1e3d617ad3c7a3ae12c7673"
+      }
+    ],
+    "first_attempt": {
+      "sha": "26c6e7471fc85117081202aacec0de15d4c1fd30",
+      "reason": "Missing exact-HEAD task run record and stale P0 HUD verifier literals; same TASK narrow checker/record repair without weakening coverage."
+    }
+  }
 }
