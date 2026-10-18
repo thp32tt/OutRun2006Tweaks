@@ -3126,4 +3126,65 @@ for label, mutant in (
         raise SystemExit('P0 SceneEffect WVP mutation survived: ' + label)
 
 
+
+# R84 DX9Ex physical draw admission: pre-draw vetoes must not poison
+# the tracked mono-backup gap, depth generation or draw statistics.
+# This is the shipping R30 owner, not the separately compiled R26_SAFE.
+r30_r84_admission = read('src/vr/d3d9/stereo_renderer_r30.cpp')
+
+def check_r30_pre_draw_accounting(xyz, shader):
+    for label, body, start, draw in (
+        ('R30 XYZRHW/FVF142', xyz,
+         '!OutRunVR::HudNativeSource::IsExactFixedFnRankHud(',
+         'const HRESULT leftHr = leftDraw();'),
+        ('R30 shader ScreenHud/SceneEffect', shader,
+         'if (!leftWvpOk)', 'const HRESULT leftHr = actualDraw();'),
+    ):
+        for token in ('R29OwnerNoteStereoDrawWithoutMonoBackup();',
+                      'R29OwnerNoteMainDepthContentWrite();'):
+            if body.count(token) != 1:
+                raise SystemExit(f'{label}: missing/duplicated physical accounting {token}')
+        require_order(body, label + ' source/WVP before GPU accounting',
+                      start,
+                      'R29OwnerNoteStereoDrawWithoutMonoBackup();',
+                      'R29OwnerNoteMainDepthContentWrite();', draw)
+    if 'R29OwnerUndoStereoDrawCount();' in shader:
+        raise SystemExit('R30 shader: pre-GPU rollback must not undo a non-existent Draw')
+    require_order(shader, 'R30 left c64 upload failure returns without draw accounting',
+                  'if (!leftWvpOk)', 'return E_NOTIMPL;',
+                  'R29OwnerNoteStereoDrawWithoutMonoBackup();',
+                  'const HRESULT leftHr = actualDraw();')
+    require_order(xyz, 'R30 physical rank and result proofs precede accounting',
+                  'if (exactStage && !R30CaptureStagePhysicalSource(stageBefore))',
+                  'if (exactGoal && !R30CaptureGoalPhysicalSource(goalBefore))',
+                  '!OutRunVR::HudNativeSource::IsExactFixedFnRankHud(',
+                  'R29OwnerNoteStereoDrawWithoutMonoBackup();')
+
+xyz_body = function_body(r30_r84_admission, 'HRESULT R30ExecuteXyzrhwStereo(')
+screen_body = function_body(r30_r84_admission, 'HRESULT R30TryScreenSpaceFovDraw(')
+check_r30_pre_draw_accounting(xyz_body, screen_body)
+for desc, mutant_xyz, mutant_shader in (
+    ('premature XYZRHW accounting',
+     xyz_body.replace('R29OwnerNoteStereoDrawWithoutMonoBackup();', '', 1)
+             .replace('const bool exactRank = state.projectedWorldMarker;',
+                      'R29OwnerNoteStereoDrawWithoutMonoBackup();\n'
+                      'const bool exactRank = state.projectedWorldMarker;', 1),
+     screen_body),
+    ('premature shader accounting',
+     xyz_body,
+     screen_body.replace('R29OwnerNoteStereoDrawWithoutMonoBackup();', '', 1)
+                .replace('if (!leftWvpOk)',
+                         'R29OwnerNoteStereoDrawWithoutMonoBackup();\n'
+                         'if (!leftWvpOk)', 1)),
+    ('missing shader depth generation', xyz_body,
+     screen_body.replace('R29OwnerNoteMainDepthContentWrite();', '', 1)),
+):
+    try:
+        check_r30_pre_draw_accounting(mutant_xyz, mutant_shader)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('R84 pre-GPU draw accounting regression not detected: ' + desc)
+
+
 print('P0 visual composition static contract: PASS')

@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01038",
+  "production_id": "CONVERSION-DX9EX-01038",
+  "event_id": "CONVERSION-DX9EX-01038-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C5_GATES_PENDING",
+  "feature_id": "DX9EX:R84:PRE_DRAW_FRAME_STATE_CORRUPTION",
+  "feature_class": "CRITICAL_BLOCKER",
+  "symptom_id": "DX9EX:R84:PRE_DRAW_FRAME_STATE_CORRUPTION",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:R84:PRE_DRAW_FRAME_STATE_CORRUPTION",
+    "goal": "Correct native R84 stereo accounting across both XYZRHW fixed-function and shader-backed ScreenHud early-rejection paths so a source admission veto or failed left-eye c64 upload cannot falsely mark a GPU draw, lose the mono-backup baseline or advance depth generation without any raster submission.",
+    "scope_boundary": "R84 R30 shared GPU draw accounting and failed pre-left WVP upload only. Original +TIME/GOAL/rank producers, center flare semantics, R26_SAFE rollback, SkyGlow, native input and FFB, and DX11/DXVK branches remain unchanged.",
+    "special_work_evidence": "Verified exact code-level failure: R9NoteStereoDrawWithoutMonoBackup increments R9DrawCalls and sets R9MonoBackupGap before R30 exactRank/stage/GOAL/FVF142 rejection, and also before R30 shader left WVP upload; R9UndoStereoDrawCount only decrements the count without clearing the gap. Main depth content serial likewise increments before a raster draw exists.",
+    "trace_stages": [
+      "Original native +TIME/GOAL/HUD/rank producer enters R84 R30 exact source gate without an actual physical Draw yet.",
+      "R30 XYZRHW or shader-backed source admission/c64 upload can reject with E_NOTIMPL before actual left draw; before fix R9 frame flags/depth serial were already modified.",
+      "Only after successful pre-left admission/accounting does native left GPU Draw execute, followed by right-eye RT/Depth/WVP restoration and conservative mono fallback on actual hardware failures."
+    ],
+    "subcomponents": [
+      "Relocate XYZRHW per-frame mono-backup and main-depth accounting behind all exact source and fixed-function rank admission checks, preserving no-eye E_NOTIMPL fallback.",
+      "Relocate shader ScreenHud/SceneEffect accounting after successful left-eye c64 upload; eliminate bogus R9 draw-count undo while preserving left WVP rollback and fail-closed right-eye safety.",
+      "Add enforced shipping R84 source-order positive and negative mutation regression to the existing HUD/P0 verifier without disabling build, fallback, original SkyGlow or R26_SAFE checks."
+    ],
+    "acceptance_items": [
+      {
+        "id": "xyzhw_no_phantom_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 native fixed-function HUD, stage, GOAL and projected-rank queue to physical eye drawing",
+        "expected_behavior": "A rejected native-source/FVF142 pre-left R30 path never calls R9 draw/depth accounting; accepted owner still accounts once before first actual left GPU Draw."
+      },
+      {
+        "id": "shader_c64_failure_preserves_backup",
+        "category": "fallback_regression",
+        "behavior_area": "Shader ScreenHud/SceneEffect failed c64 upload and original fallback state",
+        "expected_behavior": "When native left c64 upload fails but is rolled back, no draw count, R9MonoBackupGap or main-depth generation change occurs and the original E_NOTIMPL fallback remains available. Failed restoration continues to trigger mono recovery."
+      },
+      {
+        "id": "r84_exact_sha_integrated_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 game, x64 host, R26_SAFE package, Domain Isolation, HUD Inspector and Full Source Impact",
+        "expected_behavior": "Material C++ and negative source mutations pass affected verifier and required exact-SHA GitHub Actions; matching Quest3 HMD remains separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "xyzhw_no_phantom_draw": "SOURCE_ORDER_STATIC_PASS_PENDING_CI",
+    "shader_c64_failure_preserves_backup": "SOURCE_ORDER_STATIC_PASS_PENDING_CI",
+    "r84_exact_sha_integrated_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Confirmed by native source code, not an observed Quest3 frame; compiler-level/behavioral fault is pre-submit state accounting before admission and WVP upload.",
+    "source_trace": [
+      "R30ExecuteXyzrhwStereo gates exact stage/GOAL/rank/FVF142 after R9 draw/depth accounting.",
+      "R30TryScreenSpaceFovDraw performed accounting before first eye c64 upload and only decremented draw count on failed upload.",
+      "R9NoteStereoDrawWithoutMonoBackup writes R9DrawCalls and R9MonoBackupGap, while R9UndoStereoDrawCount leaves R9MonoBackupGap set."
+    ],
+    "alternatives_rejected": [
+      "Changing D3DX Flush/producers, exact semantic tokens or SkyGlow would not correct state flags set before any physical Draw and risks unrelated output."
+    ],
+    "eye_ownership": "Left eye native Draw is the earliest legitimate point to account for a stereo submission; right eye and restore are separately recorded and not presumed on any E_NOTIMPL return.",
+    "root_cause": "R30 frame accounting is performed before the last fallible pre-GPU source and shader resource checks, which can report a raster/draw gap without a physical GPU submission."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "Material source correction and P0 verifier with negative mutations staged for final exact-SHA CI. 01037 GOAL work remains independent. No CI/HMD PASS claimed before matching evidence."
+}

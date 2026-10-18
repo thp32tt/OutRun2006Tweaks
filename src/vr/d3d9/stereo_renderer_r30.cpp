@@ -5633,11 +5633,6 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::EffectiveScope()))
                 R30CaptureSkyGlowSceneBeforeHud(device);
 
-            R29OwnerNoteStereoDrawWithoutMonoBackup();
-            if (R29OwnerLeftDrawMayWriteDepth(device) ||
-                R29OwnerLeftDrawMayWriteStencil(device))
-                R29OwnerNoteMainDepthContentWrite();
-
             // Unlike a generic HUD/particle, the projected car/rival marker
             // has one exact CPU Calc3D2D anchor shared by BOTH physical eyes.
             // Native left Draw may re-enter the game's queue/shader producer.
@@ -5698,6 +5693,14 @@ namespace OutRunVRStereo
                 !OutRunVR::HudNativeSource::IsExactFixedFnRankHud(
                     fixedRankBefore))
                 return E_NOTIMPL; // no physical eye submitted yet
+
+            // A failed native source admission has submitted no eye and must
+            // not mark a missing mono backup or a modified game depth buffer.
+            // Account only after all exact producer/FVF gates have passed.
+            R29OwnerNoteStereoDrawWithoutMonoBackup();
+            if (R29OwnerLeftDrawMayWriteDepth(device) ||
+                R29OwnerLeftDrawMayWriteStencil(device))
+                R29OwnerNoteMainDepthContentWrite();
 
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
@@ -7488,11 +7491,6 @@ namespace OutRunVRStereo
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
-            R29OwnerNoteStereoDrawWithoutMonoBackup();
-            if (R29OwnerLeftDrawMayWriteDepth(device) ||
-                R29OwnerLeftDrawMayWriteStencil(device))
-                R29OwnerNoteMainDepthContentWrite();
-
             bool leftWvpOk = false;
             {
                 R30ScopedInternalPass guard;
@@ -7516,9 +7514,16 @@ namespace OutRunVRStereo
                     R29OwnerArmMonoSafety();
                     return E_FAIL;
                 }
-                R29OwnerUndoStereoDrawCount();
                 return E_NOTIMPL;
             }
+
+            // A rejected left-eye c64 upload is not a GPU draw. Keep the
+            // pre-existing frame's mono-backup and depth serial untouched
+            // until the native game draw can actually be submitted.
+            R29OwnerNoteStereoDrawWithoutMonoBackup();
+            if (R29OwnerLeftDrawMayWriteDepth(device) ||
+                R29OwnerLeftDrawMayWriteStencil(device))
+                R29OwnerNoteMainDepthContentWrite();
 
             const HRESULT leftHr = actualDraw();
 
