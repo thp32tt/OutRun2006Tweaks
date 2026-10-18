@@ -153,15 +153,18 @@ if "SpriteNodeSemanticCount = 0;" in frame:
     fail("frame fence must preserve concurrent next-generation source tags")
 # Mutation proof: replacing frame cutoff with a live 'next serial' would
 # allow an early Present to erase work prepared by another producer thread.
+frame_safety_tokens = (
+    "tag.serial <= cutoff",
+    ": SpriteNodeSemanticFrameExpireCutoff;",
+    "if (deviceReset)",
+)
 for old, wrong in (
     ("tag.serial <= cutoff", "true"),
-    ("SpriteNodeSemanticFrameExpireCutoff", "SpriteQueueSemanticCutoff"),
+    (": SpriteNodeSemanticFrameExpireCutoff;", ": SpriteQueueSemanticCutoff;"),
     ("if (deviceReset)", "if (false)"),
 ):
     mutant = frame.replace(old, wrong, 1)
-    if mutant == frame or all(token in mutant for token in (
-            "tag.serial <= cutoff", "SpriteNodeSemanticFrameExpireCutoff",
-            "if (deviceReset)")):
+    if mutant == frame or all(token in mutant for token in frame_safety_tokens):
         fail("frame-fence mutation escaped: " + old)
 
 # Diagnostic/render-thread state should stay local; making these shared would
