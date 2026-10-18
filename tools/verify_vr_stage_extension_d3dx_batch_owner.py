@@ -45,11 +45,19 @@ def check(code: str, header: str) -> list[str]:
     goal_predicate = predicate("CanFlushD3DXDirectGoalAtExit")
     queued_stage_predicate = predicate("CanArmD3DXQueueStageAfterDraw")
     queued_goal_predicate = predicate("CanArmD3DXQueueGoalAfterDraw")
+    from re import search
+    sprite_array = search(r"StageExtensionSpraniCalls\[\]\s*=\s*\{([^}]*)\}", source)
+    sprite_members = ([int(token.strip(), 16) for token in
+                       sprite_array.group(1).split(",") if token.strip()]
+                      if sprite_array else [])
+    need(sprite_members == [0x9898E, 0x98A36] and
+         0x98AC6 not in sprite_members,
+         "REA mode=2 0x2C006C must never inherit +TIME ScreenHud owner")
     need("StageExtensionSpraniCalls[]" in source and
-         "0x9898E, 0x98A36, 0x98AC6" in source and
+         "0x9898E, 0x98A36"  in source and
          "StageExtensionPrintCalls[]" in source and
          "0x989AD, 0x98A10, 0x98A89" in source,
-         "six original source edges are not preserved")
+         "five original +TIME source edges or REA mode ownership changed")
     stage_enter = source[source.find("static void StageExtensionEnter("):
                          source.find("static void StageExtensionLeave(")]
     need("FlushD3DXBeforeDirectStageSource();" in stage_enter and
@@ -529,6 +537,18 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
     def need(conditions: bool, what: str) -> None:
         if not conditions:
             errors.append(what)
+    # REA SHA-pinned mode branches: mode=1/9 B4, mode=0/7/8 B5.
+    # RVA 0x98AC6 is mode=2's distinct 0x2C006C animation, not +TIME.
+    from re import search
+    sprite_array = search(
+        r"StageExtensionSpraniCalls\[\]\s*=\s*\{([^}]*)\}", code)
+    sprite_parents = ([int(x.strip(), 16) for x in
+                       sprite_array.group(1).split(",") if x.strip()]
+                      if sprite_array else [])
+    need(sprite_parents == [0x9898E, 0x98A36],
+         "REA mode=2 0x2C006C must not inherit +TIME ScreenHud")
+    need("0x989AD, 0x98A10, 0x98A89" in code,
+         "REA +TIME text and numeric source E8 parents missing")
     def scope(text: str, start: str, end: str) -> str:
         a = text.find(start)
         b = text.find(end, a + len(start)) if a >= 0 else -1
@@ -571,10 +591,10 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
     need("vr/game/hud_command_batch.hpp" in code and
          "inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};" in h,
          "live R64 uses one thread-local command ledger")
-    need("0x9898E, 0x98A36, 0x98AC6" in pre and
+    need("0x9898E, 0x98A36"  in pre and
          "0x989AD, 0x98A10, 0x98A89" in pre and
          "TagAppendedNodes(StageExtensionBefore" in pre,
-         "six exact +TIME sprite/numeric parents survive")
+         "five exact +TIME sprite/numeric parents survive")
     need("FlushD3DXBeforeDirectStageSource();" in pre and
          "FlushD3DXAtDirectStageSourceExit();" in pre and
          "StageExtensionDirectDrawOwner.reset();" in pre,
@@ -857,6 +877,13 @@ def main_current_ledger(code: str, header: str) -> int:
     errors.extend(check_r30_stage_raw_wvp(renderer))
     if errors:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
+        return 1
+    # Kill-test provenance: reintroducing the unrelated mode=2 sprite
+    # as an exact +TIME source must FAIL the live current-ledger verifier.
+    mutant = code.replace("0x9898E, 0x98A36\n",
+                          "0x9898E, 0x98A36, 0x98AC6\n", 1)
+    if mutant == code or not check_current_ledger(mutant, header, ledger):
+        print("DX9Ex +TIME REA FAIL: mode=2 animation relabel mutation escaped")
         return 1
     # Deliberately remove the *physical* raw-game WVP source stamp in
     # R30 only. R33 remaining intact cannot mask loss of XYZRHW stereo proof.

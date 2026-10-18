@@ -60,7 +60,8 @@ namespace
     static_assert(StageExtensionLeaveHookRva(0x98A10) == 0x98A18);
     static_assert(StageExtensionLeaveHookRva(0x9898E) == 0x98993);
     static_assert(StageExtensionLeaveHookRva(0x98A36) == 0x98A3B);
-    static_assert(StageExtensionLeaveHookRva(0x98AC6) == 0x98ACB);
+    // Original E8 at 0x98AC6 belongs to mode=2's 0x2C006C animation,
+    // not the mode=1/9 +TIME or mode=0/7/8 +TIME banners.
 
     constexpr float CenterMultiSpriteAxis(
     	float pixel, float axisScale, float containScale,
@@ -350,20 +351,20 @@ class UIScaling : public Hook
     // sibling HUD owner at source, never by promoting all generic 2D draws.
     // This group is wholly inside the original 0x97000..0x98000 result
     // presentation code, not world decals or the final static GOAL helpers.
-    // The original EXE stage-extension animation uses 0x989xx sprani
-    // E8 calls (two explicit 0x2C00B4/B5 sprite identifiers plus a
-    // 0x2C006C child), NOT the 0x97xxx result-progress print calls.
-    // Own only these three original producers, never general alpha or
-    // the completed GOAL display. Confirmed EXE SHA 68ceb386...
+    // REA and SHA-pinned E8 disassembly: mode 1/9 uses 0x2C00B4,
+    // mode 0/7/8 uses 0x2C00B5. 0x98AC6 instead creates the mode=2
+    // 0x2C006C animation and MUST NOT inherit +TIME ScreenHud ownership.
+    // Other modes and the separate 0x97xxx GOAL producers stay untouched.
     static constexpr int StageExtensionSpraniCalls[] = {
-        0x9898E, 0x98A36, 0x98AC6
+        0x9898E, 0x98A36
     };
+    static_assert(std::size(StageExtensionSpraniCalls) == 2);
     // Full original 0x98000 disassembly (SHA-pinned), beyond the sprani:
     // the FIRST original time-extension path calls 0x4973C0 twice and
     // 0x4974E0 once at these precise E8 parents. These are reused text/
     // number print helpers, not the sprani animation itself. If unowned,
     // they can render +TIME as generic head-locked overlay even while
-    // the three sprite decorations above are correct.
+    // the two +TIME sprite decorations above are correct.
     static constexpr int StageExtensionPrintCalls[] = {
         0x989AD, 0x98A10, 0x98A89
     };
@@ -1449,7 +1450,7 @@ class UIScaling : public Hook
             StageExtensionRootsBefore[p] = root;
             StageExtensionBefore[p] = root ? root->tail_4 : nullptr;
         }
-        // The six original source E8 CALLs can synchronously draw text as
+        // These five exact +TIME source E8 CALLs can synchronously draw text as
         // well as enqueue sprites. Post-call node tags only cover the latter.
         // Scope only this exact source call, never the shared text renderer.
         StageExtensionSavedScope = OutRunVR::GameSemantic::CurrentScope;
@@ -2581,7 +2582,7 @@ public:
 		}
         // The original +TIME transition emits BOTH decorated sprani AND
         // its 0x973C0/0x974E0 number/text helpers, each from a distinct
-        // canonical 0x989xx E8. Atomic install/rollback across ALL SIX
+        // canonical 0x989xx E8. Atomic install/rollback across ALL FIVE
         // original source parents; tag only the newly queued siblings.
         bool stageExtensionOk = true;
         for (unsigned i = 0; i < std::size(StageExtensionSpraniCalls); ++i)
@@ -2618,11 +2619,11 @@ public:
                 StageExtensionPrintLeaveHooks[i] = {};
             }
             spdlog::warn(
-                "VR P0 +TIME: incomplete 0x989xx sprani/print parent hook; rolled back all six");
+                "VR P0 +TIME: incomplete 0x989xx sprani/print parent hook; rolled back all five");
         }
         else
             spdlog::info(
-                "VR P0 +TIME: 3 original sprani + 3 print E8 parents -> SCREEN_HUD (game animation unchanged)");
+                "VR P0 +TIME: 2 extension sprani + 3 print E8 parents -> SCREEN_HUD; mode2 0x2C006C untouched");
 
         // Exact source RVA comparison against 2026-10-11 user minidump:
         // first result crash EIP 0x97C5F = inside old E9 displacement from
