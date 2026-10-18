@@ -136,6 +136,31 @@ namespace
     static_assert(TestStageFirstAppendedNode(),
         "+TIME must not read or relabel a stale source queue tail");
 
+    // Queue-root identity is not implied by a reachable old tail: a producer
+    // may rebuild the priority list and reattach that very same tail.
+    constexpr bool TestStageExtensionStableRoot() noexcept
+    {
+        using OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot;
+        StageTailFixture original{}, replacement{}, old{}, first{}, last{};
+        original.next_0 = &old;
+        old.next_0 = &first;
+        first.next_0 = &last;
+        if (FirstVerifiedAppendedNodeOnStableRoot(
+                &original, &original, &old, &last, 4) != &first)
+            return false;
+        replacement.next_0 = &old; // reattached old pointer, new root
+        if (StageFirstAppendedNode(&replacement, &old, &last, 4) != &first ||
+            FirstVerifiedAppendedNodeOnStableRoot(
+                &original, &replacement, &old, &last, 4))
+            return false;
+        return FirstVerifiedAppendedNodeOnStableRoot(
+                   &original, &original, &original, &last, 4) == &old &&
+               !FirstVerifiedAppendedNodeOnStableRoot(
+                   nullptr, &original, nullptr, &last, 4);
+    }
+    static_assert(TestStageExtensionStableRoot(),
+        "+TIME must reject a rebuilt foreign priority root even on tail reuse");
+
     // Multi-child rank and GOAL producers can append several queue nodes.
     // Retain both live siblings without consulting a detached old tail.
     constexpr bool TestExactRankGoalSiblingTailProof() noexcept
@@ -946,7 +971,9 @@ class UIScaling : public Hook
 		OutRunVR::GameSemantic::ProducerToken producer =
 			OutRunVR::GameSemantic::ProducerToken::None,
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker =
-			nullptr)
+			nullptr,
+        const std::array<SpriteNode*, Game::SpritePriorityCount>* sourceRoots =
+            nullptr)
 	{
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
@@ -972,8 +999,16 @@ class UIScaling : public Hook
                 producer == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite ||
                 producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
             {
-                node = StageFirstAppendedNode(
-                    root, before[prio], tailAfter, Game::SpriteNodeMax);
+                // Exact +TIME E8 snapshots both root and tail before native
+                // execution. The old tail may be valid under a DIFFERENT
+                // root after rebuild/reuse: such nodes belong to that new
+                // queue and must not inherit StageExtensionTime ownership.
+                node = sourceRoots
+                    ? OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
+                        (*sourceRoots)[prio], root, before[prio],
+                        tailAfter, Game::SpriteNodeMax)
+                    : StageFirstAppendedNode(
+                        root, before[prio], tailAfter, Game::SpriteNodeMax);
             }
             else
             {
@@ -1275,6 +1310,8 @@ class UIScaling : public Hook
         StageExtensionSavedScope = OutRunVR::GameSemantic::RenderScope::None;
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         StageExtensionBefore{};
+    inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
+        StageExtensionRootsBefore{};
     inline static thread_local std::uint64_t StageExtensionCompleted = 0;
     // Bracket both immediate numeric glyph draws and the original sprite
     // producer. A previous queue node's ScreenHud/World scope must not
@@ -1290,6 +1327,7 @@ class UIScaling : public Hook
         for (int p = 0; p < Game::SpritePriorityCount; ++p)
         {
             SpriteNode* root = Game::sprite_prio_root[p];
+            StageExtensionRootsBefore[p] = root;
             StageExtensionBefore[p] = root ? root->tail_4 : nullptr;
         }
         // The six original source E8 CALLs can synchronously draw text as
@@ -1323,7 +1361,8 @@ class UIScaling : public Hook
             return;
         TagAppendedNodes(StageExtensionBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
-            OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+            OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
+            nullptr, &StageExtensionRootsBefore);
         // D3DX Draw can defer triangles beyond the original numeric CALL.
         // Close only a still-homogeneous +TIME batch while the exact direct
         // source is alive, before restoring the previous shader/HUD owner.
@@ -1343,6 +1382,7 @@ class UIScaling : public Hook
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1);
         StageExtensionBefore = {};
+        StageExtensionRootsBefore = {};
     }
 
     // The original GOAL animations print the large white record and
