@@ -257,36 +257,41 @@ int main()
             ultraWide, std::numeric_limits<float>::infinity(),
             true, true, false, false) != ultraWide)
         return 41;
-    // A/B whole-feature regression: a fully captured 21:9/16:9 title
-    // needs authored 4:3 optical proportions WITHOUT trimming its texture.
-    // Car choice, transitions, other modes and invalid snapshots must remain
-    // full-width; explicit rollback and original crop stay authoritative.
-    using OutRunVrMenuAspect::PlanStateSensitiveMenuAspect;
-    auto stateAspect = [](float sampled, float client, unsigned state,
-        bool letterbox=true, bool complete=true, bool cropped=false,
-        bool native=false) {
-        return PlanStateSensitiveMenuAspect(sampled, client, state,
-            letterbox, complete, cropped, native);
-    };
-    if (std::fabs(stateAspect(ultraWide, ultraWide, 0x04) - fourThree) > 1.e-5f ||
-        std::fabs(stateAspect(wide, wide, 0x09) - fourThree) > 1.e-5f ||
-        stateAspect(ultraWide, ultraWide, 0x0A) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x0B) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x0C) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x10) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x16) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0xFFFFFFFFu) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x04, false) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x04, true, false) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x04, true, true, true) != ultraWide ||
-        stateAspect(ultraWide, ultraWide, 0x04, true, true, false, true) != ultraWide ||
-        stateAspect(fourThree, fourThree, 0x04) != fourThree ||
-        stateAspect(2496.f/2688.f,2496.f/2688.f,0x09) != 2496.f/2688.f ||
-        stateAspect(ultraWide, wide, 0x04) != ultraWide ||
-        !std::isnan(stateAspect(std::numeric_limits<float>::quiet_NaN(),
-            ultraWide,0x04)) ||
-        stateAspect(ultraWide,std::numeric_limits<float>::infinity(),
-            0x04) != ultraWide)
+    // Quest 3 observed main-menu text squeezed when a complete
+    // 3440x1440 capture was placed on a 4:3 optical quad without cropping
+    // its UV. The real pixels, not GameState or UILetterboxing alone,
+    // determine the aspect of the shared LOCAL-fixed left/right quad.
+    // Keep the existing 4:3-matte / explicit crop path separate.
+    using OutRunVrMenuAspect::PlanCommonFovTangents;
+    using OutRunVrMenuAspect::PlanOpticallyCenteredClip;
+    using OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState;
+    const auto commonMenuFov = PlanCommonFovTangents(
+        -.80f, .80f, -.80f, .80f, -.80f, .80f, -.80f, .80f);
+    const auto titleSourceAspect = PlanUncroppedAuthoredMenuAspect(
+        ultraWide, ultraWide, true, true, false, false, false);
+    const auto menuSourceAspect = PlanUncroppedAuthoredMenuAspect(
+        wide, wide, true, true, false, false, false);
+    const auto titleQuad = PlanOpticallyCenteredClip(
+        commonMenuFov, titleSourceAspect,
+        ResolveMenuOpticalCoverageForState(nullptr, 0x04u));
+    const auto menuQuad = PlanOpticallyCenteredClip(
+        commonMenuFov, menuSourceAspect,
+        ResolveMenuOpticalCoverageForState(nullptr, 0x09u));
+    const auto cropped43 = PlanCenteredContent(ultraWide, fourThree);
+    const auto croppedQuad = PlanOpticallyCenteredClip(
+        commonMenuFov, cropped43.aspect, 1.0f);
+    if (!commonMenuFov.valid || !titleQuad.valid || !menuQuad.valid ||
+        !cropped43.crop || !croppedQuad.valid ||
+        std::fabs(titleSourceAspect - ultraWide) > 1.e-5f ||
+        std::fabs(menuSourceAspect - wide) > 1.e-5f ||
+        // Physical X/Y ratio is preserved on both native mirror widths.
+        std::fabs(titleQuad.halfWidth / titleQuad.halfHeight -
+                  ultraWide) > 1.e-4f ||
+        std::fabs(menuQuad.halfWidth / menuQuad.halfHeight -
+                  wide) > 1.e-4f ||
+        std::fabs(croppedQuad.halfWidth / croppedQuad.halfHeight -
+                  fourThree) > 1.e-4f ||
+        !(titleQuad.halfWidth > 0.0f && menuQuad.halfHeight > 0.0f))
         return 47;
     using OutRunVrMenuAspect::PlanCapturedAspect;
     constexpr float desktopAspect = 3440.0f / 1440.0f;
