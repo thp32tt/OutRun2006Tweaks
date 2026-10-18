@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01047",
+  "production_id": "CONVERSION-DX9EX-01047",
+  "event_id": "CONVERSION-DX9EX-01047-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
+  "checkpoint": "C5_GATE_PENDING",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "a2796ce42b9a1622d8b799c03b0dce3dd8f48b95",
+  "validation_bearing_result_sha": "PENDING_CI",
+  "changed_files": [
+    "src/vr/game/sprite_queue_tail_proof.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Preserve the whole original gameplay HUD native sprite family including exact 6th/6 and timer text when original priority chains are rebuilt or recycled, without leaking a previous producer's eye owner onto foreign nodes.",
+    "scope_boundary": "Require real terminal native priority-tail proof for known exact native HUD SpriteNodes only, retaining earlier source-root identity, registration epochs and unchanged R84 per-eye rendering plus original fallback. Do not modify the stage timer, shader WVP, menu cropping, FFB, SkyGlow, R26_SAFE or other lanes.",
+    "trace_stages": [
+      "Original game animated 6th/6 and clip-digit gameplay HUD producers append into native priority root, with root and previous tail captured at exact E8 entry.",
+      "Post-call TagAppendedNodes and TagDirectVrSpriteNodes use the same bounded FirstVerifiedAppendedNodeOnStableRoot gate before registering an exact node and retaining newer nested producer serial.",
+      "R84 R30 fixed-function FVF142, XYZRHW and shader HUD draws consume the valid node producer and attempt both-eye D3D9 submissions ahead of x64 OpenXR host presentation."
+    ],
+    "subcomponents": [
+      "Reject absent prior tail snapshots rather than interpreting null as proof of an empty native priority: only the actual root sentinel can mean first-in-priority.",
+      "Require the current recorded tail to terminate the live bounded list so linked interior nodes, reclaimed tails and cyclic sprite queues never inherit a stale HUD/GOAL/+TIME eye owner.",
+      "Keep positive native first-entry and two-sibling queue ownership plus negative stale, re-linked, cycle, interior-tail and iteration-bound compile-time tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_native_siblings",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original rank and timer native gameplay HUD producer through stable SpriteNode root to R84 stereo draw",
+        "expected_behavior": "A genuine terminal tail and unchanged live root preserve all newly added siblings and their exact screen HUD ownership without changing game animation."
+      },
+      {
+        "id": "hud_foreign_queue_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Stale or malformed native priority queues, unknown producer and protected fallback",
+        "expected_behavior": "Null old tail, recycled nonterminal new tail, cyclic list and bounded reachability failure cannot relabel a foreign native sprite; fallback remains original drawing."
+      },
+      {
+        "id": "hud_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Win32 R84 native DX9Ex game and R26_SAFE, x64 OpenXR host, package, Domain and impacted source inspectors",
+        "expected_behavior": "Required GitHub Actions Gate succeeds on the same validation-bearing commit before BUILD_VERIFIED; independent Quest3 optical behavior stays UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_native_siblings": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "hud_foreign_queue_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "hud_exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original OutRun native HUD rank/timer/GOAL SpriteNode producer writes use priority-root sentinel tails; an absent captured tail is not an actual empty root and a recycled tail pointer can remain reachable inside a cyclic or extended list.",
+    "source_trace": [
+      "The before-source native snapshot records sprite_prio_root[prio] and root->tail_4 in existing hooks_textures.cpp and hooks_uiscaling.cpp.",
+      "The source queue proof previously admitted null oldTail as the empty list and returned a recorded newTail without checking that newTail->next_0 was terminal.",
+      "The common helper is the gate for exact native ScreenHud sprite registration that feeds existing R84 R30 fixed-function FVF142 and GPU per-eye submissions."
+    ],
+    "alternatives_rejected": [
+      "Do not globally classify unknown sprites as ScreenHud, force D3DX Flush, weaken source producer token checks, change world or SkyGlow eye mapping, or assert observed HMD errors from static proof."
+    ],
+    "root_cause": "The previous source append proof could accept a malformed null previous tail and an interior recorded newTail on a live root, granting invalid prior HUD source identity on a reused or cyclic queue.",
+    "fix_evidence": "Material implementation SHA a2796ce42b9a1622d8b799c03b0dce3dd8f48b95 changes the actual shared C++ SpriteNode tail reachability helper to require a non-null old tail and terminal live new tail.",
+    "negative_test_evidence": "TerminalTailQueueOwnershipGuards constexpr regression checks correct first-in-priority and multi-sibling tags, null before-tail, interior reused tail, cyclic new tail, detached tail and bounded traversal.",
+    "eye_ownership": "Only exact producer tags from a real terminal native queue tail reach the existing R84 HUD left/right Draw path; unknown source stays on unchanged native D3D9 fallback. Quest3 not exercised."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "a2796ce42b9a1622d8b799c03b0dce3dd8f48b95",
+    "initial_gate_sha": "a2796ce42b9a1622d8b799c03b0dce3dd8f48b95",
+    "initial_active_policy_run": 39137318778,
+    "initial_active_policy_failure": "MISSING_EXACT_HEAD_FEATURE_RUN_RECORD",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "One-source C++ strict native queue terminal ownership change plus constexpr positive/negative regressions. First exact SHA's DX9Ex Active policy gate rejected the absent 01047 feature record before game/host builds; this commit supplies the honest run contract without changing the original material SHA. No HMD acceptance or performance measurement and no score increment until independently confirmed user-visible outcome."
+}
