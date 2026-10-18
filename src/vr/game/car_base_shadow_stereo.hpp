@@ -136,11 +136,11 @@ constexpr bool SameCarShadowForRightEye(
         SameStereoDrawSource(beforeLeft, beforeRight);
 }
 static_assert(SameCarShadowForRightEye(
-    {11,20,30,30,40,50,0x100,60,true},
-    {11,20,30,30,40,50,0x100,60,true}));
+    {11,40,30,30,40,50,0x100,60,true},
+    {11,40,30,30,40,50,0x100,60,true}));
 static_assert(!SameCarShadowForRightEye(
-    {11,20,30,30,40,50,0x100,60,true},
-    {12,20,30,30,40,50,0x100,60,true}));
+    {11,40,30,30,40,50,0x100,60,true},
+    {12,40,30,30,40,50,0x100,60,true}));
 
 constexpr bool CanUseSpatialShadow(
     GameSemantic::ProducerToken producer, GameSemantic::RenderScope scope,

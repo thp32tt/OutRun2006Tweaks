@@ -82,5 +82,15 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "New source change is a physical right-eye shadow admission fix; C6 exact-SHA and Quest3 runtime verification pending; no prior-task point duplication."
+  "notes": "New source change is a physical right-eye shadow admission fix; C6 exact-SHA and Quest3 runtime verification pending; no prior-task point duplication. Same TASK CI repair: positive static assertion fixture had uploadDraw!=drawSerial; correcting test source generation, no additional score.",
+  "material_result_sha": "d119c8f09d31f4609b661a8eb51ed3d7d5892ced",
+  "validation_bearing_result_sha": null,
+  "ci_evidence": {
+    "failed_exact_sha": "d119c8f09d31f4609b661a8eb51ed3d7d5892ced",
+    "failed_run_id": 39128764462,
+    "failed_job_id": 117679388922,
+    "failed_step": "Windows HUD Inspector MSVC error C2607 src/vr/game/car_base_shadow_stereo.hpp:138 static assertion: positive fixture had uploadDraw=20 and drawSerial=40",
+    "repair": "Correct literal positive/negative compile-time fixture uploadDraw=40 matching drawSerial=40, production SameCarShadowForRightEye predicate and R33 physical right-eye implementation unchanged",
+    "required_gates_status": "PENDING_FINAL_EXACT_SHA"
+  }
 }
