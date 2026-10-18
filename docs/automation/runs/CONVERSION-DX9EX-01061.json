@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01061",
+  "production_id": "CONVERSION-DX9EX-01061",
+  "event_id": "CONVERSION-DX9EX-01061-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve original GOAL 0-99 progress and final result title/time glyph binocular source identity across native shader c64 writes, rejecting foreign original shader/epoch before either stereo eye while maintaining native fallback.",
+    "scope_boundary": "Only the original GOAL/result finite ScreenHud shader route; do not relabel StageExtensionTime +TIME, original gameplay 6th/6, lens, world, SkyGlow, rank, R26_SAFE, input/FFB, DX11 or frozen DXVK; Quest3 remains untested.",
+    "trace_stages": [
+      "Original OutRun GOAL 0-99 progress, nineteen B9200 result glyphs and time helpers produce exact source-owned HUD callbacks.",
+      "R84 R33 native shader GOAL physical draw retrieves the ORIGINAL raw game c64 upload shader identity/epoch and nonzero write/draw serial before its left-eye c64 upload.",
+      "GOAL shader capture rejects a known foreign/partial generation before the first eye and verifies the identical source again after native left before submitting right; unmatched queues fall back to original Draw and state restoration, host XR acceptance untested."
+    ],
+    "subcomponents": [
+      "Implement an exact original-game c64 shader/epoch admission predicate for the complete finite GOAL/result HUD producer family, including original shader-unbound and unavailable-tracker paths.",
+      "Wire pre-left and post-left source capture to the R84 R33 GOAL shader owner while preserving native original matrix rollback and right-eye safety fence.",
+      "Add compile-time positive and negative GOAL regression assertions for same, foreign, stale, partial, original-unbound and absent captured source."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_exact_physical_shader_generation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_GOAL_progress_and_result_glyph_to_two_eye_physical_GPU_source",
+        "expected_behavior": "The original GOAL or result glyph physical draw with captured c64 metadata is accepted only for an identical native vertex shader and generation before left and unchanged again before right."
+      },
+      {
+        "id": "goal_foreign_c64_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "foreign_or_stale_source_rollback_and_unbound_shader_original_fallback",
+        "expected_behavior": "Foreign shader, stale epoch and incomplete original c64 metadata reject stereo ownership; missing tracker and original unbound shader keep previous safe native behavior; +TIME, SkyGlow, input, FFB and R26_SAFE are unaffected."
+      },
+      {
+        "id": "goal_exact_sha_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows_x86_R84_x64_host_package_Domain_HUD_Inspector_Full_Source",
+        "expected_behavior": "Exact final validation-bearing commit passes DX9Ex Active Windows game/host/package, Domain Isolation, HUD Inspector and Full Source Impact without skipping CI; HMD correctness is not claimed."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "GOAL 0-99 and nineteen B9200 original result glyph callers reach native shader ScreenHud R84 physical GPU submission, separate from StageExtensionTime +TIME.",
+    "root_cause": "R33 captureGoalSource discarded missing/partial raw tracker but never matched a captured raw game c64 writer's shader identity or epoch to the actual GOAL shader. A known foreign write therefore looked complete and eligible for two eyes.",
+    "source_trace": [
+      "Original GOAL and B9200 result producers establish exact ScreenHud/ProducerToken and SpriteNode or bounded direct D3DX source ownership.",
+      "R84 R33 captureGoalSource now validates original c64 shader/epoch before native LEFT submission without confusing R32's private eye upload with original writes.",
+      "The existing after-LEFT recapture and native original c64 rollback/right-eye fence preserve original fallback; exact HMD geometry and image presentation remain unobserved."
+    ],
+    "eye_ownership": "Both eyes require the same physical GOAL source, shader identity and generation, stable pose and queue identity; foreign original c64 cannot become a GOAL binocular matrix.",
+    "alternatives_rejected": [
+      "Do not reuse +TIME StageExtensionTime token for GOAL or broaden ScreenHud to world and unknown glyphs.",
+      "Do not zero out a captured foreign original WVP and relabel it as unavailable so that the old fallback accidentally admits stereo ownership."
+    ],
+    "fix_evidence": "R84 GOAL source-header predicate and R33 physical GPU pre-left capture changed in material source; HMD symptoms require actual headset reproduction."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "goal_exact_physical_shader_generation": "PENDING_BUILD",
+    "goal_foreign_c64_native_fallback": "PENDING_BUILD",
+    "goal_exact_sha_required_gates": "PENDING_EXACT_SHA"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_PLUS_PRE_CI_RUN_RECORD"
+}

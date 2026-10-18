@@ -37,6 +37,39 @@ namespace OutRunVR::GoalPhysical
         source.rawWvpDrawSerial = complete ? drawSerial : 0;
         return source;
     }
+    // The native GOAL/result Draw may follow an original c64 write from a
+    // *different* vertex shader or shader generation (for example, a racing
+    // world pass reentering the result queue). Captured foreign provenance
+    // must never be recast as missing evidence and accepted for either eye.
+    // R32's private left/right uploads are not original game writes.
+    constexpr bool MatchesCapturedOriginalWvp(
+        bool captured, std::uintptr_t physicalShader,
+        std::uint64_t physicalShaderEpoch,
+        std::uintptr_t writtenShader, std::uint64_t writtenShaderEpoch,
+        std::uint64_t writeSerial, std::uint64_t drawSerial) noexcept
+    {
+        return !captured ||
+            (writeSerial != 0 && drawSerial != 0 &&
+             physicalShader == writtenShader &&
+             physicalShaderEpoch == writtenShaderEpoch &&
+             (physicalShader == 0 || physicalShaderEpoch != 0));
+    }
+    static_assert(MatchesCapturedOriginalWvp(
+        true, 0x100, 7, 0x100, 7, 4, 3));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 7, 0x200, 7, 4, 3));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 7, 0x100, 6, 4, 3));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 7, 0x100, 7, 0, 3));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 7, 0x100, 7, 4, 0));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 0, 0x100, 0, 4, 3));
+    static_assert(MatchesCapturedOriginalWvp(
+        true, 0, 0, 0, 0, 4, 3)); // original unbound shader
+    static_assert(MatchesCapturedOriginalWvp(
+        false, 0x100, 7, 0x200, 6, 0, 0)); // genuinely absent
     constexpr bool IsGoal(const Source& s) noexcept
     {
         return GameSemantic::CanReprojectFiniteResultHudPlane(s.scope, s.producer) &&

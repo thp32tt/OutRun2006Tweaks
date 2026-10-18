@@ -1056,10 +1056,21 @@ namespace OutRunVRStereo
                 std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
                 std::uintptr_t rawShader = 0;
                 std::uint64_t rawShaderEpoch = 0;
-                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                const bool rawCaptured =
+                    OutRunVRRenderer::GetLastRawGameWvpWrite(
                         originalRawWvp, rawWriteSerial, rawDrawSerial,
-                        rawShader, rawShaderEpoch) ||
-                    rawWriteSerial == 0 || rawDrawSerial == 0)
+                        rawShader, rawShaderEpoch);
+                if (!OutRunVR::GoalPhysical::MatchesCapturedOriginalWvp(
+                        rawCaptured, shader, shaderEpoch,
+                        rawShader, rawShaderEpoch,
+                        rawWriteSerial, rawDrawSerial))
+                {
+                    // Known foreign/incomplete original c64 cannot own GOAL
+                    // sprites or result glyphs. Restore the game's WVP and
+                    // let the existing native fallback draw unchanged.
+                    return OutRunVR::GoalPhysical::Source{};
+                }
+                if (!rawCaptured)
                 {
                     rawWriteSerial = 0;
                     rawDrawSerial = 0;
