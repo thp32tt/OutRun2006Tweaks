@@ -302,6 +302,13 @@ def check(ui, manifest, fraction_header=None):
             "RenderScope::ScreenHud, producer" not in exact_owned or
             "RenderScope::WorldBillboard" in exact_owned):
         fail("exact clip HUD lost all-node ScreenHud tagging")
+    if ("rootsBefore[prio] = root;" not in exact_owned or
+            not re.search(
+                r"TagAppendedNodes\s*\(\s*tailsBefore\s*,\s*"
+                r"OutRunVR::GameSemantic::RenderScope::ScreenHud\s*,\s*"
+                r"producer\s*,\s*nullptr\s*,\s*&rootsBefore\s*\)",
+                exact_owned)):
+        fail("exact HUD and pause-arrow clips must prove original live root")
     exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
     ordered(exact_clip, "generic clip HUD token forwarding",
             "return ExactScreenHud_putClipSpriteOwned(",
@@ -317,6 +324,16 @@ def check(ui, manifest, fraction_header=None):
     if ("RenderScope::ScreenHud" not in glyph or
             "ProducerToken::TextGlyphPutSprite" not in glyph):
         fail("glyph ScreenHud lost tag")
+    # A second reference in the generic queue admission list is not
+    # enough: only the common glyph's actual fallback registration proves
+    # the original output token survived native sprite submission.
+    if ("rootsBefore[prio] = root;" not in glyph or
+            not re.search(
+                r"TagAppendedNodes\s*\(\s*tailsBefore\s*,\s*"
+                r"OutRunVR::GameSemantic::RenderScope::ScreenHud\s*,\s*"
+                r"OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite\s*,\s*"
+                r"nullptr\s*,\s*&rootsBefore\s*\)", glyph)):
+        fail("native common glyph fallback token/root lost")
     # Left/right HUD entry points adjust position before forwarding to the
     # one exact ScreenHud registration owner. A valid EXE CALL map alone cannot
     # detect accidental reversed offsets, dropped spacing, or bypassing the
@@ -477,8 +494,14 @@ def test_mutations(ui, manifest):
                          "OutRunVR::GameSemantic::ProducerToken::None);\n        const int result", 1))
     must_fail("4th place hooked as HUD", ui.replace("Module::exe_ptr(addr), RankMarker_putClipSprite,",
                                                    "Module::exe_ptr(addr), ExactScreenHud_putClipSprite,", 1))
-    must_fail("glyph token drift", ui.replace("ProducerToken::TextGlyphPutSprite",
-                                               "ProducerToken::RankMarkerClipSprite", 1))
+    # Change the actual common glyph node registration (not the new
+    # TagAppendedNodes admission list, which appears earlier in the TU).
+    must_fail("glyph token drift", ui.replace(
+        "OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite,\n                nullptr, &rootsBefore);",
+        "OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,\n                nullptr, &rootsBefore);", 1))
+    must_fail("exact clip live-root proof removed", ui.replace(
+        "RenderScope::ScreenHud, producer,\n            nullptr, &rootsBefore);",
+        "RenderScope::ScreenHud, producer,\n            nullptr, nullptr);", 1))
     must_fail("rank world first", ui.replace("if (RankMarkerSubScreenHudDepth != 0)",
                                             "if (RankMarkerSubScreenHudDepth == 0)", 1))
     must_fail("rank producer loses local anchor freeze",

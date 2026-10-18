@@ -87,6 +87,33 @@ namespace OutRunVR::SpriteQueue
         }
         static_assert(TextGlyphQueueRebuildGuards(),
             "Original glyphs must not inherit a rebuilt/foreign queue tail");
+
+        // Exact native HUD/ESC clips may enqueue several siblings after
+        // one original E8. Bounded proof must cover the last sibling and
+        // reject a replaced root or relinked old queue tail.
+        constexpr bool ExactClipQueueRebuildGuards() noexcept
+        {
+            Node root{}, oldTail{}, first{}, second{}, other{}, newRoot{};
+            root.next_0 = &oldTail;
+            oldTail.next_0 = &first;
+            first.next_0 = &second;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &second, 4) != &first)
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &second, 2))
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &newRoot, &oldTail, &second, 4))
+                return false;
+            oldTail.next_0 = &other;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &second, 4))
+                return false;
+            return true;
+        }
+        static_assert(ExactClipQueueRebuildGuards(),
+            "Exact HUD/ESC sibling lists must prove stable-root reachability");
     }
 
 }
