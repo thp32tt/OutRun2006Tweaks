@@ -203,7 +203,11 @@ def offscreen_rect_contract(code, fixture):
     return all(x in color for x in (
         "prepare_offscreen_game_draw(gameTarget)",
         "live_game_stereo::color_clear_route(", 
-        "rectContext->ClearView(gameTarget, rgba, region, 1u);",
+        "rectContext->ClearView(gameTarget, rgba, actual, 1u);",
+        "camera_clear_coverage(",
+        "if (!covered.valid) return false;",
+        "if (covered.empty) return true;",
+        "const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;",
         "raster_partial_eye_color_clear(",
         "context_->ClearRenderTargetView(gameTarget, rgba);",
     )) and all(x in depth for x in (
@@ -220,13 +224,26 @@ def offscreen_rect_contract(code, fixture):
     ))
 assert offscreen_rect_contract(source, probe)
 assert not offscreen_rect_contract(source.replace(
-    "rectContext->ClearView(gameTarget, rgba, region, 1u);", "", 1), probe)
+    "rectContext->ClearView(gameTarget, rgba, actual, 1u);", "", 1), probe)
 assert not offscreen_rect_contract(source.replace(
     "return raster_partial_eye_depth_clear(\n            context_, gameDepth",
     "return missing_partial_depth(\n            context_, gameDepth", 1), probe)
 assert not offscreen_rect_contract(source, probe.replace(
     "rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible",
     "true"))
+
+
+# A physical mip camera Clear must use the effective D3D9 viewport/scissor
+# GPU coverage before either color or Z/stencil changes the native eye's
+# source. Prevent future regressions that widen a legitimate clipped Clear.
+assert "actualCameraScissor" in probe and "outside[0] == 0u" in probe
+assert not offscreen_rect_contract(source.replace(
+    "const auto covered = camera_clear_coverage(",
+    "const auto covered = unchecked_camera_clear_coverage(", 1), probe)
+assert not offscreen_rect_contract(source.replace(
+    "if (covered.empty) return true;", "return true;", 1), probe)
+assert not offscreen_rect_contract(source, probe.replace(
+    "outside[0] == 0u", "true", 1))
 
 # Both independent game-camera and ring-eye Clear paths must admit a real
 # float color shader only for compatible typed D3D11 render-target views.
