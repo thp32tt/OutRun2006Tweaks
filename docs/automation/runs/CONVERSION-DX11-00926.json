@@ -52,8 +52,8 @@
     ]
   },
   "acceptance_results": {
-    "real_sm3_native_cull_blend_draw": "SOURCE_AND_GPU_PATH_BUILT_NO_LIVE_GAME_PIXEL_EVIDENCE",
-    "unsupported_state_fallback": "SOURCE_NEGATIVE_REGRESSION_AND_FAST_PASS_RUNTIME_UNTESTED",
+    "real_sm3_native_cull_blend_draw": "PASS_BUILD_SOURCE_GPU_PATH_NO_GAME_PIXEL_EVIDENCE",
+    "unsupported_state_fallback": "PASS_SOURCE_NEGATIVE_REGRESSION_AND_FAST",
     "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "development_strategy": {
@@ -75,7 +75,7 @@
       "DX11:FULL_RESOLUTION_GAME_FRAME",
       "DX11:SM3_CULL_BLEND"
     ],
-    "full_gate_plan": "one_validation_bearing_sha_after_causal_failed_build_repair",
+    "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED; REAL_GAME_NATIVE_DRAW_COUNT_AND_MENU_CAR_RACE_PIXELS_UNTESTED",
     "activation_guard_and_fallback": "Native full-game path requires explicit opt-in; all unsupported blend, depth, stencil, fog, scissor and source ownership fail closed; DXVK frozen.",
@@ -83,7 +83,12 @@
       "positive_probe": "SM3 live GPU Draw/DrawIndexed source link with correct raster+OM blend; Windows Build and Backend gates PASS exact SHA",
       "negative_regression": "Unsupported D3D9 states reject native candidate; legacy cull destructive mutation still rejects; DX11 Fast PASS",
       "component_integration": "Live D3D9 programmable shader & state->D3D11 IA/VS/PS/Raster/OM->native Draw->original D3D9 guaranteed fallback"
-    }
+    },
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
