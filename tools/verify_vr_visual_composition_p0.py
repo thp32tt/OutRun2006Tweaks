@@ -3150,7 +3150,8 @@ def check_r30_pre_draw_accounting(xyz, shader):
                       'R29OwnerNoteMainDepthContentWrite();', draw)
     if 'R29OwnerUndoStereoDrawCount();' in shader:
         raise SystemExit('R30 shader: pre-GPU rollback must not undo a non-existent Draw')
-    require_order(shader, 'R30 left c64 upload failure returns without draw accounting',
+    failed_upload = shader[shader.index('if (!leftWvpOk)'):]
+    require_order(failed_upload, 'R30 left c64 upload failure returns without draw accounting',
                   'if (!leftWvpOk)', 'return E_NOTIMPL;',
                   'R29OwnerNoteStereoDrawWithoutMonoBackup();',
                   'const HRESULT leftHr = actualDraw();')
