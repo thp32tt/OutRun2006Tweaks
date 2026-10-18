@@ -89,7 +89,7 @@
     "failed_preflight_conclusion": "failure",
     "failed_preflight_cause": "Run record absent at source commit; --check-head policy gate failed before compiling. No native compile failure reported.",
     "validation_bearing_result_sha": null,
-    "required_gates_state": "PENDING_ALL_FOUR_ON_FINAL_VALIDATION_BEARING_SHA",
+    "required_gates_state": "PENDING_ALL_FOUR_ON_ACTUAL_TRIGGERING_FINAL_HEAD",
     "runtime_validation": "UNTESTED",
     "source_and_ci_repair_head_sha": "765f4cc99c60452913902c6da8793d915ce94afb",
     "source_and_ci_repair_head_active": {
@@ -101,9 +101,11 @@
       "run_id": 39148938081,
       "conclusion": "success",
       "head_sha": "765f4cc99c60452913902c6da8793d915ce94afb"
-    }
+    },
+    "inert_candidate_commit_sha": "983d1598a56c51e64458b0d5dbfbcfdd5d7c2d82",
+    "inert_candidate_reason": "Negated CI directive in previous commit message still matched GitHub runner skip pattern; previous SHA has zero checks and is not a valid exact SHA gate owner."
   },
-  "notes": "Same TASK_ID retry E003 fixes the exact failed DX9Ex Active policy prerequisite by publishing the missing one-function run record. C++ source and native regression implementation remain at material SHA 8aa0350. This record commit is not another standalone functional accomplishment and is not scored separately. Final exact-SHA CI and later C6 are separate; no Quest3/VDXR test occurred. Final C5 exact-SHA reconciliation records unchanged original material source and verified follow-up C++ host compile repair; requested final four required GitHub Gates must attach to the new single validation-bearing HEAD, not prior successful mixed SHAs. HMD remains UNTESTED; CI repair/checkpoint is +0 independent score.",
+  "notes": "Same TASK_ID retry E003 fixes the exact failed DX9Ex Active policy prerequisite by publishing the missing one-function run record. C++ source and native regression implementation remain at material SHA 8aa0350. This record commit is not another standalone functional accomplishment and is not scored separately. Final exact-SHA CI and later C6 are separate; no Quest3/VDXR test occurred. Final C5 exact-SHA reconciliation records unchanged original material source and verified follow-up C++ host compile repair; requested final four required GitHub Gates must attach to the new single validation-bearing HEAD, not prior successful mixed SHAs. HMD remains UNTESTED; CI repair/checkpoint is +0 independent score. Replace inert candidate commit with a fresh triggering change; all four integration workflows must actually execute and report SUCCESS for the new HEAD before C6.",
   "validation_bearing_result_sha": null,
   "ci_repair_history": [
     {
