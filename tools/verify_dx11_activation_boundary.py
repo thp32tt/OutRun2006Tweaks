@@ -339,20 +339,40 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "return game_source_target_bound(gameTarget) &&",
         "geometry_outputs_isolated(gameTarget);",
     ]
+    # The camera's physical RTV view and actual immediate-context raster
+    # state must be inspected BEFORE replaying any eye postpass commands.
+    # This remains separate from clipped D3D9 Clear semantics.
+    raster_section = section(
+        "[[nodiscard]] bool camera_draw_coverage(",
+        "\n// Only game Draws addressed to THIS eye's real RTV+DSV")
+    raster_guards = [
+        "ctx->RSGetViewports(&viewportCount, &viewport);",
+        "ctx->RSGetState(rasterizer.GetAddressOf());",
+        "scissorEnabled = desc.ScissorEnable != FALSE;",
+        "ctx->RSGetScissorRects(&count, &scissor);",
+        "return native_game_camera_draw_coverage(",
+    ]
+    coverage_guards = [
+        "bool requireDrawableRaster) noexcept {",
+        "if (requireDrawableRaster) {",
+        "gameTarget->GetResource(resource.GetAddressOf());",
+        "native_game_camera_rtv_extent(allocation, selected);",
+        "!camera_draw_coverage(context_, camera.width, camera.height)",
+    ]
     plain_guards = [
-        "if (!vertexCount || !prepare_offscreen_game_draw(gameTarget))",
+        "if (!vertexCount || !prepare_offscreen_game_draw(gameTarget, true))",
         "context_->Draw(vertexCount, startVertex);",
         "++drawCount_;",
     ]
     indexed_guards = [
-        "if (!indexCount || !prepare_offscreen_game_draw(gameTarget))",
+        "if (!indexCount || !prepare_offscreen_game_draw(gameTarget, true))",
         "context_->DrawIndexed(indexCount, startIndex, baseVertex);",
         "++drawCount_;",
     ]
     instanced_guards = [
         "if (!live_game_stereo::may_issue_instanced(",
         "verticesPerInstance, instanceCount, drawCount_) ||",
-        "!prepare_offscreen_game_draw(gameTarget))",
+        "!prepare_offscreen_game_draw(gameTarget, true))",
         "context_->DrawInstanced(",
         "verticesPerInstance, instanceCount, startVertex, startInstance);",
         "++drawCount_;",
@@ -360,7 +380,7 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
     indexed_instanced_guards = [
         "if (!live_game_stereo::may_issue_instanced(",
         "indicesPerInstance, instanceCount, drawCount_) ||",
-        "!prepare_offscreen_game_draw(gameTarget))",
+        "!prepare_offscreen_game_draw(gameTarget, true))",
         "context_->DrawIndexedInstanced(",
         "indicesPerInstance, instanceCount, startIndex,",
         "baseVertex, startInstance);",
@@ -392,12 +412,23 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "instancedCamera.draw_offscreen_instanced(",
         "instancedCamera.draw_offscreen_indexed_instanced(",
         "instancedCamera.draw_count() == 2u",
+        "const bool rejectsOffscreenViewport =",
+        "const bool rejectsOffscreenScissor =",
+        "if (!rejectsOffscreenViewport || !rejectsOffscreenScissor)",
         "instancedCamera.color_draw_count() == 0u",
         "gameEyeFixture.replayedInstancedOffscreenCamera[0] &&",
         "gameEyeFixture.replayedInstancedOffscreenCamera[1] &&",
     ]
     missing = [
         "offscreen-target:" + token for token in source_guards if token not in target
+    ]
+    missing += [
+        "offscreen-raster:" + token for token in raster_guards
+        if token not in raster_section
+    ]
+    missing += [
+        "offscreen-draw-coverage:" + token for token in coverage_guards
+        if token not in preflight
     ]
     missing += [
         "offscreen-timeline:" + token for token in preflight_guards

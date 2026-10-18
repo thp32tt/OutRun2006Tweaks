@@ -80,16 +80,26 @@
     "src/vr/d3d11/native_game_camera_view.hpp",
     "src/vr/d3d11/native_game_stereo_submission.hpp",
     "src/vr/d3d11/native_game_stereo_submission.cpp",
-    "tools/dx11_native_transport_probe.cpp"
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_eye_partial_depth_activation.py"
   ],
   "runtime_validation_note": "Quest3/VDXR and real OutRun game input/visual/performance not executed. Original D3D9Ex source untouched.",
   "pipeline": {
     "C0_RECOVER": "latest branch ca9e65e00160f8f6da4733e843cfc2c69f12cd88; prior 00906 C6 complete; no 00907 prior record",
     "C1_REVIEW": "Confirmed offscreen draw accepted disjoint physical viewport/scissor whereas direct eye already rejects; source may be copied after no-pixel geometry.",
     "C2_IMPLEMENT": "Physical selected RTV view intersection, four offscreen Draw entrypoints, WARP negative and positive source replay",
-    "C3_VALIDATE": "PENDING exact-SHA mandatory DX11 Fast/Backend/Build/OpenXR/HUD",
-    "C4_COMMIT": "MATERIAL_SOURCE",
+    "C3_VALIDATE": "First material 6092eb7c source-graph static gate FAILED (literal signature drift). Updated source guard to demand actual physical viewport/scissor preflight, destructively tested removal; new exact validation-bearing SHA pending.",
+    "C4_COMMIT": "C++ material 6092eb7c, same-task exact-SHA contract repair pending",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_CI"
-  }
+  },
+  "ci_repairs": [
+    {
+      "cause": "Exact material 6092eb7c: DX11 Fast and Backend/Build source graph reject old literal prepare_offscreen_game_draw(gameTarget) after real offscreen geometry gained explicit requireDrawableRaster argument",
+      "category": "stale-static-contract",
+      "result": "FIXED_EXPECTING_NEW_EXACT_SHA"
+    }
+  ],
+  "material_result_sha": "6092eb7cad0edd7f11d7f8798463a567b5189112"
 }

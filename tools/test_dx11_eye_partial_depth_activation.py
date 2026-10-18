@@ -142,12 +142,30 @@ assert audit_native_offscreen_game_draw(
 assert audit_native_offscreen_game_draw(
     source, probe.replace("fixture.offscreenGameColor, &offscreenPatch,", "", 1)
 ), "missing offscreen camera-to-eye GPU copy proof slipped through"
+# A material native offscreen Draw must not admit an empty camera-scissor
+# raster after the selected RTV mip/array footprint is known. Reject removal
+# of this requirement and loss of the GPU-negative WARP verification.
+assert audit_native_offscreen_game_draw(
+    source.replace(
+        "!camera_draw_coverage(context_, camera.width, camera.height)",
+        "false", 1), probe
+), "physical offscreen raster admission bypass slipped through"
+assert audit_native_offscreen_game_draw(
+    source.replace(
+        "ctx->RSGetScissorRects(&count, &scissor);",
+        "count = 1u;", 1), probe
+), "offscreen scissor fetch bypass slipped through"
+assert audit_native_offscreen_game_draw(
+    source, probe.replace(
+        "const bool rejectsOffscreenScissor =",
+        "const bool rejectsOffscreenScissorMissing =", 1)
+), "WARP native camera scissor negative lost"
 # Offscreen instancing MUST validate the real game RT and preserve a single
 # chronological source command per call, without creating direct eye color.
 assert audit_native_offscreen_game_draw(
     source.replace(
         "verticesPerInstance, instanceCount, drawCount_) ||\n"
-        "        !prepare_offscreen_game_draw(gameTarget))",
+        "        !prepare_offscreen_game_draw(gameTarget, true))",
         "verticesPerInstance, instanceCount, drawCount_) ||\n"
         "        false)", 1), probe
 ), "instanced source target preflight bypass slipped through"
@@ -172,10 +190,10 @@ def camera_clear_contract(code, header):
     offscreen_draw = code.split("bool NativeGameEyeDrawEncoder::game_source_target_bound(", 1)[-1].split(
         "bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(", 1)[0]
     return all(t in color for t in (
-        "prepare_offscreen_game_draw(gameTarget)",
+        "prepare_offscreen_game_draw(gameTarget, false)",
         "context_->ClearRenderTargetView(gameTarget, rgba);",
     )) and all(t in depth for t in (
-        "!prepare_offscreen_game_draw(gameTarget)",
+        "!prepare_offscreen_game_draw(gameTarget, false)",
         "boundDepth.Get() != gameDepth",
         "depthResource.Get() == eyeDepthResource.Get()",
         "native_game_camera_depth_compatible(",
@@ -220,7 +238,7 @@ def offscreen_rect_contract(code, fixture):
     depth = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[1].split(
         "bool NativeGameEyeDrawEncoder::replay_due_source_clears(", 1)[0]
     return all(x in color for x in (
-        "prepare_offscreen_game_draw(gameTarget)",
+        "prepare_offscreen_game_draw(gameTarget, false)",
         "live_game_stereo::color_clear_route(", 
         "rectContext->ClearView(gameTarget, rgba, actual, 1u);",
         "const auto covered = camera_clear_coverage(",
