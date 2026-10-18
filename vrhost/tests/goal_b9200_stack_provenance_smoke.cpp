@@ -21,8 +21,9 @@ static bool VerifyOriginalGoalGlyphQueue() noexcept
     leftGlyph.next_0 = &rightGlyph;
     if (FirstVerifiedAppendedNode<Node>(&root, &old, &rightGlyph, 4) !=
             &leftGlyph ||
-        FirstVerifiedAppendedNode<Node>(&root, nullptr, &rightGlyph, 4) !=
+        FirstVerifiedAppendedNode<Node>(&root, &root, &rightGlyph, 4) !=
             &old ||
+        FirstVerifiedAppendedNode<Node>(&root, nullptr, &rightGlyph, 4) ||
         FirstVerifiedAppendedNode<Node>(&root, &old, &old, 4) ||
         FirstVerifiedAppendedNode<Node>(&root, &old, &foreign, 4) ||
         FirstVerifiedAppendedNode<Node>(&root, &old, &rightGlyph, 2))
@@ -34,8 +35,9 @@ static bool VerifyOriginalGoalGlyphQueue() noexcept
         FirstVerifiedAppendedNode<Node>(&root, &stale, &rightGlyph, 3) ||
         FirstVerifiedAppendedNode<Node>(&root, &leftGlyph, &rightGlyph, 3) !=
             &rightGlyph ||
-        FirstVerifiedAppendedNode<Node>(&root, nullptr, &rightGlyph, 3) !=
-            &leftGlyph)
+        FirstVerifiedAppendedNode<Node>(&root, &root, &rightGlyph, 3) !=
+            &leftGlyph ||
+        FirstVerifiedAppendedNode<Node>(&root, nullptr, &rightGlyph, 3))
         return false;
     // Neither a missing tail nor a self-referential queue can authorize
     // tagging unknown sprites. No former node is accessed after a rebuild.

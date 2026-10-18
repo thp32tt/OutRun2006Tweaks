@@ -142,7 +142,9 @@ namespace
         old.next_0 = &newest;
         return StageFirstAppendedNode(&root, &old, &newest, 4) == &newest &&
             StageFirstAppendedNode<StageTailFixture>(
-                &root, nullptr, &newest, 4) == &first &&
+                &root, &root, &newest, 4) == &first &&
+            StageFirstAppendedNode<StageTailFixture>(
+                &root, nullptr, &newest, 4) == nullptr &&
             StageFirstAppendedNode(&root, &stale, &newest, 4) == nullptr &&
             StageFirstAppendedNode(&root, &old, &old, 4) == nullptr &&
             StageFirstAppendedNode(&root, &old, &newest, 2) == nullptr &&
@@ -192,7 +194,9 @@ namespace
         root.next_0 = &first;
         return StageFirstAppendedNode(&root, &old, &second, 3) == nullptr &&
             StageFirstAppendedNode<StageTailFixture>(
-                &root, nullptr, &second, 3) == &first;
+                &root, &root, &second, 3) == &first &&
+            StageFirstAppendedNode<StageTailFixture>(
+                &root, nullptr, &second, 3) == nullptr;
     }
     static_assert(TestExactRankGoalSiblingTailProof(),
         "Exact GOAL/rank producers must not tag a rebuilt foreign queue");
