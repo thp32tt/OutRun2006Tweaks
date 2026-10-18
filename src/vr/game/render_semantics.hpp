@@ -144,22 +144,67 @@ namespace OutRunVR::GameSemantic
             pendingProducer == outgoingProducer;
     }
 
-    // R33's physical stereo source is one SpriteNode + queue epoch, not
-    // merely one producer token. Two +TIME nodes with identical ScreenHud
-    // semantics may each register a deferred D3DX batch: the previous
-    // node's triangles must be submitted BEFORE selecting the next node.
-    // Preserve native D3DX batching within each node (no per-Draw Flush).
+    // R33 fences a native +TIME batch by (SpriteNode*, queue epoch).
+    // SelectSpriteQueueNode increments that epoch on EVERY selection, even
+    // if a native priority-list slot is reused at the same pointer. The old
+    // inequality silently skipped the physical boundary for a reselected
+    // +TIME node with the same address/source, letting its deferred D3DX
+    // triangles submit under the later eye epoch. Drain the previous batch
+    // before the new selection, not per D3DX Draw. Foreign/unknown producers
+    // remain on the native path with no new stereo authority.
     inline constexpr bool CanIsolateD3DXStageQueueNodeTransition(
         bool queueActive, const void* outgoingNode, const void* incomingNode,
         RenderScope outgoingScope, ProducerToken outgoingProducer,
         RenderScope incomingScope, ProducerToken incomingProducer) noexcept
     {
         return queueActive && outgoingNode != nullptr &&
-            incomingNode != nullptr && outgoingNode != incomingNode &&
+            incomingNode != nullptr &&
             outgoingScope == RenderScope::ScreenHud &&
             incomingScope == RenderScope::ScreenHud &&
             outgoingProducer == ProducerToken::StageExtensionTime &&
             incomingProducer == ProducerToken::StageExtensionTime;
+    }
+
+    namespace StageQueueEpochRegression
+    {
+        inline constexpr unsigned char OldNode = 0;
+        inline constexpr unsigned char NewNode = 0;
+        // Distinct nodes and a *reselected identical pointer* both advance
+        // the physical queue epoch, regardless of identical source tokens.
+        static_assert(CanIsolateD3DXStageQueueNodeTransition(
+            true, &OldNode, &NewNode, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        static_assert(CanIsolateD3DXStageQueueNodeTransition(
+            true, &OldNode, &OldNode, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        // No previous queue, invalid native nodes, WorldBillboard, GOAL
+        // text and unrelated incoming HUD never acquire +TIME eye ownership.
+        static_assert(!CanIsolateD3DXStageQueueNodeTransition(
+            false, &OldNode, &OldNode, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        static_assert(!CanIsolateD3DXStageQueueNodeTransition(
+            true, nullptr, &NewNode, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        static_assert(!CanIsolateD3DXStageQueueNodeTransition(
+            true, &OldNode, nullptr, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        static_assert(!CanIsolateD3DXStageQueueNodeTransition(
+            true, &OldNode, &NewNode, RenderScope::WorldBillboard,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        static_assert(!CanIsolateD3DXStageQueueNodeTransition(
+            true, &OldNode, &NewNode, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020));
+        static_assert(!CanIsolateD3DXStageQueueNodeTransition(
+            true, &OldNode, &NewNode, RenderScope::ScreenHud,
+            ProducerToken::ResultProgress, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
     }
 
     // R33 GOAL stereo fences the *physical* SpriteNode and queue epoch,
