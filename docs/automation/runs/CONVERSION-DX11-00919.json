@@ -79,5 +79,17 @@
     "authentic_game_source_gpu_postpass": "PENDING_EXACT_SHA",
     "unrelated_cleared_camera_and_fallback": "PENDING_EXACT_SHA",
     "five_gate_exact_sha": "PENDING_EXACT_SHA"
-  }
+  },
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "pipeline": {
+    "C0_RECOVER": "GitHub remote 00918 C6 complete; 00919 disjoint source provenance feature.",
+    "C1_REVIEW": "A native color-eligible offscreen camera A Draw could authorize later GPU Copy/Stretch of unrelated stale camera B or mip/slice.",
+    "C2_IMPLEMENT": "Track game offscreen eligible Draw/Indexed/Instanced per physical source; invalidate successful camera TARGET Clear; use exact source identity to certify GPU Copy/Stretch postpass color; original D3D9 unchanged.",
+    "C3_VALIDATE": "Initial source SHA 67ff6382: Fast/Backend policy JSON fields and Windows audited Clear call failed; same TASK repair 7931fbb1: WARP SUCCESS, Win32 Build SUCCESS, final run JSON status field still absent; newest exact SHA pending.",
+    "C4_COMMIT": "Material source SHA 67ff6382068c6f4f9f1537e363d4119e9f947049. Identical TASK source/audit repair SHA 7931fbb1684e2aff6ee9aedb2908ff77c74c0287. Final validation SHA pending.",
+    "C5_PACKAGE": "NOT_REQUIRED_SOURCE_STAGE_HMD_UNTESTED",
+    "C6_RESULT": "PENDING_FINAL_EXACT_SHA"
+  },
+  "runtime_validation_note": "Actual Quest3/VDXR, menu/car/race game display, input/gamepad, and FFB test not performed; RUNTIME_VALIDATION=UNTESTED."
 }
