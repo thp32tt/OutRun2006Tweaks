@@ -357,12 +357,15 @@ def main():
     )
     for i, (before, after) in enumerate(mutations, 1):
         assert before in source, f"mutation {i} is ineffective"
-        # 00686 introduces a separate affine-only helper with the same
-        # parallax expression. Mutate the legacy independent-eye fallback
-        # inside R30TransformXyzrhwVertices, not that earlier new helper.
-        if before == "state.parallaxPerRhwX[eye] * rhw":
+        # Other R84 helpers can legitimately use the same tokens before
+        # the independent-world vertex transformation. Mutate the precise
+        # protected body instead of an unrelated earlier F11 restore or
+        # affine-only helper, so a destructive negative is not a no-op.
+        if before in ("state.parallaxPerRhwX[eye] * rhw", "if (!restored)"):
             begin = source.index("bool R30TransformXyzrhwVertices(")
-            at = source.index(before, begin)
+            end = source.index("bool R30TryFusedWorldXyzrhwProjection(", begin)
+            at = source.index(before, begin, end)
+            assert at >= begin, f"mutation {i} lost vertex path owner"
             altered = source[:at] + after + source[at + len(before):]
         else:
             altered = source.replace(before, after, 1)
