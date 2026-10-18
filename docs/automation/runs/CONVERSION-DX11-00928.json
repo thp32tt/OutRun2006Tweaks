@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00928",
+  "production_id": "CONVERSION-DX11-00928",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00928",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "score_policy": "C6 bookkeeping only; do not add a second performance point for CONVERSION-DX11-00928",
+  "material_result_sha": "a413f7557fa67181ed1e5a1c5307adc85b14b9ae",
+  "validation_bearing_result_sha": "c6969d4a449c6f5c1c2eefae59959f20658755f0",
+  "source_repair_shas": [
+    "c6969d4a449c6f5c1c2eefae59959f20658755f0"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Translate source-owned real-game programmable D3D9 SM3 triangle fans (VB/IB/UP) into native D3D11 indexed triangle-list draws, preserving winding, ordinal and original D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "real_sm3_triangle_fan_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_sm3_triangle_fan_index_conversion",
+        "expected_behavior": "Convert D3D9 fan geometry to D3D11 DrawIndexed with source-owned native indices and count; runtime frame output remains untested."
+      },
+      {
+        "id": "fan_fallback_and_index_regression",
+        "category": "fallback_regression",
+        "behavior_area": "source_index_bounds_and_original_game_fallback",
+        "expected_behavior": "Invalid native index bounds, pointer/count, or unsupported render inputs fail closed; preserve original D3D9 Draw, input and FFB."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_build_openxr_hud_ci",
+        "expected_behavior": "Five mandatory GitHub Actions conclude success on the exact validation-bearing commit SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_sm3_triangle_fan_draw": "SOURCE_IMPLEMENTED_AND_BUILD_VERIFIED_RUNTIME_UNTESTED",
+    "fan_fallback_and_index_regression": "PASS_EXACT_SHA_SOURCE_FAST_BACKEND_TESTS_RUNTIME_UNTESTED",
+    "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "record_recovery": {
+    "initial_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "original_run_json_found": false,
+    "feature_contract_and_acceptance_results": "Reconstructed from task material and regression repair commits plus exact-SHA CI; no prior JSON values existed to preserve.",
+    "source_material_commit": "a413f7557fa67181ed1e5a1c5307adc85b14b9ae",
+    "source_regression_repair_commit": "c6969d4a449c6f5c1c2eefae59959f20658755f0"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_game_cull_draw_00649.py",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Existing run JSON missing on branch at validated SHA; recovered material and repair commits from GitHub history.",
+    "C1_REVIEW": "Material task added source-owned SM3 D3D9 fan to native D3D11 triangle-list DrawIndexed conversion.",
+    "C2_IMPLEMENT": "Material source commit a413f7557fa67181ed1e5a1c5307adc85b14b9ae; subsequent regression fix c6969d4a449c6f5c1c2eefae59959f20658755f0.",
+    "C3_VALIDATE": "Exactly five mandatory Actions SUCCESS at c6969d4a449c6f5c1c2eefae59959f20658755f0; the optional VR PC Fast Test Build is skipped; no HMD or gameplay execution claimed.",
+    "C4_COMMIT": "Existing material a413f7557fa67181ed1e5a1c5307adc85b14b9ae and validation repair c6969d4a449c6f5c1c2eefae59959f20658755f0 were not modified in this C6-only pass.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA, COMPLETE_BUILD_VERIFIED; C6 bookkeeping record created with [skip ci] without rerunning CI or adding score."
+  },
+  "validation_evidence": {
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_GAME_HMD_RUNTIME_VERIFIED",
+    "exact_sha": "c6969d4a449c6f5c1c2eefae59959f20658755f0",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39153285141,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39153285008,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39153285025,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39153289831,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39153289836,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  },
+  "CODE_CHANGED_SHA": "c6969d4a449c6f5c1c2eefae59959f20658755f0",
+  "hold_reason": "NEED_HMD_TEST_FOR_RUNTIME_PROMOTION_ONLY",
+  "NEXT_IMPLEMENTATION_ACTION": "Runtime game/HMD validation is still required to promote source-build verified status; do not treat CI as full game rendering proof."
+}
