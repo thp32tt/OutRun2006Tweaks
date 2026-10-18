@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01033",
+  "production_id": "CONVERSION-DX9EX-01033",
+  "event_id": "CONVERSION-DX9EX-01033-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C5_WAIT_REQUIRED_CI",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "c9ac9c4ba6a81f4fdbf409b5fef065274ea48ec0",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Keep the central original C993/D3A5 lens source visually single and physically coherent across both R84 GPU eye submissions, including reentrant right-eye render-target, viewport and c64 setters, without touching the surrounding CABE rings.",
+    "scope_boundary": "Exact source-proven central 0x570002 physical C993 lens owner only. Preserve outer halo discs, SkyGlow, generic HUD, GOAL, +TIME, native fallback, depth/stencil restore, DX11/DXVK and input/FFB.",
+    "trace_stages": [
+      "SHA-pinned original EXE D3A5 parent calls C980/C993 for the unique centre object 0x570002, in contrast to the separate CABE outer-halo draw chain.",
+      "Original raw game-WVP writer and shader/pose/physical draw identity are authenticated by R30, then R30 or R33 submits the native LEFT GPU primitive.",
+      "RIGHT eye target, viewport and shader c64 setters can reenter before the second GPU Draw; the same C993 and raw writer must still be current at this last boundary, or RIGHT is vetoed with normal restoration."
+    ],
+    "subcomponents": [
+      "Revalidate both physical centre-call and original raw c64 writer immediately after RIGHT state setup and before the actual GPU Draw in R30 and R33.",
+      "Preserve existing LEFT result, restore target/depth/viewport and original c64, invalidate the stereo frame on source mismatch; add compile-time positive and negative owner mutations for other sun, new c64, pose, shader and nested Draw."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_two_eye_source_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original C993 lens callback through R84 left and right native GPU Draw",
+        "expected_behavior": "Both eyes use the same source-authenticated central sun, including after reentrant RIGHT state setter callbacks; no unrelated central sprite is submitted as the second eye."
+      },
+      {
+        "id": "centre_reentry_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "Lens c64/pose/shader mutation and source-loss preservation",
+        "expected_behavior": "A changed C993 call, raw c64 write, pose epoch, shader epoch or nested GPU draw vetoes RIGHT before rasterizing foreign geometry; LEFT and original rollback are preserved without changing CABE halos or SkyGlow."
+      },
+      {
+        "id": "centre_exact_sha_integrated_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA GitHub Windows R84 and host build, domain isolation and HUD/full-source regression",
+        "expected_behavior": "The integrated validation-bearing SHA passes DX9Ex Active Validation, Domain Isolation Guard, OutRun EXE HUD Inspector CI and DX9Ex Full Source Impact Review without CI skip; actual Quest3/VDXR remains separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "centre_two_eye_source_ownership": "PENDING",
+    "centre_reentry_fail_closed": "PENDING",
+    "centre_exact_sha_integrated_gate": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Original SHA-pinned D3A5/C980/C993 source draws the central sun 0x570002 while CABE draws independent surrounding discs; R84 R30/R33 already validates original raw WVP and post-LEFT source identity.",
+    "source_trace": [
+      "R30HasExactLensCentreRawWvp requires a matching original C993 invocation, pose epoch, live shader and original game-c64 writer before per-eye matrices are computed.",
+      "R33TryHud and R30 screen-space eye path originally validate before and after LEFT but then invoke RIGHT render-target, depth, viewport and c64 setters before submitting RIGHT without another physical owner check.",
+      "RIGHT state setters can synchronously reenter original callbacks; the newly added predicate compares accepted LEFT and pending RIGHT source/serial/shader/pose and the existing failure path restores RT/depth/original c64."
+    ],
+    "root_cause": "A time-of-check/time-of-use hole between the post-LEFT exact C993 provenance test and physical RIGHT Draw allowed reentrant GPU state setter callbacks to change the original lens owner or raw c64 source after the stereo source was accepted.",
+    "alternatives_rejected": [
+      "Do not globally flatten all alpha/flare primitives into screen HUD, duplicate original LEFT or alter CABE outer discs to hide a centre owner problem.",
+      "Do not invent new disparity heuristics, change GPU scene depth for SkyGlow, or disable the original game's one-draw fallback when source is unproven."
+    ],
+    "fix_evidence": "R30 and R33 now check the shared compile-time-enforced SameCentreForRightEye fence after RIGHT RT/depth/viewport/c64 setters and before each actualDraw. On mismatch the existing StereoFailureRightStateFailed, resource restoration and frame veto path is used without submitting RIGHT.",
+    "negative_test_evidence": "Real source header static_assert proves exact-source acceptance and rejection of another C993 call, changed original c64 write serial, changed pose sequence, changed shader epoch and intervening physical draw serial; original HMD display is not tested.",
+    "eye_ownership": "The original LEFT owner is unchanged; RIGHT must match its physically source-stamped original lens epoch, draw serial, shader epoch, pose and raw WVP writer before submission. Right-eye fail-closed recovery remains intact."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "Same TASK_ID policy-stage repair following first material c9ac9c4: initial DX9Ex Active Validation failed because the required feature-unit run record was missing. Keep original material commit distinct from this validation-bearing metadata correction. Do not count the record as another feature or assert HMD success.",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_sha": "c9ac9c4ba6a81f4fdbf409b5fef065274ea48ec0",
+    "exact_sha": null,
+    "required_gates": [],
+    "runtime_validation": "UNTESTED"
+  }
+}
