@@ -1308,6 +1308,36 @@ int main()
             offscreenGameDsv,
             "00884 real game offscreen color/depth camera pair");
 
+    // Separate actual game-owned 64x64 two-mip camera with 32x32 mip1
+    // color/depth views; the older allocation-base Clear admitted invalid
+    // 32..63 rectangle pixels and corrupted menu/vehicle camera crops.
+    D3D11_TEXTURE2D_DESC mipCameraDesc = offscreenDesc;
+    mipCameraDesc.MipLevels = 2u;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> mipCameraColor, mipCameraDepth;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mipCameraRtv;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mipCameraDsv;
+    D3D11_TEXTURE2D_DESC mipCameraDepthDesc = offscreenDepthDesc;
+    mipCameraDepthDesc.MipLevels = 2u;
+    D3D11_RENDER_TARGET_VIEW_DESC mipCameraColorView{};
+    mipCameraColorView.Format = mipCameraDesc.Format;
+    mipCameraColorView.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    mipCameraColorView.Texture2D.MipSlice = 1u;
+    D3D11_DEPTH_STENCIL_VIEW_DESC mipCameraDepthView{};
+    mipCameraDepthView.Format = mipCameraDepthDesc.Format;
+    mipCameraDepthView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    mipCameraDepthView.Texture2D.MipSlice = 1u;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &mipCameraDesc, nullptr, mipCameraColor.GetAddressOf())) &&
+            SUCCEEDED(d3d.device->CreateTexture2D(
+                &mipCameraDepthDesc, nullptr, mipCameraDepth.GetAddressOf())) &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                mipCameraColor.Get(), &mipCameraColorView,
+                mipCameraRtv.GetAddressOf())) &&
+            SUCCEEDED(d3d.device->CreateDepthStencilView(
+                mipCameraDepth.Get(), &mipCameraDepthView,
+                mipCameraDsv.GetAddressOf())),
+            "00904 native game physical mip1 offscreen color/depth views");
+
     struct GameEyeFixture {
         bool sawBoundEye[2]{};
         ID3D11DepthStencilView* eyeDepth[2]{};
@@ -1350,6 +1380,10 @@ int main()
         ID3D11Texture2D* offscreenGameColor{};
         ID3D11RenderTargetView* offscreenGameRtv{};
         ID3D11DepthStencilView* offscreenGameDsv{};
+        ID3D11Texture2D* mipCameraColor{};
+        ID3D11RenderTargetView* mipCameraRtv{};
+        ID3D11DepthStencilView* mipCameraDsv{};
+        bool replayedMipCameraClearCopy[2]{};
         bool replayedOffscreenGameClears[2]{};
         bool replayedOffscreenGamePartialClears[2]{};
         bool replayedOffscreenGameDraw[2]{};
@@ -1427,6 +1461,9 @@ int main()
     gameEyeFixture.offscreenGameColor = offscreenGameColor;
     gameEyeFixture.offscreenGameRtv = offscreenGameRtv;
     gameEyeFixture.offscreenGameDsv = offscreenGameDsv;
+    gameEyeFixture.mipCameraColor = mipCameraColor.Get();
+    gameEyeFixture.mipCameraRtv = mipCameraRtv.Get();
+    gameEyeFixture.mipCameraDsv = mipCameraDsv.Get();
     // Two game-created GPU postpasses run between the REAL eye Draw calls:
     // an unscaled per-camera array-slice copy followed by a format-converting
     // scaled source overlay AFTER the original TARGET Clear. Later callback
@@ -1887,6 +1924,45 @@ int main()
         // The targeted GPU copy is the real offscreen->eye compositor path.
         const auto beforeOffscreen = encoder.draw_count();
         const auto beforeOffscreenEyeColor = encoder.color_draw_count();
+        // Real menu/vehicle auxiliary camera is allocated 64x64 but draws
+        // and Clears through a 32x32 mip1 RTV/DSV. Prove the *view* bounds
+        // in both eye passes, including negative-region fallback and GPU
+        // Copy of the selected physical mip into the stereo ring.
+        const D3D11_VIEWPORT mipCameraViewport{
+            0.f, 0.f, 32.f, 32.f, 0.f, 1.f};
+        ID3D11RenderTargetView* selectedCamera = fixture.mipCameraRtv;
+        ctx->OMSetRenderTargets(
+            1u, &selectedCamera, fixture.mipCameraDsv);
+        ctx->RSSetViewports(1u, &mipCameraViewport);
+        const D3D11_RECT mipCameraBad{30, 29, 34, 32};
+        const D3D11_RECT mipCameraPatch{28, 28, 32, 32};
+        const UINT cameraColor = eyeIndex == 0u ? 0xffa03010u : 0xff1070c0u;
+        const bool mipCameraClears =
+            !encoder.clear_offscreen_game_color(
+                selectedCamera, 0xff123456u, &mipCameraBad) &&
+            !encoder.clear_offscreen_game_depth_stencil(
+                selectedCamera, fixture.mipCameraDsv,
+                true, 0.5f, true, 6u, &mipCameraBad) &&
+            encoder.clear_offscreen_game_color(
+                selectedCamera, cameraColor) &&
+            encoder.clear_offscreen_game_color(
+                selectedCamera, cameraColor, &mipCameraPatch) &&
+            encoder.clear_offscreen_game_depth_stencil(
+                selectedCamera, fixture.mipCameraDsv,
+                true, 0.5f, true, 6u, &mipCameraPatch);
+        // A genuine source Clear does not manufacture a geometry ordinal.
+        const bool ordinalPreserved = encoder.draw_count() ==
+            beforeOffscreen && encoder.color_draw_count() == beforeOffscreenEyeColor;
+        if (!mipCameraClears || !ordinalPreserved ||
+            !encoder.bind_eye_output()) return false;
+        const D3D11_BOX mipCameraBox{28u, 28u, 0u, 32u, 32u, 1u};
+        const bool mipCameraCopied = encoder.copy_game_surface(
+            fixture.mipCameraColor, &mipCameraBox,
+            eyeIndex == 0u ? 0 : 60, 0, 0u, 1u);
+        fixture.replayedMipCameraClearCopy[eyeIndex] =
+            mipCameraCopied && encoder.draw_count() == beforeOffscreen &&
+            encoder.color_draw_count() == beforeOffscreenEyeColor;
+        if (!fixture.replayedMipCameraClearCopy[eyeIndex]) return false;
         ID3D11RenderTargetView* gameOffscreen = fixture.offscreenGameRtv;
         ID3D11DepthStencilView* gameOffscreenDepth = fixture.offscreenGameDsv;
         ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);
@@ -2652,6 +2728,8 @@ int main()
             gameEyeFixture.endedOnOffscreenTarget[1] &&
             gameEyeFixture.rejectedDetachedDraw[0] &&
             gameEyeFixture.rejectedDetachedDraw[1] &&
+            gameEyeFixture.replayedMipCameraClearCopy[0] &&
+            gameEyeFixture.replayedMipCameraClearCopy[1] &&
             gameEyeFixture.replayedOffscreenGameClears[0] &&
             gameEyeFixture.replayedOffscreenGameClears[1] &&
             gameEyeFixture.replayedOffscreenGamePartialClears[0] &&

@@ -1,6 +1,7 @@
 #include "native_game_stereo_submission.hpp"
 #include "native_game_eye_pair_sources.hpp"
 #include "native_game_postpass_replay.hpp"
+#include "native_game_camera_view.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
 #include <limits>
@@ -330,11 +331,14 @@ bool NativeGameEyeDrawEncoder::game_source_target_bound(
     if (!producer || producer.Get() != sourceOwner.Get()) return false;
     D3D11_TEXTURE2D_DESC desc{};
     source->GetDesc(&desc);
+    D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
+    gameTarget->GetDesc(&viewDesc);
+    const auto camera = native_game_camera_rtv_extent(desc, viewDesc);
     constexpr UINT sharedFlags =
         D3D11_RESOURCE_MISC_SHARED |
         D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
-    if (!desc.Width || !desc.Height || desc.Usage != D3D11_USAGE_DEFAULT ||
+    if (!camera.valid || desc.Usage != D3D11_USAGE_DEFAULT ||
         desc.CPUAccessFlags || (desc.MiscFlags & sharedFlags) ||
         (desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u)
         return false;
@@ -379,8 +383,8 @@ bool NativeGameEyeDrawEncoder::game_source_target_bound(
         std::isfinite(view.TopLeftX) && std::isfinite(view.TopLeftY) &&
         std::isfinite(view.Width) && std::isfinite(view.Height) &&
         view.Width > 0.f && view.Height > 0.f &&
-        view.TopLeftX < static_cast<float>(desc.Width) &&
-        view.TopLeftY < static_cast<float>(desc.Height) &&
+        view.TopLeftX < static_cast<float>(camera.width) &&
+        view.TopLeftY < static_cast<float>(camera.height) &&
         view.TopLeftX + view.Width > 0.f &&
         view.TopLeftY + view.Height > 0.f;
 }
@@ -481,10 +485,14 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
     if (!resource || FAILED(resource.As(&texture)) || !texture) return false;
     D3D11_TEXTURE2D_DESC desc{};
     texture->GetDesc(&desc);
+    D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
+    gameTarget->GetDesc(&viewDesc);
+    const auto camera = native_game_camera_rtv_extent(desc, viewDesc);
+    if (!camera.valid) return false;
     const bool cropped = region &&
         !live_game_stereo::full_eye_target_rect(
             region->left, region->top, region->right, region->bottom,
-            desc.Width, desc.Height);
+            camera.width, camera.height);
     Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
     if (cropped)
         (void)context_->QueryInterface(
@@ -496,7 +504,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
     const auto route = live_game_stereo::color_clear_route(
         region != nullptr, region ? region->left : 0,
         region ? region->top : 0, region ? region->right : 0,
-        region ? region->bottom : 0, desc.Width, desc.Height,
+        region ? region->bottom : 0, camera.width, camera.height,
         rectContext != nullptr, shaderSupported);
     constexpr float scale = 1.0f / 255.0f;
     const float rgba[4]{
@@ -513,7 +521,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
         return true;
     case live_game_stereo::NativeColorClearRoute::ShaderRaster:
         return raster_partial_eye_color_clear(
-            context_, gameTarget, desc.Width, desc.Height, *region, rgba);
+            context_, gameTarget, camera.width, camera.height, *region, rgba);
     default:
         return false; // malformed region or unsupported target; DX9Ex owns it
     }
@@ -550,9 +558,16 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
     D3D11_TEXTURE2D_DESC dd{}, cd{};
     depthTexture->GetDesc(&dd);
     colorTexture->GetDesc(&cd);
+    D3D11_RENDER_TARGET_VIEW_DESC colorViewDesc{};
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc{};
+    gameTarget->GetDesc(&colorViewDesc);
+    gameDepth->GetDesc(&depthViewDesc);
+    const auto camera = native_game_camera_rtv_extent(cd, colorViewDesc);
+    const auto cameraDepth = native_game_camera_dsv_extent(dd, depthViewDesc);
     if (!owner || owner.Get() != depthOwner.Get() ||
-        !dd.Width || !dd.Height || dd.Width != cd.Width ||
-        dd.Height != cd.Height ||
+        !camera.valid || !cameraDepth.valid ||
+        camera.width != cameraDepth.width ||
+        camera.height != cameraDepth.height ||
         dd.SampleDesc.Count != cd.SampleDesc.Count ||
         dd.SampleDesc.Quality != cd.SampleDesc.Quality ||
         dd.Usage != D3D11_USAGE_DEFAULT || dd.CPUAccessFlags ||
@@ -560,12 +575,12 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
     const auto route = live_game_stereo::depth_clear_route(
         region != nullptr, region ? region->left : 0,
         region ? region->top : 0, region ? region->right : 0,
-        region ? region->bottom : 0, cd.Width, cd.Height);
+        region ? region->bottom : 0, camera.width, camera.height);
     if (route == live_game_stereo::NativeDepthClearRoute::Reject)
         return false;
     if (route == live_game_stereo::NativeDepthClearRoute::PartialRaster)
         return raster_partial_eye_depth_clear(
-            context_, gameDepth, cd.Width, cd.Height, *region,
+            context_, gameDepth, camera.width, camera.height, *region,
             depth, stencil, clearDepth, clearStencil);
     const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
                        (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
