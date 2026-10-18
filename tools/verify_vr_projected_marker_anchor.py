@@ -79,7 +79,10 @@ for marker in (
 
 for marker in (
     "ProducerToken producer = ProducerToken::None,",
-    "const ProjectedMarkerInfo* projectedMarker = nullptr) noexcept",
+    # The +TIME registry path extends registration; projected marker is still
+    # mandatory, with an additional exact producer entry-serial argument.
+    "const ProjectedMarkerInfo* projectedMarker = nullptr,",
+    "std::uint64_t preserveNewerExactSince = 0) noexcept",
 ):
     if marker not in semantics:
         fail(f"registration signature does not preserve projected marker: {marker}")

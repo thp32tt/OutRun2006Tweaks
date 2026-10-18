@@ -12,7 +12,7 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "material_result_sha": null,
+  "material_result_sha": "089fa147c0aa7ff0f855767b54bd1eb7311cc135",
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -83,5 +83,5 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "New source candidate and compile-time regressions. Do not score until exact-SHA CI; no hardware/Quest3 evidence."
+  "notes": "New source candidate and compile-time regressions. Do not score until exact-SHA CI; no hardware/Quest3 evidence. Material C++ SHA 089fa147c0aa7ff0f855767b54bd1eb7311cc135; initial Active policy failed solely on outdated projected-marker signature literal. Checker now verifies original projected payload and additional source serial."
 }
