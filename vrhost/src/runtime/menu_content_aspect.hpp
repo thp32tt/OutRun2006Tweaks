@@ -234,6 +234,38 @@ namespace OutRunVrMenuAspect
         return { true, centerX, centerY, halfWidth, halfHeight };
     }
 
+    // A change of VR eye/backbuffer resolution must not magnify a title
+    // screen just because its captured raster changed from landscape to
+    // portrait. Anchor the physical angular *height* of the complete
+    // binocular theater to the user-verified 3440x1440 desktop baseline.
+    // Keep the new source's TRUE pixel aspect and the exact existing UV:
+    // resize X and Y by the same factor; never squeeze 2496x2688 into 4:3.
+    // A narrower render target may show a narrower menu, but cannot make
+    // its text/logo taller than at the reference resolution. The ordinary
+    // FOV containment remains authoritative for any wider/odd viewport.
+    inline OpticalClipPlan StabilizeMenuToReference3440x1440(
+        const CommonFovTangents& common,
+        const OpticalClipPlan& measured,
+        float referenceAspect = 3440.0f / 1440.0f) noexcept
+    {
+        if (!measured.valid || !std::isfinite(measured.halfHeight) ||
+            measured.halfHeight <= 0.0f)
+            return measured;
+        const auto baseline = PlanOpticallyCenteredClip(
+            common, referenceAspect, 1.0f);
+        if (!baseline.valid || !std::isfinite(baseline.halfHeight) ||
+            baseline.halfHeight <= 0.0f ||
+            measured.halfHeight <= baseline.halfHeight)
+            return measured;
+        const float uniform = baseline.halfHeight / measured.halfHeight;
+        if (!std::isfinite(uniform) || uniform <= 0.0f || uniform > 1.0f)
+            return measured;
+        OpticalClipPlan stable = measured;
+        stable.halfWidth *= uniform;
+        stable.halfHeight *= uniform;
+        return stable;
+    }
+
     // The LOCAL menu samples the UV rectangle after desktop capture clipping.
     // A partially visible game window no longer occupies its GetClientRect()
     // width/height in the texture. Projecting that clipped UV with the full
