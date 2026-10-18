@@ -167,6 +167,35 @@ for old, wrong in (
     if mutant == frame or all(token in mutant for token in frame_safety_tokens):
         fail("frame-fence mutation escaped: " + old)
 
+# End-to-end physical fence wiring: canonical EXE+0x2DCB4 terminates only a
+# priority queue walk. R33 game Present closes the actual frame, while Reset
+# and device loss invalidate original ring storage before any new mapping.
+ui = read(ROOT / "src/hooks_uiscaling.cpp")
+r33 = read(ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp")
+queue_end = function_body(ui, "static void QueueEnd(")
+present = function_body(r33, "HRESULT __stdcall PresentDestR33(")
+reset = function_body(r33, "HRESULT __stdcall ResetDestR33(")
+if "EndSpriteQueueRender();" not in queue_end or "EndSpriteQueueFrame" in queue_end:
+    fail("canonical per-walk epilogue became an unsafe frame cleanup")
+if present.count("OutRunVR::GameSemantic::EndSpriteQueueFrame(true);") != 1:
+    fail("device-loss Present must invalidate stale SpriteNode generation exactly once")
+if present.count("OutRunVR::GameSemantic::EndSpriteQueueFrame();") != 1:
+    fail("normal game Present must retire unvisited original priority tags")
+if reset.count("OutRunVR::GameSemantic::EndSpriteQueueFrame(true);") != 1:
+    fail("Reset lost device-frame semantic invalidation")
+if present.index("EndSpriteQueueFrame();") < present.index(
+        "const HRESULT hr = R32ReviewRunPresentTelemetry("):
+    fail("normal frame cleanup executed before the actual game Present")
+for label, text, token in (
+    ("queue-end", queue_end, "EndSpriteQueueRender();"),
+    ("present", present, "EndSpriteQueueFrame();"),
+    ("reset", reset, "EndSpriteQueueFrame(true);"),
+):
+    mutated = text.replace(token, "/* lost physical frame boundary */", 1)
+    if mutated == text or token in mutated:
+        fail(f"{label}: frame-fence negative mutation escaped")
+print("VR original priority queue => R33 Present/Reset boundary wiring PASS")
+
 # Diagnostic/render-thread state should stay local; making these shared would
 # broaden synchronization and semantic authority beyond the proven fix.
 for marker in (
