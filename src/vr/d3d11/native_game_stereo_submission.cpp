@@ -1,5 +1,6 @@
 #include "native_game_stereo_submission.hpp"
 #include "native_game_eye_pair_sources.hpp"
+#include "native_game_postpass_replay.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
 #include <limits>
@@ -795,11 +796,13 @@ bool NativeGameEyeDrawEncoder::copy_game_surface(
     D3D11_TEXTURE2D_DESC sourceDesc{}, eyeDesc{};
     source->GetDesc(&sourceDesc);
     eyeColor->GetDesc(&eyeDesc);
-    if (!sourceDesc.MipLevels || sourceMipSlice >= sourceDesc.MipLevels ||
-        sourceMipSlice >= 32u ||
-        (sourceMipSlice && sourceDesc.SampleDesc.Count != 1u)) return false;
-    const UINT mipWidth = (std::max)(1u, sourceDesc.Width >> sourceMipSlice);
-    const UINT mipHeight = (std::max)(1u, sourceDesc.Height >> sourceMipSlice);
+    const auto sourceMip = native_game_postpass_mip_extent(
+        sourceDesc.Width, sourceDesc.Height, sourceDesc.MipLevels,
+        sourceMipSlice, sourceDesc.ArraySize, sourceArraySlice,
+        sourceDesc.SampleDesc.Count);
+    if (!sourceMip.valid) return false;
+    const UINT mipWidth = sourceMip.width;
+    const UINT mipHeight = sourceMip.height;
     // Clip a game-origin unscaled postpass at the native eye edge, while
     // preserving the original pixel-to-pixel map. This must be done BEFORE
     // choosing Copy, shader format conversion, or MSAA Resolve. All of them
@@ -1561,11 +1564,12 @@ bool NativeGameEyeDrawEncoder::stretch_game_surface(
     D3D11_TEXTURE2D_DESC sd{}, ed{};
     source->GetDesc(&sd);
     eye->GetDesc(&ed);
-    if (!sd.MipLevels || sourceMipSlice >= sd.MipLevels ||
-        sourceMipSlice >= 32u ||
-        (sourceMipSlice && sd.SampleDesc.Count != 1u)) return false;
-    const UINT mipWidth = (std::max)(1u, sd.Width >> sourceMipSlice);
-    const UINT mipHeight = (std::max)(1u, sd.Height >> sourceMipSlice);
+    const auto sourceMip = native_game_postpass_mip_extent(
+        sd.Width, sd.Height, sd.MipLevels, sourceMipSlice,
+        sd.ArraySize, sourceArraySlice, sd.SampleDesc.Count);
+    if (!sourceMip.valid) return false;
+    const UINT mipWidth = sourceMip.width;
+    const UINT mipHeight = sourceMip.height;
     constexpr UINT shared = D3D11_RESOURCE_MISC_SHARED |
         D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
         D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
@@ -1936,6 +1940,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
     Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectClearContext;
     if (partialTargetClear) {
         bool needsClearView = false;
+        bool needsPostpassShader = false;
         for (std::uint32_t eye = 0u; eye < 2u; ++eye) {
             const std::uint32_t count = partialTargetClear->count[eye];
             if (count > NativeGameEyePartialTargetClear::kMaxRectsPerEye)
@@ -1989,6 +1994,11 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     D3D11_TEXTURE2D_DESC desc{};
                     event.source->GetDesc(&desc);
                     const auto& b = event.sourceBox;
+                    const auto sourceMip = native_game_postpass_source_box(
+                        desc.Width, desc.Height, desc.MipLevels,
+                        event.sourceMipSlice, desc.ArraySize,
+                        event.sourceArraySlice, desc.SampleDesc.Count,
+                        b.left, b.top, b.right, b.bottom);
                     constexpr UINT sharedMask =
                         D3D11_RESOURCE_MISC_SHARED |
                         D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
@@ -1997,20 +2007,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         desc.Usage != D3D11_USAGE_DEFAULT ||
                         desc.CPUAccessFlags != 0u ||
                         (desc.MiscFlags & sharedMask) != 0u ||
-                        event.sourceArraySlice >= desc.ArraySize ||
-                        desc.MipLevels == 0u ||
-                        event.sourceMipSlice >= desc.MipLevels ||
-                        event.sourceMipSlice >= 32u ||
-                        (event.sourceMipSlice && desc.SampleDesc.Count != 1u) ||
+                        !sourceMip.valid ||
                         !native_game_postpass_gpu_source(
                             desc.BindFlags, desc.SampleDesc.Count,
                             D3D11_BIND_RENDER_TARGET,
                             D3D11_BIND_SHADER_RESOURCE,
                             D3D11_BIND_UNORDERED_ACCESS) ||
-                        b.front != 0u || b.back != 1u ||
-                        b.left >= b.right || b.top >= b.bottom ||
-                        b.right > (std::max)(1u, desc.Width >> event.sourceMipSlice) ||
-                        b.bottom > (std::max)(1u, desc.Height >> event.sourceMipSlice))
+                        b.front != 0u || b.back != 1u)
                         return false;
                     if (event.kind ==
                         NativeGameEyePartialTargetClear::Kind::SourceCopy) {
@@ -2028,6 +2031,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                                D3D11_BIND_RENDER_TARGET) == 0u)))
                             return false;
                         if (desc.Format != ring_.format()) {
+                            needsPostpassShader = true;
                             // Unscaled D3D9 StretchRect permits format
                             // conversion; the native encoder implements it
                             // via the same point-sampled GPU shader as Stretch.
@@ -2066,12 +2070,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         // clipping as the encoder. A fully offscreen copy
                         // remains invalid before any eye queues GPU work.
                         if (!native_game_copy_clipped_region(
-                                desc.Width, desc.Height,
+                                sourceMip.width, sourceMip.height,
                                 b.left, b.top, b.right, b.bottom,
                                 ring_.width(), ring_.height(),
                                 event.destX, event.destY).valid)
                             return false;
                     } else {
+                        needsPostpassShader = true;
                         const auto& d = event.destination;
                         // D3D9 game RTs may be RTV-only. The native postpass
                         // copies mip zero to an SRV; replay admission must
@@ -2097,7 +2102,7 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                                 desc.SampleDesc.Count == 1u) ==
                                 NativeGameStretchSourceTransfer::Reject ||
                             !native_game_stretch_clipped_region(
-                                desc.Width, desc.Height,
+                                sourceMip.width, sourceMip.height,
                                 b.left, b.top, b.right, b.bottom,
                                 ring_.width(), ring_.height(),
                                 d.left, d.top, d.right, d.bottom).valid)
@@ -2124,6 +2129,12 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                         context_.Get(), ring_.rtv(slot_, eye)))
                     return false;
             }
+            needsPostpassShader = true;
+        }
+        // Actual game Copy format conversion and scaled Stretch replay
+        // also compile a native GPU shader. Preflight before either eye
+        // queues commands to avoid a partial L-eye mutation when R fails.
+        if (needsPostpassShader) {
             HMODULE compiler = LoadLibraryW(L"d3dcompiler_47.dll");
             if (!compiler) return false;
             const bool ready = GetProcAddress(compiler, "D3DCompile") != nullptr;
