@@ -197,6 +197,18 @@ add_custom_command(TARGET outrun-vr-sprite-generation-smoke POST_BUILD
     COMMAND "$<TARGET_FILE:outrun-vr-sprite-generation-smoke>"
     COMMENT "Verify source generation across queued x86 ring reuse"
     VERBATIM)
+# Original game 0x42D710 may run a partial priority queue (0..5/7)
+# followed by a full walk within one frame. Compile/run the *production*
+# semantic registry as a mandatory host build dependency; no HMD required.
+add_executable(outrun-vr-partial-queue-lifetime-smoke
+    ../tools/diagnostics/repro_partial_queue_semantic_lifetime_20261018.cpp)
+target_include_directories(outrun-vr-partial-queue-lifetime-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-partial-queue-lifetime-smoke)
+add_custom_command(TARGET outrun-vr-partial-queue-lifetime-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-partial-queue-lifetime-smoke>" --expect-fixed
+    COMMENT "Verify partial/full original sprite priority queue lifetime at frame fence"
+    VERBATIM)
 # Build the real game CalcBall3D2D correction without a Windows game or HMD.
 add_executable(outrun-vr-stage-edge-cull-smoke tests/stage_edge_cull_smoke.cpp)
 target_include_directories(outrun-vr-stage-edge-cull-smoke PRIVATE
