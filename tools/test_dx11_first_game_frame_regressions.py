@@ -1533,7 +1533,10 @@ def main() -> None:
         "indexCount != expectedElements",
         "vertexCount != expectedElements",
     ):
-        changed = bridge.replace(token, "BROKEN_NATIVE_STRIP", 1)
+        # Two independently source-gated GPU submitters now share the
+        # actual D3D11 triangle-strip topology. Mutate both to prove there
+        # is no unvalidated alternate draw path left behind.
+        changed = bridge.replace(token, "BROKEN_NATIVE_STRIP")
         assert changed != bridge and token not in changed
 
     # 00546: D3D9 real-fan producers -> bounded source -> native indexed Draw.

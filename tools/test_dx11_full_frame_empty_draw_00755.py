@@ -50,8 +50,10 @@ for broken_bridge, broken_batch in (
                            "if (true) return false;", 1)),
     (bridge, batch.replace("++postDrawEmptySourceDraws; // source order only;",
                            "/* no post-GPU ordinal increment */ //", 1)),
-    (bridge.replace("s.frameBatch.accepts_full_on_source_target(",
-                    "s.frameBatch.accepts_full_seeded(", 1), batch),
+    # Change the observer's seeded source ordinal (not the distinct
+    # live SM3 draw's earlier, independently checked admission).
+    (bridge.replace("sourceOrdinal, sameClearedGameTarget)",
+                    "sourceOrdinal, /* no full clear proof */ false)", 1), batch),
     (bridge, batch.replace("return matchesClearedBackbuffer &&",
                            "return true &&", 1)),
 ):
