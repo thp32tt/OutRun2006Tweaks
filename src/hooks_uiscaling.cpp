@@ -421,7 +421,13 @@ class UIScaling : public Hook
 		D3DXVECTOR2* forwardedScaling = pScaling;
 		D3DXVECTOR2* forwardedTranslation = pTranslation;
         bool publishedPrecontainedMenuMatrix = false;
-
+        const bool centredPhysicalMenuFill =
+            mode == ScalingMode::KeepCentered && Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_TITLE ||
+             *Game::current_mode == GameState::STATE_MENU ||
+             *Game::current_mode == GameState::STATE_SELECTOR ||
+             *Game::current_mode == GameState::STATE_SELEXIT ||
+             *Game::current_mode == GameState::STATE_SELRESET);
 
         // Complete 2D composition is required when the game supplies a
         // non-origin scale/rotation pivot. Only title/menu/car-selection
@@ -462,7 +468,7 @@ class UIScaling : public Hook
 				const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(
                     sx, sy, Game::screen_resolution->x,
                     Game::screen_resolution->y, Game::original_resolution.x,
-                    Game::original_resolution.y);
+                    Game::original_resolution.y, centredPhysicalMenuFill);
 				const float xScale = affine.ScaleX(pScaling->x);
 				const float yScale = affine.ScaleY(pScaling->y);
 				const float centeredX = affine.MapX(pTranslation->x);
@@ -525,7 +531,7 @@ class UIScaling : public Hook
             {
                 const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(
                     sourceSx, sourceSy, dstWidth, dstHeight,
-                    srcWidth, srcHeight);
+                    srcWidth, srcHeight, centredPhysicalMenuFill);
                 const float nextSx = affine.ScaleX(inputSx);
                 const float nextSy = affine.ScaleY(inputSy);
                 const float nextTx = affine.MapX(inputTx);
@@ -564,7 +570,8 @@ class UIScaling : public Hook
                 sourceWidth > 0.0f && sourceHeight > 0.0f)
             {
                 const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(
-                    sx, sy, width, height, sourceWidth, sourceHeight);
+                    sx, sy, width, height, sourceWidth, sourceHeight,
+                    centredPhysicalMenuFill);
                 const float ratioX = affine.ratioX;
                 const float ratioY = affine.ratioY;
                 const float offsetX = affine.offsetX;
@@ -702,7 +709,8 @@ class UIScaling : public Hook
                 contained, vanillaFrontEnd, screenScaleX, screenScaleY,
             Game::screen_resolution ? Game::screen_resolution->x : 0.0f,
             Game::screen_resolution ? Game::screen_resolution->y : 0.0f,
-            Game::original_resolution.x, Game::original_resolution.y);
+            Game::original_resolution.x, Game::original_resolution.y,
+                frontEnd && mode == ScalingMode::KeepCentered);
         if (!quadMap.valid)
             return;
 

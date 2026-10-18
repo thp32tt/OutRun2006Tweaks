@@ -1,5 +1,6 @@
 #include "vr/ui/menu_quad_transform.hpp"
 #include "vr/ui/multi_sprite_contain_scale.hpp"
+#include "vr/ui/frontend_affine_contain.hpp"
 #include <cmath>
 #include <limits>
 #include <initializer_list>
@@ -57,6 +58,40 @@ int main()
     const auto stale=BuildPixelMap(true,true,3,2.25f,1600,900,640,480);
     if(!UniformQuad(stale,640,480,1600,900) ||
        !Near(stale.scaleX,1.875f) || !Near(stale.offsetX,200)) return 5;
+
+    // Fail-before: old cached 1x screen_scale inset the original title
+    // both vertically and horizontally instead of filling 4:3 rails.
+    // The two source paths must now converge on physical containment.
+    const auto physical=BuildPixelMap(true,true,1,1,
+        3440,1440,640,480,true);
+    const auto matrix=OutRunVrUiAspect::BuildFrontEndAffineContain(
+        1,1,3440,1440,640,480,true);
+    if(!UniformQuad(physical,640,480,3440,1440) ||
+       !matrix.valid || !Near(physical.scaleX,3.f) ||
+       !Near(physical.offsetX,760.f) ||
+       !Near(matrix.ScaleX(1.f),physical.scaleX) ||
+       !Near(matrix.ScaleY(1.f),physical.scaleY) ||
+       !Near(matrix.MapX(0.f),physical.offsetX) ||
+       !Near(matrix.MapY(0.f),physical.offsetY)) return 14;
+    const auto physicalPortrait=BuildPixelMap(true,true,1,1,
+        1200,1600,640,480,true);
+    const auto matrixPortrait=OutRunVrUiAspect::BuildFrontEndAffineContain(
+        1,1,1200,1600,640,480,true);
+    if(!UniformQuad(physicalPortrait,640,480,1200,1600) ||
+       !matrixPortrait.valid || !Near(physicalPortrait.scaleX,1.875f) ||
+       !Near(physicalPortrait.offsetY,350.f) ||
+       !Near(matrixPortrait.ratioX,physicalPortrait.scaleX) ||
+       !Near(matrixPortrait.offsetY,physicalPortrait.offsetY)) return 15;
+    const auto oldSmall=BuildPixelMap(true,true,1,1,
+        3440,1440,640,480);
+    const auto oldMatrix=OutRunVrUiAspect::BuildFrontEndAffineContain(
+        1,1,3440,1440,640,480);
+    if(!Near(oldSmall.scaleX,1.f) ||
+       !oldMatrix.valid || !Near(oldMatrix.ratioX,1.f) ||
+       !Near(oldMatrix.ratioY,1.f)) return 16;
+    if(BuildPixelMap(true,true,1,1,0,1440,640,480,true).valid ||
+       OutRunVrUiAspect::BuildFrontEndAffineContain(
+           1,1,0,1440,640,480,true).valid) return 17;
 
     // User-authored deliberately smaller scale remains unchanged.
     const auto small=BuildPixelMap(true,true,1,1,1920,1080,640,480);

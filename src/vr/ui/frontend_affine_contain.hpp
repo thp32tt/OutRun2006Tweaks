@@ -14,10 +14,21 @@ struct FrontEndAffineContain {
 };
 inline FrontEndAffineContain BuildFrontEndAffineContain(
  float sx,float sy,float width,float height,
- float srcWidth,float srcHeight) noexcept {
- const float contain=BoundedMultiSpriteContainScale(
+ float srcWidth,float srcHeight, bool physicalMenuFill=false) noexcept {
+ float contain=BoundedMultiSpriteContainScale(
   sx,sy,width,height,srcWidth,srcHeight);
  if(!(contain>0.f))return {};
+ // The original centered 4:3 title/selector owns a full physical content
+ // viewport. Cached screen_scale may be smaller or stale after Reset;
+ // keep it only for ratios mapping the original authored matrix.
+ if(physicalMenuFill) {
+  const double px=double(width)/srcWidth,py=double(height)/srcHeight;
+  const double physical=px<py?px:py;
+  if(!std::isfinite(physical)||physical<=0.0||
+     physical>3.402823466e38)return {};
+  contain=static_cast<float>(physical);
+  if(!std::isfinite(contain)||contain<=0.f)return {};
+ }
  const float rx=contain/sx,ry=contain/sy;
  const double ox=(double(width)-double(srcWidth)*contain)*0.5;
  const double oy=(double(height)-double(srcHeight)*contain)*0.5;

@@ -16,7 +16,8 @@ namespace OutRunVrMenuQuad
     inline PixelMap BuildPixelMap(bool contained, bool vanillaFrontEnd,
         float screenScaleX, float screenScaleY,
         float screenWidth, float screenHeight,
-        float sourceWidth, float sourceHeight) noexcept
+        float sourceWidth, float sourceHeight,
+        bool physicalMenuFill = false) noexcept
     {
         if (!std::isfinite(screenScaleX) || !std::isfinite(screenScaleY) ||
             screenScaleX <= 0.0f || screenScaleY <= 0.0f)
@@ -44,8 +45,11 @@ namespace OutRunVrMenuQuad
             ? screenScaleX : screenScaleY;
         const float physicalScale = physicalX < physicalY
             ? physicalX : physicalY;
-        const float scale = gameScale < physicalScale
-            ? gameScale : physicalScale;
+        // Only the centered title/menu/selector opts into full 4:3
+        // letterbox filling. Legacy gameplay/smaller-scale paths stay
+        // explicitly bounded by the original game scale.
+        const float scale = physicalMenuFill ? physicalScale :
+            (gameScale < physicalScale ? gameScale : physicalScale);
         const float offsetX = (screenWidth - sourceWidth * scale) * 0.5f;
         const float offsetY = (screenHeight - sourceHeight * scale) * 0.5f;
         if (!std::isfinite(offsetX) || !std::isfinite(offsetY) ||

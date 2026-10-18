@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01054",
+  "production_id": "CONVERSION-DX9EX-01054",
+  "event_id": "CONVERSION-DX9EX-01054-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS_C5",
+  "checkpoint": "C5_VALIDATE",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/ui/frontend_affine_contain.hpp",
+    "src/vr/ui/menu_quad_transform.hpp",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/menu_custom_quad_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep OutRun original main menu and car selector 4:3 full-height inside physical live-screen letterbox instead of vertically compressing or shrinking both native D3DX and custom sprite paths when game screen_scale is stale/small.",
+    "scope_boundary": "Centered 4:3 title/menu/selector game UI only. Exclude gameplay HUD, +TIME, GOAL, ESC, F11, vanilla/online modes, native input, FFB, SkyGlow, world stereo, R26_SAFE, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original OutRun title and vehicle selector native 4:3 sprite sources produce D3DX transformation matrices and textured custom sprite corners.",
+      "Native x86 hooks_uiscaling transforms D3DX matrices and independently maps custom SpriteNode textured vertices to the same physical menu aspect viewport.",
+      "R84 physical game native Draw and existing stereo host presentation consume these pixels without reclassifying shader or game-to-eye scope; only HMD can verify resulting binocular view."
+    ],
+    "subcomponents": [
+      "Correct centered title/menu/selector full, partial and pivoted D3DX sprite matrix containment when stale game scale is smaller than physical output.",
+      "Correct separate original custom menu SpriteNode quad so same physical 4:3 fill scale and offsets reach the native DrawPrimitiveUP.",
+      "Add native smoke across ultrawide, portrait, invalid surface and protected unchanged non-menu/gameplay default."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_source_geometry_full_fill",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original menu D3DX matrix and custom textured quads",
+        "expected_behavior": "Centred 4:3 menu and vehicle selector source paths use the same physical containment and no unnecessary vertical inset at 21:9 or portrait."
+      },
+      {
+        "id": "menu_negative_mode_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Gameplay HUD, +TIME, GOAL, online/vanilla, missing surface and original small scale",
+        "expected_behavior": "Default path keeps old bounded game scale and invalid outputs fail closed; game state and non-centred modes do not opt in."
+      },
+      {
+        "id": "menu_final_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game Win32, host x64, package, Domain and source inspector",
+        "expected_behavior": "Full exact SHA DX9Ex Active, Domain Isolation, HUD Inspector and Full Source Impact workflows must pass before build verified; HMD untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_source_geometry_full_fill": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "menu_negative_mode_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "menu_final_exact_sha": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "User reported horizontally enlarged main menu still failing to fill intended screen height; original SUMO_FE and selector assets have 4:3 game-space producers.",
+    "root_cause": "Source BuildPixelMap and BuildFrontEndAffineContain independently clamp menu 4:3 scale to min(game cached screen_scale, actual physical viewport contain). A smaller stale cached game scale produces a tiny inlaid menu instead of full-height contained 4:3.",
+    "source_trace": [
+      "Game title/menu/selector native D3DX full, partial and pivot matrix scaling enters hooks_uiscaling.",
+      "Custom textured menu quad uses separate 4-corner projective source with BuildPixelMap inside draw_sprite_custom_matrix_mid.",
+      "Centered mode now opts both source routes into full physical 4:3 contain while keeping existing R84 eye host and game native draw ownership."
+    ],
+    "alternatives_rejected": [
+      "Do not enlarge original gameplay HUD or F11, globally stretch 21:9 axes, retag GOAL/+/SkyGlow, or claim Quest3 HMD success from geometry code."
+    ],
+    "eye_ownership": "Native menu source geometry only; both eye draw ownership remains existing R84 path and no HMD frame has been observed.",
+    "fix_evidence": "Both independent front-end source paths select physical 4:3 contain scale with GameState title/menu/selector plus KeepCentered only.",
+    "negative_test_evidence": "Native smoke verifies wide, portrait, prior undersized game scale, invalid surfaces and default non-menu fallback."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "required_gates_state": "PENDING_ALL_FOUR_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  }
+}
