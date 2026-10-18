@@ -7,7 +7,7 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00922",
   "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SHADER_INTEGRATION",
-  "status": "IN_PROGRESS_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -92,7 +92,7 @@
     "C3_VALIDATE": "Initial exact SHA failed strict source graph V3 fingerprint; same-task repair 895baf924bc23ae20c822eb1491e6bbc08bef3d3 passed five required exact-SHA Gates",
     "C4_COMMIT": "Source material 5f2531e2bcbf33a3d30f4bfa1245900c597af1e7; exact-SHA causal CI contract repair 895baf924bc23ae20c822eb1491e6bbc08bef3d3",
     "C5_PACKAGE": "NOT_REQUIRED: native game VS/PS Draw not connected; user-testable native gameplay not proven",
-    "C6_RESULT": "SOURCE_STAGE_5_OF_5_CI_SUCCESS; FEATURE_NOT_TERMINAL, RUNTIME_VALIDATION=UNTESTED, score_change=0; continue under same TASK_ID"
+    "C6_RESULT": "PASS_EXACT_SHA; COMPLETE_BUILD_VERIFIED (SOURCE_STAGE_ONLY); all five required CI Gates SUCCESS at validation-bearing SHA 895baf924bc23ae20c822eb1491e6bbc08bef3d3. Real game programmable Draw and Quest3/VDXR gameplay remain UNTESTED/PENDING as recorded in acceptance_results. No new scoring."
   },
   "RUNTIME_VALIDATION": "UNTESTED",
   "REAL_GAME_DRAW_BLOCKER": "Real bound VS/PS rejected by live_game_frame_bridge.cpp::supported_game_state; no live constant-register, texture and vertex declaration -> native shader pair -> actual D3D11 Draw/DrawIndexed integration. Previous 15548388-source-draw evidence was obtained from an older game build, not this SHA.",
