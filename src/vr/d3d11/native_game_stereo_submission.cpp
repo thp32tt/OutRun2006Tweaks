@@ -105,6 +105,55 @@ struct ScopedNativePostpassOutputs final {
     ScopedNativePostpassOutputs& operator=(const ScopedNativePostpassOutputs&) = delete;
 };
 
+// A source Clear/Copy/Stretch scheduled immediately before an offscreen
+// Draw writes the XR eye, not the callback's currently selected camera.
+// Temporarily install the eye's original RS clip and restore ALL viewport,
+// scissor and rasterizer bindings before drawing the offscreen game geometry.
+// No GPU commands are created by the snapshot itself.
+class ScopedNativeEyeRasterForSourceReplay final {
+public:
+    ScopedNativeEyeRasterForSourceReplay(
+        ID3D11DeviceContext* context, const D3D11_VIEWPORT& eyeViewport,
+        const D3D11_RECT& eyeScissor, ID3D11RasterizerState* eyeRaster) noexcept
+        : context_(context) {
+        if (!context_) return;
+        viewportCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
+        scissorCount_ = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
+        context_->RSGetViewports(&viewportCount_, viewports_);
+        context_->RSGetScissorRects(&scissorCount_, scissors_);
+        context_->RSGetState(savedRaster_.GetAddressOf());
+        if (viewportCount_ == 0u ||
+            viewportCount_ > D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE ||
+            scissorCount_ > D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE)
+            return;
+        context_->RSSetState(eyeRaster);
+        context_->RSSetViewports(1u, &eyeViewport);
+        context_->RSSetScissorRects(1u, &eyeScissor);
+        active_ = true;
+    }
+    ~ScopedNativeEyeRasterForSourceReplay() noexcept {
+        if (!active_) return;
+        context_->RSSetState(savedRaster_.Get());
+        context_->RSSetViewports(viewportCount_, viewports_);
+        context_->RSSetScissorRects(
+            scissorCount_, scissorCount_ ? scissors_ : nullptr);
+    }
+    [[nodiscard]] bool valid() const noexcept { return active_; }
+    ScopedNativeEyeRasterForSourceReplay(
+        const ScopedNativeEyeRasterForSourceReplay&) = delete;
+    ScopedNativeEyeRasterForSourceReplay& operator=(
+        const ScopedNativeEyeRasterForSourceReplay&) = delete;
+private:
+    ID3D11DeviceContext* context_{};
+    D3D11_VIEWPORT viewports_[
+        D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
+    D3D11_RECT scissors_[
+        D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE]{};
+    UINT viewportCount_{}, scissorCount_{};
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> savedRaster_;
+    bool active_{};
+};
+
 // A native D3D9 TARGET rectangle Clear on a D3D11.0 device must rasterize
 // into the *typed RTV*, not infer its format from the backing texture. Real
 // menu/vehicle intermediates may use TYPELESS allocations with UNORM/float
@@ -483,7 +532,17 @@ bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(
         sourceClearCursor_ < sourceClears_->count[sourceClearEye_] &&
         sourceClears_->entries[sourceClearEye_][sourceClearCursor_]
             .afterDrawOrdinal <= drawCount_) {
+        // The callback's current RS viewport/scissor can belong to a smaller
+        // offscreen camera. Replay source-authored TARGET rectangles through
+        // the independently captured XR-eye raster; otherwise a valid full
+        // eye clear becomes cropped and leaves stale car/menu/race pixels.
+        // Restore offscreen RS and all its MRT/UAV outputs before the next
+        // authentic game Draw/DrawIndexed.
+        if (!eyeRasterReady_) return false;
         ScopedNativePostpassOutputs restore(context_);
+        ScopedNativeEyeRasterForSourceReplay eyeRaster(
+            context_, eyeViewport_, eyeScissor_, eyeRasterizer_.Get());
+        if (!eyeRaster.valid()) return false;
         ID3D11RenderTargetView* eye = eyeTarget_;
         context_->OMSetRenderTargets(1u, &eye, eyeDepth_);
         if (!replay_due_source_clears()) return false;

@@ -21,7 +21,20 @@ public:
         bool gameAuthoredFullColorSeed = false) noexcept
         : context_(context), eyeTarget_(eyeTarget), eyeDepth_(eyeDepth),
           targetWidth_(targetWidth), targetHeight_(targetHeight),
-          authoredFullColorClearCount_(gameAuthoredFullColorSeed ? 1u : 0u) {}
+          authoredFullColorClearCount_(gameAuthoredFullColorSeed ? 1u : 0u) {
+        // Snapshot the real eye camera raster BEFORE a game callback can
+        // switch to a menu/car offscreen RTV and its different viewport.
+        // Ordered TARGET clears and GPU copies still belong to the XR eye.
+        if (context_) {
+            UINT viewCount = 1u, scissorCount = 1u;
+            context_->RSGetViewports(&viewCount, &eyeViewport_);
+            context_->RSGetScissorRects(&scissorCount, &eyeScissor_);
+            if (viewCount == 1u && scissorCount == 1u) {
+                context_->RSGetState(eyeRasterizer_.GetAddressOf());
+                eyeRasterReady_ = true;
+            }
+        }
+    }
     NativeGameEyeDrawEncoder(const NativeGameEyeDrawEncoder&) = delete;
     NativeGameEyeDrawEncoder& operator=(const NativeGameEyeDrawEncoder&) = delete;
 
@@ -172,6 +185,13 @@ private:
     ID3D11RenderTargetView* eyeTarget_{};
     ID3D11DepthStencilView* eyeDepth_{};
     UINT targetWidth_{}, targetHeight_{};
+    // The source callback may change RS to an auxiliary camera. Own the
+    // original eye's viewport/scissor/raster state for chronological replay;
+    // never reinterpret a game Clear through that offscreen camera's clip.
+    D3D11_VIEWPORT eyeViewport_{};
+    D3D11_RECT eyeScissor_{};
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> eyeRasterizer_;
+    bool eyeRasterReady_{};
     std::uint64_t drawCount_{};
     std::uint64_t unpredicatedGameDrawCount_{};
     std::uint64_t unpredicatedAtLastFullClear_{};
