@@ -1,0 +1,96 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01051",
+  "production_id": "CONVERSION-DX9EX-01051",
+  "event_id": "CONVERSION-DX9EX-01051-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS_C5",
+  "checkpoint": "C5_VALIDATE",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "8aa035047e2fa31ea5cdb89ab8dc4a6eca18d38e",
+  "changed_files": [
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve a complete binocular stage +TIME extension display, including the original three sprite calls and three numeric glyph calls, when finite source pixels hit extreme viewport coordinates, while protecting GOAL/results and the conservative native fallback.",
+    "scope_boundary": "R84 stage +TIME native D3DX sprite and glyph coordinate-to-left/right-eye projection only; share helper with GOAL/result callers but do not change timer, game state, D3DX flushing, SkyGlow, lens, original input/FFB, R26_SAFE, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original game 0x00498670 emits three +TIME sprite producers at 0x9898E/0x98A36/0x98AC6 and three numeric print calls at 0x989AD/0x98A89/0x98A10.",
+      "Producer-tagged native D3DX/queued SpriteNode and numeric glyphs reach the R84 stage extension eye-plane coordinate helper before physical left/right Draw submission.",
+      "Source pixels are transformed once to shared game NDC in double precision, then each valid per-eye clip and viewport projects to finite destination float pixels for OpenXR composition or existing native failure fallback."
+    ],
+    "subcomponents": [
+      "Unify sprite and numeric glyph pair projection through double-precision viewport-to-game-NDC and per-eye clip calculations, preserving valid finite endpoints instead of overflowing the intermediate float multiply-by-two.",
+      "Commit LEFT and RIGHT projected positions atomically; malformed source viewport, nonpositive W, invalid matrix or unrepresentable destination must reject both and retain previous fallback outputs.",
+      "Exercise positive huge finite viewport endpoint, single-eye equivalence, negative overflowed destination and invalid RIGHT W using native C++ smoke cases, while maintaining existing GOAL/result optical callers."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_time_both_eye_pixels",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original +TIME three sprite and three numeric print producers to native R84 left and right eye projection",
+        "expected_behavior": "Finite stage extension source pixels yield finite and distinct projected LEFT and RIGHT outputs without intermediate float overflow suppressing both eyes."
+      },
+      {
+        "id": "stage_time_negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Nonfinite pixel, malformed eye W, unavailable viewport and out-of-range float destinations; original GOAL and result preservation",
+        "expected_behavior": "An invalid source or either eye never partially publishes projections; previous outputs, native fallback, original GOAL/result and timer semantics remain protected."
+      },
+      {
+        "id": "stage_time_final_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA DX9Ex Active Windows R84 game, x64 OpenXR host and package, Domain Isolation, HUD Inspector and Full Source Impact",
+        "expected_behavior": "All four required GitHub Actions gates succeed at the same validation-bearing SHA; matching Quest3/VDXR visual behavior remains UNTESTED without hardware."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_time_both_eye_pixels": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "stage_time_negative_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "stage_time_final_integrated_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Existing original game static mapping identifies all three stage +TIME sprite calls and three numeric print calls; the shared project helper is exercised by both stage and GOAL/result render paths.",
+    "source_trace": [
+      "Original stage +TIME native sprite producer and glyph producer callbacks share screen pixel coordinates and a per-eye projection route.",
+      "Previous float source-to-NDC formulation multiplies finite source offset by 2 before dividing by a finite full viewport width, overflowing at representable float endpoints.",
+      "R84 StageExtensionPlane::ProjectPixelPair produces both native eye projected coordinates atomically before GPU-eye submission; invalid one-eye transform must retain native path."
+    ],
+    "alternatives_rejected": [
+      "Do not globally flush D3DX sprites or alter original +TIME timer and state machine; intermediate arithmetic is the bounded source issue in this commit.",
+      "Do not silently upgrade mono/fallback results to verified Quest3 binocular behavior or change unrelated SkyGlow and lens draw classifications."
+    ],
+    "root_cause": "The intermediate float multiply-by-two in source pixel to game NDC calculation can become Inf for finite viewport edge coordinates and incorrectly rejects a mathematically valid binocular result.",
+    "fix_evidence": "C++ implementation commit 8aa035047e2fa31ea5cdb89ab8dc4a6eca18d38e uses double precision common game NDC and double eye projection with finite float destination validation, retaining atomic both-eye update.",
+    "negative_test_evidence": "vrhost/tests/stage_extension_eye_plane_smoke.cpp adds native large finite source and negative invalid-eye/out-of-range destination cases; Windows build and CI are pending.",
+    "eye_ownership": "Both left and right eye projected float pixel outputs must be valid before any caller-visible pair is changed; this is static source eligibility only and not proof of native GPU draw in HMD."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "8aa035047e2fa31ea5cdb89ab8dc4a6eca18d38e",
+    "failed_preflight_run_id": 39147369291,
+    "failed_preflight_job_id": 117733836285,
+    "failed_preflight_conclusion": "failure",
+    "failed_preflight_cause": "Run record absent at source commit; --check-head policy gate failed before compiling. No native compile failure reported.",
+    "validation_bearing_result_sha": null,
+    "required_gates_state": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Same TASK_ID retry E003 fixes the exact failed DX9Ex Active policy prerequisite by publishing the missing one-function run record. C++ source and native regression implementation remain at material SHA 8aa0350. This record commit is not another standalone functional accomplishment and is not scored separately. Final exact-SHA CI and later C6 are separate; no Quest3/VDXR test occurred."
+}
