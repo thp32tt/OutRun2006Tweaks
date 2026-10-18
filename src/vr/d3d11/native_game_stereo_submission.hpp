@@ -141,6 +141,15 @@ public:
     [[nodiscard]] std::uint64_t unpredicated_at_last_full_clear() const noexcept {
         return unpredicatedAtLastFullClear_;
     }
+    // Offscreen camera Draws advance source chronology and can feed a later
+    // game Copy/Stretch, but cannot certify a CLEAR-only XR eye. Track
+    // eligible on-eye geometry separately from offscreen source geometry.
+    [[nodiscard]] std::uint64_t unpredicated_eye_draw_count() const noexcept {
+        return unpredicatedEyeDrawCount_;
+    }
+    [[nodiscard]] std::uint64_t unpredicated_eye_at_last_full_clear() const noexcept {
+        return unpredicatedEyeAtLastFullClear_;
+    }
     // Depth-only and color-masked game Draws still execute and contribute to
     // the command stream, but cannot by themselves certify a visible XR eye.
     [[nodiscard]] std::uint64_t color_draw_count() const noexcept { return colorDrawCount_; }
@@ -195,6 +204,10 @@ private:
     std::uint64_t drawCount_{};
     std::uint64_t unpredicatedGameDrawCount_{};
     std::uint64_t unpredicatedAtLastFullClear_{};
+    // Actual on-eye Draw/DrawIndexed (including instancing), excluding every
+    // game offscreen camera command until an authored GPU postpass imports it.
+    std::uint64_t unpredicatedEyeDrawCount_{};
+    std::uint64_t unpredicatedEyeAtLastFullClear_{};
     std::uint64_t colorDrawCount_{};
     std::uint32_t authoredColorPostpassCount_{};
     std::uint32_t authoredFullColorClearCount_{};

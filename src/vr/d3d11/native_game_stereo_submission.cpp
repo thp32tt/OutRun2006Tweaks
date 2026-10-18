@@ -805,7 +805,10 @@ bool NativeGameEyeDrawEncoder::draw(
         eye_color_writable(), unpredicated_color_evidence());
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
-    if (unpredicated) ++unpredicatedGameDrawCount_;
+    if (unpredicated) {
+        ++unpredicatedGameDrawCount_;
+        ++unpredicatedEyeDrawCount_;
+    }
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -821,7 +824,10 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
         eye_color_writable(), unpredicated_color_evidence());
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
-    if (unpredicated) ++unpredicatedGameDrawCount_;
+    if (unpredicated) {
+        ++unpredicatedGameDrawCount_;
+        ++unpredicatedEyeDrawCount_;
+    }
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -842,7 +848,10 @@ bool NativeGameEyeDrawEncoder::draw_instanced(
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
-    if (unpredicated) ++unpredicatedGameDrawCount_;
+    if (unpredicated) {
+        ++unpredicatedGameDrawCount_;
+        ++unpredicatedEyeDrawCount_;
+    }
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -861,7 +870,10 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
     ++drawCount_;
-    if (unpredicated) ++unpredicatedGameDrawCount_;
+    if (unpredicated) {
+        ++unpredicatedGameDrawCount_;
+        ++unpredicatedEyeDrawCount_;
+    }
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -929,8 +941,10 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         authoredColorPostpassCount_ = history.colorPostpasses;
         authoredFullColorClearCount_ = history.fullTargetClears;
         lastFullClearDrawOrdinal_ = history.lastFullClearDrawOrdinal;
-        if (lastTargetClearFull_)
+        if (lastTargetClearFull_) {
             unpredicatedAtLastFullClear_ = unpredicatedGameDrawCount_;
+            unpredicatedEyeAtLastFullClear_ = unpredicatedEyeDrawCount_;
+        }
     }
     return written;
 }
@@ -2449,13 +2463,15 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             if (!encoder.finish_source_clear_timeline())
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
-            if (!live_game_stereo::authored_visible_color_output_ready(
+            if (!live_game_stereo::authored_visible_eye_frame_ready(
                     encoder.draw_count(), encoder.color_draw_count(),
                     encoder.authored_color_postpass_count(),
                     encoder.authored_full_color_clear_count(),
                     encoder.last_full_clear_draw_ordinal(),
                     encoder.unpredicated_game_draw_count(),
-                    encoder.unpredicated_at_last_full_clear()) ||
+                    encoder.unpredicated_at_last_full_clear(),
+                    encoder.unpredicated_eye_draw_count(),
+                    encoder.unpredicated_eye_at_last_full_clear()) ||
                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||

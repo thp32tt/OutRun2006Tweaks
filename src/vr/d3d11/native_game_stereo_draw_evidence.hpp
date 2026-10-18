@@ -242,4 +242,36 @@ static_assert(!authored_visible_color_output_ready(3u, 0u, 0u, 1u, 2u, 1u, 1u));
 static_assert(authored_visible_color_output_ready(3u, 0u, 0u, 1u, 2u, 2u, 1u));
 static_assert(!authored_visible_color_output_ready(3u, 0u, 1u, 0u, 0u, 0u, 0u));
 static_assert(authored_visible_color_output_ready(3u, 0u, 1u, 0u, 0u, 1u, 0u));
+// Source ordinals include legitimate offscreen menu/vehicle/race camera Draws.
+// Those Draws can supply color ONLY after a real game GPU Copy/Stretch to the
+// XR eye. A full TARGET Clear followed by offscreen-only geometry leaves a
+// clear-colored eye, not a native game frame. Depth-only ON-EYE geometry may
+// still validate an authored full color clear (as in the original D3D9 path).
+[[nodiscard]] constexpr bool authored_visible_eye_frame_ready(
+    std::uint64_t geometryDraws, std::uint64_t directColorDraws,
+    std::uint32_t authoredColorPostpasses,
+    std::uint32_t authoredFullColorClears,
+    std::uint64_t lastFullClearDrawOrdinal,
+    std::uint64_t unpredicatedGameDraws,
+    std::uint64_t unpredicatedDrawsAtLastFullClear,
+    std::uint64_t unpredicatedEyeDraws,
+    std::uint64_t unpredicatedEyeDrawsAtLastFullClear) noexcept {
+    if (unpredicatedEyeDraws > unpredicatedGameDraws ||
+        unpredicatedEyeDrawsAtLastFullClear > unpredicatedEyeDraws ||
+        !authored_visible_color_output_ready(
+            geometryDraws, directColorDraws, authoredColorPostpasses,
+            authoredFullColorClears, lastFullClearDrawOrdinal,
+            unpredicatedGameDraws, unpredicatedDrawsAtLastFullClear))
+        return false;
+    return directColorDraws != 0u || authoredColorPostpasses != 0u ||
+        (authoredFullColorClears != 0u &&
+         unpredicatedEyeDraws > unpredicatedEyeDrawsAtLastFullClear);
+}
+static_assert(!authored_visible_eye_frame_ready(1, 0, 0, 1, 0, 1, 0, 0, 0)); // offscreen only
+static_assert(authored_visible_eye_frame_ready(1, 0, 0, 1, 0, 1, 0, 1, 0)); // on-eye depth draw
+static_assert(authored_visible_eye_frame_ready(1, 0, 1, 1, 0, 1, 0, 0, 0)); // offscreen -> GPU copy
+static_assert(!authored_visible_eye_frame_ready(1, 0, 1, 1, 0, 0, 0, 0, 0)); // no eligible game draw
+static_assert(!authored_visible_eye_frame_ready(2, 0, 0, 1, 1, 2, 1, 1, 1)); // offscreen after clear
+static_assert(authored_visible_eye_frame_ready(2, 0, 0, 1, 1, 2, 1, 2, 1)); // eye after clear
+static_assert(authored_visible_eye_frame_ready(1, 1, 0, 0, 0, 1, 0, 1, 0)); // direct color
 } // namespace outrun::vr::dx11::live_game_stereo
