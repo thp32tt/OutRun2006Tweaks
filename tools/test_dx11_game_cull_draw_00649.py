@@ -10,7 +10,6 @@ def passes(src):
     return all(token in src for token in (
         '#include "live_game_cull_state.hpp"',
         "GameNativeCullAdmission admittedCull{};",
-        "game_native_cull_admission(",
         "output.nativeCullMode = admittedCull.d3d9Mode;",
         "raster.CullMode = D3D11_CULL_BACK;",
         "raster.FrontCounterClockwise = direction == 0u ? TRUE : FALSE;",
@@ -22,7 +21,7 @@ def passes(src):
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
         "for (auto& item : s.diagnosticCullRasters) item.Reset();",
-    )) and "cullMode != D3DCULL_NONE" not in capture and "fillMode != D3DFILL_SOLID" in capture and all(x in submit for x in (
+    )) and "game_native_cull_admission(" in capture and "cullMode != D3DCULL_NONE" not in capture and "fillMode != D3DFILL_SOLID" in capture and all(x in submit for x in (
         "output.scissor ? 2u : 0u", "output.scissor ? 3u : 1u",
         "output.scissor ? s.scissorRaster.Get() : s.raster.Get()"))
 assert passes(c)
@@ -34,7 +33,17 @@ for original,modified in (
     ("output.scissor ? 3u : 1u", "1u"),
     ("ctx->RSSetState(nativeRaster);", "ctx->RSSetState(s.raster.Get());"),
 ):
-    altered=c.replace(original,modified,1)
+    if original == "game_native_cull_admission(":
+        # Mutate the original fixed-function source capture, not the new
+        # programmable SM3 caller. Both paths must independently enforce cull.
+        before, rest = c.split("bool supported_game_state(", 1)
+        capture, after = rest.split("bool translate_vertices(", 1)
+        assert original in capture
+        altered = (before + "bool supported_game_state(" +
+                   capture.replace(original, modified, 1) +
+                   "bool translate_vertices(" + after)
+    else:
+        altered = c.replace(original, modified, 1)
     assert altered != c and not passes(altered), original
 assert "primitive >= 4u ? mode : 1u" in h
 assert "mode < 1u || mode > 3u" in h
