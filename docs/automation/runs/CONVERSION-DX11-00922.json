@@ -1,0 +1,142 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00922",
+  "production_id": "CONVERSION-DX11-00922",
+  "event_id": "CONVERSION-DX11-00922-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00922",
+  "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SHADER_INTEGRATION",
+  "status": "IN_PROGRESS_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "score_change": 0,
+  "material_result_sha": "5f2531e2bcbf33a3d30f4bfa1245900c597af1e7",
+  "validation_bearing_result_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3",
+  "feature_contract": {
+    "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SHADER_INTEGRATION",
+    "goal": "Translate and bind real OutRun D3D9 programmable VS/PS with live resources and input to produce a native D3D11 Draw/DrawIndexed visible in menu, vehicle selection and race, without altering original DX9Ex fallback",
+    "acceptance_items": [
+      {
+        "id": "real_programmable_game_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_shader_vertex_pixel_draw_and_visible_output",
+        "expected_behavior": "A real bound game VS/PS pair and its live vertex data, constant registers, textures and render states execute native DX11 Draw/DrawIndexed with visible pixels"
+      },
+      {
+        "id": "unmodified_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_game_input_ffb_and_dx9ex_rendering",
+        "expected_behavior": "Any unsupported shader/register or pipeline state rejects the native candidate while original D3D9 draw, input, FFB and renderer remain authoritative"
+      },
+      {
+        "id": "single_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "source_translator_backend_win32_openxr_hud",
+        "expected_behavior": "The integrated programmable source and negative regression tests pass all five mandatory GitHub Actions at one exact validation-bearing SHA"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "first_live_game_draw",
+    "integration_path": [
+      "intercept real game-authored programmable D3D9 Draw and decode SM3 VS/PS function stream",
+      "materialize supported arithmetic/source modifiers as native HLSL/DXBC with fail-closed unsupported instructions",
+      "complete live constants/texture/input layout and D3D11 Draw/DrawIndexed binding to visible native full game frame"
+    ],
+    "batch_components": [
+      "native_backend.cpp SM3 opcode decoding into translated artifact source",
+      "native_sm3_arithmetic_codegen.hpp source modifier and arithmetic HLSL emitter",
+      "dx11_sm3_arithmetic_codegen_probe.cpp positive/negative source regression"
+    ],
+    "conflict_keys": [
+      "DX11:REAL_GAME_DRAW",
+      "DX11:PROGRAMMABLE_SHADER_TRANSLATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FIRST_GAME_DRAW_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NOT_ACHIEVED: source subset expansion built and verified only; real-game playable native DX11 frame is still pending",
+    "activation_guard_and_fallback": "Diagnostic-only SM3 subset translation; runtime native programmable object binding remains disabled until live constants, shader resources, vertex declaration, and Draw target parity are actually implemented and verified; original D3D9 Draw, gamepad/FFB, DX9Ex fallback preserved; DXVK frozen",
+    "acceptance_proof": {
+      "positive_probe": "SM3 RCP/RSQ/EXP/LOG/POW/LRP/NRM/CRS/DP2ADD and source-modifier HLSL regression compiled under -Werror in DX11 Fast Gate",
+      "negative_regression": "Undefined NRM/CRS W writes, unknown modifiers and unsupported bytecode paths fail closed without bypassing renderer safety controls",
+      "component_integration": "D3D9 SM3 bytecode decoder opcode translation now feeds existing R283 DXBC materializer; live native pipeline/real-game Draw binding is still missing"
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp"
+  ],
+  "ci_failure_repair_file": "tools/verify_dx11_source_graph.py",
+  "acceptance_results": {
+    "real_programmable_game_draw": "PENDING_LIVE_DRAW_AND_VISIBLE_FRAME",
+    "unmodified_fallback": "PASS_SOURCE_FAIL_CLOSED_ONLY",
+    "single_exact_sha_ci": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Previous 00921 build-verified C6 at SHA ecc60f28e828de56896815bc2b702e71a2ac4690; newest branch policy P0 says 15548388 source draws but native_draws=0 on an earlier real-game test",
+    "C1_REVIEW": "Bridge supported_game_state rejects any bound VS/PS; R283 native translator lacked common SM3 math/modifier opcodes",
+    "C2_IMPLEMENT": "SM3 arithmetic/modifier HLSL translator and targeted negative/positive regression in material commit 5f2531e2bcbf33a3d30f4bfa1245900c597af1e7",
+    "C3_VALIDATE": "Initial exact SHA failed strict source graph V3 fingerprint; same-task repair 895baf924bc23ae20c822eb1491e6bbc08bef3d3 passed five required exact-SHA Gates",
+    "C4_COMMIT": "Source material 5f2531e2bcbf33a3d30f4bfa1245900c597af1e7; exact-SHA causal CI contract repair 895baf924bc23ae20c822eb1491e6bbc08bef3d3",
+    "C5_PACKAGE": "NOT_REQUIRED: native game VS/PS Draw not connected; user-testable native gameplay not proven",
+    "C6_RESULT": "SOURCE_STAGE_5_OF_5_CI_SUCCESS; FEATURE_NOT_TERMINAL, RUNTIME_VALIDATION=UNTESTED, score_change=0; continue under same TASK_ID"
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "REAL_GAME_DRAW_BLOCKER": "Real bound VS/PS rejected by live_game_frame_bridge.cpp::supported_game_state; no live constant-register, texture and vertex declaration -> native shader pair -> actual D3D11 Draw/DrawIndexed integration. Previous 15548388-source-draw evidence was obtained from an older game build, not this SHA.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "5f2531e2bcbf33a3d30f4bfa1245900c597af1e7",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Implement live programmable VS/PS capture/binding with actual D3D9 shader constant register uploads, vertex declaration/VB/IB and texture sampler state to native Draw/DrawIndexed; preserve fail-closed existing fixed-function and original D3D9 execution",
+  "validation_evidence": {
+    "scope": "SOURCE_STAGE_ONLY",
+    "exact_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3",
+    "ci_status": "SUCCESS",
+    "ci_gate_count": "MANDATORY_5_OF_5",
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39138203427,
+        "conclusion": "success",
+        "head_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39138203416,
+        "conclusion": "success",
+        "head_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3"
+      },
+      {
+        "name": "Build",
+        "run_id": 39138203433,
+        "conclusion": "success",
+        "head_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39138207443,
+        "conclusion": "success",
+        "head_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39138207426,
+        "conclusion": "success",
+        "head_sha": "895baf924bc23ae20c822eb1491e6bbc08bef3d3"
+      }
+    ]
+  }
+}
