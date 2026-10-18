@@ -1,0 +1,75 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01040",
+  "production_id": "CONVERSION-DX9EX-01040",
+  "event_id": "CONVERSION-DX9EX-01040-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
+  "checkpoint": "C2_IMPLEMENTED",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "PENDING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_CI",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/sprite_queue_tail_proof.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Ensure native glyph SpriteNodes from the original 0x2C808/0x2C9DB path cannot inherit a detached, rebuilt or foreign priority queue tail and thus acquire incorrect ScreenHud ownership during R84 stereo submission; preserve original classification and all non-glyph systems.",
+    "scope_boundary": "Common native glyph caller->SpriteNode queue reachability only, preserving exact B9200/GOAL, +TIME, rank, WVP and R84 veto; no DX11/DXVK/R26_SAFE/input/FFB/SkyGlow changes.",
+    "trace_stages": [
+      "Original x86 0x2C808/0x2C9DB glyph callers enter TextGlyph_putSprite and capture priority list root/tail.",
+      "TagAppendedNodes reuses existing stable-root bounded reachability helper for common glyphs and exact GOAL parents, rather than dereferencing old tail after a rebuild.",
+      "Only proven newly appended sprites retain existing ScreenHud semantics for downstream R84 queue selection and independent physical eye draw admission."
+    ],
+    "subcomponents": [
+      "Capture original root for all common TextGlyph_putSprite calls without changing native sprite arguments, timing or producer tokens.",
+      "Use bounded live-root reachability for ordinary and exact result glyph nodes instead of O(1) unverified old-tail dereference.",
+      "Compile-time positive and negative assertions for same-root append, empty sentinel, replaced root, detached tail, foreign tail and bounded cycles."
+    ],
+    "acceptance_items": [
+      {
+        "id": "glyph_queue_proof",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original glyph producers to R84 SpriteNode HUD semantics",
+        "expected_behavior": "Only a priority list containing its pre-call root, old tail and new tail may transfer the native ScreenHud ownership."
+      },
+      {
+        "id": "rebuild_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Old tail detached/rebuilt/foreign or cyclic list",
+        "expected_behavior": "No stale dereference or promotion; original native rendering and other exact producers remain protected."
+      },
+      {
+        "id": "integration_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact Windows x86 R84 game and x64 host package, Domain, HUD Inspector and Full Source Impact",
+        "expected_behavior": "All four required GitHub gates SUCCESS on one exact validation-bearing SHA without ci-skip; HMD remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "glyph_queue_proof": "SOURCE_IMPLEMENTED",
+    "rebuild_negative": "SOURCE_IMPLEMENTED",
+    "integration_gates": "PENDING"
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "final_exact_sha_gates": "PENDING",
+    "head_sha": "PENDING"
+  },
+  "notes": "Coherent common glyph queue lifetime repair, preserving original classification and bounded fallback. HMD/Quest3 validation not performed; do not report optical fix or score until required exact-SHA gates and independent material outcome verified."
+}

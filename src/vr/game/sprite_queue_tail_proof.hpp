@@ -43,4 +43,50 @@ namespace OutRunVR::SpriteQueue
             ? FirstVerifiedAppendedNode(currentRoot, oldTail, newTail, bound)
             : nullptr;
     }
+    // The common original 0x2C808/0x2C9DB glyph paths use this same
+    // bounded proof. A rebuilt list, detached old tail or cyclic chain
+    // must not gain ScreenHud ownership from a previous glyph's snapshot.
+    namespace Regression
+    {
+        struct Node
+        {
+            Node* next_0 = nullptr;
+        };
+        constexpr bool TextGlyphQueueRebuildGuards() noexcept
+        {
+            Node root{}, first{}, oldTail{}, appended{}, replacement{},
+                foreign{}, cycleA{}, cycleB{};
+            root.next_0 = &first;
+            first.next_0 = &oldTail;
+            oldTail.next_0 = &appended;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &appended, 8) != &appended)
+                return false;
+            // A first write after the empty sentinel is a real glyph.
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &root, &appended, 8) != &first)
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &replacement, &oldTail, &appended, 8))
+                return false;
+            root.next_0 = &first;
+            first.next_0 = &appended; // oldTail was detached/recycled.
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &appended, 8))
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &foreign, 8))
+                return false;
+            root.next_0 = &cycleA;
+            cycleA.next_0 = &cycleB;
+            cycleB.next_0 = &cycleA;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &foreign, 4))
+                return false;
+            return true;
+        }
+        static_assert(TextGlyphQueueRebuildGuards(),
+            "Original glyphs must not inherit a rebuilt/foreign queue tail");
+    }
+
 }

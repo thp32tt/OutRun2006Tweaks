@@ -1052,6 +1052,11 @@ class UIScaling : public Hook
                 // Original B9200 GOAL text can rebuild a priority list:
                 // oldTail->next_0 is not safe unless oldTail is still linked.
                 producer == OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+                // The common x86 glyph wrappers (0x2C808/0x2C9DB) can
+                // enqueue more than one character and run while GOAL/other
+                // HUD queues are recycled. Their old tail is not a safe
+                // pointer until the live root proves it is still linked.
+                producer == OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
@@ -1841,8 +1846,10 @@ class UIScaling : public Hook
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
-            if (exactGoalResult)
-                rootsBefore[prio] = root;
+            // Every glyph, not only stack-proven GOAL B9200, needs the
+            // pre-call root to reject a rebuilt/foreign priority list.
+            // The bounded helper never dereferences a detached old tail.
+            rootsBefore[prio] = root;
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
         // Only verified original B9200 callers carry the stable-root and
@@ -1879,11 +1886,14 @@ class UIScaling : public Hook
         }
         else
         {
-            // The untouched +TIME, stage Sumo_Printf, ordinary HUD and
-            // all unknown callers use the exact preexisting sprite route.
+            // Keep the original ScreenHud classification for ordinary
+            // glyphs, but do not read a stale tail or tag a replaced root.
+            // Verified bounded traversal is needed even when a glyph
+            // caller has no stronger exact original-parent identity.
 		    TagAppendedNodes(tailsBefore,
 			    OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			    OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite);
+			    OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite,
+                nullptr, &rootsBefore);
         }
 		return result;
 	}
