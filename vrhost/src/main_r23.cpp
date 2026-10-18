@@ -1666,12 +1666,12 @@ namespace
         // projections. Center LOCAL-fixed menu content on the optical ray,
         // then preserve its physical aspect within BOTH clipped FOV margins.
         // Reject invalid/stale publications rather than stretching a menu.
-        // 2026-10-17 Quest3: title/main menu was correctly proportioned
-        // but 75%-sized. Fit those states to the safe binocular optical
-        // boundary; keep full-width selector/exit/reset at historical 0.78.
-        // OUTRUN_VR_MENU_OPTICAL_COVERAGE explicitly overrides either default.
-        // Apply one symmetric optical margin to complete native-aspect
-        // menu and explicit 4:3 crop. The existing
+        // Quest3 optical size regression: all front-end states now use
+        // the maximum binocular-safe contained size (coverage=1.0).
+        // No automatic 75/78% reduction for selector/exit/reset/unknown
+        // states. OUTRUN_VR_MENU_OPTICAL_COVERAGE remains an explicit
+        // diagnostic override if the user deliberately requests a smaller
+        // display. The existing
         // tangent-space containment retains a uniform physical aspect,
         // optical centre, both-eye placement and clipped-fragment geometry.
         // Gameplay stereo HUD, F11 and desktop presentation are untouched.
