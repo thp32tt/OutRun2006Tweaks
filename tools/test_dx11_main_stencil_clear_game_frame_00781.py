@@ -9,7 +9,7 @@ wf=(r/".github/workflows/dx11-fast-structural.yml").read_text()
 def valid(bridge,hook,guard):
     main=bridge.split("bool observe_game_depth_clear(",1)[1].split("void observe_game_clear(",1)[0]
     color=bridge.split("void observe_game_clear(",1)[1].split("void observe_unavailable_game_draw(",1)[0]
-    raster=bridge.split("bool supported_game_state(",1)[1].split("bool submit(",1)[0]
+    raster=bridge.split("bool supported_game_state(",1)[1].split("GameNativeCullAdmission admittedCull{}",1)[0]
     return all((
       "const bool clearZ = (flags & D3DCLEAR_ZBUFFER) != 0u;" in main,
       "(flags & ~kDepthStencilFlags) != 0u" in main,
