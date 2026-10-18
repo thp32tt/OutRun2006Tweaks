@@ -116,7 +116,9 @@
   },
   "score_policy": {
     "run_key": "CONVERSION-DX11-00938",
-    "scoreboard_recorded_separately": false,
-    "retry_additional_score": 0
+    "scoreboard_recorded_separately": true,
+    "retry_additional_score": 0,
+    "scoreboard_commit": "9089c9ea8c20521bae964e820d402f64799e103e",
+    "score_awarded_once": 1
   }
 }
