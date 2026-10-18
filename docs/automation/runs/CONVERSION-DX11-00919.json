@@ -8,7 +8,7 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00919",
   "feature_id": "DX11:CAMERA_SUBRESOURCE_COLOR_PROVENANCE",
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
+  "checkpoint": "C3_VALIDATE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
@@ -20,19 +20,23 @@
       {
         "id": "authentic_game_source_gpu_postpass",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Copy/Stretch counts color only if the exact camera source had an eligible Draw"
+        "expected_behavior": "Copy/Stretch counts color only if the exact camera source had an eligible Draw",
+        "behavior_area": "real_game_offscreen_draw_native_gpu_copy_stretch_eye_color"
       },
       {
         "id": "unrelated_cleared_camera_and_fallback",
         "category": "fallback_regression",
-        "expected_behavior": "Clear invalidates stale proof; unrelated postpasses retain original GPU chronology and DX9Ex/input/FFB"
+        "expected_behavior": "Clear invalidates stale proof; unrelated postpasses retain original GPU chronology and DX9Ex/input/FFB",
+        "behavior_area": "offscreen_target_clear_resource_invalidation_dx9ex_input_fallback"
       },
       {
         "id": "five_gate_exact_sha",
         "category": "integrated_validation",
-        "expected_behavior": "Compile static identity regressions and five required GitHub Actions"
+        "expected_behavior": "Compile static identity regressions and five required GitHub Actions",
+        "behavior_area": "win32_native_draw_host_stereo_exact_sha_ci"
       }
-    ]
+    ],
+    "feature_id": "DX11:CAMERA_SUBRESOURCE_COLOR_PROVENANCE"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -50,13 +54,30 @@
     "conflict_keys": [
       "DX11:CAMERA_SUBRESOURCE_COLOR_PROVENANCE:00919"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: offscreen camera GPU color copied to XR eyes is source-authenticated, but no matching OutRun menu/car/race or HMD observation.",
+    "activation_guard_and_fallback": "Do not promote native renderer or drop game GPU commands. Unsupported/unproven source postpasses do not certify XR eye; original D3D9/DX9Ex/FFB/input path remains authoritative.",
+    "acceptance_proof": {
+      "positive_probe": "Four real offscreen native game Draw/Indexed/Instanced variants record source texture+mip+array; GPU Copy and filtered Stretch import color evidence only from the identical view.",
+      "negative_regression": "Other camera resource, array eye and mip, never-written camera or source reset by GPU TARGET Clear do not certify stale postpass; no GPU command or D3D9 path removed.",
+      "component_integration": "Camera Draw/source Clear lifecycle and chronological native L/R Copy/Stretch postpasses share a bounded per-eye provenance ledger, with static positive/negative identity assertions and exact-SHA build gates."
+    }
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.cpp",
     "src/vr/d3d11/native_game_stereo_submission.hpp",
     "src/vr/d3d11/native_game_offscreen_color_provenance.hpp"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null
+  "material_result_sha": "67ff6382068c6f4f9f1537e363d4119e9f947049",
+  "validation_bearing_result_sha": null,
+  "acceptance_results": {
+    "authentic_game_source_gpu_postpass": "PENDING_EXACT_SHA",
+    "unrelated_cleared_camera_and_fallback": "PENDING_EXACT_SHA",
+    "five_gate_exact_sha": "PENDING_EXACT_SHA"
+  }
 }

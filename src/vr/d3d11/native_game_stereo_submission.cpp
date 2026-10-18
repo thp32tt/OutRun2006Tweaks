@@ -813,12 +813,17 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
         rectContext->ClearView(gameTarget, rgba, actual, 1u);
         invalidate_offscreen_color_source(gameTarget);
         return true;
-    case live_game_stereo::NativeColorClearRoute::ShaderRaster:
-        if (!raster_partial_eye_color_clear(
-                context_, gameTarget, camera.width, camera.height, *actual, rgba))
-            return false;
-        invalidate_offscreen_color_source(gameTarget);
-        return true;
+    case live_game_stereo::NativeColorClearRoute::ShaderRaster: {
+        // Keep the original audited D3D11.0 shader-raster Clear dispatch.
+        // Only a successfully queued camera Clear invalidates old Draw color.
+        const bool issued = [&]() noexcept {
+            return raster_partial_eye_color_clear(
+                context_, gameTarget, camera.width, camera.height,
+                *actual, rgba);
+        }();
+        if (issued) invalidate_offscreen_color_source(gameTarget);
+        return issued;
+    }
     default:
         return false; // malformed region or unsupported target; DX9Ex owns it
     }
