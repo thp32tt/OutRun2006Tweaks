@@ -10,6 +10,8 @@ probe = (root / "tools/dx11_game_depth_probe.cpp").read_text(encoding="utf-8")
 def connected(cpp: str, adm: str) -> bool:
     gate = cpp.split("bool supported_game_state(", 1)[1].split("bool translate_vertices(", 1)[0]
     draw = cpp.split("bool submit(", 1)[1].split("void before_game_present(", 1)[0]
+    sm3 = cpp.split("bool submit_live_sm3_game_draw(", 1)[1].split(
+        "// Reuse geometric growth buffers", 1)[0]
     common = (
         'GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)',
         'game_native_depth_admission(',
@@ -36,7 +38,18 @@ def connected(cpp: str, adm: str) -> bool:
             'ctx->DrawIndexed(indexCount, 0, 0);',
             'ctx->Draw(static_cast<UINT>(vertices.size()), 0);',
         ))
-        and cpp.count('game_native_depth_slot(') == 2
+        and cpp.count('game_native_depth_slot(') == 3
+        and sm3.count('game_native_depth_slot(') == 1
+        and all(x in sm3 for x in (
+            'game_native_depth_admission(',
+            'if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))',
+            'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO',
+            'ds.DepthFunc = compare;',
+            'context->OMSetDepthStencilState(liveDepthState, 0u)',
+            'context->OMSetRenderTargets(',
+            'liveDepth.enabled ? s.diagnosticDepthView.Get() : nullptr',
+            'liveBatch.succeeded(liveDepth.enabled, reverseDepth)',
+        ))
         and 'constexpr std::uint32_t game_native_depth_slot(' in adm
         and 'zWrite > 1u' in adm
         and 'output = {true, zFunc == 4u, zWrite == 1u};' in adm
@@ -51,6 +64,22 @@ for original, broken in (
     ('D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO', 'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ALL'),
     ('game_native_depth_slot(', 'game_native_depth_slot_broken('),
     ('ctx->OMSetDepthStencilState(', 'ctx->OMSetRenderTargets('),
+):
+    mutated = bridge.replace(original, broken)
+    assert mutated != bridge and not connected(mutated, header), original
+
+# SM3 now shares the source-owned read-only Z family with the older
+# fixed-function Draw path. Reject mutations that promote Z reads to writes,
+# lose the per-draw DSV binding or suppress source-depth admission.
+for original, broken in (
+    ('D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO',
+     'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ALL'),
+    ('context->OMSetDepthStencilState(liveDepthState, 0u)',
+     'context->OMSetDepthStencilState(nullptr, 0u)'),
+    ('liveDepth.enabled ? s.diagnosticDepthView.Get() : nullptr',
+     'nullptr'),
+    ('liveBatch.succeeded(liveDepth.enabled, reverseDepth)',
+     'liveBatch.succeeded(false, false)'),
 ):
     mutated = bridge.replace(original, broken)
     assert mutated != bridge and not connected(mutated, header), original
