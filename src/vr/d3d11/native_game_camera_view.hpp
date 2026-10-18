@@ -122,7 +122,11 @@ native_game_camera_dsv_extent(
         double(viewport.TopLeftY) + double(viewport.Height));
     if (right <= left || bottom <= top) return false;
     if (!scissorEnabled) return true;
-    return scissor && double(scissor->right) > left &&
+    // Empty or reversed scissors overlap the viewport bounds numerically,
+    // but produce no pixels and cannot establish game Draw chronology.
+    if (!scissor || scissor->left >= scissor->right ||
+        scissor->top >= scissor->bottom) return false;
+    return double(scissor->right) > left &&
         double(scissor->bottom) > top &&
         double(scissor->left) < right &&
         double(scissor->top) < bottom;

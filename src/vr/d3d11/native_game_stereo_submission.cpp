@@ -245,23 +245,14 @@ bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
     if (!eye_targets_bound() || !targetWidth_ || !targetHeight_ ||
         !geometry_outputs_isolated(eyeTarget_)) return false;
 
-    // A correct OM eye target with an off-eye viewport still produces no
-    // game pixels. It must not count as a real stereo source Draw.
+    // A successful API Draw with a clipped or empty raster cannot be used
+    // as OpenXR eye evidence. Apply the SAME physical viewport/scissor
+    // admission as a real auxiliary menu/car/race camera Draw: they must not
+    // disagree on whether any GPU color pixels can be produced.
     UINT viewportCount = 1u;
     D3D11_VIEWPORT view{};
     context_->RSGetViewports(&viewportCount, &view);
-    if (viewportCount != 1u || !std::isfinite(view.TopLeftX) ||
-        !std::isfinite(view.TopLeftY) || !std::isfinite(view.Width) ||
-        !std::isfinite(view.Height) || view.Width <= 0.0f ||
-        view.Height <= 0.0f || view.TopLeftX >= float(targetWidth_) ||
-        view.TopLeftY >= float(targetHeight_) ||
-        view.TopLeftX + view.Width <= 0.0f ||
-        view.TopLeftY + view.Height <= 0.0f)
-        return false;
-
-    // D3D9 HUD/menu scissoring can move completely outside the current eye.
-    // A hardware-successful Draw with no visible raster coverage is not
-    // evidence for an XR eye, even when OM still points to its ring RTV/DSV.
+    if (viewportCount != 1u) return false;
     ID3D11RasterizerState* rasterizer = nullptr;
     context_->RSGetState(&rasterizer);
     bool scissorEnabled = false;
@@ -271,22 +262,15 @@ bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
         scissorEnabled = desc.ScissorEnable != FALSE;
         rasterizer->Release();
     }
+    D3D11_RECT scissor{};
     if (scissorEnabled) {
         UINT count = 1u;
-        D3D11_RECT rect{};
-        context_->RSGetScissorRects(&count, &rect);
-        const float left = (std::max)(0.0f, view.TopLeftX);
-        const float top = (std::max)(0.0f, view.TopLeftY);
-        const float right = (std::min)(float(targetWidth_),
-                                       view.TopLeftX + view.Width);
-        const float bottom = (std::min)(float(targetHeight_),
-                                        view.TopLeftY + view.Height);
-        if (count != 1u || float(rect.right) <= left ||
-            float(rect.bottom) <= top || float(rect.left) >= right ||
-            float(rect.top) >= bottom)
-            return false;
+        context_->RSGetScissorRects(&count, &scissor);
+        if (count != 1u) return false;
     }
-    return true;
+    return native_game_camera_draw_coverage(
+        targetWidth_, targetHeight_, view, scissorEnabled,
+        scissorEnabled ? &scissor : nullptr);
 }
 
 // An OM-bound eye with valid raster coverage is not a color frame when

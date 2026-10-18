@@ -1360,6 +1360,8 @@ int main()
         bool rejectedForeignDraw[2]{};
         bool rejectedOffscreenViewport[2]{};
         bool rejectedOffscreenScissor[2]{};
+        bool rejectedEmptyEyeScissor[2]{};
+        bool rejectedEmptyCameraScissor[2]{};
         bool rejectedNoColorOutput[2]{};
         bool rejectedForeignClear[2]{};
         bool rejectedInvalidClear[2]{};
@@ -1761,13 +1763,24 @@ int main()
         ctx->RSSetScissorRects(1u, &invisibleScissor);
         fixture.rejectedOffscreenScissor[eyeIndex] =
             !encoder.draw_indexed(3u, 0u, 0) && encoder.draw_count() == 0u;
+        // Valid zero-area D3D11 scissor rectangles intersect both eye
+        // coordinate ranges, but no fragment may reach the ring RTV.
+        const D3D11_RECT emptyEyeWidth{12, 12, 12, 24};
+        const D3D11_RECT emptyEyeHeight{12, 24, 32, 24};
+        ctx->RSSetScissorRects(1u, &emptyEyeWidth);
+        const bool emptyWidth = !encoder.draw(3u, 0u);
+        ctx->RSSetScissorRects(1u, &emptyEyeHeight);
+        const bool emptyHeight = !encoder.draw_indexed(3u, 0u, 0);
+        fixture.rejectedEmptyEyeScissor[eyeIndex] =
+            emptyWidth && emptyHeight && encoder.draw_count() == 0u;
         ctx->RSSetScissorRects(1u, &scissor);
 
         if (boundTarget) boundTarget->Release();
         if (boundDepth) boundDepth->Release();
         if (!fixture.sawBoundEye[eyeIndex] ||
             !fixture.rejectedOffscreenViewport[eyeIndex] ||
-            !fixture.rejectedOffscreenScissor[eyeIndex]) return false;
+            !fixture.rejectedOffscreenScissor[eyeIndex] ||
+            !fixture.rejectedEmptyEyeScissor[eyeIndex]) return false;
         // The verified game full-TARGET Clear already wrote this eye's color.
         // Change the scene's OM/RS state as a live Draw would: the producer
         // must restore caller raster/depth/blend state after both eye passes.
@@ -2228,11 +2241,29 @@ int main()
             !encoder.draw_offscreen_indexed_instanced(
                 gameOffscreen, 3u, 2u, 0u, 0, 0u) &&
             encoder.draw_count() == beforeOffscreen;
+        // Reject empty source-camera rectangles for Draw/Indexed and
+        // instanced calls before an authored Copy/Stretch touches L/R eyes.
+        const D3D11_RECT emptyCameraWidth{4, 4, 4, 12};
+        const D3D11_RECT emptyCameraHeight{4, 12, 12, 12};
+        ctx->RSSetScissorRects(1u, &emptyCameraWidth);
+        const bool emptyCameraLinear =
+            !encoder.draw_offscreen(gameOffscreen, 3u, 0u) &&
+            !encoder.draw_offscreen_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0u);
+        ctx->RSSetScissorRects(1u, &emptyCameraHeight);
+        const bool emptyCameraIndexed =
+            !encoder.draw_offscreen_indexed(gameOffscreen, 3u, 0u, 0) &&
+            !encoder.draw_offscreen_indexed_instanced(
+                gameOffscreen, 3u, 2u, 0u, 0, 0u);
+        fixture.rejectedEmptyCameraScissor[eyeIndex] =
+            emptyCameraLinear && emptyCameraIndexed &&
+            encoder.draw_count() == beforeOffscreen;
         // Restore exactly the source viewport, scissor and caller raster
         // before testing the genuine in-target game Draw and GPU postpass.
         ctx->RSSetScissorRects(1u, &scissor);
         ctx->RSSetState(previousCameraRaster.Get());
-        if (!rejectsOffscreenViewport || !rejectsOffscreenScissor)
+        if (!rejectsOffscreenViewport || !rejectsOffscreenScissor ||
+            !fixture.rejectedEmptyCameraScissor[eyeIndex])
             return false;
         const bool issuedOffscreen = eyeIndex == 0u
             ? encoder.draw_offscreen(gameOffscreen, 3u, 0u)
@@ -2901,6 +2932,10 @@ int main()
             gameEyeFixture.rejectedOffscreenViewport[1] &&
             gameEyeFixture.rejectedOffscreenScissor[0] &&
             gameEyeFixture.rejectedOffscreenScissor[1] &&
+            gameEyeFixture.rejectedEmptyEyeScissor[0] &&
+            gameEyeFixture.rejectedEmptyEyeScissor[1] &&
+            gameEyeFixture.rejectedEmptyCameraScissor[0] &&
+            gameEyeFixture.rejectedEmptyCameraScissor[1] &&
             gameEyeFixture.rejectedNoColorOutput[0] &&
             gameEyeFixture.rejectedNoColorOutput[1] &&
             gameEyeFixture.rejectedForeignClear[0] &&
