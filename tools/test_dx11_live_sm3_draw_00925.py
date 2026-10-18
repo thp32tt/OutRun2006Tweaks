@@ -45,7 +45,7 @@ for rejection in (
     "colorMask != 0x0fu || srgbWrite != FALSE",
     "srgbWrite != FALSE", "if (nativeIndices[i] >= vertexCount) return false;",
     "if (s.liveSm3Pipelines.size() >= 64u) return false;",
-    "if (pipeline.vertexTokens != vertexEvidence.tokens",
+    "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
     check(rejection in source, "missing fail-closed source/state rejection: " + rejection)
 
