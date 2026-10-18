@@ -153,6 +153,34 @@ static_assert(blended_eye_color_may_change(true, 15, 2,2,1, 1,2,1));
 static_assert(blended_eye_color_may_change(false, 15, 1,2,1, 1,2,1));
 static_assert(!blended_eye_color_may_change(false, 0, 2,2,1, 2,2,1));
 
+// The native eye can receive a real full TARGET Clear either directly from
+// the game callback or through an ordered SourceClear timeline. Both routes
+// erase prior color Draw/Copy/Stretch evidence: a later GPU Clear cannot be
+// certified by pixels written before it. A scissor/viewport-clipped Clear
+// must leave chronology intact and never fabricate a new geometry ordinal.
+struct NativeEyeColorHistory {
+    std::uint64_t colorDraws{};
+    std::uint32_t colorPostpasses{};
+    std::uint32_t fullTargetClears{};
+    std::uint64_t lastFullClearDrawOrdinal{};
+};
+[[nodiscard]] constexpr NativeEyeColorHistory after_target_clear(
+    NativeEyeColorHistory before, bool physicalFullClear,
+    std::uint64_t currentGameDrawOrdinal) noexcept {
+    if (!physicalFullClear) return before;
+    before.colorDraws = 0u;
+    before.colorPostpasses = 0u;
+    if (before.fullTargetClears !=
+        (std::numeric_limits<std::uint32_t>::max)())
+        ++before.fullTargetClears;
+    before.lastFullClearDrawOrdinal = currentGameDrawOrdinal;
+    return before;
+}
+static_assert(after_target_clear({5u, 2u, 1u, 3u}, true, 5u).colorDraws == 0u);
+static_assert(after_target_clear({5u, 2u, 1u, 3u}, true, 5u).colorPostpasses == 0u);
+static_assert(after_target_clear({5u, 2u, 1u, 3u}, true, 5u).fullTargetClears == 2u);
+static_assert(after_target_clear({5u, 2u, 1u, 3u}, false, 5u).colorDraws == 5u);
+
 [[nodiscard]] constexpr bool color_certifiable(
     bool colorWritable, bool noActivePredicate) noexcept {
     return colorWritable && noActivePredicate;

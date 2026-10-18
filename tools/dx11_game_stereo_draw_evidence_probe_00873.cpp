@@ -107,6 +107,37 @@ int main() {
         NativeDepthClearRoute::Reject);
     static_assert(depth_clear_route(true, 0, 0, 3440, 1440, 0u, 1440u) ==
         NativeDepthClearRoute::Reject);
+    // Native eye GPU chronology across direct callback Clears AND ordered
+    // SourceClear replay: a physical full TARGET overwrites prior geometry
+    // and offscreen menu/vehicle Copy/Stretch. A cropped HUD clear preserves
+    // valid pixels and the exact Draw ordinal. Later real geometry or
+    // chronological postpass is needed before publishing the cleared eye.
+    using outrun::vr::dx11::live_game_stereo::after_target_clear;
+    constexpr auto hadGameColor = outrun::vr::dx11::live_game_stereo::
+        NativeEyeColorHistory{5u, 2u, 1u, 3u};
+    constexpr auto croppedHud = after_target_clear(hadGameColor, false, 5u);
+    constexpr auto clearedEye = after_target_clear(hadGameColor, true, 5u);
+    static_assert(croppedHud.colorDraws == 5u &&
+        croppedHud.colorPostpasses == 2u &&
+        croppedHud.fullTargetClears == 1u &&
+        croppedHud.lastFullClearDrawOrdinal == 3u);
+    static_assert(clearedEye.colorDraws == 0u &&
+        clearedEye.colorPostpasses == 0u &&
+        clearedEye.fullTargetClears == 2u &&
+        clearedEye.lastFullClearDrawOrdinal == 5u);
+    static_assert(!authored_color_output_ready(
+        5u, clearedEye.colorDraws, clearedEye.colorPostpasses,
+        clearedEye.fullTargetClears, clearedEye.lastFullClearDrawOrdinal));
+    static_assert(authored_color_output_ready(
+        6u, clearedEye.colorDraws, clearedEye.colorPostpasses,
+        clearedEye.fullTargetClears, clearedEye.lastFullClearDrawOrdinal));
+    constexpr auto clippedAgain = after_target_clear(clearedEye, false, 5u);
+    static_assert(clippedAgain.fullTargetClears == 2u &&
+        clippedAgain.lastFullClearDrawOrdinal == 5u);
+    static_assert(after_target_clear(
+        {1u, 1u, (std::numeric_limits<std::uint32_t>::max)(), 1u},
+        true, 3u).fullTargetClears ==
+        (std::numeric_limits<std::uint32_t>::max)());
     // Original D3D9 TARGET Clear is authentic eye color, not fabricated
     // geometry. Admit depth-only draws following a full seed, while rejecting
     // a terminal Clear that erased the last native game geometry.

@@ -684,15 +684,9 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
         if (clear.afterDrawOrdinal < drawCount_) return false;
         if (clear.kind == NativeGameEyePartialTargetClear::Kind::TargetRect) {
             if (!clear_target_argb(clear.argb, &clear.rect)) return false;
-            // ClearView ignores the prior per-draw color-write masks.
-            // A captured full-eye TARGET Clear replaces earlier color Draws
-            // and source Copy/Stretch, but can seed later depth-only geometry.
-            if (last_target_clear_was_full()) {
-                colorDrawCount_ = 0u;
-                authoredColorPostpassCount_ = 0u;
-                ++authoredFullColorClearCount_;
-                lastFullClearDrawOrdinal_ = drawCount_;
-            }
+            // clear_target_argb() updates this source color history itself,
+            // identical to a direct game callback Clear. Do not count a
+            // queued full Clear twice or retain pre-Clear eye color evidence.
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::FullDepthStencil) {
             const bool partial = clear.rect.left || clear.rect.top ||
@@ -846,6 +840,21 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         return false;
     }
     lastTargetClearFull_ = written && covered.full;
+    if (written) {
+        // A direct, genuine game TARGET Clear can occur after eye geometry
+        // without going through set_source_clear_timeline(). Previously it
+        // left old Draw/Copy/Stretch color evidence live, certifying pixels
+        // that the GPU had already erased. Keep both Clear entrypoints in
+        // one real command chronology; cropped Clears preserve prior color.
+        const auto history = live_game_stereo::after_target_clear(
+            {colorDrawCount_, authoredColorPostpassCount_,
+             authoredFullColorClearCount_, lastFullClearDrawOrdinal_},
+            lastTargetClearFull_, drawCount_);
+        colorDrawCount_ = history.colorDraws;
+        authoredColorPostpassCount_ = history.colorPostpasses;
+        authoredFullColorClearCount_ = history.fullTargetClears;
+        lastFullClearDrawOrdinal_ = history.lastFullClearDrawOrdinal;
+    }
     return written;
 }
 
