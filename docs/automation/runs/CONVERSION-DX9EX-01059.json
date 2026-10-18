@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "e101af669fd98ff33867d7bf9e70f7bd6d48e352",
+  "validation_bearing_result_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45",
   "changed_files": [
     "src/hooks_textures.cpp",
     "src/vr/game/direct_sprite_source_provenance.hpp",
@@ -72,14 +72,97 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "native_hud_direct_source": "PENDING_EXACT_SHA",
-    "native_hud_fallback_guards": "WIN32_STATIC_ASSERT_IN_SOURCE",
-    "exact_sha_gates": "PENDING_EXACT_SHA"
+    "native_hud_direct_source": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/hooks_textures.cpp",
+        "src/vr/game/direct_sprite_source_provenance.hpp"
+      ],
+      "validation_command": "DX9Ex Active Validation policy and game/full-chain-compile at 72e79aba889c3211b79b75e544923ea6f06c3f45"
+    },
+    "native_hud_fallback_guards": {
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/game/direct_sprite_source_provenance.hpp",
+        "tools/diagnostics/repro_native_sprite_vr_admission_20261019.cpp",
+        "tools/verify_vr_visual_composition_p0.py"
+      ],
+      "validation_command": "DX9Ex Active Validation policy at 72e79aba889c3211b79b75e544923ea6f06c3f45"
+    },
+    "exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/hooks_textures.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "docs/automation/runs/CONVERSION-DX9EX-01059.json"
+      ],
+      "validation_command": "GitHub Actions DX9Ex Active Validation #39170620566; Domain Isolation Guard #39170620531; OutRun EXE HUD Inspector CI #39170620530; DX9Ex Full Source Impact Review #39170620598 (all SUCCESS, exact SHA)"
+    }
   },
   "ci_evidence": {
-    "required_gates_state": "PENDING",
-    "local_targeted_gate": "C++ compile-time negative regression in game owner; portable native-source fixture staged"
+    "required_gates_state": "PASS_ALL_FOUR_EXACT_SHA",
+    "local_targeted_gate": "C++ compile-time negative regression in game owner; portable native-source fixture staged",
+    "validation_bearing_result_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45",
+    "prior_failed_runs": [
+      {
+        "run_id": 39170209711,
+        "head_sha": "3de9a38e3c19474a8cda21918e42ac583940bae9",
+        "failed_step": "Verify reconstructed VR architecture boundaries",
+        "failed_verifier": "tools/verify_vr_visual_composition_p0.py",
+        "cause": "P0 +TIME exact-parent direct glyph ordering check detected source-admission/queue predicate placement from concurrently integrated 01058 changes; corrected through subsequent 01058 source repair"
+      }
+    ],
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39170620566,
+        "conclusion": "success",
+        "head_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39170620531,
+        "conclusion": "success",
+        "head_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39170620530,
+        "conclusion": "success",
+        "head_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39170620598,
+        "conclusion": "success",
+        "head_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45"
+      }
+    ],
+    "artifact_ids": [
+      12151869976,
+      12152715818,
+      12152780364,
+      12152990166,
+      12152940457
+    ]
   },
-  "result_commit_kind": "material_game_source_plus_feature_contract",
-  "c6_commit_kind": "none"
+  "result_commit_kind": "MATERIAL_SOURCE_PREEXISTING_C6_BOOKKEEPING",
+  "c6_commit_kind": "BOOKKEEPING_SKIP_CI",
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "validation_bearing_result_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45",
+    "source_material_sha": "e101af669fd98ff33867d7bf9e70f7bd6d48e352",
+    "verification_repair_sha": "3de9a38e3c19474a8cda21918e42ac583940bae9",
+    "promoted": "ALREADY_IN_TARGET_BRANCH",
+    "compare_behind": 0,
+    "required_workflows_passed": 4
+  },
+  "c6_completion": {
+    "reason_resolved": "TERMINAL_STATUS_NOT_COMPLETE",
+    "bookkeeping_only": true,
+    "ci_retrigger": false,
+    "score_delta": 0,
+    "runtime_validation": "UNTESTED",
+    "validation_bearing_result_sha": "72e79aba889c3211b79b75e544923ea6f06c3f45"
+  }
 }
