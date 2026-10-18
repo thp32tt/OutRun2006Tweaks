@@ -8,10 +8,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00936",
   "feature_id": "DX11:SM3_GAME_ALPHA_TEST_NATIVE_PIXEL_OUTPUT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
   "material_result_sha": "576648750c675ddf302028fe926c0992d3c81b36",
-  "validation_bearing_result_sha": "576648750c675ddf302028fe926c0992d3c81b36",
+  "validation_bearing_result_sha": "29186fbe6885b90c3ae77a32c2f24ea81d17058e",
   "score_change": 0,
   "feature_contract": {
     "feature_id": "DX11:SM3_GAME_ALPHA_TEST_NATIVE_PIXEL_OUTPUT",
@@ -94,7 +94,7 @@
     "C3_VALIDATE": "First exact SHA Fast failed on previous 00935 malformed feature_id metadata, not gameplay shader compilation; new latest 00936 valid feature contract is tracked on this gate-bearing repair commit.",
     "C4_COMMIT": "576648750c675ddf302028fe926c0992d3c81b36",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_REQUIRED_EXACT_SHA"
+    "C6_RESULT": "PASS_EXACT_SHA"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Prior actual-game native_draws=0; alpha test rejection removed in source but post-change physical game observation remains UNTESTED.",
