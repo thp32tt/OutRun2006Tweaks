@@ -1680,7 +1680,8 @@ def check_direct_native_producer_bridge(source):
                   'FirstVerifiedAppendedNodeOnStableRoot(',
                   'RegisterSpriteNodeScope(')
     for expected in ('scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture()',
-                     'node, scope, producer);'):
+                     'node, scope, producer, nullptr,',
+                     'sourceBefore.registrationSerial);'):
         require(expected, tag, 'proven source token must reach native SpriteNode')
     require('#include "vr/game/direct_sprite_source_provenance.hpp"',
             source, 'native exact HUD producer source header')
@@ -1691,7 +1692,10 @@ for case, altered in (
         'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();',
         'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Snapshot{};', 1)),
     ('lost producer token publication', textures.replace(
-        'node, scope, producer);', 'node, scope);', 1)),
+        'node, scope, producer, nullptr,',
+        'node, scope, ProducerToken::None, nullptr,', 1)),
+    ('lost nested producer generation fence', textures.replace(
+        'sourceBefore.registrationSerial);', '0);', 1)),
     ('lost native exit source proof', textures.replace(
         'scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture()',
         'scope, sourceBefore, sourceBefore', 1)),
