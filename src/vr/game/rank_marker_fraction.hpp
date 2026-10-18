@@ -69,4 +69,20 @@ namespace OutRunVR::RankMarker
         return restored;
     }
 
+    // An original vehicle rank producer may replace an entire priority
+    // sentinel and later reattach the exact same old tail to that new root.
+    // Current-root reachability alone cannot establish producer ownership.
+    // Keep both original and live root identity before touching any child's
+    // XY position; the downstream semantic tagger uses the same fence.
+    template <typename Node>
+    unsigned RestoreAppendedRankFractions(
+        Node* sourceRoot, Node* currentRoot, Node* oldTail,
+        Node* newTail, unsigned bound, float dx, float dy) noexcept
+    {
+        if (!sourceRoot || sourceRoot != currentRoot)
+            return 0u;
+        return RestoreAppendedRankFractions(
+            currentRoot, oldTail, newTail, bound, dx, dy);
+    }
+
 }

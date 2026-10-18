@@ -1502,9 +1502,11 @@ class UIScaling : public Hook
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            rootsBefore[prio] = root;
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
@@ -1546,8 +1548,11 @@ class UIScaling : public Hook
 		// A sprani producer normally emits one sprite, but can queue an
 		// animated or masked sibling. Every node appended by this exact CALL
 		// belongs to the same rank marker, not just the final priority tail.
+		// A rebuilt priority root can reattach the old tail at the same
+        // address: never stamp a foreign vehicle's projected sprite.
 		TagAppendedNodes(tailsBefore, scope,
-			OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani, marker);
+			OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
+            marker, &rootsBefore);
 		return result;
 	}
 
@@ -1559,9 +1564,11 @@ class UIScaling : public Hook
 		int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            rootsBefore[prio] = root;
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 		// Preserve the same per-car anchor through direct draw and post-call
@@ -1602,12 +1609,13 @@ class UIScaling : public Hook
 			// Restore every proven kind-0/1 child's original Calc3D2D
 			// fraction, then register the SAME live children below.
 			OutRunVR::RankMarker::RestoreAppendedRankFractions(
-				root, tailsBefore[prio], tailAfter, Game::SpriteNodeMax,
-				frozenFractionX, frozenFractionY);
+                rootsBefore[prio], root, tailsBefore[prio],
+                tailAfter, Game::SpriteNodeMax,
+                frozenFractionX, frozenFractionY);
 		}
 		TagAppendedNodes(tailsBefore, scope,
 			OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
-			projected ? &projectedAnchor : nullptr);
+            projected ? &projectedAnchor : nullptr, &rootsBefore);
 		return result;
 	}
 

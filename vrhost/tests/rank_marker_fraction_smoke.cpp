@@ -102,6 +102,27 @@ int main()
     RANK_CHECK(RestoreAppendedRankFractions(
         &root, &first, &second, 3, 0.25f, 0.25f) == 0u);
     RANK_CHECK(second.args2_58.mtx_14._41 == savedFinalX);
+    // Same pointer identities can be reattached to a different sentinel
+    // after native put_clip_sprite replaces its list. Old/new tails remain
+    // reachable, yet all children belong to the foreign priority owner.
+    MockNode foreignRoot{};
+    first.next_0 = &second;
+    foreignRoot.next_0 = &first;
+    const float frozenFirstX = first.args_10.float24;
+    const float frozenSecondX = second.args2_58.mtx_14._41;
+    RANK_CHECK(RestoreAppendedRankFractions(
+        &root, &foreignRoot, &first, &second, 4, 0.25f, -0.25f) == 0u);
+    RANK_CHECK(RestoreAppendedRankFractions(
+        static_cast<MockNode*>(nullptr), &foreignRoot,
+        &first, &second, 4, 0.25f, -0.25f) == 0u);
+    RANK_CHECK(first.args_10.float24 == frozenFirstX &&
+        second.args2_58.mtx_14._41 == frozenSecondX);
+    // Stable root + still-linked old tail DOES admit only the new child.
+    RANK_CHECK(RestoreAppendedRankFractions(
+        &foreignRoot, &foreignRoot, &first, &second,
+        4, 0.125f, -0.125f) == 1u);
+    RANK_CHECK(first.args_10.float24 == frozenFirstX &&
+        second.args2_58.mtx_14._41 == frozenSecondX + 0.125f);
     // Cycling detached queue and malformed empty source remain fail closed.
     first.next_0 = &first;
     RANK_CHECK(RestoreAppendedRankFractions(
