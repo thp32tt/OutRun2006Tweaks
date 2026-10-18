@@ -7,11 +7,11 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTING",
-  "checkpoint": "C2_SOURCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:SAFETY:R84_PRIVATE_EYE_STATE_RESTORE",
   "feature_class": "CRITICAL_BLOCKER",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -74,5 +74,41 @@
     "Domain Isolation Guard",
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
-  ]
+  ],
+  "material_result_sha": "638244499363abe116c00a7bf33df17f08bb689e",
+  "validation_bearing_result_sha": "638244499363abe116c00a7bf33df17f08bb689e",
+  "ci_evidence": {
+    "required_gates_state": "PASS_ALL_FOUR_EXACT_SHA",
+    "validation_bearing_result_sha": "638244499363abe116c00a7bf33df17f08bb689e",
+    "runtime_validation": "UNTESTED",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39160951842,
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39160951821,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39160951797,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39160951790,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "restore_all_r84_gpu_state": "PASS_BUILD",
+    "right_only_failure_safe_fallback": "PASS_BUILD",
+    "exact_sha_integrated_pipeline": "PASS_EXACT_SHA"
+  },
+  "result_commit_kind": "material_source_plus_feature_contract",
+  "c6_commit_kind": "bookkeeping_only_no_new_score"
 }
