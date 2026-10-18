@@ -204,7 +204,7 @@ def offscreen_rect_contract(code, fixture):
         "prepare_offscreen_game_draw(gameTarget)",
         "live_game_stereo::color_clear_route(", 
         "rectContext->ClearView(gameTarget, rgba, actual, 1u);",
-        "camera_clear_coverage(",
+        "const auto covered = camera_clear_coverage(",
         "if (!covered.valid) return false;",
         "if (covered.empty) return true;",
         "const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;",
@@ -220,6 +220,7 @@ def offscreen_rect_contract(code, fixture):
     )) and all(x in fixture for x in (
         "rejectsCameraRegion && clearsCameraRegion && cameraPatchVisible",
         "ctx->CopyResource(cameraReadback.Get(), fixture.offscreenGameColor);",
+        "outside[0] == 0u",
         "ctx->OMSetRenderTargets(1u, &gameOffscreen, gameOffscreenDepth);",
     ))
 assert offscreen_rect_contract(source, probe)
