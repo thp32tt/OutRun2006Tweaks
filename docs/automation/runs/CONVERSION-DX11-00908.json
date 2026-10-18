@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00908",
+  "production_id": "CONVERSION-DX11-00908",
+  "event_id": "CONVERSION-DX11-00908-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00908",
+  "feature_id": "DX11:EMPTY_SCISSOR_CAMERA_EYE_PIXEL_COVERAGE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:EMPTY_SCISSOR_CAMERA_EYE_PIXEL_COVERAGE",
+    "goal": "Do not count physically empty D3D11 game camera and left/right OpenXR eye Draw/Indexed/instancing as real color or chronological geometry during menu, vehicle and race transitions; preserve positive postpass GPU replay and DX9Ex/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "empty_eye_and_camera_draw_raster_admission",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_menu_vehicle_race_native_camera_and_eye_gpu_draw",
+        "expected_behavior": "Direct left/right eye and auxiliary offscreen RTV draw paths reject zero-width and zero-height scissor areas even when their individual edges fall within target viewport; only nonempty physical camera raster advances geometry chronology."
+      },
+      {
+        "id": "positive_gpu_postpass_and_legacy_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_postpass_and_original_dx9ex_input_ffb",
+        "expected_behavior": "Real in-target game-authored camera Draw/Indexed continue to Copy/Stretch into independent OpenXR eyes while no-pixel draws leave stereo frames uncertified; original DX9Ex fallback, input, FFB, SkyGlow and frozen DXVK remain unchanged."
+      },
+      {
+        "id": "real_win32_warp_and_final_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_replay_negative_positive_and_full_ci",
+        "expected_behavior": "Win32 WARP tests reject zero-area left/right eye Draw/Indexed and four offscreen Draw/Indexed/Instanced entrypoints, preserve positive camera replay and complete all five exact-source-SHA mandatory Actions gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Authentic game menu/car/race RTV and XR eye native Draw/Indexed/Instanced share one physical viewport/scissor pixel coverage contract",
+      "Nonempty game camera Draw source postpass remains GPU-only to independent left/right eyes with original DX9Ex fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_camera_view.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_native_transport_probe.cpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO:CAMERA_AND_EYE_EMPTY_SCISSOR_COVERAGE"
+    ],
+    "full_gate_plan": "one_final_validation_bearing_sha_after_failure_cause_repair",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY; Win32 WARP and compile do not establish actual Quest3/game runtime parity.",
+    "activation_guard_and_fallback": "Original DX9Ex/gamepad/FFB/SkyGlow unchanged, DXVK frozen.",
+    "acceptance_proof": {
+      "positive_probe": "Win32 WARP native transport positive camera and eye replay still succeeds.",
+      "negative_regression": "Left/right WARP direct and offscreen zero-area scissor negative geometry entrypoints test no source draw ordinal increment.",
+      "component_integration": "Production native renderer camera view and stereo encoder share actual physical viewport/scissor intersection; five mandatory exact-SHA gates."
+    }
+  },
+  "acceptance_results": {
+    "empty_eye_and_camera_draw_raster_admission": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "positive_gpu_postpass_and_legacy_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "real_win32_warp_and_final_exact_sha_gates": "PASS_EXACT_SHA_MANDATORY_5_OF_5"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_camera_view.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00907.json"
+  ],
+  "runtime_validation_note": "No Quest3/VDXR or actual OutRun game controller, visual or performance test performed. Native DX11 conversion not declared finished. Original game D3D9Ex/FFB remains fallback.",
+  "pipeline": {
+    "C0_RECOVER": "GitHub branch bc7c1a7061a849164238ac1fc00d84c51b8e7e55; 00907 exact SHA PASS and C6 recorded; 00908 not previously claimed.",
+    "C1_REVIEW": "Identify physically empty zero-area D3D11 scissor Draws incorrectly counted by direct eye and auxiliary camera paths.",
+    "C2_IMPLEMENT": "Game camera and XR eye C++ physical raster intersection fixed together with WARP Draw/Indexed/instanced negative GPU regression.",
+    "C3_VALIDATE": "PASS_EXACT_SHA a055b56e748cca097e4ccaab938039fc5e3612a3: Fast #39111125368, Backend #39111125390, Build #39111125391, OpenXR #39111125381, HUD #39111125318 ALL SUCCESS. Initial source WARP #39110747661 SUCCESS; extra PR Gates SUCCESS. No HMD run.",
+    "C4_COMMIT": "Material C++ 0c3fc4d9ff9b33991cc7da69592e939556957c55; same-task cause-limited static policy/C6 previous-evidence repair validation a055b56e748cca097e4ccaab938039fc5e3612a3; this C6 separate [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED PASS_EXACT_SHA a055b56e748cca097e4ccaab938039fc5e3612a3; original material retained; scoreboard RUN_KEY=CONVERSION-DX11-00908 source achievement +1 once, this bookkeeping +0; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "ci_repairs": [
+    {
+      "cause": "Exact material SHA 0c3fc4d9: previous verified 00907 C6 acceptance_results still PENDING despite 5/5 exact-SHA evidence; Fast and Backend blocked by inconsistent terminal metadata",
+      "category": "preexisting-c6-acceptance-consistency",
+      "result": "RESOLVED_SAME_TASK_WITH_PRESERVED_00907_MATERIAL_AND_VALIDATION_SHA"
+    },
+    {
+      "cause": "Build source graph activation boundary guard expected old literal viewport/scissor code instead of actual shared physical raster helper; source real WARP regression successful",
+      "category": "stale-static-contract",
+      "result": "RESOLVED_SAME_TASK_AT_VALIDATION_SHA"
+    }
+  ],
+  "material_result_sha": "0c3fc4d9ff9b33991cc7da69592e939556957c55",
+  "validation_bearing_result_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3",
+  "c6_completed_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_bookkeeping_only": true,
+  "validation_evidence": {
+    "material_sha": "0c3fc4d9ff9b33991cc7da69592e939556957c55",
+    "validation_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3",
+    "mandatory_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39111125368,
+        "conclusion": "success",
+        "validation_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39111125390,
+        "conclusion": "success",
+        "validation_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3"
+      },
+      {
+        "name": "Build",
+        "run_id": 39111125391,
+        "conclusion": "success",
+        "validation_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39111125381,
+        "conclusion": "success",
+        "validation_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39111125318,
+        "conclusion": "success",
+        "validation_sha": "a055b56e748cca097e4ccaab938039fc5e3612a3"
+      }
+    ],
+    "required_gates_passed": "5/5",
+    "native_gpu_warp_run_id": 39110747661,
+    "native_gpu_warp_conclusion": "success",
+    "runtime_validation": "UNTESTED",
+    "scope": "SOURCE_STAGE_ONLY; real OutRun game/Quest3 runtime not observed"
+  }
+}
