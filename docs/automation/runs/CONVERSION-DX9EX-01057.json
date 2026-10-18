@@ -1,0 +1,102 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01057",
+  "production_id": "CONVERSION-DX9EX-01057",
+  "event_id": "CONVERSION-DX9EX-01057-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "VALIDATION_PENDING",
+  "checkpoint": "C3_CI_FAILURE_REPAIR",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "b530057f1b582a6f886911f819c61c73be21bd78",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/hud_command_batch.hpp",
+    "src/hooks_uiscaling.cpp",
+    "tools/diagnostics/repro_b9200_direct_gpu_batch_20261019.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve all original nineteen B9200 GOAL result glyph sources through D3DX deferred CPU registration, physical GPU Flush and End, without duplicating or headlocking the GOAL progress/title/time text.",
+    "scope_boundary": "Exact original B9200 direct glyph batches and their native SpriteQueue boundary only. Keep +TIME, 6th/6, WorldBillboard, lens center, SkyGlow, FFB/input, DX11 and R26_SAFE unchanged; never grant B9200 ownership to an unrelated/unknown D3DX batch.",
+    "trace_stages": [
+      "Original EXE nineteen 0x97xxx direct E8 parent returns identify B9200 goal result glyphs before D3DXSprite::Draw CPU staging.",
+      "R84 game hook captures a stack-proven direct ResultTextB9200 command, preserving a per-batch proof only while every native D3DX Draw maintains the same owner.",
+      "R84 physical D3DX Flush, End and incoming producer/queue boundaries restore only uniform verified ScreenHud ownership; left and right eye submission remains subject to original R33/R30 GPU safety admission, with headset optics untested."
+    ],
+    "subcomponents": [
+      "Store exact original B9200 direct-parent proof in the D3DX HUD command ledger at each CPU Draw; revoke it on mixed, queued, reentrant, failed, ended or device-lost batches.",
+      "Use the proved batch owner at GPU Flush/End and before foreign Draw/first queued node, while leaving native D3DX HRESULT and unrelated batching unchanged.",
+      "Exercise behavioral C++ regressions for uniform direct glyphs and negative proof, mixed source, queue epoch/pointer reuse, End, reset and live-sprite change."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_exact_original_direct_gpu_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_GOAL_B9200_cpu_draw_to_stereo_gpu_submit",
+        "expected_behavior": "Uniform direct original B9200 goal glyphs retain their exact producer identity across deferred D3DX Draw, Flush and End instead of using an unrelated later frame's render scope."
+      },
+      {
+        "id": "goal_fail_closed_protected_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "foreign_queue_reset_and_skyglow_input_protection",
+        "expected_behavior": "Mixed or unproven glyphs, queued node epochs, replaced sprite and device reset cannot inherit direct GOAL source; original input, FFB, SkyGlow, render fallback and direct native HRESULT stay unmodified."
+      },
+      {
+        "id": "goal_exact_sha_gate_and_hardware_split",
+        "category": "integrated_validation",
+        "behavior_area": "Windows_R84_x86_x64_host_package_validation",
+        "expected_behavior": "Latest validation-bearing exact SHA passes DX9Ex Active x86 game/R26 rollback/x64 host/package, Domain, HUD Inspector and Full Source Impact; Quest3 VDXR optical acceptance remains untested until physical headset execution."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Before 01057 the R84 HUD command ledger recorded scope/producer but no persistent original B9200 direct-parent proof and CanRestoreDeferredResultOwner explicitly excluded B9200 at later physical D3DX Flush/End.",
+    "root_cause": "The original B9200 glyph CPU Draw may occur inside an exact source stack while native D3DX GPU submit happens after the E8 caller exits; restoring GPU source from a stale render scope is unsafe, so the old fallback lost the exact valid original parent even for a fully proven direct batch.",
+    "source_trace": [
+      "Original 19 E8 parent calls into B9200 produce GOAL result text, while OriginalB9200GoalStackActive checks source identity during native CPU-side Draw.",
+      "DrawDest saves the exact provenance as provenDirectB9200 only for unqueued ScreenHud batches and rejects mixed/foreign/reentrant registrations.",
+      "Physical FlushDest, EndDest, pre-foreign Draw and first SpriteQueue node use that bounded proof, with native R84 two-eye GPU eligibility and state restoration unchanged."
+    ],
+    "alternatives_rejected": [
+      "Do not classify all GOAL text, every HUD texture, every queued SpriteNode or any arbitrary D3DX End as B9200.",
+      "Do not force native Flush on each glyph, modify timer animation state or claim Quest3 optical success from compiler/CI alone."
+    ],
+    "eye_ownership": "Stack-confirmed direct GOAL source is preserved only until native physical GPU dispatch; R84 per-eye submission remains separately gated and HMD binocular correctness is unknown.",
+    "fix_evidence": "Material C++ source commit b530057f1b582a6f886911f819c61c73be21bd78 implements ledger proof and D3DX deferred source restoration under exact original stack evidence.",
+    "negative_test_evidence": "Portable C++ behavior test tools/diagnostics/repro_b9200_direct_gpu_batch_20261019.cpp and native static assertions cover verified, unknown, mixed, queued, end/reset and pointer reuse."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "required_gates_state": "PENDING_AFTER_CI_POLICY_REPAIR",
+    "failed_run_id": 39162576531,
+    "failed_sha": "b530057f1b582a6f886911f819c61c73be21bd78",
+    "failure_cause": "DX9Ex Active policy step aborted because required run feature_contract JSON was missing, before Active game and package jobs started.",
+    "runtime_validation": "UNTESTED",
+    "required_workflows": []
+  },
+  "failure_repair": {
+    "failed_run_id": 39162576531,
+    "source_material_sha": "b530057f1b582a6f886911f819c61c73be21bd78",
+    "repair_reason": "Missing exact TASK_ID feature contract result record; no source or safety gates are removed."
+  },
+  "acceptance_results": {
+    "goal_exact_original_direct_gpu_ownership": "PENDING_EXACT_SHA",
+    "goal_fail_closed_protected_fallback": "PENDING_EXACT_SHA",
+    "goal_exact_sha_gate_and_hardware_split": "PENDING_EXACT_SHA"
+  },
+  "result_commit_kind": "material_source_plus_behavioral_regression_prior_commit",
+  "c6_commit_kind": "not_created_pending_validation"
+}
