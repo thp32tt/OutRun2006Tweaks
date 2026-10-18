@@ -100,7 +100,7 @@
   "CODE_CHANGED_SHA": "11470dc180f71896cfa82a784bcac275ad9ef772",
   "NEXT_IMPLEMENTATION_ACTION": "After CI, exercise real-game native opt-in menu-car-race to observe positive native draw and published full frames.",
   "acceptance_results": {
-    "fragment_ops_native": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED",
+    "fragment_ops_native": "PASS_SOURCE_BUILD_EXACT_SHA",
     "invalid_kill_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
     "exact_ci_validation": "PASS_EXACT_SHA_5_OF_5"
   },

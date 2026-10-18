@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00932",
+  "production_id": "CONVERSION-DX11-00932",
+  "event_id": "CONVERSION-DX11-00932-E003",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00932",
+  "feature_id": "LIVE_GAME_SM3_TEXTURE_SAMPLING_NATIVE_PATH",
+  "feature_branch": "feat/dx11-00932-sm3-texture-gate-repair",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "169c03b6714e71ab5e94f749a0c51eaa1275fae1",
+  "feature_contract": {
+    "feature_id": "LIVE_GAME_SM3_TEXTURE_SAMPLING_NATIVE_PATH",
+    "goal": "Connect actual intercepted D3D9 SM3 TEXLD/TEXLDP/TEXLDB/TEXLDL/TEXLDD pixel texture-sampling instructions through native D3D11 PS sampler source and GPU game Draw, with original D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_texture_sm3",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_sm3_fragment_to_native_pixel_draw",
+        "expected_behavior": "Translate live ps_3_0 implicit, projected, bias, LOD, and gradient 2D sampling to valid HLSL sampler objects and native game Draw."
+      },
+      {
+        "id": "texture_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_sampler_and_register_safety",
+        "expected_behavior": "Reject invalid samplers, unsupported vertex texture and uninitialized swizzled TEMP coordinates while preserving original D3D9 rendering/input/FFB."
+      },
+      {
+        "id": "exact_ci_validation",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_native_shader_codegen_and_windows_build",
+        "expected_behavior": "All mandatory five GitHub Actions complete success at a single exact SHA with bounded positive and negative shader-codegen regressions."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_texture_sm3": "PENDING_EXACT_SHA",
+    "texture_fail_closed": "PENDING_EXACT_SHA",
+    "exact_ci_validation": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Live intercepted D3D9 SM3 TEXLD-family bytecode to physical TEMP lane/coord source decode",
+      "Native D3D11 PS HLSL sampled sN/tN and sampler resources",
+      "Native Draw/DrawIndexed output and original D3D9 fail-closed fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+      "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "SM3 TEXLD/TEXLDP/TEXLDB/TEXLDL/TEXLDD source translates to bound native D3D11 HLSL texture sampling; original source code and bounded C++ probe committed.",
+      "negative_regression": "Invalid texture coordinate TEMP lane, sampler or vertex pixel stage fails closed; D3D9 game and input/FFB fallback remains.",
+      "component_integration": "The live game pixel shader bytecode sampler sN and texture tN resources feed native GPU shader object and Draw pixel output."
+    },
+    "conflict_keys": [
+      "DX11:SM3_NATIVE_SHADER_TRANSLATION:2D_TEXTURE_SAMPLING:00932"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native game Draw-to-visible-frame/HMD evidence remains UNTESTED; actual runtime menu-car-race evaluation required.",
+    "activation_guard_and_fallback": "Native full-game path remains explicit opt-in; unknown shader/sample fails to original D3D9 game renderer and original FFB/input; no DXVK edits."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/test_dx11_autodev_policy.py",
+    "docs/automation/runs/CONVERSION-DX11-00931.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub exact branch 169c03b6 source material, controller checkpoint, fail gates recovered.",
+    "C1_REVIEW": "Fast/Backend gate failure comes from 00931 CI acceptance encoding, not runtime; five 00931 SHA gates previously verified.",
+    "C2_IMPLEMENT": "Preserve 00932 TEXLD-family source; correct 00931 SOURCE PASS label and add mutation regression without weakening runtime acceptance rule.",
+    "C3_VALIDATE": "Pending exact SHA five mandatory target CI checks.",
+    "C4_COMMIT": "Initial source 169c03b6, CI repair feature branch pending",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING_EXACT_SHA"
+  },
+  "CODE_CHANGED_SHA": "169c03b6714e71ab5e94f749a0c51eaa1275fae1",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Positive actual game frame pixel shader and native published full resolution still UNTESTED.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_IMPLEMENTATION_ACTION": "Fix causal gates; once source validated, test a matching game executable with native opt-in, inspect real native_draws/published frames and R175 TEXCOORD6 ownership.",
+  "validation_evidence": {
+    "scope": "SOURCE_IMPLEMENTED_NOT_VERIFIED_GAME_HMD",
+    "ci_status": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_policy": "Rollovers/repair/result bookkeeping +0; one independent material task may score only after five exact-SHA CI passes."
+}

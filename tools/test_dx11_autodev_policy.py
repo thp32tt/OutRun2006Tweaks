@@ -247,6 +247,24 @@ for label, mutate in (
     mutate(bad)
     assert validate_task(bad, p), "00900 source-only negative admitted: " + label
 
+
+# 00931 recorded five exact-SHA CI successes, but accidentally combined the
+# untested HMD/runtime qualifier into a *source-build acceptance result*.
+# Runtime proof is tracked independently. Never weaken verified_build_acceptance
+# to admit arbitrary PASS_*_UNTESTED strings at feature-terminal state.
+fragment_record = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-00931.json").read_text(encoding="utf-8"))
+assert fragment_record["runtime_validation"] == "UNTESTED"
+assert fragment_record["validation_evidence"]["ci_gate_count"] == "5/5"
+assert not validate_task(fragment_record, p), validate_task(fragment_record, p)
+mixed_source_and_runtime = copy.deepcopy(fragment_record)
+mixed_source_and_runtime["acceptance_results"]["fragment_ops_native"] = (
+    "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED"
+)
+assert validate_task(mixed_source_and_runtime, p), (
+    "UNTESTED runtime cannot be passed off as verified source acceptance"
+)
+
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
