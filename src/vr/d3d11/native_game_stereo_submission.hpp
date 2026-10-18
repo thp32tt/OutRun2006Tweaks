@@ -39,8 +39,11 @@ public:
     NativeGameEyeDrawEncoder& operator=(const NativeGameEyeDrawEncoder&) = delete;
 
     // A game callback may temporarily switch OM to a menu texture or detach
-    // RT0. Explicitly restore the owned eye color+depth target before issuing
-    // the next real game Draw; never certify an offscreen/desktop Draw as XR.
+    // RT0. Restore the owned eye color+depth AND its original viewport,
+    // scissor and raster state on an offscreen->eye transition; a stale
+    // smaller menu camera clip must not shrink a full-resolution XR Draw.
+    // When already on this eye, retain intentional game HUD scissor changes.
+    // Never certify an offscreen/desktop Draw as XR eye color.
     [[nodiscard]] bool bind_eye_output() noexcept;
     [[nodiscard]] bool draw(UINT vertexCount, UINT startVertex) noexcept;
     [[nodiscard]] bool draw_indexed(UINT indexCount, UINT startIndex,

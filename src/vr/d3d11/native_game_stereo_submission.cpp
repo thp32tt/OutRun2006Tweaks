@@ -410,8 +410,21 @@ bool NativeGameEyeDrawEncoder::raster_primitive_possible(
 
 bool NativeGameEyeDrawEncoder::bind_eye_output() noexcept {
     if (!context_ || !eyeTarget_ || !eyeDepth_) return false;
+    // A game menu/vehicle offscreen camera may leave a 256x144 viewport,
+    // scissor and winding state after its last Draw. Rebinding ONLY the
+    // full-resolution XR RTV/DSV would rasterize subsequent eye geometry
+    // inside that stale camera clip. Preserve the game's intentionally
+    // selected eye-space clip when RT0 is already the native eye, but on a
+    // real offscreen->eye transition restore this eye's snapshotted camera.
+    if (eye_targets_bound()) return eye_output_bound();
+    if (!eyeRasterReady_) return false; // no verified eye raster: DX9 fallback
     ID3D11RenderTargetView* target = eyeTarget_;
     context_->OMSetRenderTargets(1u, &target, eyeDepth_);
+    context_->RSSetState(eyeRasterizer_.Get());
+    context_->RSSetViewports(1u, &eyeViewport_);
+    context_->RSSetScissorRects(1u, &eyeScissor_);
+    // Verify the physical eye coverage and sole OM ownership after
+    // rebinding. A failed native transition never certifies OpenXR color.
     return eye_output_bound();
 }
 
@@ -812,7 +825,7 @@ bool NativeGameEyeDrawEncoder::draw(
     if (!vertexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
-    if (!replay_due_source_clears()) return false;
+    if (!replay_due_source_clears() || !eye_output_bound()) return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool eligible = unpredicated &&
         raster_primitive_possible(vertexCount);
@@ -833,7 +846,7 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
     if (!indexCount || !eye_output_bound() ||
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
-    if (!replay_due_source_clears()) return false;
+    if (!replay_due_source_clears() || !eye_output_bound()) return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool eligible = unpredicated &&
         raster_primitive_possible(indexCount);
@@ -857,7 +870,8 @@ bool NativeGameEyeDrawEncoder::draw_instanced(
     UINT startVertex, UINT startInstance) noexcept {
     if (!live_game_stereo::may_issue_instanced(
             verticesPerInstance, instanceCount, drawCount_) ||
-        !eye_output_bound() || !replay_due_source_clears())
+        !eye_output_bound() || !replay_due_source_clears() ||
+        !eye_output_bound())
         return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool eligible = unpredicated &&
@@ -880,7 +894,8 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
     INT baseVertex, UINT startInstance) noexcept {
     if (!live_game_stereo::may_issue_instanced(
             indicesPerInstance, instanceCount, drawCount_) ||
-        !eye_output_bound() || !replay_due_source_clears())
+        !eye_output_bound() || !replay_due_source_clears() ||
+        !eye_output_bound())
         return false;
     const bool unpredicated = unpredicated_color_evidence();
     const bool eligible = unpredicated &&
