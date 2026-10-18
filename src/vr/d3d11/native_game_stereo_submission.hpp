@@ -1,4 +1,5 @@
 #pragma once
+#include "native_game_offscreen_color_provenance.hpp"
 
 #include "native_shared_eye_ring.hpp"
 #include <array>
@@ -198,7 +199,8 @@ private:
     void remember_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     void invalidate_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     [[nodiscard]] bool offscreen_color_source_proven(
-        ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept;
+        ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
+        const D3D11_BOX& sourceRegion) const noexcept;
     [[nodiscard]] bool color_writable_for_samples(UINT sampleCount) const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
     // A real Draw still advances the source ordinal even if the current
@@ -229,6 +231,7 @@ private:
     struct OffscreenColorSource {
         Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
         UINT arraySlice{}, mipSlice{};
+        NativeGameOffscreenColorRegion region{};
     };
     // One per-eye lifetime; no global cross-frame stale camera ownership.
     std::array<OffscreenColorSource, 32u> offscreenColorSources_{};

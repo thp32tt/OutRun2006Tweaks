@@ -374,17 +374,44 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
     target->GetDesc(&vd);
     const auto view = native_game_camera_rtv_extent(td, vd);
     if (!view.valid) return;
+    D3D11_VIEWPORT viewport{};
+    UINT viewportCount = 1u;
+    context_->RSGetViewports(&viewportCount, &viewport);
+    if (viewportCount != 1u) return;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> raster;
+    context_->RSGetState(raster.GetAddressOf());
+    D3D11_RASTERIZER_DESC rasterDesc{};
+    if (raster) raster->GetDesc(&rasterDesc);
+    D3D11_RECT scissor{};
+    if (rasterDesc.ScissorEnable) {
+        UINT scissorCount = 1u;
+        context_->RSGetScissorRects(&scissorCount, &scissor);
+        if (scissorCount != 1u) return;
+    }
+    const auto region = native_game_offscreen_draw_pixel_region(
+        view.width, view.height,
+        double(viewport.TopLeftX), double(viewport.TopLeftY),
+        double(viewport.TopLeftX) + double(viewport.Width),
+        double(viewport.TopLeftY) + double(viewport.Height),
+        rasterDesc.ScissorEnable != FALSE,
+        scissor.left, scissor.top, scissor.right, scissor.bottom);
+    if (!native_game_offscreen_color_region_valid(region)) return;
     const NativeGameOffscreenColorKey key{
         reinterpret_cast<std::uintptr_t>(texture.Get()), view.arraySlice, view.mip};
     for (const auto& record : offscreenColorSources_)
         if (native_game_offscreen_color_key_matches(
                 key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
-                      record.arraySlice, record.mipSlice})) return;
+                      record.arraySlice, record.mipSlice}) &&
+            record.region.left == region.left &&
+            record.region.top == region.top &&
+            record.region.right == region.right &&
+            record.region.bottom == region.bottom) return;
     for (auto& record : offscreenColorSources_) {
         if (!record.texture) {
             record.texture = std::move(texture);
             record.arraySlice = view.arraySlice;
             record.mipSlice = view.mip;
+            record.region = region;
             return;
         }
     }
@@ -411,17 +438,26 @@ void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
                       record.arraySlice, record.mipSlice})) {
             record.texture.Reset();
             record.arraySlice = record.mipSlice = 0u;
+            record.region = {};
         }
 }
 bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
-    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept {
-    if (!source) return false;
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
+    const D3D11_BOX& sourceRegion) const noexcept {
+    if (!source || sourceRegion.front != 0u || sourceRegion.back != 1u)
+        return false;
+    const NativeGameOffscreenColorRegion copied{
+        sourceRegion.left, sourceRegion.top,
+        sourceRegion.right, sourceRegion.bottom};
+    if (!native_game_offscreen_color_region_valid(copied)) return false;
     const NativeGameOffscreenColorKey key{
         reinterpret_cast<std::uintptr_t>(source), arraySlice, mipSlice};
     for (const auto& record : offscreenColorSources_)
         if (native_game_offscreen_color_key_matches(
                 key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
-                      record.arraySlice, record.mipSlice})) return true;
+                      record.arraySlice, record.mipSlice}) &&
+            native_game_offscreen_color_regions_intersect(record.region, copied))
+            return true;
     return false;
 }
 
@@ -917,7 +953,8 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceCopy) {
             const bool proven = offscreen_color_source_proven(
-                clear.source, clear.sourceArraySlice, clear.sourceMipSlice);
+                clear.source, clear.sourceArraySlice, clear.sourceMipSlice,
+                clear.sourceBox);
             if (!copy_game_surface(clear.source, &clear.sourceBox,
                                    clear.destX, clear.destY,
                                    clear.sourceArraySlice, clear.sourceMipSlice))
