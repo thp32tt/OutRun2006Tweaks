@@ -336,15 +336,38 @@ bool NativeGameEyeDrawEncoder::eye_output_bound() const noexcept {
 // shader capable of writing target 0. Preserve these GPU draws as depth
 // history while requiring at least one color-capable draw per published eye.
 bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
+    return color_writable_for_samples(1u); // shared native XR eye is single-sample
+}
+
+// Real game menu/car/race cameras may be MSAA, unlike the ring eye.
+// A queued depth-only, color-masked or shaderless offscreen Draw cannot
+// certify that a subsequent GPU Copy/Stretch contains a fresh game frame.
+// Preserve the authentic GPU command and source draw ordinal regardless.
+bool NativeGameEyeDrawEncoder::source_color_writable(
+    ID3D11RenderTargetView* gameTarget) const noexcept {
+    if (!context_ || !gameTarget) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    gameTarget->GetResource(resource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    if (!resource || FAILED(resource.As(&texture)) || !texture)
+        return false;
+    D3D11_TEXTURE2D_DESC desc{};
+    texture->GetDesc(&desc);
+    return color_writable_for_samples(desc.SampleDesc.Count);
+}
+
+bool NativeGameEyeDrawEncoder::color_writable_for_samples(
+    UINT sampleCount) const noexcept {
     if (!context_) return false;
     ID3D11BlendState* blend = nullptr;
     FLOAT blendFactors[4]{};
     UINT sampleMask = 0u;
     context_->OMGetBlendState(&blend, blendFactors, &sampleMask);
-    // Ring eyes are 1x MSAA: bits 1..31 cannot write sample zero.
-    // Native scene Draw/DrawIndexed still execute, but must not certify XR
-    // color when only nonexistent samples were enabled by the source state.
-    bool writable = live_game_stereo::single_sample_eye_color_write(sampleMask);
+    // The XR eye uses sample zero, while a real offscreen MSAA camera can
+    // write any of its physical samples. High mask bits outside that
+    // attachment's sample count never certify new color pixels.
+    bool writable = live_game_stereo::render_target_color_sample_write(
+        sampleMask, sampleCount);
     if (blend) {
         D3D11_BLEND_DESC desc{};
         blend->GetDesc(&desc);
@@ -587,6 +610,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen(
     if (!vertexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
+        source_color_writable(gameTarget) &&
         raster_primitive_possible(vertexCount);
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
@@ -600,6 +624,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
     if (!indexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
+        source_color_writable(gameTarget) &&
         raster_primitive_possible(indexCount);
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
@@ -620,6 +645,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
+        source_color_writable(gameTarget) &&
         raster_primitive_possible(verticesPerInstance);
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
@@ -637,6 +663,7 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
     const bool eligible = unpredicated_color_evidence() &&
+        source_color_writable(gameTarget) &&
         raster_primitive_possible(indicesPerInstance);
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,

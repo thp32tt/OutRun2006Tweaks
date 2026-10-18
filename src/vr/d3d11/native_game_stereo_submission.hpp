@@ -191,6 +191,9 @@ private:
         bool requireDrawableRaster) noexcept;
     [[nodiscard]] bool eye_output_bound() const noexcept;
     [[nodiscard]] bool eye_color_writable() const noexcept;
+    [[nodiscard]] bool source_color_writable(
+        ID3D11RenderTargetView* gameTarget) const noexcept;
+    [[nodiscard]] bool color_writable_for_samples(UINT sampleCount) const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
     // A real Draw still advances the source ordinal even if the current
     // primitive topology cannot assemble a single point/line/triangle.

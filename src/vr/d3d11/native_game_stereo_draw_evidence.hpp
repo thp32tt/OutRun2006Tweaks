@@ -97,10 +97,26 @@ static_assert(depth_clear_route(true, 0, 0, 1921, 1080, 1920u, 1080u) ==
 // SampleMask bit zero is the ONLY sample that can write that RTV: a nonzero
 // high bit (for example 0xfffffffe) must never certify a blank stereo eye.
 // Preserve the Draw itself for D3D9 chronology/depth and fallback.
+// A menu/vehicle/race auxiliary target may be MSAA. Its shader can write
+// sample one even when sample zero is masked; the XR ring eye cannot.
+// Reject bits outside the physical sample count and unknown sample modes.
+[[nodiscard]] constexpr bool render_target_color_sample_write(
+    std::uint32_t sampleMask, std::uint32_t sampleCount) noexcept {
+    if (!sampleCount || sampleCount > 32u) return false;
+    return sampleCount == 32u ? sampleMask != 0u
+        : (sampleMask & ((1u << sampleCount) - 1u)) != 0u;
+}
 [[nodiscard]] constexpr bool single_sample_eye_color_write(
     std::uint32_t sampleMask) noexcept {
-    return (sampleMask & 1u) != 0u;
+    return render_target_color_sample_write(sampleMask, 1u);
 }
+static_assert(!render_target_color_sample_write(0u, 4u));
+static_assert(!render_target_color_sample_write(2u, 1u));
+static_assert(render_target_color_sample_write(2u, 4u));
+static_assert(!render_target_color_sample_write(8u, 2u));
+static_assert(render_target_color_sample_write(0x80000000u, 32u));
+static_assert(!render_target_color_sample_write(0xffffffffu, 0u));
+static_assert(!render_target_color_sample_write(0xffffffffu, 33u));
 static_assert(!single_sample_eye_color_write(0u));
 static_assert(!single_sample_eye_color_write(0xfffffffeu));
 static_assert(single_sample_eye_color_write(1u));

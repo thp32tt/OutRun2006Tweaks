@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00918",
+  "production_id": "CONVERSION-DX11-00918",
+  "event_id": "CONVERSION-DX11-00918-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00918",
+  "feature_id": "DX11:NATIVE_OFFSCREEN_CAMERA_COLOR_SOURCE_VALIDITY",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_OFFSCREEN_CAMERA_COLOR_SOURCE_VALIDITY",
+    "goal": "Preserve genuine menu/vehicle/race offscreen GPU Draw/DrawIndexed to native left/right eye Copy/Stretch color provenance without treating shaderless, color-masked, depth-rejected or MSAA-masked source draws as valid new rendered game pixels.",
+    "acceptance_items": [
+      {
+        "id": "live_camera_color_provenance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_vehicle_race_native_d3d11_offscreen_draw_copy_stretch_eye_output",
+        "expected_behavior": "All four native offscreen game Draw variants count real color-eligible geometry only when their source camera pixel shader, OM color write, raster, depth/stencil, sample mask and predication can produce new pixels."
+      },
+      {
+        "id": "msaa_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_eye_single_sample_vs_msaa_source_camera_dx9ex_gamepad_ffb",
+        "expected_behavior": "Preserve single-sample eye bit-zero color evidence and authentic offscreen Draw chronology; accept physical MSAA source sample bits, reject masked and unsupported sources; original D3D9 input and DX9Ex fallback remain unchanged."
+      },
+      {
+        "id": "validation_gate",
+        "category": "integrated_validation",
+        "behavior_area": "win32_native_shader_runtime_openxr_backend_fast_hud_gates",
+        "expected_behavior": "Native helper static assertions and source-stage registration plus all five exact-SHA GitHub Actions with no skipped safety/compile or fallback checks."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "GAME_AUTHORED_OFFSCREEN_DRAW_INDEXED_AND_INSTANCED",
+      "SOURCE_RTV_DEPTH_BLEND_SHADER_MSAA_COLOR_ELIGIBILITY",
+      "GAME_AUTHORED_GPU_COPY_STRETCH_TO_LEFT_RIGHT_XR_EYES"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_OFFSCREEN_CAMERA_COLOR_SOURCE_VALIDITY:00918"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: C++ records conservative menu/car/race GPU source color provenance, not hardware-proven visible game frames. Native activation remains disabled without runtime evidence.",
+    "activation_guard_and_fallback": "No game command is dropped by eligibility checks; only native OpenXR frame color certification is constrained. Original D3D9/DX9Ex rendering, gamepad, FFB, SkyGlow, eye raster and DXVK freeze unchanged.",
+    "acceptance_proof": {
+      "positive_probe": "Real source RTV sample count and bound VS/PS/OM blend/depth/predication admission wired into all 4 authentic offscreen D3D11 Draw paths and GPU postpass evidence.",
+      "negative_regression": "Source color disabled, shader absent, depth/stencil NEVER, sample masked or invalid sample count cannot certify copied stale eyes; single-sample eye remains bit-zero only.",
+      "component_integration": "Shared sample-mask helper, native game offscreen GPU Draw/DrawIndexed/instanced encoder and postpass eye frame evidence integrated in one material commit; exact-SHA gates pending."
+    }
+  },
+  "acceptance_results": {
+    "live_camera_color_provenance": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "msaa_and_original_fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "validation_gate": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "runtime_validation_note": "No matching OutRun menus, car selection, race, Quest3/VDXR pixels or gamepad test. RUNTIME_VALIDATION=UNTESTED.",
+  "pipeline": {
+    "C0_RECOVER": "Prior 00917 completed exact-SHA C6 on branch HEAD c1372e93; no 00918 claim existed.",
+    "C1_REVIEW": "Source-game Draw eligibility did not check actual offscreen RTV shader/blend/sample mask color write; stale intermediate images could certify native stereo after GPU Copy/Stretch.",
+    "C2_IMPLEMENT": "Source four D3D11 Draw variants and MSAA-vs-single-sample native eligibility changed; preserve GPU commands and D3D9 fallback.",
+    "C3_VALIDATE": "Native static_assert regression and five original GitHub Actions pending on exact material SHA.",
+    "C4_COMMIT": "Material implementation staged with this source-stage record.",
+    "C5_PACKAGE": "NOT_REQUIRED_SOURCE_STAGE_HMD_UNTESTED",
+    "C6_RESULT": "PENDING_EXACT_SHA"
+  }
+}
