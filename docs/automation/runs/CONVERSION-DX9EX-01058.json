@@ -14,7 +14,7 @@
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
+  "material_result_sha": "bd1f0e96fbbe7e0dbe01f31895fcbb18781bb9a5",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -45,6 +45,16 @@
         "behavior_area": "Windows_R84_game_host_package_source",
         "expected_behavior": "Full DX9Ex Active, Domain, EXE HUD Inspector and Full Source Impact on one exact SHA; HMD optics separate."
       }
+    ],
+    "trace_stages": [
+      "Original 0x9898E/0x98A36 +TIME sprani and 0x989AD/0x98A10/0x98A89 numeric E8 producer CALLs establish exact source identity.",
+      "StageExtensionEnter captures VR+queue admission, direct D3DX HUD source and live priority root+tail snapshots; leave tags only bounded appended sprites while exact source remains admissible.",
+      "Original D3DX Draw/Flush/End and SpriteNode submit route through R84 physical R30/R33 eye owner gates, native fallback and x64 OpenXR host, with HMD binocular optics untested."
+    ],
+    "subcomponents": [
+      "Keep source-entry VR/queue admission in a thread-local transaction and restore the original exact HUD owner across native direct numeral sprite calls.",
+      "Apply the same admission at CALL return to both stage-extension SpriteNode siblings and homogeneous native D3DX direct numeric glyph GPU Flush, without promotion during toggles or queue reentry.",
+      "Compile C++20 positive/negative admission regression including VR off/on, on/off, queue nesting, stable original source and protected R26/input/SkyGlow boundaries."
     ]
   },
   "diagnosis": {
@@ -69,7 +79,13 @@
   },
   "ci_evidence": {
     "local_targeted_gate": "C++20 portable SourceAdmission positive/negative executable PASS, compile-time static_assert included in x86 source",
-    "required_gates_state": "PENDING"
+    "required_gates_state": "PENDING",
+    "prior_failed_runs": [
+      {
+        "run_id": 39168768438,
+        "cause": "policy feature_contract missing trace_stages and subcomponents; game/host/package skipped before compiler"
+      }
+    ]
   },
   "result_commit_kind": "material_source_plus_feature_contract",
   "c6_commit_kind": "none"
