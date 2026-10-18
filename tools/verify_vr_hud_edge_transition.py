@@ -9,7 +9,7 @@ smoke=(root/"vrhost/tests/hud_edge_transition_smoke.cpp").read_text(encoding="ut
 def check(s,h):
     for token in (
         '#include "hud_edge_transition.hpp"',
-        'ProducerToken::OutRunHudPeripheralText',
+        'IsAnchorableDrivingHudProducer(',
         'RenderScope::ScreenHud',
         'return OutRunVrHudEdge::PeripheralAnchor(ndc, limit);',
         'OutRunVrHudEdge::PeripheralWeight(rawAnchorX)',
@@ -43,6 +43,25 @@ def check(s,h):
     assert 'std::clamp(0.90f / baseScale, 1.0f, 3.0f)' in s
     assert '0.65f / hudScaleY, previousBoost, 3.0f' in s
 check(src,hdr)
+# R84 3440-reference layout keeps source-proven driving text near its edges.
+# Do not broaden to the previously correct 6th/6, world, +TIME or ESC UI.
+semantics=(root/"src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
+hud_gate=semantics.split("inline constexpr bool IsAnchorableDrivingHudProducer(",1)[1].split("static_assert",1)[0]
+for label in ("ProducerToken::OutRunHudText",
+              "ProducerToken::OutRunHudPeripheralText"):
+    assert label in hud_gate, label
+for label in ("ProducerToken::DispRankClipSprite",
+              "ProducerToken::PauseOptionArrow",
+              "ProducerToken::ResultProgress"):
+    assert label not in hud_gate, label
+assert "OutRunVR::GameSemantic::IsAnchorableDrivingHudProducer(" in src
+assert "CurrentRenderProducerToken()" in src
+try:
+    check(src.replace('IsAnchorableDrivingHudProducer(', 'IsAnyHudProducer(',1),hdr)
+except AssertionError:
+    pass
+else:
+    raise AssertionError("HUD producer identity gate mutation escaped")
 for original,wrong in (
     ('return OutRunVrHudEdge::PeripheralAnchor(ndc, limit);','return ndc;'),
     ('OutRunVrHudEdge::PeripheralWeight(rawAnchorX)','1.0f'),
