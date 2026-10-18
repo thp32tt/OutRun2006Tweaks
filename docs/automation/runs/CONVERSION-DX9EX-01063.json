@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "3733e4426ae6562993756e1cdb56062c468540c2",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "95002b3945c7e54f6cab1398c36cc12874ab1543",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "src/hooks_textures.cpp",
@@ -80,13 +80,36 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "native_hud_text_source_to_queue": "PENDING_EXACT_SHA",
-    "foreign_text_and_effect_fallback": "PENDING_EXACT_SHA",
-    "hud_text_final_exact_sha_ci": "PENDING_EXACT_SHA"
+    "native_hud_text_source_to_queue": "PASS_BUILD",
+    "foreign_text_and_effect_fallback": "PASS_BUILD",
+    "hud_text_final_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "note": "Publish material+feature input together; only the final validation-bearing HEAD is pushed for exact-SHA Windows CI. No CI-skip."
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "95002b3945c7e54f6cab1398c36cc12874ab1543",
+    "material_source_sha": "3733e4426ae6562993756e1cdb56062c468540c2",
+    "validator_source_sha": "95002b3945c7e54f6cab1398c36cc12874ab1543",
+    "source_regression_repair_sha": "95002b3945c7e54f6cab1398c36cc12874ab1543",
+    "required_workflows": {
+      "DX9Ex Active Validation": {
+        "run_id": 39177242830,
+        "conclusion": "success"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39177242875,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39177242824,
+        "conclusion": "success"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39177242839,
+        "conclusion": "success"
+      }
+    },
+    "runtime": "Quest3/VDXR not executed",
+    "status_note": "Source material and validator run are exact-SHA CI verified; C6 is bookkeeping only and does not grant HMD acceptance"
   }
 }
