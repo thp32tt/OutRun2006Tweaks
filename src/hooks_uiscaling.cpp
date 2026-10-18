@@ -3279,6 +3279,7 @@ public:
         // Preserve a proven B9200 direct batch before the first native
         // queued node replaces its GPU scope. Unproven B9200 is excluded.
         const bool provenDirectResultText = !QueueRenderActive() &&
+            HudBatch.producer == ProducerToken::ResultTextB9200 &&
             HudBatch.matchesGpuOwner(false, nullptr, 0) &&
             DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
                 HudBatch.active, false, HudBatch.homogeneous,
