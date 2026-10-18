@@ -3,6 +3,7 @@
 #include "pipeline_translation.hpp"
 #include "native_sm3_arithmetic_codegen.hpp"
 #include "native_sm3_constant_codegen.hpp"
+#include "native_sm3_texture_codegen.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
@@ -261,14 +262,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V5";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_HLSL_MATERIALIZER_V6";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_PROVENANCE_V5";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_PROVENANCE_V6";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -359,6 +360,8 @@ bool build_r283_sm3_mov_shader_source(
             unsigned sourceCount{};
             bool matrix4x4{};
             bool matrix3x3{};
+            bool texture2d{};
+            unsigned samplerRegister{};
             std::array<std::string, 3> sources{};
             std::array<std::string, 4> matrixRows{};
         };
@@ -368,12 +371,37 @@ bool build_r283_sm3_mov_shader_source(
         std::array<unsigned, 16> outputWritten{};
         std::array<bool, 256> defPresent{};
         std::array<std::array<std::uint32_t, 4>, 256> defBits{};
+        std::array<bool, 16> samplerDeclared{};
+        std::array<bool, 16> sampler2dDeclared{};
+        std::array<bool, 16> sampler2dUsed{};
         bool liveConstantsUsed = false;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
         // D3D9 device. Parse all definitions before interpreting arithmetic
         // so source order cannot silently substitute external constants.
         for (const auto& instruction : decode.instructions) {
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL)) {
+                // SM3 sampler declarations carry their dimension in the DCL
+                // payload. Only an explicitly declared 2D s-register can
+                // become a native TEXLD resource, never a guessed SRV.
+                if (instruction.operandTokens.size() != 2u) return false;
+                const DWORD info = instruction.operandTokens[0];
+                const DWORD token = instruction.operandTokens[1];
+                if (r283_decode_register_type(token) == D3DSPR_SAMPLER) {
+                    const unsigned reg = token & D3DSP_REGNUM_MASK;
+                    if (reg >= samplerDeclared.size() ||
+                        samplerDeclared[reg] ||
+                        (token & 0x80000000u) == 0u ||
+                        (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                        (info & ~(0x80000000u | D3DSP_TEXTURETYPE_MASK)) != 0u)
+                        return false;
+                    samplerDeclared[reg] = true;
+                    sampler2dDeclared[reg] =
+                        (info & D3DSP_TEXTURETYPE_MASK) ==
+                        static_cast<DWORD>(D3DSTT_2D);
+                }
+                continue;
+            }
             if (instruction.opcode != static_cast<DWORD>(D3DSIO_DEF)) continue;
             if ((instruction.instructionToken & 0xf0000000u) != 0u ||
                 instruction.operandTokens.size() != 5u)
@@ -454,6 +482,14 @@ bool build_r283_sm3_mov_shader_source(
             case D3DSIO_M4x4:
             case D3DSIO_M3x3:
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
+            case D3DSIO_TEX:
+                // Ordinary ps_3_0 TEXLD only. Projected/bias/LOD and
+                // vertex-texture fetch are different operations.
+                if (vertexStage ||
+                    (instruction.instructionToken &
+                     D3DSI_OPCODE_SPECIFIC_CONTROL_MASK) != 0u)
+                    return false;
+                opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             default:
                 return false;
             }
@@ -480,6 +516,7 @@ bool build_r283_sm3_mov_shader_source(
             op.sourceCount = sourceCount;
             op.matrix4x4 = instruction.opcode == D3DSIO_M4x4;
             op.matrix3x3 = instruction.opcode == D3DSIO_M3x3;
+            op.texture2d = instruction.opcode == D3DSIO_TEX;
             if (op.matrix3x3 && (mask & 8u)) return false;
             if (op.destinationType == D3DSPR_TEMP) {
                 if (op.destinationRegister >= tempWritten.size())
@@ -519,6 +556,20 @@ bool build_r283_sm3_mov_shader_source(
                     modifier == D3DSPSM_NOT)
                     return false;
                 std::string value;
+                if (op.texture2d && i == 1u) {
+                    // SM3 TEXLD's second source is a sampler, not an
+                    // arithmetic vector. A mismatched/undeclared texture
+                    // dimensionality must stay on D3D9.
+                    if (kind != D3DSPR_SAMPLER || reg >= samplerDeclared.size() ||
+                        !samplerDeclared[reg] || !sampler2dDeclared[reg] ||
+                        modifier != D3DSPSM_NONE || swizzle != 0xe4u)
+                        return false;
+                    op.samplerRegister = reg;
+                    sampler2dUsed[reg] = true;
+                    continue;
+                }
+                if (op.texture2d && modifier != D3DSPSM_NONE)
+                    return false;
                 if ((op.matrix4x4 || op.matrix3x3) && i == 1u) {
                     // Matrix source must denote consecutive real c registers
                     // without relative indexing, modifier or row swizzle.
@@ -602,6 +653,11 @@ bool build_r283_sm3_mov_shader_source(
                 !append_native_sm3_def(translated, reg, defBits[reg]))
                 return false;
         }
+        for (unsigned reg = 0; reg < sampler2dUsed.size(); ++reg) {
+            if (sampler2dUsed[reg] &&
+                !append_native_sm3_texture2d_declarations(translated, reg))
+                return false;
+        }
         translated += "struct R283Input {\n";
         for (const auto& semantic : inputs) {
             std::string label;
@@ -640,7 +696,13 @@ bool build_r283_sm3_mov_shader_source(
             else if (op.destinationType == D3DSPR_OUTPUT)
                 dest = "output.r" + std::to_string(op.destinationRegister);
             else dest = "r283_color";
-            if (op.matrix4x4 || op.matrix3x3) {
+            if (op.texture2d) {
+                if (!append_native_sm3_texture2d_sample(
+                        translated, dest, op.destinationMask,
+                        op.sources[0], op.samplerRegister,
+                        static_cast<unsigned>(i)))
+                    return false;
+            } else if (op.matrix4x4 || op.matrix3x3) {
                 if (!append_native_sm3_matrix(
                         translated, dest, op.destinationMask,
                         op.sources[0], op.matrixRows,

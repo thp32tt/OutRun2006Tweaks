@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/native_sm3_constant_codegen.hpp"
+#include "../src/vr/d3d11/native_sm3_texture_codegen.hpp"
 #include <array>
 #include <cassert>
 #include <cstdint>
@@ -28,4 +29,23 @@ int main() {
     assert(!append_native_sm3_matrix(out, "r283_t0", 0, "input.r0", rows, 4, 17));
     assert(!append_native_sm3_matrix(out, "r283_t0", 15, "", rows, 4, 18));
     assert(out == before);
+    std::string sampled;
+    assert(append_native_sm3_texture2d_declarations(sampled, 0));
+    assert(append_native_sm3_texture2d_declarations(sampled, 15));
+    assert(sampled.find("Texture2D<float4> r283_texture15 : register(t15)") != std::string::npos);
+    assert(sampled.find("SamplerState r283_sampler15 : register(s15)") != std::string::npos);
+    const auto declarations = sampled;
+    assert(!append_native_sm3_texture2d_declarations(sampled, 16));
+    assert(sampled == declarations);
+    assert(append_native_sm3_texture2d_sample(
+        sampled, "r283_t2", 0x7u, "input.r0.xyzw", 15, 19));
+    assert(sampled.find("r283_texture15.Sample(r283_sampler15, (input.r0.xyzw).xy)") != std::string::npos);
+    assert(sampled.find("r283_t2.xyz = r283_texel_19.xyz;") != std::string::npos);
+    const auto emitted = sampled;
+    assert(!append_native_sm3_texture2d_sample(sampled, "r283_t2", 0, "input.r0", 1, 20));
+    assert(!append_native_sm3_texture2d_sample(sampled, "r283_t2", 16, "input.r0", 1, 20));
+    assert(!append_native_sm3_texture2d_sample(sampled, "r283_t2", 1, "", 1, 20));
+    assert(!append_native_sm3_texture2d_sample(sampled, "r283_t2", 1, "input.r0", 16, 20));
+    assert(sampled == emitted);
+
 }
