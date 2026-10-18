@@ -487,7 +487,7 @@ bool build_r283_sm3_mov_shader_source(
                 // vertex-texture fetch are different operations.
                 if (vertexStage ||
                     (instruction.instructionToken &
-                     D3DSI_OPCODE_SPECIFIC_CONTROL_MASK) != 0u)
+                     0x00ff0000u) != 0u)
                     return false;
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             default:
