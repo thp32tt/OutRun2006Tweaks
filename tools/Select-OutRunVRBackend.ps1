@@ -223,7 +223,12 @@ if (Test-Path $ini) {
         # x64 D3D11 OpenXR host if shared-eye transport is not admitted.
         # Native DX11 draw remains dormant and is never impersonated.
         $screenConnectTest = $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST -eq '1'
-        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" $(if ($screenConnectTest) { 'false' } else { 'true' })
+        if ($screenConnectTest) {
+            $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        } else {
+            # Preserve the strict ordinary DX11 DirectGPU transport policy.
+            $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
+        }
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } else {
         $value = switch ($Backend) {
