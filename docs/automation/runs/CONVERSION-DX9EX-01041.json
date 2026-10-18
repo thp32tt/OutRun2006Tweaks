@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01041",
+  "production_id": "CONVERSION-DX9EX-01041",
+  "event_id": "CONVERSION-DX9EX-01041-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
+  "checkpoint": "C2_IMPLEMENTED_CI_REPAIR",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "e8ce983d64e7e1330e9664be62e62fcdb08f0462",
+  "validation_bearing_result_sha": "PENDING_CI_REPAIR_SHA",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/sprite_queue_tail_proof.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Keep the original 6th/6 animated first-position SpriteNode and all clipped digit siblings on a correct R84 stereo HUD owner when their priority list survives the original native call, rejecting detached or reattached foreign queue tails rather than misassigning binocular ScreenHud ownership.",
+    "scope_boundary": "Only original rank display 0x4B9D80 two native sprite families, their priority roots and native R84 ScreenHud queue registration; excludes vehicle-attached rank, +TIME, GOAL, ESC, F11, lens, SkyGlow, DX11, DXVK, R26_SAFE and original input/FFB.",
+    "trace_stages": [
+      "Original 0x4B9D80 first animated rank sprite 0x29530 and right-side clipped digits enter DispRankFirst_sprani and DispRankRight_putClipSprite.",
+      "Original sprite callbacks may append multiple sibling nodes or replace the priority root; both wrappers snapshot root and tail before the native call.",
+      "TagAppendedNodes proves the same live root, reachable old tail and final new tail, then attaches ScreenHud only to the newly appended 6th/6 SpriteNodes for separately gated R84 left/right GPU submission."
+    ],
+    "subcomponents": [
+      "Protect the rank first animated sprite batch by capturing all original priority roots and requiring stable live-root plus bounded old/new tail proof before tagging.",
+      "Protect the right-side rank digit clip batch with the same original root proof, including all valid sibling nodes and the empty sentinel first-write case.",
+      "Compile-time positive and negative native queue fixtures for root reuse, detached tail, foreign last tail and bounded cyclic list, preserving original rendering fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_sprite_digit_queue_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original 6th/6 animated first sprite and digit siblings through native queue to R84 ScreenHud",
+        "expected_behavior": "Only real SpriteNodes appended to the same priority root receive the original rank HUD semantic owner across multi-sibling and empty-sentinel cases."
+      },
+      {
+        "id": "rank_queue_reuse_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Rebuilt native priority root, reused old tail, detached and cyclic queue",
+        "expected_behavior": "Foreign or recycled nodes are never dereferenced through a stale old tail or assigned rank HUD ownership; unverified native fallback stays unchanged."
+      },
+      {
+        "id": "rank_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows native x86 R84 game, x64 OpenXR host, R26_SAFE package, Domain, HUD Inspector and Full Source Impact",
+        "expected_behavior": "Four mandatory GitHub Actions succeed on one exact validation-bearing SHA with runtime Quest3 and VDXR untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_sprite_digit_queue_owner": "SOURCE_IMPLEMENTED",
+    "rank_queue_reuse_fallback": "SOURCE_IMPLEMENTED",
+    "rank_exact_sha_integration": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Current GitHub source showed original 6th/6 DispRankFirst_sprani and DispRankRight_putClipSprite used an O(1) oldTail->next_0 branch without a stable priority root check.",
+    "source_trace": [
+      "Original 0x4B9D80 first sprite and rank digits call native sprani and clip-sprite wrappers, capturing only tail_4 before C2.",
+      "Unverified O(1) TagAppendedNodes reads the captured old tail and can wrongly inherit ScreenHud if old-tail memory is reused or the priority root changes.",
+      "Modified exact two-family wrappers now capture root and tail and invoke the preexisting bounded stable-root verifier before R84 HUD tagging."
+    ],
+    "alternatives_rejected": [
+      "No global retag of 2D content, no vehicle-attached rank flattening and no bypass of R84 conservative physical eye admission; other visual symptoms are independent."
+    ],
+    "eye_ownership": "This fix limits which original queued rank nodes may be offered to native R84 ScreenHud stereo; successful Quest3 left/right output remains unproven.",
+    "root_cause": "Rank first and digit wrappers previously fell through TagAppendedNodes ordinary O(1) dereference despite the native producer being able to rebuild or relink its priority list."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "original_material_source_sha": "e8ce983d64e7e1330e9664be62e62fcdb08f0462",
+    "failed_exact_sha": "e8ce983d64e7e1330e9664be62e62fcdb08f0462",
+    "failed_run_id": 39124571419,
+    "failed_step": "policy: run record missing; game/host/package skipped",
+    "final_exact_sha_gates": "PENDING",
+    "head_sha": "PENDING"
+  },
+  "notes": "B: exact GitHub Active policy failure caused solely by missing required same-TASK run record; preserves prior material source and running independent CI. RUNTIME_VALIDATION=UNTESTED. CI/source changes and C6 are one feature, no duplicate score."
+}
