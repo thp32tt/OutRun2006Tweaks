@@ -1,3 +1,5 @@
+> **2026-10-19 최신 후속 작업:** 당시 보류했던 2개(Q062 HARD, Q201 CONIFEROUS FOREST)는 **원본 PNG 네이티브 픽셀 Q201 1건**과 **검증된 상위 PSD 독립 레이어 Q062 1건**의 서로 다른 방식으로 검토용 후보를 생성했습니다. 재크롭 후보 46/46건 확보(이 중 45건 원본 픽셀 일치, 1건 PSD 레이어 기반으로 평탄화 원본과 픽셀 차이 존재). **새 전체 결과 및 범위 제한은 [OUTRUN_C_NATIVE_ENGLISH_46_FINAL_20261019.md](OUTRUN_C_NATIVE_ENGLISH_46_FINAL_20261019.md)를 우선 적용**합니다. C 결과는 여전히 TEST_ONLY, 실게임 검증 및 최종 승인 미실시. 기존 A/B·DDS·255건 마스터 미변경.
+
 > **2026-10-19 후속 완료 현황(최신):** 이전 4건 중 2건(Q051 Leader!, Q154 SELECT LICENSE)은 원본 RGBA 좌표 재크롭 후보를 만들고 원본·출력 SHA 및 byte-perfect 픽셀 검증을 완료했습니다. 2건(Q062 HARD, Q201 CONIFEROUS FOREST)은 원본 아트/글자가 붙어 있어 본 C 작업의 직사각형 크롭 범위로는 분리할 수 없어 HOLD입니다. 재크롭 후보 누계는 **44/46**, 재작업 보류 **2/46**입니다. Q051 문장부호는 화면에서 콜론처럼 보여 공식 `Leader!` 번역 표기와의 일치 확인이 남았습니다. 상세 근거: [OUTRUN_C_LAST4_ISOLATION_20261019.md](OUTRUN_C_LAST4_ISOLATION_20261019.md). 44개 TEST_ONLY ZIP과 4개 비교 JPG는 N100 `work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/`에 있습니다. 원본 108개·기존 242개·255건 마스터·A/B·DDS는 변경하지 않았습니다. 별도 GitOps C 재배포는 필요하지 않습니다.
 
 # OutRun 2006 C GitOps — native HD English crop QA and source-only rework
