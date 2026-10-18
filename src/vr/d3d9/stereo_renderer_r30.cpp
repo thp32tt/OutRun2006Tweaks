@@ -6240,7 +6240,12 @@ namespace OutRunVRStereo
                 R29OwnerNoteRestoreFailure("R30.2 XYZRHW right-eye draw");
                 R29OwnerArmMonoSafety();
             }
-            return leftHr;
+            // LEFT ran once. A private-eye RT/depth/viewport restore fault
+            // has also corrupted original-game state and must reach its caller.
+            // RIGHT-only GPU faults retain the native left HRESULT while the
+            // existing Present veto protects incomplete stereo.
+            return OutRunVR::R30StateRestore::ResultAfterRestore(
+                leftHr, restoreOk, static_cast<HRESULT>(E_FAIL));
         }
 
         HRESULT R30TryXyzrhwPrimitiveUP(

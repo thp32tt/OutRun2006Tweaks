@@ -28,6 +28,7 @@
 #include "../state/state_block_tracker.hpp"
 #include "gpu_water_profiler.hpp"
 #include "stereo_completion_gate.hpp"
+#include "r30_state_restore_result.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "../game/universal_draw_trace.hpp"
 #include "../game/car_base_shadow_stereo.hpp"
@@ -814,6 +815,9 @@ namespace OutRunVRStereo
                 R32ReviewNoteRestoreFailure("R33 fast right-eye draw");
                 R32ReviewArmStereoRecoverySafety();
             }
+            // Native LEFT success cannot hide an unrestored game state.
+            result.hr = OutRunVR::R30StateRestore::ResultAfterRestore(
+                result.hr, restoreOk, static_cast<HRESULT>(E_FAIL));
             return result;
         }
 
@@ -1300,6 +1304,10 @@ namespace OutRunVRStereo
                             ? "R33 HUD original c64 rollback"
                             : "R33 C993 original c64 rollback");
                 R32ReviewArmStereoRecoverySafety();
+                // LEFT was physically submitted. Propagate a failed original
+                // c64 rollback without retrying or relabeling its GPU draw.
+                result.hr = OutRunVR::R30StateRestore::ResultAfterRestore(
+                    result.hr, restored, static_cast<HRESULT>(E_FAIL));
                 return result;
             }
 
@@ -1453,6 +1461,10 @@ namespace OutRunVRStereo
                         stereo->poseSequence);
                 }
             }
+            // Both private-eye submission and original RT/depth/viewport/c64
+            // restoration matter. Never mask corrupted native GPU bindings.
+            result.hr = OutRunVR::R30StateRestore::ResultAfterRestore(
+                result.hr, restoreOk, static_cast<HRESULT>(E_FAIL));
             return result;
         }
 

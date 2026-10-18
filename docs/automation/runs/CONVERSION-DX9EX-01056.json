@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01056",
+  "production_id": "CONVERSION-DX9EX-01056",
+  "event_id": "CONVERSION-DX9EX-01056-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTING",
+  "checkpoint": "C2_SOURCE",
+  "feature_id": "DX9EX:SAFETY:R84_PRIVATE_EYE_STATE_RESTORE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/r30_state_restore_result.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:SAFETY:R84_PRIVATE_EYE_STATE_RESTORE",
+    "goal": "Restore OutRun's original D3D9 GPU bindings and report private right-eye RT/depth/viewport/c64 state-restore faults on both R84 R30 XYZRHW and R33 fast-world/HUD paths instead of silently returning native LEFT success.",
+    "scope_boundary": "Only original game render-state rollback after R84 private-eye draws and exact-HUD source-change c64 restore. Do not change standalone RIGHT GPU Draw error policy, replay LEFT, widen lens/HUD admission, alter input/FFB/SkyGlow or touch R26_SAFE, DX11 and frozen DXVK.",
+    "special_work_evidence": "Confirmed source-level missing HRESULT propagation: R30 and R33 marked current stereo frame invalid and armed mono safety after failed original render-state restore yet returned the prior successful native LEFT Draw; R33 HUD exact producer-change c64 rollback also returned LEFT success on failed restore.",
+    "trace_stages": [
+      "Original game HUD/XYZRHW/world geometry enters R84 R30 or R33, submits one actual native LEFT Draw then private RIGHT GPU state and draw.",
+      "R30/R33 restore the original game RT/depth/viewport/c64 bindings after RIGHT, while a distinct exact HUD source-changed branch restores original c64 without dispatching RIGHT.",
+      "Failed restore now propagates an HRESULT error while keeping existing right-eye frame validity veto and preventing any duplicate native LEFT Draw."
+    ],
+    "subcomponents": [
+      "R30 native XYZRHW original world and HUD stereo path propagates failed private-eye RT/depth/viewport restoration.",
+      "R33 native fast-world and HUD shader stereo paths propagate failed original RT/depth/viewport/c64 restoration.",
+      "R33 HUD exact producer-source change after native LEFT propagates failed original c64 rollback, but successful rollback retains original game HRESULT."
+    ],
+    "acceptance_items": [
+      {
+        "id": "restore_all_r84_gpu_state",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_x86_gpu_submission",
+        "expected_behavior": "R30 and R33 original-game render state restore failure is propagated after the native left GPU submission with right-eye failure safety maintained."
+      },
+      {
+        "id": "right_only_failure_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "stereo_recovery_input_skyglow",
+        "expected_behavior": "Preserve original native left errors, right-only eye failure safety, shader/queue admission, Reset, original input/FFB, SkyGlow and R26 safe fallback."
+      },
+      {
+        "id": "exact_sha_integrated_pipeline",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Source result exact SHA must pass DX9Ex Active game/host/R26 rollback package, Domain Isolation, HUD Inspector and Full Source Impact; Quest3 validation stays untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Prepatch R84 R30ExecuteXyzrhwStereo, R33TryFastWorld, R33TryHud and R33 source-change rollback explicitly detected restore failure yet returned the original native left success.",
+    "root_cause": "GPU state-restoration fault was recorded for stereo frame recovery but was not propagated to the original game's calling HRESULT, allowing a successful call return with corrupted game D3D9 render state.",
+    "source_trace": [
+      "Original game projected screen/world draws flow into R30ExecuteXyzrhwStereo and then private right-eye RT, depth and viewport setters.",
+      "R33TryFastWorld and R33TryHud submit native left draw then private right-eye RT, depth, viewport and shader c64 setters before game-state restoration.",
+      "R33TryHud exact source-change rejection separately restores original c64 after native left but had not reported failure when original c64 setter failed."
+    ],
+    "alternatives_rejected": [
+      "Do not propagate right-only GPU Draw errors as original game's LEFT Draw failure or repeat the native left submission; existing stereo frame veto is independent."
+    ],
+    "eye_ownership": "Source-proven native LEFT remains single submission; RIGHT-only GPU faults invalidate stereo frame while original state restore errors propagate. Physical Quest3 binocular result remains unknown.",
+    "fix_evidence": "Shared R30StateRestore typed HRESULT decision applied to R30 XYZRHW and R33 fast-world/HUD state restoration including exact HUD source-change c64 rollback.",
+    "negative_test_evidence": "C++ static_assert verifies success, negative original draw, positive nonzero success, original render state restore errors, successful source-change rollback, and right-only eye Draw status separation."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ]
+}
