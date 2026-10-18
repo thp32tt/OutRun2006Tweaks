@@ -90,8 +90,20 @@
     "failed_preflight_step": "Enforce feature-sized DX9Ex autonomous completion",
     "failed_preflight_cause": "The required docs/automation/runs/CONVERSION-DX9EX-01053.json was not present in the original source commit. Python --check-head stopped before game/host compile; this is a missing-policy-input failure, not demonstrated C++ failure.",
     "validation_bearing_result_sha": null,
-    "required_gates_state": "PENDING_ALL_FOUR_EXACT_SHA",
-    "runtime_validation": "UNTESTED"
+    "required_gates_state": "PENDING_FINAL_INTEGRATED_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "policy_repairs": [
+      {
+        "head_sha": "3da593dec4e33446a45da8d6e166cbf13701985a",
+        "failure_source": "tools/verify_vr_projected_marker_anchor.py stale one-pass test",
+        "resolution": "ordered two-pass preflight/commit source contract and destructive mutation"
+      },
+      {
+        "head_sha": "07bf32ccc321166eab1b3d85d2a09a000908a513",
+        "failure_source": "tools/verify_vr_hud_exact_callsite_contract.py stale one-pass test",
+        "resolution": "original vehicle-rank P0 GUI guard updated with negative mutation tests"
+      }
+    ]
   },
-  "notes": "Retry E003 adds the missing required same-task feature contract from the already committed functional C++ rank-marker repair; no new functional material implementation, no new score for CI/metadata repair. This record is deliberately nonterminal until all exact-SHA required Gates complete. Do not rerun the same failed SHA or cancel already running workflows. Quest3/VDXR not performed."
+  "notes": "Retry E003 adds the missing required same-task feature contract from the already committed functional C++ rank-marker repair; no new functional material implementation, no new score for CI/metadata repair. This record is deliberately nonterminal until all exact-SHA required Gates complete. Do not rerun the same failed SHA or cancel already running workflows. Quest3/VDXR not performed. Source policy failure fixes 3da593de (exact projected-marker anchor two-pass proof) and 07bf32cc (P0 HUD contract two-pass proof) retain all positive/negative tests. Same TASK source, no extra score. The final integrated exact-SHA workflow gate is triggered separately because verifier-only push did not trigger Full Source Impact; ongoing 07bf native builds are preserved by concurrency cancel-in-progress=false."
 }
