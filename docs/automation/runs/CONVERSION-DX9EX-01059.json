@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01059",
+  "production_id": "CONVERSION-DX9EX-01059",
+  "event_id": "CONVERSION-DX9EX-01059-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/direct_sprite_source_provenance.hpp",
+    "tools/diagnostics/repro_native_sprite_vr_admission_20261019.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Prevent original gameplay HUD/clip SpriteNodes from inheriting incorrect binocular semantic ownership across VR toggles, queue render or external-overlay reentry; retain valid direct owners and native fallback.",
+    "scope_boundary": "Direct native put_sprite_ex/put_sprite_ex2 source-to-live-queue path only; do not change gameplay timer, original FFB/input, SkyGlow, UV restoration, R26_SAFE, DX11 or frozen DXVK. Optical output is not HMD-proven.",
+    "trace_stages": [
+      "Original EXE direct E8 caller enters native sprite hook; collect VR enable state and current producer/queue/external semantic scope before native call.",
+      "Native put_sprite_ex/put_sprite_ex2 can reenter another queue/external callback or observe VR mode transitions before returning; compare with original entry conditions, then apply the pre-existing stable-root bounded live tail proof.",
+      "Only consistently admitted native SpriteNodes gain exact scope/producer tags; R84 R30/R33 GPU owner/admission and x64 OpenXR host remain independently responsible for eye submissions; fallback is unchanged."
+    ],
+    "subcomponents": [
+      "Capture VR mode at native sprite source entry and reject tags on VR off-to-on or on-to-off transitions.",
+      "Reject queued, external overlay and changed producer/scope state across native callback, preserving known-good stable HUD and unknown native fallback.",
+      "Include source-header Win32 static assertions and executable C++ regression for stable, toggled, nested, queued, overlay and registration-generation cases, with final exact-SHA Gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_hud_direct_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_direct_sprite_owner_lifetime",
+        "expected_behavior": "Direct HUD sprites under stable VR ownership keep original eye semantic, but desktop-to-VR transition or changed parent cannot gain binocular label."
+      },
+      {
+        "id": "native_hud_fallback_guards",
+        "category": "fallback_regression",
+        "behavior_area": "VR_queue_overlay_nested_source",
+        "expected_behavior": "Both VR transition directions, queued rendering, external overlay and producer/scope changes reject wrong tags while existing valid direct source remains admitted."
+      },
+      {
+        "id": "exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex_Windows_R84_game_host_package",
+        "expected_behavior": "Windows R84 game, R26_SAFE fallback, x64 host/package, Domain, EXE HUD Inspector and Full Source Impact all pass same validation-bearing SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "TagDirectVrSpriteNodes read only Settings::VREnabled after original native callback; queue/overlay changes only restricted diagnostic producer token, not wrong render scope registration.",
+    "root_cause": "Native game callback may change VR mode and render source before captured SpriteNodes are registered; return-only check can misclassify desktop or foreign HUD children as stereo owned.",
+    "alternatives_rejected": [
+      "Do not globally promote unknown UI or bypass live tail proof.",
+      "Do not declare fixed optical visuals before Quest3/VDXR runtime."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "native_hud_direct_source": "PENDING_EXACT_SHA",
+    "native_hud_fallback_guards": "WIN32_STATIC_ASSERT_IN_SOURCE",
+    "exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "required_gates_state": "PENDING",
+    "local_targeted_gate": "C++ compile-time negative regression in game owner; portable native-source fixture staged"
+  },
+  "result_commit_kind": "material_game_source_plus_feature_contract",
+  "c6_commit_kind": "none"
+}

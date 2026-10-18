@@ -62,6 +62,59 @@ namespace OutRunVR::DirectSpriteSource
         }
     }
 
+
+    // Mode and render-queue entry conditions must survive the *entire*
+    // native put_sprite_ex/put_sprite_ex2 call. Merely checking VR at
+    // return wrongly promotes desktop nodes after an off->on toggle.
+    // Preserve the independent live-root/tail and nested-node proofs.
+    constexpr bool CanAdmitNativeDirectNodeTags(
+        bool vrAtEntry, bool vrAtReturn, Snapshot entry,
+        Snapshot onReturn) noexcept
+    {
+        return vrAtEntry && vrAtReturn &&
+            !entry.queueActive && !onReturn.queueActive &&
+            !entry.externalOverlay && !onReturn.externalOverlay &&
+            entry.scope == onReturn.scope &&
+            entry.producer == onReturn.producer;
+    }
+
+    constexpr bool TestNativeDirectVrAdmission() noexcept
+    {
+        const Snapshot hud{RenderScope::ScreenHud,
+            ProducerToken::DispRankFirst, false, false, 42};
+        const Snapshot generic{RenderScope::None,
+            ProducerToken::None, false, false, 7};
+        if (!CanAdmitNativeDirectNodeTags(true, true, hud, hud) ||
+            !CanAdmitNativeDirectNodeTags(true, true, generic, generic) ||
+            CanAdmitNativeDirectNodeTags(false, true, hud, hud) ||
+            CanAdmitNativeDirectNodeTags(true, false, hud, hud) ||
+            CanAdmitNativeDirectNodeTags(false, false, hud, hud))
+            return false;
+        auto queued = hud;
+        queued.queueActive = true;
+        if (CanAdmitNativeDirectNodeTags(true, true, queued, hud) ||
+            CanAdmitNativeDirectNodeTags(true, true, hud, queued))
+            return false;
+        auto overlay = hud;
+        overlay.externalOverlay = true;
+        if (CanAdmitNativeDirectNodeTags(true, true, overlay, hud) ||
+            CanAdmitNativeDirectNodeTags(true, true, hud, overlay))
+            return false;
+        auto changed = hud;
+        changed.producer = ProducerToken::ResultTextB9200;
+        if (CanAdmitNativeDirectNodeTags(true, true, hud, changed))
+            return false;
+        changed = hud;
+        changed.scope = RenderScope::WorldBillboard;
+        if (CanAdmitNativeDirectNodeTags(true, true, hud, changed))
+            return false;
+        changed = hud;
+        changed.registrationSerial++;
+        return CanAdmitNativeDirectNodeTags(true, true, hud, changed);
+    }
+    static_assert(TestNativeDirectVrAdmission(),
+        "Direct native HUD sprites must reject mode/queue/producer changes");
+
     // The native sprite call can reenter another exact source. Keep those
     // newly registered children, but allow unknown, same, and old tags to
     // inherit the proven enclosing source through the existing queue path.
