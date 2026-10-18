@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_MATERIAL_COMMITTED_CI_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "material_result_sha": "65f17e440f84c63b848ecc8fa3a03c140c1a2ea0",
+  "validation_bearing_result_sha": "7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/game/direct_sprite_source_provenance.hpp",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "native_direct_parent_ownership": "PENDING_CI",
-    "nested_goal_rank_isolation": "PENDING_CI",
-    "required_exact_sha_ci": "PENDING_CI"
+    "native_direct_parent_ownership": "PASS_BUILD",
+    "nested_goal_rank_isolation": "PASS_BUILD",
+    "required_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "The original native put_sprite_ex/ex2 may enqueue multiple children and reenter exact HUD, GOAL, or vehicle rank producers before returning; original callsite and bounded tails are already known.",
@@ -83,5 +83,43 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "Class A structural native HUD producer-collision repair; baseline 2be4f0729f3d82fb548cb012ce96a3fd44ca5d89; compile-time regression in changed header; no Quest3 test. Material commit SHA will be recorded after the actual SHA exists."
+  "notes": "Class A structural native HUD producer-collision repair; baseline 2be4f0729f3d82fb548cb012ce96a3fd44ca5d89; compile-time regression in changed header; no Quest3 test. Material commit SHA will be recorded after the actual SHA exists. C6 final: all four exact-SHA actions SUCCESS at 7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d; original C++ material 65f17e440f84c63b848ecc8fa3a03c140c1a2ea0; narrow verifier repair on same TASK; no Quest3/VDXR HMD execution, RUNTIME_VALIDATION=UNTESTED. C6 bookkeeping [skip ci] has no independent score.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "65f17e440f84c63b848ecc8fa3a03c140c1a2ea0",
+    "exact_sha": "7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d",
+    "runtime_validation": "UNTESTED",
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39115604843,
+        "conclusion": "success",
+        "exact_sha": "7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39115604864,
+        "conclusion": "success",
+        "exact_sha": "7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39115604852,
+        "conclusion": "success",
+        "exact_sha": "7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39115604844,
+        "conclusion": "success",
+        "exact_sha": "7a8a9e2d8f4229b9d1e0add45ce0b54b9a0a2c2d"
+      }
+    ],
+    "first_attempt": {
+      "sha": "65f17e440f84c63b848ecc8fa3a03c140c1a2ea0",
+      "run_id": 39115456526,
+      "conclusion": "failure",
+      "reason": "Outdated static verifier literal demanded three-argument native SpriteNode registration; repaired same TASK without reducing coverage, preserved generation fence negative mutations."
+    }
+  }
 }
