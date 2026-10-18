@@ -1,0 +1,102 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00929",
+  "production_id": "CONVERSION-DX11-00929",
+  "event_id": "CONVERSION-DX11-00929-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00929",
+  "feature_id": "LIVE_GAME_PROGRAMMABLE_SM3_NATIVE_DRAW_INPUT_GRAPH",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "material_result_sha": "94a1f22ba2635fa85bee6ab26ea6761028c3f1cf",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "LIVE_GAME_PROGRAMMABLE_SM3_NATIVE_DRAW_INPUT_GRAPH",
+    "goal": "Connect actual game D3D9 programmable SM3 declarations, mixed packed/float vertex register conversion, IA upload and full-size native Draw/DrawIndexed while keeping opt-in fallback and original source ordinal.",
+    "acceptance_items": [
+      {
+        "id": "real_sm3_packed_vertex_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_programmable_vertex_decl_to_native_gpu_ia",
+        "expected_behavior": "Translate source-owned game D3DCOLOR, integer, normalized, half and float attributes into exact D3D11 shader registers and real native Draw/DrawIndexed."
+      },
+      {
+        "id": "native_stream_fallback_regression",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_draw_input_and_unsupported_layout",
+        "expected_behavior": "Fail closed for unsupported declaration, stream, truncated attributes, oversized GPU vertex bytes and out-of-range indices; preserve original D3D9 Draw/input/FFB."
+      },
+      {
+        "id": "full_sha_ci_game_draw_graph",
+        "category": "integrated_validation",
+        "behavior_area": "vertex_shader_layout_gpu_upload_ci",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector mandatory Actions all succeed on one exact SHA, without inferring gameplay/HMD parity."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_sm3_packed_vertex_native_draw": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
+    "native_stream_fallback_regression": "SOURCE_IMPLEMENTED_AUTOMATION_PENDING",
+    "full_sha_ci_game_draw_graph": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "D3D9 live SM3 declaration and VB/IB/UP shadow",
+      "CPU typed game attribute unpack and semantic register mapping",
+      "Native D3D11 IA upload Draw/DrawIndexed and guarded full-resolution frame batch"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_sm3_vertex_unpack.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_live_sm3_vertex_decl_00929.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real D3D9 SM3 packed/float declaration converted to D3D11 FLOAT4 signature and native indexed/nonindexed draw input; HMD UNTESTED.",
+      "negative_regression": "Unrecognized decl type/stream/offset/stride fail closed; exact index and ordinal admission remain mandatory.",
+      "component_integration": "Source vertices captured at live game interception flow through typed unpack, translated IA layout, GPU vertex upload and native Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:PROGRAMMABLE_SHADER_TRANSLATION:LIVE_GAME_VERTEX_DECLARATION:00929"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Require matching real-game executable/menu-car-race source draw and native published frame counts >0 in one real-game test before claiming visual completion; currently UNTESTED.",
+    "activation_guard_and_fallback": "DX11 full game output remains opt-in; unknown stream/decoder/shader/resource rejects to original D3D9 renderer, input and FFB; no DXVK edits."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_sm3_vertex_unpack.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_live_sm3_vertex_decl_00929.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "00928 was C6 PASS; latest branch source 94a1f22; 00929 not previously present.",
+    "C1_REVIEW": "SM3 native Draw rejected non-FLOAT D3D9 declarations despite backend's broader shader semantic/format translator.",
+    "C2_IMPLEMENT": "Packed/normalized/half game shader inputs converted to GPU FLOAT4 IA stream, preserving FLOAT fast path and D3D9 fallback.",
+    "C3_VALIDATE": "Initial 94a1f22 exact-SHA Fast/Backend failed on missing latest task strategy in 00928; this 00929 run record repairs check-latest selection; all five exact-SHA CI pending.",
+    "C4_COMMIT": "Source material SHA 94a1f22ba2635fa85bee6ab26ea6761028c3f1cf",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING_EXACT_SHA"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Live SM3 programmable source vertex packing not covered by earlier FLOAT-only layout; real game display parity UNTESTED.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "94a1f22ba2635fa85bee6ab26ea6761028c3f1cf",
+  "NEXT_IMPLEMENTATION_ACTION": "Verify exact-SHA gates and repair only actual failures under 00929, then collect one real game native draw+published frame session."
+}
