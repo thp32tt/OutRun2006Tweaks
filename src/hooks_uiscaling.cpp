@@ -1007,9 +1007,6 @@ class UIScaling : public Hook
                    ProducerToken::RankMarkerSprani,
                    ProducerToken::ResultProgress, 9, 0);
     }
-    static_assert(TestGoalProgressQueueOwners(),
-        "GOAL SpriteNodes require stable priority root and nested owner proof");
-
 	// 1st, 2nd and 3rd are each a single sprite, and this call takes its
 	// position as floats, so the discarded fraction goes straight back on.
 	static void TagAppendedNodes(
@@ -1284,6 +1281,11 @@ class UIScaling : public Hook
     inline static thread_local std::uint64_t ResultProgressEntrySerial = 0;
 	static void ResultProgressEnter(safetyhook::Context&)
 	{
+        // MSVC evaluates member constexpr only in a complete-class context.
+        // Keep the positive/negative ownership checks compile-time and
+        // never let a malformed GOAL priority root reach the runtime hook.
+        static_assert(TestGoalProgressQueueOwners(),
+            "GOAL SpriteNodes require stable priority root and nested owner proof");
 		if (ResultProgressDepth++ != 0)
 			return;
         // Queue ownership belongs to this exact 0-99% parent ONLY if the
