@@ -24,6 +24,9 @@ namespace OutRunVR::HudCommandBatch
         // two nodes (or a direct glyph and a node) share +TIME's token.
         // Never mix them into a homogeneous delayed native D3DX batch.
         bool queued = false;
+        // Only a uniformly parent-stack-proven direct B9200 batch may keep
+        // its GOAL owner until native Flush/End. Queue tags are separate.
+        bool provenDirectB9200 = false;
         const void* queueNode = nullptr;
         std::uint64_t queueEpoch = 0;
         std::uint64_t generation = 0;
@@ -99,7 +102,8 @@ namespace OutRunVR::HudCommandBatch
                                 bool sourceStillMatches = true,
                                 bool drawQueued = false,
                                 const void* drawQueueNode = nullptr,
-                                std::uint64_t drawQueueEpoch = 0) noexcept
+                                std::uint64_t drawQueueEpoch = 0,
+                                bool exactDirectB9200Parent = false) noexcept
         {
             if (!sameGeneration(previous))
                 return false;
@@ -132,7 +136,8 @@ namespace OutRunVR::HudCommandBatch
                 }
             }
             recordDraw(drawScope, drawProducer,
-                drawQueued, drawQueueNode, drawQueueEpoch);
+                drawQueued, drawQueueNode, drawQueueEpoch,
+                exactDirectB9200Parent);
             return true;
         }
 
@@ -174,7 +179,8 @@ namespace OutRunVR::HudCommandBatch
         void recordDraw(Scope newScope, Producer newProducer,
                         bool drawQueued = false,
                         const void* drawQueueNode = nullptr,
-                        std::uint64_t drawQueueEpoch = 0) noexcept
+                        std::uint64_t drawQueueEpoch = 0,
+                        bool exactDirectB9200Parent = false) noexcept
         {
             if (!active)
                 return;
@@ -188,12 +194,19 @@ namespace OutRunVR::HudCommandBatch
                 queued = drawQueued;
                 queueNode = drawQueued ? drawQueueNode : nullptr;
                 queueEpoch = drawQueued ? drawQueueEpoch : 0;
-                homogeneous = validQueue;
+                provenDirectB9200 = newProducer == Producer::ResultTextB9200 &&
+                    !drawQueued && exactDirectB9200Parent;
+                homogeneous = validQueue &&
+                    (newProducer != Producer::ResultTextB9200 ||
+                     provenDirectB9200 || drawQueued);
             }
             else if (!validQueue || scope != newScope ||
                      producer != newProducer || queued != drawQueued ||
                      (drawQueued && (queueNode != drawQueueNode ||
-                                     queueEpoch != drawQueueEpoch)))
+                                     queueEpoch != drawQueueEpoch)) ||
+                     (newProducer == Producer::ResultTextB9200 &&
+                      !drawQueued && (!provenDirectB9200 ||
+                                     !exactDirectB9200Parent)))
             {
                 homogeneous = false;
             }
@@ -211,6 +224,7 @@ namespace OutRunVR::HudCommandBatch
             scope = Scope::None;
             producer = Producer::None;
             queued = false;
+            provenDirectB9200 = false;
             queueNode = nullptr;
             queueEpoch = 0;
         }

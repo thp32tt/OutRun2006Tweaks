@@ -2840,7 +2840,8 @@ namespace DX9ExD3DXSpriteLifetime
         bool batchActive, bool queueActive, bool homogeneous,
         unsigned pendingDraws, bool exactLiveSprite,
         OutRunVR::GameSemantic::RenderScope scope,
-        OutRunVR::GameSemantic::ProducerToken producer) noexcept
+        OutRunVR::GameSemantic::ProducerToken producer,
+        bool exactDirectB9200Batch = false) noexcept
     {
         // Source-proven B9200 glyphs may use R84's finite eye plane only
         // DURING their actual direct/queued GPU owner. Their independent
@@ -2849,7 +2850,8 @@ namespace DX9ExD3DXSpriteLifetime
         // existing negative C++ static_assert for this exact source.
         return batchActive && !queueActive && homogeneous &&
             pendingDraws != 0u && exactLiveSprite &&
-            producer != OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 &&
+            (producer != OutRunVR::GameSemantic::ProducerToken::ResultTextB9200 ||
+             exactDirectB9200Batch) &&
             (OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
                  scope, producer) ||
              (scope == OutRunVR::GameSemantic::RenderScope::ScreenHud &&
@@ -2867,11 +2869,13 @@ namespace DX9ExD3DXSpriteLifetime
         bool batchActive, bool queueActive, bool homogeneous,
         unsigned pendingDraws, bool exactLiveSprite,
         RenderScope pendingScope, ProducerToken pendingProducer,
-        RenderScope incomingScope, ProducerToken incomingProducer) noexcept
+        RenderScope incomingScope, ProducerToken incomingProducer,
+        bool exactDirectB9200Batch = false) noexcept
     {
         return CanRestoreDeferredResultOwner(
             batchActive, queueActive, homogeneous, pendingDraws,
-            exactLiveSprite, pendingScope, pendingProducer) &&
+            exactLiveSprite, pendingScope, pendingProducer,
+            exactDirectB9200Batch) &&
             (pendingScope != incomingScope ||
              pendingProducer != incomingProducer);
     }
@@ -2920,6 +2924,20 @@ namespace DX9ExD3DXSpriteLifetime
     static_assert(!CanRestoreDeferredResultOwner(
         true,false,true,2,true,RenderScope::ScreenHud,
         ProducerToken::ResultTextB9200)); // unverified result parent
+    static_assert(CanRestoreDeferredResultOwner(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::ResultTextB9200, true)); // original stack proof
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,true,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::ResultTextB9200, true)); // queue is independent
+    static_assert(!CanDrainDeferredResultBeforeForeignDraw(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::ResultTextB9200,RenderScope::None,
+        ProducerToken::None)); // unproven remains native fallback
+    static_assert(CanDrainDeferredResultBeforeForeignDraw(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::ResultTextB9200,RenderScope::None,
+        ProducerToken::None,true)); // proven outgoing batch
     static_assert(CanRestoreDeferredResultOwner(
         true,false,true,2,true,RenderScope::ScreenHud,
         ProducerToken::PauseOptionArrow));
@@ -3046,7 +3064,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             HudBatch.drawCount,
             DX9ExD3DXSpriteLifetime::CanFlush(
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
-            HudBatch.scope, HudBatch.producer);
+            HudBatch.scope, HudBatch.producer,
+            HudBatch.provenDirectB9200 && !HudBatch.queued);
         HRESULT hr;
         {
             ScopedExactProducerSemantic owned(
@@ -3075,7 +3094,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             HudBatch.drawCount,
             DX9ExD3DXSpriteLifetime::CanFlush(
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
-            HudBatch.scope, HudBatch.producer);
+            HudBatch.scope, HudBatch.producer,
+            HudBatch.provenDirectB9200 && !HudBatch.queued);
         HRESULT hr;
         {
             ScopedExactProducerSemantic owned(
@@ -3256,7 +3276,19 @@ public:
         // *proven* batch with its saved owner before changing queue context.
         // Native End remains authoritative for unknown/mixed/failed batches.
         void* firstQueueSprite = *Module::exe_ptr<void*>(0x55B218);
-        if (CanDrainDirectResultBeforeFirstQueueNode(
+        // Preserve a proven B9200 direct batch before the first native
+        // queued node replaces its GPU scope. Unproven B9200 is excluded.
+        const bool provenDirectResultText = !QueueRenderActive() &&
+            HudBatch.matchesGpuOwner(false, nullptr, 0) &&
+            DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
+                HudBatch.active, false, HudBatch.homogeneous,
+                HudBatch.drawCount,
+                DX9ExD3DXSpriteLifetime::CanFlush(
+                    firstQueueSprite, HudBatch.sprite, firstQueueSprite),
+                HudBatch.scope, HudBatch.producer,
+                HudBatch.provenDirectB9200);
+        if (provenDirectResultText ||
+            CanDrainDirectResultBeforeFirstQueueNode(
                 QueueRenderActive(), HudBatch.active,
                 DX9ExD3DXSpriteLifetime::CanFlush(
                     firstQueueSprite, HudBatch.sprite, firstQueueSprite),
@@ -3404,7 +3436,8 @@ private:
                     self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
                 HudBatch.scope, HudBatch.producer,
                 OutRunVR::GameSemantic::EffectiveScope(),
-                OutRunVR::GameSemantic::CurrentRenderProducerToken()))
+                OutRunVR::GameSemantic::CurrentRenderProducerToken(),
+                HudBatch.provenDirectB9200 && !HudBatch.queued))
         {
             const bool wasStage = StageOwner(HudBatch.scope, HudBatch.producer);
             // The incoming foreign producer is already the current scope,
@@ -3462,6 +3495,12 @@ private:
         const auto command = CapturePhysicalDrawCommand();
         const auto scope = command.scope;
         const auto source = command.producer;
+        // Prove the original 19 E8 parent stack at CPU Draw, before D3DX
+        // defers its GPU submission. Never inherit a queued node identity.
+        const bool provenDirectB9200 = Settings::VREnabled &&
+            !command.queued && command.scope == RenderScope::ScreenHud &&
+            source == ProducerToken::ResultTextB9200 &&
+            OriginalB9200GoalStackActive();
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
@@ -3481,7 +3520,8 @@ private:
             !HudBatch.completeNativeDraw(
                 submission, SUCCEEDED(hr), scope, source,
                 sameSourceAfterNative, command.queued,
-                command.queueNode, command.queueEpoch))
+                command.queueNode, command.queueEpoch,
+                provenDirectB9200))
             return hr;
         if (FAILED(hr) || !self)
             return hr;
