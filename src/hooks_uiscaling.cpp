@@ -156,7 +156,8 @@ namespace
         return FirstVerifiedAppendedNodeOnStableRoot(
                    &original, &original, &original, &last, 4) == &old &&
                !FirstVerifiedAppendedNodeOnStableRoot(
-                   nullptr, &original, nullptr, &last, 4);
+                   static_cast<StageTailFixture*>(nullptr), &original,
+                   static_cast<StageTailFixture*>(nullptr), &last, 4);
     }
     static_assert(TestStageExtensionStableRoot(),
         "+TIME must reject a rebuilt foreign priority root even on tail reuse");
