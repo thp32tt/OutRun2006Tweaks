@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00909",
+  "production_id": "CONVERSION-DX11-00909",
+  "event_id": "CONVERSION-DX11-00909-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00909",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": null,
+    "recovery_basis": "RUN_RECORD_NOT_FOUND: reconstructed from original material commit; no previous feature_contract JSON existed at the validation SHA or target branch.",
+    "goal": "Clip native left/right eye TARGET color and depth/stencil Clears to actual game viewport and enabled scissor while preserving unaffected menu, car-selection and race pixels, physically correct full-clear chronology, and original DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "viewport_scissor_clipped_color_clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_eye_color_target",
+        "expected_behavior": "An explicit or implicit game TARGET Clear clears only actual viewport/scissor intersection; empty intersection is a no-op; only physically full-eye color Clear resets geometry/postpass evidence."
+      },
+      {
+        "id": "viewport_scissor_clipped_depth_stencil_clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_eye_depth_stencil",
+        "expected_behavior": "Game D3D9-compatible left/right depth/stencil Clears preserve pixels outside active viewport/scissor and avoid whole-DSV overclear for cropped or disjoint regions."
+      },
+      {
+        "id": "native_gpu_warp_and_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "win32_warp_native_transport_and_github_actions",
+        "expected_behavior": "Win32 WARP samples protected eye pixels immediately before and after viewport-clipped TARGET/Z Clear to rule out later postpass overwrites; exact-SHA CI gates succeed; real HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "viewport_scissor_clipped_color_clear": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "viewport_scissor_clipped_depth_stencil_clear": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "native_gpu_warp_and_exact_sha_ci": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "material_result_sha": "2a0dcabb897176856e183f71eb6c926e3646024b",
+  "validation_bearing_result_sha": "db07b4e191f210129587f5634a079290769f9393",
+  "runtime_validation_note": "No actual OutRun 2006/Quest 3/VDXR visual, gamepad or frame-time verification performed. SOURCE_STAGE_ONLY; original D3D9Ex/input/FFB fallback not runtime-validated.",
+  "pipeline": {
+    "C0_RECOVER": "Run record missing on branch and at exact validation SHA; recovered original material result 2a0dcabb897176856e183f71eb6c926e3646024b from GitHub. Existing feature contract and acceptance results were unavailable, so reconstructed transparently from verified material diff and CI evidence.",
+    "C1_REVIEW": "D3D9 TARGET and depth/stencil eye Clears require viewport/scissor clipping, including no-op outside viewport, and correct full-eye clear chronology.",
+    "C2_IMPLEMENT": "Original C++ material SHA 2a0dcabb897176856e183f71eb6c926e3646024b; subsequent same-task cause-limited static acceptance repair dbc38aaac69aeaa9c30194b645ce2fa8db50acf5 and WARP pixel timing repair preserved.",
+    "C3_VALIDATE": "PASS_EXACT_SHA db07b4e191f210129587f5634a079290769f9393, as supplied by user; independently retrieved GitHub Actions Build #39112868246, OpenXR VR architecture #39112867181, OutRun EXE HUD Inspector CI #39112867341 all SUCCESS. No CI rerun.",
+    "C4_COMMIT": "Material and validation-bearing source commits retained unchanged; this C6 is independent [skip ci] bookkeeping file creation only.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA db07b4e191f210129587f5634a079290769f9393; RUN_RECORD_NOT_FOUND recovered; RUNTIME_VALIDATION=UNTESTED; score_change=0."
+  },
+  "ci_repairs": [
+    {
+      "cause": "Exact-SHA CI required acceptance metadata/static boundary assertions updated after new Clear coverage implementation.",
+      "category": "stale-static-contract",
+      "result": "RESOLVED_SAME_TASK_AT_dbc38aaac69aeaa9c30194b645ce2fa8db50acf5"
+    },
+    {
+      "cause": "Final-frame WARP eye corner pixel can be overwritten by later source-authored camera GPU postpasses.",
+      "category": "test-timing-regression",
+      "result": "RESOLVED_SAME_TASK_AT_db07b4e191f210129587f5634a079290769f9393"
+    }
+  ],
+  "c6_completed_reason": "RUN_RECORD_NOT_FOUND",
+  "c6_bookkeeping_only": true,
+  "validation_evidence": {
+    "material_sha": "2a0dcabb897176856e183f71eb6c926e3646024b",
+    "validation_sha": "db07b4e191f210129587f5634a079290769f9393",
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "Build",
+        "run_id": 39112868246,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39112867181,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39112867341,
+        "conclusion": "success"
+      }
+    ],
+    "exact_sha_ci_success_asserted_by_user": true,
+    "additional_workflow_visibility_note": "GitHub fetch_commit_workflow_runs returned three pull-request workflow runs; it does not enumerate every other CI check. No unobserved run IDs inferred.",
+    "runtime_validation": "UNTESTED",
+    "scope": "SOURCE_STAGE_ONLY; real OutRun game/Quest3 runtime not observed"
+  },
+  "recovered_record_note": "This file did not exist on vr-dx11-native-r71 or validation SHA before C6. Original feature_contract and acceptance_results could not be preserved verbatim; they were reconstructed from material commit rather than invented as an existing record."
+}
