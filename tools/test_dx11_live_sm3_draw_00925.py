@@ -19,15 +19,15 @@ check(match is not None, "real game GPU draw function absent")
 source = match.group(1)
 for condition in (
     "env_full_game_opt_in()", "game_native_backbuffer_ready(game, viewport)",
-    "s.clearColor.matches(", "s.frameBatch.accepts_full_on_source_target(",
-    "s.frameBatch.accepts_source_draw(", "s.preDrawFills.count != 0u",
+    "s.clearColor.matches(", "liveBatch.accepts_full_on_source_target(",
+    "liveBatch.accepts_source_draw(", "s.preDrawFills.count != 0u",
     "GetVertexDeclaration(", "GetVertexShaderConstantF(",
     "GetPixelShaderConstantF(", "capture_live_sm3_sampler(",
     "mirror_texture(", "CreateInputLayout(", "GetVertexShader(",
     "GetPixelShader(", "context->Draw(", "context->DrawIndexed(",
     "context->PSSetShaderResources(0u, 16u,", "context->PSSetSamplers(0u, 16u,",
     "context->VSSetConstantBuffers(", "context->PSSetConstantBuffers(",
-    "s.frameBatch.succeeded(", "s.frameBatch.record_source_draw(sourceOrdinal)",
+    "liveBatch.succeeded(", "liveBatch.record_source_draw(sourceOrdinal)",
 ):
     check(condition in source, "missing real game source-to-GPU binding: " + condition)
 

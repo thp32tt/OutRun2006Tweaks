@@ -4306,13 +4306,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ComPtr<IDirect3DSurface9> target;
     ComPtr<IUnknown> targetIdentity;
     D3DSURFACE_DESC source{};
+    auto& liveBatch = s.frameBatch;
     if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) ||
         !target || FAILED(target->GetDesc(&source)) ||
         FAILED(target.As(&targetIdentity)) || !targetIdentity ||
         !s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
              reinterpret_cast<std::uintptr_t>(targetIdentity.Get())) ||
-        !s.frameBatch.accepts_full_on_source_target(sourceOrdinal, true) ||
-        !s.frameBatch.accepts_source_draw(sourceOrdinal, true) ||
+        !liveBatch.accepts_full_on_source_target(sourceOrdinal, true) ||
+        !liveBatch.accepts_source_draw(sourceOrdinal, true) ||
         s.preDrawFills.count != 0u || viewport.Width == 0u ||
         viewport.Height == 0u) return false;
     ComPtr<IDirect3DVertexShader9> vertexShader;
@@ -4417,7 +4418,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                      s.fullGameIndexCapacity, indices, indexBytes))
             return false;
     }
-    if (s.frameBatch.first_draw()) {
+    if (liveBatch.first_draw()) {
         s.backend.begin_frame(s.clearColor.native_color(
             reinterpret_cast<std::uintptr_t>(game),
             reinterpret_cast<std::uintptr_t>(targetIdentity.Get()), kBackground));
@@ -4469,8 +4470,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ++s.eligible;
     if (s.eligibleThisFrame != (std::numeric_limits<UINT>::max)())
         ++s.eligibleThisFrame;
-    s.frameBatch.succeeded(false, false);
-    s.frameBatch.record_source_draw(sourceOrdinal);
+    liveBatch.succeeded(false, false);
+    liveBatch.record_source_draw(sourceOrdinal);
     return true;
 }
 

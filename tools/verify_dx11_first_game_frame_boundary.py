@@ -162,16 +162,16 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "native Draw escapes the two admitted game source submits")
     require(all(token in sm3.group(1) for token in (
                 "env_full_game_opt_in()", "game_native_backbuffer_ready(game, viewport)",
-                "s.clearColor.matches(", "s.frameBatch.accepts_full_on_source_target(",
-                "s.frameBatch.accepts_source_draw(", "s.preDrawFills.count != 0u",
+                "s.clearColor.matches(", "liveBatch.accepts_full_on_source_target(",
+                "liveBatch.accepts_source_draw(", "s.preDrawFills.count != 0u",
                 "GetVertexDeclaration(", "live_sm3_shader_bytes(",
                 "live_sm3_input_layout(", "GetVertexShaderConstantF(",
                 "GetPixelShaderConstantF(", "capture_live_sm3_sampler(",
                 "mirror_texture(", "context->VSSetShader(",
                 "context->PSSetShader(", "context->PSSetShaderResources(",
                 "context->PSSetSamplers(", "context->DrawIndexed(",
-                "context->Draw(", "s.frameBatch.succeeded(",
-                "s.frameBatch.record_source_draw(sourceOrdinal)")),
+                "context->Draw(", "liveBatch.succeeded(",
+                "liveBatch.record_source_draw(sourceOrdinal)")),
             "SM3 live native draw must retain exact source/constant/resource/fallback gates")
     require("if (!submit_live_sm3_game_draw(" in code and
             "s.frameBatch.abort();" in
@@ -195,7 +195,7 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)" in code and
             "s.frameBatch.must_abort_unsupported(fullMode, env_batch_opt_in())" in code and
             'GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME"' in code and
-            "s.frameBatch.accepts_full_on_source_target(" in code and
+            "liveBatch.accepts_full_on_source_target(" in code and
             "const bool sameClearedGameTarget = s.clearColor.matches(" in code and
             "return matchesClearedBackbuffer &&" in batch_source and
             "accepts_full_seeded(ordinal, matchesClearedBackbuffer);" in batch_source and
