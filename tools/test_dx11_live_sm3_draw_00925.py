@@ -171,6 +171,20 @@ for token in (
 ):
     check(token in backend, "matrix native path or fallback missing: " + token)
 
+# The actual game SM3->HLSL->GPU draw path must implement procedural
+# sin/cos and VS-only sign with physical TEMP scratch invalidation.
+for token in ("case D3DSIO_SINCOS:", "case D3DSIO_SGN:",
+              "NativeSm3ArithmeticOpcode::SineCosine",
+              "NativeSm3ArithmeticOpcode::Sign",
+              "op.sineCosine = instruction.opcode == D3DSIO_SINCOS;",
+              "op.signScratch = instruction.opcode == D3DSIO_SGN;",
+              "swizzle != 0x55u", "reg == op.signInputTemp",
+              "reg == op.destinationRegister", "reg == op.signTemps[0]",
+              "tempWritten[scratch] = 0u;"):
+    check(token in backend, "missing native SM3 procedural draw/source fallback: " + token)
+for token in ("cos(", "sin(", "sign(", "(mask & ~0x03u)"):
+    check(token in arith, "missing native SM3 HLSL math: " + token)
+
 # Vertex lighting/distance ops flow through the real game-created shader
 # bytecode decoder and the native GPU shader emitter, never through a
 # fixed-function dummy pixel path. Unsupported PS opcode still fails closed.

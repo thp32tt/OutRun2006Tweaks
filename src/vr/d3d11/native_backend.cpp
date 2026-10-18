@@ -363,6 +363,10 @@ bool build_r283_sm3_mov_shader_source(
             unsigned matrixVectorComponents{};
             bool texture2d{};
             bool texkill{};
+            bool sineCosine{};
+            bool signScratch{};
+            UINT signInputTemp{32u};
+            std::array<UINT, 2> signTemps{};
             NativeSm3Texture2DMode textureMode = NativeSm3Texture2DMode::Implicit;
             unsigned samplerRegister{};
             unsigned texkillWrittenMask{};
@@ -489,6 +493,11 @@ bool build_r283_sm3_mov_shader_source(
                 // source lane requirements for the two operands.
                 if (!vertexStage) return false;
                 opcode = NativeSm3ArithmeticOpcode::Distance; sourceCount = 2u; break;
+            case D3DSIO_SINCOS:
+                opcode = NativeSm3ArithmeticOpcode::SineCosine; sourceCount = 1u; break;
+            case D3DSIO_SGN:
+                if (!vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::Sign; sourceCount = 3u; break;
             case D3DSIO_CRS:
                 opcode = NativeSm3ArithmeticOpcode::Cross3; sourceCount = 2u; break;
             case D3DSIO_DP2ADD:
@@ -555,6 +564,14 @@ bool build_r283_sm3_mov_shader_source(
                 destination & D3DSP_REGNUM_MASK);
             op.destinationMask = mask;
             op.sourceCount = sourceCount;
+            op.sineCosine = instruction.opcode == D3DSIO_SINCOS;
+            op.signScratch = instruction.opcode == D3DSIO_SGN;
+            // SINCOS cannot write z/w. SGN scratch ownership is restricted
+            // to physical vertex TEMP registers so undefined data never leaks.
+            if ((op.sineCosine && (op.destinationType != D3DSPR_TEMP ||
+                                  (mask & ~0x03u) != 0u)) ||
+                (op.signScratch && op.destinationType != D3DSPR_TEMP))
+                return false;
             switch (instruction.opcode) {
             case D3DSIO_M4x4: op.matrixRowCount = 4u; op.matrixVectorComponents = 4u; break;
             case D3DSIO_M4x3: op.matrixRowCount = 3u; op.matrixVectorComponents = 4u; break;
@@ -647,6 +664,23 @@ bool build_r283_sm3_mov_shader_source(
                     sampler2dUsed[reg] = true;
                     continue;
                 }
+                if (op.sineCosine && i == 0u &&
+                    swizzle != 0x00u && swizzle != 0x55u &&
+                    swizzle != 0xaau && swizzle != 0xffu)
+                    return false;
+                if (op.signScratch && i != 0u) {
+                    // SGN operands 1/2 are undefined scratch outputs, not
+                    // reads. Reject aliases and poison later TEMP reads.
+                    if (kind != D3DSPR_TEMP || reg >= tempWritten.size() ||
+                        modifier != D3DSPSM_NONE || swizzle != 0xe4u ||
+                        reg == op.destinationRegister || reg == op.signInputTemp ||
+                        (i == 2u && reg == op.signTemps[0]))
+                        return false;
+                    op.signTemps[i - 1u] = reg;
+                    op.sources[i] = "r283_t" + std::to_string(reg);
+                    tempUsed[reg] = true;
+                    continue;
+                }
                 if (op.texture2d && modifier != D3DSPSM_NONE)
                     return false;
                 if (op.matrixRowCount != 0u && i == 1u) {
@@ -681,6 +715,7 @@ bool build_r283_sm3_mov_shader_source(
                     if (!defPresent[reg]) liveConstantsUsed = true;
                 } else if (kind == D3DSPR_TEMP) {
                     if (reg >= tempWritten.size()) return false;
+                    if (op.signScratch && i == 0u) op.signInputTemp = reg;
                     // A D3D9 partial instruction only reads components
                     // consumed by its opcode, destination mask and swizzle.
                     // DOT, scalar, matrix and TEX have distinct read domains.
@@ -723,6 +758,10 @@ bool build_r283_sm3_mov_shader_source(
                 outputWritten[op.destinationRegister] |= mask;
             else
                 outputWritten[0] |= mask;
+            if (op.signScratch) {
+                for (const UINT scratch : op.signTemps)
+                    tempWritten[scratch] = 0u;
+            }
             operations.push_back(std::move(op));
         }
         if (operations.empty()) return false;

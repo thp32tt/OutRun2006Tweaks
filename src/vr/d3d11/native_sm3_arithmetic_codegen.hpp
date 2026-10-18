@@ -11,7 +11,7 @@ enum class NativeSm3ArithmeticOpcode {
     Move, Add, Subtract, Multiply, MultiplyAdd, Dot3, Dot4, Minimum, Maximum,
     Absolute, Fraction, SetLessThan, SetGreaterEqual, Compare,
     Reciprocal, ReciprocalSquareRoot, Exponential2, Logarithm2,
-    Power, LinearInterpolate, Normalize3, Cross3, Dot2Add, Lighting, Distance,
+    Power, LinearInterpolate, Normalize3, Cross3, Dot2Add, Lighting, Distance, SineCosine, Sign,
     DerivativeX, DerivativeY
 };
 
@@ -32,7 +32,9 @@ enum class NativeSm3ArithmeticOpcode {
     case NativeSm3ArithmeticOpcode::DerivativeY:
     case NativeSm3ArithmeticOpcode::Absolute:
     case NativeSm3ArithmeticOpcode::Fraction:
+    case NativeSm3ArithmeticOpcode::Sign:
         return sourceIndex == 0u ? destinationMask : 0u;
+    case NativeSm3ArithmeticOpcode::SineCosine:
     case NativeSm3ArithmeticOpcode::Reciprocal:
     case NativeSm3ArithmeticOpcode::ReciprocalSquareRoot:
     case NativeSm3ArithmeticOpcode::Exponential2:
@@ -218,6 +220,20 @@ inline bool append_native_sm3_arithmetic(
                      scalar + ", " + scalar + ")";
         break;
     }
+    case NativeSm3ArithmeticOpcode::SineCosine: {
+        // Real SM3 SINCOS writes cos(angle) in x, sin(angle) in y.
+        // z/w are untouched; a shader writing them is not translatable.
+        if (!validSources(1u) || (mask & ~0x03u) != 0u) return false;
+        const auto angle = "((" + sources[0] + ").x)";
+        expression = "float4(cos(" + angle + "), sin(" + angle +
+                     "), 0.0f, 0.0f)";
+        break;
+    }
+    case NativeSm3ArithmeticOpcode::Sign:
+        // SGN's two additional operands are TEMP scratch outputs.
+        if (!validSources(3u)) return false;
+        expression = "sign(" + sources[0] + ")";
+        break;
     case NativeSm3ArithmeticOpcode::Lighting: {
         if (!validSources(1u)) return false;
         const auto x = "((" + sources[0] + ").x)";

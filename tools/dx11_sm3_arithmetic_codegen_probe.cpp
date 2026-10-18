@@ -41,9 +41,15 @@ int main() {
     assert(emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 3u));
     assert(emit(NativeSm3ArithmeticOpcode::Lighting, 15u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::Distance, 15u, 2u));
+    assert(emit(NativeSm3ArithmeticOpcode::SineCosine, 3u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::SineCosine, 1u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::Sign, 15u, 3u));
     assert(emit(NativeSm3ArithmeticOpcode::DerivativeX, 3u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::DerivativeY, 12u, 1u));
     assert(out.find("ddx(input.r0.xyzw)") != std::string::npos);
+    assert(out.find("cos(((input.r0.xyzw).x))") != std::string::npos);
+    assert(out.find("sin(((input.r0.xyzw).x))") != std::string::npos);
+    assert(out.find("sign(input.r0.xyzw)") != std::string::npos);
     assert(out.find("ddy(input.r0.xyzw)") != std::string::npos);
     assert(out.find("rsqrt(abs(") != std::string::npos);
     assert(out.find("exp2(") != std::string::npos);
@@ -75,6 +81,21 @@ int main() {
     assert(!emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 2u));
     assert(!emit(NativeSm3ArithmeticOpcode::Lighting, 15u, 2u));
     assert(!emit(NativeSm3ArithmeticOpcode::Distance, 15u, 1u));
+    assert(!emit(NativeSm3ArithmeticOpcode::SineCosine, 4u, 1u));
+    assert(!emit(NativeSm3ArithmeticOpcode::SineCosine, 15u, 1u));
+    assert(!emit(NativeSm3ArithmeticOpcode::SineCosine, 3u, 2u));
+    assert(!emit(NativeSm3ArithmeticOpcode::Sign, 15u, 1u));
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::SineCosine, 3u, 0u) == 1u);
+    static_assert(native_sm3_swizzled_components(
+        native_sm3_source_components(NativeSm3ArithmeticOpcode::SineCosine, 3u, 0u),
+        0xffu) == 8u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Sign, 3u, 0u) == 3u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Sign, 3u, 1u) == 0u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Sign, 3u, 2u) == 0u);
     // LIT ignores source.z; DST's two inputs consume distinct physical
     // source swizzles and only the lanes needed by the output mask.
     static_assert(native_sm3_source_components(
