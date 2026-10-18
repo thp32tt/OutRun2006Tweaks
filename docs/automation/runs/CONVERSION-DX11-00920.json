@@ -73,8 +73,8 @@
     "src/vr/d3d11/native_game_stereo_submission.hpp",
     "src/vr/d3d11/native_game_stereo_submission.cpp"
   ],
-  "material_result_sha": "PENDING_MATERIAL_COMMIT",
-  "validation_bearing_result_sha": "PENDING_EXACT_SHA",
+  "material_result_sha": "7a0ee8e6defaaa0f3ea6335d877461dc1d59c46a",
+  "validation_bearing_result_sha": null,
   "acceptance_results": {
     "camera_raster_to_gpu_postpass": "IMPLEMENTED_PENDING_GATE",
     "disjoint_camera_region_fallback": "IMPLEMENTED_PENDING_GATE",
@@ -87,7 +87,7 @@
     "C1_REVIEW": "Camera physical key alone permits Copy/Stretch of untouched source crop outside real viewport/scissor color Draw",
     "C2_IMPLEMENT": "Capture exact conservative per-Draw source raster region and require it overlap authentic GPU postpass source box; preserve disjoint regions separately",
     "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_MATERIAL_COMMIT",
+    "C4_COMMIT": "Material source 7a0ee8e6defaaa0f3ea6335d877461dc1d59c46a; CI policy pending stage annotation corrected under same task",
     "C5_PACKAGE": "NOT_REQUIRED_SOURCE_STAGE_HMD_UNTESTED",
     "C6_RESULT": "PENDING"
   },
