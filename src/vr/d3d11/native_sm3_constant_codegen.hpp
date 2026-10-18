@@ -33,30 +33,40 @@ inline bool append_native_sm3_matrix(
     std::string& out, const std::string& destination, unsigned mask,
     const std::string& vector,
     const std::array<std::string, 4>& rows,
-    unsigned rowCount, unsigned ordinal) {
-    if (destination.empty() || vector.empty() ||
-        (rowCount != 3u && rowCount != 4u) ||
+    unsigned rowCount, unsigned ordinal,
+    unsigned vectorComponents = 0u) {
+    // Preserve the existing M4x4/M3x3 call signature. For M4x3, M3x4 and
+    // M3x2 the physical source vector width differs from output row count.
+    if (vectorComponents == 0u)
+        vectorComponents = rowCount == 4u ? 4u : 3u;
+    const bool supported =
+        (vectorComponents == 4u && (rowCount == 4u || rowCount == 3u)) ||
+        (vectorComponents == 3u &&
+         (rowCount == 4u || rowCount == 3u || rowCount == 2u));
+    if (!supported || destination.empty() || vector.empty() ||
         mask == 0u || (mask & ~((1u << rowCount) - 1u)) != 0u)
         return false;
     for (unsigned i = 0; i < rowCount; ++i)
         if (rows[i].empty()) return false;
     const std::string temporary = "r283_matrix_" + std::to_string(ordinal);
-    const char* lanes = rowCount == 4u ? "xyzw" : "xyz";
+    const char* dotLanes = vectorComponents == 4u ? "xyzw" : "xyz";
+    static constexpr char kOutputLanes[] = "xyzw";
     out += "    float4 " + temporary + " = float4(";
     for (unsigned i = 0; i < 4u; ++i) {
         if (i) out += ", ";
         if (i < rowCount)
-            out += "dot((" + vector + ")." + lanes + ", (" +
-                   rows[i] + ")." + lanes + ")";
+            out += "dot((" + vector + ")." + dotLanes + ", (" +
+                   rows[i] + ")." + dotLanes + ")";
         else
             out += "0.0f";
     }
     out += ");\n";
     std::string writeMask;
     for (unsigned i = 0; i < rowCount; ++i)
-        if (mask & (1u << i)) writeMask += lanes[i];
+        if (mask & (1u << i)) writeMask += kOutputLanes[i];
     out += "    " + destination + "." + writeMask +
            " = " + temporary + "." + writeMask + ";\n";
     return true;
 }
+
 } // namespace outrun::vr::dx11

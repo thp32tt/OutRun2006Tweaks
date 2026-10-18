@@ -24,10 +24,26 @@ int main() {
     assert(out.find("output.r0.xyzw = r283_matrix_12.xyzw;") != std::string::npos);
     assert(append_native_sm3_matrix(out, "r283_t0", 7, "input.r0", rows, 3, 14));
     assert(out.find("r283_t0.xyz = r283_matrix_14.xyz;") != std::string::npos);
+    // Real D3D9 SM3 matrix-family VS operations feed native position,
+    // UV and color outputs. Vector width and output row count are independent.
+    assert(append_native_sm3_matrix(out, "output.r1", 7, "input.r0", rows, 3, 18, 4));
+    assert(out.find("dot((input.r0).xyzw, (r283_def2).xyzw)") != std::string::npos);
+    assert(out.find("output.r1.xyz = r283_matrix_18.xyz;") != std::string::npos);
+    assert(append_native_sm3_matrix(out, "output.r2", 15, "input.r0", rows, 4, 19, 3));
+    assert(out.find("dot((input.r0).xyz, (r283_def2).xyz)") != std::string::npos);
+    assert(out.find("output.r2.xyzw = r283_matrix_19.xyzw;") != std::string::npos);
+    assert(append_native_sm3_matrix(out, "r283_t1", 3, "input.r0", rows, 2, 20, 3));
+    assert(out.find("r283_t1.xy = r283_matrix_20.xy;") != std::string::npos);
     const auto before = out;
     assert(!append_native_sm3_matrix(out, "r283_t0", 8, "input.r0", rows, 3, 16));
     assert(!append_native_sm3_matrix(out, "r283_t0", 0, "input.r0", rows, 4, 17));
     assert(!append_native_sm3_matrix(out, "r283_t0", 15, "", rows, 4, 18));
+    assert(!append_native_sm3_matrix(out, "r283_t0", 8, "input.r0", rows, 3, 21, 4));
+    assert(!append_native_sm3_matrix(out, "r283_t0", 15, "input.r0", rows, 3, 22, 4));
+    assert(!append_native_sm3_matrix(out, "r283_t0", 4, "input.r0", rows, 2, 23, 3));
+    assert(!append_native_sm3_matrix(out, "r283_t0", 3, "input.r0", rows, 2, 24, 4));
+    const std::array<std::string, 4> missingRows{"r283_c[0]", "", "r283_def2", "r283_c[3]"};
+    assert(!append_native_sm3_matrix(out, "r283_t0", 7, "input.r0", missingRows, 3, 25, 4));
     assert(out == before);
     std::string sampled;
     assert(append_native_sm3_texture2d_declarations(sampled, 0));

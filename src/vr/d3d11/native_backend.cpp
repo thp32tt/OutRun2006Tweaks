@@ -263,14 +263,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_HLSL_MATERIALIZER_V6";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_FAMILY_HLSL_MATERIALIZER_V7";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_PROVENANCE_V6";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_FAMILY_TEX2D_PROVENANCE_V7";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -359,8 +359,8 @@ bool build_r283_sm3_mov_shader_source(
             UINT destinationRegister{};
             unsigned destinationMask{};
             unsigned sourceCount{};
-            bool matrix4x4{};
-            bool matrix3x3{};
+            unsigned matrixRowCount{};
+            unsigned matrixVectorComponents{};
             bool texture2d{};
             bool texkill{};
             NativeSm3Texture2DMode textureMode = NativeSm3Texture2DMode::Implicit;
@@ -494,7 +494,14 @@ bool build_r283_sm3_mov_shader_source(
                 if (vertexStage) return false;
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 0u; break;
             case D3DSIO_M4x4:
+            case D3DSIO_M4x3:
+            case D3DSIO_M3x4:
             case D3DSIO_M3x3:
+            case D3DSIO_M3x2:
+                // Matrix family is a real VS/PS dot-row operation, not
+                // component-wise MOV. Preserve each instruction's vector
+                // width and destination row count when emitting native GPU
+                // code; missing source lanes still fall back to D3D9.
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             case D3DSIO_TEX:
                 // ps_3_0 TEXLD/TEXLDP/TEXLDB share one 2D sampler slot;
@@ -538,8 +545,14 @@ bool build_r283_sm3_mov_shader_source(
                 destination & D3DSP_REGNUM_MASK);
             op.destinationMask = mask;
             op.sourceCount = sourceCount;
-            op.matrix4x4 = instruction.opcode == D3DSIO_M4x4;
-            op.matrix3x3 = instruction.opcode == D3DSIO_M3x3;
+            switch (instruction.opcode) {
+            case D3DSIO_M4x4: op.matrixRowCount = 4u; op.matrixVectorComponents = 4u; break;
+            case D3DSIO_M4x3: op.matrixRowCount = 3u; op.matrixVectorComponents = 4u; break;
+            case D3DSIO_M3x4: op.matrixRowCount = 4u; op.matrixVectorComponents = 3u; break;
+            case D3DSIO_M3x3: op.matrixRowCount = 3u; op.matrixVectorComponents = 3u; break;
+            case D3DSIO_M3x2: op.matrixRowCount = 2u; op.matrixVectorComponents = 3u; break;
+            default: break;
+            }
             op.texture2d = instruction.opcode == D3DSIO_TEX ||
                            instruction.opcode == D3DSIO_TEXLDL ||
                            instruction.opcode == D3DSIO_TEXLDD;
@@ -571,7 +584,9 @@ bool build_r283_sm3_mov_shader_source(
                 operations.push_back(std::move(op));
                 continue;
             }
-            if (op.matrix3x3 && (mask & 8u)) return false;
+            if (op.matrixRowCount != 0u &&
+                (mask & ~((1u << op.matrixRowCount) - 1u)) != 0u)
+                return false;
             if (op.destinationType == D3DSPR_TEMP) {
                 if (op.destinationRegister >= tempWritten.size())
                     return false;
@@ -624,14 +639,14 @@ bool build_r283_sm3_mov_shader_source(
                 }
                 if (op.texture2d && modifier != D3DSPSM_NONE)
                     return false;
-                if ((op.matrix4x4 || op.matrix3x3) && i == 1u) {
+                if (op.matrixRowCount != 0u && i == 1u) {
                     // Matrix source must denote consecutive real c registers
                     // without relative indexing, modifier or row swizzle.
                     if (kind != D3DSPR_CONST || modifier != D3DSPSM_NONE ||
                         swizzle != 0xe4u ||
-                        reg + (op.matrix4x4 ? 4u : 3u) > constantLimit)
+                        reg + op.matrixRowCount > constantLimit)
                         return false;
-                    for (unsigned row = 0u; row < (op.matrix4x4 ? 4u : 3u); ++row) {
+                    for (unsigned row = 0u; row < op.matrixRowCount; ++row) {
                         if (!native_sm3_const_reference(
                                 reg + row, constantLimit,
                                 defPresent[reg + row], op.matrixRows[row]))
@@ -664,8 +679,8 @@ bool build_r283_sm3_mov_shader_source(
                     const unsigned logicalComponents =
                         op.texture2d
                             ? native_sm3_texture_source_components(op.textureMode, i) :
-                        op.matrix4x4 ? 15u :
-                        op.matrix3x3 ? 7u :
+                        op.matrixRowCount != 0u ?
+                            (op.matrixVectorComponents == 4u ? 15u : 7u) :
                         native_sm3_source_components(op.opcode, mask, i);
                     const unsigned required =
                         native_sm3_swizzled_components(
@@ -771,11 +786,12 @@ bool build_r283_sm3_mov_shader_source(
                         static_cast<unsigned>(i), op.textureMode,
                         op.sources[2], op.sources[3]))
                     return false;
-            } else if (op.matrix4x4 || op.matrix3x3) {
+            } else if (op.matrixRowCount != 0u) {
                 if (!append_native_sm3_matrix(
                         translated, dest, op.destinationMask,
                         op.sources[0], op.matrixRows,
-                        op.matrix4x4 ? 4u : 3u, static_cast<unsigned>(i)))
+                        op.matrixRowCount, static_cast<unsigned>(i),
+                        op.matrixVectorComponents))
                     return false;
             } else if (!append_native_sm3_arithmetic(
                            translated, op.opcode, dest, op.destinationMask,

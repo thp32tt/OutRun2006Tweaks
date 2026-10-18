@@ -150,9 +150,25 @@ for token in (
     "NativeSm3Texture2DMode::Bias",
     "NativeSm3Texture2DMode::ExplicitLod",
     "NativeSm3Texture2DMode::Gradients",
-    "op.matrix4x4 ? 15u",
-    "op.matrix3x3 ? 7u",
+    "case D3DSIO_M4x3:", "case D3DSIO_M3x4:", "case D3DSIO_M3x2:",
+    "op.matrixRowCount != 0u", "op.matrixVectorComponents == 4u ? 15u : 7u",
+    "op.matrixRowCount, static_cast<unsigned>(i)",
+    "reg + op.matrixRowCount > constantLimit",
     "(tempWritten[reg] & required) != required",
 ):
     check(token in backend, "SM3 partial-register source/negative path missing: " + token)
+# Game-created matrix operands must translate into native row-dot GPU
+# shaders; unsupported destination lanes and unwritten TEMP xyz/w must
+# still reject rather than borrow D3D9's undefined data.
+for token in (
+    "case D3DSIO_M4x4:", "case D3DSIO_M4x3:",
+    "case D3DSIO_M3x4:", "case D3DSIO_M3x3:",
+    "case D3DSIO_M3x2:", "op.matrixRowCount = 2u",
+    "op.matrixVectorComponents = 3u",
+    "(mask & ~((1u << op.matrixRowCount) - 1u))",
+    "row < op.matrixRowCount; ++row",
+    "op.matrixVectorComponents == 4u ? 15u : 7u",
+):
+    check(token in backend, "matrix native path or fallback missing: " + token)
+
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")
