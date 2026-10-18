@@ -61,11 +61,10 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "GAME_AUTHORED_OFFSCREEN_OR_ON_EYE_DRAW",
-      "GPU_SOURCE_COPY_STRETCH",
-      "NATIVE_STEREO_EYE_SUBMISSION"
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: exact-SHA game scene source/CI only, not actual Quest3/VDXR pixel proof.",
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: native D3D11 eye-geometry evidence, postpass and source chronology checked at 00914 exact SHA; real live D3D9 R30 callsite and hardware runtime remain unproven.",
     "activation_guard_and_fallback": "Keep native gameplay opt-in; D3D9/DX9Ex, gamepad/FFB/SkyGlow and DXVK freeze untouched.",
     "acceptance_proof": {
       "positive_probe": "Authentic on-eye depth-only post-full-Clear Draw and authored offscreen-source GPU Copy/Stretch satisfy constexpr frame admission; Win32+WARP compiled.",
@@ -136,6 +135,6 @@
     "C3_VALIDATE": "Five mandatory exact-SHA GitHub Actions and isolated WARP success; Quest3/VDXR UNTESTED.",
     "C4_COMMIT": "Non-CI-skip material and validation-bearing 5a72c3e6d4d8e4b367d9b11ddd3f52df3f8b0b89 [AUTO:CONVERSION-DX11-00914]",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "COMPLETE_BUILD_VERIFIED; exact-SHA verified; runtime UNTESTED; separate [skip ci] bookkeeping commit; no extra task-level score."
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; exact-SHA verified; runtime UNTESTED; separate [skip ci] bookkeeping commit; no extra task-level score. Subsequent 00915 CI repair narrows stale live_game_draw_path metadata to the independently verified native GPU eye source stage (not a new 00914 result)."
   }
 }

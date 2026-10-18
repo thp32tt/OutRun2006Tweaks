@@ -557,7 +557,12 @@ def main() -> None:
                 "context_->GetPredication(&predicate, &comparison);",
                 "const bool clear = predicate == nullptr;",
                 "live_game_stereo::color_certifiable(",
-                "eye_color_writable(), unpredicated_color_evidence());",
+                "const bool eligible = unpredicated &&",
+                "raster_primitive_possible(vertexCount);",
+                "raster_primitive_possible(indexCount);",
+                "raster_primitive_possible(verticesPerInstance);",
+                "raster_primitive_possible(indicesPerInstance);",
+                "eye_color_writable(), eligible);",
                 # Count only Draws submitted into the exact
                 # per-eye output (not an unbound or desktop OM target).
                 "if (!vertexCount || !eye_output_bound() ||",
