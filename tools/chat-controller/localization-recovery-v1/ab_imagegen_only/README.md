@@ -1,3 +1,7 @@
+# DEPRECATED — do not deploy as a separate container
+
+As of 2026-10-19, the separate `outrun-ab-imagegen-only` browser service is retired. Use the single `outrun-chat-controller-localization-recovery` Chrome/profile with three persistent A/B/C tabs. The independent `outrun-c-english-native-crop` CPU worker remains separate because it has no browser session.
+
 # OutRun 2006 A/B Korean PNG image-only automation — 2026-10-17
 
 ## Active GitOps stack (no additional Portainer stack)
