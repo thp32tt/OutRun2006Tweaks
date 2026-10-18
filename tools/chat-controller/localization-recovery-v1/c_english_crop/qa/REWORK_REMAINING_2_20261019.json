@@ -1,0 +1,40 @@
+{
+  "status": "HOLD_MANUAL_LAYER_SEPARATION_REQUIRED",
+  "count": 2,
+  "items": [
+    {
+      "index": 36,
+      "status": "HOLD_NOT_SEPARABLE_BY_NATIVE_RECTANGULAR_CROP",
+      "english_official_reference": "HARD",
+      "source_png": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "original_bbox_xyxy": [
+        805,
+        291,
+        1071,
+        369
+      ],
+      "reason": "HARD text outline touches white-green background plate and left gray border. Tight rectangle would cut top glyph/outline. Native source pixel-only separation cannot remove attached art.",
+      "safe_next_action": "Keep original atlas crop as evidence; require separately approved PSD/native-layer extraction or explicit alpha edit scope.",
+      "any_output_generated": false,
+      "game_runtime": "UNTESTED"
+    },
+    {
+      "index": 59,
+      "status": "HOLD_NOT_SEPARABLE_BY_NATIVE_RECTANGULAR_CROP",
+      "english_official_reference": "CONIFEROUS FOREST",
+      "source_png": "Q201_A9ABD877_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "original_bbox_xyxy": [
+        89,
+        1924,
+        1186,
+        2036
+      ],
+      "reason": "CONIFEROUS FOREST final T meets next STAGES sprite within same native bbox; right cropping cuts final glyph.",
+      "safe_next_action": "Q147 has another instance of same phrase but is a different source atlas/style, so cannot substitute it for Q201 without cross-style QA. Require sprite-layer separation or original PSD.",
+      "any_output_generated": false,
+      "game_runtime": "UNTESTED"
+    }
+  ]
+}
