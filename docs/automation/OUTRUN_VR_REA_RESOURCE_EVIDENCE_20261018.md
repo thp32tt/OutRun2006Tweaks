@@ -126,3 +126,19 @@ User explicitly requests simultaneous original-producer→SpriteNode→GPU Draw�
 **R84 work owners**: existing `DX9EX:VIS:EXTENDED_TIME` plus the universal Draw trace feature. Use existing stage fences `CanDrainDirectResultBeforeFirstQueueNode`, `CanIsolateD3DXStageQueueNodeTransition`, `StageExtensionPhysical::SameAfterNativeLeft`, R30 `R30CaptureStagePhysicalSource`, R33 `R33TryHud` and four physical Draw entrypoints. Instrument stage vs glyph (source_serial, node type/serial/queueEpoch, priority, Begin/Draw/End, physical_draw_id, LEFT/RIGHT HRESULT, pose/shader/c64 epoch, restore) without changing optical behavior. The native-left side may pass and right be vetoed; mark runtime as `RUNTIME_VALIDATION=UNTESTED` without matching HMD evidence.
 
 **Authoritative detailed local report:** `/home/chatgpt-runner/rea-analysis/rea_plus_time_20261018/PLUS_TIME_MULTI_FUNCTION_GPU_AUDIT_20261018.md`. It lists 30+ suspected producers, modifiers, allocators, queue consumers and GPU submission methods, with confirmed facts versus hypotheses. Decompiled proprietary C/whole game assets stay **N100-local**. No +1 scoring for analysis/docs.
+
+
+## 2026-10-18 全렌더링 함수 REA/Ghidra N100 분석 인덱스 (follow-up)
+
+Source of truth for newly generated, **local/private** full original-game analysis: `/home/chatgpt-runner/rea-analysis/rendering_complete_20261018/README.md`. Verified original EXE SHA256 `68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3`.
+
+- Ghidra program-native control-flow enumeration: **7,238 internal functions**, **404,925 instructions**, **71,667 flow references**, **28,733 interfunction call/jump reference instances**; former successful C decompile corpus **7,237**, one failed decompile `0x00536D82` retains native instructions. This is more complete than inferred Ghidra pseudo-C call edges.
+- Render classification: **93 direct API/evidence functions**, **1,810 render-associated candidate functions** via up-to-two-hop union of native and C graphs. Candidates include utilities and nonrender functions, are **not all validated GPU draws**. Files: `FUNCTION_CATALOG_NATIVE_MERGED.jsonl`, 38 `function_profiles/RENDER_FUNCTIONS_*.md` volumes, `NATIVE_INTERFUNCTION_EDGES.csv`, `DIRECT_RENDER_GATES.md`, `API_TO_FUNCTION_INDEX.md`, `INDIRECT_RENDER_CALL_SITES.csv`.
+- REA/Ghidra provider direct function validation queue: `REA_RENDER_BATCH_MANIFEST.json` has **99 priority targets** (2 previously validated); worker started on N100. **Only** `REA_RENDER_BATCH_RECONCILED_STATUS.json` after running `python3 reconcile_rea_batch.py` reports newly validated files by numeric VA and EXE SHA. Do not infer that all 99 REA commands completed or mark failure from a leading-zero address string mismatch.
+- A user-owned **derived metadata only** ZIP is available locally as `/home/chatgpt-runner/rea-analysis/OUTRUN_REA_RENDERING_DEV_BUNDLE_20261018.zip`; excludes source EXE, DDS and copyrighted original decompiler C / REA code bodies.
+- GitHub documentation (metadata and independently authored developer instructions only):
+  - `docs/automation/OUTRUN_REA_RENDERING_CORPUS_20261018.md`
+  - `docs/automation/OUTRUN_REA_RENDERING_DEVELOPER_HANDOFF_20261018.md`
+  - `docs/automation/OUTRUN_REA_RENDERING_ARCHITECTURE_20261018.md`
+  - `docs/automation/OUTRUN_REA_RENDERING_TRACE_ACCEPTANCE_20261018.md`
+- NEXT DEVELOPMENT: existing feature/TASK_ID owner must choose *one proven visual defect* per dispatch; map original producer, queue node/generation, pending D3DX batch and R30/R33 physical left/right Draw/host submission using this data. Use positive/negative tests and exact SHA CI. **No HMD test or runtime fix in this analysis; RUNTIME_VALIDATION=UNTESTED, no scoreboard point**.
