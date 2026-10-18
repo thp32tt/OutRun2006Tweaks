@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01053",
+  "production_id": "CONVERSION-DX9EX-01053",
+  "event_id": "CONVERSION-DX9EX-01053-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS_C5",
+  "checkpoint": "C5_VALIDATE",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "882c4290ac5be79f452c61eaef9f7e322d413d7d",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/rank_marker_fraction.hpp",
+    "vrhost/tests/rank_marker_fraction_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep each original 4th-place-or-lower moving car's projected rank sprite and numeric siblings together with their source vehicle across the native Calc3D2D producer, bounded live sprite queue and conservative left/right eye replay, without partially moving a sibling group when a later child is malformed.",
+    "scope_boundary": "Vehicle/rival rank clip CALL subpixel remainder and its native kind-0 SPRARGS/kind-1 SPRARGS2 sibling queue only; exclude unrelated 6th/6, NaviPub, +TIME, GOAL, F11/menu, lens flare, SkyGlow, render owner fallback, DirectInput/FFB, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original car-relative Calc3D2D/put_clip producer computes the projected rank and fractional X/Y location before constructing animated SpriteNode and number siblings.",
+      "The exact native vehicle-rank clip CALL appends kind-0 and kind-1 children to a priority queue; live-root and old/new-tail reachability proof fences stale, freed or foreign producer nodes.",
+      "All bounded original rank siblings are preflighted and committed atomically before existing stereo replay, R84 per-eye world-billboard Draw and OpenXR left/right host composition; GPU-eye runtime outcome is not yet measured."
+    ],
+    "subcomponents": [
+      "Retain exact-source queue root and tail ownership through the original vehicle rank producer instead of applying fractional positions to unknown or detached sprites.",
+      "Preflight the whole appended sibling chain, including kind-0 XY and kind-1 D3DX matrix _41/_42, and reject any invalid kind, NaN, Inf, short chain or invalid fraction without a partial group update.",
+      "Apply verified Calc3D2D subpixel remainder to all eligible siblings together; preserve UV, shape, depth, native input, FFB and conservative fallback with native positive/negative regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_live_sibling_transaction",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original vehicle rank clip CALL and live SpriteNode/Sumo rank glyph group to R84 eye input",
+        "expected_behavior": "A proven same-parent group of position sprites and transformed number siblings receives consistent original subpixel X/Y in one transaction rather than detaching from its car on mixed glyph lists."
+      },
+      {
+        "id": "rank_invalid_child_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Malformed later glyph, NaN, priority queue replacement, detached old tail and unrelated draw owners",
+        "expected_behavior": "A bad later sibling rejects the whole rank correction before editing the first; unknown or detached nodes and unrelated HUD/world effects retain unmodified original coordinates and fallback."
+      },
+      {
+        "id": "rank_exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 game, x64 OpenXR host, package, Domain Isolation and affected HUD/Full Source Impact",
+        "expected_behavior": "All required GitHub Actions gates finish SUCCESS against one validation-bearing exact SHA, while Quest3/VDXR marker optics remain UNTESTED without hardware evidence."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_live_sibling_transaction": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "rank_invalid_child_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "rank_exact_sha_integration": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original OutRun vehicle-rank Calc3D2D producer uses native fractional pixel coordinates, and rank clipping may append more than one SpriteNode or glyph within a single vehicle-relative priority queue callback.",
+    "source_trace": [
+      "Original car vehicle-rank clip producer locates its own Calc3D2D projected rank anchor and invokes the exact native sprani/clip sprite and numeric sibling appends.",
+      "src/vr/game/rank_marker_fraction.hpp previously adjusted each appended kind-0 or kind-1 node sequentially; if a later node was invalid, an earlier sibling remained changed.",
+      "After the verified original live-root/old-tail/new-tail fence, the native hook hands these SpriteNodes to existing R84 semantic queue/per-eye projection and host composition; no HMD eye submission was observed."
+    ],
+    "alternatives_rejected": [
+      "Do not treat HUD 6th/6 as the vehicle-attached rival rank producer, and do not shift generic sprites globally or replay stale detached queue tails.",
+      "Do not claim per-eye VR visual correction or FPS improvement from a portable source unit test alone, and do not modify original FFB/SkyGlow/R26_SAFE fallbacks."
+    ],
+    "root_cause": "Before the first-source C2 commit, RestoreAppendedRankFractions mutated the first valid appended rank child before inspecting later glyphs. A malformed later child then returned partial success and left a visually inconsistent per-car sibling group.",
+    "fix_evidence": "Existing material commit 882c4290ac5be79f452c61eaef9f7e322d413d7d adds FractionCandidate preflight and a bounded two-pass all-or-nothing original rank sibling position repair without changing other render owners.",
+    "negative_test_evidence": "vrhost/tests/rank_marker_fraction_smoke.cpp adds fail-before/pass-after mixed kind-0/1 children, bad second glyph kind and NaN second translation, then valid sibling recovery; integrated game and host checks are pending.",
+    "eye_ownership": "Only the original rank producer's bounded live queue children may receive their own car-relative fraction; existing R84 left/right world-billboard routing is preserved but remains unverified on real Quest3/VDXR."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "882c4290ac5be79f452c61eaef9f7e322d413d7d",
+    "failed_preflight_run_id": 39155072322,
+    "failed_preflight_job_id": 117756500454,
+    "failed_preflight_step": "Enforce feature-sized DX9Ex autonomous completion",
+    "failed_preflight_cause": "The required docs/automation/runs/CONVERSION-DX9EX-01053.json was not present in the original source commit. Python --check-head stopped before game/host compile; this is a missing-policy-input failure, not demonstrated C++ failure.",
+    "validation_bearing_result_sha": null,
+    "required_gates_state": "PENDING_ALL_FOUR_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Retry E003 adds the missing required same-task feature contract from the already committed functional C++ rank-marker repair; no new functional material implementation, no new score for CI/metadata repair. This record is deliberately nonterminal until all exact-SHA required Gates complete. Do not rerun the same failed SHA or cancel already running workflows. Quest3/VDXR not performed."
+}
