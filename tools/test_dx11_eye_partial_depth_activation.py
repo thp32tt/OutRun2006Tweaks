@@ -157,7 +157,8 @@ def camera_clear_contract(code):
         "!prepare_offscreen_game_draw(gameTarget)",
         "boundDepth.Get() != gameDepth",
         "depthResource.Get() == eyeDepthResource.Get()",
-        "dd.Width != cd.Width",
+        "camera.width != cameraDepth.width",
+        "camera.height != cameraDepth.height",
         "dd.SampleDesc.Count != cd.SampleDesc.Count",
         "context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);",
     ))
@@ -168,6 +169,12 @@ assert not camera_clear_contract(source.replace(
     "depthResource.Get() == eyeDepthResource.Get()", "false", 1))
 assert not camera_clear_contract(source.replace(
     "context_->ClearRenderTargetView(gameTarget, rgba);", "", 1))
+assert not camera_clear_contract(source.replace(
+    "camera.width != cameraDepth.width",
+    "false", 1)), "different physical RTV/DSV mip extents slipped through"
+assert not camera_clear_contract(source.replace(
+    "camera.height != cameraDepth.height",
+    "false", 1)), "offscreen mip-view height mismatch slipped through"
 assert "gameEyeFixture.replayedOffscreenGameClears[0] &&" in probe
 assert "gameEyeFixture.replayedOffscreenGameClears[1] &&" in probe
 assert "gameEyeFixture.replayedOffscreenGamePartialClears[0] &&" in probe
@@ -188,7 +195,8 @@ def offscreen_rect_contract(code, fixture):
         "context_->ClearRenderTargetView(gameTarget, rgba);",
     )) and all(x in depth for x in (
         "boundDepth.Get() != gameDepth",
-        "dd.Width != cd.Width",
+        "camera.width != cameraDepth.width",
+        "camera.height != cameraDepth.height",
         "live_game_stereo::depth_clear_route(",
         "raster_partial_eye_depth_clear(",
         "context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);",
