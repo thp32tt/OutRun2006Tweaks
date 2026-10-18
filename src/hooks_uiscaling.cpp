@@ -1065,6 +1065,11 @@ class UIScaling : public Hook
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
+                // Both original 6th/6 paths (first animated sprite and
+                // right-side clip digits) can enqueue several siblings.
+                // A reused native tail is not a safe source boundary.
+                producer == OutRunVR::GameSemantic::ProducerToken::DispRankFirst ||
+                producer == OutRunVR::GameSemantic::ProducerToken::DispRankClipSprite ||
                 producer == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
                 producer == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite ||
                 producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
@@ -1715,9 +1720,11 @@ class UIScaling : public Hook
 		uint32_t spriteId, float x, float y, int a4, int a5)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+			rootsBefore[prio] = root;
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 		auto original = reinterpret_cast<DispRankFirstSpraniFn>(
@@ -1727,7 +1734,8 @@ class UIScaling : public Hook
 		// siblings on the same finite ScreenHud plane as eight kind-0 clips.
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::DispRankFirst);
+			OutRunVR::GameSemantic::ProducerToken::DispRankFirst,
+			nullptr, &rootsBefore);
 		return result;
 	}
 
@@ -2187,16 +2195,19 @@ class UIScaling : public Hook
 		// right wrapper; only its source identity differs.
 		AddSpriteSpacing(&x, false);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int p = 0; p < Game::SpritePriorityCount; ++p)
 		{
 			SpriteNode* root = Game::sprite_prio_root[p];
+			rootsBefore[p] = root;
 			before[p] = root ? root->tail_4 : nullptr;
 		}
 		const int result = Game::put_clip_sprite(
 			xstnum, x, y, flags, priority, color);
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::DispRankClipSprite);
+			OutRunVR::GameSemantic::ProducerToken::DispRankClipSprite,
+			nullptr, &rootsBefore);
 		return result;
 	}
 

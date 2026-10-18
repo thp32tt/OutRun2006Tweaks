@@ -88,6 +88,51 @@ namespace OutRunVR::SpriteQueue
         static_assert(TextGlyphQueueRebuildGuards(),
             "Original glyphs must not inherit a rebuilt/foreign queue tail");
 
+        // Original 0x4B9D80 "6th/6" is a two-family native GPU HUD
+        // batch: one animated first-position sprite plus clip-digit siblings.
+        // Both paths must fail closed on a recycled/replaced priority root,
+        // rather than gifting a foreign left-/right-eye node ScreenHud.
+        constexpr bool FixedFnRankBatchQueueRootGuards() noexcept
+        {
+            Node root{}, earlier{}, oldTail{}, first{}, last{},
+                rebuilt{}, foreign{}, cycle{};
+            root.next_0 = &earlier;
+            earlier.next_0 = &oldTail;
+            oldTail.next_0 = &first;
+            first.next_0 = &last;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &last, 5) != &first)
+                return false; // valid first and clipped siblings
+            // A first-ever 6th/6 write may append to the root sentinel.
+            root.next_0 = &first;
+            first.next_0 = &last;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &root, &last, 5) != &first)
+                return false;
+            // The old tail pointer can be physically reused/relinked
+            // under a NEW root: tail reachability alone is insufficient.
+            rebuilt.next_0 = &oldTail;
+            oldTail.next_0 = &first;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &rebuilt, &oldTail, &last, 5))
+                return false;
+            // A replaced/detached old tail is never dereferenced.
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &last, 5))
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &root, &foreign, 5))
+                return false;
+            root.next_0 = &cycle;
+            cycle.next_0 = &cycle;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &oldTail, &last, 5))
+                return false;
+            return true;
+        }
+        static_assert(FixedFnRankBatchQueueRootGuards(),
+            "Both original 6th/6 sprite families require stable priority roots");
+
         // Exact native HUD/ESC clips may enqueue several siblings after
         // one original E8. Bounded proof must cover the last sibling and
         // reject a replaced root or relinked old queue tail.
