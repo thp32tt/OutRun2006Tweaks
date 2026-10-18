@@ -497,8 +497,10 @@ bool NativeGameEyeDrawEncoder::draw_offscreen(
     UINT vertexCount, UINT startVertex) noexcept {
     if (!vertexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
+    const bool eligible = unpredicated_color_evidence();
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
+    if (eligible) ++unpredicatedGameDrawCount_
     return true;
 }
 
@@ -507,8 +509,10 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
     UINT indexCount, UINT startIndex, INT baseVertex) noexcept {
     if (!indexCount || !prepare_offscreen_game_draw(gameTarget, true))
         return false;
+    const bool eligible = unpredicated_color_evidence();
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
+    if (eligible) ++unpredicatedGameDrawCount_;
     return true;
 }
 
@@ -524,9 +528,11 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
             verticesPerInstance, instanceCount, drawCount_) ||
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
+    const bool eligible = unpredicated_color_evidence();
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
+    if (eligible) ++unpredicatedGameDrawCount_;
     return true;
 }
 
@@ -538,10 +544,12 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
             indicesPerInstance, instanceCount, drawCount_) ||
         !prepare_offscreen_game_draw(gameTarget, true))
         return false;
+    const bool eligible = unpredicated_color_evidence();
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
     ++drawCount_;
+    if (eligible) ++unpredicatedGameDrawCount_;
     return true;
 }
 
@@ -733,10 +741,12 @@ bool NativeGameEyeDrawEncoder::draw(
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     if (!replay_due_source_clears()) return false;
+    const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), unpredicated);
     context_->Draw(vertexCount, startVertex);
     ++drawCount_;
+    if (unpredicated) ++unpredicatedGameDrawCount_;
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -747,10 +757,12 @@ bool NativeGameEyeDrawEncoder::draw_indexed(
         drawCount_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
     if (!replay_due_source_clears()) return false;
+    const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), unpredicated);
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
+    if (unpredicated) ++unpredicatedGameDrawCount_;
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -765,11 +777,13 @@ bool NativeGameEyeDrawEncoder::draw_instanced(
             verticesPerInstance, instanceCount, drawCount_) ||
         !eye_output_bound() || !replay_due_source_clears())
         return false;
+    const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), unpredicated);
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
+    if (unpredicated) ++unpredicatedGameDrawCount_;
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -781,12 +795,14 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
             indicesPerInstance, instanceCount, drawCount_) ||
         !eye_output_bound() || !replay_due_source_clears())
         return false;
+    const bool unpredicated = unpredicated_color_evidence();
     const bool colorWritable = live_game_stereo::color_certifiable(
-        eye_color_writable(), unpredicated_color_evidence());
+        eye_color_writable(), unpredicated);
     context_->DrawIndexedInstanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
     ++drawCount_;
+    if (unpredicated) ++unpredicatedGameDrawCount_;
     if (colorWritable) ++colorDrawCount_;
     return true;
 }
@@ -854,6 +870,8 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         authoredColorPostpassCount_ = history.colorPostpasses;
         authoredFullColorClearCount_ = history.fullTargetClears;
         lastFullClearDrawOrdinal_ = history.lastFullClearDrawOrdinal;
+        if (lastTargetClearFull_)
+            unpredicatedAtLastFullClear_ = unpredicatedGameDrawCount_;
     }
     return written;
 }
@@ -2372,11 +2390,13 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             if (!encoder.finish_source_clear_timeline())
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
-            if (!live_game_stereo::authored_color_output_ready(
+            if (!live_game_stereo::authored_visible_color_output_ready(
                     encoder.draw_count(), encoder.color_draw_count(),
                     encoder.authored_color_postpass_count(),
                     encoder.authored_full_color_clear_count(),
-                    encoder.last_full_clear_draw_ordinal()) ||
+                    encoder.last_full_clear_draw_ordinal(),
+                    encoder.unpredicated_game_draw_count(),
+                    encoder.unpredicated_at_last_full_clear()) ||
                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||

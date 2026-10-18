@@ -146,6 +146,21 @@ int main() {
     static_assert(!authored_color_output_ready(5u, 0u, 0u, 2u, 5u));
     static_assert(!authored_color_output_ready(0u, 0u, 0u, 1u, 0u));
     static_assert(authored_color_output_ready(5u, 0u, 1u, 2u, 5u));
+    // Full-clear + predicated-only geometry is NOT a published menu/race
+    // frame, even when the D3D11 command ordinal advanced. A subsequent
+    // unpredicated depth-only Draw admits real scene chronology; a valid
+    // postpass needs at least one eligible game geometry source.
+    using outrun::vr::dx11::live_game_stereo::authored_visible_color_output_ready;
+    static_assert(!authored_visible_color_output_ready(8u, 0u, 0u, 1u,
+        3u, 1u, 1u)); // five post-clear commands suppressed
+    static_assert(authored_visible_color_output_ready(8u, 0u, 0u, 1u,
+        3u, 2u, 1u)); // genuine post-clear depth geometry
+    static_assert(!authored_visible_color_output_ready(8u, 0u, 1u, 1u,
+        3u, 0u, 0u)); // a Copy alone is not game geometry
+    static_assert(authored_visible_color_output_ready(8u, 0u, 1u, 1u,
+        3u, 1u, 1u)); // later game-authored GPU color postpass
+    static_assert(!authored_visible_color_output_ready(8u, 0u, 0u, 1u,
+        3u, 0u, 1u)); // malformed eligibility chronology
     assert(color_certifiable(true,true) &&
            !color_certifiable(false,false) &&
            authored_color_output_ready(5u, 0u, 0u, 1u, 0u) &&

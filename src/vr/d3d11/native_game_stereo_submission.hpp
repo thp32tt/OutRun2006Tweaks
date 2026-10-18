@@ -118,6 +118,16 @@ public:
         const NativeGameEyePartialTargetClear* clears, std::uint32_t eye) noexcept;
     [[nodiscard]] bool finish_source_clear_timeline() noexcept;
     [[nodiscard]] std::uint64_t draw_count() const noexcept { return drawCount_; }
+    // Draws suppressed by a live D3D11 predicate still consume their real
+    // game command ordinal but cannot certify a full-Clear/postpass XR eye.
+    // Count only game geometry issued with predication disabled, separately
+    // from color writes (depth-only menu/race geometry remains eligible).
+    [[nodiscard]] std::uint64_t unpredicated_game_draw_count() const noexcept {
+        return unpredicatedGameDrawCount_;
+    }
+    [[nodiscard]] std::uint64_t unpredicated_at_last_full_clear() const noexcept {
+        return unpredicatedAtLastFullClear_;
+    }
     // Depth-only and color-masked game Draws still execute and contribute to
     // the command stream, but cannot by themselves certify a visible XR eye.
     [[nodiscard]] std::uint64_t color_draw_count() const noexcept { return colorDrawCount_; }
@@ -163,6 +173,8 @@ private:
     ID3D11DepthStencilView* eyeDepth_{};
     UINT targetWidth_{}, targetHeight_{};
     std::uint64_t drawCount_{};
+    std::uint64_t unpredicatedGameDrawCount_{};
+    std::uint64_t unpredicatedAtLastFullClear_{};
     std::uint64_t colorDrawCount_{};
     std::uint32_t authoredColorPostpassCount_{};
     std::uint32_t authoredFullColorClearCount_{};

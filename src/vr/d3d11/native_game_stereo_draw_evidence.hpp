@@ -212,4 +212,34 @@ static_assert(authored_color_output_ready(3u, 0u, 0u, 1u, 2u));
 static_assert(!authored_color_output_ready(0u, 0u, 0u, 1u, 0u));
 static_assert(!authored_color_output_ready(2u, 0u, 0u, 1u, 2u));
 static_assert(authored_color_output_ready(2u, 0u, 1u, 1u, 2u));
+
+// A queued D3D11 Draw can be predicated away while still increasing the
+// source's real command ordinal. A full TARGET Clear followed only by those
+// suppressed commands is a cleared eye, not a native game frame. Similarly,
+// a GPU Copy/Stretch alone cannot turn zero eligible game geometry into
+// proof of a stereo game camera. Keep source order separate from eligibility:
+// post-Clear geometry must be unpredicated when Clear supplies the color.
+[[nodiscard]] constexpr bool authored_visible_color_output_ready(
+    std::uint64_t geometryDraws, std::uint64_t directColorDraws,
+    std::uint32_t authoredColorPostpasses,
+    std::uint32_t authoredFullColorClears,
+    std::uint64_t lastFullClearDrawOrdinal,
+    std::uint64_t unpredicatedGameDraws,
+    std::uint64_t unpredicatedDrawsAtLastFullClear) noexcept {
+    if (unpredicatedGameDraws == 0u ||
+        unpredicatedDrawsAtLastFullClear > unpredicatedGameDraws ||
+        !authored_color_output_ready(
+            geometryDraws, directColorDraws, authoredColorPostpasses,
+            authoredFullColorClears, lastFullClearDrawOrdinal))
+        return false;
+    return directColorDraws != 0u || authoredColorPostpasses != 0u ||
+        (authoredFullColorClears != 0u &&
+         unpredicatedGameDraws > unpredicatedDrawsAtLastFullClear);
+}
+static_assert(authored_visible_color_output_ready(2u, 0u, 0u, 1u, 0u, 1u, 0u));
+static_assert(!authored_visible_color_output_ready(2u, 0u, 0u, 1u, 0u, 0u, 0u));
+static_assert(!authored_visible_color_output_ready(3u, 0u, 0u, 1u, 2u, 1u, 1u));
+static_assert(authored_visible_color_output_ready(3u, 0u, 0u, 1u, 2u, 2u, 1u));
+static_assert(!authored_visible_color_output_ready(3u, 0u, 1u, 0u, 0u, 0u, 0u));
+static_assert(authored_visible_color_output_ready(3u, 0u, 1u, 0u, 0u, 1u, 0u));
 } // namespace outrun::vr::dx11::live_game_stereo
