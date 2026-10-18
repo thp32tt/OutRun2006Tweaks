@@ -65,7 +65,20 @@
   "diagnosis": {
     "original_evidence": "Original static EXE centre call D3A5 -> C993 is a spatial WorldBillboard, not the separately screen-projected outer CABE effect.",
     "root_cause": "R30BuildScreenSpaceEyeConstants executed R30BuildEyeAffine (a flat HUD optical precondition) unconditionally before its exact lens/shadow spatial WVP branch. An otherwise source-backed world draw may be rejected by an unused tangent HUD gate.",
-    "limitations": "Static source-coupling defect; no actual Quest3 frame or confirmed headset root cause. Exact original game WVP proof, native draw validity, and bilateral spatial matrices remain mandatory."
+    "limitations": "Static source-coupling defect; no actual Quest3 frame or confirmed headset root cause. Exact original game WVP proof, native draw validity, and bilateral spatial matrices remain mandatory.",
+    "source_trace": [
+      "Original 0xD3A5 parent invokes 0xC993 object 0x570002 WorldBillboard central sun, separately from 0xCABE rings and SkyGlow; producer marker is direct and not a queued HUD sprite.",
+      "R30 captures the original game c64 raw WVP, validates matching C993 call/shader/pose/draw serial, then reconstructs the stock worldView and head-relative lens optical matrices.",
+      "R30BuildScreenSpaceEyeConstants evaluates exact LensCentreWorld and CarBaseShadowWorld before flat HUD-affine selection; valid world paths build both OpenXR asymmetric FOV eye matrices with positive finite scale.",
+      "R33 confirms native LEFT original draw and source/c64 freshness before RIGHT RT and shader submission, restores the original game constants on rejection and fails closed to original native fallback."
+    ],
+    "alternatives_rejected": [
+      "Do not relax exact source-proof, c64 provenance, R33 left/right re-entry fences, or the R26_SAFE rollback; generic CABE rings, HUD, SkyGlow and unrelated projected effects retain old behavior.",
+      "Do not modify original EXE timing, D3DX alpha or FFB/input; this defect came from an unrelated flat HUD-affine precondition applied before valid 3D lens-eye transforms."
+    ],
+    "fix_evidence": "Committed source SHA 1aaf6e830fdbebba5184a651badeac45b8038fd4 separates R84 exact C993 and car-shadow eye route from flat-HUD affine and rejects zero, negative or nonfinite VR world scale; regression source SHA 59d70a6cfe78058da40c8c646de43d79ebbaf06f preserves both eye paths.",
+    "negative_test_evidence": "Python tools/verify_dx9ex_r84_lens_source.py passed 70 destructive source-route mutations including six HUD affine/scale guard negatives in DX9Ex Active #39151903692; R30 depthless restoration passed 12 mutations; original 39148542943 mutation #7 false-negative was repaired by the intervening 01051 regression-scope fix, not repeated here.",
+    "eye_ownership": "Exact C993 source-proven WorldBillboard receives independent LEFT/RIGHT spatial worldView*headInverse*relativeEyeInverse*OpenXR FOV GPU WVP after positive world-scale gate; original c64 restored and R33 falls back to the original native draw when either eye or draw-source coherence is invalid. The CABE outer discs and screen HUD are not promoted; Quest3 HMD outcome remains UNTESTED."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -110,9 +123,15 @@
       "dx9ex-r84-independent-full-chain-game"
     ],
     "source_regression": "python tools/verify_dx9ex_r84_lens_source.py (70 negative mutations)",
-    "runtime_note": "No physical Quest3/VDXR execution; only static, CI, Win32/x64 build and package"
+    "runtime_note": "No physical Quest3/VDXR execution; only static, CI, Win32/x64 build and package",
+    "c6_first_policy_failure": {
+      "head_sha": "00d65e51b1218ee5312d2c5f0dc1b43fc64cf6dc",
+      "active_run_id": 39152633485,
+      "reason": "terminal diagnosis schema omitted source_trace, alternatives_rejected, fix_evidence, negative_test_evidence, eye_ownership",
+      "repair_scope": "record-only; no new C++ or test change"
+    }
   },
-  "notes": "First dispatch C2 material source change; no Quest3/VDXR HMD execution. Material SHA recorded after commit in separate C6/checkpoint, no duplicate achievement. Same-task E004 rollover continuation: 1aaf6e8 material C++ retained, scoped 70 destructive C993 regressions committed at 59d70a6; exact-target 4/4 PASS and artifacts verified; standalone C6 record is not additional material scoring; HMD UNTESTED.",
+  "notes": "First dispatch C2 material source change; no Quest3/VDXR HMD execution. Material SHA recorded after commit in separate C6/checkpoint, no duplicate achievement. Same-task E004 rollover continuation: 1aaf6e8 material C++ retained, scoped 70 destructive C993 regressions committed at 59d70a6; exact-target 4/4 PASS and artifacts verified; standalone C6 record is not additional material scoring; HMD UNTESTED. Same TASK C6 policy repair fills original-renderer source trace and negative/fallback evidence; no additional score or source change.",
   "feature_ready": {
     "status": "PASS_FEATURE_CI",
     "branch": "vr-d3d9ex-candidate/01052-c993-eye-route-test",
