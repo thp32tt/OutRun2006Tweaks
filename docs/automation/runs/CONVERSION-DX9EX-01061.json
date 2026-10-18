@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
+  "validation_bearing_result_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
   "changed_files": [
     "src/vr/game/goal_progress_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -69,7 +69,7 @@
       "Do not reuse +TIME StageExtensionTime token for GOAL or broaden ScreenHud to world and unknown glyphs.",
       "Do not zero out a captured foreign original WVP and relabel it as unavailable so that the old fallback accidentally admits stereo ownership."
     ],
-    "fix_evidence": "R84 GOAL source-header predicate and R33 physical GPU pre-left capture changed in material source; HMD symptoms require actual headset reproduction."
+    "fix_evidence": "R84 GOAL source-header predicate and R33 physical GPU pre-left capture changed in material source; HMD symptoms require actual headset reproduction. Exact source commit ff4ecd250c972708bd6476db46ba4eba1796b1a7; Windows x86 game and x64 host/package and all four mandatory jobs SUCCESS; no Quest3 hardware test."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -78,9 +78,49 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "goal_exact_physical_shader_generation": "PENDING_BUILD",
-    "goal_foreign_c64_native_fallback": "PENDING_BUILD",
-    "goal_exact_sha_required_gates": "PENDING_EXACT_SHA"
+    "goal_exact_physical_shader_generation": "PASS_BUILD",
+    "goal_foreign_c64_native_fallback": "PASS_BUILD",
+    "goal_exact_sha_required_gates": "PASS_EXACT_SHA"
   },
-  "result_commit_kind": "MATERIAL_SOURCE_PLUS_PRE_CI_RUN_RECORD"
+  "result_commit_kind": "MATERIAL_SOURCE_PLUS_PRE_CI_RUN_RECORD",
+  "ci_evidence": {
+    "required_gates_state": "PASS_ALL_FOUR_EXACT_SHA",
+    "validation_bearing_result_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39174766170,
+        "head_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39174766191,
+        "head_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39174766166,
+        "head_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39174766196,
+        "head_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7",
+        "conclusion": "success"
+      }
+    ],
+    "build_note": "Windows x86 R84 game, x64 OpenXR host, full-chain compile and package passed in Active #39174766170; no physical headset test."
+  },
+  "c6_commit_kind": "BOOKKEEPING_SKIP_CI",
+  "c6_completion": {
+    "reason_resolved": "ALL_FOUR_REQUIRED_GATES_PASS_EXACT_SHA",
+    "bookkeeping_only": true,
+    "ci_retrigger": false,
+    "score_delta": 0,
+    "runtime_validation": "UNTESTED",
+    "validation_bearing_result_sha": "ff4ecd250c972708bd6476db46ba4eba1796b1a7"
+  }
 }
