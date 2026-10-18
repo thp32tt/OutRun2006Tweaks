@@ -30,4 +30,17 @@ namespace OutRunVR::SpriteQueue
         }
         return nullptr; // detached old tail, foreign node or cyclic/long list
     }
+    // Native SpriteNode tails may be recycled or moved when an original
+    // producer rebuilds a priority list. Even a currently linked new tail
+    // proves nothing about a DIFFERENT root captured before the producer.
+    // Reject that source association instead of tagging foreign HUD nodes.
+    template<class Node>
+    constexpr Node* FirstVerifiedAppendedNodeOnStableRoot(
+        Node* oldRoot, Node* currentRoot, Node* oldTail,
+        Node* newTail, unsigned bound) noexcept
+    {
+        return oldRoot && oldRoot == currentRoot
+            ? FirstVerifiedAppendedNode(currentRoot, oldTail, newTail, bound)
+            : nullptr;
+    }
 }

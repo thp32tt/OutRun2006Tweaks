@@ -947,8 +947,13 @@ class TextureReplacement : public Hook
 	}
 
 
+	struct VrSpritePrioritySnapshot
+	{
+		SpriteNode* root = nullptr;
+		SpriteNode* tail = nullptr;
+	};
 	using VrSpriteTailSnapshot =
-		std::array<SpriteNode*, Game::SpritePriorityCount>;
+		std::array<VrSpritePrioritySnapshot, Game::SpritePriorityCount>;
 
 	static VrSpriteTailSnapshot SnapshotVrSpriteTails()
 	{
@@ -956,7 +961,7 @@ class TextureReplacement : public Hook
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
-			before[prio] = root ? root->tail_4 : nullptr;
+			before[prio] = { root, root ? root->tail_4 : nullptr };
 		}
 		return before;
 	}
@@ -1007,15 +1012,17 @@ class TextureReplacement : public Hook
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
-			if (!root || !tailAfter || tailAfter == before[prio])
+			if (!root || !tailAfter || tailAfter == before[prio].tail)
 				continue;
 
-			// Unlike a captured tail pointer, the root is a live traversal
-			// boundary. Do not read oldTail->next_0 after producer execution.
-			// This deliberately leaves rebuilt/unknown queues untagged instead
-			// of misclassifying an unrelated node as HUD or WorldBillboard.
-			SpriteNode* node = OutRunVR::SpriteQueue::FirstVerifiedAppendedNode(
-				root, before[prio], tailAfter, Game::SpriteNodeMax);
+			// First prove the SAME priority root survived the native call.
+			// Root replacement can otherwise make a new list appear to be
+			// appended by this unrelated HUD producer. The helper also
+			// verifies both tails using a bounded walk from the live root.
+			// Unknown/rebuilt queues stay untagged; do not read old tail.
+			SpriteNode* node = OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
+				before[prio].root, root, before[prio].tail,
+				tailAfter, Game::SpriteNodeMax);
 			for (unsigned guard = 0;
 				node && guard < Game::SpriteNodeMax; ++guard)
 			{
