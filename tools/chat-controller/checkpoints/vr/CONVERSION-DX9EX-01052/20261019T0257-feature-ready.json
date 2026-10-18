@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "status": "FEATURE_READY",
+  "task_id": "CONVERSION-DX9EX-01052",
+  "production_id": "CONVERSION-DX9EX-01052",
+  "event_id": "CONVERSION-DX9EX-01052-E004",
+  "attempt": "2/3",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "feature_branch": "vr-d3d9ex-candidate/01052-c993-eye-route-test",
+  "feature_head": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+  "target_branch": "vr-d3d9ex-focus",
+  "expected_target_sha": "1a59e6c665db07cf315e598f190d683db92b506d",
+  "acceptance_results": {
+    "lens_source_owned_spatial_eye_path": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d9/r84_spatial_eye_route.hpp",
+        "tools/verify_dx9ex_r84_lens_source.py"
+      ],
+      "validation_command": "python tools/verify_dx9ex_r84_lens_source.py",
+      "test_result": "R84 C993 physical stereo source route PASS (70 destructive mutations)"
+    },
+    "lens_world_negative_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d9/r84_spatial_eye_route.hpp",
+        "tools/verify_dx9ex_r84_lens_source.py"
+      ],
+      "validation_command": "python tools/verify_dx9ex_r84_lens_source.py",
+      "test_result": "HUD flat-affine spatial separation and finite positive scale; 6 additional destructive mutations"
+    },
+    "lens_final_exact_sha_gates": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/verify_dx9ex_r84_lens_source.py",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "validation_command": "GitHub Actions push candidate SHA (policy, Win32 game, x64 host, full chain and package)",
+      "run_id": 39151296043
+    }
+  },
+  "candidate_checks": [
+    {
+      "name": "package",
+      "conclusion": "success"
+    },
+    {
+      "name": "full-chain-compile",
+      "conclusion": "success"
+    },
+    {
+      "name": "host",
+      "conclusion": "success"
+    },
+    {
+      "name": "game",
+      "conclusion": "success"
+    },
+    {
+      "name": "policy",
+      "conclusion": "success"
+    },
+    {
+      "name": "build-hud-inspector",
+      "conclusion": "success"
+    },
+    {
+      "name": "static-exe-analysis",
+      "conclusion": "success"
+    }
+  ],
+  "candidate_artifacts": [
+    "OutRun2-VR-DX9EX-ACTIVE-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "dx9ex-r84-independent-full-chain-game",
+    "feature-dx9ex-pacing-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "feature-dx9ex-eye-extent-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "OutRun2-VR-GPU-DIAGNOSTIC-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "dx9ex-active-game",
+    "dx9ex-active-host"
+  ],
+  "runtime_validation": "UNTESTED",
+  "next": "Fast-forward safely and verify required four workflows on exact target commit SHA; then C6."
+}
