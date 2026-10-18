@@ -105,6 +105,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
 
     bld = r30.split("bool R30BuildScreenSpaceEyeConstants(", 1)[1].split(
         "template <typename ActualDraw>", 1)[0]
+    spatial_gate = "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||"
     # Exact 3D sources must bypass ONLY the unrelated flat HUD tangent-affine
     # precondition. A stale/unknown world source never gains this exception:
     # source provenance remains checked in the separately guarded spatial arm.
@@ -139,7 +140,6 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
 
     # C993 and exact car shadow share a spatial eye matrix. Their original
     # raw c64 evidence must still be selected independently.
-    spatial_gate = "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||"
     lens = bld.split(spatial_gate, 1)[1].split(
         "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1)[0]
     for marker in (
