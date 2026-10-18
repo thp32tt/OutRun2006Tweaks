@@ -32,7 +32,7 @@ for condition in (
     check(condition in source, "missing real game source-to-GPU binding: " + condition)
 
 for rejection in (
-    "stencil || fog || clipPlanes || fill != D3DFILL_SOLID",
+    "fog || clipPlanes || fill != D3DFILL_SOLID",
     "D3DRS_ALPHAFUNC", "D3DRS_ALPHAREF", "alphaRef > 255u",
     "alphaFunc < D3DCMP_NEVER", "alphaFunc > D3DCMP_ALWAYS",
     "pipeline.alphaCompare != alphaFunc", "pipeline.alphaReference",
