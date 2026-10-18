@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01060",
+  "production_id": "CONVERSION-DX9EX-01060",
+  "event_id": "CONVERSION-DX9EX-01060-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "6efddfc1943bc28c17c5ff1cc78a312b7c888e59",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve stage +TIME sprite and numeric glyph stereo GPU ownership by refusing a captured original-game c64 matrix from another physical vertex shader or shader generation, while retaining native fallback.",
+    "scope_boundary": "Only R84 +TIME physical c64 source validation for exact original StageExtensionTime; do not relabel unrelated GOAL/rank/world/lens HUD or alter native input, FFB, SkyGlow, D3D9 fallback, R26_SAFE, independent DX11 or frozen DXVK. HMD optics remain untested.",
+    "trace_stages": [
+      "Six original game +TIME stage extension sprite and numeric E8 producers retain existing exact Source/ScreenHud, SpriteNode and D3DX deferred batch owners.",
+      "During R84 R33 shader HUD physical draw, captureStageSource reads the current vertex shader identity/epoch and the ORIGINAL raw game c64 write metadata, not private stereo eye uploads.",
+      "Require captured game c64 owner shader and epoch to match this physical draw before a left-eye submission; then existing left/right eye physical-source, pose, target and restore fences remain authoritative. Missing capture uses conservative existing native fallback.",
+      "The original x64 OpenXR host eye presentation and actual Quest3 optical acceptance remain separate runtime tests."
+    ],
+    "subcomponents": [
+      "Implement a source-coherent original-game raw c64 shader and shader-epoch admission predicate that refuses known foreign and incomplete writes, while retaining the missing-tracker fallback.",
+      "Integrate that predicate in the real R84 R33 +TIME GPU source capture before left-eye submission without changing GOAL, WorldBillboard, SkyGlow or game simulation.",
+      "Compile positive and negative C++ source-header assertions covering exact shader identity, foreign shader, stale generation, partial write, unknown capture and original unbound shader."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_shader_gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_stage_extension_raw_c64_through_R84_physical_eye",
+        "expected_behavior": "A +TIME banner and numeral draw with known original raw c64 provenance may proceed only with identical physical vertex shader identity and generation; foreign c64 cannot drive either eye."
+      },
+      {
+        "id": "stage_shader_negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "missing_raw_tracker_stale_shader_reset_native_fallback",
+        "expected_behavior": "Missing raw-tracker data keeps the existing conservative unknown fallback; stale shader epoch, mismatched identity, zero source serial or partial captured write refuse stereo ownership without changing original native input, FFB, SkyGlow or R26_SAFE."
+      },
+      {
+        "id": "stage_exact_sha_full_gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex_R84_Win32_x86_game_x64_host_package_and_domain",
+        "expected_behavior": "The exact final result SHA must pass DX9Ex Active Windows game and x64 host/package, Domain Isolation, EXE HUD Inspector and Full Source Impact gates; Quest3 optics separately remain untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R33 captureStageSource recorded rawShader/rawShaderEpoch from GetLastRawGameWvpWrite but did not compare them with the current physical shader/epoch, collapsing unmatched captured c64 into valid +TIME source.",
+    "root_cause": "The original-game c64 write tracker could describe a previous world/GOAL shader even when the physical +TIME shader owner differs. This is a static provenance vulnerability, not evidence of an observed Quest3 failure.",
+    "source_trace": [
+      "Exact StageExtensionTime native sprite and numeric producers are already admitted and tagged through hooks_uiscaling and bounded SpriteNode/D3DX queue ownership.",
+      "R84 R33 captures original raw c64 serial and shader generation before native +TIME left-eye dispatch; known foreign source is rejected before left submission.",
+      "R84 R33 still applies existing shader/pose/queue/physical left-right checks and restores game state, then x64 host performs its distinct OpenXR composition."
+    ],
+    "eye_ownership": "Both R84 physical eye submissions require original shader-coherent StageExtensionTime c64 source when captured, with existing per-eye state restore and hardware acceptance independent.",
+    "alternatives_rejected": [
+      "Do not blindly convert a captured foreign shader write to missing-evidence fallback.",
+      "Do not widen +TIME provenance across GOAL/rank or infer HMD correctness from CI."
+    ],
+    "fix_evidence": "Real R84 source material commit 6efddfc1943bc28c17c5ff1cc78a312b7c888e59 changed source admission before native GPU draw.",
+    "negative_test_evidence": "Compile-time static_assert cases in real R84 included header for shader mismatch, epoch mismatch, zero serial, absent capture and valid identity; exact Windows build pending."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "stage_shader_gpu_owner": "PENDING_EXACT_SHA",
+    "stage_shader_negative_fallback": "PENDING_EXACT_SHA",
+    "stage_exact_sha_full_gate": "PENDING_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "required_gates_state": "PENDING",
+    "prior_failed_runs": [
+      {
+        "run_id": 39173260665,
+        "head_sha": "6efddfc1943bc28c17c5ff1cc78a312b7c888e59",
+        "failed_step": "policy",
+        "cause": "Active policy requires exact current TASK_ID JSON and did not reach x86 game or x64 host build"
+      }
+    ]
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_PLUS_EXACT_SHA_GATE_CONTRACT",
+  "c6_commit_kind": "NONE"
+}
