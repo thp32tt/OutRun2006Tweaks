@@ -239,7 +239,9 @@ def require_physical_containment(header):
         "!std::isfinite(physicalX) || !std::isfinite(physicalY)",
         "const float gameScale = screenScaleX < screenScaleY",
         "const float physicalScale = physicalX < physicalY",
-        "const float scale = gameScale < physicalScale",
+        "bool physicalMenuFill = false) noexcept",
+        "const float scale = physicalMenuFill ? physicalScale :",
+        "(gameScale < physicalScale ? gameScale : physicalScale);",
         "(screenWidth - sourceWidth * scale) * 0.5f",
         "(screenHeight - sourceHeight * scale) * 0.5f",
         "return {scale, scale, offsetX, offsetY, true};",
@@ -248,7 +250,7 @@ def require_physical_containment(header):
         if token not in body:
             raise AssertionError("Live viewport containment missing: " + token)
     if not (body.index("const float physicalX") <
-            body.index("const float scale = gameScale") <
+            body.index("const float scale = physicalMenuFill ? physicalScale :") <
             body.index("return {scale, scale, offsetX, offsetY, true};")):
         raise AssertionError("UI containment must use bounded scale")
 
@@ -332,8 +334,12 @@ for old, bad in (
      "const float physicalY = screenHeight / sourceWidth;"),
     ("const float physicalScale = physicalX < physicalY",
      "const float physicalScale = physicalX > physicalY"),
-    ("const float scale = gameScale < physicalScale",
-     "const float scale = gameScale > physicalScale"),
+    ("bool physicalMenuFill = false) noexcept",
+     "bool physicalMenuFill = true) noexcept"),
+    ("const float scale = physicalMenuFill ? physicalScale :",
+     "const float scale = physicalMenuFill ? gameScale :"),
+    ("(gameScale < physicalScale ? gameScale : physicalScale);",
+     "(gameScale > physicalScale ? gameScale : physicalScale);"),
 ):
     assert old in menu_quad
     try:
