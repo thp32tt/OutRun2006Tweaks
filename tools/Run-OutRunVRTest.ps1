@@ -283,6 +283,16 @@ $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
 $oldParticleGpuUpload = $env:OUTRUN_VR_R30_PARTICLE_VB
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
 $oldExeSemanticsVerified = $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED
+$oldMenuOpticalCoverage = $env:OUTRUN_VR_MENU_OPTICAL_COVERAGE
+# Old GPU-lab/VR test shells can inherit a 0.75/0.78 optical downscale,
+# silently negating the B build's 100% default after a resolution switch.
+# Reset ONLY those historical trial values for the normal DX9Ex test.
+# Preserve genuine user-chosen overrides, all gameplay and other backends.
+if ($backend -eq 'd3d9' -and
+    $env:OUTRUN_VR_MENU_OPTICAL_COVERAGE -in @('0.75','0.78','0.750','0.780')) {
+    $env:OUTRUN_VR_MENU_OPTICAL_COVERAGE = $null
+    Write-Host 'DX9Ex B menu: ignored inherited legacy 75/78% optical shrink.'
+}
 $identityKeys = @(
     'OUTRUN_VR_SESSION_ID',
     'OUTRUN_VR_VARIANT_ID',
