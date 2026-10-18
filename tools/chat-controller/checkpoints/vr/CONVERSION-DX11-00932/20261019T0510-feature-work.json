@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "assistant_rollover_feature_progress",
+  "captured_at_kst": "2026-10-19T05:10:33+09:00",
+  "task_id": "CONVERSION-DX11-00932",
+  "production_id": "CONVERSION-DX11-00932",
+  "event_id": "CONVERSION-DX11-00932-E003",
+  "event_type": "rollover",
+  "attempt": 2,
+  "attempt_incremented_by_rollover": false,
+  "rollover_count": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "target_last_verified_head": "169c03b6714e71ab5e94f749a0c51eaa1275fae1",
+  "feature_id": "LIVE_GAME_SM3_TEXTURE_SAMPLING_NATIVE_PATH",
+  "feature_branch": "feat/dx11-00932-sm3-texture-gate-repair",
+  "feature_last_head": "bdbd218c89f01883ec94797a9f1cef3bd0c4a4f9",
+  "feature_stage": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "material_source_sha": "169c03b6714e71ab5e94f749a0c51eaa1275fae1",
+  "repair_commits": [
+    "b52ab62f93a403a313f161aea9fa58a0f4255f82",
+    "bdbd218c89f01883ec94797a9f1cef3bd0c4a4f9"
+  ],
+  "local_validation": [
+    "DX11 policy test PASS",
+    "latest 00932 source acceptance PASS",
+    "live SM3 draw static PASS",
+    "SM3 shader codegen C++20 executable PASS"
+  ],
+  "feature_ci": {
+    "build": 39161986748,
+    "hud_inspector": 39161986753,
+    "status": "PENDING_OR_QUEUED"
+  },
+  "prior_failures": [
+    {
+      "run": 39160893408,
+      "reason": "00931 source acceptance mixed RUNTIME_UNTESTED and PASS; corrected without weakening policy"
+    },
+    {
+      "run": 39161436045,
+      "reason": "MSVC C2059 native_backend.cpp:772 extra ')' in native TEXLD source call; repaired"
+    }
+  ],
+  "next_action": "Check exact feature bdbd218c Windows Build/HUD conclusion; repair only causal failures on same feature branch, then compare target...feature (behind=0), update_ref expected target HEAD force=false, verify all five exact-SHA target Actions, bundle and C6; never claim runtime playability without HMD testing.",
+  "uncompleted": [
+    "feature Windows CI pass",
+    "target safe promotion",
+    "target exact five GitHub Actions success",
+    "feature C6 record",
+    "real-game native positive draw/published frame runtime proof"
+  ],
+  "runtime_validation": "UNTESTED",
+  "score_change": 0
+}
