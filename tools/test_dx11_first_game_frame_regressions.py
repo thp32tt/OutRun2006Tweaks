@@ -317,8 +317,11 @@ def main() -> None:
                             "true);", 1)
     assert broken != bridge and sampling[3] not in broken
     # Removing the new full-frame admission must also fail the source contract.
+    # Both fixed-function and SM3 submits now independently gate exact
+    # seeded source ordinals. Mutate all admissions: leaving one live path
+    # intact would make this destructive regression a false failure.
     missing_full = bridge.replace("s.frameBatch.accepts_full_on_source_target(",
-                                  "false", 1)
+                                  "false")
     assert missing_full != bridge and sampling[5] not in missing_full
     assert "s.probeSlot = 0;" in bridge
     batch = (ROOT / "src/vr/d3d11/native_game_frame_batch.hpp").read_text()

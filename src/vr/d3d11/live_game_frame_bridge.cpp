@@ -4265,7 +4265,7 @@ bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
 // IA/VS/PS/tN/sN/b0/Draw. Deliberately restricted to proved opaque,
 // unscissored and depth-disabled passes until identical OM/Z state is modeled.
 bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
-                               D3DPRIMITIVETYPE type, UINT primitives,
+                               D3DPRIMITIVETYPE type, UINT expected,
                                const void* bytes, UINT stride, UINT vertexCount,
                                const std::uint32_t* indices, UINT indexCount,
                                std::uint64_t sourceOrdinal) noexcept {
@@ -4273,9 +4273,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         vertexCount == 0u || vertexCount > kMaxVertices ||
         type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP)
         return false;
-    UINT expected = 0u;
-    if (!game_native_primitive_element_count(
-            static_cast<std::uint32_t>(type), primitives, expected) ||
+    // The shared R30 observer has already validated the exact source
+    // primitive element count. Reuse it rather than decoding twice.
+    if (!expected ||
         (indices && (indexCount != expected || indexCount > kMaxIndices)) ||
         (!indices && vertexCount != expected) ||
         (indices && indexCount == 0u))
@@ -5655,7 +5655,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 SUCCEEDED(game->GetPixelShader(livePs.GetAddressOf())) &&
                 (liveVs || livePs)) {
                 if (!submit_live_sm3_game_draw(
-                        s, game, type, primitives, bytes, stride, vertexCount,
+                        s, game, type, expectedElements, bytes, stride, vertexCount,
                         indices, indexCount, sourceOrdinal)) {
                     s.frameBatch.abort();
                     ++s.failed;
