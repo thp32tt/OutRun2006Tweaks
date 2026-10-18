@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     pull_policy: build
     container_name: outrun-chat-controller-localization-recovery
-    restart: "no" # v2 PAUSED: no auto-restart on host boot or Docker daemon restart
+    restart: unless-stopped # UI/VNC stays available; AUTO_SEND remains false
     init: true
     shm_size: "1g"
     mem_limit: 4g
@@ -22,7 +22,7 @@ services:
       OUTRUN_KR_V2_AUTO_DEPLOY: "false"
       # No browser scheduled sends; independent C is only native English source extraction.
       SCHEDULE_MINUTES: "" # empty = no scheduled slots; controller supports empty list
-      CHAT_SLOTS: "2" # A/B browser remain paused; native OCR C is the service below, not a third browser tab
+      CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
@@ -40,7 +40,7 @@ services:
       REQUIRE_PROJECT_URL: "false"
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "false"
-      FRESH_CHAT_EACH_RUN: "true"
+      FRESH_CHAT_EACH_RUN: "false" # Keep exactly three persistent tabs; no per-run tab churn
       CHAT_RECYCLE_RUNS: "0" # Fresh chat at each accepted new A/B launch; hold if previous unverified.
       RETRY_BUTTON_COOLDOWN_SECONDS: "60"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
@@ -54,7 +54,7 @@ services:
       TAB_ERROR_FAILURE_THRESHOLD: "2"
       TAB_RECOVERY_COOLDOWN_SECONDS: "60"
       # Full container/browser recycle; credentials and Git checkpoints kept.
-      CHROME_RECYCLE_ENABLED: "true"
+      CHROME_RECYCLE_ENABLED: "false" # Preserve login/session; tab watchdog handles individual failures
       CHROME_RECYCLE_INTERVAL_MINUTES: "120"
       CHROME_RECYCLE_BUSY_GRACE_MINUTES: "30"
       CHROME_RECYCLE_BUSY_PROBE_SECONDS: "8"
@@ -67,7 +67,7 @@ services:
       MIN_SEND_GAP_SECONDS: "60"
       SLOT_DEDUP_SECONDS: "180"
     ports:
-      - "6082:6080"
+      - "6083:6080"
       - "8788:8787"
     volumes:
       - outrun_chat_localization_recovery_data:/data
@@ -138,44 +138,6 @@ services:
       options:
         max-size: "2m"
         max-file: "3"
-
-  # User-approved 2026-10-17: A/B KOREAN PNG GENERATION ONLY.
-  # 00/20/40 A, 10/30/50 B (KST). C remains an independent English-only service.
-  # No DDS composition, CLEAN, game patch or output approval.
-  outrun-ab-imagegen-only:
-    image: outrun-imagegen-a-stable:20261013
-    pull_policy: never
-    container_name: outrun-ab-imagegen-only
-    entrypoint: ["/bin/bash", "/app/start.sh"]
-    restart: unless-stopped
-    init: true
-    shm_size: "1g"
-    mem_limit: 3g
-    cpus: 1.5
-    environment:
-      DISPLAY: ":99"
-      TZ: Asia/Seoul
-      PYTHONUNBUFFERED: "1"
-      VNC_PASSWORD: "${VNC_PASSWORD:?Configure VNC_PASSWORD in Portainer}"
-      CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-https://chatgpt.com/g/g-p-6acdb8270260819190da244c0bf006a3-ausreon-hangeulhwa-singyu}"
-      AUTO_SEND: "true"
-      INPUT_ROOT: /inputs
-      STATE_ROOT: /state
-      OUTPUT_ROOT: /output
-      PROMPT_ROOT: /prompts
-      PROFILE_ROOT: /profile
-      GENERATION_TIMEOUT_SECONDS: "420"
-    ports:
-      - "6083:6080"
-    volumes:
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/app/runner.py:/app/runner.py:ro
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/app/start.sh:/app/start.sh:ro
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/inputs:/inputs:ro
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/prompts:/prompts:ro
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/profile:/profile
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/state:/state
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/output:/output
-      - /home/chatgpt-runner2/work/outrun-ab-imagegen-only/logs:/logs
 
 volumes:
   outrun_chat_localization_recovery_data:
