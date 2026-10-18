@@ -1679,9 +1679,17 @@ namespace
             OutRunVrMenuAspect::ResolveMenuOpticalCoverageForState(
                 std::getenv("OUTRUN_VR_MENU_OPTICAL_COVERAGE"),
                 clientGameState);
-        const auto placement =
+        const auto requestedPlacement =
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(
                 common, sourceAspect, opticalCoverage);
+        // Source dimensions may switch from the 3440x1440 desktop mirror
+        // to a 2496x2688 OpenXR eye backbuffer. Keep the reference menu
+        // height constant in binocular tangent space, adjusting both X/Y
+        // identically instead of enlarging the portrait menu to fill XR.
+        // The measured source aspect, UV and FOV containment are preserved.
+        const auto placement =
+            OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
+                common, requestedPlacement);
         if (!placement.valid)
             return false;
         const float visibleCenterX =
