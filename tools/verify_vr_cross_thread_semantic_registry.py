@@ -108,17 +108,61 @@ select = function_body(s, "inline void SelectSpriteQueueNode(")
 if "SpriteQueueSemanticCutoff" not in begin and "SpriteQueueSemanticCutoff" not in select:
     fail("queue walk never snapshots a semantic serial cutoff")
 
+# The original game performs a partial 0..5/7 priority walk before the
+# normal full queue in some transitions. EndSpriteQueueRender is NOT a frame
+# boundary: only visited nodes are consumed there. Unvisited ones are retired
+# at R33 game Present, never by the first partial queue epilogue.
 end = function_body(s, "inline void EndSpriteQueueRender() noexcept")
 for marker in (
     "std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);",
-    "tag.serial <= SpriteQueueSemanticCutoff",
-    "SpriteNodeSemanticPublishedCount.store(",
+    "SpriteNodeSemanticActiveQueueCutoff = 0;",
     "SpriteQueueSemanticCutoff = 0;",
 ):
     if marker not in end:
-        fail(f"queue-end stale cleanup contract missing: {marker}")
-if "SpriteNodeSemanticCount = 0;" in end:
-    fail("queue end must not erase tags produced concurrently for the next frame")
+        fail(f"queue-end cursor release missing: {marker}")
+if "SpriteNodeSemanticForgetHint(" in end or "SpriteNodeSemanticCount = 0;" in end:
+    fail("queue epilogue must retain unvisited exact producer tags")
+
+begin = function_body(s, "inline void BeginSpriteQueueRender() noexcept")
+select = function_body(s, "inline void SelectSpriteQueueNode(")
+for name, body in (("begin", begin), ("select", select)):
+    if ("if (SpriteNodeSemanticFrameExpireCutoff == 0)" not in body or
+            "SpriteNodeSemanticFrameExpireCutoff =" not in body):
+        fail(f"{name}: first-walk frame cutoff was not preserved")
+for marker in (
+    "std::uint64_t SpriteNodeSemanticFrameExpireCutoff = 0;",
+    "SpriteNodeSemanticActiveQueueCutoff = 0;",
+):
+    if marker not in s:
+        fail(f"shared frame cutoff/active queue contract missing: {marker}")
+
+frame = function_body(s, "inline void EndSpriteQueueFrame(")
+for marker in (
+    "SpriteQueueDepth != 0",
+    "std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);",
+    "SpriteNodeSemanticFrameExpireCutoff",
+    "tag.serial <= cutoff",
+    "SpriteNodeSemanticForgetHint(tag.node);",
+    "SpriteNodeSemanticPublishedCount.store(",
+    "SpriteNodeSemanticFrameExpireCutoff = 0;",
+    "if (deviceReset)",
+):
+    if marker not in frame:
+        fail(f"Present/Reset frame fence missing: {marker}")
+if "SpriteNodeSemanticCount = 0;" in frame:
+    fail("frame fence must preserve concurrent next-generation source tags")
+# Mutation proof: replacing frame cutoff with a live 'next serial' would
+# allow an early Present to erase work prepared by another producer thread.
+for old, wrong in (
+    ("tag.serial <= cutoff", "true"),
+    ("SpriteNodeSemanticFrameExpireCutoff", "SpriteQueueSemanticCutoff"),
+    ("if (deviceReset)", "if (false)"),
+):
+    mutant = frame.replace(old, wrong, 1)
+    if mutant == frame or all(token in mutant for token in (
+            "tag.serial <= cutoff", "SpriteNodeSemanticFrameExpireCutoff",
+            "if (deviceReset)")):
+        fail("frame-fence mutation escaped: " + old)
 
 # Diagnostic/render-thread state should stay local; making these shared would
 # broaden synchronization and semantic authority beyond the proven fix.
@@ -190,8 +234,8 @@ for marker in (
         fail("tag publication/overwrite lost pre-lock hint accounting: " + marker)
 if "SpriteNodeSemanticForgetHint(node);" not in consume:
     fail("tag consumption leaks a ref-counted hint")
-if "SpriteNodeSemanticForgetHint(tag.node);" not in end:
-    fail("queue-end stale sweep leaks a ref-counted hint")
+if "SpriteNodeSemanticForgetHint(tag.node);" not in frame:
+    fail("frame-fence stale sweep leaks a ref-counted hint")
 hint = function_body(s, "inline bool SpriteNodeSemanticMaybeHasTag(")
 for marker in ("std::memory_order_acquire", "has(bits.first) && has(bits.second)"):
     if marker not in hint:
