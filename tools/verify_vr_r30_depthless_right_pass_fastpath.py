@@ -86,12 +86,19 @@ def main():
         # The external F11 projection also uses a legitimate native restore
         # before R30ExecuteXyzrhwStereo. Mutation 6 must damage the actual
         # depthless XYZRHW right-eye fallback, not that unrelated F11 owner.
-        if old == "R29OwnerRestoreRightPassState(":
+        # Require mutation on the actual guarded right-eye owner. The
+        # unrelated F11 restore appears earlier and must never satisfy an
+        # XYZRHW/FOV right-pass destructive negative.
+        if old == "R29OwnerCallOriginalSetRenderTarget(":
+            begin = src.index("inline bool R30RestoreDepthlessRightPassState(")
+            at = src.index(old, begin)
+        elif old in ("R29OwnerRestoreRightPassState(",
+                     "if (!restoreOk)\n            {"):
             begin = src.index("HRESULT R30ExecuteXyzrhwStereo(")
             at = src.index(old, begin)
-            altered = src[:at] + new + src[at + len(old):]
         else:
-            altered = src.replace(old, new, 1)
+            at = src.index(old)
+        altered = src[:at] + new + src[at + len(old):]
         try:
             check(altered, r33)
         except (AssertionError, ValueError):
