@@ -2,6 +2,7 @@
 
 #include "pipeline_translation.hpp"
 #include "native_sm3_arithmetic_codegen.hpp"
+#include "native_sm3_constant_codegen.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
@@ -260,14 +261,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V4";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V5";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_MASK_SWIZZLE_PROVENANCE_V4";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_PROVENANCE_V5";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -356,12 +357,41 @@ bool build_r283_sm3_mov_shader_source(
             UINT destinationRegister{};
             unsigned destinationMask{};
             unsigned sourceCount{};
+            bool matrix4x4{};
+            bool matrix3x3{};
             std::array<std::string, 3> sources{};
+            std::array<std::string, 4> matrixRows{};
         };
         std::vector<Operation> operations;
         std::array<unsigned, 32> tempWritten{};
         std::array<bool, 32> tempUsed{};
         std::array<unsigned, 16> outputWritten{};
+        std::array<bool, 256> defPresent{};
+        std::array<std::array<std::uint32_t, 4>, 256> defBits{};
+        bool liveConstantsUsed = false;
+        const unsigned constantLimit = vertexStage ? 256u : 224u;
+        // DEF is a shader-local register override, not an upload from the
+        // D3D9 device. Parse all definitions before interpreting arithmetic
+        // so source order cannot silently substitute external constants.
+        for (const auto& instruction : decode.instructions) {
+            if (instruction.opcode != static_cast<DWORD>(D3DSIO_DEF)) continue;
+            if ((instruction.instructionToken & 0xf0000000u) != 0u ||
+                instruction.operandTokens.size() != 5u)
+                return false;
+            const DWORD token = instruction.operandTokens[0];
+            const unsigned reg = token & D3DSP_REGNUM_MASK;
+            if ((token & 0x80000000u) == 0u ||
+                r283_decode_register_type(token) != D3DSPR_CONST ||
+                reg >= constantLimit || defPresent[reg] ||
+                (token & D3DSP_WRITEMASK_ALL) != D3DSP_WRITEMASK_ALL ||
+                (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                (token & D3DSP_DSTMOD_MASK) != 0u ||
+                (token & D3DSP_DSTSHIFT_MASK) != 0u)
+                return false;
+            defPresent[reg] = true;
+            for (unsigned j = 0; j < 4u; ++j)
+                defBits[reg][j] = instruction.operandTokens[j + 1u];
+        }
         constexpr UINT kMaxOps = 512u;
         // Comparison, fraction and absolute operations are source-replayed;
         // unsupported flow control and source state still fail closed.
@@ -369,7 +399,8 @@ bool build_r283_sm3_mov_shader_source(
         // Set*ShaderConstantF and sampler bindings must be connected before
         // programs requiring them can become native Draw candidates.
         for (const auto& instruction : decode.instructions) {
-            if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL))
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL) ||
+                instruction.opcode == static_cast<DWORD>(D3DSIO_DEF))
                 continue;
             NativeSm3ArithmeticOpcode opcode{};
             unsigned sourceCount = 0u;
@@ -420,6 +451,9 @@ bool build_r283_sm3_mov_shader_source(
                 opcode = NativeSm3ArithmeticOpcode::Cross3; sourceCount = 2u; break;
             case D3DSIO_DP2ADD:
                 opcode = NativeSm3ArithmeticOpcode::Dot2Add; sourceCount = 3u; break;
+            case D3DSIO_M4x4:
+            case D3DSIO_M3x3:
+                opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             default:
                 return false;
             }
@@ -444,6 +478,9 @@ bool build_r283_sm3_mov_shader_source(
                 destination & D3DSP_REGNUM_MASK);
             op.destinationMask = mask;
             op.sourceCount = sourceCount;
+            op.matrix4x4 = instruction.opcode == D3DSIO_M4x4;
+            op.matrix3x3 = instruction.opcode == D3DSIO_M3x3;
+            if (op.matrix3x3 && (mask & 8u)) return false;
             if (op.destinationType == D3DSPR_TEMP) {
                 if (op.destinationRegister >= tempWritten.size())
                     return false;
@@ -482,6 +519,23 @@ bool build_r283_sm3_mov_shader_source(
                     modifier == D3DSPSM_NOT)
                     return false;
                 std::string value;
+                if ((op.matrix4x4 || op.matrix3x3) && i == 1u) {
+                    // Matrix source must denote consecutive real c registers
+                    // without relative indexing, modifier or row swizzle.
+                    if (kind != D3DSPR_CONST || modifier != D3DSPSM_NONE ||
+                        swizzle != 0xe4u ||
+                        reg + (op.matrix4x4 ? 4u : 3u) > constantLimit)
+                        return false;
+                    for (unsigned row = 0u; row < (op.matrix4x4 ? 4u : 3u); ++row) {
+                        if (!native_sm3_const_reference(
+                                reg + row, constantLimit,
+                                defPresent[reg + row], op.matrixRows[row]))
+                            return false;
+                        if (!defPresent[reg + row])
+                            liveConstantsUsed = true;
+                    }
+                    continue;
+                }
                 if (kind == D3DSPR_INPUT) {
                     bool declared = false;
                     for (const auto& s : inputs)
@@ -490,6 +544,11 @@ bool build_r283_sm3_mov_shader_source(
                             declared = true;
                     if (!declared) return false;
                     value = "input.r" + std::to_string(reg);
+                } else if (kind == D3DSPR_CONST) {
+                    if (!native_sm3_const_reference(
+                            reg, constantLimit, defPresent[reg], value))
+                        return false;
+                    if (!defPresent[reg]) liveConstantsUsed = true;
                 } else if (kind == D3DSPR_TEMP) {
                     if (reg >= tempWritten.size()) return false;
                     // Any source swizzle can select a not-yet-written lane.
@@ -533,7 +592,17 @@ bool build_r283_sm3_mov_shader_source(
             return false;
         }
 
-        translated = "struct R283Input {\n";
+        // Unmodified c registers are bound as actual VS/PS b0 bytes by
+        // the production constant owner. Source/DXBC materialization alone
+        // never authorizes a native Draw without a matching live upload.
+        if (liveConstantsUsed)
+            translated = "cbuffer R283LiveConstants : register(b0) { float4 r283_c[256]; };\n";
+        for (unsigned reg = 0u; reg < constantLimit; ++reg) {
+            if (defPresent[reg] &&
+                !append_native_sm3_def(translated, reg, defBits[reg]))
+                return false;
+        }
+        translated += "struct R283Input {\n";
         for (const auto& semantic : inputs) {
             std::string label;
             if (!r283_hlsl_semantic(semantic, vertexStage, false, label))
@@ -571,9 +640,15 @@ bool build_r283_sm3_mov_shader_source(
             else if (op.destinationType == D3DSPR_OUTPUT)
                 dest = "output.r" + std::to_string(op.destinationRegister);
             else dest = "r283_color";
-            if (!append_native_sm3_arithmetic(
-                    translated, op.opcode, dest, op.destinationMask,
-                    op.sources, op.sourceCount, static_cast<unsigned>(i)))
+            if (op.matrix4x4 || op.matrix3x3) {
+                if (!append_native_sm3_matrix(
+                        translated, dest, op.destinationMask,
+                        op.sources[0], op.matrixRows,
+                        op.matrix4x4 ? 4u : 3u, static_cast<unsigned>(i)))
+                    return false;
+            } else if (!append_native_sm3_arithmetic(
+                           translated, op.opcode, dest, op.destinationMask,
+                           op.sources, op.sourceCount, static_cast<unsigned>(i)))
                 return false;
         }
         translated += vertexStage ? "    return output;\n}\n"
