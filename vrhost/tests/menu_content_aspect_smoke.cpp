@@ -144,6 +144,50 @@ int main()
         !nearCoverage(ResolveMenuOpticalCoverageForState("0.90",0x0Bu),.90f) ||
         !nearCoverage(ResolveMenuOpticalCoverageForState("1.0",0x0Au),1.f))
         return 73;
+    // 3440x1440 is the verified desktop UI size. When VR switches to
+    // 2496x2688 or other source extents, hold angular menu height at the
+    // baseline while preserving physical source aspect/UV and bilateral FOV.
+    // A same-aspect resolution-only change must leave the plan bit-identical.
+    {
+        using OutRunVrMenuAspect::CommonFovTangents;
+        using OutRunVrMenuAspect::PlanOpticallyCenteredClip;
+        using OutRunVrMenuAspect::StabilizeMenuToReference3440x1440;
+        constexpr CommonFovTangents common{true,-1.f,1.f,-1.f,1.f};
+        constexpr float referenceAspect = 3440.f / 1440.f;
+        const auto reference = PlanOpticallyCenteredClip(
+            common, referenceAspect, 1.f);
+        const auto referenceStable = StabilizeMenuToReference3440x1440(
+            common, reference);
+        const float portraitAspect = 2496.f / 2688.f;
+        const auto portrait = PlanOpticallyCenteredClip(
+            common, portraitAspect, 1.f);
+        const auto stablePortrait = StabilizeMenuToReference3440x1440(
+            common, portrait);
+        const auto wide = PlanOpticallyCenteredClip(
+            common, 1920.f / 1080.f, 1.f);
+        const auto stableWide = StabilizeMenuToReference3440x1440(
+            common, wide);
+        if (!reference.valid || !portrait.valid || !wide.valid ||
+            !referenceStable.valid || !stablePortrait.valid ||
+            !stableWide.valid ||
+            !nearCoverage(reference.halfHeight, referenceStable.halfHeight) ||
+            !nearCoverage(reference.halfWidth, referenceStable.halfWidth) ||
+            !nearCoverage(reference.halfHeight, stablePortrait.halfHeight) ||
+            !nearCoverage(reference.halfHeight, stableWide.halfHeight) ||
+            !nearCoverage(stablePortrait.halfWidth / stablePortrait.halfHeight,
+                portraitAspect) ||
+            !nearCoverage(stableWide.halfWidth / stableWide.halfHeight,
+                1920.f/1080.f) ||
+            stablePortrait.halfWidth > portrait.halfWidth ||
+            stablePortrait.halfHeight > portrait.halfHeight)
+            return 74;
+        const auto noFov = StabilizeMenuToReference3440x1440(
+            CommonFovTangents{}, portrait);
+        if (!noFov.valid ||
+            !nearCoverage(noFov.halfWidth, portrait.halfWidth))
+            return 75;
+    }
+
     // Original 2D game sprite corners: native 4:3, 16:9, 21:9, VDXR
     // portrait and protected non-front-end fallback all remain separated.
     using OutRunVrMenuQuad::BuildPixelMap;
