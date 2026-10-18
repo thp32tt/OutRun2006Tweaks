@@ -602,14 +602,22 @@ bool build_r283_sm3_mov_shader_source(
                     if (!defPresent[reg]) liveConstantsUsed = true;
                 } else if (kind == D3DSPR_TEMP) {
                     if (reg >= tempWritten.size()) return false;
-                    // Any source swizzle can select a not-yet-written lane.
-                    // Reject that shader rather than reading fabricated zero.
-                    for (unsigned component = 0; component < 4u; ++component) {
-                        const unsigned readLane =
-                            (swizzle >> (component * 2u)) & 3u;
-                        if ((tempWritten[reg] & (1u << readLane)) == 0u)
-                            return false;
-                    }
+                    // A D3D9 partial instruction only reads components
+                    // consumed by its opcode, destination mask and swizzle.
+                    // DOT, scalar, matrix and TEX have distinct read domains.
+                    // Still reject any genuinely unwritten physical lane;
+                    // HLSL TEMP zero initialization is never valid evidence.
+                    const unsigned logicalComponents =
+                        op.texture2d ? 3u :
+                        op.matrix4x4 ? 15u :
+                        op.matrix3x3 ? 7u :
+                        native_sm3_source_components(op.opcode, mask, i);
+                    const unsigned required =
+                        native_sm3_swizzled_components(
+                            logicalComponents, swizzle);
+                    if (required == 0u ||
+                        (tempWritten[reg] & required) != required)
+                        return false;
                     value = "r283_t" + std::to_string(reg);
                     tempUsed[reg] = true;
                 } else {

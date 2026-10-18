@@ -74,4 +74,52 @@ int main() {
     assert(operand == "-abs(abs(input.r0.xyzw))");
     assert(!emit(static_cast<NativeSm3ArithmeticOpcode>(255), 15u, 3u));
     assert(out == before);
+    // Game ps_3_0 frequently writes a TEMP one lane at a time before
+    // consuming one swizzled lane. Identity xyzw must not demand yzw.
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Move, 1u, 0u) == 1u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::MultiplyAdd, 3u, 2u) == 3u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Compare, 8u, 1u) == 8u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Dot3, 1u, 0u) == 7u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Dot4, 1u, 1u) == 15u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Normalize3, 1u, 0u) == 7u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Reciprocal, 8u, 0u) == 1u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Power, 8u, 1u) == 1u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Dot2Add, 1u, 2u) == 1u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Dot2Add, 1u, 1u) == 3u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Move, 1u, 1u) == 0u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::Move, 16u, 0u) == 0u);
+    static_assert(native_sm3_swizzled_components(1u, 0xe4u) == 1u);
+    static_assert(native_sm3_swizzled_components(2u, 0xb1u) == 1u);
+    static_assert(native_sm3_swizzled_components(3u, 0xe4u) == 3u);
+    static_assert(native_sm3_swizzled_components(7u, 0xe4u) == 7u);
+    static_assert(native_sm3_swizzled_components(1u, 0xffu) == 8u);
+    static_assert(native_sm3_swizzled_components(0u, 0xe4u) == 0u);
+    static_assert(native_sm3_swizzled_components(16u, 0xe4u) == 0u);
+    static_assert(native_sm3_swizzled_components(1u, 256u) == 0u);
+    // Real backend rejects unwritten lanes even after a partial write.
+    const unsigned tempWrittenX = 1u;
+    const unsigned movReadX = native_sm3_swizzled_components(
+        native_sm3_source_components(NativeSm3ArithmeticOpcode::Move, 1u, 0u),
+        0xe4u);
+    const unsigned movReadY = native_sm3_swizzled_components(
+        native_sm3_source_components(NativeSm3ArithmeticOpcode::Move, 2u, 0u),
+        0xe4u);
+    assert((tempWrittenX & movReadX) == movReadX);
+    assert((tempWrittenX & movReadY) != movReadY);
+    const unsigned dotRead = native_sm3_swizzled_components(
+        native_sm3_source_components(NativeSm3ArithmeticOpcode::Dot3, 1u, 0u),
+        0xe4u);
+    assert((tempWrittenX & dotRead) != dotRead);
 }

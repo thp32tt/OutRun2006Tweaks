@@ -14,6 +14,72 @@ enum class NativeSm3ArithmeticOpcode {
     Power, LinearInterpolate, Normalize3, Cross3, Dot2Add
 };
 
+// D3D9 destination masks do not require every source swizzle lane to have
+// been previously initialized. Compute the lanes the instruction actually
+// consumes, rather than rejecting real game partial-register shaders. A
+// scalar, dot, cross or matrix operation may require lanes beyond the output
+// mask; never use the output mask blindly for those operations.
+[[nodiscard]] constexpr unsigned native_sm3_source_components(
+    NativeSm3ArithmeticOpcode opcode, unsigned destinationMask,
+    unsigned sourceIndex) noexcept {
+    if (destinationMask == 0u || (destinationMask & ~15u) != 0u ||
+        sourceIndex >= 3u)
+        return 0u;
+    switch (opcode) {
+    case NativeSm3ArithmeticOpcode::Move:
+    case NativeSm3ArithmeticOpcode::Absolute:
+    case NativeSm3ArithmeticOpcode::Fraction:
+        return sourceIndex == 0u ? destinationMask : 0u;
+    case NativeSm3ArithmeticOpcode::Reciprocal:
+    case NativeSm3ArithmeticOpcode::ReciprocalSquareRoot:
+    case NativeSm3ArithmeticOpcode::Exponential2:
+    case NativeSm3ArithmeticOpcode::Logarithm2:
+    case NativeSm3ArithmeticOpcode::Normalize3:
+        return sourceIndex == 0u
+            ? (opcode == NativeSm3ArithmeticOpcode::Normalize3 ? 7u : 1u)
+            : 0u;
+    case NativeSm3ArithmeticOpcode::Add:
+    case NativeSm3ArithmeticOpcode::Subtract:
+    case NativeSm3ArithmeticOpcode::Multiply:
+    case NativeSm3ArithmeticOpcode::Minimum:
+    case NativeSm3ArithmeticOpcode::Maximum:
+    case NativeSm3ArithmeticOpcode::SetLessThan:
+    case NativeSm3ArithmeticOpcode::SetGreaterEqual:
+        return sourceIndex < 2u ? destinationMask : 0u;
+    case NativeSm3ArithmeticOpcode::MultiplyAdd:
+    case NativeSm3ArithmeticOpcode::LinearInterpolate:
+    case NativeSm3ArithmeticOpcode::Compare:
+        return destinationMask;
+    case NativeSm3ArithmeticOpcode::Dot3:
+    case NativeSm3ArithmeticOpcode::Dot4:
+    case NativeSm3ArithmeticOpcode::Cross3:
+        return sourceIndex < 2u
+            ? (opcode == NativeSm3ArithmeticOpcode::Dot4 ? 15u : 7u)
+            : 0u;
+    case NativeSm3ArithmeticOpcode::Power:
+        return sourceIndex < 2u ? 1u : 0u;
+    case NativeSm3ArithmeticOpcode::Dot2Add:
+        return sourceIndex == 2u ? 1u : 3u;
+    default:
+        return 0u;
+    }
+}
+
+// Convert destination-side logical components (xyzw bits) into source
+// register physical lanes through the D3D9 source swizzle. The resulting
+// mask is checked against actual prior TEMP writes, not HLSL zero-init.
+[[nodiscard]] constexpr unsigned native_sm3_swizzled_components(
+    unsigned logicalComponents, unsigned swizzle) noexcept {
+    if (logicalComponents == 0u || (logicalComponents & ~15u) != 0u ||
+        swizzle > 255u)
+        return 0u;
+    unsigned physical = 0u;
+    for (unsigned lane = 0u; lane < 4u; ++lane)
+        if ((logicalComponents & (1u << lane)) != 0u)
+            physical |= 1u << ((swizzle >> (lane * 2u)) & 3u);
+    return physical;
+}
+
 // Translate only D3D9 source modifiers with exact component-wise SM3
 // semantics. Unknown address/predicate/depth-divide modes stay rejected by
 // the bytecode materializer; no source modifier can silently be ignored.

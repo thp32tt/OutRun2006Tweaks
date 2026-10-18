@@ -130,4 +130,16 @@ check("struct NativeLiveSm3Program" in header and
       "s.frameBatch.abort();" in bridge.partition(
           "if (!submit_live_sm3_game_draw(")[2][:350],
       "native shader source ownership or fallback missing")
+# Programmable shader translation must admit only actually-read TEMP lanes:
+# native VS/PS code generation consumes the helper directly; real unwritten
+# channels, scalar/dot/matrix and TEX coordinates stay fail-closed.
+for token in (
+    "native_sm3_source_components(op.opcode, mask, i)",
+    "native_sm3_swizzled_components(",
+    "op.texture2d ? 3u",
+    "op.matrix4x4 ? 15u",
+    "op.matrix3x3 ? 7u",
+    "(tempWritten[reg] & required) != required",
+):
+    check(token in backend, "SM3 partial-register source/negative path missing: " + token)
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")
