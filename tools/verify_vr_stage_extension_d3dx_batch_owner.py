@@ -728,7 +728,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "submission, SUCCEEDED(hr), scope, source," in draw and
          "sameSourceAfterNative, command.queued," in draw and
          "command.queueNode, command.queueEpoch,\n                provenDirectB9200))" in draw and
-         "source == ProducerToken::ResultTextB9200 &&\\n            OriginalB9200GoalStackActive();" in draw and
+         "source == ProducerToken::ResultTextB9200 &&\n            OriginalB9200GoalStackActive();" in draw and
          "if (FAILED(hr) || !self)" in draw and
          draw.index("const auto command = CapturePhysicalDrawCommand();") <
          draw.index("const auto submission = HudBatch.snapshot();") <
@@ -961,8 +961,8 @@ def main_current_ledger(code: str, header: str) -> int:
          "recordDraw(drawScope, drawProducer,\n                drawQueued, drawQueueNode, drawQueueEpoch,\n                exactDirectB9200Parent);",
          "(void)drawScope; (void)drawProducer;"),
         ("direct-goal-parent-not-captured", "code",
-         "source == ProducerToken::ResultTextB9200 &&\\n            OriginalB9200GoalStackActive();",
-         "source == ProducerToken::ResultTextB9200 &&\\n            false;"),
+         "source == ProducerToken::ResultTextB9200 &&\n            OriginalB9200GoalStackActive();",
+         "source == ProducerToken::ResultTextB9200 &&\n            false;"),
         ("direct-goal-mixed-parent-accepted", "ledger",
          "!exactDirectB9200Parent)))", "false)))"),
         ("direct-goal-deferred-flush-proof-lost", "code",
