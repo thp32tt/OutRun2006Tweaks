@@ -8,6 +8,8 @@ P=(r/"tools/dx11_game_depth_probe.cpp").read_text(encoding="utf8")
 def integrated(c,h,p):
     adm=c.split("bool supported_game_state(",1)[1].split("bool translate_vertices(",1)[0]
     draw=c.split("bool submit(",1)[1].split("void before_game_present(",1)[0]
+    sm3=c.split("bool submit_live_sm3_game_draw(",1)[1].split(
+        "// Reuse geometric growth buffers",1)[0]
     return (all(s in h for s in (
         "zFunc != 5u && zFunc != 7u) ||",
         "output.orderingMode = (zFunc == 5u || zFunc == 7u) ? zFunc : 0u;",
@@ -28,7 +30,16 @@ def integrated(c,h,p):
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
       and c.count("else if (output.nativeDepthOrderingMode != 0u)")==2
-      and c.count("s.diagnosticDepthOrderingStates[")==2
+      and c.count("s.diagnosticDepthOrderingStates[")==3
+      and sm3.count("s.diagnosticDepthOrderingStates[")==1
+      and all(s in sm3 for s in (
+        "else if (liveDepth.orderingMode != 0u)",
+        "game_native_depth_ordering_slot(",
+        "D3D11_COMPARISON_GREATER : D3D11_COMPARISON_GREATER_EQUAL;",
+        "D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO",
+        "liveBatch.depth_clear_value(reverseDepth)",
+        "context->OMSetDepthStencilState(liveDepthState, 0u)",
+      ))
       and c.count("for (auto& depthState : s.diagnosticDepthOrderingStates) depthState.Reset();")==2
       and "std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthOrderingStates;" in c
       and "output.nativeDepthWrite, output.nativeDepthOrderingMode)].Get(), 0);" in draw
@@ -60,4 +71,13 @@ for old,bad in (
 ):
     mutant=H.replace(old,bad,1)
     assert mutant!=H and not integrated(C,mutant,P),old
+# Programmable SM3 reverse-Z must preserve the same DSV comparison and
+# ClearDepth ownership as fixed-function game geometry.
+for old,bad in (
+    ("else if (liveDepth.orderingMode != 0u)", "else if (false)"),
+    ("liveBatch.depth_clear_value(reverseDepth)", "liveBatch.depth_clear_value(false)"),
+):
+    mutant=C.replace(old,bad)
+    assert mutant!=C and not integrated(mutant,H,P),old
+
 print("00654 PASS: GREATER/GREATEREQUAL four-way native DSV, game Draw, fallback")

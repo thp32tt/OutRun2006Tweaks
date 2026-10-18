@@ -8,6 +8,8 @@ PROBE = (ROOT/"tools/dx11_game_depth_probe.cpp").read_text(encoding="utf8")
 def connected(c: str, h: str, p: str) -> bool:
     admit = c.split("bool supported_game_state(",1)[1].split("bool translate_vertices(",1)[0]
     draw = c.split("bool submit(",1)[1].split("void before_game_present(",1)[0]
+    sm3=c.split("bool submit_live_sm3_game_draw(",1)[1].split(
+        "// Reuse geometric growth buffers",1)[0]
     slot = """game_native_depth_equality_slot(
                     output.nativeDepthWrite, output.nativeDepthEqualityMode)"""
     return (all(s in h for s in (
@@ -32,7 +34,16 @@ def connected(c: str, h: str, p: str) -> bool:
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     )) and draw.count(slot) == 1
-    and c.count("s.diagnosticDepthEqualityStates[") == 2
+    and c.count("s.diagnosticDepthEqualityStates[") == 3
+    and sm3.count("s.diagnosticDepthEqualityStates[") == 1
+    and all(s in sm3 for s in (
+        "else if (liveDepth.equalityMode != 0u)",
+        "game_native_depth_equality_slot(",
+        "D3D11_COMPARISON_EQUAL : D3D11_COMPARISON_NOT_EQUAL;",
+        "D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO",
+        "context->OMSetDepthStencilState(liveDepthState, 0u)",
+        "liveBatch.succeeded(liveDepth.enabled, reverseDepth)",
+    ))
     and draw.count("else if (output.nativeDepthEqualityMode != 0u)") == 2
     and c.count("for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();") == 2
     and "std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthEqualityStates;" in c
@@ -69,4 +80,14 @@ for original, broken in (
 ):
     mutant = HDR.replace(original, broken, 1)
     assert mutant != HDR and not connected(CPP, mutant, PROBE), original
+# Live programmable SM3 draws must retain the exact native comparison and
+# write-mask contract alongside fixed-function Draw/DrawIndexed.
+for old,bad in (
+    ("else if (liveDepth.equalityMode != 0u)", "else if (false)"),
+    ("D3D11_COMPARISON_EQUAL : D3D11_COMPARISON_NOT_EQUAL;",
+     "D3D11_COMPARISON_EQUAL : D3D11_COMPARISON_EQUAL;"),
+):
+    mutant=CPP.replace(old,bad)
+    assert mutant != CPP and not connected(mutant,HDR,PROBE),old
+
 print("00653 PASS: D3D9 EQUAL/NOTEQUAL zwrite-aware native DSV + original D3D9 fallback")
