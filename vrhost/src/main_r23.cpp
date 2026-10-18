@@ -1715,13 +1715,20 @@ namespace
         if (lastMenuDecisionState != clientGameState)
         {
             lastMenuDecisionState = clientGameState;
-            spdlog::info(
-                "VR MENU ASPECT: state={} fullVisible={} fourThree={} crop43={} wideSelector={} nativeAspect={} sourceAspect={:.4f} uv={:.4f},{:.4f},{:.4f},{:.4f} placementHalf={:.4f},{:.4f}",
-                clientGameState, capturedClientFullyVisible ? 1 : 0,
-                fullFourThreeMainMenu ? 1 : 0, cropCentered43 ? 1 : 0,
-                wideVehicleSelector ? 1 : 0, useNativeMenuAspect ? 1 : 0,
-                sourceAspect, whole.x, whole.y, whole.w, whole.h,
-                placement.halfWidth, placement.halfHeight);
+            // R23 is an independent x64 host TU; unlike the x86 game it
+            // does not link spdlog. Keep this state-change diagnostic on
+            // the host's existing std::cout logging transport.
+            std::cout << "VR MENU ASPECT: state=" << clientGameState
+                      << " fullVisible=" << (capturedClientFullyVisible ? 1 : 0)
+                      << " fourThree=" << (fullFourThreeMainMenu ? 1 : 0)
+                      << " crop43=" << (cropCentered43 ? 1 : 0)
+                      << " wideSelector=" << (wideVehicleSelector ? 1 : 0)
+                      << " nativeAspect=" << (useNativeMenuAspect ? 1 : 0)
+                      << " sourceAspect=" << sourceAspect
+                      << " uv=" << whole.x << ',' << whole.y
+                      << ',' << whole.w << ',' << whole.h
+                      << " placementHalf=" << placement.halfWidth
+                      << ',' << placement.halfHeight << '\n';
         }
         const float visibleCenterX =
             placement.centerX + placement.halfWidth * visibleOffsetX;
