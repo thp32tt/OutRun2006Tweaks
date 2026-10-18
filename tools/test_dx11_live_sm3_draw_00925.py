@@ -171,6 +171,8 @@ for token in (
 ):
     check(token in backend, "matrix native path or fallback missing: " + token)
 
+arith = (ROOT / "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp").read_text()
+
 # The actual game SM3->HLSL->GPU draw path must implement procedural
 # sin/cos and VS-only sign with physical TEMP scratch invalidation.
 for token in ("case D3DSIO_SINCOS:", "case D3DSIO_SGN:",
