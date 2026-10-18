@@ -12,7 +12,7 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "material_result_sha": null,
+  "material_result_sha": "ba2897b7e8d09218edad0e0051ed36fe4d8791d5",
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -33,6 +33,26 @@
       "Snapshot and require original priority-list roots for 0-99%, GOAL title/time and exact B9200 glyph source paths.",
       "Preserve nested exact SpriteNode source tags using existing registry serial without relabeling unverified general glyphs.",
       "Compile-time positive and negative root-rebuild, bounded queue, old-tail reuse and nested source guard regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_progress_stable_root",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original 0-99 percent and GOAL result SpriteNode source queues through R84 left/right ownership",
+        "expected_behavior": "Only new GOAL progress and result siblings appended to the same original native priority-list root receive the verified ResultProgress producer token for per-eye R84 routing; nested source tags survive."
+      },
+      {
+        "id": "goal_text_nested_producer",
+        "category": "fallback_regression",
+        "behavior_area": "nested GOAL title and B9200 glyph source, root replacement and native D3DX batch fallback",
+        "expected_behavior": "Detached or recycled tails, replaced priority roots, stale registration serial and unknown glyphs cannot be mislabeled; newer exact B9200/rank/+TIME producer ownership survives without suppressing native Draw, Flush or SkyGlow."
+      },
+      {
+        "id": "required_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 game, x64 host, R26_SAFE package, Domain isolation, HUD Inspector and Full Source Impact",
+        "expected_behavior": "Mandatory GitHub Actions pass on one identified validation-bearing SHA; Quest3 and VDXR physical per-eye correctness remain UNTESTED until matching hardware evidence."
+      }
     ]
   },
   "acceptance_results": {
@@ -46,5 +66,5 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "Class A source repair candidate. Build/automated exact-SHA gates not yet observed. No Quest3/VDXR test; runtime remains UNTESTED. Bookkeeping must preserve material source commit."
+  "notes": "CI repair (same TASK_ID): prior material C++ implementation ba2897b7e8d09218edad0e0051ed36fe4d8791d5; workflow run 39118324268 failed only in verify_vr_feature_unit_policy.py --check-head because feature_contract.acceptance_items was missing despite three acceptance_results keys. This record restores the enforced end-to-end/fallback/integration contract without altering source or weakening gates. Final exact-SHA CI pending. Quest3/VDXR UNTESTED."
 }
