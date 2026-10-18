@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01046",
+  "production_id": "CONVERSION-DX9EX-01046",
+  "event_id": "CONVERSION-DX9EX-01046-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "SOURCE_IMPLEMENTED_PENDING_GATE",
+  "checkpoint": "C4_COMMIT",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/sprite_queue_tail_proof.hpp"
+  ],
+  "material_result_sha": "2dc620415309580220c4ee60161a73d04b35324a",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve the full stage/checkpoint/GOAL result text producer-to-R84 eye path when native priority SpriteNode lists are replaced, including generic HUD glyph siblings, while keeping known-good original fallback.",
+    "scope_boundary": "Bounded live priority-root/tail reachability for three original Sumo_Printf result parents, exact GOAL result text and generic BA9D0 HUD glyph calls. No changes to original timing, gameplay logic, SkyGlow, FFB/input, R26_SAFE, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original x86 Sumo_Printf, B9200 result text and generic HUD glyph calls now snapshot both native priority root and tail before their producer executes.",
+      "Post-call TagAppendedNodes requires original root identity and bounded live-tail reachability; newer exact nested producer generation stays authoritative.",
+      "Existing R84 R30/R33 per-eye draw consumers read only valid registered HUD SpriteNode provenance before x64 OpenXR composition; HMD optical correctness needs real hardware."
+    ],
+    "subcomponents": [
+      "Bind stable-root proof to both generic HUD glyph/sprani children, all three stage/checkpoint Sumo_Printf producers and exact GOAL result text.",
+      "Preserve the source-entry registration serial so nested/newly stamped GOAL or foreign producers cannot be overwritten by the enclosing original call.",
+      "Exercise compile-time positive/negative queue ownership regression for live sibling, switched root with reused tail, detached tail, empty priority and foreign new tail."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_text_queued_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL/checkpoint/result and common HUD text producer to R84 native screen HUD SpriteNode",
+        "expected_behavior": "All live appended siblings preserve the native screen-HUD source when the original root and both tails remain reachable; exact nested owners survive."
+      },
+      {
+        "id": "goal_text_rebuild_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Replaced/reused priority root, detached tail, nested foreign GOAL/World and original fallback",
+        "expected_behavior": "A rebuilt root or orphaned tail never borrows an earlier GOAL/HUD token, and unknown native drawing remains unchanged."
+      },
+      {
+        "id": "goal_text_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Final exact-SHA R84 x86 game, x64 host, R26_SAFE rollback and four required GitHub CI Gates",
+        "expected_behavior": "Windows Active, Domain Isolation, HUD Inspector and Full Source Impact all succeed for the same validation-bearing SHA while Quest3 remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_text_queued_source": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "goal_text_rebuild_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "goal_text_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Generic original HUD BA9D0 and exact Sumo_Printf/B9200 result calls may enqueue multiple native SpriteNodes while priority queue roots can be rebuilt and old tail pointers reattached.",
+    "source_trace": [
+      "The old stage/checkpoint Sumo_Printf post-call path only cached tail_4 and passed no source-root identity to TagAppendedNodes.",
+      "The generic clipped glyph and animated glyph owners bypassed the bounded branch entirely, using stale oldTail->next_0 in an O(1) path.",
+      "B9200 result text also had only old tail and could register stale ScreenHud owner after a live list replacement; root proof and entry serial now fence nested sources."
+    ],
+    "alternatives_rejected": [
+      "Do not infer root identity from matching old tail pointers; do not globally classify unknown glyphs or force generic D3DX Flush; do not disable native fallback or widen rank/lens/SkyGlow eye owner."
+    ],
+    "root_cause": "The native HUD text entrypoints lacked a stable current-root proof when reusing pre-producer priority tails. OldTail node reuse/relinking could associate unrelated newly queued sprites with an earlier GOAL text producer.",
+    "fix_evidence": "Material C++ source 2dc620415309580220c4ee60161a73d04b35324a changes native hooks_uiscaling.cpp to use stable root and source entry serial for stage/checkpoint, GOAL text and generic HUD clip/sprani.",
+    "negative_test_evidence": "sprite_queue_tail_proof.hpp HudTextRootRebuildGuards compile-time tests distinguish live sibling, a new root reattaching the identical old tail, detached tail, empty-root first glyph and foreign new tail.",
+    "eye_ownership": "Only proven source-owned native ScreenHud queued nodes can enter existing R84 per-eye HUD path; uncertainty still falls back to original rendering. No HMD was executed."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "2dc620415309580220c4ee60161a73d04b35324a",
+    "final_exact_sha_gates": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "notes": "Initial source commit failed Active policy because this run record did not yet exist. This same-TASK repair supplies the required substantive function contract; it does not change the material source or claim runtime visual PASS."
+}
