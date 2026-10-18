@@ -1,0 +1,69 @@
+{
+  "status": "FINAL_2_QA_CANDIDATES_CREATED_WITH_DIFFERENT_PROVENANCE",
+  "source_HD_originals_sha_verified": 108,
+  "prior_native_pixel_exact_crops": 44,
+  "new_native_pixel_exact_crops": 1,
+  "new_psd_layer_crops_NOT_source_pixel_identical": 1,
+  "total_test_only_rework_candidates": 46,
+  "historical_native_test_only_crops_retained": 242,
+  "no_composite_or_DDS_or_A_B": true,
+  "game_status": "UNTESTED",
+  "manual_QA": "PENDING",
+  "items": [
+    {
+      "phrase": "CONIFEROUS FOREST",
+      "index": 59,
+      "status": "TEST_ONLY_NATIVE_4X_EXACT_PIXELS_CROP",
+      "source_png": "Q201_A9ABD877_BASE_READABLE_FLIPY.png",
+      "source_sha256": "6e05218ad9e60e727343c3197afee430323e0c41f9f58fdd199df69c30c8f56a",
+      "source_bbox_xyxy": [
+        89,
+        1924,
+        1167,
+        2036
+      ],
+      "destination_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/reworked_final2_test_only_20261019/059_Q201_CONIFEROUS_FOREST/english_native_c_crop_candidate.png",
+      "destination_sha256": "aa309aff74bbcb17d28ed85aa5a07823f3d046e098545cc80a88190611372f60",
+      "native_rgba_pixel_identical_to_original_source": true,
+      "right_side_gap_zero_alpha": true,
+      "adjacent_STAGES_excluded": true,
+      "manual_fine_qa": "PENDING",
+      "runtime": "UNTESTED",
+      "A_B": "UNTOUCHED",
+      "dds": "NOT_WRITTEN"
+    },
+    {
+      "phrase": "HARD",
+      "index": 36,
+      "status": "TEST_ONLY_PSD_RASTERIZED_LAYER_ISOLATED",
+      "source_png": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "source_png_sha256": "45545843d55e1e33a059b1832e6c75206056468b86a29478838391636eae8772",
+      "upstream_repository": "Sonic-TV/OR2006Sprites",
+      "upstream_git_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "upstream_psd_git_blob_sha1": "e22ed4d6b9f7d8464fc40d724dd0b1d37e306104",
+      "upstream_psd_layer_path": "/1/1/0/0/3/2/1",
+      "layer_name": "HARD [Rasterized]",
+      "layer_kind": "pixel",
+      "layer_original_canvas_bbox": [
+        808,
+        287,
+        1068,
+        373
+      ],
+      "padding_transparent_pixels": 8,
+      "source_rgba_pixel_identical": false,
+      "pixel_agreement_on_visible_psd_layer": {
+        "identical": 20675,
+        "total": 21302
+      },
+      "destination_png": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/reworked_final2_test_only_20261019/036_Q062_HARD_PSD_RASTER_LAYER/english_psd_layer_test_candidate.png",
+      "destination_sha256": "4ea5afd413d3f65faaf345e283cc20d5a3e928cc7871d21d67212fa64a68268d",
+      "plate_and_background_are_removed_by_separate_psd_layer": true,
+      "human_visual_final_qa": "PENDING",
+      "game_runtime": "UNTESTED",
+      "A_B": "UNTOUCHED",
+      "dds": "NOT_WRITTEN"
+    }
+  ],
+  "comparison": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/FINAL2_SOURCE_VS_EXTRACTED_20261019.jpg"
+}
