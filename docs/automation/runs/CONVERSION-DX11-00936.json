@@ -103,8 +103,8 @@
   "CODE_CHANGED_SHA": "576648750c675ddf302028fe926c0992d3c81b36",
   "NEXT_IMPLEMENTATION_ACTION": "Read final exact-SHA five Gate results, repair only causally failing source/test/contract in same TASK_ID; if all success record C6 separately. Obtain exact SHA live game/HMD evidence later.",
   "acceptance_results": {
-    "native_live_alpha_pixel_output": "PENDING_EXACT_SHA",
-    "per_draw_alpha_reference_and_fallback": "PENDING_EXACT_SHA",
-    "native_source_ci_and_probe": "PENDING_EXACT_SHA"
+    "native_live_alpha_pixel_output": "PASS_BUILD",
+    "per_draw_alpha_reference_and_fallback": "PASS_BUILD",
+    "native_source_ci_and_probe": "PASS_EXACT_SHA"
   }
 }
