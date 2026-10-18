@@ -1057,6 +1057,11 @@ class UIScaling : public Hook
                 // HUD queues are recycled. Their old tail is not a safe
                 // pointer until the live root proves it is still linked.
                 producer == OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite ||
+                // Known original clip producers, including pause arrows,
+                // can create sibling nodes after rebuilding a priority list.
+                // Never infer ScreenHud from a detached native old tail.
+                producer == OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite ||
+                producer == OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
                 producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
@@ -1732,18 +1737,22 @@ class UIScaling : public Hook
 		OutRunVR::GameSemantic::ProducerToken producer)
 	{
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            rootsBefore[prio] = root;
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 		const int result = Game::put_clip_sprite(
 			xstnum, x, y, flags, priority, color);
-		// All exact-address menu arrows, position HUD and result glyph
-		// siblings are SCREEN_HUD; tagging only tail_4 left earlier
-		// siblings head-locked by the generic fallback path.
+		// Exact original menu/position/ESC producers can queue siblings.
+        // Verify the SAME root and both tails after the native CALL before
+        // attaching their ScreenHud owner; detached/rebuilt queues keep the
+        // original untagged drawing path and cannot borrow a HUD parent.
 		TagAppendedNodes(tailsBefore,
-			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer);
+			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer,
+            nullptr, &rootsBefore);
 		return result;
 	}
 
