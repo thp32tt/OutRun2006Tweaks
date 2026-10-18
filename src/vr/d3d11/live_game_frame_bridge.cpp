@@ -4265,6 +4265,17 @@ bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
     return vertex.exact() && pixel.exact();
 }
 
+// The real-game VB/IB upload routines are defined below this SM3 caller.
+// Declare their exact signatures so both the programmable and fixed-function
+// Draw/DrawIndexed paths share the same GPU allocation/Map transaction.
+bool ensure_full_game_upload_buffer(ID3D11Device* dev,
+                                    ComPtr<ID3D11Buffer>& resource,
+                                    UINT& capacity, UINT required,
+                                    UINT bindFlags) noexcept;
+bool upload_full_game_stream(ID3D11DeviceContext* context,
+                             ID3D11Buffer* buffer, UINT capacity,
+                             const void* source, UINT bytes) noexcept;
+
 // Real programmable D3D9 game source -> SM3 HLSL/DXBC -> native D3D11
 // IA/VS/PS/tN/sN/b0/Draw. Preserve live game CW/CCW culling and the
 // four exact D3D9 RGB+alpha blend equations already owned by the backend.
