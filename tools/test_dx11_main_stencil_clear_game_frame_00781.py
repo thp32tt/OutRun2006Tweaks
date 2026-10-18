@@ -53,8 +53,18 @@ for scope,old,new in (
     assert not valid(mutant(scope,old,new),h,g),old
 # Losing the new live source-side stencil proof must also fail this Clear
 # regression: original D3D9 Draw, not a native scene, wins on conditional Z/S.
-assert not valid(b.replace("stencil_equivalent_to_disabled(",
-                           "stencil_unconditionally_ignored(",1),h,g)
+# Mutate the actual fixed-function Draw owner only. The live programmable
+# SM3 path has its own stencil proof; replacing its earlier occurrence must
+# not produce a false positive for this main-scene Clear regression.
+rasterStart = "bool supported_game_state("
+rasterEnd = "bool submit("
+prefix, tail = b.split(rasterStart, 1)
+raster, suffix = tail.split(rasterEnd, 1)
+assert "stencil_equivalent_to_disabled(" in raster
+unsafeRaster = prefix + rasterStart + raster.replace(
+    "stencil_equivalent_to_disabled(",
+    "stencil_unconditionally_ignored(", 1) + rasterEnd + suffix
+assert not valid(unsafeRaster, h, g)
 assert not valid(b,h,g.replace("sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;","true; /* unproved */"))
 assert not valid(b,h.replace("live_game_frame::observe_game_depth_clear(","live_game_frame::skip_clear(",1),g)
 print("00781 real game main STENCIL, Z|STENCIL, menu-race Draw+Present fallback PASS")
