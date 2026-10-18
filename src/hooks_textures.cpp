@@ -7,6 +7,7 @@
 #include "vr/game/dds_alpha_mask_policy.hpp"
 #include "vr/game/dds_fast_loader_request.hpp"
 #include "vr/game/sprite_uv_transaction.hpp"
+#include "vr/game/ui_texture_pending_owner.hpp"
 #include "vr/game/sprite_queue_tail_proof.hpp"
 #include "vr/game/direct_sprite_source_provenance.hpp"
 #include <fstream>
@@ -917,33 +918,21 @@ class TextureReplacement : public Hook
 	// 
 	// so we can just hook get_texture and check the textureId arg against our textureId -> scale map
 	// if it exists we'll stash the d3d pointer -> textureId mapping temporarily for put_sprite_ex2 to use
-	inline static void* prevTexture = nullptr;
-	inline static int prevTextureId = 0;
+	// Preserve the original two-entry parent/mask lookup semantics, but
+	// never let an unrelated loader thread replace a live UI owner.
+	// TLS is lightweight; the native get/put hot path performs no locking.
+	static_assert(sizeof(OutRunVR::UiTexture::PendingLookup) <= 4 * sizeof(void*));
 
-	// Mask textures don't get put_sprite_ex2 called for them, instead the next sprite drawn will have ptr_B4 setup to point to it
-	// That next sprite will likely call get_texture_dest with a different sprite ID, so we also have to keep track of the ID used prior
-	inline static void* prevMaskTexture = nullptr;
-	inline static int prevMaskTextureId = 0;
 
 	inline static SafetyHookInline get_texture = {};
 	static void* __cdecl get_texture_dest(int textureId)
 	{
 		auto* ret = get_texture.call<void*>(textureId);
 
-		prevMaskTexture = prevTexture;
-		prevMaskTextureId = prevTextureId;
-
-		if (ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr) &&
-			sprite_scales.contains(textureId))
-		{
-			prevTexture = ret;
-			prevTextureId = textureId;
-		}
-		else
-		{
-			prevTexture = nullptr;
-			prevTextureId = 0;
-		}
+		OutRunVR::UiTexture::CurrentLookup.Advance(
+			ret, textureId,
+			ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr) &&
+			sprite_scales.contains(textureId));
 		return ret;
 	}
 
@@ -1070,21 +1059,18 @@ class TextureReplacement : public Hook
 		// the independent mask owner, before handling any new sprite.
 		if (!Settings::UITextureReplacement)
 		{
-			prevTexture = nullptr;
-			prevTextureId = 0;
-			prevMaskTexture = nullptr;
-			prevMaskTextureId = 0;
+			OutRunVR::UiTexture::CurrentLookup.Clear();
 		}
 
 		if (ShouldApplyUIScale(Settings::UITextureReplacement,
-			a1->d3dtexture_ptr_C == prevTexture))
+			a1->d3dtexture_ptr_C == OutRunVR::UiTexture::CurrentLookup.texture))
 		{
-			const auto scale = sprite_scales.find(prevTextureId);
+			const auto scale = sprite_scales.find(OutRunVR::UiTexture::CurrentLookup.textureId);
 			if (scale != sprite_scales.end())
 			{
 				originalUv.Apply(a1, scale->second.first, scale->second.second);
-				prevTexture = nullptr;
-				prevTextureId = 0;
+				OutRunVR::UiTexture::CurrentLookup.texture = nullptr;
+				OutRunVR::UiTexture::CurrentLookup.textureId = 0;
 			}
 		}
 
@@ -1094,14 +1080,14 @@ class TextureReplacement : public Hook
 			if (spr_mask_flag)
 			{
 				if (ShouldApplyUIScale(Settings::UITextureReplacement,
-					a1->child_B4->d3dtexture_ptr_C == prevMaskTexture))
+					a1->child_B4->d3dtexture_ptr_C == OutRunVR::UiTexture::CurrentLookup.maskTexture))
 				{
-					const auto scale = sprite_scales.find(prevMaskTextureId);
+					const auto scale = sprite_scales.find(OutRunVR::UiTexture::CurrentLookup.maskTextureId);
 					if (scale != sprite_scales.end())
 					{
 						maskUv.Apply(a1->child_B4, scale->second.first, scale->second.second);
-						prevMaskTexture = nullptr;
-						prevMaskTextureId = 0;
+						OutRunVR::UiTexture::CurrentLookup.maskTexture = nullptr;
+						OutRunVR::UiTexture::CurrentLookup.maskTextureId = 0;
 					}
 				}
 			}
