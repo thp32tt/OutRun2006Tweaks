@@ -100,7 +100,7 @@ services:
     security_opt:
       - no-new-privileges:true
     pids_limit: 32
-    cpus: 0.75
+    cpus: 1.5
     mem_limit: 1g
     tmpfs:
       - /tmp:rw,nosuid,size=64m
