@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00917",
+  "production_id": "CONVERSION-DX11-00917",
+  "event_id": "CONVERSION-DX11-00917-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00917",
+  "feature_id": "DX11:NATIVE_STEREO_TYPED_CAMERA_PARTIAL_GPU_CLEAR",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_TYPED_CAMERA_PARTIAL_GPU_CLEAR",
+    "goal": "Preserve source-ordered native menu/car/race GPU eye rendering when game-authored typed camera color rectangles and cropped depth/stencil clears replay on D3D11.0 without compromising original game input or DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "typed_native_camera_clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_game_camera_typed_color_clear_draw_and_postpass",
+        "expected_behavior": "Render game-authored bounded TARGET Clears through a float pixel-shader on additional supported typed color RTV formats with actual D3D11 RT capability verification."
+      },
+      {
+        "id": "depth_stencil_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "left_right_native_eyes_depth_stencil_gamepad_ffb_and_dx9ex_fallback",
+        "expected_behavior": "Preflight cropped GPU depth/stencil shader compiler before either eye writes; fail closed for unsupported formats and preserve unmodified D3D9 game rendering and controls."
+      },
+      {
+        "id": "same_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "native_win32_openxr_backend_fast_hud_git_actions",
+        "expected_behavior": "Verify typed format static assertions, native GPU Clear/Draw timeline integration and original mandatory five exact-SHA GitHub Actions gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "GAME_AUTHORED_TYPED_CAMERA_CLEAR",
+      "NATIVE_D3D11_CLEAR_DRAW_COPY_STRETCH",
+      "LEFT_RIGHT_GPU_OPENXR_EYE_REPLAY"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_partial_color_format.hpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_TYPED_CAMERA_PARTIAL_GPU_CLEAR:00917"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: native camera Clear/Draw eye-source graph and GPU conversion improvements are C++ source-only until exact-SHA gates; real D3D9 menus, vehicle selection, race and Quest3 pixels NOT verified.",
+    "activation_guard_and_fallback": "NativeDrawPathActive opt-in, guarded, DX9Ex fail-closed fallback remains authoritative. Preserve input/FFB/SkyGlow and do not resume or promote DXVK.",
+    "acceptance_proof": {
+      "positive_probe": "Typed UNORM/SNORM/sRGB/float camera RTV shaders and source partial depth/stencil preflight implemented in genuine native eye C++ code.",
+      "negative_regression": "Integer, depth and typeless formats remain rejected; missing compiler fails before first eye; DX9Ex original game input/FFB and source draw predication retained.",
+      "component_integration": "Native GPU per-eye source Clear to Draw/Indexed/Copy/Stretch graph changed; five mandatory exact-SHA Gate results are pending."
+    }
+  },
+  "acceptance_results": {
+    "typed_native_camera_clear": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "depth_stencil_fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "same_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_partial_color_format.hpp"
+  ],
+  "material_result_sha": "5f01d2a2d1a39991fcba781e8f6ac632abd1df5a",
+  "validation_bearing_result_sha": null,
+  "runtime_validation_note": "No matching OutRun menu/car/race hardware session, Quest3/VDXR stereo pixel inspection or gamepad benchmark. RUNTIME_VALIDATION=UNTESTED.",
+  "ci_repair_reason": "Initial material SHA's Fast acceptance gate inspected previous 00916 C6 because this 00917 durable source-stage run record was absent. Preserve 00916 exact-SHA success and acceptance; establish 00917 nonterminal CI pending contract with no gate relaxation."
+}
