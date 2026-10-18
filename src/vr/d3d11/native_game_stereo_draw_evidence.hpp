@@ -123,6 +123,36 @@ static_assert(fragment_can_reach_eye_color(true, false, true, false, true));
 static_assert(!fragment_can_reach_eye_color(true, true, false, false, false));
 static_assert(!fragment_can_reach_eye_color(false, false, true, true, true));
 
+// Actual D3D11 eye color must CHANGE, not merely pass the sample mask.
+// ZERO*source + ONE*destination preserves the destination for ADD and
+// REV_SUBTRACT; a full-identity menu/vehicle HUD draw still advances the
+// genuine geometry ordinal but must not certify a newly rendered XR eye.
+// RGB and alpha independently retain an actual writable lane; MIN/MAX
+// and unknown blending factors remain eligible for the renderer.
+[[nodiscard]] constexpr bool blended_eye_color_may_change(
+    bool blendEnabled, std::uint32_t writeMask,
+    std::uint32_t srcRgb, std::uint32_t dstRgb, std::uint32_t opRgb,
+    std::uint32_t srcAlpha, std::uint32_t dstAlpha,
+    std::uint32_t opAlpha) noexcept {
+    constexpr std::uint32_t kZero = 1u, kOne = 2u;
+    constexpr std::uint32_t kAdd = 1u, kReverseSubtract = 3u;
+    const auto identity = [](std::uint32_t src, std::uint32_t dst,
+                             std::uint32_t op) constexpr {
+        return src == kZero && dst == kOne &&
+               (op == kAdd || op == kReverseSubtract);
+    };
+    if ((writeMask & 15u) == 0u) return false;
+    if (!blendEnabled) return true; // replacement still writes a target
+    return ((writeMask & 7u) != 0u && !identity(srcRgb, dstRgb, opRgb)) ||
+           ((writeMask & 8u) != 0u && !identity(srcAlpha, dstAlpha, opAlpha));
+}
+static_assert(!blended_eye_color_may_change(true, 15, 1,2,1, 1,2,1));
+static_assert(!blended_eye_color_may_change(true, 15, 1,2,3, 1,2,3));
+static_assert(blended_eye_color_may_change(true, 15, 1,2,1, 2,2,1));
+static_assert(blended_eye_color_may_change(true, 15, 2,2,1, 1,2,1));
+static_assert(blended_eye_color_may_change(false, 15, 1,2,1, 1,2,1));
+static_assert(!blended_eye_color_may_change(false, 0, 2,2,1, 2,2,1));
+
 [[nodiscard]] constexpr bool color_certifiable(
     bool colorWritable, bool noActivePredicate) noexcept {
     return colorWritable && noActivePredicate;

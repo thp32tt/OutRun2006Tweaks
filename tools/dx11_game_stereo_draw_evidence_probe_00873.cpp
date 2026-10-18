@@ -40,6 +40,23 @@ int main() {
     static_assert(color_certifiable(true, true));
     static_assert(!color_certifiable(true, false));
     static_assert(!color_certifiable(false, true));
+    // Real menu/vehicle/race blend identity is not a valid eye color Draw.
+    // Alpha-only HUD and RGB-only world writes remain independent evidence.
+    using outrun::vr::dx11::live_game_stereo::blended_eye_color_may_change;
+    static_assert(!blended_eye_color_may_change(true, 0xFu, 1,2,1, 1,2,1));
+    static_assert(!blended_eye_color_may_change(true, 0x7u, 1,2,3, 2,2,1));
+    static_assert(!blended_eye_color_may_change(true, 0x8u, 2,2,1, 1,2,1));
+    static_assert(blended_eye_color_may_change(true, 0x8u, 1,2,1, 2,2,1));
+    static_assert(blended_eye_color_may_change(true, 0x7u, 2,2,1, 1,2,1));
+    static_assert(blended_eye_color_may_change(true, 0xFu, 1,2,1, 2,2,1));
+    static_assert(blended_eye_color_may_change(true, 0xFu, 1,2,2, 1,2,1));
+    static_assert(blended_eye_color_may_change(true, 0xFu, 1,2,4, 1,2,1));
+    static_assert(blended_eye_color_may_change(false, 0xFu, 1,2,1, 1,2,1));
+    static_assert(!blended_eye_color_may_change(false, 0u, 2,2,1, 2,2,1));
+    static_assert(!color_certifiable(
+        blended_eye_color_may_change(true, 0xFu, 1,2,1, 1,2,1), true));
+    static_assert(color_certifiable(
+        blended_eye_color_may_change(true, 0xFu, 1,2,1, 2,2,1), true));
     // Full-size TARGET rectangles take D3D11.0 ClearRenderTargetView on both
     // eyes, so native game scene replay can run without a D3D11.1 context.
     // Cropped menu/HUD rectangles use ClearView or the bounded D3D11.0

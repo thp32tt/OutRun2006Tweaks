@@ -290,9 +290,18 @@ bool NativeGameEyeDrawEncoder::eye_color_writable() const noexcept {
     if (blend) {
         D3D11_BLEND_DESC desc{};
         blend->GetDesc(&desc);
+        const auto& eye = desc.RenderTarget[0];
         writable = writable &&
             (desc.RenderTarget[0].RenderTargetWriteMask &
-             D3D11_COLOR_WRITE_ENABLE_ALL) != 0u;
+             D3D11_COLOR_WRITE_ENABLE_ALL) != 0u &&
+            live_game_stereo::blended_eye_color_may_change(
+                eye.BlendEnable != FALSE, eye.RenderTargetWriteMask,
+                static_cast<UINT>(eye.SrcBlend),
+                static_cast<UINT>(eye.DestBlend),
+                static_cast<UINT>(eye.BlendOp),
+                static_cast<UINT>(eye.SrcBlendAlpha),
+                static_cast<UINT>(eye.DestBlendAlpha),
+                static_cast<UINT>(eye.BlendOpAlpha));
         blend->Release();
     }
     ID3D11VertexShader* vertex = nullptr;
