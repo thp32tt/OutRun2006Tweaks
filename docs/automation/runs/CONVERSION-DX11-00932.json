@@ -1,0 +1,138 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00932",
+  "production_id": "CONVERSION-DX11-00932",
+  "event_id": "CONVERSION-DX11-00932-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00932",
+  "feature_id": "LIVE_GAME_SM3_2D_TEXTURE_SAMPLING_NATIVE_PATH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "169c03b6714e71ab5e94f749a0c51eaa1275fae1",
+  "validation_bearing_result_sha": "3a234feb4646fff786ea41a31c6df738fe4585f7",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "LIVE_GAME_SM3_2D_TEXTURE_SAMPLING_NATIVE_PATH",
+    "goal": "Admit real programmable ps_3_0 projected, bias, explicit LOD and gradient 2D texture sampling through live intercepted D3D9 bytecode, native D3D11 HLSL materialization and real game Draw/DrawIndexed while preserving renderer, gamepad and FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_texture_family",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_sm3_pixel_shader_native_sampler_draw",
+        "expected_behavior": "Pixel ps_3_0 TEXLD/TEXLDP/TEXLDB/TEXLDL/TEXLDD 2D sampling maps to HLSL Sample/SampleBias/SampleLevel/SampleGrad with actual GPU shader/sampler bindings."
+      },
+      {
+        "id": "source_fallback_integrity",
+        "category": "fallback_regression",
+        "behavior_area": "shader_operand_liveness_and_game_input_safety",
+        "expected_behavior": "Only read xy or xyw and real gradient lanes; malformed control flags, unsupported shader stages, undefined TEMP lanes, samplers and unsupported modes fail closed, preserving D3D9 Draw/input/FFB."
+      },
+      {
+        "id": "mandatory_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "five_gate_native_gpu_shader_compilation",
+        "expected_behavior": "DX11 Fast, Backend, Win32 Build, OpenXR and HUD Inspector all success on exact validation-bearing SHA following same TASK causal code and prior acceptance record repair."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "vertical_slice",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Intercept live D3D9 ps_3_0 TEX instructions, sampler declaration and actual temporary/coordinate register masks",
+      "Generate native D3D11 pixel shader Sample/SampleBias/SampleLevel/SampleGrad code and existing sN/tN descriptors",
+      "Submit on real Draw/DrawIndexed with fail-closed original D3D9/input/FFB fallback; full visual output requires a separate game run"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+      "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real C++ native backend compiles and produces all five 2D sampler variants with exact HLSL expected output; five exact-SHA required workflows success.",
+      "negative_regression": "Unknown modes, invalid sampler slots, missing derivatives, unknown instruction control, unsupported vertex texture owner and unwritten TEMP lane are rejected; original D3D9 path remains authoritative.",
+      "component_integration": "Decoded D3D9 pixel texture instructions -> native shader HLSL emitter -> existing PS sN/tN GPU resources -> real D3D11 game Draw/DrawIndexed path."
+    },
+    "conflict_keys": [
+      "DX11:SM3_NATIVE_SHADER_TRANSLATION:TEXTURE2D_FAMILY:00932"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Build and source success are not game desktop/HMD native draw or published full-frame evidence; runtime UNTESTED.",
+    "activation_guard_and_fallback": "Native full-game opt-in only; malformed shader remains on original D3D9 game renderer/gamepad/FFB. DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+    "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "docs/automation/runs/CONVERSION-DX11-00931.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Latest GitHub HEAD 23d10414 (prior 00931 C6) and no conflicting live DX11 owner confirmed.",
+    "C1_REVIEW": "Live pixel shader decoder supported TEXLDL/TEXLDD operand plans but native D3D11 HLSL sampling only admitted plain TEXLD; projected/bias/LOD/gradient blocked.",
+    "C2_IMPLEMENT": "Implemented actual pixel shader 2D texture family in source parser and HLSL compiler path, register-specific liveness, source fallback and coherent source tests.",
+    "C3_VALIDATE": "Initial 169c03b6 failed 00931 prior acceptance token and MSVC C2059:772; causally repaired under same task, final 3a234feb all five exact-SHA Actions SUCCESS; real game/HMD UNTESTED.",
+    "C4_COMMIT": "material 169c03b6714e71ab5e94f749a0c51eaa1275fae1; prior record causal fix c7e4d8073b9bd34be0a2442ce135255cba05e42b; final source/validation 3a234feb4646fff786ea41a31c6df738fe4585f7",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; SOURCE_BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Native SM3 2D modes admitted in source; actual end-to-end game native draw/published frame evidence has not been observed on Quest3/VDXR.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "3a234feb4646fff786ea41a31c6df738fe4585f7",
+  "NEXT_IMPLEMENTATION_ACTION": "After checked exact-SHA native build, obtain real menu-car-race game launch counts and first native published frame; resolve only evidence-backed next blocker.",
+  "acceptance_results": {
+    "native_texture_family": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "source_fallback_integrity": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "mandatory_exact_sha_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_GAME_HMD_RUNTIME_VERIFIED",
+    "exact_sha": "3a234feb4646fff786ea41a31c6df738fe4585f7",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39161771761,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39161771744,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39161771790,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39161771799,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39161771811,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  },
+  "score_policy": "Single integrated source capability 00932; causal CI fixes and C6 are not independent performance and never score separately."
+}
