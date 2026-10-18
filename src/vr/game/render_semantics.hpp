@@ -893,6 +893,12 @@ namespace OutRunVR::GameSemantic
     // while the renderer drains the previous generation of this SAME address.
     // A 0x2D710 partial queue consume may also precede the full frame consume.
     inline std::uint64_t SpriteNodeSemanticActiveQueueCutoff = 0;
+    // The original game may render priorities 0..5/7, then do a later
+    // full queue walk in the SAME frame. The first walk's queue-exit is
+    // not a frame fence. Keep a serial watermark taken at the FIRST walk
+    // and retire only that generation at game Present/Reset.
+    // Guarded by SpriteNodeSemanticMutex, shared across producer threads.
+    inline std::uint64_t SpriteNodeSemanticFrameExpireCutoff = 0;
     inline std::atomic<std::uint64_t> SpriteNodeSemanticProtectedDrops{ 0 };
 
     inline thread_local RenderScope SpriteQueuePreviousScope = RenderScope::None;
@@ -1372,6 +1378,11 @@ namespace OutRunVR::GameSemantic
                 SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
                 SpriteNodeSemanticActiveQueueCutoff =
                     SpriteQueueSemanticCutoff;
+                // Preserve the earliest frame generation across a partial
+                // queue pass followed by the normal full queue pass.
+                if (SpriteNodeSemanticFrameExpireCutoff == 0)
+                    SpriteNodeSemanticFrameExpireCutoff =
+                        SpriteQueueSemanticCutoff;
             }
             // Runtime ea7c322d proved queue->SCREEN_HUD is too strong, while
             // runtime 9554272a proved queue->NONE leaves 2D content duplicated
@@ -1402,6 +1413,11 @@ namespace OutRunVR::GameSemantic
                 SpriteQueueSemanticCutoff = next > 0 ? next - 1 : 0;
                 SpriteNodeSemanticActiveQueueCutoff =
                     SpriteQueueSemanticCutoff;
+                // Preserve the earliest frame generation across a partial
+                // queue pass followed by the normal full queue pass.
+                if (SpriteNodeSemanticFrameExpireCutoff == 0)
+                    SpriteNodeSemanticFrameExpireCutoff =
+                        SpriteQueueSemanticCutoff;
             }
         }
         CurrentSpriteQueueNode = node;
@@ -1433,34 +1449,59 @@ namespace OutRunVR::GameSemantic
             CurrentQueueProjectedMarker = {};
             CurrentQueueExactScope = RenderScope::None;
 
-            // Remove only tags that existed when this queue walk began. A
-            // producer thread may already be preparing the next frame while
-            // the renderer is finishing this one; preserve those newer tags.
-            std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
-            std::size_t write = 0;
-            for (std::size_t read = 0;
-                read < SpriteNodeSemanticCount; ++read)
+            // Do NOT clear unvisited tags here: the original 0x42D710
+            // may execute another priority range before this frame's
+            // Present. Consumed nodes already remove their own tags.
+            // The next queue pass takes a fresh serial cutoff; only the
+            // explicit frame fence retires still-unvisited old tags.
             {
-                const auto& tag = SpriteNodeSemanticTags[read];
-                if (tag.serial != 0 &&
-                    tag.serial <= SpriteQueueSemanticCutoff)
-                {
-                    SpriteNodeSemanticForgetHint(tag.node);
-                    SpriteNodeSemanticStaleCleared.fetch_add(
-                        1, std::memory_order_relaxed);
-                    continue;
-                }
-                if (write != read)
-                    SpriteNodeSemanticTags[write] = tag;
-                ++write;
+                std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+                SpriteNodeSemanticActiveQueueCutoff = 0;
             }
-            while (SpriteNodeSemanticCount > write)
-                SpriteNodeSemanticTags[--SpriteNodeSemanticCount] = {};
-            SpriteNodeSemanticPublishedCount.store(
-                SpriteNodeSemanticCount, std::memory_order_release);
-            SpriteNodeSemanticActiveQueueCutoff = 0;
             SpriteQueueSemanticCutoff = 0;
         }
+    }
+
+
+    // Explicit game-frame boundary: Present ends ALL original partial/full
+    // queue passes, while Reset/device loss invalidates existing node
+    // storage. Never use a prior queue epilogue as this fence.
+    // Producers for the next frame may publish concurrently; the first
+    // queue walk's serial cutoff protects those newer generations.
+    inline void EndSpriteQueueFrame(bool deviceReset = false) noexcept
+    {
+        if (!deviceReset && SpriteQueueDepth != 0)
+            return; // no mid-walk deletion
+        std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
+        const std::uint64_t cutoff = deviceReset
+            ? SpriteNodeSemanticNextSerial.load(std::memory_order_acquire) - 1
+            : SpriteNodeSemanticFrameExpireCutoff;
+        if (cutoff == 0)
+            return;
+        std::size_t write = 0;
+        for (std::size_t read = 0; read < SpriteNodeSemanticCount; ++read)
+        {
+            const auto& tag = SpriteNodeSemanticTags[read];
+            if (tag.serial != 0 && tag.serial <= cutoff)
+            {
+                SpriteNodeSemanticForgetHint(tag.node);
+                SpriteNodeSemanticStaleCleared.fetch_add(
+                    1, std::memory_order_relaxed);
+                continue;
+            }
+            if (write != read)
+                SpriteNodeSemanticTags[write] = tag;
+            ++write;
+        }
+        while (SpriteNodeSemanticCount > write)
+            SpriteNodeSemanticTags[--SpriteNodeSemanticCount] = {};
+        SpriteNodeSemanticPublishedCount.store(
+            SpriteNodeSemanticCount, std::memory_order_release);
+        SpriteNodeSemanticFrameExpireCutoff = 0;
+        // The normal Present is outside the queue walk. On device Reset
+        // there may be a stale writer/reader, so clear the shared cutoff.
+        if (deviceReset)
+            SpriteNodeSemanticActiveQueueCutoff = 0;
     }
 
 }

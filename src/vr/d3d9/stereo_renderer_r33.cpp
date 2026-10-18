@@ -1973,7 +1973,13 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = R32ReviewIsGameDevice(device);
-            if (gameDevice) GpuWaterProbe::instance().reset();
+            if (gameDevice)
+            {
+                // A reset can invalidate original SpriteNode ring addresses
+                // without a final queue walk. Discard old-frame attribution.
+                OutRunVR::GameSemantic::EndSpriteQueueFrame(true);
+                GpuWaterProbe::instance().reset();
+            }
             const HRESULT hr = R32ReviewRunResetLifecycle(
                 device, [&]() noexcept {
                     return R33ResetR22Hook.stdcall<HRESULT>(device, params);
@@ -2080,6 +2086,7 @@ namespace OutRunVRStereo
                 if (cooperative == D3DERR_DEVICELOST ||
                     cooperative == D3DERR_DEVICENOTRESET)
                 {
+                    OutRunVR::GameSemantic::EndSpriteQueueFrame(true);
                     ++R33LostDeviceBypasses;
                     GpuWaterProbe::instance().reset();
                     // A lost device may retire stereo surfaces before the
@@ -2118,6 +2125,10 @@ namespace OutRunVRStereo
                 });
             if (device && R32ReviewIsGameDevice(device))
             {
+                // Present is after the partial and full sprite-priority
+                // walks. Retire unvisited old-frame tags once, not at each
+                // canonical 0x2DCB4 queue epilogue.
+                OutRunVR::GameSemantic::EndSpriteQueueFrame();
                 // These are frame-local leases, not permanent COM identities:
                 // resize/rebuild can recycle the same surface address without
                 // a classic Reset. Re-probe each next frame (at most two

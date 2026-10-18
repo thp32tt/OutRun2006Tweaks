@@ -35,6 +35,7 @@ int main()
     if(CurrentQueueProducerToken()!=ProducerToken::RankMarkerSprani ||
        CurrentScope!=RenderScope::ProjectedWorldMarker2D)return 5;
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
     if(SpriteNodeSemanticCount || SpriteNodeSemanticMaybeHasTag(&node))return 6;
 
     // Ordinary repeated writes to a node with no live queue should retain
@@ -48,6 +49,7 @@ int main()
     SelectSpriteQueueNode(&sibling);
     if(CurrentQueueProducerToken()!=ProducerToken::DispRankClipSprite)return 8;
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
 
     // Force saturation with all 560 slots snapshotted. A cross-thread
     // next-frame producer must not replace the still-valid original tag.
@@ -67,6 +69,10 @@ int main()
     SelectSpriteQueueNode(&slots[0]);
     if(CurrentQueueProducerToken()!=ProducerToken::StageExtensionTime)return 11;
     EndSpriteQueueRender();
-    if(SpriteNodeSemanticCount != 0)return 12;
+    // Unvisited snapshotted tags must survive a partial walk, then retire
+    // strictly at the frame fence. They may NOT leak into the next frame.
+    if(SpriteNodeSemanticCount != SpriteNodeSemanticCapacity-1)return 12;
+    EndSpriteQueueFrame();
+    if(SpriteNodeSemanticCount != 0)return 13;
     return 0;
 }

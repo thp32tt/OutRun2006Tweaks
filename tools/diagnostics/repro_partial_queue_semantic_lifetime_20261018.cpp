@@ -25,6 +25,7 @@ int main(int argc, char** argv)
     const bool controlB = CurrentQueueProducerToken() ==
         ProducerToken::RankMarkerSprani;
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
     if (!controlA || !controlB)
     {
         std::puts("CONTROL_SINGLE_WALK=FAILED");
@@ -58,9 +59,14 @@ int main(int argc, char** argv)
         ProducerToken::RankMarkerSprani &&
         CurrentScope == RenderScope::ProjectedWorldMarker2D;
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
+    const bool noOldTagAfterFrame =
+        !SpriteNodeSemanticMaybeHasTag(&later) &&
+        PeekSpriteNodeScope(&later) == RenderScope::None;
 
     const bool preserved =
-        firstOk && laterTagStillAvailable && laterOwnerSurvived;
+        firstOk && laterTagStillAvailable && laterOwnerSurvived &&
+        noOldTagAfterFrame;
     std::printf("CASE=PARTIAL_THEN_FULL initial=%u after_partial=%u final=%u\n",
         unsigned(firstOk), unsigned(laterTagStillAvailable),
         unsigned(laterOwnerSurvived));
