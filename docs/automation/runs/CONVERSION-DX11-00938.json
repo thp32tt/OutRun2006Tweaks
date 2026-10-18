@@ -9,18 +9,18 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00938",
   "feature_id": "DX11:LIVE_SM3_RT_WRITE_MASK_AND_BLEND_CACHE",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
   "gameplay_test_performed": false,
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "0ef8439793cabc9b1c6d686a851a32f730a4a1a8",
+  "validation_bearing_result_sha": "0ef8439793cabc9b1c6d686a851a32f730a4a1a8",
   "score_change": 0,
   "feature_contract": {
     "feature_id": "DX11:LIVE_SM3_RT_WRITE_MASK_AND_BLEND_CACHE",
@@ -86,20 +86,37 @@
     "C0_RECOVER": "00937 terminal C6 exact-SHA verified; 00938 has no prior run; HEAD a31838c2.",
     "C1_REVIEW": "Real SM3 game Draw hard-rejected every partial RT0 write mask; native per-device blend cache lacked mask identity.",
     "C2_IMPLEMENT": "Source SM3 masked Draw RT0 translation and cache/OM binding plus positive/negative regression.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_GIT_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5",
+    "C4_COMMIT": "0ef8439793cabc9b1c6d686a851a32f730a4a1a8",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING"
+    "C6_RESULT": "PASS_EXACT_SHA_5_OF_5; COMPLETE_BUILD_VERIFIED; runtime game/HMD UNTESTED."
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "No observed real-game native Draw/published full frame at this exact candidate; source and CI cannot assert native playability.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_GIT_SHA",
-  "NEXT_IMPLEMENTATION_ACTION": "Inspect full final exact-SHA Fast/Backend/Windows Build/OpenXR/HUD. Repair causal failures on 00938; write C6 bookkeeping only after PASS.",
+  "CODE_CHANGED_SHA": "0ef8439793cabc9b1c6d686a851a32f730a4a1a8",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller may select a distinct unresolved real-game native Draw/full-frame feature. Preserve 00938 exact SHA; collect matching menu/vehicle/race native Draw/pixel and Quest3 evidence before runtime promotion.",
   "acceptance_results": {
-    "live_sm3_masked_om_gpu_draw": "PENDING_EXACT_SHA",
-    "masked_blend_cache_and_fallback": "PENDING_EXACT_SHA",
-    "masked_sm3_exact_sha_validation": "PENDING_EXACT_SHA"
+    "live_sm3_masked_om_gpu_draw": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "masked_blend_cache_and_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "masked_sm3_exact_sha_validation": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "head_sha": "0ef8439793cabc9b1c6d686a851a32f730a4a1a8",
+    "required_workflow_runs": {
+      "fast": 39173300538,
+      "backend": 39173300588,
+      "windows_build": 39173305076,
+      "openxr": 39173305094,
+      "hud": 39173305103
+    },
+    "all_required_gates": "SUCCESS",
+    "runtime": "UNTESTED"
+  },
+  "score_policy": {
+    "run_key": "CONVERSION-DX11-00938",
+    "scoreboard_recorded_separately": false,
+    "retry_additional_score": 0
   }
 }
