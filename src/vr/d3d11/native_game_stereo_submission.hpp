@@ -1,6 +1,7 @@
 #pragma once
 
 #include "native_shared_eye_ring.hpp"
+#include <array>
 
 namespace outrun::vr::dx11 {
 
@@ -193,6 +194,11 @@ private:
     [[nodiscard]] bool eye_color_writable() const noexcept;
     [[nodiscard]] bool source_color_writable(
         ID3D11RenderTargetView* gameTarget) const noexcept;
+    // Genuine offscreen game Draw -> exact source subresource -> GPU postpass.
+    void remember_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
+    void invalidate_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
+    [[nodiscard]] bool offscreen_color_source_proven(
+        ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept;
     [[nodiscard]] bool color_writable_for_samples(UINT sampleCount) const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
     // A real Draw still advances the source ordinal even if the current
@@ -220,6 +226,12 @@ private:
     std::uint64_t unpredicatedEyeAtLastFullClear_{};
     std::uint64_t colorDrawCount_{};
     std::uint32_t authoredColorPostpassCount_{};
+    struct OffscreenColorSource {
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+        UINT arraySlice{}, mipSlice{};
+    };
+    // One per-eye lifetime; no global cross-frame stale camera ownership.
+    std::array<OffscreenColorSource, 32u> offscreenColorSources_{};
     std::uint32_t authoredFullColorClearCount_{};
     std::uint64_t lastFullClearDrawOrdinal_{};
     bool lastTargetClearFull_{};

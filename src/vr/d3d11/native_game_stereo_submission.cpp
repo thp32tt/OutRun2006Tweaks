@@ -1,4 +1,5 @@
 #include "native_game_stereo_submission.hpp"
+#include "native_game_offscreen_color_provenance.hpp"
 #include "native_game_eye_pair_sources.hpp"
 #include "native_game_postpass_replay.hpp"
 #include "native_game_camera_view.hpp"
@@ -356,6 +357,74 @@ bool NativeGameEyeDrawEncoder::source_color_writable(
     return color_writable_for_samples(desc.SampleDesc.Count);
 }
 
+
+// An eligible Draw from camera A is NOT evidence that a later GPU Copy from
+// camera B contains freshly rendered game pixels. Keep only the exact physical
+// resource/mip/slice of live, color-writable menu/car/race Draws.
+void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
+    ID3D11RenderTargetView* target) noexcept {
+    if (!target) return;
+    Microsoft::WRL::ComPtr<ID3D11Resource> allocation;
+    target->GetResource(allocation.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    if (!allocation || FAILED(allocation.As(&texture)) || !texture) return;
+    D3D11_TEXTURE2D_DESC td{};
+    D3D11_RENDER_TARGET_VIEW_DESC vd{};
+    texture->GetDesc(&td);
+    target->GetDesc(&vd);
+    const auto view = native_game_camera_rtv_extent(td, vd);
+    if (!view.valid) return;
+    const NativeGameOffscreenColorKey key{
+        reinterpret_cast<std::uintptr_t>(texture.Get()), view.arraySlice, view.mip};
+    for (const auto& record : offscreenColorSources_)
+        if (native_game_offscreen_color_key_matches(
+                key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                      record.arraySlice, record.mipSlice})) return;
+    for (auto& record : offscreenColorSources_) {
+        if (!record.texture) {
+            record.texture = std::move(texture);
+            record.arraySlice = view.arraySlice;
+            record.mipSlice = view.mip;
+            return;
+        }
+    }
+    // Full ledger: keep original GPU commands but do not invent source proof.
+}
+void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
+    ID3D11RenderTargetView* target) noexcept {
+    if (!target) return;
+    Microsoft::WRL::ComPtr<ID3D11Resource> allocation;
+    target->GetResource(allocation.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    if (!allocation || FAILED(allocation.As(&texture)) || !texture) return;
+    D3D11_TEXTURE2D_DESC td{};
+    D3D11_RENDER_TARGET_VIEW_DESC vd{};
+    texture->GetDesc(&td);
+    target->GetDesc(&vd);
+    const auto view = native_game_camera_rtv_extent(td, vd);
+    if (!view.valid) return;
+    const NativeGameOffscreenColorKey key{
+        reinterpret_cast<std::uintptr_t>(texture.Get()), view.arraySlice, view.mip};
+    for (auto& record : offscreenColorSources_)
+        if (native_game_offscreen_color_key_matches(
+                key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                      record.arraySlice, record.mipSlice})) {
+            record.texture.Reset();
+            record.arraySlice = record.mipSlice = 0u;
+        }
+}
+bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept {
+    if (!source) return false;
+    const NativeGameOffscreenColorKey key{
+        reinterpret_cast<std::uintptr_t>(source), arraySlice, mipSlice};
+    for (const auto& record : offscreenColorSources_)
+        if (native_game_offscreen_color_key_matches(
+                key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                      record.arraySlice, record.mipSlice})) return true;
+    return false;
+}
+
 bool NativeGameEyeDrawEncoder::color_writable_for_samples(
     UINT sampleCount) const noexcept {
     if (!context_) return false;
@@ -614,7 +683,10 @@ bool NativeGameEyeDrawEncoder::draw_offscreen(
         raster_primitive_possible(vertexCount);
     context_->Draw(vertexCount, startVertex);
     ++drawCount_; // source ordinal, NEVER direct XR color evidence
-    if (eligible) ++unpredicatedGameDrawCount_;
+    if (eligible) {
+        ++unpredicatedGameDrawCount_;
+        remember_offscreen_color_source(gameTarget);
+    }
     return true;
 }
 
@@ -628,7 +700,10 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed(
         raster_primitive_possible(indexCount);
     context_->DrawIndexed(indexCount, startIndex, baseVertex);
     ++drawCount_;
-    if (eligible) ++unpredicatedGameDrawCount_;
+    if (eligible) {
+        ++unpredicatedGameDrawCount_;
+        remember_offscreen_color_source(gameTarget);
+    }
     return true;
 }
 
@@ -650,7 +725,10 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_instanced(
     context_->DrawInstanced(
         verticesPerInstance, instanceCount, startVertex, startInstance);
     ++drawCount_;
-    if (eligible) ++unpredicatedGameDrawCount_;
+    if (eligible) {
+        ++unpredicatedGameDrawCount_;
+        remember_offscreen_color_source(gameTarget);
+    }
     return true;
 }
 
@@ -669,7 +747,10 @@ bool NativeGameEyeDrawEncoder::draw_offscreen_indexed_instanced(
         indicesPerInstance, instanceCount, startIndex,
         baseVertex, startInstance);
     ++drawCount_;
-    if (eligible) ++unpredicatedGameDrawCount_;
+    if (eligible) {
+        ++unpredicatedGameDrawCount_;
+        remember_offscreen_color_source(gameTarget);
+    }
     return true;
 }
 
@@ -726,13 +807,18 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
     switch (route) {
     case live_game_stereo::NativeColorClearRoute::FullRtv:
         context_->ClearRenderTargetView(gameTarget, rgba);
+        invalidate_offscreen_color_source(gameTarget);
         return true;
     case live_game_stereo::NativeColorClearRoute::ClearView:
         rectContext->ClearView(gameTarget, rgba, actual, 1u);
+        invalidate_offscreen_color_source(gameTarget);
         return true;
     case live_game_stereo::NativeColorClearRoute::ShaderRaster:
-        return raster_partial_eye_color_clear(
-            context_, gameTarget, camera.width, camera.height, *actual, rgba);
+        if (!raster_partial_eye_color_clear(
+                context_, gameTarget, camera.width, camera.height, *actual, rgba))
+            return false;
+        invalidate_offscreen_color_source(gameTarget);
+        return true;
     default:
         return false; // malformed region or unsupported target; DX9Ex owns it
     }
@@ -825,22 +911,26 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 return false;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceCopy) {
+            const bool proven = offscreen_color_source_proven(
+                clear.source, clear.sourceArraySlice, clear.sourceMipSlice);
             if (!copy_game_surface(clear.source, &clear.sourceBox,
                                    clear.destX, clear.destY,
                                    clear.sourceArraySlice, clear.sourceMipSlice))
                 return false;
             // Game-authored offscreen menu/car/race compositing can write
             // real eye color even when its on-eye geometry only updates Z.
-            // Count ONLY successfully replayed, source-timeline GPU copies;
-            // arbitrary callback copies cannot certify an OpenXR frame.
-            ++authoredColorPostpassCount_;
+            // Count only a postpass of an actually color-written camera
+            // subresource; unrelated stale textures never certify this eye.
+            if (proven) ++authoredColorPostpassCount_;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
+            const bool proven = offscreen_color_source_proven(
+                clear.source, clear.sourceArraySlice, clear.sourceMipSlice);
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice, clear.sourceMipSlice))
                 return false;
-            ++authoredColorPostpassCount_;
+            if (proven) ++authoredColorPostpassCount_;
         } else {
             return false; // Reject unrecognized source commands, never fabricate a Clear.
         }

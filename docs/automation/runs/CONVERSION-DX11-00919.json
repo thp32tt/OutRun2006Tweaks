@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00919",
+  "production_id": "CONVERSION-DX11-00919",
+  "event_id": "CONVERSION-DX11-00919-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00919",
+  "feature_id": "DX11:CAMERA_SUBRESOURCE_COLOR_PROVENANCE",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "feature_contract": {
+    "goal": "Bind game offscreen color Draw to the exact source texture, mip and array slice of native GPU Copy/Stretch",
+    "acceptance_items": [
+      {
+        "id": "authentic_game_source_gpu_postpass",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Copy/Stretch counts color only if the exact camera source had an eligible Draw"
+      },
+      {
+        "id": "unrelated_cleared_camera_and_fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Clear invalidates stale proof; unrelated postpasses retain original GPU chronology and DX9Ex/input/FFB"
+      },
+      {
+        "id": "five_gate_exact_sha",
+        "category": "integrated_validation",
+        "expected_behavior": "Compile static identity regressions and five required GitHub Actions"
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "real offscreen Draw",
+      "texture/mip/array source provenance",
+      "native GPU Copy/Stretch XR eye"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "src/vr/d3d11/native_game_stereo_submission.hpp",
+      "src/vr/d3d11/native_game_offscreen_color_provenance.hpp"
+    ],
+    "conflict_keys": [
+      "DX11:CAMERA_SUBRESOURCE_COLOR_PROVENANCE:00919"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_offscreen_color_provenance.hpp"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null
+}
