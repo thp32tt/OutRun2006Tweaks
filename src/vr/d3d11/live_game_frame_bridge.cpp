@@ -4279,7 +4279,9 @@ bool upload_full_game_stream(ID3D11DeviceContext* context,
 // Real programmable D3D9 game source -> SM3 HLSL/DXBC -> native D3D11
 // IA/VS/PS/tN/sN/b0/Draw. Preserve live game CW/CCW culling and the
 // four exact D3D9 RGB+alpha blend equations already owned by the backend.
-// Scissor, alpha test, fog, depth, stencil and unknown factors remain D3D9.
+// Unknown stencil, alpha-test, fog and blend states still fail closed.
+// Live programmable geometry can now share the native DSV and scissor path
+// with full-frame fixed-function Draws without reusing D3D9 GPU resources.
 bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                D3DPRIMITIVETYPE type, UINT expected,
                                const void* bytes, UINT stride, UINT vertexCount,
@@ -4315,8 +4317,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-        alpha || stencil || depth != D3DZB_FALSE ||
-        fog || scissor || clipPlanes || fill != D3DFILL_SOLID ||
+        alpha || stencil || fog || clipPlanes || fill != D3DFILL_SOLID ||
         colorMask != 0x0fu || srgbWrite != FALSE ||
         !game_native_backbuffer_ready(game, viewport))
         return false;
@@ -4348,6 +4349,62 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         !liveBatch.accepts_source_draw(sourceOrdinal, true) ||
         s.preDrawFills.count != 0u || viewport.Width == 0u ||
         viewport.Height == 0u) return false;
+    // Intercept the REAL programmable game Draw's Z contract. Depth history
+    // is owned by the isolated native DSV, never by the game's D3D9 surface.
+    // A different/unknown main Z, W-buffering, bias or MSAA returns to D3D9.
+    GameNativeDepthAdmission liveDepth{};
+    if (depth != D3DZB_FALSE) {
+        DWORD zWrite = TRUE, zFunc = 0u, bias = ~0u, slopeBias = ~0u;
+        ComPtr<IDirect3DSurface9> gameDepth;
+        ComPtr<IUnknown> gameDepthIdentity;
+        D3DSURFACE_DESC depthDesc{};
+        if (FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+            FAILED(game->GetRenderState(D3DRS_ZFUNC, &zFunc)) ||
+            FAILED(game->GetRenderState(D3DRS_DEPTHBIAS, &bias)) ||
+            FAILED(game->GetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, &slopeBias)) ||
+            FAILED(game->GetDepthStencilSurface(gameDepth.GetAddressOf())) ||
+            !gameDepth || FAILED(gameDepth->GetDesc(&depthDesc)) ||
+            FAILED(gameDepth.As(&gameDepthIdentity)) || !gameDepthIdentity ||
+            depthDesc.Width != source.Width ||
+            depthDesc.Height != source.Height ||
+            !s.clearColor.main_depth_still_bound(
+                reinterpret_cast<std::uintptr_t>(gameDepthIdentity.Get())) ||
+            !game_native_depth_admission(
+                depth, zWrite, zFunc, bias, slopeBias,
+                depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE, liveDepth))
+            return false;
+    }
+    const bool reverseDepth = liveDepth.orderingMode != 0u;
+    if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))
+        return false;
+    // Full-resolution source scissor coordinates are already D3D11 pixels.
+    // Clip to viewport AND RT boundaries; never broaden a live D3D9 scissor.
+    const auto sourceRight = static_cast<std::int64_t>(source.Width);
+    const auto sourceBottom = static_cast<std::int64_t>(source.Height);
+    D3D11_RECT liveScissor{0, 0, static_cast<LONG>(source.Width),
+                                static_cast<LONG>(source.Height)};
+    if (scissor != FALSE) {
+        RECT gameRect{};
+        if (FAILED(game->GetScissorRect(&gameRect)) ||
+            gameRect.right <= gameRect.left ||
+            gameRect.bottom <= gameRect.top)
+            return false;
+        const std::int64_t l = (std::max)(
+            std::int64_t{0}, (std::max)(static_cast<std::int64_t>(gameRect.left),
+                                       static_cast<std::int64_t>(viewport.X)));
+        const std::int64_t t = (std::max)(
+            std::int64_t{0}, (std::max)(static_cast<std::int64_t>(gameRect.top),
+                                       static_cast<std::int64_t>(viewport.Y)));
+        const std::int64_t r = (std::min)(
+            sourceRight, (std::min)(static_cast<std::int64_t>(gameRect.right),
+                 static_cast<std::int64_t>(viewport.X) + viewport.Width));
+        const std::int64_t b = (std::min)(
+            sourceBottom, (std::min)(static_cast<std::int64_t>(gameRect.bottom),
+                 static_cast<std::int64_t>(viewport.Y) + viewport.Height));
+        if (r <= l || b <= t) return false;
+        liveScissor = {static_cast<LONG>(l), static_cast<LONG>(t),
+                       static_cast<LONG>(r), static_cast<LONG>(b)};
+    }
     ComPtr<IDirect3DVertexShader9> vertexShader;
     ComPtr<IDirect3DPixelShader9> pixelShader;
     ComPtr<IDirect3DVertexDeclaration9> sourceDecl;
@@ -4409,6 +4466,65 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         std::memcmp(pipeline.declaration.data(), declaration.data(),
                     declaration.size() * sizeof(D3DVERTEXELEMENT9)) != 0)
         return false;
+    // Bind the same native depth family as fixed-function menu/race Draws,
+    // including write-disabled comparison and reversed/equality modes.
+    // All resources/states must exist before mutating the current GPU frame.
+    ID3D11DepthStencilState* liveDepthState = nullptr;
+    if (liveDepth.enabled) {
+        if (!s.diagnosticDepthView) {
+            D3D11_TEXTURE2D_DESC zDesc{};
+            zDesc.Width = s.nativeWidth;
+            zDesc.Height = s.nativeHeight;
+            zDesc.MipLevels = 1u;
+            zDesc.ArraySize = 1u;
+            zDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            zDesc.SampleDesc.Count = 1u;
+            zDesc.Usage = D3D11_USAGE_DEFAULT;
+            zDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            ComPtr<ID3D11Texture2D> created;
+            ComPtr<ID3D11DepthStencilView> view;
+            if (FAILED(device->CreateTexture2D(
+                    &zDesc, nullptr, created.GetAddressOf())) ||
+                FAILED(device->CreateDepthStencilView(
+                    created.Get(), nullptr, view.GetAddressOf())))
+                return false;
+            s.diagnosticDepth = std::move(created);
+            s.diagnosticDepthView = std::move(view);
+        }
+        ComPtr<ID3D11DepthStencilState>* state = nullptr;
+        D3D11_COMPARISON_FUNC compare = D3D11_COMPARISON_LESS;
+        if (liveDepth.always) {
+            state = &s.diagnosticDepthAlwaysStates[liveDepth.writeEnabled ? 1u : 0u];
+            compare = D3D11_COMPARISON_ALWAYS;
+        } else if (liveDepth.equalityMode != 0u) {
+            state = &s.diagnosticDepthEqualityStates[game_native_depth_equality_slot(
+                liveDepth.writeEnabled, liveDepth.equalityMode)];
+            compare = liveDepth.equalityMode == D3DCMP_EQUAL
+                ? D3D11_COMPARISON_EQUAL : D3D11_COMPARISON_NOT_EQUAL;
+        } else if (liveDepth.orderingMode != 0u) {
+            state = &s.diagnosticDepthOrderingStates[game_native_depth_ordering_slot(
+                liveDepth.writeEnabled, liveDepth.orderingMode)];
+            compare = liveDepth.orderingMode == D3DCMP_GREATER
+                ? D3D11_COMPARISON_GREATER : D3D11_COMPARISON_GREATER_EQUAL;
+        } else {
+            state = &s.diagnosticDepthStates[game_native_depth_slot(
+                liveDepth.writeEnabled, liveDepth.lessEqual)];
+            compare = liveDepth.lessEqual ? D3D11_COMPARISON_LESS_EQUAL
+                                           : D3D11_COMPARISON_LESS;
+        }
+        if (!*state) {
+            D3D11_DEPTH_STENCIL_DESC ds{};
+            ds.DepthEnable = TRUE;
+            ds.DepthWriteMask = liveDepth.writeEnabled
+                ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+            ds.DepthFunc = compare;
+            ds.StencilEnable = FALSE;
+            if (FAILED(device->CreateDepthStencilState(
+                    &ds, state->GetAddressOf())))
+                return false;
+        }
+        liveDepthState = state->Get();
+    }
     // Mirror only samplers used by the translated ps_3_0 TEXLD program.
     // Every live tN/sN is bound on THIS D3D11 immediate context for THIS draw.
     std::array<ComPtr<ID3D11ShaderResourceView>,16> views{};
@@ -4471,19 +4587,28 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         static_cast<float>(viewport.Width), static_cast<float>(viewport.Height),
         viewport.MinZ, viewport.MaxZ};
     context->RSSetViewports(1u, &nativeViewport);
-    const D3D11_RECT rect{0,0,static_cast<LONG>(source.Width),
-                              static_cast<LONG>(source.Height)};
-    context->RSSetScissorRects(1u, &rect);
+    context->RSSetScissorRects(1u, &liveScissor);
+    const unsigned scissorSlot = scissor != FALSE ? 2u : 0u;
     ID3D11RasterizerState* liveRaster =
         nativeCull.d3d9Mode == D3DCULL_CW
-            ? s.diagnosticCullRasters[0].Get()
+            ? s.diagnosticCullRasters[scissorSlot].Get()
             : nativeCull.d3d9Mode == D3DCULL_CCW
-                ? s.diagnosticCullRasters[1].Get() : s.raster.Get();
+                ? s.diagnosticCullRasters[scissorSlot + 1u].Get()
+                : (scissor != FALSE ? s.scissorRaster.Get() : s.raster.Get());
     // Raster selection mirrors the source winding on both Draw/DrawIndexed.
     context->RSSetState(liveRaster);
     ID3D11RenderTargetView* rtv = s.backend.color_rtv();
-    context->OMSetRenderTargets(1u, &rtv, nullptr);
-    context->OMSetDepthStencilState(nullptr, 0u);
+    context->OMSetRenderTargets(
+        1u, &rtv, liveDepth.enabled ? s.diagnosticDepthView.Get() : nullptr);
+    // A preceding successful full game Z Clear owns the native depth seed.
+    // First native Z draw must initialize DSV even after color-only Draws.
+    if (liveDepth.enabled && liveBatch.clear_depth()) {
+        context->ClearDepthStencilView(
+            s.diagnosticDepthView.Get(), D3D11_CLEAR_DEPTH,
+            liveBatch.depth_clear_value(reverseDepth), 0u);
+        liveBatch.consume_depth_clear();
+    }
+    context->OMSetDepthStencilState(liveDepthState, 0u);
     ID3D11BlendState* liveBlend = nullptr;
     switch (nativeBlend) {
     case LiveSm3Blend::disabled: break;
@@ -4519,7 +4644,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ++s.eligible;
     if (s.eligibleThisFrame != (std::numeric_limits<UINT>::max)())
         ++s.eligibleThisFrame;
-    liveBatch.succeeded(false, false);
+    liveBatch.succeeded(liveDepth.enabled, reverseDepth);
     liveBatch.record_source_draw(sourceOrdinal);
     return true;
 }
