@@ -135,5 +135,14 @@
   "notes": "Same TASK_ID B exact CI policy failure repair only. Run record addition changes no native game runtime; retain material source SHA and do not award an additional score. No HMD test performed. Exact failure repairs: required feature-unit policy record, +TIME host smoke code-61 expectation, and missing HUD Inspector smoke path filter; retain material 1e2cef, no duplicate score. Exact-SHA 4-gate outcome pending, Quest3/VDXR untested. C6: exact-SHA four mandatory GitHub Actions SUCCESS at 79d0e9d3; real original material remains 1e2cefcc. No Quest3/VDXR optics or physical 72Hz evidence; retry, test expectation, gate coverage and checkpoint earn no additional AI score.",
   "latest_event_id": "CONVERSION-DX9EX-01042-E003",
   "latest_event_type": "retry",
-  "latest_attempt": "2/3"
+  "latest_attempt": "2/3",
+  "c6_result": {
+    "result": "PASS_EXACT_SHA",
+    "status": "COMPLETE_BUILD_VERIFIED",
+    "checkpoint": "C6_STATE",
+    "validation_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
+    "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "record_kind": "BOOKKEEPING_ONLY",
+    "score_delta": 0
+  }
 }
