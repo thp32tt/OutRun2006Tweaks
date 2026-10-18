@@ -44,8 +44,8 @@ def verify_eye_pair_submission(body: str) -> None:
         raise SystemExit("DX11 submitted stereo eye copies must quarantine on failed EVENT arming")
     legacy = "!exact_source(left_source) || !exact_source(right_source)"
     msaa = [
-        "!exact_source(left_source, leftDesc)",
-        "!exact_source(right_source, rightDesc)",
+        "!exact_source(left_source, leftDesc,",
+        "!exact_source(right_source, rightDesc,",
         "desc.SampleDesc.Count == 0",
         "producer_device_->CheckFormatSupport(format_, &formatSupport)",
         "formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE",
@@ -62,8 +62,8 @@ def verify_eye_pair_submission(body: str) -> None:
             if needle not in body:
                 raise SystemExit(f"DX11 MSAA producer missing preflight/resolve: {needle}")
         checkpoints = [
-            "!exact_source(left_source, leftDesc)",
-            "!exact_source(right_source, rightDesc)",
+            "!exact_source(left_source, leftDesc,",
+            "!exact_source(right_source, rightDesc,",
             "producer_device_->CheckFormatSupport(format_, &formatSupport)",
             "native_game_eye_transfer(",
             "transfer == NativeGameEyeTransfer::Reject",
@@ -90,10 +90,9 @@ def verify_eye_pair_submission(body: str) -> None:
             and eyes[2] < eyes[3]
         ):
             raise SystemExit("DX11 MSAA admission/copy/resolve/GPU ownership must precede guarded fence")
-        # 00842 actual game-camera texture arrays: two distinct physical
-        # source slices, not two views of the same eye or stale ring alias.
-        # This is a GPU transfer implementation contract, not fabricated
-        # proof that the live R30 renderer has attached its camera callback.
+        # 00903 retains 00842 real-array protection and requires physically
+        # selected game camera mips and exact GPU subresources.
+        # This is not proof that a real HMD has rendered the game.
         source_guards = (
             "left_array_slice >= leftDesc.ArraySize",
             "right_array_slice >= rightDesc.ArraySize",
@@ -103,18 +102,33 @@ def verify_eye_pair_submission(body: str) -> None:
         slice_writes = (
             "context->CopySubresourceRegion(entry.eye[0].Get()",
             "context->CopySubresourceRegion(entry.eye[1].Get()",
-            "D3D11CalcSubresource(0u, left_array_slice, leftDesc.MipLevels)",
-            "D3D11CalcSubresource(0u, right_array_slice, rightDesc.MipLevels)",
+            "D3D11CalcSubresource(left_mip_slice, left_array_slice,",
+            "D3D11CalcSubresource(right_mip_slice, right_array_slice,",
         )
-        for needle in source_guards + slice_writes:
+        mip_guards = (
+            "const auto extent = native_game_postpass_mip_extent(",
+            "!extent.valid || extent.width != width_",
+            "extent.height != height_",
+            "left_mip_slice, left_array_slice)",
+            "right_mip_slice, right_array_slice)",
+            "(leftDesc.SampleDesc.Count > 1u && leftDesc.MipLevels != 1u)",
+            "(rightDesc.SampleDesc.Count > 1u && rightDesc.MipLevels != 1u)",
+        )
+        for needle in mip_guards + source_guards + slice_writes:
             if needle not in body:
-                raise SystemExit("DX11 00842 missing real array-slice mip-zero GPU path: " + needle)
+                raise SystemExit("DX11 00903 missing selected mip/array GPU path: " + needle)
+        if not (
+            body.index("native_game_postpass_mip_extent(") <
+            body.index("!exact_source(left_source, leftDesc,") <
+            body.index("entry.gpu_copy_queued = true;")
+        ):
+            raise SystemExit("DX11 00903 mip extent admission must precede eye GPU ownership")
         for needle in source_guards:
             if body.index(needle) >= queued:
                 raise SystemExit("DX11 eye source slice and alias admission must precede GPU writes")
         for needle in slice_writes:
             if not queued < body.index(needle) < fence:
-                raise SystemExit("DX11 eye array mip-zero copy must precede producer EVENT")
+                raise SystemExit("DX11 selected eye mip/array GPU copy must precede producer EVENT")
     elif legacy in body:
         if not (
             body.index(legacy) < body.index("entry.gpu_copy_queued = true;")
@@ -407,6 +421,19 @@ def main() -> None:
     ):
         if needle not in probe_source:
             raise SystemExit("DX11 00842 WARP native game stereo array regression missing: " + needle)
+    # Actual WARP GPU pixels distinguish mip0 from selected mip1 and
+    # verify that both stereo eyes and ACK reached the shared transport.
+    for needle in (
+        "00903 real GPU game camera mip array",
+        "00903 physical eye/mip color output",
+        "!mipSubmission.capture_eye(0u, mipEyes, 1u, 0xc1u, 37u, 0u, 0u)",
+        "mipSubmission.capture_eye(0u, mipEyes, 1u, 0xc1u, 37u, 0u, 1u)",
+        "mipSubmission.capture_eye(1u, mipEyes, 1u, 0xd2u, 37u, 1u, 1u)",
+        "00903 source mip1 left/right colors, never mip0",
+        "00903 XR host handoff and exact ACK for mip-selected eyes",
+    ):
+        if needle not in probe_source:
+            raise SystemExit("DX11 00903 GPU selected-mip test evidence missing: " + needle)
     for needle in [
         "foreign.device->OpenSharedResource(",
         "foreign.context->CopyResource(hostReadback, hostEyes[eyeIndex]);",
