@@ -30,7 +30,7 @@ def test(root, cpatch_path=None):
     assert 'LOCALIZATION_SLOT_NAMES = ("A", "B", "C")' in expanded
     assert 'CHAT_SLOTS != 3' in expanded and 'CHAT_SLOTS != 2' not in expanded
     assert "SCHEDULED_LOCALIZATION_LANES.update({3: \"C\", 33: \"C\"})" in expanded
-    assert 'if CONTROLLER_MODE == "localization" and slot.name in ("A", "B") and _outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE"' in expanded
+    assert 'if CONTROLLER_MODE == "localization" and slot.name in ("A", "B") and (_outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE"' in expanded
     assert 'if CONTROLLER_MODE == "localization" and slot.name in ("A", "B"):\n        project_name' in expanded
     assert 'elif CONTROLLER_MODE == "localization" and slot.name == "C":' in expanded
     assert 'send_result = await send_message(page, prompt)' in expanded
