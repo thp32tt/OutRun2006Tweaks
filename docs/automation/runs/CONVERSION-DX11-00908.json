@@ -57,7 +57,7 @@
     "conflict_keys": [
       "DX11:NATIVE_GAME_STEREO:CAMERA_AND_EYE_EMPTY_SCISSOR_COVERAGE"
     ],
-    "full_gate_plan": "one_final_validation_bearing_sha_after_failure_cause_repair",
+    "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
       "D3D11_NATIVE_DRAW",
       "NATIVE_STEREO_EYE_OUTPUT"
