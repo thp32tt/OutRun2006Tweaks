@@ -7,9 +7,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00920",
   "feature_id": "DX11:OFFSCREEN_POSTPASS_PIXEL_REGION_PROVENANCE",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C5_WAIT_REQUIRED_GATES",
+  "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -74,7 +74,7 @@
     "src/vr/d3d11/native_game_stereo_submission.cpp"
   ],
   "material_result_sha": "7a0ee8e6defaaa0f3ea6335d877461dc1d59c46a",
-  "validation_bearing_result_sha": "b8e76f46d4b3443eacf3653b444b208d9a728e8b",
+  "validation_bearing_result_sha": null,
   "acceptance_results": {
     "camera_raster_to_gpu_postpass": "IMPLEMENTED_PENDING_GATE",
     "disjoint_camera_region_fallback": "IMPLEMENTED_PENDING_GATE",
@@ -86,18 +86,46 @@
     "C0_RECOVER": "Remote 00919 C6 verified at HEAD 43b1a955",
     "C1_REVIEW": "Camera physical key alone permits Copy/Stretch of untouched source crop outside real viewport/scissor color Draw",
     "C2_IMPLEMENT": "Capture exact conservative per-Draw source raster region and require it overlap authentic GPU postpass source box; preserve disjoint regions separately",
-    "C3_VALIDATE": "Exact validation SHA b8e76f46d4b3443eacf3653b444b208d9a728e8b; GitHub CI SUCCESS as confirmed in C6 dispatch. No CI rerun; real HMD/controls/visuals UNTESTED.",
+    "C3_VALIDATE": "Observed on GitHub at candidate b8e76f46d4b3443eacf3653b444b208d9a728e8b: DX11 Fast Structural Checks #39132827565 and Backend Conversion Gate #39132827498 SUCCESS; Build #39132827520/#39132831742, OpenXR #39132827533/#39132831735, HUD Inspector #39132827546/#39132831707 CANCELLED, not PASS. Retain source implementation and pending mandatory integrated exact-SHA validation.",
     "C4_COMMIT": "Material source 7a0ee8e6defaaa0f3ea6335d877461dc1d59c46a; CI policy pending stage annotation corrected under same task",
     "C5_PACKAGE": "NOT_REQUIRED_SOURCE_STAGE_HMD_UNTESTED",
-    "C6_RESULT": "PASS_EXACT_SHA; resolved prior hold TERMINAL_STATUS_NOT_COMPLETE; bookkeeping-only [skip ci], exact validation SHA b8e76f46d4b3443eacf3653b444b208d9a728e8b, no score duplication or mandatory CI rerun."
+    "C6_RESULT": "Historical C6 bookkeeping claimed PASS_EXACT_SHA, but GitHub Actions shows three of five mandatory workflows CANCELLED at that candidate SHA. Source remains implemented; terminal BUILD_VERIFIED withdrawn until five exact-SHA SUCCESS. No runtime PASS or extra score."
   },
   "runtime_validation_note": "Quest3/VDXR/OutRun real menu/car/race/gamepad/FFB not tested. SOURCE_STAGE build verified, NOT gameplay nor HMD pass.",
   "validation_evidence": {
     "scope": "SOURCE_STAGE_ONLY",
     "runtime_validation": "UNTESTED",
     "exact_sha": "b8e76f46d4b3443eacf3653b444b208d9a728e8b",
-    "ci_status": "SUCCESS",
-    "ci_status_source": "C6_USER_CONFIRMED"
+    "ci_status": "PARTIAL_FAST_BACKEND_SUCCESS_OTHER_REQUIRED_CANCELLED",
+    "ci_status_source": "GITHUB_ACTIONS_API",
+    "required_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39132827565,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39132827498,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39132831742,
+        "conclusion": "cancelled"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39132831735,
+        "conclusion": "cancelled"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39132831707,
+        "conclusion": "cancelled"
+      }
+    ]
   },
-  "c6_bookkeeping_only": true
+  "c6_bookkeeping_only": true,
+  "ci_reconciliation_task_id": "CONVERSION-DX11-00921"
 }
