@@ -1616,6 +1616,7 @@ namespace
             static_cast<float>(c.sourceWidth_),
             static_cast<float>(c.sourceHeight_),
             whole.x, whole.y, whole.w, whole.h, authoredAspect);
+        bool fullFourThreeMainMenu = false;
         if (plan.crop)
         {
             const float previousWidth = whole.w;
@@ -1653,6 +1654,18 @@ namespace
                 completeClient, cropCentered43,
                 useNativeMenuAspect || wideVehicleSelector,
                 imageMatteVerified);
+            fullFourThreeMainMenu =
+                OutRunVrMenuAspect::RestoreFullMainMenuFourThree(
+                    clientGameState, completeClient,
+                    useNativeMenuAspect, wideVehicleSelector, false);
+            if (fullFourThreeMainMenu)
+            {
+                // Undo the game's stretched 3440x1440 TITLE/MAIN raster
+                // optically. The entire source UV stays visible; cropping
+                // would cut the Ferrari and SINGLE PLAYER menu columns.
+                // This is 4:3 in BOTH eyes, not a second desktop resize.
+                sourceAspect = 4.0f / 3.0f;
+            }
             // Source UV is still the COMPLETE client here. It must retain
             // the physical aspect of those actual captured pixels. Forcing
             // this 3440x1440/1920x1080 rectangle into a 4:3 optical quad
@@ -1687,8 +1700,8 @@ namespace
         // height constant in binocular tangent space, adjusting both X/Y
         // identically instead of enlarging the portrait menu to fill XR.
         // The measured source aspect, UV and FOV containment are preserved.
-        const auto placement = cropCentered43
-            ? requestedPlacement // Explicit source crop remains user's A/B.
+        const auto placement = (cropCentered43 || fullFourThreeMainMenu)
+            ? requestedPlacement // Fill 4:3 title height without old 21:9 limiter.
             : OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
                 common, requestedPlacement);
         if (!placement.valid)
