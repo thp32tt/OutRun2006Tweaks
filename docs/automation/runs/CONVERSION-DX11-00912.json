@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00912",
   "feature_id": "DX11:NATIVE_STEREO_UNPREDICATED_GAME_GEOMETRY",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -72,9 +72,9 @@
     }
   },
   "acceptance_results": {
-    "source_draw_and_eye_history": "PENDING_EXACT_SHA",
-    "safe_game_fallback": "PENDING_EXACT_SHA",
-    "source_graph_and_exact_sha_gates": "PENDING_EXACT_SHA"
+    "source_draw_and_eye_history": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "safe_game_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "source_graph_and_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
@@ -83,7 +83,65 @@
     "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
   ],
   "material_result_sha": "b64007607843a44cb3b89646f9250c028c989aad",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "082926e2251f29b3391836a805447d1d7059f649",
   "blocking_evidence": "CI 39118986352 fails legacy 00911 policy acceptance; 39118986460 fails source graph because 00912 cached predicate without required literal expression; 00912 C++ also omitted semicolon.",
-  "runtime_validation_note": "No Quest3/VDXR game or HMD tests performed; RUNTIME_VALIDATION=UNTESTED."
+  "runtime_validation_note": "No matching Quest3/VDXR game-menu, car-selection, race screenshot/eye output or gamepad actual in-game test performed. RUNTIME_VALIDATION=UNTESTED; no native full-game runtime parity or deployment claim.",
+  "task_level_scoreboard_award": 1,
+  "scoreboard_commit_sha": "712d8db3bbc9cb1823a31a14fb7113f412bda285",
+  "repair_result_sha": "082926e2251f29b3391836a805447d1d7059f649",
+  "pipeline": {
+    "C0_RECOVER": "Existing 00912 source material b64007607843a44cb3b89646f9250c028c989aad. Backend #39118986352 failure from stale 00911 selection, Build #39118986460 source graph guard, plus semicolon defect.",
+    "C1_REVIEW": "Confirmed 00912 native geometry provenance source and constant stereo regressions; no permission to weaken native activation, shader safety or DXVK freeze.",
+    "C2_IMPLEMENT": "Original four-file C++/constexpr 00912 material b64007607843a44cb3b89646f9250c028c989aad; causal source compile/guard repair and 00912 acceptance record at 082926e2251f29b3391836a805447d1d7059f649",
+    "C3_VALIDATE": "Exact SHA 082926e2251f29b3391836a805447d1d7059f649: GitHub mandatory Fast, Backend, Build, OpenXR architecture, HUD Inspector 5/5 SUCCESS; additional WARP SUCCESS; all duplicate workflows completed without cancellation.",
+    "C4_COMMIT": "Original source material b640076; source repair plus validation-bearing 082926e2251f29b3391836a805447d1d7059f649 [AUTO:CONVERSION-DX11-00912] (no CI skip). C6 bookkeeping [skip ci] separate after all exact SHA workflows completed.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED and PASS_EXACT_SHA source-stage only. Quest3/VDXR RUNTIME_VALIDATION=UNTESTED. 00912 task-level +1 already committed once in AI_SCOREBOARD.md; this retry/C6 +0."
+  },
+  "validation_evidence": {
+    "material_sha": "b64007607843a44cb3b89646f9250c028c989aad",
+    "validation_sha": "082926e2251f29b3391836a805447d1d7059f649",
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39119275133,
+        "conclusion": "success",
+        "head_sha": "082926e2251f29b3391836a805447d1d7059f649"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39119275122,
+        "conclusion": "success",
+        "head_sha": "082926e2251f29b3391836a805447d1d7059f649"
+      },
+      {
+        "name": "Build",
+        "run_id": 39119275115,
+        "conclusion": "success",
+        "head_sha": "082926e2251f29b3391836a805447d1d7059f649"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39119275151,
+        "conclusion": "success",
+        "head_sha": "082926e2251f29b3391836a805447d1d7059f649"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39119275148,
+        "conclusion": "success",
+        "head_sha": "082926e2251f29b3391836a805447d1d7059f649"
+      },
+      {
+        "name": "DX11 Native Transport Isolated WARP",
+        "run_id": 39119275140,
+        "conclusion": "success",
+        "head_sha": "082926e2251f29b3391836a805447d1d7059f649"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "scope": "SOURCE_STAGE_ONLY",
+    "ci_gate_count": "MANDATORY_5_OF_5_PLUS_WARP"
+  },
+  "c6_bookkeeping_only": true
 }
