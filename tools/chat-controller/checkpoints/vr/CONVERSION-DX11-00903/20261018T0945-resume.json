@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "manual_git_verified_rollover_recovery",
+  "captured_at_kst": "2026-10-18T09:45:27+09:00",
+  "target_branch": "vr-dx11-native-r71",
+  "task_id": "CONVERSION-DX11-00903",
+  "production_id": "CONVERSION-DX11-00903",
+  "event_id": "CONVERSION-DX11-00903-E003",
+  "event_type": "rollover",
+  "attempt": 2,
+  "chat_rollovers": 2,
+  "head_sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+  "head_is_git_verified": true,
+  "base_sha": "e7dba7069981854fbd0f46a8376d3811b5ad7e6a",
+  "compare": {
+    "ahead_by": 3,
+    "behind_by": 0
+  },
+  "material_result_sha": "2b442769e32713d009a94de642b9713dcebb035b",
+  "repair_commits": [
+    "0f5ddd28685595833891f6ea9097bf662ab9c24e",
+    "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3"
+  ],
+  "feature_id": "DX11:NATIVE_GAME_STEREO_SELECTED_MIP_GPU_TRANSFER",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "runtime_validation": "UNTESTED",
+  "resolved_failures": [
+    {
+      "run": 39083314324,
+      "step": "Verify DX11 native transport lifetime contract",
+      "cause": "static contract required pre-00903 mip0-only exact_source signatures"
+    },
+    {
+      "run": 39083635701,
+      "step": "tools/test_dx11_eye_msaa_resolve_00695.py",
+      "cause": "legacy MSAA regression still required old exact_source signature"
+    }
+  ],
+  "checks": {
+    "fast": {
+      "sha": "9c18a4b76d2e1a1318ee9afe0c3fac966e4be6f3",
+      "run": 39083722511,
+      "result": "SUCCESS"
+    },
+    "isolated_warp": {
+      "sha": "0f5ddd28685595833891f6ea9097bf662ab9c24e",
+      "run": 39083635867,
+      "result": "SUCCESS"
+    },
+    "backend": {
+      "run": 39083722454,
+      "result": "PENDING"
+    },
+    "build": {
+      "run": 39083722541,
+      "result": "IN_PROGRESS"
+    },
+    "openxr": {
+      "run": 39083726231,
+      "result": "IN_PROGRESS"
+    },
+    "hud": {
+      "run": 39083726234,
+      "result": "IN_PROGRESS"
+    }
+  },
+  "uncompleted": [
+    "Wait for exact-SHA 9c18a4b7 Backend/Build/OpenXR/HUD verdict; inspect actual failure before editing",
+    "Only after 5/5 exact SHA success, write docs/automation/runs/CONVERSION-DX11-00903.json C6 with [skip ci] bookkeeping; preserve material SHA and UNTESTED",
+    "Do not alter game GPU C++ again to satisfy stale static tests unless a real source issue is proven"
+  ],
+  "next_action": "Confirm latest target HEAD and 5 mandatory exact-SHA CI gates; fix only concrete failure and then C6. No duplicate score for same TASK_ID.",
+  "score_change": 0
+}
