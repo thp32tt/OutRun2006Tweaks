@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "SOURCE_IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C2_SOURCE",
+  "status": "C5_EXACT_SHA_GATES_PENDING",
+  "checkpoint": "C5_VALIDATE",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
+  "material_result_sha": "55c6b0f3e820188638be32f6c7798d38ad2121d1",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "vrhost/src/runtime/menu_content_aspect.hpp",
@@ -76,5 +76,21 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "C2 host native 4:3 title/main-menu source+UV+OpenXR contain correction and affected host regression. Original game capture and device/FFB untouched. GitHub exact-SHA CI pending. Source-layout authority comes from configured game UI and restricted states, not a sampled matte. Quest3 HMD not run."
+  "notes": "C2 host native 4:3 title/main-menu source+UV+OpenXR contain correction and affected host regression. Original game capture and device/FFB untouched. GitHub exact-SHA CI pending. Source-layout authority comes from configured game UI and restricted states, not a sampled matte. Quest3 HMD not run. C5: exact-SHA Active host/game/full-chain/package and Domain succeeded on repair head 1d5125c6. Bind original functional material 55c6b0f3; launch final mandatory four gate workflows on this non-skip run-record commit. C6 and HMD remain pending.",
+  "ci_evidence": {
+    "material_source_sha": "55c6b0f3e820188638be32f6c7798d38ad2121d1",
+    "preflight_repair_sha": "1d5125c67d543143e7ab8e862de0bd19ba815a3d",
+    "preflight_dx9ex_active_run": 39145143505,
+    "preflight_dx9ex_active_conclusion": "success",
+    "preflight_domain_run": 39145143579,
+    "preflight_domain_conclusion": "success",
+    "final_required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "final_exact_sha_state": "PENDING_NEW_GATE_BEARING_COMMIT",
+    "runtime_validation": "UNTESTED"
+  }
 }
