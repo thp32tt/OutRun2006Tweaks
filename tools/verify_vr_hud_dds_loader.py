@@ -272,18 +272,38 @@ def verify(text):
     obligations=[
         (lookup,"ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr)"),
         (spr2,"if (!Settings::UITextureReplacement)"),
-        (spr2,"prevMaskTexture = nullptr;"),
-        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\ta1->d3dtexture_ptr_C == prevTexture)"),
-        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\t\t\ta1->child_B4->d3dtexture_ptr_C == prevMaskTexture)"),
-        (spr2,"sprite_scales.find(prevTextureId)"),
-        (spr2,"sprite_scales.find(prevMaskTextureId)"),
+        (spr2,"OutRunVR::UiTexture::CurrentLookup.Clear();"),
+        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\ta1->d3dtexture_ptr_C == OutRunVR::UiTexture::CurrentLookup.texture)"),
+        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\t\t\ta1->child_B4->d3dtexture_ptr_C == OutRunVR::UiTexture::CurrentLookup.maskTexture)"),
+        (spr2,"sprite_scales.find(OutRunVR::UiTexture::CurrentLookup.textureId)"),
+        (spr2,"sprite_scales.find(OutRunVR::UiTexture::CurrentLookup.maskTextureId)"),
         (spr1,"ShouldApplyUIScale(Settings::UITextureReplacement, true)"),
         (spr1,"sprite_scales.find(xstnum)"),
     ]
+    # Keep the original source-verified parent/mask and enable/disable
+    # obligations even though the owner is now thread-local. Verify the
+    # *actual* production helper, not just a standalone test fixture.
+    helper_path = ROOT/"src/vr/game/ui_texture_pending_owner.hpp"
+    if not helper_path.is_file():
+        raise ValueError("UI thread-local lookup helper missing")
+    helper = helper_path.read_text(encoding="utf-8")
+    for required in (
+        "inline thread_local PendingLookup CurrentLookup{};",
+        "maskTexture = texture;",
+        "maskTextureId = textureId;",
+        "texture = eligible && nativeTexture ? nativeTexture : nullptr;",
+        "void Clear() noexcept",
+    ):
+        if required not in helper:
+            raise ValueError("UI thread-local parent/mask contract missing: "+required)
+    if "OutRunVR::UiTexture::CurrentLookup.Advance(" not in lookup:
+        raise ValueError("get_texture lost its per-thread owner")
+    if "inline static void* " in text and "inline static void* prev" in text:
+        raise ValueError("global UI parent/mask state retained")
     for region,needle in obligations:
         if needle not in region:
             raise ValueError("UI runtime toggle or single-lookup guard missing: "+needle)
-    if any(x in spr2+spr1 for x in ("sprite_scales[prevTextureId]","sprite_scales[prevMaskTextureId]","sprite_scales[xstnum]")):
+    if any(x in spr2+spr1 for x in ("sprite_scales[OutRunVR::UiTexture::CurrentLookup.textureId]","sprite_scales[OutRunVR::UiTexture::CurrentLookup.maskTextureId]","sprite_scales[xstnum]")):
         raise ValueError("sprite scaling hot path resumed repeated map lookups")
     return len(guards) + len(xrgb_checks) + len(state_guards) + 4
 
@@ -358,10 +378,12 @@ def negatives(text):
         "dstRow[p + 2] = srcRow[p];",
         "return enabled && matches;",
         "if (!Settings::UITextureReplacement)",
+        "OutRunVR::UiTexture::CurrentLookup.Clear();",
+        "OutRunVR::UiTexture::CurrentLookup.Advance(",
         "ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr)",
         "ShouldApplyUIScale(Settings::UITextureReplacement, true)",
-        "sprite_scales.find(prevTextureId)",
-        "sprite_scales.find(prevMaskTextureId)",
+        "sprite_scales.find(OutRunVR::UiTexture::CurrentLookup.textureId)",
+        "sprite_scales.find(OutRunVR::UiTexture::CurrentLookup.maskTextureId)",
         "sprite_scales.find(xstnum)",
     ]
     for token in needles:
