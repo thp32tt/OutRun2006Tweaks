@@ -175,11 +175,23 @@ if min(original_pos) < 0 or original_pos != sorted(original_pos):
     fail("result glyph must capture priority tails then call original put_sprite_ex")
 try:
     begin_exact = glyph_body.index("if (exactGoalResult)\n        {\n            TagAppendedNodes")
-    begin_default = glyph_body.index("else\n        {\n            // The untouched +TIME")
+    begin_default = glyph_body.index("else\n        {\n            // Keep the original ScreenHud classification for ordinary")
 except ValueError:
     fail("B9200 result glyph exact/legacy branch missing")
 if begin_exact <= original_pos[-1] or begin_default <= begin_exact:
     fail("GOAL B9200 result ownership must follow the original glyph")
+# Both exact B9200 and ordinary 0x2C808/0x2C9DB glyphs now use
+# the same bounded stable-root live queue proof. Keep that safety
+# invariant, not just the text used by the old fast-path verifier.
+if ("rootsBefore[prio] = root;" not in glyph_body or
+        "nullptr, &rootsBefore, entrySerial" not in
+        glyph_body[begin_exact:begin_default] or
+        "nullptr, &rootsBefore" not in glyph_body[begin_default:]):
+    fail("native glyph branches must snapshot and prove stable priority roots")
+tag_fn = function_body(uiscale, "static void TagAppendedNodes(")
+if ("producer == OutRunVR::GameSemantic::ProducerToken::TextGlyphPutSprite" not in tag_fn or
+        "FirstVerifiedAppendedNodeOnStableRoot(" not in tag_fn):
+    fail("generic text glyphs must use bounded live-root queue proof")
 for name, section, producer in (
     ("exact B9200", glyph_body[begin_exact:begin_default],
      "OutRunVR::GameSemantic::ProducerToken::ResultTextB9200"),
