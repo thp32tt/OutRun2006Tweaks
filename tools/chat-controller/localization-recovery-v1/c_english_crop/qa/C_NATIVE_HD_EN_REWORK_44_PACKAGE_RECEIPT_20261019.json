@@ -1,0 +1,12 @@
+{
+  "status": "ARCHIVE_TEST_ONLY_VERIFIED",
+  "filename": "C_NATIVE_HD_EN_REWORK_44_TEST_ONLY_20261019.zip",
+  "bytes": 5834243,
+  "sha256": "3a82c58bb0ec85cc73069bad9fb54c52bfa49fb4a583c1e5456d5ae9f6834659",
+  "cropped_native_candidates": 44,
+  "source_HD_png_pinned": 108,
+  "original_hd_crops_retained": 242,
+  "remaining_holds": 2,
+  "all_original_and_DDS_mutated": false,
+  "game_validation": "UNTESTED"
+}
