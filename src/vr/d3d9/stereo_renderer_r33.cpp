@@ -1369,6 +1369,17 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightStateFailed;
                     rightHr = E_FAIL;
                 }
+                // All original GOAL progress, elapsed time and result glyph
+                // producers must retain their physical GPU owner through the
+                // LAST right-eye RT, depth, viewport and c64 setters too.
+                // A post-left fence alone is insufficient under reentrancy.
+                if (SUCCEEDED(rightHr) && exactGoalEye &&
+                    !OutRunVR::GoalPhysical::SameAfterNativeLeft(
+                        goalBeforeLeft, captureGoalSource()))
+                {
+                    rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                    rightHr = E_FAIL;
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;

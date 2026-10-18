@@ -5834,6 +5834,22 @@ namespace OutRunVRStereo
                         rightHr = E_FAIL;
                     }
                 }
+                // GOAL 0-99 and result glyphs also carry a physical queue
+                // and original game c64 generation. RT/depth/viewport
+                // setters after LEFT can reenter a different GOAL child.
+                // Only the original exact producer may submit RIGHT.
+                if (SUCCEEDED(rightHr) && exactGoal)
+                {
+                    OutRunVR::GoalPhysical::Source atRight{};
+                    if (!R30CaptureGoalPhysicalSource(atRight) ||
+                        !OutRunVR::GoalPhysical::SameAfterNativeLeft(
+                            goalBefore, atRight))
+                    {
+                        rightFailure =
+                            OutRunVR::StereoFailureRightStateFailed;
+                        rightHr = E_FAIL;
+                    }
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure =

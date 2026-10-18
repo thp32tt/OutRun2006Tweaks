@@ -1,3 +1,4 @@
+#include "../../src/vr/game/goal_progress_physical_source.hpp"
 #include "../../src/vr/d3d9/stage_extension_eye_plane.hpp"
 #include "../../src/vr/game/stage_extension_physical_source.hpp"
 #include <cmath>
@@ -517,5 +518,82 @@ int main() {
         IsValid(Source{RenderScope::ScreenHud,
             ProducerToken::ResultProgress, false, nullptr, 0, 23, 9, 0, 0}))
         return 37;
+    // R84 GOAL 0-99/result sprite and numeric glyphs need a second
+    // physical-source fence AFTER the last RIGHT-eye GPU state setter.
+    // Post-LEFT ownership alone does not prove the queued node or original
+    // c64 still belongs to GOAL at the actual right native Draw.
+    {
+        namespace Goal = OutRunVR::GoalPhysical;
+        using OutRunVR::GameSemantic::ProducerToken;
+        using OutRunVR::GameSemantic::RenderScope;
+        const int goalNode = 10, foreignNode = 11;
+        for (auto producer : {
+                ProducerToken::GoalTime020, ProducerToken::GoalTime150,
+                ProducerToken::ResultProgress, ProducerToken::OutRunStagePrintf,
+                ProducerToken::ResultTextB9200})
+        {
+            const Goal::Source queued{
+                RenderScope::ScreenHud, producer, true, &goalNode, 7,
+                91, 52, 0x1234, 8, 104, 51};
+            const Goal::Source direct{
+                RenderScope::ScreenHud, producer, false, nullptr, 0,
+                91, 52, 0x1234, 8, 104, 51};
+            for (const auto& before : {queued, direct})
+            {
+                if (!Goal::IsValid(before) ||
+                    !Goal::SameAfterNativeLeft(before, before))
+                    return 82;
+                auto atRight = before;
+                ++atRight.rawWvpWriteSerial;
+                if (Goal::SameAfterNativeLeft(before, atRight))
+                    return 83; // native c64 overwritten after LEFT
+                atRight = before;
+                ++atRight.poseEpoch;
+                if (Goal::SameAfterNativeLeft(before, atRight))
+                    return 84; // recenter during right-eye state setters
+                atRight = before;
+                ++atRight.drawSerial;
+                if (Goal::SameAfterNativeLeft(before, atRight))
+                    return 85; // reentrant foreign physical Draw
+                atRight = before;
+                atRight.producer = ProducerToken::StageExtensionTime;
+                if (Goal::SameAfterNativeLeft(before, atRight))
+                    return 86; // stage +TIME may not inherit GOAL
+                atRight = before;
+                ++atRight.shaderEpoch;
+                if (Goal::SameAfterNativeLeft(before, atRight))
+                    return 87; // reentrant shader switch
+                atRight = before;
+                atRight.rawWvpWriteSerial = 0;
+                if (Goal::SameAfterNativeLeft(before, atRight))
+                    return 88; // incomplete original-WVP evidence
+                if (before.queued)
+                {
+                    atRight = before;
+                    atRight.node = &foreignNode;
+                    if (Goal::SameAfterNativeLeft(before, atRight))
+                        return 89;
+                    atRight = before;
+                    ++atRight.queueEpoch;
+                    if (Goal::SameAfterNativeLeft(before, atRight))
+                        return 90; // recycled original SpriteNode
+                }
+            }
+        }
+        const Goal::Source unknown{};
+        if (Goal::IsValid(unknown))
+            return 91;
+        const Goal::Source foreign{
+            RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+            false, nullptr, 0, 91, 52, 0x1234, 8, 104, 51};
+        if (Goal::IsValid(foreign))
+            return 92;
+        const Goal::Source noRaw{
+            RenderScope::ScreenHud, ProducerToken::ResultProgress,
+            false, nullptr, 0, 91, 52, 0x1234, 8};
+        if (!Goal::IsValid(noRaw))
+            return 93; // preserve existing missing-WVP native fallback
+    }
+
     return 0;
 }
