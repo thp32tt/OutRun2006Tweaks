@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "6efddfc1943bc28c17c5ff1cc78a312b7c888e59",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff",
   "changed_files": [
     "src/vr/game/stage_extension_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -80,12 +80,12 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "stage_shader_gpu_owner": "PENDING_EXACT_SHA",
-    "stage_shader_negative_fallback": "PENDING_EXACT_SHA",
-    "stage_exact_sha_full_gate": "PENDING_EXACT_SHA"
+    "stage_shader_gpu_owner": "PASS_BUILD",
+    "stage_shader_negative_fallback": "PASS_BUILD",
+    "stage_exact_sha_full_gate": "PASS_EXACT_SHA"
   },
   "ci_evidence": {
-    "required_gates_state": "PENDING",
+    "required_gates_state": "PASS_ALL_FOUR_EXACT_SHA",
     "prior_failed_runs": [
       {
         "run_id": 39173260665,
@@ -93,8 +93,44 @@
         "failed_step": "policy",
         "cause": "Active policy requires exact current TASK_ID JSON and did not reach x86 game or x64 host build"
       }
-    ]
+    ],
+    "validation_bearing_result_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39173498142,
+        "conclusion": "success",
+        "head_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39173498246,
+        "conclusion": "success",
+        "head_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39173498213,
+        "conclusion": "success",
+        "head_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39173498182,
+        "conclusion": "success",
+        "head_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff"
+      }
+    ],
+    "local_targeted_gate": "R84 game header static_assert shader/epoch/serial positive and negative tests compiled in Windows full-chain exact-SHA job"
   },
-  "result_commit_kind": "MATERIAL_SOURCE_PLUS_EXACT_SHA_GATE_CONTRACT",
-  "c6_commit_kind": "NONE"
+  "result_commit_kind": "MATERIAL_SOURCE_PLUS_PRE_CI_RUN_RECORD",
+  "c6_commit_kind": "BOOKKEEPING_SKIP_CI",
+  "c6_completion": {
+    "reason_resolved": "ALL_FOUR_REQUIRED_GATES_PASS_EXACT_SHA",
+    "bookkeeping_only": true,
+    "ci_retrigger": false,
+    "score_delta": 0,
+    "runtime_validation": "UNTESTED",
+    "validation_bearing_result_sha": "beb68643c287bc7fc9837d4a33a24c353c084eff"
+  }
 }
