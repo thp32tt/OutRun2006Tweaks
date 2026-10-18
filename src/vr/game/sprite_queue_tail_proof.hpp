@@ -181,7 +181,7 @@ namespace OutRunVR::SpriteQueue
                     &root, &root, &old, &last, 4) != &first)
                 return false;
             if (FirstVerifiedAppendedNodeOnStableRoot(
-                    &root, &root, nullptr, &last, 4))
+                    &root, &root, static_cast<Node*>(nullptr), &last, 4))
                 return false; // missing before-tail is NOT empty-list proof
             // An old tail may have been recycled or the new tail can be an
             // intermediate node while an unrelated producer extends the list.
