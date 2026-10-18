@@ -280,6 +280,29 @@ def check_stage_extension_direct_owner(text: str) -> None:
     for marker in expected:
         if marker not in enter:
             fail("stage +TIME immediate parent lost ownership: " + marker)
+    # The source now snapshots entry admission AND checks live VR state
+    # before entering native D3DX. Merely finding another == 0 later in
+    # the function would let a mutated source snapshot escape this guard.
+    if re.search(
+        r"StageExtensionAdmission\s*=\s*\{\s*Settings::VREnabled\s*,\s*"
+        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*\}",
+        enter,
+    ) is None:
+        fail("stage +TIME entry VR/queue snapshot lost")
+    if re.search(
+        r"if\s*\(\s*Settings::VREnabled\s*&&\s*"
+        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*&&\s*"
+        r"StageExtensionAdmission\.mayBeginDirect\(\)\s*\)",
+        enter,
+    ) is None:
+        fail("stage +TIME live VR/queue direct ownership fence lost")
+    if re.search(
+        r"if\s*\(\s*StageExtensionAdmission\.mayPublish\(\s*"
+        r"Settings::VREnabled\s*,\s*"
+        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*\)\s*\)",
+        leave,
+    ) is None:
+        fail("stage +TIME queued sibling/native flush exit admission lost")
     if "GameSemantic::CurrentScope =" in enter:
         fail("stage +TIME immediate parent overrides an active sprite queue")
     for marker in (
@@ -335,12 +358,14 @@ for old, replacement in (
     ("nullptr, true,", "nullptr, false,"),
     ("ProducerToken::StageExtensionTime);", "ProducerToken::None);"),
     ("StageExtensionDirectDrawOwner.reset();", "/* missing reset */"),
+    ("StageExtensionAdmission.mayPublish(", "StageExtensionAdmission.mayBeginDirect("),
 ):
     # Mutate the selected +TIME function, not the first matching marker
     # elsewhere in the file (GOAL progress now owns the same direct flag).
     # A global replace silently mutated GOAL and falsely failed this gate.
     function_marker = ("static void StageExtensionLeave("
-                       if old == "StageExtensionDirectDrawOwner.reset();"
+                       if old in {"StageExtensionDirectDrawOwner.reset();",
+                                  "StageExtensionAdmission.mayPublish("}
                        else "static void StageExtensionEnter(")
     body = function_body(ui, function_marker)
     if old not in body:
