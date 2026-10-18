@@ -159,6 +159,45 @@ namespace OutRunVR::SpriteQueue
         }
         static_assert(ExactClipQueueRebuildGuards(),
             "Exact HUD/ESC sibling lists must prove stable-root reachability");
+
+        // A live stage/checkpoint/result or generic BA9D0 HUD glyph group
+        // can replace its priority root while the native call is pending.
+        // Its previous tail can even be reattached under the new root.
+        // An old-tail-only check would mis-tag those foreign screen glyphs.
+        constexpr bool HudTextRootRebuildGuards() noexcept
+        {
+            Node beforeRoot{}, old{}, a{}, b{}, afterRoot{}, recycled{}, alien{};
+            beforeRoot.next_0 = &old;
+            old.next_0 = &a;
+            a.next_0 = &b;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &beforeRoot, &beforeRoot, &old, &b, 4) != &a)
+                return false;
+            // A new root linking the same old tail is NOT an append.
+            afterRoot.next_0 = &old;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &beforeRoot, &afterRoot, &old, &b, 4))
+                return false;
+            // Prior tail detached from the still-live root is also foreign.
+            beforeRoot.next_0 = &recycled;
+            recycled.next_0 = &b;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &beforeRoot, &beforeRoot, &old, &b, 4))
+                return false;
+            // An empty-root priority receiving its first glyph remains valid.
+            beforeRoot.next_0 = &a;
+            a.next_0 = &b;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &beforeRoot, &beforeRoot, &beforeRoot, &b, 3) != &a)
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &beforeRoot, &beforeRoot, &beforeRoot, &alien, 3))
+                return false;
+            return true;
+        }
+        static_assert(HudTextRootRebuildGuards(),
+            "HUD text must not borrow a rebuilt or recycled priority root");
+
     }
 
 }

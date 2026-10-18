@@ -1046,7 +1046,8 @@ class UIScaling : public Hook
             // producers can rebuild the queue, so prove old/new tail
             // reachability before dereferencing the old tail.
             SpriteNode* node = nullptr;
-            if (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+            if (sourceRoots ||
+                 producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
                 producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf ||
                 producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
                 // Original B9200 GOAL text can rebuild a priority list:
@@ -1173,10 +1174,11 @@ class UIScaling : public Hook
 		if (!OutRunHudTextScreenHud)
 			return Game::put_clip_sprite(
 				sprite, x, y, flags, priority, color);
-		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{}, rootsBefore{};
 		for (int p = 0; p < Game::SpritePriorityCount; ++p)
 		{
 			SpriteNode* root = Game::sprite_prio_root[p];
+			rootsBefore[p] = root;
 			before[p] = root ? root->tail_4 : nullptr;
 		}
 		const int result = Game::put_clip_sprite(
@@ -1185,7 +1187,8 @@ class UIScaling : public Hook
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunHudPeripheralText
 				? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText
-				: OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
+				: OutRunVR::GameSemantic::ProducerToken::OutRunHudText,
+			 nullptr, &rootsBefore);
 		return result;
 	}
 	static int __cdecl OutRunHudText_sprani(
@@ -1194,10 +1197,11 @@ class UIScaling : public Hook
 		if (!OutRunHudTextScreenHud)
 			return Game::sprani_play_ae_auth_alpha(
 				spriteId, x, y, a4, a5, alpha);
-		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{}, rootsBefore{};
 		for (int p = 0; p < Game::SpritePriorityCount; ++p)
 		{
 			SpriteNode* root = Game::sprite_prio_root[p];
+			rootsBefore[p] = root;
 			before[p] = root ? root->tail_4 : nullptr;
 		}
 		const int result = Game::sprani_play_ae_auth_alpha(
@@ -1206,7 +1210,8 @@ class UIScaling : public Hook
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunHudPeripheralText
 				? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText
-				: OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
+				: OutRunVR::GameSemantic::ProducerToken::OutRunHudText,
+			 nullptr, &rootsBefore);
 		return result;
 	}
 
@@ -1220,13 +1225,20 @@ class UIScaling : public Hook
 		OutRunStagePrintfDirectDrawOwner;
 	inline static thread_local
 		std::array<SpriteNode*, Game::SpritePriorityCount> OutRunStagePrintfBefore{};
+	inline static thread_local
+		std::array<SpriteNode*, Game::SpritePriorityCount> OutRunStagePrintfRootsBefore{};
+	inline static thread_local std::uint64_t OutRunStagePrintfEntrySerial = 0;
 	static void OutRunStagePrintfEnter(safetyhook::Context&)
 	{
 		if (OutRunStagePrintfDepth++ != 0)
 			return;
+		OutRunStagePrintfEntrySerial =
+			OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+				std::memory_order_acquire);
 		for (int p = 0; p < Game::SpritePriorityCount; ++p)
 		{
 			SpriteNode* root = Game::sprite_prio_root[p];
+			OutRunStagePrintfRootsBefore[p] = root;
 			OutRunStagePrintfBefore[p] = root ? root->tail_4 : nullptr;
 		}
         // Each of the three exact 0x97xxx Sumo_Printf result producers can
@@ -1268,7 +1280,9 @@ class UIScaling : public Hook
         }
 		TagAppendedNodes(OutRunStagePrintfBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+			OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf,
+			nullptr, &OutRunStagePrintfRootsBefore,
+			OutRunStagePrintfEntrySerial);
         // D3DX can defer the record/stage glyph draw beyond its original
         // Sumo_Printf E8. Drain only this exact homogeneous live source
         // before RAII restores the previous world/queue identity. Mixed or
@@ -1286,6 +1300,8 @@ class UIScaling : public Hook
                 Game::game_mode ? *Game::game_mode : -1);
         }
 		OutRunStagePrintfBefore = {};
+		OutRunStagePrintfRootsBefore = {};
+		OutRunStagePrintfEntrySerial = 0;
 	}
 
 	// R74 exact result-progress CALL boundaries: the parent 0x2D200 creates
@@ -1499,15 +1515,22 @@ class UIScaling : public Hook
         ResultTextSavedScope = OutRunVR::GameSemantic::RenderScope::None;
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         ResultTextBefore{};
+    inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
+        ResultTextRootsBefore{};
+    inline static thread_local std::uint64_t ResultTextEntrySerial = 0;
     inline static thread_local std::uint64_t ResultTextCompleted = 0;
 
     static void ResultTextEnter(safetyhook::Context&)
     {
         if (ResultTextDepth++ != 0)
             return;
+        ResultTextEntrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
         for (int p = 0; p < Game::SpritePriorityCount; ++p)
         {
             SpriteNode* root = Game::sprite_prio_root[p];
+            ResultTextRootsBefore[p] = root;
             ResultTextBefore[p] = root ? root->tail_4 : nullptr;
         }
         // Exact 19 B9200 parent calls also need source-time ownership for
@@ -1524,7 +1547,8 @@ class UIScaling : public Hook
             return;
         TagAppendedNodes(ResultTextBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
-            OutRunVR::GameSemantic::ProducerToken::ResultTextB9200);
+            OutRunVR::GameSemantic::ProducerToken::ResultTextB9200,
+            nullptr, &ResultTextRootsBefore, ResultTextEntrySerial);
         // Restore the exact previous scope without relying on a live VR flag.
         OutRunVR::GameSemantic::CurrentScope = ResultTextSavedScope;
         ResultTextSavedScope =
@@ -1537,6 +1561,8 @@ class UIScaling : public Hook
                 Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
                 Game::game_mode ? *Game::game_mode : -1);
         ResultTextBefore = {};
+        ResultTextRootsBefore = {};
+        ResultTextEntrySerial = 0;
     }
 
 	// R74 original GOAL helpers have the verified zero-argument void ABI.
