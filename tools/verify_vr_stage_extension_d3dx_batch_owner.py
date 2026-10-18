@@ -642,7 +642,9 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "queued = drawQueued;" in ledger_draw and
          "queueNode = drawQueued ? drawQueueNode : nullptr;" in ledger_draw and
          "queueEpoch = drawQueued ? drawQueueEpoch : 0;" in ledger_draw and
-         "homogeneous = validQueue;" in ledger_draw and
+         "homogeneous = validQueue &&" in ledger_draw and
+         "provenDirectB9200 = newProducer == Producer::ResultTextB9200 &&" in ledger_draw and
+         "provenDirectB9200 || drawQueued" in ledger_draw and
          "else if (!validQueue || scope != newScope ||" in ledger_draw and
          "producer != newProducer || queued != drawQueued ||" in ledger_draw and
          "queueNode != drawQueueNode" in ledger_draw and
@@ -662,6 +664,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.active, QueueRenderActive(), HudBatch.homogeneous" in flush and
          "HudBatch.scope, HudBatch.producer" in flush and
          "ScopedExactProducerSemantic owned(" in flush and
+         "HudBatch.provenDirectB9200 && !HudBatch.queued" in flush and
          "const auto submission = HudBatch.snapshot();" in flush and
          "Flush_hk.stdcall<HRESULT>(self)" in flush and
          "HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));" in flush and
@@ -672,6 +675,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "native Flush must retire only matching exact batch generation")
     need("CanRestoreDeferredResultOwner(" in end and
          "ScopedExactProducerSemantic owned(" in end and
+         "HudBatch.provenDirectB9200 && !HudBatch.queued" in end and
          "const auto submission = HudBatch.snapshot();" in end and
          "End_hk.stdcall<HRESULT>(self)" in end and
          "HudBatch.completeNativeEnd(submission);" in end and
@@ -722,7 +726,8 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "HudBatch.completeNativeDraw(" in draw and
          "submission, SUCCEEDED(hr), scope, source," in draw and
          "sameSourceAfterNative, command.queued," in draw and
-         "command.queueNode, command.queueEpoch))" in draw and
+         "command.queueNode, command.queueEpoch,\n                provenDirectB9200))" in draw and
+         "OriginalB9200GoalStackActive();" in draw and
          "if (FAILED(hr) || !self)" in draw and
          draw.index("const auto command = CapturePhysicalDrawCommand();") <
          draw.index("const auto submission = HudBatch.snapshot();") <
@@ -753,7 +758,8 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "first queue node must submit previous direct result under original owner")
     need("GoalOwner(nextScope, nextProducer)" in node and
          "nextProducer != CurrentRenderProducerToken()" in node and
-         "HudBatch.boundaryReady = enteringStage || enteringGoal;" in node,
+         "HudBatch.boundaryReady = enteringStage || enteringGoal;" in node and
+         "HudBatch.provenDirectB9200" in node,
          "GOAL Stage/Result queue-owner boundary must remain selective")
     need("HudBatch.boundaryReady && QueueRenderActive()" in queue_end and
          "HudBatch.drawCount != 0 && HudBatch.homogeneous" in queue_end and
@@ -799,6 +805,8 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "if (!succeeded || !sourceStillMatches)" in cd and
          "if (!unchanged(previous))" in cd and
          "active && drawCount == 0" in cd and
+         "exactDirectB9200Parent" in cd and
+         "provenDirectB9200 = false;" in ledger_forget and
          "homogeneous && scope == Scope::None" in cd and
          "producer == Producer::None" in cd and
          "lastSuccessfulFlushMutationSerial != 0" in cd and
@@ -806,7 +814,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
          "if (!cleanInternalFlush)" in cd and
          "onFlushFailure();" in cd and
          "recordDraw(drawScope, drawProducer," in cd and
-         "drawQueued, drawQueueNode, drawQueueEpoch);" in cd and
+         "drawQueued, drawQueueNode, drawQueueEpoch,\n                exactDirectB9200Parent);" in cd and
          cd.find("if (!succeeded || !sourceStillMatches)") < cd.find("if (!unchanged(previous))") <
          cd.find("if (!cleanInternalFlush)") <
          cd.rfind("onFlushFailure();") < cd.find("recordDraw(drawScope, drawProducer,") and
@@ -942,14 +950,22 @@ def main_current_ledger(code: str, header: str) -> int:
         ("foreign-draw-steals-owner", "code", "ScopedExactProducerSemantic outgoingBatch(", "ScopedExactProducerSemantic wrongBatch("),
         ("foreign-batch-no-split", "code", "flushed = FlushTracked(self);", "flushed = false;"),
         ("mix-becomes-homogeneous", "ledger", "homogeneous = false;", "homogeneous = true;"),
-        ("queue-invalid-owner-accepted", "ledger", "homogeneous = validQueue;", "homogeneous = true;"),
+        ("queue-invalid-owner-accepted", "ledger",
+         "homogeneous = validQueue &&\\n                    (newProducer != Producer::ResultTextB9200 ||\\n                     provenDirectB9200 || drawQueued);".replace("\\\\n", "\\n"),
+         "homogeneous = true;"),
         ("queue-direct-mix-accepted", "ledger", "queued != drawQueued", "queued == drawQueued"),
         ("queue-node-mix-accepted", "ledger", "queueNode != drawQueueNode", "queueNode == drawQueueNode"),
         ("queue-epoch-mix-accepted", "ledger", "queueEpoch != drawQueueEpoch", "queueEpoch == drawQueueEpoch"),
 
         ("successful-draw-untracked", "ledger",
-         "recordDraw(drawScope, drawProducer,\n                drawQueued, drawQueueNode, drawQueueEpoch);",
+         "recordDraw(drawScope, drawProducer,\n                drawQueued, drawQueueNode, drawQueueEpoch,\n                exactDirectB9200Parent);",
          "(void)drawScope; (void)drawProducer;"),
+        ("direct-goal-parent-not-captured", "code",
+         "OriginalB9200GoalStackActive();", "false;"),
+        ("direct-goal-mixed-parent-accepted", "ledger",
+         "!exactDirectB9200Parent)))", "false)))"),
+        ("direct-goal-deferred-flush-proof-lost", "code",
+         "HudBatch.provenDirectB9200 && !HudBatch.queued", "false"),
         ("texture-flush-stamp-lost", "ledger", "lastSuccessfulFlushMutationSerial = mutationSerial;", "lastSuccessfulFlushMutationSerial = 0;"),
         ("texture-flush-stamp-ignored", "ledger", "lastSuccessfulFlushMutationSerial == mutationSerial", "true"),
         ("texture-flush-promotes-source-switch", "ledger", "if (!succeeded || !sourceStillMatches)", "if (!succeeded)"),
