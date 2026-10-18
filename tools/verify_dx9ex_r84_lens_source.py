@@ -21,10 +21,11 @@ PATHS = (
     ".github/workflows/vr-dx9ex-active.yml",
     "src/hooks_graphics.cpp",
     "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/r84_spatial_eye_route.hpp",
 )
 
 
-def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, semantic):
+def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, semantic, spatial):
     assert "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;" in api
     assert "return GetTopLevelDrawSerial();" in r29
     assert '#include "lens_centre_source_provenance.hpp"' in r30
@@ -104,6 +105,38 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
 
     bld = r30.split("bool R30BuildScreenSpaceEyeConstants(", 1)[1].split(
         "template <typename ActualDraw>", 1)[0]
+    # Exact 3D sources must bypass ONLY the unrelated flat HUD tangent-affine
+    # precondition. A stale/unknown world source never gains this exception:
+    # source provenance remains checked in the separately guarded spatial arm.
+    spatial_admission = (
+        "const bool exactLensWorld =\n"
+        "                screenKind == R30ScreenSpaceKind::ExactLensCentreWorld;\n"
+        "            const bool exactShadowWorld =\n"
+        "                screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld;\n"
+        "            if (OutRunVR::SpatialEyeRoute::NeedsFlatHudAffine(\n"
+        "                    exactLensWorld, exactShadowWorld) &&\n"
+        "                !R30BuildEyeAffine(stereo, eyeScale, eyeOffset))\n"
+        "                return false;"
+    )
+    assert spatial_admission in bld, "exact spatial owners lost scoped HUD-affine bypass"
+    assert bld.index(spatial_admission) < bld.index(spatial_gate)
+    assert bld.count("R30BuildEyeAffine(stereo, eyeScale, eyeOffset)") == 1
+    for exact_lens, exact_shadow in (
+        ("false", "false"), ("true", "false"),
+        ("false", "true"), ("true", "true")
+    ):
+        predicate = f"NeedsFlatHudAffine({exact_lens}, {exact_shadow})"
+        assert predicate in spatial, "spatial flat-HUD predicate fixture missing: " + predicate
+    assert "return !exactWorldLensCentre && !exactWorldCarShadow;" in spatial
+    assert "std::isfinite(worldScale) && worldScale > 0.0f" in spatial
+    assert ('#include "r84_spatial_eye_route.hpp"' in r30 and
+            "inline bool PositiveWorldScale(float worldScale)" in spatial)
+    # Degenerate/nonfinite scale must reject BOTH spatial-eye matrices;
+    # the original native lens draw stays the conservative fallback.
+    assert ("if (!OutRunVR::SpatialEyeRoute::PositiveWorldScale(\n"
+            "                        lensWorldScale))\n"
+            "                    return false;") in bld
+
     # C993 and exact car shadow share a spatial eye matrix. Their original
     # raw c64 evidence must still be selected independently.
     spatial_gate = "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||"
@@ -413,6 +446,18 @@ def main():
             ": R30HasExactCarBaseShadowRawWvp(rawGameWvp)"),
         (2, "viewDepth < (exactShadow ? 0.05f : 1.25f)",
             "viewDepth < (exactShadow ? 0.05f : 0.0f)"),
+        (2, "const bool exactLensWorld =\n                screenKind == R30ScreenSpaceKind::ExactLensCentreWorld;",
+            "const bool exactLensWorld = false;"),
+        (2, "const bool exactShadowWorld =\n                screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld;",
+            "const bool exactShadowWorld = false;"),
+        (2, "OutRunVR::SpatialEyeRoute::NeedsFlatHudAffine(",
+            "OutRunVR::SpatialEyeRoute::AlwaysNeedFlatHudAffine("),
+        (2, "OutRunVR::SpatialEyeRoute::PositiveWorldScale(",
+            "OutRunVR::SpatialEyeRoute::AllowDegenerateScale("),
+        (11, "return !exactWorldLensCentre && !exactWorldCarShadow;",
+            "return true; /* incorrectly require HUD affine for 3D */"),
+        (11, "std::isfinite(worldScale) && worldScale > 0.0f",
+            "std::isfinite(worldScale) && worldScale >= 0.0f"),
         (2, "headPoseSequence != stereo.poseSequence", "false"),
         (2, "R29OwnerMultiplyMatrix(worldView, headInverse)", "R29OwnerMultiplyMatrix(headInverse, worldView)"),
         (2, "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))", "std::memcpy(&rawUploadedT, original, sizeof(rawUploadedT))"),
