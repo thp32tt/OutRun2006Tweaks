@@ -207,22 +207,79 @@ namespace OutRunVR::GameSemantic
             ProducerToken::StageExtensionTime));
     }
 
-    // R33 GOAL stereo fences the *physical* SpriteNode and queue epoch,
-    // not just the result/progress producer token. Distinct nodes with the
-    // same GOAL E8 source can accumulate separate D3DX Draw batches; drain
-    // the previous homogeneous node while it is still selected. Do not
-    // affect the already isolated +TIME path, pause arrows, or unknown HUD.
+    // R33 GOAL stereo fences the physical SpriteNode AND its queue epoch,
+    // not just the result/progress producer token. SelectSpriteQueueNode
+    // advances the epoch on every selection, including pointer reuse.
+    // A recycled GOAL node with the same address/token must drain the old
+    // homogeneous D3DX batch before its previous eye ownership is lost.
+    // No implicit ownership for +TIME, pause arrows or unknown HUD.
     inline constexpr bool CanIsolateD3DXGoalQueueNodeTransition(
         bool queueActive, const void* outgoingNode, const void* incomingNode,
         RenderScope outgoingScope, ProducerToken outgoingProducer,
         RenderScope incomingScope, ProducerToken incomingProducer) noexcept
     {
         return queueActive && outgoingNode != nullptr &&
-            incomingNode != nullptr && outgoingNode != incomingNode &&
+            incomingNode != nullptr &&
             outgoingProducer == incomingProducer &&
             outgoingProducer != ProducerToken::StageExtensionTime &&
             CanReprojectFiniteResultHudPlane(outgoingScope, outgoingProducer) &&
             CanReprojectFiniteResultHudPlane(incomingScope, incomingProducer);
+    }
+
+    namespace GoalQueueEpochRegression
+    {
+        inline constexpr unsigned char PreviousNode = 0;
+        inline constexpr unsigned char NextNode = 0;
+        // Both distinct GOAL nodes and a recycled identical native pointer
+        // are new physical selections: the previous batch must be fenced
+        // while its original queue epoch is still current.
+        static_assert(CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &NextNode, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020));
+        static_assert(CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &PreviousNode, RenderScope::ScreenHud,
+            ProducerToken::ResultProgress, RenderScope::ScreenHud,
+            ProducerToken::ResultProgress));
+        static_assert(CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &PreviousNode, RenderScope::ScreenHud,
+            ProducerToken::ResultTextB9200, RenderScope::ScreenHud,
+            ProducerToken::ResultTextB9200));
+        // No queue, null boundary, mismatched exact GOAL producers,
+        // staged +TIME, ordinary overlay, world marker or unknown token
+        // may acquire GOAL's physical eye ownership.
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            false, &PreviousNode, &PreviousNode, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, nullptr, &NextNode, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, nullptr, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &NextNode, RenderScope::ScreenHud,
+            ProducerToken::GoalTime020, RenderScope::ScreenHud,
+            ProducerToken::GoalTime150));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &PreviousNode, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime, RenderScope::ScreenHud,
+            ProducerToken::StageExtensionTime));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &PreviousNode, RenderScope::ScreenOverlay2D,
+            ProducerToken::ResultProgress, RenderScope::ScreenOverlay2D,
+            ProducerToken::ResultProgress));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &PreviousNode, RenderScope::WorldBillboard,
+            ProducerToken::GoalTime020, RenderScope::WorldBillboard,
+            ProducerToken::GoalTime020));
+        static_assert(!CanIsolateD3DXGoalQueueNodeTransition(
+            true, &PreviousNode, &PreviousNode, RenderScope::ScreenHud,
+            ProducerToken::None, RenderScope::ScreenHud,
+            ProducerToken::None));
     }
 
     // The source E8 can return before its registered D3DX triangles reach
