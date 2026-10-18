@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
-  "checkpoint": "C3_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "1e2cefccb4f94dd605d07df647b5ec2ca9a9c4f3",
-  "validation_bearing_result_sha": "PENDING_CI",
-  "automation_validation": "PENDING",
+  "validation_bearing_result_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/game/render_semantics.hpp"
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "stage_source_to_queue": "SOURCE_IMPLEMENTED_PARTIAL_RUNTIME_UNTESTED",
-    "stage_d3dx_source_fallback": "SOURCE_IMPLEMENTED",
-    "stage_exact_sha_gates": "PENDING"
+    "stage_source_to_queue": "PASS_EXACT_SHA",
+    "stage_d3dx_source_fallback": "PASS_EXACT_SHA",
+    "stage_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R84 SelectSpriteQueueNode increments SpriteQueueNodeEpoch on every selection, including when a native node pointer is selected again; the stage D3DX transition helper gated on outgoingNode != incomingNode.",
@@ -73,7 +73,9 @@
       "No global D3DX per-Draw Flush, no SkyGlow/HUD generic retag, no synthetic game timer changes, no bypass of physical R84/host stereo admission."
     ],
     "eye_ownership": "A reused node pointer has a new R84 queue epoch after SelectSpriteQueueNode; the previous queued D3DX triangles must be submitted with the OLD epoch before R30/R33 evaluates the next eye. Actual Quest3 optical outcome is still untested.",
-    "root_cause": "Queue-boundary admission compared only SpriteNode pointer inequality, despite physical draw identity requiring both pointer and incremented queue epoch."
+    "root_cause": "Queue-boundary admission compared only SpriteNode pointer inequality, despite physical draw identity requiring both pointer and incremented queue epoch.",
+    "fix_evidence": "Source material 1e2cefccb4f94dd605d07df647b5ec2ca9a9c4f3 corrected same-pointer stage queue epoch admission; host smoke regression repair 33a7ea7bf3e0282e68383598aa8d5322118eb864 passed x64 host and native deterministic tests on final exact 79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6.",
+    "negative_test_evidence": "Native +TIME queue test refuses inactive queue, null outgoing/incoming pointer, foreign GOAL or projected WorldBillboard ownership, while permitting same-pointer NEW selection epoch; all exact-SHA CI gates passed (runtime HMD not tested)."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -86,8 +88,8 @@
     "failed_exact_sha": "1e2cefccb4f94dd605d07df647b5ec2ca9a9c4f3",
     "failed_run_id": 39126228807,
     "failed_step": "policy: run record missing; full-chain game/host/package skipped",
-    "final_exact_sha_gates": "PENDING",
-    "head_sha": "PENDING",
+    "final_exact_sha_gates": "PASS_EXACT_SHA",
+    "head_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
     "first_policy_repair_sha": "64a3561672924924571ac83c6f1549ba0383dd11",
     "host_smoke_failed_sha": "64a3561672924924571ac83c6f1549ba0383dd11",
     "host_smoke_failed_run_id": 39126404829,
@@ -95,7 +97,43 @@
     "host_smoke_failure": "stage_extension_eye_plane_smoke returned 61: obsolete same-pointer denial contradicted the corrected queue-epoch selection semantics",
     "host_smoke_repair_sha": "33a7ea7bf3e0282e68383598aa8d5322118eb864",
     "host_smoke_repair_validation": "GitHub exact-SHA host job success within DX9Ex Active Validation #39126748372",
-    "hud_gate_coverage_repair": "HUD Inspector push and PR path filters now watch vrhost/tests/stage_extension_eye_plane_smoke.cpp; previous 33a7ea7 did not dispatch this required gate."
+    "hud_gate_coverage_repair": "HUD Inspector push and PR path filters now watch vrhost/tests/stage_extension_eye_plane_smoke.cpp; previous 33a7ea7 did not dispatch this required gate.",
+    "build_validation": "BUILD_VERIFIED",
+    "runtime_validation": "UNTESTED",
+    "ci_repair_shas": [
+      "64a3561672924924571ac83c6f1549ba0383dd11",
+      "33a7ea7bf3e0282e68383598aa8d5322118eb864",
+      "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6"
+    ],
+    "verified_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39127302814,
+        "head_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39127302669,
+        "head_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39127302797,
+        "head_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39127302701,
+        "head_sha": "79d0e9d3bb3af9d6f37041d6d96cc434832ce3a6",
+        "conclusion": "success"
+      }
+    ]
   },
-  "notes": "Same TASK_ID B exact CI policy failure repair only. Run record addition changes no native game runtime; retain material source SHA and do not award an additional score. No HMD test performed. Exact failure repairs: required feature-unit policy record, +TIME host smoke code-61 expectation, and missing HUD Inspector smoke path filter; retain material 1e2cef, no duplicate score. Exact-SHA 4-gate outcome pending, Quest3/VDXR untested."
+  "notes": "Same TASK_ID B exact CI policy failure repair only. Run record addition changes no native game runtime; retain material source SHA and do not award an additional score. No HMD test performed. Exact failure repairs: required feature-unit policy record, +TIME host smoke code-61 expectation, and missing HUD Inspector smoke path filter; retain material 1e2cef, no duplicate score. Exact-SHA 4-gate outcome pending, Quest3/VDXR untested. C6: exact-SHA four mandatory GitHub Actions SUCCESS at 79d0e9d3; real original material remains 1e2cefcc. No Quest3/VDXR optics or physical 72Hz evidence; retry, test expectation, gate coverage and checkpoint earn no additional AI score.",
+  "latest_event_id": "CONVERSION-DX9EX-01042-E003",
+  "latest_event_type": "retry",
+  "latest_attempt": "2/3"
 }
