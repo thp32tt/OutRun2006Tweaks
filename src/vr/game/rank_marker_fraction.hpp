@@ -10,15 +10,19 @@ namespace OutRunVR::RankMarker
     // by the same vehicle-rank clip CALL. kind 0 is a SPRARGS position;
     // kind 1 is a transformed SPRARGS2 quad (translation lives in mtx_14).
     // Never edit an unknown node layout or publish a half-updated X/Y pair.
+    // Preflight original rank kind-0 sprite positions and kind-1 transform
+    // translations without mutating either coordinate. A multi-glyph rank
+    // must never update its first child if a later sibling has invalid data.
     template <typename SpriteNodeT>
-    bool RestoreFraction(SpriteNodeT& node, float dx, float dy) noexcept
+    bool FractionCandidate(const SpriteNodeT& node, float dx, float dy,
+        float& candidateX, float& candidateY) noexcept
     {
         if (!std::isfinite(dx) || !std::isfinite(dy) ||
             std::fabs(dx) > 1.0f || std::fabs(dy) > 1.0f)
             return false;
 
-        float* x = nullptr;
-        float* y = nullptr;
+        const float* x = nullptr;
+        const float* y = nullptr;
         if (node.kind_C == 0u)
         {
             x = &node.args_10.float24;
@@ -26,8 +30,8 @@ namespace OutRunVR::RankMarker
         }
         else if (node.kind_C == 1u)
         {
-            // D3DXVec4Transform uses row-vector matrices. _41/_42 move
-            // every corner equally without modifying UV, depth or shape.
+            // D3DX row-vector sprite matrices carry translation in _41/_42;
+            // UV, animation, shape and depth are deliberately unchanged.
             x = &node.args2_58.mtx_14._41;
             y = &node.args2_58.mtx_14._42;
         }
@@ -38,8 +42,27 @@ namespace OutRunVR::RankMarker
         const float nextY = *y + dy;
         if (!std::isfinite(nextX) || !std::isfinite(nextY))
             return false;
-        *x = nextX;
-        *y = nextY;
+        candidateX = nextX;
+        candidateY = nextY;
+        return true;
+    }
+
+    template <typename SpriteNodeT>
+    bool RestoreFraction(SpriteNodeT& node, float dx, float dy) noexcept
+    {
+        float x = 0.0f, y = 0.0f;
+        if (!FractionCandidate(node, dx, dy, x, y))
+            return false;
+        if (node.kind_C == 0u)
+        {
+            node.args_10.float24 = x;
+            node.args_10.float28 = y;
+        }
+        else
+        {
+            node.args2_58.mtx_14._41 = x;
+            node.args2_58.mtx_14._42 = y;
+        }
         return true;
     }
     // The original 4th+ place rank clip CALL may rebuild its SpriteNode
@@ -57,16 +80,39 @@ namespace OutRunVR::RankMarker
             root, oldTail, newTail, bound);
         if (!first)
             return 0u;
-        unsigned restored = 0;
-        for (Node* node = first; node && bound != 0; --bound)
+        // The original clip producer emits a logical rank marker containing
+        // multiple animated/number siblings. Partial fraction repair makes
+        // those siblings detach from one vehicle in different eyes. First
+        // validate EVERY bounded live sibling, then apply the same native
+        // Calc3D2D fraction to all of them. No queue node is modified when
+        // an unexpected kind, NaN or truncated chain is encountered.
+        unsigned count = 0;
+        bool reachedTail = false;
+        for (Node* node = first; node && count < bound; node = node->next_0)
         {
-            if (RestoreFraction(*node, dx, dy))
-                ++restored;
+            float x = 0.0f, y = 0.0f;
+            if (!FractionCandidate(*node, dx, dy, x, y))
+                return 0u;
+            ++count;
             if (node == newTail)
+            {
+                reachedTail = true;
                 break;
+            }
+        }
+        if (!reachedTail)
+            return 0u;
+
+        Node* node = first;
+        for (unsigned i = 0; i < count; ++i)
+        {
+            // All children passed the exact same preflight above. The native
+            // producer/queue is synchronous; no other callback mutates the
+            // list between these two bounded passes.
+            RestoreFraction(*node, dx, dy);
             node = node->next_0;
         }
-        return restored;
+        return count;
     }
 
     // An original vehicle rank producer may replace an entire priority

@@ -68,6 +68,34 @@ int main()
            first.args_10.float28 == 199.75f);
     RANK_CHECK(second.args2_58.mtx_14._41 == 50.375f &&
            second.args2_58.mtx_14._42 == 59.75f);
+    // Before the two-pass fix, an invalid SECOND rank glyph left the
+    // already-adjusted FIRST glyph detached from its vehicle (return 1).
+    // Reject the WHOLE same-call visual group without touching any child.
+    const float committedFirstX = first.args_10.float24;
+    const float committedFirstY = first.args_10.float28;
+    const float committedSecondX = second.args2_58.mtx_14._41;
+    second.kind_C = 9;
+    RANK_CHECK(RestoreAppendedRankFractions(
+        &root, &old, &second, 4, 0.25f, -0.25f) == 0u);
+    RANK_CHECK(first.args_10.float24 == committedFirstX &&
+        first.args_10.float28 == committedFirstY &&
+        second.args2_58.mtx_14._41 == committedSecondX);
+    second.kind_C = 1;
+    // A malformed (NaN) later glyph has the same transaction rule.
+    second.args2_58.mtx_14._41 =
+        std::numeric_limits<float>::quiet_NaN();
+    RANK_CHECK(RestoreAppendedRankFractions(
+        &root, &old, &second, 4, 0.125f, 0.125f) == 0u);
+    RANK_CHECK(first.args_10.float24 == committedFirstX &&
+        first.args_10.float28 == committedFirstY);
+    second.args2_58.mtx_14._41 = committedSecondX;
+    // Valid mixed kind-0/kind-1 siblings still move together on the next
+    // exact parent, without changing their original UV/scale/depth.
+    RANK_CHECK(RestoreAppendedRankFractions(
+        &root, &old, &second, 4, 0.125f, 0.125f) == 2u);
+    RANK_CHECK(first.args_10.float24 == committedFirstX + 0.125f &&
+        first.args_10.float28 == committedFirstY + 0.125f &&
+        second.args2_58.mtx_14._41 == committedSecondX + 0.125f);
     // Detached tail: its next_0 may be stale or reused by a foreign
     // producer. The current root is authoritative; DO NOT dereference old.
     stale.next_0 = &foreign;
