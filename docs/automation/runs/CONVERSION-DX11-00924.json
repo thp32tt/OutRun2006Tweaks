@@ -7,9 +7,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00924",
   "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SAMPLER_BINDING",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -18,7 +18,7 @@
   "full_dx11_renderer_complete": false,
   "score_change": 0,
   "material_result_sha": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af",
   "feature_contract": {
     "feature_id": "DX11:REAL_GAME_DRAW_PROGRAMMABLE_SAMPLER_BINDING",
     "goal": "Connect real game ps_3_0 sampler declarations and TEXLD to D3D11 shader tN/sN samples, then bind live game resources and produce complete native menu/car/race Draw with original game fallback",
@@ -93,15 +93,56 @@
     "C0_RECOVER": "Branch HEAD 4a15fcab, 00923 exact-SHA source-stage build proved but live game programmable native Draw unfinished",
     "C1_REVIEW": "Actual SM3 TEXLD was unsupported in R283",
     "C2_IMPLEMENT": "Source shader TEXLD and sampler translation material f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
-    "C3_VALIDATE": "Initial exact-SHA gates failed stale 00923 terminal acceptance and source graph V5 contract; causal repair staged",
+    "C3_VALIDATE": "Required DX11 Fast, Backend, Win32 Build, OpenXR and HUD 5/5 SUCCESS on same exact validation-bearing repair SHA 79c2723b65b01c8ca83eb8a6299ad5bd77c945af; original source-only material SHA retained; no HMD/gameplay runtime test",
     "C4_COMMIT": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_EXACT_SHA"
+    "C6_RESULT": "PASS_EXACT_SHA; COMPLETE_BUILD_VERIFIED (SOURCE_STAGE_ONLY), exact validation-bearing SHA 79c2723b65b01c8ca83eb8a6299ad5bd77c945af; required 5/5 GitHub Actions SUCCESS. TERMINAL_STATUS_NOT_COMPLETE prior hold addressed for terminal build verification only. Live native D3D11 SRV/sampler bindings and real game Draw/visible frames remain pending per preserved acceptance_results. HMD/gameplay UNTESTED. Bookkeeping-only [skip ci], no duplicate scoring."
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Game-authored texture/sampler SRV and sampler states not yet bound to native programmable GPU draw",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "f2b1fad24e3b01ed0e47c6934edc54badbad43b2",
-  "NEXT_IMPLEMENTATION_ACTION": "Bind D3D9 source sampler snapshots to D3D11 tN/sN at native programmable draw, measure real Draw+frame counts before enabling"
+  "NEXT_IMPLEMENTATION_ACTION": "Bind D3D9 source sampler snapshots to D3D11 tN/sN at native programmable draw, measure real Draw+frame counts before enabling",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "validation_evidence": {
+    "scope": "SOURCE_STAGE_ONLY",
+    "exact_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af",
+    "ci_status": "SUCCESS",
+    "ci_gate_count": "MANDATORY_5_OF_5",
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39144100319,
+        "conclusion": "success",
+        "head_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39144100349,
+        "conclusion": "success",
+        "head_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af"
+      },
+      {
+        "name": "Build",
+        "run_id": 39144100365,
+        "conclusion": "success",
+        "head_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39144100341,
+        "conclusion": "success",
+        "head_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39144100317,
+        "conclusion": "success",
+        "head_sha": "79c2723b65b01c8ca83eb8a6299ad5bd77c945af"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  }
 }
