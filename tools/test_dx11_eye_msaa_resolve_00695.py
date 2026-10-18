@@ -16,8 +16,8 @@ def connected(s,h):
     except IndexError:
         return False
     checks=[
-        "exact_source(left_source, leftDesc)",
-        "exact_source(right_source, rightDesc)",
+        "exact_source(left_source, leftDesc,",
+        "exact_source(right_source, rightDesc,",
         "desc.SampleDesc.Count == 0",
         "desc.SampleDesc.Count == 1 && desc.SampleDesc.Quality != 0",
         "producer_device_->CheckFormatSupport(format_, &formatSupport)",
@@ -28,6 +28,12 @@ def connected(s,h):
         "transfer == NativeGameEyeTransfer::Reject",
         "native_game_eye_pair_sources_admitted(",
         "transfer == NativeGameEyeTransfer::Resolve",
+        "native_game_postpass_mip_extent(",
+        "!extent.valid || extent.width != width_",
+        "left_mip_slice, left_array_slice)",
+        "right_mip_slice, right_array_slice)",
+        "D3D11CalcSubresource(left_mip_slice, left_array_slice,",
+        "D3D11CalcSubresource(right_mip_slice, right_array_slice,",
         "context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);",
         "context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);",
         "context->CopyResource(entry.eye[0].Get(), left_source);",
@@ -72,10 +78,14 @@ for removed in [
     else:
         raise AssertionError("queued native stereo eye safety mutation accepted: " + removed)
 for removed in [
-    "!exact_source(left_source, leftDesc)",
-    "!exact_source(right_source, rightDesc)",
+    "!exact_source(left_source, leftDesc,",
+    "!exact_source(right_source, rightDesc,",
     "producer_device_->CheckFormatSupport(format_, &formatSupport)",
     "transfer == NativeGameEyeTransfer::Reject",
+    "native_game_postpass_mip_extent(",
+    "!extent.valid || extent.width != width_",
+    "left_mip_slice, left_array_slice)",
+    "D3D11CalcSubresource(left_mip_slice, left_array_slice,",
     "native_game_eye_pair_sources_admitted(",
     "context->ResolveSubresource(entry.eye[0].Get()",
     "context->ResolveSubresource(entry.eye[1].Get()",
@@ -92,11 +102,17 @@ for removed in [
 changes=0
 for key in [
     "desc.SampleDesc.Count == 0",
-    "exact_source(left_source, leftDesc)",
-    "exact_source(right_source, rightDesc)",
+    "exact_source(left_source, leftDesc,",
+    "exact_source(right_source, rightDesc,",
     "producer_device_->CheckFormatSupport(format_, &formatSupport)",
     "formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE",
     "native_game_eye_transfer(",
+    "native_game_postpass_mip_extent(",
+    "!extent.valid || extent.width != width_",
+    "left_mip_slice, left_array_slice)",
+    "right_mip_slice, right_array_slice)",
+    "D3D11CalcSubresource(left_mip_slice, left_array_slice,",
+    "D3D11CalcSubresource(right_mip_slice, right_array_slice,",
     "native_game_eye_pair_sources_admitted(",
     "transfer == NativeGameEyeTransfer::Resolve",
     "context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);",
