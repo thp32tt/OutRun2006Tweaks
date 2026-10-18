@@ -1336,6 +1336,18 @@ namespace OutRunVRStereo
                         OutRunVR::StereoFailureRightWvpUploadFailed;
                     rightHr = E_FAIL;
                 }
+                // RIGHT RT/depth/viewport/c64 setters can synchronously
+                // reenter game code after LEFT's source was validated.
+                // Reject a changed physical C993 or original game WVP
+                // before the RIGHT native Draw; preserve LEFT and restore.
+                if (SUCCEEDED(rightHr) && exactCentreEye &&
+                    !OutRunVR::LensCentre::SameCentreForRightEye(
+                        centreBeforeLeft, centreRawBeforeLeft,
+                        captureCentreSource(), captureCentreRawSource()))
+                {
+                    rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                    rightHr = E_FAIL;
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;

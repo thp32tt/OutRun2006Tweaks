@@ -126,6 +126,41 @@ namespace OutRunVR::LensCentre
             raw.writtenDraw <= physical.drawSerial &&
             physical.drawSerial - raw.writtenDraw < 128u;
     }
+    // RIGHT RT/viewport/WVP setters run after the accepted LEFT draw.
+    // A synchronous nested callback can replace C993 or game c64 at this
+    // final boundary. Never send a foreign source to the other eye.
+    constexpr bool SameCentreForRightEye(
+        const StereoDrawSource& left, const RawStereoSource& leftRaw,
+        const StereoDrawSource& atRight, const RawStereoSource& atRightRaw) noexcept
+    {
+        return IsCoherentNativeCentrePair(left, leftRaw) &&
+            IsCoherentNativeCentrePair(atRight, atRightRaw) &&
+            SameStereoDrawSource(left, atRight) &&
+            SameRawStereoSource(leftRaw, atRightRaw);
+    }
+    static_assert(SameCentreForRightEye(
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true},
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true}));
+    static_assert(!SameCentreForRightEye(
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true},
+        {8,40,11,9,0x100,true}, {101,39,8,8,9,9,0x100,11,true}),
+        "another C993 centre must never reach RIGHT");
+    static_assert(!SameCentreForRightEye(
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true},
+        {7,40,11,9,0x100,true}, {102,39,7,7,9,9,0x100,11,true}),
+        "reentrant game c64 write vetoes RIGHT");
+    static_assert(!SameCentreForRightEye(
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true},
+        {7,40,11,10,0x100,true}, {101,39,7,7,9,9,0x100,11,true}),
+        "new pose vetoes RIGHT");
+    static_assert(!SameCentreForRightEye(
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true},
+        {7,40,12,9,0x100,true}, {101,39,7,7,9,9,0x100,12,true}),
+        "new shader epoch vetoes RIGHT");
+    static_assert(!SameCentreForRightEye(
+        {7,40,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true},
+        {7,41,11,9,0x100,true}, {101,39,7,7,9,9,0x100,11,true}),
+        "nested physical GPU draw vetoes RIGHT");
     static_assert(IsCoherentNativeCentrePair(
         {7,40,11,9,0x100,true},
         {101,39,7,7,9,9,0x100,11,true}));

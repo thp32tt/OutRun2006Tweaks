@@ -7605,6 +7605,21 @@ namespace OutRunVRStereo
                         OutRunVR::StereoFailureRightWvpUploadFailed;
                     rightHr = E_FAIL;
                 }
+                // A RIGHT RT/viewport/c64 setter can synchronously invoke
+                // another original callback after the post-LEFT fence.
+                // Revalidate the same C993 call and original c64 writer
+                // before issuing any second physical GPU submission.
+                if (SUCCEEDED(rightHr) && exactCentre)
+                {
+                    const CentrePhysicalSource atRight = captureCentre();
+                    if (!OutRunVR::LensCentre::SameCentreForRightEye(
+                            centreBefore.draw, centreBefore.raw,
+                            atRight.draw, atRight.raw))
+                    {
+                        rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                        rightHr = E_FAIL;
+                    }
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
