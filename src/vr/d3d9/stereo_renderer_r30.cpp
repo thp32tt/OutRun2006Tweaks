@@ -3056,6 +3056,17 @@ namespace OutRunVRStereo
                 // an eye HUD plane to road/sky/spatial effect geometry.
                 if (R30SpatialSceneEffectNeedsWorldRouting())
                     return R30ScreenSpaceKind::None;
+                // Quest 3 Draw evidence: generic SCENE_FX hit the screen
+                // plane 77,160 times, making sky/world-space effects follow
+                // the head rather than their original 3D camera. Missing
+                // original WVP is NOT affirmative proof of screen-space.
+                // A plain SceneEffect must therefore retain its original
+                // source/world fallback, never receive the HUD c64. The
+                // explicit ProjectedScreenEffect2D CABE outer halos stay
+                // eligible for the existing binocular flat effect path.
+                if (scope ==
+                    OutRunVR::GameSemantic::RenderScope::SceneEffect)
+                    return R30ScreenSpaceKind::None;
                 // Do not promote any other direct WorldBillboard, including
                 // nested projected-effect calls, to flat HUD space.
                 if (!OutRunVR::GameSemantic::QueueRenderActive() &&
