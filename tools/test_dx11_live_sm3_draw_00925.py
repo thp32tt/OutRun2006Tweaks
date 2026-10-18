@@ -135,6 +135,12 @@ check("struct NativeLiveSm3Program" in header and
 # channels, scalar/dot/matrix and TEX coordinates stay fail-closed.
 for token in (
     "native_sm3_source_components(op.opcode, mask, i)",
+    "case D3DSIO_TEXKILL:",
+    "case D3DSIO_DSX:",
+    "case D3DSIO_DSY:",
+    "op.texkill = instruction.opcode == D3DSIO_TEXKILL;",
+    "(tempWritten[op.destinationRegister] & 0x07u) != 0x07u",
+    "append_native_sm3_texkill(",
     "native_sm3_swizzled_components(",
     "op.texture2d ? 3u",
     "op.matrix4x4 ? 15u",

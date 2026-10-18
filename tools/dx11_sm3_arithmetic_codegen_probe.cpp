@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/native_sm3_arithmetic_codegen.hpp"
+#include "../src/vr/d3d11/native_sm3_fragment_codegen.hpp"
 #include <array>
 #include <cassert>
 #include <string>
@@ -37,6 +38,10 @@ int main() {
     assert(emit(NativeSm3ArithmeticOpcode::Normalize3, 7u, 1u));
     assert(emit(NativeSm3ArithmeticOpcode::Cross3, 7u, 2u));
     assert(emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 3u));
+    assert(emit(NativeSm3ArithmeticOpcode::DerivativeX, 3u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::DerivativeY, 12u, 1u));
+    assert(out.find("ddx(input.r0.xyzw)") != std::string::npos);
+    assert(out.find("ddy(input.r0.xyzw)") != std::string::npos);
     assert(out.find("rsqrt(abs(") != std::string::npos);
     assert(out.find("exp2(") != std::string::npos);
     assert(out.find("log2(abs(") != std::string::npos);
@@ -79,6 +84,12 @@ int main() {
     static_assert(native_sm3_source_components(
         NativeSm3ArithmeticOpcode::Move, 1u, 0u) == 1u);
     static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::DerivativeX, 2u, 0u) == 2u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::DerivativeY, 4u, 0u) == 4u);
+    static_assert(native_sm3_source_components(
+        NativeSm3ArithmeticOpcode::DerivativeX, 2u, 1u) == 0u);
+    static_assert(native_sm3_source_components(
         NativeSm3ArithmeticOpcode::MultiplyAdd, 3u, 2u) == 3u);
     static_assert(native_sm3_source_components(
         NativeSm3ArithmeticOpcode::Compare, 8u, 1u) == 8u);
@@ -108,6 +119,13 @@ int main() {
     static_assert(native_sm3_swizzled_components(0u, 0xe4u) == 0u);
     static_assert(native_sm3_swizzled_components(16u, 0xe4u) == 0u);
     static_assert(native_sm3_swizzled_components(1u, 256u) == 0u);
+    // Pixel-only TEXKILL reads all three prior TEMP lanes; no fabricated
+    // zeros may turn an unwritten channel into a native pixel discard.
+    std::string killSource;
+    assert(append_native_sm3_texkill(killSource, 2u, 0u));
+    assert(killSource == "    clip(r283_t2.xyz);\n");
+    assert(!append_native_sm3_texkill(killSource, 32u, 1u));
+    assert(killSource == "    clip(r283_t2.xyz);\n");
     // Real backend rejects unwritten lanes even after a partial write.
     const unsigned tempWrittenX = 1u;
     const unsigned movReadX = native_sm3_swizzled_components(

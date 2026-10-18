@@ -11,7 +11,8 @@ enum class NativeSm3ArithmeticOpcode {
     Move, Add, Subtract, Multiply, MultiplyAdd, Dot3, Dot4, Minimum, Maximum,
     Absolute, Fraction, SetLessThan, SetGreaterEqual, Compare,
     Reciprocal, ReciprocalSquareRoot, Exponential2, Logarithm2,
-    Power, LinearInterpolate, Normalize3, Cross3, Dot2Add
+    Power, LinearInterpolate, Normalize3, Cross3, Dot2Add,
+    DerivativeX, DerivativeY
 };
 
 // D3D9 destination masks do not require every source swizzle lane to have
@@ -27,6 +28,8 @@ enum class NativeSm3ArithmeticOpcode {
         return 0u;
     switch (opcode) {
     case NativeSm3ArithmeticOpcode::Move:
+    case NativeSm3ArithmeticOpcode::DerivativeX:
+    case NativeSm3ArithmeticOpcode::DerivativeY:
     case NativeSm3ArithmeticOpcode::Absolute:
     case NativeSm3ArithmeticOpcode::Fraction:
         return sourceIndex == 0u ? destinationMask : 0u;
@@ -148,9 +151,13 @@ inline bool append_native_sm3_arithmetic(
     }
     case NativeSm3ArithmeticOpcode::Absolute:
     case NativeSm3ArithmeticOpcode::Fraction:
+    case NativeSm3ArithmeticOpcode::DerivativeX:
+    case NativeSm3ArithmeticOpcode::DerivativeY:
         if (!validSources(1u)) return false;
         expression = std::string(
-            opcode == NativeSm3ArithmeticOpcode::Absolute ? "abs(" : "frac(") +
+            opcode == NativeSm3ArithmeticOpcode::Absolute ? "abs(" :
+            opcode == NativeSm3ArithmeticOpcode::Fraction ? "frac(" :
+            opcode == NativeSm3ArithmeticOpcode::DerivativeX ? "ddx(" : "ddy(") +
             sources[0] + ")"; break;
     case NativeSm3ArithmeticOpcode::Add:
     case NativeSm3ArithmeticOpcode::Subtract:

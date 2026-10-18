@@ -4,6 +4,7 @@
 #include "native_sm3_arithmetic_codegen.hpp"
 #include "native_sm3_constant_codegen.hpp"
 #include "native_sm3_texture_codegen.hpp"
+#include "native_sm3_fragment_codegen.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
@@ -361,6 +362,7 @@ bool build_r283_sm3_mov_shader_source(
             bool matrix4x4{};
             bool matrix3x3{};
             bool texture2d{};
+            bool texkill{};
             unsigned samplerRegister{};
             std::array<std::string, 3> sources{};
             std::array<std::string, 4> matrixRows{};
@@ -479,6 +481,16 @@ bool build_r283_sm3_mov_shader_source(
                 opcode = NativeSm3ArithmeticOpcode::Cross3; sourceCount = 2u; break;
             case D3DSIO_DP2ADD:
                 opcode = NativeSm3ArithmeticOpcode::Dot2Add; sourceCount = 3u; break;
+            case D3DSIO_DSX:
+                if (vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::DerivativeX; sourceCount = 1u; break;
+            case D3DSIO_DSY:
+                if (vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::DerivativeY; sourceCount = 1u; break;
+            case D3DSIO_TEXKILL:
+                // ps_3_0 TEXKILL reads a prior TEMP xyz, never writes it.
+                if (vertexStage) return false;
+                opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 0u; break;
             case D3DSIO_M4x4:
             case D3DSIO_M3x3:
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
@@ -517,6 +529,19 @@ bool build_r283_sm3_mov_shader_source(
             op.matrix4x4 = instruction.opcode == D3DSIO_M4x4;
             op.matrix3x3 = instruction.opcode == D3DSIO_M3x3;
             op.texture2d = instruction.opcode == D3DSIO_TEX;
+            op.texkill = instruction.opcode == D3DSIO_TEXKILL;
+            if (op.texkill) {
+                // D3D9 TEXKILL is encoded with a destination-style TEMP
+                // operand but only tests prior xyz values. Never promote a
+                // shader that kills from an unwritten channel or other bank.
+                if (mask != 0x0fu || op.destinationType != D3DSPR_TEMP ||
+                    op.destinationRegister >= tempWritten.size() ||
+                    (tempWritten[op.destinationRegister] & 0x07u) != 0x07u)
+                    return false;
+                tempUsed[op.destinationRegister] = true;
+                operations.push_back(std::move(op));
+                continue;
+            }
             if (op.matrix3x3 && (mask & 8u)) return false;
             if (op.destinationType == D3DSPR_TEMP) {
                 if (op.destinationRegister >= tempWritten.size())
@@ -704,7 +729,12 @@ bool build_r283_sm3_mov_shader_source(
             else if (op.destinationType == D3DSPR_OUTPUT)
                 dest = "output.r" + std::to_string(op.destinationRegister);
             else dest = "r283_color";
-            if (op.texture2d) {
+            if (op.texkill) {
+                if (!append_native_sm3_texkill(
+                        translated, op.destinationRegister,
+                        static_cast<unsigned>(i)))
+                    return false;
+            } else if (op.texture2d) {
                 if (!append_native_sm3_texture2d_sample(
                         translated, dest, op.destinationMask,
                         op.sources[0], op.samplerRegister,
