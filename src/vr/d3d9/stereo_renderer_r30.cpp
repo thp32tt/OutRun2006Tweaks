@@ -2261,8 +2261,8 @@ namespace OutRunVRStereo
                  !Settings::VRHudEdgeAnchors.get()) ||
                 OutRunVR::GameSemantic::EffectiveScope() !=
                     OutRunVR::GameSemantic::RenderScope::ScreenHud ||
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() !=
-                    OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText ||
+                !OutRunVR::GameSemantic::IsAnchorableDrivingHudProducer(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()) ||
                 !source || !count || stride < 4u * sizeof(float) ||
                 !(width > 0.0f && height > 0.0f))
                 return {};
