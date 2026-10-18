@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00936",
+  "production_id": "CONVERSION-DX11-00936",
+  "event_id": "CONVERSION-DX11-00936-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00936",
+  "feature_id": "DX11:SM3_GAME_ALPHA_TEST_NATIVE_PIXEL_OUTPUT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "576648750c675ddf302028fe926c0992d3c81b36",
+  "validation_bearing_result_sha": "576648750c675ddf302028fe926c0992d3c81b36",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:SM3_GAME_ALPHA_TEST_NATIVE_PIXEL_OUTPUT",
+    "goal": "Connect actual game-authored D3D9 programmable pixel shader alpha compare state and live ALPHAREF into a compiled native D3D11 SM3 game Draw so alpha-tested menu, car selection and race geometry can render with DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_live_alpha_pixel_output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_created_sm3_draw_ps_alpha_discard",
+        "expected_behavior": "Live D3D9 ALPHATESTENABLE and ALPHAFUNC cause native HLSL pixel discard after real ps_3_0 output for supported compares, rather than rejecting every alpha-tested game draw."
+      },
+      {
+        "id": "per_draw_alpha_reference_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_authored_render_state_and_safe_fallback",
+        "expected_behavior": "Bound integer ALPHAREF is uploaded to independent D3D11 PS b1 per draw; supported comparison modes use separately cached shaders; malformed or unsafe state keeps original D3D9/DX9Ex game render/input/FFB."
+      },
+      {
+        "id": "native_source_ci_and_probe",
+        "category": "integrated_validation",
+        "behavior_area": "shader_compilation_native_draw_and_required_ci",
+        "expected_behavior": "Actual native VS/PS/DrawIndexed source, portable alpha truth-table probe and live-draw static regression exist; all mandatory exact-SHA Fast/Backend/Build/OpenXR/HUD gates must pass before build-verified state."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "programmable_shader_path",
+    "integration_path": [
+      "Capture actual game D3D9 programmable draw ALPHATESTENABLE, ALPHAFUNC and ALPHAREF without altering the original gameplay draw",
+      "Compile SM3 pixel output with comparison-specific HLSL discard and exact pipeline cache identity",
+      "Upload live ALPHAREF into D3D11 PS constant buffer slot b1 and submit native Draw/DrawIndexed while protecting original D3D9 input/FFB fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_backend.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_alpha_test.hpp",
+      "tools/dx11_live_sm3_alpha_test_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "SM3 pixel HLSL alpha compare and source-bound PS b1 upload implemented; final exact-SHA CI outstanding.",
+      "negative_regression": "Reject unsupported alpha modes/references and disallow cache variant reuse; DX9Ex game render/input/FFB fallback unchanged.",
+      "component_integration": "D3D9 source alpha render states -> native HLSL SM3 shader compiler and comparison-specific pipeline cache -> live D3D11 PS b1 constant + GPU Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:GAME_SM3_ALPHA_TEST:CONVERSION-DX11-00936"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Game alpha test C++ source implemented; real gameplay output, HMD and alpha pixel match UNTESTED.",
+    "activation_guard_and_fallback": "Native game draw stays opt-in and fail closed; original D3D9/DX9Ex renderer/input/FFB authoritative, DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_alpha_test.hpp",
+    "tools/dx11_live_sm3_alpha_test_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "00935 source/C6 finished at prior exact SHA; current 00936 material source selected from actual SM3 Draw alpha admission gap.",
+    "C1_REVIEW": "Live programmable path rejected any D3D9 alpha testing and had no per-draw ALPHAREF pixel shader translation.",
+    "C2_IMPLEMENT": "Live game state capture, native pixel discard, compare-specific cache, b1 upload, portable truth table probe and static linked Draw regression.",
+    "C3_VALIDATE": "First exact SHA Fast failed on previous 00935 malformed feature_id metadata, not gameplay shader compilation; new latest 00936 valid feature contract is tracked on this gate-bearing repair commit.",
+    "C4_COMMIT": "576648750c675ddf302028fe926c0992d3c81b36",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING_REQUIRED_EXACT_SHA"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Prior actual-game native_draws=0; alpha test rejection removed in source but post-change physical game observation remains UNTESTED.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "576648750c675ddf302028fe926c0992d3c81b36",
+  "NEXT_IMPLEMENTATION_ACTION": "Read final exact-SHA five Gate results, repair only causally failing source/test/contract in same TASK_ID; if all success record C6 separately. Obtain exact SHA live game/HMD evidence later.",
+  "acceptance_results": {
+    "native_live_alpha_pixel_output": "PENDING_EXACT_SHA",
+    "per_draw_alpha_reference_and_fallback": "PENDING_EXACT_SHA",
+    "native_source_ci_and_probe": "PENDING_EXACT_SHA"
+  }
+}
