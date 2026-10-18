@@ -7,18 +7,19 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IN_PROGRESS_C5",
-  "checkpoint": "C5_VALIDATE",
+  "status": "COMPLETE_C6",
+  "checkpoint": "C6_RESULT",
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "1aaf6e830fdbebba5184a651badeac45b8038fd4",
+  "validation_bearing_result_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
-    "src/vr/d3d9/r84_spatial_eye_route.hpp"
+    "src/vr/d3d9/r84_spatial_eye_route.hpp",
+    "tools/verify_dx9ex_r84_lens_source.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -57,9 +58,9 @@
     ]
   },
   "acceptance_results": {
-    "lens_source_owned_spatial_eye_path": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "lens_world_negative_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "lens_final_exact_sha_gates": "PENDING_EXACT_SHA"
+    "lens_source_owned_spatial_eye_path": "PASS_EXACT_SHA",
+    "lens_world_negative_fallback": "PASS_EXACT_SHA",
+    "lens_final_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original static EXE centre call D3A5 -> C993 is a spatial WorldBillboard, not the separately screen-projected outer CABE effect.",
@@ -73,8 +74,54 @@
     "DX9Ex Full Source Impact Review"
   ],
   "ci_evidence": {
-    "required_gates_state": "PENDING_EXACT_SHA",
-    "runtime_validation": "UNTESTED"
+    "required_gates_state": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "validation_bearing_result_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "feature_ready_source_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "required_gates": {
+      "DX9Ex Active Validation": {
+        "run_id": 39151903692,
+        "conclusion": "success",
+        "head_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39151903760,
+        "conclusion": "success",
+        "head_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39151903710,
+        "conclusion": "success",
+        "head_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39151903728,
+        "conclusion": "success",
+        "head_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f"
+      }
+    },
+    "verified_artifacts": [
+      "feature-dx9ex-eye-extent-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+      "OutRun2-VR-GPU-DIAGNOSTIC-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+      "feature-dx9ex-pacing-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+      "dx9ex-active-game",
+      "OutRun2-VR-DX9EX-ACTIVE-59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+      "dx9ex-active-host",
+      "dx9ex-r84-independent-full-chain-game"
+    ],
+    "source_regression": "python tools/verify_dx9ex_r84_lens_source.py (70 negative mutations)",
+    "runtime_note": "No physical Quest3/VDXR execution; only static, CI, Win32/x64 build and package"
   },
-  "notes": "First dispatch C2 material source change; no Quest3/VDXR HMD execution. Material SHA recorded after commit in separate C6/checkpoint, no duplicate achievement."
+  "notes": "First dispatch C2 material source change; no Quest3/VDXR HMD execution. Material SHA recorded after commit in separate C6/checkpoint, no duplicate achievement. Same-task E004 rollover continuation: 1aaf6e8 material C++ retained, scoped 70 destructive C993 regressions committed at 59d70a6; exact-target 4/4 PASS and artifacts verified; standalone C6 record is not additional material scoring; HMD UNTESTED.",
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "branch": "vr-d3d9ex-candidate/01052-c993-eye-route-test",
+    "sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "validation_command": "python tools/verify_dx9ex_r84_lens_source.py",
+    "evidence_paths": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d9/r84_spatial_eye_route.hpp",
+      "tools/verify_dx9ex_r84_lens_source.py"
+    ]
+  }
 }
