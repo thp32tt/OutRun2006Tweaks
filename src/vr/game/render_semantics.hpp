@@ -85,6 +85,28 @@ namespace OutRunVR::GameSemantic
         PauseOptionArrow, // Exact SMPAUSEMENU arrows, never generic clips.
     };
 
+    // Gameplay speed/time glyph producers that may retain the original
+    // edge position after source 3440x1440 -> XR 2496x2688. Preserve the
+    // already-correct 6th/6 and any result/ESC/F11/world path unchanged.
+    inline constexpr bool IsAnchorableDrivingHudProducer(
+        ProducerToken producer) noexcept
+    {
+        return producer == ProducerToken::OutRunHudPeripheralText ||
+            producer == ProducerToken::OutRunHudText;
+    }
+    static_assert(IsAnchorableDrivingHudProducer(
+        ProducerToken::OutRunHudPeripheralText));
+    static_assert(IsAnchorableDrivingHudProducer(
+        ProducerToken::OutRunHudText));
+    static_assert(!IsAnchorableDrivingHudProducer(
+        ProducerToken::DispRankClipSprite));
+    static_assert(!IsAnchorableDrivingHudProducer(
+        ProducerToken::PauseOptionArrow));
+    static_assert(!IsAnchorableDrivingHudProducer(
+        ProducerToken::ResultProgress));
+    static_assert(!IsAnchorableDrivingHudProducer(
+        ProducerToken::LensFlareCentre));
+
     // The GOAL 0-99% progress, its two exact time helpers and the three
     // verified stage-result printf parents have the SAME physical XYZRHW
     // submission risk as +TIME: the source may finish before D3DX Flush.
