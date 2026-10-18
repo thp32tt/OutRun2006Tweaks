@@ -1728,12 +1728,25 @@ def check_direct_native_producer_bridge(source):
                   'ProvenScreenHudProducer(',
                   'FirstVerifiedAppendedNodeOnStableRoot(',
                   'RegisterSpriteNodeScope(')
+    # Verify the *particular* native admission transaction rather than a
+    # global substring: the new nested BA9D0 text bridge may separately
+    # contain sourceBefore/sourceAfter. That independent match must never
+    # let mutation of the primary entry/return fence escape.
+    native_admission = tag.split('CanAdmitNativeDirectNodeTags(', 1)[1].split(';', 1)[0]
     for expected in ('vrEnabledAtEntry, Settings::VREnabled,',
-                     'sourceBefore, sourceAfter))',
-                     'scope, sourceBefore, sourceAfter)',
+                     'sourceBefore, sourceAfter))'):
+        require(expected, native_admission, 'native entry/return admission')
+    for expected in ('scope, sourceBefore, sourceAfter)',
                      'node, scope, producer, nullptr,',
                      'sourceBefore.registrationSerial);'):
         require(expected, tag, 'proven source token must reach native SpriteNode')
+    # Unclassified inner BA9D0 put_sprite may only inherit an E8-verified
+    # text parent. Unknown indirect calls, +TIME, GOAL, rank and lens retain
+    # native fallback and cannot borrow a generic HUD classifier.
+    for expected in ('CanCarryExactHudTextAtUnknownCallsite(',
+                     'ProvenScreenHudProducer(',
+                     'scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;'):
+        require(expected, tag, 'bounded direct BA9D0 bridge')
     require('#include "vr/game/direct_sprite_source_provenance.hpp"',
             source, 'native exact HUD producer source header')
 
@@ -1759,6 +1772,9 @@ for case, altered in (
     ('lost native return snapshot proof', textures.replace(
         'sourceBefore, sourceAfter))',
         'sourceBefore, sourceBefore))', 1)),
+    ('lost exact text parent whitelist', textures.replace(
+        'CanCarryExactHudTextAtUnknownCallsite(',
+        'CanCarryEveryUnknownCaller(', 1)),
 ):
     if altered == textures:
         raise SystemExit('P0 native direct sprite regression target missing: ' + case)
@@ -1885,9 +1901,12 @@ def check_outrun_text_owner(source, contracts):
         require(needle, source, 'exact BA9D0 child RVA source')
 
     parent = function_body(source, 'static void __cdecl OutRunHudTextProducer_dest(')
-    require_order(parent, 'scope only original ScreenHud parents of BA9D0',
-                  'OutRunHudTextCallerRva(_ReturnAddress())',
-                  'OutRunVRHudSemantics::ClassifyCaller(caller)',
+    require_order(parent, 'scope only E8-proven ScreenHud parents of BA9D0',
+                  'const void* returnAddress = _ReturnAddress();',
+                  'OutRunHudTextCallerRva(returnAddress)',
+                  'OutRunVRHudSemantics::ClassifyDirectCallsite(caller,',
+                  '*(reinterpret_cast<const std::uint8_t*>(returnAddress) - 5))',
+                  'OutRunVRHudSemantics::UnknownInfo();',
                   'const bool previous = OutRunHudTextScreenHud;',
                   'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;',
                   'OutRunHudTextProducerHook.call(',
@@ -1921,6 +1940,12 @@ for label, marker0, mutant in (
     ('parent classification bypass',
      'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;',
      'semantic.space != OutRunVRHudSemantics::SpacePolicy::ScreenHud;'),
+    ('parent lost E8 gate',
+     'OutRunVRHudSemantics::ClassifyDirectCallsite(caller,',
+     'OutRunVRHudSemantics::ClassifyCaller(caller /* E8 check removed */,'),
+    ('parent lost unknown fallback',
+     'OutRunVRHudSemantics::UnknownInfo();',
+     'OutRunVRHudSemantics::ClassifyCaller(caller);'),
     ('clip child no tag',
      'OutRunHudText_clip(', 'OutRunHudText_clip_untagged('),
     ('sprani child no tag',
