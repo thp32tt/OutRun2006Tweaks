@@ -617,7 +617,11 @@ int main() {
         // A mathematically valid double output can still exceed the
         // actual float pixel API range. Fail closed for BOTH eye outputs.
         lx = 17.f; ly = 19.f; rx = 23.f; ry = 29.f;
-        if (ProjectPixelPair(identity, identity, large, 0.f,
+        const float rightOutsideFloat[16]{
+            1,0,0,0, 0,1,0,0, 0,0,1,0, 2,0,0,1};
+        // LEFT maps to a valid finite pixel at the viewport origin;
+        // RIGHT's +2 NDC translation maps beyond FLT_MAX.
+        if (ProjectPixelPair(identity, rightOutsideFloat, large, 0.f,
                 large, 0.f, large, large, 1.f, lx, ly, rx, ry) ||
             lx != 17.f || ly != 19.f || rx != 23.f || ry != 29.f)
             return 96;
