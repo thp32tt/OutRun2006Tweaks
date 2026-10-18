@@ -1,3 +1,16 @@
+## 2026-10-18 C 슬롯 OCR 중복 작업 제거 — GitOps v2
+
+측정: 2026-10-18 UTC 기준 기존 N100 C OCR 로그에서 원본 PNG 716회 중복 검사, 매치 1,670, 중복 1,153, 보류 517, 신규 크롭 0. 하루 전 원본 108개에서 최초 166개 TEST_ONLY 결과를 얻은 뒤에 전수 재검사를 무한 반복하는 구조를 개선했습니다.
+
+- 소스 `c_english_crop/ocr_hd108.py`의 `POLICY_VERSION=hd108-pass-v2-20261018-reviewed-edge-crops`. 원본 HD PNG 각 파일은 이 정책 버전과 원본 SHA별 **한 번만** 검사한 뒤 `hd108_ocr/processed_v2/*.json`에 처리 기록을 남깁니다. 같은 원본/같은 정책을 또 OCR하지 않습니다. 원본·검증 정책이 바뀌면 명시적으로 새 버전으로 다시 스캔합니다.
+- OCR 1회에서 원본 4개씩 순차 검사. 108개 완료 시 `HD108_PASS_COMPLETE_REVIEW_PENDING`를 기록하고, 이후 OCR 반복을 멈춥니다. 기존 50개 DDS 검사도 이미 처리한 94개 결과에 대한 반복 OCR은 중지하며, 원본·기존 큐·결과 보관은 유지합니다.
+- `ALPHA_TOUCHES_CROP_BORDER_REVIEW`는 겹쳐진 불투명한 원본 배경/윤곽 때문에 생길 수 있으므로 원본 네이티브 픽셀 그대로 **검토용 크롭**을 별도 생성하고 `edge_warning` 및 `human_review_required=true`를 남깁니다. 진짜 빈 픽셀/너무 작은 후보는 HOLD합니다. 번역/합성/DDS 수정/게임 PASS 선언은 하지 않습니다.
+- C CPU 쿼터 0.75 → **1.5**. A/B 서비스 및 설정은 건드리지 않습니다.
+- 실제 N100 108개 원본 ZIP/매니페스트를 사용한 격리 시험에서 첫 2개/다음 2개 파일 처리, 재검사 방지, 원본 픽셀 일치 PASS. 실제 신규 생성량과 실게임 검증 여부는 **새 GitOps C 이미지가 배포된 후** 재측정해야 합니다.
+- Portainer GitHub 스택 `localization-controller-recovery-20260928`, Compose `tools/chat-controller/localization-recovery-v1/docker-compose.yml`을 최신 커밋으로 **Rebuild + Redeploy**해야 적용됩니다. 독립 C Docker 재생성은 금지.
+
+---
+
 ## 2026-10-17 GitHub/Portainer C 슬롯 — 최신 사용자 지시
 
 - **C 영문 원본 크롭은 단독 Docker Compose 금지**. 이 GitOps 스택의 `outrun-c-english-native-crop` 서비스만 사용합니다. 배포 이름 `outrun-localization-c-english-crop` (기존 독립 컨테이너 `outrun-c-original-english-crop`와 별개).
