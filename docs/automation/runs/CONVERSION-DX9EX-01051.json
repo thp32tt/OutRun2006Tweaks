@@ -89,8 +89,57 @@
     "failed_preflight_conclusion": "failure",
     "failed_preflight_cause": "Run record absent at source commit; --check-head policy gate failed before compiling. No native compile failure reported.",
     "validation_bearing_result_sha": null,
-    "required_gates_state": "PENDING_EXACT_SHA",
-    "runtime_validation": "UNTESTED"
+    "required_gates_state": "PENDING_ALL_FOUR_ON_FINAL_VALIDATION_BEARING_SHA",
+    "runtime_validation": "UNTESTED",
+    "source_and_ci_repair_head_sha": "765f4cc99c60452913902c6da8793d915ce94afb",
+    "source_and_ci_repair_head_active": {
+      "run_id": 39148938088,
+      "conclusion": "success",
+      "head_sha": "765f4cc99c60452913902c6da8793d915ce94afb"
+    },
+    "source_and_ci_repair_head_full_source": {
+      "run_id": 39148938081,
+      "conclusion": "success",
+      "head_sha": "765f4cc99c60452913902c6da8793d915ce94afb"
+    }
   },
-  "notes": "Same TASK_ID retry E003 fixes the exact failed DX9Ex Active policy prerequisite by publishing the missing one-function run record. C++ source and native regression implementation remain at material SHA 8aa0350. This record commit is not another standalone functional accomplishment and is not scored separately. Final exact-SHA CI and later C6 are separate; no Quest3/VDXR test occurred."
+  "notes": "Same TASK_ID retry E003 fixes the exact failed DX9Ex Active policy prerequisite by publishing the missing one-function run record. C++ source and native regression implementation remain at material SHA 8aa0350. This record commit is not another standalone functional accomplishment and is not scored separately. Final exact-SHA CI and later C6 are separate; no Quest3/VDXR test occurred. Final C5 exact-SHA reconciliation records unchanged original material source and verified follow-up C++ host compile repair; requested final four required GitHub Gates must attach to the new single validation-bearing HEAD, not prior successful mixed SHAs. HMD remains UNTESTED; CI repair/checkpoint is +0 independent score.",
+  "validation_bearing_result_sha": null,
+  "ci_repair_history": [
+    {
+      "sha": "2ab4de95470ee079f23e23e2286f7f9b7d8d634d",
+      "kind": "CXX_SMOKE_NEGATIVE_INPUT",
+      "evidence": "Previous +TIME float-range negative used a finite valid destination; now right-eye distinct +2 NDC exceeds FLOAT_MAX while preserving atomic two-eye fallback."
+    },
+    {
+      "sha": "6c87c11120f04fbadb9086d8ea95ad651c38f737",
+      "kind": "POSITIONT_SCOPE",
+      "evidence": "Bound validator to actual function body, not unrelated F11 GetFVF."
+    },
+    {
+      "sha": "c09621cab1d174435e0167c831859a5dad0c4a38",
+      "kind": "WORLD_EYE_TAIL_NEGATIVE",
+      "evidence": "Apply destructive restored branch mutation in R30TransformXyzrhwVertices, not F11."
+    },
+    {
+      "sha": "8d0c0120cfab4b65ff13b67dd94c3e4221aac7df",
+      "kind": "DEPTHLESS_SOURCE_NEGATIVE",
+      "evidence": "Target R30 right-eye native fallback rather than F11."
+    },
+    {
+      "sha": "37688bddb67a94aa68b05dbc1a3d055389b258da",
+      "kind": "DEPTHLESS_RT_NEGATIVE",
+      "evidence": "Scope RT restoration and failure guard mutations to protected R30 draw owners."
+    },
+    {
+      "sha": "a34012a9038e2946b748e2f87603dc58c9005540",
+      "kind": "R23_MENU_SOURCE_CONTRACT",
+      "evidence": "Match four-parameter atomic GetGameUv(client_rect, full_visibility) contract."
+    },
+    {
+      "sha": "765f4cc99c60452913902c6da8793d915ce94afb",
+      "kind": "CXX_HOST_COMPILE",
+      "evidence": "Fix x64 VR host MSVC C2653/C3861 undefined spdlog by using existing std::cout transport; Active #39148938088 and Full Source #39148938081 SUCCESS."
+    }
+  ]
 }
