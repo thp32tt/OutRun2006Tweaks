@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "C2_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "validation_bearing_result_sha": "15d038c7fb194ba2b0fa7c3ba5fa8abe83f2b360",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_uiscaling.cpp"
