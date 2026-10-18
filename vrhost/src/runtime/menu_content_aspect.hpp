@@ -261,37 +261,15 @@ namespace OutRunVrMenuAspect
         return static_cast<float>(aspect);
     }
 
-    // Quest3 user A/B: the title/main menu is authored for a 4:3 UI but
-    // game UIScalingMode=1/2 may submit it over a complete 16:9/21:9 raster.
-    // Its stretched text must be corrected in the optical projection WITHOUT
-    // cropping source UV: an unverified matte is never a licence to discard
-    // actual texture pixels. The selector and selector-exit/reset states use
-    // authored wide car previews and the right-side vehicle list instead.
-    // Original GameState values come from src/game.hpp, published through
-    // SharedPose::reserved[ClientGameStateIndex]; do not alter the IPC ABI.
-    inline float PlanStateSensitiveMenuAspect(
-        float sampledAspect, float fullClientAspect, std::uint32_t gameState,
-        bool gameConfiguredLetterbox, bool fullyCaptured,
-        bool cropAlreadyApplied, bool useNativeAspect) noexcept
-    {
-        constexpr std::uint32_t Title = 0x04u;
-        constexpr std::uint32_t Menu = 0x09u;
-        constexpr float FourThree = 4.0f / 3.0f;
-        if ((gameState != Title && gameState != Menu) ||
-            !gameConfiguredLetterbox || !fullyCaptured ||
-            cropAlreadyApplied || useNativeAspect ||
-            !std::isfinite(sampledAspect) ||
-            !std::isfinite(fullClientAspect) ||
-            !(sampledAspect > FourThree + 0.01f && sampledAspect <= 5.0f) ||
-            !(fullClientAspect > FourThree + 0.01f &&
-              fullClientAspect <= 5.0f) ||
-            std::fabs(sampledAspect - fullClientAspect) > 0.02f)
-            return sampledAspect;
-        // Projection aspect only: full UV including title/menu edge pixels
-        // is preserved. Selector/vanilla/partial/unknown states fail closed.
-        return FourThree;
-    }
-
+    // Do not restore a 4:3 optical aspect from game state alone.
+    // The whole captured 3440x1440/1920x1080 image has that physical
+    // aspect even if its native menu artwork is already letterboxed.
+    // State-selecting a 4:3 projection without narrowing source UV
+    // compresses text, logos and car previews. The caller applies the
+    // existing bounded PlanVisibleCenteredContent crop when source pixels
+    // have independent matte evidence or the user explicitly opts in.
+    // PlanUncroppedAuthoredMenuAspect keeps the full source untouched.
+    
     // Quest3 menu/car-select: some original 4:3 OutRun UI is rasterized
     // over the ENTIRE ultrawide game client (including the car/model list).
     // Cropping to 4:3 loses those authored pixels; projecting the uncropped
