@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "113c97cf4b9d61c1352a6bd5318779bfb503e3de",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "5fc6c633a18255b08b9d3b4bef71271193510a05",
   "changed_files": [
     "src/vr/game/rank_marker_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -80,14 +80,36 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "rank_car_anchor_stereo": "PENDING_EXACT_SHA",
-    "rank_reentrant_native_fallback": "PENDING_EXACT_SHA",
-    "rank_final_exact_sha_gate": "PENDING_EXACT_SHA"
+    "rank_car_anchor_stereo": "PASS_BUILD",
+    "rank_reentrant_native_fallback": "PASS_BUILD",
+    "rank_final_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "failed_material_policy_run": 39175949718,
-    "note": "CI policy requires run record in validation-bearing commit; source material SHA remains distinct"
-  }
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "5fc6c633a18255b08b9d3b4bef71271193510a05",
+    "material_source_sha": "113c97cf4b9d61c1352a6bd5318779bfb503e3de",
+    "validator_source_sha": "5fc6c633a18255b08b9d3b4bef71271193510a05",
+    "required_workflows": {
+      "DX9Ex Active Validation": {
+        "run_id": 39176382959,
+        "conclusion": "success"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39176382968,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39176382971,
+        "conclusion": "success"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39176383008,
+        "conclusion": "success"
+      }
+    },
+    "runtime": "Quest3/VDXR not executed"
+  },
+  "c6_commit_kind": "BOOKKEEPING_ONLY",
+  "c6_completion": "4/4 required exact-SHA gates complete; no Quest3/VDXR validation"
 }
