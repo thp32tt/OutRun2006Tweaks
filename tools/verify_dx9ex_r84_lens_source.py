@@ -269,10 +269,16 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "const bool exactRankEye =",
         "screenKind == R32ReviewScreenSpaceKind::ProjectedWorldMarker2D;",
         "const auto rankBeforeLeft = exactRankEye",
-        "OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)",
+        "const auto rankRawBeforeLeft = exactRankEye",
+        "OutRunVR::RankMarker::CoherentOriginalRankWvp(",
         "const bool rankSourceChanged = exactRankEye &&",
         "OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(",
-        "rankBeforeLeft, captureRankSource());",
+        "const auto rankRawAfterLeft = exactRankEye",
+        "OutRunVR::RankMarker::SameOriginalRankWvp(",
+        "rankBeforeLeft, rankAfterLeft)",
+        "rankRawBeforeLeft, rankRawAfterLeft)",
+        "if (SUCCEEDED(rightHr) && exactRankEye)",
+        "const auto rawAtRight = captureRankOriginalWvp();",
         "R33/rank-marker-source-changed",
         "R33 rank marker original c64 rollback",
     ):
@@ -293,8 +299,19 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
             "C993 coherent source pair veto lost: " + label)
     assert "centreBeforeLeft, centreRawBeforeLeft)) ||" in before_native_left
     assert "centreAfterLeft, centreRawAfterLeft));" in after_native_left
-    assert "OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)" in before_native_left
+    assert "OutRunVR::RankMarker::CoherentOriginalRankWvp(" in before_native_left
+    assert "rankBeforeLeft, rankRawBeforeLeft)) ||" in before_native_left
     assert "const bool rankSourceChanged = exactRankEye &&" in after_native_left
+    assert "OutRunVR::RankMarker::SameOriginalRankWvp(" in after_native_left
+    assert "rankRawBeforeLeft, rankRawAfterLeft)" in after_native_left
+    assert physical.count("OutRunVR::RankMarker::CoherentOriginalRankWvp(") == 3
+    assert physical.count("OutRunVR::RankMarker::SameOriginalRankWvp(") == 2
+    right_rank = physical[physical.index("IDirect3DSurface9* rightEye ="):
+                          physical.index("restoreOk = R32ReviewRestoreRightPassState(")]
+    assert "const auto rankAtRight = captureRankSource();" in right_rank
+    assert "const auto rawAtRight = captureRankOriginalWvp();" in right_rank
+    assert right_rank.index("if (SUCCEEDED(rightHr) && exactRankEye)") < (
+        right_rank.index("rightHr = actualDraw();"))
     assert physical.index("const auto rankBeforeLeft = exactRankEye") < left_draw
     assert physical.index("const bool rankSourceChanged = exactRankEye &&") < after_left
     assert physical.index("const bool centreSourceChanged = exactCentreEye &&") < after_left
@@ -507,8 +524,12 @@ def main():
              "const bool rankSourceChanged = false &&"),
         (7, "OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(",
              "OutRunVR::RankMarker::NeverCheckPhysicalRankSource("),
-        (7, "OutRunVR::RankMarker::ValidRankSource(rankBeforeLeft)",
-             "OutRunVR::RankMarker::NeverCheckPreLeftRankSource(rankBeforeLeft)"),
+        (7, "OutRunVR::RankMarker::CoherentOriginalRankWvp(",
+             "OutRunVR::RankMarker::NeverCheckOriginalCarWvp("),
+        (7, "rankRawBeforeLeft, rankRawAfterLeft)",
+             "rankRawBeforeLeft, rankRawBeforeLeft)"),
+        (7, "if (SUCCEEDED(rightHr) && exactRankEye)",
+             "if (SUCCEEDED(rightHr) && false /* foreign car allowed */)"),
         (7, "const bool nativeHudSourceChanged = exactNativeHud &&",
              "const bool nativeHudSourceChanged = false &&"),
         (7, "OutRunVR::HudNativeSource::SameSourceAfterNativeUpload(",
