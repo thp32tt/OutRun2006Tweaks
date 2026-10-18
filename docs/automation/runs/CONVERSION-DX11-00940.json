@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00940",
+  "production_id": "CONVERSION-DX11-00940",
+  "event_id": "CONVERSION-DX11-00940-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00940",
+  "feature_id": "DX11:LIVE_SM3_PREDRAW_COLORFILL_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "558caeab78bae2984fef3575ce51f7fae2ea171d",
+  "validation_bearing_result_sha": "558caeab78bae2984fef3575ce51f7fae2ea171d",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_PREDRAW_COLORFILL_NATIVE_FRAME",
+    "goal": "Preserve game-authored full-size menu/vehicle/race ColorFill chronology before actual programmable SM3 native D3D11 Draw/DrawIndexed, rejecting stale source/unsupported D3D11.1 while keeping original D3D9/gamepad/FFB.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_ordered_predraw_colorfill",
+        "category": "end_to_end_behavior",
+        "behavior_area": "source_colorfill_native_gpu_frame",
+        "expected_behavior": "Original full TARGET Clear then clipped game ColorFill rectangles are submitted in-order as D3D11.1 ClearView before first real programmable SM3 GPU Draw or DrawIndexed."
+      },
+      {
+        "id": "invalid_owner_extent_and_platform_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_ownership_and_d3d9_input_fallback",
+        "expected_behavior": "Wrong game device, target identity, extents, invalid rectangles or absent D3D11.1 context reject optional SM3 native Draw, preserving original D3D9 Draw/Present/input/FFB."
+      },
+      {
+        "id": "five_required_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_source_and_build_regressions",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector succeed on one exact source SHA, with live source and C++ positive/negative tests."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "D3D9 successful source-target ColorFill transaction after full backbuffer Clear",
+      "Exact device and bounded-rectangle replay admission",
+      "Native D3D11.1 ClearView composited ahead of actual game SM3 Draw/DrawIndexed"
+    ],
+    "batch_components": [
+      "Actual native programmable SM3 bridge GPU ColorFill chronological replay",
+      "Portable source mutation admission + targeted C++ and source-linked Python regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game-authored recorded clipped background fill proceeds through native SM3 GPU ClearView and Draw code path; exact-sha Win32 build successful.",
+      "negative_regression": "Wrong source owner, zero/resized extents, negative/outside bounds, overflow, and missing Context1 reject native replay without altering D3D9 Draw/Present.",
+      "component_integration": "Real D3D9 device ColorFill->canonical source epoch->D3D11 full-size RTV->SM3 GPU Draw and fallback."
+    },
+    "conflict_keys": [
+      "DX11:SM3_PREDRAW_COLORFILL:CONVERSION-DX11-00940"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_COLORFILL",
+      "NATIVE_D3D11_CLEARVIEW",
+      "D3D11_NATIVE_SM3_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI 5/5 only; matching real game menu/vehicle/race, gamepad and Quest3/VDXR pixels remain UNTESTED.",
+    "activation_guard_and_fallback": "Explicit diagnostic opt-in; original D3D9/DX9Ex Draw, input and FFB unchanged; DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "tools/dx11_clipped_color_fill_00799.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Reconciled 00939 C6, latest HEAD and 00940 owner/run absent; preserved unrelated 00939 scoreboard commit.",
+    "C1_REVIEW": "Confirmed SM3 Draw rejected every pre-Draw partial ColorFill that fixed-function native Draw already replayed.",
+    "C2_IMPLEMENT": "Added live game SM3 native GPU ordered ClearView replay, source/rectangle validation, portable negative C++ tests and live-SM3 source regressions.",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5; all five mandatory GitHub workflows succeeded at source SHA.",
+    "C4_COMMIT": "558caeab78bae2984fef3575ce51f7fae2ea171d",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; actual game, Quest3/VDXR, input and gamepad UNTESTED."
+  },
+  "acceptance_results": {
+    "live_sm3_ordered_predraw_colorfill": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "invalid_owner_extent_and_platform_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "five_required_exact_sha_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "head_sha": "558caeab78bae2984fef3575ce51f7fae2ea171d",
+    "required_workflow_runs": {
+      "fast": 39176602474,
+      "backend": 39176602478,
+      "windows_build": 39176602476,
+      "openxr": 39176602500,
+      "hud": 39176602472
+    },
+    "all_required_gates": "SUCCESS",
+    "runtime": "UNTESTED",
+    "original_material_commit": "558caeab78bae2984fef3575ce51f7fae2ea171d",
+    "ci_repair_commits": []
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No matching runtime evidence that the integrated live SM3+ColorFill source covers all actual game draws and yields full menu->car->race pixels.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "558caeab78bae2984fef3575ce51f7fae2ea171d",
+  "NEXT_IMPLEMENTATION_ACTION": "Select a distinct still-missing contiguous live game SM3 Draw/DrawIndexed->RT/Present native connection; preserve original D3D9 and exact-sha gate. Quest3 actual runtime requires independent hardware proof.",
+  "score_policy": {
+    "run_key": "CONVERSION-DX11-00940",
+    "scoreboard_recorded_separately": true,
+    "scoreboard_sha": "4a2163b5645423c832732cf2fdf9859788014c9b",
+    "scoreboard_ai2_cumulative": 1548,
+    "retry_additional_score": 0
+  }
+}
