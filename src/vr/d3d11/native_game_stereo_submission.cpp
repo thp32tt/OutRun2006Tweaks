@@ -167,12 +167,27 @@ private:
     if (!context || !target) return false;
     D3D11_RENDER_TARGET_VIEW_DESC view{};
     target->GetDesc(&view);
-    // The shader writes a float4; permit other typed normalized/float
-    // game-camera RTVs (luminance, two-channel, full-float, sRGB) without
-    // reinterpreting integer/depth/typeless storage as color. The exact
-    // device/typed-RTV renderability check below remains mandatory.
-    if (!native_game_partial_color_shader_format(view.Format))
-        return false;
+    // Retain the original audited typed-RTV admission in the native GPU
+    // activation boundary. Additional valid typed cameras (luminance,
+    // two-channel, float and sRGB) use the same float4 Clear shader only
+    // after the shared extended classifier explicitly accepts the format.
+    // Integer, typeless and depth views still fail closed.
+    switch (view.Format) {
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case DXGI_FORMAT_R10G10B10A2_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_FLOAT:
+    case DXGI_FORMAT_R11G11B10_FLOAT:
+    case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_B5G5R5A1_UNORM:
+        break;
+    default:
+        if (!native_game_partial_color_shader_format(view.Format))
+            return false;
+        break;
+    }
     Microsoft::WRL::ComPtr<ID3D11Device> device;
     context->GetDevice(device.GetAddressOf());
     UINT support = 0u;
