@@ -1650,16 +1650,60 @@ direct_put = function_body(textures, 'static int __cdecl put_sprite_ex_dest(')
 require_order(
     direct_put, 'put_sprite_ex semantic publication must follow the real producer draw',
     'const int result = put_sprite_ex.call<int>(a1, a2);',
-    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);',
+    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);',
     'return result;'
 )
 direct_put2 = function_body(textures, 'static int __cdecl put_sprite_ex2_dest(')
 require_order(
     direct_put2, 'put_sprite_ex2 semantic publication must follow the real producer draw',
     'const int result = put_sprite_ex2.call<int>(a1, a2);',
-    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);',
+    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);',
     'return result;'
 )
+
+# Original exact HUD parent provenance must be snapshotted BEFORE the native
+# producer and rechecked AFTER it. A broad return-RVA range alone cannot
+# label the SpriteNode with an exact source token. The node still requires the
+# bounded stable-priority-root reachability proof.
+def check_direct_native_producer_bridge(source):
+    first = function_body(source, 'static int __cdecl put_sprite_ex_dest(')
+    second = function_body(source, 'static int __cdecl put_sprite_ex2_dest(')
+    for function, native_name in ((first, 'put_sprite_ex.call<int>'),
+                                  (second, 'put_sprite_ex2.call<int>')):
+        require_order(function, 'exact native producer before/after fence',
+                      'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();',
+                      'const int result = ' + native_name,
+                      'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);')
+    tag = function_body(source, 'static void TagDirectVrSpriteNodes(')
+    require_order(tag, 'bounded exact tag publication',
+                  'ProvenScreenHudProducer(',
+                  'FirstVerifiedAppendedNodeOnStableRoot(',
+                  'RegisterSpriteNodeScope(')
+    for expected in ('scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture()',
+                     'node, scope, producer);'):
+        require(expected, tag, 'proven source token must reach native SpriteNode')
+    require('#include "vr/game/direct_sprite_source_provenance.hpp"',
+            source, 'native exact HUD producer source header')
+
+check_direct_native_producer_bridge(textures)
+for case, altered in (
+    ('lost entry snapshot', textures.replace(
+        'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();',
+        'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Snapshot{};', 1)),
+    ('lost producer token publication', textures.replace(
+        'node, scope, producer);', 'node, scope);', 1)),
+    ('lost native exit source proof', textures.replace(
+        'scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture()',
+        'scope, sourceBefore, sourceBefore', 1)),
+):
+    if altered == textures:
+        raise SystemExit('P0 native direct sprite regression target missing: ' + case)
+    try:
+        check_direct_native_producer_bridge(altered)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('P0 native direct sprite regression escaped: ' + case)
 
 # 00519 observed projected semantic ownership but zero build attempts: XYZRHW needs an exact route.
 require('projectedWorldMarker', r30, 'fixed-function projected marker state')

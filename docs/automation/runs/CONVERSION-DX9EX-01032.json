@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01032",
+  "production_id": "CONVERSION-DX9EX-01032",
+  "event_id": "CONVERSION-DX9EX-01032-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C3_LOCAL_REGRESSION",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "d038ce8b32c21d6b09e22e4cbe6e965b84c1fdbe",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/direct_sprite_source_provenance.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Preserve the exact original 6th/6 gameplay HUD SpriteNode source producer when a native direct draw appends its sibling nodes, so already-identified screen HUD can enter the correct R84 left and right GPU owner without being downgraded to a tokenless generic HUD.",
+    "scope_boundary": "Only source-backed native direct queued gameplay HUD owner registration, with existing +TIME/GOAL parent tokens preserved; do not change fixed-function eye shader, original game timer, world marker anchor, menu, SkyGlow, F11 external overlay, DX9Ex rollback, DX11, DXVK or input/FFB.",
+    "trace_stages": [
+      "Original 0x004B9D80 DispRank leading sprite and clipped sibling calls enter native put_sprite_ex/put_sprite_ex2 under an exact per-parent semantic while the original priority queue is appended.",
+      "Capture direct parent ScreenHud token at native call entry and after exit; only a consistent token and same bounded live priority root permit registration on newly appended SpriteNodes.",
+      "R84 queue consumption recovers the queued exact producer in its physical draw command, permitting existing FVF142 and HUD left/right GPU owner admission without world-space WVP borrowing."
+    ],
+    "subcomponents": [
+      "Capture independent source ownership around both native put_sprite_ex and put_sprite_ex2 before UV-scoped native producer calls and after restoration.",
+      "Attach a named exact token only for allowlisted verified screen HUD parents with unchanged source identity, without permitting nested queue/external overlays or WorldBillboard to inherit it.",
+      "Verify the bridge source ordering and queue reachability through CI mutation negatives; add C++ compile-time producer snapshot matching and rejection cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_disprank_source_recovered",
+        "category": "end_to_end_behavior",
+        "behavior_area": "6th/6 native queue producer to R84 binocular HUD source",
+        "expected_behavior": "Known 6th/6 exact parent sprites and clip siblings preserve original exact token across a stable native call and reach queued physical left/right owner."
+      },
+      {
+        "id": "native_unknown_reentry_world_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Unrelated native producer, reused queue and external overlay safety",
+        "expected_behavior": "Nested source mismatch, unknown caller, active queue/external overlay, world scope and rebuilt queue never gain another producer's exact ScreenHud token."
+      },
+      {
+        "id": "native_r84_exact_sha_integrated_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows game and OpenXR host/package original stereo regression",
+        "expected_behavior": "Final exact SHA passes DX9Ex Active Windows x86 R84 game/x64 host/package, Domain Isolation, HUD Inspector and Full Source Impact without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_disprank_source_recovered": "PENDING",
+    "native_unknown_reentry_world_isolation": "PENDING",
+    "native_r84_exact_sha_integrated_gate": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Verified original producer 0x004B9D80 draws 6th/6 leading sprite and later clipped number siblings; unlike world-attached rank source 0x004BAD20. The native source may be an exact scoped parent before the generic direct hooks publish its queue nodes.",
+    "source_trace": [
+      "hooks_textures.cpp snapshot of root/tail and original call runs before TagDirectVrSpriteNodes registration with only RenderScope (producer token None) for direct HUD tags.",
+      "render_semantics.hpp R84 SpriteNode registered tags carry both scope and producer into canonical queue ownership, and R30 exact FVF142 needs DispRankFirst or DispRankClipSprite to admit the named HUD owner.",
+      "New exact-source before/after fence transfers only an existing scoped original parent token through the stable queue, preserving R84 original draw and all fail-closed GPU gates if unknown."
+    ],
+    "root_cause": "The ordinary native direct sprite producer registered ScreenHud SpriteNodes with the default ProducerToken::None despite an already-proven original parent producer being live across the call, causing those direct children to lose exact R84 HUD source identity until another exact parent hook happened to retag them.",
+    "alternatives_rejected": [
+      "Existing bounded stable-root proof is already implemented; do not rewrite it or call stale tail pointer directly.",
+      "Do not reclassify all common text, use blind returnAddress-5 as an exact source, or promote D3DX mixed batches from unrelated sources.",
+      "Do not change fixedfn shader ownership, F11 external overlay, world rival markers, SkyGlow or original FFB."
+    ],
+    "fix_evidence": "Preserved proven source token from original pre/post native call snapshot to exact SpriteNode registration, restricted by pre-existing direct ScreenHud scope, allowlisted producer, disabled queue and external overlay, and unchanged stable root walk.",
+    "negative_test_evidence": "C++ compile-time positive/negative scope and producer source checks and verifier mutation tests for removed pre-call snapshot, removed producer argument and removed exit capture; no real HMD evidence.",
+    "eye_ownership": "GPU physical command now retains exact known HUD producer on safely appended native queue nodes; pre-existing stereo/eye target and source-WVP checks remain authoritative, and physical HMD outcome remains UNTESTED."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "First material SHA d038ce8b32c21d6b09e22e4cbe6e965b84c1fdbe failed policy due missing run record and HUD Inspector due stale two-argument call expectation; this same-task bounded verifier/feature-contract input repair does not create a second scored feature."
+}
