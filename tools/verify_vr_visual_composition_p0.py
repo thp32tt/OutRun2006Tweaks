@@ -1853,10 +1853,12 @@ def check_outrun_text_owner(source, contracts):
         body = function_body(source, sig)
         require_order(body, sig + ' all-node ScreenHud ownership',
                       'if (!OutRunHudTextScreenHud)',
-                      'std::array<SpriteNode*, Game::SpritePriorityCount> before{};',
+                      'std::array<SpriteNode*, Game::SpritePriorityCount> before{}, rootsBefore{};',
+                      'rootsBefore[p] = root;',
                       'const int result = ' + original,
                       'TagAppendedNodes(before,',
                       'RenderScope::ScreenHud',
+                      'nullptr, &rootsBefore);',
                       'return result;')
     install = function_body(source, 'bool apply() override')
     require_order(install, 'BA9D0 source-to-E8-child install',
