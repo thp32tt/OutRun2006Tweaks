@@ -7,9 +7,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00929",
   "feature_id": "LIVE_GAME_PROGRAMMABLE_SM3_NATIVE_DRAW_INPUT_GRAPH",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -18,7 +18,7 @@
   "full_dx11_renderer_complete": false,
   "score_change": 0,
   "material_result_sha": "94a1f22ba2635fa85bee6ab26ea6761028c3f1cf",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "259319d69ca07005064ab48f75e33f2d2cd8c1be",
   "feature_contract": {
     "feature_id": "LIVE_GAME_PROGRAMMABLE_SM3_NATIVE_DRAW_INPUT_GRAPH",
     "goal": "Connect actual game D3D9 programmable SM3 declarations, mixed packed/float vertex register conversion, IA upload and full-size native Draw/DrawIndexed while keeping opt-in fallback and original source ordinal.",
@@ -44,9 +44,9 @@
     ]
   },
   "acceptance_results": {
-    "real_sm3_packed_vertex_native_draw": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
-    "native_stream_fallback_regression": "SOURCE_IMPLEMENTED_AUTOMATION_PENDING",
-    "full_sha_ci_game_draw_graph": "PENDING_EXACT_SHA"
+    "real_sm3_packed_vertex_native_draw": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "native_stream_fallback_regression": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "full_sha_ci_game_draw_graph": "PASS_EXACT_SHA_5_OF_5"
   },
   "development_strategy": {
     "work_class": "vertical_slice",
@@ -88,15 +88,47 @@
     "C0_RECOVER": "00928 was C6 PASS; latest branch source 94a1f22; 00929 not previously present.",
     "C1_REVIEW": "SM3 native Draw rejected non-FLOAT D3D9 declarations despite backend's broader shader semantic/format translator.",
     "C2_IMPLEMENT": "Packed/normalized/half game shader inputs converted to GPU FLOAT4 IA stream, preserving FLOAT fast path and D3D9 fallback.",
-    "C3_VALIDATE": "Initial 94a1f22 exact-SHA Fast/Backend failed on missing latest task strategy in 00928; this 00929 run record repairs check-latest selection; all five exact-SHA CI pending.",
-    "C4_COMMIT": "Source material SHA 94a1f22ba2635fa85bee6ab26ea6761028c3f1cf",
+    "C3_VALIDATE": "Exactly five required DX11 Fast/Backend/Windows Build/OpenXR/HUD Actions succeeded at validation-bearing SHA 259319d69ca07005064ab48f75e33f2d2cd8c1be. Native menu-car-race/Quest3/gamepad runtime remains UNTESTED.",
+    "C4_COMMIT": "Material game-source SHA 94a1f22ba2635fa85bee6ab26ea6761028c3f1cf; validation-bearing repair/run-contract SHA 259319d69ca07005064ab48f75e33f2d2cd8c1be.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_EXACT_SHA"
+    "C6_RESULT": "PASS_EXACT_SHA; COMPLETE_BUILD_VERIFIED; bookkeeping commit uses [skip ci] after successful exact SHA checks."
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Live SM3 programmable source vertex packing not covered by earlier FLOAT-only layout; real game display parity UNTESTED.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "94a1f22ba2635fa85bee6ab26ea6761028c3f1cf",
-  "NEXT_IMPLEMENTATION_ACTION": "Verify exact-SHA gates and repair only actual failures under 00929, then collect one real game native draw+published frame session."
+  "NEXT_IMPLEMENTATION_ACTION": "Material source is build-verified, NOT game/HMD-proven; next independent selection requires real game menu/car/race native draw and published frame measurement, original D3D9 fallback retained.",
+  "score_policy": "C6 bookkeeping and retry do not independently earn another point; material achievement recorded once, subject to scoreboard deduplication.",
+  "validation_evidence": {
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_GAME_HMD_RUNTIME_VERIFIED",
+    "exact_sha": "259319d69ca07005064ab48f75e33f2d2cd8c1be",
+    "ci_status": "PASS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "exact_sha_workflow_runs": {
+      "fast": {
+        "run_id": 39156154369,
+        "conclusion": "success"
+      },
+      "backend": {
+        "run_id": 39156154307,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 39156154378,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 39156154398,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 39156154356,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "gameplay_validation": "UNTESTED"
+  }
 }
