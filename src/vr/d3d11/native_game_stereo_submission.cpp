@@ -2,6 +2,7 @@
 #include "native_game_eye_pair_sources.hpp"
 #include "native_game_postpass_replay.hpp"
 #include "native_game_camera_view.hpp"
+#include "native_game_partial_color_format.hpp"
 #include "native_game_stretch_source.hpp"
 #include "native_game_stereo_draw_evidence.hpp"
 #include "native_game_raster_topology.hpp"
@@ -166,20 +167,12 @@ private:
     if (!context || !target) return false;
     D3D11_RENDER_TARGET_VIEW_DESC view{};
     target->GetDesc(&view);
-    switch (view.Format) {
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8X8_UNORM:
-    case DXGI_FORMAT_R10G10B10A2_UNORM:
-    case DXGI_FORMAT_R16G16B16A16_UNORM:
-    case DXGI_FORMAT_R16G16B16A16_FLOAT:
-    case DXGI_FORMAT_R11G11B10_FLOAT:
-    case DXGI_FORMAT_B5G6R5_UNORM:
-    case DXGI_FORMAT_B5G5R5A1_UNORM:
-        break;
-    default:
+    // The shader writes a float4; permit other typed normalized/float
+    // game-camera RTVs (luminance, two-channel, full-float, sRGB) without
+    // reinterpreting integer/depth/typeless storage as color. The exact
+    // device/typed-RTV renderability check below remains mandatory.
+    if (!native_game_partial_color_shader_format(view.Format))
         return false;
-    }
     Microsoft::WRL::ComPtr<ID3D11Device> device;
     context->GetDevice(device.GetAddressOf());
     UINT support = 0u;
@@ -2241,6 +2234,12 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                           event.depth < 0.0f || event.depth > 1.0f)) ||
                         route == live_game_stereo::NativeDepthClearRoute::Reject)
                         return false;
+                    // A cropped Z/stencil Clear always rasterizes on D3D11,
+                    // including 11.1: ClearView is a color operation here.
+                    // Verify d3dcompiler before recording eye L, not after
+                    // partially mutating the stereo pair during eye replay.
+                    if (route == live_game_stereo::NativeDepthClearRoute::PartialRaster)
+                        needsPostpassShader = true;
                 } else if (event.kind ==
                                NativeGameEyePartialTargetClear::Kind::SourceCopy ||
                            event.kind ==
