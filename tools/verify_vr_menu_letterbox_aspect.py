@@ -844,10 +844,10 @@ def verify_visible_menu_fragment(code: str) -> None:
     # the client RECT and the full-visibility bit. Do not resurrect the
     # older pixel-difference approximation for a partially captured menu.
     visibility_call = (
-        "RECT capturedClient{};\\n"
-        "        bool capturedClientFullyVisible = false;\\n"
-        "        if (!c.GetGameUv(\\n"
-        "                whole, false, &capturedClient, &capturedClientFullyVisible))\\n"
+        "RECT capturedClient{};\n"
+        "        bool capturedClientFullyVisible = false;\n"
+        "        if (!c.GetGameUv(\n"
+        "                whole, false, &capturedClient, &capturedClientFullyVisible))\n"
         "            return false;"
     )
     assert visibility_call in code
