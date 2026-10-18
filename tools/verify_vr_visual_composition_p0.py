@@ -803,7 +803,21 @@ def verify_exact_call_window_hud_scope(source):
         require(f'OutRunVR::GameSemantic::CurrentScope = {saved};',
                 leave, kind+' must restore former owner')
         require(f'{saved} =', leave, kind+' resets saved scope')
-        if 'Settings::VREnabled' in leave:
+        if kind == 'StageExtension':
+            # Current VR is a valid condition for acquiring eye ownership;
+            # the scoped direct HUD owner and original RenderScope must be
+            # restored unconditionally, even when the E8 source toggles VR.
+            if re.search(
+                r'(?m)^\s*OutRunVR::GameSemantic::CurrentScope\s*=\s*'
+                r'StageExtensionSavedScope;\s*$', leave
+            ) is None:
+                raise SystemExit(kind+' restoration became conditional')
+            if 'StageExtensionAdmission.mayPublish(' not in leave:
+                raise SystemExit(kind+' +TIME GPU/queue owner guard lost')
+            cleanup = leave[leave.find('StageExtensionDirectDrawOwner.reset();'):]
+            if 'Settings::VREnabled' in cleanup:
+                raise SystemExit(kind+' restoration now VR gated')
+        elif 'Settings::VREnabled' in leave:
             raise SystemExit(kind+' leaked source-time scope on mid-call VR change')
 verify_exact_call_window_hud_scope(ui)
 
@@ -829,8 +843,13 @@ def verify_stage_extension_direct_draw_owner(source, semantics):
                   'TagAppendedNodes(StageExtensionBefore,',
                   'StageExtensionDirectDrawOwner.reset();',
                   'CurrentScope = StageExtensionSavedScope;')
-    if 'Settings::VREnabled' in end:
-        raise SystemExit('+TIME direct scope leaked when VR toggled off')
+    if 'StageExtensionAdmission.mayPublish(' not in end:
+        raise SystemExit('+TIME queue/numeric exit guard missing')
+    if re.search(
+        r'(?m)^\s*OutRunVR::GameSemantic::CurrentScope\s*=\s*'
+        r'StageExtensionSavedScope;\s*$', end
+    ) is None:
+        raise SystemExit('+TIME saved RenderScope restoration became conditional')
     helper = function_body(semantics, 'class ScopedExactProducerSemantic final')
     for guard in ('SpriteQueueDepth == 0',
                   'CurrentQueueExactScope = RenderScope::None;',

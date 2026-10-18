@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 // One native +TIME E8 source owns both immediate numeric glyphs and queued
 // sprani siblings. The lifetime is an exact source CALL, not the entire frame.
@@ -10,6 +11,8 @@ namespace OutRunVR::StageExtension
     {
         bool vrAtEntry = false;
         bool outsideQueueAtEntry = false;
+        // A native queue can reenter and exit during an exact +TIME CALL.
+        std::uint64_t queueEpochAtEntry = 0;
 
         constexpr bool mayBeginDirect() const noexcept
         {
@@ -17,9 +20,11 @@ namespace OutRunVR::StageExtension
         }
 
         constexpr bool mayPublish(bool vrAtLeave,
-                                  bool outsideQueueAtLeave) const noexcept
+                                  bool outsideQueueAtLeave,
+                                  std::uint64_t queueEpochAtLeave = 0) const noexcept
         {
-            return mayBeginDirect() && vrAtLeave && outsideQueueAtLeave;
+            return mayBeginDirect() && vrAtLeave && outsideQueueAtLeave &&
+                queueEpochAtLeave == queueEpochAtEntry;
         }
     };
 
@@ -36,5 +41,7 @@ namespace OutRunVR::StageExtension
             "VR disabled mid-source must not publish stale HUD tags");
         static_assert(!SourceAdmission{true, true}.mayPublish(true, false),
             "Queue reentry during source exit must keep native ownership");
+        static_assert(SourceAdmission{true, true, 9}.mayPublish(true, true, 9));
+        static_assert(!SourceAdmission{true, true, 9}.mayPublish(true, true, 10));
     }
 }

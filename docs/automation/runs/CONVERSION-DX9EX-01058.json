@@ -64,7 +64,15 @@
       "Do not add the mode-2 0x98AC6 unrelated animation",
       "Do not globally promote generic glyphs or flush unrelated D3DX batches",
       "Do not assert Quest3 +TIME optics PASS without HMD execution."
-    ]
+    ],
+    "source_trace": [
+      "Exact 0x989xx +TIME original E8 CALL begins with VR state and queue selection epoch snapshot before sprani/numeric generation.",
+      "Scoped direct D3DX HUD glyph owner and bounded SpriteNode siblings are published only when source producer is still eligible.",
+      "R84 DX9Ex right-eye HUD submit and OpenXR host cannot inherit source after VR toggle or any transient nested queue selection; unknown buffers preserve native fallback."
+    ],
+    "eye_ownership": "Only stable VR+queue depth+selection epoch can grant original exact source binocular ScreenHud ownership; optics remain HMD untested.",
+    "fix_evidence": "Native StageExtension C++ and SourceAdmission source transaction repair captures queue-selection generation, rejects transient reentry and restores original scope unconditionally.",
+    "negative_test_evidence": "Portable C++20 and strict source negative mutation contract for stable VR, VR toggles, queue nesting, and transient queue selection epoch."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -83,7 +91,19 @@
     "prior_failed_runs": [
       {
         "run_id": 39168768438,
-        "cause": "policy feature_contract missing trace_stages and subcomponents; game/host/package skipped before compiler"
+        "cause": "missing feature trace contract"
+      },
+      {
+        "run_id": 39168929951,
+        "cause": "provenance old signature"
+      },
+      {
+        "run_id": 39169087526,
+        "cause": "negative mutation targeted wrong source snapshot"
+      },
+      {
+        "run_id": 39169468833,
+        "cause": "P0 verifier equated VR-guarded tag with conditional original RenderScope cleanup"
       }
     ]
   },

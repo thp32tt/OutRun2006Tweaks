@@ -20,5 +20,8 @@ int main()
         const SourceAdmission nestedQueue{true, false};
         assert(!nestedQueue.mayBeginDirect());
         assert(!nestedQueue.mayPublish(true, true));
+        const SourceAdmission transientQueue{true, true, 17};
+        assert(transientQueue.mayPublish(true, true, 17));
+        assert(!transientQueue.mayPublish(true, true, 18));
     }
 }

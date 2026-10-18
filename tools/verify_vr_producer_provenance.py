@@ -285,7 +285,8 @@ def check_stage_extension_direct_owner(text: str) -> None:
     # the function would let a mutated source snapshot escape this guard.
     if re.search(
         r"StageExtensionAdmission\s*=\s*\{\s*Settings::VREnabled\s*,\s*"
-        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*\}",
+        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*,\s*"
+        r"OutRunVR::GameSemantic::CurrentQueueNodeEpoch\(\)\s*\}",
         enter,
     ) is None:
         fail("stage +TIME entry VR/queue snapshot lost")
@@ -299,7 +300,8 @@ def check_stage_extension_direct_owner(text: str) -> None:
     if re.search(
         r"if\s*\(\s*StageExtensionAdmission\.mayPublish\(\s*"
         r"Settings::VREnabled\s*,\s*"
-        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*\)\s*\)",
+        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*,\s*"
+        r"OutRunVR::GameSemantic::CurrentQueueNodeEpoch\(\)\s*\)\s*\)",
         leave,
     ) is None:
         fail("stage +TIME queued sibling/native flush exit admission lost")

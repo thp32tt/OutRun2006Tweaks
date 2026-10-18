@@ -1455,7 +1455,8 @@ class UIScaling : public Hook
             return;
         StageExtensionAdmission = {
             Settings::VREnabled,
-            OutRunVR::GameSemantic::SpriteQueueDepth == 0
+            OutRunVR::GameSemantic::SpriteQueueDepth == 0,
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
         };
         // The original E8 may execute while VR is disabled. In that case,
         // do not snapshot or later label desktop glyphs as ScreenHud if the
@@ -1518,7 +1519,8 @@ class UIScaling : public Hook
         // Unknown or mixed native D3DX buffers still use their original End.
         if (StageExtensionAdmission.mayPublish(
                 Settings::VREnabled,
-                OutRunVR::GameSemantic::SpriteQueueDepth == 0))
+                OutRunVR::GameSemantic::SpriteQueueDepth == 0,
+            OutRunVR::GameSemantic::CurrentQueueNodeEpoch()))
         {
             TagAppendedNodes(StageExtensionBefore,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
