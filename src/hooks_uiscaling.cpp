@@ -5,6 +5,7 @@
 #include "vr/game/hud_command_batch.hpp"
 #include "vr/game/goal_result_parent_provenance.hpp"
 #include "vr/game/sprite_queue_tail_proof.hpp"
+#include "vr/game/stage_extension_source_admission.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
@@ -1436,6 +1437,11 @@ class UIScaling : public Hook
         StageExtensionRootsBefore{};
     inline static thread_local std::uint64_t StageExtensionCompleted = 0;
     inline static thread_local std::uint64_t StageExtensionEntrySerial = 0;
+    // Keep the original +TIME source's entry admission across all five E8
+    // parents. A desktop-to-VR toggle or a queued reentrant call must never
+    // publish that earlier source as an OpenXR HUD owner on return.
+    inline static thread_local OutRunVR::StageExtension::SourceAdmission
+        StageExtensionAdmission{};
     // Bracket both immediate numeric glyph draws and the original sprite
     // producer. A previous queue node's ScreenHud/World scope must not
     // override the current exact +TIME source when it rasterizes directly.
@@ -1447,23 +1453,37 @@ class UIScaling : public Hook
     {
         if (StageExtensionDepth++ != 0)
             return;
-        // Snapshot before the original source call: preserve only nested
-        // exact tags created during this E8, never stale ring-buffer tags.
-        StageExtensionEntrySerial =
-            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
-                std::memory_order_acquire);
-        for (int p = 0; p < Game::SpritePriorityCount; ++p)
+        StageExtensionAdmission = {
+            Settings::VREnabled,
+            OutRunVR::GameSemantic::SpriteQueueDepth == 0
+        };
+        // The original E8 may execute while VR is disabled. In that case,
+        // do not snapshot or later label desktop glyphs as ScreenHud if the
+        // user enables VR before the CALL returns. Reentrant queue draws
+        // also retain their existing authoritative per-node owner.
+        if (StageExtensionAdmission.mayBeginDirect())
         {
-            SpriteNode* root = Game::sprite_prio_root[p];
-            StageExtensionRootsBefore[p] = root;
-            StageExtensionBefore[p] = root ? root->tail_4 : nullptr;
+            StageExtensionEntrySerial =
+                OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                    std::memory_order_acquire);
+            for (int p = 0; p < Game::SpritePriorityCount; ++p)
+            {
+                SpriteNode* root = Game::sprite_prio_root[p];
+                StageExtensionRootsBefore[p] = root;
+                StageExtensionBefore[p] = root ? root->tail_4 : nullptr;
+            }
+        }
+        else
+        {
+            StageExtensionEntrySerial = 0;
+            StageExtensionRootsBefore = {};
+            StageExtensionBefore = {};
         }
         // These five exact +TIME source E8 CALLs can synchronously draw text as
         // well as enqueue sprites. Post-call node tags only cover the latter.
         // Scope only this exact source call, never the shared text renderer.
         StageExtensionSavedScope = OutRunVR::GameSemantic::CurrentScope;
-        if (Settings::VREnabled &&
-            OutRunVR::GameSemantic::SpriteQueueDepth == 0)
+        if (StageExtensionAdmission.mayBeginDirect())
         {
             // Immediate +TIME numerals must not consume a prior queued
             // world's pending Draw token. Shield it until this original
@@ -1487,15 +1507,20 @@ class UIScaling : public Hook
     {
         if (!StageExtensionDepth || --StageExtensionDepth != 0)
             return;
-        TagAppendedNodes(StageExtensionBefore,
-            OutRunVR::GameSemantic::RenderScope::ScreenHud,
-            OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
-            nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
-        // D3DX Draw can defer triangles beyond the original numeric CALL.
-        // Close only a still-homogeneous +TIME batch while the exact direct
-        // source is alive, before restoring the previous shader/HUD owner.
-        // Failed/unknown/mixed batches retain normal D3DX End behavior.
-        FlushD3DXAtDirectStageSourceExit();
+        // Guard BOTH queued +TIME sprani and direct numeral batch ownership.
+        // The source may toggle VR or reenter the renderer during the E8:
+        // only an unchanged, direct VR source is eligible for eye semantics.
+        // Unknown or mixed native D3DX buffers still use their original End.
+        if (StageExtensionAdmission.mayPublish(
+                Settings::VREnabled,
+                OutRunVR::GameSemantic::SpriteQueueDepth == 0))
+        {
+            TagAppendedNodes(StageExtensionBefore,
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
+                nullptr, &StageExtensionRootsBefore, StageExtensionEntrySerial);
+            FlushD3DXAtDirectStageSourceExit();
+        }
         // Always restore the exact direct-draw queue cursor/anchor even if
         // VR enablement changes inside the original +TIME E8 call.
         StageExtensionDirectDrawOwner.reset();
@@ -1512,6 +1537,7 @@ class UIScaling : public Hook
         StageExtensionBefore = {};
         StageExtensionRootsBefore = {};
         StageExtensionEntrySerial = 0;
+        StageExtensionAdmission = {};
     }
 
     // The original GOAL animations print the large white record and

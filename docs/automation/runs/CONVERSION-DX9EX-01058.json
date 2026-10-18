@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01058",
+  "production_id": "CONVERSION-DX9EX-01058",
+  "event_id": "CONVERSION-DX9EX-01058-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/stage_extension_source_admission.hpp",
+    "tools/diagnostics/repro_stage_extension_source_admission_20261019.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve original +TIME banner and numeric glyph ownership across direct original E8, native SpriteNode, and deferred D3DX GPU submission; refuse VR mode-toggled or reentrant queued source as a new binocular HUD owner.",
+    "scope_boundary": "Only two original +TIME sprani parents and three numeric parents. Do not alter mode-2 0x98AC6, GOAL B9200, SkyGlow, game timer, native input/FFB, R26_SAFE or DXVK.",
+    "acceptance_items": [
+      {
+        "id": "stage_source_lifetime",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_+TIME_sprite_and_numeric_producer_to_eye_scope",
+        "expected_behavior": "A stable source VR admission publishes +TIME sprite queue siblings and direct numeric draw ownership; VR toggle during CALL never publishes desktop nodes as VR HUD."
+      },
+      {
+        "id": "stage_negative_queue_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "VR_toggle_nested_queue_deferred_gpu_original_fallback",
+        "expected_behavior": "VR off->on, on->off, in-queue reentry refuse source admission, preserve original D3DX fallback and owner restoration."
+      },
+      {
+        "id": "stage_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows_R84_game_host_package_source",
+        "expected_behavior": "Full DX9Ex Active, Domain, EXE HUD Inspector and Full Source Impact on one exact SHA; HMD optics separate."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "StageExtensionEnter made the direct owner conditional on VREnabled but StageExtensionLeave unconditionally called TagAppendedNodes under ScreenHud, including sources entered with VR disabled.",
+    "root_cause": "Producer entry conditions were not retained across the original 0x989xx CALL. A VR toggle could leave desktop or reentrant queued +TIME SpriteNodes with an unsupported binocular ScreenHud owner.",
+    "alternatives_rejected": [
+      "Do not add the mode-2 0x98AC6 unrelated animation",
+      "Do not globally promote generic glyphs or flush unrelated D3DX batches",
+      "Do not assert Quest3 +TIME optics PASS without HMD execution."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "stage_source_lifetime": "PENDING_EXACT_SHA",
+    "stage_negative_queue_fallback": "PASS_PORTABLE_SOURCE_TEST",
+    "stage_exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "local_targeted_gate": "C++20 portable SourceAdmission positive/negative executable PASS, compile-time static_assert included in x86 source",
+    "required_gates_state": "PENDING"
+  },
+  "result_commit_kind": "material_source_plus_feature_contract",
+  "c6_commit_kind": "none"
+}
