@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
-  "checkpoint": "C2_IMPLEMENTED_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
   "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "e8ce983d64e7e1330e9664be62e62fcdb08f0462",
-  "validation_bearing_result_sha": "PENDING_CI_REPAIR_SHA",
-  "automation_validation": "PENDING",
+  "validation_bearing_result_sha": "7690b40f52e96e1ac209a536843eb7e0853b1886",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -85,8 +85,8 @@
     "failed_exact_sha": "e8ce983d64e7e1330e9664be62e62fcdb08f0462",
     "failed_run_id": 39124571419,
     "failed_step": "policy: run record missing; game/host/package skipped",
-    "final_exact_sha_gates": "PENDING",
-    "head_sha": "PENDING"
+    "final_exact_sha_gates": "PASS_EXACT_SHA",
+    "head_sha": "7690b40f52e96e1ac209a536843eb7e0853b1886"
   },
   "notes": "B: exact GitHub Active policy failure caused solely by missing required same-TASK run record; preserves prior material source and running independent CI. RUNTIME_VALIDATION=UNTESTED. CI/source changes and C6 are one feature, no duplicate score."
 }
