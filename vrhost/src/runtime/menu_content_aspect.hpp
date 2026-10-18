@@ -157,17 +157,17 @@ namespace OutRunVrMenuAspect
         float halfWidth = 0.0f, halfHeight = 0.0f;
     };
 
-    // The latest Quest3 observation found a correctly proportioned
-    // title/main menu approximately 75% undersized. Only those exact
-    // game states increase default optical coverage to 1.0; wide vehicle
-    // selection and unknown states retain the verified 0.78 rollback.
-    // All cases keep common binocular FOV containment and explicit A/B.
+    // Quest 3 user A/B: remove the old ~75-78% default optical shrink
+    // for ALL front-end game states (title, main menu, car selector,
+    // exit/reset). The separately validated binocular FOV contain still
+    // prevents overflow, and source aspect/UV remain unchanged.
+    // A deliberate environment A/B override can still request < 1.0.
     inline float ResolveMenuOpticalCoverage(
-        const char* requested, float defaultCoverage = 0.78f) noexcept
+        const char* requested, float defaultCoverage = 1.0f) noexcept
     {
         if (!std::isfinite(defaultCoverage) ||
             defaultCoverage < 0.50f || defaultCoverage > 1.0f)
-            defaultCoverage = 0.78f;
+            defaultCoverage = 1.0f;
         if (!requested || !*requested)
             return defaultCoverage;
         char* end = nullptr;
@@ -178,14 +178,14 @@ namespace OutRunVrMenuAspect
         return parsed;
     }
 
-    // GameState is source-published by the original game, not inferred
-    // from the captured window's aspect. Do not resize the Ferrari selector.
+    // Every menu state uses full safe optical coverage by default.
+    // Retain the state argument for the original game ABI/callers, but
+    // do not quietly reinstate the old 0.78 car-selector fallback.
     inline float ResolveMenuOpticalCoverageForState(
         const char* requested, std::uint32_t gameState) noexcept
     {
-        const float fallback =
-            gameState == 0x04u || gameState == 0x09u ? 1.0f : 0.78f;
-        return ResolveMenuOpticalCoverage(requested, fallback);
+        (void)gameState;
+        return ResolveMenuOpticalCoverage(requested, 1.0f);
     }
 
     inline OpticalClipPlan PlanOpticallyCenteredClip(
