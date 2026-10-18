@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00910",
+  "production_id": "CONVERSION-DX11-00910",
+  "event_id": "CONVERSION-DX11-00910-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00910",
+  "feature_id": "DX11:NATIVE_STEREO_EYE_BLEND_WRITABILITY_EVIDENCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_EYE_BLEND_WRITABILITY_EVIDENCE",
+    "recovery_basis": "RUN_RECORD_NOT_FOUND: no existing 00910 run JSON on target branch or exact validation commit; recovered this contract from original material commit diff, not claimed to be a preexisting contract.",
+    "goal": "Only certify native left/right XR eye color when game-authored draw blend state can write actual RGB or alpha pixels; reject destination-preserving ZERO/ONE ADD/REV_SUB identity blending without suppressing real Draw chronology or original D3D9Ex/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_eye_blend_identity_color_admission",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_stereo_eye_draw_output_and_geometry_chronology",
+        "expected_behavior": "Source-owned native eye color evidence rejects destination-preserving ZERO-source ONE-destination identity blends on enabled channels, while physical Draw geometry chronology stays independent."
+      },
+      {
+        "id": "independent_rgb_alpha_and_original_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_eye_color_masks_menu_vehicle_race_and_dx9ex",
+        "expected_behavior": "RGB-only and alpha-only actual writes remain separately eligible, unknown MIN/MAX and nonidentity modes are not falsely suppressed; no original DX9Ex Draw/Present, gamepad or FFB runtime claims."
+      },
+      {
+        "id": "draw_evidence_probe_and_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_stereo_draw_evidence_static_probe_and_github_actions",
+        "expected_behavior": "C++ constexpr evidence probe covers identity rejection and positive write combinations; five mandatory GitHub Actions gates succeed for the unchanged validation-bearing SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Read live source-authored native OM blend desc and per-channel write mask on actual left/right XR eye color Draw path",
+      "Reject destination-preserving ADD/REV_SUB ZERO-source ONE-destination identity without hiding valid RGB-only or alpha-only eye writes, and preserve physical native draw chronology and DX9Ex fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+      "src/vr/d3d11/native_game_stereo_submission.cpp",
+      "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+    ],
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_EYE:BLEND_WRITABILITY_EVIDENCE:00910"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_ONLY: source static checks and GitHub Actions success; no OutRun 2006 real-game, Quest3 or VDXR visual verification.",
+    "activation_guard_and_fallback": "Native path remains opt-in/fail-closed; no source-owned DX9Ex Draw/Present/input/FFB or DXVK change in the original 00910 material commit.",
+    "acceptance_proof": {
+      "positive_probe": "Original 00910 C++ static evidence covers alpha-only, RGB-only and nonidentity blend writes with write mask and disabled blend variants.",
+      "negative_regression": "Original 00910 static assertions reject fully preserving ZERO/ONE ADD and REV_SUB and masks with no writable channels; no physical HMD observation claimed.",
+      "component_integration": "Native eye color writable check consumes the new blend predicate, and original 00910 draw-evidence probe includes positive/negative test cases; GitHub exact validation SHA five mandatory Actions gates succeeded."
+    }
+  },
+  "acceptance_results": {
+    "native_eye_blend_identity_color_admission": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "independent_rgb_alpha_and_original_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "draw_evidence_probe_and_exact_sha_ci": "PASS_EXACT_SHA_MANDATORY_5_OF_5"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_stereo_draw_evidence.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_game_stereo_draw_evidence_probe_00873.cpp"
+  ],
+  "material_result_sha": "5741ff7999fc70636309c2937e45923a7b732ab7",
+  "validation_bearing_result_sha": "4de1ba7a4da2689602be7dbaac3474296751131b",
+  "runtime_validation_note": "Actual OutRun 2006 menu/car/race, Quest 3/VDXR, controller/FFB and user-visible DX11 frame quality were not run or observed. RUNTIME_VALIDATION=UNTESTED.",
+  "pipeline": {
+    "C0_RECOVER": "RUN_RECORD_NOT_FOUND on target branch and exact validation SHA; recovered original 00910 material 5741ff7999fc70636309c2937e45923a7b732ab7 and inspected its three actual modified files. Contract/acceptance fields reconstructed from the original material diff; no preexisting run record falsely claimed.",
+    "C1_REVIEW": "Review ZERO/ONE blend identity false-positive eye-color evidence and previous 00909 recovered-contract structural gate failure.",
+    "C2_IMPLEMENT": "Original 00910 material commit 5741ff7999fc70636309c2937e45923a7b732ab7 adds native stereo eye blend write predicate and evidence static probe; not modified in this C6.",
+    "C3_VALIDATE": "PASS_EXACT_SHA 4de1ba7a4da2689602be7dbaac3474296751131b: GitHub push-run DX11 Fast #39115594758, Backend #39115594973, Build #39115594780, OpenXR #39115594760, HUD Inspector #39115594620 all SUCCESS. No rerun.",
+    "C4_COMMIT": "Original material 5741ff7999fc70636309c2937e45923a7b732ab7; subsequent same-task cause-limited recovered-00909 feature contract repair at exact validation 4de1ba7a4da2689602be7dbaac3474296751131b; C6 adds this JSON only via independent [skip ci] bookkeeping commit.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA; validation SHA 4de1ba7a4da2689602be7dbaac3474296751131b unchanged; RUN_RECORD_NOT_FOUND recovered; RUNTIME_VALIDATION=UNTESTED; score_change=0."
+  },
+  "ci_repairs": [
+    {
+      "category": "prior-run-recovered-contract-metadata",
+      "cause": "00909's recovered C6 metadata omitted nonnull feature identity/development strategy and fallback acceptance required by 00910 structural CI checks.",
+      "result": "RESOLVED_SAME_TASK_AT_4de1ba7a4da2689602be7dbaac3474296751131b",
+      "affected_record": "CONVERSION-DX11-00909",
+      "original_00909_material_and_validation_sha_preserved": true
+    }
+  ],
+  "c6_completed_reason": "RUN_RECORD_NOT_FOUND",
+  "c6_bookkeeping_only": true,
+  "validation_evidence": {
+    "material_sha": "5741ff7999fc70636309c2937e45923a7b732ab7",
+    "validation_sha": "4de1ba7a4da2689602be7dbaac3474296751131b",
+    "mandatory_gates": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39115594758,
+        "conclusion": "success",
+        "validation_sha": "4de1ba7a4da2689602be7dbaac3474296751131b"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39115594973,
+        "conclusion": "success",
+        "validation_sha": "4de1ba7a4da2689602be7dbaac3474296751131b"
+      },
+      {
+        "name": "Build",
+        "run_id": 39115594780,
+        "conclusion": "success",
+        "validation_sha": "4de1ba7a4da2689602be7dbaac3474296751131b"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39115594760,
+        "conclusion": "success",
+        "validation_sha": "4de1ba7a4da2689602be7dbaac3474296751131b"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39115594620,
+        "conclusion": "success",
+        "validation_sha": "4de1ba7a4da2689602be7dbaac3474296751131b"
+      }
+    ],
+    "required_gates_passed": "5/5",
+    "additional_pull_request_workflows": [
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39115599373,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 39115599458,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39115599353,
+        "conclusion": "success"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "scope": "SOURCE_STAGE_ONLY; HMD and real game not run"
+  },
+  "recovered_record_note": "RUN_RECORD_NOT_FOUND: 00910 record was absent on branch and validation SHA. Consequently, there was no pre-existing feature_contract or acceptance_results to preserve verbatim. Reconstructed from original material commit with explicit recovery attribution; original 00910 material and validation SHA untouched. FEATURE_ID was unspecified by the incoming dispatch (None); the descriptive feature ID here is recovered from the original material diff, not claimed to be a previously assigned ID."
+}
