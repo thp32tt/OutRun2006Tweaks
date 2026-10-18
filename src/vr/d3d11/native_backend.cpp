@@ -363,9 +363,10 @@ bool build_r283_sm3_mov_shader_source(
             bool matrix3x3{};
             bool texture2d{};
             bool texkill{};
+            NativeSm3Texture2DMode textureMode = NativeSm3Texture2DMode::Implicit;
             unsigned samplerRegister{};
             unsigned texkillWrittenMask{};
-            std::array<std::string, 3> sources{};
+            std::array<std::string, 4> sources{};
             std::array<std::string, 4> matrixRows{};
         };
         std::vector<Operation> operations;
@@ -496,13 +497,23 @@ bool build_r283_sm3_mov_shader_source(
             case D3DSIO_M3x3:
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             case D3DSIO_TEX:
-                // Ordinary ps_3_0 TEXLD only. Projected/bias/LOD and
-                // vertex-texture fetch are different operations.
+                // ps_3_0 TEXLD/TEXLDP/TEXLDB share one 2D sampler slot;
+                // the token control bits select projection or LOD bias.
                 if (vertexStage ||
-                    (instruction.instructionToken &
-                     0x00ff0000u) != 0u)
+                    ((instruction.instructionToken >> 16u) & 0xffu) > 2u)
                     return false;
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
+            case D3DSIO_TEXLDL:
+                // The native live-draw bridge only binds PS samplers.
+                if (vertexStage ||
+                    (instruction.instructionToken & 0x00ff0000u) != 0u)
+                    return false;
+                opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
+            case D3DSIO_TEXLDD:
+                if (vertexStage ||
+                    (instruction.instructionToken & 0x00ff0000u) != 0u)
+                    return false;
+                opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 4u; break;
             default:
                 return false;
             }
@@ -529,8 +540,20 @@ bool build_r283_sm3_mov_shader_source(
             op.sourceCount = sourceCount;
             op.matrix4x4 = instruction.opcode == D3DSIO_M4x4;
             op.matrix3x3 = instruction.opcode == D3DSIO_M3x3;
-            op.texture2d = instruction.opcode == D3DSIO_TEX;
+            op.texture2d = instruction.opcode == D3DSIO_TEX ||
+                           instruction.opcode == D3DSIO_TEXLDL ||
+                           instruction.opcode == D3DSIO_TEXLDD;
             op.texkill = instruction.opcode == D3DSIO_TEXKILL;
+            if (op.texture2d) {
+                if (instruction.opcode == D3DSIO_TEXLDL)
+                    op.textureMode = NativeSm3Texture2DMode::ExplicitLod;
+                else if (instruction.opcode == D3DSIO_TEXLDD)
+                    op.textureMode = NativeSm3Texture2DMode::Gradients;
+                else if (((instruction.instructionToken >> 16u) & 0xffu) == 1u)
+                    op.textureMode = NativeSm3Texture2DMode::Projected;
+                else if (((instruction.instructionToken >> 16u) & 0xffu) == 2u)
+                    op.textureMode = NativeSm3Texture2DMode::Bias;
+            }
             if (op.texkill) {
                 // D3D9 TEXKILL is encoded with a destination-style TEMP
                 // operand but only tests prior xyz values. Never promote a
@@ -639,7 +662,8 @@ bool build_r283_sm3_mov_shader_source(
                     // Still reject any genuinely unwritten physical lane;
                     // HLSL TEMP zero initialization is never valid evidence.
                     const unsigned logicalComponents =
-                        op.texture2d ? 3u :
+                        op.texture2d
+                            ? native_sm3_texture_source_components(op.textureMode, i) :
                         op.matrix4x4 ? 15u :
                         op.matrix3x3 ? 7u :
                         native_sm3_source_components(op.opcode, mask, i);
@@ -744,7 +768,8 @@ bool build_r283_sm3_mov_shader_source(
                 if (!append_native_sm3_texture2d_sample(
                         translated, dest, op.destinationMask,
                         op.sources[0], op.samplerRegister,
-                        static_cast<unsigned>(i)))
+                        static_cast<unsigned>(i), op.textureMode,
+                        op.sources[2], op.sources[3])))
                     return false;
             } else if (op.matrix4x4 || op.matrix3x3) {
                 if (!append_native_sm3_matrix(
@@ -754,7 +779,9 @@ bool build_r283_sm3_mov_shader_source(
                     return false;
             } else if (!append_native_sm3_arithmetic(
                            translated, op.opcode, dest, op.destinationMask,
-                           op.sources, op.sourceCount, static_cast<unsigned>(i)))
+                           std::array<std::string, 3>{
+                               op.sources[0], op.sources[1], op.sources[2]},
+                           op.sourceCount, static_cast<unsigned>(i)))
                 return false;
         }
         translated += vertexStage ? "    return output;\n}\n"

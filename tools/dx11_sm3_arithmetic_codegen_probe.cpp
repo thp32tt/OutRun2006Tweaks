@@ -1,5 +1,6 @@
 #include "../src/vr/d3d11/native_sm3_arithmetic_codegen.hpp"
 #include "../src/vr/d3d11/native_sm3_fragment_codegen.hpp"
+#include "../src/vr/d3d11/native_sm3_texture_codegen.hpp"
 #include <array>
 #include <cassert>
 #include <string>
@@ -79,6 +80,44 @@ int main() {
     assert(operand == "-abs(abs(input.r0.xyzw))");
     assert(!emit(static_cast<NativeSm3ArithmeticOpcode>(255), 15u, 3u));
     assert(out == before);
+    // Pixel programmable texture instructions share actual sN/tN bindings.
+    // Only xy and (for projected/bias/LOD) w are consumed from coordinates.
+    using TM = NativeSm3Texture2DMode;
+    static_assert(native_sm3_texture_source_components(TM::Implicit, 0u) == 3u);
+    static_assert(native_sm3_texture_source_components(TM::Bias, 0u) == 11u);
+    static_assert(native_sm3_texture_source_components(TM::ExplicitLod, 0u) == 11u);
+    static_assert(native_sm3_texture_source_components(TM::Projected, 0u) == 11u);
+    static_assert(native_sm3_texture_source_components(TM::Gradients, 0u) == 3u);
+    static_assert(native_sm3_texture_source_components(TM::Gradients, 2u) == 3u);
+    static_assert(native_sm3_texture_source_components(TM::Gradients, 3u) == 3u);
+    static_assert(native_sm3_texture_source_components(TM::Gradients, 1u) == 0u);
+    std::string textureSource;
+    assert(append_native_sm3_texture2d_declarations(textureSource, 2u));
+    assert(append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 2u, 0u));
+    assert(append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 3u, "input.r0", 2u, 1u, TM::Projected));
+    assert(append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 2u, 2u, TM::Bias));
+    assert(append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 2u, 3u, TM::ExplicitLod));
+    assert(append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 2u, 4u,
+        TM::Gradients, "r283_t1", "r283_t2"));
+    assert(textureSource.find(".Sample(r283_sampler2, (input.r0).xy)") != std::string::npos);
+    assert(textureSource.find("((input.r0).xy / (input.r0).w)") != std::string::npos);
+    assert(textureSource.find(".SampleBias(") != std::string::npos);
+    assert(textureSource.find(".SampleLevel(") != std::string::npos);
+    assert(textureSource.find(".SampleGrad(") != std::string::npos);
+    const auto validTexture = textureSource;
+    assert(!append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 2u, 5u, TM::Gradients));
+    assert(!append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 16u, 5u));
+    assert(!append_native_sm3_texture2d_sample(
+        textureSource, "output.r0", 15u, "input.r0", 2u, 5u,
+        static_cast<TM>(255u)));
+    assert(textureSource == validTexture);
     // Game ps_3_0 frequently writes a TEMP one lane at a time before
     // consuming one swizzled lane. Identity xyzw must not demand yzw.
     static_assert(native_sm3_source_components(
