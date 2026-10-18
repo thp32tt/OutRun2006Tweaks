@@ -11,6 +11,8 @@ source = (ROOT / "src/vr/d3d11/native_game_stereo_submission.cpp").read_text(
     encoding="utf-8")
 probe = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
     encoding="utf-8")
+camera_header = (ROOT / "src/vr/d3d11/native_game_camera_view.hpp").read_text(
+    encoding="utf-8")
 
 assert not audit_native_partial_depth_clear(source, probe), "valid DSV audit failed"
 # The timeline's valid bounded Clear must replay through GPU Draw, while its
@@ -158,11 +160,17 @@ assert audit_native_offscreen_game_draw(
 ), "indexed instanced phantom eye color slipped through"
 # Offscreen camera color+depth Clear must remain an owned GPU command and
 # cannot forge a direct-eye clear/draw. Mutation checks cover both domains.
-def camera_clear_contract(code):
+# Game color and depth attachment parity is now shared by Draw/Indexed and
+# source Clear. Audit the actual selected RTV/DSV extent/samples predicate,
+# not the previous inline duplicated token sequence. All negative mutations
+# must still fail, including a source header mutation of width or height.
+def camera_clear_contract(code, header):
     color = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(", 1)[-1].split(
         "bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[0]
     depth = code.split("bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(", 1)[-1].split(
         "bool NativeGameEyeDrawEncoder::replay_due_source_clears(", 1)[0]
+    offscreen_draw = code.split("bool NativeGameEyeDrawEncoder::game_source_target_bound(", 1)[-1].split(
+        "bool NativeGameEyeDrawEncoder::prepare_offscreen_game_draw(", 1)[0]
     return all(t in color for t in (
         "prepare_offscreen_game_draw(gameTarget)",
         "context_->ClearRenderTargetView(gameTarget, rgba);",
@@ -170,24 +178,35 @@ def camera_clear_contract(code):
         "!prepare_offscreen_game_draw(gameTarget)",
         "boundDepth.Get() != gameDepth",
         "depthResource.Get() == eyeDepthResource.Get()",
-        "camera.width != cameraDepth.width",
-        "camera.height != cameraDepth.height",
-        "dd.SampleDesc.Count != cd.SampleDesc.Count",
+        "native_game_camera_depth_compatible(",
         "context_->ClearDepthStencilView(gameDepth, flags, depth, stencil);",
-    ))
-assert camera_clear_contract(source)
+    )) and "native_game_camera_depth_compatible(" in offscreen_draw and all(
+        t in header for t in (
+            "color.width == depth.width",
+            "color.height == depth.height",
+            "colorSamples == depthSamples",
+            "colorSampleQuality == depthSampleQuality",
+        )
+    )
+
+assert camera_clear_contract(source, camera_header)
 assert not camera_clear_contract(source.replace(
-    "boundDepth.Get() != gameDepth", "false", 1))
+    "boundDepth.Get() != gameDepth", "false", 1), camera_header)
 assert not camera_clear_contract(source.replace(
-    "depthResource.Get() == eyeDepthResource.Get()", "false", 1))
+    "depthResource.Get() == eyeDepthResource.Get()", "false", 1), camera_header)
 assert not camera_clear_contract(source.replace(
-    "context_->ClearRenderTargetView(gameTarget, rgba);", "", 1))
+    "context_->ClearRenderTargetView(gameTarget, rgba);", "", 1), camera_header)
+assert not camera_clear_contract(source, camera_header.replace(
+    "color.width == depth.width", "true", 1)), "RTV/DSV width bypass slipped through"
+assert not camera_clear_contract(source, camera_header.replace(
+    "color.height == depth.height", "true", 1)), "RTV/DSV height bypass slipped through"
+assert not camera_clear_contract(source, camera_header.replace(
+    "colorSamples == depthSamples", "true", 1)), "camera sample count mismatch slipped through"
+assert not camera_clear_contract(source, camera_header.replace(
+    "colorSampleQuality == depthSampleQuality", "true", 1)), "camera MSAA quality mismatch slipped through"
 assert not camera_clear_contract(source.replace(
-    "camera.width != cameraDepth.width",
-    "false", 1)), "different physical RTV/DSV mip extents slipped through"
-assert not camera_clear_contract(source.replace(
-    "camera.height != cameraDepth.height",
-    "false", 1)), "offscreen mip-view height mismatch slipped through"
+    "native_game_camera_depth_compatible(", "unchecked_camera_depth(", 1
+), camera_header), "real game Draw depth admission bypass slipped through"
 assert "gameEyeFixture.replayedOffscreenGameClears[0] &&" in probe
 assert "gameEyeFixture.replayedOffscreenGameClears[1] &&" in probe
 assert "gameEyeFixture.replayedOffscreenGamePartialClears[0] &&" in probe
