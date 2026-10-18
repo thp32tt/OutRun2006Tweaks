@@ -456,6 +456,19 @@ add_custom_command(TARGET outrun-vr-ui-sprite-uv-smoke POST_BUILD
     COMMENT "Verify original UI sprite and mask UV restoration across draws"
     VERBATIM)
 
+# Native game UI DDS parent/mask lookups are per-thread source owners.
+# The smoke links the production lookup state header and deliberately
+# interleaves two producers, guarding car-selector/mask texture-id affinity.
+add_executable(outrun-vr-ui-lookup-owner-smoke
+    tests/ui_texture_pending_owner_smoke.cpp)
+target_include_directories(outrun-vr-ui-lookup-owner-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src")
+add_dependencies(outrun-vr-host outrun-vr-ui-lookup-owner-smoke)
+add_custom_command(TARGET outrun-vr-ui-lookup-owner-smoke POST_BUILD
+    COMMAND "$<TARGET_FILE:outrun-vr-ui-lookup-owner-smoke>"
+    COMMENT "Verify native UI sprite/mask texture lookup thread ownership"
+    VERBATIM)
+
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 # ESC shader arrows and XYZRHW shell share an NDC-constant signed Y move.
 # Exercise actual game-side clip matrix math during mandatory Release host CI.
