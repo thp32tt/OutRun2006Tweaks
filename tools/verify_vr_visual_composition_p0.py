@@ -2743,7 +2743,9 @@ def check_time_goal_lens_owner(source_r30, source_ui):
     # A damaged branch is a negative test failure (SystemExit), never a
     # spurious Python ValueError masking that the guard detected the defect.
     exact_begin = glyph.find('if (exactGoalResult)\n        {\n            TagAppendedNodes')
-    default_begin = glyph.find('else\n        {\n            // The untouched +TIME')
+    # Find the native C++ else block, never an arbitrary changing comment.
+    # The source-specific GOAL and fallback scopes are verified below.
+    default_begin = glyph.find('\n        else\n        {\n', exact_begin)
     if exact_begin < 0 or default_begin <= exact_begin:
         raise SystemExit('GOAL source-specific glyph branch missing or reordered')
     b9200_glyph = glyph[exact_begin:default_begin]
