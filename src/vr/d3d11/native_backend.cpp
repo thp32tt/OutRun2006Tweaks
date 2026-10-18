@@ -769,7 +769,7 @@ bool build_r283_sm3_mov_shader_source(
                         translated, dest, op.destinationMask,
                         op.sources[0], op.samplerRegister,
                         static_cast<unsigned>(i), op.textureMode,
-                        op.sources[2], op.sources[3])))
+                        op.sources[2], op.sources[3]))
                     return false;
             } else if (op.matrix4x4 || op.matrix3x3) {
                 if (!append_native_sm3_matrix(

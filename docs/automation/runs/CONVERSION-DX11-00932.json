@@ -60,6 +60,7 @@
       "src/vr/d3d11/native_backend.cpp",
       "src/vr/d3d11/native_sm3_texture_codegen.hpp",
       "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py",
       "tools/test_dx11_live_sm3_draw_00925.py"
     ],
     "acceptance_proof": {
@@ -86,20 +87,21 @@
     "tools/dx11_sm3_arithmetic_codegen_probe.cpp",
     "tools/test_dx11_live_sm3_draw_00925.py",
     "tools/test_dx11_autodev_policy.py",
-    "docs/automation/runs/CONVERSION-DX11-00931.json"
+    "docs/automation/runs/CONVERSION-DX11-00931.json",
+    "src/vr/d3d11/native_backend.cpp"
   ],
   "pipeline": {
     "C0_RECOVER": "GitHub exact branch 169c03b6 source material, controller checkpoint, fail gates recovered.",
     "C1_REVIEW": "Fast/Backend gate failure comes from 00931 CI acceptance encoding, not runtime; five 00931 SHA gates previously verified.",
-    "C2_IMPLEMENT": "Preserve 00932 TEXLD-family source; correct 00931 SOURCE PASS label and add mutation regression without weakening runtime acceptance rule.",
-    "C3_VALIDATE": "Pending exact SHA five mandatory target CI checks.",
+    "C2_IMPLEMENT": "Preserve 00932 TEXLD-family source; correct 00931 SOURCE PASS label and add mutation regression without weakening runtime acceptance rule. MSVC C2059 failure in real native_backend TEXLD emitter call corrected by removing the surplus close parenthesis and adding negative static regression.",
+    "C3_VALIDATE": "N100 policy + live-game source checks + g++ fragment-codegen PASS; feature Windows CI discovered MSVC C2059, repair pending renewed exact feature CI and mandatory target gates.",
     "C4_COMMIT": "Initial source 169c03b6, CI repair feature branch pending",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_RESULT": "PENDING_EXACT_SHA"
   },
   "CODE_CHANGED_SHA": "169c03b6714e71ab5e94f749a0c51eaa1275fae1",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "REAL_GAME_DRAW_BLOCKER": "Positive actual game frame pixel shader and native published full resolution still UNTESTED.",
+  "REAL_GAME_DRAW_BLOCKER": "MSVC native source syntax repaired in feature branch; real-game native Draw and published full frame still UNTESTED.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "NEXT_IMPLEMENTATION_ACTION": "Fix causal gates; once source validated, test a matching game executable with native opt-in, inspect real native_draws/published frames and R175 TEXCOORD6 ownership.",

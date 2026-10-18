@@ -155,4 +155,9 @@ for token in (
     "(tempWritten[reg] & required) != required",
 ):
     check(token in backend, "SM3 partial-register source/negative path missing: " + token)
+# MSVC C2059 regression: texture sampling emitter call must be balanced.
+# CI feature branch caught one surplus ')' in native_backend.cpp:772.
+check("op.sources[2], op.sources[3]))" in backend and
+      "op.sources[2], op.sources[3])))" not in backend,
+      "SM3 sampled texture emitter C++ call has an extra closing parenthesis")
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")
