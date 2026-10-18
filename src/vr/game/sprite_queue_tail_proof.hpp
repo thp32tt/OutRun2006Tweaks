@@ -11,7 +11,7 @@ namespace OutRunVR::SpriteQueue
     constexpr Node* FirstVerifiedAppendedNode(
         Node* root, Node* oldTail, Node* newTail, unsigned bound) noexcept
     {
-        if (!root || !newTail || newTail == root ||
+        if (!root || !oldTail || !newTail || newTail == root ||
             newTail == oldTail || bound == 0)
             return nullptr;
         // An empty priority-list root is its own tail_4 sentinel.
@@ -19,14 +19,20 @@ namespace OutRunVR::SpriteQueue
         // priority in a frame; do not lose their whole newly queued batch.
         // Still prove the NEW tail is in the live bounded chain before
         // tagging anything, including when the old tail is the root.
-        Node* first = (!oldTail || oldTail == root) ? root->next_0 : nullptr;
+        Node* first = oldTail == root ? root->next_0 : nullptr;
         for (Node* node = root->next_0;
              node && bound != 0; node = node->next_0, --bound)
         {
             if (node == oldTail)
                 first = node->next_0;
             if (node == newTail)
-                return first;
+            {
+                // Root->tail_4 must be a *terminal* node. A recycled tail
+                // reachable inside a rebuilt/cyclic priority chain is not a
+                // completed producer append and can otherwise give later
+                // foreign sprites the previous HUD/+TIME/GOAL eye owner.
+                return node->next_0 == nullptr ? first : nullptr;
+            }
         }
         return nullptr; // detached old tail, foreign node or cyclic/long list
     }
@@ -159,6 +165,56 @@ namespace OutRunVR::SpriteQueue
         }
         static_assert(ExactClipQueueRebuildGuards(),
             "Exact HUD/ESC sibling lists must prove stable-root reachability");
+
+        // Reject malformed snapshots and a reused "tail" that has become
+        // an interior node in the live priority list. The real native
+        // empty-list sentinel is root itself, NOT a null old-tail pointer.
+        // All valid siblings remain tagged, including first-in-priority
+        // +TIME, 6th/6, and GOAL draws.
+        constexpr bool TerminalTailQueueOwnershipGuards() noexcept
+        {
+            Node root{}, old{}, first{}, last{}, later{}, cycle{};
+            root.next_0 = &old;
+            old.next_0 = &first;
+            first.next_0 = &last;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &old, &last, 4) != &first)
+                return false;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, nullptr, &last, 4))
+                return false; // missing before-tail is NOT empty-list proof
+            // An old tail may have been recycled or the new tail can be an
+            // intermediate node while an unrelated producer extends the list.
+            last.next_0 = &later;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &old, &last, 5))
+                return false;
+            // The purported new tail is a member of a ring, not a terminal.
+            later.next_0 = &last;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &old, &later, 5))
+                return false;
+            // The original game may use root as the empty priority sentinel.
+            root.next_0 = &first;
+            first.next_0 = &last;
+            last.next_0 = nullptr;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &root, &last, 3) != &first)
+                return false;
+            // Bound exhaustion must not turn a partial walk into a tag.
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &root, &last, 1))
+                return false;
+            // Cycle before the alleged tail also fails without touching it.
+            first.next_0 = &cycle;
+            cycle.next_0 = &first;
+            if (FirstVerifiedAppendedNodeOnStableRoot(
+                    &root, &root, &root, &last, 4))
+                return false;
+            return true;
+        }
+        static_assert(TerminalTailQueueOwnershipGuards(),
+            "Only a bounded live terminal priority tail may acquire GPU eye ownership");
 
         // A live stage/checkpoint/result or generic BA9D0 HUD glyph group
         // can replace its priority root while the native call is pending.
