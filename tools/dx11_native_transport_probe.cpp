@@ -1930,6 +1930,12 @@ int main()
         // Copy of the selected physical mip into the stereo ring.
         const D3D11_VIEWPORT mipCameraViewport{
             0.f, 0.f, 32.f, 32.f, 0.f, 1.f};
+        // The camera's physical mip viewport must not leak into the
+        // full-resolution game eye (or the following 64x64 HUD geometry).
+        D3D11_VIEWPORT priorCameraViewport{};
+        UINT priorCameraViewportCount = 1u;
+        ctx->RSGetViewports(&priorCameraViewportCount, &priorCameraViewport);
+        if (priorCameraViewportCount != 1u) return false;
         ID3D11RenderTargetView* selectedCamera = fixture.mipCameraRtv;
         ctx->OMSetRenderTargets(
             1u, &selectedCamera, fixture.mipCameraDsv);
@@ -1953,6 +1959,7 @@ int main()
         // A genuine source Clear does not manufacture a geometry ordinal.
         const bool ordinalPreserved = encoder.draw_count() ==
             beforeOffscreen && encoder.color_draw_count() == beforeOffscreenEyeColor;
+        ctx->RSSetViewports(1u, &priorCameraViewport);
         if (!mipCameraClears || !ordinalPreserved ||
             !encoder.bind_eye_output()) return false;
         const D3D11_BOX mipCameraBox{28u, 28u, 0u, 32u, 32u, 1u};

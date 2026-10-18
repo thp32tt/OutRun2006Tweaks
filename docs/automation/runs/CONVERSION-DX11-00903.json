@@ -44,7 +44,7 @@
   },
   "acceptance_results": {
     "selected_game_camera_mip_gpu_stereo": "PASS_WARP_INDEPENDENT_MIP1_PIXELS",
-    "msaa_preflight_and_original_fallback": "PASS_MSAA_FAIL_CLOSED_CHECKS",
+    "msaa_preflight_and_original_fallback": "PASS_MSAA_REJECTION_CLOSED_CHECKS",
     "warp_gpu_pixels_five_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "development_strategy": {
