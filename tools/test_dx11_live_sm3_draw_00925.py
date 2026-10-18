@@ -32,8 +32,12 @@ for condition in (
     check(condition in source, "missing real game source-to-GPU binding: " + condition)
 
 for rejection in (
-    "alpha || stencil || depth != D3DZB_FALSE",
-    "fog || scissor || clipPlanes || fill != D3DFILL_SOLID",
+    "alpha || stencil || fog || clipPlanes || fill != D3DFILL_SOLID",
+    "game_native_depth_admission(", "depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE",
+    "s.clearColor.main_depth_still_bound(",
+    "if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))",
+    "if (scissor != FALSE)", "gameRect.right <= gameRect.left",
+    "r <= l || b <= t",
     "colorMask != 0x0fu || srgbWrite != FALSE",
     "srgbWrite != FALSE", "if (indices[i] >= vertexCount) return false;",
     "if (s.liveSm3Pipelines.size() >= 64u) return false;",
@@ -56,7 +60,9 @@ for token in (
     "D3DRS_SEPARATEALPHABLENDENABLE", "live_sm3_blend(",
     "nativeBlend == LiveSm3Blend::unsupported", "context->RSSetState(liveRaster)",
     "context->OMSetBlendState(liveBlend",
-    "s.diagnosticCullRasters[0].Get()", "s.diagnosticCullRasters[1].Get()",
+    "s.diagnosticCullRasters[scissorSlot].Get()",
+    "s.diagnosticCullRasters[scissorSlot + 1u].Get()",
+    "s.scissorRaster.Get()",
     "s.alphaBlend.Get()", "s.additiveBlend.Get()",
     "s.sourceAlphaAddBlend.Get()", "s.premultipliedAlphaBlend.Get()",
 ):
@@ -70,6 +76,36 @@ for token in (
 ):
     check(token in composite, "native D3D9 blend mapping/fallback missing: " + token)
 
+# New live SM3 raster/DSV implementation must bind actual GPU state, not
+# merely lift the old unsupported-depth/scissor admission rejection. Preserve
+# source-owned depth identity, first/continued Z clears, per-draw raster
+# clipping, full native Draw and a fail-closed game fallback.
+for token in (
+    "D3DRS_ZWRITEENABLE", "D3DRS_ZFUNC", "D3DRS_DEPTHBIAS",
+    "D3DRS_SLOPESCALEDEPTHBIAS", "GetDepthStencilSurface(",
+    "s.diagnosticDepthView", "DXGI_FORMAT_D32_FLOAT",
+    "D3D11_DEPTH_WRITE_MASK_ZERO", "D3D11_COMPARISON_LESS_EQUAL",
+    "D3D11_COMPARISON_GREATER_EQUAL", "CreateDepthStencilState(",
+    "context->OMSetRenderTargets(", "liveDepth.enabled ? s.diagnosticDepthView.Get()",
+    "context->OMSetDepthStencilState(liveDepthState, 0u)",
+    "liveBatch.depth_clear_value(reverseDepth)",
+    "liveBatch.consume_depth_clear()",
+    "liveBatch.succeeded(liveDepth.enabled, reverseDepth)",
+    "context->RSSetScissorRects(1u, &liveScissor)",
+    "scissor != FALSE ? 2u : 0u",
+    "scissor != FALSE ? s.scissorRaster.Get()",
+):
+    check(token in source, "SM3 real game Z/scissor GPU path absent: " + token)
+# Negative mutation markers: guard disabled or unrelated source Z surfaces,
+# W-buffer/bias/MSAA, malformed scissor and mixed Z ordering.
+for token in (
+    "depthDesc.Width != source.Width", "depthDesc.Height != source.Height",
+    "depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE",
+    "!s.clearColor.main_depth_still_bound(",
+    "if (r <= l || b <= t) return false;",
+    "if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))",
+):
+    check(token in source, "SM3 unsafe Z/scissor fallback admitted: " + token)
 check("build_r283_sm3_mov_shader_source(vertexSource, true" in backend and
       "build_r283_sm3_mov_shader_source(pixelSource, false" in backend and
       'vertexHlsl.find("r283_texture")' in backend and
