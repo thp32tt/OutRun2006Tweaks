@@ -26,16 +26,20 @@ int main() {
                 active, outgoing, incoming,
                 outScope, outToken, inScope, inToken);
         };
+        // Each SelectSpriteQueueNode call advances the physical epoch.
+        // This includes native priority-slot reuse with the SAME pointer:
+        // drain the previous homogeneous D3DX batch before the new epoch.
+        // The helper is called on selection, not per D3DX Draw.
         if (!check(true, &firstNode, &secondNode,
+                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
+            !check(true, &firstNode, &firstNode,
                    RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
                    RenderScope::ScreenHud, ProducerToken::StageExtensionTime))
             return 60;
-        // No split within one SpriteNode, outside a live queue, or with
-        // incomplete node identity, to preserve original texture batching.
-        if (check(true, &firstNode, &firstNode,
-                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
-                  RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
-            check(false, &firstNode, &secondNode,
+        // Inactive queues, missing node identity and foreign owners never
+        // acquire stage +TIME batch authority or alter native fallback.
+        if (check(false, &firstNode, &secondNode,
                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
                   RenderScope::ScreenHud, ProducerToken::StageExtensionTime) ||
             check(true, nullptr, &secondNode,
