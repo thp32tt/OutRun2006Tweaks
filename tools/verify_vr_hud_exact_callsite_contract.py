@@ -111,10 +111,16 @@ def check_extra_producers(ui, contracts):
             fail('result-progress partial hook rollback missing ' + token)
 
     goal = function_body(ui, 'static void GoalTime_TagHelper(')
-    ordered(goal, 'GOAL sprite parent call and all-node scope',
-            'Game::SpritePriorityCount', 'Module::exe_ptr(helperRva)',
+    # The current GOAL owner binds both the immutable priority-root lease
+    # and semantic entry serial before calling either original title/time
+    # producer. Check the live post-call tag explicitly instead of matching
+    # the retired three-argument TagAppendedNodes invocation.
+    ordered(goal, 'GOAL sprite parent call, stable root and all-node scope',
+            'Game::SpritePriorityCount', 'const auto entrySerial =',
+            'rootsBefore[prio] = root;', 'Module::exe_ptr(helperRva)',
             'original();', 'TagAppendedNodes(before,',
-            'RenderScope::ScreenHud, producer);')
+            'RenderScope::ScreenHud, producer,',
+            'nullptr, &rootsBefore, entrySerial);')
     # There are two intentionally different original components on the GOAL
     # screen (likely course/stage label and recorded time). Do not interpret
     # adjacent E8 calls as the same white timer emitted twice; either
@@ -543,6 +549,20 @@ def test_mutations(ui, manifest):
     must_fail('goal 150 retargeted to 020',
               ui.replace('GoalTime_TagHelper(0xBE150);',
                          'GoalTime_TagHelper(0xBE020);', 1))
+    goal_start = ui.index('static void GoalTime_TagHelper(')
+    goal_end = ui.index('static void __cdecl GoalTime_Help020', goal_start)
+    goal_region = ui[goal_start:goal_end]
+    if (goal_region.count('rootsBefore[prio] = root;') != 1 or
+            goal_region.count('nullptr, &rootsBefore, entrySerial);') != 1):
+        fail('GOAL stable-root/entry-serial mutation anchor unavailable')
+    must_fail('GOAL root lease removed',
+              ui[:goal_start] + goal_region.replace(
+                  'rootsBefore[prio] = root;',
+                  'rootsBefore[prio] = nullptr;', 1) + ui[goal_end:])
+    must_fail('GOAL semantic entry serial or root forwarding lost',
+              ui[:goal_start] + goal_region.replace(
+                  'nullptr, &rootsBefore, entrySerial);',
+                  'nullptr, nullptr, 0);', 1) + ui[goal_end:])
     # The original GOAL helper now drains its tracked D3DX batch before
     # restoring source ownership. Mutate the one original call within that
     # live boundary, not a retired adjacent original()/reset() sequence.
@@ -578,7 +598,7 @@ def test_mutations(ui, manifest):
     must_fail('result-progress hook group no longer fail-closed',
               ui.replace('ResultProgressLeaveB = {};',
                          'ResultProgressLeaveNoop = {};', 1))
-    print('P0 GOAL/RESULT original producer mutations: 5/5 failures detected')
+    print('P0 GOAL/RESULT original producer mutations: 7/7 failures detected')
     print("P0 HUD mutation suite: 10/10 failures detected")
 
 
