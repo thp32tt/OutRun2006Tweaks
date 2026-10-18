@@ -24,6 +24,7 @@
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
+#include "r30_state_restore_result.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "hud_original_wvp_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
@@ -6615,17 +6616,25 @@ namespace OutRunVRStereo
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawPrimitiveVB-ShadowXYZRHW");
 
+            bool streamRestored = false;
             {
                 R30ScopedInternalPass guard;
-                if (FAILED(device->SetStreamSource(
-                        0, vb, streamOffset, stride)))
-                {
-                    R29OwnerNoteRestoreFailure("R30.6 VB stream restore");
-                    R29OwnerArmMonoSafety();
-                }
+                streamRestored = SUCCEEDED(device->SetStreamSource(
+                    0, vb, streamOffset, stride));
+            }
+            if (!streamRestored)
+            {
+                // LEFT may already have rasterized. Losing the game's VB
+                // binding cannot be counted as a clean stereo transaction.
+                // Never replay the physical draw after a partial eye frame.
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerNoteRestoreFailure("R30.6 VB stream restore");
+                R29OwnerArmMonoSafety();
             }
             vb->Release();
-            return hr;
+            return OutRunVR::R30StateRestore::ResultAfterRestore(
+                hr, streamRestored, static_cast<HRESULT>(E_FAIL));
         }
 
 
@@ -6792,9 +6801,13 @@ namespace OutRunVRStereo
             }
             if (!restored)
             {
+                // Fixed-function native HUD, rank and ESC share the game's
+                // original PROJECTION. Failure poisons the current eye,
+                // not just later draws. Neither eye may be replayed here.
                 R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R29OwnerNoteRestoreFailure(
-                    "R84 R62 projected rank PROJECTION restore");
+                    "R84 R62 fixed-function PROJECTION restore");
                 R29OwnerArmMonoSafety();
             }
             if (Settings::VRTelemetry && SUCCEEDED(hr) && restored)
@@ -6810,7 +6823,8 @@ namespace OutRunVRStereo
                         count, projected && marker && marker->valid ? 1 : 0,
                         primitiveCount);
             }
-            return hr;
+            return OutRunVR::R30StateRestore::ResultAfterRestore(
+                hr, restored, static_cast<HRESULT>(E_FAIL));
         }
 
 
@@ -7146,20 +7160,26 @@ namespace OutRunVRStereo
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawIndexedPrimitiveVB-ShadowXYZRHW");
 
+            bool restoreOk = false;
             {
                 R30ScopedInternalPass guard;
-                bool restoreOk = SUCCEEDED(device->SetStreamSource(
-                    0, vb, streamOffset, stride));
-                restoreOk = SUCCEEDED(device->SetIndices(ib)) && restoreOk;
-                if (!restoreOk)
-                {
-                    R29OwnerNoteRestoreFailure("R30.6 VB/IB restore");
-                    R29OwnerArmMonoSafety();
-                }
+                const bool streamRestored = SUCCEEDED(
+                    device->SetStreamSource(0, vb, streamOffset, stride));
+                // Restore both families even if the first setter fails.
+                const bool indicesRestored = SUCCEEDED(device->SetIndices(ib));
+                restoreOk = streamRestored && indicesRestored;
+            }
+            if (!restoreOk)
+            {
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
+                R29OwnerNoteRestoreFailure("R30.6 VB/IB restore");
+                R29OwnerArmMonoSafety();
             }
             ib->Release();
             vb->Release();
-            return hr;
+            return OutRunVR::R30StateRestore::ResultAfterRestore(
+                hr, restoreOk, static_cast<HRESULT>(E_FAIL));
         }
 
         // Called on every eligible FlatPerspectiveEffect draw. The cache key
