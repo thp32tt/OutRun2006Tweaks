@@ -1,0 +1,30 @@
+{
+  "state": "LAST4_HANDOFF_READY_SOURCE_PIXEL_QA_ONLY",
+  "date_kst": "2026-10-19",
+  "original_full_hd_png": 108,
+  "original_native_roi_png": 242,
+  "historic_master_items": 255,
+  "historic_master_sha256_current": "34e00cf03ab93dce5903a1460e97ed67a4023fa7310f96b7a43ec797c997c14e",
+  "prior_native_rework_candidates": 42,
+  "last4_completed_new_crop_candidates": 2,
+  "total_native_rework_test_only": 44,
+  "unsolved_without_layer_separation": 2,
+  "holds": [
+    {
+      "index": 36,
+      "phrase": "HARD",
+      "reason": "HARD text outline touches white-green background plate and left gray border. Tight rectangle would cut top glyph/outline. Native source pixel-only separation cannot remove attached art."
+    },
+    {
+      "index": 59,
+      "phrase": "CONIFEROUS FOREST",
+      "reason": "CONIFEROUS FOREST final T meets next STAGES sprite within same native bbox; right cropping cuts final glyph."
+    }
+  ],
+  "no_original_png_or_existing_crop_modified": true,
+  "qa_verification": "44/44 SHA TEST_ONLY",
+  "korean_composite": "NOT_RUN",
+  "A_B": "UNTOUCHED",
+  "gameplay": "UNTESTED",
+  "not_promoted_to_release": true
+}
