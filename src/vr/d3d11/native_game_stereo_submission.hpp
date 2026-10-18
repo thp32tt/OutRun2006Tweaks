@@ -136,6 +136,12 @@ public:
     [[nodiscard]] std::uint64_t last_full_clear_draw_ordinal() const noexcept {
         return lastFullClearDrawOrdinal_;
     }
+    // A nominally full D3D9 TARGET RECT can be cropped by the active
+    // viewport/scissor. Only a PHYSICALLY full color Clear resets prior eye
+    // geometry/postpass evidence in the replay chronology.
+    [[nodiscard]] bool last_target_clear_was_full() const noexcept {
+        return lastTargetClearFull_;
+    }
 private:
     [[nodiscard]] bool eye_targets_bound() const noexcept;
     // Native geometry may write only its designated XR eye or offscreen
@@ -161,6 +167,7 @@ private:
     std::uint32_t authoredColorPostpassCount_{};
     std::uint32_t authoredFullColorClearCount_{};
     std::uint64_t lastFullClearDrawOrdinal_{};
+    bool lastTargetClearFull_{};
     const NativeGameEyePartialTargetClear* sourceClears_{};
     std::uint32_t sourceClearEye_{}, sourceClearCursor_{};
 };

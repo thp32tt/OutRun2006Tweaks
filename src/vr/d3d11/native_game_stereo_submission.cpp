@@ -678,10 +678,7 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             // ClearView ignores the prior per-draw color-write masks.
             // A captured full-eye TARGET Clear replaces earlier color Draws
             // and source Copy/Stretch, but can seed later depth-only geometry.
-            if (live_game_stereo::full_eye_target_rect(
-                    clear.rect.left, clear.rect.top,
-                    clear.rect.right, clear.rect.bottom,
-                    targetWidth_, targetHeight_)) {
+            if (last_target_clear_was_full()) {
                 colorDrawCount_ = 0u;
                 authoredColorPostpassCount_ = 0u;
                 ++authoredFullColorClearCount_;
@@ -793,13 +790,18 @@ bool NativeGameEyeDrawEncoder::draw_indexed_instanced(
 
 bool NativeGameEyeDrawEncoder::clear_target_argb(
     std::uint32_t argb, const D3D11_RECT* region) noexcept {
-    // D3D9 TARGET Clear ignores viewport/scissor; target identity matters.
-    // An offscreen menu RT must never be mistaken for the owned OpenXR eye.
+    lastTargetClearFull_ = false;
     if (!eye_targets_bound() || !targetWidth_ || !targetHeight_) return false;
-    const bool cropped = region &&
-        !live_game_stereo::full_eye_target_rect(
-            region->left, region->top, region->right, region->bottom,
-            targetWidth_, targetHeight_);
+    // D3D9 Clear clips even explicit TARGET rectangles to the live viewport
+    // and (when enabled) scissor. D3D11 ClearRTV/ClearView ignore RS clips.
+    // Do not erase another menu/HUD area of the native L/R eye, and do not
+    // reset geometry evidence for a nominal full RECT that is actually cropped.
+    const auto covered = camera_clear_coverage(
+        context_, targetWidth_, targetHeight_, region);
+    if (!covered.valid) return false;
+    if (covered.empty) return true; // genuine D3D9 clipped no-op
+    const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;
+    const bool cropped = actual != nullptr;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
     if (cropped)
         (void)context_->QueryInterface(
@@ -810,28 +812,32 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         static_cast<float>((argb >> 8) & 0xffu) * kByte,
         static_cast<float>(argb & 0xffu) * kByte,
         static_cast<float>((argb >> 24) & 0xffu) * kByte};
-    // Full RTV/ClearView routes are unchanged. D3D11.0's shader route
-    // explicitly checks the typed output view and preserves DX9Ex fallback.
     const bool shaderSupported = cropped && !rectContext &&
         native_game_partial_color_shader_rtv(context_, eyeTarget_);
     const auto route = live_game_stereo::color_clear_route(
-        region != nullptr, region ? region->left : 0,
-        region ? region->top : 0, region ? region->right : 0,
-        region ? region->bottom : 0, targetWidth_, targetHeight_,
+        cropped, actual ? actual->left : 0,
+        actual ? actual->top : 0, actual ? actual->right : 0,
+        actual ? actual->bottom : 0, targetWidth_, targetHeight_,
         rectContext != nullptr, shaderSupported);
+    bool written = false;
     switch (route) {
     case live_game_stereo::NativeColorClearRoute::FullRtv:
         context_->ClearRenderTargetView(eyeTarget_, rgba);
-        return true;
+        written = true;
+        break;
     case live_game_stereo::NativeColorClearRoute::ClearView:
-        rectContext->ClearView(eyeTarget_, rgba, region, 1u);
-        return true;
+        rectContext->ClearView(eyeTarget_, rgba, actual, 1u);
+        written = true;
+        break;
     case live_game_stereo::NativeColorClearRoute::ShaderRaster:
-        return raster_partial_eye_color_clear(
-            context_, eyeTarget_, targetWidth_, targetHeight_, *region, rgba);
+        written = raster_partial_eye_color_clear(
+            context_, eyeTarget_, targetWidth_, targetHeight_, *actual, rgba);
+        break;
     default:
         return false;
     }
+    lastTargetClearFull_ = written && covered.full;
+    return written;
 }
 
 bool NativeGameEyeDrawEncoder::clear_depth_stencil(
@@ -841,19 +847,24 @@ bool NativeGameEyeDrawEncoder::clear_depth_stencil(
         (clearDepth && (!std::isfinite(depth) ||
                         depth < 0.0f || depth > 1.0f)))
         return false;
+    // The original D3D9 Z/stencil Clear is viewport/scissor clipped just
+    // like TARGET, even if its pRects contains the entire eye. A native
+    // whole-DSV Clear here would erase untouched HUD/car/race depth pixels.
+    const auto covered = camera_clear_coverage(
+        context_, targetWidth_, targetHeight_, region);
+    if (!covered.valid) return false;
+    if (covered.empty) return true;
+    const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;
     const auto route = live_game_stereo::depth_clear_route(
-        region != nullptr, region ? region->left : 0,
-        region ? region->top : 0, region ? region->right : 0,
-        region ? region->bottom : 0, targetWidth_, targetHeight_);
+        actual != nullptr, actual ? actual->left : 0,
+        actual ? actual->top : 0, actual ? actual->right : 0,
+        actual ? actual->bottom : 0, targetWidth_, targetHeight_);
     if (route == live_game_stereo::NativeDepthClearRoute::Reject)
         return false;
     if (route == live_game_stereo::NativeDepthClearRoute::PartialRaster)
         return raster_partial_eye_depth_clear(
-            context_, eyeDepth_, targetWidth_, targetHeight_, *region,
+            context_, eyeDepth_, targetWidth_, targetHeight_, *actual,
             depth, stencil, clearDepth, clearStencil);
-    // Full-eye game RECT and implicit full Z/stencil Clear are the same
-    // GPU operation. The base D3D11.0 API handles both directly, independently
-    // on the left/right DSV, without a shader or diagnostic geometry Draw.
     const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
                        (clearStencil ? D3D11_CLEAR_STENCIL : 0u);
     context_->ClearDepthStencilView(eyeDepth_, flags,

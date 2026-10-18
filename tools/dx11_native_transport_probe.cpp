@@ -2314,6 +2314,20 @@ int main()
             encoder.bind_eye_output();
         if (!fixture.replayedInstancedOffscreenCamera[eyeIndex]) return false;
 
+        // A real D3D9 Clear clips BOTH TARGET and Z/stencil to the active
+        // camera viewport/scissor. These commands lie in the other eye's
+        // untouched region: they must succeed as no-ops, not wipe its HUD.
+        const D3D11_RECT outsideGameViewport = eyeIndex == 0u
+            ? D3D11_RECT{60, 0, 64, 4} : D3D11_RECT{0, 0, 4, 4};
+        const auto beforeViewportClear = encoder.draw_count();
+        const bool viewportClippedClears =
+            encoder.clear_target_argb(0xff773399u, &outsideGameViewport) &&
+            !encoder.last_target_clear_was_full() &&
+            encoder.clear_depth_stencil(
+                0.125f, 7u, true, true, &outsideGameViewport) &&
+            encoder.draw_count() == beforeViewportClear;
+        if (!viewportClippedClears) return false;
+
         // A game menu/HUD can Clear a TARGET rectangle AFTER real geometry.
         // Validate ordered eye pixels, selected Z/stencil and no phantom draw.
         const D3D11_RECT badRect{63, 24, 68, 30};
@@ -3234,6 +3248,16 @@ int main()
         const bool distinctColor = eyeIndex == 0u
             ? pixel[0] == 0 && pixel[1] == 255 && pixel[2] == 255
             : pixel[0] == 255 && pixel[1] == 255 && pixel[2] == 0;
+        // The outside-viewport Clear above must not erase the untouched
+        // ring-eye corner. Check real WARP pixels, not just API returns.
+        const auto* protectedCorner = pixel + mapped.RowPitch +
+            (eyeIndex == 0u ? 62u : 1u) * 4u;
+        require(eyeIndex == 0u
+                ? protectedCorner[0] == 0u && protectedCorner[1] == 255u &&
+                  protectedCorner[2] == 255u
+                : protectedCorner[0] == 255u && protectedCorner[1] == 255u &&
+                  protectedCorner[2] == 0u,
+                "00909 viewport-clipped native TARGET/Z clear retains opposite eye corner");
         // Check genuine GPU pixels from the AFTER-draw TARGET rectangles.
         const UINT clearX = eyeIndex == 0u ? 6u : 42u;
         const auto* clearPixel = pixel + 6u * mapped.RowPitch + clearX * 4u;
