@@ -1,0 +1,16 @@
+{
+  "status": "46_NATIVE_ENGLISH_CANDIDATES_PACKAGED_TEST_ONLY",
+  "file": "/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/qa_review_20261018/OUTRUN_C_NATIVE_ENGLISH_46_TEST_ONLY_20261019.zip",
+  "bytes": 5981364,
+  "sha256": "77301b467d51a6c24d5ca9d138829e65b000d0537ee05c62afbc6e4ae16cb1e8",
+  "candidate_count": 46,
+  "source_pixel_exact_count": 45,
+  "upstream_PSD_layer_count_not_source_pixel_exact": 1,
+  "C_original_crop_retained": 242,
+  "legacy_master_255_retained": true,
+  "original_assets_108_retained": true,
+  "DDS_or_game_replacements": false,
+  "A_B_unchanged": true,
+  "game_acceptance": "UNTESTED",
+  "semantic_and_visual_signoff": "PENDING"
+}
