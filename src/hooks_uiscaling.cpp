@@ -1595,8 +1595,59 @@ class UIScaling : public Hook
 	static void __cdecl GoalTime_Help020() { GoalTime_TagHelper(0xBE020); }
 	static void __cdecl GoalTime_Help150() { GoalTime_TagHelper(0xBE150); }
 
+    // Original vehicle Calc3D2D rank, clipped digits and rival markers:
+    // a rebuilt queue or nested source must not inherit a foreign anchor.
+    struct VehicleRankQueueFixture { VehicleRankQueueFixture* next_0 = nullptr; };
+    static constexpr bool TestVehicleRankNestedQueueOwnership() noexcept
+    {
+        using OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot;
+        using OutRunVR::GameSemantic::PreserveNestedExactSpriteOwner;
+        using OutRunVR::GameSemantic::ProducerToken;
+        VehicleRankQueueFixture root{}, oldTail{}, sprite{}, digit{},
+            replacementRoot{};
+        root.next_0 = &oldTail;
+        oldTail.next_0 = &sprite;
+        sprite.next_0 = &digit;
+        if (FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &root, &oldTail, &digit, 4) != &sprite)
+            return false; // sprite and digit siblings belong to same car
+        replacementRoot.next_0 = &oldTail;
+        if (FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &replacementRoot, &oldTail, &digit, 4))
+            return false; // reused tail, replacement priority root
+        root.next_0 = &sprite;
+        if (FirstVerifiedAppendedNodeOnStableRoot(
+                &root, &root, &oldTail, &digit, 4))
+            return false; // detached old tail
+        return PreserveNestedExactSpriteOwner(
+                   ProducerToken::ResultProgress,
+                   ProducerToken::RankMarkerSprani, 12, 11) &&
+               PreserveNestedExactSpriteOwner(
+                   ProducerToken::StageExtensionTime,
+                   ProducerToken::RankMarkerClipSprite, 12, 12) &&
+               PreserveNestedExactSpriteOwner(
+                   ProducerToken::RankMarkerClipSprite,
+                   ProducerToken::RivalMarkerSprani, 14, 12) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::RankMarkerSprani,
+                   ProducerToken::RankMarkerSprani, 14, 12) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::ResultProgress,
+                   ProducerToken::RivalMarkerSprani, 10, 12) &&
+               !PreserveNestedExactSpriteOwner(
+                   ProducerToken::ResultProgress,
+                   ProducerToken::RivalMarkerSprani, 14, 0);
+    }
+    static_assert(TestVehicleRankNestedQueueOwnership(),
+        "Rank marker source/queue lifetime must reject foreign nested owners");
+
 	static int __cdecl RankMarker_sprani(uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+        // Preserve this native source's registration boundary: a nested
+        // exact producer must retain its newer SpriteNode stereo owner.
+        const auto entrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
@@ -1648,7 +1699,7 @@ class UIScaling : public Hook
         // address: never stamp a foreign vehicle's projected sprite.
 		TagAppendedNodes(tailsBefore, scope,
 			OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
-            marker, &rootsBefore);
+            marker, &rootsBefore, entrySerial);
 		return result;
 	}
 
@@ -1659,6 +1710,11 @@ class UIScaling : public Hook
 	static int __cdecl RankMarker_putClipSprite(
 		int xstnum, int x, int y, uint32_t flags, float priority, uint32_t color)
 	{
+        // Preserve this native source's registration boundary: a nested
+        // exact producer must retain its newer SpriteNode stereo owner.
+        const auto entrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
         std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
@@ -1711,7 +1767,8 @@ class UIScaling : public Hook
 		}
 		TagAppendedNodes(tailsBefore, scope,
 			OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
-            projected ? &projectedAnchor : nullptr, &rootsBefore);
+            projected ? &projectedAnchor : nullptr,
+            &rootsBefore, entrySerial);
 		return result;
 	}
 
@@ -1802,10 +1859,17 @@ class UIScaling : public Hook
 	static int __cdecl RivalMarker_sprani(
 		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
+        // Preserve this native source's registration boundary: a nested
+        // exact producer must retain its newer SpriteNode stereo owner.
+        const auto entrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
 		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
+            rootsBefore[prio] = root;
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 
@@ -1831,7 +1895,8 @@ class UIScaling : public Hook
 		// scope and anchor, with no widening to generic world/HUD sprites.
 		TagAppendedNodes(before, scope,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
-			projected ? &projectedAnchor : nullptr);
+			projected ? &projectedAnchor : nullptr,
+            &rootsBefore, entrySerial);
 		return result;
 	}
 
