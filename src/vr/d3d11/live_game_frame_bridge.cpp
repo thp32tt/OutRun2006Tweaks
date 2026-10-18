@@ -3,6 +3,7 @@
 #include "live_game_depth_state.hpp"
 #include "live_game_cull_state.hpp"
 #include "live_game_sm3_composite.hpp"
+#include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
 #include "live_game_pixel_center.hpp"
@@ -153,6 +154,14 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Factor == D3DTA_TFACTOR &&
               kStage1Complement == D3DTA_COMPLEMENT &&
               kStage1AlphaReplicate == D3DTA_ALPHAREPLICATE);
+static_assert(D3DDECLTYPE_FLOAT1 == 0 && D3DDECLTYPE_FLOAT4 == 3 &&
+              D3DDECLTYPE_D3DCOLOR == 4 && D3DDECLTYPE_UBYTE4 == 5 &&
+              D3DDECLTYPE_SHORT2 == 6 && D3DDECLTYPE_SHORT4 == 7 &&
+              D3DDECLTYPE_UBYTE4N == 8 && D3DDECLTYPE_SHORT2N == 9 &&
+              D3DDECLTYPE_SHORT4N == 10 && D3DDECLTYPE_USHORT2N == 11 &&
+              D3DDECLTYPE_USHORT4N == 12 && D3DDECLTYPE_FLOAT16_2 == 15 &&
+              D3DDECLTYPE_FLOAT16_4 == 16 && D3DDECLTYPE_UNUSED == 17,
+              "Portable D3D9 SM3 declaration types changed");
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
 
@@ -4202,24 +4211,42 @@ std::uint64_t live_sm3_pipeline_identity(
 // substitute. Source offsets and formats must fit the rebased game stream.
 bool live_sm3_input_layout(
     const std::vector<D3DVERTEXELEMENT9>& declaration, UINT stride,
-    std::vector<D3D11_INPUT_ELEMENT_DESC>& layout) noexcept {
+    std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
+    bool& repack, UINT& nativeStride) noexcept {
     if (declaration.size() < 2u || stride == 0u) return false;
     static constexpr const char* kPosition = "POSITION";
     static constexpr const char* kTexcoord = "TEXCOORD";
     static constexpr const char* kNormal = "NORMAL";
     static constexpr const char* kColor = "COLOR";
+    static constexpr const char* kBlendWeight = "BLENDWEIGHT";
+    static constexpr const char* kBlendIndices = "BLENDINDICES";
+    static constexpr const char* kTangent = "TANGENT";
+    static constexpr const char* kBinormal = "BINORMAL";
+    static constexpr const char* kPositionT = "POSITIONT";
+    static constexpr const char* kPsize = "PSIZE";
+    static constexpr const char* kFog = "FOG";
+    static constexpr const char* kDepth = "DEPTH";
+    static constexpr const char* kSample = "SAMPLE";
+    repack = false;
+    nativeStride = stride;
     for (std::size_t i = 0; i + 1u < declaration.size(); ++i) {
         const auto& in = declaration[i];
         if (in.Stream != 0u || in.Method != D3DDECLMETHOD_DEFAULT ||
             in.UsageIndex >= 16u) return false;
         DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
-        UINT width = 0u;
+        const UINT width = game_sm3_decl_width(in.Type);
         switch (in.Type) {
-        case D3DDECLTYPE_FLOAT1: format = DXGI_FORMAT_R32_FLOAT; width = 4u; break;
-        case D3DDECLTYPE_FLOAT2: format = DXGI_FORMAT_R32G32_FLOAT; width = 8u; break;
-        case D3DDECLTYPE_FLOAT3: format = DXGI_FORMAT_R32G32B32_FLOAT; width = 12u; break;
-        case D3DDECLTYPE_FLOAT4: format = DXGI_FORMAT_R32G32B32A32_FLOAT; width = 16u; break;
-        default: return false;
+        case D3DDECLTYPE_FLOAT1: format = DXGI_FORMAT_R32_FLOAT; break;
+        case D3DDECLTYPE_FLOAT2: format = DXGI_FORMAT_R32G32_FLOAT; break;
+        case D3DDECLTYPE_FLOAT3: format = DXGI_FORMAT_R32G32B32_FLOAT; break;
+        case D3DDECLTYPE_FLOAT4: format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+        default:
+            if (width == 0u) return false;
+            // Native IA cannot safely reinterpret D3D9 packed integer,
+            // D3DCOLOR or half values as the float SM3 signature.
+            repack = true;
+            format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+            break;
         }
         if (static_cast<UINT>(in.Offset) + width > stride) return false;
         const char* name = nullptr;
@@ -4228,6 +4255,15 @@ bool live_sm3_input_layout(
         case D3DDECLUSAGE_TEXCOORD: name = kTexcoord; break;
         case D3DDECLUSAGE_NORMAL: name = kNormal; break;
         case D3DDECLUSAGE_COLOR: name = kColor; break;
+        case D3DDECLUSAGE_BLENDWEIGHT: name = kBlendWeight; break;
+        case D3DDECLUSAGE_BLENDINDICES: name = kBlendIndices; break;
+        case D3DDECLUSAGE_TANGENT: name = kTangent; break;
+        case D3DDECLUSAGE_BINORMAL: name = kBinormal; break;
+        case D3DDECLUSAGE_POSITIONT: name = kPositionT; break;
+        case D3DDECLUSAGE_PSIZE: name = kPsize; break;
+        case D3DDECLUSAGE_FOG: name = kFog; break;
+        case D3DDECLUSAGE_DEPTH: name = kDepth; break;
+        case D3DDECLUSAGE_SAMPLE: name = kSample; break;
         default: return false;
         }
         for (const auto& old : layout)
@@ -4243,8 +4279,19 @@ bool live_sm3_input_layout(
         layout.push_back(element);
     }
     const auto& end = declaration.back();
-    return !layout.empty() && end.Stream == 0xffu &&
-        end.Type == D3DDECLTYPE_UNUSED;
+    if (layout.empty() || end.Stream != 0xffu ||
+        end.Type != D3DDECLTYPE_UNUSED) return false;
+    if (repack) {
+        // Full FLOAT4 packing also supplies D3D9's missing 0/0/0/1 defaults.
+        // Bind only a validated source-owned stream; no D3D9 GPU references.
+        if (layout.size() > (1u << 20u) / (4u * sizeof(float))) return false;
+        nativeStride = static_cast<UINT>(layout.size() * 4u * sizeof(float));
+        for (std::size_t i = 0; i < layout.size(); ++i) {
+            layout[i].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+            layout[i].AlignedByteOffset = static_cast<UINT>(i * 16u);
+        }
+    }
+    return true;
 }
 
 bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
@@ -4434,7 +4481,36 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         count < 2u || count > MAXD3DDECLLENGTH) return false;
     declaration.resize(count);
     std::vector<D3D11_INPUT_ELEMENT_DESC> input;
-    if (!live_sm3_input_layout(declaration, stride, input)) return false;
+    bool repack = false;
+    UINT nativeStride = stride;
+    if (!live_sm3_input_layout(declaration, stride, input,
+                               repack, nativeStride)) return false;
+    // A mixed packed/float D3D9 stream must reach the actual game's native
+    // Draw in shader-visible FLOAT4 register order (not format bitcasts).
+    // Reject oversized, malformed or untranslatable data before any upload.
+    std::vector<std::uint8_t> unpacked;
+    const void* nativeBytes = bytes;
+    if (repack) {
+        const auto total = static_cast<std::uint64_t>(nativeStride) * vertexCount;
+        if (total == 0u || total > (1ull << 25u)) return false;
+        try {
+            unpacked.resize(static_cast<std::size_t>(total));
+            const auto* original = static_cast<const std::uint8_t*>(bytes);
+            for (UINT v = 0u; v < vertexCount; ++v) {
+                for (std::size_t i = 0; i < input.size(); ++i) {
+                    std::array<float, 4> decoded{};
+                    if (!game_sm3_unpack_attribute(
+                            declaration[i].Type,
+                            original + static_cast<std::size_t>(v) * stride +
+                                declaration[i].Offset, decoded)) return false;
+                    std::memcpy(unpacked.data() +
+                            static_cast<std::size_t>(v) * nativeStride + i * 16u,
+                            decoded.data(), sizeof(decoded));
+                }
+            }
+        } catch (...) { return false; }
+        nativeBytes = unpacked.data();
+    }
     ProgrammableShaderFunctionSourceEvidence vertexEvidence, pixelEvidence;
     if (!live_sm3_shader_bytes(vertexShader.Get(), pixelShader.Get(),
                               vertexEvidence, pixelEvidence)) return false;
@@ -4564,12 +4640,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         (pipeline.program.pixelConstants &&
          FAILED(game->GetPixelShaderConstantF(0, pixelConstants.data(), 224u))))
         return false;
-    const UINT vertexBytes = stride * vertexCount;
+    const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) * vertexCount;
+    if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
+    const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
     if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
                                         s.fullGameVertexCapacity, vertexBytes,
                                         D3D11_BIND_VERTEX_BUFFER) ||
         !upload_full_game_stream(context, s.fullGameVertexUpload.Get(),
-                                 s.fullGameVertexCapacity, bytes, vertexBytes))
+                                 s.fullGameVertexCapacity, nativeBytes, vertexBytes))
         return false;
     if (nativeIndices) {
         for (UINT i = 0; i < nativeIndexCount; ++i)
@@ -4640,7 +4718,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     const UINT offset = 0u;
     ID3D11Buffer* stream = s.fullGameVertexUpload.Get();
     context->IASetInputLayout(pipeline.inputLayout.Get());
-    context->IASetVertexBuffers(0u, 1u, &stream, &stride, &offset);
+    context->IASetVertexBuffers(0u, 1u, &stream, &nativeStride, &offset);
     context->IASetPrimitiveTopology(type == D3DPT_TRIANGLESTRIP ?
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP :
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
