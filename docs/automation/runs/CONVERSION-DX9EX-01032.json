@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C5_WAIT_REQUIRED_CI",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "d038ce8b32c21d6b09e22e4cbe6e965b84c1fdbe",
   "validation_bearing_result_sha": "fe97583fd9da65eb03cec80fc994abdfc4a8a954",
-  "automation_validation": "PASS_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/hooks_textures.cpp",
@@ -84,5 +84,37 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "First material SHA d038ce8b32c21d6b09e22e4cbe6e965b84c1fdbe failed policy due missing run record and HUD Inspector due stale two-argument call expectation; this same-task bounded verifier/feature-contract input repair does not create a second scored feature."
+  "notes": "C6 bookkeeping claim in prior 6c07bea was premature: the exact validation SHA has not passed all four required GitHub Actions, and acceptance_results remain PENDING. Hold original material_result_sha and validation_bearing_result_sha until all four SUCCESS. This is a same-task metadata consistency repair, no functional achievement or score.",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_sha": "d038ce8b32c21d6b09e22e4cbe6e965b84c1fdbe",
+    "exact_sha": "fe97583fd9da65eb03cec80fc994abdfc4a8a954",
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "status": "completed",
+        "conclusion": "success",
+        "id": 39110121230
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "status": "completed",
+        "conclusion": "success",
+        "id": 39110121239
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "completed",
+        "conclusion": "success",
+        "id": 39110121235
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "status": "pending",
+        "conclusion": null,
+        "id": 39110121301
+      }
+    ],
+    "runtime_validation": "UNTESTED"
+  }
 }
