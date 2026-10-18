@@ -1075,6 +1075,8 @@ struct LiveSm3Pipeline {
     ComPtr<ID3D11InputLayout> inputLayout;
     ComPtr<ID3D11Buffer> vertexConstants;
     ComPtr<ID3D11Buffer> pixelConstants;
+    ComPtr<ID3D11Buffer> alphaReference;
+    unsigned alphaCompare{};
     std::vector<DWORD> vertexTokens, pixelTokens;
     std::vector<D3DVERTEXELEMENT9> declaration;
 };
@@ -4191,8 +4193,10 @@ bool capture_live_sm3_sampler(IDirect3DDevice9* game, unsigned slot,
 std::uint64_t live_sm3_pipeline_identity(
     const ProgrammableShaderFunctionSourceEvidence& vertex,
     const ProgrammableShaderFunctionSourceEvidence& pixel,
-    const std::vector<D3DVERTEXELEMENT9>& declaration) noexcept {
-    if (!vertex.exact() || !pixel.exact() || declaration.empty()) return 0u;
+    const std::vector<D3DVERTEXELEMENT9>& declaration,
+    unsigned alphaCompare) noexcept {
+    if (!vertex.exact() || !pixel.exact() || declaration.empty() ||
+        alphaCompare > 8u) return 0u;
     std::uint64_t h = 1469598103934665603ull;
     const auto hashBytes = [&](const void* value, std::size_t bytes) {
         const auto* b = static_cast<const std::uint8_t*>(value);
@@ -4204,6 +4208,9 @@ std::uint64_t live_sm3_pipeline_identity(
     hashBytes(vertex.tokens.data(), vertex.byteSize);
     hashBytes(pixel.tokens.data(), pixel.byteSize);
     hashBytes(declaration.data(), declaration.size() * sizeof(D3DVERTEXELEMENT9));
+    // Distinct alpha comparisons compile distinct native pixel shaders.
+    // Do not reuse a cached no-alpha shader for a menu alpha-tested Draw.
+    hashBytes(&alphaCompare, sizeof(alphaCompare));
     return h != 0u ? h : 1u;
 }
 
@@ -4367,6 +4374,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
     DWORD srcBlend = 0u, dstBlend = 0u, blendOp = 0u, separateAlpha = TRUE;
+    DWORD alphaFunc = 0u, alphaRef = 0u;
     D3DVIEWPORT9 viewport{};
     if (FAILED(game->GetViewport(&viewport)) ||
         FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
@@ -4380,9 +4388,17 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-        alpha || stencil || fog || clipPlanes || fill != D3DFILL_SOLID ||
+        stencil || fog || clipPlanes || fill != D3DFILL_SOLID ||
         colorMask != 0x0fu || srgbWrite != FALSE ||
         !game_native_backbuffer_ready(game, viewport))
+        return false;
+    // SM3 pixel alpha test is shader-side in D3D11, not a blend state.
+    // Preserve the exact live game's compare and 8-bit reference per Draw.
+    if (alpha != FALSE &&
+        (FAILED(game->GetRenderState(D3DRS_ALPHAFUNC, &alphaFunc)) ||
+         FAILED(game->GetRenderState(D3DRS_ALPHAREF, &alphaRef)) ||
+         alphaFunc < D3DCMP_NEVER || alphaFunc > D3DCMP_ALWAYS ||
+         alphaRef > 255u))
         return false;
     // Reject an unknown game raster winding before any D3D11 mutation.
     GameNativeCullAdmission nativeCull{};
@@ -4519,7 +4535,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     auto* context = s.backend.context();
     if (!device || !context) return false;
     const auto key = live_sm3_pipeline_identity(
-        vertexEvidence, pixelEvidence, declaration);
+        vertexEvidence, pixelEvidence, declaration, alphaFunc);
     if (!key) return false;
     auto it = s.liveSm3Pipelines.find(key);
     if (it == s.liveSm3Pipelines.end()) {
@@ -4527,7 +4543,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (s.liveSm3Pipelines.size() >= 64u) return false;
         LiveSm3Pipeline pipeline{};
         if (!compile_native_live_sm3_program(
-                device, vertexEvidence, pixelEvidence, pipeline.program))
+                device, vertexEvidence, pixelEvidence, alphaFunc, pipeline.program))
             return false;
         if (FAILED(device->CreateInputLayout(
                 input.data(), static_cast<UINT>(input.size()),
@@ -4544,6 +4560,16 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             (pipeline.program.pixelConstants &&
              FAILED(device->CreateBuffer(&cb, nullptr,
                         pipeline.pixelConstants.GetAddressOf())))) return false;
+        if (alphaFunc != 0u) {
+            D3D11_BUFFER_DESC alphaDesc{};
+            alphaDesc.ByteWidth = 16u;
+            alphaDesc.Usage = D3D11_USAGE_DEFAULT;
+            alphaDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+            if (FAILED(device->CreateBuffer(&alphaDesc, nullptr,
+                           pipeline.alphaReference.GetAddressOf())))
+                return false;
+        }
+        pipeline.alphaCompare = alphaFunc;
         pipeline.vertexTokens = vertexEvidence.tokens;
         pipeline.pixelTokens = pixelEvidence.tokens;
         pipeline.declaration = declaration;
@@ -4552,7 +4578,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     auto& pipeline = it->second;
     // A hash collision may never reuse shaders or a declaration from a
     // different live game draw.
-    if (pipeline.vertexTokens != vertexEvidence.tokens ||
+    if (pipeline.alphaCompare != alphaFunc ||
+        (alphaFunc != 0u && !pipeline.alphaReference) ||
+        pipeline.vertexTokens != vertexEvidence.tokens ||
         pipeline.pixelTokens != pixelEvidence.tokens ||
         pipeline.declaration.size() != declaration.size() ||
         std::memcmp(pipeline.declaration.data(), declaration.data(),
@@ -4672,6 +4700,13 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (pipeline.program.pixelConstants)
         context->UpdateSubresource(pipeline.pixelConstants.Get(), 0, nullptr,
                                    pixelConstants.data(), 0, 0);
+    if (alphaFunc != 0u) {
+        const std::array<std::uint32_t, 4> reference{{alphaRef, 0u, 0u, 0u}};
+        context->UpdateSubresource(pipeline.alphaReference.Get(), 0u, nullptr,
+                                   reference.data(), 0u, 0u);
+    }
+    ID3D11Buffer* alphaBuffer = pipeline.alphaReference.Get();
+    context->PSSetConstantBuffers(1u, 1u, &alphaBuffer);
     ID3D11Buffer* vsConstants = pipeline.vertexConstants.Get();
     ID3D11Buffer* psConstants = pipeline.pixelConstants.Get();
     context->VSSetConstantBuffers(0u, 1u, &vsConstants);

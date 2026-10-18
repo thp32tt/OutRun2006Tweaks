@@ -5,6 +5,7 @@
 #include "native_sm3_constant_codegen.hpp"
 #include "native_sm3_texture_codegen.hpp"
 #include "native_sm3_fragment_codegen.hpp"
+#include "live_game_sm3_alpha_test.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
@@ -1389,14 +1390,17 @@ bool compile_native_live_sm3_program(
     ID3D11Device* device,
     const ProgrammableShaderFunctionSourceEvidence& vertexSource,
     const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    unsigned alphaCompare,
     NativeLiveSm3Program& output) noexcept {
     output = {};
-    if (!device || !vertexSource.exact() || !pixelSource.exact())
+    if (!device || !vertexSource.exact() || !pixelSource.exact() ||
+        alphaCompare > 8u)
         return false;
     try {
         std::string vertexHlsl, pixelHlsl;
         if (!build_r283_sm3_mov_shader_source(vertexSource, true, vertexHlsl) ||
-            !build_r283_sm3_mov_shader_source(pixelSource, false, pixelHlsl))
+            !build_r283_sm3_mov_shader_source(pixelSource, false, pixelHlsl) ||
+            !append_native_sm3_alpha_test(pixelHlsl, alphaCompare))
             return false;
         Microsoft::WRL::ComPtr<ID3DBlob> vertexDxbc, pixelDxbc;
         if (!compile_shader_source(vertexHlsl, "live_sm3_vs", "vs_4_0", vertexDxbc) ||

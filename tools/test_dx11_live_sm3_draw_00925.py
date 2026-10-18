@@ -32,7 +32,11 @@ for condition in (
     check(condition in source, "missing real game source-to-GPU binding: " + condition)
 
 for rejection in (
-    "alpha || stencil || fog || clipPlanes || fill != D3DFILL_SOLID",
+    "stencil || fog || clipPlanes || fill != D3DFILL_SOLID",
+    "D3DRS_ALPHAFUNC", "D3DRS_ALPHAREF", "alphaRef > 255u",
+    "alphaFunc < D3DCMP_NEVER", "alphaFunc > D3DCMP_ALWAYS",
+    "pipeline.alphaCompare != alphaFunc", "pipeline.alphaReference",
+    "context->PSSetConstantBuffers(1u, 1u, &alphaBuffer)",
     "game_native_depth_admission(", "depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE",
     "s.clearColor.main_depth_still_bound(",
     "if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))",
@@ -122,7 +126,8 @@ check("build_r283_sm3_mov_shader_source(vertexSource, true" in backend and
       "build_r283_sm3_mov_shader_source(pixelSource, false" in backend and
       'vertexHlsl.find("r283_texture")' in backend and
       "candidate.pixelSamplerMask" in backend and
-      "CreatePixelShader(" in backend and "CreateVertexShader(" in backend,
+      "CreatePixelShader(" in backend and "CreateVertexShader(" in backend and
+      "append_native_sm3_alpha_test(pixelHlsl, alphaCompare)" in backend,
       "native programmable SM3 pair must create real GPU objects")
 check("struct NativeLiveSm3Program" in header and
       "s.liveSm3Pipelines.clear();" in bridge and
@@ -201,4 +206,14 @@ check(backend.count("if (!vertexStage) return false;") >= 2,
 check("127.9961f" in arith and "destinationMask & 0x0au" in arith and
       "sourceIndex == 0u" in arith,
       "D3D9 lit power clamp or dst physical lane contract missing")
+\n# Native alpha testing is a real translated PS/CB resource, never a
+# removed D3D9 alpha admission check or a disabled game's alpha stage.
+alpha_helper = (ROOT / "src/vr/d3d11/live_game_sm3_alpha_test.hpp").read_text()
+for required in ("register(b1)", "discard;", "r283_alpha_ref", "saturate(",
+                 "case 1u:", "case 7u:", "case 8u:"):
+    check(required in alpha_helper, "D3D9 alpha comparison missing: " + required)
+check("hashBytes(&alphaCompare, sizeof(alphaCompare))" in bridge and
+      "pipeline.alphaCompare = alphaFunc;" in bridge and
+      "UpdateSubresource(pipeline.alphaReference.Get()" in bridge,
+      "live alpha compare must be cached and uploaded per real Draw")
 print("DX11 live SM3 source/negative GPU-boundary regression PASS (runtime UNTESTED)")

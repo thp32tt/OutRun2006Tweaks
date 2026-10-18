@@ -4791,6 +4791,7 @@ struct NativeLiveSm3Program {
     ID3D11Device* device,
     const ProgrammableShaderFunctionSourceEvidence& vertexSource,
     const ProgrammableShaderFunctionSourceEvidence& pixelSource,
+    unsigned alphaCompare,
     NativeLiveSm3Program& output) noexcept;
 
 class NativeBackend final {
