@@ -4,7 +4,8 @@ param(
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [string]$VariantId = 'AUTO',
-    [switch]$AllowTargetOverride
+    [switch]$AllowTargetOverride,
+    [switch]$ScreenConnectionTest
 )
 
 $ErrorActionPreference = 'Stop'
@@ -49,6 +50,10 @@ if ($target -and -not $AllowTargetOverride) {
     }
 }
 
+if ($ScreenConnectionTest -and (!$target -or [string]$target.RendererTarget -ne 'dx11-native' -or $resolvedBackend -ne 'dx11')) {
+    throw 'ScreenConnectionTest is allowed only for the isolated dx11-native one-click target.'
+}
+
 $validBackends = @('2d','d3d9','dx11','dxvk-safe','dxvk')
 if ($validBackends -notcontains $resolvedBackend) {
     throw "Unsupported one-click backend: $resolvedBackend"
@@ -64,6 +69,7 @@ if ($target) {
 }
 Write-Host ("Launch backend  : {0}" -f $resolvedBackend)
 Write-Host ("Test profile    : {0}" -f $TestProfile)
+Write-Host ("Screen link test: {0} (D3D9Ex game -> D3D11 OpenXR host; not native DX11 draw)" -f $ScreenConnectionTest)
 Write-Host ("Variant         : {0}" -f $resolvedVariant)
 if (Test-Path $visualChecklist) {
     Write-Host ("One-run QA       : {0}" -f $visualChecklist)
@@ -83,6 +89,8 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
 # DLL starts outrun-vr-host.exe via AutoLaunchHost; this launcher never starts a
 # second host process.
 $oldDx11Census = $env:OUTRUN_VR_DX11_CENSUS
+$oldScreenConnectTest = $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST
+if ($ScreenConnectionTest) { $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST = '1' } else { $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST = $null }
 if ($target -and [string]$target.RendererTarget -eq 'dx11-native') {
     # R72 is observation-only. Source draw/state census is enabled
     # automatically, but NativeDrawPathActive remains false and no draw is
@@ -105,6 +113,7 @@ try {
     }
 } finally {
     $env:OUTRUN_VR_DX11_CENSUS = $oldDx11Census
+    $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST = $oldScreenConnectTest
 }
 
 exit $oneClickExitCode

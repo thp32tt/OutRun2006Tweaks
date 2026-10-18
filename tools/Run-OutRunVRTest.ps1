@@ -330,7 +330,7 @@ if($backend -ne '2d' -and $TestProfile -eq 'STAGE_DIAGNOSTIC'){
 }else{
     $env:OUTRUN_VR_SHADER_FINGERPRINT=$null
 }
-if($backend -eq 'dx11' -and $TestProfile -eq 'STAGE_DIAGNOSTIC'){
+if($backend -eq 'dx11' -and ($TestProfile -eq 'STAGE_DIAGNOSTIC' -or $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST -eq '1')){
     $env:OUTRUN_VR_DX11_CENSUS='1'
 }else{
     $env:OUTRUN_VR_DX11_CENSUS='0'

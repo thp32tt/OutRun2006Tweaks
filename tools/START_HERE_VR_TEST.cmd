@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 title OutRun 2006 VR One-Click
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Invoke-OutRunVROneClick.ps1" -Backend auto -TestProfile CORRECTNESS
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Invoke-OutRunVROneClick.ps1" -Backend auto -TestProfile CORRECTNESS -ScreenConnectionTest
 if errorlevel 1 goto :failed
 
 echo.

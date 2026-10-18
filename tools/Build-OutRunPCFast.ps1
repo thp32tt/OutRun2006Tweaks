@@ -202,6 +202,9 @@ foreach ($file in $runtimeFiles) {
     Copy-Item $src (Join-Path $packageDir $file)
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
+if ((Get-Content 'tools/VR_ONE_CLICK_TARGET.json' -Raw | ConvertFrom-Json).RendererTarget -eq 'dx11-native') {
+    Copy-Item 'docs/test-builds/2026-10-18-dx11-screen-connect.md' (Join-Path $packageDir 'DX11_SCREEN_CONNECT_README.md')
+}
 
 @(
     'USER-FACING LAUNCHER POLICY'

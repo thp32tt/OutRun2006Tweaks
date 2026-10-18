@@ -218,7 +218,12 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
-        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
+        # Isolated HMD screen-connect test: retain DirectGPU preference while
+        # permitting the actual D3D9Ex game/SBS desktop image to reach the
+        # x64 D3D11 OpenXR host if shared-eye transport is not admitted.
+        # Native DX11 draw remains dormant and is never impersonated.
+        $screenConnectTest = $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST -eq '1'
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" $(if ($screenConnectTest) { 'false' } else { 'true' })
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } else {
         $value = switch ($Backend) {
@@ -259,6 +264,7 @@ $activeText = @(
     "matrix=$matrix"
     "session=$session"
     "startedUtc=$($startedUtc.ToString('o'))"
+    "dx11ScreenConnectionTest=$($Backend -eq 'dx11' -and $env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST -eq '1')"
     "selected=$((Get-Date).ToString('o'))"
 ) -join $nl
 Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding ascii
@@ -300,7 +306,7 @@ Write-Host "Any previous root logs were archived before this session was created
 switch ($Backend) {
     "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
     "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
-    "dx11" { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." }
+    "dx11" { if ($env:OUTRUN_VR_DX11_SCREEN_CONNECT_TEST -eq '1') { Write-Host "DX11 SCREEN LINK TEST: live D3D9Ex game -> x64 D3D11 OpenXR host; DirectGPU prioritized, Desktop Duplication fallback allowed; native DX11 draw remains dormant." } else { Write-Host "DX11 HOST/DIRECTGPU: D3D9Ex game + x64 D3D11 OpenXR host; DirectGPU-only; ACK run identity required." } }
     "dxvk-safe" { Write-Host "DXVK SAFE: provider-local D3D9Ex is probed when exported; DirectGPU optional; multiview patcher disabled." }
     "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
 }
