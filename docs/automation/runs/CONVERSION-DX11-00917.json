@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00917",
   "feature_id": "DX11:NATIVE_STEREO_TYPED_CAMERA_PARTIAL_GPU_CLEAR",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -71,16 +71,69 @@
     }
   },
   "acceptance_results": {
-    "typed_native_camera_clear": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "depth_stencil_fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "same_sha_gate": "PENDING_EXACT_SHA"
+    "typed_native_camera_clear": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "depth_stencil_fallback": "PASS_BUILD_VERIFIED_SOURCE_STAGE",
+    "same_sha_gate": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/native_game_stereo_submission.cpp",
     "src/vr/d3d11/native_game_partial_color_format.hpp"
   ],
   "material_result_sha": "5f01d2a2d1a39991fcba781e8f6ac632abd1df5a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448",
   "runtime_validation_note": "No matching OutRun menu/car/race hardware session, Quest3/VDXR stereo pixel inspection or gamepad benchmark. RUNTIME_VALIDATION=UNTESTED.",
-  "ci_repair_reason": "Initial material SHA's Fast acceptance gate inspected previous 00916 C6 because this 00917 durable source-stage run record was absent. Preserve 00916 exact-SHA success and acceptance; establish 00917 nonterminal CI pending contract with no gate relaxation."
+  "ci_repair_reason": "Initial material SHA's Fast acceptance gate inspected previous 00916 C6 because this 00917 durable source-stage run record was absent. Preserve 00916 exact-SHA success and acceptance; establish 00917 nonterminal CI pending contract with no gate relaxation.",
+  "c6_bookkeeping_only": true,
+  "validation_evidence": {
+    "github_exact_sha_workflow_runs_verified": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39127275730,
+        "conclusion": "success",
+        "head_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39127275805,
+        "conclusion": "success",
+        "head_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448"
+      },
+      {
+        "name": "Build",
+        "run_id": 39127275788,
+        "conclusion": "success",
+        "head_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39127275836,
+        "conclusion": "success",
+        "head_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39127275785,
+        "conclusion": "success",
+        "head_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448"
+      },
+      {
+        "name": "DX11 Native Transport Isolated WARP",
+        "run_id": 39127275734,
+        "conclusion": "success",
+        "head_sha": "1d89c046896ecd67580e72fbccf8fec5393b1448"
+      }
+    ],
+    "scope": "SOURCE_STAGE_ONLY",
+    "ci_gate_count": "MANDATORY_5_OF_5_PLUS_WARP",
+    "runtime_validation": "UNTESTED"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD b6910550; 00916 C6 checked; 00917 no preexisting claim.",
+    "C1_REVIEW": "Identified typed native auxiliary camera Clear coverage and cropped Z/stencil shader dependency.",
+    "C2_IMPLEMENT": "Source typed RTV format Clear and pre-eye compiler preflight at material 5f01d2a2; preserve audited original typed switch in source repair 1d89c046.",
+    "C3_VALIDATE": "Initial exact material fast acceptance inspected stale 00916; run contract added at 161c68f9. Source graph verifier detected missing legacy switch; repaired at 1d89c046. Five exact-SHA required GitHub Actions SUCCESS plus WARP SUCCESS.",
+    "C4_COMMIT": "Material 5f01d2a2; source-graph repair and validation-bearing result 1d89c046.",
+    "C5_PACKAGE": "NOT_REQUIRED_SOURCE_STAGE_HMD_UNTESTED",
+    "C6_RESULT": "PASS_EXACT_SHA on 1d89c046; separate [skip ci] bookkeeping without altering validation SHA."
+  }
 }
