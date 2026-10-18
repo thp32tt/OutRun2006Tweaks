@@ -306,6 +306,10 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "rankRawBeforeLeft, rankRawAfterLeft)" in after_native_left
     assert physical.count("OutRunVR::RankMarker::CoherentOriginalRankWvp(") == 3
     assert physical.count("OutRunVR::RankMarker::SameOriginalRankWvp(") == 2
+    # Both the post-native-LEFT and post-right-state setter physical marker
+    # comparisons are mandatory. A first-occurrence mutation must not be
+    # masked by the intact second occurrence in this same R33 function.
+    assert physical.count("OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(") == 2
     right_rank = physical[physical.index("IDirect3DSurface9* rightEye ="):
                           physical.index("restoreOk = R32ReviewRestoreRightPassState(")]
     assert "const auto rankAtRight = captureRankSource();" in right_rank
