@@ -82,6 +82,22 @@ native_game_camera_dsv_extent(
         texture.ArraySize, slice, texture.SampleDesc.Count);
     return {extent.width, extent.height, mip, slice, extent.valid};
 }
+// The same physical camera view admission applies to BOTH live auxiliary
+// Draw/DrawIndexed and Clear. A DSV pointing at another mip/array extent or
+// MSAA configuration is not a compatible camera depth attachment, even when
+// D3D11 accepted the texture allocation or an alternate view of the eye.
+// A color-only camera may use no DSV; callers enforce this when one is bound.
+[[nodiscard]] constexpr bool native_game_camera_depth_compatible(
+    const NativeGameCameraViewExtent& color,
+    const NativeGameCameraViewExtent& depth,
+    UINT colorSamples, UINT depthSamples,
+    UINT colorSampleQuality, UINT depthSampleQuality) noexcept {
+    return color.valid && depth.valid &&
+        color.width == depth.width && color.height == depth.height &&
+        colorSamples != 0u && colorSamples == depthSamples &&
+        colorSampleQuality == depthSampleQuality;
+}
+
 // D3D9 Clear is clipped to the current game viewport and (when enabled)
 // scissor as well as to explicit pRects. D3D11 ClearRTV/DSV and ClearView
 // ignore RS clipping. Compute the exact single-camera GPU clear rectangle

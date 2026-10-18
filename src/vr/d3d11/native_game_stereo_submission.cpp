@@ -399,11 +399,23 @@ bool NativeGameEyeDrawEncoder::game_source_target_bound(
         cameraDepthTexture->GetDevice(depthOwner.GetAddressOf());
         D3D11_TEXTURE2D_DESC depthDesc{};
         cameraDepthTexture->GetDesc(&depthDesc);
+        D3D11_DEPTH_STENCIL_VIEW_DESC selectedDepthView{};
+        cameraDepth->GetDesc(&selectedDepthView);
+        const auto physicalDepth =
+            native_game_camera_dsv_extent(depthDesc, selectedDepthView);
+        // Unlike the existing color-only admission, an actually bound game
+        // DSV must address the same selected physical mip and sample layout.
+        // Without this, a menu/vehicle source Draw is counted and later
+        // copied to an XR eye despite having an incompatible Z/stencil view.
         if (!depthOwner || depthOwner.Get() != producer.Get() ||
             depthDesc.Usage != D3D11_USAGE_DEFAULT ||
             depthDesc.CPUAccessFlags != 0u ||
             (depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL) == 0u ||
-            (depthDesc.MiscFlags & sharedFlags) != 0u)
+            (depthDesc.MiscFlags & sharedFlags) != 0u ||
+            !native_game_camera_depth_compatible(
+                camera, physicalDepth, desc.SampleDesc.Count,
+                depthDesc.SampleDesc.Count, desc.SampleDesc.Quality,
+                depthDesc.SampleDesc.Quality))
             return false;
     }
     UINT count = 1u;
@@ -598,11 +610,9 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
     const auto camera = native_game_camera_rtv_extent(cd, colorViewDesc);
     const auto cameraDepth = native_game_camera_dsv_extent(dd, depthViewDesc);
     if (!owner || owner.Get() != depthOwner.Get() ||
-        !camera.valid || !cameraDepth.valid ||
-        camera.width != cameraDepth.width ||
-        camera.height != cameraDepth.height ||
-        dd.SampleDesc.Count != cd.SampleDesc.Count ||
-        dd.SampleDesc.Quality != cd.SampleDesc.Quality ||
+        !native_game_camera_depth_compatible(
+            camera, cameraDepth, cd.SampleDesc.Count, dd.SampleDesc.Count,
+            cd.SampleDesc.Quality, dd.SampleDesc.Quality) ||
         dd.Usage != D3D11_USAGE_DEFAULT || dd.CPUAccessFlags ||
         (dd.BindFlags & D3D11_BIND_DEPTH_STENCIL) == 0u) return false;
     const auto covered = camera_clear_coverage(

@@ -1963,6 +1963,49 @@ int main()
                 &clipDesc, clipRaster.GetAddressOf()))) return false;
         ctx->RSSetState(clipRaster.Get());
         ctx->RSSetScissorRects(1u, &mipCameraPatch);
+        // Exercise physical RTV/DSV admission using real WARP mip1 views:
+        // the 32x32 camera Z view is compatible, but the ordinary 64x64
+        // offscreen DSV cannot be paired with the camera's mip1 Draw/Clear.
+        D3D11_TEXTURE2D_DESC physicalColor{}, physicalDepth{}, baseDepth{};
+        D3D11_RENDER_TARGET_VIEW_DESC physicalColorView{};
+        D3D11_DEPTH_STENCIL_VIEW_DESC physicalDepthView{}, baseDepthView{};
+        Microsoft::WRL::ComPtr<ID3D11Resource> physicalDepthResource;
+        Microsoft::WRL::ComPtr<ID3D11Resource> baseDepthResource;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> physicalDepthTexture;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> baseDepthTexture;
+        fixture.mipCameraColor->GetDesc(&physicalColor);
+        selectedCamera->GetDesc(&physicalColorView);
+        fixture.mipCameraDsv->GetDesc(&physicalDepthView);
+        fixture.offscreenGameDsv->GetDesc(&baseDepthView);
+        fixture.mipCameraDsv->GetResource(
+            physicalDepthResource.GetAddressOf());
+        fixture.offscreenGameDsv->GetResource(
+            baseDepthResource.GetAddressOf());
+        if (!physicalDepthResource || !baseDepthResource ||
+            FAILED(physicalDepthResource.As(&physicalDepthTexture)) ||
+            FAILED(baseDepthResource.As(&baseDepthTexture)) ||
+            !physicalDepthTexture || !baseDepthTexture) return false;
+        physicalDepthTexture->GetDesc(&physicalDepth);
+        baseDepthTexture->GetDesc(&baseDepth);
+        const auto selectedColorExtent =
+            outrun::vr::dx11::native_game_camera_rtv_extent(
+                physicalColor, physicalColorView);
+        const auto selectedDepthExtent =
+            outrun::vr::dx11::native_game_camera_dsv_extent(
+                physicalDepth, physicalDepthView);
+        const auto mismatchedDepthExtent =
+            outrun::vr::dx11::native_game_camera_dsv_extent(
+                baseDepth, baseDepthView);
+        const bool cameraDrawDepthParity =
+            outrun::vr::dx11::native_game_camera_depth_compatible(
+                selectedColorExtent, selectedDepthExtent,
+                physicalColor.SampleDesc.Count, physicalDepth.SampleDesc.Count,
+                physicalColor.SampleDesc.Quality, physicalDepth.SampleDesc.Quality) &&
+            !outrun::vr::dx11::native_game_camera_depth_compatible(
+                selectedColorExtent, mismatchedDepthExtent,
+                physicalColor.SampleDesc.Count, baseDepth.SampleDesc.Count,
+                physicalColor.SampleDesc.Quality, baseDepth.SampleDesc.Quality);
+        if (!cameraDrawDepthParity) return false;
         const bool mipCameraClears =
             !encoder.clear_offscreen_game_color(
                 selectedCamera, 0xff123456u, &mipCameraBad) &&
