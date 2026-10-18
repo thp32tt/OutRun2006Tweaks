@@ -76,6 +76,11 @@ int main()
     BeginSpriteQueueRender();
     RegisterSpriteNodeScope(&nodes[301], RenderScope::WorldBillboard);
     EndSpriteQueueRender();
+    // A partial original queue walk may finish before this frame's
+    // Present. Its unvisited old tag must still be available to a later
+    // priority pass; only the explicit frame fence expires it.
+    EXPECT(PeekSpriteNodeScope(&nodes[300]) == hud);
+    EndSpriteQueueFrame();
     EXPECT(PeekSpriteNodeScope(&nodes[300]) == RenderScope::None);
     EXPECT(SpriteNodeSemanticMaybeHasTag(&nodes[301]));
     EXPECT(ConsumeSpriteNodeScope(&nodes[301]) == RenderScope::WorldBillboard);
@@ -104,6 +109,7 @@ int main()
     EXPECT(CurrentRenderProducerToken() == ProducerToken::None);
     EXPECT(CurrentProjectedMarker() == nullptr);
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
     // Future tag and its negative-filter hint survive expiry of the older
     // tags; the SAME exact source is selected when the next walk starts.
     EXPECT(SpriteNodeSemanticMaybeHasTag(&nodes[1301]));
@@ -114,6 +120,7 @@ int main()
     EXPECT(CurrentRenderProducerToken() ==
         ProducerToken::StageExtensionTime);
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
     EXPECT(SpriteNodeSemanticPublishedCount.load() == 0);
 
     // Same generation rule covers original per-car view-space markers; do
@@ -127,6 +134,7 @@ int main()
     EXPECT(EffectiveScope() == generic);
     EXPECT(CurrentProjectedMarker() == nullptr);
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
     BeginSpriteQueueRender();
     SelectSpriteQueueNode(&nodes[1302]);
     EXPECT(EffectiveScope() == RenderScope::ProjectedWorldMarker2D);
@@ -135,6 +143,7 @@ int main()
     EXPECT(CurrentRenderProducerToken() ==
         ProducerToken::RankMarkerSprani);
     EndSpriteQueueRender();
+    EndSpriteQueueFrame();
     EXPECT(SpriteNodeSemanticPublishedCount.load() == 0);
 
     // Exhaust the bounded registry to exercise oldest-entry eviction.
