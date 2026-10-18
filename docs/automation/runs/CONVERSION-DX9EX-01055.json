@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01055",
+  "production_id": "CONVERSION-DX9EX-01055",
+  "event_id": "CONVERSION-DX9EX-01055-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATE",
+  "feature_id": "DX9EX:SAFETY:R84_D3D9_STATE_RESTORE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "automation_validation": "FAILED_POLICY_RECORD_MISSING_ON_FIRST_MATERIAL_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "fdd3233c0f5e580c25c9e9b919b5d0f69e6331a3",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/r30_state_restore_result.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:SAFETY:R84_D3D9_STATE_RESTORE",
+    "goal": "Keep the original OutRun 2006 D3D9 projection, vertex stream and index bindings intact across R84 two-eye fixed-function and XYZRHW GPU draws, reporting restore failures rather than erroneously returning native Draw success.",
+    "scope_boundary": "Exact R84 native GPU binding restore across FVF142 HUD/rank/ESC and shadow VB/IB XYZRHW paths only. Preserve original left draw identity, prevent a new fallback draw, protect SkyGlow, original input/FFB, R26_SAFE rollback, DX11 and frozen DXVK.",
+    "special_work_evidence": "Confirmed source-level error contract: existing R30 GPU submission returned its prior successful HRESULT after SetTransform(PROJECTION), SetStreamSource, or SetIndices restoration failed while only arming mono safety; this could report success despite mutated game render state. No physical failure frame asserted.",
+    "trace_stages": [
+      "Original game ScreenHud, projected rank and XYZ vertices enter R84 R30 FVF142 and converted VB/IB drawing routes.",
+      "R30 issues native left and private right GPU draw then restores original D3D9 projection, VB stream and optional index buffers.",
+      "Failed original state restoration must mark right-eye frame unsafe, invalidate affected depth and expose failed HRESULT while R29 Present/host avoids partially restored stereo state."
+    ],
+    "subcomponents": [
+      "Fixed-function native HUD/rank/ESC optical PROJECTION restore failure propagates a failed result and does not masquerade as complete.",
+      "Dynamic or shadow VB stream restores track HRESULT, flag incomplete right-eye state and return failure only after original drawing is attempted.",
+      "Indexed VB/IB restoration attempts both original setters independently, retaining original failed GPU HRESULT and failing closed on either restoration failure."
+    ],
+    "acceptance_items": [
+      {
+        "id": "restore_gpu_state_and_status",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 fixed-function HUD plus transformed VB/IB stereo draw and game state",
+        "expected_behavior": "Successful original GPU draw is never reported successful if original projection, vertex stream or indices cannot be restored; stereo frame safety is armed."
+      },
+      {
+        "id": "restore_protected_negative",
+        "category": "fallback_regression",
+        "behavior_area": "Failed original GPU draw, one failed original setter, multiple failures and unmodified D3D9 fallback",
+        "expected_behavior": "Negative restore tests retain original native GPU failure when present and do not reissue physical left Draw, overwrite input/FFB, reclassify SkyGlow or modify R26_SAFE."
+      },
+      {
+        "id": "restore_final_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 x86 game, x64 host, package and cross-domain inspections",
+        "expected_behavior": "One validation-bearing exact SHA passes DX9Ex Active, Domain Isolation, HUD Inspector and Full Source Impact; actual Quest3 remains separately UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Authenticated R84 source 664b69f contains three restore blocks which detect failed original D3D9 state setters but return previous GPU draw result unconditionally.",
+    "root_cause": "HRESULT from the last native GPU Draw is returned regardless of SetTransform projection, SetStreamSource or SetIndices restoration failure. Mono-safety side effects do not repair the original game state or change the reported success status.",
+    "source_trace": [
+      "R84 native FVF142 ScreenHud/ProjectedWorldMarker2D/ESC enters R30TryFixedFunctionOriginalSpriteStereo and retains original PROJECTION.",
+      "R30TryXyzrhwPrimitiveVB and R30TryXyzrhwIndexedPrimitiveVB submit original-left/secondary-right GPU geometry.",
+      "After native GPU submission original D3D9 PROJECTION/stream/indices restore setters run; failure now marks right eye invalid and propagates a failed result."
+    ],
+    "alternatives_rejected": [
+      "A generic extra native left draw or automatic E_NOTIMPL retry is unsafe after a physical GPU submission and could duplicate alpha; original input, world and SkyGlow owners remain untouched."
+    ],
+    "eye_ownership": "Right-eye frame validity is explicitly marked failed when original restore setters fail; the source does not establish a real Quest3 failure or prove current binocular correctness.",
+    "fix_evidence": "Fixed-function projection plus VB and VB/IB state restore now fail closed and retain original HRESULT errors; shared header static_assert covers success, draw failure, restore failure and nonzero success status.",
+    "negative_test_evidence": "R30StateRestore constexpr compile contract cases and portable g++17 -Wall -Wextra -Werror smoke pass; full exact-SHA Windows jobs pending."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "first_material_sha": "fdd3233c0f5e580c25c9e9b919b5d0f69e6331a3",
+    "first_attempt": {
+      "run_id": 39158691397,
+      "conclusion": "failure",
+      "root_cause": "Required task run feature_contract JSON absent; Win32 builds skipped."
+    },
+    "subsequent_candidate": "PENDING_FINAL_EXACT_SHA"
+  }
+}
