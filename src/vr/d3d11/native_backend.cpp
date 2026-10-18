@@ -260,14 +260,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V3";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_HLSL_MATERIALIZER_V4";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_MASK_SWIZZLE_PROVENANCE_V3";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_MASK_SWIZZLE_PROVENANCE_V4";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -402,6 +402,24 @@ bool build_r283_sm3_mov_shader_source(
                 opcode = NativeSm3ArithmeticOpcode::SetGreaterEqual; sourceCount = 2u; break;
             case D3DSIO_CMP:
                 opcode = NativeSm3ArithmeticOpcode::Compare; sourceCount = 3u; break;
+            case D3DSIO_RCP:
+                opcode = NativeSm3ArithmeticOpcode::Reciprocal; sourceCount = 1u; break;
+            case D3DSIO_RSQ:
+                opcode = NativeSm3ArithmeticOpcode::ReciprocalSquareRoot; sourceCount = 1u; break;
+            case D3DSIO_EXP:
+                opcode = NativeSm3ArithmeticOpcode::Exponential2; sourceCount = 1u; break;
+            case D3DSIO_LOG:
+                opcode = NativeSm3ArithmeticOpcode::Logarithm2; sourceCount = 1u; break;
+            case D3DSIO_POW:
+                opcode = NativeSm3ArithmeticOpcode::Power; sourceCount = 2u; break;
+            case D3DSIO_LRP:
+                opcode = NativeSm3ArithmeticOpcode::LinearInterpolate; sourceCount = 3u; break;
+            case D3DSIO_NRM:
+                opcode = NativeSm3ArithmeticOpcode::Normalize3; sourceCount = 1u; break;
+            case D3DSIO_CRS:
+                opcode = NativeSm3ArithmeticOpcode::Cross3; sourceCount = 2u; break;
+            case D3DSIO_DP2ADD:
+                opcode = NativeSm3ArithmeticOpcode::Dot2Add; sourceCount = 3u; break;
             default:
                 return false;
             }
@@ -460,7 +478,8 @@ bool build_r283_sm3_mov_shader_source(
                 const unsigned modifier =
                     static_cast<unsigned>((token & D3DSP_SRCMOD_MASK) >>
                                           D3DSP_SRCMOD_SHIFT);
-                if (modifier != D3DSPSM_NONE && modifier != D3DSPSM_NEG)
+                if (modifier == D3DSPSM_DZ || modifier == D3DSPSM_DW ||
+                    modifier == D3DSPSM_NOT)
                     return false;
                 std::string value;
                 if (kind == D3DSPR_INPUT) {
@@ -490,7 +509,8 @@ bool build_r283_sm3_mov_shader_source(
                 value += ".";
                 for (unsigned component = 0; component < 4u; ++component)
                     value += lanes[(swizzle >> (component * 2u)) & 3u];
-                if (modifier == D3DSPSM_NEG) value = "-(" + value + ")";
+                if (!append_native_sm3_source_modifier(value, modifier))
+                    return false;
                 op.sources[i] = std::move(value);
             }
 

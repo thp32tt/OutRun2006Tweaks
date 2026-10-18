@@ -9,8 +9,34 @@ namespace outrun::vr::dx11 {
 
 enum class NativeSm3ArithmeticOpcode {
     Move, Add, Subtract, Multiply, MultiplyAdd, Dot3, Dot4, Minimum, Maximum,
-    Absolute, Fraction, SetLessThan, SetGreaterEqual, Compare
+    Absolute, Fraction, SetLessThan, SetGreaterEqual, Compare,
+    Reciprocal, ReciprocalSquareRoot, Exponential2, Logarithm2,
+    Power, LinearInterpolate, Normalize3, Cross3, Dot2Add
 };
+
+// Translate only D3D9 source modifiers with exact component-wise SM3
+// semantics. Unknown address/predicate/depth-divide modes stay rejected by
+// the bytecode materializer; no source modifier can silently be ignored.
+inline bool append_native_sm3_source_modifier(std::string& operand,
+                                              unsigned modifier) {
+    if (operand.empty()) return false;
+    const auto value = "(" + operand + ")";
+    switch (modifier) {
+    case 0u: break;                         // D3DSPSM_NONE
+    case 1u: operand = "-(" + operand + ")"; break; // D3DSPSM_NEG
+    case 2u: operand = "(" + value + " - 0.5f)"; break; // BIAS
+    case 3u: operand = "-(" + value + " - 0.5f)"; break; // BIASNEG
+    case 4u: operand = "(2.0f * " + value + " - 1.0f)"; break; // SIGN
+    case 5u: operand = "-(2.0f * " + value + " - 1.0f)"; break; // SIGNNEG
+    case 6u: operand = "(1.0f - " + value + ")"; break; // COMP
+    case 7u: operand = "(2.0f * " + value + ")"; break; // X2
+    case 8u: operand = "-(2.0f * " + value + ")"; break; // X2NEG
+    case 11u: operand = "abs(" + operand + ")"; break; // ABS
+    case 12u: operand = "-abs(" + operand + ")"; break; // ABSNEG
+    default: return false; // DZ/DW/NOT and reserved modifier encodings
+    }
+    return true;
+}
 
 // Preserve lane masks and scalar-dot replication. Unsupported operand counts,
 // empty expressions or unknown opcodes fail closed before the HLSL compiler.
@@ -32,6 +58,28 @@ inline bool append_native_sm3_arithmetic(
     case NativeSm3ArithmeticOpcode::Move:
         if (!validSources(1u)) return false;
         expression = sources[0]; break;
+    case NativeSm3ArithmeticOpcode::Reciprocal:
+    case NativeSm3ArithmeticOpcode::ReciprocalSquareRoot:
+    case NativeSm3ArithmeticOpcode::Exponential2:
+    case NativeSm3ArithmeticOpcode::Logarithm2: {
+        if (!validSources(1u)) return false;
+        const auto x = "((" + sources[0] + ").x)";
+        const std::string scalar =
+            opcode == NativeSm3ArithmeticOpcode::Reciprocal ? "(1.0f / " + x + ")" :
+            opcode == NativeSm3ArithmeticOpcode::ReciprocalSquareRoot ? "rsqrt(abs(" + x + "))" :
+            opcode == NativeSm3ArithmeticOpcode::Exponential2 ? "exp2(" + x + ")" :
+            "log2(abs(" + x + "))";
+        expression = "float4(" + scalar + ", " + scalar + ", " +
+                     scalar + ", " + scalar + ")";
+        break;
+    }
+    case NativeSm3ArithmeticOpcode::Normalize3: {
+        if (!validSources(1u) || (mask & 8u)) return false;
+        // SM3 nrm writes xyz; the undefined w lane must not be fabricated.
+        expression = "float4(normalize((" + sources[0] +
+                     ").xyz), 0.0f)";
+        break;
+    }
     case NativeSm3ArithmeticOpcode::Absolute:
     case NativeSm3ArithmeticOpcode::Fraction:
         if (!validSources(1u)) return false;
@@ -61,6 +109,33 @@ inline bool append_native_sm3_arithmetic(
         expression = "((" + sources[0] + " * " + sources[1] +
                      ") + " + sources[2] + ")";
         break;
+    case NativeSm3ArithmeticOpcode::LinearInterpolate:
+        if (!validSources(3u)) return false;
+        expression = "((" + sources[0] + " * " + sources[1] +
+                     ") + ((1.0f - (" + sources[0] + ")) * " +
+                     sources[2] + "))";
+        break;
+    case NativeSm3ArithmeticOpcode::Power: {
+        if (!validSources(2u)) return false;
+        const auto scalar = "pow(abs((" + sources[0] + ").x), (" +
+                            sources[1] + ").x)";
+        expression = "float4(" + scalar + ", " + scalar + ", " +
+                     scalar + ", " + scalar + ")";
+        break;
+    }
+    case NativeSm3ArithmeticOpcode::Cross3:
+        if (!validSources(2u) || (mask & 8u)) return false;
+        expression = "float4(cross((" + sources[0] + ").xyz, (" +
+                     sources[1] + ").xyz), 0.0f)";
+        break;
+    case NativeSm3ArithmeticOpcode::Dot2Add: {
+        if (!validSources(3u)) return false;
+        const auto scalar = "(dot((" + sources[0] + ").xy, (" +
+                            sources[1] + ").xy) + (" + sources[2] + ").x)";
+        expression = "float4(" + scalar + ", " + scalar + ", " +
+                     scalar + ", " + scalar + ")";
+        break;
+    }
     case NativeSm3ArithmeticOpcode::SetLessThan:
     case NativeSm3ArithmeticOpcode::SetGreaterEqual: {
         if (!validSources(2u)) return false;

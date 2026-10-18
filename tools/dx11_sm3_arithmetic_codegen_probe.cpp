@@ -28,6 +28,22 @@ int main() {
     assert(emit(NativeSm3ArithmeticOpcode::SetLessThan, 15u, 2u));
     assert(emit(NativeSm3ArithmeticOpcode::SetGreaterEqual, 15u, 2u));
     assert(emit(NativeSm3ArithmeticOpcode::Compare, 15u, 3u));
+    assert(emit(NativeSm3ArithmeticOpcode::Reciprocal, 15u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::ReciprocalSquareRoot, 15u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::Exponential2, 15u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::Logarithm2, 15u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::Power, 15u, 2u));
+    assert(emit(NativeSm3ArithmeticOpcode::LinearInterpolate, 15u, 3u));
+    assert(emit(NativeSm3ArithmeticOpcode::Normalize3, 7u, 1u));
+    assert(emit(NativeSm3ArithmeticOpcode::Cross3, 7u, 2u));
+    assert(emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 3u));
+    assert(out.find("rsqrt(abs(") != std::string::npos);
+    assert(out.find("exp2(") != std::string::npos);
+    assert(out.find("log2(abs(") != std::string::npos);
+    assert(out.find("pow(abs(") != std::string::npos);
+    assert(out.find("normalize((input.r0.xyzw).xyz)") != std::string::npos);
+    assert(out.find("cross((input.r0.xyzw).xyz") != std::string::npos);
+    assert(out.find("dot((input.r0.xyzw).xy") != std::string::npos);
     assert(out.find("output.r0.xy = r283_value_1.xy;") != std::string::npos);
     assert(out.find("dot((input.r0.xyzw).xyz, (r283_t0.yxwz).xyz)") !=
            std::string::npos);
@@ -44,6 +60,18 @@ int main() {
     assert(!emit(NativeSm3ArithmeticOpcode::MultiplyAdd, 15u, 2u));
     assert(!emit(NativeSm3ArithmeticOpcode::Compare, 15u, 2u));
     assert(!emit(NativeSm3ArithmeticOpcode::Fraction, 15u, 2u));
+    assert(!emit(NativeSm3ArithmeticOpcode::Normalize3, 15u, 1u));
+    assert(!emit(NativeSm3ArithmeticOpcode::Cross3, 15u, 2u));
+    assert(!emit(NativeSm3ArithmeticOpcode::Dot2Add, 15u, 2u));
+    std::string operand = "input.r0.xyzw";
+    assert(append_native_sm3_source_modifier(operand, 11u));
+    assert(operand == "abs(input.r0.xyzw)");
+    assert(append_native_sm3_source_modifier(operand, 12u));
+    assert(operand == "-abs(abs(input.r0.xyzw))");
+    assert(!append_native_sm3_source_modifier(operand, 9u));
+    assert(!append_native_sm3_source_modifier(operand, 10u));
+    assert(!append_native_sm3_source_modifier(operand, 13u));
+    assert(operand == "-abs(abs(input.r0.xyzw))");
     assert(!emit(static_cast<NativeSm3ArithmeticOpcode>(255), 15u, 3u));
     assert(out == before);
 }
