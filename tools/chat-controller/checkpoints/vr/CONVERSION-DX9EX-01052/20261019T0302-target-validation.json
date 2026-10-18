@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "ai2_target_validation_handoff",
+  "task_id": "CONVERSION-DX9EX-01052",
+  "production_id": "CONVERSION-DX9EX-01052",
+  "event_id": "CONVERSION-DX9EX-01052-E004",
+  "attempt": "2/3",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "feature_stage": "FEATURE_READY_PROMOTED_C5",
+  "feature_branch": "vr-d3d9ex-candidate/01052-c993-eye-route-test",
+  "target_branch": "vr-d3d9ex-focus",
+  "target_expected_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+  "promoted_force": false,
+  "promoted_behind": 0,
+  "feature_ci_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+  "feature_ci_active": 39151296043,
+  "feature_ci_status": "SUCCESS",
+  "feature_artifacts_verified": true,
+  "target_exact_sha_gates": {
+    "DX9Ex Active Validation": 39151903692,
+    "Domain Isolation Guard": 39151903760,
+    "OutRun EXE HUD Inspector CI": 39151903710,
+    "DX9Ex Full Source Impact Review": 39151903728
+  },
+  "gate_state": "WAIT_THREE_EXACT_TARGET_CI",
+  "material_source_sha": "1aaf6e830fdbebba5184a651badeac45b8038fd4",
+  "regression_material_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+  "remaining": [
+    "Await exact SHA 4/4 SUCCESS",
+    "Commit C6 terminal run record referencing original source and all evidence; no new C++ if no failure",
+    "Validate final target SHA and artifacts again",
+    "Score RUN_KEY once after completion"
+  ],
+  "runtime_validation": "UNTESTED",
+  "ai_score_change": 0
+}
