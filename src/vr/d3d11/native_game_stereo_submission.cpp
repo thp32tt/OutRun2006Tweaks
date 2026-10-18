@@ -358,6 +358,63 @@ bool NativeGameEyeDrawEncoder::source_color_writable(
 }
 
 
+// A clipped D3D9 TARGET Clear does not erase unaffected game camera
+// pixels. Split a valid recorded Draw rectangle into up to four disjoint
+// surviving strips; never bridge the erased region with a bounding box.
+struct NativeCameraColorRemainder {
+    std::array<NativeGameOffscreenColorRegion, 4u> parts{};
+    std::size_t count{};
+};
+[[nodiscard]] constexpr NativeCameraColorRemainder
+subtract_native_camera_clear(
+    NativeGameOffscreenColorRegion written,
+    NativeGameOffscreenColorRegion erased) noexcept {
+    NativeCameraColorRemainder out{};
+    if (!native_game_offscreen_color_region_valid(written)) return out;
+    if (!native_game_offscreen_color_regions_intersect(written, erased)) {
+        out.parts[0] = written;
+        out.count = 1u;
+        return out;
+    }
+    const std::uint32_t left = (std::max)(written.left, erased.left);
+    const std::uint32_t top = (std::max)(written.top, erased.top);
+    const std::uint32_t right = (std::min)(written.right, erased.right);
+    const std::uint32_t bottom = (std::min)(written.bottom, erased.bottom);
+    if (top > written.top)
+        out.parts[out.count++] = {written.left, written.top, written.right, top};
+    if (bottom < written.bottom)
+        out.parts[out.count++] = {written.left, bottom, written.right, written.bottom};
+    if (left > written.left)
+        out.parts[out.count++] = {written.left, top, left, bottom};
+    if (right < written.right)
+        out.parts[out.count++] = {right, top, written.right, bottom};
+    return out;
+}
+constexpr NativeGameOffscreenColorRegion kCameraDraw{0u, 0u, 100u, 100u};
+constexpr NativeGameOffscreenColorRegion kCameraPartialClear{25u, 25u, 75u, 75u};
+constexpr auto kCameraSurvivors =
+    subtract_native_camera_clear(kCameraDraw, kCameraPartialClear);
+static_assert(kCameraSurvivors.count == 4u);
+static_assert(!native_game_offscreen_color_regions_intersect(
+    kCameraSurvivors.parts[0], kCameraPartialClear));
+static_assert(!native_game_offscreen_color_regions_intersect(
+    kCameraSurvivors.parts[1], kCameraPartialClear));
+static_assert(!native_game_offscreen_color_regions_intersect(
+    kCameraSurvivors.parts[2], kCameraPartialClear));
+static_assert(!native_game_offscreen_color_regions_intersect(
+    kCameraSurvivors.parts[3], kCameraPartialClear));
+static_assert(native_game_offscreen_color_regions_intersect(
+    kCameraSurvivors.parts[0], {10u, 10u, 20u, 20u}));
+static_assert(native_game_offscreen_color_regions_intersect(
+    kCameraSurvivors.parts[3], {80u, 40u, 90u, 60u}));
+static_assert(subtract_native_camera_clear(kCameraDraw, kCameraDraw).count == 0u);
+static_assert(subtract_native_camera_clear(
+    kCameraDraw, {150u, 0u, 200u, 100u}).count == 1u);
+static_assert(subtract_native_camera_clear(
+    kCameraDraw, {0u, 0u, 50u, 100u}).count == 1u);
+static_assert(subtract_native_camera_clear(
+    kCameraDraw, {0u, 0u, 0u, 100u}).count == 1u);
+
 // An eligible Draw from camera A is NOT evidence that a later GPU Copy from
 // camera B contains freshly rendered game pixels. Keep only the exact physical
 // resource/mip/slice of live, color-writable menu/car/race Draws.
@@ -840,14 +897,69 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
         static_cast<float>((argb >> 8) & 0xffu) * scale,
         static_cast<float>(argb & 0xffu) * scale,
         static_cast<float>((argb >> 24) & 0xffu) * scale};
+    // Keep authentic menu/vehicle/race Draw pixels outside a successful
+    // partial camera TARGET Clear. Preserve other resources and mip/slices
+    // first; on ledger exhaustion drop extra strips rather than invent color.
+    const auto invalidateWrittenPixels = [&]() noexcept {
+        if (!actual) {
+            invalidate_offscreen_color_source(gameTarget);
+            return;
+        }
+        const NativeGameOffscreenColorRegion erased{
+            static_cast<std::uint32_t>(actual->left),
+            static_cast<std::uint32_t>(actual->top),
+            static_cast<std::uint32_t>(actual->right),
+            static_cast<std::uint32_t>(actual->bottom)};
+        const NativeGameOffscreenColorKey clearedKey{
+            reinterpret_cast<std::uintptr_t>(texture.Get()),
+            camera.arraySlice, camera.mip};
+        std::array<OffscreenColorSource, 32u> survivors{};
+        std::array<OffscreenColorSource, 96u> extras{};
+        std::size_t survivorCount = 0u, extraCount = 0u;
+        for (auto& record : offscreenColorSources_) {
+            if (!record.texture) continue;
+            const NativeGameOffscreenColorKey recordKey{
+                reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                record.arraySlice, record.mipSlice};
+            if (!native_game_offscreen_color_key_matches(
+                    clearedKey, recordKey) ||
+                !native_game_offscreen_color_regions_intersect(
+                    record.region, erased)) {
+                if (survivorCount < survivors.size())
+                    survivors[survivorCount++] = std::move(record);
+                continue;
+            }
+            const auto kept = subtract_native_camera_clear(record.region, erased);
+            if (!kept.count) continue;
+            if (survivorCount < survivors.size()) {
+                auto& first = survivors[survivorCount++];
+                first.texture = record.texture;
+                first.arraySlice = record.arraySlice;
+                first.mipSlice = record.mipSlice;
+                first.region = kept.parts[0];
+            }
+            for (std::size_t i = 1u; i < kept.count &&
+                    extraCount < extras.size(); ++i) {
+                auto& next = extras[extraCount++];
+                next.texture = record.texture;
+                next.arraySlice = record.arraySlice;
+                next.mipSlice = record.mipSlice;
+                next.region = kept.parts[i];
+            }
+        }
+        for (std::size_t i = 0u; i < extraCount &&
+                survivorCount < survivors.size(); ++i)
+            survivors[survivorCount++] = std::move(extras[i]);
+        offscreenColorSources_ = std::move(survivors);
+    };
     switch (route) {
     case live_game_stereo::NativeColorClearRoute::FullRtv:
         context_->ClearRenderTargetView(gameTarget, rgba);
-        invalidate_offscreen_color_source(gameTarget);
+        invalidateWrittenPixels();
         return true;
     case live_game_stereo::NativeColorClearRoute::ClearView:
         rectContext->ClearView(gameTarget, rgba, actual, 1u);
-        invalidate_offscreen_color_source(gameTarget);
+        invalidateWrittenPixels();
         return true;
     case live_game_stereo::NativeColorClearRoute::ShaderRaster: {
         // Keep the original audited D3D11.0 shader-raster Clear dispatch.
@@ -857,7 +969,7 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
                 context_, gameTarget, camera.width, camera.height,
                 *actual, rgba);
         }();
-        if (issued) invalidate_offscreen_color_source(gameTarget);
+        if (issued) invalidateWrittenPixels();
         return issued;
     }
     default:
