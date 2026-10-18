@@ -35,3 +35,15 @@ All changes below are QA/rework artifacts. **No A/B, no image generation, no DDS
 Review the 15 Q057 candidates at full native resolution, evaluate remaining 32 rework requests,
 and independently approve plate/underline candidates before downstream alpha/Korean stage.
 Do not equate these TEST_ONLY QA steps with actual game acceptance.
+
+
+## Additional 12 rework candidates, source-only
+- Individually visually compared native crop versus narrowed/expanded original-HD region.
+- 12 exact pixel crops stored in N100 `qa_review_20261018/reworked_12_test_only/`.
+- Fixed IDs from six-sheet visual triage: 002, 005, 006, 016, 037, 038, 039, 042, 044, 045, 047, 058.
+- Restored punctuation, removed neighboring UI fragments when isolation is possible.
+- Native RGBA byte equality and original source SHA **12/12 PASS**, output SHA **12/12 PASS**.
+- Comparison `qa_review_20261018/MORE_REWORK_PROTOTYPES.jpg`.
+- Aggregate Q057 15 + additional 12 = **27 unapproved rework candidates**, **20 still require rework**.
+- All 242 previous original crops and 255 legacy baseline remain immutable; zero DDS/image generation.
+- Neither visual candidate nor technical crop proof is an in-game PASS.
