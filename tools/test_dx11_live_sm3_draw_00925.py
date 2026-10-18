@@ -206,7 +206,8 @@ check(backend.count("if (!vertexStage) return false;") >= 2,
 check("127.9961f" in arith and "destinationMask & 0x0au" in arith and
       "sourceIndex == 0u" in arith,
       "D3D9 lit power clamp or dst physical lane contract missing")
-\n# Native alpha testing is a real translated PS/CB resource, never a
+
+# Native alpha testing is a real translated PS/CB resource, never a
 # removed D3D9 alpha admission check or a disabled game's alpha stage.
 alpha_helper = (ROOT / "src/vr/d3d11/live_game_sm3_alpha_test.hpp").read_text()
 for required in ("register(b1)", "discard;", "r283_alpha_ref", "saturate(",

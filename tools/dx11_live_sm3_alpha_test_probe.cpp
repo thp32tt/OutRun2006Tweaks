@@ -1,6 +1,7 @@
 // Focused portable native SM3 alpha-test regression (not HMD evidence).
 #include "../src/vr/d3d11/live_game_sm3_alpha_test.hpp"
 #include <string>
+#include <initializer_list>
 
 int main() {
     using namespace outrun::vr::dx11;
