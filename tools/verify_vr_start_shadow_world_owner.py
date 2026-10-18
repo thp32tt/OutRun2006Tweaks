@@ -179,6 +179,12 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
     ):
         assert source_proof in physical, source_proof
     assert "centreSourceChanged || shadowSourceChanged" in physical
+    # The final physical RIGHT admission occurs AFTER native RT/depth/WVP
+    # setters, independently of pre-/post-LEFT game WVP evidence.
+    assert "CarShadowStereo::SameCarShadowForRightEye(" in physical
+    assert (physical.index("rightHr = R32ReviewSetRenderTarget(") <
+            physical.index("shadowBeforeLeft, captureShadowSource()") <
+            physical.index("rightHr = actualDraw();"))
     assert 'shadowSourceChanged ? "R33/car-shadow-source-changed"' in physical
     assert "R32ReviewMarkFrameRightDrawFailed();" in physical
     assert "R32ReviewSetWvpBatch(device, original);" in physical
@@ -194,6 +200,8 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
         ("if (!command.IsDirectCarBaseShadow())",
          "if (false && !command.IsDirectCarBaseShadow())"),
         ("centreSourceChanged || shadowSourceChanged", "centreSourceChanged || false"),
+        ("CarShadowStereo::SameCarShadowForRightEye(",
+         "CarShadowStereo::UnsafeRightEyeSource("),
     ):
         altered = physical.replace(original, mutant)
         assert original in physical and original not in altered
@@ -233,6 +241,7 @@ def check_r84_shadow_route_shape(semantic, r30, r33, r32, support, review):
     assert "uploadSerial != 0" in r33
     assert r33.count("CarShadowStereo::IsCoherentBeforeNativeLeft(") >= 2
     assert "shadowBeforeLeft, shadowAfterLeft" in r33
+    assert "CarShadowStereo::SameCarShadowForRightEye(" in r33
     assert "if (!command.IsDirectCarBaseShadow())" in r33
     assert all("ExactCarBaseShadowWorld" in x for x in (r30, r32, support, review))
 

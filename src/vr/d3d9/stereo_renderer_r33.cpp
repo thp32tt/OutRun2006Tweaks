@@ -1348,6 +1348,16 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightStateFailed;
                     rightHr = E_FAIL;
                 }
+                // RIGHT target/depth/viewport/c64 state setters may change
+                // native game c64 or its source after LEFT was validated.
+                // Fail closed before a foreign player shadow reaches RIGHT.
+                if (SUCCEEDED(rightHr) && exactShadowEye &&
+                    !OutRunVR::CarShadowStereo::SameCarShadowForRightEye(
+                        shadowBeforeLeft, captureShadowSource()))
+                {
+                    rightFailure = OutRunVR::StereoFailureRightStateFailed;
+                    rightHr = E_FAIL;
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;

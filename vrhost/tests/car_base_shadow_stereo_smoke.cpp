@@ -122,6 +122,30 @@ int main()
         return 26;
     if (!CarShadowStereo::SameStereoDrawSource(physical, physical))
         return 27;
+    // RIGHT state setters are a second reentrant owner boundary.
+    if (!CarShadowStereo::SameCarShadowForRightEye(physical, physical))
+        return 28;
+    physicalMutation = physical; ++physicalMutation.uploadSerial;
+    if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
+        return 29;
+    physicalMutation = physical; ++physicalMutation.drawSerial;
+    if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
+        return 30;
+    physicalMutation = physical; ++physicalMutation.poseEpoch;
+    if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
+        return 31;
+    physicalMutation = physical; ++physicalMutation.shaderEpoch;
+    if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
+        return 32;
+    physicalMutation = physical; ++physicalMutation.poseSequence;
+    if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
+        return 33;
+    physicalMutation = physical; physicalMutation.exactSource = false;
+    if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
+        return 34;
+    physicalMutation = physical; physicalMutation.uploadDraw = 39;
+    if (CarShadowStereo::SameCarShadowForRightEye(physicalMutation,physical))
+        return 35;
     std::cout << "R84 contact shadow eye-owner PASS\n";
     return 0;
 }

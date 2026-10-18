@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01043",
+  "production_id": "CONVERSION-DX9EX-01043",
+  "event_id": "CONVERSION-DX9EX-01043-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C5_GATES_PENDING",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp",
+    "tools/verify_vr_start_shadow_world_owner.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Preserve normal race-start contact-shadow spatial stereo and original alpha while rejecting a new original WVP/pose/shader/producer entering during RIGHT eye state setup before the physical right GPU draw.",
+    "scope_boundary": "Only R84 original player contact shadow direct GPU owner through native right eye; exclude normal road/car, lens, SkyGlow, GOAL/HUD, native input/FFB, R26_SAFE and DX11/DXVK.",
+    "trace_stages": [
+      "Original x86 RestoreCarBaseShadow and DrawObjectAlpha_Internal source owns raw game c64/world matrix and player shadow alpha.",
+      "R30 R84 exact CarBaseShadow admission, R33 physical native LEFT draw and independent pre/post-left source comparisons.",
+      "R33 native RIGHT target/depth/viewport/WVP setters can reenter source; resample before physical right Draw, then restore original D3D9 state and compose OpenXR eyes."
+    ],
+    "subcomponents": [
+      "Fence physical RIGHT GPU Draw after its native state setters against any changed exact original shadow source.",
+      "Preserve existing LEFT draw once and conservative right-eye invalidation, failure reporting, restoration, recovery and normal car world fallback.",
+      "Extend native source mutation regression and mandatory R84 start-shadow source-route verifier for the new real Draw callsite."
+    ],
+    "acceptance_items": [
+      {
+        "id": "shadow_full_stereo_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original player car contact shadow raw c64→R30→R33→physical LEFT and RIGHT GPU paths",
+        "expected_behavior": "RIGHT physical native Draw requires identical game raw WVP, draw serial, pose, shader and exact producer following right render-state setters."
+      },
+      {
+        "id": "shadow_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Native D3D9 state restore and original player/world shadow fallback",
+        "expected_behavior": "RIGHT source mismatch skips duplicate/foreign draw while marking incomplete stereo and restoring game RT/depth/viewport/c64; matching source stays eligible."
+      },
+      {
+        "id": "shadow_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 game/x64 host/R26_SAFE package and Domain/HUD/Full Source required gates",
+        "expected_behavior": "All required exact-SHA gates pass before build-verified completion; matching Quest3/VDXR optics remain separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "shadow_full_stereo_owner": "PENDING_EXACT_SHA",
+    "shadow_native_fallback": "PENDING_EXACT_SHA",
+    "shadow_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original player shadow DrawObjectAlpha_Internal and R84 exact CarBaseShadow WVP producer scope are present; right state setters have no source resampling in the existing native eye path.",
+    "source_trace": [
+      "R30 source admits native direct CarBaseShadow with original game c64 and pose.",
+      "R33 source compares original shadow identity before and after physical native LEFT.",
+      "D3D9 RIGHT render target/depth/viewport/WVP setters are reentrant and the old R33 branch only rechecked LensCentre before RIGHT."
+    ],
+    "alternatives_rejected": [
+      "No change to game shadow opacity, no generic alpha doubling, no ScreenHud retagging, no bypass to R26 or DXVK."
+    ],
+    "eye_ownership": "Only matching original direct player shadow can enter both native eyes; a mismatched source after RIGHT setter requires suppression of right GPU submission and normal stereo recovery.",
+    "root_cause": "No final right-eye source identity check after D3D9 state setters in R33 exact contact-shadow route; confirmed static gap, not a proven Quest3 frame root cause.",
+    "fix_evidence": "R33 physical right-eye source guard and exact C++ smoke+CI structure regression included in material batch; awaiting exact SHA build.",
+    "negative_test_evidence": "Mutation checks changed game WVP serial/draw, pose, shader epoch, poseSequence, missing exact source and malformed left, plus right-Draw branch source-order guard."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "notes": "New source change is a physical right-eye shadow admission fix; C6 exact-SHA and Quest3 runtime verification pending; no prior-task point duplication."
+}
