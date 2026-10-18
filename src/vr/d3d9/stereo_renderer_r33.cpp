@@ -1125,11 +1125,22 @@ namespace OutRunVRStereo
                 std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
                 std::uintptr_t rawShader = 0;
                 std::uint64_t rawShaderEpoch = 0;
-                if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                const bool rawCaptured =
+                    OutRunVRRenderer::GetLastRawGameWvpWrite(
                         originalRawWvp, rawWriteSerial, rawDrawSerial,
-                        rawShader, rawShaderEpoch) ||
-                    rawWriteSerial == 0 || rawDrawSerial == 0)
+                        rawShader, rawShaderEpoch);
+                if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(
+                        rawCaptured, shader, shaderEpoch, rawShader, rawShaderEpoch,
+                        rawWriteSerial, rawDrawSerial))
                 {
+                    // A known foreign original c64 write is not a valid
+                    // +TIME source for either eye. Preserve native fallback.
+                    return OutRunVR::StageExtensionPhysical::Source{};
+                }
+                if (!rawCaptured)
+                {
+                    // No original c64 evidence: keep the existing explicit
+                    // unknown/unknown fallback, never borrow live eye c64.
                     rawWriteSerial = 0;
                     rawDrawSerial = 0;
                 }

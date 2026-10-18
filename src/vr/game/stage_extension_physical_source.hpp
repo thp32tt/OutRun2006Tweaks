@@ -25,6 +25,44 @@ namespace OutRunVR::StageExtensionPhysical
         std::uint64_t rawWvpDrawSerial = 0;
     };
 
+    // R84 receives the last ORIGINAL game c64 write separately from its
+    // private left/right eye uploads. An available write from a different
+    // vertex shader is NOT missing evidence: it is a foreign physical owner.
+    // Reject that candidate before the left eye rather than silently
+    // converting its stale write into the unknown (zero/zero) fallback.
+    // Only a genuinely unavailable original-write tracker may use fallback.
+    constexpr bool MatchesCapturedOriginalWvp(
+        bool captured, std::uintptr_t physicalShader,
+        std::uint64_t physicalShaderEpoch,
+        std::uintptr_t writtenShader, std::uint64_t writtenShaderEpoch,
+        std::uint64_t writeSerial, std::uint64_t drawSerial) noexcept
+    {
+        return !captured ||
+            (writeSerial != 0 && drawSerial != 0 &&
+             physicalShader == writtenShader &&
+             physicalShaderEpoch == writtenShaderEpoch &&
+             (physicalShader == 0 || physicalShaderEpoch != 0));
+    }
+
+    // Source-header regressions execute in the real Windows R84 TU.
+    // A previous world/GOAL shader's c64 must not be used for +TIME stereo.
+    static_assert(MatchesCapturedOriginalWvp(
+        true, 0x100, 9, 0x100, 9, 42, 40));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 9, 0x200, 9, 42, 40));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 9, 0x100, 8, 42, 40));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 9, 0x100, 9, 0, 40));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 9, 0x100, 9, 42, 0));
+    static_assert(!MatchesCapturedOriginalWvp(
+        true, 0x100, 0, 0x100, 0, 42, 40));
+    static_assert(MatchesCapturedOriginalWvp(
+        true, 0, 0, 0, 0, 42, 40));
+    static_assert(MatchesCapturedOriginalWvp(
+        false, 0x100, 9, 0x200, 8, 0, 0));
+
     constexpr bool IsStage(const Source& s) noexcept
     {
         return s.scope == GameSemantic::RenderScope::ScreenHud &&
