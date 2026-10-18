@@ -220,6 +220,93 @@ constexpr bool native_game_separate_alpha_contract() noexcept {
 static_assert(native_game_separate_alpha_contract(),
               "Live D3D9 independent alpha OM/fallback regression");
 
+// Live programmable D3D9 color and independent-alpha factors map to a
+// per-game-Draw D3D11 output-merger state. No guessed blend constants or
+// dual-source/factor modes: anything not representable falls back to D3D9.
+constexpr bool sm3_live_factor(DWORD f, bool alpha, bool independent,
+                              D3D11_BLEND& out) noexcept {
+    if (independent && f != D3DBLEND_ZERO && f != D3DBLEND_ONE &&
+        f != D3DBLEND_SRCALPHA && f != D3DBLEND_INVSRCALPHA &&
+        f != D3DBLEND_DESTALPHA && f != D3DBLEND_INVDESTALPHA) return false;
+    switch (f) {
+    case D3DBLEND_ZERO: out = D3D11_BLEND_ZERO; break;
+    case D3DBLEND_ONE: out = D3D11_BLEND_ONE; break;
+    case D3DBLEND_SRCCOLOR: out = alpha ? D3D11_BLEND_SRC_ALPHA : D3D11_BLEND_SRC_COLOR; break;
+    case D3DBLEND_INVSRCCOLOR: out = alpha ? D3D11_BLEND_INV_SRC_ALPHA : D3D11_BLEND_INV_SRC_COLOR; break;
+    case D3DBLEND_SRCALPHA: out = D3D11_BLEND_SRC_ALPHA; break;
+    case D3DBLEND_INVSRCALPHA: out = D3D11_BLEND_INV_SRC_ALPHA; break;
+    case D3DBLEND_DESTALPHA: out = D3D11_BLEND_DEST_ALPHA; break;
+    case D3DBLEND_INVDESTALPHA: out = D3D11_BLEND_INV_DEST_ALPHA; break;
+    case D3DBLEND_DESTCOLOR: out = alpha ? D3D11_BLEND_DEST_ALPHA : D3D11_BLEND_DEST_COLOR; break;
+    case D3DBLEND_INVDESTCOLOR: out = alpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR; break;
+    default: return false;
+    }
+    return true;
+}
+constexpr bool sm3_live_blend_op(DWORD f, D3D11_BLEND_OP& out) noexcept {
+    switch (f) {
+    case D3DBLENDOP_ADD: out = D3D11_BLEND_OP_ADD; return true;
+    case D3DBLENDOP_SUBTRACT: out = D3D11_BLEND_OP_SUBTRACT; return true;
+    case D3DBLENDOP_REVSUBTRACT: out = D3D11_BLEND_OP_REV_SUBTRACT; return true;
+    default: return false;
+    }
+}
+constexpr bool sm3_live_blend_desc(
+    DWORD sc, DWORD dc, DWORD oc, bool separate,
+    DWORD sa, DWORD da, DWORD oa, D3D11_RENDER_TARGET_BLEND_DESC& out) noexcept {
+    D3D11_RENDER_TARGET_BLEND_DESC b{};
+    b.BlendEnable = TRUE;
+    b.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    if (!sm3_live_factor(sc, false, false, b.SrcBlend) ||
+        !sm3_live_factor(dc, false, false, b.DestBlend) ||
+        !sm3_live_blend_op(oc, b.BlendOp) ||
+        !sm3_live_factor(separate ? sa : sc, true, separate, b.SrcBlendAlpha) ||
+        !sm3_live_factor(separate ? da : dc, true, separate, b.DestBlendAlpha) ||
+        !sm3_live_blend_op(separate ? oa : oc, b.BlendOpAlpha))
+        return false;
+    out = b;
+    return true;
+}
+constexpr std::uint64_t sm3_live_blend_key(
+    const D3D11_RENDER_TARGET_BLEND_DESC& b) noexcept {
+    return static_cast<std::uint64_t>(b.SrcBlend) |
+        (static_cast<std::uint64_t>(b.DestBlend) << 8u) |
+        (static_cast<std::uint64_t>(b.BlendOp) << 16u) |
+        (static_cast<std::uint64_t>(b.SrcBlendAlpha) << 24u) |
+        (static_cast<std::uint64_t>(b.DestBlendAlpha) << 32u) |
+        (static_cast<std::uint64_t>(b.BlendOpAlpha) << 40u);
+}
+constexpr bool sm3_live_blend_regression() noexcept {
+    D3D11_RENDER_TARGET_BLEND_DESC b{};
+    if (!sm3_live_blend_desc(D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR,
+        D3DBLENDOP_SUBTRACT, true, D3DBLEND_ONE, D3DBLEND_INVSRCALPHA,
+        D3DBLENDOP_REVSUBTRACT, b) ||
+        b.SrcBlend != D3D11_BLEND_SRC_COLOR ||
+        b.DestBlend != D3D11_BLEND_INV_DEST_COLOR ||
+        b.BlendOp != D3D11_BLEND_OP_SUBTRACT ||
+        b.SrcBlendAlpha != D3D11_BLEND_ONE ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_SRC_ALPHA ||
+        b.BlendOpAlpha != D3D11_BLEND_OP_REV_SUBTRACT) return false;
+    if (!sm3_live_blend_desc(D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR,
+        D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) ||
+        b.SrcBlendAlpha != D3D11_BLEND_SRC_ALPHA ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_DEST_ALPHA) return false;
+    const auto saved = b;
+    return !sm3_live_blend_desc(D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,
+                D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
+           !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
+                D3DBLENDOP_MIN, false, 0u, 0u, 0u, b) &&
+           !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
+                D3DBLENDOP_ADD, true, D3DBLEND_SRCCOLOR,
+                D3DBLEND_ONE, D3DBLENDOP_ADD, b) &&
+           saved.SrcBlend == b.SrcBlend &&
+           saved.SrcBlendAlpha == b.SrcBlendAlpha;
+}
+static_assert(sm3_live_blend_regression(),
+              "Game RGB/independent alpha OM translation must fail closed");
+
+
+
 // Map a live D3D9 source viewport onto the diagnostic backbuffer inset.
 // Using the complete game render-target dimensions (not viewport.Width alone)
 // preserves split/partial menu, vehicle-selection and race views during both
@@ -1085,6 +1172,7 @@ struct State {
     // Shader bytecode+declaration keyed cache is bound to this backend's
     // exact D3D11 device lifetime, and discarded on source Reset.
     std::unordered_map<std::uint64_t, LiveSm3Pipeline> liveSm3Pipelines;
+    std::unordered_map<std::uint64_t, ComPtr<ID3D11BlendState>> liveSm3BlendStates;
     // Non-owning identity only: reset at every Present/Reset. Never retain a
     // game D3D9 COM object or mix different device Draw calls in one GPU batch.
     std::uintptr_t sourceGameDevice = 0u;
@@ -1599,6 +1687,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.fullGameIndexUpload.Reset();
     s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
     s.liveSm3Pipelines.clear();
+    s.liveSm3BlendStates.clear();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
@@ -4374,6 +4463,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
     DWORD srcBlend = 0u, dstBlend = 0u, blendOp = 0u, separateAlpha = TRUE;
+    DWORD srcBlendAlpha = 0u, dstBlendAlpha = 0u, blendOpAlpha = 0u;
     DWORD alphaFunc = 0u, alphaRef = 0u;
     D3DVIEWPORT9 viewport{};
     if (FAILED(game->GetViewport(&viewport)) ||
@@ -4412,9 +4502,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
          FAILED(game->GetRenderState(
              D3DRS_SEPARATEALPHABLENDENABLE, &separateAlpha))))
         return false;
+    if (blend != FALSE && separateAlpha != FALSE &&
+        (FAILED(game->GetRenderState(D3DRS_SRCBLENDALPHA, &srcBlendAlpha)) ||
+         FAILED(game->GetRenderState(D3DRS_DESTBLENDALPHA, &dstBlendAlpha)) ||
+         FAILED(game->GetRenderState(D3DRS_BLENDOPALPHA, &blendOpAlpha))))
+        return false;
     const auto nativeBlend = live_sm3_blend(
         blend != FALSE, srcBlend, dstBlend, blendOp, separateAlpha != FALSE);
-    if (nativeBlend == LiveSm3Blend::unsupported) return false;
+    D3D11_RENDER_TARGET_BLEND_DESC extendedDesc{};
+    if (nativeBlend == LiveSm3Blend::unsupported &&
+        !sm3_live_blend_desc(srcBlend, dstBlend, blendOp,
+            separateAlpha != FALSE, srcBlendAlpha, dstBlendAlpha,
+            blendOpAlpha, extendedDesc)) return false;
     ComPtr<IDirect3DSurface9> target;
     ComPtr<IUnknown> targetIdentity;
     D3DSURFACE_DESC source{};
@@ -4534,6 +4633,22 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     auto* device = s.backend.device();
     auto* context = s.backend.context();
     if (!device || !context) return false;
+    ID3D11BlendState* extendedBlend = nullptr;
+    if (nativeBlend == LiveSm3Blend::unsupported) {
+        const auto blendKey = sm3_live_blend_key(extendedDesc);
+        auto found = s.liveSm3BlendStates.find(blendKey);
+        if (found == s.liveSm3BlendStates.end()) {
+            if (s.liveSm3BlendStates.size() >= 64u) return false;
+            D3D11_BLEND_DESC desc{};
+            desc.RenderTarget[0] = extendedDesc;
+            ComPtr<ID3D11BlendState> created;
+            if (FAILED(device->CreateBlendState(&desc, created.GetAddressOf())) ||
+                !created) return false;
+            found = s.liveSm3BlendStates.emplace(blendKey, std::move(created)).first;
+        }
+        extendedBlend = found->second.Get();
+        if (!extendedBlend) return false;
+    }
     const auto key = live_sm3_pipeline_identity(
         vertexEvidence, pixelEvidence, declaration, alphaFunc);
     if (!key) return false;
@@ -4747,7 +4862,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         liveBlend = s.sourceAlphaAddBlend.Get(); break;
     case LiveSm3Blend::premultiplied_alpha:
         liveBlend = s.premultipliedAlphaBlend.Get(); break;
-    case LiveSm3Blend::unsupported: return false;
+    case LiveSm3Blend::unsupported:
+        liveBlend = extendedBlend;
+        if (!liveBlend) return false;
+        break;
     }
     context->OMSetBlendState(liveBlend, nullptr, 0xffffffffu);
     const UINT offset = 0u;
@@ -8152,6 +8270,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.fullGameIndexUpload.Reset();
     s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
     s.liveSm3Pipelines.clear();
+    s.liveSm3BlendStates.clear();
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
 }
