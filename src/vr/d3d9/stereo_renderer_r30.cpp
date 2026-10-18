@@ -27,6 +27,7 @@
 #include "lens_centre_source_provenance.hpp"
 #include "hud_original_wvp_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
+#include "r84_spatial_eye_route.hpp"
 #include "stage_extension_eye_plane.hpp"
 #include "hud_shader_eye_pose.hpp"
 #include "../core/r29_owner_api.hpp"
@@ -7274,7 +7275,19 @@ namespace OutRunVRStereo
                     R30SupportWvpFirstRegister, original, R30SupportWvpRegisterCount)))
                 return false;
 
-            if (!R30BuildEyeAffine(stereo, eyeScale, eyeOffset))
+            // Exact C993 sun and player contact-shadow own an ORIGINAL
+            // spatial game WVP. They build their own head-relative binocular
+            // eye matrices below; a separate flat-HUD FOV affine is neither
+            // used nor admissible evidence for these world-space draws.
+            // The prior unconditional flat-HUD affine gate could reject a
+            // source-proven spatial draw before its actual eye projection.
+            const bool exactLensWorld =
+                screenKind == R30ScreenSpaceKind::ExactLensCentreWorld;
+            const bool exactShadowWorld =
+                screenKind == R30ScreenSpaceKind::ExactCarBaseShadowWorld;
+            if (OutRunVR::SpatialEyeRoute::NeedsFlatHudAffine(
+                    exactLensWorld, exactShadowWorld) &&
+                !R30BuildEyeAffine(stereo, eyeScale, eyeOffset))
                 return false;
 
             D3DMATRIX uploadedT{};
@@ -7578,7 +7591,11 @@ namespace OutRunVRStereo
                     return false;
                 const float lensWorldScale =
                     Settings::VRWorldScale * Settings::VRStereoDepth;
-                if (!std::isfinite(lensWorldScale))
+                // Zero/negative depth-scale collapses or mirrors the
+                // true 3D centre/shadow. Never publish a degenerate pair as
+                // stereo; preserve the original game draw on bad settings.
+                if (!OutRunVR::SpatialEyeRoute::PositiveWorldScale(
+                        lensWorldScale))
                     return false;
                 // OpenXR eyeOrientation is head-local. The common head pose
                 // is already removed by headInverse, so preserve individual
