@@ -171,7 +171,17 @@ def check(r29: str, r30: str, header: str) -> None:
     assert not re.search(r"\bSharedState\b", r30), "R30 still owns lower shared IPC pointer"
     for signature, forwarding in LOWER_SERVICES.items():
         assert signature in header, f"R29 header lacks lower service: {signature}"
-        assert signature in r30, f"R30 retained lower-symbol dependency: {signature}"
+        if signature == "R29OwnerUndoStereoDrawCount(":
+            # The R84 failed-left-c64 path now defers draw accounting
+            # until the first physical GPU submission. Undoing a count
+            # that was never incremented would corrupt the frame count.
+            # Retain the R29 owner export while rejecting a regression
+            # that reintroduces the stale R30 rollback call.
+            assert signature not in r30, (
+                "R30 must not undo an uncounted pre-GPU draw"
+            )
+        else:
+            assert signature in r30, f"R30 retained lower-symbol dependency: {signature}"
         assert forwarding in body(r29, signature), (
             f"R29 lower service delegation lost: {signature}"
         )
@@ -377,6 +387,20 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"negative mutation unexpectedly PASS: {signature}")
+    # The legacy R30 undo was correctly retired together with pre-GPU
+    # accounting. An accidental reintroduction must fail this contract.
+    count_site = "R29OwnerNoteStereoDrawWithoutMonoBackup();"
+    assert count_site in r30, "R30 physical draw count owner missing"
+    mutant_r30 = r30.replace(
+        count_site,
+        "R29OwnerUndoStereoDrawCount();\n        " + count_site, 1
+    )
+    try:
+        check(r29, mutant_r30, header)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("obsolete R30 pre-GPU rollback mutation escaped")
     # One wrong physical hook and one wrong upper forwarding edge per export.
     for signature, (physical, facade, delegate) in PHYSICAL_HOOK_TARGETS.items():
         poison = ("return nullptr;" if "InstalledDevice" in signature
