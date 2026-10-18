@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01044",
+  "production_id": "CONVERSION-DX9EX-01044",
+  "event_id": "CONVERSION-DX9EX-01044-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "BUILD_VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "material_result_sha": "d7a1c693fc0da498c004d96a6bd381ee0206a02f",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Prevent GOAL progress 0–99% titles, elapsed-time glyphs and result sprites from inheriting a newer queue epoch when an original SpriteNode pointer is recycled before D3DX physical eye submission.",
+    "scope_boundary": "Only R84 native queued ScreenHud GOAL/result progress and delayed D3DX GPU batch provenance. Preserve +TIME independent flush, 6th/6 and vehicle rank, F11/ESC, original world/SkyGlow, R26_SAFE, input/FFB, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original 0x4973C0/0x4974E0 GOAL text and result progress native sprite producer registers exact GOAL ScreenHud tag.",
+      "hooks_uiscaling.cpp BeforeQueueNode preserves outgoing D3DX batch before SelectSpriteQueueNode increments native queue epoch even when next node pointer is reused.",
+      "R84 R33 and R30 consume physical queue node, queue epoch, source WVP and producer identity for actual LEFT and RIGHT GPU submissions before OpenXR host composition."
+    ],
+    "subcomponents": [
+      "Reopen physical queue transition for same-address GOAL SpriteNode reuse while preserving the old exact producer and per-eye queue epoch.",
+      "Compile-time positive/negative tests for recycled and different GOAL nodes, unknown/mixed/fallback and unrelated +TIME, world and overlay producers.",
+      "Maintain R84 original native End fallback when no exact live homogeneous batch is eligible, with no change to original race input/FFB/SkyGlow."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_full_visual_route",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL 0-99% progress/text → exact sprite queue epoch → two actual R84 eye Draw submissions",
+        "expected_behavior": "Same reused pointer with newly selected GOAL epoch fences the old homogeneous D3DX batch before the physical eye owner changes."
+      },
+      {
+        "id": "goal_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unknown and mixed D3DX native End, distinct +TIME and world/SkyGlow fallback",
+        "expected_behavior": "Null node, inactive queue, mismatched original producer, projected-world and native overlay cannot acquire GOAL flush authority."
+      },
+      {
+        "id": "goal_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA R84 x86 game and x64 OpenXR host, R26_SAFE rollback package and mandatory Domain/Inspector/Full Source",
+        "expected_behavior": "Full GitHub Windows x86/x64 package and source impact Gates pass at one validation-bearing SHA; Quest3 optical success remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_full_visual_route": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "goal_safe_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "goal_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original GOAL progress sprites and 0x4B9200-family result text can submit multiple SpriteNodes under one source token, with D3DX Draw→Flush delayed relative to native producer.",
+    "source_trace": [
+      "Original GOAL native producer assigns exact ScreenHud and GoalTime/ResultProgress token to SpriteNode.",
+      "Native BeforeQueueNode calls CanIsolateD3DXGoalQueueNodeTransition while still using the outgoing exact node/epoch.",
+      "SelectSpriteQueueNode unconditionally increments queue epoch, even when same physical pointer is recycled.",
+      "Original predicate excluded identical outgoing/incoming node pointers, leaving a physical batch unflushed across the new R84 eye identity."
+    ],
+    "alternatives_rejected": [
+      "Do not widen all ScreenOverlay2D or globally Flush unknown D3DX batches; do not change GOAL timer, +TIME, native input, original SkyGlow or R26_SAFE."
+    ],
+    "eye_ownership": "Only homogeneous exact GOAL ScreenHud D3DX batches flush under their previous SpriteNode/epoch before the next queue selection; matching eye GPU submissions still undergo conservative R84 per-eye validation.",
+    "root_cause": "GOAL queue node transition predicate requires outgoingNode != incomingNode despite a guaranteed queue-epoch increment for every selection, allowing an old deferred batch to inherit the newly selected GOAL queue epoch in pointer-reuse cases.",
+    "fix_evidence": "material_result_sha d7a1c693fc0da498c004d96a6bd381ee0206a02f includes active C++ fix and 11 constexpr positive/negative regressions. Exact Windows CI still pending; HMD untested.",
+    "negative_test_evidence": "Compile-time checks cover distinct and identical GOAL node pointers, GOAL/result numeric tokens, null/inactive queue, foreign GOAL producer, +TIME, ScreenOverlay2D, WorldBillboard and unknown."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "failed_exact_sha": "d7a1c693fc0da498c004d96a6bd381ee0206a02f",
+    "failed_run_id": 39130417983,
+    "failed_step": "Policy run record missing",
+    "repair": "Add required same-TASK feature run contract without changing the active renderer C++ fix",
+    "final_exact_sha_gates": "PENDING"
+  }
+}
