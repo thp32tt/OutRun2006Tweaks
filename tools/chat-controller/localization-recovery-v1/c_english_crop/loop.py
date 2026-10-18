@@ -141,15 +141,18 @@ def main():
                 if now-last_discovery >= 60:
                     last_discovery=now
                     try:
-                        # OCR derives the native ROI coordinates itself; the older
-                        # alpha-only proposal sweep is not required in production.
-                        # Prioritize all 108 original, unsplit HD PNGs before
-                        # older DDS registry OCR; both remain independent.
-                        original108=ocr_hd108.scan(max_sources=2, max_new=args.max_per_cycle)
-                        write_audit(original108)
-                        verified_runner.VERIFIED.update(verified_runner.load_auto_sources())
-                        recognized=ocr_recognize.scan(verified_runner.VERIFIED, verified_runner.check_original, max_new=args.max_per_cycle, max_sources=4)
-                        write_audit(recognized)
+                        # Scan each of the 108 verified unsplit HD originals ONCE
+                        # per policy revision, not hundreds of times each day.
+                        # DDS registry already yielded the historic 94 C crops;
+                        # its repeatedly rescheduled OCR added no new output.
+                        # Preserve DDS queue processing below, but stop redundant
+                        # full-image DDS scans until an explicit separate change.
+                        original108=ocr_hd108.scan(max_sources=4, max_new=1000)
+                        if (original108["status"]!="HD108_PASS_COMPLETE_REVIEW_PENDING"
+                            or last_summary!=original108["status"]):
+                            write_audit(original108)
+                        if original108["status"]=="HD108_PASS_COMPLETE_REVIEW_PENDING":
+                            last_summary=original108["status"]
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
                 summary = process_batch(args.max_per_cycle)
