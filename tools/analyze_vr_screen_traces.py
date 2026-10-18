@@ -30,11 +30,25 @@ CHECKED_SOURCE_FAMILIES = {
     "HUD_TEXT_DIGITS","PROJECTED_RANK","PAUSE_OPTION_ARROW","PLAYER_CAR_SHADOW",
 }
 RVA_GROUPS = {
-    "STAGE_PLUS_TIME": {0x9898E, 0x98A36, 0x98AC6, 0x989AD, 0x98A10, 0x98A89},
+    "STAGE_PLUS_TIME": {0x9898E, 0x98A36, 0x989AD, 0x98A10, 0x98A89},
     "RANK_6TH_OF_6": {0xB9DA6},
     "PROJECTED_RANK": {0xBB0FB,0xBB133,0xBB16C,0xBB1A5,
                        0xBB21F,0xBB241,0xBB271,0xBB2BC,0xBB2D0},
 }
+
+# Original EXE 0x00498670: animation and number producer calls are
+# separate, and the 0x98AC6/0x2C006C branch is NOT confirmed +TIME.
+# These labels describe call-sites, not a proven SpriteNode type or GPU draw.
+SOURCE_CALLS = {
+    0x9898E: ("STAGE_PLUS_TIME", "animation", "0x2C00B4"),
+    0x98A36: ("STAGE_PLUS_TIME", "animation", "0x2C00B5"),
+    0x989AD: ("STAGE_PLUS_TIME", "number", "time string"),
+    0x98A10: ("STAGE_PLUS_TIME", "number", "seven-digit"),
+    0x98A89: ("STAGE_PLUS_TIME", "number", "other branch text"),
+    0x98AC6: ("UNCONFIRMED_STAGE_BRANCH", "animation", "0x2C006C"),
+}
+AMBIGUOUS_GROUPS = {"UNCONFIRMED_STAGE_BRANCH"}
+
 
 def collect_files(root: Path):
     if root.is_file():
@@ -81,6 +95,8 @@ def parse_original_hud(csvs):
     samples=collections.defaultdict(list)
     invalid=0
     observed_sites=collections.defaultdict(set)
+    source_kinds=collections.defaultdict(collections.Counter)
+    source_candidates=collections.defaultdict(list)
     for path in csvs:
         with path.open("r",encoding="utf-8-sig",errors="replace",newline="") as f:
             for row in csv.DictReader(f):
@@ -92,6 +108,8 @@ def parse_original_hud(csvs):
                     invalid+=1
                     continue
                 labels=[name for name,rv in RVA_GROUPS.items() if value in rv]
+                if value in SOURCE_CALLS:
+                    labels=[SOURCE_CALLS[value][0]]
                 if not labels:
                     semantic=str(row.get("semantic") or "").upper()
                     if "RESULT" in semantic or "GOAL" in semantic:labels=["GOAL_RESULT_TIMER"]
@@ -102,17 +120,26 @@ def parse_original_hud(csvs):
                     result[label]["observed_rows"]+=1
                     if label in RVA_GROUPS:
                         observed_sites[label].add(value)
+                    if value in SOURCE_CALLS:
+                        _,kind,detail=SOURCE_CALLS[value]
+                        source_kinds[label][kind]+=1
+                        if label in AMBIGUOUS_GROUPS and len(source_candidates[label])<24:
+                            source_candidates[label].append({"call_rva":f"0x{value:X}",
+                                "source_kind":kind,"original_argument":detail,
+                                "confidence":"UNCONFIRMED_PLUS_TIME_VISUAL"})
+                    else:
+                        source_kinds[label]["not_statically_typed"]+=1
                     if len(samples[label])<12:
                         samples[label].append({"call_rva":row.get("call_rva"),
                             "event":row.get("event"),"semantic":row.get("semantic"),
                             "mode":row.get("mode"),"stage":row.get("stage"),
                             "arg0":row.get("arg0")})
-    return result,samples,invalid,observed_sites
+    return result,samples,invalid,observed_sites,source_kinds,source_candidates
 
 def analyze(root: Path):
     logs,csvs=collect_files(root)
     counters,windows,meta=parse_logs(logs)
-    hud,hud_samples,invalid,observed_sites=parse_original_hud(csvs)
+    hud,hud_samples,invalid,observed_sites,source_kinds,source_candidates=parse_original_hud(csvs)
     families={}
     for family in FAMILIES:
         nums=dict(counters[family])
@@ -152,6 +179,8 @@ def analyze(root: Path):
                           "source_site_coverage":coverage,
                           "last_owner":meta.get(family,{}),
                           "hud_source_rows":hud[family]["observed_rows"],
+                          "original_producer_call_kinds":dict(source_kinds[family]),
+                          "gpu_pair_evidence":"FIVE_SECOND_AGGREGATE_NOT_EXACT_SOURCE_TO_EYE",
                           "example_callers":hud_samples.get(family,[]),
                           "flags":flags}
     investigations=[{"family":k,"flags":v["flags"]} for k,v in families.items()
@@ -163,6 +192,7 @@ def analyze(root: Path):
         "runtime_validation":"UNTESTED unless matching Quest3/HMD evidence is provided",
         "input_logs":[str(p) for p in logs],"input_hud_csv":[str(p) for p in csvs],
         "invalid_hud_call_rows":invalid,
+        "ambiguous_original_calls":dict(source_candidates),
         "families":families,
         "review_queue":investigations,
         "known_gaps":{
@@ -173,6 +203,11 @@ def analyze(root: Path):
            "unvisited_scenes":"NOT_OBSERVED/NOT_CAPTURED is never a PASS or failure",
            "source_only":"CSV caller does not prove a GPU family or left/right submission",
            "identity":"5s aggregate not exact source_serial->GPU draw lifetime, requires detailed bounded events",
+           "partial_queue":"Original 0x004C50A0 may consume a priority subset before full 0x0042D710; CSV alone cannot prove per-walk ownership, frame cutoff or stale node reuse",
+           "node_type":"Original clip type 0 and sprani animation type 1 may both feed one visual family; caller kind does NOT establish queue node type",
+           "d3dx_deferred":"D3DXSprite Draw may flush on End after producer scope exits; one physical draw may represent many producers",
+           "stage_2c006c":"Call RVA 0x98AC6 / animation 0x2C006C is only an ambiguous stage branch, excluded from confirmed +TIME site coverage",
+           "nine_pass":"0x00449050 has 9 render passes; static stage index does not establish actual GPU route or OpenXR submission",
         },
     }
 

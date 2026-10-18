@@ -29,8 +29,10 @@ with tempfile.TemporaryDirectory() as d:
  assert data['families']['RANK_6TH_OF_6']['status']=='OBSERVED_NEEDS_QUEST3_OPTICAL_VALIDATION'
  assert data['families']['PAUSE_OPTION_ARROW']['status']=='NOT_OBSERVED'
  assert data['families']['STAGE_PLUS_TIME']['hud_source_rows']==1
+ assert data['families']['STAGE_PLUS_TIME']['original_producer_call_kinds']=={'animation':1}
+ assert '0x98AC6' not in data['families']['STAGE_PLUS_TIME']['source_site_coverage']['expected_call_rvas']
  assert data['families']['STAGE_PLUS_TIME']['source_site_coverage']['status']=='PARTIAL_CAPTURE_NOT_RUNTIME_FAILURE'
- assert len(data['families']['STAGE_PLUS_TIME']['source_site_coverage']['not_captured_call_rvas'])==5
+ assert len(data['families']['STAGE_PLUS_TIME']['source_site_coverage']['not_captured_call_rvas'])==4
  assert data['known_gaps']['f11'].startswith('Separate host')
  # A native GPU failure without an R33 eye-specific failure was invisible
  # to the previous analyzer. It must be investigated, not optical-validated.
@@ -55,6 +57,12 @@ with tempfile.TemporaryDirectory() as d:
  assert source_result['families']['STAGE_PLUS_TIME']['status']=='SOURCE_ONLY_GPU_NOT_ATTRIBUTED'
  assert source_result['families']['STAGE_PLUS_TIME']['source_site_coverage']['status']=='ALL_KNOWN_SITES_CAPTURED'
  assert not source_result['families']['STAGE_PLUS_TIME']['source_site_coverage']['not_captured_call_rvas']
+ assert source_result['families']['STAGE_PLUS_TIME']['hud_source_rows']==5
+ assert source_result['families']['STAGE_PLUS_TIME']['original_producer_call_kinds']=={'animation':2,'number':3}
+ assert source_result['ambiguous_original_calls']['UNCONFIRMED_STAGE_BRANCH'][0]['call_rva']=='0x98AC6'
+ assert source_result['ambiguous_original_calls']['UNCONFIRMED_STAGE_BRANCH'][0]['confidence']=='UNCONFIRMED_PLUS_TIME_VISUAL'
+ assert source_result['families']['STAGE_PLUS_TIME']['gpu_pair_evidence']=='FIVE_SECOND_AGGREGATE_NOT_EXACT_SOURCE_TO_EYE'
+ assert 'partial' in source_result['known_gaps']['partial_queue'].lower() or 'priority subset' in source_result['known_gaps']['partial_queue']
  assert source_result['families']['WORLD']['status']=='NOT_OBSERVED'
  # R30 returns the native LEFT HRESULT even when RIGHT/restore fails:
  # the diagnostic must detect this failure from physical-eye counters.
@@ -68,4 +76,19 @@ with tempfile.TemporaryDirectory() as d:
  assert r30_result['families']['RANK_6TH_OF_6']['status']=='INVESTIGATE'
  assert r30_result['families']['RANK_6TH_OF_6']['counters']['r30Both']==1
  assert 'R30_EYE_OR_RESTORE_FAILED' in r30_result['families']['RANK_6TH_OF_6']['flags']
- print('PASS native and R30 eye failure, source-only/queue provenance and six +TIME callsites')
+ # The ambiguous 0x2C006C branch cannot fill a missing +TIME callsite.
+ only_branch=root/'ambiguous_only'
+ only_branch.mkdir()
+ with (only_branch/'OutRun2006Tweaks-hudtrace.csv').open('w',newline='') as f:
+  w=csv.DictWriter(f,fieldnames=['call_rva','event','semantic'])
+  w.writeheader()
+  w.writerow({'call_rva':'0x98AC6','event':'sprani','semantic':'EXTTIME'})
+ branch=t.analyze(only_branch)
+ assert branch['families']['STAGE_PLUS_TIME']['hud_source_rows']==0
+ assert branch['families']['STAGE_PLUS_TIME']['status']=='NOT_OBSERVED'
+ assert branch['families']['STAGE_PLUS_TIME']['source_site_coverage']['status']=='NOT_CAPTURED'
+ assert branch['ambiguous_original_calls']['UNCONFIRMED_STAGE_BRANCH'][0]['original_argument']=='0x2C006C'
+ # GPU evidence still requires actual eye submissions, even if all five
+ # confirmed producer calls and a five-second native aggregate are present.
+ assert source_result['families']['STAGE_PLUS_TIME']['status']=='SOURCE_ONLY_GPU_NOT_ATTRIBUTED'
+ print('PASS R30/R33 failures, partial-queue limits, 5 confirmed +TIME + 1 ambiguous source callsite')
