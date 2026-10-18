@@ -39,7 +39,7 @@ for rejection in (
     "if (scissor != FALSE)", "gameRect.right <= gameRect.left",
     "r <= l || b <= t",
     "colorMask != 0x0fu || srgbWrite != FALSE",
-    "srgbWrite != FALSE", "if (indices[i] >= vertexCount) return false;",
+    "srgbWrite != FALSE", "if (nativeIndices[i] >= vertexCount) return false;",
     "if (s.liveSm3Pipelines.size() >= 64u) return false;",
     "if (pipeline.vertexTokens != vertexEvidence.tokens",
 ):
@@ -75,6 +75,18 @@ for token in (
     "LiveSm3Blend::unsupported", "static_assert(",
 ):
     check(token in composite, "native D3D9 blend mapping/fallback missing: " + token)
+
+# The SM3 real-game fan expansion changes the physical index buffer owner.
+# The exact post-conversion pointer/count must be checked before the dynamic
+# D3D11 upload; do not silently validate only the old D3D9 index pointer.
+for token in (
+    "if (nativeIndices) {",
+    "for (UINT i = 0; i < nativeIndexCount; ++i)",
+    "if (nativeIndices[i] >= vertexCount) return false;",
+    "s.fullGameIndexCapacity, nativeIndices, indexBytes",
+    "context->DrawIndexed(nativeIndexCount, 0u, 0);",
+):
+    check(token in source, "SM3 converted game index ownership missing: " + token)
 
 # New live SM3 raster/DSV implementation must bind actual GPU state, not
 # merely lift the old unsupported-depth/scissor admission rejection. Preserve
