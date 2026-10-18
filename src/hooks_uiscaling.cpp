@@ -1455,7 +1455,10 @@ class UIScaling : public Hook
             return;
         StageExtensionAdmission = {
             Settings::VREnabled,
-            OutRunVR::GameSemantic::SpriteQueueDepth == 0,
+            // QueueRenderActive() is the original node dispatcher predicate
+            // (SpriteQueueDepth != 0). Snapshot that admission at source
+            // entry; the live depth guard remains at direct GPU ownership.
+            !OutRunVR::GameSemantic::QueueRenderActive(),
             OutRunVR::GameSemantic::CurrentQueueNodeEpoch()
         };
         // The original E8 may execute while VR is disabled. In that case,

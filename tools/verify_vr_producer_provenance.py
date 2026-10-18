@@ -285,7 +285,7 @@ def check_stage_extension_direct_owner(text: str) -> None:
     # the function would let a mutated source snapshot escape this guard.
     if re.search(
         r"StageExtensionAdmission\s*=\s*\{\s*Settings::VREnabled\s*,\s*"
-        r"OutRunVR::GameSemantic::SpriteQueueDepth\s*==\s*0\s*,\s*"
+        r"!OutRunVR::GameSemantic::QueueRenderActive\(\)\s*,\s*"
         r"OutRunVR::GameSemantic::CurrentQueueNodeEpoch\(\)\s*\}",
         enter,
     ) is None:

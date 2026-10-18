@@ -71,7 +71,7 @@
       "R84 DX9Ex right-eye HUD submit and OpenXR host cannot inherit source after VR toggle or any transient nested queue selection; unknown buffers preserve native fallback."
     ],
     "eye_ownership": "Only stable VR+queue depth+selection epoch can grant original exact source binocular ScreenHud ownership; optics remain HMD untested.",
-    "fix_evidence": "Native StageExtension C++ and SourceAdmission source transaction repair captures queue-selection generation, rejects transient reentry and restores original scope unconditionally.",
+    "fix_evidence": "Native StageExtension C++ and SourceAdmission source transaction repair captures queue-selection generation, rejects transient reentry and restores original scope unconditionally. Entry admission now uses original queue dispatcher predicate QueueRenderActive() while direct native GPU guard retains the exact explicit live depth predicate.",
     "negative_test_evidence": "Portable C++20 and strict source negative mutation contract for stable VR, VR toggles, queue nesting, and transient queue selection epoch."
   },
   "required_gates": [
@@ -104,6 +104,10 @@
       {
         "run_id": 39169468833,
         "cause": "P0 verifier equated VR-guarded tag with conditional original RenderScope cleanup"
+      },
+      {
+        "run_id": 39170074972,
+        "cause": "P0 source-order guard matched entry queue snapshot instead of subsequent native direct GPU guard; repaired entry via equivalent QueueRenderActive predicate, preserving live exact guard and strict mutation"
       }
     ]
   },
