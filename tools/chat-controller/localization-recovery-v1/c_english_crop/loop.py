@@ -133,6 +133,7 @@ def main():
                           "max_per_cycle":args.max_per_cycle,"mode":"C_NATIVE_ENGLISH_CROP_ONLY",
                           "RUNTIME_VALIDATION":"UNTESTED"}),flush=True)
         last_summary = None
+        last_hd108_status = None
         heartbeat = 0.0
         last_discovery = -1000000.0
         while not STOP:
@@ -149,10 +150,9 @@ def main():
                         # full-image DDS scans until an explicit separate change.
                         original108=ocr_hd108.scan(max_sources=4, max_new=1000)
                         if (original108["status"]!="HD108_PASS_COMPLETE_REVIEW_PENDING"
-                            or last_summary!=original108["status"]):
+                            or last_hd108_status!=original108["status"]):
                             write_audit(original108)
-                        if original108["status"]=="HD108_PASS_COMPLETE_REVIEW_PENDING":
-                            last_summary=original108["status"]
+                        last_hd108_status=original108["status"]
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
                 summary = process_batch(args.max_per_cycle)
