@@ -1689,19 +1689,22 @@ require('RenderScope::WorldBillboard', textures, 'direct world-billboard scope')
 if 'RtlCaptureStackBackTrace' in textures:
     raise SystemExit('P0 visual composition drift: runtime stack-walk HUD classification is forbidden')
 direct_put = function_body(textures, 'static int __cdecl put_sprite_ex_dest(')
-require_order(
-    direct_put, 'put_sprite_ex semantic publication must follow the real producer draw',
-    'const int result = put_sprite_ex.call<int>(a1, a2);',
-    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);',
-    'return result;'
-)
 direct_put2 = function_body(textures, 'static int __cdecl put_sprite_ex2_dest(')
-require_order(
-    direct_put2, 'put_sprite_ex2 semantic publication must follow the real producer draw',
-    'const int result = put_sprite_ex2.call<int>(a1, a2);',
-    'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);',
-    'return result;'
-)
+# A native put_sprite callback can toggle VR or reenter a queued/overlay
+# producer. The entry mode and parent source must be captured before the
+# original call and supplied to the post-call admission fence in both ABIs.
+for hook, native in ((direct_put, 'put_sprite_ex'),
+                     (direct_put2, 'put_sprite_ex2')):
+    require_order(
+        hook, native+' VR entry/exit semantic publication',
+        'const bool vrEnabledAtEntry = Settings::VREnabled;',
+        'const auto vrTailsBefore = SnapshotVrSpriteTails();',
+        'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();',
+        'const int result = '+native+'.call<int>(a1, a2);',
+        'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress,',
+        'vrSourceBefore, vrEnabledAtEntry);',
+        'return result;'
+    )
 
 # Original exact HUD parent provenance must be snapshotted BEFORE the native
 # producer and rechecked AFTER it. A broad return-RVA range alone cannot
@@ -1713,15 +1716,21 @@ def check_direct_native_producer_bridge(source):
     for function, native_name in ((first, 'put_sprite_ex.call<int>'),
                                   (second, 'put_sprite_ex2.call<int>')):
         require_order(function, 'exact native producer before/after fence',
+                      'const bool vrEnabledAtEntry = Settings::VREnabled;',
                       'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();',
                       'const int result = ' + native_name,
-                      'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress, vrSourceBefore);')
+                      'TagDirectVrSpriteNodes(vrTailsBefore, returnAddress,',
+                      'vrSourceBefore, vrEnabledAtEntry);')
     tag = function_body(source, 'static void TagDirectVrSpriteNodes(')
     require_order(tag, 'bounded exact tag publication',
+                  'const auto sourceAfter = OutRunVR::DirectSpriteSource::Capture();',
+                  'CanAdmitNativeDirectNodeTags(',
                   'ProvenScreenHudProducer(',
                   'FirstVerifiedAppendedNodeOnStableRoot(',
                   'RegisterSpriteNodeScope(')
-    for expected in ('scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture()',
+    for expected in ('vrEnabledAtEntry, Settings::VREnabled,',
+                     'sourceBefore, sourceAfter))',
+                     'scope, sourceBefore, sourceAfter)',
                      'node, scope, producer, nullptr,',
                      'sourceBefore.registrationSerial);'):
         require(expected, tag, 'proven source token must reach native SpriteNode')
@@ -1739,8 +1748,17 @@ for case, altered in (
     ('lost nested producer generation fence', textures.replace(
         'sourceBefore.registrationSerial);', '0);', 1)),
     ('lost native exit source proof', textures.replace(
-        'scope, sourceBefore, OutRunVR::DirectSpriteSource::Capture()',
-        'scope, sourceBefore, sourceBefore', 1)),
+        'scope, sourceBefore, sourceAfter)',
+        'scope, sourceBefore, sourceBefore)', 1)),
+    ('lost VR-entry admission proof', textures.replace(
+        'vrEnabledAtEntry, Settings::VREnabled,',
+        'Settings::VREnabled, Settings::VREnabled,', 1)),
+    ('lost native VR-mode/source fence', textures.replace(
+        'CanAdmitNativeDirectNodeTags(',
+        'CanAlwaysAdmitNativeDirectNodeTags(', 1)),
+    ('lost native return snapshot proof', textures.replace(
+        'sourceBefore, sourceAfter))',
+        'sourceBefore, sourceBefore))', 1)),
 ):
     if altered == textures:
         raise SystemExit('P0 native direct sprite regression target missing: ' + case)
