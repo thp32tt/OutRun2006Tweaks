@@ -1,0 +1,99 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01039",
+  "production_id": "CONVERSION-DX9EX-01039",
+  "event_id": "CONVERSION-DX9EX-01039-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "latest_event_id": "CONVERSION-DX9EX-01039-E003",
+  "latest_event_type": "retry",
+  "latest_attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C5_GATES_PENDING",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "513434b63bc388cf92c0825f0315c3c1732d26aa",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/hud_semantics.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Protect the original game's native HUD SpriteNode source ownership through verified x86 direct-call semantics into R84 stereo submission, preventing unrelated indirect callers from falsely inheriting HUD or world optical placement; exact Quest3 visual alignment remains unproven.",
+    "scope_boundary": "Direct put_sprite_ex and put_sprite_ex2 source eligibility, original E8 instruction classification, conservative UNKNOWN fallback and preserved queued exact child tags; no changes to world, R30/R33 draw code, SkyGlow, input/FFB, DX11, DXVK or R26_SAFE.",
+    "trace_stages": [
+      "Original x86 EXE producer returns from a known ScreenHud or projected-world semantic RVA range before native put_sprite entry.",
+      "hooks_textures.cpp verifies near E8 opcode and classifies source only through ClassifyDirectCallsite while queue tagging keeps original root and nested registration serial.",
+      "R84 physical draw source gates receive only correctly classified scope candidates, then independently decide left/right GPU submissions and original conservative fallback."
+    ],
+    "subcomponents": [
+      "Add explicit E8 direct-call predicate to canonical HUD semantic classifier and reject FF indirect/non-call addresses.",
+      "Integrate the source predicate into shared native put_sprite_ex and put_sprite_ex2 caller-to-SpriteNode tag path without touching original UV or FFB state.",
+      "Add seven compile-time positive and negative original HUD, projected marker and out-of-range caller regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "exact_direct_sprite_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original game ScreenHud producer to queued native SpriteNode owner identity",
+        "expected_behavior": "Known original E8 callsites still classify HUD and rank world source; FF indirect and non-E8 sites cannot be promoted solely from an RVA range."
+      },
+      {
+        "id": "unknown_source_safe_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unproven indirect caller, nested queue source and original mono/world fallback",
+        "expected_behavior": "Indirect, non-call and outside-range sources remain unknown; existing exact queued node tags, R84 veto, SkyGlow and R26_SAFE rollback remain protected."
+      },
+      {
+        "id": "exact_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Windows x86 R84 game, x64 host and package plus Domain, HUD Inspector and Full Source Impact",
+        "expected_behavior": "All four mandated GitHub checks succeed at one non-CI-skipped exact validation-bearing SHA; Quest3/VDXR runtime status is UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "exact_direct_sprite_source": "SOURCE_ASSERTIONS_PENDING_CI",
+    "unknown_source_safe_fallback": "SOURCE_ASSERTIONS_PENDING_CI",
+    "exact_integrated_gates": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Review of existing native producer call classification and original EXE caller RVA map; source semantics alone do not prove Quest3 eye output.",
+    "source_trace": [
+      "Original hook used returnAddress minus five to classify broad HUD/world function RVA without checking the x86 instruction at that address.",
+      "Original material 513434b6 added ClassifyDirectCallsite and E8 opcode admission in hooks_textures.cpp with seven compile-time positive/negative conditions.",
+      "TagDirectVrSpriteNodes still verifies live root and appended node reachability before forwarding semantic scope into R84 independently gated physical eye routes."
+    ],
+    "alternatives_rejected": [
+      "Active workflow 39121583163 failed exact-HEAD run-record policy before Windows game/host/package compile; no compiler failure established."
+    ],
+    "eye_ownership": "This task only addresses original source admission and preserves native fallback; actual left/right HMD GPU submission, optical legibility and FPS are separately unverified.",
+    "root_cause": "Prior material commit omitted mandatory docs/automation/runs/CONVERSION-DX9EX-01039.json; policy --check-head correctly failed before build jobs."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "original_material_source_sha": "513434b63bc388cf92c0825f0315c3c1732d26aa",
+    "failed_exact_sha": "513434b63bc388cf92c0825f0315c3c1732d26aa",
+    "failed_run_id": 39121583163,
+    "failed_step": "policy: run record missing; game/host/package skipped",
+    "prior_pass": {
+      "domain_run_id": 39121583135,
+      "hud_inspector_run_id": 39121583190,
+      "full_source_impact_run_id": 39121583169
+    },
+    "final_exact_sha_gates": "PENDING"
+  },
+  "notes": "Original E001 material source SHA is authoritative. This E003 run-record CI failure repair is not new functional code/score; no CI skip. Whole HUD optical defect is not claimed fixed. Quest3/VDXR runtime UNTESTED, DXVK frozen."
+}
