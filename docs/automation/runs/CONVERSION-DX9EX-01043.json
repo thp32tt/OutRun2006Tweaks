@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C5_GATES_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "shadow_full_stereo_owner": "PENDING_EXACT_SHA",
-    "shadow_native_fallback": "PENDING_EXACT_SHA",
-    "shadow_exact_sha_gates": "PENDING_EXACT_SHA"
+    "shadow_full_stereo_owner": "PASS_EXACT_SHA",
+    "shadow_native_fallback": "PASS_EXACT_SHA",
+    "shadow_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Original player shadow DrawObjectAlpha_Internal and R84 exact CarBaseShadow WVP producer scope are present; right state setters have no source resampling in the existing native eye path.",
@@ -73,8 +73,8 @@
     ],
     "eye_ownership": "Only matching original direct player shadow can enter both native eyes; a mismatched source after RIGHT setter requires suppression of right GPU submission and normal stereo recovery.",
     "root_cause": "No final right-eye source identity check after D3D9 state setters in R33 exact contact-shadow route; confirmed static gap, not a proven Quest3 frame root cause.",
-    "fix_evidence": "R33 physical right-eye source guard and exact C++ smoke+CI structure regression included in material batch; awaiting exact SHA build.",
-    "negative_test_evidence": "Mutation checks changed game WVP serial/draw, pose, shader epoch, poseSequence, missing exact source and malformed left, plus right-Draw branch source-order guard."
+    "fix_evidence": "Native source material d119c8f09d31f4609b661a8eb51ed3d7d5892ced, corrected CI fixture/source repair SHA 0c02ed4f46ffd0eee49b388363f5d66f472bfb2b; required 4 exact SHA actions SUCCESS. Quest3 HMD unchanged UNTESTED.",
+    "negative_test_evidence": "Native matching source and changed game raw WVP serial/draw, shader, pose, poseSequence, missing exact source, malformed left source are covered by host x64 deterministic smoke and static shape mutation verifier in exact-SHA DX9Ex Active CI."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -82,15 +82,61 @@
     "OutRun EXE HUD Inspector CI",
     "DX9Ex Full Source Impact Review"
   ],
-  "notes": "New source change is a physical right-eye shadow admission fix; C6 exact-SHA and Quest3 runtime verification pending; no prior-task point duplication. Same TASK CI repair: positive static assertion fixture had uploadDraw!=drawSerial; correcting test source generation, no additional score.",
+  "notes": "Implemented and build-verified under same TASK_ID: original player shadow R33 revalidation before native RIGHT eye GPU draw, preserved original fallback, C++ and verifier negatives. Source material d119c8; validation-bearing repair 0c02ed4f46ffd0eee49b388363f5d66f472bfb2b passed mandatory 4/4 Actions. Prior broken fixture and transient external FLAC clone failures repaired/retried without scoring duplicates. Runtime Quest3/VDXR UNTESTED; no runtime optical PASS, no DXVK changes.",
   "material_result_sha": "d119c8f09d31f4609b661a8eb51ed3d7d5892ced",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
   "ci_evidence": {
     "failed_exact_sha": "d119c8f09d31f4609b661a8eb51ed3d7d5892ced",
     "failed_run_id": 39128764462,
     "failed_job_id": 117679388922,
     "failed_step": "Windows HUD Inspector MSVC error C2607 src/vr/game/car_base_shadow_stereo.hpp:138 static assertion: positive fixture had uploadDraw=20 and drawSerial=40",
     "repair": "Correct literal positive/negative compile-time fixture uploadDraw=40 matching drawSerial=40, production SameCarShadowForRightEye predicate and R33 physical right-eye implementation unchanged",
-    "required_gates_status": "PENDING_FINAL_EXACT_SHA"
+    "required_gates_status": "PENDING_FINAL_EXACT_SHA",
+    "head_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+    "validation_bearing_result_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+    "final_exact_sha_gates": "PASS_EXACT_SHA",
+    "verified_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39129379803,
+        "head_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+        "conclusion": "success",
+        "run_attempt": 1
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39129379792,
+        "head_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+        "conclusion": "success",
+        "run_attempt": 1
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39129379829,
+        "head_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+        "conclusion": "success",
+        "run_attempt": 2
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39129379728,
+        "head_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+        "conclusion": "success",
+        "run_attempt": 1
+      }
+    ],
+    "hud_network_failure_run_id": 39129379829,
+    "hud_network_failure_job_id": 117681212932,
+    "hud_transient_error": "CMake FetchContent flac clone failed to connect github.com:443, selective retry of failed HUD inspector job without source change; attempt 2 SUCCESS",
+    "build_validation": "BUILD_VERIFIED",
+    "runtime_validation": "UNTESTED"
+  },
+  "c6_evidence": {
+    "result": "PASS_EXACT_SHA",
+    "head_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+    "material_result_sha": "d119c8f09d31f4609b661a8eb51ed3d7d5892ced",
+    "validation_bearing_result_sha": "0c02ed4f46ffd0eee49b388363f5d66f472bfb2b",
+    "record_only": true,
+    "ci_skipped_in_checkpoint": true
   }
 }
