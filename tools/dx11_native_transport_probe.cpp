@@ -3415,6 +3415,80 @@ int main()
     shaderEyeView->Release();
     shaderEyes->Release();
 
+    // 00903: independent menu/car/race stereo cameras can finish in mip 1
+    // of a larger game GPU texture array. Copy that exact physical mip into
+    // native XR eye pixels; mip 0 deliberately carries opposite colors.
+    D3D11_TEXTURE2D_DESC mipEyeDesc = sourceDesc;
+    mipEyeDesc.Width = 128u;
+    mipEyeDesc.Height = 128u;
+    mipEyeDesc.MipLevels = 2u;
+    mipEyeDesc.ArraySize = 2u;
+    ID3D11Texture2D* mipEyes = nullptr;
+    ID3D11RenderTargetView* mipViews[2][2]{};
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &mipEyeDesc, nullptr, &mipEyes)) && mipEyes,
+            "00903 real GPU game camera mip array");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        for (UINT level = 0u; level < 2u; ++level) {
+            D3D11_RENDER_TARGET_VIEW_DESC view{};
+            view.Format = mipEyeDesc.Format;
+            view.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            view.Texture2DArray.MipSlice = level;
+            view.Texture2DArray.FirstArraySlice = eye;
+            view.Texture2DArray.ArraySize = 1u;
+            require(SUCCEEDED(d3d.device->CreateRenderTargetView(
+                        mipEyes, &view, &mipViews[eye][level])),
+                    "00903 physical eye/mip color output");
+            d3d.context->ClearRenderTargetView(
+                mipViews[eye][level],
+                (eye == 0u) == (level == 1u) ? red : blue);
+        }
+    }
+    outrun::vr::dx11::NativeGameStereoSubmission mipSubmission(ring);
+    require(mipSubmission.begin(d3d.context, 29u, 37u) &&
+            !mipSubmission.capture_eye(0u, mipEyes, 1u, 0xc1u, 37u, 0u, 0u) &&
+            !mipSubmission.capture_eye(0u, mipEyes, 1u, 0xc1u, 37u, 0u, 2u) &&
+            mipSubmission.capture_eye(0u, mipEyes, 1u, 0xc1u, 37u, 0u, 1u) &&
+            mipSubmission.capture_eye(1u, mipEyes, 1u, 0xd2u, 37u, 1u, 1u) &&
+            mipSubmission.submit() && mipSubmission.in_flight(),
+            "00903 two real source mip1 game cameras to GPU stereo ring");
+    outrun::vr::dx11::NativeGameStereoPublishedFrame mipFrame{};
+    bool mipReady = false;
+    for (int retry = 0; retry < 2000 && !mipReady; ++retry) {
+        mipReady = mipSubmission.try_publish(mipFrame);
+        require(!ring.synchronization_faulted(), "00903 GPU fence");
+        if (!mipReady) Sleep(1);
+    }
+    require(mipReady && mipFrame.eyeViewSignature[0] == 0xc1u &&
+            mipFrame.eyeViewSignature[1] == 0xd2u &&
+            mipFrame.sourcePoseSequence == 37u,
+            "00903 exact independent mip camera identities and pose");
+    for (UINT eye = 0u; eye < 2u; ++eye) {
+        d3d.context->CopyResource(readback, ring.eye(mipFrame.gpu.slot, eye));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0u, D3D11_MAP_READ, 0u, &mapped)),
+                "00903 physical shared-eye pixel readback");
+        const auto* px = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool correct = eye == 0u
+            ? px[0] == 255u && px[1] == 0u && px[2] == 0u && px[3] == 255u
+            : px[0] == 0u && px[1] == 0u && px[2] == 255u && px[3] == 255u;
+        d3d.context->Unmap(readback, 0u);
+        require(correct, "00903 source mip1 left/right colors, never mip0");
+    }
+    hostFrame.frameId = 29u;
+    hostFrame.sourcePoseSequence = 37u;
+    hostFrame.flags &= ~OutRunVR::RenderFrameDirectGpuTransport;
+    require(mipSubmission.attach_host_frame(mipFrame, hostFrame) &&
+            ring.retire_acknowledged(
+                make_ack(ring.identity(), mipFrame.gpu.slot, 29u)) &&
+            !mipSubmission.attach_host_frame(mipFrame, hostFrame),
+            "00903 XR host handoff and exact ACK for mip-selected eyes");
+    for (UINT eye = 0u; eye < 2u; ++eye)
+        for (UINT level = 0u; level < 2u; ++level)
+            mipViews[eye][level]->Release();
+    mipEyes->Release();
+
     // A recorder may fail AFTER one eye's GPU writes were queued. Neither a
     // cancellation nor another frame may reuse the ring without hard retire.
     const auto partialDraw = [](
@@ -3426,10 +3500,10 @@ int main()
         return false;
     };
     std::uint32_t partialSlot = 99;
-    require(ring.try_acquire_slot(d3d.context, 29, nullptr, partialSlot) &&
-            !ring.render_eye_pair(d3d.context, partialSlot, 29, partialDraw, nullptr) &&
+    require(ring.try_acquire_slot(d3d.context, 30, nullptr, partialSlot) &&
+            !ring.render_eye_pair(d3d.context, partialSlot, 30, partialDraw, nullptr) &&
             ring.synchronization_faulted() &&
-            !ring.cancel_acquired_slot(partialSlot, 29) &&
+            !ring.cancel_acquired_slot(partialSlot, 30) &&
             !ring.activation_ready(),
             "00812 partial native eye draw quarantines transport until Reset");
 

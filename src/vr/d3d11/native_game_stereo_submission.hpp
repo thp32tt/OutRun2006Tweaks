@@ -271,7 +271,8 @@ public:
                      std::uint64_t nativeDrawCount,
                      std::uint64_t eyeViewSignature,
                      std::uint32_t sourcePoseSequence,
-                     UINT sourceArraySlice = 0u) noexcept;
+                     UINT sourceArraySlice = 0u,
+                     UINT sourceMipSlice = 0u) noexcept;
 
     // Copy both genuine game eyes on the producer's single GPU command stream,
     // then arm its asynchronous fence. Never advertise or ACK on mere enqueue.
@@ -332,13 +333,15 @@ private:
     enum class State : std::uint8_t { Idle, Acquired, GpuPending };
     void release_local() noexcept;
     [[nodiscard]] bool source_is_live(
-        ID3D11Texture2D* source, UINT arraySlice) const noexcept;
+        ID3D11Texture2D* source, UINT arraySlice,
+        UINT mipSlice) const noexcept;
 
     NativeSharedEyeRing& ring_;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> eyes_[2];
     std::uint64_t eyeViews_[2]{};
     UINT eyeArraySlices_[2]{};
+    UINT eyeMipSlices_[2]{};
     std::uint64_t frameId_{};
     std::uint32_t poseSequence_{};
     std::uint32_t slot_{OutRunVR::RenderFrameRingSize};

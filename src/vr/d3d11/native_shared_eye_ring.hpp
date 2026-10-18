@@ -116,7 +116,9 @@ namespace outrun::vr::dx11
             ID3D11Texture2D* left_source,
             ID3D11Texture2D* right_source,
             UINT left_array_slice = 0u,
-            UINT right_array_slice = 0u) noexcept;
+            UINT right_array_slice = 0u,
+            UINT left_mip_slice = 0u,
+            UINT right_mip_slice = 0u) noexcept;
 
         // The native game renderer can draw two genuine, independently posed
         // views directly into the shared ring RTs, avoiding the extra GPU

@@ -1,5 +1,6 @@
 #include "native_shared_eye_ring.hpp"
 #include "native_game_eye_pair_sources.hpp"
+#include "native_game_postpass_replay.hpp"
 #include "native_game_om_slots.hpp"
 
 #include <dxgi.h>
@@ -329,7 +330,8 @@ namespace outrun::vr::dx11
         std::uint64_t frame_id,
         ID3D11Texture2D* left_source,
         ID3D11Texture2D* right_source,
-        UINT left_array_slice, UINT right_array_slice) noexcept
+        UINT left_array_slice, UINT right_array_slice,
+        UINT left_mip_slice, UINT right_mip_slice) noexcept
     {
         if (!activation_ready() || same_producer_context(context) == false ||
             slot >= slots_.size() || frame_id == 0 ||
@@ -343,9 +345,14 @@ namespace outrun::vr::dx11
             return false;
 
         const auto exact_source = [&](ID3D11Texture2D* source,
-                                      D3D11_TEXTURE2D_DESC& desc) noexcept {
+                                      D3D11_TEXTURE2D_DESC& desc,
+                                      UINT mipSlice, UINT arraySlice) noexcept {
             source->GetDesc(&desc);
-            if (desc.Width != width_ || desc.Height != height_ ||
+            const auto extent = native_game_postpass_mip_extent(
+                desc.Width, desc.Height, desc.MipLevels, mipSlice,
+                desc.ArraySize, arraySlice, desc.SampleDesc.Count);
+            if (!extent.valid || extent.width != width_ ||
+                extent.height != height_ ||
                 desc.Format != format_ || desc.MipLevels == 0 ||
                 desc.ArraySize == 0 || desc.SampleDesc.Count == 0 ||
                 (desc.SampleDesc.Count == 1 && desc.SampleDesc.Quality != 0) ||
@@ -387,12 +394,14 @@ namespace outrun::vr::dx11
         // Any rejection leaves the Acquired slot unchanged and records no
         // native GPU commands, so the original DX9Ex frame remains usable.
         D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{};
-        if (!exact_source(left_source, leftDesc) ||
-            !exact_source(right_source, rightDesc))
+        if (!exact_source(left_source, leftDesc,
+                          left_mip_slice, left_array_slice) ||
+            !exact_source(right_source, rightDesc,
+                          right_mip_slice, right_array_slice))
             return false;
-        // Game-authored left/right cameras can occupy separate full-size
-        // array slices of the SAME D3D11 texture, with a mip chain. Only
-        // mip zero represents the actual full-resolution eye frame.
+        // Game-authored L/R cameras can occupy independently selected array
+        // slices and physical mip levels of the same local GPU image.
+        // Both selected source extents must match the native XR eye.
         if (left_array_slice >= leftDesc.ArraySize ||
             right_array_slice >= rightDesc.ArraySize ||
             (leftDesc.SampleDesc.Count > 1u && leftDesc.MipLevels != 1u) ||
@@ -567,11 +576,13 @@ namespace outrun::vr::dx11
                 // pixels on GPU; never copy an entire array/mip allocation.
                 context->CopySubresourceRegion(entry.eye[0].Get(), 0u,
                     0u, 0u, 0u, left_source,
-                    D3D11CalcSubresource(0u, left_array_slice, leftDesc.MipLevels),
+                    D3D11CalcSubresource(left_mip_slice, left_array_slice,
+                                         leftDesc.MipLevels),
                     nullptr);
                 context->CopySubresourceRegion(entry.eye[1].Get(), 0u,
                     0u, 0u, 0u, right_source,
-                    D3D11CalcSubresource(0u, right_array_slice, rightDesc.MipLevels),
+                    D3D11CalcSubresource(right_mip_slice, right_array_slice,
+                                         rightDesc.MipLevels),
                     nullptr);
             }
         }

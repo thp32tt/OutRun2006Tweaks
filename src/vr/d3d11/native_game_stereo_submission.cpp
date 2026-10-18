@@ -1812,6 +1812,7 @@ void NativeGameStereoSubmission::release_local() noexcept {
     context_.Reset();
     eyeViews_[0] = eyeViews_[1] = 0;
     eyeArraySlices_[0] = eyeArraySlices_[1] = 0u;
+    eyeMipSlices_[0] = eyeMipSlices_[1] = 0u;
     frameId_ = poseSequence_ = 0;
     slot_ = OutRunVR::RenderFrameRingSize;
     state_ = State::Idle;
@@ -1839,7 +1840,7 @@ bool NativeGameStereoSubmission::begin(
 }
 
 bool NativeGameStereoSubmission::source_is_live(
-    ID3D11Texture2D* source, UINT arraySlice) const noexcept
+    ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice) const noexcept
 {
     if (!context_ || !source) return false;
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice, sourceDevice;
@@ -1849,10 +1850,14 @@ bool NativeGameStereoSubmission::source_is_live(
         return false;
     D3D11_TEXTURE2D_DESC desc{};
     source->GetDesc(&desc);
-    return desc.Width == ring_.width() && desc.Height == ring_.height() &&
-        desc.Format == ring_.format() && desc.MipLevels != 0u &&
-        desc.ArraySize != 0u && arraySlice < desc.ArraySize &&
-        desc.SampleDesc.Count != 0u &&
+    // Preserve selected game camera mip geometry across the native stereo
+    // producer and OpenXR shared ring; a larger atlas mip0 is not the eye.
+    const auto mip = native_game_postpass_mip_extent(
+        desc.Width, desc.Height, desc.MipLevels, mipSlice,
+        desc.ArraySize, arraySlice, desc.SampleDesc.Count);
+    return mip.valid && mip.width == ring_.width() &&
+        mip.height == ring_.height() &&
+        desc.Format == ring_.format() &&
         (desc.SampleDesc.Count == 1u || desc.MipLevels == 1u) &&
         desc.Usage == D3D11_USAGE_DEFAULT && desc.CPUAccessFlags == 0u &&
         (native_game_eye_local_render_target_admitted(
@@ -1883,16 +1888,18 @@ bool NativeGameStereoSubmission::source_is_live(
 bool NativeGameStereoSubmission::capture_eye(
     std::uint32_t eyeIndex, ID3D11Texture2D* nativeColor,
     std::uint64_t nativeDrawCount, std::uint64_t eyeViewSignature,
-    std::uint32_t sourcePoseSequence, UINT sourceArraySlice) noexcept
+    std::uint32_t sourcePoseSequence, UINT sourceArraySlice,
+    UINT sourceMipSlice) noexcept
 {
     if (state_ != State::Acquired || eyeIndex >= 2u ||
         eyes_[eyeIndex] || !nativeDrawCount || !eyeViewSignature ||
         sourcePoseSequence != poseSequence_ ||
-        !source_is_live(nativeColor, sourceArraySlice))
+        !source_is_live(nativeColor, sourceArraySlice, sourceMipSlice))
         return false;
     eyes_[eyeIndex] = nativeColor;
     eyeViews_[eyeIndex] = eyeViewSignature;
     eyeArraySlices_[eyeIndex] = sourceArraySlice;
+    eyeMipSlices_[eyeIndex] = sourceMipSlice;
     return true;
 }
 
@@ -2300,8 +2307,8 @@ bool NativeGameStereoSubmission::submit() noexcept
     if (state_ != State::Acquired || !eyes_[0] || !eyes_[1] ||
         eyeViews_[0] == 0u || eyeViews_[1] == 0u ||
         eyeViews_[0] == eyeViews_[1] ||
-        !source_is_live(eyes_[0].Get(), eyeArraySlices_[0]) ||
-        !source_is_live(eyes_[1].Get(), eyeArraySlices_[1]))
+        !source_is_live(eyes_[0].Get(), eyeArraySlices_[0], eyeMipSlices_[0]) ||
+        !source_is_live(eyes_[1].Get(), eyeArraySlices_[1], eyeMipSlices_[1]))
         return false;
 
     // submit_eye_pair itself checks canonical COM identities, every ring-owned
@@ -2310,7 +2317,8 @@ bool NativeGameStereoSubmission::submit() noexcept
     // command/fence failure the ring quarantines its allocation.
     if (!ring_.submit_eye_pair(context_.Get(), slot_, frameId_,
                                eyes_[0].Get(), eyes_[1].Get(),
-                               eyeArraySlices_[0], eyeArraySlices_[1]))
+                               eyeArraySlices_[0], eyeArraySlices_[1],
+                               eyeMipSlices_[0], eyeMipSlices_[1]))
         return false;
     eyes_[0].Reset();
     eyes_[1].Reset();
