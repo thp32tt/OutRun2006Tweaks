@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <limits>
 
 // Original C993 may submit c64..c67 in several successful game uploads.
 // Never combine matrices across the exact producer call, latched pose,
@@ -7,6 +8,16 @@
 // unrelated/queued draws are excluded by the caller.
 namespace OutRunVR::LensCentre
 {
+    // Game D3D9 may accept non-finite shader constants, but a stereo eye
+    // projection cannot safely invert/reproject a NaN/Inf world matrix.
+    // Only inspect the c64..c67 rows that this source actually updates;
+    // neighboring game constants retain their original D3D9 behavior.
+    constexpr bool FiniteCentreWvp(float value) noexcept
+    {
+        constexpr float limit = std::numeric_limits<float>::max();
+        return value >= -limit && value <= limit;
+    }
+
     struct PartialWvpUpload
     {
         float raw[16]{};
@@ -71,6 +82,14 @@ namespace OutRunVR::LensCentre
                     continue;
                 const std::uint32_t source = (reg - start) * 4;
                 const std::uint32_t target = (reg - 64) * 4;
+                // Reject the entire candidate, not a half-written row.
+                // Original D3D9 upload/draw is unchanged on this fallback.
+                for (std::uint32_t column = 0; column != 4; ++column)
+                    if (!FiniteCentreWvp(values[source + column]))
+                    {
+                        Reset();
+                        return false;
+                    }
                 for (std::uint32_t column = 0; column != 4; ++column)
                     raw[target + column] = values[source + column];
                 covered = static_cast<std::uint8_t>(
@@ -193,6 +212,45 @@ namespace OutRunVR::LensCentre
         return !stage.Append(65,1,newRow,9,3,0x40,6,0xA0,52,true) &&
             stage.covered == 0x02 && !stage.committedComplete;
     }
+    // A single invalid c64 source row must never be combined with the
+    // otherwise complete previous partial matrix or passed to both eyes.
+    // Non-c64 registers on the SAME D3D9 call are not ours to reject.
+    constexpr bool RejectsNonFiniteCentreMatrix() noexcept
+    {
+        PartialWvpUpload stage{};
+        constexpr float valid[16]{
+            1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16};
+        constexpr float badInf[4]{
+            9, std::numeric_limits<float>::infinity(), 11,12};
+        constexpr float badNan[4]{
+            std::numeric_limits<float>::quiet_NaN(), 14,15,16};
+        if (!stage.Append(64,2,valid,7,3,0x40,6,0xA0,51,true) &&
+            stage.covered != 0x03u)
+            return false;
+        if (stage.Append(66,1,badInf,7,3,0x40,6,0xA0,51,true) ||
+            stage.covered != 0 || stage.CommitComplete())
+            return false;
+        if (stage.Append(67,1,badNan,7,3,0x40,6,0xA0,51,true) ||
+            stage.covered != 0)
+            return false;
+        // Full healthy source still reaches the physical binocular owner.
+        if (!stage.Append(64,4,valid,7,3,0x40,6,0xA0,51,true) ||
+            !stage.CommitComplete())
+            return false;
+        // A partial invalid overwrite invalidates even a committed matrix.
+        if (stage.Append(66,1,badInf,7,3,0x40,6,0xA0,51,true) ||
+            stage.covered != 0 || stage.committedComplete)
+            return false;
+        // Register 63 is outside C993's c64..c67 eye matrix. Its NaN is
+        // irrelevant if row 64 on this same D3D9 call is finite.
+        constexpr float neighbor[8]{
+            std::numeric_limits<float>::quiet_NaN(), 0,0,0,
+            21,22,23,24};
+        return !stage.Append(63,2,neighbor,7,3,0x40,6,0xA0,51,true) &&
+            stage.covered == 0x01u && stage.raw[0] == 21;
+    }
+    static_assert(RejectsNonFiniteCentreMatrix(),
+        "C993 non-finite raw c64 must keep original game draw, not poison stereo");
     static_assert(CommittedFullAcceptsOwnedPartialRows());
     static_assert(RejectsCrossDrawAndOverlappingPartialWvp());
     static_assert(SplitUploadCompletesOwnedWvp());
