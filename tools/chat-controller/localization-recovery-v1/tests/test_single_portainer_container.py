@@ -26,7 +26,9 @@ def test():
     assert 'ENTRYPOINT ["/usr/bin/tini","-g","--","/opt/outrun/entrypoint.sh"]' in dockerfile
 
     req = (ROOT / "requirements.txt").read_text(encoding="utf-8")
-    assert "Pillow==12.3.0" in req and "numpy==2.3.5" in req
+    assert "playwright==1.63.0" in req
+    assert "Pillow==" not in req and "numpy==" not in req
+    assert "python3-numpy" in dockerfile and "python3-pil" in dockerfile
     entry = (ROOT / "entrypoint.sh").read_text(encoding="utf-8")
     assert "/opt/outrun/c_english_crop/loop.py" in entry
     assert "OUTRUN_CROP_ENABLED" in entry
