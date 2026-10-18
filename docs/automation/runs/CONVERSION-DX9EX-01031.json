@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01031",
+  "production_id": "CONVERSION-DX9EX-01031",
+  "event_id": "CONVERSION-DX9EX-01031-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "C2_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep the six original +TIME sprite and numeric producers on their original SpriteNode priority queue root, preserving complete optical source ownership across native queue rebuild and pointer reuse instead of tagging unrelated screen or world content.",
+    "scope_boundary": "Only the exact +TIME source to queued SpriteNode owner, not GOAL results, deferred D3DX batch lifetime, lens flare, menus, SkyGlow, input/FFB, R26_SAFE, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original 0x00498670 exact source issues three sprani and three numeric E8 calls, with old priority root and tail captured before the producer executes.",
+      "Native queue append registrations require both the same root identity and bounded live old/new tail reachability before StageExtensionTime ScreenHud scope is attached.",
+      "Proven queued source propagates through existing R84 physical left/right GPU owner; rebuilt or unknown roots fall back to unchanged original D3D9 Draw."
+    ],
+    "subcomponents": [
+      "Store exact original priority root for every +TIME source boundary and propagate through post-producer node association.",
+      "Use shared stable-root reachability proof on all stage priority lists, preserving safe same-root multi-child and originally empty list handling.",
+      "Add C++ constexpr positive and negative tests for live append, replaced root with reused old tail, and invalid old root while leaving D3DX/GOAL isolation in place."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_six_call_root_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original +TIME sibling SpriteNodes and per-eye owner",
+        "expected_behavior": "Exact stage sprite and numeric parents tag newly appended ScreenHud nodes only while the original native priority root remains the same."
+      },
+      {
+        "id": "stage_rebuilt_reused_root_rejection",
+        "category": "fallback_regression",
+        "behavior_area": "Priority root replacement and tail-pointer reuse",
+        "expected_behavior": "Reject a different live root even if it reuses a reachable old tail, while same-root append and initially empty queue still accept."
+      },
+      {
+        "id": "stage_final_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 game and host/package protected regression",
+        "expected_behavior": "Final exact SHA passes DX9Ex Active game/host/rollback package, Domain Isolation, HUD Inspector and Full Source Impact."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_six_call_root_owner": "PENDING",
+    "stage_rebuilt_reused_root_rejection": "PENDING",
+    "stage_final_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "The +TIME hook recorded only prior tails, not source root identity. Rebuilt queues that reuse the same old tail could be mistakenly tagged StageExtensionTime even though they belong to a different producer/root.",
+    "original_evidence": "Verified original +TIME 0x00498670 has six distinct sprite and numeric source E8 calls and the current direct/queued D3DX stage producer hooks are already present.",
+    "source_trace": [
+      "StageExtensionEnter snapshots old tail before each original exact call.",
+      "TagAppendedNodes previously looked up the potentially new root after the original CALL and walked the old tail reachable there.",
+      "R84 consumes exact SpriteNode ownership for physical left/right GPU eye submission, so foreign tags can change optical route."
+    ],
+    "alternatives_rejected": [
+      "Already present 01022/01025 D3DX deferred homogeneous batch fixes are not removed or rewritten.",
+      "Generic UI/world/GOAL tagging must not be broadened or previous runtime optical PASS inferred."
+    ],
+    "fix_evidence": "An original-root per-priority array and FirstVerifiedAppendedNodeOnStableRoot check protect the exact +TIME association without changing the native sprite or R84 eye shaders.",
+    "negative_test_evidence": "C++ constexpr regression exercises false-positive reused-tail association under a replacement root and accepts verified same-root/empty-original-root cases.",
+    "eye_ownership": "Proof limits ScreenHud owner registration; existing physical R84 left/right submission still requires GPU gates and matching Quest3 HMD evidence."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ]
+}
