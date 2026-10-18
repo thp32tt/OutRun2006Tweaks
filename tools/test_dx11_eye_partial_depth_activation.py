@@ -105,6 +105,19 @@ assert audit_native_partial_color_clear(
 # Test explicit OM binding/alias/device and source chronology tampering.
 assert not audit_native_offscreen_game_draw(source, probe), "valid offscreen audit failed"
 assert audit_native_offscreen_game_draw(
+    source, probe.replace(
+        "ctx->RSSetViewports(1u, &priorCameraViewport);", "", 1)
+), "physical camera viewport leaked into full native eye"
+assert audit_native_offscreen_game_draw(
+    source, probe.replace(
+        "eyeIndex == 0u ? 0 : 60, 60, 0u, 1u);",
+        "eyeIndex == 0u ? 0 : 60, 0, 0u, 1u);", 1)
+), "camera GPU copy overwrote original per-eye full color seed"
+assert audit_native_offscreen_game_draw(
+    source, probe.replace(
+        "require(physicalCameraPixel,", "require(true,", 1)
+), "independent physical-mip WARP eye pixel validation bypassed"
+assert audit_native_offscreen_game_draw(
     source.replace("const bool bound = actual == gameTarget;",
                    "const bool bound = actual != gameTarget;", 1), probe
 ), "offscreen RTV bound-state tamper slipped through"

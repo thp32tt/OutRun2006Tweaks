@@ -382,6 +382,13 @@ def audit_native_offscreen_game_draw(source: str, transport_probe: str) -> list[
         "gameEyeFixture.replayedMipCameraClearCopy[0] &&",
         "gameEyeFixture.replayedMipCameraClearCopy[1] &&",
         "&mipCameraBad) &&",
+        // After a genuine mip1 camera Clear/Copy, the callback must restore
+        // the full eye viewport and leave original D3D9 color untouched.
+        "ctx->RSSetViewports(1u, &priorCameraViewport);",
+        "eyeIndex == 0u ? 0 : 60, 60, 0u, 1u);",
+        "const bool physicalCameraPixel = eyeIndex == 0u",
+        "require(physicalCameraPixel,",
+        "const bool distinctColor = eyeIndex == 0u",
         "instancedCamera.draw_offscreen_instanced(",
         "instancedCamera.draw_offscreen_indexed_instanced(",
         "instancedCamera.draw_count() == 2u",
