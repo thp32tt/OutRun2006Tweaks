@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01063",
+  "production_id": "CONVERSION-DX9EX-01063",
+  "event_id": "CONVERSION-DX9EX-01063-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+  "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "3733e4426ae6562993756e1cdb56062c468540c2",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/hooks_textures.cpp",
+    "src/vr/game/direct_sprite_source_provenance.hpp",
+    "src/vr/hud_semantics.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:WHITE_HUD_DIPLOPIA",
+    "symptom_id": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+    "goal": "Restore source-owned native gameplay HUD glyph and peripheral-text sprites from their original direct E8 parent through BA9D0, live SpriteNode queue registration, R84 ScreenHud physical Draw and per-eye submission, without reclassifying unrelated original sprites.",
+    "scope_boundary": "Only original E8 source-proven ScreenHud text/peripheral BA9D0 path; preserve unknown/indirect calls, queue rebuild, nested GOAL/+TIME/rank, lens, world, F11 external overlay, input/FFB/SkyGlow, R26_SAFE and DXVK freeze.",
+    "trace_stages": [
+      "Original mapped EXE near CALL E8 -> BA9D0 OutRunHudTextProducer_dest, with safe unknown on indirect/unrecognized callsite.",
+      "Native synchronous put_sprite_ex/put_sprite_ex2 may enter shared unclassified text helper: stable exact text parent + unchanged queue/VR/overlay scope -> live-root bounded SpriteNode registration with original producer token.",
+      "Existing R84 physical Draw command and exact ScreenHud stereo route consume queued token; R33 and R30 native fallback and x64 OpenXR are preserved, not represented as HMD evidence."
+    ],
+    "subcomponents": [
+      "Reject unverified original text return RVA and indirect parent calls before constructing direct ScreenHud owner in hooks_uiscaling.",
+      "Carry exact native HUD text/peripheral producer through the unclassified inner BA9D0 put_sprite path only when the parent E8 scope and safe queue/root/producer admission match.",
+      "Add compile-time positive, foreign-producer/indirect E8/queue/external overlay and GOAL/+TIME/world/lens negatives while retaining existing R84 eye and original-draw safety."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_hud_text_source_to_queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_E8_BA9D0_to_native_SpriteNode_and_stereo_screen_hud",
+        "expected_behavior": "Classified original E8 text and edge/peripheral glyphs carry distinct exact ScreenHud producer through nested native nodes; R84 existing stereo path can retain that identity."
+      },
+      {
+        "id": "foreign_text_and_effect_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "unknown_indirect_world_goal_stage_rank_external_queue_rebuild_desktop",
+        "expected_behavior": "Unverified indirect CALLs, producer or queue mutations, VR toggles, external overlays, protected GOAL/+TIME/rank/lens and world cannot acquire native HUD text ownership; native original fallback remains."
+      },
+      {
+        "id": "hud_text_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows_R84_x86_game_x64_OpenXR_host_package_Domain_HUD_Inspector_Full_Source",
+        "expected_behavior": "Exact last source/test SHA passes required DX9Ex Active, Domain, HUD Inspector and Full Source Impact workflows; headset Quest3/VDXR runtime remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Original mapped caller ranges were only a broad SemanticInfo classifier for BA9D0 text, while native put_sprite callbacks have an independently unclassified shared inner callsite.",
+    "root_cause": "OutRunHudTextProducer_dest classified caller range without verifying the actual E8 parent, and TagDirectVrSpriteNodes returned on the shared unclassified inner call before the exact text/peripheral outer producer could be carried onto appended live SpriteNodes.",
+    "source_trace": [
+      "Original HUD source E8 -> scoped exact text token while native font producer runs.",
+      "Shared put_sprite node append -> bounded stable-root queue proof and original parent source stamp.",
+      "R84 physical draw consumes ScreenHud producer via current queue and routes through existing guarded stereo eye path."
+    ],
+    "alternatives_rejected": [
+      "No broad ret-5 producer tagging for unknown indirect/FF calls.",
+      "No reclassification of +TIME, GOAL, car rank or lens as generic text.",
+      "No changes to original game binary, DXVK, FFB/input, SkyGlow or R26_SAFE."
+    ],
+    "fix_evidence": "Material source code commit 3733e4426ae6562993756e1cdb56062c468540c2 with compile-time positive/negative route coverage; automated Windows/HMD evidence pending."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "native_hud_text_source_to_queue": "PENDING_EXACT_SHA",
+    "foreign_text_and_effect_fallback": "PENDING_EXACT_SHA",
+    "hud_text_final_exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "note": "Publish material+feature input together; only the final validation-bearing HEAD is pushed for exact-SHA Windows CI. No CI-skip."
+  }
+}
