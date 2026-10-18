@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01045",
+  "production_id": "CONVERSION-DX9EX-01045",
+  "event_id": "CONVERSION-DX9EX-01045-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "BUILD_VALIDATION_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp"
+  ],
+  "material_result_sha": "5366b7d7f3dac1d23f75c9df461925719887c35d",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Preserve native vehicle-attached and separate rival rank marker source identity and Calc3D2D anchor across nested original sprite producers and rebuilt priority lists, so a foreign exact child does not inherit the outer car's left/right projected eye owner.",
+    "scope_boundary": "Original R84 rank sprani, clipped 4th/5th digits and separate rival marker queued siblings only; no new broad HUD/world promotion, no forced physical Draw/Flush, preserve R26_SAFE, F11/ESC, GOAL, +TIME, SkyGlow, input/FFB and independent DX11/frozen DXVK.",
+    "trace_stages": [
+      "Original 0x4BAD20 Calc3D2D RankMarker sprani and clipped-digit native x86 producer snapshots anchor, root/tail and sprite registration serial before calling the game.",
+      "Nested original CALL may tag another exact producer; TagAppendedNodes bounded proof rejects replaced root/detached tail and preserves nested registration newer than outer entry.",
+      "R84 SpriteNode RenderScope/ProducerToken/ProjectedMarkerInfo is consumed by R30/33 per-eye GPU route then by x64 OpenXR host; per-eye runtime optical correctness remains untested."
+    ],
+    "subcomponents": [
+      "Freeze registration boundary across both animated and clipped vehicle rank sources.",
+      "Capture and require the prior native priority root for separate rival sprani queue and preserve a nested exact producer.",
+      "Compile-time positive/negative queue/serial regression for preserved sibling, replaced root, detached tail, same/foreign producer, newer/older/unknown serial."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_native_source_queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original Calc3D2D vehicle marker sprite/digit and rival producer into R84 queued per-eye owner",
+        "expected_behavior": "Outer post-call tagging preserves exact nested source, same-root live siblings, native anchor and explicit projected vs WorldBillboard fallback."
+      },
+      {
+        "id": "rank_negative_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Rebuilt/reused queue, foreign exact nested producer, native no-anchor, world/HUD/SkyGlow, R26_SAFE and input",
+        "expected_behavior": "No foreign/recycled root or newer exact sibling gains prior car's identity; native unknown remains conservative."
+      },
+      {
+        "id": "rank_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 full-chain game, R26_SAFE, x64 host and Active ZIP; Domain, HUD Inspector and Full Source",
+        "expected_behavior": "Exact validation-bearing source SHA mandatory Gates SUCCESS; Quest3 binocular appearance and frame pacing separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_native_source_queue": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "rank_negative_native_fallback": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "rank_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Original vehicle-attached rank and rival sprite/clip native CALL producers can enqueue siblings and reenter other UI producers while post-call tags inherit outer Calc3D2D source.",
+    "source_trace": [
+      "RankMarker_sprani and RankMarker_putClipSprite had stable-root snapshot but omitted preserveNewerExactSince when calling TagAppendedNodes.",
+      "RivalMarker_sprani captured only before tails; with no sourceRoots argument it lacked stable-root proof despite RivalMarkerSprani requiring exact bounded queue association.",
+      "RegisterSpriteNodeScope already supports PreserveNestedExactSpriteOwner(serial) but omitted caller entry serial for all three original rank source wrappers."
+    ],
+    "root_cause": "A newer nested exact SpriteNode registration could be overwritten by outer rank post-call tagging; rival source also accepted a reattached old tail under a replaced priority root without a stable-root snapshot.",
+    "fix_evidence": "C++ source material commit 5366b7d7f3dac1d23f75c9df461925719887c35d adds entry-serial guard to rank sprani, rank clip and rival sprani; rival root snapshot; compile-time queue and serial positives/negatives.",
+    "negative_test_evidence": "TestVehicleRankNestedQueueOwnership: live sprite+digit siblings; replaced priority root with reused old tail; detached old tail; newer foreign source, same producer, older source and missing serial.",
+    "eye_ownership": "The native queued source carries existing exact render scope/ProjectedMarkerInfo to physical R84 draw; no new broad eye authority is granted. HMD still needed for original reported rank headlock/duplication."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "material_source_sha": "5366b7d7f3dac1d23f75c9df461925719887c35d",
+    "final_exact_sha_gates": "PENDING"
+  },
+  "notes": "Single coherent native vehicle/rival rank queue ownership source repair. Existing optical failures remain unverified until Quest3/VDXR; this source guard alone does not prove the whole visible rank feature is fixed. No new score until exact-SHA build confirmation and one independent accepted functional result."
+}
