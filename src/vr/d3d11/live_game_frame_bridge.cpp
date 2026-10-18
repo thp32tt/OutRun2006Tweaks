@@ -4494,7 +4494,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (!env_full_game_opt_in() || !game || !bytes || !stride ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
         type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
-        type != D3DPT_TRIANGLEFAN)
+        type != D3DPT_TRIANGLEFAN &&
+        type != D3DPT_LINELIST && type != D3DPT_LINESTRIP)
         return false;
     // The shared R30 observer has already validated the exact source
     // primitive element count. Reuse it rather than decoding twice.
@@ -4543,6 +4544,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         (colorMask & ~0x0fu) != 0u || srgbWrite != FALSE ||
         !game_native_backbuffer_ready(game, viewport))
         return false;
+    // Original D3D9 menu/race line strips and lists use one-pixel
+    // LASTPIXEL raster rules. An antialiased or last-pixel-disabled line
+    // cannot be silently converted to a single-sample D3D11 line.
+    // Query this state on the real shader-bound game Draw before touching GPU.
+    if (type == D3DPT_LINELIST || type == D3DPT_LINESTRIP) {
+        DWORD lineAA = TRUE, lastPixel = FALSE;
+        if (FAILED(game->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)) ||
+            FAILED(game->GetRenderState(D3DRS_LASTPIXEL, &lastPixel)) ||
+            !game_native_sm3_line_raster(static_cast<std::uint32_t>(type),
+                                         lineAA != FALSE, lastPixel != FALSE))
+            return false;
+    }
     // A real programmable game Draw can use ALWAYS/one-sided stencil with
     // zero write mask; that is pixel-equivalent to disabled stencil. A
     // conditional test or any possible write must stay on original D3D9.
@@ -5013,7 +5026,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ID3D11Buffer* stream = s.fullGameVertexUpload.Get();
     context->IASetInputLayout(pipeline.inputLayout.Get());
     context->IASetVertexBuffers(0u, 1u, &stream, &nativeStride, &offset);
-    context->IASetPrimitiveTopology(type == D3DPT_TRIANGLESTRIP ?
+    // Keep the authentic primitive family across programmable VB, IB and
+    // UP game draws. Fan indices above were already triangulated; line
+    // topologies must NEVER be reinterpreted as filled triangles.
+    context->IASetPrimitiveTopology(type == D3DPT_LINELIST ?
+        D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
+        type == D3DPT_LINESTRIP ?
+        D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP :
+        type == D3DPT_TRIANGLESTRIP ?
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP :
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     if (nativeIndices)

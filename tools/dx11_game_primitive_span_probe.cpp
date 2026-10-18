@@ -49,6 +49,16 @@ int main() {
         assert(!game_native_primitive_element_count(kind, kMaxNativeGamePrimitives + 1u, elements) &&
                elements == retained);
     }
+    // 00941: shader-bound game line list/strip admission and fallback.
+    using outrun::vr::dx11::live_game_frame::game_native_sm3_line_raster;
+    assert(game_native_sm3_line_raster(2u, false, true));
+    assert(game_native_sm3_line_raster(3u, false, true));
+    for (unsigned invalid : {0u, 1u, 4u, 5u, 6u, 7u})
+        assert(!game_native_sm3_line_raster(invalid, false, true));
+    assert(!game_native_sm3_line_raster(2u, true, true));
+    assert(!game_native_sm3_line_raster(3u, true, true));
+    assert(!game_native_sm3_line_raster(2u, false, false));
+    assert(!game_native_sm3_line_raster(3u, false, false));
     using outrun::vr::dx11::live_game_frame::game_native_unit_point_raster;
     constexpr unsigned one = 0x3f800000u;
     constexpr unsigned zero = 0u;

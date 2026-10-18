@@ -92,6 +92,23 @@ for token in (
 ):
     check(token in source, "SM3 converted game index ownership missing: " + token)
 
+# Real programmable menu/race lines already exist in the D3D9 observer,
+# but must reach the actual native SM3 IA topology instead of being
+# reinterpreted as triangles. Unsupported AA/LASTPIXEL must fail closed.
+for token in (
+    "type != D3DPT_LINELIST && type != D3DPT_LINESTRIP",
+    "D3DRS_ANTIALIASEDLINEENABLE", "D3DRS_LASTPIXEL",
+    "game_native_sm3_line_raster(static_cast<std::uint32_t>(type),",
+    "D3D11_PRIMITIVE_TOPOLOGY_LINELIST",
+    "D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP",
+    "context->IASetPrimitiveTopology(type == D3DPT_LINELIST ?",
+):
+    check(token in source, "live SM3 game line/strip GPU routing absent: " + token)
+span_header = (ROOT / "src/vr/d3d11/live_game_primitive_span.hpp").read_text()
+check("!antialiased && lastPixel" in span_header and
+      "game_native_sm3_line_raster(3u, false, true)" in span_header,
+      "live SM3 D3D9 line raster unsupported-state fallback absent")
+
 # SM3 first-Draw source ColorFill must be replayed as actual GPU ClearView
 # BEFORE native Draw and only after matching owner, extent and D3D11.1.
 check("s.preDrawFills.count != 0u || viewport.Width" not in source,

@@ -164,6 +164,21 @@ inline bool game_compact_sparse_indices(
      return true;
  }
 
+// D3D9 single-sample line raster parity for *programmable* VS/PS draws.
+ // The fixed-function game raster already uses these same exclusions.
+ // A rejected raster never mutates the native color/depth output; original
+ // D3D9 remains the only source of menu/race pixels and gamepad behavior.
+[[nodiscard]] constexpr bool game_native_sm3_line_raster(
+    std::uint32_t d3d9Type, bool antialiased, bool lastPixel) noexcept {
+    return (d3d9Type == 2u || d3d9Type == 3u) &&
+           !antialiased && lastPixel;
+}
+static_assert(game_native_sm3_line_raster(2u, false, true) &&
+              game_native_sm3_line_raster(3u, false, true) &&
+              !game_native_sm3_line_raster(2u, true, true) &&
+              !game_native_sm3_line_raster(3u, false, false) &&
+              !game_native_sm3_line_raster(4u, false, true));
+
 // D3D11 draws 1-pixel points, but D3D9 may enlarge each point, scale it,
 // use per-vertex PSIZE or expand texture coordinates as point sprites.
  // Only the exact unscaled singleton form is sampled into the opt-in inset.
