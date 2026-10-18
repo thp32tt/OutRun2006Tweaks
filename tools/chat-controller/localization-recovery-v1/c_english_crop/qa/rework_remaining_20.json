@@ -1,0 +1,266 @@
+{
+  "status": "REWORK_OUTSTANDING_MANUAL_NATIVE_CROP_REQUIRED",
+  "count": 20,
+  "items": [
+    {
+      "visual_sheet_index": 1,
+      "source_png": "Q044_19CEDB9_BASE_READABLE_FLIPY.png",
+      "english": "Ranking",
+      "original_box": [
+        248,
+        154,
+        597,
+        324
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Car and neighboring stage text included"
+    },
+    {
+      "visual_sheet_index": 4,
+      "source_png": "Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "english": "Sector4",
+      "original_box": [
+        187,
+        336,
+        379,
+        396
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Neighboring vertical black UI fragment"
+    },
+    {
+      "visual_sheet_index": 10,
+      "source_png": "Q050_CBF8ECBF_BASE_READABLE_FLIPY.png",
+      "english": "FRIEND REQUEST",
+      "original_box": [
+        611,
+        979,
+        1380,
+        1113
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Yellow UI borders/plate lines cross crop"
+    },
+    {
+      "visual_sheet_index": 12,
+      "source_png": "Q051_FF2462BB_BASE_READABLE_FLIPY.png",
+      "english": "Leader!",
+      "original_box": [
+        3106,
+        870,
+        3604,
+        977
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Black vertical UI element included"
+    },
+    {
+      "visual_sheet_index": 15,
+      "source_png": "Q051_FF2462BB_BASE_READABLE_FLIPY.png",
+      "english": "Rival",
+      "original_box": [
+        2328,
+        539,
+        2484,
+        601
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Right neighboring letter visible"
+    },
+    {
+      "visual_sheet_index": 17,
+      "source_png": "Q051_FF2462BB_BASE_READABLE_FLIPY.png",
+      "english": "Start",
+      "original_box": [
+        1324,
+        731,
+        1460,
+        789
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Stray bottom UI pixels included"
+    },
+    {
+      "visual_sheet_index": 18,
+      "source_png": "Q052_A8CE339F_BASE_READABLE_FLIPY.png",
+      "english": "Goal",
+      "original_box": [
+        1412,
+        300,
+        1535,
+        357
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Stray bottom UI pixels included"
+    },
+    {
+      "visual_sheet_index": 19,
+      "source_png": "Q052_A8CE339F_BASE_READABLE_FLIPY.png",
+      "english": "Start",
+      "original_box": [
+        788,
+        301,
+        921,
+        358
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Stray bottom UI pixels included"
+    },
+    {
+      "visual_sheet_index": 36,
+      "source_png": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "english": "HARD",
+      "original_box": [
+        805,
+        291,
+        1071,
+        369
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "White/green adjacent plate parts protrude from HARD crop"
+    },
+    {
+      "visual_sheet_index": 41,
+      "source_png": "Q101_560FA536_BASE_READABLE_FLIPY.png",
+      "english": "Versus Special Course has been selected.",
+      "original_box": [
+        1493,
+        1508,
+        3485,
+        1645
+      ],
+      "visual_triage": "REWORK_CLIPPED_OR_LABEL_MISMATCH",
+      "visual_triage_reason": "Recorded English label incomplete relative to visible full sentence"
+    },
+    {
+      "visual_sheet_index": 46,
+      "source_png": "Q135_2B0863D6_BASE_READABLE_FLIPY.png",
+      "english": "INTERMEDIATE B",
+      "original_box": [
+        801,
+        90,
+        1402,
+        201
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Neighboring NOVICE/CLASS/UI fragment included"
+    },
+    {
+      "visual_sheet_index": 49,
+      "source_png": "Q154_4D38BBB0_BASE_READABLE_FLIPY.png",
+      "english": "SELECT LICENSE",
+      "original_box": [
+        1955,
+        517,
+        3520,
+        712
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Duplicated adjacent SELECT LICENSE text"
+    },
+    {
+      "visual_sheet_index": 52,
+      "source_png": "Q164_5B65E08C_BASE_READABLE_FLIPY.png",
+      "english": "SELECT LICENSE",
+      "original_box": [
+        557,
+        550,
+        1526,
+        674
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Red UI border and neighboring sprite line"
+    },
+    {
+      "visual_sheet_index": 53,
+      "source_png": "Q197_9F060EC1_BASE_READABLE_FLIPY.png",
+      "english": "COMPLETE",
+      "original_box": [
+        383,
+        1551,
+        694,
+        1618
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Neighboring left number/sprite fragment"
+    },
+    {
+      "visual_sheet_index": 54,
+      "source_png": "Q197_9F060EC1_BASE_READABLE_FLIPY.png",
+      "english": "DRIVE TIME",
+      "original_box": [
+        385,
+        1824,
+        723,
+        1889
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Neighboring left number/sprite fragment"
+    },
+    {
+      "visual_sheet_index": 55,
+      "source_png": "Q197_9F060EC1_BASE_READABLE_FLIPY.png",
+      "english": "VS RANK",
+      "original_box": [
+        382,
+        1642,
+        640,
+        1709
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Neighboring left number/sprite fragment"
+    },
+    {
+      "visual_sheet_index": 56,
+      "source_png": "Q197_9F060EC1_BASE_READABLE_FLIPY.png",
+      "english": "WIN RATIO",
+      "original_box": [
+        383,
+        1732,
+        692,
+        1799
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Neighboring left number/sprite fragment"
+    },
+    {
+      "visual_sheet_index": 59,
+      "source_png": "Q201_A9ABD877_BASE_READABLE_FLIPY.png",
+      "english": "CONIFEROUS FOREST",
+      "original_box": [
+        89,
+        1924,
+        1186,
+        2036
+      ],
+      "visual_triage": "REWORK_CLIPPED_OR_LABEL_MISMATCH",
+      "visual_triage_reason": "Coniferous Forest meets adjacent text at right edge"
+    },
+    {
+      "visual_sheet_index": 60,
+      "source_png": "Q201_A9ABD877_BASE_READABLE_FLIPY.png",
+      "english": "GIANT STATUES",
+      "original_box": [
+        179,
+        1678,
+        1082,
+        1801
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Adjacent typography touches right edge"
+    },
+    {
+      "visual_sheet_index": 74,
+      "source_png": "Q225_E3C455FA_BASE_READABLE_FLIPY.png",
+      "english": "SETUP",
+      "original_box": [
+        941,
+        501,
+        1201,
+        584
+      ],
+      "visual_triage": "REWORK_NEIGHBOR_ART_INCLUDED",
+      "visual_triage_reason": "Black left menu/UI bar included"
+    }
+  ]
+}
