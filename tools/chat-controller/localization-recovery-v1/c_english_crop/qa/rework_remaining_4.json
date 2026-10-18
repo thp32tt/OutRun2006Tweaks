@@ -1,0 +1,54 @@
+{
+  "status": "MANUAL_MASK_OR_REVIEW_NEEDED_NOT_AUTO_DISPATCHED",
+  "count": 4,
+  "items": [
+    {
+      "visual_sheet_index": 12,
+      "english": "Leader!",
+      "source_png": "Q051_FF2462BB_BASE_READABLE_FLIPY.png",
+      "bbox_xyxy": [
+        3106,
+        870,
+        3604,
+        977
+      ],
+      "reason": "Black vertical UI element included"
+    },
+    {
+      "visual_sheet_index": 36,
+      "english": "HARD",
+      "source_png": "Q062_33491F83_BASE_READABLE_FLIPY.png",
+      "bbox_xyxy": [
+        805,
+        291,
+        1071,
+        369
+      ],
+      "reason": "White/green adjacent plate parts protrude from HARD crop"
+    },
+    {
+      "visual_sheet_index": 49,
+      "english": "SELECT LICENSE",
+      "source_png": "Q154_4D38BBB0_BASE_READABLE_FLIPY.png",
+      "bbox_xyxy": [
+        1955,
+        517,
+        3520,
+        712
+      ],
+      "reason": "Duplicated adjacent SELECT LICENSE text"
+    },
+    {
+      "visual_sheet_index": 59,
+      "english": "CONIFEROUS FOREST",
+      "source_png": "Q201_A9ABD877_BASE_READABLE_FLIPY.png",
+      "bbox_xyxy": [
+        89,
+        1924,
+        1186,
+        2036
+      ],
+      "reason": "Coniferous Forest meets adjacent text at right edge"
+    }
+  ]
+}
