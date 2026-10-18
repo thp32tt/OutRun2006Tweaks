@@ -61,7 +61,7 @@
     ],
     "acceptance_proof": {
       "positive_probe": "C++ compilation executes real SM3 fragment shader source generation (DSX/DSY/TEXKILL), with integrated D3D11 Draw source binding verified by existing contract.",
-      "negative_regression": "Vertex derivatives/TEXKILL, malformed TEXKILL and uninitialized TEMP xyz fail closed to D3D9; probe asserts invalid emitter use.",
+      "negative_regression": "D3D9 TEMP TEXKILL requires ALL four lanes previously written (Microsoft D3DSIO_TEXKILL spec), enforced at instruction-time and emitter; xyz-only, wrong bank, vertex fragment op, invalid register and unknown shader ops fail closed.",
       "component_integration": "Source opcode translator and fragment HLSL emitter feed native shader materialization, game pixel shader CreatePixelShader and Draw/DrawIndexed."
     },
     "conflict_keys": [
@@ -87,14 +87,14 @@
   "pipeline": {
     "C0_RECOVER": "00930 prior exact-SHA success on 116f0a7d; fresh branch owner and HEAD inspected.",
     "C1_REVIEW": "SM3 live pixel fragment DSX, DSY and TEXKILL absent in native HLSL translator, falsely falling back on valid fragment programs.",
-    "C2_IMPLEMENT": "Emit real D3D11 ddx, ddy and clip pixel shader HLSL with fail-closed TEMP xyz liveness.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_5_GATES",
+    "C2_IMPLEMENT": "Integrated pixel derivative/kill code plus D3D9 normative four-lane TEXKILL safety repair; preserve instruction-time TEMP mask in HLSL emitter.",
+    "C3_VALIDATE": "Initial SHA superseded for causal TEXKILL D3D9 TEMP-writemask defect; revised exact SHA five Gate PENDING.",
     "C4_COMMIT": "PENDING_SHA",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_RESULT": "PENDING_CI"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "REAL_GAME_DRAW_BLOCKER": "Actual same-SHA game native draw and output remain UNTESTED; new SM3 fragment source paths require runtime observation.",
+  "REAL_GAME_DRAW_BLOCKER": "Original D3D9 requires all 4 TEMP lanes initialized before TEXKILL; causal source repair applied; actual game native Draw/output still UNTESTED.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "PENDING",

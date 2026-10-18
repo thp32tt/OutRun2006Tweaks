@@ -122,9 +122,14 @@ int main() {
     // Pixel-only TEXKILL reads all three prior TEMP lanes; no fabricated
     // zeros may turn an unwritten channel into a native pixel discard.
     std::string killSource;
-    assert(append_native_sm3_texkill(killSource, 2u, 0u));
+    static_assert(native_sm3_texkill_ready(2u, 15u));
+    static_assert(!native_sm3_texkill_ready(2u, 7u));
+    static_assert(!native_sm3_texkill_ready(2u, 0u));
+    static_assert(!native_sm3_texkill_ready(32u, 15u));
+    assert(append_native_sm3_texkill(killSource, 2u, 15u, 0u));
     assert(killSource == "    clip(r283_t2.xyz);\n");
-    assert(!append_native_sm3_texkill(killSource, 32u, 1u));
+    assert(!append_native_sm3_texkill(killSource, 2u, 7u, 1u));
+    assert(!append_native_sm3_texkill(killSource, 32u, 15u, 1u));
     assert(killSource == "    clip(r283_t2.xyz);\n");
     // Real backend rejects unwritten lanes even after a partial write.
     const unsigned tempWrittenX = 1u;

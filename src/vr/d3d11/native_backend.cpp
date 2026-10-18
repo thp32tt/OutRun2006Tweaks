@@ -364,6 +364,7 @@ bool build_r283_sm3_mov_shader_source(
             bool texture2d{};
             bool texkill{};
             unsigned samplerRegister{};
+            unsigned texkillWrittenMask{};
             std::array<std::string, 3> sources{};
             std::array<std::string, 4> matrixRows{};
         };
@@ -534,10 +535,15 @@ bool build_r283_sm3_mov_shader_source(
                 // D3D9 TEXKILL is encoded with a destination-style TEMP
                 // operand but only tests prior xyz values. Never promote a
                 // shader that kills from an unwritten channel or other bank.
+                // Microsoft D3D9 requires all FOUR TEMP components to have
+                // been written, even though clip tests xyz only.
                 if (mask != 0x0fu || op.destinationType != D3DSPR_TEMP ||
                     op.destinationRegister >= tempWritten.size() ||
-                    (tempWritten[op.destinationRegister] & 0x07u) != 0x07u)
+                    !native_sm3_texkill_ready(
+                        op.destinationRegister,
+                        tempWritten[op.destinationRegister]))
                     return false;
+                op.texkillWrittenMask = tempWritten[op.destinationRegister];
                 tempUsed[op.destinationRegister] = true;
                 operations.push_back(std::move(op));
                 continue;
@@ -732,7 +738,7 @@ bool build_r283_sm3_mov_shader_source(
             if (op.texkill) {
                 if (!append_native_sm3_texkill(
                         translated, op.destinationRegister,
-                        static_cast<unsigned>(i)))
+                        op.texkillWrittenMask, static_cast<unsigned>(i)))
                     return false;
             } else if (op.texture2d) {
                 if (!append_native_sm3_texture2d_sample(
