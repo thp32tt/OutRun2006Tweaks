@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "kind": "ai2_feature_handoff",
+  "task_id": "CONVERSION-DX9EX-01052",
+  "production_id": "CONVERSION-DX9EX-01052",
+  "event_id": "CONVERSION-DX9EX-01052-E004",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "target_observed_head": "1a59e6c665db07cf315e598f190d683db92b506d",
+  "base_material_sha": "1aaf6e830fdbebba5184a651badeac45b8038fd4",
+  "feature_branch": "vr-d3d9ex-candidate/01052-c993-eye-route-test",
+  "feature_head": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+  "stage": "C5_VALIDATE",
+  "feature_changed_files": [
+    "tools/verify_dx9ex_r84_lens_source.py"
+  ],
+  "root_ci_failure": {
+    "run_id": 39148542943,
+    "reason": "unsafe mutation survived: 7 in R30 depthless right-pass verifier",
+    "already_repaired_by_other_feature": true
+  },
+  "feature_ci": {
+    "active_run_id": 39151296043,
+    "hud_run_id": 39151296072,
+    "policy": "SUCCESS",
+    "exact_c993_mutations": 70,
+    "r30_depthless_mutations": 12,
+    "game_host_package": "IN_PROGRESS"
+  },
+  "remaining": [
+    "Confirm feature CI host/game/full-chain-compile/package SUCCESS on exact feature SHA",
+    "Read artifacts",
+    "Refresh current target HEAD and compare feature branch behind_by==0",
+    "Fast-forward safely via update_ref expected_sha and force=false",
+    "Check four required workflows on exact target HEAD, then C6 record"
+  ],
+  "runtime_validation": "UNTESTED",
+  "score_change": 0,
+  "reason": "Durable source-and-CI state only; not a result-completion or scoring event"
+}
