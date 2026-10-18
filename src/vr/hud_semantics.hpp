@@ -232,6 +232,12 @@ namespace OutRunVRHudSemantics
     static_assert(ClassifyDirectCallsite(0x0B9F3A, 0xE8).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyDirectCallsite(0x0BB0FB, 0xE8).space == SpacePolicy::WorldBillboard);
     static_assert(ClassifyDirectCallsite(0x0B9F3A, 0xFF).space == SpacePolicy::Unknown);
+    // The direct BA9D0 text wrapper now checks the real parent instruction,
+    // rather than assigning ScreenHud from a function range after FF/90.
+    static_assert(ClassifyDirectCallsite(0x0B90B3, 0xE8).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyDirectCallsite(0x0BE4BC, 0xE8).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyDirectCallsite(0x0B90B3, 0xFF).space == SpacePolicy::Unknown);
+    static_assert(ClassifyDirectCallsite(0x0BE4BC, 0x90).space == SpacePolicy::Unknown);
     static_assert(ClassifyDirectCallsite(0x0BB0FB, 0xFF).space == SpacePolicy::Unknown);
     static_assert(ClassifyDirectCallsite(0x098A89, 0x90).space == SpacePolicy::Unknown);
     static_assert(ClassifyDirectCallsite(0x0B9500, 0xE8).space == SpacePolicy::Unknown);

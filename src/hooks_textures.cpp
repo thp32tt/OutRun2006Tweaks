@@ -1019,7 +1019,18 @@ class TextureReplacement : public Hook
 			scope = OutRunVR::GameSemantic::RenderScope::WorldBillboard;
 			break;
 		default:
-			return;
+			// The shared 0x4BA9D0 text formatter can emit native SpriteNodes
+			// through a caller which has no independent spatial classification.
+			// Its exact original E8 HUD parent, while still on the stack, owns
+			// those nodes. Never extend this fallback to arbitrary HUD, GOAL,
+			// lens, world markers or unverified source calls.
+			if (!OutRunVR::DirectSpriteSource::CanCarryExactHudTextAtUnknownCallsite(
+				OutRunVR::DirectSpriteSource::ProvenScreenHudProducer(
+					OutRunVR::GameSemantic::RenderScope::ScreenHud,
+					sourceBefore, sourceAfter)))
+				return;
+			scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+			break;
 		}
 
 		// The original call may have reentered a distinct producer. Only

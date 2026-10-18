@@ -1133,8 +1133,15 @@ class UIScaling : public Hook
 	static void __cdecl OutRunHudTextProducer_dest(
 		int glyphSet, int x, int y, const char* text, int a4, float alpha)
 	{
-		const auto caller = OutRunHudTextCallerRva(_ReturnAddress());
-		const auto semantic = OutRunVRHudSemantics::ClassifyCaller(caller);
+		const void* returnAddress = _ReturnAddress();
+		const auto caller = OutRunHudTextCallerRva(returnAddress);
+		// Keep direct native HUD ownership on a verified original E8 edge.
+		// A function-range match alone cannot identify an indirect CALL's
+		// producer; leave those glyphs on the unclassified native path.
+		const auto semantic = caller
+			? OutRunVRHudSemantics::ClassifyDirectCallsite(caller,
+				*(reinterpret_cast<const std::uint8_t*>(returnAddress) - 5))
+			: OutRunVRHudSemantics::UnknownInfo();
 		const bool previous = OutRunHudTextScreenHud;
 		const bool previousPeripheral = OutRunHudPeripheralText;
 		OutRunHudTextScreenHud = previous ||
