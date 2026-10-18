@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "dx9ex_rollover_durable_handoff",
+  "task_id": "CONVERSION-DX9EX-01052",
+  "production_id": "CONVERSION-DX9EX-01052",
+  "event_id": "CONVERSION-DX9EX-01052-E004",
+  "event_type": "rollover",
+  "attempt": "2/3",
+  "target_branch": "vr-d3d9ex-focus",
+  "target_latest_confirmed_head": "a4d41f34bde0a7d8152a4cf54453b53cae139839",
+  "feature_branch": "vr-d3d9ex-candidate/01052-c993-eye-route-test",
+  "feature_ready_sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+  "material_cpp_sha": "1aaf6e830fdbebba5184a651badeac45b8038fd4",
+  "final_c6_evidence_record": "docs/automation/runs/CONVERSION-DX9EX-01052.json",
+  "c6_policy_repair_sha": "a4d41f34bde0a7d8152a4cf54453b53cae139839",
+  "same_sha_4_of_4_completed_on_feature_ready": {
+    "sha": "59d70a6cfe78058da40c8c646de43d79ebbaf06f",
+    "runs": {
+      "active": 39151903692,
+      "domain": 39151903760,
+      "hud": 39151903710,
+      "full_source": 39151903728
+    }
+  },
+  "c6_final_sha_gates": {
+    "sha": "a4d41f34bde0a7d8152a4cf54453b53cae139839",
+    "active": {
+      "id": 39152728466,
+      "status": "SUCCESS",
+      "package": "SUCCESS",
+      "artifacts": 7
+    },
+    "domain": {
+      "id": 39152728478,
+      "status": "SUCCESS"
+    },
+    "hud": {
+      "id": 39152728380,
+      "status": "SUCCESS"
+    },
+    "full_source": {
+      "id": 39152728446,
+      "status": "PENDING_RUN",
+      "note": "Prior obsolete 00d Full Source #39152633517 completed SUCCESS, new final a4d run queued with jobs starting."
+    }
+  },
+  "next_action": "Check exact target-head Full Source #39152728446 completion; if success, final 4/4 on a4d and no changes. If fails fix only root cause under same TASK; no rescore. Use GitHub head SSOT.",
+  "scoreboard": {
+    "repo": "thp32tt/ai-dev-lab",
+    "branch": "main",
+    "score": 1530,
+    "previous": 1529,
+    "delta": 1,
+    "run_key": "CONVERSION-DX9EX-01052",
+    "ssot_commit": "915b04703bb2bca6aabf75da0d1c325908fd6ecc",
+    "duplicate_count": 0
+  },
+  "runtime_validation": "UNTESTED"
+}
