@@ -152,8 +152,9 @@ assert audit_native_offscreen_game_draw(
 ), "physical offscreen raster admission bypass slipped through"
 assert audit_native_offscreen_game_draw(
     source.replace(
-        "ctx->RSGetScissorRects(&count, &scissor);",
-        "count = 1u;", 1), probe
+        "ctx->RSGetScissorRects(&count, &scissor);\n"
+        "        if (count != 1u) return false;",
+        "count = 1u;\n        if (count != 1u) return false;", 1), probe
 ), "offscreen scissor fetch bypass slipped through"
 assert audit_native_offscreen_game_draw(
     source, probe.replace(
