@@ -3498,10 +3498,13 @@ private:
         const auto source = command.producer;
         // Prove the original 19 E8 parent stack at CPU Draw, before D3DX
         // defers its GPU submission. Never inherit a queued node identity.
+        // An unowned original caller already passed the expensive stack
+        // check above; reuse that exact proof rather than unwinding twice
+        // per numeric glyph. Owned callers still require a fresh stack check.
         const bool provenDirectB9200 = Settings::VREnabled &&
             !command.queued && command.scope == RenderScope::ScreenHud &&
             source == ProducerToken::ResultTextB9200 &&
-            OriginalB9200GoalStackActive();
+            (exactB9200Direct || OriginalB9200GoalStackActive());
         const auto submission = HudBatch.snapshot();
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
