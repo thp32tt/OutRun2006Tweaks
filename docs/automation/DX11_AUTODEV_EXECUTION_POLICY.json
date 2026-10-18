@@ -3,7 +3,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "effective_from_task_number": 531,
-  "mission": "2026-10-14 override: implement full-resolution actual OutRun gameplay D3D9->native D3D11 Draw/DrawIndexed->full-frame presentation across menu/vehicle/race BEFORE more 256x144 inset probes, WARP-only work, isolated state formats, CI bookkeeping or speculative optimizations. Keep safe DX9Ex fallback and final exact-SHA quality gate.",
+  "mission": "2026-10-18 user override: first REAL live-game programmable shader bound D3D9 Draw -> native D3D11 GPU Draw -> full game frame -> early test candidate -> native L/R OpenXR; do not produce endless state/guard/CI-only microtasks or optimize DX9Ex performance while native Draw=0. Use compatible DXUP/DXVK/HlslDecompiler code/semantics where justified; final exact-SHA gates unchanged.",
   "policy_status": "repository-enforced-at-exact-sha-ci; external controller runtime adoption requires separate verification",
   "no_automatic_gameplay_promotion": true,
   "allowed_work_classes": [
@@ -15,48 +15,54 @@
   ],
   "milestones": [
     {
-      "id": "full_resolution_native_game_frame",
-      "rank": 0,
-      "work_class": "integration",
-      "owner_conflict_key": "DX11:FULL_RESOLUTION_GAME_FRAME",
-      "done_when": "Actual intercepted live D3D9 game Draw and DrawIndexed with native VS/PS, resources and render target produce the full-size menu/vehicle/race game frame (not solely 256x144 inset), connected to guarded presentation with original D3D9 gamepad/render fallback; source/CI verified distinctly from HMD observed output."
-    },
-    {
-      "id": "shader_parity_r175",
-      "rank": 1,
-      "work_class": "blocker_resolution",
-      "owner_conflict_key": "DX11:R175:existing-00477",
-      "done_when": "Exact WARP TEXCOORD6/VS-PS varying color matches expected; no unrelated probe bypass",
-      "note": "Do not duplicate an active/blocked owner without fenced release or new evidence."
-    },
-    {
       "id": "first_live_game_draw",
-      "rank": 2,
+      "rank": 0,
       "work_class": "vertical_slice",
       "owner_conflict_key": "DX11:REAL_GAME_DRAW",
       "done_when": "Intercept a real game-authored D3D9 draw; bind live D3D11 resources, shader, IA/OM; issue guarded native Draw/DrawIndexed into a game-visible diagnostic target, record pixel/frame evidence and DX9Ex fallback. CI/WARP is not sufficient to claim in-game PASS."
     },
     {
-      "id": "gameplay_draw_activation",
+      "id": "full_resolution_native_game_frame",
+      "rank": 1,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:FULL_RESOLUTION_GAME_FRAME",
+      "done_when": "Actual intercepted live D3D9 game Draw and DrawIndexed with native VS/PS, resources and render target produce the full-size menu/vehicle/race game frame (not solely 256x144 inset), connected to guarded presentation with original D3D9 gamepad/render fallback; source/CI verified distinctly from HMD observed output."
+    },
+    {
+      "id": "programmable_shader_path",
+      "rank": 2,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
+      "done_when": "Representative observed VS/PS pair materialized and bound with correct constants/input layout and GPU pixel result"
+    },
+    {
+      "id": "native_stereo_eye_transport",
       "rank": 3,
+      "work_class": "integration",
+      "owner_conflict_key": "DX11:EYE_XR_HANDOFF",
+      "done_when": "D3D11 eye target producer -> shared ring/host consumes exact generation with fence and ACK proof"
+    },
+    {
+      "id": "gameplay_draw_activation",
+      "rank": 4,
       "work_class": "integration",
       "owner_conflict_key": "DX11:GAME_DRAW_ACTIVATION",
       "done_when": "Controlled opt-in/fail-closed routing of supported game draws to the native frame output with fallback for unsupported states; capture a game frame and input-safe return path."
     },
     {
       "id": "menu_to_race_native_frame",
-      "rank": 4,
+      "rank": 5,
       "work_class": "integration",
       "owner_conflict_key": "DX11:MENU_RACE_FRAME",
       "done_when": "Actual game menu/vehicle selection/race draw path and presentation validated against DX9Ex reference, with Quest 3 testing separately tracked."
     },
     {
-      "id": "mono_native_draw",
-      "rank": 5,
-      "work_class": "vertical_slice",
-      "owner_conflict_key": "DX11:MONO_NATIVE_DRAW",
-      "done_when": "Owned D3D9 source snapshot -> D3D11 resources+shader -> real WARP Draw -> positive/negative pixel proof; gameplay routing remains disabled",
-      "note": "Historical pre-00537 dormant WARP milestone; no longer an independent new task"
+      "id": "shader_parity_r175",
+      "rank": 6,
+      "work_class": "blocker_resolution",
+      "owner_conflict_key": "DX11:R175:existing-00477",
+      "done_when": "Exact WARP TEXCOORD6/VS-PS varying color matches expected; no unrelated probe bypass",
+      "note": "Do not duplicate an active/blocked owner without fenced release or new evidence."
     },
     {
       "id": "live_resource_capture",
@@ -66,18 +72,12 @@
       "done_when": "Actual D3D9 creation/lock/unlock/mutation/reset/release lifetimes connect to D3D11 mirrors in fail-closed scoped test"
     },
     {
-      "id": "programmable_shader_path",
-      "rank": 8,
-      "work_class": "integration",
-      "owner_conflict_key": "DX11:PROGRAMMABLE_SHADER_TRANSLATION",
-      "done_when": "Representative observed VS/PS pair materialized and bound with correct constants/input layout and GPU pixel result"
-    },
-    {
-      "id": "native_stereo_eye_transport",
+      "id": "mono_native_draw",
       "rank": 9,
-      "work_class": "integration",
-      "owner_conflict_key": "DX11:EYE_XR_HANDOFF",
-      "done_when": "D3D11 eye target producer -> shared ring/host consumes exact generation with fence and ACK proof"
+      "work_class": "vertical_slice",
+      "owner_conflict_key": "DX11:MONO_NATIVE_DRAW",
+      "done_when": "Owned D3D9 source snapshot -> D3D11 resources+shader -> real WARP Draw -> positive/negative pixel proof; gameplay routing remains disabled",
+      "note": "Historical pre-00537 dormant WARP milestone; no longer an independent new task"
     },
     {
       "id": "dx11_build_acceleration",
@@ -118,7 +118,13 @@
     "defer_nonblocking_performance_until_real_game_frame": true,
     "require_compact_checkpoint_without_new_score": true,
     "require_whole_dx11_source_before_hmd_test": true,
-    "forbid_independent_microtasks_during_source_completion": true
+    "forbid_independent_microtasks_during_source_completion": true,
+    "require_material_native_game_draw_progress_before_new_independent_task": true,
+    "refuse_guard_only_terminal_playability": true,
+    "prohibit_rechecking_unchanged_exact_sha": true,
+    "prioritize_live_shader_bound_draw_at_native_draw_zero": true,
+    "enable_early_real_game_frame_test_candidate": true,
+    "import_external_source_only_after_license_review": true
   },
   "required_task_strategy_fields": [
     "work_class",
@@ -255,5 +261,59 @@
     "runtime_hmd": "defer until source integrated and full exact-SHA mandatory CI passes",
     "preserve": "opt-in, native activation fail-closed, original D3D9/DX9Ex renderer, gamepad, FFB and branch isolation",
     "external_controller_adoption": "NOT_VERIFIED"
+  },
+  "user_override_20261018": {
+    "status": "ACTIVE",
+    "execution_mode": "PLAYABLE_NATIVE_DX11_VERTICAL_SLICE_FIRST",
+    "supersedes": "2026-10-16 source-completion deferral of all real-game tests, not CI/fallback safety",
+    "known_runtime_evidence": {
+      "game_d3d9_draw_calls": 15548388,
+      "eligible_state_draws": 0,
+      "native_d3d11_draws": 0,
+      "native_published_frames": 0,
+      "quest3_native_dx11": "NOT_PROVEN"
+    },
+    "priority": [
+      "intercepted_game_programmable_shader_draw_to_d3d11",
+      "full_size_native_d3d11_game_frame_and_early_game_test",
+      "distinct_native_d3d11_left_right_openxr_gpu_handoff",
+      "menu_race_visual_correctness",
+      "performance_after_native_pixels"
+    ],
+    "implementation_required_per_cycle": true,
+    "prohibit_standalone_probe_guard_ci_only_delivery": true,
+    "continue_same_unfinished_feature_task_id": true,
+    "forbid_new_score_for_partial_dormant_microtask": true,
+    "final_ci": "unchanged five required exact SHA DX11 Fast/Backend/Windows Build/OpenXR/HUD once per integrated candidate; failure repair under same feature",
+    "runtime_truth": "positive native draw + native publication in same real-game SHA, then full contiguous menu-car-race and two-eye Quest3 separately",
+    "max_consecutive_validation_only_dispatches_when_implementable": 0,
+    "open_source_reference_priority": [
+      {
+        "repo": "misyltoad/dxup",
+        "license": "Zlib",
+        "role": "D3D9-to-D3D11 mapping candidate/reference",
+        "caveat": "archived 2019; evaluate compatibility and maintain attribution"
+      },
+      {
+        "repo": "doitsujin/dxvk",
+        "license": "Zlib",
+        "role": "D3D9 state/shader/resource mapping reference only",
+        "caveat": "Vulkan backend; not native D3D11 output"
+      },
+      {
+        "repo": "AndresTraks/HlslDecompiler",
+        "license": "MIT",
+        "role": "D3D9 Shader Model bytecode translation support",
+        "caveat": "shader decompile correctness must be tested"
+      },
+      {
+        "repo": "microsoft/D3D9On12",
+        "license": "MIT",
+        "role": "mapping reference only",
+        "caveat": "DX12 development prohibited"
+      }
+    ],
+    "forbid_unreviewed_external_code_import": true,
+    "external_controller_adoption": "UNVERIFIED"
   }
 }

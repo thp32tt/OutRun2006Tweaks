@@ -77,6 +77,25 @@ def validate_policy(policy: dict) -> list[str]:
             errors.append("feature-sized dispatch rule disabled: " + key)
     if not policy.get("required_task_strategy_fields"):
         errors.append("task strategy contract missing")
+    # 2026-10-18: Verify that recommendation/dispatch has a live-game delivery
+    # target, not only an ever-growing inventory of CI/probe milestones.
+    latest = policy.get("user_override_20261018") or {}
+    if (latest.get("status") != "ACTIVE" or
+        latest.get("execution_mode") != "PLAYABLE_NATIVE_DX11_VERTICAL_SLICE_FIRST" or
+        latest.get("max_consecutive_validation_only_dispatches_when_implementable") != 0 or
+        not latest.get("implementation_required_per_cycle") or
+        not latest.get("prohibit_standalone_probe_guard_ci_only_delivery") or
+        not latest.get("continue_same_unfinished_feature_task_id") or
+        not latest.get("forbid_unreviewed_external_code_import")):
+        errors.append("2026-10-18 playable-native-DX11 source-first dispatch override missing")
+    for rule in ("require_material_native_game_draw_progress_before_new_independent_task",
+                 "refuse_guard_only_terminal_playability",
+                 "prohibit_rechecking_unchanged_exact_sha",
+                 "prioritize_live_shader_bound_draw_at_native_draw_zero",
+                 "enable_early_real_game_frame_test_candidate",
+                 "import_external_source_only_after_license_review"):
+        if rules.get(rule) is not True:
+            errors.append("playable-DX11 execution rule disabled: " + rule)
     return errors
 
 
@@ -373,7 +392,19 @@ def main() -> int:
         print("DX11 policy FAIL:", "; ".join(errors))
         return 1
     if args.recommend:
-        print(json.dumps({"milestones": policy["milestones"], "selection_rules": policy["selection_rules"]}, indent=2))
+        print(json.dumps({
+            "active_priority": "REAL_LIVE_PROGRAMMABLE_GAME_DRAW_TO_NATIVE_D3D11",
+            "game_draw_status": "OBSERVED_15548388_D3D9__ZERO_ELIGIBLE__ZERO_NATIVE__ZERO_PUBLICATION",
+            "next_source_paths": [
+                "src/vr/d3d11/live_game_frame_bridge.cpp",
+                "src/vr/d3d11/native_backend.cpp",
+                "src/vr/d3d11/runtime_census.cpp",
+                "src/vr/d3d9/stereo_renderer_r30.cpp",
+            ],
+            "delivery_override": policy["user_override_20261018"],
+            "milestones": policy["milestones"],
+            "selection_rules": policy["selection_rules"],
+        }, indent=2))
         return 0
     run = latest_dx11_run() if args.check_latest else args.check_run
     if run:

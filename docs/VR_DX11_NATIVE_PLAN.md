@@ -1,5 +1,22 @@
 # OutRun VR — Native D3D11 backend
 
+## 2026-10-18 — emergency reroute to playable native DX11 (latest user instruction)
+
+The user observed a game running through the VR host, but native D3D11 game Draw still issued **zero** draws. Source evidence: ~15.5 million D3D9 source draws, zero native-state eligibility and zero native output. The older `source-complete-before-all-runtime-tests` plan produced too many isolated C++/CI microtasks. **Replace it with a working-vertical-slice-first plan and prompt desktop native-frame tests as soon as a real candidate exists.** Keep full mandatory CI and safe DX9Ex fallback.
+
+| Order | Actual implementation batch | Objective and truth gate |
+| --- | --- | --- |
+| 0 | Live programmable shader-bound game Draw | D3D9 real VS/PS + constants + VB/IB/texture/state mapped to D3D11, first game-origin D3D11 Draw and eligible state >0. Diagnose reject reasons, no fake/fixture-only counters. |
+| 1 | Native full frame in game | Full-resolution native render targets and complete source draw accounting, native-presented frames >0, control input intact; send a desktop menu/car/race play-test candidate when CI/build succeeds. |
+| 2 | Native L/R and OpenXR | GPU-only D3D11 stereo game images with host generation/fence/ACK, actual two-eye OpenXR output; CPU-to-D3D9 copyback cannot count. |
+| 3 | Gameplay visual correctness | Menu/car/race coverage, shader parity, HUD, shadow, flare, markers, Reset/device loss; Quest3 after candidate is real. |
+| 4 | Performance | Optimize frame pacing, texture/RT copies, 72Hz after game-native pixels exist. |
+
+**Reuse/adapt priority:** (1) [DXUP](https://github.com/misyltoad/dxup) zlib for real D3D9->D3D11 API/shader/FF implementation precedent, archived so evaluate rather than blindly replace; (2) [DXVK](https://github.com/doitsujin/dxvk) zlib for D3D9 resource/shader/state semantics only; (3) [HlslDecompiler](https://github.com/AndresTraks/HlslDecompiler) MIT for SM1-3 shader understanding; (4) [D3D9On12](https://github.com/microsoft/D3D9On12) MIT reference-only, do not revive DX12. [dgVoodoo2](https://github.com/dege-diosg/dgVoodoo2) may inform architecture only: no code import without explicit license verification. Reuse only attributable compatible code; preserve independent DXVK lane.
+
+**Operational change:** no new standalone probe-only feature; keep the same unfinished task/lease, make material source diffs before full CI, restrict review to a proven blocker, one integrated exact-SHA CI set plus failure repair, and do not award progress/declare playable for dormant or nativeDraw=0 builds. A finished CI source phase is not a finished game. The 2026-10-16 section below is history when conflicting with this runtime-first bounded integration approach.
+
+
 Baseline: `vr-r70-structure-squash` at `b6c208bbc9a411b9c035be26f9e1e9c014028738`
 
 Development branch: `vr-dx11-native-r71`
