@@ -983,7 +983,15 @@ class TextureReplacement : public Hook
 
 		const auto callRva =
 			static_cast<std::uint32_t>(offset) - 5u;
-		return OutRunVRHudSemantics::ClassifyCaller(callRva);
+		// Classify only E8 CALL rel32 sites in the mapped original EXE.
+		// An unknown address never reads arbitrary caller memory and stays
+		// on the normal native fallback; unproven indirect CALLs do not
+		// inherit broad HUD/world ownership from an adjacent function RVA.
+		const auto source = OutRunVRHudSemantics::ClassifyCaller(callRva);
+		if (source.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+			return source;
+		const auto opcode = *reinterpret_cast<const std::uint8_t*>(ret - 5u);
+		return OutRunVRHudSemantics::ClassifyDirectCallsite(callRva, opcode);
 	}
 
 	static void TagDirectVrSpriteNodes(

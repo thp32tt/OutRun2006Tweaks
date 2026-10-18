@@ -130,6 +130,16 @@ namespace OutRunVRHudSemantics
         return UnknownInfo();
     }
 
+    // The original producer's return RVA is only eligible for native HUD
+    // scope when it follows an x86 near CALL rel32 (E8). Broad function
+    // ranges alone cannot prove ownership for an indirect/thunk caller.
+    // Rejected callsites preserve the original unclassified fallback.
+    constexpr SemanticInfo ClassifyDirectCallsite(
+        std::uint32_t callRva, std::uint8_t opcode) noexcept
+    {
+        return opcode == 0xE8u ? ClassifyCaller(callRva) : UnknownInfo();
+    }
+
     // Exact reverse-engineered anchor inventory from hooks_uiscaling.cpp.
     // This is a review/test source-of-truth, even where the anchor itself is
     // not a direct sprite call and therefore may not appear in hudtrace.csv.
@@ -216,4 +226,13 @@ namespace OutRunVRHudSemantics
     static_assert(ClassifyCaller(0x0BB0FB).space == SpacePolicy::WorldBillboard);
     static_assert(ClassifyCaller(0x0BE5CD).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0FC84E).space == SpacePolicy::ScreenHud);
+    // Direct CALL eligibility must preserve stage/HUD and projected
+    // rank, but reject FF indirect calls and non-call neighbours.
+    static_assert(ClassifyDirectCallsite(0x098A89, 0xE8).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyDirectCallsite(0x0B9F3A, 0xE8).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyDirectCallsite(0x0BB0FB, 0xE8).space == SpacePolicy::WorldBillboard);
+    static_assert(ClassifyDirectCallsite(0x0B9F3A, 0xFF).space == SpacePolicy::Unknown);
+    static_assert(ClassifyDirectCallsite(0x0BB0FB, 0xFF).space == SpacePolicy::Unknown);
+    static_assert(ClassifyDirectCallsite(0x098A89, 0x90).space == SpacePolicy::Unknown);
+    static_assert(ClassifyDirectCallsite(0x0B9500, 0xE8).space == SpacePolicy::Unknown);
 }
