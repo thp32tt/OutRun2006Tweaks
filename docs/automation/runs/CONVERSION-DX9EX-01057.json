@@ -7,15 +7,15 @@
   "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "VALIDATION_PENDING",
-  "checkpoint": "C3_CI_REPAIR_PORTABLE_CXX20",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "b530057f1b582a6f886911f819c61c73be21bd78",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
   "changed_files": [
     "src/vr/game/hud_command_batch.hpp",
     "src/hooks_uiscaling.cpp",
@@ -80,8 +80,8 @@
     "DX9Ex Full Source Impact Review"
   ],
   "ci_evidence": {
-    "required_gates_state": "PENDING_FINAL_EXACT_SHA",
-    "validation_bearing_result_sha": null,
+    "required_gates_state": "PASS_ALL_FOUR_EXACT_SHA",
+    "validation_bearing_result_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
     "runtime_validation": "UNTESTED",
     "prior_failed_runs": [
       {
@@ -102,7 +102,37 @@
       }
     ],
     "local_targeted_gate": "R84 +TIME/GOAL ledger 49 destructive negative mutations PASS on 10c4d8e8; portable C++20 test initial compile exposed mixed auto enum declaration, repaired in this commit",
-    "required_workflows": []
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39163733221,
+        "conclusion": "success",
+        "head_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
+        "run_attempt": 2
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39163733234,
+        "conclusion": "success",
+        "head_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
+        "run_attempt": 1
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39163733366,
+        "conclusion": "success",
+        "head_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
+        "run_attempt": 1
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39163733293,
+        "conclusion": "success",
+        "head_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
+        "run_attempt": 1
+      }
+    ],
+    "terminal_status_prior_hold": "TERMINAL_STATUS_NOT_COMPLETE"
   },
   "failure_repair": {
     "failed_run_id": 39162812517,
@@ -116,5 +146,14 @@
     "goal_exact_sha_gate_and_hardware_split": "PENDING_EXACT_SHA"
   },
   "result_commit_kind": "material_source_plus_behavioral_regression_prior_commit",
-  "c6_commit_kind": "not_created_pending_validation"
+  "c6_commit_kind": "BOOKKEEPING_SKIP_CI",
+  "c6_completion": {
+    "reason_resolved": "TERMINAL_STATUS_NOT_COMPLETE",
+    "result_validation_sha": "f315c093d728bc64c694b38b6e5b4ae6c9273be8",
+    "validation_scope": "AUTOMATION_ONLY",
+    "runtime_validation": "UNTESTED",
+    "bookkeeping_only": true,
+    "ci_retrigger": false,
+    "score_delta": 0
+  }
 }
