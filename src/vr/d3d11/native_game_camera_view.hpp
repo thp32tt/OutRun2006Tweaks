@@ -1,6 +1,9 @@
 #pragma once
 #include "native_game_postpass_replay.hpp"
 #include <d3d11.h>
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 namespace outrun::vr::dx11 {
 
@@ -78,5 +81,66 @@ native_game_camera_dsv_extent(
         texture.Width, texture.Height, texture.MipLevels, mip,
         texture.ArraySize, slice, texture.SampleDesc.Count);
     return {extent.width, extent.height, mip, slice, extent.valid};
+}
+// D3D9 Clear is clipped to the current game viewport and (when enabled)
+// scissor as well as to explicit pRects. D3D11 ClearRTV/DSV and ClearView
+// ignore RS clipping. Compute the exact single-camera GPU clear rectangle
+// before choosing full RTV, D3D11.1 ClearView or the D3D11.0 raster route.
+struct NativeGameCameraClearRegion {
+    D3D11_RECT rect{};
+    bool valid{}, empty{}, full{};
+};
+
+[[nodiscard]] inline NativeGameCameraClearRegion native_game_camera_clear_region(
+    UINT width, UINT height, const D3D11_VIEWPORT& viewport,
+    bool scissorEnabled, const D3D11_RECT* scissor,
+    const D3D11_RECT* sourceRegion) noexcept {
+    if (!width || !height ||
+        width > static_cast<UINT>((std::numeric_limits<LONG>::max)()) ||
+        height > static_cast<UINT>((std::numeric_limits<LONG>::max)()))
+        return {};
+    const auto wholePixel = [](float n) noexcept {
+        return std::isfinite(n) && n >= 0.0f &&
+            n < static_cast<float>((std::numeric_limits<LONG>::max)()) &&
+            std::trunc(n) == n;
+    };
+    const float right = viewport.TopLeftX + viewport.Width;
+    const float bottom = viewport.TopLeftY + viewport.Height;
+    if (!wholePixel(viewport.TopLeftX) || !wholePixel(viewport.TopLeftY) ||
+        !wholePixel(viewport.Width) || !wholePixel(viewport.Height) ||
+        !wholePixel(right) || !wholePixel(bottom) ||
+        viewport.Width <= 0.f || viewport.Height <= 0.f ||
+        (scissorEnabled && (!scissor ||
+            scissor->left >= scissor->right ||
+            scissor->top >= scissor->bottom)))
+        return {};
+    const LONG w = static_cast<LONG>(width), h = static_cast<LONG>(height);
+    const D3D11_RECT source = sourceRegion
+        ? *sourceRegion : D3D11_RECT{0, 0, w, h};
+    // A malformed D3D9 source rectangle is NOT silently repaired.
+    if (source.left < 0 || source.top < 0 || source.right > w ||
+        source.bottom > h || source.left >= source.right ||
+        source.top >= source.bottom)
+        return {};
+    D3D11_RECT out{
+        (std::max)(source.left, static_cast<LONG>(viewport.TopLeftX)),
+        (std::max)(source.top, static_cast<LONG>(viewport.TopLeftY)),
+        (std::min)(source.right, static_cast<LONG>(right)),
+        (std::min)(source.bottom, static_cast<LONG>(bottom))};
+    if (scissorEnabled) {
+        out.left = (std::max)(out.left, scissor->left);
+        out.top = (std::max)(out.top, scissor->top);
+        out.right = (std::min)(out.right, scissor->right);
+        out.bottom = (std::min)(out.bottom, scissor->bottom);
+    }
+    NativeGameCameraClearRegion result{};
+    result.valid = true;
+    result.empty = out.left >= out.right || out.top >= out.bottom;
+    if (!result.empty) {
+        result.rect = out;
+        result.full = out.left == 0 && out.top == 0 &&
+            out.right == w && out.bottom == h;
+    }
+    return result;
 }
 } // namespace outrun::vr::dx11

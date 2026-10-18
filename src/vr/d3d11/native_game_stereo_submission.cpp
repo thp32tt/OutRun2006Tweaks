@@ -137,6 +137,36 @@ struct ScopedNativePostpassOutputs final {
         SUCCEEDED(device->CheckFormatSupport(view.Format, &support)) &&
         (support & D3D11_FORMAT_SUPPORT_RENDER_TARGET) != 0u;
 }
+
+// The Clear command uses real D3D9 viewport/scissor coverage, not the
+// D3D11.0/11.1 full-RTV semantics. Query RS before a shader-backed Clear
+// temporarily swaps the draw pipeline, and preserve fail-closed fallback.
+[[nodiscard]] NativeGameCameraClearRegion camera_clear_coverage(
+    ID3D11DeviceContext* ctx, UINT width, UINT height,
+    const D3D11_RECT* region) noexcept {
+    if (!ctx) return {};
+    D3D11_VIEWPORT viewport{};
+    UINT viewportCount = 1u;
+    ctx->RSGetViewports(&viewportCount, &viewport);
+    if (viewportCount != 1u) return {};
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> raster;
+    ctx->RSGetState(raster.GetAddressOf());
+    bool enabled = false;
+    if (raster) {
+        D3D11_RASTERIZER_DESC desc{};
+        raster->GetDesc(&desc);
+        enabled = desc.ScissorEnable != FALSE;
+    }
+    D3D11_RECT scissor{};
+    if (enabled) {
+        UINT count = 1u;
+        ctx->RSGetScissorRects(&count, &scissor);
+        if (count != 1u) return {};
+    }
+    return native_game_camera_clear_region(
+        width, height, viewport, enabled, enabled ? &scissor : nullptr,
+        region);
+}
 }
 
 // Only game Draws addressed to THIS eye's real RTV+DSV are source evidence.
@@ -489,22 +519,25 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
     gameTarget->GetDesc(&viewDesc);
     const auto camera = native_game_camera_rtv_extent(desc, viewDesc);
     if (!camera.valid) return false;
-    const bool cropped = region &&
-        !live_game_stereo::full_eye_target_rect(
-            region->left, region->top, region->right, region->bottom,
-            camera.width, camera.height);
+    const auto covered = camera_clear_coverage(
+        context_, camera.width, camera.height, region);
+    if (!covered.valid) return false;
+    if (covered.empty) return true; // genuine D3D9 clipped no-op, no GPU write
+    const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;
+    const bool cropped = actual != nullptr;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext1> rectContext;
     if (cropped)
         (void)context_->QueryInterface(
             IID_PPV_ARGS(rectContext.GetAddressOf()));
-    // A D3D11.0 device needs a bounded shader Draw rather than silently
-    // clearing the complete menu/vehicle source camera.
+    // The source viewport/scissor may crop even a null pRects Clear.
+    // D3D11.0 must rasterize the cropped region; never wipe the entire
+    // menu/car camera nor silently discard the genuine game Clear.
     const bool shaderSupported = cropped && !rectContext &&
         native_game_partial_color_shader_rtv(context_, gameTarget);
     const auto route = live_game_stereo::color_clear_route(
-        region != nullptr, region ? region->left : 0,
-        region ? region->top : 0, region ? region->right : 0,
-        region ? region->bottom : 0, camera.width, camera.height,
+        cropped, actual ? actual->left : 0,
+        actual ? actual->top : 0, actual ? actual->right : 0,
+        actual ? actual->bottom : 0, camera.width, camera.height,
         rectContext != nullptr, shaderSupported);
     constexpr float scale = 1.0f / 255.0f;
     const float rgba[4]{
@@ -517,11 +550,11 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
         context_->ClearRenderTargetView(gameTarget, rgba);
         return true;
     case live_game_stereo::NativeColorClearRoute::ClearView:
-        rectContext->ClearView(gameTarget, rgba, region, 1u);
+        rectContext->ClearView(gameTarget, rgba, actual, 1u);
         return true;
     case live_game_stereo::NativeColorClearRoute::ShaderRaster:
         return raster_partial_eye_color_clear(
-            context_, gameTarget, camera.width, camera.height, *region, rgba);
+            context_, gameTarget, camera.width, camera.height, *actual, rgba);
     default:
         return false; // malformed region or unsupported target; DX9Ex owns it
     }
@@ -572,15 +605,20 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_depth_stencil(
         dd.SampleDesc.Quality != cd.SampleDesc.Quality ||
         dd.Usage != D3D11_USAGE_DEFAULT || dd.CPUAccessFlags ||
         (dd.BindFlags & D3D11_BIND_DEPTH_STENCIL) == 0u) return false;
+    const auto covered = camera_clear_coverage(
+        context_, camera.width, camera.height, region);
+    if (!covered.valid) return false;
+    if (covered.empty) return true; // a real viewport/scissor-clipped Z/S no-op
+    const D3D11_RECT* actual = covered.full ? nullptr : &covered.rect;
     const auto route = live_game_stereo::depth_clear_route(
-        region != nullptr, region ? region->left : 0,
-        region ? region->top : 0, region ? region->right : 0,
-        region ? region->bottom : 0, camera.width, camera.height);
+        actual != nullptr, actual ? actual->left : 0,
+        actual ? actual->top : 0, actual ? actual->right : 0,
+        actual ? actual->bottom : 0, camera.width, camera.height);
     if (route == live_game_stereo::NativeDepthClearRoute::Reject)
         return false;
     if (route == live_game_stereo::NativeDepthClearRoute::PartialRaster)
         return raster_partial_eye_depth_clear(
-            context_, gameDepth, camera.width, camera.height, *region,
+            context_, gameDepth, camera.width, camera.height, *actual,
             depth, stencil, clearDepth, clearStencil);
     const UINT flags = (clearDepth ? D3D11_CLEAR_DEPTH : 0u) |
                        (clearStencil ? D3D11_CLEAR_STENCIL : 0u);

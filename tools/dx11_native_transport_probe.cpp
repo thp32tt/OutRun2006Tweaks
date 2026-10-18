@@ -1,5 +1,6 @@
 #include <Windows.h>
 
+#include <array>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -1943,6 +1944,25 @@ int main()
         const D3D11_RECT mipCameraBad{30, 29, 34, 32};
         const D3D11_RECT mipCameraPatch{28, 28, 32, 32};
         const UINT cameraColor = eyeIndex == 0u ? 0xffa03010u : 0xff1070c0u;
+        // The original D3D9 camera Clear respects viewport + enabled scissor.
+        // Seed physical mip1 on the GPU, then a full-surface source Clear must
+        // change ONLY the camera's real scissored corner. The later native eye
+        // Copy proves the live GPU pixel survives source -> OpenXR ring.
+        const float opaqueBlack[4]{0.f, 0.f, 0.f, 1.f};
+        ctx->ClearRenderTargetView(selectedCamera, opaqueBlack);
+        D3D11_RASTERIZER_DESC clipDesc{};
+        clipDesc.FillMode = D3D11_FILL_SOLID;
+        clipDesc.CullMode = D3D11_CULL_NONE;
+        clipDesc.DepthClipEnable = TRUE;
+        clipDesc.ScissorEnable = TRUE;
+        Microsoft::WRL::ComPtr<ID3D11Device> clipDevice;
+        ctx->GetDevice(clipDevice.GetAddressOf());
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState> clipRaster, oldRaster;
+        ctx->RSGetState(oldRaster.GetAddressOf());
+        if (!clipDevice || FAILED(clipDevice->CreateRasterizerState(
+                &clipDesc, clipRaster.GetAddressOf()))) return false;
+        ctx->RSSetState(clipRaster.Get());
+        ctx->RSSetScissorRects(1u, &mipCameraPatch);
         const bool mipCameraClears =
             !encoder.clear_offscreen_game_color(
                 selectedCamera, 0xff123456u, &mipCameraBad) &&
@@ -1956,11 +1976,49 @@ int main()
             encoder.clear_offscreen_game_depth_stencil(
                 selectedCamera, fixture.mipCameraDsv,
                 true, 0.5f, true, 6u, &mipCameraPatch);
+        // Read ACTUAL physical mip1 GPU bytes in a WARP-only staging copy.
+        // The scissor's outside pixel must retain the black seed, while the
+        // inside pixel takes this eye's independent source camera RGBA.
+        D3D11_TEXTURE2D_DESC cameraStorage{};
+        fixture.mipCameraColor->GetDesc(&cameraStorage);
+        cameraStorage.Usage = D3D11_USAGE_STAGING;
+        cameraStorage.BindFlags = 0u;
+        cameraStorage.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        cameraStorage.MiscFlags = 0u;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> scissorReadback;
+        const bool createdReadback = SUCCEEDED(clipDevice->CreateTexture2D(
+            &cameraStorage, nullptr, scissorReadback.GetAddressOf()));
+        bool actualCameraScissor = false;
+        if (createdReadback) {
+            ctx->OMSetRenderTargets(0u, nullptr, nullptr);
+            ctx->CopyResource(scissorReadback.Get(), fixture.mipCameraColor);
+            const UINT selectedMip = D3D11CalcSubresource(
+                1u, 0u, cameraStorage.MipLevels);
+            D3D11_MAPPED_SUBRESOURCE pixels{};
+            if (SUCCEEDED(ctx->Map(scissorReadback.Get(), selectedMip,
+                                   D3D11_MAP_READ, 0u, &pixels))) {
+                const auto* base = static_cast<const std::uint8_t*>(pixels.pData);
+                const auto* inside = base + 29u * pixels.RowPitch + 29u * 4u;
+                const auto* outside = base + 29u * pixels.RowPitch + 27u * 4u;
+                const std::array<std::uint8_t, 4u> expected = eyeIndex == 0u
+                    ? std::array<std::uint8_t, 4u>{0xa0u,0x30u,0x10u,0xffu}
+                    : std::array<std::uint8_t, 4u>{0x10u,0x70u,0xc0u,0xffu};
+                actualCameraScissor = inside[0] == expected[0] &&
+                    inside[1] == expected[1] && inside[2] == expected[2] &&
+                    inside[3] == expected[3] &&
+                    outside[0] == 0u && outside[1] == 0u &&
+                    outside[2] == 0u && outside[3] == 0xffu;
+                ctx->Unmap(scissorReadback.Get(), selectedMip);
+            }
+        }
+        ctx->OMSetRenderTargets(
+            1u, &selectedCamera, fixture.mipCameraDsv);
+        ctx->RSSetState(oldRaster.Get());
         // A genuine source Clear does not manufacture a geometry ordinal.
         const bool ordinalPreserved = encoder.draw_count() ==
             beforeOffscreen && encoder.color_draw_count() == beforeOffscreenEyeColor;
         ctx->RSSetViewports(1u, &priorCameraViewport);
-        if (!mipCameraClears || !ordinalPreserved ||
+        if (!mipCameraClears || !actualCameraScissor || !ordinalPreserved ||
             !encoder.bind_eye_output()) return false;
         const D3D11_BOX mipCameraBox{28u, 28u, 0u, 32u, 32u, 1u};
         // Place the physical mip1 camera patch in a dedicated lower corner
