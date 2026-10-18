@@ -1,0 +1,29 @@
+{
+  "status": "45_NATIVE_REWORK_TECHNICAL_QA_PASS_VISUAL_APPROVAL_PENDING",
+  "counts": {
+    "source_108_verified": 108,
+    "native_rework_candidates": 45,
+    "candidate_sha_pixel_source_pass": 45,
+    "candidate_alpha_edge_contact": 38,
+    "original_242_unchanged": 242
+  },
+  "manual_visual_qa": "PENDING",
+  "in_game_qa": "UNTESTED",
+  "pages": [
+    "45_REWORK_QA_PAGE_01_of_05.jpg",
+    "45_REWORK_QA_PAGE_02_of_05.jpg",
+    "45_REWORK_QA_PAGE_03_of_05.jpg",
+    "45_REWORK_QA_PAGE_04_of_05.jpg",
+    "45_REWORK_QA_PAGE_05_of_05.jpg"
+  ],
+  "original_242_preserved": true,
+  "original_255_archived_preserved": true,
+  "A_B": "UNCHANGED",
+  "unresolved_cases": [
+    {
+      "id": 36,
+      "english": "HARD",
+      "reason": "glyph plate cannot be safely separated using only rectangular crop"
+    }
+  ]
+}
