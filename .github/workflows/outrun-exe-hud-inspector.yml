@@ -45,6 +45,8 @@ on:
       - 'tools/verify_vr_visual_composition_p0.py'
       - 'tools/verify_dx9ex_r84_lens_source.py' # C993 exact physical draw provenance gate depends on this verifier.
       - 'tools/verify_vr_r33_single_classification.py' # R33 physical +TIME/GOAL routing verification.
+      - 'tools/verify_vr_cross_thread_semantic_registry.py' # Live queue provenance + first partial frame cutoff contract.
+      - 'tools/diagnostics/repro_partial_queue_semantic_lifetime_20261018.cpp' # Test actual source with same SHA.
       - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
       - 'tools/verify_vr_texture_scene_contract.py'
