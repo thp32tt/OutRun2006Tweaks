@@ -705,10 +705,18 @@ def verify_exact_time_extension_parent(ui_source, sem_source, analyzer):
                   'StageExtensionEnterHooks[i] = safetyhook::create_mid(',
                   'Module::exe_ptr(rva), StageExtensionEnter',
                   'StageExtensionLeaveHooks[i] = safetyhook::create_mid(',
-                  'Module::exe_ptr(rva + 5), StageExtensionLeave',
+                  'Module::exe_ptr(StageExtensionLeaveHookRva(rva)), StageExtensionLeave',
                   'StageExtensionPrintEnterHooks[i] = safetyhook::create_mid(',
                   'StageExtensionPrintLeaveHooks[i] = safetyhook::create_mid(',
                   'if (!stageExtensionOk)')
+    # REA/Ghidra original branch 0x498958 -> 0x498A18. A 5-byte
+    # post-CALL hook at 0x98A15 would corrupt that live target.
+    require('callRva == 0x98A10 ? 0x98A18 : callRva + 5',
+            ui_source, 'REA safe post-CALL branch destination 0x98A18')
+    require('static_assert(StageExtensionLeaveHookRva(0x98A10) == 0x98A18);',
+            ui_source, 'REA branch-safe hook compile-time contract')
+    if 'Module::exe_ptr(rva + 5), StageExtensionLeave' in ui_source:
+        raise SystemExit('unsafe +TIME post-CALL hook overlaps a live original jump')
     if any(x in leave for x in ('SetRenderState(', 'Game::fn43FA10(',
                                'SetTransform(')):
         raise SystemExit('no gameplay time or GPU state manipulation allowed')
