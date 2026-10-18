@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01042",
+  "production_id": "CONVERSION-DX9EX-01042",
+  "event_id": "CONVERSION-DX9EX-01042-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
+  "checkpoint": "C3_CI_REPAIR",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "1e2cefccb4f94dd605d07df647b5ec2ca9a9c4f3",
+  "validation_bearing_result_sha": "PENDING_CI",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep all three original +TIME animated sprites and three time-digit producers on their correct source-owned stereo HUD paths through source scopes, queued node generations and D3DX deferred physical eye submissions; avoid headlock, duplication and unrelated GOAL/road contamination.",
+    "scope_boundary": "Only stage extension 0x00498670 exact sprite/numeric families and their D3DX native queued submission on R84; exclude normal result/GOAL, 6th/6, vehicle markers, lens, F11/ESC, SkyGlow, input, FFB, R26_SAFE and DX11/DXVK.",
+    "trace_stages": [
+      "Original +TIME sprite CALL RVAs 0x9898E/0x98A36/0x98AC6 and digit CALL RVAs 0x989AD/0x98A89/0x98A10 enter source-exact scopes.",
+      "StageExtensionEnter/Leave attaches direct/glyph and native queued SpriteNode ScreenHud provenance; SelectSpriteQueueNode advances its epoch even for the same pointer.",
+      "D3DXSprite deferred Draw/Flush/End and BeforeQueueNode split outgoing exact-owned batches before queue epoch changes; R84 R30/R33 must still prove both physical eye submissions and restore.",
+      "OpenXR host composition and actual +TIME optical single-image result remain separately untested on Quest3/VDXR."
+    ],
+    "subcomponents": [
+      "Restore the source-owned D3DX +TIME boundary when SelectSpriteQueueNode reselects the SAME live SpriteNode address but increments physical queue epoch.",
+      "Maintain the existing homogeneous live D3DX batch and original native fallback veto while rejecting null, unqueued, non-HUD, GOAL and foreign-owner transitions.",
+      "Run compile-time positive and negative native Stage queue transition checks; preserve original all-six producer mapping and queue/physical Draw invariant for future HMD acceptance."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_source_to_queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original six +TIME sprite and numeric producers through queued SpriteNode and R84 per-eye GPU submission",
+        "expected_behavior": "Every stage sprite and digit remains on its original exact ScreenHud source across direct and deferred queue paths; a reselected identical node address cannot transfer pending triangles into the next queue epoch."
+      },
+      {
+        "id": "stage_d3dx_source_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3DX deferred batch owner transition, stale/reused node and unrelated incoming GOAL/world producer",
+        "expected_behavior": "Outgoing homogeneous stage commands submit before queue selection advances; null nodes, non-stage/foreign scopes and unknown/mixed batches never gain +TIME stereo authority."
+      },
+      {
+        "id": "stage_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 R84 game, x64 host, R26_SAFE package, Domain isolation, EXE inspector and full source impact",
+        "expected_behavior": "Four required GitHub Actions gates PASS on one final full exact validation-bearing SHA; Quest3/VDXR optical acceptance remains independent."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_source_to_queue": "SOURCE_IMPLEMENTED_PARTIAL_RUNTIME_UNTESTED",
+    "stage_d3dx_source_fallback": "SOURCE_IMPLEMENTED",
+    "stage_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "R84 SelectSpriteQueueNode increments SpriteQueueNodeEpoch on every selection, including when a native node pointer is selected again; the stage D3DX transition helper gated on outgoingNode != incomingNode.",
+    "source_trace": [
+      "Original 0x00498670 calls one of six exact sprite/numeric E8s with StageExtensionTime producer ownership.",
+      "Native D3DX Draw can defer GPU execution past source return and does not necessarily flush on a SpriteNode reselection.",
+      "BeforeQueueNode calls CanIsolateD3DXStageQueueNodeTransition before changing queued node/epoch; old helper skipped the same-pointer case.",
+      "Patched helper treats any new valid StageExtensionTime selection as physical epoch boundary while retaining the existing homogeneous/outgoing-owner/native Flush proof."
+    ],
+    "alternatives_rejected": [
+      "No global D3DX per-Draw Flush, no SkyGlow/HUD generic retag, no synthetic game timer changes, no bypass of physical R84/host stereo admission."
+    ],
+    "eye_ownership": "A reused node pointer has a new R84 queue epoch after SelectSpriteQueueNode; the previous queued D3DX triangles must be submitted with the OLD epoch before R30/R33 evaluates the next eye. Actual Quest3 optical outcome is still untested.",
+    "root_cause": "Queue-boundary admission compared only SpriteNode pointer inequality, despite physical draw identity requiring both pointer and incremented queue epoch."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "ci_evidence": {
+    "original_material_source_sha": "1e2cefccb4f94dd605d07df647b5ec2ca9a9c4f3",
+    "failed_exact_sha": "1e2cefccb4f94dd605d07df647b5ec2ca9a9c4f3",
+    "failed_run_id": 39126228807,
+    "failed_step": "policy: run record missing; full-chain game/host/package skipped",
+    "final_exact_sha_gates": "PENDING",
+    "head_sha": "PENDING"
+  },
+  "notes": "Same TASK_ID B exact CI policy failure repair only. Run record addition changes no native game runtime; retain material source SHA and do not award an additional score. No HMD test performed."
+}
