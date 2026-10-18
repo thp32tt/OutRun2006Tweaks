@@ -964,7 +964,7 @@ for label, original in (
     ('GOAL time helper direct owner lost',
      'goalDirectDrawOwner.emplace('),
     ('GOAL time helper queued sibling tagging lost',
-     'TagAppendedNodes(before,\n\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenHud, producer);'),
+     'TagAppendedNodes(before,\n\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenHud, producer,\n            nullptr, &rootsBefore, entrySerial);'),
 ):
     if original not in ui:
         raise SystemExit('GOAL direct owner mutation fixture missing: ' + label)
@@ -992,15 +992,21 @@ def mutate_exact_result_parent(source, signature, old_token):
     body = function_body(source, signature)
     if old_token not in body:
         raise SystemExit("GOAL result parent fault injection missing: " + old_token)
+    # Preserve the original call punctuation: the GOAL root/serial API now
+    # has additional arguments and the ResultProgress token ends in a comma.
+    replacement = re.sub(r'ProducerToken::[A-Za-z0-9_]+',
+                         'ProducerToken::None', old_token, count=1)
+    if replacement == old_token:
+        raise SystemExit('GOAL result mutation lacks semantic producer token')
     return source.replace(body, body.replace(
-        old_token, "ProducerToken::None);", 1), 1)
+        old_token, replacement, 1), 1)
 
 
 for label, corrupt in (
     ("result parent no provenance",
      mutate_exact_result_parent(
          ui, "static void ResultProgressLeave(",
-         "ProducerToken::ResultProgress);")),
+         "ProducerToken::ResultProgress,")),
     ("GOAL parent no provenance",
      mutate_exact_result_parent(
          ui, "static void GoalTime_TagHelper(",
