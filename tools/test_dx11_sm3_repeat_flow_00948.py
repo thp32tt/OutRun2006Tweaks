@@ -8,7 +8,7 @@ workflow = (root / ".github/workflows/dx11-fast-structural.yml").read_text()
 for s in (
     'D3DSIO_DEFI', 'D3DSIO_REP', 'D3DSIO_ENDREP',
     'D3DSPR_CONSTINT', 'intDefPresent[reg] = true',
-    'native_sm3_static_repeat_count(', 'structuredFlow.begin_repeat(count)',
+    'native_sm3_static_repeat_count(', 'structuredFlow.begin_repeat(count, tempWritten, outputWritten)',
     'structuredFlow.end_repeat(', 'structuredFlow.begin_if()',
     'structuredFlow.end_if()', 'structuredFlow.otherwise()',
     '!structuredFlow.empty()', 'append_native_sm3_repeat_begin(',
