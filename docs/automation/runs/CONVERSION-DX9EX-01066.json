@@ -7,15 +7,15 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "c4303e744249b24ac36bed221a204c2da348f346",
+  "validation_bearing_result_sha": "c4303e744249b24ac36bed221a204c2da348f346",
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_uiscaling.cpp"
@@ -70,7 +70,7 @@
       "Do not flush per glyph, change GOAL timer/progress logic, hide the native original GPU Draw or alter ordinary F11/pause and unrelated world/lens/SkyGlow.",
       "Do not treat one passing compile or a source-level static predicate as real headset binocular correctness."
     ],
-    "fix_evidence": "Native physical D3DX Flush/End source fix with compile-time positive/negative GOAL and +TIME regression guards; final GitHub CI and Quest3 checks pending."
+    "fix_evidence": "Actual GPU native C++ source and constexpr cases implemented at c4303e744249b24ac36bed221a204c2da348f346; DX9Ex Active, Domain, HUD Inspector and Full Source exact-SHA gates all passed."
   },
   "required_gates": [
     "DX9Ex Active Validation",
@@ -79,14 +79,37 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "goal_099_exact_gpu_owner": "PENDING_BUILD",
-    "goal_native_fallback_and_protected_owners": "PENDING_BUILD",
-    "goal_final_exact_sha_gates": "PENDING"
+    "goal_099_exact_gpu_owner": "PASS_BUILD",
+    "goal_native_fallback_and_protected_owners": "PASS_BUILD",
+    "goal_final_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "c4303e744249b24ac36bed221a204c2da348f346",
+    "material_source_sha": "c4303e744249b24ac36bed221a204c2da348f346",
+    "validator_source_sha": "c4303e744249b24ac36bed221a204c2da348f346",
+    "required_workflows": {
+      "DX9Ex Active Validation": {
+        "run_id": 39181973943,
+        "conclusion": "success"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39181973990,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39181973949,
+        "conclusion": "success"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39181973944,
+        "conclusion": "success"
+      }
+    },
     "runtime": "Quest3/VDXR not executed",
-    "status_note": "Material source queued for same-SHA GitHub Actions; no HMD optical claim."
-  }
+    "status_note": "All four required GitHub Actions completed SUCCESS on exact validation-bearing material SHA; no HMD display or performance proof."
+  },
+  "c6_commit_kind": "BOOKKEEPING_ONLY",
+  "c6_completion": "4/4 exact-SHA required workflows SUCCESS. GOAL native source fix BUILD_VERIFIED; Quest3/VDXR UNTESTED. No added code, CI rerun or duplicate scoring."
 }
