@@ -861,31 +861,43 @@ namespace
         if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)
             return;
 
-        // Never wait for XR enumeration while loading the 2D game/menu.
-        // The Direct3D9Ex CreateDevice boundary performs a second, synchronous
-        // but nonblocking eye-extent read if the host is ready by then.
+        // The same physical D3D9Ex source must be chosen BEFORE the game
+        // builds its 640x480 -> source UI scale. The host starts asynchronously
+        // and may need a brief time to publish the VDXR eye extent. Only the
+        // opt-in unified source path waits (bounded 1250 ms); legacy configs
+        // keep their original zero-wait behavior. Never change game resolution
+        // later at CreateDevice: that path cannot replay the UI scale init.
         OutRunVR::RequestVRHostStartup();
         OutRunVR::IpcV3::HostStateReader reader;
-        OutRunVR::IpcV3::HostState host{};
-        if (reader.Read(host))
+        const ULONGLONG startTick = GetTickCount64();
+        for (;;)
         {
-            // A crashed host can leave HostAlive and dimensions in shared
-            // memory. Never distort the menu before a valid Ex source exists.
-            const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
-                {host.recommendedWidth[0], host.recommendedHeight[0]},
-                {host.recommendedWidth[1], host.recommendedHeight[1]},
-                host.hostPid,
-                (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
-                OutRunVR::HostProcess::IsAlive);
-            if (OutRunVR::EyeExtent::Valid(extent))
+            OutRunVR::IpcV3::HostState host{};
+            if (reader.Read(host))
             {
-                Game::screen_resolution->x = static_cast<int>(extent.width);
-                Game::screen_resolution->y = static_cast<int>(extent.height);
-                *Game::D3DWindowed = 1;
-                spdlog::info("VR EYE RESOLUTION: nonblocking XR eye extent {}x{} at config",
-                    extent.width, extent.height);
-                return;
+                // Crashed hosts can leave stale dimensions in shared memory.
+                const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
+                    {host.recommendedWidth[0], host.recommendedHeight[0]},
+                    {host.recommendedWidth[1], host.recommendedHeight[1]},
+                    host.hostPid,
+                    (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
+                    OutRunVR::HostProcess::IsAlive);
+                if (OutRunVR::EyeExtent::Valid(extent))
+                {
+                    Game::screen_resolution->x = static_cast<int>(extent.width);
+                    Game::screen_resolution->y = static_cast<int>(extent.height);
+                    *Game::D3DWindowed = 1;
+                    spdlog::info(
+                        "VR UNIFIED SOURCE: XR eye {}x{} selected for 3D + 2D menu before logical UI scale initialization, waited={}ms",
+                        extent.width, extent.height,
+                        static_cast<unsigned>(GetTickCount64() - startTick));
+                    return;
+                }
             }
+            if (!Settings::VRUnifiedEyeMenuSource ||
+                GetTickCount64() - startTick >= 1250ull)
+                break;
+            Sleep(25);
         }
         spdlog::info(
             "VR UNIFIED SOURCE: XR eye not ready at game-config scale initialization; keep game source/menu {}x{} for this launch (no late CreateDevice resize)",
