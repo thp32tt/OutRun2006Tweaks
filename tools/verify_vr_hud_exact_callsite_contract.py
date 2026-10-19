@@ -140,6 +140,67 @@ def check_extra_producers(ui, contracts):
             fail('GOAL original direct-CALL owner missing ' + helper)
 
 
+def check_goal_full_result_graph(ui, contracts):
+    # REA FUN_004979E0 contains the background 0x2D280, fill 0x2D200,
+    # percentage 0x4B9200 and animated 0x29530. The older two 0x2D200
+    # midhooks cannot own the whole output. Bind the two direct parent E8s,
+    # not a post-CALL rva+5 detour (the prior 19 result E8s crashed there).
+    exact = {0x98924: ("A", "e8b7f0ffff"), 0x992AC: ("B", "e82fe7ffff")}
+    for rva, (suffix, signature) in exact.items():
+        entries = [c for c in contracts if int(c["rva"], 16) == rva]
+        if len(entries) != 1:
+            fail("full GOAL progress missing/duplicate exact original E8 0x%X" % rva)
+        c = entries[0]
+        if c.get("expectedBytes", "").lower() != signature or c.get("signatureLength") != 5:
+            fail("full GOAL progress original E8 bytes/destination changed 0x%X" % rva)
+        value = bytes.fromhex(signature)
+        target = (rva + 5 + int.from_bytes(value[1:], "little", signed=True)) & 0xFFFFFFFF
+        if target != 0x979E0:
+            fail("full GOAL progress wrong original target 0x%X" % rva)
+        name = "ResultProgressFullParentCall" + suffix
+        if ui.count(name + " = 0x%X" % rva) != 1:
+            fail("full GOAL progress original caller constant changed " + name)
+        if not any(b.get("path") == "src/hooks_uiscaling.cpp" and
+                   b.get("needle") == name + " = 0x%X" % rva
+                   for b in c.get("sourceBindings", [])):
+            fail("full GOAL progress original caller lost source binding")
+        hook = (r"Memory::VP::InjectHook\s*\(\s*"
+                r"Module::exe_ptr\(" + name + r"\),\s*"
+                r"ResultProgressFullParent,\s*Memory::HookType::Call\);")
+        if len(re.findall(hook, ui, re.S)) != 1:
+            fail("full GOAL progress missing E8-only hook at 0x%X" % rva)
+    if ui.count("ResultProgressFullParentTarget = 0x979E0") != 1:
+        fail("full GOAL progress original function address changed")
+
+    body = function_body(ui, "static bool __cdecl ResultProgressFullParent(")
+    for required in (
+        "using ResultProgressFullParentFn = bool(__cdecl*)();",
+        "Module::exe_ptr(ResultProgressFullParentTarget)",
+        "if (!Settings::VREnabled || !Game::current_mode ||",
+        "*Game::current_mode != GameState::STATE_GOAL ||",
+        "OutRunVR::GameSemantic::QueueRenderActive())",
+        "return original();",
+        "rootsBefore[p] = root;",
+        "OutRunVR::GameSemantic::ProducerToken::ResultProgress",
+        "nullptr, &rootsBefore, entrySerial);",
+    ):
+        if required not in (ui if required.startswith("using ") else body):
+            fail("full GOAL progress lost bounded exact parent protection: " + required)
+    ordered(body, "full GOAL background/fill/glyph ownership sequence",
+            "FlushD3DXBeforeDirectGoalSource();",
+            "const auto entrySerial =",
+            "rootsBefore[p] = root;",
+            "ScopedExactProducerSemantic parentOwner(",
+            "const bool result = original();",
+            "TagAppendedNodes(before,",
+            "FlushD3DXAtDirectGoalSourceExit();",
+            "return result;")
+    if body.count("original()") != 2 or body.count("TagAppendedNodes(before,") != 1:
+        fail("full GOAL progress must not duplicate the original or global-tag unrelated nodes")
+    if "Module::exe_ptr(ResultProgressFullParentTarget + " in ui:
+        fail("full GOAL progress must never detour post-call/return instructions")
+
+
 def check_disprank_first(ui, contracts):
     # This is not one of the old 71 CALLs. The original EXE producer window
     # was independently decoded by tools/analyze_outrun_exe.py in canonical
@@ -261,6 +322,7 @@ def check(ui, manifest, fraction_header=None):
     if len(owned) != 71:
         fail("expected 71 exact canonical HUD CALLs")
     check_extra_producers(ui, contracts)
+    check_goal_full_result_graph(ui, contracts)
     check_disprank_first(ui, contracts)
 
     # Sibling expansion in put_clip_sprite must tag *all* original children;
