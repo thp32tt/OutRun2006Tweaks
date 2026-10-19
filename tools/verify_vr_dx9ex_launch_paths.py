@@ -32,7 +32,7 @@ def check(src):
         (selector, r'finally\s*\{\s*if\s*\(Test-Path\s+-LiteralPath\s+\$staged\)', "aborted stage must be cleaned up"),
         (selector, r'\$enforceReleaseIdentity\s*=\s*\(Test-Path\s+\$packageInputsFile\)', "released package must enforce main/fallback identity"),
         (selector, r'\$sourceSha\s*-ne\s*\[string\]\$buildInputs\.IntegrationSha', "released variant must match the build manifest exact SHA"),
-        (selector, r'\[string\]\$buildInputs\.VariantId\s*-ne\s*"R84_SPLIT_R33_R32_R31_R30_R29"', "released default must be compiled R84"),
+        (selector, r"\}\s*elseif\s*\(\[string\]\$buildInputs\.VariantId\s*-ne\s*'R84_SPLIT_R33_R32_R31_R30_R29'\)", "released default must be compiled R84"),
         (selector, r'\$rendererCmakeFlags\s*-notmatch\s*\x27OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON\x27', "R84 must be the fully split owner"),
         (selector, r'\$rendererCmakeFlags\s*-notmatch\s*\x27OUTRUN_VR_R26_HUD_COMPARE=ON\x27', "R26 fallback must retain its shipped HUD owner"),
         (selector, r'DX9Ex selected host is not the matching exact-SHA host', "different OpenXR host hashes must fail closed"),
