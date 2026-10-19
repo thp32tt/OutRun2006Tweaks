@@ -1,0 +1,544 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1945-A0002-B0003-B0004-UNIQUE8",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-19T19:45:00+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "C1 independent lightweight QA only; no ImageGen, A/B queue consumption, DDS final composition, C2/C3 or in-game approval",
+  "policy_contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "policy_glyph": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+  "role_file": "localization/controller_roles.json",
+  "mapping": "localization/graphics/transcriptions.jsonl, statuses=transcribed_reviewed, indexes 47,106,154,198",
+  "dedup": "Eight distinct candidate SHA-256 were excluded from seven earlier GitHub C1 QA commits [2af7a753,b0be5a6d,1783cae7,7022c6ee,20001512,3aaafcc3,b6b17faf]. A0001 and B0001 historical SHA were not re-reviewed.",
+  "N100_evidence": [
+    "work/c1_batch_20261019_1945/compare_1.jpg",
+    "work/c1_batch_20261019_1945/compare_2.jpg",
+    "work/c1_batch_20261019_1945/metrics.json"
+  ],
+  "summary": {
+    "PASS": 7,
+    "FAIL": 1,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "failures": [
+    "Q047_af0145ebb3f8374e, Space->공백: FAIL_LINE_LAYOUT (diagonal/staggered syllables vs source single horizontal text row)."
+  ],
+  "non_goals": [
+    "All PNG candidates have larger pixel dimensions than the native source ROI; final same-as-source UI safe-cell fit is not yet proven.",
+    "C1 QA is PNG-only. Static DDS, C2/C3 and real game approvals remain UNTESTED."
+  ],
+  "text_length_difference_ignored": true,
+  "image_generation_called": false,
+  "queue_consumed": false,
+  "assets_modified": false,
+  "final_dds": "NOT_CREATED",
+  "runtime_validation": "UNTESTED",
+  "outputs": [
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0002-356FF14F",
+      "region_id": "Q047_23f6bf94b603e6e8",
+      "source_english": "Backspace",
+      "approved_korean": "지우기",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q047_23f6bf94b603e6e8_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q047_23f6bf94b603e6e8_source_k.png",
+      "source_png_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "candidate_sha256": "5c0b2f789b6fc88482883429b4cfaf78b3a608e941bd8a173356bb8f9913a430",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        1068,
+        312
+      ],
+      "candidate_dimensions": [
+        2066,
+        761
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        330,
+        121,
+        1752,
+        650
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0002-356FF14F",
+      "region_id": "Q047_e486b1ebd4bf222c",
+      "source_english": "Backspace",
+      "approved_korean": "지우기",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q047_e486b1ebd4bf222c_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q047_e486b1ebd4bf222c_source_k.png",
+      "source_png_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "candidate_sha256": "300c21e59fa67d71bbb3889fd32df52e3c7dee0fe2892668356ccd050f455c07",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        1068,
+        312
+      ],
+      "candidate_dimensions": [
+        1842,
+        854
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        273,
+        160,
+        1561,
+        692
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0002-356FF14F",
+      "region_id": "Q047_0611724516dae855",
+      "source_english": "Shift",
+      "approved_korean": "시프트",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q047_0611724516dae855_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q047_0611724516dae855_source_k.png",
+      "source_png_sha256": "23a289c7ace630488614a0e1ef93e6f9682fe11b4599f85a8efbcbf1e3f76dc7",
+      "candidate_sha256": "96c3c6fd2e20e790a1b4868db976127289a80b300db3142ad464f3f2546e1a78",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        604,
+        276
+      ],
+      "candidate_dimensions": [
+        1855,
+        848
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        195,
+        146,
+        1670,
+        710
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0002-356FF14F",
+      "region_id": "Q047_df01ba2f24db22df",
+      "source_english": "Symbols",
+      "approved_korean": "기호",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q047_df01ba2f24db22df_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q047_df01ba2f24db22df_source_k.png",
+      "source_png_sha256": "916795172e75bd1baa526c675ffe7dbb8a62ee86450942ac49bdf5f844140f40",
+      "candidate_sha256": "8f6a18da7ec7acfed4c9a417c444e1b6cb4dbc162ab9890f91231ee7b5da8bd5",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        944,
+        312
+      ],
+      "candidate_dimensions": [
+        2180,
+        721
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        663,
+        110,
+        1561,
+        624
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0002-356FF14F",
+      "region_id": "Q047_af0145ebb3f8374e",
+      "source_english": "Space",
+      "approved_korean": "공백",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q047_af0145ebb3f8374e_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q047_af0145ebb3f8374e_source_k.png",
+      "source_png_sha256": "ff8c39b2083271ec1dc85b728fc991711d2c3d1ee17019cd69b70131ee74e719",
+      "candidate_sha256": "4964bade80e6bc22e27f56eb8cdfc5075886a2d1aaa1a599234588babcb3a86e",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        676,
+        312
+      ],
+      "candidate_dimensions": [
+        1846,
+        852
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        370,
+        140,
+        1471,
+        734
+      ],
+      "verdict": "FAIL",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "FAIL_LINE_LAYOUT: Source Space is a single horizontal text row, but Korean 공백 has visibly staggered/diagonal syllable baselines and is unsuitable for faithful placement. Not a text-length/scale-based rejection.",
+      "per_glyph_readability": "PASS_LEGIBLE_BUT_LAYOUT_FAIL",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "region_id": "Q106_637d5c496e789cf7",
+      "source_english": "Transmission",
+      "approved_korean": "변속기",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q106_637d5c496e789cf7_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q106_637d5c496e789cf7_source_k.png",
+      "source_png_sha256": "90df56ba40371e5a0b20bc4b3c5ed23b144e76e9acb2f8f6e3eec493d9170d99",
+      "candidate_sha256": "5dcf2c73cffc89b162365bb959aae62b7e68113a98086d12eafa4e796b8a33b6",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        1126,
+        172
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        481,
+        177,
+        1734,
+        519
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "region_id": "Q154_7c6a5c11159f61fa",
+      "source_english": "SINGLE PLAYER",
+      "approved_korean": "싱글 플레이",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q154_7c6a5c11159f61fa_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q154_7c6a5c11159f61fa_source_k.png",
+      "source_png_sha256": "d1d0e308e6def0f859ed95dde6833b0be0915928fa2b37e33614db6ba7c726a0",
+      "candidate_sha256": "608268ad4b89bc0463ec89465b80e65f346b12243b0d5baec798bf9d0dfea88a",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        1262,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        211,
+        222,
+        1948,
+        520
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0004-BDE270CC",
+      "region_id": "Q198_df206aa0666f06b2",
+      "source_english": "INTERMEDIATE B",
+      "approved_korean": "중급 B",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q198_df206aa0666f06b2_source.png",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q198_df206aa0666f06b2_source_k.png",
+      "source_png_sha256": "dc5d24308da6a1831dd28c69291039e7841d0a4d9a8db30fb4fc8e0213f69974",
+      "candidate_sha256": "d323b6a4eecd8c50a0780fc73e4be6ef12a472819693f6b1d7799d0a68e9cad2",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "reviewed_translation_match": true,
+      "source_dimensions": [
+        1832,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_outer_edges_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        562,
+        173,
+        1630,
+        548
+      ],
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "visual_observation": "PASS_C1_VISIBLE_LETTERING_ONLY: approved Hangul characters legible and matching; transparent lettering without visible English residue, protected artwork, framing, or visible edge clipping.",
+      "per_glyph_readability": "PASS",
+      "translation_length_variance_ignored": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "C2_C3_ingame_approval": "NOT_GRANTED",
+      "new_dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    }
+  ]
+}
