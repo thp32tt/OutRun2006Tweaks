@@ -57,7 +57,14 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     source = read(path)
     assert source.count("bool R30CopySparseVertexShadow(") == 1, path
     assert source.count("live::game_compact_sparse_indices(") == 1, path
-    assert source.count("R30CopySparseVertexShadow(") == 2, path
+    if path.endswith("/stereo_renderer_r30.cpp"):
+        # Two original indexed uses plus verified secondary-stream gathering.
+        assert source.count("R30CopySparseVertexShadow(") == 3, path
+        assert "capturedPhysical.swap(uniquePhysical);" in source
+        assert "capturedPhysical[i]=static_cast<UINT>(low+i);" in source
+        assert "R30CaptureNativeAdditionalStreams(" in source
+    else:
+        assert source.count("R30CopySparseVertexShadow(") == 2, path
     assert "std::lock_guard<std::mutex> lock(entry->mutex)" in source
     assert "!R30RangeValid(entry->valid, static_cast<UINT>(offset)," in source
     assert "nativeVertexCount = static_cast<UINT>(uniquePhysical.size())" in source
@@ -79,8 +86,18 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
                   "if (!sparseWindow) unpacked[i] -= minVertex;",
                   "firstVertex, stride, numVertices, unpacked.data(), count"):
         assert token in up, (path, token)
-    assert "if (ok) live::observe_indexed(device, topology, primitiveCount," in source
-    assert "vertices.data(), stride, nativeVertexCount," in source
+    if path.endswith("/stereo_renderer_r30.cpp"):
+        indexed = source.split("void R30ObserveNativeIndexedVB(", 1)[1].split(
+            "void R30ObserveNativeIndexedUP(", 1)[0]
+        capture = indexed.find("R30CaptureNativeAdditionalStreams(")
+        forward = indexed.find("if (ok) nativeSource.forwarded = true;", capture)
+        native_draw = indexed.find("live::observe_indexed(", forward)
+        assert capture >= 0 and forward > capture and native_draw > forward
+        assert "vertices.data(),stride,nativeVertexCount," in indexed
+        assert "indices.data(),count,&extra);" in indexed
+    else:
+        assert "if (ok) live::observe_indexed(device, topology, primitiveCount," in source
+        assert "vertices.data(), stride, nativeVertexCount," in source
     assert "const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(" in source
 assert "if (ib) ctx->DrawIndexed(indexCount, 0, 0);" in bridge
 # 00678 counts the source ordinal *before* topology/native admission.

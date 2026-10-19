@@ -3539,7 +3539,7 @@ namespace OutRunVRStereo
                     std::array<std::vector<std::uint8_t>,3> owned{};
                     if (!R30CaptureNativeAdditionalStreams(
                             device,physical,extra,owned)) return;
-                    nativeSource.forwarded=true;
+                    if (valid) nativeSource.forwarded = true;
                     live::observe_linear(device,topology,primitiveCount,
                                          bytes.data(),stride,&extra);
                 }
@@ -3687,7 +3687,7 @@ namespace OutRunVRStereo
                     if (capturedPhysical.size()!=nativeVertexCount ||
                         !R30CaptureNativeAdditionalStreams(
                             device,capturedPhysical,extra,owned)) return;
-                    nativeSource.forwarded=true;
+                    if (ok) nativeSource.forwarded = true;
                     live::observe_indexed(device,topology,primitiveCount,
                         vertices.data(),stride,nativeVertexCount,
                         indices.data(),count,&extra);
