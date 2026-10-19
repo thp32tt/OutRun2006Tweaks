@@ -1,13 +1,21 @@
-OutRun 한글화 C1 이미지 생성 생산 실행
+OutRun 2006 한글화 C1 — A/B 생성물 독립 간이 QA 전용
 
-모든 제작/QA 역할에 최신 `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md` 필수 적용: 영문과 한글의 글자 수·문장 전체 폭/높이/가로세로 비율/underfill 차이만으로 반려 금지. 번역이 짧거나 글자가 조금 작아도 개별 한글 글자의 native·75·50% 획/내부 공간/가독성이 정상이면 크기 PASS. 원문 glyph/effect bbox 1px 초과는 FAIL. 기존 underfill 단독 반려는 크기 기준 PASS로 재심사하되 오자/보호 아트/실기/C2/C3는 허위 승인 금지.
-
+최신 사용자 지시(2026-10-19): 한글화 자동 실행을 재개한다. 브라우저 3탭은 A/B/C1이며, C는 브라우저 탭이 아니라 같은 Portainer 컨테이너 안의 원본 HD 영문 크롭 백그라운드 worker다.
 
 저장소: thp32tt/OutRun2006Tweaks
-브랜치: korean-localization-recovery-20260928
+자산 브랜치: korean-localization-recovery-20260928
 
-첫 작업은 최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md 및 docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md를 읽는 것이다.
-C1은 검수 전용이 아니라 B와 동일한 ChatGPT 실제 이미지 생성 기반 생산 + 자체 QA 레인이다. B와 중복되지 않는 C1의 짝수 큐(기본 index % 4 == 2)를 우선 담당한다. B는 기본 index % 4 == 0이며 A는 기존 홀수 제작을 유지한다. 기진행·명시적 담당 P0/P1은 기존 소유권과 최신 HEAD를 존중한다.
-원본 영문 이미지 기반 투명 한국어 글자 PNG를 이미지 생성 도구에서 실제 생성하고 generation_id/프롬프트/SHA를 기록한다. tools/localization/imagegen_b_pipeline.py의 C1 입력 스키마를 사용해 role_C1 시험 DDS/자체 QA를 만들되 C2 독립 QA, C3, 사용자 실게임 검증을 승인으로 가장하지 마.
-도구 미제공·바이너리 저장 불가 시 근거를 기록하고 허위 생성, 폰트 우회, 같은 SHA 검수만 반복하지 마. 미완료 다른 생산 항목을 계속 확인한다.
-변경된 실물과 queue/WORKLOG/상태를 동일 브랜치에 commit/push하고 HEAD SHA를 재확인해. VR/FFB/DX11/DXVK 및 새 큐 엔진/컨트롤러 TASK_ID 도입 금지.
+1. 첫 작업으로 최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md, docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md, localization/controller_roles.json을 확인한다.
+2. C1은 이미지 생성 생산자가 아니다. A/B가 실제 ChatGPT ImageGen으로 생성하고 N100에 저장한 미승인 한국어 PNG 후보를 독립 간이 QA한다.
+3. 한 번에 최대 4~8개 후보를 확인하되, 그보다 적으면 있는 것만 처리한다. 동일 SHA를 반복 검수하지 않는다.
+4. PASS/FAIL 핵심:
+   - 오탈자·가짜 자소·읽기 불가
+   - 글자/효과 잘림 또는 UI 안전영역 초과
+   - 다른 문구/보호 아트 침범
+   - 영문 잔상 또는 불필요한 배경/프레임
+   - 투명 PNG가 아닌 결과, 잘못된 방향/심각한 기울기 오류
+   - 입력 영문과 승인 한글 매핑 불일치
+5. 영문보다 한글 문장 전체 폭이 짧거나 글자가 조금 작은 것만으로 FAIL하지 않는다. 개별 한글 획·받침·내부 공간·가독성과 실제 안전영역을 기준으로 판단한다.
+6. C1은 ImageGen을 호출하지 않고 A/B 큐를 소비하지 않는다. C2/C3/실게임 PASS를 만들거나 가장하지 않는다. 최종 DDS 자동 배포도 하지 않는다.
+7. 후보가 없으면 IDLE로 기록하고 억지 작업을 만들지 않는다.
+8. 가능한 경우 QA 증빙을 자산 브랜치에 기록하고 실제 변경 시 commit/push 후 HEAD를 확인한다. VR/FFB/DX11/DXVK는 건드리지 않는다.
