@@ -1144,8 +1144,18 @@ class UIScaling : public Hook
 			: OutRunVRHudSemantics::UnknownInfo();
 		const bool previous = OutRunHudTextScreenHud;
 		const bool previousPeripheral = OutRunHudPeripheralText;
+		const bool pauseFrameParent =
+			Settings::VREnabled && Game::current_mode &&
+			*Game::current_mode == GameState::STATE_SMPAUSEMENU &&
+			!OutRunVR::GameSemantic::QueueRenderActive() &&
+			OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+				OutRunVR::GameSemantic::ProducerToken::PauseFrameShell;
+		// PauseFrameDisp is a stronger original producer than BA9D0's generic
+		// call-site map. Its child text belongs to the same ESC optical shell,
+		// not the gameplay HUD plane.
 		OutRunHudTextScreenHud = previous ||
-			semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;
+			(!pauseFrameParent &&
+			 semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud);
 		// Producer-callsite whitelist, not position-only inference: the
 		// generic OutRunHudText token also includes protected GOAL and other
 		// screen HUD. Preserve those sibling glyphs and their queue scopes.
@@ -1154,7 +1164,7 @@ class UIScaling : public Hook
 		// peripheral identity for the nested call, then restore it at exit.
 		// A classified non-peripheral HUD (including GOAL), or world marker,
 		// must NEVER borrow a parent's edge-anchor entitlement.
-		OutRunHudPeripheralText =
+		OutRunHudPeripheralText = pauseFrameParent ? previousPeripheral :
 			(semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
 			 (OutRunVRHudSemantics::InRange(caller, 0x0B9000, 0x0B9200) || // gear/REV
 			  OutRunVRHudSemantics::InRange(caller, 0x0B9E00, 0x0BA100) || // rank
@@ -1167,7 +1177,7 @@ class UIScaling : public Hook
         {
             std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
                 directHudOwner;
-            if (Settings::VREnabled &&
+            if (Settings::VREnabled && !pauseFrameParent &&
                 semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud)
             {
                 const auto token = OutRunHudPeripheralText
@@ -2002,7 +2012,13 @@ class UIScaling : public Hook
         // Capture exact B9200 parent provenance before it can reenter the
         // native glyph routine. Generic text keeps its original fast path.
         const bool exactGoalResult = IsOriginalB9200GoalGlyph();
-        const auto entrySerial = exactGoalResult
+        const bool pauseFrameGlyph = !exactGoalResult &&
+            Settings::VREnabled && Game::current_mode &&
+            *Game::current_mode == GameState::STATE_SMPAUSEMENU &&
+            !OutRunVR::GameSemantic::QueueRenderActive() &&
+            OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                OutRunVR::GameSemantic::ProducerToken::PauseFrameShell;
+        const auto entrySerial = (exactGoalResult || pauseFrameGlyph)
             ? OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
                 std::memory_order_acquire) : 0;
 		std::array<SpriteNode*, Game::SpritePriorityCount> tailsBefore{};
@@ -2046,6 +2062,16 @@ class UIScaling : public Hook
             TagAppendedNodes(tailsBefore,
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 OutRunVR::GameSemantic::ProducerToken::ResultTextB9200,
+                nullptr, &rootsBefore, entrySerial);
+        }
+        else if (pauseFrameGlyph)
+        {
+            // A glyph produced inside exact PauseFrameDisp is part of the
+            // native ESC shell. Keep it on the same ScreenOverlay2D scale and
+            // vertical affine as the kind-1 0x30040-0x3004F frame pieces.
+            TagAppendedNodes(tailsBefore,
+                OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,
+                OutRunVR::GameSemantic::ProducerToken::PauseFrameShell,
                 nullptr, &rootsBefore, entrySerial);
         }
         else

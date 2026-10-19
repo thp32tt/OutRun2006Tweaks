@@ -6,6 +6,9 @@ ROOT = Path(__file__).resolve().parents[1]
 source = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
 helper = (ROOT / "src/vr/d3d9/pause_menu_eye_affine.hpp").read_text(encoding="utf-8")
 tests = (ROOT / "vrhost/tests/pause_menu_eye_affine_smoke.cpp").read_text(encoding="utf-8")
+ui_source = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
+pause_source = (ROOT / "src/hooks_drawdistance.cpp").read_text(encoding="utf-8")
+semantics = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
 
 def require(condition: bool, context: str = "ESC source invariant") -> None:
     # Never rely on Python's 'assert': -O/PYTHONOPTIMIZE must not bypass
@@ -96,6 +99,68 @@ def check(s: str, h: str) -> None:
             'hudScale._22 = shaderPauseY;' in s)
     require('const float questScale = ResponsiveMenuScale(' in tests)
     require('ResponsiveMenuScale(1.25f, factor, false)' in tests)
+
+
+def check_pause_frame_owner(ui: str, pause: str, semantic_source: str) -> None:
+    require('PauseFrameShell,' in semantic_source,
+            'exact PauseFrameDisp producer token missing')
+    frame = pause[pause.index('class PauseMenuVisibility'):
+                  pause.index('PauseMenuVisibility PauseMenuVisibility::instance;')]
+    for required in (
+        'Module::exe_ptr(0x8C5F0)',
+        'ScopedExactProducerSemantic pauseFrameOwner(',
+        'RenderScope::ScreenOverlay2D',
+        'ProducerToken::PauseFrameShell',
+        'FirstVerifiedAppendedNodeOnStableRoot(',
+        'PeekSpriteNodeProducerToken(node) == ProducerToken::None',
+        'TagPauseFrameNodes(before, rootsBefore, entrySerial);',
+    ):
+        require(required in frame, required)
+
+    hud = ui[ui.index('static void __cdecl OutRunHudTextProducer_dest('):
+             ui.index('static int __cdecl OutRunHudText_clip(')]
+    require('const bool pauseFrameParent =' in hud)
+    require('ProducerToken::PauseFrameShell' in hud)
+    require('!pauseFrameParent &&' in hud)
+
+    glyph = ui[ui.index('static int __cdecl TextGlyph_putSprite('):
+               ui.index('enum SpriteScaleType')]
+    for required in (
+        'const bool pauseFrameGlyph = !exactGoalResult &&',
+        'ProducerToken::PauseFrameShell',
+        'else if (pauseFrameGlyph)',
+        'RenderScope::ScreenOverlay2D',
+        'nullptr, &rootsBefore, entrySerial',
+    ):
+        require(required in glyph, required)
+
+
+check_pause_frame_owner(ui_source, pause_source, semantics)
+for bad_ui, bad_pause, bad_semantics in (
+    (ui_source.replace('else if (pauseFrameGlyph)', 'else if (false)', 1),
+     pause_source, semantics),
+    (ui_source.replace(
+        '(!pauseFrameParent &&\n\t\t\t semantic.space ==',
+        '(true &&\n\t\t\t semantic.space ==', 1),
+     pause_source, semantics),
+    (ui_source,
+     pause_source.replace(
+        'PeekSpriteNodeProducerToken(node) == ProducerToken::None',
+        'true', 1),
+     semantics),
+    (ui_source,
+     pause_source.replace(
+        'RenderScope::ScreenOverlay2D,\n\t\t\t\tnullptr, true,',
+        'RenderScope::ScreenHud,\n\t\t\t\tnullptr, true,', 1),
+     semantics),
+    (ui_source, pause_source,
+     semantics.replace('PauseFrameShell,', 'PauseFrameShell_REMOVED,', 1)),
+):
+    try:
+        check_pause_frame_owner(bad_ui, bad_pause, bad_semantics)
+    except AssertionError:
+        continue
+    raise AssertionError("unsafe PauseFrame owner mutation escaped verification")
 
 check(source, helper)
 for mutant_index, mutant in enumerate((

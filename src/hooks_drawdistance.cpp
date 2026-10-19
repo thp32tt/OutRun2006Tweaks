@@ -8,6 +8,8 @@
 #include <ini.h>
 #include "overlay/overlay.hpp"
 #include "input_manager.hpp"
+#include "vr/game/render_semantics.hpp"
+#include "vr/game/sprite_queue_tail_proof.hpp"
 
 namespace Settings
 {
@@ -667,10 +669,80 @@ class PauseMenuVisibility : public Hook
 	}
 
 	inline static SafetyHookInline pauseframedisp_hook = {};
+
+	static void TagPauseFrameNodes(
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& rootsBefore,
+		std::uint64_t entrySerial)
+	{
+		using namespace OutRunVR::GameSemantic;
+		for (int priority = 0; priority < Game::SpritePriorityCount; ++priority)
+		{
+			SpriteNode* root = Game::sprite_prio_root[priority];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == before[priority])
+				continue;
+
+			SpriteNode* node =
+				OutRunVR::SpriteQueue::FirstVerifiedAppendedNodeOnStableRoot(
+					rootsBefore[priority], root, before[priority], tailAfter,
+					Game::SpriteNodeMax);
+			for (unsigned guard = 0;
+				 node && guard < Game::SpriteNodeMax;
+				 ++guard, node = node->next_0)
+			{
+				// Nested exact children (for example the already-proven
+				// option-arrow E8s) keep their stronger producer identity.
+				// Only previously unowned descendants of PauseFrameDisp gain
+				// the shell owner.
+				if (PeekSpriteNodeProducerToken(node) == ProducerToken::None)
+					RegisterSpriteNodeScope(
+						node, RenderScope::ScreenOverlay2D,
+						ProducerToken::PauseFrameShell, nullptr, entrySerial);
+				if (node == tailAfter)
+					break;
+			}
+		}
+	}
+
 	static void __fastcall pauseframedisp_dest(void* thisptr, void* unused)
 	{
-		if (EnablePauseMenu)
+		if (!EnablePauseMenu)
+			return;
+
+		const bool exactPauseFrame = Settings::VREnabled &&
+			Game::current_mode &&
+			*Game::current_mode == GameState::STATE_SMPAUSEMENU &&
+			Game::sprite_prio_root;
+		if (!exactPauseFrame)
+		{
 			pauseframedisp_hook.thiscall(thisptr);
+			return;
+		}
+
+		const auto entrySerial =
+			OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+				std::memory_order_acquire);
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
+		for (int priority = 0; priority < Game::SpritePriorityCount; ++priority)
+		{
+			SpriteNode* root = Game::sprite_prio_root[priority];
+			rootsBefore[priority] = root;
+			before[priority] = root ? root->tail_4 : nullptr;
+		}
+
+		// REA proves EXE+0x8C5F0 is PauseFrameDisp: it emits the 0x30040-
+		// 0x3004F frame through put_sprite_ex2/kind-1 (FVF 0x144 XYZRHW)
+		// and can invoke nested text/animation producers. Keep that exact
+		// parent alive while descendants are queued so text cannot silently
+		// fall back to the gameplay ScreenHud scale.
+		OutRunVR::GameSemantic::ScopedExactProducerSemantic pauseFrameOwner(
+			OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,
+			nullptr, true,
+			OutRunVR::GameSemantic::ProducerToken::PauseFrameShell);
+		pauseframedisp_hook.thiscall(thisptr);
+		TagPauseFrameNodes(before, rootsBefore, entrySerial);
 	}
 
 public:
