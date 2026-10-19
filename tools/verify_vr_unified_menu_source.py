@@ -36,6 +36,7 @@ def check_source(cfg,ex):
     return True
 def check_ui(ui,policy):
     assert "OutRunVR::LogicalUI::Contain(" in ui
+    assert "legacyTranslation.y += logicalViewport.y;" in ui
     assert "(std::min)(gameFactor, logicalViewport.scale)" in ui
     assert "const float x = (renderWidth - width) * 0.5f;" in policy
     assert "const float y = (renderHeight - height) * 0.5f;" in policy

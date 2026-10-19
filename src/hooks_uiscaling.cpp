@@ -488,6 +488,11 @@ class UIScaling : public Hook
                         (sw - ow * factor) * 0.5f;
                     legacyTranslation.y =
                         (pTranslation->y / sy) * factor;
+                    // The stable 16:9 menu has no vertical offset. XR eye
+                    // portrait surfaces DO: centre the same 640x480 menu
+                    // without changing the game's original logical pixels.
+                    if (logicalViewport.valid)
+                        legacyTranslation.y += logicalViewport.y;
                     if (std::isfinite(legacyScale.x) &&
                         std::isfinite(legacyScale.y) &&
                         std::isfinite(legacyTranslation.x) &&
