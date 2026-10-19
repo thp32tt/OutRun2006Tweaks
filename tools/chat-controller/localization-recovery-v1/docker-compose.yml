@@ -20,8 +20,8 @@ services:
       OUTRUN_KR_V2_AUTO_GENERATE: "true"
       OUTRUN_KR_V2_AUTO_COMPOSE: "false"
       OUTRUN_KR_V2_AUTO_DEPLOY: "false"
-      # A/B generate from verified native ROI on alternating 10-minute slots. C1 remains available but is not scheduled.
-      SCHEDULE_MINUTES: "0,10,20,30,40,50"
+      # A/B generate from verified native ROI; C1 independent QA runs at :15/:45.
+      SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"
       CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C1
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
