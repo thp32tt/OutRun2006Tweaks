@@ -8,6 +8,7 @@ import hashlib
 import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 import os
@@ -132,6 +133,46 @@ class ProjectLibraryTests(unittest.TestCase):
         self.assertIsNone(error)
         self.assertIsNotNone(proof)
         self.assertEqual(proof["library_content_sha256"],SHAS)
+
+    def test_verified_local_export_hashes_survive_chat_dom_loss_after_restart(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            task="OUTRUN-ROI-A-RESTART"
+            role="A"
+            names=[f"candidate-{i}.png" for i in range(5)]
+            out=root/"text_roi_batches"/"candidate_outputs"/role
+            out.mkdir(parents=True)
+            rows=[]
+            active_items=[]
+            local_shas=[]
+            for i,name in enumerate(names):
+                payload=(b"PNG-CANDIDATE-"+str(i).encode())*50
+                (out/name).write_bytes(payload)
+                sha=hashlib.sha256(payload).hexdigest()
+                local_shas.append(sha)
+                rows.append({"name":name,"sha256":sha})
+                active_items.append({"output_filename":name})
+            ev=root/"text_roi_batches"/"export_evidence"
+            ev.mkdir(parents=True)
+            (ev/(task+".json")).write_text(__import__("json").dumps({
+                "task_id":task,"role":role,
+                "status":"UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS",
+                "files":rows
+            }),encoding="utf-8")
+            self.folder.rows=[
+                {"id":"libfile_LOCAL"+str(i).zfill(6),"name":names[i],
+                 "sha256":local_shas[i],"bytes":1400}
+                for i in range(5)
+            ]
+            active={"task_id":task,"role":role,"count":5,"items":active_items}
+            class RestartedChat(FakeChat):
+                async def evaluate(self,js,args):
+                    raise AssertionError("source chat DOM must not be required")
+            chat=RestartedChat(self.folder,[])
+            proof,error=asyncio.run(gate.verify_project_library_images(chat,active,root=root,max_scan=12))
+            self.assertIsNone(error)
+            self.assertEqual(proof["generated_image_sha256"],local_shas)
+            self.assertEqual(proof["source_hash_method"],"verified_local_export_evidence")
 
     def test_one_missing_library_png_must_not_pass(self):
         self.folder.rows[-1]["sha256"]="b"*64
