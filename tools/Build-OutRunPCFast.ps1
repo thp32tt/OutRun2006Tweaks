@@ -162,6 +162,7 @@ $runtimeFiles = @(
     'Select-OutRunVRBackend.ps1',
     'Run-OutRunVRTest.ps1',
     'Run-OutRunVRTest.cmd',
+    'START_DX9EX_PC_FAST.cmd',
     'Collect-OutRunVRLogs.ps1',
     'Collect-OutRunVRLogs.cmd',
     'Analyze-OutRunVRSession.ps1',

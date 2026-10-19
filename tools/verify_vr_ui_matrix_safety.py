@@ -84,7 +84,12 @@ def require_vr_legacy_owner(source: str) -> None:
         "mode == ScalingMode::KeepCentered ||",
         "mode == ScalingMode::OnlineArcade))",
         "if (pScaling && pTranslation &&",
-        "const float factor = (std::min)(sx, sy);",
+        "const auto logicalViewport =", 
+        "OutRunVR::LogicalUI::Contain(",
+        "const float gameFactor = (std::min)(sx, sy);",
+        "const float factor = logicalViewport.valid",
+        "(std::min)(gameFactor, logicalViewport.scale)",
+        "legacyTranslation.y += logicalViewport.y;",
         "(pScaling->x / sx) * factor;",
         "(pScaling->y / sy) * factor;",
         "(sw - ow * factor) * 0.5f;",
@@ -103,6 +108,13 @@ def require_vr_legacy_owner(source: str) -> None:
     assert "CanContainOriginalFullFrontEndVector" not in block
     assert "NeedsFrontEndAffineContain" not in block
     assert "BuildFrontEndAffineContain" not in block
+    assert block.index("const auto logicalViewport =") < block.index(
+        "const float gameFactor =") < block.index(
+        "const float factor = logicalViewport.valid") < block.index(
+        "legacyScale.x =")
+    assert block.index("legacyTranslation.y =") < block.index(
+        "legacyTranslation.y += logicalViewport.y;") < block.index(
+        "std::isfinite(legacyTranslation.y))")
 
 require_vr_legacy_owner(text)
 for old, broken in (
@@ -111,6 +123,9 @@ for old, broken in (
     ("(sw - ow * factor) * 0.5f;", "(sw - ow * factor);"),
     ("inputScale = &legacyScale;", "inputScale = pScaling;"),
     ("inputTranslation = &legacyTranslation;", "inputTranslation = pTranslation;"),
+    ("(std::min)(gameFactor, logicalViewport.scale)", "gameFactor"),
+    ("legacyTranslation.y += logicalViewport.y;", "legacyTranslation.y += 0.0f;"),
+    ("const float gameFactor = (std::min)(sx, sy);", "const float gameFactor = sx;"),
 ):
     assert old in text
     try:
