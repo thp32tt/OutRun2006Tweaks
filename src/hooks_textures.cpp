@@ -92,13 +92,20 @@ inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& form
 		format.dwFlags, format.dwRGBBitCount, format.dwRGBAlphaBitMask);
 	using OutRunVR::DdsAlphaMask::Rgb32Intent;
 
-	if (format.dwRGBBitCount == 16 &&
-		format.dwRBitMask == 0x00000f00 &&
-		format.dwGBitMask == 0x000000f0 &&
-		format.dwBBitMask == 0x0000000f &&
-		format.dwRGBAlphaBitMask == 0x0000f000)
+	// Resolve all three original 16-bit RGB layouts from declared
+	// opacity, rather than silently treating an undeclared alpha bit as 0.
+	// Unrecognized/mixed source masks must use the native D3DX decoder.
+	using OutRunVR::DdsAlphaMask::Rgb16Intent;
+	const auto rgb16 = OutRunVR::DdsAlphaMask::Classify16(
+		format.dwFlags, format.dwRGBBitCount, format.dwRBitMask,
+		format.dwGBitMask, format.dwBBitMask, format.dwRGBAlphaBitMask);
+	switch (rgb16)
 	{
-		return D3DFMT_A4R4G4B4;
+	case Rgb16Intent::Rgb565: return D3DFMT_R5G6B5;
+	case Rgb16Intent::Opaque555: return D3DFMT_X1R5G5B5;
+	case Rgb16Intent::Alpha1555: return D3DFMT_A1R5G5B5;
+	case Rgb16Intent::Alpha4444: return D3DFMT_A4R4G4B4;
+	default: break;
 	}
 	if (rgb32Intent == Rgb32Intent::Alpha &&
 		format.dwRGBBitCount == 32 &&
@@ -157,20 +164,16 @@ inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& form
 			return D3DFMT_X8B8G8R8;
 	}
 
-	if (format.dwRGBBitCount == 16 &&
-		format.dwRBitMask == 0x0000f800 &&
-		format.dwGBitMask == 0x000007e0 &&
-		format.dwBBitMask == 0x0000001f)
-	{
-		return D3DFMT_R5G6B5;
-	}
-	if (format.dwRGBBitCount == 24 &&
+	// 24-bit menu RGB cannot carry a meaningful alpha channel or
+	// FOURCC tag. Reject malformed DDS metadata to the native D3DX path.
+	if ((format.dwFlags & DDPF_RGB) &&
+		!(format.dwFlags & (DDPF_FOURCC | DDPF_ALPHAPIXELS)) &&
+		format.dwRGBBitCount == 24 &&
+		format.dwRGBAlphaBitMask == 0 &&
 		format.dwRBitMask == 0x00ff0000 &&
 		format.dwGBitMask == 0x0000ff00 &&
 		format.dwBBitMask == 0x000000ff)
-	{
 		return D3DFMT_R8G8B8;
-	}
 
 	return D3DFMT_UNKNOWN;
 }
@@ -224,6 +227,43 @@ constexpr bool VerifyDdsPixelIntentAndNativeFallback() noexcept
 	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_R8G8B8)
 		return false; // existing BGR24 -> opaque X8 uploader
 	f.dwFlags = 0;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_UNKNOWN)
+		return false;
+	// Explicit 16-bit X1/A1 source intent determines native selector opacity.
+	f.dwFlags = DDPF_RGB;
+	f.dwRGBBitCount = 16;
+	f.dwRBitMask = 0x7c00; f.dwGBitMask = 0x03e0;
+	f.dwBBitMask = 0x001f; f.dwRGBAlphaBitMask = 0x8000;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_X1R5G5B5)
+		return false;
+	f.dwFlags |= DDPF_ALPHAPIXELS;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_A1R5G5B5)
+		return false;
+	f.dwFlags = DDPF_RGB;
+	f.dwRBitMask = 0x0f00; f.dwGBitMask = 0x00f0;
+	f.dwBBitMask = 0x000f; f.dwRGBAlphaBitMask = 0xf000;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_UNKNOWN)
+		return false; // undeclared high-nibble alpha stays native D3DX
+	f.dwFlags |= DDPF_ALPHAPIXELS;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_A4R4G4B4)
+		return false;
+	f.dwFlags = DDPF_RGB;
+	f.dwRGBAlphaBitMask = 0;
+	f.dwRBitMask = 0xf800; f.dwGBitMask = 0x07e0;
+	f.dwBBitMask = 0x001f;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_R5G6B5)
+		return false;
+	f.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_UNKNOWN)
+		return false;
+	f.dwFlags = DDPF_RGB;
+	f.dwRGBBitCount = 24;
+	f.dwRBitMask = 0x00ff0000;
+	f.dwGBitMask = 0x0000ff00;
+	f.dwBBitMask = 0x000000ff;
+	if (GetD3DFormatFromPixelFormat(f) != D3DFMT_R8G8B8)
+		return false;
+	f.dwFlags = DDPF_ALPHAPIXELS;
 	return GetD3DFormatFromPixelFormat(f) == D3DFMT_UNKNOWN;
 }
 static_assert(VerifyDdsPixelIntentAndNativeFallback(),
