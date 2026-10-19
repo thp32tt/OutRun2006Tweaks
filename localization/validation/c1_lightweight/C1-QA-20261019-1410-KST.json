@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1410-KST-NATIVE-ROI-PNG-QA",
+  "role": "C1",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "previous_review": "localization/validation/c1_lightweight/C1-QA-20261019-1310-KST.json",
+  "previous_reviewed_sha_count": 8,
+  "inspection_basis": "Actual N100 persisted candidate PNG bytes inspected visually; original English PNGs and reviewed A state translation mapping compared; independent PNG RGBA/alpha-edge audit",
+  "batch_id": "OUTRUN-ROI-A-0001-173D19C9",
+  "total_unique_new_candidate_sha": 2,
+  "summary": {
+    "PASS": 2,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "outputs": [
+    {
+      "role": "A",
+      "queue_index": "047",
+      "filename": "Q047_b08df53b8bfdbadf_source_k.png",
+      "sha256": "a89b098a445fb89d96152fe1ab1abb39ed550f2aa75a2332c581b9c35b79578d",
+      "source_roi_png": "Q047_b08df53b8bfdbadf_source.png",
+      "source_crop_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_roi_xywh": [
+        3701,
+        852,
+        1068,
+        312
+      ],
+      "original_text": "Backspace",
+      "approved_translation": "지우기",
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG RGBA",
+      "alpha32_bbox": [
+        388,
+        126,
+        1832,
+        596
+      ],
+      "alpha32_outer_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_glyph_integrity": "PASS_NATIVE",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "nontext_art": "NONE_OBSERVED",
+      "verdict": "PASS",
+      "reason": "Visible Hangul 지우기 has legible strokes and no extraneous background/frame, English residue or clipped effects at meaningful alpha."
+    },
+    {
+      "role": "A",
+      "queue_index": "047",
+      "filename": "Q047_e26cf75d44be41e8_source_k.png",
+      "sha256": "270e862474971af4713c6030d77ffd8026346e21e6bb44e8d6ae0f9232a8a7b0",
+      "source_roi_png": "Q047_e26cf75d44be41e8_source.png",
+      "source_crop_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_roi_xywh": [
+        3325,
+        364,
+        1068,
+        312
+      ],
+      "original_text": "Backspace",
+      "approved_translation": "지우기",
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG RGBA",
+      "alpha32_bbox": [
+        421,
+        123,
+        1783,
+        599
+      ],
+      "alpha32_outer_edge_pixels": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_glyph_integrity": "PASS_NATIVE",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "nontext_art": "NONE_OBSERVED",
+      "verdict": "PASS",
+      "reason": "Visible Hangul 지우기 has legible strokes and no extraneous background/frame, English residue or clipped effects at meaningful alpha."
+    }
+  ],
+  "scope": "C1_LIGHTWEIGHT_PNG_ONLY",
+  "source_bbox_containment": "NOT_TESTED_NO_UI_COMPOSITION",
+  "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+  "downsized_native_75_50": "NOT_TESTED",
+  "DDS_uv_fit": "NOT_TESTED",
+  "library_binding": "UNVERIFIED",
+  "new_dds_approval": false,
+  "ImageGen_calls": 0,
+  "queue_items_consumed": 0,
+  "C2_C3_ingame_PASS_created": 0,
+  "dds_written": 0,
+  "deployment_performed": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_final_approval": "NOT_GRANTED",
+  "notes": [
+    "Korean whole-line width/scale difference alone is not a failure.",
+    "Prior eight candidate SHA entries are excluded, including one earlier FAIL; no retest/override.",
+    "Historic Q104 2026-10-15 candidate excluded as pre-existing unrelated artifact.",
+    "Two identical English source pixel inputs are distinct ROI placements with distinct Korean output SHA; both audited separately."
+  ]
+}
