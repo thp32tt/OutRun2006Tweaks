@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTING_C2",
-  "checkpoint": "C2_SOURCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
@@ -70,9 +70,31 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "frontend_full_vector_physical_aspect": "PENDING",
-    "nongame_menu_ui_fallback": "PENDING",
-    "frontend_exact_sha_ci": "PENDING"
+    "frontend_full_vector_physical_aspect": "PASS_BUILD",
+    "nongame_menu_ui_fallback": "PASS_BUILD",
+    "frontend_exact_sha_ci": "PASS_EXACT_SHA"
   },
-  "next_action": "Implement original front-end full-vector guard with C++ regressions in existing R84 build source; after material SHA verify exact CI; Quest3/VDXR UNTESTED."
+  "next_action": "COMPLETE_BUILD_VERIFIED. Matching Quest3/VDXR optical/runtime test remains NEED_HMD_TEST; do not repeat exact-SHA GitHub gates or claim real device PASS.",
+  "material_result_sha": "0acb3d93f6b2166e25f473db243a522fbeee299b",
+  "validation_bearing_result_sha": "50cf63a2bb8f2dd33f4db8a8fb5cf26f87ba57e2",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_ui_matrix_safety.py"
+  ],
+  "result_commit_kind": "C6_BOOKKEEPING_AFTER_VALIDATION_BEARING_RESULT",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_source_sha": "0acb3d93f6b2166e25f473db243a522fbeee299b",
+    "validation_bearing_result_sha": "50cf63a2bb8f2dd33f4db8a8fb5cf26f87ba57e2",
+    "runs": {
+      "DX9Ex Active Validation": 39191218986,
+      "Domain Isolation Guard": 39191218736,
+      "OutRun EXE HUD Inspector CI": 39191218779,
+      "DX9Ex Full Source Impact Review": 39191218821
+    },
+    "required_gate_conclusions": "4/4 SUCCESS",
+    "prior_failed_active": 39190813744,
+    "prior_failure": "First validation-bearing material SHA hit legacy UI matrix verifier literal assertion; corrected same-task verifier negative controls on final exact SHA.",
+    "runtime": "Quest3/VDXR UNTESTED"
+  }
 }
