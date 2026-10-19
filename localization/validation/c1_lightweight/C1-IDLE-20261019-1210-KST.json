@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-INDEPENDENT-LIGHT-QA-20261019-1210-KST",
+  "reviewer": "C1",
+  "record_type": "RUN_CHECKPOINT",
+  "checked_at_kst": "2026-10-19T12:14:44+09:00",
+  "status": "IDLE_NO_ELIGIBLE_NEW_CANDIDATES",
+  "policy_ref": "korean-localization-recovery-20260928",
+  "policy_source_head_at_scan": "e025604863581f0f11b5b431a798e4906606b76d",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "current_batches": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "pending_items": 5,
+      "completed_files": 0,
+      "status": "SENT_AWAITING_GENERATED_IMAGES"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "pending_items": 5,
+      "completed_files": 0,
+      "status": "SENT_AWAITING_GENERATED_IMAGES"
+    }
+  ],
+  "inventory": [
+    {
+      "path": "work/outrun-ab-imagegen-only/output/A",
+      "current_png_count": 0
+    },
+    {
+      "path": "work/outrun-ab-imagegen-only/output/B",
+      "current_png_count": 0
+    },
+    {
+      "path": "work/image-src/text_roi_batches/candidate_outputs/A",
+      "current_pipeline_eligible_count": 0,
+      "historical_file_count": 1,
+      "excluded": [
+        {
+          "filename": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+          "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+          "mtime_utc": "2026-10-15T08:50:08.386Z",
+          "reason": "Pre-2026-10-19 historical ROI candidate; previously recorded UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS / REWORK_DIMENSIONS / OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED; not a newly saved current A/B native-ROI output; SHA already recorded; do not re-review as new."
+        }
+      ]
+    },
+    {
+      "path": "work/image-src/text_roi_batches/candidate_outputs/B",
+      "current_pipeline_eligible_count": 0,
+      "comment": "Directory not present in current ROI candidate_outputs."
+    },
+    {
+      "path": "work/image-src/ab_batches/candidate_outputs/A,B",
+      "eligibility": "EXCLUDED_LEGACY_986_TILES",
+      "reason": "Historic uniform tile outputs excluded from current native unsplit HD ROI pipeline."
+    }
+  ],
+  "examined_unique_candidate_sha_count": 0,
+  "qa_results": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1
+  },
+  "visual_checks_not_performed": [
+    "Hangul spelling/readability",
+    "mapping match",
+    "transparent RGBA",
+    "safe UI placement",
+    "source glyph/effect clipping",
+    "protected art",
+    "orientation/slant"
+  ],
+  "repeat_sha_review": false,
+  "no_actions": [
+    "No ImageGen",
+    "No A/B queue/state mutation",
+    "No C2/C3 or in-game PASS",
+    "No DDS write or deployment",
+    "No VR/FFB/DX11/DXVK modifications"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "last_related_checkpoint": "localization/validation/c1_lightweight/C1-IDLE-20261019-1111-KST.json",
+  "next_action": "At next C1 slot, inspect N100-persisted actual new A/B native HD ROI Korean candidate PNGs; batch-review up to 8 unique, not yet reviewed SHA values."
+}
