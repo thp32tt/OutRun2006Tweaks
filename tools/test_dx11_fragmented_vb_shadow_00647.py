@@ -29,5 +29,16 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     assert block.index("R30CopyVertexShadow(vb, static_cast<UINT>(first),") < block.index(
         "if (live::game_sparse_shadow_retry_eligible(") < block.index(
         "R30CopySparseVertexShadow(")
-    assert "if (ok) live::observe_indexed(device, topology, primitiveCount," in block
+    if path.endswith("/stereo_renderer_r30.cpp"):
+        # Production R30 gathers every referenced secondary stream before
+        # forwarding native indexed Draw. A capture miss must preserve the
+        # unavailable-source guard rather than promote incomplete geometry.
+        capture = block.find("R30CaptureNativeAdditionalStreams(")
+        forwarding = block.find("if (ok) nativeSource.forwarded = true;", capture)
+        draw = block.find("live::observe_indexed(", forwarding)
+        assert capture >= 0 and forwarding > capture and draw > forwarding
+        assert "!R30CaptureNativeAdditionalStreams(" in block[capture-100:forwarding]
+        assert "return;" in block[capture:forwarding]
+    else:
+        assert "if (ok) live::observe_indexed(device, topology, primitiveCount," in block
 print("00647 fragmented VB shadow -> sparse native DrawIndexed fallback PASS")
