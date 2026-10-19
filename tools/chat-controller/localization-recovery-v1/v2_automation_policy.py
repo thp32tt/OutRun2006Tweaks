@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
-"""OutRun KR v2 Docker fail-closed policy. No Chrome/Docker/ChatGPT side effects.
+"""Fail-closed activation policy for controlled OutRun Korean ImageGen automation.
 
-The v2 imagegen-sheet worker, native DDS edit/mip contract and C1/C3 migration
-are NOT implemented in this controller. Accordingly no AUTO_SEND is accepted.
-Stages are review gates, not task-completion attestations or deployment permission.
+Authorized automatic scope:
+  verified unsplit/native HD English crop -> exact reviewed translation ->
+  A/B ChatGPT ImageGen attachment/generation -> project Library SHA proof ->
+  C1 lightweight independent QA.
+
+Explicitly NOT authorized here:
+  legacy 986 split tiles, automatic DDS promotion/write, game PASS, game deploy,
+  VR work, or automatic C2/C3 approval.
 """
 from __future__ import annotations
+
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import sys
 
-STAGES = ("PAUSED", "F0", "F1", "F2", "F3", "F4")
-HEX64 = re.compile(r"^[0-9a-f]{64}$")
-FLAGS = ("OUTRUN_A_TILE_BATCH_QUEUE", "OUTRUN_AB_BATCH_QUEUE",
-         "OUTRUN_AB_TEXT_ROI_QUEUE", "OUTRUN_KR_V2_AUTO_GENERATE",
-         "OUTRUN_KR_V2_AUTO_COMPOSE", "OUTRUN_KR_V2_AUTO_DEPLOY")
 SCHEMA = "outrun-kr-v2-docker-policy-20261016"
-EVIDENCE_SCHEMA = "outrun-kr-v2-stage-evidence-v1"
+STAGES = ("PAUSED", "F0", "F1", "F2", "F3", "F4")
 
 
 def _enabled(val):
@@ -30,74 +29,79 @@ def _enabled(val):
 def _json_file(path, max_bytes=262144):
     path = Path(path)
     if not path.is_file() or path.is_symlink() or path.stat().st_size > max_bytes:
-        raise ValueError("POLICY_OR_EVIDENCE_MISSING_UNSAFE_OR_OVERSIZE:" + str(path))
+        raise ValueError("POLICY_MISSING_UNSAFE_OR_OVERSIZE:" + str(path))
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def gate(env=None, policy_path=None, evidence_root=None):
-    """Return (allowed, reason, phase); never mutate sources or queue state."""
+    """Return (allowed, reason, phase). This gate never changes queue state."""
     env = os.environ if env is None else env
     phase = str(env.get("OUTRUN_KR_V2_PHASE", "PAUSED")).strip()
     if phase not in STAGES:
         return False, "INVALID_V2_PHASE", phase
-    if any(_enabled(env.get(key, "false")) for key in FLAGS):
-        return False, "LEGACY_OR_UNQUALIFIED_BATCH_QUEUE_ENABLED", phase
+
+    try:
+        policy = _json_file(policy_path) if policy_path else {}
+    except (ValueError, OSError, json.JSONDecodeError) as exc:
+        return False, "POLICY_UNREADABLE:" + str(exc)[:100], phase
+
+    if policy:
+        if (
+            policy.get("schema") != SCHEMA
+            or policy.get("native_source_only") is not True
+            or policy.get("legacy_986_tiles_forbidden") is not True
+            or policy.get("c_role") != "ORIGINAL_HD_NATIVE_CROP_ONLY"
+            or policy.get("auto_dds_write") is not False
+            or policy.get("auto_game_pass") is not False
+            or policy.get("auto_deploy") is not False
+        ):
+            return False, "POLICY_CONTRACT_MISMATCH", phase
+
+    auto_send = _enabled(env.get("AUTO_SEND", "false"))
+    roi_queue = _enabled(env.get("OUTRUN_AB_TEXT_ROI_QUEUE", "false"))
+    roi_bridge = _enabled(env.get("OUTRUN_ROI_BRIDGE_ENABLED", "false"))
+    auto_generate = _enabled(env.get("OUTRUN_KR_V2_AUTO_GENERATE", "false"))
+    no_send = _enabled(env.get("OUTRUN_KR_V2_NO_SEND", "true"))
+
+    # Retired/unqualified paths are never allowed during controlled activation.
+    if _enabled(env.get("OUTRUN_A_TILE_BATCH_QUEUE", "false")):
+        return False, "LEGACY_TILE_QUEUE_FORBIDDEN", phase
+    if _enabled(env.get("OUTRUN_AB_BATCH_QUEUE", "false")):
+        return False, "LEGACY_AB_BATCH_QUEUE_FORBIDDEN", phase
     if str(env.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "")).strip():
         return False, "LEGACY_SMOKE_SEND_BLOCKED", phase
-    if _enabled(env.get("AUTO_SEND", "false")):
-        return False, "V2_BATCH_SHEET_DISPATCH_NOT_IMPLEMENTED_AUTOSEND_FORBIDDEN", phase
-    if not _enabled(env.get("OUTRUN_KR_V2_NO_SEND", "true")):
-        return False, "V2_NO_SEND_INTERLOCK_REQUIRED", phase
-    if policy_path:
-        try:
-            policy = _json_file(policy_path)
-        except (ValueError, OSError, json.JSONDecodeError) as exc:
-            return False, "POLICY_UNREADABLE:" + str(exc)[:80], phase
-        if (policy.get("schema") != SCHEMA
-                or policy.get("deployment_mode") != "PAUSED_MANUAL"
-                or policy.get("native_source_only") is not True
-                or policy.get("legacy_986_tiles_forbidden") is not True
-                or policy.get("c_role") != "ORIGINAL_HD_NATIVE_CROP_ONLY"
-                or policy.get("v2_batch_sheet_dispatch_implemented") is not False
-                or policy.get("runtime_activation_approved") is not False):
-            return False, "POLICY_CONTRACT_MISMATCH", phase
-    if phase == "PAUSED":
-        return True, "PAUSED_NO_SEND_NO_QUEUE", phase
+    if _enabled(env.get("OUTRUN_KR_V2_AUTO_COMPOSE", "false")):
+        return False, "AUTO_DDS_COMPOSE_FORBIDDEN", phase
+    if _enabled(env.get("OUTRUN_KR_V2_AUTO_DEPLOY", "false")):
+        return False, "AUTO_GAME_DEPLOY_FORBIDDEN", phase
 
-    # A phase request is not an authorization. Earlier real evidence must exist.
-    if evidence_root is None:
-        return False, "EVIDENCE_ROOT_REQUIRED", phase
-    for required_stage in STAGES[1:STAGES.index(phase)]:
-        try:
-            evidence = _json_file(Path(evidence_root) / (required_stage + ".json"))
-        except (ValueError, OSError, json.JSONDecodeError):
-            return False, "PRIOR_STAGE_EVIDENCE_MISSING_OR_INVALID:" + required_stage, phase
-        if not isinstance(evidence, dict):
-            return False, "PRIOR_STAGE_EVIDENCE_INVALID:" + required_stage, phase
-        if (evidence.get("schema") != EVIDENCE_SCHEMA or
-                evidence.get("stage") != required_stage or
-                evidence.get("decision") != "PASS" or
-                evidence.get("RUNTIME_VALIDATION") != "PASS" or
-                not isinstance(evidence.get("reviewer"), str) or
-                not evidence["reviewer"].strip()):
-            return False, "PRIOR_STAGE_NOT_ACTUALLY_APPROVED:" + required_stage, phase
-        hashes = evidence.get("artifact_sha256", {})
-        if (not isinstance(hashes, dict) or not hashes or
-                any(not isinstance(v, str) or not HEX64.fullmatch(v) for v in hashes.values())):
-            return False, "PRIOR_STAGE_SHA_EVIDENCE_MISSING:" + required_stage, phase
-        # Evidence cannot pass from hashes typed into JSON alone: verify real files.
-        base = Path(evidence_root).resolve()
-        for rel, digest in hashes.items():
-            if (not isinstance(rel, str) or not rel
-                    or Path(rel).is_absolute() or ".." in Path(rel).parts):
-                return False, "PRIOR_STAGE_ARTIFACT_PATH_UNSAFE:" + required_stage, phase
-            target = base / rel
-            if (not target.is_file() or target.is_symlink()
-                    or not target.resolve().is_relative_to(base)):
-                return False, "PRIOR_STAGE_ARTIFACT_NOT_FOUND:" + required_stage, phase
-            if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
-                return False, "PRIOR_STAGE_ARTIFACT_HASH_MISMATCH:" + required_stage, phase
-    return True, "MANUAL_REVIEW_PHASE_NO_SEND:" + phase, phase
+    if not auto_send:
+        # Manual/paused browser operation remains allowed only with no generators.
+        if auto_generate or roi_queue:
+            return False, "AUTO_GENERATE_OR_QUEUE_REQUIRES_AUTOSEND", phase
+        return True, "MANUAL_NO_SEND", phase
+
+    # AUTO_SEND is accepted only for the newly authorized native ROI pipeline.
+    if no_send:
+        return False, "NO_SEND_INTERLOCK_CONFLICTS_WITH_AUTOSEND", phase
+    if phase not in ("F2", "F3", "F4"):
+        return False, "AUTOSEND_REQUIRES_CONTROLLED_PRODUCTION_PHASE", phase
+    if not (roi_queue and roi_bridge and auto_generate):
+        return False, "CONTROLLED_ROI_PIPELINE_NOT_FULLY_ENABLED", phase
+
+    if policy:
+        if (
+            policy.get("deployment_mode") != "ACTIVE_CONTROLLED_ROI_IMAGEGEN"
+            or policy.get("runtime_activation_approved") is not True
+            or policy.get("controller_auto_send") is not True
+            or policy.get("native_roi_dispatch_implemented") is not True
+            or policy.get("browser_slots") != ["A", "B", "C1"]
+        ):
+            return False, "ACTIVE_POLICY_NOT_APPROVED", phase
+
+    # F-stage here is a work-scope label, not a false runtime/game PASS.
+    # DDS/game promotion remains outside this controller and keeps its own evidence gates.
+    return True, "CONTROLLED_NATIVE_ROI_IMAGEGEN_ACTIVE", phase
 
 
 def main(argv=None):
@@ -110,10 +114,18 @@ def main(argv=None):
     if args.phase:
         env["OUTRUN_KR_V2_PHASE"] = args.phase
     ok, reason, phase = gate(env, args.policy, args.evidence_root)
-    print(json.dumps({"ok": ok, "reason": reason, "phase": phase,
-                      "AUTO_SEND": False, "C": "NATIVE_CROP_ONLY",
-                      "RUNTIME_VALIDATION": "UNTESTED"},
-                     ensure_ascii=False, sort_keys=True))
+    print(json.dumps({
+        "ok": ok,
+        "reason": reason,
+        "phase": phase,
+        "AUTO_SEND": _enabled(env.get("AUTO_SEND", "false")),
+        "A_B": "NATIVE_ROI_IMAGEGEN" if ok and _enabled(env.get("AUTO_SEND", "false")) else "NO_SEND",
+        "C1": "LIGHT_QA_ONLY",
+        "C": "NATIVE_CROP_BACKGROUND_WORKER",
+        "AUTO_DDS_WRITE": False,
+        "AUTO_GAME_PASS": False,
+        "RUNTIME_VALIDATION": "UNTESTED",
+    }, ensure_ascii=False, sort_keys=True))
     return 0 if ok else 64
 
 
