@@ -144,6 +144,11 @@ def verify(text, window_source=None, mask_policy_source=None):
     ):
         if needle not in mask16:
             raise ValueError("16-bit DDS flag/mask admission missing: " + needle)
+    # Alpha1555 is admitted in two places: the 555 bitmask guard AND
+    # the branch choosing A1 rather than invalid. A mutation of either
+    # comparison must not survive because the other still has that literal.
+    if mask16.count("alpha == 0x8000u") != 2:
+        raise ValueError("16-bit A1 alpha mask guard or selection missing")
     for original in (
         "Classify16(0x40u, 16, 0x7c00, 0x03e0, 0x001f, 0x8000)",
         "Classify16(0x41u, 16, 0x7c00, 0x03e0, 0x001f, 0x8000)",
