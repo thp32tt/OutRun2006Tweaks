@@ -41,6 +41,15 @@ def check(b,s,r,cmd):
                   'if not exist "backends\\d3d9\\outrun-vr-host.exe"',
                   'Run-OutRunVRTest.ps1'):
         assert token in cmd, ("starter guard missing",token)
+    for token in ("[System.Management.Automation.Language.Parser]::ParseFile(",
+                  "Get-ChildItem -LiteralPath $packageDir -Filter '*.ps1' -File",
+                  "if ($parseErrors -and $parseErrors.Count -gt 0)",
+                  "PC Fast launcher syntax invalid:"):
+        assert token in b, ("PowerShell compile-time prepackage guard missing", token)
+    assert s.count("function Get-PeMachine(") == 1
+    assert s.count("$logPatterns=@(") == 1
+    assert "$sourceSha -notmatch '^[0-9a-fA-F]{40}$' -or" in s
+    assert "DX9Ex PC Fast package manifest/build contract mismatch." in s
     assert workflow.count("runs-on: [self-hosted, Windows, X64, outrun-pc]") == 1
     assert "contains(github.event.head_commit.message, '[pc-build]')" in workflow
     return True

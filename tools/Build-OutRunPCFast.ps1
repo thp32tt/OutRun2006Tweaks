@@ -179,6 +179,22 @@ foreach ($file in $runtimeFiles) {
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
 
+# A successful CMake build says NOTHING about the PowerShell launcher.
+# Fail packaging before ZIP publication if ANY shipped PS1 is unparseable.
+# This uses the actual Windows PowerShell AST parser on the PC build runner.
+foreach ($scriptFile in Get-ChildItem -LiteralPath $packageDir -Filter '*.ps1' -File) {
+    $parseTokens = $null
+    $parseErrors = $null
+    [void][System.Management.Automation.Language.Parser]::ParseFile(
+        $scriptFile.FullName, [ref]$parseTokens, [ref]$parseErrors)
+    if ($parseErrors -and $parseErrors.Count -gt 0) {
+        $parseDetail = ($parseErrors | ForEach-Object { $_.ToString() }) -join '; '
+        throw "PC Fast launcher syntax invalid: $($scriptFile.Name) :: $parseDetail"
+    }
+}
+Write-Host 'PC Fast launcher PowerShell parser: PASS (all packaged PS1 files)'
+
+
 @(
     'OUTRUN VR TEST / LOG UPLOAD'
     ''
