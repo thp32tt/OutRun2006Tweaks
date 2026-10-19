@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1545-KST-DEDUP-IDLE",
+  "reviewer": "C1",
+  "run_slot": "2026-10-19 15:45 KST",
+  "status": "IDLE",
+  "branch": "korean-localization-recovery-20260928",
+  "precheck_remote_head": "2f36e6cc487300e882f3c8d442c8bea89c151f76",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_backend": "GitHub canonical documents + N100 SHA256 read-only",
+  "directory": "work/image-src/text_roi_batches/candidate_outputs",
+  "sha256_checked": [
+    {
+      "role": "A",
+      "filename": "Q047_4413daf457459290_source_k.png",
+      "sha256": "351989088410097f2061b45ebfbc6803d874daf8c3ea226f5bef5af17b88037a",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "A",
+      "filename": "Q047_5f2c337e1f58da01_source_k.png",
+      "sha256": "0062cb2f480b84ab96e4caf08e00aadc8056fa390c4c573044366e2efee7b739",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "A",
+      "filename": "Q047_b08df53b8bfdbadf_source_k.png",
+      "sha256": "a89b098a445fb89d96152fe1ab1abb39ed550f2aa75a2332c581b9c35b79578d",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "A",
+      "filename": "Q047_cb84295162aadad2_source_k.png",
+      "sha256": "8471541e8e911f0185823d85fdf9147fd15bfed8574cc699ea9d75b90b7ea3d3",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "A",
+      "filename": "Q047_e26cf75d44be41e8_source_k.png",
+      "sha256": "270e862474971af4713c6030d77ffd8026346e21e6bb44e8d6ae0f9232a8a7b0",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "B",
+      "filename": "Q044_cdc9fa80e5787778_source_k.png",
+      "sha256": "a98cf6dbb0d815232ce328e0ca5b08ce90c206aa5da879ce0ceb5baf6125b0d8",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "B",
+      "filename": "Q046_0d765b14d3cb7d96_source_k.png",
+      "sha256": "d94bd5b7ea50f43c9ac830589fb400fdea27c72f52139f6822b5f507cbf840d5",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "B",
+      "filename": "Q046_3f91f6c614e65f91_source_k.png",
+      "sha256": "bd573c526fd6f2f6946ef525560aa271b2d3d93ace687e11c52a81b025e73c15",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "B",
+      "filename": "Q046_6425d2109138a0a6_source_k.png",
+      "sha256": "a0bbab5c0fe53bc13fd4378c83fcd601fb1a3cac338ab3a8aedaf893cf24a250",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    },
+    {
+      "role": "B",
+      "filename": "Q046_71c038f285be8338_source_k.png",
+      "sha256": "f77dff2cd63ba29a4ecf3a174fd6554596a33bcaba5515334b8ff28c6987b336",
+      "disposition": "PREVIOUSLY_REVIEWED_UNCHANGED_SKIP"
+    }
+  ],
+  "prior_qa": [
+    "localization/validation/c1_lightweight/C1-QA-20261019-1310-KST.json",
+    "localization/validation/c1_lightweight/C1-QA-20261019-1341-A0001-REMAINDER-2.json",
+    "localization/validation/c1_lightweight/C1-IDLE-20261019-1450-KST.json"
+  ],
+  "counts": {
+    "current_A": 5,
+    "current_B": 5,
+    "checked_sha": 10,
+    "already_reviewed_sha": 10,
+    "new_sha": 0,
+    "new_PASS": 0,
+    "new_FAIL": 0,
+    "new_HOLD": 0
+  },
+  "legacy_excluded": {
+    "file": "A/Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+    "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+    "source_date": "2026-10-15",
+    "reason": "Not current 2026-10-19 A/B production batch; do not count as new"
+  },
+  "previous_fail_still_open": {
+    "file": "B/Q046_71c038f285be8338_source_k.png",
+    "sha256": "f77dff2cd63ba29a4ecf3a174fd6554596a33bcaba5515334b8ff28c6987b336",
+    "reason": "Unwanted red circular non-text graphic between '기어' and '다운'"
+  },
+  "translation_length_policy": "Korean shorter than English alone is never FAIL",
+  "actions": {
+    "imagegen_calls": 0,
+    "A_B_queue_consumed": 0,
+    "DDS_written": 0,
+    "C2_C3_ingame_pass_created": 0,
+    "deployment_performed": false
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_final_approval": "NOT_GRANTED",
+  "ai1_score_delta": 0,
+  "score_reason": "No new unique candidate or independent new QA; dedup/IDLE status only."
+}
