@@ -4721,7 +4721,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // registers from the intercepted game's VB/IB/UP snapshots.
     // An instanced stream-0 source cannot be replicated by a single
     // non-instanced D3D11 Draw. Retain D3D9 output and input in that case.
-    DWORD sourceFrequency = 0u;
+    UINT sourceFrequency = 0u;
     if (FAILED(game->GetStreamSourceFreq(0u, &sourceFrequency)) ||
         sourceFrequency != 1u) return false;
     // Reject oversized, malformed or untranslatable data before any upload.
