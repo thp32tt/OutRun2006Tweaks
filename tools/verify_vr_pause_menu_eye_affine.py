@@ -119,7 +119,9 @@ def check_pause_frame_owner(ui: str, pause: str, semantic_source: str) -> None:
     frame = pause[pause.index('class PauseMenuVisibility'):
                   pause.index('PauseMenuVisibility PauseMenuVisibility::instance;')]
     for required in (
+        'Module::exe_ptr(0xE4060)',
         'Module::exe_ptr(0x8C5F0)',
+        'pausemenudisp_hook.thiscall(thisptr);',
         'ScopedExactProducerSemantic pauseFrameOwner(\n'
         '\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,\n'
         '\t\t\tnullptr, true,\n'
@@ -127,8 +129,14 @@ def check_pause_frame_owner(ui: str, pause: str, semantic_source: str) -> None:
         'FirstVerifiedAppendedNodeOnStableRoot(',
         'PeekSpriteNodeProducerToken(node) == ProducerToken::None',
         'TagPauseFrameNodes(before, rootsBefore, entrySerial);',
+        '// Shared native Window::Disp.',
     ):
         require(required in frame, required)
+
+    child = frame[frame.index('static void __fastcall pauseframedisp_dest'):
+                  frame.index('static void __fastcall pausemenudisp_dest')]
+    require('ProducerToken::PauseFrameShell' not in child,
+            'shared Window::Disp must not own exact ESC semantics')
 
     hud = ui[ui.index('static void __cdecl OutRunHudTextProducer_dest('):
              ui.index('static int __cdecl OutRunHudText_clip(')]
@@ -165,6 +173,11 @@ for bad_ui, bad_pause, bad_semantics in (
      pause_source.replace(
         'PeekSpriteNodeProducerToken(node) == ProducerToken::None',
         'true', 1),
+     semantics),
+    (ui_source,
+     pause_source.replace(
+        'Module::exe_ptr(0xE4060)',
+        'Module::exe_ptr(0x8C5F0)', 1),
      semantics),
     (ui_source,
      pause_source.replace(

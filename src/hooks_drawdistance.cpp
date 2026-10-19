@@ -668,7 +668,11 @@ class PauseMenuVisibility : public Hook
 			sprani_hook.call();
 	}
 
+	// 0x8C5F0 is shared Window::Disp. Keep it only for the historical
+	// EnablePauseMenu visibility behaviour; exact VR ownership starts at the
+	// ESC-only parent RVA 0xE4060.
 	inline static SafetyHookInline pauseframedisp_hook = {};
+	inline static SafetyHookInline pausemenudisp_hook = {};
 
 	static void TagPauseFrameNodes(
 		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
@@ -707,16 +711,21 @@ class PauseMenuVisibility : public Hook
 
 	static void __fastcall pauseframedisp_dest(void* thisptr, void* unused)
 	{
-		if (!EnablePauseMenu)
-			return;
+		// Shared native Window::Disp. Do not grant pause VR provenance here:
+		// this renderer is reused by unrelated native windows.
+		if (EnablePauseMenu)
+			pauseframedisp_hook.thiscall(thisptr);
+	}
 
-		const bool exactPauseFrame = Settings::VREnabled &&
+	static void __fastcall pausemenudisp_dest(void* thisptr, void* unused)
+	{
+		const bool exactPauseFrame = EnablePauseMenu && Settings::VREnabled &&
 			Game::current_mode &&
 			*Game::current_mode == GameState::STATE_SMPAUSEMENU &&
 			Game::sprite_prio_root;
 		if (!exactPauseFrame)
 		{
-			pauseframedisp_hook.thiscall(thisptr);
+			pausemenudisp_hook.thiscall(thisptr);
 			return;
 		}
 
@@ -732,16 +741,17 @@ class PauseMenuVisibility : public Hook
 			before[priority] = root ? root->tail_4 : nullptr;
 		}
 
-		// REA proves EXE+0x8C5F0 is PauseFrameDisp: it emits the 0x30040-
-		// 0x3004F frame through put_sprite_ex2/kind-1 (FVF 0x144 XYZRHW)
-		// and can invoke nested text/animation producers. Keep that exact
-		// parent alive while descendants are queued so text cannot silently
-		// fall back to the gameplay ScreenHud scale.
+		// REA exact-parent proof:
+		// VA 0x4E4060 / RVA 0xE4060 is the ESC menu display parent. Its
+		// this+0x130 and this+0x3194 virtual +0x0C calls reach shared
+		// Window::Disp RVA 0x8C5F0, which emits 0x30040-0x3004F kind-1
+		// XYZRHW frame pieces. Keep stronger nested child tokens and tag only
+		// otherwise-unowned descendants of this exact ESC subtree.
 		OutRunVR::GameSemantic::ScopedExactProducerSemantic pauseFrameOwner(
 			OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,
 			nullptr, true,
 			OutRunVR::GameSemantic::ProducerToken::PauseFrameShell);
-		pauseframedisp_hook.thiscall(thisptr);
+		pausemenudisp_hook.thiscall(thisptr);
 		TagPauseFrameNodes(before, rootsBefore, entrySerial);
 	}
 
@@ -755,6 +765,7 @@ public:
 	{
 		sprani_hook = safetyhook::create_inline(Module::exe_ptr(0x28170), sprani_dest);
 		pauseframedisp_hook = safetyhook::create_inline(Module::exe_ptr(0x8C5F0), pauseframedisp_dest);
+		pausemenudisp_hook = safetyhook::create_inline(Module::exe_ptr(0xE4060), pausemenudisp_dest);
 		return true;
 	}
 

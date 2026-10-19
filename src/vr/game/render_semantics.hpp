@@ -83,9 +83,10 @@ namespace OutRunVR::GameSemantic
         LensFlareCentre, // Exact D3A5 -> C993 central sun, never CABE discs.
         CarBaseShadow, // Direct original player-car contact shadow.
         PauseOptionArrow, // Exact SMPAUSEMENU arrows, never generic clips.
-        // Exact original PauseFrameDisp (EXE RVA 0x8C5F0) subtree. The
-        // background/frame is kind-1 XYZRHW while nested text can be kind-0;
-        // one token keeps both on the same pause-only optical transform.
+        // Exact original ESC PauseMenuDisp parent (EXE RVA 0xE4060) subtree.
+        // Its shared Window::Disp child is RVA 0x8C5F0: background/frame is
+        // kind-1 XYZRHW while nested text can be kind-0. One token keeps both
+        // on the same pause-only optical transform without claiming other windows.
         PauseFrameShell,
     };
 
