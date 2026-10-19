@@ -119,15 +119,11 @@ async def verify_project_library_images(page,active, max_scan=MAX_SCAN):
                                wait_until="domcontentloaded",timeout=35000)
         await folder_page.get_by_role("tab",name="Folders",exact=True).wait_for(
             state="visible",timeout=45000)
-        # Prefer the actual folder card (plain native BUTTON aria-label), not
-        # the sidebar project DIV with role=button of the same label.
+        # ChatGPT can render duplicate responsive copies of the same folder
+        # card. Duplicate DOM nodes are presentation duplicates, not Library
+        # identity ambiguity. Destination route + exact PNG SHA remain mandatory.
         located=folder_page.get_by_role("button",name=project,exact=True)
         await located.last.wait_for(state="visible",timeout=25000)
-        candidates=await folder_page.evaluate("""project=>
-          [...document.querySelectorAll('button[aria-label]')]
-           .filter(el=>el.getAttribute('aria-label')===project).length""",project)
-        if candidates!=1:
-            return None,"PROJECT_LIBRARY_FOLDER_AMBIGUOUS"
         await located.last.click(timeout=20000)
         await folder_page.wait_for_url(re.compile(r"^https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+(?:[?].*)?$"),
                                        timeout=25000)
