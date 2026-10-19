@@ -5,6 +5,7 @@
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
+#include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
 #include "live_game_pixel_center.hpp"
@@ -4306,27 +4307,30 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
 
 
 bool capture_live_sm3_sampler(IDirect3DDevice9* game, unsigned slot,
-                              TextureCapture& out) noexcept {
-    if (!game || slot >= 16u) return false;
+                              TextureCapture& out,
+                              bool vertexStage = false) noexcept {
+    const unsigned sourceSlot =
+        game_sm3_sampler_source_slot(vertexStage, slot);
+    if (!game || sourceSlot == kGameSm3InvalidSamplerSlot) return false;
     ComPtr<IDirect3DBaseTexture9> source;
-    if (FAILED(game->GetTexture(slot, source.GetAddressOf())) ||
+    if (FAILED(game->GetTexture(sourceSlot, source.GetAddressOf())) ||
         !source || source->GetType() != D3DRTYPE_TEXTURE ||
         FAILED(source.As(&out.texture))) return false;
     DWORD u{}, v{}, mag{}, min{}, mip{}, maxMip{}, anisotropy{}, srgb{}, border{}, bias{};
-    if (FAILED(game->GetSamplerState(slot, D3DSAMP_ADDRESSU, &u)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_ADDRESSV, &v)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_MAGFILTER, &mag)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_MINFILTER, &min)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_MIPFILTER, &mip)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_MAXANISOTROPY, &anisotropy)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_SRGBTEXTURE, &srgb)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_BORDERCOLOR, &border)) ||
-        FAILED(game->GetSamplerState(slot, D3DSAMP_MIPMAPLODBIAS, &bias)))
+    if (FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSU, &u)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSV, &v)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_MAGFILTER, &mag)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_MINFILTER, &min)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_MIPFILTER, &mip)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_MAXANISOTROPY, &anisotropy)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_SRGBTEXTURE, &srgb)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_BORDERCOLOR, &border)) ||
+        FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_MIPMAPLODBIAS, &bias)))
         return false;
     DWORD addressW{};
     // 2D sampling ignores W, but an unsupported U/V profile never clamps.
-    if (FAILED(game->GetSamplerState(slot, D3DSAMP_ADDRESSW, &addressW)))
+    if (FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSW, &addressW)))
         return false;
     out.enabled = true;
     out.addressU = static_cast<D3DTEXTUREADDRESS>(u);
@@ -4921,8 +4925,26 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         }
         liveDepthState = state->Get();
     }
-    // Mirror only samplers used by the translated ps_3_0 TEXLD program.
-    // Every live tN/sN is bound on THIS D3D11 immediate context for THIS draw.
+    // Preserve separate D3D9 VS and PS texture stage namespaces.
+    // VS s0..s3 resolves to D3DVERTEXTEXTURESAMPLER0..3 on the game device;
+    // native VS tN/sN uses the same ordinal with independent stage bindings.
+    // Any unsupported vertex texture fails before the native GPU Draw.
+    std::array<ComPtr<ID3D11ShaderResourceView>,4> vertexViews{};
+    std::array<ComPtr<ID3D11SamplerState>,4> vertexSamplers{};
+    std::array<ID3D11ShaderResourceView*,4> boundVertexViews{};
+    std::array<ID3D11SamplerState*,4> boundVertexSamplers{};
+    for (unsigned slot = 0; slot < 4u; ++slot) {
+        if ((pipeline.program.vertexSamplerMask & (1u << slot)) == 0u)
+            continue;
+        TextureCapture capture{};
+        if (!capture_live_sm3_sampler(game, slot, capture, true) ||
+            !mirror_texture(device, capture,
+                            vertexViews[slot], vertexSamplers[slot]))
+            return false;
+        boundVertexViews[slot] = vertexViews[slot].Get();
+        boundVertexSamplers[slot] = vertexSamplers[slot].Get();
+    }
+    // PS texld and VS texldl may both use s0, but MUST NOT alias samplers.
     std::array<ComPtr<ID3D11ShaderResourceView>,16> views{};
     std::array<ComPtr<ID3D11SamplerState>,16> samplers{};
     std::array<ID3D11ShaderResourceView*,16> boundViews{};
@@ -5074,6 +5096,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
     context->VSSetShader(pipeline.program.vertexShader.Get(), nullptr, 0u);
     context->PSSetShader(pipeline.program.pixelShader.Get(), nullptr, 0u);
+    // Explicitly clear absent VS slots between menu/vehicle/race Draws.
+    context->VSSetShaderResources(0u, 4u, boundVertexViews.data());
+    context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
     if (nativeIndices) context->DrawIndexed(nativeIndexCount, 0u, 0);

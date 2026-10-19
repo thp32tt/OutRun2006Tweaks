@@ -531,9 +531,10 @@ bool build_r283_sm3_mov_shader_source(
                     return false;
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             case D3DSIO_TEXLDL:
-                // The native live-draw bridge only binds PS samplers.
-                if (vertexStage ||
-                    (instruction.instructionToken & 0x00ff0000u) != 0u)
+                // VS texldl is legal with explicit LOD and independent
+                // D3DVERTEXTEXTURESAMPLER0..3 bindings. Implicit VS TEX,
+                // gradient and projected variants remain DX9Ex-owned.
+                if ((instruction.instructionToken & 0x00ff0000u) != 0u)
                     return false;
                 opcode = NativeSm3ArithmeticOpcode::Move; sourceCount = 2u; break;
             case D3DSIO_TEXLDD:
@@ -658,6 +659,7 @@ bool build_r283_sm3_mov_shader_source(
                     // arithmetic vector. A mismatched/undeclared texture
                     // dimensionality must stay on D3D9.
                     if (kind != D3DSPR_SAMPLER || reg >= samplerDeclared.size() ||
+                        (vertexStage && reg >= 4u) ||
                         !samplerDeclared[reg] || !sampler2dDeclared[reg] ||
                         modifier != D3DSPSM_NONE || swizzle != 0xe4u)
                         return false;
@@ -1407,10 +1409,8 @@ bool compile_native_live_sm3_program(
             !compile_shader_source(pixelHlsl, "live_sm3_ps", "ps_4_0", pixelDxbc) ||
             !vertexDxbc || !pixelDxbc)
             return false;
-        // Vertex texture fetch needs independent VS tN/sN bindings;
-        // reject rather than sampling the wrong pixel-stage resources.
-        if (vertexHlsl.find("r283_texture") != std::string::npos)
-            return false;
+        // Compile actual SM3 vertex fetches into VS4 SampleLevel.
+        // VS sampler ownership is independent of the pixel-stage resource.
         NativeLiveSm3Program candidate{};
         if (FAILED(device->CreateVertexShader(
                 vertexDxbc->GetBufferPointer(), vertexDxbc->GetBufferSize(),
@@ -1429,6 +1429,10 @@ bool compile_native_live_sm3_program(
         for (unsigned slot = 0; slot < 16u; ++slot) {
             const auto symbol = "r283_texture" + std::to_string(slot) +
                                 " : register(t" + std::to_string(slot) + ")";
+            if (vertexHlsl.find(symbol) != std::string::npos) {
+                if (slot >= 4u) return false;
+                candidate.vertexSamplerMask |= static_cast<std::uint8_t>(1u << slot);
+            }
             if (pixelHlsl.find(symbol) != std::string::npos)
                 candidate.pixelSamplerMask |= static_cast<std::uint16_t>(1u << slot);
         }

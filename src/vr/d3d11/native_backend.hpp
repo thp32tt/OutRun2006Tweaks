@@ -4780,6 +4780,8 @@ struct NativeLiveSm3Program {
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
     std::vector<std::uint8_t> vertexBytecode;
+    // D3D9 VS stage has four independent sampler registers (s0..s3).
+    std::uint8_t vertexSamplerMask{};
     std::uint16_t pixelSamplerMask{};
     bool vertexConstants{};
     bool pixelConstants{};

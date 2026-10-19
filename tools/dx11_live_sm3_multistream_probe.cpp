@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/live_game_sm3_stream_assembly.hpp"
+#include "../src/vr/d3d11/live_game_sm3_sampler_slots.hpp"
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -12,6 +13,13 @@ static float value(const std::vector<std::uint8_t>& v, unsigned row,
     return out;
 }
 int main() {
+    // D3D9 VS sampler namespace is distinct from pixel s0..s15.
+    static_assert(game_sm3_sampler_source_slot(true,0u)==256u);
+    static_assert(game_sm3_sampler_source_slot(true,3u)==259u);
+    static_assert(game_sm3_sampler_source_slot(false,0u)==0u);
+    static_assert(game_sm3_sampler_source_slot(false,15u)==15u);
+    assert(game_sm3_sampler_source_slot(true,4u)==kGameSm3InvalidSamplerSlot);
+    assert(game_sm3_sampler_source_slot(false,16u)==kGameSm3InvalidSamplerSlot);
     // Sparse index order [physical 8, physical 2] is equal in both VB shadows.
     const float p[6]{8.f,80.f,800.f,2.f,20.f,200.f};
     const std::uint8_t c[16]{
