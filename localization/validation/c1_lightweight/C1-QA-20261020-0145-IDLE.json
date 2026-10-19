@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-0145-IDLE",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-20T01:45:00+09:00",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "verified_policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "n100_candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+  "previous_review_set": "work/c1_batch_20261019_2015/previous_shas.json + metrics.json",
+  "dedup_evidence": "work/c1_sha_dedup_20261019_2145.py",
+  "inventory": {
+    "saved_png_count": 63,
+    "sha_previously_reviewed_count": 62,
+    "saved_png_reviewed_sha_matches": 62,
+    "legacy_excluded_count": 1,
+    "new_eligible_count": 0,
+    "new_reviewed_count": 0,
+    "pass": 0,
+    "fail": 0,
+    "hold": 0
+  },
+  "excluded_legacy_candidate": {
+    "path": "work/image-src/text_roi_batches/candidate_outputs/A/Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+    "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+    "reason": "Legacy candidate without current verified native ROI production receipt; not reviewed"
+  },
+  "note": "No new unapproved SHA-unique verified native ROI A/B candidate at the time of this check. Do not repeat previously reviewed SHA or promote excluded legacy file.",
+  "imagegen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "new_dds_written": false,
+  "C2_C3_ingame_PASS_created": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "scoring": "Status recheck / IDLE, +0 under latest user score rule"
+}
