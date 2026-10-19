@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01066",
+  "production_id": "CONVERSION-DX9EX-01066",
+  "event_id": "CONVERSION-DX9EX-01066-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve native GOAL 0–99 percent progress/time/title and final result HUD source for both R84 eyes without letting a previously unknown D3DX GPU batch inherit an active original GOAL direct caller, while preserving real game output.",
+    "scope_boundary": "Only physical game-owned native ID3DXSprite Flush/End under exact direct GOAL ScreenHud parent and no proven homogeneous GPU ledger; preserve valid GOAL/+TIME, normal race/timer, F11/pause, car/world/rank/lens/SkyGlow, input/FFB, R26_SAFE, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original OutRun EXE 0x4973C0 GOAL 0–99 percent progress and the 0x4974E0 and B9200/GOAL printf/time sources bind their exact E8 parent and SpriteNodes.",
+      "Native ID3DXSprite Draw may enqueue triangles from a previous owner; R84 HudBatch tracks exact homogeneity, native session generation, pending count, queue state and game sprite and can restore only a proven physical Flush/End GPU batch.",
+      "The direct GOAL caller remains active during an unknown native GPU Flush/End; reject that source for THIS submission so R33/R30 only reprojects provenance-proven GPU draws into x86 left/right eye and x64 OpenXR host."
+    ],
+    "subcomponents": [
+      "Add GOAL-family source-specific GPU submission proof to render_semantics preserving stage +TIME and all valid GOAL progress/glyph/printf/time deferred batches.",
+      "Apply the fail-closed GOAL test to both native D3DX Flush and End while preserving current exact RAII source and pending HUD/marker restoration.",
+      "Compile constexpr positive original GOAL producer cases and negative valid restored batch, queued, foreign world, pause, ordinary overlay, unknown producer and +TIME coexistence cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_099_exact_gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_GOAL_099_numeric_sprite_D3DX_gpu_left_right",
+        "expected_behavior": "Exact GOAL progress, time, printf and proven B9200 sources keep binocular ownership only when the physical native GPU batch is homogeneous and restored; unknown prior native batches do not impersonate GOAL."
+      },
+      {
+        "id": "goal_native_fallback_and_protected_owners",
+        "category": "fallback_regression",
+        "behavior_area": "native_Flush_End_queue_stage_pause_world_lens_rollback",
+        "expected_behavior": "Both Flush and End conservatively clear only unproven direct GOAL ownership and restore previous semantics afterward, with original native Draw and HRESULT unchanged and queue, +TIME, pause, lens and SkyGlow not widened."
+      },
+      {
+        "id": "goal_final_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "x86_R84_x64_host_Domain_Inspector_Full_Source_CI",
+        "expected_behavior": "All four required GitHub exact-SHA gates succeed for final validation-bearing commit while Quest3 runtime remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Original GOAL progress 0x4973C0 -> native progress SpriteNodes and result/time producers can cause ID3DXSprite Draw to enqueue deferred GPU triangles before the later native Flush/End in R84.",
+    "root_cause": "FlushDest/EndDest shielded an unproven earlier native D3DX batch from the live StageExtensionTime direct owner but not the analogous exact GOAL direct owner; a foreign physical Draw could therefore inherit the current GOAL ScreenHud token.",
+    "source_trace": [
+      "Original EXE GOAL 0–99 percent result/progress and time glyph E8 calls enter exact native direct/queue producer scopes.",
+      "The D3DX Draw registration captures a HudBatch ledger, which may be unproven or mixed while the original GOAL scoped CPU caller remains live during Flush/End.",
+      "Native physical Flush and End use the same bounded fail-closed submission shield for GOAL and +TIME, preserving the existing R84 strict eye ownership admission and real D3DX HRESULT."
+    ],
+    "eye_ownership": "Only source-proven homogeneous original GOAL physical GPU batches may be restored for R84 left and right eyes; an unproven GOAL batch retains the conservative game fallback without inventing binocular evidence.",
+    "alternatives_rejected": [
+      "Do not relabel all generic screen text or queued GOAL nodes; their existing exact parent and epoch ownership has priority.",
+      "Do not flush per glyph, change GOAL timer/progress logic, hide the native original GPU Draw or alter ordinary F11/pause and unrelated world/lens/SkyGlow.",
+      "Do not treat one passing compile or a source-level static predicate as real headset binocular correctness."
+    ],
+    "fix_evidence": "Native physical D3DX Flush/End source fix with compile-time positive/negative GOAL and +TIME regression guards; final GitHub CI and Quest3 checks pending."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "goal_099_exact_gpu_owner": "PENDING_BUILD",
+    "goal_native_fallback_and_protected_owners": "PENDING_BUILD",
+    "goal_final_exact_sha_gates": "PENDING"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "runtime": "Quest3/VDXR not executed",
+    "status_note": "Material source queued for same-SHA GitHub Actions; no HMD optical claim."
+  }
+}

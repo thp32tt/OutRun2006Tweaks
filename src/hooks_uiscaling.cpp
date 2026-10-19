@@ -3109,17 +3109,17 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
             HudBatch.scope, HudBatch.producer,
             HudBatch.provenDirectB9200 && !HudBatch.queued);
-        // A mixed/unknown older D3DX batch is not granted the current
-        // +TIME producer merely because Flush/End happens inside its E8.
-        // Keep the real native submission, but revoke optical source
-        // authority only for this bounded physical callback.
-        const bool unprovenStage =
-            CanSuppressUnprovenDirectStageD3DXSubmission(
+        // A mixed/unknown older native batch must not borrow a currently
+        // active +TIME or GOAL direct source at PHYSICAL Flush/End. Verified
+        // homogeneous owner batches still restore their exact producer;
+        // queued node GPU ownership and native HRESULT remain unchanged.
+        const bool unprovenResult =
+            CanSuppressUnprovenDirectResultD3DXSubmission(
                 restore, QueueRenderActive(), EffectiveScope(),
                 CurrentRenderProducerToken());
         HRESULT hr;
         {
-            ScopedUnprovenDirectStageD3DXSubmission unproven(unprovenStage);
+            ScopedUnprovenDirectResultD3DXSubmission unproven(unprovenResult);
             ScopedExactProducerSemantic owned(
                 restore ? HudBatch.scope : RenderScope::None, nullptr, restore,
                 restore ? HudBatch.producer : ProducerToken::None);
@@ -3148,17 +3148,17 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
                 self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218)),
             HudBatch.scope, HudBatch.producer,
             HudBatch.provenDirectB9200 && !HudBatch.queued);
-        // A mixed/unknown older D3DX batch is not granted the current
-        // +TIME producer merely because Flush/End happens inside its E8.
-        // Keep the real native submission, but revoke optical source
-        // authority only for this bounded physical callback.
-        const bool unprovenStage =
-            CanSuppressUnprovenDirectStageD3DXSubmission(
+        // A mixed/unknown older native batch must not borrow a currently
+        // active +TIME or GOAL direct source at PHYSICAL Flush/End. Verified
+        // homogeneous owner batches still restore their exact producer;
+        // queued node GPU ownership and native HRESULT remain unchanged.
+        const bool unprovenResult =
+            CanSuppressUnprovenDirectResultD3DXSubmission(
                 restore, QueueRenderActive(), EffectiveScope(),
                 CurrentRenderProducerToken());
         HRESULT hr;
         {
-            ScopedUnprovenDirectStageD3DXSubmission unproven(unprovenStage);
+            ScopedUnprovenDirectResultD3DXSubmission unproven(unprovenResult);
             ScopedExactProducerSemantic owned(
                 restore ? HudBatch.scope : RenderScope::None, nullptr, restore,
                 restore ? HudBatch.producer : ProducerToken::None);

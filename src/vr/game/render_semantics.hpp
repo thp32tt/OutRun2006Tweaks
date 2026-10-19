@@ -163,6 +163,65 @@ namespace OutRunVR::GameSemantic
         false, false, RenderScope::WorldBillboard,
         ProducerToken::StageExtensionTime));
 
+    // Original GOAL progress, its two time helpers, stage printf and the
+    // nineteen stack-proven B9200 result-glyph parents have the SAME native
+    // Draw -> deferred Flush/End gap as +TIME. A live caller's direct scope
+    // does not prove who created the triangles already in D3DX's GPU batch.
+    // Only the actual homogeneous batch ledger can restore an eye owner.
+    // Do not mask queue nodes, F11, pause arrows or world/lens effects.
+    inline constexpr bool CanSuppressUnprovenDirectGoalD3DXSubmission(
+        bool restoredExactBatch, bool queued, RenderScope scope,
+        ProducerToken producer) noexcept
+    {
+        return !restoredExactBatch && !queued &&
+            scope == RenderScope::ScreenHud &&
+            (producer == ProducerToken::GoalTime020 ||
+             producer == ProducerToken::GoalTime150 ||
+             producer == ProducerToken::ResultProgress ||
+             producer == ProducerToken::OutRunStagePrintf ||
+             producer == ProducerToken::ResultTextB9200);
+    }
+
+    // Only a physical native D3DX Flush/End, not CPU Draw registration,
+    // can use this fail-closed classification. Keep the existing +TIME
+    // contract intact; unrelated producers remain completely unchanged.
+    inline constexpr bool CanSuppressUnprovenDirectResultD3DXSubmission(
+        bool restoredExactBatch, bool queued, RenderScope scope,
+        ProducerToken producer) noexcept
+    {
+        return CanSuppressUnprovenDirectStageD3DXSubmission(
+                   restoredExactBatch, queued, scope, producer) ||
+               CanSuppressUnprovenDirectGoalD3DXSubmission(
+                   restoredExactBatch, queued, scope, producer);
+    }
+
+    static_assert(CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(CanSuppressUnprovenDirectGoalD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(CanSuppressUnprovenDirectGoalD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(CanSuppressUnprovenDirectGoalD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
+    static_assert(CanSuppressUnprovenDirectGoalD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::ResultTextB9200));
+    static_assert(CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        true, false, RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, true, RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::WorldBillboard, ProducerToken::ResultProgress));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::ScreenOverlay2D, ProducerToken::GoalTime150));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::PauseOptionArrow));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::DispRankClipSprite));
+    static_assert(!CanSuppressUnprovenDirectResultD3DXSubmission(
+        false, false, RenderScope::ScreenHud, ProducerToken::None));
+
     // Previous direct D3DX triangles must be submitted under their OLD
     // owner before the first exact +TIME SpriteNode becomes current.
     // This is never permission to relabel an unknown or mixed batch.
@@ -1370,6 +1429,12 @@ namespace OutRunVR::GameSemantic
         ScopedUnprovenDirectStageD3DXSubmission& operator=(
             const ScopedUnprovenDirectStageD3DXSubmission&) = delete;
     };
+
+    // Shared fail-closed submission shield for both original +TIME and
+    // GOAL: save/restore the direct producer, pending one-shot, projected
+    // marker and queue scope around exactly ONE native GPU Flush/End.
+    using ScopedUnprovenDirectResultD3DXSubmission =
+        ScopedUnprovenDirectStageD3DXSubmission;
 
     // An outer +TIME producer must not overwrite a different exact producer
     // registered by a nested source while its original E8 call was active.
