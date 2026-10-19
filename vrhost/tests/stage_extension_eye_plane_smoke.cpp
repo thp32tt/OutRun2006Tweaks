@@ -17,6 +17,32 @@ int main() {
     // A captured foreign WVP is NOT an unavailable tracker and cannot be
     // repackaged as a zero/zero source for native stereo.
     using OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp;
+    using OutRunVR::StageExtensionPhysical::RequiresOriginalShaderC64;
+    // Regression: a fixed-function +TIME numeral must not be vetoed by
+    // the previous world's unrelated raw vertex-shader c64 write. The
+    // same mismatched c64 remains a hard veto for shader-owned +TIME.
+    if (RequiresOriginalShaderC64(0) ||
+        !RequiresOriginalShaderC64(0x100) ||
+        MatchesCapturedOriginalWvp(true, 0, 0, 0x100, 9, 50, 49))
+        return 71;
+    const OutRunVR::StageExtensionPhysical::Source fixedFnStage{
+        OutRunVR::GameSemantic::RenderScope::ScreenHud,
+        OutRunVR::GameSemantic::ProducerToken::StageExtensionTime,
+        false, nullptr, 0, 7, 11, 0, 0, 0, 0};
+    if (!OutRunVR::StageExtensionPhysical::IsValid(fixedFnStage) ||
+        !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            fixedFnStage, fixedFnStage))
+        return 72;
+    auto changedFixedFn = fixedFnStage;
+    ++changedFixedFn.poseEpoch;
+    if (OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            fixedFnStage, changedFixedFn))
+        return 73;
+    changedFixedFn = fixedFnStage;
+    ++changedFixedFn.topLevelDrawSerial;
+    if (OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            fixedFnStage, changedFixedFn))
+        return 74;
     if (!MatchesCapturedOriginalWvp(true, 0x100, 9, 0x100, 9, 50, 49) ||
         !MatchesCapturedOriginalWvp(false, 0x100, 9, 0x200, 8, 0, 0) ||
         !MatchesCapturedOriginalWvp(true, 0, 0, 0, 0, 50, 49) ||

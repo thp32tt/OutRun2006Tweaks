@@ -25,6 +25,19 @@ namespace OutRunVR::StageExtensionPhysical
         std::uint64_t rawWvpDrawSerial = 0;
     };
 
+    // Fixed-function/XYZRHW +TIME triangles have no vertex shader and do
+    // not consume VS c64. The last ORIGINAL game c64 may still belong to
+    // the preceding road/world shader; treating it as this HUD glyph's
+    // source incorrectly vetoes stereo before the left-eye draw. Source,
+    // queue, pose, shader and draw-serial fences remain mandatory for BOTH
+    // eyes. Shader-backed +TIME retains the strict original-c64 fence.
+    constexpr bool RequiresOriginalShaderC64(std::uintptr_t shader) noexcept
+    {
+        return shader != 0;
+    }
+    static_assert(!RequiresOriginalShaderC64(0));
+    static_assert(RequiresOriginalShaderC64(0x100));
+
     // R84 receives the last ORIGINAL game c64 write separately from its
     // private left/right eye uploads. An available write from a different
     // vertex shader is NOT missing evidence: it is a foreign physical owner.

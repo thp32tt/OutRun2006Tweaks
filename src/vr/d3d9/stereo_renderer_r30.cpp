@@ -5863,36 +5863,34 @@ namespace OutRunVRStereo
             if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                 R29OwnerCurrentVertexShaderIdentity() != 0)
                 return false;
-            // The XYZRHW/fixed-function +TIME draw shares the shader path's
-            // original c64 generation guard. A native LEFT submission may
-            // reenter an original game WVP writer with the SAME stage token,
-            // SpriteNode, shader and pose. Without the raw write serial,
-            // R30 could submit that foreign generation to the RIGHT eye.
-            // The raw tracker excludes R30/R32 private eye uploads; if no
-            // complete source pair is available, retain the conservative
-            // legacy zero/zero stamp rather than importing live stereo c64.
-            float rawWvp[16]{};
+            // Fixed-function original +TIME glyphs use FVF/PROJECTION or
+            // XYZRHW vertices, NOT the last VS c64 register. A prior road's
+            // raw game c64 is therefore foreign but irrelevant to this draw.
+            // Fence only shader-backed +TIME against that original VS write:
+            // the shader route still rejects a known foreign generation.
+            // Both fixed-function eyes retain their independent queue/pose/
+            // top-level draw/shader identity checks in SameAfterNativeLeft.
             std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
-            std::uintptr_t rawShader = 0;
-            std::uint64_t rawShaderEpoch = 0;
-            const bool rawCaptured = OutRunVRRenderer::GetLastRawGameWvpWrite(
-                rawWvp, rawWriteSerial, rawDrawSerial,
-                rawShader, rawShaderEpoch);
-            // R33 already rejects a known foreign shader's original c64.
-            // R30 fixedfn/XYZRHW must not label that same stale matrix as
-            // this +TIME SpriteNode's physical eye source merely because
-            // its write serial stayed stable during the native LEFT Draw.
-            // Only a genuinely unavailable tracker gets the zero/zero
-            // native fallback, never a captured mismatched shader/epoch.
-            if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(
-                    rawCaptured, shader, shaderEpoch,
-                    rawShader, rawShaderEpoch,
-                    rawWriteSerial, rawDrawSerial))
-                return false;
-            if (!rawCaptured)
+            if (OutRunVR::StageExtensionPhysical::RequiresOriginalShaderC64(
+                    shader))
             {
-                rawWriteSerial = 0;
-                rawDrawSerial = 0;
+                float rawWvp[16]{};
+                std::uintptr_t rawShader = 0;
+                std::uint64_t rawShaderEpoch = 0;
+                const bool rawCaptured =
+                    OutRunVRRenderer::GetLastRawGameWvpWrite(
+                        rawWvp, rawWriteSerial, rawDrawSerial,
+                        rawShader, rawShaderEpoch);
+                if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(
+                        rawCaptured, shader, shaderEpoch,
+                        rawShader, rawShaderEpoch,
+                        rawWriteSerial, rawDrawSerial))
+                    return false;
+                if (!rawCaptured)
+                {
+                    rawWriteSerial = 0;
+                    rawDrawSerial = 0;
+                }
             }
             source = {draw.scope, draw.producer, draw.queued,
                 draw.queueNode, draw.queueEpoch,

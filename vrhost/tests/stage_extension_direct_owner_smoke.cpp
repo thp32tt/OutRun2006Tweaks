@@ -15,7 +15,7 @@ int main()
     {
         using namespace OutRunVR::StageExtensionPhysical;
         Source direct{RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
-            false, nullptr, 0, 7, 11, 0, 0, 41, 11};
+            false, nullptr, 0, 7, 11, 0x100, 9, 41, 11};
         if (!IsValid(direct) || !SameAfterNativeLeft(direct, direct))
             return 94;
         Source changed = direct;
