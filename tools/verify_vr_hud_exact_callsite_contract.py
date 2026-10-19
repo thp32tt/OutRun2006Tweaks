@@ -746,7 +746,27 @@ def test_mutations(ui, manifest):
     must_fail('result-progress hook group no longer fail-closed',
               ui.replace('ResultProgressLeaveB = {};',
                          'ResultProgressLeaveNoop = {};', 1))
-    print('P0 GOAL/RESULT original producer mutations: 7/7 failures detected')
+    # Native full-parent GOAL graph must not regress to fill-only 0x2D200,
+    # unproven queue-root publication or an arbitrary original E8 target.
+    must_fail('full result-progress E8 parent hook removed',
+              ui.replace('Module::exe_ptr(ResultProgressFullParentCallA),\n'
+                         '            ResultProgressFullParent, Memory::HookType::Call);',
+                         'Module::exe_ptr(ResultProgressFullParentCallA),\n'
+                         '            ResultProgressEnter, Memory::HookType::Call);', 1))
+    full_start = ui.index('static bool __cdecl ResultProgressFullParent(')
+    full_end = ui.index('inline static SafetyHookMid StageExtensionEnterHooks[', full_start)
+    full = ui[full_start:full_end]
+    if full.count('nullptr, &rootsBefore, entrySerial);') != 1:
+        fail('full GOAL progress exact-node mutation anchor missing')
+    must_fail('full result-progress loses live root lease',
+              ui[:full_start] + full.replace(
+                  'nullptr, &rootsBefore, entrySerial);',
+                  'nullptr, nullptr, entrySerial);', 1) + ui[full_end:])
+    corrupt = copy.deepcopy(manifest)
+    next(x for x in corrupt['contracts']
+         if int(x['rva'], 16) == 0x992AC)['expectedBytes'] = 'e800000000'
+    must_fail('second full-progress E8 target corrupted', changed_manifest=corrupt)
+    print('P0 GOAL/RESULT original producer mutations: 10/10 failures detected')
     print("P0 HUD mutation suite: 10/10 failures detected")
 
 
