@@ -26,6 +26,7 @@
 #include "vr/game/queued_hud_partial_wvp.hpp"
 #include "vr/game/hud_native_source_transaction.hpp"
 #include "../core/r23_target_owner_api.hpp"
+#include "../debug/hmdless_debug_pose.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -55,6 +56,7 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRHeadTracking;
+    extern Setting<int> VRHmdlessDebugMode;
 	extern Setting<bool> VRPositionalTracking;
 	extern Setting<bool> VRCullingCameraSync;
 	extern Setting<bool> VRCullingUnionFov;
@@ -680,8 +682,57 @@ namespace OutRunVRRenderer
 				static_cast<LONG>(gameState));
 		}
 
+        // Read-only synthetic input; do not forge HostAlive, hostPid or any
+        // seqlock fields in the shared OpenXR mapping. This drives the SAME
+        // original c64/WVP and R29-R33 per-eye paths as a real host pose.
+        bool ReadHmdlessDebugPose(PoseSample& pose)
+        {
+            static const ULONGLONG startedMs = GetTickCount64();
+            static std::uint32_t sequence = 0;
+            static bool firstLog = true;
+            const int mode = Settings::VRHmdlessDebugMode.get();
+            if (!OutRunVR::HmdlessDebug::Enabled(mode))
+                return false;
+            const auto step = OutRunVR::HmdlessDebug::SelectPose(
+                mode, static_cast<std::uint32_t>((GetTickCount64() - startedMs) / 1000u));
+            const float yaw = step.yawDegrees * (Pi / 360.0f);
+            const float pitch = step.pitchDegrees * (Pi / 360.0f);
+            const float sy = std::sin(yaw), cy = std::cos(yaw);
+            const float sp = std::sin(pitch), cp = std::cos(pitch);
+
+            pose = {};
+            // Simple RH yaw(Y) and pitch(X) orientation. A distinct nonzero,
+            // monotonic even source sequence is latched for both eyes per scene.
+            pose.orientation = { sp * cy, cp * sy, -sp * sy, cp * cy };
+            pose.position = { step.xMeters, step.yMeters, step.zMeters };
+            pose.positionValid = true;
+            pose.hostPid = 0x484D444Cu; // 'HMDL' synthetic identity only
+            pose.referenceSpaceGeneration = 1u;
+            sequence += 2u;
+            if (!sequence)
+                sequence = 2u;
+            pose.sequence = sequence;
+            pose.stereoValid = true;
+            // Quest-like diagnostic fixture, NOT a sampled Quest 3 runtime FOV.
+            pose.eyeFov[0] = { -0.90f, 0.85f, 0.85f, -0.85f };
+            pose.eyeFov[1] = { -0.85f, 0.90f, 0.85f, -0.85f };
+            pose.eyeOffset[0][0] = -0.032f;
+            pose.eyeOffset[1][0] =  0.032f;
+            LastPoseSourceV3 = false;
+            if (firstLog)
+            {
+                firstLog = false;
+                spdlog::warn(
+                    "VR HMD-less: synthetic pose source enabled mode={}; 64mm IPD/asymmetric FOV; desktop SBS ONLY; HMD runtime validation remains UNTESTED",
+                    mode);
+            }
+            return true;
+        }
+
 		bool ReadHostPose(PoseSample& pose)
 		{
+            if (OutRunVR::HmdlessDebug::Enabled(Settings::VRHmdlessDebugMode.get()))
+                return ReadHmdlessDebugPose(pose);
 			OutRunVR::IpcV3::HostPoseSnapshot v3{};
 			if (V3PoseSource.Read(v3))
 			{
