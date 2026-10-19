@@ -122,8 +122,8 @@ namespace Settings
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
 	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", true,
 		"Legacy compatibility toggle; superseded by StageCullingMode. The game render projection is never modified across an entire scene." };
-	Setting<float> VRCullingUnionMarginDegrees{ "VR", "CullingUnionMarginDegrees", 4.0f,
-		"Extra angular safety margin added around the two-eye culling union.", Range<float>{ 0.0f, 15.0f } };
+	Setting<float> VRCullingUnionMarginDegrees{ "VR", "CullingUnionMarginDegrees", 8.0f,
+		"Extra angular safety margin in VR Wide (StageCullingMode=1). Start at 8 degrees to reduce headset-edge scenery pop; larger margins render more stage nodes and may cost FPS. Can be tuned in F11. The original game render projection and HUD are not modified.", Range<float>{ 0.0f, 15.0f } };
 	Setting<bool> VRNormalizeReflectionRate{ "VR", "NormalizeReflectionRate", true,
 		"Keeps car cubemap reflection work at the original 60 Hz time budget when rendering the HMD at 72/80/90/120 Hz." };
 	Setting<float> VRNearPlane{ "VR", "NearPlane", 0.10f,

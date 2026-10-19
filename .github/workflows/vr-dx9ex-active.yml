@@ -424,6 +424,7 @@ jobs:
             'tools/verify_vr_pc_fast_package_contract.py',
             'tools/verify_vr_20261020_hmd_baseline.py',
             'tools/verify_vr_mirror_aspect_fit.py',
+            'tools/verify_vr_wide_culling_adjustable.py',
             'tools/verify_vr_menu_letterbox_aspect.py',
             'tools/verify_vr_f11_font_density.py',
             'tools/verify_vr_f11_toggle_frame.py',
