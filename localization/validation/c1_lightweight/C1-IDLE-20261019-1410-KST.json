@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1410-KST-DEDUP-IDLE",
+  "reviewer": "C1",
+  "run_slot": "C1",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "inspected_n100_path": "work/image-src/text_roi_batches/candidate_outputs",
+  "source_a_b_read_only": true,
+  "current_candidate_files": {
+    "A": 6,
+    "B": 5
+  },
+  "sha_dedup_sources": [
+    "localization/validation/c1_lightweight/C1-QA-20261019-1310-KST.json",
+    "localization/validation/c1_lightweight/C1-QA-20261019-1341-A0001-REMAINDER-2.json"
+  ],
+  "historical_legacy_excluded": "Q104_OutRunMode_FullHD_TextROI_2x_k.png (dated 2026-10-15, not newly generated 2026-10-19 candidate)",
+  "current_20261019_unique_sha_count": 10,
+  "previous_c1_unique_sha_count": 10,
+  "new_unique_sha_count": 0,
+  "status": "IDLE",
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1
+  },
+  "duplicate_sha_verifications": [
+    {
+      "filename": "Q047_b08df53b8bfdbadf_source_k.png",
+      "sha256": "a89b098a445fb89d96152fe1ab1abb39ed550f2aa75a2332c581b9c35b79578d",
+      "prior_qa": "C1-QA-20261019-1341-A0001-REMAINDER-2.json"
+    },
+    {
+      "filename": "Q047_e26cf75d44be41e8_source_k.png",
+      "sha256": "270e862474971af4713c6030d77ffd8026346e21e6bb44e8d6ae0f9232a8a7b0",
+      "prior_qa": "C1-QA-20261019-1341-A0001-REMAINDER-2.json"
+    }
+  ],
+  "correction": "A redundant SHA-identical C1-QA-20261019-1410-KST.json was briefly committed then deleted after cross-checking latest score SSOT and previous C1 13:41 evidence. This run creates no additional PASS/FAIL and must not accrue points.",
+  "ImageGen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "DDS_written": 0,
+  "C2_C3_ingame_pass_created": 0,
+  "deployment_performed": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "final_approval": "NOT_GRANTED",
+  "ai1_previous_confirmed_score": 1645,
+  "ai1_score_delta": 0,
+  "ai1_cumulative_score": 1645,
+  "scoreboard_source": "thp32tt/ai-dev-lab AI_SCOREBOARD.md latest remotely downloaded as of 2026-10-19 ~14:10 KST; entry 13:54:30 C1 1341 same SHA +1 already applied"
+}
