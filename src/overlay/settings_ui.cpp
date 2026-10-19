@@ -58,6 +58,14 @@ class SettingsWindow : public OverlayWindow
 
 	// A section is worth listing if it is named by the search itself, or holds a
 	// setting that is.
+    static bool setting_matches(const Settings::SettingBase* setting,
+        std::string_view search)
+    {
+        return matches_search(setting->key(), search) ||
+            (setting->section() == "VR" && setting->key() == "AntiAliasing" &&
+                matches_search("MSAA", search));
+    }
+
 	static bool section_matches(std::string_view section, std::string_view search)
 	{
 		if (matches_search(section, search))
@@ -69,7 +77,7 @@ class SettingsWindow : public OverlayWindow
 			return true;
 
 		for (const Settings::SettingBase* setting : Settings::SettingBase::registry())
-			if (!setting->hidden() && setting->section() == section && matches_search(setting->key(), search))
+			if (!setting->hidden() && setting->section() == section && setting_matches(setting, search))
 				return true;
 
 		return false;
@@ -273,7 +281,7 @@ public:
 			{
 				if (setting->hidden() || setting->section() != std::string_view(section))
 					continue;
-				if (!wholeSection && !matches_search(setting->key(), search))
+				if (!wholeSection && !setting_matches(setting, search))
 					continue;
 
 				// Warn about Windows.Input.Gaming when showing VibrationMode
@@ -286,7 +294,9 @@ public:
 					ImGui::PopStyleColor();
 				}
 
-				const std::string label(setting->key());
+				const std::string label(
+                    setting->section() == "VR" && setting->key() == "AntiAliasing"
+                        ? "MSAA (AntiAliasing)" : setting->key());
 
 				if (draw_control(setting, label))
 				{
