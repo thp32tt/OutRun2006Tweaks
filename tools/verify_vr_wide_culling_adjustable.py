@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """2026-10-20 HMD: VR PMT wide margin is editable while keeping stereo source."""
 from pathlib import Path
-import re
 r=Path(__file__).resolve().parents[1]
 settings=(r/'src/vr/settings.cpp').read_text(encoding='utf-8')
 profiles=(r/'tools/OutRunVR-TestProfiles.ps1').read_text(encoding='utf-8')
@@ -24,9 +23,11 @@ def check(s,p,c):
     before = owner.split('static void BeforeVisible(', 1)[1].split(
         'static void AfterVisible(', 1)[0]
     after = owner.split('static void AfterVisible(', 1)[1].split('public:', 1)[0]
-    # A commented-out restore contains the same substring, but is NOT code.
-    # Require each exact statement at the native visibility call boundary.
-    assert re.search(r'(?m)^\\s*RestoreScopedProjection\\(\\);\\s*
+    # Require both real statements; a commented-out call is not executable.
+    assert any(line.strip() == 'RestoreScopedProjection();'
+               for line in before.splitlines())
+    assert any(line.strip() == 'RestoreScopedProjection();'
+               for line in after.splitlines())
     assert 'projection->_11 = newX;' in owner
     assert 'projection->_22 = newY;' in owner
     assert 'if (vr && mode == 2)' in owner
