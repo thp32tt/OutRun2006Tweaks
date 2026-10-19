@@ -133,7 +133,12 @@ def check_pause_frame_owner(ui: str, pause: str, semantic_source: str) -> None:
              ui.index('static int __cdecl OutRunHudText_clip(')]
     require('const bool pauseFrameParent =' in hud)
     require('ProducerToken::PauseFrameShell' in hud)
-    require('!pauseFrameParent &&' in hud)
+    require(
+        'OutRunHudTextScreenHud = previous ||\n'
+        '\t\t\t(!pauseFrameParent &&\n'
+        '\t\t\t semantic.space == '
+        'OutRunVRHudSemantics::SpacePolicy::ScreenHud);' in hud,
+        'BA9D0 pause parent must not promote ESC child text to gameplay HUD')
 
     glyph = ui[ui.index('static int __cdecl TextGlyph_putSprite('):
                ui.index('enum SpriteScaleType')]
@@ -162,12 +167,18 @@ for bad_ui, bad_pause, bad_semantics in (
      semantics),
     (ui_source,
      pause_source.replace(
-        'RenderScope::ScreenOverlay2D,\n\t\t\t\tnullptr, true,',
-        'RenderScope::ScreenHud,\n\t\t\t\tnullptr, true,', 1),
+        'OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,\n'
+        '\t\t\tnullptr, true,',
+        'OutRunVR::GameSemantic::RenderScope::ScreenHud,\n'
+        '\t\t\tnullptr, true,', 1),
      semantics),
     (ui_source, pause_source,
      semantics.replace('PauseFrameShell,', 'PauseFrameShell_REMOVED,', 1)),
 ):
+    require(
+        bad_ui != ui_source or bad_pause != pause_source or
+        bad_semantics != semantics,
+        'PauseFrame negative mutation did not change source')
     try:
         check_pause_frame_owner(bad_ui, bad_pause, bad_semantics)
     except AssertionError:
