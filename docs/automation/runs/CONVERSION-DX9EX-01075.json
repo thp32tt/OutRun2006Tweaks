@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01075",
+  "production_id": "CONVERSION-DX9EX-01075",
+  "event_id": "CONVERSION-DX9EX-01075-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATION",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "fa653e442e322baa2fa5047059e260020dacd3e5",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/game/stage_extension_physical_source.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Restore complete stage-extension +TIME sprite and numeric original native R84 binocular HUD rendering without allowing previous road/world shader c64 to reject fixed-function GPU eye delivery, preserving live phase and end-of-stage results.",
+    "scope_boundary": "Only original 0x9898E/0x98A36 sprani and 0x989AD/0x98A10/0x98A89 numeric exact StageExtensionTime physical owners in R30/R33; original 0x98AC6 mode=2 animation, GOAL, menu, lens, ordinary HUD, SkyGlow, input/FFB, R26_SAFE, DX11 and DXVK stay untouched.",
+    "trace_stages": [
+      "Canonical original game's two +TIME sprite and three exact numeral E8 callers enter StageExtensionEnter/Leave and queue or direct D3DX ScreenHud ownership with source-generation protection.",
+      "D3DX and SpriteNode physical GPU Draw captures exact producer/queue/pose and original shader identity at R30 fixed-function/XYZRHW or R33 HUD; R30 already skips foreign VS c64 when shaderless.",
+      "R33 previously required stale game raw c64 even with shader identity zero; updated R33 admits valid shaderless direct and queued +TIME while demanding strict same-shader original generation for shader-backed producers.",
+      "Native left post-call and pre-right source fences retain queue epoch, physical Draw serial, shader, pose and original raw c64 generation; game state/RT/depth/viewport and conservative original fallback are unchanged."
+    ],
+    "subcomponents": [
+      "R33 shaderless +TIME physical owner now excludes unrelated previous world/GOAL c64 while preserving original shader-backed game c64 matching across left/right.",
+      "Shared stage physical Source validity prohibits stale nonzero raw c64 on fixed-function physical glyphs and preserves qualified queued and direct source identity.",
+      "C++ smoke tests cover both +TIME source modes, queued sprite and direct numeric, original shader generation changes, wrong producer and right-eye regression while retaining native fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_direct_numeric_and_queued_sprite_native_eye_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_stage_E8_direct_D3DX_and_queued_SpriteNode_R30_R33_fixedfn_shader_eye_pair",
+        "expected_behavior": "Both original +TIME numeric and sprani physical GPU sources qualify for independent left/right stereo despite an unrelated previous world c64 write; native pose, queue, draw and source remains exact."
+      },
+      {
+        "id": "stage_foreign_original_shader_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "foreign_c64_shader_epoch_queue_pose_and_non_stage_original_fallback",
+        "expected_behavior": "A fixed-function stage cannot borrow raw world c64; shader-owned stage rejects mismatched original game shader or raw generation and retains original single-draw conservative fallback without disabling other HUD/effects."
+      },
+      {
+        "id": "stage_exact_sha_windows_integrated_gate",
+        "category": "integrated_validation",
+        "behavior_area": "win32_r84_game_x64_openxr_host_package_domain_hud_full_source_CI",
+        "expected_behavior": "All required DX9Ex Active Windows game/host/package, Domain Isolation, HUD Inspector and Full Source Impact GitHub Actions complete SUCCESS at the final validation-bearing exact SHA; Quest3 runtime separately UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "2026-10-19 canonical original E8 StageExtensionSpraniCalls and StageExtensionPrintCalls and current R84 R30/R33 source captures; 0x98AC6 mode=2 remains excluded as documented by SHA-pinned original REA.",
+    "root_cause": "R30CaptureStagePhysicalSource skips the last original game c64 when no current vertex shader, while R33 captureStageSource still unconditionally fetches it and rejects foreign world raw shader during shaderless stage rendering.",
+    "source_trace": [
+      "Original StageExtensionEnter establishes source-backed direct owner or deferred SpriteNode tags, before StageExtensionLeave flushes exact owned D3DX batches.",
+      "R30 physical fixed-function/XYZRHW captures raw c64 only when RequiresOriginalShaderC64(shader) while R33 previously always checked foreign raw game c64 regardless of shader.",
+      "New R33 branch and shared Source admission match the R30 physical owner rule, and unchanged post-left/pre-right transactions enforce same source and eye state."
+    ],
+    "eye_ownership": "Static first-eye and second-eye source admission is repaired for shaderless +TIME, with exact generation protection for shader route. No matching Quest3/VDXR live GPU/HMD proof yet.",
+    "alternatives_rejected": [
+      "No broad ScreenHud token promotion, no repeated global D3DX Flush, no unowned projection, and no disabling normal native game fallback or GOAL/SkyGlow."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "stage_direct_numeric_and_queued_sprite_native_eye_pair": "PENDING_EXACT_SHA_CI",
+    "stage_foreign_original_shader_fail_closed": "PENDING_EXACT_SHA_CI",
+    "stage_exact_sha_windows_integrated_gate": "PENDING_EXACT_SHA_CI"
+  },
+  "result_commit_kind": "SEPARATE_SOURCE_MATERIAL_AND_POLICY_REQUIRED_RECORD_VALIDATION_BEARING",
+  "ci_evidence": {
+    "earlier_sha": "fa653e442e322baa2fa5047059e260020dacd3e5",
+    "earlier_active_run_id": 39198878472,
+    "earlier_failure": "POLICY_MISSING_REQUIRED_RUN_RECORD",
+    "current": "PENDING_EXACT_SHA"
+  },
+  "next_action": "Validate exact record-bearing SHA with all four required GitHub Actions; repair only an observed source/CI failure under 01075, then separate C6; matching Quest3 HMD runtime remains UNTESTED."
+}
