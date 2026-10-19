@@ -143,8 +143,9 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
               "GetLastRawGameWvpWrite(", "GetLastGameWvpSemanticProvenance(",
               "R29OwnerCurrentShaderEpoch(", "OwnsDirectGameWvp({",
               "GetCurrentLatchedPoseEpoch()", "GetLastGameWvpPoseEpoch()",
-              "R29OwnerTopLevelDrawSerial() + 1u", "sourceScope, sourceProducer, queueNode, queueEpoch"):
+              "R29OwnerTopLevelDrawSerial(), writeDraw", "sourceScope, sourceProducer, queueNode, queueEpoch"):
         assert s in proof, s
+    assert "R29OwnerTopLevelDrawSerial() + 1u, writeDraw" not in proof
     eye = r30.split("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld ||", 1)[1].split(
         "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1)[0]
     for s in ("ExactCarBaseShadowWorld", "R30HasExactCarBaseShadowRawWvp(rawGameWvp)",
@@ -166,6 +167,8 @@ def check_r84_shadow_route(semantic, r30, r32, r33, support, review):
     # If a synchronous game callback changes c64/shader/pose/producer,
     # the RIGHT render target must never receive the stale original WVP.
     assert "captureShadowSource" in physical
+    assert "drawSerial, uploadDraw," in physical
+    assert "drawSerial + 1u, uploadDraw" not in physical
     # Verify the original-game WVP pre-left guard and the independently
     # re-sampled post-left source, not an obsolete exact code string.
     for source_proof in (

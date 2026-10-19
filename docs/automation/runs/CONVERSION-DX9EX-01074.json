@@ -1,0 +1,84 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01074",
+  "production_id": "CONVERSION-DX9EX-01074",
+  "event_id": "CONVERSION-DX9EX-01074-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "changed_files": [
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp",
+    "tools/verify_vr_start_shadow_world_owner.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Restore race-start direct player contact-shadow binocular native drawing by reconciling R23 physical Draw N against original car c64 upload at N-1 across R30 and R33.",
+    "scope_boundary": "Only player contact-shadow original producer 0x69EB4/0x6AC76/0x6B766, game WVP, R23/R30/R33 eye delivery and original fallback; no HUD, lens, +TIME, GOAL, SkyGlow, original input/FFB, R26_SAFE or DXVK.",
+    "trace_stages": [
+      "Original replacement CalcPeraShadow wraps Game::DrawObjectAlpha_Internal with original player-car matrix and CarBaseShadow exact token.",
+      "Game RecordGameWvpWrite stamps original c64 at last physical serial N-1; R23 increments the serial BEFORE intercepted Draw to N.",
+      "R30 and R33 incorrectly used N+1 for admission, while R33 pre-left required original c64==N, conflicting with real physical ordering.",
+      "R30 and R33 now require game upload N-1 then physical N, with native left/post-left/right source fencing and unchanged original single fallback."
+    ],
+    "subcomponents": [
+      "Real R30 game c64 source serial repair and eye matrix admission.",
+      "R33 current physical serial, pre-left/post-left/pre-right generation coherence and native original fallback.",
+      "Positive N-1 and negative N-2/N C++ smoke plus strict changed-source verifier, unchanged global visual and input/FFB protections."
+    ],
+    "acceptance_items": [
+      {
+        "id": "start_shadow_original_source_native_eye_pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_car_shadow_c64_R23_R30_R33_both_eyes",
+        "expected_behavior": "Original game WVP c64 at N-1 is admissible during physical N in original per-eye renderer with coherent shader, pose and source."
+      },
+      {
+        "id": "start_shadow_mismatched_source_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "stale_c64_N2_or_reentrant_N_queue_shader_pose_and_original",
+        "expected_behavior": "Reject stale N-2/current N or foreign source and keep exactly one unmodified native fallback without borrowing world WVP."
+      },
+      {
+        "id": "start_shadow_final_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "win32_r84_host_openxr_package_domain_hud_fullsource",
+        "expected_behavior": "Required four GitHub Actions succeed at exact result SHA; HMD remains untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "root_cause": "R23BeforeTopLevelDraw increments before R30/R33 hooks, so original Game WVP captured at prior N-1; R30/R33 shadow source predicted N+1 and R33 pre-left equality with N.",
+    "original_evidence": "stereo_renderer_r23.cpp draw counter before call, outrun_renderer.cpp RecordGameWvpWrite uses current serial during c64 setter, R30 lens uses current N unlike shadow path.",
+    "eye_ownership": "Static C++ and CI only; Quest3/VDXR single-shadow geometry/FPS untested.",
+    "alternatives_rejected": [
+      "No generic alpha or world owner promotion.",
+      "Preserve native game fallback, SkyGlow, input/FFB and R26_SAFE."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "start_shadow_original_source_native_eye_pair": "PENDING_EXACT_SHA",
+    "start_shadow_mismatched_source_native_fallback": "PENDING_EXACT_SHA",
+    "start_shadow_final_exact_sha_gate": "PENDING_EXACT_SHA"
+  },
+  "result_commit_kind": "MATERIAL_VALIDATION_BEARING",
+  "next_action": "Exact SHA 4/4 CI required; separate [skip ci] C6 only on PASS. RUNTIME_VALIDATION=UNTESTED."
+}

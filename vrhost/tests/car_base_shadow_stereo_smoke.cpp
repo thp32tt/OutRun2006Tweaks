@@ -81,23 +81,28 @@ int main()
     if (!CarShadowStereo::ValidScaledAlpha(.3f,.5f,scaled) ||
         scaled < .149f || scaled > .151f)
         return 16;
-    // Source-correct original contact-shadow Draw: R30's "next draw"
-    // generation is 41, and the original raw c64 belongs to draw 40.
+    // R23 already entered player-shadow GPU Draw serial N=40;
+    // the source-proven original car c64 belongs to prior N-1=39.
     // The physical R33 guard must reject a different left-eye owner even
     // when its shader/pose and alpha state look identical.
     const CarShadowStereo::StereoDrawSource physical{
-        11, 40, 30, 30, 40, 50, 0x100, 60, true
+        11, 39, 30, 30, 40, 50, 0x100, 60, true
     };
     if (!CarShadowStereo::IsCoherentBeforeNativeLeft(physical))
         return 17;
+    auto wrongSource = physical;
+    wrongSource.uploadDraw = 38; // unrelated prior car/world draw
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(wrongSource)) return 36;
+    wrongSource.uploadDraw = 40; // reentrant writer in this Draw
+    if (CarShadowStereo::IsCoherentBeforeNativeLeft(wrongSource)) return 37;
     auto physicalMutation = physical;
     physicalMutation.uploadSerial = 0; // no game WVP write
     if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
         return 18;
-    physicalMutation = physical; physicalMutation.uploadDraw = 39;
+    physicalMutation = physical; physicalMutation.uploadDraw = 38;
     if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
         return 19; // previous vehicle or world draw
-    physicalMutation = physical; physicalMutation.uploadDraw = 41;
+    physicalMutation = physical; physicalMutation.uploadDraw = 40;
     if (CarShadowStereo::IsCoherentBeforeNativeLeft(physicalMutation))
         return 20; // future/mismatched submission
     physicalMutation = physical; physicalMutation.uploadPoseEpoch = 31;
@@ -143,7 +148,7 @@ int main()
     physicalMutation = physical; physicalMutation.exactSource = false;
     if (CarShadowStereo::SameCarShadowForRightEye(physical,physicalMutation))
         return 34;
-    physicalMutation = physical; physicalMutation.uploadDraw = 39;
+    physicalMutation = physical; physicalMutation.uploadDraw = 38;
     if (CarShadowStereo::SameCarShadowForRightEye(physicalMutation,physical))
         return 35;
     std::cout << "R84 contact shadow eye-owner PASS\n";

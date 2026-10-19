@@ -1019,7 +1019,8 @@ namespace OutRunVRStereo
                     OutRunVR::CarShadowStereo::OwnsDirectGameWvp({
                         OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
                         OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
-                        drawSerial + 1u, uploadDraw,
+                        // Current Draw is N, original car c64 writer belongs to N-1.
+                        drawSerial, uploadDraw,
                         shader, writeShader, shaderEpoch, writeShaderEpoch,
                         writtenScope, writtenProducer, queueNode, queueEpoch
                     });

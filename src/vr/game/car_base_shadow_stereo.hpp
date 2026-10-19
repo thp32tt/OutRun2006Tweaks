@@ -26,7 +26,8 @@ inline bool ValidScaledAlpha(float raw, float opacity, float& out) noexcept
 struct DirectGameWvpOwner
 {
     std::uint64_t currentPoseEpoch, uploadedPoseEpoch;
-    std::uint64_t nextDrawSerial, uploadDrawSerial;
+    // R23 advances physical Draw N before hook entry; game c64 is at N-1.
+    std::uint64_t currentDrawSerial, uploadDrawSerial;
     std::uintptr_t currentShader, uploadShader;
     std::uint64_t currentShaderEpoch, uploadShaderEpoch;
     GameSemantic::RenderScope uploadScope;
@@ -42,8 +43,8 @@ constexpr bool OwnsDirectGameWvp(const DirectGameWvpOwner& owner) noexcept
 {
     return owner.currentPoseEpoch != 0 &&
         owner.currentPoseEpoch == owner.uploadedPoseEpoch &&
-        owner.nextDrawSerial > owner.uploadDrawSerial &&
-        owner.nextDrawSerial - owner.uploadDrawSerial == 1u &&
+        owner.currentDrawSerial > owner.uploadDrawSerial &&
+        owner.currentDrawSerial - owner.uploadDrawSerial == 1u &&
         owner.currentShader != 0 &&
         owner.currentShader == owner.uploadShader &&
         owner.currentShaderEpoch != 0 &&
@@ -77,7 +78,8 @@ constexpr bool IsCoherentBeforeNativeLeft(
     return source.exactSource &&
         source.uploadSerial != 0 && source.uploadDraw != 0 &&
         source.drawSerial != 0 &&
-        source.uploadDraw == source.drawSerial &&
+        source.drawSerial > source.uploadDraw &&
+        source.drawSerial - source.uploadDraw == 1u &&
         source.poseEpoch != 0 &&
         source.poseEpoch == source.uploadPoseEpoch &&
         source.shaderEpoch != 0 && source.shader != 0 &&
@@ -87,11 +89,13 @@ constexpr bool IsCoherentBeforeNativeLeft(
 // Both original-source identity and the native draw generation must still
 // match immediately before the left eye; prior car/world matrices are unsafe.
 static_assert(IsCoherentBeforeNativeLeft(
-    {11, 40, 30, 30, 40, 50, 0x100, 60, true}));
+    {11, 39, 30, 30, 40, 50, 0x100, 60, true})); // original N-1
 static_assert(!IsCoherentBeforeNativeLeft(
-    {11, 39, 30, 30, 40, 50, 0x100, 60, true}));
+    {11, 38, 30, 30, 40, 50, 0x100, 60, true})); // stale N-2
 static_assert(!IsCoherentBeforeNativeLeft(
-    {0, 40, 30, 30, 40, 50, 0x100, 60, true}));
+    {11, 40, 30, 30, 40, 50, 0x100, 60, true})); // same N
+static_assert(!IsCoherentBeforeNativeLeft(
+    {0, 39, 30, 30, 40, 50, 0x100, 60, true}));
 
 constexpr bool SameStereoDrawSource(
     const StereoDrawSource& a, const StereoDrawSource& b) noexcept
@@ -136,11 +140,11 @@ constexpr bool SameCarShadowForRightEye(
         SameStereoDrawSource(beforeLeft, beforeRight);
 }
 static_assert(SameCarShadowForRightEye(
-    {11,40,30,30,40,50,0x100,60,true},
-    {11,40,30,30,40,50,0x100,60,true}));
+    {11,39,30,30,40,50,0x100,60,true},
+    {11,39,30,30,40,50,0x100,60,true}));
 static_assert(!SameCarShadowForRightEye(
-    {11,40,30,30,40,50,0x100,60,true},
-    {12,40,30,30,40,50,0x100,60,true}));
+    {11,39,30,30,40,50,0x100,60,true},
+    {12,39,30,30,40,50,0x100,60,true}));
 
 constexpr bool CanUseSpatialShadow(
     GameSemantic::ProducerToken producer, GameSemantic::RenderScope scope,
