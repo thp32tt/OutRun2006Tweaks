@@ -21,6 +21,7 @@ on:
       - 'tools/verify_vr_ui_matrix_safety.py'
       - 'tools/verify_vr_custom_sprite_descriptor.py' # Changed UI mutation checks must validate the same exact game SHA.
       - 'vrhost/tests/stage_extension_eye_plane_smoke.cpp' # +TIME eye-epoch regression must exercise matching HUD inspector SHA.
+      - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py' # Changed +TIME captured-WVP regression must run all final exact-SHA gates.
       - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'src/hooks_framerate.cpp'
       - 'tools/verify_vr_sumo_replay_semantics.py'
@@ -81,6 +82,7 @@ on:
       - 'tools/verify_vr_ui_matrix_safety.py'
       - 'tools/verify_vr_custom_sprite_descriptor.py' # Changed UI mutation checks must validate the same exact game SHA.
       - 'vrhost/tests/stage_extension_eye_plane_smoke.cpp' # +TIME eye-epoch regression must exercise matching HUD inspector SHA.
+      - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py' # Changed +TIME captured-WVP regression must run all final exact-SHA gates.
       - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'src/hooks_framerate.cpp'
       - 'tools/verify_vr_sumo_replay_semantics.py'

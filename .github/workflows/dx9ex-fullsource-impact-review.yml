@@ -16,6 +16,7 @@ on:
       - 'tools/verify_vr_ui_matrix_safety.py'
       - 'tools/verify_vr_custom_sprite_descriptor.py' # Changed UI mutation checks must validate the same exact game SHA.
       - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
+      - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py' # Changed +TIME captured-WVP regression must run all final exact-SHA gates.
       - 'tools/verify_vr_win32_cross_domain_safety.py'
       - '.github/workflows/dx9ex-fullsource-impact-review.yml'
       - 'src/**'
