@@ -11,8 +11,13 @@ def test():
     svc = services["outrun-chat-controller-localization-recovery"]
     env = svc["environment"]
     assert env["CHAT_SLOTS"] == "3"
-    assert env["AUTO_SEND"] == "false"
+    assert env["AUTO_SEND"] == "true"
     assert env["OUTRUN_CROP_ENABLED"] == "true"
+    assert env["OUTRUN_ROI_BRIDGE_ENABLED"] == "true"
+    assert env["OUTRUN_AB_TEXT_ROI_QUEUE"] == "true"
+    assert env["SCHEDULE_MINUTES"] == "0,10,30,40"
+    assert env["OUTRUN_KR_V2_AUTO_COMPOSE"] == "false"
+    assert env["OUTRUN_KR_V2_AUTO_DEPLOY"] == "false"
     assert svc["ports"] == ["6083:6080", "8788:8787"]
     mounts = [v for v in svc["volumes"] if isinstance(v, dict)]
     sources = {v.get("source") for v in mounts}
@@ -31,6 +36,7 @@ def test():
     assert "python3-numpy" in dockerfile and "python3-pil" in dockerfile
     entry = (ROOT / "entrypoint.sh").read_text(encoding="utf-8")
     assert "/opt/outrun/c_english_crop/loop.py" in entry
+    assert "/opt/outrun/app/crop_to_imagegen_queue.py" in entry
     assert "OUTRUN_CROP_ENABLED" in entry
     print("SINGLE_PORTAINER_CONTAINER_PASS")
 
