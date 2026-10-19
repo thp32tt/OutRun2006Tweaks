@@ -64,20 +64,20 @@ int main() {
         OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
             fixedFnQueued, poisonedQueued))
         return 78; // no stale c64 can cross a new queue-node epoch
-    auto shaderStage = fixedFnStage;
-    shaderStage.shader = 0x100;
-    shaderStage.shaderEpoch = 9;
-    shaderStage.rawWvpWriteSerial = 50;
-    shaderStage.rawWvpDrawSerial = 49;
-    if (!OutRunVR::StageExtensionPhysical::IsValid(shaderStage) ||
+    auto shaderBackedStage = fixedFnStage;
+    shaderBackedStage.shader = 0x100;
+    shaderBackedStage.shaderEpoch = 9;
+    shaderBackedStage.rawWvpWriteSerial = 50;
+    shaderBackedStage.rawWvpDrawSerial = 49;
+    if (!OutRunVR::StageExtensionPhysical::IsValid(shaderBackedStage) ||
         !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
-            shaderStage, shaderStage) ||
+            shaderBackedStage, shaderBackedStage) ||
         MatchesCapturedOriginalWvp(true, 0x100, 9, 0x200, 9, 50, 49))
         return 79; // shader-backed stage still fences original c64
-    auto changedShader = shaderStage;
+    auto changedShader = shaderBackedStage;
     ++changedShader.rawWvpWriteSerial;
     if (OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
-            shaderStage, changedShader))
+            shaderBackedStage, changedShader))
         return 80; // native LEFT cannot borrow another RIGHT shader WVP
 
     auto changedFixedFn = fixedFnStage;
