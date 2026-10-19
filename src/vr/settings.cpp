@@ -89,6 +89,10 @@ namespace Settings
 		"Base fail-open timeout for OpenXR cadence waits. PhaseLock may extend this to four runtime periods (max 100 ms) so a temporary compositor stall can recover without returning to an uncapped producer loop.", Range<float>{ 5.0f, 100.0f } };
 	Setting<bool> VRPositionalTracking{ "VR", "PositionalTracking", true,
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
+    // F11 VR PMT visibility policy; the desktop/legacy gate stays unchanged.
+    Setting<int> VRStageCullingMode{ "VR", "StageCullingMode", 1,
+        "VR PMT culling: Legacy follows Graphics/DisableStageCulling; VR Wide keeps culling with a stereo FOV and safety margin; Off disables PMT culling. HMD validation required.",
+        { "Legacy (Graphics setting)", "VR Wide (stereo FOV)", "Off (no PMT culling)" } };
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
 	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", true,
@@ -269,6 +273,9 @@ namespace OutRunVR
 		void declare_settings() override
 		{
 			Settings::VRAutoLaunchHost.needs_restart();
+            // Superseded by the explicit F11 StageCullingMode; keep existing
+            // INI parsing backwards compatible without duplicate controls.
+            Settings::VRCullingUnionFov.hidden(true);
             Settings::VRAntiAliasing.needs_restart();
             Settings::VRTransparencySupersampling.needs_restart();
             Settings::VRAutoRenderResolution.needs_restart();
