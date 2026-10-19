@@ -1321,7 +1321,7 @@ namespace OutRunVRRenderer
 			{
 				CullingUnionFovDeferredLogged = true;
 				spdlog::warn(
-					"VR renderer: CullingUnionFov disabled in active rendering after visual-regression evidence; live projection remains untouched until a culling-only frustum boundary is proven");
+					"VR renderer: render projection remains stock; widened stereo FOV is isolated to the verified PMT result-gate call when VR StageCullingMode=1");
 			}
 			FrameTelemetryFlags |= ClientCullingCameraSynced;
 		}
