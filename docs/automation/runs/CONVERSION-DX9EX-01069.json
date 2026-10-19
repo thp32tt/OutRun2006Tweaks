@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C5_VALIDATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "1b1fb6433f199ae8e9293cc377c3f0ca2260c002",
   "changed_files": [
@@ -82,10 +82,13 @@
   },
   "result_commit_kind": "VALIDATION_BEARING_RECORD_FOR_PREVIOUS_MATERIAL_SOURCE",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "material_source_sha": "1b1fb6433f199ae8e9293cc377c3f0ca2260c002",
     "prior_failed_active": 39186580633,
-    "prior_failure": "exact task function record missing; policy pre-build failure, not a compiler failure"
+    "prior_failure": "exact task function record missing; policy pre-build failure, not a compiler failure",
+    "validation_bearing_result_sha": "36c04e69cd6c391f1092b4fb7f8da1f0fac7a412"
   },
-  "next_action": "Run four required GitHub Actions exact validation-bearing SHA gates once; repair exact failures under same TASK_ID; preserve Quest3 RUNTIME_VALIDATION=UNTESTED."
+  "next_action": "C6 PASS_EXACT_SHA recorded; HMD/Quest3 runtime remains UNTESTED; do not rerun builds or CI for this bookkeeping result.",
+  "validation_bearing_result_sha": "36c04e69cd6c391f1092b4fb7f8da1f0fac7a412",
+  "c6_previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
