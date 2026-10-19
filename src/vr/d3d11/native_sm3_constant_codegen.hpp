@@ -14,6 +14,21 @@ inline bool native_sm3_const_reference(unsigned reg, unsigned limit,
                   : "r283_c[" + std::to_string(reg) + "]";
     return true;
 }
+// SM3 shader-owned DEFB; a live b# from Set*ShaderConstantB must
+// fail closed until a generation-matched source snapshot is implemented.
+inline bool native_sm3_bool_reference(unsigned reg, bool defined,
+                                     std::string& out) {
+    if (reg >= 16u || !defined) return false;
+    out = "r283_b" + std::to_string(reg);
+    return true;
+}
+inline bool append_native_sm3_defb(std::string& out, unsigned reg,
+                                   std::uint32_t literal) {
+    if (reg >= 16u || literal > 1u) return false;
+    out += "static const bool r283_b" + std::to_string(reg) +
+           (literal ? " = true;\n" : " = false;\n");
+    return true;
+}
 inline bool append_native_sm3_def(std::string& out, unsigned reg,
                                   const std::array<std::uint32_t, 4>& bits) {
     if (reg >= 256u) return false;

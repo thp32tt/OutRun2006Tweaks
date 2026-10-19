@@ -366,7 +366,7 @@ bool build_r283_sm3_mov_shader_source(
             bool texture2d{};
             bool texkill{};
             // Flow instructions are source operations, not synthetic register writes.
-            // 1=IFC, 2=ELSE, 3=ENDIF. The emitter preserves their original order.
+            // 1=IFC/IF, 2=ELSE, 3=ENDIF; the emitter preserves branch order.
             unsigned flowKind{};
             std::string flowCondition;
             bool sineCosine{};
@@ -385,6 +385,8 @@ bool build_r283_sm3_mov_shader_source(
         std::array<unsigned, 16> outputWritten{};
         std::array<bool, 256> defPresent{};
         std::array<std::array<std::uint32_t, 4>, 256> defBits{};
+        std::array<bool, 16> boolDefPresent{};
+        std::array<std::uint32_t, 16> boolDefBits{};
         std::array<bool, 16> samplerDeclared{};
         std::array<bool, 16> sampler2dDeclared{};
         std::array<bool, 16> sampler2dUsed{};
@@ -417,6 +419,29 @@ bool build_r283_sm3_mov_shader_source(
                 }
                 continue;
             }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB)) {
+                // Unlike a live b# register, a shader-owned DEFB has
+                // exact compile-time value and cannot become stale on Draw.
+                if ((instruction.instructionToken & 0xf0000000u) != 0u ||
+                    (instruction.instructionToken & 0x00ff0000u) != 0u ||
+                    instruction.operandTokens.size() != 2u)
+                    return false;
+                const DWORD token = instruction.operandTokens[0];
+                const unsigned reg = token & D3DSP_REGNUM_MASK;
+                const DWORD literal = instruction.operandTokens[1];
+                if ((token & 0x80000000u) == 0u ||
+                    r283_decode_register_type(token) != D3DSPR_CONSTBOOL ||
+                    reg >= boolDefPresent.size() || boolDefPresent[reg] ||
+                    (token & D3DSP_WRITEMASK_ALL) != D3DSP_WRITEMASK_ALL ||
+                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    (token & D3DSP_DSTMOD_MASK) != 0u ||
+                    (token & D3DSP_DSTSHIFT_MASK) != 0u ||
+                    literal > 1u)
+                    return false;
+                boolDefPresent[reg] = true;
+                boolDefBits[reg] = literal;
+                continue;
+            }
             if (instruction.opcode != static_cast<DWORD>(D3DSIO_DEF)) continue;
             if ((instruction.instructionToken & 0xf0000000u) != 0u ||
                 instruction.operandTokens.size() != 5u)
@@ -443,7 +468,8 @@ bool build_r283_sm3_mov_shader_source(
         // programs requiring them can become native Draw candidates.
         for (const auto& instruction : decode.instructions) {
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL) ||
-                instruction.opcode == static_cast<DWORD>(D3DSIO_DEF))
+                instruction.opcode == static_cast<DWORD>(D3DSIO_DEF) ||
+                instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB))
                 continue;
             // SM3 scalar float-compare branches can change menu/race shader
             // output, including gradients and alpha. Preserve genuine control
@@ -508,6 +534,36 @@ bool build_r283_sm3_mov_shader_source(
                 branch.flowKind = 1u;
                 branch.flowCondition = scalarOperands[0] + " " + compareOp +
                                        " " + scalarOperands[1];
+                operations.push_back(std::move(branch));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_IF)) {
+                // Real SM3 IF consumes a scalar b# boolean.  Do not
+                // fabricate dynamic Set*ShaderConstantB state or predicates.
+                if ((instruction.instructionToken & 0xf0000000u) != 0u ||
+                    (instruction.instructionToken & 0x00ff0000u) != 0u ||
+                    instruction.operandTokens.size() != 1u ||
+                    operations.size() >= kMaxOps)
+                    return false;
+                const DWORD token = instruction.operandTokens[0];
+                const unsigned reg = token & D3DSP_REGNUM_MASK;
+                const unsigned swizzle = (token & D3DSP_SWIZZLE_MASK) >> 16u;
+                if ((token & 0x80000000u) == 0u ||
+                    r283_decode_register_type(token) != D3DSPR_CONSTBOOL ||
+                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    ((token & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) !=
+                        D3DSPSM_NONE ||
+                    (swizzle != 0xe4u && swizzle != 0u) ||
+                    reg >= boolDefPresent.size())
+                    return false;
+                std::string boolCondition;
+                if (!native_sm3_bool_reference(
+                        reg, boolDefPresent[reg], boolCondition) ||
+                    !writtenFlow.begin(tempWritten, outputWritten))
+                    return false;
+                Operation branch{};
+                branch.flowKind = 1u;
+                branch.flowCondition = std::move(boolCondition);
                 operations.push_back(std::move(branch));
                 continue;
             }
@@ -877,6 +933,11 @@ bool build_r283_sm3_mov_shader_source(
         // never authorizes a native Draw without a matching live upload.
         if (liveConstantsUsed)
             translated = "cbuffer R283LiveConstants : register(b0) { float4 r283_c[256]; };\n";
+        for (unsigned reg = 0u; reg < boolDefPresent.size(); ++reg) {
+            if (boolDefPresent[reg] &&
+                !append_native_sm3_defb(translated, reg, boolDefBits[reg]))
+                return false;
+        }
         for (unsigned reg = 0u; reg < constantLimit; ++reg) {
             if (defPresent[reg] &&
                 !append_native_sm3_def(translated, reg, defBits[reg]))
