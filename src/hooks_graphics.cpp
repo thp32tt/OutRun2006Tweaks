@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
+#include "vr/ui/vr_mirror_aspect_fit.hpp"
 #include "vr/game/pmt_node_culling_contract.hpp"
 #include "vr_shared.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
@@ -36,6 +37,7 @@ namespace Settings
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRMirrorFitDesktop;
+    extern Setting<bool> VRMirrorPreserveAspect;
     extern Setting<bool> VRAutoRenderResolution;
     extern Setting<int> VRAntiAliasing;
     extern Setting<int> VRStageCullingMode;
@@ -2230,14 +2232,38 @@ class WindowedBorderless : public Hook
 				window, MONITOR_DEFAULTTOPRIMARY);
 			if (monitor && GetMonitorInfoW(monitor, &monitorInfo))
 			{
-				x = monitorInfo.rcMonitor.left;
-				y = monitorInfo.rcMonitor.top;
-				width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
-				height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
-				spdlog::info(
-					"VR PC MIRROR: fitting borderless window to monitor {}x{} while internal backbuffer remains {}x{}",
-					width, height,
-					Game::screen_resolution->x, Game::screen_resolution->y);
+                const int monitorWidth =
+                    monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+                const int monitorHeight =
+                    monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+                x = monitorInfo.rcMonitor.left;
+                y = monitorInfo.rcMonitor.top;
+                width = monitorWidth;
+                height = monitorHeight;
+                // The unified physical source may be portrait 2496x2688
+                // while a 3440x1440 desktop mirror is ultrawide. Stretching
+                // the HWND to that whole monitor rescales the D3D9Ex Present
+                // anisotropically and flattens car/menu sprites vertically.
+                // Fit the WINDOW, never the actual game/eye render buffers.
+                // Users can opt out for old full-width mirror A/B captures.
+                if (Settings::VRMirrorPreserveAspect) {
+                    const auto fit = OutRunVRMirrorAspect::Fit(
+                        monitorWidth, monitorHeight,
+                        Game::screen_resolution->x,
+                        Game::screen_resolution->y);
+                    if (fit.valid) {
+                        x += fit.left;
+                        y += fit.top;
+                        width = fit.width;
+                        height = fit.height;
+                    }
+                }
+                spdlog::info(
+                    "VR PC MIRROR: monitor={}x{} source={}x{} fittedWindow={}x{} origin={},{} preserveAspect={} (OpenXR eyes unchanged)",
+                    monitorWidth, monitorHeight,
+                    Game::screen_resolution->x, Game::screen_resolution->y,
+                    width, height, x, y,
+                    Settings::VRMirrorPreserveAspect.get());
 			}
 		}
 

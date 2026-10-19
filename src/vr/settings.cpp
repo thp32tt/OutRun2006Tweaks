@@ -66,7 +66,9 @@ namespace Settings
     Setting<int> VRRenderHeight{ "VR", "RenderHeight", 0,
         "Optional game/eye render height. 0 = use original desktop default; set with RenderWidth. Not an OpenXR runtime autodetection.", Range<int>{ 0, 8192 } };
     Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", true,
-		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
+        "Fits the borderless PC mirror within the monitor even when the internal D3D9Ex source is larger. The game and OpenXR eye images are not resized." };
+    Setting<bool> VRMirrorPreserveAspect{ "VR", "MirrorPreserveAspect", true,
+        "Keep the original 2D menu/game pixel aspect when displaying a portrait VDXR 3D/2D source on an ultrawide desktop. The PC mirror is centered with unused desktop space instead of vertically squashing the image. VR eye buffers and all source UI pixels stay unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
 	Setting<float> VRHudScale{ "VR", "HudScale", 0.82f,
