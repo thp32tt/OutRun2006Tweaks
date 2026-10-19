@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/stage_edge_cull_projection.hpp"
 #include "vr/game/pmt_node_culling_contract.hpp"
+#include "vr_shared.hpp"
 #include "vr/game/driver_seat_camera_math.hpp"
 #include "vr/game/driver_seat_car_space.hpp"
 #include "vr/game/driver_seat_render_pass.hpp"
@@ -35,6 +36,8 @@ namespace Settings
 	extern Setting<bool> VRMirrorFitDesktop;
     extern Setting<bool> VRAutoRenderResolution;
     extern Setting<int> VRAntiAliasing;
+    extern Setting<int> VRStageCullingMode;
+    extern Setting<float> VRCullingUnionMarginDegrees;
     extern Setting<bool> VRTransparencySupersampling;
 	extern Setting<int> VRRenderWidth;
 	extern Setting<int> VRRenderHeight;
@@ -1605,51 +1608,244 @@ public:
 };
 ScreenEdgeCullFix ScreenEdgeCullFix::instance;
 
+// VR PMT culling is intentionally attached to the *original visibility
+// function's call boundary*, not to the render projection/WVP upload.
+// Changing the live projection for an entire BeginScene caused previous visual
+// regressions: world rendering and effects inherited a culling-only matrix.
+//
+// PMT walk:
+//   EXE+0x5015 CALL render_node_visible_404b00
+//   EXE+0x501D TEST EAX,EAX / JE ...
+// Keep the original EAX answer for the VR-wide case, and override it only for
+// explicit disable/fail-open. Both hooks are on the same rendering thread.
 class DisableStageCulling : public Hook
 {
-	inline static bool SignatureMismatchLogged = false;
+    inline static SafetyHookMid before_visible_hook{};
+    inline static SafetyHookMid result_gate_hook{};
+    inline static bool signature_mismatch_logged = false;
+    inline static bool projection_writable = false;
+    inline static std::uint64_t scoped_calls = 0;
+    inline static std::uint64_t fail_open_calls = 0;
+    inline static std::uint64_t first_deferred_report = 0;
+
+    // Canonical OutRun.exe + 0x55D8A0 = game's 0x0095D8A0 projection matrix.
+    // Only a scoped CPU PMT visibility invocation ever sees the widened copy.
+    static constexpr std::uintptr_t ProjectionRva = 0x0055D8A0u;
+
+    struct SavedProjection
+    {
+        D3DMATRIX* target = nullptr;
+        D3DMATRIX original{};
+        bool active = false;
+    };
+    inline static thread_local SavedProjection saved{};
+
+    static bool VrGameplay() noexcept
+    {
+        return Settings::VREnabled.get() && Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_GAME ||
+             *Game::current_mode == GameState::STATE_SMPAUSEMENU) &&
+            OutRunVR::RuntimeEligibility::MayInjectStereo();
+    }
+
+    static bool ValidateProjectionAddress() noexcept
+    {
+        D3DMATRIX* p = Module::exe_ptr<D3DMATRIX>(ProjectionRva);
+        MEMORY_BASIC_INFORMATION mbi{};
+        if (!p || !VirtualQuery(p, &mbi, sizeof(mbi)) ||
+            mbi.State != MEM_COMMIT)
+            return false;
+        const DWORD access = mbi.Protect & 0xFFu;
+        if (access != PAGE_READWRITE && access != PAGE_WRITECOPY &&
+            access != PAGE_EXECUTE_READWRITE &&
+            access != PAGE_EXECUTE_WRITECOPY)
+            return false;
+        const auto begin = reinterpret_cast<std::uintptr_t>(p);
+        const auto regionEnd =
+            reinterpret_cast<std::uintptr_t>(mbi.BaseAddress) + mbi.RegionSize;
+        return begin <= regionEnd && regionEnd - begin >= sizeof(D3DMATRIX);
+    }
+
+    static bool GetWideFov(float& tanHorizontal, float& tanVertical) noexcept
+    {
+        const auto* frame = OutRunVRRenderer::GetLatchedStereoFrameView();
+        if (!frame || !frame->valid || frame->poseSequence == 0)
+            return false;
+        const float margin = std::clamp(
+            Settings::VRCullingUnionMarginDegrees.get(), 0.0f, 15.0f) *
+            0.01745329251994329577f;
+        float h = 0.0f, v = 0.0f;
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            const auto& fov = frame->eyeFov[eye];
+            const float angles[4] = {
+                fov.angleLeft, fov.angleRight, fov.angleDown, fov.angleUp
+            };
+            for (float angle : angles)
+                if (!std::isfinite(angle) || std::abs(angle) >= 1.56f)
+                    return false;
+            if (!(fov.angleLeft < fov.angleRight) ||
+                !(fov.angleDown < fov.angleUp))
+                return false;
+            h = std::max(h, std::max(std::abs(fov.angleLeft),
+                std::abs(fov.angleRight)));
+            v = std::max(v, std::max(std::abs(fov.angleDown),
+                std::abs(fov.angleUp)));
+        }
+        // Symmetric enclosure of both OpenXR asymmetric eye frusta.
+        // Conservative when either eye differs; never shrink original FOV.
+        h = std::min(1.48f, h + margin);
+        v = std::min(1.48f, v + margin);
+        tanHorizontal = std::tan(h);
+        tanVertical = std::tan(v);
+        return std::isfinite(tanHorizontal) && tanHorizontal > 0.0f &&
+            std::isfinite(tanVertical) && tanVertical > 0.0f;
+    }
+
+    static void RestoreScopedProjection() noexcept
+    {
+        if (!saved.active)
+            return;
+        if (saved.target)
+            std::memcpy(saved.target, &saved.original, sizeof(D3DMATRIX));
+        saved = {};
+    }
+
+    static void BeforeVisible(safetyhook::Context&) noexcept
+    {
+        // The companion after-call hook always restores the CPU matrix, even
+        // when the original game decides this PMT node is invisible.
+        RestoreScopedProjection();
+        if (!projection_writable || !VrGameplay() ||
+            Settings::VRStageCullingMode.get() != 1)
+            return;
+
+        float tanH = 0.0f, tanV = 0.0f;
+        if (!GetWideFov(tanH, tanV))
+            return;
+        auto* projection = Module::exe_ptr<D3DMATRIX>(ProjectionRva);
+        if (!projection)
+            return;
+        D3DMATRIX original{};
+        std::memcpy(&original, projection, sizeof(original));
+        if (!std::isfinite(original._11) || !std::isfinite(original._22) ||
+            !std::isfinite(original._34) || !std::isfinite(original._44) ||
+            original._11 <= 0.0f || original._22 <= 0.0f ||
+            std::abs(original._34) < 0.5f || std::abs(original._44) > 0.5f)
+            return; // Not a perspective-world source: never alter it.
+
+        // D3D9 right-handed projection. A culling-only symmetric enclosure
+        // lets the game keep its own visibility algorithm and node transforms.
+        const float newX = std::min(original._11, 1.0f / tanH);
+        const float newY = std::min(original._22, 1.0f / tanV);
+        if (!std::isfinite(newX) || !std::isfinite(newY) ||
+            newX <= 0.0f || newY <= 0.0f)
+            return;
+        saved.target = projection;
+        saved.original = original;
+        saved.active = true;
+        projection->_11 = newX;
+        projection->_22 = newY;
+        projection->_31 = 0.0f;
+        projection->_32 = 0.0f;
+        ++scoped_calls;
+    }
+
+    static void AfterVisible(safetyhook::Context& ctx) noexcept
+    {
+        const bool scoped = saved.active;
+        RestoreScopedProjection();
+
+        const bool vr = VrGameplay();
+        const int mode = Settings::VRStageCullingMode.get();
+        if (vr && mode == 2)
+        {
+            ctx.eax = 1u; // TEST EAX,EAX now falls through
+            return;
+        }
+        if (vr && mode == 1)
+        {
+            // A missing/invalid pose or unsafe projection must never delete
+            // scenery in a VR frame. This costs perf only until VR is ready.
+            if (!scoped)
+            {
+                ++fail_open_calls;
+                ctx.eax = 1u;
+            }
+        }
+        else if (Settings::DisableStageCulling.get())
+        {
+            // Original Graphics toggle remains authoritative for legacy and
+            // desktop modes without patching code bytes under a live detour.
+            ctx.eax = 1u;
+        }
+
+        if ((scoped_calls + fail_open_calls) != 0 &&
+            ((scoped_calls + fail_open_calls) & 0xFFFFFu) == 0 &&
+            first_deferred_report != scoped_calls + fail_open_calls)
+        {
+            first_deferred_report = scoped_calls + fail_open_calls;
+            spdlog::info(
+                "VR PMT CULL: scopedWide={} failOpen={} mode={} marginDeg={:.1f}; HMD coverage untested",
+                scoped_calls, fail_open_calls, mode,
+                Settings::VRCullingUnionMarginDegrees.get());
+        }
+    }
 
 public:
-	std::string_view description() override
-	{
-		return "DisableStageCulling";
-	}
+    std::string_view description() override
+    {
+        return "DisableStageCulling";
+    }
 
-	void declare_settings() override
-	{
-		Settings::DisableStageCulling.watch([this] { apply(); });
-	}
+    bool apply() override
+    {
+        // Relocated TEST/JE must be stock before the mid-hook is installed.
+        auto* gate = Module::exe_ptr<std::uint8_t>(
+            OutRunVR::PmtNodeCull::ResultTestRva);
+        if (!OutRunVR::PmtNodeCull::ResultGateBytesCompatible(
+                gate, OutRunVR::PmtNodeCull::OriginalResultGate.size()))
+        {
+            if (!signature_mismatch_logged)
+            {
+                signature_mismatch_logged = true;
+                spdlog::error(
+                    "VR PMT CULL: signature mismatch at 0x{:X}, refusing hooks",
+                    static_cast<unsigned>(OutRunVR::PmtNodeCull::ResultTestRva));
+            }
+            return false;
+        }
+        const auto* call = Module::exe_ptr<std::uint8_t>(
+            OutRunVR::PmtNodeCull::WalkNodeVisibleCallRva);
+        if (!call || *call != 0xE8u)
+        {
+            spdlog::error("VR PMT CULL: expected direct CALL absent at 0x5015");
+            return false;
+        }
 
-	bool apply() override
-	{
-		// PC walk_404d10 calls render_node_visible_404b00 at RVA 0x5015,
-		// then executes TEST EAX,EAX at 0x501D and JE at 0x501F.
-		// Quest exports the same logical PMT traversal names. Validate that
-		// exact result gate before changing the branch: an address-only NOP on
-		// a foreign executable/mod would silently corrupt stage traversal.
-		auto* gate = Module::exe_ptr<std::uint8_t>(
-			OutRunVR::PmtNodeCull::ResultTestRva);
-		if (!OutRunVR::PmtNodeCull::ResultGateBytesCompatible(
-				gate, OutRunVR::PmtNodeCull::OriginalResultGate.size()))
-		{
-			if (!SignatureMismatchLogged)
-			{
-				SignatureMismatchLogged = true;
-				spdlog::error(
-					"DisableStageCulling: PMT node-visible gate signature mismatch at EXE+0x{:X}; refusing branch patch",
-					static_cast<unsigned>(OutRunVR::PmtNodeCull::ResultTestRva));
-			}
-			return false;
-		}
+        projection_writable = ValidateProjectionAddress();
+        // Install the after-call restore FIRST. If the pre-call hook fails,
+        // no source matrix is ever changed.
+        result_gate_hook = safetyhook::create_mid(
+            Module::exe_ptr(OutRunVR::PmtNodeCull::ResultTestRva),
+            AfterVisible);
+        if (!result_gate_hook)
+            return false;
+        before_visible_hook = safetyhook::create_mid(
+            Module::exe_ptr(OutRunVR::PmtNodeCull::WalkNodeVisibleCallRva),
+            BeforeVisible);
+        if (!before_visible_hook)
+        {
+            result_gate_hook = {};
+            return false;
+        }
+        spdlog::info(
+            "VR PMT CULL: native result-gate modes installed; projectionWritable={} (wide FOV scoped to call only)",
+            projection_writable);
+        return true;
+    }
 
-		static TogglePatch patch(
-			Module::exe_ptr(OutRunVR::PmtNodeCull::DisableBranchRva),
-			{ 0x90, 0x90 });
-		patch.set(Settings::DisableStageCulling.get());
-		return true;
-	}
-
-	static DisableStageCulling instance;
+    static DisableStageCulling instance;
 };
 DisableStageCulling DisableStageCulling::instance;
 
