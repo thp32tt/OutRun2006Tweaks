@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00941",
+  "production_id": "CONVERSION-DX11-00941",
+  "event_id": "CONVERSION-DX11-00941-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00941",
+  "feature_id": "DX11:LIVE_SM3_MENU_RACE_LINE_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "4201b27e5287f158c1102b2b55e1b986495b576f",
+  "validation_bearing_result_sha": "1dc824eeb2020383b6f075b78468d2a43f53c6a7",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_MENU_RACE_LINE_NATIVE_DRAW",
+    "goal": "Route actual intercepted programmable game SM3 menu/race LINELIST and LINESTRIP VB/IB/UP Draw/DrawIndexed through the native D3D11 full-size frame IA without losing original game rendering or input fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_live_sm3_line_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_native_ia_topology",
+        "expected_behavior": "Game D3D9 SM3 LINE list and strip buffers follow the actual native D3D11 Draw/DrawIndexed IA topology instead of rejected/triangle conversion."
+      },
+      {
+        "id": "line_aa_lastpixel_dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_gameplay_input_fallback",
+        "expected_behavior": "Unsupported anti-aliased and last-pixel-disabled D3D9 line draws fail closed while original D3D9 and gamepad/FFB behavior remain authoritative."
+      },
+      {
+        "id": "required_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "native_build_and_regressions",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR, and HUD gates succeed on one exact source SHA with portable positive and negative source-linked regressions."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept original live D3D9 programmable VS/PS game Draw/DrawIndexed and preserve primitive span / VB/IB/UP snapshots",
+      "Translate authentic SM3 game line-family raster admission into native D3D11 LINELIST and LINESTRIP IA bindings",
+      "Issue guarded D3D11 native Draw or DrawIndexed into source-owned full-size color output with original D3D9 Draw/Present/input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp native programmable GPU line-topology and raster-state binding",
+      "src/vr/d3d11/live_game_primitive_span.hpp bounded line admission, portable C++ regression and source-linked Python negative test"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game-authored SM3 line list/strip topology is forwarded to native IA Draw/DrawIndexed; 5/5 exact-SHA GitHub build and source-linked tests pass.",
+      "negative_regression": "AA line or LASTPIXEL-disabled source cannot mutate native GPU; original D3D9 and gamepad/FFB routing remains default.",
+      "component_integration": "Live game D3D9 programmable callsite -> actual line VB/IB/UP and SM3 shader -> D3D11 IA/VS/PS -> opt-in full-frame source-owned output."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_LINES:CONVERSION-DX11-00941"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_D3D9_SM3_LINE_SOURCE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and exact-SHA CI 5/5 only; game-authored line Draw GPU visual pixels, full menu-car-race and Quest3/VDXR remain RUNTIME UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in/fail-closed; no default native gameplay promotion, original D3D9/DX9Ex Draw/Present/inputs/FFB stay authoritative, DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Same 00941 retry: Backend run 39178295416 at original material SHA failed only historical 00940 canonical live-callsite/native-draw acceptance metadata; original 00941 C++ source present.",
+    "C1_REVIEW": "Used existing 00941 SM3 native line-list/strip implementation; preserved source/feature owner and no duplicate full matrix.",
+    "C2_IMPLEMENT": "Real native line-family C++/portable regression material preserved from 4201b27e; repaired proven 00940 record canonical path in same 00941 retry at 1dc824ee without weakening policy.",
+    "C3_VALIDATE": "PASS_EXACT_SHA 5_OF_5 at 1dc824eeb2020383b6f075b78468d2a43f53c6a7; native game/HMD session UNTESTED.",
+    "C4_COMMIT": "material 4201b27e5287f158c1102b2b55e1b986495b576f; validation-bearing failure repair 1dc824eeb2020383b6f075b78468d2a43f53c6a7",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED source stage only; not native menu-car-race or HMD runtime PASS."
+  },
+  "acceptance_results": {
+    "native_live_sm3_line_draw": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "line_aa_lastpixel_dx9ex_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "required_exact_sha_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "head_sha": "1dc824eeb2020383b6f075b78468d2a43f53c6a7",
+    "required_workflow_runs": {
+      "fast": 39178554948,
+      "backend": 39178554993,
+      "windows_build": 39178554902,
+      "openxr": 39178555265,
+      "hud": 39178555027
+    },
+    "all_required_gates": "SUCCESS",
+    "runtime": "UNTESTED",
+    "original_material_commit": "4201b27e5287f158c1102b2b55e1b986495b576f",
+    "ci_repair_commits": [
+      "1dc824eeb2020383b6f075b78468d2a43f53c6a7"
+    ],
+    "original_failure_run": 39178295416
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Native menu/vehicle/race continuous real-game pixels and gamepad/OpenXR headset playback still lack matching real-game evidence; broader shader/resource coverage still needed.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "4201b27e5287f158c1102b2b55e1b986495b576f",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue independent unimplemented contiguous native game Draw/DrawIndexed shader/resource source features through controller; run matching desktop game/Quest3 tests for true visual evidence.",
+  "score_policy": {
+    "run_key": "CONVERSION-DX11-00941",
+    "scoreboard_recorded_separately": true,
+    "scoreboard_sha": "48df0ad6655d4747ce11c873e57c928035d22847",
+    "scoreboard_ai2_cumulative": 1551,
+    "retry_additional_score": 0
+  }
+}
