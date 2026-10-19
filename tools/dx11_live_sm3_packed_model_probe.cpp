@@ -30,7 +30,7 @@ int main() {
     in=encode(512u,511u,1023u,0u);
     assert(game_sm3_unpack_attribute(14u,in.data(),out));
     assert(out[0]==-1.f && out[1]==1.f && out[3]==1.f);
-    in=encode(513u,0u,511u);
+    in=encode(514u,0u,511u);
     assert(game_sm3_unpack_attribute(14u,in.data(),out));
     assert(out[0]>-1.f && out[0]<0.f && out[1]==0.f && out[2]==1.f);
     const std::uint8_t bgra[]={255u,128u,0u,255u};
