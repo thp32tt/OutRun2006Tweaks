@@ -7,12 +7,12 @@
   "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "NEEDS_VALIDATION",
-  "checkpoint": "C5_PENDING_FINAL_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "ed12dbf1863afac17bf6859da3d720e303711e08",
   "changed_files": [
@@ -77,16 +77,28 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "selector_d3d9_dds_16bit_opacity": "SOURCE_IMPLEMENTED",
-    "selector_malformed_native_fallback": "SOURCE_IMPLEMENTED",
-    "selector_final_exact_sha_ci": "PENDING"
+    "selector_d3d9_dds_16bit_opacity": "PASS_BUILD",
+    "selector_malformed_native_fallback": "PASS_BUILD",
+    "selector_final_exact_sha_ci": "PASS_EXACT_SHA"
   },
-  "result_commit_kind": "VALIDATION_BEARING_RECORD_FOR_EXISTING_MATERIAL_SOURCE",
+  "result_commit_kind": "C6_BOOKKEEPING_AFTER_VALIDATION_BEARING_RESULT",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "material_source_sha": "ed12dbf1863afac17bf6859da3d720e303711e08",
     "prior_failed_active": 39192719006,
-    "prior_failure": "Run-record missing in exact-HEAD feature-policy gate, remaining jobs skipped; not evidence of compile failure"
+    "prior_failure": "Run-record missing in exact-HEAD feature-policy gate, remaining jobs skipped; not evidence of compile failure",
+    "validation_bearing_result_sha": "7f9cddb0ffe1a776eee75b049cb0562124512928",
+    "runs": {
+      "DX9Ex Active Validation": 39193597616,
+      "Domain Isolation Guard": 39193597597,
+      "OutRun EXE HUD Inspector CI": 39193597601,
+      "DX9Ex Full Source Impact Review": 39193597610
+    },
+    "required_gate_conclusions": "4/4 SUCCESS",
+    "runtime": "Quest3/VDXR UNTESTED",
+    "prior_failed_record": 39192719006,
+    "prior_failed_source_inspector": 39192935751
   },
-  "next_action": "Execute exact-SHA required GitHub gate checks; only after every Gate SUCCESS record C6 separately, never infer Quest3/VDXR hardware PASS."
+  "next_action": "COMPLETE_BUILD_VERIFIED at the exact validation-bearing SHA; Quest3/VDXR car-selection optical/runtime acceptance remains NEED_HMD_TEST. No further exact-SHA CI rerun or duplicate score on C6.",
+  "validation_bearing_result_sha": "7f9cddb0ffe1a776eee75b049cb0562124512928"
 }
