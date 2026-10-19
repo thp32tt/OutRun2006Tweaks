@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-IDLE-20261020-0445",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-20T04:45:00+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "Independent QA for saved A/B native HD ROI Korean PNG; no ImageGen, no A/B queue consumption, no DDS, C2/C3 or in-game approvals",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root_on_n100": "work/image-src/text_roi_batches/candidate_outputs",
+  "sha_comparison_sources": [
+    "work/c1_batch_20261019_2015/previous_shas.json",
+    "work/c1_batch_20261019_2015/metrics.json"
+  ],
+  "sha_dedup_script": "work/c1_sha_dedup_20261019_2145.py",
+  "observations": {
+    "stored_png_count": 63,
+    "previously_reviewed_sha_count": 62,
+    "reviewed_sha_matches": 62,
+    "legacy_excluded_count": 1,
+    "new_eligible_count": 0,
+    "new_eligible": [],
+    "legacy_excluded": [
+      {
+        "path": "A/Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+        "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+        "reason": "Legacy output lacks current source_k ROI naming/receipt; not newly eligible for this C1 run"
+      }
+    ]
+  },
+  "summary": {
+    "status": "IDLE",
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "reviewed_new_sha_count": 0
+  },
+  "ImageGen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "final_dds_written": false,
+  "C2_C3_ingame_PASS_created": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_delta": 0,
+  "reason": "No new unique eligible candidate after SHA dedup. No duplicate QA or score increment."
+}
