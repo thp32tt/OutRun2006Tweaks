@@ -46,9 +46,10 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $profileLib=Join-Path $root 'OutRunVR-TestProfiles.ps1'
 $game=Join-Path $root $GameExe
 
-if(!(Test-Path $active) -or !(Test-Path $current)){
-    throw 'Select a renderer/backend once before using the test launcher.'
-}
+# A clean PC Fast Test ZIP cannot carry a machine-specific selected
+# renderer or CURRENT_VR_SESSION.json. Bootstrap only a genuinely new DX9Ex
+# install; never silently replace a user's existing 2D/DXVK selection.
+# Validate the original game and scripts BEFORE trying to install any DLL.
 if(!(Test-Path $collector)){throw 'Collect-OutRunVRLogs.ps1 not found.'}
 if(!(Test-Path $selector)){throw 'Select-OutRunVRBackend.ps1 not found.'}
 if(!(Test-Path $profileLib)){throw 'OutRunVR-TestProfiles.ps1 not found.'}
@@ -60,6 +61,26 @@ $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
     $_.ProcessName -ieq 'OR2006C2C' -or $_.ProcessName -ieq 'outrun-vr-host'
 }
 if($running){throw 'OutRun or outrun-vr-host.exe is already running.'}
+
+$activeMissing = !(Test-Path -LiteralPath $active)
+$currentMissing = !(Test-Path -LiteralPath $current)
+if($activeMissing -or $currentMissing){
+    if(-not ($activeMissing -and $currentMissing)){
+        throw 'Incomplete VR backend session (one metadata file missing). Run Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS to repair it explicitly.'
+    }
+    $firstRunPayload = Join-Path $root 'backends/d3d9'
+    foreach($required in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt')){
+        if(!(Test-Path -LiteralPath (Join-Path $firstRunPayload $required))){
+            throw "DX9Ex first-run payload missing $required in $firstRunPayload. Extract the complete PC Fast Test ZIP into the original OR2006C2C.EXE game folder."
+        }
+    }
+    Write-Host 'PC FAST FIRST LAUNCH: selecting DX9Ex/CURRENT_FOCUS and creating the initial VR session.'
+    & $selector -Backend d3d9 -TestProfile $TestProfile -VariantId CURRENT_FOCUS
+    if(-not $? -or !(Test-Path -LiteralPath $active) -or
+       !(Test-Path -LiteralPath $current)){
+        throw 'DX9Ex first-run setup failed to produce ACTIVE_VR_BACKEND.txt and CURRENT_VR_SESSION.json.'
+    }
+}
 
 $kv=@{}
 Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1]]=$matches[2]}}
