@@ -7,15 +7,15 @@
   "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "WAITING_CI",
-  "checkpoint": "C5_VALIDATION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "cde4e005350f6c8214c77d9e40c24feb9ea08c73",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "35b136262a38e34083611240a5f2c73d1b8b12db",
   "changed_files": [
     "src/vr/game/lens_centre_partial_wvp.hpp"
   ],
@@ -78,21 +78,39 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "lens_original_c64_finite_eye_source": "PENDING_CI",
-    "lens_stale_nonfinite_and_outer_fallback": "PENDING_CI",
-    "lens_final_exact_sha_full_ci": "PENDING_CI"
+    "lens_original_c64_finite_eye_source": "PASS_BUILD",
+    "lens_stale_nonfinite_and_outer_fallback": "PASS_BUILD",
+    "lens_final_exact_sha_full_ci": "PASS_EXACT_SHA"
   },
   "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "35b136262a38e34083611240a5f2c73d1b8b12db",
     "material_source_sha": "cde4e005350f6c8214c77d9e40c24feb9ea08c73",
-    "failed_prior_workflow": {
-      "name": "DX9Ex Active Validation",
-      "run_id": 39178542138,
-      "conclusion": "failure",
-      "reason": "exact-HEAD feature record missing before any Windows compile"
+    "validator_source_sha": "35b136262a38e34083611240a5f2c73d1b8b12db",
+    "previous_failed_run_id": 39178542138,
+    "previous_failure": "record missing at policy gate; corrected under same TASK_ID",
+    "required_workflows": {
+      "DX9Ex Active Validation": {
+        "run_id": 39178803301,
+        "conclusion": "success"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39178803292,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39178803316,
+        "conclusion": "success"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39178803275,
+        "conclusion": "success"
+      }
     },
     "runtime": "Quest3/VDXR not executed",
-    "status_note": "This record restores the contract input for the existing material source SHA; a successful exact-SHA build is not a physical binocular lens acceptance."
-  }
+    "status_note": "All four exact-SHA GitHub gates passed after policy-record repair. No hardware optical claim."
+  },
+  "c6_commit_kind": "BOOKKEEPING_ONLY",
+  "c6_completion": "4/4 required exact-SHA workflows SUCCESS at 35b13626; HMD untested; no duplicate production score."
 }
