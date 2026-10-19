@@ -25,7 +25,7 @@ def check(s: str, h: str) -> None:
     require('ExternalOverlaySemanticDepth == 0' in exact_pause)
     require('GameState::STATE_SMPAUSEMENU' in s)
     require('R30IsPauseMenuExactArrow()' in s)
-    arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuElement()')]
+    arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuExactShell()')]
     require('OutRunVrPauseEye::ExactArrowOwner(' in arrow)
     # R84 accepts both the newly isolated exact pause-arrow producer and
     # already-owned generic paused UI. Mutating either producer lookup to a
