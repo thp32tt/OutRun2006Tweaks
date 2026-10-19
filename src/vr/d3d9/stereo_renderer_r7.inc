@@ -51,6 +51,7 @@ namespace Settings
 	extern Setting<bool> VRAutoEnableWhenHostPresent;
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRDirectGpuOnly;
+    extern Setting<int> VRHmdlessDebugMode;
 	extern Setting<float> VRWorldScale;
 	extern Setting<float> VRStereoDepth;
 	extern Setting<bool> VRTelemetry;
@@ -337,6 +338,10 @@ namespace OutRunVRStereo
 
 		bool HostRenderEligible()
 		{
+            // Synthetic pose is latched inside the game renderer. Do not
+            // impersonate the x64 OpenXR host or alter the shared-memory ABI.
+            if (Settings::VRHmdlessDebugMode != 0)
+                return true;
 			if (!SharedState || SharedState->magic != OutRunVR::SharedMagic ||
 				SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
 				SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
@@ -355,11 +360,15 @@ namespace OutRunVRStereo
 
 		bool HostDirectTransportSupported()
 		{
+            if (Settings::VRHmdlessDebugMode != 0)
+                return false;
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuTransport) != 0;
 		}
 
 		bool HostDirectTransportReady()
 		{
+            if (Settings::VRHmdlessDebugMode != 0)
+                return false;
 			return SharedState && (SharedState->flags & OutRunVR::HostDirectGpuReady) != 0;
 		}
 
@@ -1658,7 +1667,7 @@ if(WaitForEventQuery(slot.fence,1,0u))
 						spdlog::info("VR stereo: 4-slot direct GPU transport uses bounded post-Present completion; source eye={}x{}",BackBufferDesc.Width,BackBufferDesc.Height);
 					}
 				}
-				else if(Settings::VRDirectGpuOnly)
+				else if(Settings::VRDirectGpuOnly && Settings::VRHmdlessDebugMode == 0)
 				{
 					markDirectOnlyHold();
 				}
