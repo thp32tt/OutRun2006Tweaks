@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00951",
+  "production_id": "CONVERSION-DX11-00951",
+  "event_id": "CONVERSION-DX11-00951-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00951",
+  "feature_id": "DX11:LIVE_SM3_SCALAR_PREDICATED_NATIVE_GAME_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_SCALAR_PREDICATED_NATIVE_GAME_DRAW",
+    "goal": "Carry D3D9 SM3 p0.x scalar predicated arithmetic and explicit-LOD texture instructions from intercepted game VS/PS into guarded native D3D11 HLSL Draw/DrawIndexed, while withholding conditional-only register provenance and retaining original game render/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_predicated_draw_shader",
+        "category": "end_to_end_behavior",
+        "behavior_area": "shader_decoder_and_native_hlsl_draw",
+        "expected_behavior": "Source SM3 instruction bit-28 and trailing p0.x/!p0.x operands decode and emit native VS/PS conditional executable arithmetic/explicit-LOD texturing."
+      },
+      {
+        "id": "predicated_fallback_and_register_provenance",
+        "category": "fallback_regression",
+        "behavior_area": "shader_register_safety_original_game_input",
+        "expected_behavior": "Reject uninitialized/vector predicates and unsafe derivative/texkill; conditional-only writes do not advance definite TEMP/output masks; DX9Ex/input/FFB preserved."
+      },
+      {
+        "id": "full_required_same_sha_validation",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_windows_openxr_and_hud",
+        "expected_behavior": "Portable C++ positive/negative focused regression and Fast/Backend/Windows/OpenXR/HUD full GitHub CI 5/5 SUCCESS on exact validation-bearing SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept SM3 game-owned shader bytecode with bit-28 predicated arithmetic/texture instruction",
+      "Decode trailing p0.x or !p0.x and require definite SETP lifetime",
+      "Compile guarded D3D11 HLSL VS/PS with conservative conditional destination register state",
+      "Reach existing fail-closed native Draw/DrawIndexed and full-resolution frame path; actual game pixels remain UNTESTED"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_predicated_instruction.hpp",
+      "tools/dx11_sm3_predicated_draw_probe_00951.cpp",
+      "tools/test_dx11_sm3_predicated_draw_00951.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Scalar p0.x/!p0.x guarded HLSL and native arithmetic/explicit-LOD C++ helper regression",
+      "negative_regression": "Unset predicate, vector swizzle, source modifier and conditional-only TEMP/output writes fail closed; original D3D9 path unchanged",
+      "component_integration": "Captured D3D9 SM3 VS/PS → bit28 trailing predicate → HLSL conditional native shader → guarded D3D11 Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_SCALAR_PREDICATED_NATIVE_GAME_DRAW:CONVERSION-DX11-00951"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_SHADER_CAPTURE",
+      "SCALAR_PREDICATE_HLSL",
+      "D3D11_NATIVE_DRAW",
+      "ORIGINAL_GAME_FALLBACK"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_GAME_OUTPUT_UNTESTED",
+    "activation_guard_and_fallback": "Native opt-in remains fail-closed; D3D9Ex game renderer/input/FFB/SkyGlow unchanged, DXVK frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_predicated_instruction.hpp",
+    "tools/dx11_sm3_predicated_draw_probe_00951.cpp",
+    "tools/test_dx11_sm3_predicated_draw_00951.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub starting branch HEAD c0085a35, 00950 already terminal exact-SHA 5/5, no 00951 claimed owner collision",
+    "C1_REVIEW": "D3D9 SM3 bit-28 predicate operand causes existing arithmetic/texture compiler fail-closed despite SETP/BREAKP support",
+    "C2_IMPLEMENT": "Actual native C++ source parser/predicate HLSL emission and predicated register lifetime changes; negative C++ helper regression",
+    "C3_VALIDATE": "Same SHA mandatory 5/5 GitHub Actions SUCCESS, HMD/game runtime not run",
+    "C4_COMMIT": "Material f13fb16cb990ffcf2d097222ce6aae145fb8c29b; no CI-skip in result",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA at source material SHA, bookkeeping separate [skip ci]; RUNTIME_VALIDATION=UNTESTED"
+  },
+  "acceptance_results": {
+    "native_predicated_draw_shader": "PASS_BUILD",
+    "predicated_fallback_and_register_provenance": "PASS_BUILD",
+    "full_required_same_sha_validation": "PASS_EXACT_SHA"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Latest known real-game native_draws=0 evidence 2026-10-18 not superseded by a matching launch. Dynamic b#/i#, vector p0 and other unsupported shader paths can still reject native Draw; full real-game output not measured.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "f13fb16cb990ffcf2d097222ce6aae145fb8c29b",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue native menu/car/race programmable shader/resource path, obtain exact-SHA real-game eligible/native draw and published-frame evidence before native output promotion; Quest3/VDXR afterward.",
+  "score_change": 0,
+  "material_result_sha": "f13fb16cb990ffcf2d097222ce6aae145fb8c29b",
+  "validation_bearing_result_sha": "f13fb16cb990ffcf2d097222ce6aae145fb8c29b",
+  "validation_evidence": {
+    "exact_sha": "f13fb16cb990ffcf2d097222ce6aae145fb8c29b",
+    "required_workflow_runs": {
+      "fast": 39199476096,
+      "backend": 39199476059,
+      "windows_build": 39199476079,
+      "openxr": 39199476095,
+      "hud": 39199476088
+    },
+    "ci_gate_count": "5/5",
+    "all_required_gates": "SUCCESS",
+    "github_exact_sha_workflow_runs_verified": true,
+    "gameplay": "UNTESTED",
+    "runtime": "UNTESTED",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
+  }
+}
