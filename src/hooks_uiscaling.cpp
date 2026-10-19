@@ -407,6 +407,11 @@ class UIScaling : public Hook
     // verified ABI-safe wrapper exists: minidumps EIP 0x97C5F / 0x97E75.
     static constexpr int ResultTextUnsafeReturnRva = 0x97C57;
 
+    // REA-proven original graph parents: background + progress fill + glyphs.
+    // The existing inner 0x2D200 hooks cover only the two fill calls.
+    static constexpr int ResultProgressFullParentCallA = 0x98924;
+    static constexpr int ResultProgressFullParentCallB = 0x992AC;
+    static constexpr int ResultProgressFullParentTarget = 0x979E0;
     static constexpr int ResultProgressCallA = 0x97BE4;
 	static constexpr int ResultProgressCallB = 0x97DEC;
 	// The GOAL time panel also calls two sprite-producing helpers directly.
@@ -1453,6 +1458,50 @@ class UIScaling : public Hook
         ResultProgressRootsBefore = {};
         ResultProgressEntrySerial = 0;
 	}
+
+    // Canonical FUN_004979E0: no arguments, boolean in AL, plain RET.
+    // Wrap ONLY its two verified E8 calls; never hook function return bytes.
+    using ResultProgressFullParentFn = bool(__cdecl*)();
+    static bool __cdecl ResultProgressFullParent()
+    {
+        const auto original = reinterpret_cast<ResultProgressFullParentFn>(
+            Module::exe_ptr(ResultProgressFullParentTarget));
+        if (!Settings::VREnabled || !Game::current_mode ||
+            *Game::current_mode != GameState::STATE_GOAL ||
+            OutRunVR::GameSemantic::QueueRenderActive())
+            return original();
+
+        // The previous deferred D3DX batch must leave under its OLD owner.
+        FlushD3DXBeforeDirectGoalSource();
+        std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+        std::array<SpriteNode*, Game::SpritePriorityCount> rootsBefore{};
+        const auto entrySerial =
+            OutRunVR::GameSemantic::SpriteNodeSemanticNextSerial.load(
+                std::memory_order_acquire);
+        for (int p = 0; p < Game::SpritePriorityCount; ++p)
+        {
+            SpriteNode* root = Game::sprite_prio_root[p];
+            rootsBefore[p] = root;
+            before[p] = root ? root->tail_4 : nullptr;
+        }
+
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic parentOwner(
+            OutRunVR::GameSemantic::RenderScope::ScreenHud, nullptr, true,
+            OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+        const bool result = original(); // original stage animation once
+        if (Settings::VREnabled && Game::current_mode &&
+            *Game::current_mode == GameState::STATE_GOAL)
+        {
+            // Nested exact producers keep the newer serial/token; only
+            // new stable-root siblings inherit the full result-graph owner.
+            TagAppendedNodes(before,
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                OutRunVR::GameSemantic::ProducerToken::ResultProgress,
+                nullptr, &rootsBefore, entrySerial);
+            FlushD3DXAtDirectGoalSourceExit();
+        }
+        return result;
+    }
 
     inline static SafetyHookMid StageExtensionEnterHooks[
         std::size(StageExtensionSpraniCalls)]{};
@@ -2688,6 +2737,14 @@ public:
 			spdlog::error(
 				"VR P0 RESULT: exact R74 producer midhooks incomplete; all rolled back");
 		}
+        // Two exact original CALLs enter the same graph builder; never install
+        // another unsafe post-CALL midhook in its function body.
+        Memory::VP::InjectHook(
+            Module::exe_ptr(ResultProgressFullParentCallA),
+            ResultProgressFullParent, Memory::HookType::Call);
+        Memory::VP::InjectHook(
+            Module::exe_ptr(ResultProgressFullParentCallB),
+            ResultProgressFullParent, Memory::HookType::Call);
         // The original +TIME transition emits BOTH decorated sprani AND
         // its 0x973C0/0x974E0 number/text helpers, each from a distinct
         // canonical 0x989xx E8. Atomic install/rollback across ALL FIVE
