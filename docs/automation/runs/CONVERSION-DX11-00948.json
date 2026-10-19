@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00948",
   "feature_id": "DX11:LIVE_SM3_STATIC_REPETITION_NATIVE_FRAME",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -75,7 +75,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_CI_PENDING; actual menu/car/race native draw and published pixel counts UNTESTED.",
+    "visible_frame_acceptance": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED; native game pixels, continuous menu/car/race and Quest3 remain UNTESTED.",
     "activation_guard_and_fallback": "Native opt-in remains fail closed; source-game dynamic integer state never guessed; D3D9Ex game rendering/input/FFB/SkyGlow untouched, DXVK frozen."
   },
   "changed_files": [
@@ -89,21 +89,41 @@
     "C0_RECOVER": "GitHub branch 8594dce; prior 00947 exact-SHA C6 verified; no new 00948 record",
     "C1_REVIEW": "SM3 translator did not recognize DEFI/REP/ENDREP on real shader-bound VS/PS",
     "C2_IMPLEMENT": "Implemented bounded shader-owned repetition, structured branch nesting, C++ source probe",
-    "C3_VALIDATE": "PENDING exact-SHA five mandatory workflows",
-    "C4_COMMIT": "MATERIAL_SHA_PENDING",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5: DX11 Fast, Backend Conversion, Win32 Build, OpenXR architecture and HUD Inspector at exact ae04e7c6341bf124cb9b808c3097d0bc39a13d77; gameplay/HMD UNTESTED.",
+    "C4_COMMIT": "material/validation-bearing=ae04e7c6341bf124cb9b808c3097d0bc39a13d77",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_EXACT_SHA"
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; exact SHA five mandatory GitHub Actions SUCCESS; bookkeeping [skip ci] separate; RUNTIME_VALIDATION=UNTESTED."
   },
   "acceptance_results": {
-    "static_sm3_repeat_native_game_draw": "SOURCE_IMPLEMENTED_RUNTIME_UNTESTED",
-    "nested_flow_and_safe_d3d9_fallback": "SOURCE_IMPLEMENTED_TARGETED_VALIDATION_PENDING",
-    "five_exact_sha_gates": "PENDING"
+    "static_sm3_repeat_native_game_draw": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED",
+    "nested_flow_and_safe_d3d9_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "five_exact_sha_gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Real-game native draw count and whole menu/car/race frame publication not observed; source-only implementation.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING",
+  "CODE_CHANGED_SHA": "ae04e7c6341bf124cb9b808c3097d0bc39a13d77",
   "NEXT_IMPLEMENTATION_ACTION": "If exact-SHA CI fails, repair source cause under 00948; then real-game desktop and Quest3/VDXR test distinct from GitHub build.",
-  "score_change": 0
+  "score_change": 0,
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "material_result_sha": "ae04e7c6341bf124cb9b808c3097d0bc39a13d77",
+  "validation_bearing_result_sha": "ae04e7c6341bf124cb9b808c3097d0bc39a13d77",
+  "validation_evidence": {
+    "exact_sha": "ae04e7c6341bf124cb9b808c3097d0bc39a13d77",
+    "original_material_commit": "ae04e7c6341bf124cb9b808c3097d0bc39a13d77",
+    "required_workflow_runs": {
+      "fast": 39192891671,
+      "backend": 39192891608,
+      "windows_build": 39192891881,
+      "openxr": 39192891620,
+      "hud": 39192891652
+    },
+    "all_required_gates": "SUCCESS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "runtime": "UNTESTED",
+    "gameplay": "UNTESTED",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
+  }
 }
