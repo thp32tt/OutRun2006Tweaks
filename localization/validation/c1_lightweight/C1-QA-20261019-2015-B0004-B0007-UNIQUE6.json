@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-2015-B0004-B0007-UNIQUE6",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-19T20:15:00+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "Independent lightweight QA of saved and unapproved native HD ROI A/B Korean transparent PNGs only; does not produce images, consume queues, approve DDS/C2/C3/in-game",
+  "policy_contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "policy_glyph": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+  "roles": "localization/controller_roles.json",
+  "translation_record": "localization/graphics/transcriptions.jsonl: indexes 198,212,220,236, status transcribed_reviewed",
+  "prior_qa_sha_count": 56,
+  "excluded_legacy_candidate": "work/image-src/text_roi_batches/candidate_outputs/A/Q104_OutRunMode_FullHD_TextROI_2x_k.png (no production-ROI receipt; not SHA-reviewed in this run)",
+  "summary": {
+    "new_candidate_sha_count": 6,
+    "PASS": 5,
+    "FAIL": 1,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "evidence_on_N100": [
+    "work/c1_batch_20261019_2015/metrics.json",
+    "work/c1_batch_20261019_2015/compare_1.jpg",
+    "work/c1_batch_20261019_2015/compare_2.jpg"
+  ],
+  "text_length_difference_ignored": true,
+  "whole_sentence_width_ratio": "diagnostic_only",
+  "deployment": false,
+  "ImageGen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "C2_C3_ingame_PASS_created": false,
+  "final_dds_written": false,
+  "ui_safe_cell_composition": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "outputs": [
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0004-BDE270CC",
+      "region_id": "Q198_cd21290e2d3e81c0",
+      "source_english": "INTERMEDIATE A",
+      "approved_korean": "중급 A",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q198_cd21290e2d3e81c0_source_k.png",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q198_cd21290e2d3e81c0_source.png",
+      "candidate_sha256": "e58d1be7342180c5de32c246b47d59e69132375d120fe2cbbe37e25068ac3ac8",
+      "source_png_sha256": "d82cb6ffb0f15b2e0c433b57a0c2db626c1387f4cd416f31f6036050780dfc50",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "prior_reviewed_sha_match": false,
+      "translation_mapping_status": "transcribed_reviewed",
+      "translation_manifest_match": true,
+      "source_dimensions": [
+        1840,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        502,
+        163,
+        1738,
+        567
+      ],
+      "verdict": "PASS",
+      "reason": "Korean text visually readable and exact; alpha RGBA and source/export SHA verified, no evident unwanted background/frame at shown crop.",
+      "per_glyph_readability": "PASS",
+      "text_length_difference_ignored": true,
+      "ui_safe_cell_final_composition": "UNTESTED",
+      "source_glyph_bbox_containment_after_scaling": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "new_dds": false
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0004-BDE270CC",
+      "region_id": "Q212_630db9e8c21db398",
+      "source_english": "PROFESSIONAL",
+      "approved_korean": "프로",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q212_630db9e8c21db398_source_k.png",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q212_630db9e8c21db398_source.png",
+      "candidate_sha256": "f38c34bb61b4c0aa3881b2dd8f019c7f24b7ec51bc2678c8e2ed0f2bb37e3351",
+      "source_png_sha256": "9f850e52ddf80fa32bfbf844cec5405468548d60fc1bdb382f0cffd89b58ac35",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "prior_reviewed_sha_match": false,
+      "translation_mapping_status": "transcribed_reviewed",
+      "translation_manifest_match": true,
+      "source_dimensions": [
+        1732,
+        276
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        95,
+        201,
+        2078,
+        551
+      ],
+      "verdict": "FAIL",
+      "reason": "UNWANTED_NON_TEXT_LINE: candidate adds a long orange underline extending almost full width below PRO (not present in native source ROI); violates lettering-only output constraint.",
+      "per_glyph_readability": "PASS",
+      "text_length_difference_ignored": true,
+      "ui_safe_cell_final_composition": "UNTESTED",
+      "source_glyph_bbox_containment_after_scaling": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "new_dds": false
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0004-BDE270CC",
+      "region_id": "Q212_e8fbad1cf9f20fc5",
+      "source_english": "OUTRUN",
+      "approved_korean": "아웃런",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q212_e8fbad1cf9f20fc5_source_k.png",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q212_e8fbad1cf9f20fc5_source.png",
+      "candidate_sha256": "c8ef2d21e78ca1d96079e5625759b7a27e3fa478a1ab833e504b2cb68efa7af3",
+      "source_png_sha256": "42d65a0105fcbdcafd27687b00dcfb82c09d1d425e70560d7d4197b6de9ce919",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "prior_reviewed_sha_match": false,
+      "translation_mapping_status": "transcribed_reviewed",
+      "translation_manifest_match": true,
+      "source_dimensions": [
+        980,
+        272
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        413,
+        133,
+        1763,
+        604
+      ],
+      "verdict": "PASS",
+      "reason": "Korean text visually readable and exact; alpha RGBA and source/export SHA verified, no evident unwanted background/frame at shown crop.",
+      "per_glyph_readability": "PASS",
+      "text_length_difference_ignored": true,
+      "ui_safe_cell_final_composition": "UNTESTED",
+      "source_glyph_bbox_containment_after_scaling": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "new_dds": false
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0004-BDE270CC",
+      "region_id": "Q220_8facf5c4fc322b9c",
+      "source_english": "HEART ATTACK",
+      "approved_korean": "하트 어택",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q220_8facf5c4fc322b9c_source_k.png",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q220_8facf5c4fc322b9c_source.png",
+      "candidate_sha256": "d6e1676733119d55c9aceacb6a0a346a71f83d5b378b43ba36526894b8f32dab",
+      "source_png_sha256": "7c416adb176bfbd66a5b8ea90070879254c149478b9d23245ccd7a080ee6a271",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "prior_reviewed_sha_match": false,
+      "translation_mapping_status": "transcribed_reviewed",
+      "translation_manifest_match": true,
+      "source_dimensions": [
+        1158,
+        172
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        375,
+        192,
+        1799,
+        521
+      ],
+      "verdict": "PASS",
+      "reason": "Korean text visually readable and exact; alpha RGBA and source/export SHA verified, no evident unwanted background/frame at shown crop.",
+      "per_glyph_readability": "PASS",
+      "text_length_difference_ignored": true,
+      "ui_safe_cell_final_composition": "UNTESTED",
+      "source_glyph_bbox_containment_after_scaling": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "new_dds": false
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0007-C5B92195",
+      "region_id": "Q236_16f0df6848987484",
+      "source_english": "LEGEND",
+      "approved_korean": "레전드",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_16f0df6848987484_source_k.png",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_16f0df6848987484_source.png",
+      "candidate_sha256": "eeba6391fc49df09cd525815ef60356586eae4668ba78a5cfd840f98f4fc6481",
+      "source_png_sha256": "cad11b54a4af743f0a108a1a836fe01923b66905e81440f2bd735ebcfbc2431b",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "prior_reviewed_sha_match": false,
+      "translation_mapping_status": "transcribed_reviewed",
+      "translation_manifest_match": true,
+      "source_dimensions": [
+        974,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        375,
+        103,
+        1818,
+        595
+      ],
+      "verdict": "PASS",
+      "reason": "Korean text visually readable and exact; alpha RGBA and source/export SHA verified, no evident unwanted background/frame at shown crop.",
+      "per_glyph_readability": "PASS",
+      "text_length_difference_ignored": true,
+      "ui_safe_cell_final_composition": "UNTESTED",
+      "source_glyph_bbox_containment_after_scaling": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "new_dds": false
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0007-C5B92195",
+      "region_id": "Q236_effe19c782b6763b",
+      "source_english": "SUNNY BEACH",
+      "approved_korean": "서니 비치",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_effe19c782b6763b_source_k.png",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_effe19c782b6763b_source.png",
+      "candidate_sha256": "8d35072088702b1fca2a16be2bc0fc8b9ccb8ff28b5ba601c1cddb6b6dcf9f9b",
+      "source_png_sha256": "7d159a2a57d1f8622d26219430308343923f015482b8e808bf84b34e76dcfb63",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "prior_reviewed_sha_match": false,
+      "translation_mapping_status": "transcribed_reviewed",
+      "translation_manifest_match": true,
+      "source_dimensions": [
+        1690,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha1_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_LRTB": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visible_bbox_alpha16": [
+        260,
+        171,
+        1922,
+        548
+      ],
+      "verdict": "PASS",
+      "reason": "Korean text visually readable and exact; alpha RGBA and source/export SHA verified, no evident unwanted background/frame at shown crop.",
+      "per_glyph_readability": "PASS",
+      "text_length_difference_ignored": true,
+      "ui_safe_cell_final_composition": "UNTESTED",
+      "source_glyph_bbox_containment_after_scaling": "UNTESTED",
+      "runtime_validation": "UNTESTED",
+      "new_dds": false
+    }
+  ]
+}
