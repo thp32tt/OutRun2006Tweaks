@@ -495,10 +495,18 @@ def negatives(text):
         "return Rgb16Intent::Alpha4444;",
         "Classify16(0x40u, 16, 0x0f00, 0x00f0, 0x000f, 0xf000)",
     ]
+    class_start = mask_policy.find("constexpr Rgb16Intent Classify16(")
+    if class_start < 0:
+        raise ValueError("16-bit native DDS policy missing")
     for needle in mask_policy_mutations:
-        changed = mask_policy.replace(needle, "__DDS_BAD_CONTRACT__", 1)
-        if changed == mask_policy:
-            raise ValueError("mask policy mutation not applied: " + needle)
+        # Some guards occur in the preceding RGB32 Classify too. Mutate
+        # the actual 16-bit classifier (or its later static assertions),
+        # not the unrelated earlier RGB32 owner.
+        at = mask_policy.find(needle, class_start)
+        if at < 0:
+            raise ValueError("16-bit mask policy mutation not applied: " + needle)
+        changed = (mask_policy[:at] + "__DDS_BAD_CONTRACT__" +
+                   mask_policy[at + len(needle):])
         try:
             verify(text, mask_policy_source=changed)
             raise ValueError("mask policy mutation survived: " + needle)
