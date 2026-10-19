@@ -15,7 +15,7 @@ from pathlib import Path
 import re
 
 DEFAULT_PROJECT_LIBRARY = "아웃런 한글화 신규"
-MAX_SCAN = 75
+MAX_SCAN = max(25, min(1000, int(os.environ.get("OUTRUN_LIBRARY_MAX_SCAN", "500"))))
 MAX_IMAGE_BYTES = 30_000_000
 
 def _now():
