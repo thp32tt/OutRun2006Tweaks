@@ -97,9 +97,9 @@
     "C6_RESULT": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA recorded at original validation-bearing SHA, separate [skip ci] bookkeeping commit; runtime/gameplay/HMD UNTESTED."
   },
   "acceptance_results": {
-    "break_and_breakc_shader_to_draw": "PENDING_EXACT_SHA",
-    "early_exit_safe_written_masks": "PENDING_EXACT_SHA",
-    "full_required_five_exact_sha_gates": "PENDING_EXACT_SHA"
+    "break_and_breakc_shader_to_draw": "PASS_SOURCE_AND_FOCUSED_CXX_REGRESSION",
+    "early_exit_safe_written_masks": "PASS_SOURCE_AND_NEGATIVE_REGRESSION",
+    "full_required_five_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Actual programmable game Draw count and full frame runtime not yet measured; source-only.",
@@ -125,5 +125,5 @@
     "directly_retrieved_workflow_count": "3/3 SUCCESS (connector pull-request-filtered view; not exhaustive)",
     "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
   },
-  "c6_record_repair_note": "TERMINAL_STATUS_NOT_COMPLETE resolved without altering source, material SHA, feature_contract, acceptance_results or score; validation-bearing SHA retained."
+  "c6_record_repair_note": "Original C6 preserved material and validation SHA. CONVERSION-DX11-00950 Backend Gate #39197407733 exposed stale PENDING acceptance on terminal 00949; source and fallback regressions were checked at Fast #39195018947 and exact-SHA five required workflows completed SUCCESS (Fast #39195018947, Backend #39195018912, Windows Build #39195019103, OpenXR #39195024285, HUD #39195024193). Reconciled acceptance evidence only; game/HMD UNTESTED, no new feature or score."
 }
