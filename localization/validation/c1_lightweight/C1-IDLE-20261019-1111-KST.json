@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-INDEPENDENT-LIGHT-QA-20261019-1111-KST",
+  "reviewer": "C1",
+  "record_type": "RUN_CHECKPOINT",
+  "checked_at_kst": "2026-10-19T11:16:53+09:00",
+  "status": "IDLE_NO_ELIGIBLE_NEW_CANDIDATES",
+  "policy_ref": "korean-localization-recovery-20260928",
+  "policy_source_head_at_scan": "fca49127315c4ef12f4f7ec055f324c2ea75fb02",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "input_restriction": "Only actual A/B ChatGPT ImageGen generated, N100-persisted, unapproved Korean PNG from current verified native original English ROI pipeline; SHA de-duplicate; do not promote old tile/reassembly work as new candidates.",
+  "inventory": [
+    {
+      "path": "work/outrun-ab-imagegen-only/output/A",
+      "candidate_count": 0,
+      "description": "A output empty"
+    },
+    {
+      "path": "work/outrun-ab-imagegen-only/output/B",
+      "candidate_count": 0,
+      "description": "B output empty"
+    },
+    {
+      "path": "work/image-src/text_roi_batches/candidate_outputs/A",
+      "total_files_observed": 1,
+      "eligible_new_candidates": 0,
+      "excluded": [
+        {
+          "filename": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+          "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+          "reason": "2026-10-15 historical ROI candidate, export evidence status UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS; OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED; not a new 2026-10-19 verified native C-crop pipeline A/B candidate; no re-review or PASS asserted"
+        }
+      ]
+    },
+    {
+      "path": "work/image-src/ab_batches/candidate_outputs/A and /B",
+      "eligibility": "EXCLUDED_LEGACY_986_TILES",
+      "reason": "2026-10-14 legacy uniform tiles; new input/production prohibited by 2026-10-19 contract"
+    }
+  ],
+  "examined_unique_candidate_sha_count": 0,
+  "qa_results": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1
+  },
+  "checks_not_run": [
+    "visual_glyph_readability",
+    "mapping_verification",
+    "safe_area_and_protected_art",
+    "transparency",
+    "rotation"
+  ],
+  "non_actions": [
+    "no ImageGen",
+    "no A/B queue consumption or mutation",
+    "no C2/C3 or runtime PASS",
+    "no DDS compose or deployment",
+    "no VR/FFB/DX11/DXVK changes"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "At next C1 scheduled slot, inspect current N100 A/B persisted native-ROI outputs; if eligible candidates appear, review up to 8 unique SHAs and record factual visual evidence."
+}
