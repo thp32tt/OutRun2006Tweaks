@@ -1833,6 +1833,11 @@ class UIScaling : public Hook
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
 			marker = projected ? &projectedAnchor : nullptr;
 		}
+        const bool projectedVehicleRank =
+            scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+        const int anchorLiftY =
+            OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
+                Settings::VREnabled, projectedVehicleRank);
 
         // Scope the actual original draw AFTER determining NaviPub vs
         // vehicle owner; this preserves the historical precedence contract.
@@ -1843,7 +1848,8 @@ class UIScaling : public Hook
                 scope, marker, Settings::VREnabled,
                 OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani);
             result = Game::sprani_play_ae_auth_alpha(
-                spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
+                spriteId, x + RankMarkerFracX,
+                y + RankMarkerFracY + float(anchorLiftY),
                 a4, a5, alpha);
         }
 
@@ -1890,6 +1896,9 @@ class UIScaling : public Hook
         const float frozenFractionY = RankMarkerFracY;
 		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
 		const bool projected = !screenHud && projectedAnchor.valid;
+        const int anchorLiftY =
+            OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
+                Settings::VREnabled, projected);
 		const auto scope = screenHud
 			? OutRunVR::GameSemantic::RenderScope::ScreenHud
 			: (projected
@@ -1901,7 +1910,7 @@ class UIScaling : public Hook
                 scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,
                 OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
             result = Game::put_clip_sprite(
-                xstnum, x, y, flags, priority, color);
+                xstnum, x, y + anchorLiftY, flags, priority, color);
         }
 
 		// put_clip_sprite normally queues one glyph. If an animation/mask

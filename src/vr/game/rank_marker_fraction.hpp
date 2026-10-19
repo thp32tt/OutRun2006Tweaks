@@ -6,6 +6,23 @@
 
 namespace OutRunVR::RankMarker
 {
+    // Original sub_4BAD20 already chooses a physical point one game unit
+    // above the target car: car-local (0,1,0) is transformed to camera/view
+    // space and then projected by Calc3D2D. Only after that 3D projection
+    // does the PC HUD apply a common -32 pixel Y lift in 640x480 space.
+    // In HMD stereo that fixed angular lift makes the marker appear detached
+    // from its car. Cancel only that common desktop lift for an exact
+    // projected vehicle-rank owner; preserve every per-sprite offset.
+    inline constexpr int VehicleAnchorDesktopLiftPixels(
+        bool vrEnabled, bool projectedVehicleRank) noexcept
+    {
+        return vrEnabled && projectedVehicleRank ? 32 : 0;
+    }
+
+    static_assert(VehicleAnchorDesktopLiftPixels(true, true) == 32);
+    static_assert(VehicleAnchorDesktopLiftPixels(false, true) == 0);
+    static_assert(VehicleAnchorDesktopLiftPixels(true, false) == 0);
+
     // Apply the exact Calc3D2D subpixel remainder to every sprite produced
     // by the same vehicle-rank clip CALL. kind 0 is a SPRARGS position;
     // kind 1 is a transformed SPRARGS2 quad (translation lives in mtx_14).

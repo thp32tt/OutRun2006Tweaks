@@ -271,6 +271,27 @@ for body, label, producer in (
 
 if "&projectedAnchor" not in rank13 or "&projectedAnchor" not in rank46:
     fail("rank marker nodes do not carry snapshotted vehicle rank anchor")
+
+# Original sub_4BAD20 already projects car-local (0,1,0). The shared -32px
+# shift is desktop presentation spacing, not a second physical car anchor.
+# Cancel it only for exact projected vehicle-rank producers in VR.
+for token in (
+    "return vrEnabled && projectedVehicleRank ? 32 : 0;",
+    "static_assert(VehicleAnchorDesktopLiftPixels(true, true) == 32);",
+    "static_assert(VehicleAnchorDesktopLiftPixels(false, true) == 0);",
+    "static_assert(VehicleAnchorDesktopLiftPixels(true, false) == 0);",
+):
+    if token not in rank_fraction:
+        fail("vehicle-rank desktop lift contract missing: " + token)
+for body, label, token in (
+    (rank13, "rank 1st-3rd", "y + RankMarkerFracY + float(anchorLiftY)"),
+    (rank46, "rank 4th+", "xstnum, x, y + anchorLiftY, flags"),
+):
+    if "VehicleAnchorDesktopLiftPixels(" not in body or        "Settings::VREnabled" not in body or token not in body:
+        fail(label + " lost exact projected desktop-lift cancellation")
+if "VehicleAnchorDesktopLiftPixels(" in rival:
+    fail("protected rival marker inherited vehicle-rank desktop lift correction")
+
 if "&projectedAnchor" not in rival or "RivalMarkerProjectedInfo = {};" not in rival:
     fail("rival marker must consume one exact recovered anchor and copy it to all sibling nodes")
 # Both immediate (pre-queue) and deferred SpriteNode draws for each exact
@@ -638,6 +659,48 @@ def require_rank_direct_isolation(source: str, helper: str = rank_fraction) -> N
             fail("rank affine/clip candidate and atomic correction changed: " + required)
 
 require_rank_direct_isolation(ui)
+
+def require_projected_rank_desktop_lift(source: str, helper: str) -> None:
+    r13 = function_body(source, "static int __cdecl RankMarker_sprani(")
+    r46 = function_body(source, "static int __cdecl RankMarker_putClipSprite(")
+    rv = function_body(source, "static int __cdecl RivalMarker_sprani(")
+    if "return vrEnabled && projectedVehicleRank ? 32 : 0;" not in helper:
+        fail("rank desktop-lift helper widened or removed")
+    if "scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D" not in r13:
+        fail("rank sprani desktop lift is not projected-only")
+    if "y + RankMarkerFracY + float(anchorLiftY)" not in r13:
+        fail("rank sprani desktop lift cancellation lost")
+    if "const bool projected = !screenHud && projectedAnchor.valid;" not in r46:
+        fail("rank clip desktop lift lost ScreenHud exclusion")
+    if "xstnum, x, y + anchorLiftY, flags" not in r46:
+        fail("rank clip desktop lift cancellation lost")
+    if "VehicleAnchorDesktopLiftPixels(" in rv:
+        fail("rival marker inherited rank desktop lift correction")
+
+require_projected_rank_desktop_lift(ui, rank_fraction)
+for name, source_old, source_new, helper_old, helper_new in (
+    ("rank sprani lift removed",
+     "y + RankMarkerFracY + float(anchorLiftY)", "y + RankMarkerFracY",
+     None, None),
+    ("rank clip lift removed",
+     "xstnum, x, y + anchorLiftY, flags", "xstnum, x, y, flags",
+     None, None),
+    ("rank lift widened",
+     None, None,
+     "return vrEnabled && projectedVehicleRank ? 32 : 0;",
+     "return vrEnabled ? 32 : 0;"),
+):
+    changed_source = ui if source_old is None else ui.replace(source_old, source_new, 1)
+    changed_helper = rank_fraction if helper_old is None else rank_fraction.replace(helper_old, helper_new, 1)
+    if changed_source == ui and changed_helper == rank_fraction:
+        fail("rank desktop-lift mutation setup failed: " + name)
+    try:
+        require_projected_rank_desktop_lift(changed_source, changed_helper)
+    except SystemExit:
+        pass
+    else:
+        fail("rank desktop-lift mutant escaped: " + name)
+
 for name, original, replacement in (
     ("rank sprani pending", "Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani", "false,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani"),
     ("rank clip direct", "ProducerToken::RankMarkerClipSprite);", "ProducerToken::RivalMarkerSprani);"),
