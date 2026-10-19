@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1745-A0003-B0005-UNIQUE8",
+  "reviewer": "C1",
+  "requested_at": "2026-10-19T17:45:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "precheck_remote_head": "1783cae7038db5f56111e7a8b945d411ae4ef95c",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "last_prior_qa": "localization/validation/c1_lightweight/C1-QA-20261019-1715-B0002-B0003-UNIQUE8.json",
+  "scope": "Eight new SHA256 candidate PNGs generated after earlier C1 run. Not producer self-QA, C2/C3, DDS, game PASS, or library proof.",
+  "reviewed_unique_sha_count": 8,
+  "summary": {
+    "PASS": 8,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "inspection": "Actual N100 source/candidate/export SHA-256 matched. 8 independent source/output image pair visual comparisons. PNG/RGBA, alpha thresholds 1/16/32/128 and four-edge check. Source-to-canonical reviewed mapping verified against N100 production manifest and GitHub transcriptions.",
+  "outputs": [
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0003-000A832E",
+      "region_id": "Q047_27fff9d87243a16b",
+      "source_english": "Caps Lock",
+      "approved_korean": "대문자 고정",
+      "visible_korean": "대문자 고정",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q047_27fff9d87243a16b_source_k.png",
+      "candidate_sha256": "6be76392fa883f70ed8c0b7ed938cfa6ec2947c42f4a1ae041068f351378ec99",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q047_27fff9d87243a16b_source.png",
+      "source_png_sha256": "de9bf9b34204c8a3f3eb5783f67bfa7ceb8e7f2b9cb4261b54db92dae5b62f24",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0003-000A832E",
+      "region_id": "Q049_de9a907afba73cc7",
+      "source_english": "TUNED",
+      "approved_korean": "튜닝",
+      "visible_korean": "튜닝",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q049_de9a907afba73cc7_source_k.png",
+      "candidate_sha256": "7835f7243f5a40f535e81f3979ca764f9b2a21216682dd9548564855e5c0be0c",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q049_de9a907afba73cc7_source.png",
+      "source_png_sha256": "621824e84d970a5113b45a0ba569dbc90b0d910c5c86f04063630b0a94f577c4",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0003-000A832E",
+      "region_id": "Q049_3ba74067b6ccd286",
+      "source_english": "NORMAL",
+      "approved_korean": "일반",
+      "visible_korean": "일반",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q049_3ba74067b6ccd286_source_k.png",
+      "candidate_sha256": "c8b39dd1d9fb969135405f39762f7391a289773d952b4378e1143e6d13e6079a",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q049_3ba74067b6ccd286_source.png",
+      "source_png_sha256": "1381b67f5c8f739beb66e4a080042017e81312b1dacd56d525b65c946f2018cd",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0003-000A832E",
+      "region_id": "Q049_f4c08c63a50c336a",
+      "source_english": "Spare!",
+      "approved_korean": "스페어!",
+      "visible_korean": "스페어!",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q049_f4c08c63a50c336a_source_k.png",
+      "candidate_sha256": "382c9b11a9af8c1cd8bb6dac58e24e61b5bf42eff6fbaa04fff2fdeeb7101718",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q049_f4c08c63a50c336a_source.png",
+      "source_png_sha256": "f0a39ea3f4ae51e8a08d2b8e06c423aa8f6512414f87b0e991eb9be7ea772686",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        2158,
+        729
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        30,
+        0,
+        2,
+        16
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Legible clean Korean; faint alpha=1..15 border specks at outer edges, not visible text/effect clipping; monitor downstream alpha threshold/cleaning.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0003-000A832E",
+      "region_id": "Q049_a47ab4333636e1d8",
+      "source_english": "GOAL!",
+      "approved_korean": "골!",
+      "visible_korean": "골!",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q049_a47ab4333636e1d8_source_k.png",
+      "candidate_sha256": "9c179a8e163e2c2e453ef77c4e64ddab5f9829c7805fa89d2e07e4fc424beae8",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q049_a47ab4333636e1d8_source.png",
+      "source_png_sha256": "9564c358fed122bb2ae5efedc0325c240ad7a90b75337030e5a9cfa43b93db5e",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "region_id": "Q220_19f323d9fbd47a3d",
+      "source_english": "OUTRUN",
+      "approved_korean": "아웃런",
+      "visible_korean": "아웃런",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q220_19f323d9fbd47a3d_source_k.png",
+      "candidate_sha256": "8b198e8c0c0ceb77679f9c42abec1eb92ada59011882df5f9b3efc8407c7b73a",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q220_19f323d9fbd47a3d_source.png",
+      "source_png_sha256": "4002734f7242157783e60352c61f52e1fe632e65be0c86cda5fe257fa096b0d8",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "region_id": "Q226_8d217552ac176753",
+      "source_english": "GOAL A",
+      "approved_korean": "골 A",
+      "visible_korean": "골 A",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q226_8d217552ac176753_source_k.png",
+      "candidate_sha256": "f6551326ef0c8eb018077acb2ffe3d8c18a77faf8dfdd37c586c759dd18f29f3",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q226_8d217552ac176753_source.png",
+      "source_png_sha256": "671064af3df5bf8ff480c2bc881eb1ac9c3a8854727b5ef68d3afab5911694ba",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        1774,
+        887
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "region_id": "Q226_6cd397ded315829e",
+      "source_english": "GOAL C",
+      "approved_korean": "골 C",
+      "visible_korean": "골 C",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TRANSLATION_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q226_6cd397ded315829e_source_k.png",
+      "candidate_sha256": "d7c18f2dc1fb52fbbb51e8c41dba89727a3aacef2ca4f139880ee188ba0662a2",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q226_6cd397ded315829e_source.png",
+      "source_png_sha256": "402fc5e25fa94d9669807d9142184bed6daf7cd2465cdfd337a9986c0d91e7fe",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "png_format": "PNG",
+      "png_mode": "RGBA",
+      "candidate_dimensions": [
+        1983,
+        793
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_observation": "Correct readable Korean and expected effects, no visible foreign text, frame, collage, clipping or major orientation defect.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    }
+  ],
+  "notes": [
+    "PASS here applies only to the standalone generated Korean lettering PNG and readable reviewed translation, not the UV/game cell placement or the final saved DDS.",
+    "Generated canvases are not identical to original source ROI dimensions; no automatic source-width/full-sentence-size failure. Back-fitting to the true UI safe zone and actual resampling remains untested.",
+    "Spare! generated PNG contains low alpha (1..15) speckles touching left/top/bottom edges; alpha>=16 letter/effect pixels remain well inside all edges. No observable glyph clipping; alpha cleanup must be validated if composing.",
+    "No duplicate of prior C1 SHA review recorded; recent prior run addressed B0002/B0003 source ordinals and prior records predate these exports.",
+    "Do not alter producer queue or mark ChatGPT library provenance as verified based on N100 exporter evidence alone."
+  ],
+  "evidence": {
+    "side_by_side_N100": [
+      "work/c1_batch_20261019_1745/compare_1.jpg",
+      "work/c1_batch_20261019_1745/compare_2.jpg"
+    ],
+    "alpha_and_sha_verification_N100": "work/c1_batch_20261019_1745_verify.py",
+    "source_mapping_N100": "work/roi_bridge_dryrun_20261019/text_roi_batches/production_manifest.json",
+    "export_evidence_N100": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0003-000A832E.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0005-C8B02A8D.json"
+    ]
+  },
+  "actions": {
+    "imagegen_calls": 0,
+    "A_B_queue_consumed": 0,
+    "dds_written": 0,
+    "C2_C3_ingame_PASS_created": 0,
+    "deployment": false
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_final_approval": "NOT_GRANTED"
+}
