@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
+  "material_result_sha": "c64f443350abd2e37bf6f0765ceaa377d0bea0fd",
   "changed_files": [
     "src/vr/game/goal_progress_physical_source.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -78,13 +78,46 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "goal_fixedfn_binocular_source": "SOURCE_IMPLEMENTED",
-    "goal_foreign_shader_fail_closed": "SOURCE_IMPLEMENTED",
-    "goal_final_exact_sha_ci": "PENDING"
+    "goal_fixedfn_binocular_source": "PASS_EXACT_SHA",
+    "goal_foreign_shader_fail_closed": "PASS_EXACT_SHA",
+    "goal_final_exact_sha_ci": "PASS_EXACT_SHA"
   },
-  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSION_PENDING_CI",
+  "result_commit_kind": "VALIDATION_BEARING_RESULT_AND_SEPARATE_C6_RECORD",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA"
+    "status": "PASS_EXACT_SHA",
+    "material_source_sha": "c64f443350abd2e37bf6f0765ceaa377d0bea0fd",
+    "validation_bearing_result_sha": "bb9ce8c5a5c2a6f554c893f866fad3e1c434f345",
+    "gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39195620590,
+        "status": "success",
+        "sha": "bb9ce8c5a5c2a6f554c893f866fad3e1c434f345"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39195620692,
+        "status": "success",
+        "sha": "bb9ce8c5a5c2a6f554c893f866fad3e1c434f345"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39195620726,
+        "status": "success",
+        "sha": "bb9ce8c5a5c2a6f554c893f866fad3e1c434f345"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39195620584,
+        "status": "success",
+        "sha": "bb9ce8c5a5c2a6f554c893f866fad3e1c434f345"
+      }
+    ],
+    "earlier_failed_sha": "c64f443350abd2e37bf6f0765ceaa377d0bea0fd",
+    "earlier_failed_active_run": 39195427762,
+    "earlier_failure_cause": "Prior +TIME D3DX guard used stale syntax/indent match after actual fixedfn source code; repaired same task in verifier bb9ce8.",
+    "required_gates_success": "4/4"
   },
-  "next_action": "Run mandatory exact SHA GitHub Gates; separate Quest3/VDXR hardware verification from automated results."
+  "next_action": "BUILD_VERIFIED only: Quest3/VDXR GOAL 0-99, time, final text LEFT/RIGHT and re-center HMD validation required. Do not rerun or re-score same TASK_ID.",
+  "validation_bearing_result_sha": "bb9ce8c5a5c2a6f554c893f866fad3e1c434f345"
 }
