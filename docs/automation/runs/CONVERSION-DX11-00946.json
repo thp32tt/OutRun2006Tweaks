@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00946",
   "feature_id": "DX11:LIVE_SM3_DYNAMIC_IFC_NATIVE_FRAME",
-  "status": "CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -90,21 +90,44 @@
     "C0_RECOVER": "Latest GitHub HEAD & 00945 completed C6 reconciled; no other active conflicting IFC owner found.",
     "C1_REVIEW": "R283 real SM3 translator rejected genuine IFC/ELSE/ENDIF as unsupported, suppressing applicable native game Draw.",
     "C2_IMPLEMENT": "Branch-sensitive source codegen/definite-write analysis, nested flow portable regressions and original D3D9 fallback committed.",
-    "C3_VALIDATE": "PENDING_FIVE_EXACT_SHA_GATES; initial material Fast failed because 00945 terminal run record validation, repaired by 00946 CI_PENDING policy-valid run; corrected native HLSL newline escape.",
-    "C4_COMMIT": "material=6e310597b35708e7f33df5fc03e8b12dd38d4e27; same-task real validation repair in next commit",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5: DX11 Fast, Backend, Windows Build, OpenXR architecture, HUD Inspector all completed SUCCESS at exact 198a1ab6f0279c5f93cdb04d77907648e984052a; no real game or Quest3/VDXR run.",
+    "C4_COMMIT": "material=6e310597b35708e7f33df5fc03e8b12dd38d4e27; same-task integration repair=9c3149cc2fe216f7c84bcf7bf273935327f5109b; exact-SHA source contract repair=198a1ab6f0279c5f93cdb04d77907648e984052a",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING"
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA_5_OF_5; separate bookkeeping-only [skip ci]; RUNTIME_VALIDATION=UNTESTED."
   },
   "acceptance_results": {
-    "source_sm3_ifc_native_game_draw": "PENDING_EXACT_SHA_BUILD",
-    "flow_definite_write_and_fallback": "PENDING_EXACT_SHA_BUILD",
-    "five_exact_sha_gates": "PENDING_EXACT_SHA"
+    "source_sm3_ifc_native_game_draw": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED",
+    "flow_definite_write_and_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "five_exact_sha_gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Actual game native IFC shader draw counts and full menu/car/race native frame evidence not captured; remains separate runtime test.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "6e310597b35708e7f33df5fc03e8b12dd38d4e27",
-  "NEXT_IMPLEMENTATION_ACTION": "Complete exact-SHA Fast/Backend/Win32/OpenXR/HUD gates on corrected IFC code; if Gate fails, fix causal source under same TASK_ID, no HMD/gameplay PASS claim.",
-  "score_change": 0
+  "NEXT_IMPLEMENTATION_ACTION": "Continue next DISTINCT unimplemented real-game SM3 native shader/control/resource path in DX11; require matching live menu-to-race native draw pixels and Quest3/VDXR test before any runtime promotion. Do not repeat 00946 C6, CI or score.",
+  "score_change": 0,
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "validation_bearing_result_sha": "198a1ab6f0279c5f93cdb04d77907648e984052a",
+  "validation_evidence": {
+    "exact_sha": "198a1ab6f0279c5f93cdb04d77907648e984052a",
+    "original_material_commit": "6e310597b35708e7f33df5fc03e8b12dd38d4e27",
+    "ci_repair_commits": [
+      "9c3149cc2fe216f7c84bcf7bf273935327f5109b",
+      "198a1ab6f0279c5f93cdb04d77907648e984052a"
+    ],
+    "required_workflow_runs": {
+      "fast": 39189989680,
+      "backend": 39189989685,
+      "windows_build": 39189989670,
+      "openxr": 39189993151,
+      "hud": 39189992980
+    },
+    "all_required_gates": "SUCCESS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "runtime": "UNTESTED",
+    "gameplay": "UNTESTED",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
+  }
 }
