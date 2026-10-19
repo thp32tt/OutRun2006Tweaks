@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-0545-IDLE",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-20T05:45:00+09:00",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "No unreviewed, current-policy eligible native-HD-ROI A/B generated Korean PNG candidates; duplicate SHA review prohibited.",
+  "sources": {
+    "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "glyph_policy": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "roles": "localization/controller_roles.json",
+    "candidate_root_on_N100": "work/image-src/text_roi_batches/candidate_outputs",
+    "sha_dedup_script_on_N100": "work/c1_sha_dedup_20261019_2145.py",
+    "previous_sha_ledger_on_N100": "work/c1_batch_20261019_2015/previous_shas.json",
+    "last_review_metrics_on_N100": "work/c1_batch_20261019_2015/metrics.json",
+    "previous_qa_record": "localization/validation/c1_lightweight/C1-QA-20261019-2015-B0004-B0007-UNIQUE6.json"
+  },
+  "sha_dedup_observation": {
+    "checked_using": "N100 run_python_file, SHA-256 from file bytes, matching existing ledger + previous final six C1 SHA",
+    "stored_candidate_png_count": 63,
+    "prior_reviewed_unique_sha_count": 62,
+    "stored_candidates_matching_prior_reviewed_sha": 62,
+    "excluded_unreceipted_legacy_png": [
+      {
+        "path": "work/image-src/text_roi_batches/candidate_outputs/A/Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+        "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+        "reason": "LEGACY_NO_CURRENT_NATIVE_ROI_PRODUCER_RECEIPT"
+      }
+    ],
+    "unreviewed_eligible_png_count": 0
+  },
+  "summary": {
+    "new_candidate_sha_count": 0,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1
+  },
+  "notes": "This records an idle inventory check, not a re-review or newly approved candidate. PNG-level QA is not performed when no eligible new SHA exists.",
+  "ImageGen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "C2_C3_ingame_PASS_created": false,
+  "final_dds_written": false,
+  "deployment": false,
+  "runtime_validation": "UNTESTED",
+  "competition_scoring": {
+    "AI": "AI 1",
+    "prior_confirmed_points": 1652,
+    "this_run_points": 0,
+    "result_points": 1652,
+    "reason": "No new candidate QA achievement; IDLE only, no duplicate credit"
+  }
+}
