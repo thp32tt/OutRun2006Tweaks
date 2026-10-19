@@ -8,13 +8,13 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C2_IMPLEMENTED",
+  "checkpoint": "C3_POLICY_REPAIR",
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": "PENDING_GITHUB_COMMIT",
+  "material_result_sha": "48f46e1e4bc62ffe2c77c5e693ae16afa6b76549",
   "validation_bearing_result_sha": "PENDING",
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
@@ -44,11 +44,32 @@
         "behavior_area": "R84_Win32_Game_Host_Package_Domain_HUD_Inspector_Full_Source",
         "expected_behavior": "Required same SHA Actions pass; HMD validation remains UNTESTED."
       }
+    ],
+    "trace_stages": [
+      "Original EXE 0x498670 stage transition: exact 0x9898E and 0x98A36 sprani plus 0x989AD,0x98A10,0x98A89 numeric HUD callers are scoped as StageExtensionTime; mode=2 sprani 0x98AC6 remains distinct.",
+      "Original direct ID3DXSprite::Draw queues CPU-side D3DX triangles; on a later physical Flush/End the tracked exact homogeneous producer can be restored, whereas unknown/mixed earlier native triangle batches have no StageExtensionTime provenance.",
+      "At real ID3DXSprite FlushDest and EndDest only, unproven prior direct +TIME scope is temporarily masked to None, allowing R84 R33/R30 or original fallback without inventing left/right ScreenHud eye ownership; native original HRESULT and queue scope are preserved.",
+      "At original +TIME producer return, the exact scoped owner, pending one-shot, previously queued SpriteNode selection and candidate OpenXR per-eye source are restored; actual binocular visibility is pending HMD evidence."
+    ],
+    "subcomponents": [
+      "Implement bounded physical native D3DX Flush and End ownership suppression for a preceding unproven/mixed direct +TIME GPU batch rather than treating an inactive ScopedExactProducerSemantic(None) as isolation.",
+      "Preserve exact homogeneous +TIME sprite and numeric owner and the queued SpriteNode path while protecting GOAL, lens centre/outer rings, SceneEffect/SkyGlow and unrelated one-shot pending semantics.",
+      "Add constexpr positive/negative classification tests for known direct batch, queue-active, other overlay scope, other GOAL producer and world effect; preserve source/eye fallback and unmodified original D3DX HRESULT."
     ]
   },
   "diagnosis": {
     "root_cause": "On a failed GPU batch-owner restoration check, FlushDest and EndDest used ScopedExactProducerSemantic(None) (inactive), leaving the live StageExtensionTime direct scope to classify a physically submitted earlier unproven GPU batch.",
-    "fix_evidence": "C++ scoped fail-closed physical GPU owner masking for unproven direct stage native Flush/End plus positive/negative constexpr regression cases; no original D3DX submission suppressed."
+    "fix_evidence": "Material native C++ and constexpr guard commit 48f46e1e4bc62ffe2c77c5e693ae16afa6b76549; initial Active policy job failed on incomplete run feature_contract trace/subcomponents, not compilation, and is repaired as C6 validation record under the same TASK_ID.",
+    "original_evidence": "Original game +TIME stage source is 0x498670; exact stage sprites (0x9898E, 0x98A36) and numerical +TIME producers (0x989AD,0x98A10,0x98A89) invoke native D3DX Draw which may defer submission until native Flush/End.",
+    "source_trace": [
+      "Original EXE 0x498670 stage transition: exact 0x9898E and 0x98A36 sprani plus 0x989AD,0x98A10,0x98A89 numeric HUD callers are scoped as StageExtensionTime; mode=2 sprani 0x98AC6 remains distinct.",
+      "Original direct ID3DXSprite::Draw queues CPU-side D3DX triangles; on a later physical Flush/End the tracked exact homogeneous producer can be restored, whereas unknown/mixed earlier native triangle batches have no StageExtensionTime provenance.",
+      "At real ID3DXSprite FlushDest and EndDest only, unproven prior direct +TIME scope is temporarily masked to None, allowing R84 R33/R30 or original fallback without inventing left/right ScreenHud eye ownership; native original HRESULT and queue scope are preserved."
+    ],
+    "eye_ownership": "Only a proven exact StageExtensionTime direct D3DX GPU batch can enter R84 exact ScreenHud binocular projection; an unknown/mixed older batch now uses native fallback without borrowing the active stage parent. This is static code-path correctness, not HMD visual verification.",
+    "alternatives_rejected": [
+      "Do not globally flush D3DX Draw or treat texture/FVF/alpha as proof of +TIME; do not relabel a queued stage, mixed result, GOAL, centre lens or SkyGlow frame; do not suppress a native GPU Draw."
+    ]
   },
   "required_gates": [
     "DX9Ex Active Validation",
