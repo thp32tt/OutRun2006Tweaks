@@ -1980,15 +1980,23 @@ namespace OutRunVRRenderer
 				{
 					const UINT wvpOffsetRegisters =
 						OutRunWvpRegister - startRegister;
-					RecordGameWvpWrite(
-						constantData + wvpOffsetRegisters * 4,
-						constantData + wvpOffsetRegisters * 4);
+					const float* nativeGameWvp =
+						constantData + wvpOffsetRegisters * 4;
+					// Partial C993 uploads already reject non-finite rows.
+					// This independent complete source used to publish first,
+					// bypassing that strict original-game source filter.
+					const bool publishNativeCentreWvp =
+						OutRunVR::LensCentre::CanPublishCompleteOriginalCentreWvp(
+							lensBefore.exactDirectCentre, nativeGameWvp);
+					if (publishNativeCentreWvp)
+						RecordGameWvpWrite(nativeGameWvp, nativeGameWvp);
 					// A full c64..c67 game upload is not discarded by a
 					// subsequent single-row D3D9 update in this very same
 					// C993 physical submission. R84 must reconstruct the
 					// complete ORIGINAL matrix, not fall back to mono merely
 					// because the GPU retained three unchanged rows.
-					if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+					if (publishNativeCentreWvp &&
+						OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
 							OutRunVR::GameSemantic::ProducerToken::LensFlareCentre &&
 						OutRunVR::GameSemantic::CurrentLensCentreCallEpoch != 0 &&
 						!OutRunVR::GameSemantic::QueueRenderActive())

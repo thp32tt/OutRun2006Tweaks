@@ -18,6 +18,22 @@ namespace OutRunVR::LensCentre
         return value >= -limit && value <= limit;
     }
 
+    // Full native c64 upload is a separate path from the partial-row
+    // assembler. Preserve original D3D9 HRESULT/Draw even for malformed
+    // values, but do not promote an invalid C993 matrix into R84 eyes.
+    constexpr bool CanPublishCompleteOriginalCentreWvp(
+        bool exactDirectCentre, const float* rows) noexcept
+    {
+        if (!exactDirectCentre)
+            return true; // other game sources keep native behavior
+        if (!rows)
+            return false;
+        for (std::uint32_t i = 0; i != 16; ++i)
+            if (!FiniteCentreWvp(rows[i]))
+                return false;
+        return true;
+    }
+
     struct PartialWvpUpload
     {
         float raw[16]{};
@@ -249,6 +265,28 @@ namespace OutRunVR::LensCentre
         return !stage.Append(63,2,neighbor,7,3,0x40,6,0xA0,51,true) &&
             stage.covered == 0x01u && stage.raw[0] == 21;
     }
+    constexpr bool CompleteCentreWvpSourceAdmission() noexcept
+    {
+        constexpr float good[16]{
+            1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+        constexpr float nan[16]{
+            1,2,3,4,5,6,7,8,9,10,11,12,13,14,
+            std::numeric_limits<float>::quiet_NaN(),16};
+        constexpr float inf[16]{
+            1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+            std::numeric_limits<float>::infinity()};
+        constexpr float negativeInf[16]{
+            -std::numeric_limits<float>::infinity(),
+            2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+        return CanPublishCompleteOriginalCentreWvp(true, good) &&
+            !CanPublishCompleteOriginalCentreWvp(true, nan) &&
+            !CanPublishCompleteOriginalCentreWvp(true, inf) &&
+            !CanPublishCompleteOriginalCentreWvp(true, negativeInf) &&
+            !CanPublishCompleteOriginalCentreWvp(true, nullptr) &&
+            CanPublishCompleteOriginalCentreWvp(false, nan);
+    }
+    static_assert(CompleteCentreWvpSourceAdmission(),
+        "Complete native C993 c64 must be finite before eye admission");
     static_assert(RejectsNonFiniteCentreMatrix(),
         "C993 non-finite raw c64 must keep original game draw, not poison stereo");
     static_assert(CommittedFullAcceptsOwnedPartialRows());

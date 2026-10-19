@@ -9,6 +9,19 @@ int main()
     assert(RejectsMixedAndFailedUploads());
     assert(RejectsCrossDrawAndOverlappingPartialWvp());
     assert(CommittedFullAcceptsOwnedPartialRows());
+    assert(CompleteCentreWvpSourceAdmission());
+    // Both complete and split original C993 c64 paths must reject
+    // malformed stereo candidates; other sources are left untouched.
+    float validFull[16]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
+    assert(CanPublishCompleteOriginalCentreWvp(true, validFull));
+    validFull[9] = std::numeric_limits<float>::quiet_NaN();
+    assert(!CanPublishCompleteOriginalCentreWvp(true, validFull));
+    assert(CanPublishCompleteOriginalCentreWvp(false, validFull));
+    validFull[9] = std::numeric_limits<float>::infinity();
+    assert(!CanPublishCompleteOriginalCentreWvp(true, validFull));
+    validFull[9] = -std::numeric_limits<float>::infinity();
+    assert(!CanPublishCompleteOriginalCentreWvp(true, validFull));
+    assert(!CanPublishCompleteOriginalCentreWvp(true, nullptr));
     const RawWvpEvidence raw{7, 7, 9, 9, 40, 27, 0x100, 0x100, 11, 11, true, true, true};
     assert(OwnsRawWvp(raw));
     auto relatch = raw;
