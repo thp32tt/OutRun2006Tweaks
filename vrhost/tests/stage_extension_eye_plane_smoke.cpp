@@ -539,11 +539,14 @@ int main() {
     duringLeft.shaderEpoch = 14;
     if (SameAfterNativeLeft(queuedStage, duringLeft))
         return 45;
-    // Native LEFT +TIME can reenter another original game c64 writer
-    // without changing shader, queue, producer or frame-pose identity.
-    // Both queued stage sprites and direct numeric D3DX glyphs must
-    // reject that GPU source change before submitting RIGHT.
+    // Shader-backed native LEFT +TIME can reenter another original game
+    // c64 writer without changing queue, producer or frame-pose identity.
+    // Fixed-function queued +TIME intentionally carries raw c64 as zero/zero
+    // (covered above), so make this queued fixture shader-backed before
+    // testing the original-c64 RIGHT-eye source fence.
     auto stampedQueued = queuedStage;
+    stampedQueued.shader = 0x1234;
+    stampedQueued.shaderEpoch = 11;
     stampedQueued.rawWvpWriteSerial = 711;
     stampedQueued.rawWvpDrawSerial = 99;
     auto stampedDirect = directStage;
