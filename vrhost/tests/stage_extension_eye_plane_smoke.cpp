@@ -33,6 +33,53 @@ int main() {
         !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
             fixedFnStage, fixedFnStage))
         return 72;
+    // R30 and R33 both own the physical +TIME family. A shaderless
+    // DIRECT numeral or QUEUED sprani is eligible with zero game c64,
+    // even if the previous world shader had a valid raw upload. Before
+    // this correction R33 still read that unrelated shader and refused
+    // the left/right pair, whereas the R30 fixed-function route did not.
+    if (MatchesCapturedOriginalWvp(
+            true, 0, 0, 0x100, 9, 50, 49))
+        return 75; // foreign game c64 must never be rebranded as +TIME
+    auto poisonedFixedFn = fixedFnStage;
+    poisonedFixedFn.rawWvpWriteSerial = 50;
+    poisonedFixedFn.rawWvpDrawSerial = 49;
+    if (OutRunVR::StageExtensionPhysical::IsValid(poisonedFixedFn) ||
+        OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            fixedFnStage, poisonedFixedFn))
+        return 76; // same-nonzero previous world raw upload is invalid
+    int queuedNode = 0;
+    auto fixedFnQueued = fixedFnStage;
+    fixedFnQueued.queued = true;
+    fixedFnQueued.node = &queuedNode;
+    fixedFnQueued.queueEpoch = 12;
+    if (!OutRunVR::StageExtensionPhysical::IsValid(fixedFnQueued) ||
+        !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            fixedFnQueued, fixedFnQueued))
+        return 77; // both real queued +TIME eyes still qualify
+    auto poisonedQueued = fixedFnQueued;
+    poisonedQueued.rawWvpWriteSerial = 50;
+    poisonedQueued.rawWvpDrawSerial = 49;
+    if (OutRunVR::StageExtensionPhysical::IsValid(poisonedQueued) ||
+        OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            fixedFnQueued, poisonedQueued))
+        return 78; // no stale c64 can cross a new queue-node epoch
+    auto shaderStage = fixedFnStage;
+    shaderStage.shader = 0x100;
+    shaderStage.shaderEpoch = 9;
+    shaderStage.rawWvpWriteSerial = 50;
+    shaderStage.rawWvpDrawSerial = 49;
+    if (!OutRunVR::StageExtensionPhysical::IsValid(shaderStage) ||
+        !OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            shaderStage, shaderStage) ||
+        MatchesCapturedOriginalWvp(true, 0x100, 9, 0x200, 9, 50, 49))
+        return 79; // shader-backed stage still fences original c64
+    auto changedShader = shaderStage;
+    ++changedShader.rawWvpWriteSerial;
+    if (OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(
+            shaderStage, changedShader))
+        return 80; // native LEFT cannot borrow another RIGHT shader WVP
+
     auto changedFixedFn = fixedFnStage;
     ++changedFixedFn.poseEpoch;
     if (OutRunVR::StageExtensionPhysical::SameAfterNativeLeft(

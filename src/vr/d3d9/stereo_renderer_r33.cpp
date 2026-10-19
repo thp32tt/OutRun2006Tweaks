@@ -1160,28 +1160,38 @@ namespace OutRunVRStereo
                 // original game c64 writer without changing the queue,
                 // producer, shader or pose. Private R32 eye uploads do not
                 // advance this original game WVP generation.
-                float originalRawWvp[16]{};
                 std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
-                std::uintptr_t rawShader = 0;
-                std::uint64_t rawShaderEpoch = 0;
-                const bool rawCaptured =
-                    OutRunVRRenderer::GetLastRawGameWvpWrite(
-                        originalRawWvp, rawWriteSerial, rawDrawSerial,
-                        rawShader, rawShaderEpoch);
-                if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(
-                        rawCaptured, shader, shaderEpoch, rawShader, rawShaderEpoch,
-                        rawWriteSerial, rawDrawSerial))
+                // Unlike shader-backed +TIME, fixed-function/FVF/XYZRHW
+                // numeric glyphs never consume original game VS c64. R30
+                // already separates those paths. R33 must not reject the
+                // exact same physical HUD producer because the last raw
+                // write belonged to an unrelated road/world shader.
+                // A shader-backed draw still rejects a known foreign c64.
+                if (OutRunVR::StageExtensionPhysical::RequiresOriginalShaderC64(
+                        shader))
                 {
-                    // A known foreign original c64 write is not a valid
-                    // +TIME source for either eye. Preserve native fallback.
-                    return OutRunVR::StageExtensionPhysical::Source{};
-                }
-                if (!rawCaptured)
-                {
-                    // No original c64 evidence: keep the existing explicit
-                    // unknown/unknown fallback, never borrow live eye c64.
-                    rawWriteSerial = 0;
-                    rawDrawSerial = 0;
+                    float originalRawWvp[16]{};
+                    std::uintptr_t rawShader = 0;
+                    std::uint64_t rawShaderEpoch = 0;
+                    const bool rawCaptured =
+                        OutRunVRRenderer::GetLastRawGameWvpWrite(
+                            originalRawWvp, rawWriteSerial, rawDrawSerial,
+                            rawShader, rawShaderEpoch);
+                    if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(
+                            rawCaptured, shader, shaderEpoch,
+                            rawShader, rawShaderEpoch,
+                            rawWriteSerial, rawDrawSerial))
+                    {
+                        // Known foreign ORIGINAL c64 cannot own either eye.
+                        return OutRunVR::StageExtensionPhysical::Source{};
+                    }
+                    if (!rawCaptured)
+                    {
+                        // Missing original shader evidence: retain the
+                        // explicit zero/zero conservative fallback.
+                        rawWriteSerial = 0;
+                        rawDrawSerial = 0;
+                    }
                 }
                 return OutRunVR::StageExtensionPhysical::Source{
                     cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,

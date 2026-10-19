@@ -87,6 +87,11 @@ namespace OutRunVR::StageExtensionPhysical
         return IsStage(s) && s.poseEpoch != 0 &&
             s.topLevelDrawSerial != 0 &&
             (s.shader == 0 || s.shaderEpoch != 0) &&
+            // Fixed-function +TIME has no original VS c64 to consume.
+            // An inherited road/GOAL raw upload is never a stage owner,
+            // even when both captured serials are nonzero and coherent.
+            (RequiresOriginalShaderC64(s.shader) ||
+             (s.rawWvpWriteSerial == 0 && s.rawWvpDrawSerial == 0)) &&
             ((s.rawWvpWriteSerial == 0) == (s.rawWvpDrawSerial == 0)) &&
             (s.queued ? (s.node != nullptr && s.queueEpoch != 0)
                       : (s.node == nullptr && s.queueEpoch == 0));
