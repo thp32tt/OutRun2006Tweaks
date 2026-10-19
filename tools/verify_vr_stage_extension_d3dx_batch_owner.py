@@ -834,7 +834,7 @@ def check_current_ledger(code: str, header: str, ledger: str) -> list[str]:
 
 
 def check_r30_stage_raw_wvp(renderer: str) -> list[str]:
-    """R84's XYZRHW/fixedfn +TIME must stamp raw game c64 like R33 shader."""
+    """R84 +TIME must distinguish fixed-function from shader-owned raw c64 and fence both eyes."""
     begin = renderer.find("        bool R30CaptureStagePhysicalSource(")
     end = renderer.find("        bool R30CaptureGoalPhysicalSource(", begin)
     if begin < 0 or end <= begin:
@@ -842,8 +842,10 @@ def check_r30_stage_raw_wvp(renderer: str) -> list[str]:
     stage = renderer[begin:end]
     evidence = (
         ("GetLastRawGameWvpWrite(", "original game c64 serial never sampled"),
-        ("const bool rawCaptured = OutRunVRRenderer::GetLastRawGameWvpWrite(",
+        ("const bool rawCaptured =",
          "stage must distinguish a genuinely unavailable original WVP tracker"),
+        ("RequiresOriginalShaderC64(",
+          "fixed-function +TIME must never consume a previous world shader c64"),
         ("if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(",
          "known foreign or incomplete original c64 source must veto +TIME eye ownership"),
         ("rawCaptured, shader, shaderEpoch,",
@@ -854,7 +856,7 @@ def check_r30_stage_raw_wvp(renderer: str) -> list[str]:
          "captured raw serial pair must be validated before +TIME eye admission"),
         ("if (!rawCaptured)",
          "only unavailable original WVP capture can retain zero/zero native fallback"),
-        ("rawWriteSerial = 0;\n                rawDrawSerial = 0;",
+        ("rawWriteSerial = 0;\n                    rawDrawSerial = 0;",
          "unknown c64 generation must retain zero/zero fallback"),
         ("rawWriteSerial, rawDrawSerial};",
          "raw game c64 generation missing from R30 source stamp"),
@@ -910,6 +912,8 @@ def main_current_ledger(code: str, header: str) -> int:
     capture_end = renderer.find("        bool R30CaptureGoalPhysicalSource(", capture_begin)
     captured = renderer[capture_begin:capture_end]
     for label, before, after in (
+        ("missing-fixed-function-exemption",
+         "RequiresOriginalShaderC64(", "RequiresForeignRawShaderC64("),
         ("missing-original-c64-capture", "GetLastRawGameWvpWrite(",
          "GetLastLiveStereoWvpWrite("),
         ("missing-captured-stage-veto",
@@ -928,7 +932,7 @@ def main_current_ledger(code: str, header: str) -> int:
         ("missing-right-eye-c64-stamp",
          "rawWriteSerial, rawDrawSerial};", "0, 0};"),
         ("missing-c64-stamp-pair-fallback",
-         "rawWriteSerial = 0;\n                rawDrawSerial = 0;",
+         "rawWriteSerial = 0;\n                    rawDrawSerial = 0;",
          "rawWriteSerial = 0;"),
     ):
         changed = captured.replace(before, after, 1)
