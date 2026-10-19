@@ -29,13 +29,16 @@ int main() {
     assert(temps[2] == 15u && outputs[1] == 15u);
     assert(flow.begin_repeat(2u, temps, outputs));
     assert(flow.begin_repeat(3u, temps, outputs));
-    temps[2] = 1u; outputs[1] = 1u;
+    // A new write inside the inner REP is not definite after BREAK.
+    // Original writes to other lanes are never undone in D3D9.
+    temps[5] = 15u; outputs[2] = 15u;
     assert(flow.record_break());
     assert(flow.end_repeat(temps, outputs));
-    assert(temps[2] == 15u && outputs[1] == 15u);
-    temps[2] = 7u;
+    assert(temps[5] == 0u && outputs[2] == 0u);
+    // The outer loop did not BREAK; its own post-inner write is definite.
+    temps[5] = 7u;
     assert(flow.end_repeat(temps, outputs));
-    assert(temps[2] == 7u && flow.empty());
+    assert(temps[5] == 7u && temps[2] == 15u && flow.empty());
     temps[3] = 0u;
     assert(flow.begin_repeat(16u, temps, outputs));
     temps[3] = 15u;
