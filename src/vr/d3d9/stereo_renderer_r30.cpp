@@ -2008,17 +2008,25 @@ namespace OutRunVRStereo
                      OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite));
         }
 
-        // The source game draws the ESC shell as generic overlay and its
-        // arrows/YES-NO as exact queued HUD sprites. Both must use one optical
-        // correction; F11, ordinary HUD and results remain strictly excluded.
+        bool R30IsPauseMenuExactShell() noexcept
+        {
+            return OutRunVrPauseEye::ExactShellOwner(
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::PauseFrameShell);
+        }
+
+        // The source game draws the ESC shell through exact PauseFrameDisp
+        // (RVA 0x8C5F0) and its arrows/YES-NO through exact queued HUD E8s.
+        // State 0x12 alone is not provenance: while paused, unrelated generic
+        // ScreenOverlay2D must retain ordinary HUD policy.
         bool R30IsPauseMenuElement() noexcept
         {
             return OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
                 Game::current_mode &&
                 *Game::current_mode == GameState::STATE_SMPAUSEMENU &&
-                (OutRunVR::GameSemantic::EffectiveScope() ==
-                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
-                 R30IsPauseMenuExactArrow());
+                (R30IsPauseMenuExactShell() || R30IsPauseMenuExactArrow());
         }
 
         // Match the exact ESC arrows on the finite-world HUD shader plane

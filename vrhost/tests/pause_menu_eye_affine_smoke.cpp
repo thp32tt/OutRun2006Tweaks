@@ -109,6 +109,11 @@ int main()
     if (!ExactArrowOwner(true, true) || ExactArrowOwner(true, false) ||
         ExactArrowOwner(false, true) || ExactArrowOwner(false, false))
         return 18;
+    // Pause state + a generic overlay is insufficient. Only the exact
+    // PauseFrameDisp subtree may share the shell's independent optics.
+    if (!ExactShellOwner(true, true) || ExactShellOwner(true, false) ||
+        ExactShellOwner(false, true) || ExactShellOwner(false, false))
+        return 23;
 
     // Previously only exact ScreenHud arrows received the pause optical
     // scale/offset. Queued ESC text with a separately proven same-node raw

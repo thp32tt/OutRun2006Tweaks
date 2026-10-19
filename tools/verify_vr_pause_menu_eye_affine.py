@@ -39,6 +39,18 @@ def check(s: str, h: str) -> None:
     require('return screenHud && exactProducer;' in h)
     require('ExactArrowOwner(true, true)' in tests)
     require('ExactArrowOwner(true, false)' in tests)
+    require('bool R30IsPauseMenuExactShell() noexcept' in s)
+    shell = s[s.index('bool R30IsPauseMenuExactShell() noexcept'):
+              s.index('bool R30IsPauseMenuElement() noexcept')]
+    require('OutRunVrPauseEye::ExactShellOwner(' in shell)
+    require('RenderScope::ScreenOverlay2D' in shell)
+    require('CurrentRenderProducerToken() ==' in shell)
+    require('ProducerToken::PauseFrameShell' in shell)
+    require('constexpr bool ExactShellOwner(bool screenOverlay, bool exactProducer)' in h)
+    require('return screenOverlay && exactProducer;' in h)
+    require('ExactShellOwner(true, true)' in tests)
+    require('ExactShellOwner(true, false)' in tests)
+    require('(R30IsPauseMenuExactShell() || R30IsPauseMenuExactArrow())' in exact_pause)
     require(s.count('R30PauseMenuVerticalAffine(') == 4)
     for required in (
         'hudScaleY * pauseVertical.scale[eye] * ndcY',
@@ -168,6 +180,10 @@ for mutant_index, mutant in enumerate((
                    'GameSemantic::CurrentQueueProducerToken() ==', 1),
     source.replace('return OutRunVrPauseEye::ExactArrowOwner(',
                    'return OutRunVrPauseEye::ShaderHorizontalScale(', 1),
+    source.replace('return OutRunVrPauseEye::ExactShellOwner(',
+                   'return OutRunVrPauseEye::ExactArrowOwner(', 1),
+    source.replace('ProducerToken::PauseFrameShell',
+                   'ProducerToken::None', 1),
     source.replace('hudScaleX, eyeScale[eye], pauseOwned);',
                    'hudScaleX, eyeScale[eye], false);', 1),
     source.replace('const bool pauseOwned = R30IsPauseMenuElement();',
@@ -213,6 +229,8 @@ for mutant_index, mutant in enumerate((
         continue
     raise AssertionError(f"unsafe ESC mutation #{mutant_index} escaped verification")
 for bad_helper in (
+    helper.replace('return screenOverlay && exactProducer;',
+                   'return screenOverlay;'),
     helper.replace('originalPause && (sourceHud || sourceQueuedOverlay)',
                    'originalPause && sourceHud'),
     helper.replace('originalPause && (sourceHud || sourceQueuedOverlay)',

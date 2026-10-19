@@ -14,6 +14,17 @@ namespace OutRunVrPauseEye
         return screenHud && exactProducer;
     }
 
+    // Exact PauseFrameDisp subtree only. A pause game-state bit plus a generic
+    // ScreenOverlay2D queue is not sufficient ownership: other queued 2D
+    // content can coexist while paused and must keep its ordinary HUD policy.
+    constexpr bool ExactShellOwner(bool screenOverlay, bool exactProducer) noexcept
+    {
+        return screenOverlay && exactProducer;
+    }
+    static_assert(ExactShellOwner(true, true));
+    static_assert(!ExactShellOwner(true, false));
+    static_assert(!ExactShellOwner(false, true));
+
     // R84 native ESC producer -> queued child text -> shader GPU sink.
     // The caller has already established exact ScreenHud or a live
     // same-node/epoch ScreenOverlay2D WVP. Pause state is mandatory in BOTH
