@@ -15,7 +15,7 @@ def test():
     assert env["OUTRUN_CROP_ENABLED"] == "true"
     assert env["OUTRUN_ROI_BRIDGE_ENABLED"] == "true"
     assert env["OUTRUN_AB_TEXT_ROI_QUEUE"] == "true"
-    assert env["SCHEDULE_MINUTES"] == "0,10,30,40"
+    assert env["SCHEDULE_MINUTES"] == "0,10,15,20,30,40,45,50"
     assert env["OUTRUN_KR_V2_AUTO_COMPOSE"] == "false"
     assert env["OUTRUN_KR_V2_AUTO_DEPLOY"] == "false"
     assert svc["ports"] == ["6083:6080", "8788:8787"]
