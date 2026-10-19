@@ -879,7 +879,6 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
 
     delta = function_body(renderer, "bool R30BuildProjectedRankDelta(")
     for token in (
-        "bool carryPhysicalDepth",
         "carryPhysicalDepth ? &shift.ndcZ[eye] : nullptr",
         "carryPhysicalDepth ? &shift.invW[eye] : nullptr",
         "shift.deltaX[eye] = projectedX - shift.baseX;",
