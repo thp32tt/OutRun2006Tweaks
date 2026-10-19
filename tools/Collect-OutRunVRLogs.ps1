@@ -181,7 +181,13 @@ if($backend -eq 'd3d9' -and ($variant -eq 'R26_SAFE' -or $variant -eq 'R84_TEST'
 }
 $installedHash=if(Test-Path $installedDll){(Get-FileHash $installedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
 $selectedHash=if(Test-Path $selectedDll){(Get-FileHash $selectedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
-$expectedHash=if($kv.gameDllSha256){[string]$kv.gameDllSha256}else{'NOT_RECORDED'}
+# A PC Fast ACTIVE_VR_BACKEND.txt is not required to provide this
+# optional field. Dot lookup under StrictMode raises PropertyNotFoundStrict.
+# Hashtable membership, unlike .property access, is safe for absent keys.
+$expectedHash=if($kv.ContainsKey('gameDllSha256') -and
+    ![string]::IsNullOrWhiteSpace([string]$kv['gameDllSha256'])){
+    [string]$kv['gameDllSha256']
+}else{'NOT_RECORDED'}
 $gameDllMatches=($installedHash -ne 'MISSING' -and
     $selectedHash -ne 'MISSING' -and
     $installedHash -eq $selectedHash -and

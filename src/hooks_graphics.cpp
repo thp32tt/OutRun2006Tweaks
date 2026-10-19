@@ -39,6 +39,7 @@ namespace Settings
     extern Setting<bool> VRAutoRenderResolution;
     extern Setting<int> VRAntiAliasing;
     extern Setting<int> VRStageCullingMode;
+    extern Setting<bool> VRLensFlareCentreEnabled;
     extern Setting<float> VRCullingUnionMarginDegrees;
     extern Setting<bool> VRTransparencySupersampling;
 	extern Setting<int> VRRenderWidth;
@@ -670,6 +671,15 @@ class VRLensFlareProjected2D : public Hook
             objectId == 0x570002
             ? OutRunVR::GameSemantic::RenderScope::WorldBillboard
             : OutRunVR::GameSemantic::RenderScope::None;
+        // HMD-confirmed 2026-10-20: this exact C993 centre appears twice
+        // and head-follows even while the outer CABE rings remain distinct.
+        // Until a same-call/pose/raw-WVP proof permits per-eye rendering,
+        // remove this ONE source draw, not a whole SceneEffect or sun/sky
+        // producer. A user setting can restore it for comparison. Desktop
+        // and unknown C993 objects always execute their original draw.
+        if (centreScope != OutRunVR::GameSemantic::RenderScope::None &&
+            !Settings::VRLensFlareCentreEnabled.get())
+            return;
         // An unrelated one-shot producer (for example an earlier queued
         // HUD/world draw) must not replace this exact C993 centre draw.
         // Keep its token intact for the original later owner, and leave all
