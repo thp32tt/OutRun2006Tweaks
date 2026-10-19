@@ -8,7 +8,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00942",
-  "feature_id": null,
+  "feature_id": "DX11:LIVE_SM3_PACKED_GAME_VERTEX_NATIVE_DRAW",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
@@ -24,7 +24,7 @@
   "validation_bearing_result_sha": "ecdde980ac41001baac75707cbab27ea2e8585c1",
   "score_change": 0,
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "DX11:LIVE_SM3_PACKED_GAME_VERTEX_NATIVE_DRAW",
     "goal": "Translate actual D3D9 game SM3 packed UDEC3/DEC3N mesh VB/IB/UP vertex declarations into shader-visible float4 for native full-frame D3D11 Draw/DrawIndexed while rejecting unsupported instanced stream-0 and preserving original D3D9/DX9Ex Draw/Present/input/FFB fallback.",
     "acceptance_items": [
       {
