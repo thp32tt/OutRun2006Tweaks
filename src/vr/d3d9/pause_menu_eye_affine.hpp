@@ -14,6 +14,21 @@ namespace OutRunVrPauseEye
         return screenHud && exactProducer;
     }
 
+    // The original ESC arrow E8 caller is a source identity, not the current
+    // pause game-state alone. Reentrant native calls can change VR or mode
+    // before registering SpriteNodes. Fail closed for the WHOLE queued batch;
+    // generic screen clips retain their unmodified original owner.
+    constexpr bool CanTagNativePauseArrow(bool vrEntry, bool vrExit,
+        bool pauseEntry, bool pauseExit) noexcept
+    {
+        return vrEntry && vrExit && pauseEntry && pauseExit;
+    }
+    static_assert(CanTagNativePauseArrow(true, true, true, true));
+    static_assert(!CanTagNativePauseArrow(true, false, true, true));
+    static_assert(!CanTagNativePauseArrow(true, true, true, false));
+    static_assert(!CanTagNativePauseArrow(false, true, true, true));
+    static_assert(!CanTagNativePauseArrow(true, true, false, true));
+
     // Exact PauseFrameDisp subtree only. A pause game-state bit plus a generic
     // ScreenOverlay2D queue is not sufficient ownership: other queued 2D
     // content can coexist while paused and must keep its ordinary HUD policy.

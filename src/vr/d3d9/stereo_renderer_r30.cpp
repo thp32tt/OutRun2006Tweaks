@@ -1998,14 +1998,13 @@ namespace OutRunVRStereo
             return OutRunVrPauseEye::ExactArrowOwner(
                 OutRunVR::GameSemantic::EffectiveScope() ==
                     OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                // Exact paused-game E8 arrows now have a dedicated token
-                // that survives D3DX Draw/Flush/End. Retain the previous
-                // generic exact clip admission for other paused option UI
-                // while the game-state and ScreenHud gates remain mandatory.
-                (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                     OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow ||
-                 OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                     OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite));
+                // Only the twelve original pause-arrow E8 replacements
+                // establish this producer. ExactScreenHudClipSprite is shared
+                // with unrelated HUD/menu/result callers and MUST NOT inherit
+                // the independent ESC scale or vertical positioning just
+                // because a native D3DX batch finishes while the game pauses.
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow);
         }
 
         bool R30IsPauseMenuExactShell() noexcept

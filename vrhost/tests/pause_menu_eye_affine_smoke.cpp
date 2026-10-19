@@ -109,6 +109,17 @@ int main()
     if (!ExactArrowOwner(true, true) || ExactArrowOwner(true, false) ||
         ExactArrowOwner(false, true) || ExactArrowOwner(false, false))
         return 18;
+    // A source-proven ESC arrow remains tagged across a native queue append
+    // only if VR and pause context survive the original producer call.
+    // False→true transitions, game/VR exit, and unowned direct clips must
+    // keep their original source classification and avoid the pause plane.
+    if (!CanTagNativePauseArrow(true, true, true, true) ||
+        CanTagNativePauseArrow(true, false, true, true) ||
+        CanTagNativePauseArrow(false, true, true, true) ||
+        CanTagNativePauseArrow(true, true, true, false) ||
+        CanTagNativePauseArrow(true, true, false, true) ||
+        CanTagNativePauseArrow(false, false, false, false))
+        return 24;
     // Pause state + a generic overlay is insufficient. Only the exact
     // PauseFrameDisp subtree may share the shell's independent optics.
     if (!ExactShellOwner(true, true) || ExactShellOwner(true, false) ||

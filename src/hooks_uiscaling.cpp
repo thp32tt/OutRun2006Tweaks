@@ -5,6 +5,7 @@
 #include "vr/game/hud_command_batch.hpp"
 #include "vr/game/goal_result_parent_provenance.hpp"
 #include "vr/game/sprite_queue_tail_proof.hpp"
+#include "vr/d3d9/pause_menu_eye_affine.hpp"
 #include "vr/game/stage_extension_source_admission.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
@@ -1901,8 +1902,22 @@ class UIScaling : public Hook
             rootsBefore[prio] = root;
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
+		// The exact ESC producer can reenter the game and switch out of VR
+		// or leave the pause state before its native queued siblings appear.
+		// Capture BOTH entry conditions: exit-only classification would hand
+		// an unrelated menu/gameplay node the previous pause eye transform.
+		const bool pauseArrow = producer ==
+			OutRunVR::GameSemantic::ProducerToken::PauseOptionArrow;
+		const bool vrAtEntry = Settings::VREnabled;
+		const bool pauseAtEntry = Game::current_mode &&
+			*Game::current_mode == GameState::STATE_SMPAUSEMENU;
 		const int result = Game::put_clip_sprite(
 			xstnum, x, y, flags, priority, color);
+		if (pauseArrow && !OutRunVrPauseEye::CanTagNativePauseArrow(
+			vrAtEntry, Settings::VREnabled, pauseAtEntry,
+			Game::current_mode &&
+				*Game::current_mode == GameState::STATE_SMPAUSEMENU))
+			return result; // original native result/Draw remains authoritative
 		// Exact original menu/position/ESC producers can queue siblings.
         // Verify the SAME root and both tails after the native CALL before
         // attaching their ScreenHud owner; detached/rebuilt queues keep the
