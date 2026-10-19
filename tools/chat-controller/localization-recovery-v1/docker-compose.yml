@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     pull_policy: build
     container_name: outrun-chat-controller-localization-recovery
-    restart: unless-stopped # UI/VNC stays available; AUTO_SEND remains false
+    restart: unless-stopped # UI/VNC and controlled localization automation stay available
     init: true
     shm_size: "1g"
     mem_limit: 4g
@@ -14,20 +14,20 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
-      AUTO_SEND: "false" # HARD PAUSE: never enable without a new verified release
-      OUTRUN_KR_V2_PHASE: "PAUSED"
-      OUTRUN_KR_V2_NO_SEND: "true" # startup interlock, not a production permission
-      OUTRUN_KR_V2_AUTO_GENERATE: "false"
+      AUTO_SEND: "true" # User explicitly reauthorized controlled Korean automation 2026-10-19
+      OUTRUN_KR_V2_PHASE: "F2" # Working-scope label only; not a game/runtime PASS claim
+      OUTRUN_KR_V2_NO_SEND: "false" # Controlled A/B ROI ImageGen dispatch is explicitly authorized
+      OUTRUN_KR_V2_AUTO_GENERATE: "true"
       OUTRUN_KR_V2_AUTO_COMPOSE: "false"
       OUTRUN_KR_V2_AUTO_DEPLOY: "false"
-      # No browser scheduled sends; independent C is only native English source extraction.
-      SCHEDULE_MINUTES: "" # empty = no scheduled slots; controller supports empty list
-      CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C
+      # A/B generate from verified native ROI; C1 independently reviews. C crop is a background worker.
+      SCHEDULE_MINUTES: "0,10,30,40"
+      CHAT_SLOTS: "3" # One Chrome/profile, three persistent tabs: A/B/C1
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
-      OUTRUN_AB_TEXT_ROI_QUEUE: "false" # old one-phrase queue not a v2 batch-sheet runner
-      # Fresh v2 manifest + CLEAN/DDS/runtime gates are NOT implemented: no sends.
+      OUTRUN_AB_TEXT_ROI_QUEUE: "true" # Verified native-crop source-bound ImageGen queue
+      # DDS compose/game PASS/deploy remain disabled; only PNG generation + C1 QA is automatic.
       OUTRUN_AB_BATCH_SIZE: "5"
       OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
       OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
@@ -69,13 +69,15 @@ services:
       OUTRUN_CROP_ENABLED: "true"
       OUTRUN_CROP_INTERVAL_SECONDS: "60"
       OUTRUN_CROP_MAX_PER_CYCLE: "10"
+      OUTRUN_ROI_BRIDGE_ENABLED: "true"
+      OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS: "60"
     ports:
       - "6083:6080"
       - "8788:8787"
     volumes:
       - outrun_chat_localization_recovery_data:/data
-      # Read original 986 tiles from inputs/A/HD_EN_TILES_20261014 for both roles.
-      # Overlay ONLY /data/imagegen; browser profile, state and logs stay on named volumes.
+      # Shared image workspace. New production consumes only the verified native-ROI manifest;
+      # legacy 986 split tiles may remain archived here but are forbidden as new inputs.
       # Docker daemon host path must exist; do not silently create an empty bind directory.
       - type: bind
         source: /home/chatgpt-runner2/work/image-src
