@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline tests for the separate post-tile ImageGen ROI queue."""
 from __future__ import annotations
+import asyncio
 import hashlib
 import json
 import os
@@ -101,6 +102,36 @@ class TextRoiQueueTests(unittest.TestCase):
             binding, reason = ab_batch_queue.next_binding("A", self.root)
             self.assertIsNone(binding)
             self.assertEqual(reason, "HOLD_LEGACY_TILES_RETIRED_TEXT_ROI_QUEUE_REQUIRED")
+
+    def test_redeploy_reopens_recorded_active_chat_before_result_probe(self):
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        text_roi_queue.stage_submission("A",binding["task_id"],self.root)
+        target="https://chatgpt.com/c/active-batch-chat"
+        text_roi_queue.record_chat_url("A",binding["task_id"],target,self.root)
+        sent=self.root/"sent"
+        sent.mkdir(parents=True,exist_ok=True)
+        (sent/f'A_{binding["task_id"]}.json').write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":binding["task_id"],"role":"A",
+            "tiles":[{"filename":Path(binding["path"]).name}]
+        }),encoding="utf-8")
+
+        class Page:
+            def __init__(self):
+                self.url="https://chatgpt.com/c/restored-old-slot"
+                self.opened=[]
+            async def goto(self,url,**kwargs):
+                self.opened.append(url)
+                self.url=url
+            async def evaluate(self,*args,**kwargs):
+                return {"count":0,"expected":1,"busy":False,"verified_by":"TEST","error":None}
+
+        page=Page()
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",page,self.root))
+        self.assertFalse(can_continue)
+        self.assertEqual(page.opened,[target])
+        self.assertTrue(status.startswith("IMAGEGEN_OUTPUT_COUNT_MISMATCH:"))
 
     def test_two_roles_do_not_share_state(self):
         b = dict(self.item, id="Q104_Second_Text", role="B", imagegen_input_png="Q104_OutRunModeB.png")
