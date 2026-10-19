@@ -120,9 +120,10 @@ def check_pause_frame_owner(ui: str, pause: str, semantic_source: str) -> None:
                   pause.index('PauseMenuVisibility PauseMenuVisibility::instance;')]
     for required in (
         'Module::exe_ptr(0x8C5F0)',
-        'ScopedExactProducerSemantic pauseFrameOwner(',
-        'RenderScope::ScreenOverlay2D',
-        'ProducerToken::PauseFrameShell',
+        'ScopedExactProducerSemantic pauseFrameOwner(\n'
+        '\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenOverlay2D,\n'
+        '\t\t\tnullptr, true,\n'
+        '\t\t\tOutRunVR::GameSemantic::ProducerToken::PauseFrameShell);',
         'FirstVerifiedAppendedNodeOnStableRoot(',
         'PeekSpriteNodeProducerToken(node) == ProducerToken::None',
         'TagPauseFrameNodes(before, rootsBefore, entrySerial);',
