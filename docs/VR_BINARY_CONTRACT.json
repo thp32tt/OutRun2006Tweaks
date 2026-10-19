@@ -1628,7 +1628,7 @@
         },
         {
           "path": "src/hooks_graphics.cpp",
-          "needle": "PMT node-visible gate signature mismatch"
+          "needle": "VR PMT CULL: signature mismatch at 0x{:X}, refusing hooks"
         }
       ]
     },
