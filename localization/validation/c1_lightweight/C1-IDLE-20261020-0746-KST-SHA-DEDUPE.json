@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-0746-KST-SHA-DEDUPE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T07:46:00+09:00",
+  "inspected_at_kst": "2026-10-20T07:50:44+09:00",
+  "verdict": "IDLE",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "observed_source": "N100 work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+  "sha_audit": {
+    "method": "full SHA256 of every stored PNG against 2026-10-19 20:15 C1 56+6 recorded review hashes",
+    "stored_png_count": 63,
+    "previously_reviewed_candidate_sha_count": 62,
+    "sha_matches_to_reviewed": 62,
+    "legacy_excluded_count": 1,
+    "new_eligible_candidate_sha_count": 0
+  },
+  "excluded_legacy_candidate": {
+    "path": "work/image-src/text_roi_batches/candidate_outputs/A/Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+    "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+    "reason": "legacy non _source_k.png without verified native ROI producer/export receipt; not a new A/B ImageGen candidate; do not auto-approve"
+  },
+  "prior_qa_record": "localization/validation/c1_lightweight/C1-QA-20261019-2015-B0004-B0007-UNIQUE6.json",
+  "dedup_helper": "N100 work/c1_sha_dedup_20261019_2145.py (read-only)",
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1,
+    "newly_reviewed": 0
+  },
+  "image_generation_calls": 0,
+  "a_b_queue_consumed": 0,
+  "dds_written": 0,
+  "final_approval_created": false,
+  "c2_c3_ingame_pass_created": false,
+  "ui_safe_cell_composition": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "score_change": 0,
+  "notes": "No new eligible unreviewed producer candidate; this is an idle availability/dedup audit, not a visual re-review of already audited SHA or new production achievement. No VR/FFB/DX11/DXVK changes."
+}
