@@ -101,9 +101,36 @@ for token in (
     "game_native_sm3_line_raster(static_cast<std::uint32_t>(type),",
     "D3D11_PRIMITIVE_TOPOLOGY_LINELIST",
     "D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP",
-    "context->IASetPrimitiveTopology(type == D3DPT_LINELIST ?",
+    "type == D3DPT_LINELIST ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :",
+    "context->IASetPrimitiveTopology(type == D3DPT_POINTLIST ?",
+    "D3D11_PRIMITIVE_TOPOLOGY_POINTLIST",
 ):
-    check(token in source, "live SM3 game line/strip GPU routing absent: " + token)
+    check(token in source, "live SM3 game point/line GPU routing absent: " + token)
+# D3D9 already exposes POINTLIST source spans to both indexed and
+# non-indexed hooks. Assert the genuine shader-bound game Draw now reaches
+# the native IA with original indexed/nonindexed geometry, but only under a
+# one-pixel point raster. Unsupported PSIZE/sprites/scaled points return to
+# original D3D9 before native pipeline/upload mutation.
+for token in (
+    "type != D3DPT_POINTLIST && type != D3DPT_TRIANGLELIST",
+    "if (type == D3DPT_POINTLIST) {",
+    "D3DRS_POINTSIZE, &size",
+    "D3DRS_POINTSIZE_MIN, &minimum",
+    "D3DRS_POINTSIZE_MAX, &maximum",
+    "D3DRS_POINTSPRITEENABLE, &sprite",
+    "D3DRS_POINTSCALEENABLE, &scaled",
+    "declaration[i].Usage == D3DDECLUSAGE_PSIZE",
+    "!game_native_unit_point_raster(",
+    "context->Draw(vertexCount, 0u);",
+    "context->DrawIndexed(nativeIndexCount, 0u, 0);",
+):
+    check(token in source, "real game SM3 point/fallback integration missing: " + token)
+    check(token not in source.replace(token, "", 1),
+          "point negative source mutation did not remove " + token)
+check(source.index("!game_native_unit_point_raster(") <
+      source.index("ensure_pipeline(s, source.Width, source.Height)") <
+      source.index("context->DrawIndexed(nativeIndexCount"),
+      "unsupported point mode must fail before native GPU mutation")
 span_header = (ROOT / "src/vr/d3d11/live_game_primitive_span.hpp").read_text()
 check("!antialiased && lastPixel" in span_header and
       "game_native_sm3_line_raster(3u, false, true)" in span_header,
