@@ -1,0 +1,475 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1310-KST-NATIVE-ROI-PNG-QA",
+  "reviewer": "C1",
+  "inspection_basis": "GitHub canonical policy + N100 persisted actual A/B generated candidate PNG bytes, inspected at native visual previews + Pillow alpha/border checks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_source_head_at_start": "62e65a52dba2b8b997a40e8a9aa657c0539ec732",
+  "reviewed_policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "latest_previous_qa": "localization/validation/c1_lightweight/C1-IDLE-20261019-1210-KST.json",
+  "newly_exported_batch_ids": [
+    "OUTRUN-ROI-A-0001-173D19C9",
+    "OUTRUN-ROI-B-0001-0C1BAFA9"
+  ],
+  "total_unique_candidate_sha": 8,
+  "summary": {
+    "PASS": 7,
+    "FAIL": 1,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "policy_notes": [
+    "The PASS verdicts are only for C1 candidate-PNG wording/glyph/transparency visual review; they are not full UI-cell, DDS, C2/C3, library-binding or game approval.",
+    "Translation shorter than original or generator image dimensions larger than crop are not independent FAIL grounds; any later resize must preserve aspect and real UI safe cell.",
+    "Files have been previously classified by exporter as UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS and paired by output order, but the present C1 visual verification independently checked the visible Hangul against approved source mapping.",
+    "At alpha >=32 every reviewed candidate has 0 pixels on the outermost PNG edges; near-alpha-zero (<32) noise for some candidates does not show actual glyph clipping.",
+    "Only actual candidate PNGs inspected; no A/B state or queue mutated."
+  ],
+  "outputs": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "source_ordinal": 1,
+      "queue_index": "044",
+      "original_text": "LOSE",
+      "approved_translation": "패배",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q044_cdc9fa80e5787778_source_k.png",
+      "sha256": "a98cf6dbb0d815232ce328e0ca5b08ce90c206aa5da879ce0ceb5baf6125b0d8",
+      "source_roi_png": "Q044_cdc9fa80e5787778_source.png",
+      "source_crop_sha256": "c71918eeaa04b5c8ae9cae62bcc368912026baf0f92ec340076756ac759da492",
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "source_roi_xywh": [
+        517,
+        104,
+        516,
+        212
+      ],
+      "generated_dimensions": [
+        1956,
+        804
+      ],
+      "source_roi_dimensions": [
+        516,
+        212
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        296,
+        48,
+        1638,
+        775
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": false,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "source_ordinal": 2,
+      "queue_index": "046",
+      "original_text": "ACCELERATE",
+      "approved_translation": "가속",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q046_3f91f6c614e65f91_source_k.png",
+      "sha256": "bd573c526fd6f2f6946ef525560aa271b2d3d93ace687e11c52a81b025e73c15",
+      "source_roi_png": "Q046_3f91f6c614e65f91_source.png",
+      "source_crop_sha256": "57d0e55604375cbd71f2ca2b1a58704c4e56a1c47f1485d46cb35d52daa62a51",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "source_roi_xywh": [
+        1184,
+        209,
+        1428,
+        252
+      ],
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "source_roi_dimensions": [
+        1428,
+        252
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        574,
+        130,
+        1608,
+        579
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": false,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "source_ordinal": 3,
+      "queue_index": "046",
+      "original_text": "BRAKE",
+      "approved_translation": "브레이크",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q046_6425d2109138a0a6_source_k.png",
+      "sha256": "a0bbab5c0fe53bc13fd4378c83fcd601fb1a3cac338ab3a8aedaf893cf24a250",
+      "source_roi_png": "Q046_6425d2109138a0a6_source.png",
+      "source_crop_sha256": "8b7f0f857df989a0ece6cf1f00b9bcc703d7d3520f80e00a877a0734de91030c",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "source_roi_xywh": [
+        397,
+        208,
+        824,
+        256
+      ],
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "source_roi_dimensions": [
+        824,
+        256
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        147,
+        127,
+        2023,
+        589
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": true,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "source_ordinal": 4,
+      "queue_index": "046",
+      "original_text": "GEAR DOWN",
+      "approved_translation": "기어 다운",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q046_71c038f285be8338_source_k.png",
+      "sha256": "f77dff2cd63ba29a4ecf3a174fd6554596a33bcaba5515334b8ff28c6987b336",
+      "source_roi_png": "Q046_71c038f285be8338_source.png",
+      "source_crop_sha256": "25cc48a96997f2a6c6859eddf7eabd32ab1d091eca84c8ed0c28a4e76b6621e5",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "source_roi_xywh": [
+        865,
+        270,
+        1332,
+        256
+      ],
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "source_roi_dimensions": [
+        1332,
+        256
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        232,
+        163,
+        1945,
+        548
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": true,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "FAIL",
+      "reason": "FAIL_NON_TEXT_RED_CIRCULAR_ARTIFACT: visible red ring/background between 기어 and 다운; text-only transparent candidate required",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "source_ordinal": 5,
+      "queue_index": "046",
+      "original_text": "BRAKE",
+      "approved_translation": "브레이크",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q046_0d765b14d3cb7d96_source_k.png",
+      "sha256": "d94bd5b7ea50f43c9ac830589fb400fdea27c72f52139f6822b5f507cbf840d5",
+      "source_roi_png": "Q046_0d765b14d3cb7d96_source.png",
+      "source_crop_sha256": "c5e5ea0a0d65bd83408db8c88530bb3358080de419d3c915362f7ada66f29f26",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "source_roi_xywh": [
+        588,
+        208,
+        824,
+        256
+      ],
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "source_roi_dimensions": [
+        824,
+        256
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        250,
+        153,
+        1926,
+        568
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": true,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "source_ordinal": 1,
+      "queue_index": "047",
+      "original_text": "Accents",
+      "approved_translation": "악센트",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q047_4413daf457459290_source_k.png",
+      "sha256": "351989088410097f2061b45ebfbc6803d874daf8c3ea226f5bef5af17b88037a",
+      "source_roi_png": "Q047_4413daf457459290_source.png",
+      "source_crop_sha256": "5e5f54ac32867611b305e8c2de299a7cae85eceae8b234f4e6cc6b960298ddf2",
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+      "source_roi_xywh": [
+        3739,
+        366,
+        904,
+        268
+      ],
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "source_roi_dimensions": [
+        904,
+        268
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        303,
+        108,
+        1883,
+        617
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": false,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "source_ordinal": 2,
+      "queue_index": "047",
+      "original_text": "Backspace",
+      "approved_translation": "지우기",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q047_5f2c337e1f58da01_source_k.png",
+      "sha256": "0062cb2f480b84ab96e4caf08e00aadc8056fa390c4c573044366e2efee7b739",
+      "source_roi_png": "Q047_5f2c337e1f58da01_source.png",
+      "source_crop_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+      "source_roi_xywh": [
+        2461,
+        852,
+        1068,
+        312
+      ],
+      "generated_dimensions": [
+        2172,
+        724
+      ],
+      "source_roi_dimensions": [
+        1068,
+        312
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        397,
+        124,
+        1775,
+        606
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": false,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "source_ordinal": 3,
+      "queue_index": "047",
+      "original_text": "Done",
+      "approved_translation": "완료",
+      "translation_source": "localization/graphics/transcriptions.jsonl status=transcribed_reviewed",
+      "filename": "Q047_cb84295162aadad2_source_k.png",
+      "sha256": "8471541e8e911f0185823d85fdf9147fd15bfed8574cc699ea9d75b90b7ea3d3",
+      "source_roi_png": "Q047_cb84295162aadad2_source.png",
+      "source_crop_sha256": "6c410bdff52c478ca9617a02b05d60f064d90e72f2001e9da49446483ada9a2b",
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+      "source_roi_xywh": [
+        3742,
+        463,
+        604,
+        268
+      ],
+      "generated_dimensions": [
+        1881,
+        836
+      ],
+      "source_roi_dimensions": [
+        604,
+        268
+      ],
+      "actual_format": "PNG RGBA",
+      "alpha_transparency_verified": true,
+      "alpha_bounding_box_at_32": [
+        242,
+        103,
+        1671,
+        744
+      ],
+      "nonzero_alpha32_pixels_on_canvas_edges": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "only_tiny_alpha1_edge_noise": false,
+      "visual_legibility": "PASS",
+      "translation_exact_match": "PASS",
+      "orientation": "PASS_READABLE_UPRIGHT",
+      "verdict": "PASS",
+      "reason": "PASS_C1_VISIBLE_LETTERING_ONLY: legible mapped Hangul; no visible non-text frame/residual or clipped lettering at meaningful alpha",
+      "qa_scope": "C1_LIGHTWEIGHT_PNG_VISUAL_ONLY",
+      "dds_uv_fit": "NOT_TESTED",
+      "full_ui_safe_cell_invasion": "NOT_TESTED_NO_COMPOSITION",
+      "imagegen_library_binding": "UNVERIFIED",
+      "new_dds_approval": false
+    }
+  ],
+  "prohibited_actions_performed": false,
+  "ImageGen_calls": 0,
+  "queue_items_consumed": 0,
+  "C2_C3_ingame_PASS_created": 0,
+  "dds_written": 0,
+  "deployment_performed": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_final_approval": "NOT_GRANTED"
+}
