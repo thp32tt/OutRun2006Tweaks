@@ -4373,6 +4373,7 @@ bool live_sm3_input_layout(
     const NativeGameAdditionalStreams* extra,
     std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
     bool& repack, UINT& nativeStride) noexcept {
+    try {
     if (declaration.size() < 2u || stride == 0u) return false;
     static constexpr const char* kPosition = "POSITION";
     static constexpr const char* kTexcoord = "TEXCOORD";
@@ -4459,6 +4460,10 @@ bool live_sm3_input_layout(
         }
     }
     return true;
+    } catch (...) {
+        layout.clear();
+        return false;
+    }
 }
 
 bool live_sm3_shader_bytes(IDirect3DVertexShader9* vertexShader,
@@ -4502,6 +4507,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                const std::uint32_t* indices, UINT indexCount,
                                std::uint64_t sourceOrdinal,
                                const NativeGameAdditionalStreams* extra) noexcept {
+    try {
     if (!env_full_game_opt_in() || !game || !bytes || !stride ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
         type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
@@ -5080,6 +5086,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     liveBatch.succeeded(liveDepth.enabled, reverseDepth);
     liveBatch.record_source_draw(sourceOrdinal);
     return true;
+    } catch (...) {
+        s.frameBatch.abort();
+        return false;
+    }
 }
 
 // Reuse geometric growth buffers for the thousands of game-owned VB/IB

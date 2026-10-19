@@ -24,8 +24,16 @@ for token in ("GetVertexDeclaration(", "live_sm3_input_layout(declaration, strid
               "context->DrawIndexed(nativeIndexCount", "context->Draw(vertexCount",
               "nativeByteCount > (1ull << 25u)",
               "GetStreamSourceFreq(0u, &sourceFrequency)",
-              "sourceFrequency != 1u", "catch (...) { return false; }"):
+              "sourceFrequency != 1u", "catch (...) {",
+              "s.frameBatch.abort();"):
     require(token in p, "game draw/upload/fail closed missing " + token)
+# Both declaration building and native SM3 Draw allocation run in noexcept
+# entrypoints. Any allocation failure must preserve D3D9 and must not leave
+# a partially populated native IA or a publishable partial frame.
+require("catch (...) {" in layout and "layout.clear();" in layout,
+        "SM3 declaration exception must fail closed without partial IA")
+require("catch (...) {" in p and "s.frameBatch.abort();" in p,
+        "SM3 Draw exception must abort partial native frame")
 for token in ("D3DDECLUSAGE_BLENDWEIGHT", "D3DDECLUSAGE_BLENDINDICES",
               "D3DDECLUSAGE_POSITIONT", "D3DDECLUSAGE_TANGENT",
               "D3DDECLTYPE_FLOAT1", "D3DDECLTYPE_FLOAT4",
