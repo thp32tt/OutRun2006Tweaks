@@ -106,7 +106,11 @@ def verify(hook: str, r30: str, r33: str, budget: str) -> None:
 
     cull = between(hook, "class DisableStageCulling : public Hook", "class DisableVehicleLODs")
     assert 'Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,' in hook
-    assert "patch.set(Settings::DisableStageCulling.get());" in cull
+    assert "else if (Settings::DisableStageCulling.get())" in cull
+    assert "if (vr && mode == 1)" in cull
+    assert "if (vr && mode == 2)" in cull
+    assert "OutRunVR::PmtNodeCull::ResultGateBytesCompatible(" in cull
+    assert "patch.set(" not in cull
     assert "!Settings::VREnabled.get()" not in cull
     anis = between(hook, "class AnisotropicFiltering : public Hook", "class VSyncOverride")
     assert "static bool PreserveScreenTextureFiltering() noexcept" in anis
@@ -130,8 +134,8 @@ def main() -> None:
         (h.replace("frameCadence.Reset();", "/* cadence stale on VR disable */", 1), t, w),
         (h.replace("std::clamp(dt * 60.0, 0.0, 1.0)",
                    "std::clamp(dt * 60.0, 0.0, 2.0)", 1), t, w),
-        (h.replace("patch.set(Settings::DisableStageCulling.get());",
-                   "patch.set(Settings::DisableStageCulling.get() && !Settings::VREnabled.get());", 1), t, w),
+        (h.replace("else if (Settings::DisableStageCulling.get())",
+                   "else if (false /* legacy PMT culling toggle lost */)", 1), t, w),
         (h.replace("RenderScope::ScreenHud", "RenderScope::None", 1), t, w),
         (h, t.replace("desc.FVF != 0", "desc.FVF == 0", 1), w),
         (h, t.replace("!= D3DFVF_XYZRHW", "== D3DFVF_XYZRHW", 1), w),
