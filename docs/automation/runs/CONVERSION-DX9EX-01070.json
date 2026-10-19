@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01070",
+  "production_id": "CONVERSION-DX9EX-01070",
+  "event_id": "CONVERSION-DX9EX-01070-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATION",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "50b8062b913f122e18599f1da3e4b77146bf6b5a",
+  "changed_files": [
+    "src/vr/game/lens_centre_partial_wvp.hpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "The original D3A5->C980->C993 central lens source must not publish non-finite complete native game c64 WVP as an R84 eye reprojection candidate, matching split-register admission while preserving native submission and same-source stereo recovery.",
+    "scope_boundary": "Exact original C993 central sun native complete c64..c67 publication and R84 eye evidence only; no CABE outer halos, SkyGlow, generic HUD/GOAL/+TIME, FFB/input, R26_SAFE, DX11 or DXVK.",
+    "trace_stages": [
+      "Original EXE D3A5->C980->C993 centre producer writes native original c64..c67; complete uploads entered RecordGameWvpWrite before partial-upload finite WVP guard.",
+      "Native SetVertexShaderConstantF keeps original result while complete centre source now checks all 16 floats before RecordGameWvpWrite original-game source publication.",
+      "Finite complete/split matrix enters R30 original C993 proof -> R33 left/right physical draw and state rollback; invalid complete source retains original native draw and conservative fallback."
+    ],
+    "subcomponents": [
+      "Implement native C++ complete-source finite admission on exact centre in outrun_renderer; preserve original D3D9 draw/result and all other producers.",
+      "Add header constexpr and portable executable lens smoke tests for healthy full matrix, NaN, positive/negative infinity, null and unaffected non-centre sources.",
+      "Run existing exact-SHA x86 R84 game/x64 host/package, Domain Isolation, HUD Inspector and Full Source Impact quality gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_full_raw_c64_eye_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_c993_complete_game_c64_renderer_r30_r33_eyes",
+        "expected_behavior": "Only finite original C993 c64 source can be published to native lens R84 LEFT/RIGHT eye path while preserving native shader-constant submission."
+      },
+      {
+        "id": "lens_nonfinite_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "malformed_c993_full_shader_constants_and_noncentre_source",
+        "expected_behavior": "NaN/Inf and absent original full centre source cannot publish lens stereo WVP; unrelated HUD/world/SkyGlow and original native result remain unchanged."
+      },
+      {
+        "id": "lens_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package_domain_inspector_full_source_exact_sha",
+        "expected_behavior": "Same final validation-bearing SHA passes DX9Ex Active Win32 R84 game+x64 host/package, Domain, Inspector and Full Source Impact; HMD untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "src/vr/game/outrun_renderer.cpp full semanticOverlay shader constants registered RecordGameWvpWrite on complete native c64 before the split-upload-only FiniteCentreWvp checks in lens_centre_partial_wvp.hpp.",
+    "root_cause": "A complete invalid C993 game shader WVP could be stamped as the latest original-game matrix even though the partial assembler rejected NaN/Inf values.",
+    "source_trace": [
+      "Original C993 -> full native c64 setter -> same-source gate -> finite centre check -> original WVP recorder -> R30 physical screen-space lens owner -> R33 left/right or original native fallback."
+    ],
+    "eye_ownership": "Original game source-provenance C++ repair only; no real Quest3 optical or FPS claims.",
+    "alternatives_rejected": [
+      "Never reject original D3D9 source upload, disable centre/halo/SkyGlow, or globally change unrelated world/HUD shader semantics."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "lens_full_raw_c64_eye_source": "SOURCE_IMPLEMENTED",
+    "lens_nonfinite_native_fallback": "SOURCE_IMPLEMENTED",
+    "lens_final_exact_sha_ci": "PENDING"
+  },
+  "result_commit_kind": "VALIDATION_BEARING_RECORD_FOR_PREVIOUS_MATERIAL_SOURCE",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_source_sha": "50b8062b913f122e18599f1da3e4b77146bf6b5a"
+  },
+  "next_action": "Validate this final exact-SHA GitHub Gate once; repair any failure in same TASK_ID, RUNTIME_VALIDATION remains UNTESTED."
+}
