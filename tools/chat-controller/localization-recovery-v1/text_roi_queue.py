@@ -432,8 +432,19 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         return False, "SENT_RECEIPT_BINDING_MISMATCH"
     if not active.get("source_chat_url"):
         return False, "CHAT_URL_NOT_RECORDED"
-    if page.url.rstrip("/") != active["source_chat_url"].rstrip("/"):
-        return False, "ACTIVE_CHAT_NOT_OPEN"
+    target=active["source_chat_url"].strip()
+    if not re.fullmatch(r"https://chatgpt\\.com/(?:g/g-p-[^/]+/)?c/[^?#]+(?:[?#].*)?", target):
+        return False, "ACTIVE_CHAT_URL_UNSAFE"
+    if page.url.rstrip("/") != target.rstrip("/"):
+        # A Portainer/browser restart can restore the older persistent slot URL
+        # while the in-flight batch belongs to a newer conversation. Reopen
+        # only that exact recorded ChatGPT conversation; never resend the task.
+        try:
+            await page.goto(target, wait_until="domcontentloaded", timeout=45000)
+        except Exception as exc:
+            return False, "ACTIVE_CHAT_REOPEN_FAILED:" + type(exc).__name__
+        if page.url.rstrip("/") != target.rstrip("/"):
+            return False, "ACTIVE_CHAT_REOPEN_MISMATCH"
     expected=active["count"]
     try:
         result=await page.evaluate(r"""async ({task,expected})=>{
