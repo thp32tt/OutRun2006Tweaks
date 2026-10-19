@@ -27,12 +27,12 @@ def check(s: str, h: str) -> None:
     require('R30IsPauseMenuExactArrow()' in s)
     arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuExactShell()')]
     require('OutRunVrPauseEye::ExactArrowOwner(' in arrow)
-    # R84 accepts both the newly isolated exact pause-arrow producer and
-    # already-owned generic paused UI. Mutating either producer lookup to a
-    # queue-only lookup must fail: synchronous native E8 calls also render.
-    require(arrow.count('GameSemantic::CurrentRenderProducerToken() ==') == 2)
+    # R84 ESC optics belong only to the original E8 PauseOptionArrow source.
+    # Generic ScreenHud clips share other HUD/menu/result producers; checking
+    # actual producer identity preserves both queued and direct draw paths.
+    require(arrow.count('GameSemantic::CurrentRenderProducerToken() ==') == 1)
     require('ProducerToken::PauseOptionArrow' in arrow)
-    require('ProducerToken::ExactScreenHudClipSprite' in arrow)
+    require('OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite' not in arrow)
     require('GameSemantic::CurrentQueueProducerToken()' not in arrow)
     require('CurrentSpriteQueueProducer ==' not in arrow)
     require('constexpr bool ExactArrowOwner(bool screenHud, bool exactProducer)' in h)
@@ -190,6 +190,8 @@ check(source, helper)
 for mutant_index, mutant in enumerate((
     source.replace('GameSemantic::CurrentRenderProducerToken() ==',
                    'GameSemantic::CurrentQueueProducerToken() ==', 1),
+    source.replace('ProducerToken::PauseOptionArrow);',
+                   'ProducerToken::ExactScreenHudClipSprite);', 1),
     source.replace('return OutRunVrPauseEye::ExactArrowOwner(',
                    'return OutRunVrPauseEye::ShaderHorizontalScale(', 1),
     source.replace('return OutRunVrPauseEye::ExactShellOwner(',
