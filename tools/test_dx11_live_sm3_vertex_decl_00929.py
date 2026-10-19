@@ -22,7 +22,9 @@ for token in ("GetVertexDeclaration(", "live_sm3_input_layout(declaration, strid
               "nativeBytes = unpacked.data()", "s.fullGameVertexCapacity, nativeBytes, vertexBytes",
               "context->IASetVertexBuffers(0u, 1u, &stream, &nativeStride, &offset)",
               "context->DrawIndexed(nativeIndexCount", "context->Draw(vertexCount",
-              "nativeByteCount > (1ull << 25u)", "catch (...) { return false; }"):
+              "nativeByteCount > (1ull << 25u)",
+              "GetStreamSourceFreq(0u, &sourceFrequency)",
+              "sourceFrequency != 1u", "catch (...) { return false; }"):
     require(token in p, "game draw/upload/fail closed missing " + token)
 for token in ("D3DDECLUSAGE_BLENDWEIGHT", "D3DDECLUSAGE_BLENDINDICES",
               "D3DDECLUSAGE_POSITIONT", "D3DDECLUSAGE_TANGENT",
@@ -38,7 +40,10 @@ for token in ("case 4u:", "case 5u:", "case 8u:", "case 9u:",
               "case 16u:", "src[2] / 255.0f", "src[0] / 255.0f",
               "signedValue / 32767.0f", "bits / 65535.0f",
               "game_sm3_half_to_float(", "default: return false;",
-              "game_sm3_decl_width(13u) == 0u"):
+              "game_sm3_decl_width(13u) == 4u",
+              "game_sm3_decl_width(14u) == 4u",
+              "case 13u: case 14u:", "signed10",
+              "game_sm3_decl_width(17u) == 0u"):
     require(token in unpack, "packed shader attribute decode not proven: " + token)
 require("if (nativeIndices[i] >= vertexCount) return false;" in p and
         "liveBatch.accepts_source_draw(" in p and

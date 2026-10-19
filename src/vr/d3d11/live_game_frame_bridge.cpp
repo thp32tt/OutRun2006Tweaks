@@ -160,6 +160,7 @@ static_assert(D3DDECLTYPE_FLOAT1 == 0 && D3DDECLTYPE_FLOAT4 == 3 &&
               D3DDECLTYPE_UBYTE4N == 8 && D3DDECLTYPE_SHORT2N == 9 &&
               D3DDECLTYPE_SHORT4N == 10 && D3DDECLTYPE_USHORT2N == 11 &&
               D3DDECLTYPE_USHORT4N == 12 && D3DDECLTYPE_FLOAT16_2 == 15 &&
+              D3DDECLTYPE_UDEC3 == 13 && D3DDECLTYPE_DEC3N == 14 &&
               D3DDECLTYPE_FLOAT16_4 == 16 && D3DDECLTYPE_UNUSED == 17,
               "Portable D3D9 SM3 declaration types changed");
 constexpr UINT kWidth = 256;
@@ -4716,6 +4717,13 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                repack, nativeStride)) return false;
     // A mixed packed/float D3D9 stream must reach the actual game's native
     // Draw in shader-visible FLOAT4 register order (not format bitcasts).
+    // DEC3N normals / UDEC3 mesh values now feed genuine shader FLOAT4
+    // registers from the intercepted game's VB/IB/UP snapshots.
+    // An instanced stream-0 source cannot be replicated by a single
+    // non-instanced D3D11 Draw. Retain D3D9 output and input in that case.
+    DWORD sourceFrequency = 0u;
+    if (FAILED(game->GetStreamSourceFreq(0u, &sourceFrequency)) ||
+        sourceFrequency != 1u) return false;
     // Reject oversized, malformed or untranslatable data before any upload.
     std::vector<std::uint8_t> unpacked;
     const void* nativeBytes = bytes;

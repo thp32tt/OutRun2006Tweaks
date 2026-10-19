@@ -16,10 +16,11 @@ namespace outrun::vr::dx11::live_game_frame {
     case 2u: return 12u;  // FLOAT3
     case 3u: return 16u;  // FLOAT4
     case 4u: case 5u: case 6u: case 8u: case 9u: case 11u:
+    case 13u: case 14u: return 4u; // UDEC3 / DEC3N packed triples.
     case 15u: return 4u;  // D3DCOLOR, UBYTE4, SHORT2, UBYTE4N,
                           // SHORT2N, USHORT2N, FLOAT16_2
     case 7u: case 10u: case 12u: case 16u: return 8u;
-    default: return 0u;  // UDEC3/DEC3N need distinct signed packing rules
+    default: return 0u;  // Unknown encoding: fail closed
     }
 }
 
@@ -79,6 +80,27 @@ namespace outrun::vr::dx11::live_game_frame {
         }
         return true;
     }
+    case 13u: case 14u: { // UDEC3 / DEC3N packed real-game mesh attributes.
+        std::uint32_t packed = 0u;
+        std::memcpy(&packed, src, sizeof(packed));
+        for (unsigned i = 0u; i < 3u; ++i) {
+            const auto raw = (packed >> (i * 10u)) & 0x3ffu;
+            if (type == 13u) {
+                // Unsigned D3D9 UDEC3: integer 0..1023, not normalized.
+                out[i] = static_cast<float>(raw);
+            } else {
+                // Two's-complement 10-bit signed normalized DEC3N:
+                // [-512,+511] / 511 saturated to [-1,+1].
+                // High two bits are unused. D3D9 supplies W=1.
+                const std::int32_t signed10 = (raw & 0x200u)
+                    ? static_cast<std::int32_t>(raw) - 1024
+                    : static_cast<std::int32_t>(raw);
+                out[i] = (std::max)(-1.0f,
+                                    static_cast<float>(signed10) / 511.0f);
+            }
+        }
+        return true;
+    }
     case 15u: case 16u: { // FLOAT16_2 / FLOAT16_4
         const unsigned count = type == 15u ? 2u : 4u;
         for (unsigned i = 0u; i < count; ++i) {
@@ -96,6 +118,7 @@ static_assert(game_sm3_decl_width(0u) == 4u &&
               game_sm3_decl_width(4u) == 4u &&
               game_sm3_decl_width(10u) == 8u &&
               game_sm3_decl_width(16u) == 8u &&
-              game_sm3_decl_width(13u) == 0u &&
+              game_sm3_decl_width(13u) == 4u &&
+              game_sm3_decl_width(14u) == 4u &&
               game_sm3_decl_width(17u) == 0u);
 } // namespace outrun::vr::dx11::live_game_frame
