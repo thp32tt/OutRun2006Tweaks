@@ -31,6 +31,62 @@ def expected_library_name():
 def _hex64(s):
     return isinstance(s,str) and bool(re.fullmatch(r"[0-9a-f]{64}",s))
 
+
+def _trusted_export_hashes(active, root):
+    """Return SHA-bound generated candidate hashes from prior verified export.
+
+    This is used after a container/browser restart when the original ChatGPT
+    turn is no longer mounted in the restored persistent tab. It never trusts
+    filenames alone: task, role, expected output names, file bytes and SHA256
+    must all agree with the active queue record.
+    """
+    if root is None:
+        return None
+    root=Path(root).resolve()
+    task=active.get("task_id")
+    role=active.get("role")
+    expected=active.get("count")
+    items=active.get("items") or []
+    if not isinstance(task,str) or role not in ("A","B") or not isinstance(expected,int):
+        return None
+    if len(items)!=expected:
+        return None
+    evidence=root/"text_roi_batches"/"export_evidence"/(task+".json")
+    if not evidence.is_file() or evidence.is_symlink():
+        return None
+    try:
+        doc=json.loads(evidence.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if (doc.get("task_id")!=task or doc.get("role")!=role or
+        doc.get("status")!="UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS"):
+        return None
+    rows=doc.get("files")
+    if not isinstance(rows,list) or len(rows)!=expected:
+        return None
+    by_name={r.get("name"):r for r in rows if isinstance(r,dict)}
+    expected_names=[x.get("output_filename") for x in items]
+    if len(by_name)!=expected or set(by_name)!=set(expected_names):
+        return None
+    hashes=[]
+    base=root/"text_roi_batches"/"candidate_outputs"/role
+    for name in expected_names:
+        rec=by_name.get(name) or {}
+        sha=rec.get("sha256")
+        p=base/name
+        if not _hex64(sha) or not p.is_file() or p.is_symlink():
+            return None
+        h=hashlib.sha256()
+        with p.open("rb") as fh:
+            for chunk in iter(lambda:fh.read(1<<20),b""):
+                h.update(chunk)
+        if h.hexdigest()!=sha:
+            return None
+        hashes.append(sha)
+    if len(set(hashes))!=expected:
+        return None
+    return hashes
+
 # Hash the exact generated ImageGen PNGs from the *specific* previous chat turn.
 # One preview and N carousel selectors count as N images, not N+1.
 GENERATED_PNG_HASHES_JS = r"""async ({task,expected})=>{
@@ -89,7 +145,7 @@ LIBRARY_CARD_DIGEST_JS = r"""async card=>{
   }catch(e){return{id,name,error:'LIBRARY_IMAGE_FETCH_EXCEPTION'};}
 }"""
 
-async def verify_project_library_images(page,active, max_scan=MAX_SCAN):
+async def verify_project_library_images(page,active, root=None, max_scan=MAX_SCAN):
     """Return (evidence, error), without touching queue state or files.
 
     SHA256 equality to every generated PNG of this batch is mandatory.
@@ -100,16 +156,20 @@ async def verify_project_library_images(page,active, max_scan=MAX_SCAN):
         return None,"BAD_EXPECTED_IMAGE_COUNT"
     try:
         project=expected_library_name()
-        originals=await page.evaluate(GENERATED_PNG_HASHES_JS,
-                                      {"task":active["task_id"],"expected":expected})
-        if originals.get("error"):
-            return None,originals["error"]
-        images=originals.get("images",[])
-        source_shas=[x.get("sha256") for x in images]
+        source_shas=_trusted_export_hashes(active,root)
+        source_hash_method="verified_local_export_evidence"
+        if source_shas is None:
+            originals=await page.evaluate(GENERATED_PNG_HASHES_JS,
+                                          {"task":active["task_id"],"expected":expected})
+            if originals.get("error"):
+                return None,originals["error"]
+            images=originals.get("images",[])
+            source_shas=[x.get("sha256") for x in images]
+            source_hash_method="source_chat_generated_blob_sha256"
         if len(source_shas)!=expected or len(set(source_shas))!=expected or not all(map(_hex64,source_shas)):
             return None,"INVALID_SOURCE_IMAGE_HASHES"
     except Exception as exc:
-        return None,"SOURCE_CHAT_HASH_FAILED:"+str(exc)[:95]
+        return None,"SOURCE_HASH_FAILED:"+str(exc)[:95]
 
     # A new disposable Library tab does not disturb either persistent A/B tab.
     folder_page=None
@@ -193,6 +253,7 @@ async def verify_project_library_images(page,active, max_scan=MAX_SCAN):
             "folder":project,
             "folder_visible_label":project,
             "verification_method":"browser_content_sha256_match",
+            "source_hash_method":source_hash_method,
             "verified_at":_now(),
             "library_folder_url":library_url,
             "library_item_ids":[x["id"] for x in ordered],
