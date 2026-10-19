@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01072",
+  "production_id": "CONVERSION-DX9EX-01072",
+  "event_id": "CONVERSION-DX9EX-01072-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "NEEDS_VALIDATION",
+  "checkpoint": "C5_PENDING_FINAL_EXACT_SHA",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "ed12dbf1863afac17bf6859da3d720e303711e08",
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/dds_alpha_mask_policy.hpp",
+    "vrhost/tests/dds_alpha_mask_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Ensure native car selection DDS formats preserve the source-declared opacity and alpha for all supported 16-bit RGB pixel-mask layouts without whitening menu textures or corrupting the original game's fallback.",
+    "scope_boundary": "Only vehicle-selector DDS RGB 565/X1R5G5B5/A1R5G5B5/A4R4G4B4 and 24-bit decode intent; preserve all unsupported DDS native D3DX fallback, sprite lifetime, input, FFB, SkyGlow, DX11, and frozen DXVK.",
+    "trace_stages": [
+      "Native OutRun car-selection DDS pixel-format header carries flags and RGB/alpha masks into src/hooks_textures.cpp::GetD3DFormatFromPixelFormat.",
+      "GetD3DFormatFromPixelFormat dispatches Classify16 in dds_alpha_mask_policy.hpp into D3D9 X1/A1/A4/565 formats or D3DFMT_UNKNOWN for native D3DX fallback.",
+      "Original D3D9 texture resource and selector sprites reach the vehicle-selection UI and existing R84 left/right eye OpenXR composition without changing reset, draw, or game input semantics."
+    ],
+    "subcomponents": [
+      "Classify 16-bit RGB-only 555 high-bit mask as opaque X1 and declared 1-bit alpha as A1; map valid 565 and declared 4444 independently in C++.",
+      "Reject undeclared 4444 alpha, conflicting FOURCC or 565 alpha, and malformed BGR24 metadata to native D3DX; keep existing 32-bit RGB opacity handling.",
+      "Exercise positive, malformed and fallback format mutations in compile-time checks and vrhost/tests/dds_alpha_mask_smoke.cpp, then run mandatory final exact-SHA CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "selector_d3d9_dds_16bit_opacity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_car_selector_rgb16_texture_source_to_d3d9_sprite",
+        "expected_behavior": "Opaque 555 and 565 formats do not manufacture transparency; declared A1 and A4 formats map to their matching D3D9 alpha textures."
+      },
+      {
+        "id": "selector_malformed_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "ambiguous_dds_flags_alpha_fourcc_and_rgb24_native_d3dx",
+        "expected_behavior": "Ambiguous or conflicting RGB alpha/FourCC source masks are rejected for fast conversion and retain the unchanged native D3DX decoder."
+      },
+      {
+        "id": "selector_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_domain_inspector_full_impact",
+        "expected_behavior": "Final validation-bearing exact SHA must pass required DX9Ex Active Windows game, host and package jobs, Domain Isolation, HUD Inspector and Full Source Impact; HMD remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Previously committed ed12dbf1863afac17bf6859da3d720e303711e08 changed source DDS classifier, C++ compile-time format checks and executable DDS smoke; GitHub Actions 39192719006 failed before build because the exact task record was absent.",
+    "root_cause": "Existing fast DDS decode mapped some 16-bit formats by bit masks without considering DDPF_ALPHAPIXELS declaration and could manufacture transparency or assume malformed alpha; a separate CI policy failure occurred because the prior material commit omitted docs/automation/runs/CONVERSION-DX9EX-01072.json.",
+    "source_trace": [
+      "Game vehicle-select DDS pixel format flags and bit masks enter GetD3DFormatFromPixelFormat in hooks_textures.cpp.",
+      "DdsAlphaMask::Classify16 distinguishes RGB-only X1 from declared A1/A4 and 565; unsupported formats return UNKNOWN to the untouched native D3DX path.",
+      "Native menu texture resource is consumed by the original game sprite/selection draw and R84 OpenXR host composition, with actual Quest3/VDXR imagery still unverified."
+    ],
+    "eye_ownership": "This source fix only ensures texture upload semantics before R84 left/right eye composition; it does not prove physical binocular vehicle selection without Quest3.",
+    "alternatives_rejected": [
+      "Do not blindly map high alpha-shaped bits to transparency when DDS metadata has no ALPHAPIXELS flag.",
+      "Do not bypass native D3DX decoding for unrecognized formats or alter unrelated R84 stereo HUD, SkyGlow, input or FFB to hide white selector sprites."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "selector_d3d9_dds_16bit_opacity": "SOURCE_IMPLEMENTED",
+    "selector_malformed_native_fallback": "SOURCE_IMPLEMENTED",
+    "selector_final_exact_sha_ci": "PENDING"
+  },
+  "result_commit_kind": "VALIDATION_BEARING_RECORD_FOR_EXISTING_MATERIAL_SOURCE",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_source_sha": "ed12dbf1863afac17bf6859da3d720e303711e08",
+    "prior_failed_active": 39192719006,
+    "prior_failure": "Run-record missing in exact-HEAD feature-policy gate, remaining jobs skipped; not evidence of compile failure"
+  },
+  "next_action": "Execute exact-SHA required GitHub gate checks; only after every Gate SUCCESS record C6 separately, never infer Quest3/VDXR hardware PASS."
+}
