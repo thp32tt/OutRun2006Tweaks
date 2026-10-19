@@ -5,6 +5,7 @@
 #include "native_sm3_constant_codegen.hpp"
 #include "native_sm3_texture_codegen.hpp"
 #include "native_sm3_fragment_codegen.hpp"
+#include "native_sm3_conditional_flow.hpp"
 #include "live_game_sm3_alpha_test.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
@@ -264,14 +265,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_FAMILY_HLSL_MATERIALIZER_V7";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V8";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_FAMILY_TEX2D_PROVENANCE_V7";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V8";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -364,6 +365,10 @@ bool build_r283_sm3_mov_shader_source(
             unsigned matrixVectorComponents{};
             bool texture2d{};
             bool texkill{};
+            // Flow instructions are source operations, not synthetic register writes.
+            // 1=IFC, 2=ELSE, 3=ENDIF. The emitter preserves their original order.
+            unsigned flowKind{};
+            std::string flowCondition;
             bool sineCosine{};
             bool signScratch{};
             UINT signInputTemp{32u};
@@ -384,6 +389,7 @@ bool build_r283_sm3_mov_shader_source(
         std::array<bool, 16> sampler2dDeclared{};
         std::array<bool, 16> sampler2dUsed{};
         bool liveConstantsUsed = false;
+        NativeSm3ConditionalFlow writtenFlow;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
         // D3D9 device. Parse all definitions before interpreting arithmetic
@@ -439,6 +445,94 @@ bool build_r283_sm3_mov_shader_source(
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL) ||
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEF))
                 continue;
+            // SM3 scalar float-compare branches can change menu/race shader
+            // output, including gradients and alpha. Preserve genuine control
+            // flow instead of assuming both arms run. The branch-state tracker
+            // intersects physical register initialization across both paths.
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_IFC)) {
+                if ((instruction.instructionToken & 0xf0000000u) != 0u ||
+                    (instruction.instructionToken & 0x00f80000u) != 0u ||
+                    instruction.operandTokens.size() != 2u ||
+                    operations.size() >= kMaxOps)
+                    return false;
+                const unsigned comparison =
+                    (instruction.instructionToken >> 16u) & 7u;
+                const char* compareOp = native_sm3_ifc_comparison(comparison);
+                if (!compareOp || !writtenFlow.begin(tempWritten, outputWritten))
+                    return false;
+                std::array<std::string, 2> scalarOperands{};
+                static constexpr char lanes[] = "xyzw";
+                for (unsigned i = 0u; i < 2u; ++i) {
+                    const DWORD token = instruction.operandTokens[i];
+                    const unsigned swizzle =
+                        static_cast<unsigned>((token & D3DSP_SWIZZLE_MASK) >> 16u);
+                    const UINT reg = static_cast<UINT>(token & D3DSP_REGNUM_MASK);
+                    if ((token & 0x80000000u) == 0u ||
+                        (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                        ((token & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) !=
+                            D3DSPSM_NONE ||
+                        (swizzle != 0x00u && swizzle != 0x55u &&
+                         swizzle != 0xaau && swizzle != 0xffu))
+                        return false;
+                    const unsigned component = swizzle & 3u;
+                    const auto kind = r283_decode_register_type(token);
+                    std::string value;
+                    if (kind == D3DSPR_TEMP) {
+                        if (reg >= tempWritten.size() ||
+                            (tempWritten[reg] & (1u << component)) == 0u)
+                            return false;
+                        tempUsed[reg] = true;
+                        value = "r283_t" + std::to_string(reg);
+                    } else if (kind == D3DSPR_INPUT) {
+                        bool declared = false;
+                        for (const auto& input : inputs)
+                            if (input.registerType == D3DSPR_INPUT &&
+                                input.registerIndex == reg)
+                                declared = true;
+                        if (!declared) return false;
+                        value = "input.r" + std::to_string(reg);
+                    } else if (kind == D3DSPR_CONST) {
+                        if (reg >= constantLimit ||
+                            !native_sm3_const_reference(
+                                reg, constantLimit, defPresent[reg], value))
+                            return false;
+                        if (!defPresent[reg]) liveConstantsUsed = true;
+                    } else {
+                        // Boolean/predicate/relative-indexed control is not a
+                        // float IFC and must remain on the original D3D9 path.
+                        return false;
+                    }
+                    scalarOperands[i] = value + "." + lanes[component];
+                }
+                Operation branch{};
+                branch.flowKind = 1u;
+                branch.flowCondition = scalarOperands[0] + " " + compareOp +
+                                       " " + scalarOperands[1];
+                operations.push_back(std::move(branch));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_ELSE)) {
+                if ((instruction.instructionToken & 0xf0000000u) != 0u ||
+                    !instruction.operandTokens.empty() ||
+                    operations.size() >= kMaxOps ||
+                    !writtenFlow.otherwise(tempWritten, outputWritten))
+                    return false;
+                Operation branch{};
+                branch.flowKind = 2u;
+                operations.push_back(std::move(branch));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_ENDIF)) {
+                if ((instruction.instructionToken & 0xf0000000u) != 0u ||
+                    !instruction.operandTokens.empty() ||
+                    operations.size() >= kMaxOps ||
+                    !writtenFlow.end(tempWritten, outputWritten))
+                    return false;
+                Operation branch{};
+                branch.flowKind = 3u;
+                operations.push_back(std::move(branch));
+                continue;
+            }
             NativeSm3ArithmeticOpcode opcode{};
             unsigned sourceCount = 0u;
             switch (instruction.opcode) {
@@ -767,7 +861,7 @@ bool build_r283_sm3_mov_shader_source(
             }
             operations.push_back(std::move(op));
         }
-        if (operations.empty()) return false;
+        if (operations.empty() || !writtenFlow.empty()) return false;
         if (vertexStage) {
             for (const auto& output : outputs)
                 if (output.registerType != D3DSPR_OUTPUT ||
@@ -825,6 +919,15 @@ bool build_r283_sm3_mov_shader_source(
                               " = float4(0, 0, 0, 0);\n";
         for (std::size_t i = 0u; i < operations.size(); ++i) {
             const auto& op = operations[i];
+            if (op.flowKind != 0u) {
+                if (op.flowKind == 1u)
+                    translated += "    if (" + op.flowCondition + ") {\\n";
+                else if (op.flowKind == 2u)
+                    translated += "    } else {\\n";
+                else
+                    translated += "    }\\n";
+                continue;
+            }
             std::string dest;
             if (op.destinationType == D3DSPR_TEMP)
                 dest = "r283_t" + std::to_string(op.destinationRegister);

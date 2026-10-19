@@ -64,6 +64,8 @@ jobs:
       - name: Run focused DX11 source-only regression checks
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_arithmetic_codegen_probe.cpp -o /tmp/dx11_sm3_arithmetic && /tmp/dx11_sm3_arithmetic
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_conditional_flow_probe_00946.cpp -o /tmp/dx11_sm3_ifc_00946 && /tmp/dx11_sm3_ifc_00946
+          python tools/test_dx11_sm3_conditional_flow_00946.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model
