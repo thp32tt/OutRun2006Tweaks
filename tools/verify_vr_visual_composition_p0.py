@@ -2526,6 +2526,7 @@ def verify_centre_actual_draw_owner(source):
                      'objectId == 0x570002',
                      'RenderScope::WorldBillboard',
                      'RenderScope::None',
+                     ': OutRunVR::GameSemantic::RenderScope::None;',
                      'ScopedExactProducerSemantic semantic(',
                      'centreScope, nullptr, true,',
                      'ProducerToken::LensFlareCentre',
