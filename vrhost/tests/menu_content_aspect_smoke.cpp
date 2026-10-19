@@ -754,27 +754,57 @@ int main()
         return 12;
 
 
-    // TITLE/MAIN keeps the complete source UV but restores the authored
-    // 4:3 optical plane only when the same capture transaction proves the
-    // client is fully visible. Wide selector/exit/reset and rollback stay native.
-    using OutRunVrMenuAspect::RestoreFullMainMenuFourThree;
-    if (!RestoreFullMainMenuFourThree(
+    // TITLE/MAIN may bypass the legacy optical HEIGHT cap, but complete
+    // uncropped UV must retain the sampled physical aspect. Selector/exit,
+    // clipped frames and native-aspect diagnostic opt-out remain independent.
+    using OutRunVrMenuAspect::IsUncroppedTitleOrMainMenu;
+    if (!IsUncroppedTitleOrMainMenu(
             0x04u, true, false, false, false) ||
-        !RestoreFullMainMenuFourThree(
+        !IsUncroppedTitleOrMainMenu(
             0x09u, true, false, false, false) ||
-        RestoreFullMainMenuFourThree(
+        IsUncroppedTitleOrMainMenu(
             0x0Au, true, false, true, false) ||
-        RestoreFullMainMenuFourThree(
+        IsUncroppedTitleOrMainMenu(
             0x0Bu, true, false, true, false) ||
-        RestoreFullMainMenuFourThree(
+        IsUncroppedTitleOrMainMenu(
             0x0Cu, true, false, true, false) ||
-        RestoreFullMainMenuFourThree(
+        IsUncroppedTitleOrMainMenu(
             0x09u, false, false, false, false) ||
-        RestoreFullMainMenuFourThree(
+        IsUncroppedTitleOrMainMenu(
             0x09u, true, true, false, false) ||
-        RestoreFullMainMenuFourThree(
+        IsUncroppedTitleOrMainMenu(
             0x09u, true, false, false, true))
         return 63;
+
+    // Previously title/main state alone forced 4:3 while the entire
+    // 2496x2688 source UV stayed visible (horizontal stretch ~= 1.436).
+    // These cases must keep the captured aspect until a SAME-TRANSACTION
+    // crop changes UV and projection together, on both eyes.
+    using OutRunVrMenuAspect::ProjectMenuCapturedAspect;
+    constexpr float authored43 = 4.0f / 3.0f;
+    for (const float sampled : {4.f / 3.f, 16.f / 9.f,
+                                3440.f / 1440.f, 2496.f / 2688.f})
+    {
+        const float uncropped = ProjectMenuCapturedAspect(
+            sampled, authored43, false);
+        const float cropped = ProjectMenuCapturedAspect(
+            sampled, authored43, true);
+        if (uncropped != sampled || cropped != authored43)
+            return 64;
+        const OutRunVrMenuAspect::CommonFovTangents unit{
+            true, -1.f, 1.f, -1.f, 1.f};
+        const auto quad = OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+            unit, uncropped, 1.0f);
+        if (!quad.valid || std::fabs(
+                quad.halfWidth / quad.halfHeight - uncropped) > 0.0001f)
+            return 65;
+    }
+    // The same un-cropped main-menu title state must NOT silently change
+    // aspect just because the capture HWND is fully visible.
+    if (!IsUncroppedTitleOrMainMenu(0x09u, true, false, false, false) ||
+        ProjectMenuCapturedAspect(
+            2496.f / 2688.f, authored43, false) == authored43)
+        return 66;
 
     // Mono recovery theater is a distinct path from the shared-eye menu
     // projection. A partially off-output window must retain the original

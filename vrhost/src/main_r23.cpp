@@ -1621,7 +1621,7 @@ namespace
             static_cast<float>(c.sourceWidth_),
             static_cast<float>(c.sourceHeight_),
             whole.x, whole.y, whole.w, whole.h, authoredAspect);
-        bool fullFourThreeMainMenu = false;
+        bool uncroppedTitleOrMainMenu = false;
         if (plan.crop)
         {
             const float previousWidth = whole.w;
@@ -1633,7 +1633,8 @@ namespace
             // Render the captured fragment in the full authored 4:3
             // or vanilla client plane. Do not use fragment aspect to
             // project a new, larger menu. Both eyes share this placement.
-            sourceAspect = authoredAspect;
+            sourceAspect = OutRunVrMenuAspect::ProjectMenuCapturedAspect(
+                sourceAspect, authoredAspect, true);
             visibleOffsetX = plan.visibleOffsetX;
             visibleOffsetY = plan.visibleOffsetY;
             visibleWidthScale = plan.visibleWidthScale;
@@ -1663,12 +1664,16 @@ namespace
             // client snapshot/UV. Use that authoritative bit instead of the
             // old <=1px floating-point reconstruction, which can reject a
             // valid complete window under desktop/DPI scaling.
-            fullFourThreeMainMenu =
-                OutRunVrMenuAspect::RestoreFullMainMenuFourThree(
+            uncroppedTitleOrMainMenu =
+                OutRunVrMenuAspect::IsUncroppedTitleOrMainMenu(
                     clientGameState, capturedClientFullyVisible,
                     useNativeMenuAspect, wideVehicleSelector, false);
-            if (fullFourThreeMainMenu)
-                sourceAspect = 4.0f / 3.0f;
+            // Regression: the old 4:3 assignment here stretched the
+            // FULL uncropped 2496x2688 or 3440x1440 source in Quest3.
+            // Only the plan.crop branch is allowed to change the UV and
+            // corresponding physical aspect as one atomic decision.
+            sourceAspect = OutRunVrMenuAspect::ProjectMenuCapturedAspect(
+                sourceAspect, authoredAspect, false);
             // Source UV is still the COMPLETE client here. It must retain
             // the physical aspect of those actual captured pixels. Forcing
             // this 3440x1440/1920x1080 rectangle into a 4:3 optical quad
@@ -1704,7 +1709,7 @@ namespace
         // the corrected 4:3 menu again. The uncropped selector retains
         // reference-height stabilization during eye/backbuffer resizing.
         // The measured source aspect, UV and FOV containment are preserved.
-        const auto placement = (cropCentered43 || fullFourThreeMainMenu)
+        const auto placement = (cropCentered43 || uncroppedTitleOrMainMenu)
             ? requestedPlacement
             : OutRunVrMenuAspect::StabilizeMenuToReference3440x1440(
                 common, requestedPlacement);
@@ -1720,7 +1725,7 @@ namespace
             // the host's existing std::cout logging transport.
             std::cout << "VR MENU ASPECT: state=" << clientGameState
                       << " fullVisible=" << (capturedClientFullyVisible ? 1 : 0)
-                      << " fourThree=" << (fullFourThreeMainMenu ? 1 : 0)
+                      << " uncroppedTitle=" << (uncroppedTitleOrMainMenu ? 1 : 0)
                       << " crop43=" << (cropCentered43 ? 1 : 0)
                       << " wideSelector=" << (wideVehicleSelector ? 1 : 0)
                       << " nativeAspect=" << (useNativeMenuAspect ? 1 : 0)

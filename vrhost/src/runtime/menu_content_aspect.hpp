@@ -305,11 +305,11 @@ namespace OutRunVrMenuAspect
         return static_cast<float>(aspect);
     }
 
-    // TITLE/MAIN is authored as a 4:3 optical composition even when the
-    // complete front-end raster is stretched across a wide desktop client.
-    // Keep the full UV (side artwork is real), but undo that anamorphic stretch
-    // in the headset. Selector/exit/reset are genuinely wide and stay native.
-    inline constexpr bool RestoreFullMainMenuFourThree(
+    // Title/main identity controls optical HEIGHT stabilization only.
+    // A fully visible uncropped client does NOT authorize forcing a 4:3
+    // projection: source UV and physical aspect must agree. 4:3 is valid
+    // only after an independently authorized UV crop.
+    inline constexpr bool IsUncroppedTitleOrMainMenu(
         std::uint32_t gameState, bool fullyVisibleCapture,
         bool explicitNativeAspect, bool wideVehicleSelector,
         bool croppedFragment) noexcept
@@ -318,16 +318,38 @@ namespace OutRunVrMenuAspect
             fullyVisibleCapture && !explicitNativeAspect &&
             !wideVehicleSelector && !croppedFragment;
     }
-    static_assert(RestoreFullMainMenuFourThree(
+    static_assert(IsUncroppedTitleOrMainMenu(
         0x04u, true, false, false, false));
-    static_assert(RestoreFullMainMenuFourThree(
+    static_assert(IsUncroppedTitleOrMainMenu(
         0x09u, true, false, false, false));
-    static_assert(!RestoreFullMainMenuFourThree(
+    static_assert(!IsUncroppedTitleOrMainMenu(
         0x0Au, true, false, false, false));
-    static_assert(!RestoreFullMainMenuFourThree(
+    static_assert(!IsUncroppedTitleOrMainMenu(
         0x09u, false, false, false, false));
-    static_assert(!RestoreFullMainMenuFourThree(
+    static_assert(!IsUncroppedTitleOrMainMenu(
         0x09u, true, true, false, false));
+
+    // Source UV and the projected physical aspect form one transaction.
+    // Without actual UV cropping, an XR portrait (2496x2688) or PC
+    // ultrawide frame must NEVER be squeezed onto a 4:3 optical rectangle.
+    constexpr float ProjectMenuCapturedAspect(
+        float sampledPhysicalAspect, float authoredCropAspect,
+        bool sourceUvCropped) noexcept
+    {
+        return sourceUvCropped ? authoredCropAspect : sampledPhysicalAspect;
+    }
+    static_assert(ProjectMenuCapturedAspect(
+        2496.0f / 2688.0f, 4.0f / 3.0f, false) ==
+        2496.0f / 2688.0f);
+    static_assert(ProjectMenuCapturedAspect(
+        3440.0f / 1440.0f, 4.0f / 3.0f, false) ==
+        3440.0f / 1440.0f);
+    static_assert(ProjectMenuCapturedAspect(
+        1920.0f / 1080.0f, 4.0f / 3.0f, false) ==
+        1920.0f / 1080.0f);
+    static_assert(ProjectMenuCapturedAspect(
+        2496.0f / 2688.0f, 4.0f / 3.0f, true) ==
+        4.0f / 3.0f);
 
     // Do not restore a 4:3 optical aspect from game state alone.
     // The whole captured 3440x1440/1920x1080 image has that physical
