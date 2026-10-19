@@ -9,10 +9,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00949",
   "feature_id": "DX11:LIVE_SM3_STRUCTURED_EARLY_EXIT_NATIVE_FRAME",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -91,10 +91,10 @@
     "C0_RECOVER": "GitHub HEAD 6dc5aecc and prior task 00948 code exact SHA success verified; no 00949 owner collision.",
     "C1_REVIEW": "Real SM3 shader BREAK/BREAKC rejected by native shader bytecode parser despite bounded REP support.",
     "C2_IMPLEMENT": "Shader-owned BREAK/BREAKC instruction parser, comparison, HLSL emission, safe nested REP definite-write merge, focused regressions.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA; prior 14bcf83c FAST failed on historical 00948 result metadata before tests; record-only repair combined in this candidate.",
-    "C4_COMMIT": "Material C++ commit 14bcf83cbf83e484178d413c92f1dd85b78038d1; final validation-bearing SHA pending.",
+    "C3_VALIDATE": "PASS_EXACT_SHA at 77bd396a0f974339e8dec6e17260c75e41f9336d: user-reported full CI SUCCESS; GitHub connector independently returned OpenXR #39195024285, Build #39195024198 and HUD #39195024193 as SUCCESS. Fast/Backend not exposed by PR-filtered lookup; runtime UNTESTED.",
+    "C4_COMMIT": "Material C++ commit 14bcf83cbf83e484178d413c92f1dd85b78038d1; validation-bearing exact SHA 77bd396a0f974339e8dec6e17260c75e41f9336d; no source changes in C6.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING"
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA recorded at original validation-bearing SHA, separate [skip ci] bookkeeping commit; runtime/gameplay/HMD UNTESTED."
   },
   "acceptance_results": {
     "break_and_breakc_shader_to_draw": "PENDING_EXACT_SHA",
@@ -109,10 +109,21 @@
   "NEXT_IMPLEMENTATION_ACTION": "Repair any genuine exact-SHA required CI failure on this task then record build result separately from game/HMD runtime.",
   "score_change": 0,
   "material_result_sha": "14bcf83cbf83e484178d413c92f1dd85b78038d1",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "77bd396a0f974339e8dec6e17260c75e41f9336d",
   "validation_evidence": {
     "runtime": "UNTESTED",
     "gameplay": "UNTESTED",
-    "ci": "PENDING_EXACT_SHA"
-  }
+    "ci": "PASS_EXACT_SHA",
+    "exact_sha": "77bd396a0f974339e8dec6e17260c75e41f9336d",
+    "original_material_commit": "14bcf83cbf83e484178d413c92f1dd85b78038d1",
+    "confirmed_workflow_runs": {
+      "openxr": 39195024285,
+      "windows_build": 39195024198,
+      "hud": 39195024193
+    },
+    "exact_sha_ci_success": "USER_CONFIRMED",
+    "directly_retrieved_workflow_count": "3/3 SUCCESS (connector pull-request-filtered view; not exhaustive)",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
+  },
+  "c6_record_repair_note": "TERMINAL_STATUS_NOT_COMPLETE resolved without altering source, material SHA, feature_contract, acceptance_results or score; validation-bearing SHA retained."
 }
