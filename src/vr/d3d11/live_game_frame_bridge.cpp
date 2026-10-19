@@ -4514,8 +4514,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     try {
     if (!env_full_game_opt_in() || !game || !bytes || !stride ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
-        type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
-        type != D3DPT_TRIANGLEFAN &&
+        type != D3DPT_POINTLIST && type != D3DPT_TRIANGLELIST &&
+        type != D3DPT_TRIANGLESTRIP && type != D3DPT_TRIANGLEFAN &&
         type != D3DPT_LINELIST && type != D3DPT_LINESTRIP)
         return false;
     // The shared R30 observer has already validated the exact source
@@ -4730,6 +4730,27 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (FAILED(sourceDecl->GetDeclaration(declaration.data(), &count)) ||
         count < 2u || count > MAXD3DDECLLENGTH) return false;
     declaration.resize(count);
+    // D3D9 programmable point sprites and varying point sizes have no
+    // equivalent in this single-sample D3D11 SM3 pipeline. A genuine
+    // one-pixel POINTLIST, including an indexed point draw, can reach the
+    // same native VS/PS/texture/RT path as triangles and lines instead of
+    // aborting the menu/race frame. An input PSIZE, scaled size or sprite
+    // remains authoritative on the original D3D9 Draw.
+    if (type == D3DPT_POINTLIST) {
+        DWORD size = 0u, minimum = 0u, maximum = 0u;
+        DWORD sprite = TRUE, scaled = TRUE;
+        bool perVertexSize = false;
+        for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
+            perVertexSize |= declaration[i].Usage == D3DDECLUSAGE_PSIZE;
+        if (FAILED(game->GetRenderState(D3DRS_POINTSIZE, &size)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSIZE_MIN, &minimum)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSIZE_MAX, &maximum)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSPRITEENABLE, &sprite)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSCALEENABLE, &scaled)) ||
+            !game_native_unit_point_raster(
+                size, minimum, maximum, sprite, scaled, perVertexSize))
+            return false;
+    }
     std::vector<D3D11_INPUT_ELEMENT_DESC> input;
     bool repack = false;
     UINT nativeStride = stride;
@@ -5083,8 +5104,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Keep the authentic primitive family across programmable VB, IB and
     // UP game draws. Fan indices above were already triangulated; line
     // topologies must NEVER be reinterpreted as filled triangles.
-    context->IASetPrimitiveTopology(type == D3DPT_LINELIST ?
-        D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
+    context->IASetPrimitiveTopology(type == D3DPT_POINTLIST ?
+        D3D11_PRIMITIVE_TOPOLOGY_POINTLIST :
+        type == D3DPT_LINELIST ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
         type == D3DPT_LINESTRIP ?
         D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP :
         type == D3DPT_TRIANGLESTRIP ?

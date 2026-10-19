@@ -14,6 +14,24 @@ int main() {
         assert(!game_native_primitive_element_count(type, 0u, count));
     }
     assert(!game_native_primitive_element_count(7u, 1u, count));
+    // Live programmable SM3 POINTLIST uses the same source vertex/index
+    // budget as fixed-function Draw; no extra triangle vertices are read.
+    assert(game_native_primitive_element_count(1u, 3u, count) && count == 3u);
+    assert(game_native_primitive_element_count(1u, kMaxNativeGamePrimitives, count));
+    assert(count == kMaxNativeGamePrimitives);
+    assert(!game_native_primitive_element_count(1u, 0u, count));
+    // Only the genuine D3D9 unit-point raster may be mirrored into the
+    // full-resolution native SM3 Draw/DrawIndexed. Sprite, PSIZE, scaling,
+    // oversized and non-finite point ranges must retain original D3D9.
+    constexpr std::uint32_t one = 0x3f800000u;
+    constexpr std::uint32_t two = 0x40000000u;
+    assert(game_native_unit_point_raster(one, one, two, 0u, 0u, false));
+    assert(!game_native_unit_point_raster(two, one, two, 0u, 0u, false));
+    assert(!game_native_unit_point_raster(one, one, two, 1u, 0u, false));
+    assert(!game_native_unit_point_raster(one, one, two, 0u, 1u, false));
+    assert(!game_native_unit_point_raster(one, one, two, 0u, 0u, true));
+    assert(!game_native_unit_point_raster(one, two, two, 0u, 0u, false));
+    assert(!game_native_unit_point_raster(one, one, 0x7f800000u, 0u, 0u, false));
     assert(game_native_primitive_element_count(4u, kMaxNativeGamePrimitives, count));
     assert(count == 6144u);
     std::vector<std::uint32_t> physical(kMaxNativeGameVertices);
