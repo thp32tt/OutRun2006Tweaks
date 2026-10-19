@@ -84,7 +84,7 @@ class PolicyTests(unittest.TestCase):
 
         s = (HERE / "docker-compose.yml").read_text(encoding="utf-8")
         self.assertIn('AUTO_SEND: "true"', s)
-        self.assertIn('SCHEDULE_MINUTES: "0,10,30,40"', s)
+        self.assertIn('SCHEDULE_MINUTES: "0,10,15,20,30,40,45,50"', s)
         self.assertIn('OUTRUN_AB_TEXT_ROI_QUEUE: "true"', s)
         self.assertIn('OUTRUN_A_TILE_BATCH_QUEUE: "false"', s)
         self.assertIn('OUTRUN_AB_BATCH_QUEUE: "false"', s)
