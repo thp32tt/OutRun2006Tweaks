@@ -513,7 +513,7 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             from app.project_library_gate import verify_project_library_images
         except ModuleNotFoundError:
             from project_library_gate import verify_project_library_images
-        proof, error = await verify_project_library_images(page,active)
+        proof, error = await verify_project_library_images(page,active,root=root)
         if error or not proof:
             return False,"PROJECT_LIBRARY_NOT_VERIFIED:"+str(error or "NO_PROOF")
         _atomic_json(_library_evidence_path(root,task),proof)
