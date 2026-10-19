@@ -3301,4 +3301,56 @@ for desc, mutant_xyz, mutant_shader in (
         raise SystemExit('R84 pre-GPU draw accounting regression not detected: ' + desc)
 
 
+# R84 F11 overlay is an exact external owner: a cached VS epoch may
+# become stale after StateBlock::Apply, but the live GetVertexShader null
+# check below it remains mandatory. Never turn off other target/pose vetoes.
+def verify_r84_f11_live_shader_gate(code):
+    body = function_body(code, 'bool R30PrepareExternalImGuiProjection(')
+    assert 'ExternalOverlaySemanticDepth == 0' in body
+    assert 'EffectiveScope() != RenderScope::ScreenOverlay2D' in body
+    assert 'R29OwnerCurrentVertexShaderIdentity() != 0 ||' not in body, (
+        'stale shader shadow blocked live fixed-function F11')
+    for token in (
+        'R29OwnerCurrentVertexShaderIdentity();',
+        'if (FAILED(device->GetVertexShader(&liveShader)))',
+        'if (liveShader)',
+        'liveShader->Release();',
+        'R29OwnerResynchronizeShaderEpoch(device);',
+        'frame.rightDrawFailed', 'frame.stereoIncomplete',
+        '!frame.rightEyeSurface', 'R29OwnerStableStereoBase(device)',
+        'D3DRS_SCISSORTESTENABLE',
+        'R30BuildStageExtensionXyzrhwEyePlane(',
+    ):
+        assert token in body, 'F11 original safety fence lost: ' + token
+    assert (body.index('const std::uintptr_t cachedShader =') <
+            body.index('GetVertexShader(&liveShader)') <
+            body.index('if (liveShader)') <
+            body.index('if (cachedShader != 0)') <
+            body.index('R29OwnerResynchronizeShaderEpoch(device);') <
+            body.index('DWORD fvf = 0;')), (
+                'F11 resync must follow the definitive live null VS test')
+
+verify_r84_f11_live_shader_gate(r30_r84_admission)
+for label, damaged in (
+    ('restore stale VS veto', r30_r84_admission.replace(
+        'EffectiveScope() != RenderScope::ScreenOverlay2D ||',
+        'EffectiveScope() != RenderScope::ScreenOverlay2D ||\n'
+        '                R29OwnerCurrentVertexShaderIdentity() != 0 ||', 1)),
+    ('remove live shader check', r30_r84_admission.replace(
+        'if (FAILED(device->GetVertexShader(&liveShader)))',
+        'if (false)', 1)),
+    ('skip post-StateBlock shader sync', r30_r84_admission.replace(
+        'if (cachedShader != 0)\n'
+        '                R29OwnerResynchronizeShaderEpoch(device);',
+        'if (cachedShader != 0) {}', 1)),
+):
+    assert damaged != r30_r84_admission, 'F11 regression fixture absent: ' + label
+    try:
+        verify_r84_f11_live_shader_gate(damaged)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('F11 live VS negative regression escaped: ' + label)
+
+
 print('P0 visual composition static contract: PASS')

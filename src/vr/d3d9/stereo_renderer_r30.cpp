@@ -3647,7 +3647,6 @@ namespace OutRunVRStereo
             if (!device ||
                 ExternalOverlaySemanticDepth == 0 ||
                 EffectiveScope() != RenderScope::ScreenOverlay2D ||
-                R29OwnerCurrentVertexShaderIdentity() != 0 ||
                 !R29OwnerStableStereoBase(device) ||
                 !R29OwnerEnsureStereoResources(device))
                 return false;
@@ -3658,6 +3657,13 @@ namespace OutRunVRStereo
                 !frame.rightEyeSurface)
                 return false;
 
+            // StateBlock::Apply can return to fixed function without an
+            // equivalent setter notification. The cached shader identity
+            // must not veto an exact external F11 draw when the live device
+            // already proves the VS is null. This query is F11-scoped, not
+            // part of the world/particle draw hotpath.
+            const std::uintptr_t cachedShader =
+                R29OwnerCurrentVertexShaderIdentity();
             IDirect3DVertexShader9* liveShader = nullptr;
             if (FAILED(device->GetVertexShader(&liveShader)))
                 return false;
@@ -3666,6 +3672,8 @@ namespace OutRunVRStereo
                 liveShader->Release();
                 return false;
             }
+            if (cachedShader != 0)
+                R29OwnerResynchronizeShaderEpoch(device);
 
             DWORD fvf = 0;
             if (FAILED(device->GetFVF(&fvf)) ||
