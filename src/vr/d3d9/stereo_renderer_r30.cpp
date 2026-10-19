@@ -3199,6 +3199,10 @@ namespace OutRunVRStereo
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
             bool projectedWorldMarker = false;
+            // Only RankMarkerSprani/RankMarkerClipSprite own the new physical
+            // vehicle depth. RivalMarkerSprani deliberately preserves the
+            // pre-regression screen-sprite Z/RHW/clip depth.
+            bool projectedVehicleRankDepth = false;
             // Exact +TIME and GOAL-owned D3DX/fixed-function sprites need the
             // recentered finite optical HUD plane used by shader glyphs.
             // Never enable this on generic ScreenOverlay2D or smoke/world.
@@ -3251,15 +3255,11 @@ namespace OutRunVRStereo
             const float clipY = marker.viewX * transform._12 +
                 marker.viewY * transform._22 + marker.viewZ * transform._32 +
                 transform._42;
-            const float clipZ = marker.viewX * transform._13 +
-                marker.viewY * transform._23 + marker.viewZ * transform._33 +
-                transform._43;
             const float clipW = marker.viewX * transform._14 +
                 marker.viewY * transform._24 + marker.viewZ * transform._34 +
                 transform._44;
             if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
-                !std::isfinite(clipZ) || !std::isfinite(clipW) ||
-                clipW <= 1.0e-6f)
+                !std::isfinite(clipW) || clipW <= 1.0e-6f)
                 return false;
             x = clipX / clipW;
             y = clipY / clipW;
@@ -3267,6 +3267,11 @@ namespace OutRunVRStereo
                 return false;
             if (ndcZ || invW)
             {
+                const float clipZ = marker.viewX * transform._13 +
+                    marker.viewY * transform._23 + marker.viewZ * transform._33 +
+                    transform._43;
+                if (!std::isfinite(clipZ))
+                    return false;
                 const float projectedZ = clipZ / clipW;
                 const float projectedInvW = 1.0f / clipW;
                 if (!OutRunVR::RankMarker::ValidProjectedDepth(
@@ -3281,7 +3286,8 @@ namespace OutRunVRStereo
         bool R30BuildProjectedRankDelta(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             const D3DMATRIX& baseProjection,
-            OutRunVR::RankMarker::StereoNdcShift& shift) noexcept
+            OutRunVR::RankMarker::StereoNdcShift& shift,
+            bool carryPhysicalDepth) noexcept
         {
             const auto* marker =
                 OutRunVR::GameSemantic::CurrentProjectedMarker();
@@ -3327,9 +3333,13 @@ namespace OutRunVRStereo
                     R29OwnerProjectionFromFov(
                         baseProjection, stereo.eyeFov[eye]));
                 float projectedX = 0.0f, projectedY = 0.0f;
+                float* eyeNdcZ =
+                    carryPhysicalDepth ? &shift.ndcZ[eye] : nullptr;
+                float* eyeInvW =
+                    carryPhysicalDepth ? &shift.invW[eye] : nullptr;
                 if (!R30ProjectRankAnchor(
                         *marker, eyeTransform, projectedX, projectedY,
-                        &shift.ndcZ[eye], &shift.invW[eye]))
+                        eyeNdcZ, eyeInvW))
                     return false;
                 shift.deltaX[eye] = projectedX - shift.baseX;
                 shift.deltaY[eye] = projectedY - shift.baseY;
@@ -4249,11 +4259,16 @@ namespace OutRunVRStereo
             if (OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
                     OutRunVR::GameSemantic::EffectiveScope()))
             {
+                const bool vehicleRankDepth =
+                    OutRunVR::GameSemantic::ProjectedMarkerOwnsVehicleDepth(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken());
                 if (!haveBaseProjection ||
                     !R30BuildProjectedRankDelta(
-                        state.stereo, baseProjection, state.projectedRank))
+                        state.stereo, baseProjection, state.projectedRank,
+                        vehicleRankDepth))
                     return false;
                 state.projectedWorldMarker = true;
+                state.projectedVehicleRankDepth = vehicleRankDepth;
                 state.worldEffect = false;
                 return true;
             }
@@ -5455,13 +5470,16 @@ namespace OutRunVRStereo
             }
             const auto& vp = state.viewport;
             float projectedZ[2]{}, projectedRhw[2]{};
-            for (int eye = 0; eye < 2; ++eye)
+            if (state.projectedVehicleRankDepth)
             {
-                if (!OutRunVR::RankMarker::ResolvePositionTDepth(
-                        state.projectedRank, eye,
-                        vp.MinZ, vp.MaxZ,
-                        projectedZ[eye], projectedRhw[eye]))
-                    return false;
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    if (!OutRunVR::RankMarker::ResolvePositionTDepth(
+                            state.projectedRank, eye,
+                            vp.MinZ, vp.MaxZ,
+                            projectedZ[eye], projectedRhw[eye]))
+                        return false;
+                }
             }
             const float requestedScale = Settings::VRHudScale.get();
             if (!std::isfinite(requestedScale))
@@ -5497,8 +5515,11 @@ namespace OutRunVRStereo
                         (eye == 0 ? left.data() : right.data()) + off);
                     dst[0] = x[eye];
                     dst[1] = y[eye];
-                    dst[2] = projectedZ[eye];
-                    dst[3] = projectedRhw[eye];
+                    if (state.projectedVehicleRankDepth)
+                    {
+                        dst[2] = projectedZ[eye];
+                        dst[3] = projectedRhw[eye];
+                    }
                 }
             }
             return true;
@@ -6870,7 +6891,8 @@ namespace OutRunVRStereo
                     clipShift._42 =
                         state.projectedRank.deltaY[eye] +
                         (1.0f - markerScale) * state.projectedRank.baseY;
-                    if (!R30ApplyProjectedRankClipDepth(
+                    if (state.projectedVehicleRankDepth &&
+                        !R30ApplyProjectedRankClipDepth(
                             clipShift, state.projectedRank, eye))
                         return E_NOTIMPL;
                     eyeProjection[eye] =
@@ -7476,8 +7498,11 @@ namespace OutRunVRStereo
                 D3DMATRIX baseProjection{};
                 std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
                 OutRunVR::RankMarker::StereoNdcShift shift{};
+                const bool vehicleRankDepth =
+                    OutRunVR::GameSemantic::ProjectedMarkerOwnsVehicleDepth(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken());
                 if (!R30BuildProjectedRankDelta(
-                        stereo, baseProjection, shift))
+                        stereo, baseProjection, shift, vehicleRankDepth))
                     return false;
                 const float requestedScale = Settings::VRHudScale.get();
                 if (!std::isfinite(requestedScale))
@@ -7493,7 +7518,8 @@ namespace OutRunVRStereo
                         (1.0f - markerScale) * shift.baseX;
                     clipShift._42 = shift.deltaY[eye] +
                         (1.0f - markerScale) * shift.baseY;
-                    if (!R30ApplyProjectedRankClipDepth(
+                    if (vehicleRankDepth &&
+                        !R30ApplyProjectedRankClipDepth(
                             clipShift, shift, eye))
                         return false;
                     const D3DMATRIX corrected =

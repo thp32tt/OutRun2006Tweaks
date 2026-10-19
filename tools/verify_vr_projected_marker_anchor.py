@@ -864,9 +864,24 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
         if token not in stereo_header:
             fail("R84 projected rank depth header lost: " + token)
 
+    depth_owner = function_body(
+        semantics, "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(")
+    for token in (
+        "producer == ProducerToken::RankMarkerSprani",
+        "producer == ProducerToken::RankMarkerClipSprite",
+    ):
+        if token not in depth_owner:
+            fail("R84 vehicle-rank depth owner lost: " + token)
+    if "ProducerToken::RivalMarkerSprani" in depth_owner:
+        fail("protected rival marker inherited vehicle-rank physical depth")
+    if "!ProjectedMarkerOwnsVehicleDepth(\n        ProducerToken::RivalMarkerSprani)" not in semantics:
+        fail("rival marker negative depth static_assert lost")
+
     delta = function_body(renderer, "bool R30BuildProjectedRankDelta(")
     for token in (
-        "&shift.ndcZ[eye], &shift.invW[eye]",
+        "bool carryPhysicalDepth",
+        "carryPhysicalDepth ? &shift.ndcZ[eye] : nullptr",
+        "carryPhysicalDepth ? &shift.invW[eye] : nullptr",
         "shift.deltaX[eye] = projectedX - shift.baseX;",
         "shift.deltaY[eye] = projectedY - shift.baseY;",
     ):
@@ -884,6 +899,7 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
 
     positiont = function_body(renderer, "bool R30TransformProjectedRankXyzrhwStereo(")
     for token in (
+        "if (state.projectedVehicleRankDepth)",
         "ResolvePositionTDepth(",
         "dst[2] = projectedZ[eye];",
         "dst[3] = projectedRhw[eye];",
@@ -892,12 +908,19 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
             fail("R84 projected rank POSITIONT depth lost: " + token)
 
     fixedfn = function_body(renderer, "HRESULT R30TryFixedFunctionOriginalSpriteStereo(")
-    if "R30ApplyProjectedRankClipDepth(" not in fixedfn:
-        fail("R84 projected rank FVF142 depth override lost")
+    if "state.projectedVehicleRankDepth &&" not in fixedfn or \
+            "R30ApplyProjectedRankClipDepth(" not in fixedfn:
+        fail("R84 projected rank FVF142 depth isolation/override lost")
 
     shader = function_body(renderer, "bool R30BuildScreenSpaceEyeConstants(")
-    if "R30ApplyProjectedRankClipDepth(" not in shader:
-        fail("R84 projected rank shader-c64 depth override lost")
+    for token in (
+        "const bool vehicleRankDepth =",
+        "ProjectedMarkerOwnsVehicleDepth(",
+        "if (vehicleRankDepth &&",
+        "R30ApplyProjectedRankClipDepth(",
+    ):
+        if token not in shader:
+            fail("R84 projected rank shader depth isolation/override lost: " + token)
 
 
 require_r84_rank_depth_contract(rank_stereo, r84)
@@ -905,7 +928,8 @@ for label, source_kind, original, broken in (
     ("rank depth payload", "header",
      "float ndcZ[2]{}, invW[2]{};", "float ndcZ[2]{};"),
     ("rank eye depth capture", "renderer",
-     "&shift.ndcZ[eye], &shift.invW[eye]", "nullptr, nullptr"),
+     "carryPhysicalDepth ? &shift.ndcZ[eye] : nullptr",
+     "carryPhysicalDepth ? nullptr : nullptr"),
     ("rank clip depth", "renderer",
      "clipShift._43 = shift.ndcZ[eye];", "clipShift._43 = 0.0f;"),
     ("rank POSITIONT Z", "renderer",
@@ -925,5 +949,26 @@ for label, source_kind, original, broken in (
         pass
     else:
         fail("R84 rank depth mutation escaped: " + label)
+
+# A future refactor must not silently add the already-good rival marker to the
+# new rank 1-5 physical-depth policy.
+rival_depth_mutant = semantics.replace(
+    "producer == ProducerToken::RankMarkerClipSprite;",
+    "producer == ProducerToken::RankMarkerClipSprite ||\\n"
+    "            producer == ProducerToken::RivalMarkerSprani;",
+    1)
+if rival_depth_mutant == semantics:
+    fail("rival depth-isolation mutation setup failed")
+try:
+    require_r84_rank_depth_contract(rank_stereo, r84)
+    mutated_owner = function_body(
+        rival_depth_mutant,
+        "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(")
+    if "ProducerToken::RivalMarkerSprani" in mutated_owner:
+        raise SystemExit
+except SystemExit:
+    pass
+else:
+    fail("rival physical-depth widening escaped verifier")
 
 print("VR projected marker anchor contract PASS")

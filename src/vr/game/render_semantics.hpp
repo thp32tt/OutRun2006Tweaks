@@ -90,6 +90,24 @@ namespace OutRunVR::GameSemantic
         PauseFrameShell,
     };
 
+    // Rank 1-5 were explicitly promoted from a screen-authored sprite depth
+    // to their recovered vehicle anchor depth. The existing rival marker was
+    // already HMD-correct before that change and must preserve its original
+    // sprite Z/RHW/clip depth while still using the projected anchor for XY.
+    inline constexpr bool ProjectedMarkerOwnsVehicleDepth(
+        ProducerToken producer) noexcept
+    {
+        return producer == ProducerToken::RankMarkerSprani ||
+            producer == ProducerToken::RankMarkerClipSprite;
+    }
+
+    static_assert(ProjectedMarkerOwnsVehicleDepth(
+        ProducerToken::RankMarkerSprani));
+    static_assert(ProjectedMarkerOwnsVehicleDepth(
+        ProducerToken::RankMarkerClipSprite));
+    static_assert(!ProjectedMarkerOwnsVehicleDepth(
+        ProducerToken::RivalMarkerSprani));
+
     // The GOAL 0-99% progress, its two exact time helpers and the three
     // verified stage-result printf parents have the SAME physical XYZRHW
     // submission risk as +TIME: the source may finish before D3DX Flush.
