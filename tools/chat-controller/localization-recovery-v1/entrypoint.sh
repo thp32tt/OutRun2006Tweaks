@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Fail closed BEFORE Chrome/VNC or any saved browser automation can start.
-# This image does not yet support the 5-label v2 production dispatcher.
+# Fail closed unless the controlled native-crop -> A/B ImageGen -> C1 QA policy is valid.
 python /opt/outrun/app/v2_automation_policy.py \
   --policy /opt/outrun/v2_docker_policy.json \
   --evidence-root /data/imagegen/korean_v2/stage_evidence
@@ -91,6 +91,13 @@ if [[ "${OUTRUN_CROP_ENABLED:-true}" == "true" ]]; then
     --interval-seconds "${OUTRUN_CROP_INTERVAL_SECONDS:-60}" \
     --max-per-cycle "${OUTRUN_CROP_MAX_PER_CYCLE:-10}" \
     >>/logs/c-english-crop.log 2>&1 &
+fi
+
+if [[ "${OUTRUN_ROI_BRIDGE_ENABLED:-true}" == "true" ]]; then
+  echo "$(date -Is) starting native crop -> ImageGen queue bridge" >>/logs/roi-bridge.log
+  python -u /opt/outrun/app/crop_to_imagegen_queue.py \
+    --interval-seconds "${OUTRUN_ROI_BRIDGE_INTERVAL_SECONDS:-60}" \
+    >>/logs/roi-bridge.log 2>&1 &
 fi
 
 exec python -m app.controller
