@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00947",
   "feature_id": "DX11:LIVE_SM3_SHADER_BOOL_IF_NATIVE_FRAME",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -90,21 +90,41 @@
     "C0_RECOVER": "00946 completed C6; latest HEAD checked.",
     "C1_REVIEW": "SM3 DEFB/IF rejected despite decoder support.",
     "C2_IMPLEMENT": "Shader-owned bool native HLSL, branch integration and regression.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5 (Fast, Backend, Win32 Build, OpenXR, HUD; real gameplay and Quest3 remain UNTESTED)",
+    "C4_COMMIT": "material/validation-bearing=2915b69b1f647c0e0d18cc7715bddd65439ef861",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_EXACT_SHA"
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; exact SHA 5/5 SUCCESS; bookkeeping-only [skip ci] separate; HMD/real game UNTESTED"
   },
   "acceptance_results": {
-    "shader_boolean_branch_native_draw": "PENDING_EXACT_SHA",
-    "boolean_branch_and_fallback": "PENDING_EXACT_SHA",
-    "five_exact_sha_gates": "PENDING_EXACT_SHA"
+    "shader_boolean_branch_native_draw": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED",
+    "boolean_branch_and_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "five_exact_sha_gates": "PASS_EXACT_SHA_5_OF_5"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Actual native menu/car/race pixel evidence is not yet captured.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_COMMIT",
-  "NEXT_IMPLEMENTATION_ACTION": "Confirm exact-SHA five Gates; repair causal failures in 00947; obtain native game frames before HMD promotion; implement live boolean source snapshots separately.",
-  "score_change": 0
+  "CODE_CHANGED_SHA": "2915b69b1f647c0e0d18cc7715bddd65439ef861",
+  "NEXT_IMPLEMENTATION_ACTION": "Next distinct live game DX11 program/resource blocker after completed DEFB/IF; native menu/car/race and Quest3 still require exact-game evidence. Do not re-run 00947 CI/score.",
+  "score_change": 0,
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "validation_bearing_result_sha": "2915b69b1f647c0e0d18cc7715bddd65439ef861",
+  "material_result_sha": "2915b69b1f647c0e0d18cc7715bddd65439ef861",
+  "validation_evidence": {
+    "exact_sha": "2915b69b1f647c0e0d18cc7715bddd65439ef861",
+    "original_material_commit": "2915b69b1f647c0e0d18cc7715bddd65439ef861",
+    "required_workflow_runs": {
+      "fast": 39191605927,
+      "backend": 39191605866,
+      "windows_build": 39191605752,
+      "openxr": 39191605790,
+      "hud": 39191605877
+    },
+    "all_required_gates": "SUCCESS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED",
+    "runtime": "UNTESTED",
+    "gameplay": "UNTESTED"
+  }
 }
