@@ -417,10 +417,21 @@ arrow_scope = code[arrow_begin:pause_begin]
 for marker in ("RenderScope::ScreenHud",
                "CurrentRenderProducerToken()",
                "OutRunVrPauseEye::ExactArrowOwner(",
-               "ProducerToken::ExactScreenHudClipSprite",
                "ProducerToken::PauseOptionArrow"):
+    # The shared original clip source has no proven pause E8 provenance.
+    # It is intentionally NOT a native ESC optical owner, even in pause mode.
     assert marker in arrow_scope, marker
 assert "CurrentSpriteQueueProducer ==" not in arrow_scope
+assert "ProducerToken::ExactScreenHudClipSprite" not in arrow_scope
+# Destructive widening to a generic ScreenHud clip would reintroduce the
+# ESC-only binocular scale and vertical-position contamination.
+widened_arrow_scope = arrow_scope.replace(
+    "ProducerToken::PauseOptionArrow);",
+    "ProducerToken::PauseOptionArrow ||\n"
+    "                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==\n"
+    "                    OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);", 1)
+assert widened_arrow_scope != arrow_scope
+assert "ProducerToken::ExactScreenHudClipSprite" in widened_arrow_scope
 # An active queued node wins over the exact direct E8 caller; on a
 # synchronous original call, that same semantic API supplies direct owner.
 semantic_src = (root / "src/vr/game/render_semantics.hpp").read_text()
@@ -446,8 +457,6 @@ for original, corrupt in (
     assert original not in mutant
 for original, corrupt in (
     ("RenderScope::ScreenHud", "RenderScope::WorldBillboard"),
-    ("ProducerToken::ExactScreenHudClipSprite",
-     "ProducerToken::ResultProgress"),
     ("ProducerToken::PauseOptionArrow",
      "ProducerToken::ResultProgress"),
     ("ProducerToken::PauseFrameShell",
@@ -483,6 +492,16 @@ normal_clips = producer[producer.index("static int __cdecl ExactScreenHud_putCli
                                        producer.index("static int __cdecl ExactScreenHud_putClipSprite("))]
 assert "ProducerToken::ExactScreenHudClipSprite" in normal_clips
 assert "FlushD3DXBeforeDirectGoalSource" not in normal_clips
+native_clip = producer[producer.index("static int ExactScreenHud_putClipSpriteOwned("):
+                       producer.index("static int __cdecl ExactScreenHud_putClipSprite(")]
+assert "const bool vrAtEntry = Settings::VREnabled;" in native_clip
+assert "const bool pauseAtEntry = Game::current_mode &&" in native_clip
+assert "OutRunVrPauseEye::CanTagNativePauseArrow(" in native_clip
+assert native_clip.index("Game::put_clip_sprite(") < \
+       native_clip.index("CanTagNativePauseArrow(") < \
+       native_clip.index("TagAppendedNodes(")
+assert "return result; // original native result/Draw remains authoritative" in native_clip
+assert "constexpr bool CanTagNativePauseArrow(bool vrEntry, bool vrExit," in pause_helper
 
 pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
 pause_func = code[code.index("bool R30IsPauseMenuExactShell() noexcept"):pause_end]
