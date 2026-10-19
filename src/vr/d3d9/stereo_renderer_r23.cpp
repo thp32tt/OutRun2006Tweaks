@@ -620,6 +620,11 @@ namespace OutRunVRStereo
         const char* R23DiagnoseHostFreshness(std::int64_t& ageMs) noexcept
         {
             ageMs = -1;
+            if (Settings::VRHmdlessDebugMode != 0)
+            {
+                ageMs = 0;
+                return "synthetic-local-debug";
+            }
             if (!SharedState)
                 return "mapping-or-header";
 
