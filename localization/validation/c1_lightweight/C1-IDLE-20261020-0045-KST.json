@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-IDLE-20261020-0045-KST",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-20T00:45:00+09:00",
+  "reviewer": "ChatGPT AI 1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "precheck_remote_head": "02b349ffeb334e95df5819a510151de6f0c1a604",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json",
+    "docs/KOREAN_LOCALIZATION_QA_THROUGHPUT_POLICY.md"
+  ],
+  "prior_qa_record": "localization/validation/c1_lightweight/C1-IDLE-20261019-2345-KST.json",
+  "verification_backend": "Live N100 MCP read-only SHA256 dedup script and A/B candidate directory enumeration; GitHub C1 record and scoreboard cross-check",
+  "candidate_directory_on_N100": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+  "scan_script_on_N100": "work/c1_sha_dedup_20261019_2145.py",
+  "sha_history_sources": [
+    "work/c1_batch_20261019_2015/previous_shas.json",
+    "work/c1_batch_20261019_2015/metrics.json (candidate_sha256)",
+    "localization/validation/c1_lightweight/C1-IDLE-20261019-2345-KST.json"
+  ],
+  "known_reviewed_unique_sha_count": 62,
+  "saved_png_count": 63,
+  "previously_reviewed_sha_matches": 62,
+  "excluded_legacy_candidate": {
+    "filename": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+    "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+    "reason": "Historic non-native ROI result; not an eligible source_k.png production ROI candidate and lacks approved current provenance"
+  },
+  "new_eligible_unreviewed_candidate_count": 0,
+  "result": "IDLE",
+  "reason": "No new SHA-qualified native HD ROI A/B PNG candidate. All 62 eligible saved candidate SHA are in prior C1 review history. Exclude unapproved legacy output rather than re-review it.",
+  "reviewed_new_sha256": [],
+  "new_verdicts": [],
+  "output_png_modified": false,
+  "imagegen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "final_DDS_written": false,
+  "C2_C3_ingame_PASS_created": false,
+  "automatic_deployment": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "qa_policy": "No width-only underfill FAIL; never review duplicate SHA; no fake C2/C3/game PASS.",
+  "ai_score_reference": {
+    "source": "thp32tt/ai-dev-lab/main/AI_SCOREBOARD.md fetched live by GitHub blob SHA 5661155307573e8b1d188530fa58c5f2c8831f8a",
+    "baseline_AI1": 1652,
+    "impact": 0,
+    "result_AI1": 1652,
+    "reason": "C1 IDLE: no new candidate, no new QA achievement"
+  }
+}
