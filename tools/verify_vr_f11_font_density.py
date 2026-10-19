@@ -1003,7 +1003,8 @@ def check_source_reset_atlas_hold(hook: str) -> None:
     """Same-frame F11 open retains XR atlas during temporary source loss."""
     area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// Quantised quarter-steps prevent continuous atlas churn", 1)[0]
-    active = "if (f11VisibleThisFrame && vrGameplay &&"\n    assert "!Settings::VRUnifiedEyeMenuSource)" in area
+    active = "if (f11VisibleThisFrame && vrGameplay &&"
+    assert "!Settings::VRUnifiedEyeMenuSource)" in area
     size = "if (Game::screen_resolution &&"
     retain = ("vrFontMultiplier = std::clamp(\\n"
               "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);"
