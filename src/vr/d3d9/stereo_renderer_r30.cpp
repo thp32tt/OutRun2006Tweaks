@@ -31,6 +31,7 @@
 #include "r84_spatial_eye_route.hpp"
 #include "stage_extension_eye_plane.hpp"
 #include "hud_shader_eye_pose.hpp"
+#include "f11_screen_2d.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
@@ -3659,8 +3660,11 @@ namespace OutRunVRStereo
                 return false;
 
             const auto frame = R29OwnerCaptureFrameSnapshot();
-            if (!frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
-                frame.rightDrawFailed || frame.stereoIncomplete ||
+            // External ImGui is allowed to start before a game's first
+            // world primitive. A prior world/HUD stereo draw is NOT its
+            // producer proof. The right eye must still exist and the frame
+            // must not already have failed; do not bypass pose/resource gates.
+            if (frame.rightDrawFailed || frame.stereoIncomplete ||
                 !frame.rightEyeSurface)
                 return false;
 
@@ -3712,24 +3716,39 @@ namespace OutRunVRStereo
                  frame.poseSequence != state.stereo.poseSequence))
                 return false;
 
-            float baseRaw[16]{};
-            if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))
-                return false;
-            D3DMATRIX baseProjection{};
-            std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
-            if (!R29OwnerMatrixFinite(baseProjection) ||
-                !R30BuildStageExtensionXyzrhwEyePlane(
-                    state, baseProjection))
-                return false;
-
-            // ImGui owns its pixel density. Compose its stock orthographic
-            // pixel->NDC projection only with the finite recentered eye plane;
-            // no gameplay HudScale/pause scale is applied a second time.
+            // F11 is a real 2D overlay. Do NOT route ImGui through the
+            // gameplay StageExtension HUD plane (-2.50 game units), world
+            // base-projection inverse, head inverse, eye pose, IPD or c64.
+            // Map the identical 2D menu pixels into BOTH OpenXR asymmetric
+            // FOVs instead. The adjustment is purely affine in clip space:
+            // the menu stays in front of the user, with zero game-world depth.
+            OutRunVRF11Screen2D::TangentBounds eyeBounds[2]{};
             for (int eye = 0; eye < 2; ++eye)
             {
-                eyes[eye] = R29OwnerMultiplyMatrix(
-                    stockProjection,
-                    state.stageExtensionClipFromGameNdc[eye]);
+                eyeBounds[eye] = {
+                    std::tan(state.stereo.eyeFov[eye].angleLeft),
+                    std::tan(state.stereo.eyeFov[eye].angleRight),
+                    std::tan(state.stereo.eyeFov[eye].angleDown),
+                    std::tan(state.stereo.eyeFov[eye].angleUp)
+                };
+            }
+            OutRunVRF11Screen2D::EyeAffine eyeAffine[2]{};
+            if (!OutRunVRF11Screen2D::Build(eyeBounds, eyeAffine))
+                return false;
+
+            // The Win32/ImGui backend already supplies correct source pixel
+            // positions, font atlas and mouse hitboxes. Preserve its WORLD,
+            // VIEW and orthographic PROJECTION source and change only the
+            // final per-eye clip NDC. Unlike world/HUD, there is no recenter-
+            // relative translation or independent VRHudScale to drift F11.
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                D3DMATRIX clip = R29OwnerIdentityMatrix();
+                clip._11 = eyeAffine[eye].scaleX;
+                clip._22 = eyeAffine[eye].scaleY;
+                clip._41 = eyeAffine[eye].offsetX;
+                clip._42 = eyeAffine[eye].offsetY;
+                eyes[eye] = R29OwnerMultiplyMatrix(stockProjection, clip);
                 if (!R29OwnerMatrixFinite(eyes[eye]))
                     return false;
 
