@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-0345-IDLE",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-20T03:45:00+09:00",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "precheck_head": "858b6fcffa9aea842fd0219e15e0997cf80c9ebc",
+  "verified_policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "n100_candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+  "dedup_script": "work/c1_sha_dedup_20261019_2145.py",
+  "reviewed_sha_inputs": [
+    "work/c1_batch_20261019_2015/previous_shas.json",
+    "work/c1_batch_20261019_2015/metrics.json"
+  ],
+  "inventory": {
+    "stored_png_count": 63,
+    "previously_reviewed_sha_count": 62,
+    "reviewed_sha_matches": 62,
+    "legacy_excluded_count": 1,
+    "new_eligible_count": 0,
+    "new_reviewed_count": 0,
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "excluded_legacy_candidate": {
+    "path": "work/image-src/text_roi_batches/candidate_outputs/A/Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+    "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+    "reason": "Historic output without current verified native ROI production evidence; do not treat as new A/B candidate"
+  },
+  "notes": [
+    "Executed fresh N100 SHA256 dedup against actual persisted PNG candidate directory; no new eligible output.",
+    "Did not rereview an already checked SHA, consume A/B queues or invoke ImageGen.",
+    "Nothing promoted to C2/C3/DDS/user real-game PASS. No final DDS output or deployment.",
+    "Status-only refresh is +0 per user's anti-duplicate scoring instructions."
+  ],
+  "imagegen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "new_dds_written": false,
+  "C2_C3_ingame_PASS_created": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "scoring": "IDLE status recheck +0"
+}
