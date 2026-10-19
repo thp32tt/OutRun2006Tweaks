@@ -1003,7 +1003,7 @@ def check_source_reset_atlas_hold(hook: str) -> None:
     """Same-frame F11 open retains XR atlas during temporary source loss."""
     area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// Quantised quarter-steps prevent continuous atlas churn", 1)[0]
-    active = "if (f11VisibleThisFrame && vrGameplay)"
+    active = "if (f11VisibleThisFrame && vrGameplay &&"\n    assert "!Settings::VRUnifiedEyeMenuSource)" in area
     size = "if (Game::screen_resolution &&"
     retain = ("vrFontMultiplier = std::clamp(\\n"
               "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);"
@@ -1032,7 +1032,7 @@ def check_first_visible_f11_frame(hook: str) -> None:
     assert hook.index(call) < hook.index("float vrFontMultiplier = 1.0f;")
     assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index(
         "overlayActive = Overlay::render();")
-    assert "if (f11VisibleThisFrame && vrGameplay)" in hook
+    assert "if (f11VisibleThisFrame && vrGameplay &&" in hook\n    assert "!Settings::VRUnifiedEyeMenuSource)" in hook
     density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "R23TryGetPublishedEyeExtentPair(extent)", 1)[0]
     assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in density
