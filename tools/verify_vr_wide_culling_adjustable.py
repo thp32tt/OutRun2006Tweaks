@@ -35,7 +35,17 @@ for typ,old,bad in (
 ):
     parts=dict(settings=settings,profiles=profiles,source=source)
     assert old in parts[typ]
-    parts[typ]=parts[typ].replace(old,bad,1)
+    if typ == 'source':
+        # Avoid mutating a different projection owner earlier in the TU:
+        # the exact PMT visibility hook is the unit under review.
+        prefix, scoped_suffix = parts['source'].split(
+            'class DisableStageCulling : public Hook', 1)
+        scoped, suffix = scoped_suffix.split('class WindowedBorderless', 1)
+        assert old in scoped
+        parts['source'] = prefix + 'class DisableStageCulling : public Hook' + (
+            scoped.replace(old,bad,1)) + 'class WindowedBorderless' + suffix
+    else:
+        parts[typ]=parts[typ].replace(old,bad,1)
     try:check(parts['settings'],parts['profiles'],parts['source'])
     except (AssertionError,ValueError):pass
     else:raise AssertionError('wide cull mutant escaped '+typ+old)
