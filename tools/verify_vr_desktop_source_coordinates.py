@@ -24,7 +24,8 @@ def assert_game_source_owner(text: str):
         "if (commandLineResolution)", "if (manualRequested)",
         "Game::screen_resolution->x = manualW;",
         "Game::screen_resolution->y = manualH;",
-        "if (Settings::VRFollowGameResolution)",
+        "if (Settings::VRFollowGameResolution &&
+            !Settings::VRUnifiedEyeMenuSource)",
         "Game::screen_resolution->x, Game::screen_resolution->y);",
         "if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)",
         "Game::screen_resolution->x = static_cast<int>(extent.width);",
@@ -33,11 +34,13 @@ def assert_game_source_owner(text: str):
         assert token in part, f"missing game/XR contract: {token}"
     loc = [part.index(token) for token in (
         "if (commandLineResolution)", "if (manualRequested)",
-        "if (Settings::VRFollowGameResolution)",
+        "if (Settings::VRFollowGameResolution &&
+            !Settings::VRUnifiedEyeMenuSource)",
         "if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)",
         "Game::screen_resolution->x = static_cast<int>(extent.width);")]
     assert loc == sorted(loc), "manual/game priority must precede XR overwrite"
-    follow = part.split("if (Settings::VRFollowGameResolution)",1)[1].split(
+    follow = part.split("if (Settings::VRFollowGameResolution &&
+            !Settings::VRUnifiedEyeMenuSource)",1)[1].split(
         "if (!Settings::VRAutoRenderResolution",1)[0]
     assert "return;" in follow and "GetSystemMetrics(" not in follow
     assert "Game::screen_resolution->x =" not in follow
@@ -48,14 +51,16 @@ def assert_eye_source_isolation(text: str):
     end = text.index("Direct3DCreate9Fn OriginalDirect3DCreate9",start)
     part = text[start:end]
     assert "Settings::VRFollowGameResolution ||" in part
-    assert part.index("Settings::VRFollowGameResolution ||") < part.index(
+    assert "Settings::VRUnifiedEyeMenuSource) ||" in part
+    assert part.index("Settings::VRUnifiedEyeMenuSource) ||") < part.index(
         "Settings::VRAutoRenderResolution")
     assert "GetSystemMetrics(" not in part
 
 assert_game_source_owner(config)
 assert_eye_source_isolation(ex)
 for original, mutated in (
-    ("if (Settings::VRFollowGameResolution)", "if (false)"),
+    ("if (Settings::VRFollowGameResolution &&
+            !Settings::VRUnifiedEyeMenuSource)", "if (false)"),
     ("if (manualRequested)", "if (false)"),
     ("Game::screen_resolution->x = manualW;", "Game::screen_resolution->x = 640;"),
     ("Game::screen_resolution->y = manualH;", "Game::screen_resolution->y = 480;"),
