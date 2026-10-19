@@ -436,10 +436,64 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "return CurrentDirectExactProducer;" in producer
 
 
+def verify_outer_lens_c64_owner(renderer):
+    """CABE only: synced Calc3D2D camera and shader c64 must not both rotate."""
+    outer = renderer.split("const auto semanticScope =", 1)[1].split(
+        "// The subsequent game world write", 1)[0]
+    gate = outer.split(
+        "const bool projectedLensWithSyncedCamera =", 1)[1].split(
+        "const bool semanticOverlay =", 1)[0]
+    for required in (
+        "CullingCameraOverridden &&",
+        "!OutRunVR::GameSemantic::QueueRenderActive() &&",
+        "OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(",
+        "semanticScope);",
+    ):
+        assert required in gate, "outer CABE c64 scope escaped: " + required
+    route = outer.split("const bool semanticOverlay =", 1)[1].split(
+        "if (semanticOverlay)", 1)[0]
+    assert "OutRunVR::GameSemantic::CorroboratesHud(semanticScope)" in route
+    assert "OutRunVR::GameSemantic::CorroboratesWorld(semanticScope)" in route
+    assert "projectedLensWithSyncedCamera;" in route
+    original = outer.split("if (semanticOverlay)", 1)[1].split(
+        "return result;", 1)[0]
+    assert "SetVertexShaderConstantFHook.stdcall<HRESULT>(" in original
+    assert "device, startRegister, constantData, vector4fCount);" in original
+    assert "if (SUCCEEDED(result) && sourceUnchanged)" in original
+    assert "RecordGameWvpWrite(nativeGameWvp, nativeGameWvp);" in original
+    assert "TryPrepareOutRunWvp(" not in original
+    # Camera-sync-disabled mode deliberately uses the pre-existing
+    # world-WVP injection path. No blanket alpha/sky/SceneEffect bypass.
+    assert "TryPrepareOutRunWvp(" in renderer
+    assert "CullingCameraOverridden" in renderer
+
+
 def main():
     values = tuple((ROOT / path).read_text(encoding="utf-8-sig")
                    for path in PATHS)
     check(*values)
+    renderer = (ROOT / "src/vr/game/outrun_renderer.cpp").read_text(
+        encoding="utf-8-sig")
+    verify_outer_lens_c64_owner(renderer)
+    outer_begin = renderer.index("const bool projectedLensWithSyncedCamera =")
+    outer_end = renderer.index("if (semanticOverlay)", outer_begin)
+    outer = renderer[outer_begin:outer_end]
+    # Negative mutations prove this is conditional on real camera sync,
+    # an exact unqueued projected source, and native unmodified upload.
+    for old, altered in (
+        ("CullingCameraOverridden &&", "true &&"),
+        ("!OutRunVR::GameSemantic::QueueRenderActive() &&", "true &&"),
+        ("CorroboratesProjectedScreenEffect(", "CorroboratesWorld("),
+        ("projectedLensWithSyncedCamera;", "false;"),
+    ):
+        assert old in outer, "outer CABE mutation fixture missing: " + old
+        modified = (renderer[:outer_begin] + outer.replace(old, altered, 1) +
+                    renderer[outer_end:])
+        try:
+            verify_outer_lens_c64_owner(modified)
+        except AssertionError:
+            continue
+        raise AssertionError("unsafe CABE c64 mutation escaped: " + old)
     mutants = [
         (0, "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;", "// removed facade"),
         (1, "return GetTopLevelDrawSerial();", "return 0;"),

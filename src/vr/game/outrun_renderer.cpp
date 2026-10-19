@@ -2009,11 +2009,25 @@ namespace OutRunVRRenderer
             const auto hudBefore = CaptureHudUploadSource();
             const auto semanticScope =
 				OutRunVR::GameSemantic::EffectiveScope();
+			// CABE outer lens discs have already used the live HMD-synced
+			// game camera for Calc3D2D. When that sync really owns the camera,
+			// leave their ORIGINAL game c64 intact: R30's direct projected
+			// effect path intentionally omits a second head inverse.
+			// With camera sync OFF, preserve the previous shader injection.
+			// Scope only the unqueued CABE producer; C993's independently
+			// source-proven WorldBillboard and all ordinary world draws are
+			// unchanged. This also keeps the original GPU c64 for fallback.
+			const bool projectedLensWithSyncedCamera =
+				CullingCameraOverridden &&
+				!OutRunVR::GameSemantic::QueueRenderActive() &&
+				OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(
+					semanticScope);
 			const bool semanticOverlay =
 				OutRunVR::GameSemantic::CorroboratesHud(semanticScope) ||
 				OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(
 					semanticScope) ||
-				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope);
+				OutRunVR::GameSemantic::CorroboratesWorld(semanticScope) ||
+				projectedLensWithSyncedCamera;
 			if (semanticOverlay)
 			{
 				const HRESULT result =
