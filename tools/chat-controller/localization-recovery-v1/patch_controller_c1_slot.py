@@ -41,8 +41,9 @@ def patch(source: str) -> str:
     s = replace_once(
         s,
         'SCHEDULED_LOCALIZATION_LANES = {minute: ("A" if minute % 10 == 0 else "B") for minute in range(0, 60, 5)}',
-        '''# OUTRUN_C1_SLOT_V2: current policy A :00, B :30, C1 :10/:40.
-SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 30: "B", 40: "C1"}''',
+        '''# OUTRUN_C1_SLOT_V2: production cadence A :00/:20/:40, B :10/:30/:50.
+# C1 stays as the persistent third QA tab but has no scheduled send slot.
+SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "B", 20: "A", 30: "B", 40: "A", 50: "B"}''',
         "schedule",
     )
     s = replace_once(
