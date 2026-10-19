@@ -7,14 +7,14 @@
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
+  "material_result_sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb",
   "changed_files": [
     "src/vr/game/car_base_shadow_stereo.hpp",
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -75,10 +75,43 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "start_shadow_original_source_native_eye_pair": "PENDING_EXACT_SHA",
-    "start_shadow_mismatched_source_native_fallback": "PENDING_EXACT_SHA",
-    "start_shadow_final_exact_sha_gate": "PENDING_EXACT_SHA"
+    "start_shadow_original_source_native_eye_pair": "PASS_EXACT_SHA",
+    "start_shadow_mismatched_source_native_fallback": "PASS_EXACT_SHA",
+    "start_shadow_final_exact_sha_gate": "PASS_EXACT_SHA"
   },
-  "result_commit_kind": "MATERIAL_VALIDATION_BEARING",
-  "next_action": "Exact SHA 4/4 CI required; separate [skip ci] C6 only on PASS. RUNTIME_VALIDATION=UNTESTED."
+  "result_commit_kind": "MATERIAL_VALIDATION_BEARING_AND_SEPARATE_C6_RECORD",
+  "next_action": "COMPLETE_BUILD_VERIFIED only. Quest3/VDXR exact-build race-start single shadow and world quality runtime NEED_HMD_TEST; do not repeat exact-SHA CI or add duplicate score.",
+  "validation_bearing_result_sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_source_sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb",
+    "validation_bearing_result_sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb",
+    "gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 39197514483,
+        "status": "success",
+        "sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 39197514481,
+        "status": "success",
+        "sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39197514492,
+        "status": "success",
+        "sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 39197514490,
+        "status": "success",
+        "sha": "5f8b3cd4a2ae7ad2336d2f88c348938e2b9022bb"
+      }
+    ],
+    "required_gates_success": "4/4"
+  }
 }
