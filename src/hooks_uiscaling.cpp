@@ -1017,6 +1017,24 @@ class UIScaling : public Hook
         RankMarkerExactCalcEdge = true;
         Calc3D2D_dest(a1, a2, in, out);
         RankMarkerExactCalcEdge = previous;
+        // A source-only probe: distinguish an unexecuted exact ordinal E8
+        // from an executed but unprojectable raw view-space input.
+        // No HUD/world/rival state or GPU submission changes here.
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t exactEdgeCalls = 0;
+            const auto n = ++exactEdgeCalls;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR R57 ORDINAL EDGE PROBE: e8=0xBAEE2 calls={} rawFinite={} "
+                    "projectionValid={} sourceZ={} screenZ={} navipubDepth={}",
+                    n,
+                    in && std::isfinite(in->x) &&
+                    std::isfinite(in->y) && std::isfinite(in->z),
+                    RankMarkerProjectedInfo.valid ? 1 : 0,
+                    in ? in->z : 0.f, out ? out->z : 0.f,
+                    RankMarkerSubScreenHudDepth);
+        }
     }
 
 	// The fraction of a pixel sub_4BAD20 discarded when it rounded the marker
@@ -1067,6 +1085,20 @@ class UIScaling : public Hook
 		++RankMarkerSubActiveDepth;
 		const int result = RankMarkerSub_hk.call<int>(arg);
 		--RankMarkerSubActiveDepth;
+        // A separate bounded parent counter proves the 0x4BAD20 producer
+        // ran even when there was NO matching 0xBAEE2 Calc3D2D edge.
+        // Preserve the exact working rival 0xBB6F5 path and full draw.
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t rankOwnerCalls = 0;
+            const auto n = ++rankOwnerCalls;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR R57 RANK OWNER PROBE: sub=0x4BAD20 calls={} "
+                    "projectedValid={} navipubDepth={} parentActive={}",
+                    n, RankMarkerProjectedInfo.valid ? 1 : 0,
+                    RankMarkerSubScreenHudDepth, RankMarkerSubActiveDepth);
+        }
 		RankMarkerProjectedInfo = saved;
 		RankMarkerFracX = savedFractionX;
 		RankMarkerFracY = savedFractionY;
