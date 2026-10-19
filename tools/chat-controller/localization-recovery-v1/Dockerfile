@@ -25,7 +25,8 @@ COPY src/controller.py.part* /tmp/controller-parts/
 COPY chrome_maintenance.py /opt/outrun/app/chrome_maintenance.py
 RUN mkdir -p /opt/outrun/c_english_crop
 COPY c_english_crop/*.py /opt/outrun/c_english_crop/
-RUN python -m py_compile /opt/outrun/c_english_crop/*.py && tesseract --list-langs 2>&1 | grep -q eng
+COPY crop_to_imagegen_queue.py /opt/outrun/app/crop_to_imagegen_queue.py
+RUN python -m py_compile /opt/outrun/c_english_crop/*.py /opt/outrun/app/crop_to_imagegen_queue.py && tesseract --list-langs 2>&1 | grep -q eng
 COPY chrome-cache-clean.sh /opt/outrun/chrome-cache-clean.sh
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
@@ -44,10 +45,10 @@ RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py \
 
 # Add the third logical C tab to the SAME controller after A/B native PNG wiring.
 # This does not spawn a second service; runtime deployment remains operator-manual.
-COPY patch_controller_c_slot.py /tmp/patch_controller_c_slot.py
-RUN python /tmp/patch_controller_c_slot.py /opt/outrun/app/controller.py \
+COPY patch_controller_c1_slot.py /tmp/patch_controller_c1_slot.py
+RUN python /tmp/patch_controller_c1_slot.py /opt/outrun/app/controller.py \
  && python -m py_compile /opt/outrun/app/controller.py \
- && rm -f /tmp/patch_controller_c_slot.py
+ && rm -f /tmp/patch_controller_c1_slot.py
 
 COPY v2_automation_policy.py /opt/outrun/app/v2_automation_policy.py
 COPY v2_docker_policy.json /opt/outrun/v2_docker_policy.json
