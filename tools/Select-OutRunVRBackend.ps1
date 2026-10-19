@@ -89,6 +89,14 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
         $isPcFastPackage =
             [string]$buildInputs.ValidationClass -eq 'PC_FAST_INCREMENTAL_NOT_FINAL_CI'
         if ($isPcFastPackage) {
+            # PC Fast writes VARIANT_ID.txt, not BUILD_VARIANT.txt. A user
+            # extracting over an old R84 build can retain a stale
+            # BUILD_VARIANT.txt that must NEVER override this exact package.
+            $pcFastVariantFile = Join-Path $src 'VARIANT_ID.txt'
+            if (!(Test-Path -LiteralPath $pcFastVariantFile)) {
+                throw "DX9Ex PC Fast VARIANT_ID.txt missing: $pcFastVariantFile"
+            }
+            $rendererBuildVariant = (Get-Content -LiteralPath $pcFastVariantFile -Raw).Trim()
             $pcFastMarker = Join-Path $root 'PC_FAST_BUILD.txt'
             if ([string]$buildInputs.VariantId -ne 'ACTIVE_FULL_R34' -or
                 [string]$buildInputs.BuildContract -ne 'R51-PC-FAST-v2-R26HUD-ON' -or
@@ -112,12 +120,25 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
     }
 
     if ($isPcFastPackage) {
-        if ($variant -ne 'CURRENT_FOCUS' -or
-            $rendererBuildVariant -ne $expectedVariant -or
-            $rendererCmakeFlags -ne [string]$buildInputs.CMakeFlags -or
-            $rendererCmakeFlags -notmatch 'OUTRUN_VR_R26_HUD_COMPARE=ON' -or
-            $rendererCmakeFlags -notmatch 'OUTRUN_VR_SAFE_DRAW_COMPARE=OFF') {
-            throw "DX9Ex PC Fast compiled renderer contract mismatch: $variant."
+        $contractFailures = @()
+        if ($variant -ne 'CURRENT_FOCUS') {
+            $contractFailures += "Selected variant=$variant expected=CURRENT_FOCUS"
+        }
+        if ($rendererBuildVariant -ne $expectedVariant) {
+            $contractFailures += "Compiled variant=$rendererBuildVariant expected=$expectedVariant"
+        }
+        if ($rendererCmakeFlags -ne [string]$buildInputs.CMakeFlags) {
+            $contractFailures += "Compiled CMakeFlags=$rendererCmakeFlags expected=$($buildInputs.CMakeFlags)"
+        }
+        if ($rendererCmakeFlags -notmatch 'OUTRUN_VR_R26_HUD_COMPARE=ON') {
+            $contractFailures += 'R26 HUD compare flag missing'
+        }
+        if ($rendererCmakeFlags -notmatch 'OUTRUN_VR_SAFE_DRAW_COMPARE=OFF') {
+            $contractFailures += 'SAFE DRAW flag mismatch'
+        }
+        if ($contractFailures.Count -gt 0) {
+            throw ("DX9Ex PC Fast compiled renderer contract mismatch: " +
+                ($contractFailures -join '; '))
         }
     } elseif ($rendererBuildVariant -ne $expectedVariant -or
         ($variant -ne 'R26_SAFE' -and
