@@ -6261,6 +6261,23 @@ namespace OutRunVRStereo
                         rightHr = E_FAIL;
                     }
                 }
+                // RT/depth/viewport setters can also cross a queued rank
+                // producer boundary. LEFT's post-draw snapshot is not enough:
+                // prove that the exact same vehicle/SpriteNode/pose/shader/FVF
+                // still owns the physical command immediately before RIGHT.
+                if (SUCCEEDED(rightHr) && exactRank)
+                {
+                    OutRunVR::RankMarker::PhysicalRankSource atRight{};
+                    if (!R30CaptureProjectedRankPhysicalSource(
+                            device, atRight) ||
+                        !OutRunVR::RankMarker::SameRankSourceAfterNativeLeft(
+                            rankBefore, atRight))
+                    {
+                        rightFailure =
+                            OutRunVR::StereoFailureRightStateFailed;
+                        rightHr = E_FAIL;
+                    }
+                }
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure =

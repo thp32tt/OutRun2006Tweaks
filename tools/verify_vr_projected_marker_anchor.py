@@ -715,16 +715,24 @@ def require_r84_physical_rank_transaction(header: str, renderer: str) -> None:
         "R30CaptureProjectedRankPhysicalSource(device, rankBefore)",
         "const HRESULT leftHr = leftDraw();",
         "R30CaptureProjectedRankPhysicalSource(device, rankAfter)",
+        "OutRunVR::RankMarker::PhysicalRankSource atRight{};",
+        "R30CaptureProjectedRankPhysicalSource(\n                            device, atRight)",
         "SameRankSourceAfterNativeLeft(",
         "R29OwnerMarkRightDrawFailed();", "R29OwnerArmMonoSafety();",
     ):
         if token not in physical:
             fail("R84 native rank stereo gate lost: " + token)
+    first_same = physical.index("SameRankSourceAfterNativeLeft(")
+    at_right = physical.index("OutRunVR::RankMarker::PhysicalRankSource atRight{};")
+    right_capture = physical.index(
+        "R30CaptureProjectedRankPhysicalSource(\n                            device, atRight)")
+    second_same = physical.index("SameRankSourceAfterNativeLeft(", first_same + 1)
+    right_draw = physical.index("rightHr = rightDraw();")
     if not (physical.index("R30CaptureProjectedRankPhysicalSource(device, rankBefore)") <
             physical.index("const HRESULT leftHr = leftDraw();") <
             physical.index("R30CaptureProjectedRankPhysicalSource(device, rankAfter)") <
-            physical.index("SameRankSourceAfterNativeLeft(")):
-        fail("R84 rank physical after-native-left source gate misordered")
+            first_same < at_right < right_capture < second_same < right_draw):
+        fail("R84 rank physical LEFT/RIGHT source gates misordered")
 
 require_r84_physical_rank_transaction(rank_physical, r84)
 for label, original, broken in (
@@ -748,6 +756,9 @@ for label, original, broken in (
     ("lost native FVF", "device->GetFVF(&fvf)", "device->GetFVF(nullptr)"),
     ("reused old snapshot", "R30CaptureProjectedRankPhysicalSource(device, rankAfter)",
      "R30CaptureProjectedRankPhysicalSource(device, rankBefore)"),
+    ("right-eye owner recheck lost",
+     "R30CaptureProjectedRankPhysicalSource(\n                            device, atRight)",
+     "R30CaptureProjectedRankPhysicalSource(\n                            device, rankAfter)"),
 ):
     if original not in r84:
         fail("R84 rank native mutation input missing: " + label)
@@ -759,7 +770,7 @@ for label, original, broken in (
     # Never mutate an unrelated first occurrence in this large renderer.
     target_function = (
         "HRESULT R30ExecuteXyzrhwStereo("
-        if label == "reused old snapshot"
+        if label in ("reused old snapshot", "right-eye owner recheck lost")
         else "bool R30CaptureProjectedRankPhysicalSource("
     )
     target_body = function_body(r84, target_function)
