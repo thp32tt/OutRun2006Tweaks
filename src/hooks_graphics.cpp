@@ -1689,15 +1689,15 @@ class DisableStageCulling : public Hook
             if (!(fov.angleLeft < fov.angleRight) ||
                 !(fov.angleDown < fov.angleUp))
                 return false;
-            h = std::max(h, std::max(std::abs(fov.angleLeft),
+            h = (std::max)(h, (std::max)(std::abs(fov.angleLeft),
                 std::abs(fov.angleRight)));
-            v = std::max(v, std::max(std::abs(fov.angleDown),
+            v = (std::max)(v, (std::max)(std::abs(fov.angleDown),
                 std::abs(fov.angleUp)));
         }
         // Symmetric enclosure of both OpenXR asymmetric eye frusta.
         // Conservative when either eye differs; never shrink original FOV.
-        h = std::min(1.48f, h + margin);
-        v = std::min(1.48f, v + margin);
+        h = (std::min)(1.48f, h + margin);
+        v = (std::min)(1.48f, v + margin);
         tanHorizontal = std::tan(h);
         tanVertical = std::tan(v);
         return std::isfinite(tanHorizontal) && tanHorizontal > 0.0f &&
@@ -1738,8 +1738,8 @@ class DisableStageCulling : public Hook
 
         // D3D9 right-handed projection. A culling-only symmetric enclosure
         // lets the game keep its own visibility algorithm and node transforms.
-        const float newX = std::min(original._11, 1.0f / tanH);
-        const float newY = std::min(original._22, 1.0f / tanV);
+        const float newX = (std::min)(original._11, 1.0f / tanH);
+        const float newY = (std::min)(original._22, 1.0f / tanV);
         if (!std::isfinite(newX) || !std::isfinite(newY) ||
             newX <= 0.0f || newY <= 0.0f)
             return;
