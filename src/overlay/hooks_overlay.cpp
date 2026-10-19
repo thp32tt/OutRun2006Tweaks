@@ -20,6 +20,7 @@
 
 namespace Settings
 {
+    extern Setting<bool> VRUnifiedEyeMenuSource;
 	Setting<bool> OverlayEnabled{ "Overlay", "Enabled", true,
 		"Enables the OutRun2006Tweaks overlay." };
 	Setting<bool> WindowedHideMouseCursor{ "Window", "WindowedHideMouseCursor", true,
@@ -384,7 +385,13 @@ class D3DHooks : public Hook
 			// visible frame. Last-frame overlayActive misses legacy F11 release,
 			// while a held bound action incorrectly prewarms the closing frame.
 			// The later render consumes the same edge and still owns the cursor.
-			if (f11VisibleThisFrame && vrGameplay)
+			// The unified D3D9Ex source already has the physical XR eye
+            // dimensions. ImGui is authored in those source pixels and is
+            // mapped to the headset once by the VR compositor. Applying a
+            // second source-to-eye font aspect factor caused the oversized
+            // upper-right F11 window observed at 3440x1440.
+            if (f11VisibleThisFrame && vrGameplay &&
+                !Settings::VRUnifiedEyeMenuSource)
 			{
 				// A zero-sized/stale source publication during Reset is no more
 				// reason to replace a valid Quest3 atlas than a missing eye

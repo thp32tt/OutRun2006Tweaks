@@ -53,7 +53,7 @@ namespace Settings
     Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,
         "Experimental: use one VR 3D/2D menu render source. If the VDXR/OpenXR eye size is available BEFORE the original game graphics initialization, select it for both the D3D9Ex source and the game's scaled 2D menu. 640x480 logical UI coordinates remain independent. Never change the source at CreateDevice after the UI scale was calculated. When unavailable, keep the configured game resolution. Manual RenderWidth/Height and -width/-height win. Restart required." };
     Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", true,
-        "Follow the game's configured backbuffer for VR source/UI coordinates. VD Streaming VR Graphics Quality changes OpenXR eye dimensions separately; no monitor-size lock or XR overwrite. A paired RenderWidth/RenderHeight or explicit -width/-height still wins. Disable only for legacy experimental XR-sized game source. Restart required." };
+        "Follow the game's configured resolution for VR source and UI when UnifiedEyeMenuSource is disabled. In unified mode, a ready XR eye extent sets ONE shared game/menu source before UI scale initialization; -width/-height or paired VR manual source settings take precedence. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
         "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
         "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };

@@ -15,6 +15,12 @@ assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,' in settings
 assert "Settings::VRUnifiedEyeMenuSource.needs_restart();" in settings
 assert "Settings::VRUnifiedEyeMenuSource" in cfg and "Settings::VRUnifiedEyeMenuSource" in ex
 assert "vr_logical_coordinate_space.hpp" in ui
+overlay=(root/"src/overlay/hooks_overlay.cpp").read_text(encoding="utf-8")
+assert "if (f11VisibleThisFrame && vrGameplay &&" in overlay
+assert "!Settings::VRUnifiedEyeMenuSource)" in overlay
+assert "extern Setting<bool> VRUnifiedEyeMenuSource;" in overlay
+assert "GetTickCount64() - startTick >= 1250ull" in cfg
+assert "Sleep(25);" in cfg
 def check_source(cfg,ex):
     c=cfg.split("void ApplyVrEyeResolutionAfterConfig(",1)[1].split("class CommandLineArguments",1)[0]
     guard=c.index("if (commandLineResolution)")
