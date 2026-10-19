@@ -1908,7 +1908,15 @@ def check_outrun_text_owner(source, contracts):
                   '*(reinterpret_cast<const std::uint8_t*>(returnAddress) - 5))',
                   'OutRunVRHudSemantics::UnknownInfo();',
                   'const bool previous = OutRunHudTextScreenHud;',
-                  'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;',
+                  'const bool pauseFrameParent =',
+                  'GameState::STATE_SMPAUSEMENU',
+                  'CurrentRenderProducerToken() ==',
+                  'ProducerToken::PauseFrameShell;',
+                  'OutRunHudTextScreenHud = previous ||',
+                  '(!pauseFrameParent &&',
+                  'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud);',
+                  'if (Settings::VREnabled && !pauseFrameParent &&',
+                  'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud)',
                   'OutRunHudTextProducerHook.call(',
                   'OutRunHudTextScreenHud = previous;')
     for sig, original in (
@@ -1938,8 +1946,14 @@ def check_outrun_text_owner(source, contracts):
 check_outrun_text_owner(ui, json.loads(binary_contract)['contracts'])
 for label, marker0, mutant in (
     ('parent classification bypass',
-     'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;',
-     'semantic.space != OutRunVRHudSemantics::SpacePolicy::ScreenHud;'),
+     'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud);',
+     'semantic.space != OutRunVRHudSemantics::SpacePolicy::ScreenHud);'),
+    ('pause frame parent bypass',
+     '(!pauseFrameParent &&',
+     '(true &&'),
+    ('pause frame token lost',
+     'ProducerToken::PauseFrameShell;',
+     'ProducerToken::None;'),
     ('parent lost E8 gate',
      'OutRunVRHudSemantics::ClassifyDirectCallsite(caller,',
      'OutRunVRHudSemantics::ClassifyCaller(caller /* E8 check removed */,'),
