@@ -75,7 +75,7 @@ def _read_sources(root):
                 raise ValueError("ROI_MISSING_PROOF:" + ident + ":" + field)
         if e["english"] == e["korean"] or not re.fullmatch("[0-9a-f]{64}", e["imagegen_input_sha256"]) or not re.fullmatch("[0-9a-f]{64}", e["source_dds_sha256"]) or not re.fullmatch("[0-9a-f]{64}", e["source_png_sha256"]):
             raise ValueError("ROI_INVALID_TRANSLATION_OR_SHA")
-        if e.get("source_provenance") not in ("DIRECT_FULL_HD_PNG", "DDS_PIXEL_VERIFIED_FULL_SOURCE"):
+        if e.get("source_provenance") not in ("DIRECT_FULL_HD_PNG", "DDS_PIXEL_VERIFIED_FULL_SOURCE", "SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG"):
             raise ValueError("ROI_UNVERIFIED_FULL_SOURCE:" + ident)
         bbox = e.get("bbox_xyxy")
         if not (isinstance(bbox, list) and len(bbox) == 4 and all(type(v) is int for v in bbox) and
