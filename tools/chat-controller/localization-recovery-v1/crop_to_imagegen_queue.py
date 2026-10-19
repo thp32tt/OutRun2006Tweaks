@@ -242,6 +242,8 @@ def main():
         except Exception as exc:
             print(json.dumps({"status": "QUEUE_SYNC_HOLD", "reason": type(exc).__name__ + ":" + str(exc)[:300]},
                              ensure_ascii=False), flush=True)
+            if args.once:
+                raise SystemExit(64)
         if args.once:
             break
         time.sleep(args.interval_seconds)
