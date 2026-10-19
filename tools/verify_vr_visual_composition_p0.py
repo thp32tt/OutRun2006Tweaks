@@ -1920,7 +1920,7 @@ def check_outrun_text_owner(source, contracts):
                   'OutRunHudTextScreenHud = previous;')
     require('if (Settings::VREnabled && !pauseFrameParent &&\n'
             '                semantic.space == '
-            'OutRunVRHudSemantics::SpacePolicy::ScreenHud)' in parent,
+            'OutRunVRHudSemantics::SpacePolicy::ScreenHud)',
             parent, 'BA9D0 direct owner must retain exact pause-parent exclusion')
     for sig, original in (
         ('static int __cdecl OutRunHudText_clip(', 'Game::put_clip_sprite('),
