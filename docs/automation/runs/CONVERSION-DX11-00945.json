@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00945",
+  "production_id": "CONVERSION-DX11-00945",
+  "event_id": "CONVERSION-DX11-00945-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00945",
+  "feature_id": "DX11:LIVE_SM3_UNIT_POINTLIST_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "c6_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "material_result_sha": "909116b35ee949e308afa43cf0aa039fa2907378",
+  "validation_bearing_result_sha": "24d59b9afdf8bb8769e57d4b2b39e2efd6c3043d",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_UNIT_POINTLIST_NATIVE_DRAW",
+    "goal": "Route genuine live-game D3D9 programmable SM3 one-pixel POINTLIST draws, indexed and nonindexed, through the native full-resolution D3D11 POINTLIST IA Draw/DrawIndexed path without sacrificing original D3D9 rendering/input/FFB for unsupported point modes.",
+    "scope_boundary": "Only source-owned live SM3 native POINTLIST and associated source-bound positive/negative regressions; preserve shader, texture, depth, blend, source VB/IB/UP bindings, all preexisting primitive families, original D3D9/DX9Ex fallback and frozen DXVK. No claim of real-game, Quest3 or HMD validation.",
+    "acceptance_items": [
+      {
+        "id": "native_live_sm3_unit_point_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_sm3_pointlist_native_ia_draw_and_drawindexed",
+        "expected_behavior": "Original game programmable unit-size point primitives reach native D3D11 POINTLIST IA using authentic point vertex/index spans, shader and render state."
+      },
+      {
+        "id": "unsupported_point_modes_original_d3d9_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "point_size_sprite_scale_psize_source_guard",
+        "expected_behavior": "Point sprites, scaled/non-unit/nonfinite or invalid point sizes, declaration PSIZE, and failed D3D9 point raster state reads reject native GPU submission before state mutation and retain original D3D9 draw/input/FFB."
+      },
+      {
+        "id": "required_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_win32_openxr_hud_exact_sha",
+        "expected_behavior": "DX11 Fast, Backend Conversion Gate, Windows Build, OpenXR architecture and HUD Inspector all succeed on the same validation-bearing code SHA, with positive and negative source-linked regressions; hardware/gameplay remain UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept genuine live D3D9 SM3 POINTLIST indexed and nonindexed draw spans",
+      "Check authentic one-pixel render states and reject sprites, scale and PSIZE before native GPU mutation",
+      "Issue D3D11 POINTLIST IA and native Draw/DrawIndexed while keeping original D3D9 fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tests/vr/dx11_live_game_large_mesh.cpp",
+      "tools/test_dx11_live_sm3_draw_00925.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "visible_frame_acceptance": "Source and mandatory exact-SHA CI build verified; matching real OutRun menu/car/race, Quest3/VDXR, HMD and gamepad runtime output UNTESTED.",
+    "activation_guard_and_fallback": "Full-game native path remains opt-in, fail-closed; original D3D9/DX9Ex rendering, input and FFB remain authoritative."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tests/vr/dx11_live_game_large_mesh.cpp",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub target branch HEAD equalled validation-bearing exact SHA; run record was absent (RUN_RECORD_NOT_FOUND). Restore missing C6 result only.",
+    "C1_REVIEW": "Recovered material/source ownership from 909116b3 and same-task Fast regression repair from 24d59b9; no new source changes.",
+    "C2_IMPLEMENT": "Preserve earlier genuine unit-POINTLIST material commit and original D3D9 point-mode guards; no implementation or repair changes in C6.",
+    "C3_VALIDATE": "Five mandatory GitHub Actions SUCCESS at exact 24d59b9; no CI or builds re-run. Hardware/gameplay UNTESTED.",
+    "C4_COMMIT": "material=909116b35ee949e308afa43cf0aa039fa2907378; same-task test repair/validation-bearing=24d59b9afdf8bb8769e57d4b2b39e2efd6c3043d",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA_5_OF_5; RUNTIME_VALIDATION=UNTESTED; separate bookkeeping-only [skip ci] run record."
+  },
+  "acceptance_results": {
+    "native_live_sm3_unit_point_draw": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED",
+    "unsupported_point_modes_original_d3d9_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "required_exact_sha_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "exact_sha": "24d59b9afdf8bb8769e57d4b2b39e2efd6c3043d",
+    "branch_head_before_c6": "24d59b9afdf8bb8769e57d4b2b39e2efd6c3043d",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED",
+    "required_workflow_runs": {
+      "fast": 39186944729,
+      "backend": 39186944709,
+      "windows_build": 39186947902,
+      "openxr": 39186947870,
+      "hud": 39186947869
+    },
+    "supplemental_successful_build_run": 39186944745,
+    "all_required_gates": "SUCCESS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "original_material_commit": "909116b35ee949e308afa43cf0aa039fa2907378",
+    "ci_repair_commits": [
+      "24d59b9afdf8bb8769e57d4b2b39e2efd6c3043d"
+    ],
+    "prior_failed_fast_run": 39186809483,
+    "runtime": "UNTESTED",
+    "gameplay": "UNTESTED"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "No matching real game/HMD output measurements demonstrating live POINTLIST visual parity or complete native menu-to-race frames.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "909116b35ee949e308afa43cf0aa039fa2907378",
+  "NEXT_IMPLEMENTATION_ACTION": "Select a distinct unimplemented source-backed native Draw feature; validate actual game/Quest3 separately; do not re-score or rerun CI for this C6 bookkeeping.",
+  "score_policy": "C6 bookkeeping, retry and exact-SHA result reporting add +0; no scoreboard update or new material result."
+}
