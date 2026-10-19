@@ -166,7 +166,8 @@ for token in (
     check(token in source, "SM3 unsafe Z/scissor fallback admitted: " + token)
 check("build_r283_sm3_mov_shader_source(vertexSource, true" in backend and
       "build_r283_sm3_mov_shader_source(pixelSource, false" in backend and
-      'vertexHlsl.find("r283_texture")' in backend and
+      "candidate.vertexSamplerMask" in backend and
+      "(vertexStage && reg >= 4u)" in backend and
       "candidate.pixelSamplerMask" in backend and
       "CreatePixelShader(" in backend and "CreateVertexShader(" in backend and
       "append_native_sm3_alpha_test(pixelHlsl, alphaCompare)" in backend,
@@ -177,6 +178,45 @@ check("struct NativeLiveSm3Program" in header and
       "s.frameBatch.abort();" in bridge.partition(
           "if (!submit_live_sm3_game_draw(")[2][:350],
       "native shader source ownership or fallback missing")
+# Real D3D9 vertex-stage TEXLDL samples the independent game texture
+# namespace 256..259, never pixel samplers 0..15. The VS HLSL program
+# must explicitly own its required stages, and both native shader stages
+# must bind their own resources on the same immediate Draw context.
+slot_header = (ROOT / "src/vr/d3d11/live_game_sm3_sampler_slots.hpp").read_text()
+for required in (
+    "shaderRegister < 4u ? 256u + shaderRegister",
+    "shaderRegister < 16u ? shaderRegister",
+    "kGameSm3InvalidSamplerSlot",
+):
+    check(required in slot_header,
+          "missing distinct D3D9 VS/PS sampler ownership: " + required)
+for required in (
+    "case D3DSIO_TEXLDL:", "if ((instruction.instructionToken & 0x00ff0000u) != 0u)",
+    "candidate.vertexSamplerMask", "candidate.pixelSamplerMask",
+    "(vertexStage && reg >= 4u)",
+):
+    check(required in backend, "unsafe native SM3 VS texture compiler: " + required)
+for required in (
+    "game_sm3_sampler_source_slot(vertexStage, slot)",
+    "game->GetTexture(sourceSlot,", "game->GetSamplerState(sourceSlot,",
+):
+    check(required in bridge, "missing source game vertex sampler capture: " + required)
+for required in (
+    "capture_live_sm3_sampler(game, slot, capture, true)",
+    "vertexViews[slot], vertexSamplers[slot]",
+    "boundVertexViews[slot] = vertexViews[slot].Get();",
+    "boundVertexSamplers[slot] = vertexSamplers[slot].Get();",
+    "context->VSSetShaderResources(0u, 4u, boundVertexViews.data());",
+    "context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());",
+    "context->PSSetShaderResources(0u, 16u, boundViews.data());",
+    "context->PSSetSamplers(0u, 16u, boundSamplers.data());",
+):
+    check(required in source, "real-game VS texture binding/fallback absent: " + required)
+    # Removing ANY single required GPU binding/capture must fail the contract;
+    # this remains a negative safety check, not a string-only readiness PASS.
+    check(required not in source.replace(required, "", 1),
+          "source mutation failed to remove required VS/PS binding: " + required)
+
 # Programmable shader translation must admit only actually-read TEMP lanes:
 # native VS/PS code generation consumes the helper directly; real unwritten
 # channels, scalar/dot/matrix and TEX coordinates stay fail-closed.
