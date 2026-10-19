@@ -185,9 +185,12 @@ print("PASS exact driving peripheral producer; protected GOAL/+TIME/unknown 4 ne
 # helper while the exact driving-HUD parent is still active. Preserve that
 # parent only for Unknown nested callers; classified GOAL, C2C HUD and
 # projected/world markers may not borrow the peripheral anchor.
-inherit_guard = owner[owner.index("OutRunHudPeripheralText =\\n".replace("\\n", "\n")):
-                      owner.index("// BA9D0 may rasterize", owner.index("OutRunHudPeripheralText =\\n".replace("\\n", "\n")))]
+peripheral_assign = "OutRunHudPeripheralText = pauseFrameParent ? previousPeripheral :"
+assert peripheral_assign in owner
+inherit_guard = owner[owner.index(peripheral_assign):
+                      owner.index("// BA9D0 may rasterize", owner.index(peripheral_assign))]
 assert "previousPeripheral &&" in inherit_guard
+assert "pauseFrameParent ? previousPeripheral :" in inherit_guard
 assert "semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown" in inherit_guard
 assert inherit_guard.count("semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud") == 1
 def nested_peripheral(parent, space, exact=False):
@@ -201,6 +204,7 @@ assert not nested_peripheral(False, "ScreenHud")  # unrelated text
 assert "OutRunHudPeripheralText = previousPeripheral;" in owner
 for original, wrong in (
     ("previousPeripheral &&", "false &&"),
+    ("pauseFrameParent ? previousPeripheral :", "false ? previousPeripheral :"),
     ("SpacePolicy::Unknown);", "SpacePolicy::ScreenHud);"),
     ("SpacePolicy::ScreenHud &&", "SpacePolicy::Unknown &&"),
 ):
@@ -208,9 +212,10 @@ for original, wrong in (
     mutated = inherit_guard.replace(original, wrong, 1)
     assert not all(x in mutated for x in (
         "previousPeripheral &&",
+        "pauseFrameParent ? previousPeripheral :",
         "SpacePolicy::Unknown);",
         "SpacePolicy::ScreenHud &&"))
-print("PASS nested driving text owner, classified GOAL/world exclusions and 3 destructive mutations")
+print("PASS nested driving text owner, pause-shell isolation, classified GOAL/world exclusions and 4 destructive mutations")
 
 
 
