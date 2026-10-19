@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-IDLE-20261019-2045-KST",
+  "run_slot": "C1",
+  "requested_at_kst": "2026-10-19 20:45 KST",
+  "reviewer": "ChatGPT AI 1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "precheck_remote_head": "29756c560938e0f91098d057c8da46b9184bddd2",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "qa_history_directory": "localization/validation/c1_lightweight/",
+  "verification_backend": "GitHub connected repository QA records plus N100 read-only SHA-256 audit",
+  "candidate_directory_on_N100": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+  "existing_qa_record_count": 9,
+  "existing_reviewed_unique_sha_count": 62,
+  "saved_png_count": 63,
+  "sha256_matched_previously_reviewed_count": 62,
+  "sha256_mismatched_or_missing_reviewed_count": 0,
+  "excluded_legacy_candidate": {
+    "filename": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+    "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+    "reason": "historical non-ROI candidate excluded from native ROI review"
+  },
+  "new_eligible_unreviewed_candidate_count": 0,
+  "result": "IDLE",
+  "reason": "All eligible stored A/B native ROI candidate PNG SHA-256 values already appear in earlier independent C1 QA evidence; no SHA-new pending PNG.",
+  "reviewed_new_sha256": [],
+  "new_verdicts": [],
+  "output_png_modified": false,
+  "imagegen_calls": 0,
+  "A_B_queue_consumed": 0,
+  "final_DDS_written": false,
+  "C2_C3_ingame_PASS_created": false,
+  "automatic_deployment": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "qa_policy": "Do not re-review identical SHA and do not fail solely for Korean text width underfill",
+  "ai_score_impact": 0
+}
