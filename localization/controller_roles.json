@@ -2,7 +2,7 @@
   "schema_version": 2,
   "branch": "korean-localization-recovery-20260928",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-  "active_policy": "docs/OUTRUN_C_N100_ORIGINAL_CROP_ONLY_20261016.md",
+  "active_policy": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
     "A": "OutRun 한글화 A 실행",
     "B": "OutRun 한글화 B 실행",
@@ -27,14 +27,16 @@
   },
   "lanes": {
     "A": {
-      "mode": "hd_source_dds_png_chatgpt_native_imagegen_production_and_self_qa",
+      "mode": "verified_native_roi_chatgpt_imagegen_production_and_self_qa",
       "primary_index_parity": "odd",
-      "independent_qa_owner": "C1"
+      "independent_qa_owner": "C1",
+      "runtime_status": "ACTIVE_CONTROLLED_AUTOSEND"
     },
     "B": {
-      "mode": "hd_source_dds_png_chatgpt_native_imagegen_production_and_self_qa",
-      "primary_index_parity": "even_existing_owner_respected",
-      "independent_qa_owner": "C1"
+      "mode": "verified_native_roi_chatgpt_imagegen_production_and_self_qa",
+      "primary_index_parity": "even",
+      "independent_qa_owner": "C1",
+      "runtime_status": "ACTIVE_CONTROLLED_AUTOSEND"
     },
     "C1": {
       "mode": "batch_independent_lightweight_qa_only",
@@ -48,14 +50,14 @@
       ],
       "image_generation_enabled": false,
       "new_dds_production_enabled": false,
-      "runtime_status": "PAUSED_NO_SEND"
+      "runtime_status": "ACTIVE_SCHEDULED_QA"
     },
     "C": {
-      "mode": "N100_STANDALONE_DOCKER_NATIVE_ORIGINAL_ENGLISH_CROP_ONLY",
+      "mode": "N100_IN_CONTAINER_BACKGROUND_NATIVE_ORIGINAL_ENGLISH_CROP_ONLY",
       "docker_slot": "C",
-      "container_name": "outrun-c-original-english-crop",
-      "docker_compose_project": "outrun-c-original-english-crop",
-      "docker_compose_service": "c-english-original-crop",
+      "container_name": "outrun-chat-controller-localization-recovery",
+      "docker_compose_project": "outrun-kor",
+      "docker_compose_service": "outrun-chat-controller-localization-recovery",
       "compose_path": "docker/c-original-english-crop/compose.yaml",
       "runner": "docker/c-original-english-crop/loop.py",
       "source_root": "work/c_salvage_text_roi/source_full_20261012",
@@ -73,12 +75,12 @@
       "dds_write_enabled": false,
       "new_dds_production_enabled": false,
       "legacy_salvage_enabled": false,
-      "A_B_C1_dispatch_enabled": false,
+      "A_B_C1_dispatch_enabled": true,
       "accepted_inputs": "SHA_PINNED_FULL_ORIGINAL_HD_ENGLISH_PNG_DDS_PIXEL_EQUIVALENT_AND_REVIEWED_NATIVE_XYXY_ONLY",
       "historic_986_tiles_allowed": false,
       "archived_255_immutable": true,
       "automatic_unknown_ROI_discovery": false,
-      "runtime_status": "N100_STANDALONE_DOCKER_RUNNING_VERIFIED_20261017_0100_KST",
+      "runtime_status": "IN_CONTAINER_BACKGROUND_WORKER_REDEPLOY_PENDING",
       "output_status": "CROP_TEST_ONLY_REVIEW_REQUIRED",
       "RUNTIME_VALIDATION": "UNTESTED",
       "deployment": "ALREADY_RUNNING_AS_SEPARATE_N100_COMPOSE_NO_ADDITIONAL_DEPLOY"
@@ -101,28 +103,31 @@
   "RUNTIME_VALIDATION": "UNTESTED_unless_game_run",
   "approval_veto": "Do not forge historic C2 PASS; migrate legacy evidence code explicitly before official promotion",
   "historical_signoffs": "C2/C3 records preserved not new work",
-  "controller_mode": "A_B_C1_PAUSED_C_N100_OFFLINE_ORIGINAL_ENGLISH_CROP_ONLY",
+  "controller_mode": "A_B_IMAGEGEN_ACTIVE_C1_QA_ACTIVE_C_NATIVE_CROP_BACKGROUND",
   "source_refresh": "Always read latest HEAD/contract/HD policy/queue and verify remote HEAD",
   "work_steal": {
     "enabled": false
   },
-  "policy_version": "hd-imagegen-manual-v2",
+  "policy_version": "native-roi-imagegen-auto-v3-20261019",
   "deployment": {
-    "mode": "MANUAL_ONLY",
+    "mode": "PORTAINER_GIT_MANUAL_REDEPLOY",
     "auto_deploy": false,
-    "stage_auto_send": false,
-    "runtime_status": "NOT_DEPLOYED_BY_THIS_CHANGE",
+    "stage_auto_send": true,
+    "runtime_status": "SOURCE_READY_REDEPLOY_REQUIRED",
     "activation_requires": [
-      "manual_operator_deploy"
+      "manual_operator_pull_and_redeploy"
     ],
-    "auto_send_authorization": "USER_EXPLICIT_20261012_163934_KST",
+    "auto_send_authorization": "USER_EXPLICIT_20261019",
     "post_deploy_checks": [
-      "source_attachment_to_output_smoke",
-      "explicit_minute_to_role_dispatch_verified",
-      "C2_tab_absent"
+      "AUTO_SEND_true",
+      "schedule_0_10_30_40",
+      "controller_tabs_A_B_C1",
+      "C2_tab_absent",
+      "native_crop_bridge_populates_verified_roi_queue",
+      "actual_source_attachment_and_generated_image_smoke"
     ],
-    "C_offline": "N100_STANDALONE_DOCKER_RUNNING",
-    "A_B_C1": "PAUSED_DO_NOT_REDEPLOY"
+    "C_offline": "IN_SAME_CONTAINER_BACKGROUND_WORKER",
+    "A_B_C1": "ACTIVE_AFTER_PORTAINER_REDEPLOY"
   },
   "schedule_dispatch": {
     "timezone": "Asia/Seoul",
@@ -133,32 +138,32 @@
       "40": "C1"
     },
     "round_robin_compatible": false,
-    "runtime_adapter_status": "UNVERIFIED",
-    "runtime_dispatch_enabled": false,
-    "C_offline": "N100_STANDALONE_DOCKER_60S_POLL_NOT_BROWSER_MINUTE_DISPATCH"
+    "runtime_adapter_status": "IMPLEMENTED_REDEPLOY_PENDING",
+    "runtime_dispatch_enabled": true,
+    "C_offline": "IN_CONTAINER_60S_NATIVE_CROP_AND_ROI_BRIDGE"
   },
   "imagegen": {
     "backend": "chatgpt_native",
     "paid_api_fallback": false,
-    "default_input": "single_HD_atlas_READABLE_when_all_targets_share_transform",
+    "default_input": "verified_unsplit_native_HD_phrase_ROI_RGBA",
     "mixed_orientation_input": "per_sprite_READABLE_ROI",
-    "default_output": "single_full_edit_unreviewed",
+    "default_output": "transparent_Korean_lettering_candidate_unapproved",
     "roi_output": "transparent_lettering",
     "template_directory": "tools/localization/imagegen_prompts",
     "prompt_builder": "tools/localization/build_imagegen_prompt.py",
     "max_same_failure_attempts": 2,
-    "automatic_pipeline_status": "E2E_UNVERIFIED"
+    "automatic_pipeline_status": "CONTROLLED_PNG_AUTOMATION_ENABLED_DDS_GAME_GATES_SEPARATE"
   },
   "policy_review_record": "localization/policy_reviews/OUTRUN-HD-IMAGEGEN-POLICY-MANUAL-20261012-1333.json",
   "policy_review_record_C": "docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md",
   "operational_slot_assignment": {
-    "effective_date": "2026-10-17",
-    "authority": "USER_C_SLOT_DOCKER_CROP_ASSIGNMENT",
-    "C": "N100:outrun-c-original-english-crop/c-english-original-crop",
-    "C_execution": "independent_external_docker_worker_not_third_ChatGPT_tab",
+    "effective_date": "2026-10-19",
+    "authority": "USER_CONTROLLED_KOREAN_AUTOMATION_RESTART",
+    "C1": "ChatGPT browser third tab independent lightweight QA",
+    "C": "in-container native original English crop background worker",
     "existing_Portainer_stack": "outrun-kor",
-    "Portainer_A_B_C1": "PAUSED_AUTO_SEND_FALSE_NO_REDEPLOY",
-    "conflict_protection": "NO_SECOND_C_INSTANCE_NO_BROWSER_C_DISPATCH",
-    "pending_limitation": "NEW_ROI_SPECS_NOT_AUTO_DISCOVERED"
+    "Portainer_A_B_C1": "AUTO_SEND_TRUE_AFTER_MANUAL_REDEPLOY",
+    "conflict_protection": "ONE_LOCALIZATION_CONTAINER_NO_SECOND_C_INSTANCE_C2_DISABLED",
+    "pending_limitation": "DDS_FINAL_COMPOSE_AND_GAME_PASS_NOT_AUTOMATED"
   }
 }
