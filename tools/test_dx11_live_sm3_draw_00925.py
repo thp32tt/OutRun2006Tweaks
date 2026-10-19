@@ -178,6 +178,15 @@ check("struct NativeLiveSm3Program" in header and
       "s.frameBatch.abort();" in bridge.partition(
           "if (!submit_live_sm3_game_draw(")[2][:350],
       "native shader source ownership or fallback missing")
+# Preserve the real (nine-argument) observer after multi-stream ownership
+# was added, including empty legal draws. D3DVERTEXELEMENT9::Stream is WORD,
+# while GameSm3ElementRef::stream is uint8_t: the preceding declaration
+# validation proves < 4, so explicitly narrow rather than failing MSVC C2397.
+check("static_cast<std::uint8_t>(declaration[i].Stream)" in bridge,
+      "actual SM3 multistream vertex declaration fails Win32 C2397")
+check("observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u, nullptr);" in bridge,
+      "empty game draw missing additional-stream argument (Win32 C2660)")
+
 # Real D3D9 vertex-stage TEXLDL samples the independent game texture
 # namespace 256..259, never pixel samplers 0..15. The VS HLSL program
 # must explicitly own its required stages, and both native shader stages

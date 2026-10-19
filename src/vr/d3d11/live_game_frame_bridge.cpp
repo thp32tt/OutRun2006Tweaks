@@ -4769,8 +4769,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 extra->extra[slot-1u].vertexCount};
         std::vector<GameSm3ElementRef> elements;
         for (std::size_t i=0u; i+1u<declaration.size(); ++i)
-            elements.push_back({declaration[i].Stream,
-                                declaration[i].Offset,declaration[i].Type});
+            elements.push_back({
+                static_cast<std::uint8_t>(declaration[i].Stream),
+                declaration[i].Offset, declaration[i].Type});
         if (!game_sm3_assemble_streams(elements,streams,vertexCount,unpacked))
             return false;
         nativeBytes=unpacked.data();
@@ -6531,7 +6532,7 @@ void observe_empty_game_draw(IDirect3DDevice9* game,
         observe_unavailable_game_draw(game);
         return;
     }
-    observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u);
+    observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u, nullptr);
 }
 
 void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
