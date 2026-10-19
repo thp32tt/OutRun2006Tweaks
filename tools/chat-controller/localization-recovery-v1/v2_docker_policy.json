@@ -1,13 +1,23 @@
 {
   "schema": "outrun-kr-v2-docker-policy-20261016",
   "plan_task_id": "OUTRUN-KR-PLAN-REVIEW-20261016-094508",
-  "deployment_mode": "PAUSED_MANUAL",
+  "deployment_mode": "ACTIVE_CONTROLLED_ROI_IMAGEGEN",
   "native_source_only": true,
   "legacy_986_tiles_forbidden": true,
   "c_role": "ORIGINAL_HD_NATIVE_CROP_ONLY",
+  "browser_slots": [
+    "A",
+    "B",
+    "C1"
+  ],
+  "native_roi_dispatch_implemented": true,
   "v2_batch_sheet_dispatch_implemented": false,
-  "runtime_activation_approved": false,
-  "controller_auto_send": false,
+  "runtime_activation_approved": true,
+  "controller_auto_send": true,
+  "auto_scope": "NATIVE_CROP_TO_A_B_IMAGEGEN_AND_C1_LIGHT_QA",
+  "auto_dds_write": false,
+  "auto_game_pass": false,
+  "auto_deploy": false,
   "stages": [
     "F0",
     "F1",
@@ -15,21 +25,19 @@
     "F3",
     "F4"
   ],
-  "F0": "Q051 original native DDS no-op roundtrip plus representative clean plate",
-  "F1": "one Korean Q051 phrase persisted DDS and user actual game proof",
-  "F2": "all five Q051 phrases exact mapping + actual game proof",
-  "F3": "two more style families, total fifteen phrases, full QA",
-  "F4": "6-8 sheets only when overall time per final-pass phrase beats 5",
+  "working_stage": "F2",
   "requirements": {
     "source_sha_pinned": true,
     "translation_approved": true,
-    "raw_orientation_and_ui_safe_mask": true,
-    "alpha_and_phrase_map_verified": true,
-    "clean_mask_separate_from_sprite": true,
+    "native_unsplit_hd_source_only": true,
+    "actual_chatgpt_png_attachment": true,
+    "generated_output_count_verified": true,
+    "project_library_content_sha_verified": true,
+    "c1_independent_light_qa": true,
+    "legacy_986_tiles_forbidden": true,
     "dds_single_writer_and_mip_preserved": true,
-    "unicode_text_runtime_separate_release_gate": true,
-    "c1_c3_game_never_forged": true,
-    "protected_pixels_zero_change": true
+    "protected_pixels_zero_change": true,
+    "runtime_and_game_approval_separate": true
   },
   "release_owner": "USER_MANUAL_PORTAINER_REDEPLOY_ONLY",
   "no_live_or_other_projects_modified": true
