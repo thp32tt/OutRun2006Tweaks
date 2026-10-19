@@ -4,6 +4,7 @@ The real B batch and its five library items were also SHA256-matched
 using N100 Playwright on 2026-10-14, without modifying controller state.
 """
 import asyncio
+import hashlib
 import importlib.util
 from pathlib import Path
 import sys
@@ -118,6 +119,19 @@ class ProjectLibraryTests(unittest.TestCase):
         self.assertTrue(self.folder.closed)
         self.assertEqual(proof["folder"],"아웃런 한글화 신규")
         self.assertEqual(proof["match_status"],"EXACT_GENERATED_LIBRARY_PNG_SHA256_MATCH")
+
+    def test_default_scan_reaches_matches_beyond_old_75_item_cap(self):
+        decoys=[{"id":"libfile_DECOY"+str(i).zfill(6),
+                 "name":f"older-{i}.png","sha256":hashlib.sha256(str(i).encode()).hexdigest(),"bytes":900}
+                for i in range(120)]
+        matches=[{"id":"libfile_MATCH"+str(i).zfill(6),
+                  "name":f"target-{i}.png","sha256":sha,"bytes":1400}
+                 for i,sha in enumerate(SHAS)]
+        self.folder.rows=decoys+matches
+        proof,error=asyncio.run(gate.verify_project_library_images(self.chat,ACTIVE))
+        self.assertIsNone(error)
+        self.assertIsNotNone(proof)
+        self.assertEqual(proof["library_content_sha256"],SHAS)
 
     def test_one_missing_library_png_must_not_pass(self):
         self.folder.rows[-1]["sha256"]="b"*64
