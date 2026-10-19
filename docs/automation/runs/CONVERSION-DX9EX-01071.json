@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01071",
+  "production_id": "CONVERSION-DX9EX-01071",
+  "event_id": "CONVERSION-DX9EX-01071-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTING_C2",
+  "checkpoint": "C2_SOURCE",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Preserve complete original title/menu/selector 4:3 physical containment while preventing full-vector game D3DX transforms belonging to gameplay HUD, GOAL and +TIME from borrowing menu-only affine containment; keep exact pivot/partial-vector menu and desktop rollback behavior.",
+    "scope_boundary": "Original front-end title, menu and selector D3DXMatrixTransformation2D full-scale/translation producer, its partial/pivot siblings, and direct custom-sprite quad pipeline only. No VR world, F11, ESC, GOAL, stage timer, renderer R29–R33, R26_SAFE, input, FFB, SkyGlow, DX11, frozen DXVK edits.",
+    "trace_stages": [
+      "Original game D3DXMatrixTransformation2D is shared by main-menu, car-selection and gameplay visual producers; a full-vector path was not gated to a front-end game state.",
+      "Native hooks_uiscaling full/partial/pivot branches author the source matrix, with exact original copied-matrix ledger preventing double quad aspect conversion.",
+      "Original custom sprite vertices and R84 physical Draw feed the per-eye XR stereo pipeline; unknown/not-menu sources retain native unmodified D3DX matrix and protected separate HUD owners."
+    ],
+    "subcomponents": [
+      "Scope full-vector D3DX affine containment to the same title/menu/selector game states as partial and pivoted transforms, with one producer-entry state snapshot.",
+      "Keep valid full/partial/pivoted menu contain and existing already-contained quad ledger while proving gameplay/GOAL/+TIME negative invariants in C++ compile-time regression.",
+      "Preserve original native D3DX return and Win32 R84 game/host/package, domain and source-inspector exact-SHA validation and HMD UNTESTED."
+    ],
+    "acceptance_items": [
+      {
+        "id": "frontend_full_vector_physical_aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_frontend_d3dx_full_partial_pivot_and_native_menu_quad",
+        "expected_behavior": "Title/menu/selector original full-vector sprite transforms use intended physical 4:3 containment without changing existing contained matrix and custom quad ownership."
+      },
+      {
+        "id": "nongame_menu_ui_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "race_hud_goal_stage_f11_pause_world_original_d3dx_and_rollback",
+        "expected_behavior": "Gameplay HUD, GOAL and +TIME native D3DX transforms do not acquire the menu-only affine; partial/pivot menu and VR disabled fallback retain original behavior."
+      },
+      {
+        "id": "frontend_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "x86_r84_x64_openxr_package_domain_inspector_full_source_exact_sha",
+        "expected_behavior": "Final validation-bearing result SHA passes required DX9Ex Active Win32 game+host+package, Domain Isolation, HUD Inspector and Full Source Impact gates; hardware Quest3 remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Direct source cross-check src/hooks_uiscaling.cpp D3DXMatrixTransformation2D_dest: existing complete pScaling+pTranslation branch invokes BuildFrontEndAffineContain with no Game::current_mode front-end guard, unlike its partial and pivot branches.",
+    "root_cause": "Shared original game native D3DX full-vector menu containment admitted non-front-end producer matrices in centered UI modes, potentially repositioning unrelated gameplay HUD/GOAL/+TIME before their independent R84 GPU owner.",
+    "source_trace": [
+      "Original native source D3DXMatrixTransformation2D complete/partial/pivot input decides UI contained menu versus unrelated race state.",
+      "One original state snapshot fences D3DX full-vector and preserves exact same guarded native partial/pivot path.",
+      "Original source result retained with ContainedMatrices fingerprint, custom sprite quad mapped once, and R84 native physical eye path unchanged."
+    ],
+    "eye_ownership": "The source-boundary change does not assert binocular Quest3 behavior; it prevents foreign HUD source transformation before R84 physical left/right draw while leaving exact native menu quad eye owner unchanged.",
+    "alternatives_rejected": [
+      "Do not modify original EXE, widen generic ScreenHud identity, disable SkyGlow, force D3DX Flush, or shift unrelated World/F11/ESC into menu plane."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "frontend_full_vector_physical_aspect": "PENDING",
+    "nongame_menu_ui_fallback": "PENDING",
+    "frontend_exact_sha_ci": "PENDING"
+  },
+  "next_action": "Implement original front-end full-vector guard with C++ regressions in existing R84 build source; after material SHA verify exact CI; Quest3/VDXR UNTESTED."
+}
