@@ -8,6 +8,7 @@
 #include "native_sm3_conditional_flow.hpp"
 #include "native_sm3_repeat_flow.hpp"
 #include "native_sm3_predicate_flow.hpp"
+#include "native_sm3_predicated_instruction.hpp"
 #include "live_game_sm3_alpha_test.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
@@ -367,6 +368,8 @@ bool build_r283_sm3_mov_shader_source(
             unsigned matrixVectorComponents{};
             bool texture2d{};
             bool texkill{};
+            bool predicated{};
+            bool negatePredicate{};
             // Flow instructions are source operations, not synthetic register writes.
             // 1=IF, 2=ELSE, 3=ENDIF, 4=REP, 5=ENDREP,
             // 6=BREAK, 7=BREAKC, 8=SETP, 9=BREAKP.
@@ -842,9 +845,14 @@ bool build_r283_sm3_mov_shader_source(
             }
             // Predication, co-issue and unknown opcode-control flags are NOT
             // interchangeable with unguarded HLSL arithmetic.
+            // SM3 bit 28 adds a final source token for the p0 predicate.
+            // Other reserved/co-issue instruction bits still fail closed.
+            const bool sourcePredicated =
+                (instruction.instructionToken & 0x10000000u) != 0u;
             if (operations.size() >= kMaxOps ||
-                (instruction.instructionToken & 0xf0000000u) != 0u ||
-                instruction.operandTokens.size() != sourceCount + 1u)
+                (instruction.instructionToken & 0xe0000000u) != 0u ||
+                instruction.operandTokens.size() !=
+                    sourceCount + 1u + (sourcePredicated ? 1u : 0u))
                 return false;
             const DWORD destination = instruction.operandTokens[0];
             const unsigned mask =
@@ -861,6 +869,35 @@ bool build_r283_sm3_mov_shader_source(
                 destination & D3DSP_REGNUM_MASK);
             op.destinationMask = mask;
             op.sourceCount = sourceCount;
+            if (sourcePredicated) {
+                // The native owner tracks shader SETP p0.x only.  A
+                // vector predicate, unknown/unwritten p0 or implicit
+                // texture derivatives cannot be silently scalarized.
+                // Explicit-Lod TEXLDL is safe inside a dynamic HLSL IF.
+                if (instruction.opcode == D3DSIO_TEXKILL ||
+                    instruction.opcode == D3DSIO_DSX ||
+                    instruction.opcode == D3DSIO_DSY ||
+                    (instruction.opcode == D3DSIO_TEX ||
+                     instruction.opcode == D3DSIO_TEXLDD))
+                    return false;
+                const DWORD predicate = instruction.operandTokens.back();
+                const unsigned swizzle =
+                    (predicate & D3DSP_SWIZZLE_MASK) >> 16u;
+                const unsigned modifier =
+                    (predicate & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT;
+                bool invert = false;
+                if ((predicate & 0x80000000u) == 0u ||
+                    r283_decode_register_type(predicate) != D3DSPR_PREDICATE ||
+                    (predicate & D3DSP_REGNUM_MASK) != 0u ||
+                    (predicate & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    !native_sm3_scalar_predicate(
+                        predicateFlow.ready(), swizzle, modifier,
+                        D3DSPSM_NOT, invert))
+                    return false;
+                op.predicated = true;
+                op.negatePredicate = invert;
+                predicateUsed = true;
+            }
             op.sineCosine = instruction.opcode == D3DSIO_SINCOS;
             op.signScratch = instruction.opcode == D3DSIO_SGN;
             // SINCOS cannot write z/w. SGN scratch ownership is restricted
@@ -1050,12 +1087,21 @@ bool build_r283_sm3_mov_shader_source(
                 op.sources[i] = std::move(value);
             }
 
+            // A conditional draw-time instruction cannot initialize a
+            // previously undefined game register. HLSL's zero-initialized
+            // placeholder is not D3D9 register-provenance evidence.
             if (op.destinationType == D3DSPR_TEMP)
-                tempWritten[op.destinationRegister] |= mask;
+                tempWritten[op.destinationRegister] =
+                    native_sm3_predicated_write_mask(
+                        tempWritten[op.destinationRegister], mask, op.predicated);
             else if (op.destinationType == D3DSPR_OUTPUT)
-                outputWritten[op.destinationRegister] |= mask;
+                outputWritten[op.destinationRegister] =
+                    native_sm3_predicated_write_mask(
+                        outputWritten[op.destinationRegister], mask, op.predicated);
             else
-                outputWritten[0] |= mask;
+                outputWritten[0] =
+                    native_sm3_predicated_write_mask(
+                        outputWritten[0], mask, op.predicated);
             if (op.signScratch) {
                 for (const UINT scratch : op.signTemps)
                     tempWritten[scratch] = 0u;
@@ -1160,6 +1206,10 @@ bool build_r283_sm3_mov_shader_source(
             else if (op.destinationType == D3DSPR_OUTPUT)
                 dest = "output.r" + std::to_string(op.destinationRegister);
             else dest = "r283_color";
+            if (op.predicated &&
+                !append_native_sm3_predicated_begin(
+                    translated, op.negatePredicate))
+                return false;
             if (op.texkill) {
                 if (!append_native_sm3_texkill(
                         translated, op.destinationRegister,
@@ -1185,6 +1235,8 @@ bool build_r283_sm3_mov_shader_source(
                                op.sources[0], op.sources[1], op.sources[2]},
                            op.sourceCount, static_cast<unsigned>(i)))
                 return false;
+            if (op.predicated)
+                append_native_sm3_predicated_end(translated);
         }
         translated += vertexStage ? "    return output;\n}\n"
                                   : "    return r283_color;\n}\n";
