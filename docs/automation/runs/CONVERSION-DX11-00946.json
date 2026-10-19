@@ -1,0 +1,110 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00946",
+  "production_id": "CONVERSION-DX11-00946",
+  "event_id": "CONVERSION-DX11-00946-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00946",
+  "feature_id": "DX11:LIVE_SM3_DYNAMIC_IFC_NATIVE_FRAME",
+  "status": "CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "6e310597b35708e7f33df5fc03e8b12dd38d4e27",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_DYNAMIC_IFC_NATIVE_FRAME",
+    "goal": "Translate real shader-bound D3D9 SM3 dynamic scalar float compare IFC/ELSE/ENDIF branch control into native DX11 game VS/PS programs for menu-to-race Draw/DrawIndexed, while preserving definite-write masks and safe original D3D9 rendering/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "source_sm3_ifc_native_game_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_shader_translation_and_native_draw",
+        "expected_behavior": "Real game D3D9 VS/PS scalar comparison branch opcodes materialize to HLSL conditionals linked into existing D3D11 Draw/DrawIndexed and full-resolution output."
+      },
+      {
+        "id": "flow_definite_write_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "branch_register_read_proof_and_d3d9_fallback",
+        "expected_behavior": "Uninitialized TEMP/output lanes, malformed comparison tokens, unsupported boolean/predicate control, unbalanced and deep nested branches fail closed before native draw; original D3D9 rendering and gamepad remain authoritative."
+      },
+      {
+        "id": "five_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_branch_probe_source_regression_and_win32_build",
+        "expected_behavior": "Portable real C++ flow-path probe and negative source checks plus all five GitHub Actions Fast/Backend/Windows/OpenXR/HUD pass at exactly one validation-bearing SHA, with HMD runtime separate."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept actual D3D9 game SM3 VS/PS bytecode from genuine Draw and DrawIndexed",
+      "Decode scalar IFC/ELSE/ENDIF and prove branch-specific TEMP/output register initialization and live constants",
+      "Materialize native DX11 VS/PS HLSL conditional branches while preserving all shader/resource/input bindings and fail-closed D3D9 render/input fallback",
+      "Issue existing native full-resolution D3D11 Draw/DrawIndexed and guarded frame publication only after full state validation"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_conditional_flow.hpp",
+      "tools/dx11_sm3_conditional_flow_probe_00946.cpp",
+      "tools/test_dx11_sm3_conditional_flow_00946.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ portable branch-state tests covering scalar compare modes, nested balanced branches and definite writes; exact-source integration into real D3D9 shader-to-native D3D11 program materialization.",
+      "negative_regression": "Malformed controls, unsupported register banks, unwritten lanes, ELSE without IF, duplicate ELSE, unclosed and over-depth IF fail closed to original game D3D9 Draw.",
+      "component_integration": "Actual intercepted OutRun programmable shader bytecode -> native HLSL conditional VS/PS -> existing full-resolution D3D11 Draw/DrawIndexed with original D3D9 fallback."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_DYNAMIC_IFC_NATIVE_FRAME:CONVERSION-DX11-00946"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_D3D9_SM3_SHADER_BYTES",
+      "NATIVE_SM3_IFC_HLSL",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact source/CI build only; actual native game pixels, menu/vehicle/race play, Quest3, gamepad and HMD remain UNTESTED.",
+    "activation_guard_and_fallback": "Existing opt-in native full game path remains fail closed; original D3D9/DX9Ex rendering/input/FFB and SkyGlow unchanged, frozen DXVK untouched."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_conditional_flow.hpp",
+    "tools/dx11_sm3_conditional_flow_probe_00946.cpp",
+    "tools/test_dx11_sm3_conditional_flow_00946.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Latest GitHub HEAD & 00945 completed C6 reconciled; no other active conflicting IFC owner found.",
+    "C1_REVIEW": "R283 real SM3 translator rejected genuine IFC/ELSE/ENDIF as unsupported, suppressing applicable native game Draw.",
+    "C2_IMPLEMENT": "Branch-sensitive source codegen/definite-write analysis, nested flow portable regressions and original D3D9 fallback committed.",
+    "C3_VALIDATE": "PENDING_FIVE_EXACT_SHA_GATES; initial material Fast failed because 00945 terminal run record validation, repaired by 00946 CI_PENDING policy-valid run; corrected native HLSL newline escape.",
+    "C4_COMMIT": "material=6e310597b35708e7f33df5fc03e8b12dd38d4e27; same-task real validation repair in next commit",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING"
+  },
+  "acceptance_results": {
+    "source_sm3_ifc_native_game_draw": "PENDING_EXACT_SHA_BUILD",
+    "flow_definite_write_and_fallback": "PENDING_EXACT_SHA_BUILD",
+    "five_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Actual game native IFC shader draw counts and full menu/car/race native frame evidence not captured; remains separate runtime test.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "6e310597b35708e7f33df5fc03e8b12dd38d4e27",
+  "NEXT_IMPLEMENTATION_ACTION": "Complete exact-SHA Fast/Backend/Win32/OpenXR/HUD gates on corrected IFC code; if Gate fails, fix causal source under same TASK_ID, no HMD/gameplay PASS claim.",
+  "score_change": 0
+}

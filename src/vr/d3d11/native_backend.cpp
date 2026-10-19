@@ -921,11 +921,11 @@ bool build_r283_sm3_mov_shader_source(
             const auto& op = operations[i];
             if (op.flowKind != 0u) {
                 if (op.flowKind == 1u)
-                    translated += "    if (" + op.flowCondition + ") {\\n";
+                    translated += "    if (" + op.flowCondition + ") {\n";
                 else if (op.flowKind == 2u)
-                    translated += "    } else {\\n";
+                    translated += "    } else {\n";
                 else
-                    translated += "    }\\n";
+                    translated += "    }\n";
                 continue;
             }
             std::string dest;
