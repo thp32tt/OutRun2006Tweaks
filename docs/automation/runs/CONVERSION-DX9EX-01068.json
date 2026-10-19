@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01068",
+  "production_id": "CONVERSION-DX9EX-01068",
+  "event_id": "CONVERSION-DX9EX-01068-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATION",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "5d6d66652aa1e91a36a64047e7c2884927004a0f",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/pause_menu_eye_affine_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Ensure original ESC/pause shell and twelve exact option-arrow E8 sources alone receive the independent R84 binocular pause optical size and vertical positioning, while unrelated native screen HUD clips and callbacks that leave VR/pause cannot borrow the paused stereo plane.",
+    "scope_boundary": "Only exact native ESC E8 arrow producer and queue registration plus R84 paused ScreenHud renderer admission; leave PauseFrameShell, unrelated generic HUD, +TIME/GOAL, F11, title/selector, normal race world, R26_SAFE rollback, input/FFB, SkyGlow, DX11 and frozen DXVK unchanged.",
+    "trace_stages": [
+      "Original ESC option-arrow calls at RVA E358B/E35A3/E35CC/E35F7/E481B/E4833/E485C/E4887/EC24C/EC277/ED4D4/ED7A3 are redirected to PauseOptionArrow_putClipSprite, not shared generic clip producers.",
+      "PauseOptionArrow native producer enters exact ScreenHud source scope, snapshots VR and pause mode, and calls the original put_clip_sprite; a native callback may reenter before returning with SpriteNode siblings.",
+      "Original queued sprites retain the exact PauseOptionArrow node owner only across a stable native VR and pause transition; reverted or foreign queue routes retain original native Draw/fallback without pause-owned stereo affinity.",
+      "R84 R30 classifies the physical game ScreenHud Draw from the exact PauseOptionArrow token before applying left/right ESC-specific contain and signed vertical pixel shift; generic ExactScreenHudClipSprite cannot inherit that plane while paused."
+    ],
+    "subcomponents": [
+      "Correct R84 physical pause admission so the exact original ESC arrow E8 token, not unrelated generic exact ScreenHud clip token, owns pause optical scale and Y offset.",
+      "Fence original native queued ESC sprite registration across both entry and exit VR/pause state while retaining the original game's sprite submission and safely tagged legitimate siblings.",
+      "Add compile-time and executable positive and negative pause state-transition/VR toggle ownership regressions without changing shell/gameplay/HUD fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_exact_gpu_paused_eye_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "exact_original_pause_arrow_e8_renderer_r84_both_eyes",
+        "expected_behavior": "Only the original exact ESC option arrows receive R84 left/right pause containment and vertical positioning; real paused shell retains its own producer and ordinary generic HUD clips cannot impersonate ESC arrows."
+      },
+      {
+        "id": "esc_original_native_queue_transition_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_put_clip_sprite_pause_vr_entry_exit_queue",
+        "expected_behavior": "A nested VR exit, pause exit or false-to-true mode transition cannot tag a foreign queued native child as an ESC arrow; unchanged pause contexts retain sibling provenance and the original native result/Draw."
+      },
+      {
+        "id": "esc_full_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "win32_r84_x64_host_package_domain_inspector_full_source",
+        "expected_behavior": "Final validation-bearing exact SHA passes DX9Ex Active x86 game/x64 host/package, Domain Isolation, HUD Inspector and Full Source Impact; Quest3/VDXR optical and FFB acceptance remain separately UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Source inspection of hooks_uiscaling.cpp confirms twelve separate original ESC option-arrow E8 call replacements already mark PauseOptionArrow, whereas generic ExactScreenHud clip sources also exist and are shared with non-ESC callers; R30 previously accepted either token during paused mode.",
+    "root_cause": "R30IsPauseMenuExactArrow accepted unrelated generic ExactScreenHudClipSprite whenever the original game paused, giving unowned text/clip HUD the ESC-exclusive eye plane. The exact native arrow queued helper also registered children after reentrant VR/menu transitions without checking that producer-entry identity still held.",
+    "source_trace": [
+      "Original ESC arrow E8 -> PauseOptionArrow_putClipSprite -> exact native ScreenHud producer -> Game::put_clip_sprite and stable-root SpriteNode tail tagging.",
+      "Each selected queue node receives its producer token and scope through render_semantics while R84 R30 resolves the current physical ScreenHud GPU Draw classification.",
+      "An exact PauseOptionArrow may enter per-eye ESC containment/vertical translation; unknown or stale native sprites retain conservative R84 or original draw fallback without widening GOAL/F11/world."
+    ],
+    "eye_ownership": "R84 stereo admission now requires the proven exact PauseOptionArrow source and safe mode-preserved queued registration; the shell remains exact PauseFrameShell. This prevents a foreign HUD Draw borrowing the pause-only left/right eye transform, but headset optics are not established without Quest3 verification.",
+    "alternatives_rejected": [
+      "Do not infer ESC ownership from state 0x12 alone or from any generic ExactScreenHudClipSprite, and do not move F11 or HUD/GOAL into a pause plane.",
+      "Do not suppress native sprite Draw or skip returned HRESULT, flush unrelated D3DX batches, or alter R26_SAFE fallback."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "esc_exact_gpu_paused_eye_owner": "SOURCE_IMPLEMENTED",
+    "esc_original_native_queue_transition_fallback": "SOURCE_IMPLEMENTED",
+    "esc_full_exact_sha_gates": "PENDING"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS_WITH_REQUIRED_VALIDATION_RECORD",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "prior_failed_active": 39185709609,
+    "prior_failure": "Initial policy-only error: missing feature record before downstream Windows jobs could start; same TASK_ID repair, no source rollback",
+    "material_source_sha": "5d6d66652aa1e91a36a64047e7c2884927004a0f"
+  },
+  "next_action": "Run required full exact-SHA GitHub Actions on record-bearing commit; correct actual failures under original TASK_ID and keep Quest3 runtime UNTESTED."
+}
