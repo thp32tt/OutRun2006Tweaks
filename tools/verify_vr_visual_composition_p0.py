@@ -1916,9 +1916,12 @@ def check_outrun_text_owner(source, contracts):
                   '(!pauseFrameParent &&',
                   'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud);',
                   'if (Settings::VREnabled && !pauseFrameParent &&',
-                  'semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud)',
                   'OutRunHudTextProducerHook.call(',
                   'OutRunHudTextScreenHud = previous;')
+    require('if (Settings::VREnabled && !pauseFrameParent &&\n'
+            '                semantic.space == '
+            'OutRunVRHudSemantics::SpacePolicy::ScreenHud)' in parent,
+            parent, 'BA9D0 direct owner must retain exact pause-parent exclusion')
     for sig, original in (
         ('static int __cdecl OutRunHudText_clip(', 'Game::put_clip_sprite('),
         ('static int __cdecl OutRunHudText_sprani(', 'Game::sprani_play_ae_auth_alpha('),
@@ -1954,6 +1957,13 @@ for label, marker0, mutant in (
     ('pause frame token lost',
      'ProducerToken::PauseFrameShell;',
      'ProducerToken::None;'),
+    ('direct pause guard bypass',
+     'if (Settings::VREnabled && !pauseFrameParent &&\n'
+     '                semantic.space == '
+     'OutRunVRHudSemantics::SpacePolicy::ScreenHud)',
+     'if (Settings::VREnabled && true &&\n'
+     '                semantic.space == '
+     'OutRunVRHudSemantics::SpacePolicy::ScreenHud)'),
     ('parent lost E8 gate',
      'OutRunVRHudSemantics::ClassifyDirectCallsite(caller,',
      'OutRunVRHudSemantics::ClassifyCaller(caller /* E8 check removed */,'),
