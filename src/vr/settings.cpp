@@ -96,7 +96,7 @@ namespace Settings
 	Setting<bool> VRCullingCameraSync{ "VR", "CullingCameraSync", true,
 		"Temporarily mirrors the render-time VR camera into OutRun's live camera position/look so render-phase culling and camera-facing effects can follow head motion. Restored before game logic resumes." };
 	Setting<bool> VRCullingUnionFov{ "VR", "CullingUnionFov", true,
-		"Widens the temporary render-phase culling projection to the union of both OpenXR eye FOVs plus a small safety margin. The stock game projection is restored before gameplay logic resumes and the actual eye projections remain unchanged." };
+		"Legacy compatibility toggle; superseded by StageCullingMode. The game render projection is never modified across an entire scene." };
 	Setting<float> VRCullingUnionMarginDegrees{ "VR", "CullingUnionMarginDegrees", 4.0f,
 		"Extra angular safety margin added around the two-eye culling union.", Range<float>{ 0.0f, 15.0f } };
 	Setting<bool> VRNormalizeReflectionRate{ "VR", "NormalizeReflectionRate", true,
