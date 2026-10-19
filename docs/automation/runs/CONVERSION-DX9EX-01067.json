@@ -2,20 +2,20 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-01067",
   "production_id": "CONVERSION-DX9EX-01067",
-  "event_id": "CONVERSION-DX9EX-01067-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-01067-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "215b09f73c97a5c29654f09736d3974dccfccfee",
+  "validation_bearing_result_sha": "e54fc997472258303f491af30c57b6bb6353fcfa",
   "changed_files": [
     "src/hooks_textures.cpp",
     "src/vr/game/ui_texture_lookup_window.hpp"
@@ -78,14 +78,28 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "selector_uv_mask_exact_owner": "PENDING_BUILD",
-    "selector_reset_unmatched_fallback": "PENDING_BUILD",
-    "selector_final_exact_sha_ci": "PENDING"
+    "selector_uv_mask_exact_owner": "PASS_BUILD",
+    "selector_reset_unmatched_fallback": "PASS_BUILD",
+    "selector_final_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "runtime": "Quest3/VDXR not executed",
-    "status_note": "Material texture lookup-window candidate awaiting exact-SHA Windows x86 game and x64 host CI; no real UI proof."
+    "status": "PASS_EXACT_SHA",
+    "runtime": "Quest3/VDXR not executed; RUNTIME_VALIDATION=UNTESTED",
+    "status_note": "C6 BUILD_VERIFIED exact SHA after same-task verifier failure repair; not an HMD visual PASS or new score.",
+    "exact_sha": "e54fc997472258303f491af30c57b6bb6353fcfa",
+    "material_sha": "215b09f73c97a5c29654f09736d3974dccfccfee",
+    "required_gate_runs": {
+      "DX9Ex Active Validation": 39184169672,
+      "Domain Isolation Guard": 39184169694,
+      "OutRun EXE HUD Inspector CI": 39184169709,
+      "DX9Ex Full Source Impact Review": 39184169677
+    },
+    "all_required_gates": "4/4 SUCCESS",
+    "prior_failed_active": 39183595692,
+    "repair_commit_shas": [
+      "02ab1dea8433ec3c1470110fe9d79fa83fed98f7",
+      "e54fc997472258303f491af30c57b6bb6353fcfa"
+    ]
   }
 }
