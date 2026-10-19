@@ -29,6 +29,13 @@ namespace Settings
 		"Enables the OpenXR renderer-side VR bridge." };
 	Setting<bool> VRAutoEnableWhenHostPresent{ "VR", "AutoEnableWhenHostPresent", true,
 		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
+    // HMD-less debug runs game-side R84 left/right rendering to the desktop.
+    // Never auto-start or impersonate an OpenXR host in this mode.
+    Setting<int> VRHmdlessDebugMode{ "VR", "HmdlessDebugMode", 0,
+        "No-headset diagnostic only. Desktop SBS gameplay eye preview using synthetic 64 mm IPD and asymmetric FOV; restart required. This does NOT validate Quest 3 optics or compositor.",
+        { "Off (normal Quest 3)", "Center (desktop SBS)", "Auto pose sweep (14 s)",
+          "Yaw +30", "Yaw -30", "Pitch +20", "Pitch -20",
+          "Move +10 cm X", "Move -10 cm X" } };
 	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
     // VR quality is independent of the original game's [DX] ANTIALIASING.
@@ -230,7 +237,7 @@ namespace OutRunVR
 
 		DWORD WINAPI VRAutoLaunchHostThread(void*)
 		{
-			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
+			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost || Settings::VRHmdlessDebugMode != 0)
 				return 0;
             for (int attempt = 0; attempt < 40; ++attempt)
             {
@@ -249,7 +256,7 @@ namespace OutRunVR
 
     void RequestVRHostStartup() noexcept
     {
-        if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
+        if (!Settings::VREnabled || !Settings::VRAutoLaunchHost || Settings::VRHmdlessDebugMode != 0)
             return;
         static std::atomic<bool> queued{false};
         bool expected = false;
@@ -273,6 +280,7 @@ namespace OutRunVR
 		void declare_settings() override
 		{
 			Settings::VRAutoLaunchHost.needs_restart();
+            Settings::VRHmdlessDebugMode.needs_restart();
             // Superseded by the explicit F11 StageCullingMode; keep existing
             // INI parsing backwards compatible without duplicate controls.
             Settings::VRCullingUnionFov.hidden(true);
