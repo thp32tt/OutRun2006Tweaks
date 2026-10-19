@@ -20,7 +20,35 @@ def body(text,marker):
                 return text[brace+1:i]
     raise ValueError("unmatched C++ braces: "+marker)
 
-def verify(text):
+def verify_texture_lookup_window(window_source):
+    """Guard both the C++ one-shot state machine and its fail-closed identity checks."""
+    normalized = "".join(window_source.split())
+    def check(marker, meaning):
+        if "".join(marker.split()) not in normalized:
+            raise ValueError("vehicle selector lookup window lost " + meaning)
+    for token, meaning in (
+        ("constexpr bool SpriteMatches(Texture* submitted) const noexcept", "sprite match"),
+        ("return submitted && sprite == submitted;", "non-null sprite identity"),
+        ("constexpr bool MaskMatches(Texture* submitted) const noexcept", "mask match"),
+        ("return submitted && mask == submitted;", "non-null mask identity"),
+        ("if (!returned) { Clear(); return; }", "failed lookup invalidation"),
+        ("pending_.mask = pending_.sprite;", "paired mask pointer"),
+        ("pending_.maskId = pending_.spriteId;", "paired mask ID"),
+        ("pending_.sprite = hasScale ? returned : nullptr;", "unscaled pointer fallback"),
+        ("pending_.spriteId = hasScale ? id : 0;", "unscaled ID fallback"),
+        ("const auto current = pending_;", "snapshot before consumption"),
+        ("const auto current = pending_; Clear(); return current;", "consume-once invalidation"),
+        ("static_assert(TextureLookupSubmissionGuards()", "compiled positive and negative cases"),
+        ("window.Observe(nullptr, 9, false);", "failed lookup regression"),
+        ("window.Clear();", "pack change regression"),
+        ("paired.MaskMatches(&mask)", "parent/mask pair regression"),
+        ("plain.maskId != 7", "unscaled parent mask regression"),
+        ("reused.SpriteMatches(&sprite)", "one-shot reuse regression"),
+    ):
+        check(token, meaning)
+
+
+def verify(text, window_source=None):
     # Inspect the actual runtime decoder with or without constexpr; either
     # spelling is a valid function, and both must meet identical strict guards.
     fmt_marker=("inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat("
@@ -269,23 +297,52 @@ def verify(text):
     lookup=body(text,"static void* __cdecl get_texture_dest(")
     spr2=body(text,"static int __cdecl put_sprite_ex2_dest(")
     spr1=body(text,"static int __cdecl put_sprite_ex_dest(")
-    obligations=[
-        (lookup,"ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr)"),
-        (spr2,"if (!Settings::UITextureReplacement)"),
-        (spr2,"prevMaskTexture = nullptr;"),
-        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\ta1->d3dtexture_ptr_C == prevTexture)"),
-        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\t\t\ta1->child_B4->d3dtexture_ptr_C == prevMaskTexture)"),
-        (spr2,"sprite_scales.find(prevTextureId)"),
-        (spr2,"sprite_scales.find(prevMaskTextureId)"),
-        (spr1,"ShouldApplyUIScale(Settings::UITextureReplacement, true)"),
-        (spr1,"sprite_scales.find(xstnum)"),
+    if window_source is None:
+        window_source = (ROOT / "src/vr/game/ui_texture_lookup_window.hpp").read_text(encoding="utf-8")
+    verify_texture_lookup_window(window_source)
+    # Read the producer and consumer from the actual hook: a pointer alone
+    # cannot authorize another frame, sprite family, or pack's UV scale.
+    obligations = [
+        (text, '#include "vr/game/ui_texture_lookup_window.hpp"'),
+        (text, "TextureLookupWindow<void> pendingTextureLookups{};"),
+        (lookup, "if (!Settings::UITextureReplacement)"),
+        (lookup, "pendingTextureLookups.Clear();"),
+        (lookup, "pendingTextureLookups.Observe(ret, textureId,"),
+        (lookup, "sprite_scales.contains(textureId)"),
+        (spr2, "const auto lookup = pendingTextureLookups.Consume();"),
+        (spr2, "lookup.SpriteMatches(a1->d3dtexture_ptr_C)"),
+        (spr2, "sprite_scales.find(lookup.spriteId)"),
+        (spr2, "a1->child_B4 && *Module::exe_ptr<int>(0x586B28)"),
+        (spr2, "lookup.MaskMatches(a1->child_B4->d3dtexture_ptr_C)"),
+        (spr2, "sprite_scales.find(lookup.maskId)"),
+        (spr2, "originalUv.Apply(a1,"),
+        (spr2, "maskUv.Apply(a1->child_B4,"),
+        (spr2, "maskUv.Restore();"),
+        (spr2, "originalUv.Restore();"),
+        (spr1, "pendingTextureLookups.Consume();"),
+        (spr1, "ShouldApplyUIScale(Settings::UITextureReplacement, true)"),
+        (spr1, "sprite_scales.find(xstnum)"),
     ]
-    for region,needle in obligations:
+    xstset = body(text, "static void LoadXstsetSprite_dest(")
+    obligations += [(xstset, "pendingTextureLookups.Clear();")]
+    for region, needle in obligations:
         if needle not in region:
-            raise ValueError("UI runtime toggle or single-lookup guard missing: "+needle)
-    if any(x in spr2+spr1 for x in ("sprite_scales[prevTextureId]","sprite_scales[prevMaskTextureId]","sprite_scales[xstnum]")):
-        raise ValueError("sprite scaling hot path resumed repeated map lookups")
-    return len(guards) + len(xrgb_checks) + len(state_guards) + 4
+            raise ValueError("UI runtime toggle or bounded-lookup guard missing: " + needle)
+    normalized_sprite = "".join(spr2.split())
+    if normalized_sprite.count("ShouldApplyUIScale(Settings::UITextureReplacement,") < 2:
+        raise ValueError("sprite/mask UI toggle checks must be independent")
+    if not (spr2.index("pendingTextureLookups.Consume()") <
+            spr2.index("lookup.SpriteMatches(") <
+            spr2.index("put_sprite_ex2.call<int>(") <
+            spr2.index("maskUv.Restore()") <
+            spr2.index("originalUv.Restore()")):
+        raise ValueError("consume, draw and parent/mask UV restore lifetime drift")
+    if any(x in spr2 + spr1 for x in (
+        "sprite_scales[lookup.spriteId]", "sprite_scales[lookup.maskId]",
+        "sprite_scales[xstnum]", "prevMaskTexture", "prevTextureId")):
+        raise ValueError("old pointer owner or unchecked scale-map lookup returned")
+    return len(guards) + len(xrgb_checks) + len(state_guards) + len(obligations)
+
 
 
 def negatives(text):
@@ -358,10 +415,16 @@ def negatives(text):
         "dstRow[p + 2] = srcRow[p];",
         "return enabled && matches;",
         "if (!Settings::UITextureReplacement)",
-        "ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr)",
-        "ShouldApplyUIScale(Settings::UITextureReplacement, true)",
-        "sprite_scales.find(prevTextureId)",
-        "sprite_scales.find(prevMaskTextureId)",
+        "pendingTextureLookups.Observe(ret, textureId,",
+        "pendingTextureLookups.Clear();",
+        "const auto lookup = pendingTextureLookups.Consume();",
+        "lookup.SpriteMatches(a1->d3dtexture_ptr_C)",
+        "lookup.MaskMatches(a1->child_B4->d3dtexture_ptr_C)",
+        "sprite_scales.find(lookup.spriteId)",
+        "sprite_scales.find(lookup.maskId)",
+        "a1->child_B4 && *Module::exe_ptr<int>(0x586B28)",
+        "maskUv.Restore();",
+        "originalUv.Restore();",
         "sprite_scales.find(xstnum)",
     ]
     for token in needles:
@@ -374,7 +437,36 @@ def negatives(text):
         except ValueError as exc:
             if str(exc).startswith("mutation was NOT caught"):
                 raise
-    return len(needles)
+    # Mutations of the actual standalone C++ state-machine must fail too:
+    # no positive-only test that ignores NULL, reused pointers or mask IDs.
+    header = (ROOT / "src/vr/game/ui_texture_lookup_window.hpp").read_text(encoding="utf-8")
+    window_needles = [
+        "return submitted && sprite == submitted;",
+        "return submitted && mask == submitted;",
+        "if (!returned) { Clear(); return; }",
+        "pending_.mask = pending_.sprite;",
+        "pending_.maskId = pending_.spriteId;",
+        "pending_.sprite = hasScale ? returned : nullptr;",
+        "pending_.spriteId = hasScale ? id : 0;",
+        "const auto current = pending_;",
+        "Clear();\n            return current;",
+        "static_assert(TextureLookupSubmissionGuards()",
+        "window.Observe(nullptr, 9, false);",
+        "paired.MaskMatches(&mask)",
+        "plain.maskId != 7",
+        "reused.SpriteMatches(&sprite)",
+    ]
+    for token in window_needles:
+        mutant = header.replace(token, "__DDS_BAD_CONTRACT__", 1)
+        if mutant == header:
+            raise ValueError("window mutation not applied: " + token)
+        try:
+            verify(text, mutant)
+            raise ValueError("window mutation was NOT caught: " + token)
+        except ValueError as exc:
+            if str(exc).startswith("window mutation was NOT caught"):
+                raise
+    return len(needles) + len(window_needles)
 
 if __name__=="__main__":
     text=(ROOT/"src/hooks_textures.cpp").read_text(encoding="utf-8")
