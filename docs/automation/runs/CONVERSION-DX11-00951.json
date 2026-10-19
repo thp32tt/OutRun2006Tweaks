@@ -70,12 +70,14 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "LIVE_D3D9_SHADER_CAPTURE",
       "SCALAR_PREDICATE_HLSL",
       "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
       "ORIGINAL_GAME_FALLBACK"
     ],
-    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_GAME_OUTPUT_UNTESTED",
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_GAME_OUTPUT_UNTESTED: live D3D9→HLSL→native Draw reaches existing guarded full-resolution desktop-frame publication source graph; no observed pixels and no HMD validation",
     "activation_guard_and_fallback": "Native opt-in remains fail-closed; D3D9Ex game renderer/input/FFB/SkyGlow unchanged, DXVK frozen."
   },
   "changed_files": [
@@ -92,7 +94,7 @@
     "C3_VALIDATE": "Same SHA mandatory 5/5 GitHub Actions SUCCESS, HMD/game runtime not run",
     "C4_COMMIT": "Material f13fb16cb990ffcf2d097222ce6aae145fb8c29b; no CI-skip in result",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PASS_EXACT_SHA at source material SHA, bookkeeping separate [skip ci]; RUNTIME_VALIDATION=UNTESTED"
+    "C6_RESULT": "PASS_EXACT_SHA at source material SHA, bookkeeping separate [skip ci]; RUNTIME_VALIDATION=UNTESTED; 00952 exact-SHA Gate regression found missing source-stage labels LIVE_D3D9_CALLSITE/VISIBLE_FRAME_OUTPUT in 00951 record; corrected labels without changing 00951 build/runtime evidence"
   },
   "acceptance_results": {
     "native_predicated_draw_shader": "PASS_BUILD",
