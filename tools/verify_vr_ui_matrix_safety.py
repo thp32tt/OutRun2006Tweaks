@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Single-pass DX9Ex UI matrix safety invariant, with 3 distinct mutants."""
+"""DX9Ex original UI matrix safety, owner checks, and destructive regressions."""
 from pathlib import Path
 from math import isfinite
 
@@ -11,7 +11,7 @@ def require_safe(source: str) -> None:
     end = source.index("static inline SafetyHookMid draw_sprite_custom_matrix_hk", start)
     s = source[start:end]
     required = (
-        "pScaling && pTranslation &&",
+        "CanContainOriginalFullFrontEndVector(",
         "Game::screen_scale && Game::screen_resolution",
         "std::isfinite(sx) && std::isfinite(sy)",
         "sx > 1.0e-6f && sy > 1.0e-6f",
@@ -30,7 +30,7 @@ def require_safe(source: str) -> None:
         if needle not in s:
             raise AssertionError(f"Missing UI matrix guard: {needle}")
     order = [
-        "pScaling && pTranslation &&",
+        "CanContainOriginalFullFrontEndVector(",
         "Game::screen_scale && Game::screen_resolution",
         "sx > 1.0e-6f && sy > 1.0e-6f",
         "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(",
@@ -66,6 +66,63 @@ def require_safe(source: str) -> None:
 
 
 require_safe(text)
+
+# 01071: Enforce the new full-vector guard and its shared game-state snapshot.
+# Never accept an unsafe full HUD transform just because a string was renamed.
+def require_frontend_owner(source: str) -> None:
+    predicate = source.split(
+        "constexpr bool CanContainOriginalFullFrontEndVector(", 1)[1].split(
+        "// The six +TIME caller tails", 1)[0]
+    for required in (
+        "return exactFrontEnd && containedMode &&",
+        "hasScale && hasTranslation;",
+        "static_assert(CanContainOriginalFullFrontEndVector(true, true, true, true)",
+        "static_assert(!CanContainOriginalFullFrontEndVector(false, true, true, true)",
+        "static_assert(!CanContainOriginalFullFrontEndVector(true, false, true, true)",
+    ):
+        assert required in predicate, "full-vector safety missing: " + required
+    owner = source.split("const bool originalFrontEndProducer =", 1)[1].split(
+        "const bool centredPhysicalMenuFill =", 1)[0]
+    assert "Game::current_mode &&" in owner
+    for state in ("TITLE", "MENU", "SELECTOR", "SELEXIT", "SELRESET"):
+        assert "GameState::STATE_" + state in owner, "frontend missing: " + state
+    for excluded in ("GOAL", "RACE"):
+        assert "GameState::STATE_" + excluded not in owner, "foreign HUD owner: " + excluded
+    hook = source.split(
+        "static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
+    for required in (
+        "mode == ScalingMode::KeepCentered && originalFrontEndProducer;",
+        "const bool frontEndPivot = NeedsFrontEndAffineContain(\n            originalFrontEndProducer,",
+        "if (!frontEndPivot && CanContainOriginalFullFrontEndVector(\n                originalFrontEndProducer,",
+        "pScaling != nullptr, pTranslation != nullptr) &&",
+        "const bool partialFrontEndMenu = originalFrontEndProducer;",
+    ):
+        assert required in hook, "source owner handoff missing: " + required
+    assert hook.index("const bool originalFrontEndProducer =") < hook.index(
+        "const bool frontEndPivot =") < hook.index(
+        "if (!frontEndPivot && CanContainOriginalFullFrontEndVector(")
+
+require_frontend_owner(text)
+for good, bad in (
+    ("hasScale && hasTranslation;", "hasScale || hasTranslation;"),
+    ("const bool originalFrontEndProducer = Game::current_mode &&",
+     "const bool originalFrontEndProducer = true &&"),
+    ("*Game::current_mode == GameState::STATE_SELECTOR",
+     "*Game::current_mode == GameState::STATE_GOAL"),
+    ("if (!frontEndPivot && CanContainOriginalFullFrontEndVector(\n                originalFrontEndProducer,",
+     "if (!frontEndPivot && CanContainOriginalFullFrontEndVector(\n                true,"),
+    ("const bool partialFrontEndMenu = originalFrontEndProducer;",
+     "const bool partialFrontEndMenu = true;"),
+):
+    assert good in text, "missing owner mutation anchor: " + good
+    try:
+        require_frontend_owner(text.replace(good, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("unsafe front-end owner mutation escaped: " + bad)
+print("DX9Ex front-end full-vector exact-owner PASS (5 destructive controls)")
 
 # Source owner introduced by 00961: preserve the physical viewport bound,
 # finite offsets, and separate X/Y ratios for full/nullable/pivoted D3DX paths.
@@ -289,7 +346,8 @@ for w, h, margin in ((2496, 2688, 408), (3440, 1440, 0),
     assert abs((h - 480 * s) / 2 - margin) < 1e-5
 
 mutants = (
-    ("pScaling && pTranslation &&", "pScaling || pTranslation ||"),
+    ("CanContainOriginalFullFrontEndVector(\n                originalFrontEndProducer,",
+     "CanContainOriginalFullFrontEndVector(\n                true,"),
     ("sx > 1.0e-6f && sy > 1.0e-6f", "sx >= 0.0f && sy >= 0.0f"),
     ("std::isfinite(centeredX) && std::isfinite(centeredY)",
      "std::isfinite(centeredX) || std::isfinite(centeredY)"),
@@ -300,6 +358,7 @@ for good, bad in mutants:
         raise AssertionError("No-op negative mutation: " + good)
     try:
         require_safe(mutant)
+        require_frontend_owner(mutant)
     except AssertionError:
         pass
     else:
@@ -558,14 +617,13 @@ print("DX9Ex custom matrix complete quad publishing PASS (4 negative controls)")
 # Front-end sprites supplying only one must still get aspect containment,
 # while gameplay/HUD and both-present/both-absent original routes stay intact.
 def require_partial_menu_vectors(code: str) -> None:
+    require_frontend_owner(code)
     # Constrain the check to this path, not the earlier pivot branch or
     # unrelated D3DX sprite consumers. The hook now saves the result first.
     body = code.split("const bool partialFrontEndMenu =", 1)[1].split(
         "const int result = D3DXMatrixTransformation2D.stdcall<int>", 1)[0]
     for required in (
-        "GameState::STATE_TITLE", "GameState::STATE_MENU",
-        "GameState::STATE_SELECTOR", "GameState::STATE_SELEXIT",
-        "GameState::STATE_SELRESET",
+        "originalFrontEndProducer;",
         "((pScaling == nullptr) != (pTranslation == nullptr))",
         "Game::screen_scale && Game::screen_resolution",
         "pScaling ? pScaling->x : 1.0f",
@@ -585,7 +643,7 @@ def require_partial_menu_vectors(code: str) -> None:
 
 require_partial_menu_vectors(text)
 for old, bad in (
-    ("GameState::STATE_SELECTOR", "GameState::STATE_GOAL"),
+    ("originalFrontEndProducer;", "true;"),
     ("((pScaling == nullptr) != (pTranslation == nullptr))",
      "(pScaling == nullptr && pTranslation == nullptr)"),
     ("pScaling ? pScaling->x : 1.0f", "pScaling->x"),
@@ -620,11 +678,8 @@ def require_pivot_containment(source: str) -> None:
         "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
     guard = block.split("if (!frontEndPivot", 1)[0]
     body = block.split("const int result = D3DXMatrixTransformation2D.stdcall<int>", 1)[1]
-    for state in ("STATE_TITLE", "STATE_MENU", "STATE_SELECTOR",
-                  "STATE_SELEXIT", "STATE_SELRESET"):
-        assert "GameState::" + state in guard, "pivot owner missing: " + state
-    for excluded in ("STATE_GOAL", "STATE_RACE"):
-        assert "GameState::" + excluded not in guard, "pivot owner leaked: " + excluded
+    require_frontend_owner(source)
+    assert "originalFrontEndProducer," in guard, "pivot must use original mode"
     for required in (
         "if (frontEndPivot && result && pOut &&",
         "const auto affine = OutRunVrUiAspect::BuildFrontEndAffineContain(",
@@ -649,7 +704,7 @@ def require_pivot_containment(source: str) -> None:
 
 require_pivot_containment(text)
 for old, bad in (
-    ("GameState::STATE_SELECTOR", "GameState::STATE_GOAL"),
+    ("originalFrontEndProducer,", "true,"),
     ("const float ratioY = affine.ratioY;", "const float ratioY = affine.ratioX;"),
     ("pOut->_12 = mapped.m12;", "pOut->_12 = mapped.m11;"),
     ("std::isfinite(mapped.tx) && std::isfinite(mapped.ty)",
