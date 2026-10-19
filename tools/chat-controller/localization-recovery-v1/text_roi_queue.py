@@ -430,24 +430,41 @@ async def inspect_slot(role, page, root="/data/imagegen"):
     if (data.get("task_id") != task or data.get("role") != role or
         len(data.get("tiles",[])) != active["count"]):
         return False, "SENT_RECEIPT_BINDING_MISMATCH"
-    if not active.get("source_chat_url"):
-        return False, "CHAT_URL_NOT_RECORDED"
-    target=active["source_chat_url"].strip()
-    if not re.fullmatch(r"https://chatgpt\.com/(?:g/g-p-[^/]+/)?c/[^?#]+(?:[?#].*)?", target):
-        return False, "ACTIVE_CHAT_URL_UNSAFE"
-    if page.url.rstrip("/") != target.rstrip("/"):
-        # A Portainer/browser restart can restore the older persistent slot URL
-        # while the in-flight batch belongs to a newer conversation. Reopen
-        # only that exact recorded ChatGPT conversation; never resend the task.
-        try:
-            await page.goto(target, wait_until="domcontentloaded", timeout=45000)
-        except Exception as exc:
-            return False, "ACTIVE_CHAT_REOPEN_FAILED:" + type(exc).__name__
-        if page.url.rstrip("/") != target.rstrip("/"):
-            return False, "ACTIVE_CHAT_REOPEN_MISMATCH"
     expected=active["count"]
-    try:
-        result=await page.evaluate(r"""async ({task,expected})=>{
+    generated_evidence=root/STATE_DIR/"generated_visible"/(task+".json")
+    persisted_generated=False
+    if generated_evidence.is_file() and not generated_evidence.is_symlink():
+        try:
+            prior=json.loads(generated_evidence.read_text(encoding="utf-8"))
+            persisted_generated=(
+                prior.get("task_id")==task and prior.get("role")==role and
+                prior.get("distinct_generated_images")==expected and
+                prior.get("status")=="IMAGES_VISIBLE_NOT_LIBRARY_PROOF" and
+                prior.get("export_status") in (
+                    "LOCAL_CANDIDATES_EXPORTED_UNAPPROVED",
+                    "EXISTING_CANDIDATES_VERIFIED",
+                )
+            )
+        except Exception:
+            persisted_generated=False
+
+    if not persisted_generated:
+        if not active.get("source_chat_url"):
+            return False, "CHAT_URL_NOT_RECORDED"
+        target=active["source_chat_url"].strip()
+        if not re.fullmatch(r"https://chatgpt\.com/(?:g/g-p-[^/]+/)?c/[^?#]+(?:[?#].*)?", target):
+            return False, "ACTIVE_CHAT_URL_UNSAFE"
+        if page.url.rstrip("/") != target.rstrip("/"):
+            # Reopen the exact recorded chat only when we still need fresh DOM
+            # evidence. A prior SHA-bound export can survive browser restarts.
+            try:
+                await page.goto(target, wait_until="domcontentloaded", timeout=45000)
+            except Exception as exc:
+                return False, "ACTIVE_CHAT_REOPEN_FAILED:" + type(exc).__name__
+            if page.url.rstrip("/") != target.rstrip("/"):
+                return False, "ACTIVE_CHAT_REOPEN_MISMATCH"
+        try:
+            result=await page.evaluate(r"""async ({task,expected})=>{
           if(location.hostname!=='chatgpt.com'|| !location.pathname.includes('/c/'))return{error:'NOT_CHAT'};
           const usr=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
             .find(n=>(n.innerText||'').includes('UPLOAD_TASK_ID='+task));
@@ -486,24 +503,23 @@ async def inspect_slot(role, page, root="/data/imagegen"):
           return{count:sources.length,expected,busy:!!turn.querySelector('[data-talvt-turn-state="in_progress"]'),
                  verified_by:'SINGLE_VISIBLE_PREVIEW_FALLBACK',error:null};
         }""",{"task":task,"expected":expected})
-    except Exception:
-        return False, "IMAGEGEN_RESULT_UI_NOT_VERIFIED"
-    if result.get("error"):
-        return False, "IMAGEGEN_"+result["error"]
-    if result.get("busy"):
-        return False, "IMAGEGEN_STILL_RUNNING"
-    if result.get("count") != expected:
-        return False, "IMAGEGEN_OUTPUT_COUNT_MISMATCH:"+str(result.get("count"))+"/"+str(expected)
-    try:
-        export_status=await export_unapproved_k_candidates(page,active,root)
-    except Exception as exc:
-        return False, "GENERATED_CANDIDATE_EXPORT_UNVERIFIED:"+str(exc)[:110]
-    evidence=root/STATE_DIR/"generated_visible"/(task+".json")
-    evidence.parent.mkdir(parents=True,exist_ok=True)
-    _atomic_json(evidence,{"task_id":task,"role":role,"distinct_generated_images":expected,
-                           "verification_method":result.get("verified_by"),
-                           "status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
-                           "export_status":export_status,"checked_at":_now().isoformat()})
+        except Exception:
+            return False, "IMAGEGEN_RESULT_UI_NOT_VERIFIED"
+        if result.get("error"):
+            return False, "IMAGEGEN_"+result["error"]
+        if result.get("busy"):
+            return False, "IMAGEGEN_STILL_RUNNING"
+        if result.get("count") != expected:
+            return False, "IMAGEGEN_OUTPUT_COUNT_MISMATCH:"+str(result.get("count"))+"/"+str(expected)
+        try:
+            export_status=await export_unapproved_k_candidates(page,active,root)
+        except Exception as exc:
+            return False, "GENERATED_CANDIDATE_EXPORT_UNVERIFIED:"+str(exc)[:110]
+        generated_evidence.parent.mkdir(parents=True,exist_ok=True)
+        _atomic_json(generated_evidence,{"task_id":task,"role":role,"distinct_generated_images":expected,
+                               "verification_method":result.get("verified_by"),
+                               "status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
+                               "export_status":export_status,"checked_at":_now().isoformat()})
     verified, reason=_library_confirmed(root,active)
     if not verified:
         # Inspect ChatGPT's actual existing project Library (no extra folder).
