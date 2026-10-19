@@ -9,6 +9,7 @@ FRAMERATE = ROOT / "src/hooks_framerate.cpp"
 R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
 R84 = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
 RANK_PHYSICAL = ROOT / "src/vr/game/rank_marker_physical_source.hpp"
+RANK_STEREO = ROOT / "src/vr/game/projected_rank_stereo.hpp"
 
 
 def fail(message: str) -> None:
@@ -50,6 +51,7 @@ framerate = read(FRAMERATE)
 r30 = read(R30)
 r84 = read(R84)
 rank_physical = read(RANK_PHYSICAL)
+rank_stereo = read(RANK_STEREO)
 
 # Exact projected rank/rival markers must carry a recovered game-view anchor.
 for marker in (
@@ -775,5 +777,79 @@ for label, original, broken in (
         pass
     else:
         fail("R84 physical rank mutation escaped: " + label)
+
+# R84 projected rank must keep the exact vehicle depth all the way through
+# shader-c64, fixed-function FVF142 and POSITIONT/XYZRHW submissions. The old
+# implementation moved only XY and preserved a flat sprite Z/RHW.
+def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
+    for token in (
+        "float ndcZ[2]{}, invW[2]{};",
+        "ValidProjectedDepth(",
+        "ResolvePositionTDepth(",
+    ):
+        if token not in stereo_header:
+            fail("R84 projected rank depth header lost: " + token)
+
+    delta = function_body(renderer, "bool R30BuildProjectedRankDelta(")
+    for token in (
+        "&shift.ndcZ[eye], &shift.invW[eye]",
+        "shift.deltaX[eye] = projectedX - shift.baseX;",
+        "shift.deltaY[eye] = projectedY - shift.baseY;",
+    ):
+        if token not in delta:
+            fail("R84 projected rank eye depth capture lost: " + token)
+
+    clip_depth = function_body(renderer, "bool R30ApplyProjectedRankClipDepth(")
+    for token in (
+        "ValidProjectedDepth(",
+        "clipShift._33 = 0.0f;",
+        "clipShift._43 = shift.ndcZ[eye];",
+    ):
+        if token not in clip_depth:
+            fail("R84 projected rank clip-depth override lost: " + token)
+
+    positiont = function_body(renderer, "bool R30TransformProjectedRankXyzrhwStereo(")
+    for token in (
+        "ResolvePositionTDepth(",
+        "dst[2] = projectedZ[eye];",
+        "dst[3] = projectedRhw[eye];",
+    ):
+        if token not in positiont:
+            fail("R84 projected rank POSITIONT depth lost: " + token)
+
+    fixedfn = function_body(renderer, "HRESULT R30TryFixedFunctionOriginalSpriteStereo(")
+    if "R30ApplyProjectedRankClipDepth(" not in fixedfn:
+        fail("R84 projected rank FVF142 depth override lost")
+
+    shader = function_body(renderer, "bool R30BuildScreenSpaceEyeConstants(")
+    if "R30ApplyProjectedRankClipDepth(" not in shader:
+        fail("R84 projected rank shader-c64 depth override lost")
+
+
+require_r84_rank_depth_contract(rank_stereo, r84)
+for label, source_kind, original, broken in (
+    ("rank depth payload", "header",
+     "float ndcZ[2]{}, invW[2]{};", "float ndcZ[2]{};"),
+    ("rank eye depth capture", "renderer",
+     "&shift.ndcZ[eye], &shift.invW[eye]", "nullptr, nullptr"),
+    ("rank clip depth", "renderer",
+     "clipShift._43 = shift.ndcZ[eye];", "clipShift._43 = 0.0f;"),
+    ("rank POSITIONT Z", "renderer",
+     "dst[2] = projectedZ[eye];", "dst[2] = src[2];"),
+    ("rank POSITIONT RHW", "renderer",
+     "dst[3] = projectedRhw[eye];", "dst[3] = src[3];"),
+):
+    source = rank_stereo if source_kind == "header" else r84
+    if original not in source:
+        fail("R84 rank depth mutation setup failed: " + label)
+    mutant = source.replace(original, broken, 1)
+    try:
+        require_r84_rank_depth_contract(
+            mutant if source_kind == "header" else rank_stereo,
+            mutant if source_kind == "renderer" else r84)
+    except SystemExit:
+        pass
+    else:
+        fail("R84 rank depth mutation escaped: " + label)
 
 print("VR projected marker anchor contract PASS")
