@@ -816,7 +816,9 @@ def verify_visible_menu_fragment(code: str) -> None:
         "const float authoredAspect =",
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
         "const RECT& fullClient = capturedClient;",
-        "sourceAspect = authoredAspect;",
+        "sourceAspect = OutRunVrMenuAspect::ProjectMenuCapturedAspect(",
+        "sourceAspect, authoredAspect, true);",
+        "sourceAspect, authoredAspect, false);",
         "clientGameState, gameConfiguredLetterbox,",
         "imageMatteVerified, requestedCrop,\n                requestedNoCrop || useNativeMenuAspect);",
         "completeClient, cropCentered43,",
@@ -852,7 +854,7 @@ def verify_visible_menu_fragment(code: str) -> None:
     )
     assert visibility_call in code
     assert "clientGameState, capturedClientFullyVisible," in body
-    assert "OutRunVrMenuAspect::RestoreFullMainMenuFourThree(" in body
+    assert "OutRunVrMenuAspect::IsUncroppedTitleOrMainMenu(" in body
     assert "if (!c.GetGameUv(whole, false, &capturedClient)) return false;" not in code
     assert "GetClientRect(c.hwnd_, &cr)" not in body
     assert "GetGameClientOutputRect(fullClient);" not in body
@@ -885,7 +887,7 @@ def verify_visible_menu_fragment(code: str) -> None:
     assert "if (cropCentered43)" not in body.split("PlanVisibleCenteredContent(", 1)[0]
     assert body.index("const RECT& fullClient = capturedClient;") < body.index(
         "PlanVisibleCenteredContent(")
-    assert body.index("sourceAspect = authoredAspect;") < body.index(
+    assert body.index("sourceAspect = OutRunVrMenuAspect::ProjectMenuCapturedAspect(") < body.index(
         "PlanOpticallyCenteredClip(")
     assert body.index("placement.centerX + placement.halfWidth * visibleOffsetX;") < body.index(
         "const float sx[4]")
@@ -960,7 +962,10 @@ for old, bad in (
      "cropCentered43 ? 4.0f / 3.0f : 4.0f / 3.0f;"),
     ("cropCentered43 ? 4.0f / 3.0f : clientAspect;",
      "cropCentered43 ? clientAspect : 4.0f / 3.0f;"),
-    ("sourceAspect = authoredAspect;", "sourceAspect = plan.aspect;"),
+    ("sourceAspect, authoredAspect, true);",
+     "sourceAspect, authoredAspect, false);"),
+    ("sourceAspect, authoredAspect, false);",
+     "sourceAspect, authoredAspect, true);"),
     ("const RECT& fullClient = capturedClient;",
      "RECT fullClient{}; c.GetGameClientOutputRect(fullClient);"),
     ("constexpr bool imageMatteVerified = false;",
