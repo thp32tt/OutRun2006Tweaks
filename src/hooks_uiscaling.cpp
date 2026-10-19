@@ -123,6 +123,25 @@ namespace
         true, false, false, false, false, false, 0, 1),
         "Vanilla must preserve the original menu matrix");
 
+    // A full scale+translation pair is still a MENU-owned D3DX sprite
+    // transform, not permission to contain HUD, stage timers or GOAL.
+    // The exact menu/pivot/partial paths share their game-state snapshot.
+    constexpr bool CanContainOriginalFullFrontEndVector(
+        bool exactFrontEnd, bool containedMode,
+        bool hasScale, bool hasTranslation) noexcept
+    {
+        return exactFrontEnd && containedMode &&
+            hasScale && hasTranslation;
+    }
+    static_assert(CanContainOriginalFullFrontEndVector(true, true, true, true),
+        "Complete original title/menu transforms remain contained");
+    static_assert(!CanContainOriginalFullFrontEndVector(false, true, true, true),
+        "Race HUD, GOAL and +TIME must never borrow menu containment");
+    static_assert(!CanContainOriginalFullFrontEndVector(true, false, true, true),
+        "Vanilla/rollback original D3DX transforms are not intercepted");
+    static_assert(!CanContainOriginalFullFrontEndVector(true, true, false, true));
+    static_assert(!CanContainOriginalFullFrontEndVector(true, true, true, false));
+
     // The six +TIME caller tails are snapshots, not owned queue pointers.
     // Validate both boundaries against the live chain before dereferencing
     // any old tail (which may have been freed by a nested queue rebuild).
@@ -423,24 +442,24 @@ class UIScaling : public Hook
 		D3DXVECTOR2* forwardedScaling = pScaling;
 		D3DXVECTOR2* forwardedTranslation = pTranslation;
         bool publishedPrecontainedMenuMatrix = false;
-        const bool centredPhysicalMenuFill =
-            mode == ScalingMode::KeepCentered && Game::current_mode &&
+        // Capture the original producer's game mode ONCE. The complete
+        // D3DX scale+translation branch used to apply menu 4:3 containment
+        // even to race HUD/GOAL/+TIME matrices; unlike its pivot/partial
+        // siblings it had no title/menu/selector ownership check.
+        const bool originalFrontEndProducer = Game::current_mode &&
             (*Game::current_mode == GameState::STATE_TITLE ||
              *Game::current_mode == GameState::STATE_MENU ||
              *Game::current_mode == GameState::STATE_SELECTOR ||
              *Game::current_mode == GameState::STATE_SELEXIT ||
              *Game::current_mode == GameState::STATE_SELRESET);
+        const bool centredPhysicalMenuFill =
+            mode == ScalingMode::KeepCentered && originalFrontEndProducer;
 
         // Complete 2D composition is required when the game supplies a
         // non-origin scale/rotation pivot. Only title/menu/car-selection
         // producers take this path; other visual owners remain unchanged.
         const bool frontEndPivot = NeedsFrontEndAffineContain(
-            Game::current_mode &&
-                (*Game::current_mode == GameState::STATE_TITLE ||
-                 *Game::current_mode == GameState::STATE_MENU ||
-                 *Game::current_mode == GameState::STATE_SELECTOR ||
-                 *Game::current_mode == GameState::STATE_SELEXIT ||
-                 *Game::current_mode == GameState::STATE_SELRESET),
+            originalFrontEndProducer,
             mode == ScalingMode::KeepCentered ||
                 mode == ScalingMode::OnlineArcade,
             pScaling != nullptr, pTranslation != nullptr,
@@ -449,9 +468,11 @@ class UIScaling : public Hook
 		// D3DX allows optional 2D scaling/translation inputs. During resolution
 		// or device reset the game scale may also be invalid. Preserve input
 		// values and forward the original call when reprojection is unsafe.
-        if (!frontEndPivot && (mode == ScalingMode::KeepCentered ||
-		     mode == ScalingMode::OnlineArcade) &&
-		    pScaling && pTranslation &&
+        if (!frontEndPivot && CanContainOriginalFullFrontEndVector(
+                originalFrontEndProducer,
+                mode == ScalingMode::KeepCentered ||
+                    mode == ScalingMode::OnlineArcade,
+                pScaling != nullptr, pTranslation != nullptr) &&
 		    Game::screen_scale && Game::screen_resolution)
 		{
 			const float sx = Game::screen_scale->x;
@@ -500,12 +521,7 @@ class UIScaling : public Hook
         // documented identity (scale=1, translation=0), then stage BOTH output
         // vectors so only these partial front-end draws gain containment.
         // Never widen this path into gameplay HUD, GOAL/+TIME, F11 or pause.
-        const bool partialFrontEndMenu = Game::current_mode &&
-            (*Game::current_mode == GameState::STATE_TITLE ||
-             *Game::current_mode == GameState::STATE_MENU ||
-             *Game::current_mode == GameState::STATE_SELECTOR ||
-             *Game::current_mode == GameState::STATE_SELEXIT ||
-             *Game::current_mode == GameState::STATE_SELRESET);
+        const bool partialFrontEndMenu = originalFrontEndProducer;
         if (!frontEndPivot && partialFrontEndMenu &&
             (mode == ScalingMode::KeepCentered ||
              mode == ScalingMode::OnlineArcade) &&
