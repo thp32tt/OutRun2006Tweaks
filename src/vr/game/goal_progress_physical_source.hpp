@@ -37,6 +37,31 @@ namespace OutRunVR::GoalPhysical
         source.rawWvpDrawSerial = complete ? drawSerial : 0;
         return source;
     }
+    // Fixed-function GOAL sprite and D3DX glyph draws consume FVF/XY
+    // coordinates, not a vertex-shader c64 WVP. Reusing a preceding world's
+    // original c64 generation can veto the right eye even while both native
+    // GOAL sprites retain a valid queue, pose and physical draw source.
+    // Shader-backed results still require their own exact game c64 writer.
+    constexpr bool RequiresOriginalShaderC64(std::uintptr_t shader) noexcept
+    {
+        return shader != 0;
+    }
+    static_assert(!RequiresOriginalShaderC64(0));
+    static_assert(RequiresOriginalShaderC64(0x100));
+
+    // Use one generation-stamp rule for both R30 fixed-function/XYZRHW and
+    // R33 shader HUD submission. Never import unrelated VS constants into
+    // a fixed-function result; do not weaken the shader-backed source fence.
+    constexpr Source StampPhysicalGameWvpGeneration(
+        Source source, bool captured, std::uint64_t writeSerial,
+        std::uint64_t drawSerial) noexcept
+    {
+        return RequiresOriginalShaderC64(source.shader)
+            ? StampOriginalGameWvpGeneration(
+                source, captured, writeSerial, drawSerial)
+            : StampOriginalGameWvpGeneration(source, false, 0, 0);
+    }
+
     // The native GOAL/result Draw may follow an original c64 write from a
     // *different* vertex shader or shader generation (for example, a racing
     // world pass reentering the result queue). Captured foreign provenance

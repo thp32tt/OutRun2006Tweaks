@@ -164,6 +164,50 @@ static bool CheckB9200DirectGpuSource()
 static bool CheckGoalPhysicalBothEyeSources()
 {
     using namespace OutRunVR::GoalPhysical;
+    // This is the real R30/R33 decision boundary for all five GOAL
+    // families: a fixed-function glyph has no vertex shader and may not
+    // borrow or be vetoed by the preceding world shader's original c64.
+    if (RequiresOriginalShaderC64(0) ||
+        !RequiresOriginalShaderC64(0x1234))
+        return false;
+    Source fixedFn{RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        false, nullptr, 0, 7, 11, 0, 0};
+    auto fixedForeign = StampPhysicalGameWvpGeneration(
+        fixedFn, true, 900, 77);
+    if (fixedForeign.rawWvpWriteSerial ||
+        fixedForeign.rawWvpDrawSerial ||
+        !SameAfterNativeLeft(fixedFn, fixedForeign))
+        return false;
+    Source shaderGoal = fixedFn;
+    shaderGoal.shader = 0x1234;
+    shaderGoal.shaderEpoch = 9;
+    auto shaderOwned = StampPhysicalGameWvpGeneration(
+        shaderGoal, true, 900, 77);
+    if (!SameAfterNativeLeft(shaderOwned, shaderOwned) ||
+        shaderOwned.rawWvpWriteSerial != 900 ||
+        shaderOwned.rawWvpDrawSerial != 77 ||
+        MatchesCapturedOriginalWvp(
+            true, shaderGoal.shader, shaderGoal.shaderEpoch,
+            0x9999, 9, 900, 77) ||
+        MatchesCapturedOriginalWvp(
+            true, shaderGoal.shader, shaderGoal.shaderEpoch,
+            shaderGoal.shader, 8, 900, 77) ||
+        MatchesCapturedOriginalWvp(
+            true, shaderGoal.shader, shaderGoal.shaderEpoch,
+            shaderGoal.shader, 9, 0, 77) ||
+        !MatchesCapturedOriginalWvp(
+            true, shaderGoal.shader, shaderGoal.shaderEpoch,
+            shaderGoal.shader, 9, 900, 77) ||
+        !MatchesCapturedOriginalWvp(
+            false, shaderGoal.shader, shaderGoal.shaderEpoch,
+            0x9999, 8, 0, 0))
+        return false;
+    auto shaderReentered = StampPhysicalGameWvpGeneration(
+        shaderGoal, true, 901, 77);
+    if (SameAfterNativeLeft(shaderOwned, shaderReentered) ||
+        SameAfterNativeLeft(shaderGoal, shaderOwned))
+        return false;
+
     const int nodeA = 1, nodeB = 2;
     for (const auto token : {ProducerToken::ResultProgress,
              ProducerToken::GoalTime020, ProducerToken::GoalTime150,

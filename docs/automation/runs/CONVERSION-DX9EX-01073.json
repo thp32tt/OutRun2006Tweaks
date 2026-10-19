@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01073",
+  "production_id": "CONVERSION-DX9EX-01073",
+  "event_id": "CONVERSION-DX9EX-01073-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_MATERIAL",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "changed_files": [
+    "src/vr/game/goal_progress_physical_source.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Restore R84 native binocular GOAL/time/result glyph submission when the current physical Draw is fixed-function, without borrowing stale world c64, while enforcing same-original-game shader/epoch ownership for shader GOAL across both eyes.",
+    "scope_boundary": "Only GOAL result, time and progress physical GPU source capture in native R84 R30 fixed-function/XYZRHW and R33 shader HUD, not +TIME, rank, menu, lens, SkyGlow, input/FFB, R26_SAFE, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original 0x004973C0 GOAL progress, original 0x004974E0 glyphs and exact result B9200/GOAL source scopes select queued SpriteNode or synchronous D3DX direct glyph.",
+      "Native R84 R30 fixed-function or XYZRHW Draw and R33 shader HUD Draw capture physical source from original game shader and exact queue, pose and current top-level GPU submission serial.",
+      "GOAL physical source remains coherent after native LEFT and before RIGHT RT/depth/viewport/c64 submission while original GAME state restoration and conservative fallback remain unchanged."
+    ],
+    "subcomponents": [
+      "Distinguish GOAL fixed-function from shader-backed R30/R33 physical admission; never import unrelated world game VS c64 for native FVF glyphs.",
+      "Require shader-backed R30 GOAL c64 writer shader and epoch equivalence before native LEFT, matching R33, and fence left-to-right against original raw upload generation changes.",
+      "Exercise all GOAL source producers with positive/negative fixed-function, shader owner, shader epoch, raw generation, queue/pose and +TIME/world fallback tests and exact SHA Windows integration."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_fixedfn_binocular_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_goal_progress_time_result_native_fvf_xyzrhw_to_r84_gpu_eye_pair",
+        "expected_behavior": "Fixed-function direct/queued GOAL glyphs retain eligible left/right stereo source without depending on a preceding unrelated world's vertex shader game c64."
+      },
+      {
+        "id": "goal_foreign_shader_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "shader_backed_original_game_wvp_queue_pose_generation_and_native_desktop",
+        "expected_behavior": "Shader-backed GOAL rejects foreign current-vs-written shader/epoch or changed upload generation; unavailable tracking and unclassified GOAL retain conservative native fallback."
+      },
+      {
+        "id": "goal_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "win32_r84_game_x64_openxr_host_package_domain_hud_fullsource",
+        "expected_behavior": "Full required GitHub Actions passes on final validation-bearing exact SHA with no CI skip; real Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Latest R84 R30CaptureGoalPhysicalSource unconditionally stamped the last original game c64 regardless of physical current shader, even though fixed-function GOAL uses no VS c64; R33 rejected foreign c64 but also queried it for shaderless sources.",
+    "root_cause": "Native GOAL stage/result fixed-function draws can inherit a preceding world vertex shader's c64 generation, wrongly denying one or both eyes; shader-backed R30 did not check original game write shader identity unlike R33. Both paths need identical source admission policy.",
+    "source_trace": [
+      "Original GOAL 0x004973C0/0x004974E0/result B9200 exact ScreenHud text/sprite producer establishes physical SpriteNode or direct D3DX source.",
+      "R30CaptureGoalPhysicalSource now rejects a known foreign original game shader and epoch only for shader-backed draws; fixed-function goes straight to exact queue/pose/draw source, never stale WVP.",
+      "R33 captureGoalSource applies same fixed-function vs shader source selection, then existing original LEFT, post-left, pre-right, HRESULT, RT/depth/viewport and c64 restoration fences preserve native fallback."
+    ],
+    "eye_ownership": "Static C++ source correction and smoke verify eligible physical eye ownership fences, not observed headset binocular position. Quest3/VDXR live image behavior and FPS are untested.",
+    "alternatives_rejected": [
+      "No global ScreenHud tagging of world/fixed-function draws; no forced D3DX Flush, unsafe queue promotion or disabling original fallback.",
+      "Do not borrow last injected per-eye GPU c64 as original game source evidence or weaken R33 shader generation validation."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "goal_fixedfn_binocular_source": "SOURCE_IMPLEMENTED",
+    "goal_foreign_shader_fail_closed": "SOURCE_IMPLEMENTED",
+    "goal_final_exact_sha_ci": "PENDING"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSION_PENDING_CI",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA"
+  },
+  "next_action": "Run mandatory exact SHA GitHub Gates; separate Quest3/VDXR hardware verification from automated results."
+}

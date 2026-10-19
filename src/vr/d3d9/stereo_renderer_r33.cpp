@@ -1042,16 +1042,29 @@ namespace OutRunVRStereo
             // A native left callback may select a foreign GOAL result child;
             // never bind the old per-eye matrix to that new GPU owner.
             auto captureGoalSource = [&]() noexcept {
-                const auto cmd = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                const auto cmd =
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
                 std::uintptr_t shader = 0;
                 std::uint64_t shaderEpoch = 0;
                 if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                     R29OwnerCurrentVertexShaderIdentity() != 0)
                     return OutRunVR::GoalPhysical::Source{};
-                // GOAL 0-99 and result child draws can reenter another
-                // original c64 writer without changing queue, shader or
-                // current pose. Keep native LEFT and RIGHT on that writer.
-                // R32's temporary stereo eye uploads are excluded here.
+                const OutRunVR::GoalPhysical::Source baseline{
+                    cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,
+                    cmd.queueEpoch,
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch
+                };
+                // Fixed-function GOAL glyphs own no original VS c64.
+                // Never reject their pair based on an unrelated road
+                // shader's last upload. The exact queue/pose/draw stamps
+                // still gate native LEFT, reentrant callbacks and RIGHT.
+                if (!OutRunVR::GoalPhysical::RequiresOriginalShaderC64(shader))
+                    return OutRunVR::GoalPhysical::StampPhysicalGameWvpGeneration(
+                        baseline, false, 0, 0);
+
+                // Shader-backed result glyphs retain strict provenance:
+                // private stereo c64 uploads are not game source writes.
                 float originalRawWvp[16]{};
                 std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
                 std::uintptr_t rawShader = 0;
@@ -1064,22 +1077,9 @@ namespace OutRunVRStereo
                         rawCaptured, shader, shaderEpoch,
                         rawShader, rawShaderEpoch,
                         rawWriteSerial, rawDrawSerial))
-                {
-                    // Known foreign/incomplete original c64 cannot own GOAL
-                    // sprites or result glyphs. Restore the game's WVP and
-                    // let the existing native fallback draw unchanged.
                     return OutRunVR::GoalPhysical::Source{};
-                }
-                if (!rawCaptured)
-                {
-                    rawWriteSerial = 0;
-                    rawDrawSerial = 0;
-                }
-                return OutRunVR::GoalPhysical::Source{
-                    cmd.scope, cmd.producer, cmd.queued, cmd.queueNode,
-                    cmd.queueEpoch, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                    R29OwnerTopLevelDrawSerial(), shader, shaderEpoch,
-                    rawWriteSerial, rawDrawSerial};
+                return OutRunVR::GoalPhysical::StampPhysicalGameWvpGeneration(
+                    baseline, rawCaptured, rawWriteSerial, rawDrawSerial);
             };
             const auto goalCommand =
                 OutRunVR::GameSemantic::CapturePhysicalDrawCommand();

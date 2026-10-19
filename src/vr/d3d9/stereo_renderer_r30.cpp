@@ -5902,19 +5902,37 @@ namespace OutRunVRStereo
 
         // GOAL 0-99%, time and result glyphs require their own physical
         // GPU source, distinct from +TIME and generic HUD/particle draws.
-        bool R30CaptureGoalPhysicalSource(OutRunVR::GoalPhysical::Source& out) noexcept
+        bool R30CaptureGoalPhysicalSource(
+            OutRunVR::GoalPhysical::Source& out) noexcept
         {
-            const auto draw = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const auto draw =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
             std::uintptr_t shader = 0;
             std::uint64_t shaderEpoch = 0;
             if (!R29OwnerCurrentShaderEpoch(shader, shaderEpoch) &&
                 R29OwnerCurrentVertexShaderIdentity() != 0)
                 return false;
-            // R33 already fences the ORIGINAL shader/c64 WVP generation.
-            // R30's fixed-function and XYZRHW GOAL path must use the same
-            // physical identity: native LEFT may reenter a different game
-            // matrix writer without changing its producer, SpriteNode, pose
-            // or shader. Private stereo uploads do not count as game writes.
+            const OutRunVR::GoalPhysical::Source baseline{
+                draw.scope, draw.producer, draw.queued, draw.queueNode,
+                draw.queueEpoch,
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                R29OwnerTopLevelDrawSerial(), shader, shaderEpoch
+            };
+            // GOAL numbers and result sprites may use native fixed-function
+            // or XYZRHW geometry. They do not consume the earlier WORLD
+            // shader's original game c64 upload, so it must never veto an
+            // otherwise valid pair of GOAL eyes.
+            if (!OutRunVR::GoalPhysical::RequiresOriginalShaderC64(shader))
+            {
+                out = OutRunVR::GoalPhysical::StampPhysicalGameWvpGeneration(
+                    baseline, false, 0, 0);
+                return OutRunVR::GoalPhysical::IsValid(out);
+            }
+
+            // Shader-backed GOAL must prove the SAME original game shader
+            // and upload generation as the selected native physical Draw.
+            // A captured foreign write is not "missing evidence": reject
+            // it before LEFT. R32 private eye uploads do not advance this.
             float originalRawWvp[16]{};
             std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
             std::uintptr_t rawShader = 0;
@@ -5922,11 +5940,12 @@ namespace OutRunVRStereo
             const bool captured = OutRunVRRenderer::GetLastRawGameWvpWrite(
                 originalRawWvp, rawWriteSerial, rawDrawSerial,
                 rawShader, rawShaderEpoch);
-            const OutRunVR::GoalPhysical::Source baseline{
-                draw.scope, draw.producer, draw.queued, draw.queueNode,
-                draw.queueEpoch, OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
-                R29OwnerTopLevelDrawSerial(), shader, shaderEpoch};
-            out = OutRunVR::GoalPhysical::StampOriginalGameWvpGeneration(
+            if (!OutRunVR::GoalPhysical::MatchesCapturedOriginalWvp(
+                    captured, shader, shaderEpoch,
+                    rawShader, rawShaderEpoch,
+                    rawWriteSerial, rawDrawSerial))
+                return false;
+            out = OutRunVR::GoalPhysical::StampPhysicalGameWvpGeneration(
                 baseline, captured, rawWriteSerial, rawDrawSerial);
             return OutRunVR::GoalPhysical::IsValid(out);
         }
