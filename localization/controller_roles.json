@@ -18,11 +18,19 @@
     "C2"
   ],
   "schedule": {
-    "A": ":00",
-    "B": ":30",
-    "C1": [
-      ":10",
+    "A": [
+      ":00",
+      ":20",
       ":40"
+    ],
+    "B": [
+      ":10",
+      ":30",
+      ":50"
+    ],
+    "C1": [
+      ":15",
+      ":45"
     ]
   },
   "lanes": {
@@ -108,7 +116,7 @@
   "work_steal": {
     "enabled": false
   },
-  "policy_version": "native-roi-imagegen-auto-v3-20261019",
+  "policy_version": "native-roi-imagegen-auto-v4-20261019",
   "deployment": {
     "mode": "PORTAINER_GIT_MANUAL_REDEPLOY",
     "auto_deploy": false,
@@ -120,7 +128,7 @@
     "auto_send_authorization": "USER_EXPLICIT_20261019",
     "post_deploy_checks": [
       "AUTO_SEND_true",
-      "schedule_0_10_30_40",
+      "schedule_A_00_20_40_B_10_30_50_C1_15_45",
       "controller_tabs_A_B_C1",
       "C2_tab_absent",
       "native_crop_bridge_populates_verified_roi_queue",
@@ -133,9 +141,13 @@
     "timezone": "Asia/Seoul",
     "minute_to_role": {
       "0": "A",
-      "10": "C1",
+      "10": "B",
+      "15": "C1",
+      "20": "A",
       "30": "B",
-      "40": "C1"
+      "40": "A",
+      "45": "C1",
+      "50": "B"
     },
     "round_robin_compatible": false,
     "runtime_adapter_status": "IMPLEMENTED_REDEPLOY_PENDING",
@@ -159,7 +171,7 @@
   "operational_slot_assignment": {
     "effective_date": "2026-10-19",
     "authority": "USER_CONTROLLED_KOREAN_AUTOMATION_RESTART",
-    "C1": "ChatGPT browser third tab independent lightweight QA",
+    "C1": "ChatGPT browser third tab independent lightweight QA at :15/:45",
     "C": "in-container native original English crop background worker",
     "existing_Portainer_stack": "outrun-kor",
     "Portainer_A_B_C1": "AUTO_SEND_TRUE_AFTER_MANUAL_REDEPLOY",
