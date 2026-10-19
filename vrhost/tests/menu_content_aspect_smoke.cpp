@@ -3,6 +3,7 @@
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
 #include <cmath>
+#include <initializer_list>
 #include <limits>
 
 // Original game HUD side spacing must use the SAME 4:3 min-axis

@@ -19,8 +19,8 @@ def check(s):
     assert s.count('returnAddress == Module::exe_ptr(0xBB6F5)')==1
 check(src)
 for a,b in (
-    ('"VR R57 ORDINAL EDGE PROBE: e8=0xBAEE2 calls={}"','"VR R57 ORDINAL EDGE PROBE: calls={}"'),
-    ('"VR R57 RANK OWNER PROBE: sub=0x4BAD20 calls={}"','"VR R57 RANK OWNER PROBE: calls={}"')):
+    ('"VR R57 ORDINAL EDGE PROBE: e8=0xBAEE2 calls={} rawFinite={} "','"VR R57 ORDINAL EDGE PROBE: calls={} rawFinite={} "'),
+    ('"VR R57 RANK OWNER PROBE: sub=0x4BAD20 calls={} "','"VR R57 RANK OWNER PROBE: calls={} "')):
     assert a in src
     try:check(src.replace(a,b,1))
     except (AssertionError,ValueError):pass
