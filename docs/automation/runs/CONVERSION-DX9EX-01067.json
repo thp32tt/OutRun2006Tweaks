@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01067",
+  "production_id": "CONVERSION-DX9EX-01067",
+  "event_id": "CONVERSION-DX9EX-01067-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "src/vr/game/ui_texture_lookup_window.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Preserve original vehicle-selection texture and child-mask UV identity across native get_texture→put_sprite_ex2, preventing null/failure, stale recycled pointers, cross-pack lookup and unrelated direct sprite draws from supplying a foreign selector UV transform without altering original managed texture loading or draw behavior.",
+    "scope_boundary": "Only UI replacement lookups and native put_sprite_ex/put_sprite_ex2 lifetime; preserve correct paired mask/parent replacement, ordinary no-replacement game sprites, original COM returns, UV restore, R84, R26_SAFE, input/FFB, F11, GOAL/+TIME, SkyGlow, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original vehicle selector xstset loads DDS through UI replacement/native decoder and publishes a per-slot original-to-replacement sprite_scales ratio only on viable DDS inputs.",
+      "Original get_texture texture-pointer/slot pair is now captured as a bounded two-lookup parent/mask window; failed lookup or new xstset destroys unproven binding.",
+      "Original put_sprite_ex2 consumes the exact window before native callbacks; only non-null exact matched parent and child COM identity may use existing transient UV scale with scoped restoration.",
+      "Unmatched/failed/earlier native put_sprite_ex cannot promote an old selector texture into a later user's UI UV; game Draw, source sprite queue semantics, R84 x86 and OpenXR host are otherwise unchanged."
+    ],
+    "subcomponents": [
+      "Replace stale global prevTexture/prevMaskTexture pointer reuse with bounded texture submission owner and fail-closed invalid original lookups.",
+      "Scope both original parent and mask UV transaction to one native sprite submission, expire parent/mask on xstset changes and direct-sprite-family consumes without losing fresh reentrant get_texture bindings.",
+      "Compile constexpr positive parent/mask and negative failed lookup, unrelated identity, one-shot re-use, unscaled parent valid mask, cross-pack reset regression paths."
+    ],
+    "acceptance_items": [
+      {
+        "id": "selector_uv_mask_exact_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_get_texture_sprite_ex2_parent_mask",
+        "expected_behavior": "Known valid UI DDS parent/mask lookups retain original UV and matched replacement scaling only during the correct native sprite call; false null/foreign matches fail closed."
+      },
+      {
+        "id": "selector_reset_unmatched_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "null_get_failed_dds_xstset_switch_reused_pointer_original_sprite",
+        "expected_behavior": "Failed lookup, newer pack, direct sibling, and later pointer reuse cannot consume a stale selector UV binding; unmatched sprite and original device input/FFB stay unchanged."
+      },
+      {
+        "id": "selector_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "x86_R84_x64_OpenXR_Active_Domain_Inspector_Full_Source",
+        "expected_behavior": "Final validation-bearing exact SHA completes required Actions Gate; Quest3 real white-texture/selector and mask test remains separate."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The original native vehicle selector uses consecutive get_texture texture source/mask lookups and parent/child SPRARGS2; current fork used previous COM pointer identities without a consumption epoch.",
+    "root_cause": "Previous get_texture state could survive failed/null lookup, unrelated sprite submission, or pack reload. Null source and null saved pointer compared equal and could look up valid slot zero, allowing a foreign sprite or selection mask to acquire stale replacement UV ratios.",
+    "source_trace": [
+      "Original source DDS/slot → UITextureReplacement D3DX loader and sprite_scales → get_texture_dest pointer association → put_sprite_ex2_dest parent/child scoped UV rewrite → original native Draw and R84 eyes.",
+      "The new one-shot get_texture lookup expires at native sprite entry, failed lookup and successful xstset switch; paired legitimate mask and parent remain distinct."
+    ],
+    "eye_ownership": "No stereo owner widened and no GPU eye route promoted; this fixes source texture/UV pairing before the original R84 draw. Quest3 white-sprite optical proof remains pending.",
+    "alternatives_rejected": [
+      "Do not force white selection sprites into ScreenHud or widen generic UI stereo classification.",
+      "Do not retain address-only mask cache across an unknown number of native sprite submissions or change game DDSTexture/FFB/SkyGlow fallback.",
+      "Do not infer that static C++ binding repair proves every white selector symptom resolved."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "selector_uv_mask_exact_owner": "PENDING_BUILD",
+    "selector_reset_unmatched_fallback": "PENDING_BUILD",
+    "selector_final_exact_sha_ci": "PENDING"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "runtime": "Quest3/VDXR not executed",
+    "status_note": "Material texture lookup-window candidate awaiting exact-SHA Windows x86 game and x64 host CI; no real UI proof."
+  }
+}

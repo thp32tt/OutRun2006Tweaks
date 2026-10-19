@@ -7,6 +7,7 @@
 #include "vr/game/dds_alpha_mask_policy.hpp"
 #include "vr/game/dds_fast_loader_request.hpp"
 #include "vr/game/sprite_uv_transaction.hpp"
+#include "vr/game/ui_texture_lookup_window.hpp"
 #include "vr/game/sprite_queue_tail_proof.hpp"
 #include "vr/game/direct_sprite_source_provenance.hpp"
 #include <fstream>
@@ -910,43 +911,22 @@ class TextureReplacement : public Hook
 
 
 
-	// put_sprite_ex2 usually doesn't have the proper textureId set inside SPRARGS2, only the d3dtexture_ptr_C
-	// we could store each d3dtexture ptr somewhere when they're created, and then check against them later to find the scale
-	// but that's not really ideal since pointers could get freed, with new texture using same address
-	// luckily it seems almost every put_sprite_ex2 call is preceeded by a get_texture call with the actual texture ID
-	// 
-	// so we can just hook get_texture and check the textureId arg against our textureId -> scale map
-	// if it exists we'll stash the d3d pointer -> textureId mapping temporarily for put_sprite_ex2 to use
-	inline static void* prevTexture = nullptr;
-	inline static int prevTextureId = 0;
-
-	// Mask textures don't get put_sprite_ex2 called for them, instead the next sprite drawn will have ptr_B4 setup to point to it
-	// That next sprite will likely call get_texture_dest with a different sprite ID, so we also have to keep track of the ID used prior
-	inline static void* prevMaskTexture = nullptr;
-	inline static int prevMaskTextureId = 0;
+	// The game's selection-mask pair uses two consecutive get_texture calls.
+	// The window expires at the next native sprite submission, failed lookup,
+	// or xstset switch; stale COM addresses are not durable DDS provenance.
+	inline static OutRunVR::SpriteUV::TextureLookupWindow<void> pendingTextureLookups{};
 
 	inline static SafetyHookInline get_texture = {};
 	static void* __cdecl get_texture_dest(int textureId)
 	{
 		auto* ret = get_texture.call<void*>(textureId);
-
-		prevMaskTexture = prevTexture;
-		prevMaskTextureId = prevTextureId;
-
-		if (ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr) &&
-			sprite_scales.contains(textureId))
-		{
-			prevTexture = ret;
-			prevTextureId = textureId;
-		}
+		if (!Settings::UITextureReplacement)
+			pendingTextureLookups.Clear();
 		else
-		{
-			prevTexture = nullptr;
-			prevTextureId = 0;
-		}
+			pendingTextureLookups.Observe(ret, textureId,
+				sprite_scales.contains(textureId));
 		return ret;
 	}
-
 
 	struct VrSpritePrioritySnapshot
 	{
@@ -1084,43 +1064,24 @@ class TextureReplacement : public Hook
 		// The active option may change while these get_texture hooks stay
 		// installed. Discard pending pointer/ID bindings on disable, including
 		// the independent mask owner, before handling any new sprite.
-		if (!Settings::UITextureReplacement)
-		{
-			prevTexture = nullptr;
-			prevTextureId = 0;
-			prevMaskTexture = nullptr;
-			prevMaskTextureId = 0;
-		}
-
+		// Consume once, before native callbacks can re-enter get_texture.
+		// An unbound/null texture cannot borrow an earlier selector/mask UV.
+		const auto lookup = pendingTextureLookups.Consume();
 		if (ShouldApplyUIScale(Settings::UITextureReplacement,
-			a1->d3dtexture_ptr_C == prevTexture))
+			lookup.SpriteMatches(a1->d3dtexture_ptr_C)))
 		{
-			const auto scale = sprite_scales.find(prevTextureId);
+			const auto scale = sprite_scales.find(lookup.spriteId);
 			if (scale != sprite_scales.end())
-			{
 				originalUv.Apply(a1, scale->second.first, scale->second.second);
-				prevTexture = nullptr;
-				prevTextureId = 0;
-			}
 		}
 
-		if (a1->child_B4)
+		if (a1->child_B4 && *Module::exe_ptr<int>(0x586B28) &&
+			ShouldApplyUIScale(Settings::UITextureReplacement,
+				lookup.MaskMatches(a1->child_B4->d3dtexture_ptr_C)))
 		{
-			int spr_mask_flag = *Module::exe_ptr<int>(0x586B28);
-			if (spr_mask_flag)
-			{
-				if (ShouldApplyUIScale(Settings::UITextureReplacement,
-					a1->child_B4->d3dtexture_ptr_C == prevMaskTexture))
-				{
-					const auto scale = sprite_scales.find(prevMaskTextureId);
-					if (scale != sprite_scales.end())
-					{
-						maskUv.Apply(a1->child_B4, scale->second.first, scale->second.second);
-						prevMaskTexture = nullptr;
-						prevMaskTextureId = 0;
-					}
-				}
-			}
+			const auto scale = sprite_scales.find(lookup.maskId);
+			if (scale != sprite_scales.end())
+				maskUv.Apply(a1->child_B4, scale->second.first, scale->second.second);
 		}
 
 		const int result = put_sprite_ex2.call<int>(a1, a2);
@@ -1140,6 +1101,9 @@ class TextureReplacement : public Hook
         const auto vrTailsBefore = SnapshotVrSpriteTails();
         const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();
 		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
+		// A direct put_sprite_ex draws a different source family. Retire
+		// its texture lookup rather than letting a later selector reuse it.
+		pendingTextureLookups.Consume();
 		int xstnum = a1->xstnum_0;
 		OutRunVR::SpriteUV::ScopedSprArgsScale<SPRARGS> originalUv;
 		if (ShouldApplyUIScale(Settings::UITextureReplacement, true))
@@ -1167,6 +1131,8 @@ class TextureReplacement : public Hook
 		// filename *contents* and original game slot identify its textures.
 		if (UiTextureCursor.Select(xstsetFilename, static_cast<int>(ctx.eax)))
 		{
+			// A selector pack swap invalidates the previous slot's COM owner.
+			pendingTextureLookups.Clear();
 			CurrentXstsetFilename = UiTextureCursor.Name();
 			CurrentXstsetIndex = static_cast<int>(ctx.eax);
 			OutRunVRHudInspector::TraceXstSet(
