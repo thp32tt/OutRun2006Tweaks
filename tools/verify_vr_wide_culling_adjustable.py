@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """2026-10-20 HMD: VR PMT wide margin is editable while keeping stereo source."""
 from pathlib import Path
+import re
 r=Path(__file__).resolve().parents[1]
 settings=(r/'src/vr/settings.cpp').read_text(encoding='utf-8')
 profiles=(r/'tools/OutRunVR-TestProfiles.ps1').read_text(encoding='utf-8')
@@ -20,7 +21,83 @@ def check(s,p,c):
         'RestoreScopedProjection();',
         'ctx.eax = 1u;',
     ): assert marker in owner, marker
-    assert owner.count('RestoreScopedProjection();') >= 2
+    before = owner.split('static void BeforeVisible(', 1)[1].split(
+        'static void AfterVisible(', 1)[0]
+    after = owner.split('static void AfterVisible(', 1)[1].split('public:', 1)[0]
+    # A commented-out restore contains the same substring, but is NOT code.
+    # Require each exact statement at the native visibility call boundary.
+    assert re.search(r'(?m)^\\s*RestoreScopedProjection\\(\\);\\s*
+    assert 'projection->_11 = newX;' in owner
+    assert 'projection->_22 = newY;' in owner
+    assert 'if (vr && mode == 2)' in owner
+check(settings,profiles,source)
+for typ,old,bad in (
+    ('settings','"CullingUnionMarginDegrees", 8.0f,','"CullingUnionMarginDegrees", 4.0f,'),
+    ('profiles','# the user must be able to tune VR PMT wide-FOV margin in F11.',
+     "-CullingUnionMarginDegrees=8.0 # F11 no longer free"),
+    ('source','const float newX = (std::min)(original._11, 1.0f / tanH);',
+     'const float newX = 1.0f / tanH;'),
+    ('source','RestoreScopedProjection();','// RestoreScopedProjection();'),
+):
+    parts=dict(settings=settings,profiles=profiles,source=source)
+    assert old in parts[typ]
+    if typ == 'source':
+        # Avoid mutating a different projection owner earlier in the TU:
+        # the exact PMT visibility hook is the unit under review.
+        prefix, scoped_suffix = parts['source'].split(
+            'class DisableStageCulling : public Hook', 1)
+        scoped, suffix = scoped_suffix.split('class WindowedBorderless', 1)
+        assert old in scoped
+        parts['source'] = prefix + 'class DisableStageCulling : public Hook' + (
+            scoped.replace(old,bad,1)) + 'class WindowedBorderless' + suffix
+    else:
+        parts[typ]=parts[typ].replace(old,bad,1)
+    try:check(parts['settings'],parts['profiles'],parts['source'])
+    except (AssertionError,ValueError):pass
+    else:raise AssertionError('wide cull mutant escaped '+typ+old)
+from math import tan, radians
+for baseDeg in (35.,46.,60.):
+    original=1/tan(radians(baseDeg))
+    enlarged=1/tan(radians(min(85,baseDeg+8)))
+    assert min(original,enlarged)<=original and enlarged>0
+print('PASS PMT VR wide 8deg default, F11 writable, scoped projection restore, 4 destructive controls')
+, before)
+    assert re.search(r'(?m)^\\s*RestoreScopedProjection\\(\\);\\s*
+    assert 'projection->_11 = newX;' in owner
+    assert 'projection->_22 = newY;' in owner
+    assert 'if (vr && mode == 2)' in owner
+check(settings,profiles,source)
+for typ,old,bad in (
+    ('settings','"CullingUnionMarginDegrees", 8.0f,','"CullingUnionMarginDegrees", 4.0f,'),
+    ('profiles','# the user must be able to tune VR PMT wide-FOV margin in F11.',
+     "-CullingUnionMarginDegrees=8.0 # F11 no longer free"),
+    ('source','const float newX = (std::min)(original._11, 1.0f / tanH);',
+     'const float newX = 1.0f / tanH;'),
+    ('source','RestoreScopedProjection();','// RestoreScopedProjection();'),
+):
+    parts=dict(settings=settings,profiles=profiles,source=source)
+    assert old in parts[typ]
+    if typ == 'source':
+        # Avoid mutating a different projection owner earlier in the TU:
+        # the exact PMT visibility hook is the unit under review.
+        prefix, scoped_suffix = parts['source'].split(
+            'class DisableStageCulling : public Hook', 1)
+        scoped, suffix = scoped_suffix.split('class WindowedBorderless', 1)
+        assert old in scoped
+        parts['source'] = prefix + 'class DisableStageCulling : public Hook' + (
+            scoped.replace(old,bad,1)) + 'class WindowedBorderless' + suffix
+    else:
+        parts[typ]=parts[typ].replace(old,bad,1)
+    try:check(parts['settings'],parts['profiles'],parts['source'])
+    except (AssertionError,ValueError):pass
+    else:raise AssertionError('wide cull mutant escaped '+typ+old)
+from math import tan, radians
+for baseDeg in (35.,46.,60.):
+    original=1/tan(radians(baseDeg))
+    enlarged=1/tan(radians(min(85,baseDeg+8)))
+    assert min(original,enlarged)<=original and enlarged>0
+print('PASS PMT VR wide 8deg default, F11 writable, scoped projection restore, 4 destructive controls')
+, after)
     assert 'projection->_11 = newX;' in owner
     assert 'projection->_22 = newY;' in owner
     assert 'if (vr && mode == 2)' in owner
