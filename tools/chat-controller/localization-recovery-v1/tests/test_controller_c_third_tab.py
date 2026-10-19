@@ -27,7 +27,7 @@ def test(root, patch_path=None):
     expanded = c1patch.patch(ab)
     ast.parse(expanded)
     assert c1patch.patch(expanded) == expanded
-    assert expanded.count("# OUTRUN_C1_SLOT_V2") == 1
+    assert expanded.startswith("# OUTRUN_C1_SLOT_V2\n")
     assert 'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1")' in expanded
     assert 'CHAT_SLOTS != 3' in expanded and 'CHAT_SLOTS != 2' not in expanded
     assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 30: "B", 40: "C1"}' in expanded
