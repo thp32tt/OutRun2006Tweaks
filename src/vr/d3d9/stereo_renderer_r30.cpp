@@ -19,6 +19,7 @@
 #include "vr/d3d11/live_game_primitive_span.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
+#include <array>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -375,7 +376,7 @@ namespace OutRunVRStereo
             const std::vector<std::uint32_t>& physical,
             std::vector<std::uint8_t>& out)
         {
-            if (!buffer || stride < 16u || stride > 512u ||
+            if (!buffer || stride == 0u || stride > 512u ||
                 physical.empty() || physical.size() >
                     outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices) return false;
             const auto entry = R30FindVertexShadow(buffer);
@@ -3431,6 +3432,51 @@ namespace OutRunVRStereo
             }
         };
 
+        // Source-epoch CPU shadows are gathered with the same physical
+        // vertex order for all referenced D3D9 SM3 streams, even after sparse
+        // indexed compaction. Never Lock a live GPU buffer for DX11 translation.
+        bool R30CaptureNativeAdditionalStreams(
+            IDirect3DDevice9* device,
+            const std::vector<std::uint32_t>& physical,
+            outrun::vr::dx11::live_game_frame::NativeGameAdditionalStreams& extra,
+            std::array<std::vector<std::uint8_t>,3>& owned)
+        {
+            if (!device || physical.empty()) return false;
+            IDirect3DVertexDeclaration9* decl=nullptr;
+            if (FAILED(device->GetVertexDeclaration(&decl)) || !decl)
+                return true; // fixed-function path unchanged
+            std::array<D3DVERTEXELEMENT9,MAXD3DDECLLENGTH> elements{};
+            UINT count=MAXD3DDECLLENGTH;
+            const bool ok=SUCCEEDED(decl->GetDeclaration(elements.data(),&count));
+            decl->Release();
+            if (!ok || count<2u || count>MAXD3DDECLLENGTH) return false;
+            std::array<bool,4> used{};
+            for (UINT i=0u; i+1u<count; ++i) {
+                if (elements[i].Stream>=used.size()) return false;
+                used[elements[i].Stream]=true;
+            }
+            for (UINT slot=1u; slot<used.size(); ++slot) {
+                if (!used[slot]) continue;
+                IDirect3DVertexBuffer9* vb=nullptr;
+                UINT offset=0u,stride=0u;
+                if (FAILED(device->GetStreamSource(slot,&vb,&offset,&stride)) ||
+                    !vb || !stride || stride>512u) {
+                    if (vb) vb->Release();
+                    return false;
+                }
+                R30EnsureVertexBufferHooks(vb);
+                R30EnsureVertexShadow(vb);
+                const bool captured=R30CopySparseVertexShadow(
+                    vb,offset,stride,physical,owned[slot-1u]);
+                vb->Release();
+                if (!captured) return false;
+                extra.extra[slot-1u]={
+                    owned[slot-1u].data(),stride,
+                    static_cast<UINT>(physical.size())};
+            }
+            return true;
+        }
+
         void R30ObserveNativeLinearVB(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE topology, UINT firstVertex,
             UINT primitiveCount) noexcept
@@ -3485,9 +3531,18 @@ namespace OutRunVRStereo
                     R30CopyVertexShadow(vb, static_cast<UINT>(firstByte),
                                         static_cast<UINT>(byteCount), bytes);
                 vb->Release();
-                if (valid) nativeSource.forwarded = true;
-                if (valid) live::observe_linear(device, topology,
-                                primitiveCount, bytes.data(), stride);
+                if (valid) {
+                    std::vector<std::uint32_t> physical(nativeElements);
+                    for (UINT i=0u; i<nativeElements; ++i)
+                        physical[i]=firstVertex+i;
+                    live::NativeGameAdditionalStreams extra{};
+                    std::array<std::vector<std::uint8_t>,3> owned{};
+                    if (!R30CaptureNativeAdditionalStreams(
+                            device,physical,extra,owned)) return;
+                    nativeSource.forwarded=true;
+                    live::observe_linear(device,topology,primitiveCount,
+                                         bytes.data(),stride,&extra);
+                }
             } catch (...) { /* Native diagnostic must never alter game HRESULT. */ }
         }
 
@@ -3579,6 +3634,7 @@ namespace OutRunVRStereo
                     high = std::max(high, static_cast<std::uint64_t>(physical));
                 }
                 std::vector<std::uint8_t> vertices;
+                std::vector<std::uint32_t> capturedPhysical;
                 UINT nativeVertexCount = 0u;
                 // Indices were bounds-validated before the dense shadow copy.
                 // A hole in that contiguous CPU shadow must not invalidate
@@ -3598,6 +3654,9 @@ namespace OutRunVRStereo
                         for (auto& i : indices)
                             i -= static_cast<std::uint32_t>(low);
                         nativeVertexCount = static_cast<UINT>(high-low+1u);
+                        capturedPhysical.resize(nativeVertexCount);
+                        for (UINT i=0u; i<nativeVertexCount; ++i)
+                            capturedPhysical[i]=static_cast<UINT>(low+i);
                     }
                 }
                 // Also retry a *failed dense copy* through the same bounded,
@@ -3616,15 +3675,23 @@ namespace OutRunVRStereo
                              vb, streamOffset, stride, uniquePhysical, vertices);
                     if (ok) {
                         nativeVertexCount = static_cast<UINT>(uniquePhysical.size());
+                        capturedPhysical.swap(uniquePhysical);
                         indices.swap(compact);
                     }
                 } else if (!validPhysicalIndices) ok = false;
                 ib->Release();
                 vb->Release();
-                if (ok) nativeSource.forwarded = true;
-                if (ok) live::observe_indexed(device, topology, primitiveCount,
-                    vertices.data(), stride, nativeVertexCount,
-                    indices.data(), count);
+                if (ok) {
+                    live::NativeGameAdditionalStreams extra{};
+                    std::array<std::vector<std::uint8_t>,3> owned{};
+                    if (capturedPhysical.size()!=nativeVertexCount ||
+                        !R30CaptureNativeAdditionalStreams(
+                            device,capturedPhysical,extra,owned)) return;
+                    nativeSource.forwarded=true;
+                    live::observe_indexed(device,topology,primitiveCount,
+                        vertices.data(),stride,nativeVertexCount,
+                        indices.data(),count,&extra);
+                }
             } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
         }
 

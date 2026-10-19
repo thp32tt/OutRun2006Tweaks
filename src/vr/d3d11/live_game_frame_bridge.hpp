@@ -3,6 +3,7 @@
 #include <d3d9.h>
 #include <d3d11.h>
 #include <cstdint>
+#include <array>
 
 namespace outrun::vr::dx11::live_game_frame {
 
@@ -28,15 +29,25 @@ void set_native_full_game_gpu_sink(NativeFullGameGpuSink sink, void* user) noexc
 // Never intercept, skip or replace the game's original D3D9 return value.
 bool diagnostic_enabled() noexcept;
 
+// Source-owned, epoch-valid secondary D3D9 VB shadows. Each stream shares
+// stream-0's exact physical vertex order (including indexed sparse gathers).
+// Borrowed pointers are valid only during the synchronous observe call.
+struct NativeGameAdditionalStreams {
+    struct View { const void* bytes{}; UINT stride{}; UINT vertexCount{}; };
+    std::array<View, 3> extra{};
+};
+
 // Pointer lifetime is limited to this call: data is copied before returning.
 // The caller must attest that data came from the current game Draw call or
 // from a generation-current D3D9 Lock/Unlock CPU shadow.
 void observe_linear(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
-                    UINT primitiveCount, const void* vertices, UINT stride) noexcept;
+                    UINT primitiveCount, const void* vertices, UINT stride,
+                    const NativeGameAdditionalStreams* extra = nullptr) noexcept;
 void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
                      UINT primitiveCount, const void* vertices, UINT stride,
                      UINT vertexCount, const std::uint32_t* rebasedIndices,
-                     UINT indexCount) noexcept;
+                     UINT indexCount,
+                     const NativeGameAdditionalStreams* extra = nullptr) noexcept;
 
 // A supported zero-count Draw has no CPU VB/IB/UP shadow. Observe its source
 // ordinal; after the real D3D9 call, failed HRESULT still aborts native output.

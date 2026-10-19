@@ -32,6 +32,8 @@ on:
       # not leave the preceding shader result as the last tested revision.
       - 'tools/dx11_game_stage1_*probe*.cpp'
       - 'tools/dx11_live_sm3_packed_model_probe.cpp'
+      - 'tools/dx11_live_sm3_multistream_probe.cpp'
+      - 'src/vr/d3d11/live_game_sm3_stream_assembly.hpp'
       - 'docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json'
       - 'docs/automation/runs/CONVERSION-DX11-*.json'
       - '.github/workflows/build.yml'
@@ -65,6 +67,7 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_multistream_probe.cpp -o /tmp/dx11_sm3_multistream && /tmp/dx11_sm3_multistream
           python tools/test_dx11_live_sm3_vertex_decl_00929.py
           python tools/test_dx11_live_sm3_draw_00925.py
           python tools/test_dx11_linear_predication_r230.py

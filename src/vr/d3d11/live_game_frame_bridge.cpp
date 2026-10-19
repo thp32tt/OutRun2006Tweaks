@@ -4,6 +4,7 @@
 #include "live_game_cull_state.hpp"
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
+#include "live_game_sm3_stream_assembly.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
 #include "live_game_pixel_center.hpp"
@@ -4369,6 +4370,7 @@ std::uint64_t live_sm3_pipeline_identity(
 // substitute. Source offsets and formats must fit the rebased game stream.
 bool live_sm3_input_layout(
     const std::vector<D3DVERTEXELEMENT9>& declaration, UINT stride,
+    const NativeGameAdditionalStreams* extra,
     std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
     bool& repack, UINT& nativeStride) noexcept {
     if (declaration.size() < 2u || stride == 0u) return false;
@@ -4389,8 +4391,14 @@ bool live_sm3_input_layout(
     nativeStride = stride;
     for (std::size_t i = 0; i + 1u < declaration.size(); ++i) {
         const auto& in = declaration[i];
-        if (in.Stream != 0u || in.Method != D3DDECLMETHOD_DEFAULT ||
+        if (in.Stream >= 4u || in.Method != D3DDECLMETHOD_DEFAULT ||
             in.UsageIndex >= 16u) return false;
+        const UINT sourceStride = in.Stream == 0u ? stride :
+            extra ? extra->extra[in.Stream-1u].stride : 0u;
+        if (in.Stream != 0u) {
+            if (!extra || !extra->extra[in.Stream-1u].bytes) return false;
+            repack = true; // merge original VB streams into one native IA
+        }
         DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
         const UINT width = game_sm3_decl_width(in.Type);
         switch (in.Type) {
@@ -4406,7 +4414,8 @@ bool live_sm3_input_layout(
             format = DXGI_FORMAT_R32G32B32A32_FLOAT;
             break;
         }
-        if (static_cast<UINT>(in.Offset) + width > stride) return false;
+        if (!sourceStride || static_cast<UINT>(in.Offset) + width > sourceStride)
+            return false;
         const char* name = nullptr;
         switch (in.Usage) {
         case D3DDECLUSAGE_POSITION: name = kPosition; break;
@@ -4491,7 +4500,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                D3DPRIMITIVETYPE type, UINT expected,
                                const void* bytes, UINT stride, UINT vertexCount,
                                const std::uint32_t* indices, UINT indexCount,
-                               std::uint64_t sourceOrdinal) noexcept {
+                               std::uint64_t sourceOrdinal,
+                               const NativeGameAdditionalStreams* extra) noexcept {
     if (!env_full_game_opt_in() || !game || !bytes || !stride ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
         type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
@@ -4713,7 +4723,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     std::vector<D3D11_INPUT_ELEMENT_DESC> input;
     bool repack = false;
     UINT nativeStride = stride;
-    if (!live_sm3_input_layout(declaration, stride, input,
+    if (!live_sm3_input_layout(declaration, stride, extra, input,
                                repack, nativeStride)) return false;
     // A mixed packed/float D3D9 stream must reach the actual game's native
     // Draw in shader-visible FLOAT4 register order (not format bitcasts).
@@ -4724,29 +4734,36 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     UINT sourceFrequency = 0u;
     if (FAILED(game->GetStreamSourceFreq(0u, &sourceFrequency)) ||
         sourceFrequency != 1u) return false;
+    std::array<bool,4> referenced{};
+    for (std::size_t i=0u; i+1u<declaration.size(); ++i)
+        referenced[declaration[i].Stream]=true;
+    for (UINT slot=1u; slot<referenced.size(); ++slot) {
+        if (!referenced[slot]) continue;
+        UINT frequency=0u;
+        // Instance-rate/unknown stream stepping is not ordinary vertex-rate.
+        if (!extra || !extra->extra[slot-1u].bytes ||
+            extra->extra[slot-1u].vertexCount < vertexCount ||
+            FAILED(game->GetStreamSourceFreq(slot,&frequency)) ||
+            frequency != 1u) return false;
+    }
     // Reject oversized, malformed or untranslatable data before any upload.
     std::vector<std::uint8_t> unpacked;
     const void* nativeBytes = bytes;
     if (repack) {
-        const auto total = static_cast<std::uint64_t>(nativeStride) * vertexCount;
-        if (total == 0u || total > (1ull << 25u)) return false;
-        try {
-            unpacked.resize(static_cast<std::size_t>(total));
-            const auto* original = static_cast<const std::uint8_t*>(bytes);
-            for (UINT v = 0u; v < vertexCount; ++v) {
-                for (std::size_t i = 0; i < input.size(); ++i) {
-                    std::array<float, 4> decoded{};
-                    if (!game_sm3_unpack_attribute(
-                            declaration[i].Type,
-                            original + static_cast<std::size_t>(v) * stride +
-                                declaration[i].Offset, decoded)) return false;
-                    std::memcpy(unpacked.data() +
-                            static_cast<std::size_t>(v) * nativeStride + i * 16u,
-                            decoded.data(), sizeof(decoded));
-                }
-            }
-        } catch (...) { return false; }
-        nativeBytes = unpacked.data();
+        std::array<GameSm3StreamView,4> streams{};
+        streams[0]={static_cast<const std::uint8_t*>(bytes),stride,vertexCount};
+        if (extra) for (UINT slot=1u; slot<4u; ++slot)
+            streams[slot]={
+                static_cast<const std::uint8_t*>(extra->extra[slot-1u].bytes),
+                extra->extra[slot-1u].stride,
+                extra->extra[slot-1u].vertexCount};
+        std::vector<GameSm3ElementRef> elements;
+        for (std::size_t i=0u; i+1u<declaration.size(); ++i)
+            elements.push_back({declaration[i].Stream,
+                                declaration[i].Offset,declaration[i].Type});
+        if (!game_sm3_assemble_streams(elements,streams,vertexCount,unpacked))
+            return false;
+        nativeBytes=unpacked.data();
     }
     ProgrammableShaderFunctionSourceEvidence vertexEvidence, pixelEvidence;
     if (!live_sm3_shader_bytes(vertexShader.Get(), pixelShader.Get(),
@@ -6132,7 +6149,8 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
 }
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
-             const std::uint32_t* indices, UINT indexCount) noexcept {
+             const std::uint32_t* indices, UINT indexCount,
+              const NativeGameAdditionalStreams* extra) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
         State& s = state();
@@ -6247,7 +6265,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 (liveVs || livePs)) {
                 if (!submit_live_sm3_game_draw(
                         s, game, type, expectedElements, bytes, stride, vertexCount,
-                        indices, indexCount, sourceOrdinal)) {
+                        indices, indexCount, sourceOrdinal, extra)) {
                     s.frameBatch.abort();
                     ++s.failed;
                 }
@@ -6482,7 +6500,8 @@ void observe_empty_game_draw(IDirect3DDevice9* game,
 }
 
 void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
-                    UINT primitives, const void* vertices, UINT stride) noexcept {
+                    UINT primitives, const void* vertices, UINT stride,
+                    const NativeGameAdditionalStreams* extra) noexcept {
     // DrawPrimitiveUP with no vertices is a real source call, not a missing
     // shadow. Preserve its ordinal between full-size menu/car/race native Draws.
     if (primitives == 0u &&
@@ -6498,14 +6517,16 @@ void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
         observe_unavailable_game_draw(game);
         return;
     }
-    observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0);
+    observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0,
+            extra);
 }
 
 void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                      UINT primitives, const void* vertices, UINT stride,
                      UINT vertexCount, const std::uint32_t* indices,
-                     UINT indexCount) noexcept {
-    observe(game, type, primitives, vertices, stride, vertexCount, indices, indexCount);
+                     UINT indexCount, const NativeGameAdditionalStreams* extra) noexcept {
+    observe(game, type, primitives, vertices, stride, vertexCount, indices,
+            indexCount, extra);
 }
 
 bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
