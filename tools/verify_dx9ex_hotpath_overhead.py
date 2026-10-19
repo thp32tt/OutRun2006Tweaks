@@ -85,7 +85,18 @@ print("DX9Ex hotpath source guard PASS (runtime/Quest3 untested)")
 r33 = (ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8")
 assert 'Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,' in graphics
 culling = graphics.split("class DisableStageCulling : public Hook", 1)[1].split("class DisableVehicleLODs", 1)[0]
-assert "patch.set(Settings::DisableStageCulling.get());" in culling
+# The scoped PMT visibility result gate now replaces the old live
+# binary Patch::set toggle. Keep desktop DisableStageCulling while VR mode
+# 1 is union-FOV/pose fail-open and mode 2 forces the original visible result.
+assert "else if (Settings::DisableStageCulling.get())" in culling
+assert "if (vr && mode == 2)" in culling
+assert "if (vr && mode == 1)" in culling
+assert "if (!scoped)" in culling
+assert "ctx.eax = 1u;" in culling
+assert "OutRunVR::PmtNodeCull::ResultGateBytesCompatible(" in culling
+assert "OutRunVR::PmtNodeCull::ResultTestRva" in culling
+assert "safetyhook::create_mid(" in culling
+assert "patch.set(" not in culling
 assert "!Settings::VREnabled.get()" not in culling
 fast = r33.split("R32ReviewOwnedResult R33TryFastWorld(", 1)[1].split("R32ReviewEnsureStereoResources", 1)[0]
 assert "if (fragile)\n            {\n                if (R33TelemetryEnabled())\n                    R32ReviewNoteDispatchFragile();\n                return {};\n            }" in fast
@@ -97,8 +108,8 @@ assert "MultiplyMatrix(worldView, LatchedHeadInverse), projection);" in renderer
 assert "cachedHeadProjection" not in renderer
 assert "GetVertexShaderConstantF(" in r30
 assert "device->SetRenderState(D3DRS_ALPHAREF, alphaRef);" in graphics
-# Mutation of the protected if-condition cannot satisfy this source contract.
-assert "patch.set(Settings::DisableStageCulling.get());" not in culling.replace(
-    "patch.set(Settings::DisableStageCulling.get());",
-    "patch.set(Settings::DisableStageCulling.get() && !Settings::VREnabled.get());")
+# A destructive mutation that disables the legacy result gate must
+# be rejected; no executable code-byte patch is used in this owner.
+assert "else if (Settings::DisableStageCulling.get())" not in culling.replace(
+    "else if (Settings::DisableStageCulling.get())", "else if (false)")
 print("DX9Ex flicker fail-closed source guard PASS; HMD UNTESTED")
