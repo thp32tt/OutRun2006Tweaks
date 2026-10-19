@@ -6,6 +6,7 @@
 #include "native_sm3_texture_codegen.hpp"
 #include "native_sm3_fragment_codegen.hpp"
 #include "native_sm3_conditional_flow.hpp"
+#include "native_sm3_repeat_flow.hpp"
 #include "live_game_sm3_alpha_test.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
@@ -369,6 +370,7 @@ bool build_r283_sm3_mov_shader_source(
             // 1=IFC/IF, 2=ELSE, 3=ENDIF; the emitter preserves branch order.
             unsigned flowKind{};
             std::string flowCondition;
+            unsigned repeatCount{};
             bool sineCosine{};
             bool signScratch{};
             UINT signInputTemp{32u};
@@ -387,11 +389,14 @@ bool build_r283_sm3_mov_shader_source(
         std::array<std::array<std::uint32_t, 4>, 256> defBits{};
         std::array<bool, 16> boolDefPresent{};
         std::array<std::uint32_t, 16> boolDefBits{};
+        std::array<bool, 16> intDefPresent{};
+        std::array<std::array<std::uint32_t, 4>, 16> intDefBits{};
         std::array<bool, 16> samplerDeclared{};
         std::array<bool, 16> sampler2dDeclared{};
         std::array<bool, 16> sampler2dUsed{};
         bool liveConstantsUsed = false;
         NativeSm3ConditionalFlow writtenFlow;
+        NativeSm3StructuredFlow structuredFlow;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
         // D3D9 device. Parse all definitions before interpreting arithmetic
@@ -417,6 +422,27 @@ bool build_r283_sm3_mov_shader_source(
                         (info & D3DSP_TEXTURETYPE_MASK) ==
                         static_cast<DWORD>(D3DSTT_2D);
                 }
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_DEFI)) {
+                // Only shader-owned i# literals have a stable repeat count.
+                // Dynamic Set*ShaderConstantI is not captured by this owner.
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    instruction.operandTokens.size() != 5u)
+                    return false;
+                const DWORD token = instruction.operandTokens[0];
+                const unsigned reg = token & D3DSP_REGNUM_MASK;
+                if ((token & 0x80000000u) == 0u ||
+                    r283_decode_register_type(token) != D3DSPR_CONSTINT ||
+                    reg >= intDefPresent.size() || intDefPresent[reg] ||
+                    (token & D3DSP_WRITEMASK_ALL) != D3DSP_WRITEMASK_ALL ||
+                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    (token & D3DSP_DSTMOD_MASK) != 0u ||
+                    (token & D3DSP_DSTSHIFT_MASK) != 0u)
+                    return false;
+                intDefPresent[reg] = true;
+                for (unsigned j = 0u; j < 4u; ++j)
+                    intDefBits[reg][j] = instruction.operandTokens[j + 1u];
                 continue;
             }
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB)) {
@@ -469,7 +495,8 @@ bool build_r283_sm3_mov_shader_source(
         for (const auto& instruction : decode.instructions) {
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_DCL) ||
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEF) ||
-                instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB))
+                instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB) ||
+                instruction.opcode == static_cast<DWORD>(D3DSIO_DEFI))
                 continue;
             // SM3 scalar float-compare branches can change menu/race shader
             // output, including gradients and alpha. Preserve genuine control
@@ -484,7 +511,8 @@ bool build_r283_sm3_mov_shader_source(
                 const unsigned comparison =
                     (instruction.instructionToken >> 16u) & 7u;
                 const char* compareOp = native_sm3_ifc_comparison(comparison);
-                if (!compareOp || !writtenFlow.begin(tempWritten, outputWritten))
+                if (!compareOp || !structuredFlow.begin_if() ||
+                    !writtenFlow.begin(tempWritten, outputWritten))
                     return false;
                 std::array<std::string, 2> scalarOperands{};
                 static constexpr char lanes[] = "xyzw";
@@ -559,6 +587,7 @@ bool build_r283_sm3_mov_shader_source(
                 std::string boolCondition;
                 if (!native_sm3_bool_reference(
                         reg, boolDefPresent[reg], boolCondition) ||
+                    !structuredFlow.begin_if() ||
                     !writtenFlow.begin(tempWritten, outputWritten))
                     return false;
                 Operation branch{};
@@ -571,6 +600,7 @@ bool build_r283_sm3_mov_shader_source(
                 if ((instruction.instructionToken & 0xf0000000u) != 0u ||
                     !instruction.operandTokens.empty() ||
                     operations.size() >= kMaxOps ||
+                    !structuredFlow.otherwise() ||
                     !writtenFlow.otherwise(tempWritten, outputWritten))
                     return false;
                 Operation branch{};
@@ -582,11 +612,52 @@ bool build_r283_sm3_mov_shader_source(
                 if ((instruction.instructionToken & 0xf0000000u) != 0u ||
                     !instruction.operandTokens.empty() ||
                     operations.size() >= kMaxOps ||
+                    !structuredFlow.end_if() ||
                     !writtenFlow.end(tempWritten, outputWritten))
                     return false;
                 Operation branch{};
                 branch.flowKind = 3u;
                 operations.push_back(std::move(branch));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_REP)) {
+                // D3D9 SM3 REP reads integer i#.x; no live device int
+                // snapshot, predicate, relative indexing or BREAK is guessed.
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    instruction.operandTokens.size() != 1u ||
+                    operations.size() >= kMaxOps)
+                    return false;
+                const DWORD token = instruction.operandTokens[0];
+                const unsigned reg = token & D3DSP_REGNUM_MASK;
+                const unsigned swizzle = (token & D3DSP_SWIZZLE_MASK) >> 16u;
+                if ((token & 0x80000000u) == 0u ||
+                    r283_decode_register_type(token) != D3DSPR_CONSTINT ||
+                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    ((token & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) !=
+                        D3DSPSM_NONE ||
+                    (swizzle != 0u && swizzle != 0xe4u) ||
+                    reg >= intDefPresent.size() || !intDefPresent[reg])
+                    return false;
+                unsigned count = 0u;
+                if (!native_sm3_static_repeat_count(
+                        intDefBits[reg], count) ||
+                    !structuredFlow.begin_repeat(count))
+                    return false;
+                Operation loop{};
+                loop.flowKind = 4u;
+                loop.repeatCount = count;
+                operations.push_back(std::move(loop));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_ENDREP)) {
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    !instruction.operandTokens.empty() ||
+                    operations.size() >= kMaxOps ||
+                    !structuredFlow.end_repeat())
+                    return false;
+                Operation loop{};
+                loop.flowKind = 5u;
+                operations.push_back(std::move(loop));
                 continue;
             }
             NativeSm3ArithmeticOpcode opcode{};
@@ -917,7 +988,8 @@ bool build_r283_sm3_mov_shader_source(
             }
             operations.push_back(std::move(op));
         }
-        if (operations.empty() || !writtenFlow.empty()) return false;
+        if (operations.empty() || !writtenFlow.empty() ||
+            !structuredFlow.empty()) return false;
         if (vertexStage) {
             for (const auto& output : outputs)
                 if (output.registerType != D3DSPR_OUTPUT ||
@@ -985,8 +1057,13 @@ bool build_r283_sm3_mov_shader_source(
                     translated += "    if (" + op.flowCondition + ") {\n";
                 else if (op.flowKind == 2u)
                     translated += "    } else {\n";
-                else
+                else if (op.flowKind == 3u || op.flowKind == 5u)
                     translated += "    }\n";
+                else if (op.flowKind == 4u) {
+                    if (!append_native_sm3_repeat_begin(
+                            translated, op.repeatCount, static_cast<unsigned>(i)))
+                        return false;
+                } else return false;
                 continue;
             }
             std::string dest;
