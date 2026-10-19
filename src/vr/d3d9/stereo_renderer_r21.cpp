@@ -65,6 +65,20 @@ namespace OutRunVRStereo
             sampleQpc = 0;
             ageMs = INT64_MAX;
 
+            // Real-host freshness must remain fail-closed in Mode 0.
+            // An explicitly selected HMD-less run has a local pose producer:
+            // use only the process-local eligibility state, never publish
+            // fake HostAlive/heartbeat into a shared OpenXR mapping.
+            if (Settings::VRHmdlessDebugMode != 0)
+            {
+                hostPid = 0x484D444Cu; // same synthetic identity as renderer
+                flags = OutRunVR::HostAlive | OutRunVR::SessionVisible |
+                    OutRunVR::HostShouldRender;
+                ++heartbeat;
+                ageMs = 0;
+                return R21HostStatus::Fresh;
+            }
+
             if (!SharedState)
                 return R21HostStatus::Stale;
 
