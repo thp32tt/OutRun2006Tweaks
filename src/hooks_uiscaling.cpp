@@ -439,6 +439,59 @@ class UIScaling : public Hook
 		D3DXVECTOR2* pScaling, D3DXVECTOR2* pRotationCenter, float Rotation, D3DXVECTOR2* pTranslation)
 	{
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+        // Quest3 optical regression 2026-10-19: The shared R84/R26_SAFE
+        // front-end rewrite promoted title/mode ownership into permission to
+        // remap partial and pivoted D3DX matrices. The original letterbox
+        // background and separately queued text no longer share a coordinate
+        // space. Restore the known-good 2026-10-09 full-vector-only mapping
+        // while VR is enabled; do not rewrite the game's input pointers.
+        // This is a bounded compatibility rollback, NOT proof of HMD PASS.
+        if (Settings::VREnabled &&
+            (mode == ScalingMode::KeepCentered ||
+             mode == ScalingMode::OnlineArcade))
+        {
+            D3DXVECTOR2 legacyScale{}, legacyTranslation{};
+            D3DXVECTOR2* inputScale = pScaling;
+            D3DXVECTOR2* inputTranslation = pTranslation;
+            if (pScaling && pTranslation &&
+                Game::screen_scale && Game::screen_resolution)
+            {
+                const float sx = Game::screen_scale->x;
+                const float sy = Game::screen_scale->y;
+                const float sw = Game::screen_resolution->x;
+                const float ow = Game::original_resolution.x;
+                if (std::isfinite(sx) && std::isfinite(sy) &&
+                    sx > 1.0e-6f && sy > 1.0e-6f &&
+                    std::isfinite(sw) && std::isfinite(ow) &&
+                    std::isfinite(pScaling->x) &&
+                    std::isfinite(pScaling->y) &&
+                    std::isfinite(pTranslation->x) &&
+                    std::isfinite(pTranslation->y))
+                {
+                    const float factor = (std::min)(sx, sy);
+                    legacyScale.x = (pScaling->x / sx) * factor;
+                    legacyScale.y = (pScaling->y / sy) * factor;
+                    legacyTranslation.x =
+                        (pTranslation->x / sx) * factor +
+                        (sw - ow * factor) * 0.5f;
+                    legacyTranslation.y =
+                        (pTranslation->y / sy) * factor;
+                    if (std::isfinite(legacyScale.x) &&
+                        std::isfinite(legacyScale.y) &&
+                        std::isfinite(legacyTranslation.x) &&
+                        std::isfinite(legacyTranslation.y))
+                    {
+                        inputScale = &legacyScale;
+                        inputTranslation = &legacyTranslation;
+                    }
+                }
+            }
+            // The old owned D3DX path never promoted nullable/rotation-only
+            // matrices and never applied a second 4:3 optical affine.
+            return D3DXMatrixTransformation2D.stdcall<int>(
+                pOut, pScalingCenter, pScalingRotation,
+                inputScale, pRotationCenter, Rotation, inputTranslation);
+        }
 		// D3DX treats these input vectors as read-only. The game may reuse
 		// the same source sprite matrix across menu/car-selection draws;
 		// do not accumulate our aspect correction in the caller's storage.
