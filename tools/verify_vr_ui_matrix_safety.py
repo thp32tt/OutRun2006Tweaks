@@ -9,7 +9,12 @@ text = (Path(__file__).resolve().parents[1] / "src/hooks_uiscaling.cpp").read_te
 def require_safe(source: str) -> None:
     start = source.index("static int __stdcall D3DXMatrixTransformation2D_dest(")
     end = source.index("static inline SafetyHookMid draw_sprite_custom_matrix_hk", start)
-    s = source[start:end]
+    # Active VR uses a bounded October-9 compatibility path BEFORE the
+    # experimental front-end producer affine. Verify the modern R84 path
+    # independently, rather than mistaking its earlier legacy return for
+    # an unsafe early call in the current branch.
+    s = source[start:end].split(
+        "// D3DX treats these input vectors as read-only.", 1)[1]
     required = (
         "CanContainOriginalFullFrontEndVector(",
         "Game::screen_scale && Game::screen_resolution",
@@ -66,6 +71,56 @@ def require_safe(source: str) -> None:
 
 
 require_safe(text)
+
+# The user's R84 and R26_SAFE HMD sessions both reproduced the same
+# misregistered quit-dialog text: the shared UI hook was the regression.
+# Pin the older full-vector-only VR dispatch so a later refactor cannot
+# silently expose partial/pivot source matrices to this broken mapping.
+def require_vr_legacy_owner(source: str) -> None:
+    block = source.split("static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
+        "// D3DX treats these input vectors as read-only.", 1)[0]
+    keys = (
+        "if (Settings::VREnabled &&",
+        "mode == ScalingMode::KeepCentered ||",
+        "mode == ScalingMode::OnlineArcade))",
+        "if (pScaling && pTranslation &&",
+        "const float factor = (std::min)(sx, sy);",
+        "(pScaling->x / sx) * factor;",
+        "(pScaling->y / sy) * factor;",
+        "(sw - ow * factor) * 0.5f;",
+        "(pTranslation->y / sy) * factor;",
+        "std::isfinite(legacyTranslation.y))",
+        "inputScale = &legacyScale;",
+        "inputTranslation = &legacyTranslation;",
+        "return D3DXMatrixTransformation2D.stdcall<int>(",
+    )
+    for key in keys:
+        assert key in block, "legacy VR compatibility missing: " + key
+    assert block.index("if (Settings::VREnabled &&") < block.index(
+        "if (pScaling && pTranslation &&") < block.index(
+        "return D3DXMatrixTransformation2D.stdcall<int>(")
+    assert "pScaling->x =" not in block and "pTranslation->x =" not in block
+    assert "CanContainOriginalFullFrontEndVector" not in block
+    assert "NeedsFrontEndAffineContain" not in block
+    assert "BuildFrontEndAffineContain" not in block
+
+require_vr_legacy_owner(text)
+for old, broken in (
+    ("if (Settings::VREnabled &&", "if (!Settings::VREnabled &&"),
+    ("if (pScaling && pTranslation &&", "if (pScaling || pTranslation ||"),
+    ("(sw - ow * factor) * 0.5f;", "(sw - ow * factor);"),
+    ("inputScale = &legacyScale;", "inputScale = pScaling;"),
+    ("inputTranslation = &legacyTranslation;", "inputTranslation = pTranslation;"),
+):
+    assert old in text
+    try:
+        require_vr_legacy_owner(text.replace(old, broken, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("VR legacy UI rollback mutation escaped: " + old)
+print("VR known-good full-vector matrix rollback PASS (5 destructive controls)")
+
 
 # 01071: Enforce the new full-vector guard and its shared game-state snapshot.
 # Never accept an unsafe full HUD transform just because a string was renamed.
