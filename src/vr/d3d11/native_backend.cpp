@@ -266,14 +266,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V8";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V9";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V8";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V9";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -367,7 +367,8 @@ bool build_r283_sm3_mov_shader_source(
             bool texture2d{};
             bool texkill{};
             // Flow instructions are source operations, not synthetic register writes.
-            // 1=IFC/IF, 2=ELSE, 3=ENDIF; the emitter preserves branch order.
+            // 1=IF, 2=ELSE, 3=ENDIF, 4=REP, 5=ENDREP,
+            // 6=BREAK, 7=BREAKC; native emitter preserves branch order.
             unsigned flowKind{};
             std::string flowCondition;
             unsigned repeatCount{};
@@ -502,7 +503,21 @@ bool build_r283_sm3_mov_shader_source(
             // output, including gradients and alpha. Preserve genuine control
             // flow instead of assuming both arms run. The branch-state tracker
             // intersects physical register initialization across both paths.
-            if (instruction.opcode == static_cast<DWORD>(D3DSIO_IFC)) {
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_BREAK)) {
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    !instruction.operandTokens.empty() ||
+                    operations.size() >= kMaxOps ||
+                    !structuredFlow.record_break())
+                    return false;
+                Operation stop{};
+                stop.flowKind = 6u;
+                operations.push_back(std::move(stop));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_IFC) ||
+                instruction.opcode == static_cast<DWORD>(D3DSIO_BREAKC)) {
+                const bool conditionalBreak =
+                    instruction.opcode == static_cast<DWORD>(D3DSIO_BREAKC);
                 if ((instruction.instructionToken & 0xf0000000u) != 0u ||
                     (instruction.instructionToken & 0x00f80000u) != 0u ||
                     instruction.operandTokens.size() != 2u ||
@@ -511,8 +526,11 @@ bool build_r283_sm3_mov_shader_source(
                 const unsigned comparison =
                     (instruction.instructionToken >> 16u) & 7u;
                 const char* compareOp = native_sm3_ifc_comparison(comparison);
-                if (!compareOp || !structuredFlow.begin_if() ||
-                    !writtenFlow.begin(tempWritten, outputWritten))
+                if (!compareOp ||
+                    (conditionalBreak
+                         ? !structuredFlow.record_break()
+                         : (!structuredFlow.begin_if() ||
+                            !writtenFlow.begin(tempWritten, outputWritten))))
                     return false;
                 std::array<std::string, 2> scalarOperands{};
                 static constexpr char lanes[] = "xyzw";
@@ -559,7 +577,7 @@ bool build_r283_sm3_mov_shader_source(
                     scalarOperands[i] = value + "." + lanes[component];
                 }
                 Operation branch{};
-                branch.flowKind = 1u;
+                branch.flowKind = conditionalBreak ? 7u : 1u;
                 branch.flowCondition = scalarOperands[0] + " " + compareOp +
                                        " " + scalarOperands[1];
                 operations.push_back(std::move(branch));
@@ -641,7 +659,7 @@ bool build_r283_sm3_mov_shader_source(
                 unsigned count = 0u;
                 if (!native_sm3_static_repeat_count(
                         intDefBits[reg], count) ||
-                    !structuredFlow.begin_repeat(count))
+                    !structuredFlow.begin_repeat(count, tempWritten, outputWritten))
                     return false;
                 Operation loop{};
                 loop.flowKind = 4u;
@@ -653,7 +671,7 @@ bool build_r283_sm3_mov_shader_source(
                 if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
                     !instruction.operandTokens.empty() ||
                     operations.size() >= kMaxOps ||
-                    !structuredFlow.end_repeat())
+                    !structuredFlow.end_repeat(tempWritten, outputWritten))
                     return false;
                 Operation loop{};
                 loop.flowKind = 5u;
@@ -1062,6 +1080,11 @@ bool build_r283_sm3_mov_shader_source(
                 else if (op.flowKind == 4u) {
                     if (!append_native_sm3_repeat_begin(
                             translated, op.repeatCount, static_cast<unsigned>(i)))
+                        return false;
+                } else if (op.flowKind == 6u || op.flowKind == 7u) {
+                    if (!append_native_sm3_break(
+                            translated, op.flowKind == 7u ?
+                                op.flowCondition : std::string{}))
                         return false;
                 } else return false;
                 continue;

@@ -70,6 +70,8 @@ jobs:
           python tools/test_dx11_sm3_boolean_flow_00947.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_repeat_flow_probe_00948.cpp -o /tmp/dx11_sm3_repeat_00948 && /tmp/dx11_sm3_repeat_00948
           python tools/test_dx11_sm3_repeat_flow_00948.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_break_flow_probe_00949.cpp -o /tmp/dx11_sm3_break_00949 && /tmp/dx11_sm3_break_00949
+          python tools/test_dx11_sm3_break_flow_00949.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model

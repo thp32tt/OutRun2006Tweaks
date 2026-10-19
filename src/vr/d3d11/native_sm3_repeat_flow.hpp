@@ -55,8 +55,50 @@ public:
         return true;
     }
 
+    using Temps = std::array<unsigned, 32>;
+    using Outputs = std::array<unsigned, 16>;
+
+    // A BREAK can leave the loop before an instruction writes a TEMP or
+    // output. Intersect uncertain writes with the pre-loop state at ENDREP.
+    bool begin_repeat(unsigned count, const Temps& temps,
+                      const Outputs& outputs) {
+        if (!begin_repeat(count)) return false;
+        Frame& frame = frames_.back();
+        frame.entryTemps = temps;
+        frame.entryOutputs = outputs;
+        frame.tracksWrites = true;
+        return true;
+    }
+
+    bool record_break() noexcept {
+        for (auto it = frames_.rbegin(); it != frames_.rend(); ++it) {
+            if (it->kind == 2u) {
+                if (!it->tracksWrites) return false;
+                it->hasBreak = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool end_repeat(Temps& temps, Outputs& outputs) noexcept {
+        if (frames_.empty() || frames_.back().kind != 2u ||
+            !frames_.back().tracksWrites) return false;
+        const Frame& frame = frames_.back();
+        if (frame.hasBreak) {
+            for (unsigned i = 0u; i < temps.size(); ++i)
+                temps[i] &= frame.entryTemps[i];
+            for (unsigned i = 0u; i < outputs.size(); ++i)
+                outputs[i] &= frame.entryOutputs[i];
+        }
+        frames_.pop_back();
+        return true;
+    }
+
+    // Structural-only legacy mode cannot authorize a BREAK.
     bool end_repeat() noexcept {
-        if (frames_.empty() || frames_.back().kind != 2u) return false;
+        if (frames_.empty() || frames_.back().kind != 2u ||
+            frames_.back().tracksWrites) return false;
         frames_.pop_back();
         return true;
     }
@@ -68,6 +110,10 @@ private:
         unsigned kind;
         unsigned count;
         bool hasElse;
+        bool tracksWrites = false;
+        bool hasBreak = false;
+        Temps entryTemps{};
+        Outputs entryOutputs{};
     };
     std::vector<Frame> frames_;
 };
@@ -78,6 +124,15 @@ inline bool append_native_sm3_repeat_begin(
     const std::string index = "r283_repeat_" + std::to_string(ordinal);
     translated += "    [loop] for (int " + index + " = 0; " + index +
                   " < " + std::to_string(count) + "; ++" + index + ") {\n";
+    return true;
+}
+
+inline bool append_native_sm3_break(std::string& translated,
+                                    const std::string& condition) {
+    if (condition.empty())
+        translated += "    break;\n";
+    else
+        translated += "    if (" + condition + ") break;\n";
     return true;
 }
 
