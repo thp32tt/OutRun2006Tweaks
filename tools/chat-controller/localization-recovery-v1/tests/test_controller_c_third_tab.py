@@ -30,7 +30,7 @@ def test(root, patch_path=None):
     assert expanded.startswith("# OUTRUN_C1_SLOT_V2\n")
     assert 'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1")' in expanded
     assert 'CHAT_SLOTS != 3' in expanded and 'CHAT_SLOTS != 2' not in expanded
-    assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 30: "B", 40: "C1"}' in expanded
+    assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "B", 15: "C1", 20: "A", 30: "B", 40: "A", 45: "C1", 50: "B"}' in expanded
     assert 'slot.name in ("A", "B") and (_outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE"' in expanded
     assert 'slot.name in ("A", "B"):\n        project_name' in expanded
     assert 'elif CONTROLLER_MODE == "localization" and slot.name == "C1":' in expanded
@@ -48,8 +48,8 @@ def test(root, patch_path=None):
     else:
         raise AssertionError("C1 patch accepted source without A/B PNG injection")
 
-    expected = {0:"A", 10:"C1", 30:"B", 40:"C1"}
-    assert expected == {0:"A", 10:"C1", 30:"B", 40:"C1"}
+    expected = {0:"A", 10:"B", 15:"C1", 20:"A", 30:"B", 40:"A", 45:"C1", 50:"B"}
+    assert expected == {0:"A", 10:"B", 15:"C1", 20:"A", 30:"B", 40:"A", 45:"C1", 50:"B"}
     print(json.dumps({
         "test":"A_B_C1_THREE_TAB",
         "status":"PASS",
