@@ -129,6 +129,40 @@ namespace OutRunVR::GameSemantic
     static_assert(!CanReprojectFiniteResultHudPlane(
         RenderScope::ScreenHud, ProducerToken::None));
 
+    // A D3DXSprite::Flush/End may physically submit an earlier, untracked
+    // batch while the original +TIME numeric E8 is still on the stack.
+    // Merely declining to restore HudBatch's owner is insufficient: the
+    // live direct source scope would still classify that foreign GPU Draw
+    // as StageExtensionTime. Hide unproven ownership for this single
+    // physical submission, without touching the native D3DX HRESULT.
+    inline constexpr bool CanSuppressUnprovenDirectStageD3DXSubmission(
+        bool restoredExactBatch, bool queued, RenderScope scope,
+        ProducerToken producer) noexcept
+    {
+        return !restoredExactBatch && !queued &&
+            scope == RenderScope::ScreenHud &&
+            producer == ProducerToken::StageExtensionTime;
+    }
+
+    static_assert(CanSuppressUnprovenDirectStageD3DXSubmission(
+        false, false, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime));
+    static_assert(!CanSuppressUnprovenDirectStageD3DXSubmission(
+        true, false, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime));
+    static_assert(!CanSuppressUnprovenDirectStageD3DXSubmission(
+        false, true, RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime));
+    static_assert(!CanSuppressUnprovenDirectStageD3DXSubmission(
+        false, false, RenderScope::ScreenOverlay2D,
+        ProducerToken::StageExtensionTime));
+    static_assert(!CanSuppressUnprovenDirectStageD3DXSubmission(
+        false, false, RenderScope::ScreenHud,
+        ProducerToken::GoalTime020));
+    static_assert(!CanSuppressUnprovenDirectStageD3DXSubmission(
+        false, false, RenderScope::WorldBillboard,
+        ProducerToken::StageExtensionTime));
+
     // Previous direct D3DX triangles must be submitted under their OLD
     // owner before the first exact +TIME SpriteNode becomes current.
     // This is never permission to relabel an unknown or mixed batch.
@@ -1286,6 +1320,55 @@ namespace OutRunVR::GameSemantic
             const ScopedExactProducerSemantic&) = delete;
         ScopedExactProducerSemantic& operator=(
             const ScopedExactProducerSemantic&) = delete;
+    };
+
+    // Fail-closed only for an UNPROVEN native D3DX Flush/End occurring
+    // inside an exact direct +TIME producer. Unlike the ScreenOverlay2D
+    // plane (which can still enter eye projection), None preserves native
+    // single-draw fallback and cannot invent stereo eye ownership. Preserve
+    // even a pending unrelated one-shot or projected world marker.
+    class ScopedUnprovenDirectStageD3DXSubmission final
+    {
+        RenderScope scope_ = RenderScope::None;
+        RenderScope queueScope_ = RenderScope::None;
+        RenderScope nextDraw_ = RenderScope::None;
+        ProducerToken producer_ = ProducerToken::None;
+        ProjectedMarkerInfo marker_{};
+        bool active_ = false;
+
+    public:
+        explicit ScopedUnprovenDirectStageD3DXSubmission(bool suppress) noexcept
+            : active_(suppress && SpriteQueueDepth == 0 &&
+                ExternalOverlaySemanticDepth == 0 &&
+                !ExactLensCentreDrawOwnsSemantic())
+        {
+            if (!active_)
+                return;
+            scope_ = CurrentScope;
+            queueScope_ = CurrentQueueExactScope;
+            nextDraw_ = NextDrawScope;
+            producer_ = CurrentDirectExactProducer;
+            marker_ = CurrentQueueProjectedMarker;
+            CurrentScope = RenderScope::None;
+            CurrentQueueExactScope = RenderScope::None;
+            NextDrawScope = RenderScope::None;
+            CurrentDirectExactProducer = ProducerToken::None;
+            CurrentQueueProjectedMarker = {};
+        }
+        ~ScopedUnprovenDirectStageD3DXSubmission()
+        {
+            if (!active_)
+                return;
+            CurrentScope = scope_;
+            CurrentQueueExactScope = queueScope_;
+            NextDrawScope = nextDraw_;
+            CurrentDirectExactProducer = producer_;
+            CurrentQueueProjectedMarker = marker_;
+        }
+        ScopedUnprovenDirectStageD3DXSubmission(
+            const ScopedUnprovenDirectStageD3DXSubmission&) = delete;
+        ScopedUnprovenDirectStageD3DXSubmission& operator=(
+            const ScopedUnprovenDirectStageD3DXSubmission&) = delete;
     };
 
     // An outer +TIME producer must not overwrite a different exact producer

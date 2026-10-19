@@ -1,0 +1,69 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01065",
+  "production_id": "CONVERSION-DX9EX-01065",
+  "event_id": "CONVERSION-DX9EX-01065-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "checkpoint": "C2_IMPLEMENTED",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "PENDING_GITHUB_COMMIT",
+  "validation_bearing_result_sha": "PENDING",
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Prevent original +TIME direct HUD scope from contaminating an earlier unknown/mixed ID3DXSprite GPU Flush/End while preserving valid exact +TIME batches, queued sibling ownership and unchanged original game Draw/FFB.",
+    "scope_boundary": "Exact direct StageExtensionTime physical D3DX Flush/End only; do not change GOAL, lens/SkyGlow, F11, rank, DX11, frozen DXVK, R26_SAFE or original GPU HRESULT.",
+    "acceptance_items": [
+      {
+        "id": "stage_unknown_d3dx_fallback",
+        "category": "end_to_end_behavior",
+        "behavior_area": "stage_numeric_gpu_batch_boundary",
+        "expected_behavior": "Unknown preexisting native D3DX GPU triangles cannot acquire StageExtensionTime from a later E8 scope; fail-closed original draw remains."
+      },
+      {
+        "id": "stage_known_and_foreign_preservation",
+        "category": "fallback_regression",
+        "behavior_area": "stage_exact_queue_goal_world_one_shot",
+        "expected_behavior": "Verified +TIME direct and queued batches retain exact GPU source; GOAL/world/other owner and one-shot pending state preserved."
+      },
+      {
+        "id": "stage_final_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84_Win32_Game_Host_Package_Domain_HUD_Inspector_Full_Source",
+        "expected_behavior": "Required same SHA Actions pass; HMD validation remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "root_cause": "On a failed GPU batch-owner restoration check, FlushDest and EndDest used ScopedExactProducerSemantic(None) (inactive), leaving the live StageExtensionTime direct scope to classify a physically submitted earlier unproven GPU batch.",
+    "fix_evidence": "C++ scoped fail-closed physical GPU owner masking for unproven direct stage native Flush/End plus positive/negative constexpr regression cases; no original D3DX submission suppressed."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "stage_unknown_d3dx_fallback": "PENDING_BUILD",
+    "stage_known_and_foreign_preservation": "PENDING_BUILD",
+    "stage_final_exact_sha_ci": "PENDING"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
+  "ci_evidence": {
+    "status": "PENDING",
+    "runtime": "Quest3/VDXR not executed"
+  }
+}
