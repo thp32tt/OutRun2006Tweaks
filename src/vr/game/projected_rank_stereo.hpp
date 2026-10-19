@@ -8,7 +8,39 @@ namespace OutRunVR::RankMarker
     {
         float baseX = 0.0f, baseY = 0.0f;
         float deltaX[2]{}, deltaY[2]{};
+        // Projected car/rival markers are screen-authored sprites, but their
+        // GPU depth must still belong to the exact vehicle anchor. Carry the
+        // binocular anchor's clip depth and reciprocal-W with its XY delta.
+        float ndcZ[2]{}, invW[2]{};
     };
+
+    inline bool ValidProjectedDepth(float ndcZ, float invW) noexcept
+    {
+        return std::isfinite(ndcZ) && ndcZ >= 0.0f && ndcZ <= 1.0f &&
+            std::isfinite(invW) && invW > 0.0f;
+    }
+
+    // POSITIONT/XYZRHW bypasses the transform pipeline, so a projected rank
+    // quad must explicitly inherit the vehicle anchor's screen-Z and RHW.
+    inline bool ResolvePositionTDepth(
+        const StereoNdcShift& shift, int eye, float minZ, float maxZ,
+        float& outZ, float& outRhw) noexcept
+    {
+        if (eye < 0 || eye > 1 ||
+            !ValidProjectedDepth(shift.ndcZ[eye], shift.invW[eye]) ||
+            !std::isfinite(minZ) || !std::isfinite(maxZ) || maxZ <= minZ)
+            return false;
+        const double z = double(minZ) +
+            double(shift.ndcZ[eye]) * (double(maxZ) - double(minZ));
+        if (!std::isfinite(z))
+            return false;
+        const float stagedZ = static_cast<float>(z);
+        if (!std::isfinite(stagedZ))
+            return false;
+        outZ = stagedZ;
+        outRhw = shift.invW[eye];
+        return true;
+    }
     // The two rank eyes are one logical submission. A stale pose or Reset
     // must not publish a left-eye position if the right eye is invalid.
     // Double intermediates also avoid overflow in finite viewport products.

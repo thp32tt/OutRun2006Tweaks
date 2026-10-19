@@ -3231,7 +3231,8 @@ namespace OutRunVRStereo
         // from alpha/RHW or another car's most recent shader constants.
         bool R30ProjectRankAnchor(
             const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
-            const D3DMATRIX& transform, float& x, float& y) noexcept
+            const D3DMATRIX& transform, float& x, float& y,
+            float* ndcZ = nullptr, float* invW = nullptr) noexcept
         {
             if (!marker.valid || !std::isfinite(marker.viewX) ||
                 !std::isfinite(marker.viewY) || !std::isfinite(marker.viewZ) ||
@@ -3243,15 +3244,31 @@ namespace OutRunVRStereo
             const float clipY = marker.viewX * transform._12 +
                 marker.viewY * transform._22 + marker.viewZ * transform._32 +
                 transform._42;
+            const float clipZ = marker.viewX * transform._13 +
+                marker.viewY * transform._23 + marker.viewZ * transform._33 +
+                transform._43;
             const float clipW = marker.viewX * transform._14 +
                 marker.viewY * transform._24 + marker.viewZ * transform._34 +
                 transform._44;
             if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
-                !std::isfinite(clipW) || clipW <= 1.0e-6f)
+                !std::isfinite(clipZ) || !std::isfinite(clipW) ||
+                clipW <= 1.0e-6f)
                 return false;
             x = clipX / clipW;
             y = clipY / clipW;
-            return std::isfinite(x) && std::isfinite(y);
+            if (!std::isfinite(x) || !std::isfinite(y))
+                return false;
+            if (ndcZ || invW)
+            {
+                const float projectedZ = clipZ / clipW;
+                const float projectedInvW = 1.0f / clipW;
+                if (!OutRunVR::RankMarker::ValidProjectedDepth(
+                        projectedZ, projectedInvW))
+                    return false;
+                if (ndcZ) *ndcZ = projectedZ;
+                if (invW) *invW = projectedInvW;
+            }
+            return true;
         }
 
         bool R30BuildProjectedRankDelta(
@@ -3304,7 +3321,8 @@ namespace OutRunVRStereo
                         baseProjection, stereo.eyeFov[eye]));
                 float projectedX = 0.0f, projectedY = 0.0f;
                 if (!R30ProjectRankAnchor(
-                        *marker, eyeTransform, projectedX, projectedY))
+                        *marker, eyeTransform, projectedX, projectedY,
+                        &shift.ndcZ[eye], &shift.invW[eye]))
                     return false;
                 shift.deltaX[eye] = projectedX - shift.baseX;
                 shift.deltaY[eye] = projectedY - shift.baseY;
@@ -3315,6 +3333,25 @@ namespace OutRunVRStereo
                     return false;
             }
             return true;
+        }
+
+        bool R30ApplyProjectedRankClipDepth(
+            D3DMATRIX& clipShift,
+            const OutRunVR::RankMarker::StereoNdcShift& shift,
+            int eye) noexcept
+        {
+            if (eye < 0 || eye > 1 ||
+                !OutRunVR::RankMarker::ValidProjectedDepth(
+                    shift.ndcZ[eye], shift.invW[eye]))
+                return false;
+            // clipShift is applied after the original sprite WVP. Preserve
+            // clip-W and the existing XY/artwork placement, but force clip-Z
+            // onto the exact vehicle anchor: z' = w * anchorNdcZ.
+            clipShift._13 = 0.0f;
+            clipShift._23 = 0.0f;
+            clipShift._33 = 0.0f;
+            clipShift._43 = shift.ndcZ[eye];
+            return R29OwnerMatrixFinite(clipShift);
         }
 
         bool R30HasXyzrhwInputLayout(IDirect3DDevice9* device) noexcept
@@ -5344,9 +5381,10 @@ namespace OutRunVRStereo
             return false;
         }
 
-            // Per-vehicle Calc3D2D quad: preserve original Z/RHW, UV,
-        // alpha, animation offsets and sprite ordering, moving only XY
-        // by its own view-space anchor's exact two-eye delta.
+            // Per-vehicle Calc3D2D quad: preserve UV/alpha/animation offsets
+        // and sprite ordering, but give the quad the exact vehicle anchor's
+        // per-eye Z/RHW. XY retains the stock sprite layout plus the exact
+        // binocular anchor delta instead of becoming a generic HUD plane.
     bool R30TransformProjectedRankXyzrhwStereo(
         const void* source, UINT vertexCount, UINT stride,
         const R30XyzrhwState& state,
@@ -5391,6 +5429,15 @@ namespace OutRunVRStereo
                 std::memcpy(right.data(), source, bytes);
             }
             const auto& vp = state.viewport;
+            float projectedZ[2]{}, projectedRhw[2]{};
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                if (!OutRunVR::RankMarker::ResolvePositionTDepth(
+                        state.projectedRank, eye,
+                        vp.MinZ, vp.MaxZ,
+                        projectedZ[eye], projectedRhw[eye]))
+                    return false;
+            }
             const float requestedScale = Settings::VRHudScale.get();
             if (!std::isfinite(requestedScale))
                 return false;
@@ -5425,6 +5472,8 @@ namespace OutRunVRStereo
                         (eye == 0 ? left.data() : right.data()) + off);
                     dst[0] = x[eye];
                     dst[1] = y[eye];
+                    dst[2] = projectedZ[eye];
+                    dst[3] = projectedRhw[eye];
                 }
             }
             return true;
@@ -6779,6 +6828,9 @@ namespace OutRunVRStereo
                     clipShift._42 =
                         state.projectedRank.deltaY[eye] +
                         (1.0f - markerScale) * state.projectedRank.baseY;
+                    if (!R30ApplyProjectedRankClipDepth(
+                            clipShift, state.projectedRank, eye))
+                        return E_NOTIMPL;
                     eyeProjection[eye] =
                         R29OwnerMultiplyMatrix(originalProjection, clipShift);
                 }
@@ -7399,6 +7451,9 @@ namespace OutRunVRStereo
                         (1.0f - markerScale) * shift.baseX;
                     clipShift._42 = shift.deltaY[eye] +
                         (1.0f - markerScale) * shift.baseY;
+                    if (!R30ApplyProjectedRankClipDepth(
+                            clipShift, shift, eye))
+                        return false;
                     const D3DMATRIX corrected =
                         R29OwnerMultiplyMatrix(stockWvp, clipShift);
                     if (!R29OwnerMatrixFinite(corrected))

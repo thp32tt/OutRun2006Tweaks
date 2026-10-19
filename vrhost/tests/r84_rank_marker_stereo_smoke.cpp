@@ -5,6 +5,7 @@
 #include <limits>
 using OutRunVR::RankMarker::StereoNdcShift;
 using OutRunVR::RankMarker::RemapScreenPoint;
+using OutRunVR::RankMarker::ResolvePositionTDepth;
 static bool eq(float a,float b) { return std::fabs(a-b)<0.001f; }
 
 #include "../../src/vr/game/rank_marker_sparse.hpp"
@@ -162,4 +163,21 @@ int main()
         400,200,0,0,0,480,1,s,pairX,pairY));
     assert(pairX[0] == snapshotX[0] && pairX[1] == snapshotX[1] &&
         pairY[0] == snapshotY[0] && pairY[1] == snapshotY[1]);
+
+    // A vehicle-attached marker must not retain the original 2D sprite
+    // depth after its XY has been moved to the two eye projections.
+    s.ndcZ[0] = 0.25f; s.invW[0] = 0.125f;
+    s.ndcZ[1] = 0.75f; s.invW[1] = 0.0625f;
+    float depthZ = -1.0f, depthRhw = -1.0f;
+    assert(ResolvePositionTDepth(s, 0, 0.0f, 1.0f, depthZ, depthRhw));
+    assert(eq(depthZ, 0.25f) && eq(depthRhw, 0.125f));
+    assert(ResolvePositionTDepth(s, 1, 0.2f, 0.8f, depthZ, depthRhw));
+    assert(eq(depthZ, 0.65f) && eq(depthRhw, 0.0625f));
+    const float savedDepthZ = depthZ, savedDepthRhw = depthRhw;
+    s.invW[1] = 0.0f;
+    assert(!ResolvePositionTDepth(s, 1, 0.0f, 1.0f, depthZ, depthRhw));
+    assert(depthZ == savedDepthZ && depthRhw == savedDepthRhw);
+    s.invW[1] = 0.0625f;
+    s.ndcZ[1] = 1.01f;
+    assert(!ResolvePositionTDepth(s, 1, 0.0f, 1.0f, depthZ, depthRhw));
 }
