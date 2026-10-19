@@ -1,0 +1,504 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1845-A0004-B0007-UNIQUE8",
+  "run_slot": "C1",
+  "reviewed_at_utc": "2026-10-19T09:56:52.388Z",
+  "requested_at_kst": "2026-10-19T18:45:00+09:00",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "reviewer": "C1",
+  "scope": "Unapproved existing A/B generated transparent Korean PNG candidates; exact SHA independent lightweight visual QA only",
+  "source_contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "source_glyph_policy": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+  "source_mapping": "localization/graphics/transcriptions.jsonl transcribed_reviewed",
+  "prior_qa": "localization/validation/c1_lightweight/C1-QA-20261019-1815-B0005-REMAINDER2-B0006-UNIQUE7.json",
+  "new_unique_sha_count": 8,
+  "summary": {
+    "PASS": 8,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "visual_proof_on_N100": [
+    "work/c1_batch_20261019_1845/compare_1.jpg",
+    "work/c1_batch_20261019_1845/compare_2.jpg",
+    "work/c1_batch_20261019_1845/metrics.json"
+  ],
+  "validation": "Confirmed 8 new SHA unique against five previous C1 QA logs (25 SHA), exact source PNG/manifest SHA and candidate/export SHA, all 8 English→Korean mappings against the GitHub transcribed_reviewed index, RGBA PNG alpha1 and alpha16 edge counts, and human visual reading of source-vs-output pairs. alpha=1 single-pixel fringe on one image is not legible clip.",
+  "whole_sentence_width_ratio": "diagnostic_only",
+  "text_length_difference_ignored": true,
+  "runtime_validation": "UNTESTED",
+  "final_dds": "NOT_CREATED",
+  "final_composition": "NOT_TESTED",
+  "ui_safe_cell_restore": "UNTESTED",
+  "library_binding": "UNVERIFIED",
+  "c2_c3_game_approval": "NOT_GRANTED",
+  "queue_consumed": false,
+  "image_generation_called": false,
+  "outputs": [
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0004-73FA0354",
+      "region_id": "Q051_a4d20de7d73bdf1e",
+      "source_english": "Score",
+      "approved_korean": "점수",
+      "visually_read_korean": "점수",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q051_a4d20de7d73bdf1e_source_k.png",
+      "candidate_sha256": "83b4f39db8fb82cbeaa402e30684c9771e48494d2a251a30274f7e34a3acb101",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q051_a4d20de7d73bdf1e_source.png",
+      "source_png_sha256": "4a7fb31072c11d5e88931c7db2ff602ceba9c7d8da4f9b51b34793b2fd4617b4",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        570,
+        168
+      ],
+      "candidate_dimensions": [
+        1774,
+        887
+      ],
+      "alpha1_bbox": [
+        185,
+        21,
+        1666,
+        863
+      ],
+      "alpha16_bbox": [
+        341,
+        186,
+        1496,
+        693
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "점수: 두 음절 모두 정확하고 받침·내부 공간 명료. 원문 계열 노랑/진청색 효과, 정방향, 불필요 배경 없음.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0004-73FA0354",
+      "region_id": "Q053_f6bb9f1d4f148346",
+      "source_english": "ANSWER",
+      "approved_korean": "정답",
+      "visually_read_korean": "정답",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q053_f6bb9f1d4f148346_source_k.png",
+      "candidate_sha256": "9e79c91071e6040c8ba17cf6a125d1240b1ca1d869d3db145ae26039ec7219d7",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q053_f6bb9f1d4f148346_source.png",
+      "source_png_sha256": "72a3c45f21ff4144e62d620d888f2f964cd362c167159d2ca02576ea7e7629e1",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1133,
+        234
+      ],
+      "candidate_dimensions": [
+        2127,
+        739
+      ],
+      "alpha1_bbox": [
+        531,
+        79,
+        1807,
+        713
+      ],
+      "alpha16_bbox": [
+        538,
+        121,
+        1621,
+        599
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "정답: 두 음절 정확하고 자소·금색 외곽선·그림자 선명. 영어 잔상/프레임 없음.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0004-73FA0354",
+      "region_id": "Q065_4796905a3921198b",
+      "source_english": "Loading",
+      "approved_korean": "로딩",
+      "visually_read_korean": "로딩",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q065_4796905a3921198b_source_k.png",
+      "candidate_sha256": "be5db41e703752c9029c509df669834da8c40e6dd5ba0e6f1bd88c2ccca2bff2",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q065_4796905a3921198b_source.png",
+      "source_png_sha256": "62f94a045d173ebd8b98d6e9110d62bbb2b628ce2b1bff918c7a2b81df3340f8",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        936,
+        240
+      ],
+      "candidate_dimensions": [
+        1919,
+        820
+      ],
+      "alpha1_bbox": [
+        35,
+        195,
+        1719,
+        733
+      ],
+      "alpha16_bbox": [
+        514,
+        197,
+        1421,
+        639
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "로딩: 두 음절 정확, 획과 받침 분리되며 무채색 원본 계열 외곽선 보존.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0004-73FA0354",
+      "region_id": "Q065_1b2f9e3d8eb09bc6",
+      "source_english": "Loading",
+      "approved_korean": "로딩",
+      "visually_read_korean": "로딩",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q065_1b2f9e3d8eb09bc6_source_k.png",
+      "candidate_sha256": "8fe6cae3d675ff0c5660c02cfa593e37c5525b0bbd46f0e7407fadf908231ebb",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q065_1b2f9e3d8eb09bc6_source.png",
+      "source_png_sha256": "43cb5a58864e7eff64e4344f0f3d1c0608d126b0a3a6a2855bff59d8e81493db",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        936,
+        240
+      ],
+      "candidate_dimensions": [
+        2032,
+        774
+      ],
+      "alpha1_bbox": [
+        345,
+        61,
+        1658,
+        734
+      ],
+      "alpha16_bbox": [
+        525,
+        163,
+        1520,
+        636
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "로딩: 독립 SHA에 대한 별도 후보. 로딩 정확, 획·받침·외곽선 가독성 양호.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0004-73FA0354",
+      "region_id": "Q101_14fba2230560a7b6",
+      "source_english": "You will run 15 courses continuously.",
+      "approved_korean": "15코스를 연속으로 달립니다.",
+      "visually_read_korean": "15코스를 연속으로 달립니다.",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/A/Q101_14fba2230560a7b6_source_k.png",
+      "candidate_sha256": "6f78fd50252287d4d52473e2e37c45ef1204af9a79f96ddda6551c4fc377ed46",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q101_14fba2230560a7b6_source.png",
+      "source_png_sha256": "c08831115aa1ae27e315f822ed58d8d5a869566ec3a86fcbfb41028e49268b86",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1864,
+        166
+      ],
+      "candidate_dimensions": [
+        2098,
+        750
+      ],
+      "alpha1_bbox": [
+        79,
+        72,
+        2051,
+        699
+      ],
+      "alpha16_bbox": [
+        81,
+        270,
+        2049,
+        464
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "15코스를 연속으로 달립니다.: 승인 매핑 일치. 각 음절과 숫자 읽힘, 정방향, 다크블루 외곽선 정상.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0007-C5B92195",
+      "region_id": "Q236_cfaed6fec02afd92",
+      "source_english": "TULIP GARDEN",
+      "approved_korean": "튤립 가든",
+      "visually_read_korean": "튤립 가든",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_cfaed6fec02afd92_source_k.png",
+      "candidate_sha256": "fc47a08941ec837304ed8f1d8ab6782a279afaa68c477fabe28dd561b80b5c62",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_cfaed6fec02afd92_source.png",
+      "source_png_sha256": "d97f117124207cafe4247dac184cfd052a49f56c8552b68fd59acfe6e66018c4",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1716,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_bbox": [
+        81,
+        71,
+        2129,
+        591
+      ],
+      "alpha16_bbox": [
+        367,
+        179,
+        1818,
+        538
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "튤립 가든: 승인 매핑 일치, 어두운 금속 계열 자소와 받침 구분됨, 추가 배경/프레임 없음.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0007-C5B92195",
+      "region_id": "Q236_12ffdc7a2d4925b0",
+      "source_english": "IMPERIAL AVENUE",
+      "approved_korean": "임페리얼 애비뉴",
+      "visually_read_korean": "임페리얼 애비뉴",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_12ffdc7a2d4925b0_source_k.png",
+      "candidate_sha256": "8a79391eae00c0c334d658d37a2a3c21c4f8d8cba76add91627bf52234749bde",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_12ffdc7a2d4925b0_source.png",
+      "source_png_sha256": "59cd590e96e1cfddd31cad97b10d601395cbbd4ce505d3188cf1898aa4a418ca",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1072,
+        120
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_bbox": [
+        0,
+        23,
+        2104,
+        683
+      ],
+      "alpha16_bbox": [
+        160,
+        222,
+        2028,
+        499
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        15,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "임페리얼 애비뉴: 승인 매핑 일치, 모든 글자 가독. 좌측 테두리에서 alpha=1 픽셀 15개 관측되나 alpha>=16 테두리 픽셀 0, 글자/효과가 잘린 흔적 없이 시각적으로 무시 가능한 초미세 알파 잡음. 최종 합성 전 재확인.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0007-C5B92195",
+      "region_id": "Q236_0ba6539ff24c59a8",
+      "source_english": "MILKY WAY",
+      "approved_korean": "밀키 웨이",
+      "visually_read_korean": "밀키 웨이",
+      "verdict": "PASS",
+      "reason": "C1_PNG_TEXT_GLYPH_ALPHA_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_0ba6539ff24c59a8_source_k.png",
+      "candidate_sha256": "d3e0ddb53c99381967f2008c23719be2ae2b007e77428a14451d77f5566f7e28",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_0ba6539ff24c59a8_source.png",
+      "source_png_sha256": "4a2b28058c9a2e5b5691298ba19b6935aec14bc6c8b77cc72cecd20ccb076c52",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1378,
+        232
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_bbox": [
+        122,
+        9,
+        2158,
+        668
+      ],
+      "alpha16_bbox": [
+        241,
+        168,
+        1946,
+        565
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "visual_observation": "밀키 웨이: 승인 매핑 일치, 각 글자 자소와 받침 및 어두운 외곽선 식별 가능.",
+      "ui_safe_cell_restore": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    }
+  ]
+}
