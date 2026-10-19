@@ -450,6 +450,10 @@ for original, corrupt in (
      "ProducerToken::ResultProgress"),
     ("ProducerToken::PauseOptionArrow",
      "ProducerToken::ResultProgress"),
+    ("ProducerToken::PauseFrameShell",
+     "ProducerToken::None"),
+    ("RenderScope::ScreenOverlay2D",
+     "RenderScope::WorldBillboard"),
 ):
     mutant = arrow_scope.replace(original, corrupt, 1)
     assert original not in mutant
@@ -481,13 +485,16 @@ assert "ProducerToken::ExactScreenHudClipSprite" in normal_clips
 assert "FlushD3DXBeforeDirectGoalSource" not in normal_clips
 
 pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
-pause_func = code[code.index("bool R30IsPauseMenuElement() noexcept"):pause_end]
+pause_func = code[code.index("bool R30IsPauseMenuExactShell() noexcept"):pause_end]
 for token in (
+    "OutRunVrPauseEye::ExactShellOwner(",
+    "RenderScope::ScreenOverlay2D,",
+    "CurrentRenderProducerToken() ==",
+    "ProducerToken::PauseFrameShell",
     "ExternalOverlaySemanticDepth == 0 &&",
     "Game::current_mode &&",
     "*Game::current_mode == GameState::STATE_SMPAUSEMENU &&",
-    "RenderScope::ScreenOverlay2D ||",
-    "R30IsPauseMenuExactArrow());",
+    "(R30IsPauseMenuExactShell() || R30IsPauseMenuExactArrow());",
     "if (!R30IsPauseMenuElement())",
     "Settings::VRPauseMenuVerticalOffset.get()",
     "!std::isfinite(fraction)",
