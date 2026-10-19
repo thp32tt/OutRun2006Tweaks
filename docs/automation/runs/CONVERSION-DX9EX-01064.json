@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01064",
+  "production_id": "CONVERSION-DX9EX-01064",
+  "event_id": "CONVERSION-DX9EX-01064-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "WAITING_CI",
+  "checkpoint": "C5_VALIDATION",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "cde4e005350f6c8214c77d9e40c24feb9ea08c73",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/lens_centre_partial_wvp.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Keep the original OutRun C993 central lens flare's original-game c64 world projection finite, same-source and same-draw throughout native R84 eye reprojection without doubling its centre or disturbing independent outer rings and SkyGlow.",
+    "scope_boundary": "Exact original D3A5→C980→C993 central lens WorldBillboard c64..c67 shader source only; unrelated register uploads, CABE outer lens rings, SkyGlow, original D3D9 draw, FFB/input, R26_SAFE, DX11 and frozen DXVK must remain unchanged.",
+    "trace_stages": [
+      "Original EXE centre producer D3A5→C980→C993 scoped game DrawObjectAlphaCentre starts original-world projection.",
+      "Original D3D9 shader SetVertexShaderConstantF writes full or split c64..c67 rows with device, shader binding, producer, pose, present and draw identity; PartialWvpUpload rejects any NaN/Inf c64 candidate atomically while never rejecting neighboring constants.",
+      "R84 native original draw remains conservatively available when source admission fails; strictly finite and source-owned original matrix is the only candidate for world-to-left/right-eye lens re-projection and subsequent host OpenXR composition."
+    ],
+    "subcomponents": [
+      "Protect complete and split source c64..c67 uploads against NaN/Inf before accepting or committing original lens matrix for the native stereo re-projection path.",
+      "Invalidate stale partial/committed source rows on malformed producer upload while passing through unrelated original game constants and the original draw without altering outer lens rings.",
+      "Retain constexpr/compiled positive complete and split source cases and negative NaN/Inf/stale/foreign source cases in the lens_centre_partial_wvp.hpp regression contract."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_original_c64_finite_eye_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_D3A5_C980_C993_raw_c64_R84_eye_projection",
+        "expected_behavior": "Original exact central flare may be eye reprojected only from source-owned finite complete c64 world projection, including same-draw split rows."
+      },
+      {
+        "id": "lens_stale_nonfinite_and_outer_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "NaN_Inf_split_shader_pose_queue_other_constants_original_d3d9_outer_SkyGlow",
+        "expected_behavior": "Invalid central lens source aborts stereo ownership atomically, does not poison later split uploads, and never rejects original game draw or neighboring non-c64 rows and outer effects."
+      },
+      {
+        "id": "lens_final_exact_sha_full_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows_R84_x86_game_x64_host_package_Domain_HUD_Inspector_Full_Source",
+        "expected_behavior": "All required final exact-SHA DX9Ex Active, Domain, HUD Inspector and Full Source Impact actions pass before build verified status; Quest3 HMD visual acceptance stays separate."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "C993 lens centre original-world c64..c67 may be set over full or partial original-game D3D9 shader constant writes; R84 captures those rows before applying stereo matrices.",
+    "root_cause": "Existing native lens partial-source WVP constructor accepted non-finite original-game c64 values that Direct3D9 upload may carry, allowing NaN/Inf to contaminate per-eye world projection and reuse of partially committed prior source matrices.",
+    "source_trace": [
+      "Original EXE D3A5→C980→C993 central lens producer is independent of the original CABE outer disc chain.",
+      "R84 source provenance stages c64..c67 constant rows for same producer/shader/device/pose and native Draw; invalid rows now reset the entire candidate.",
+      "Finite same-draw original-game WVP is admitted to guarded R84 per-eye processing; invalid source must fall back to one original-game draw and keep input and SkyGlow intact."
+    ],
+    "eye_ownership": "Only validated original-game finite centre WVP is a candidate for left and right eye stereo reprojection; this source guard does not establish physical HMD optical success.",
+    "alternatives_rejected": [
+      "Do not reclassify CABE outer flare disks as centre or blanket-disable alpha, world particles or SkyGlow.",
+      "Do not substitute stale live shader constants for unknown original C993 writes or widen draw-age without producer proof.",
+      "Do not suppress the original native D3D9 draw when stereo provenance fails."
+    ],
+    "fix_evidence": "Material C++ source and constexpr positive/negative tests implemented in cde4e005350f6c8214c77d9e40c24feb9ea08c73; active run 39178542138 failed at prior missing per-task feature record, not at compilation."
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "lens_original_c64_finite_eye_source": "PENDING_CI",
+    "lens_stale_nonfinite_and_outer_fallback": "PENDING_CI",
+    "lens_final_exact_sha_full_ci": "PENDING_CI"
+  },
+  "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_source_sha": "cde4e005350f6c8214c77d9e40c24feb9ea08c73",
+    "failed_prior_workflow": {
+      "name": "DX9Ex Active Validation",
+      "run_id": 39178542138,
+      "conclusion": "failure",
+      "reason": "exact-HEAD feature record missing before any Windows compile"
+    },
+    "runtime": "Quest3/VDXR not executed",
+    "status_note": "This record restores the contract input for the existing material source SHA; a successful exact-SHA build is not a physical binocular lens acceptance."
+  }
+}
