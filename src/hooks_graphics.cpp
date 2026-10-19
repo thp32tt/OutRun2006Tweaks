@@ -18,6 +18,8 @@
 #include <iostream>
 #include <array>
 #include <cmath>
+#include <cstdint>
+#include <cstring>
 
 namespace Settings
 {
