@@ -9,6 +9,7 @@
 #include "native_sm3_repeat_flow.hpp"
 #include "native_sm3_predicate_flow.hpp"
 #include "native_sm3_predicated_instruction.hpp"
+#include "native_sm3_destination_output.hpp"
 #include "live_game_sm3_alpha_test.hpp"
 #include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
@@ -370,6 +371,8 @@ bool build_r283_sm3_mov_shader_source(
             bool texkill{};
             bool predicated{};
             bool negatePredicate{};
+            unsigned destinationModifier{};
+            unsigned destinationShift{};
             // Flow instructions are source operations, not synthetic register writes.
             // 1=IF, 2=ELSE, 3=ENDIF, 4=REP, 5=ENDREP,
             // 6=BREAK, 7=BREAKC, 8=SETP, 9=BREAKP.
@@ -858,8 +861,9 @@ bool build_r283_sm3_mov_shader_source(
             const unsigned mask =
                 static_cast<unsigned>((destination & D3DSP_WRITEMASK_ALL) >> 16u);
             if ((destination & 0x80000000u) == 0u || mask == 0u ||
-                (destination & D3DSP_DSTMOD_MASK) != 0u ||
-                (destination & D3DSP_DSTSHIFT_MASK) != 0u ||
+                !native_sm3_destination_modifiers_accepted(
+                    (destination & D3DSP_DSTMOD_MASK) >> D3DSP_DSTMOD_SHIFT,
+                    (destination & D3DSP_DSTSHIFT_MASK) >> D3DSP_DSTSHIFT_SHIFT) ||
                 (destination & D3DSHADER_ADDRESSMODE_MASK) != 0u)
                 return false;
             Operation op{};
@@ -868,6 +872,10 @@ bool build_r283_sm3_mov_shader_source(
             op.destinationRegister = static_cast<UINT>(
                 destination & D3DSP_REGNUM_MASK);
             op.destinationMask = mask;
+            op.destinationModifier = static_cast<unsigned>(
+                (destination & D3DSP_DSTMOD_MASK) >> D3DSP_DSTMOD_SHIFT);
+            op.destinationShift = static_cast<unsigned>(
+                (destination & D3DSP_DSTSHIFT_MASK) >> D3DSP_DSTSHIFT_SHIFT);
             op.sourceCount = sourceCount;
             if (sourcePredicated) {
                 // The native owner tracks shader SETP p0.x only.  A
@@ -1234,6 +1242,13 @@ bool build_r283_sm3_mov_shader_source(
                            std::array<std::string, 3>{
                                op.sources[0], op.sources[1], op.sources[2]},
                            op.sourceCount, static_cast<unsigned>(i)))
+                return false;
+            // D3D9 applies destination shift, then saturate to the actual
+            // written channels. Keep this inside the real SETP predicate
+            // body and after TEXLD/matrix/arithmetic HLSL emission.
+            if (!append_native_sm3_destination_postprocess(
+                    translated, dest, op.destinationMask,
+                    op.destinationModifier, op.destinationShift))
                 return false;
             if (op.predicated)
                 append_native_sm3_predicated_end(translated);

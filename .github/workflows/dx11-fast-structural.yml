@@ -78,6 +78,8 @@ jobs:
           python tools/test_dx11_sm3_predicate_flow_00950.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_predicated_draw_probe_00951.cpp -o /tmp/dx11_sm3_predicated_00951 && /tmp/dx11_sm3_predicated_00951
           python tools/test_dx11_sm3_predicated_draw_00951.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_destination_output_probe_00952.cpp -o /tmp/dx11_sm3_output_00952 && /tmp/dx11_sm3_output_00952
+          python tools/test_dx11_sm3_destination_output_00952.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model
