@@ -482,7 +482,7 @@ async def inspect_slot(role, page, root="/data/imagegen"):
     if not active.get("source_chat_url"):
         return False, "CHAT_URL_NOT_RECORDED"
     target=active["source_chat_url"].strip()
-    if not re.fullmatch(r"https://chatgpt\\.com/(?:g/g-p-[^/]+/)?c/[^?#]+(?:[?#].*)?", target):
+    if not re.fullmatch(r"https://chatgpt\.com/(?:g/g-p-[^/]+/)?c/[^?#]+(?:[?#].*)?", target):
         return False, "ACTIVE_CHAT_URL_UNSAFE"
     if page.url.rstrip("/") != target.rstrip("/"):
         try:
