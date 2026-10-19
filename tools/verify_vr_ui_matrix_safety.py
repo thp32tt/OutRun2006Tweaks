@@ -408,7 +408,11 @@ mutants = (
      "std::isfinite(centeredX) || std::isfinite(centeredY)"),
 )
 for good, bad in mutants:
-    mutant = text.replace(good, bad, 1)
+    # Mutate the R84 branch under test, not the earlier known-good VR
+    # compatibility path which deliberately uses the same finite guard.
+    legacy, boundary, modern = text.partition(
+        "// D3DX treats these input vectors as read-only.")
+    mutant = legacy + boundary + modern.replace(good, bad, 1)
     if mutant == text:
         raise AssertionError("No-op negative mutation: " + good)
     try:
