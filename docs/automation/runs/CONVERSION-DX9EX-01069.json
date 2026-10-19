@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-01069",
+  "production_id": "CONVERSION-DX9EX-01069",
+  "event_id": "CONVERSION-DX9EX-01069-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C5_VALIDATION",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "1b1fb6433f199ae8e9293cc377c3f0ca2260c002",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Ensure the original stage-extension +TIME native sprite children and numeric glyphs never receive an R84 fixed-function or XYZRHW LEFT/RIGHT eye pair from a foreign or stale original game c64 shader upload, preserving valid same-shader and truly absent tracker fallbacks.",
+    "scope_boundary": "Only +TIME stage physical raw-WVP identity under R84 fixed-function/XYZRHW entry and matching R33 shader owner; no GOAL, generic HUD, F11, ESC, lens, world, input, FFB, SkyGlow, R26_SAFE, DX11 or frozen DXVK changes.",
+    "trace_stages": [
+      "Original EXE 0x00498670 stage +TIME producer and three sprite E8 calls at 0x9898E/0x98A36/0x98AC6 plus numeric glyph calls at 0x989AD/0x98A89/0x98A10 establish exact StageExtensionTime screen HUD ownership.",
+      "The original SpriteNode queue or direct D3DX stage glyph binds exact source and the source-backed shader/pose/c64 epoch before physical GPU Draw; the existing R33 shader path rejects a captured foreign raw shader upload.",
+      "R84 R30 fixed-function and XYZRHW physical LEFT/RIGHT Draw capture now evaluates the same captured original shader and shader-epoch contract before recording raw c64 generation, then preserves same-node, original-HRESULT and right-eye restore fences."
+    ],
+    "subcomponents": [
+      "Implement shader/epoch ownership parity in the real R30 +TIME physical source capture for both fixed-function and XYZRHW draws, rejecting known foreign or incomplete game WVP while keeping the unavailable raw tracker native fallback.",
+      "Extend executable stage-extension eye-plane smoke with positive original-shader and unknown-tracker cases plus mismatched shader, epoch and malformed original source negative cases.",
+      "Run final exact-SHA Windows game, OpenXR host and package and Domain, Inspector and Full Source Impact checks without suppressing output or changing unrelated source paths."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_exact_shader_wvp_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_stage_sprite_glyph_r30_fixedfn_xyzrhw_physical_eye_pair",
+        "expected_behavior": "Both +TIME sprites and numeric glyphs use only an original game c64 writer from their verified current shader and epoch for left and right native eye draws; a foreign captured raw writer is refused."
+      },
+      {
+        "id": "stage_unavailable_tracker_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "missing_original_wvp_tracker_unknown_native_draw_preservation",
+        "expected_behavior": "A truly absent original c64 capture remains zero/zero and uses unchanged safe R84 fallback, while an available mismatched or incomplete source never acquires an unrelated +TIME eye owner."
+      },
+      {
+        "id": "stage_final_exact_sha_windows_ci",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package_domain_hud_inspector_full_source_exact_sha",
+        "expected_behavior": "The same final validation-bearing exact SHA must pass DX9Ex Active x86 R84 game and x64 OpenXR host and package plus Domain Isolation, HUD Inspector and Full Source Impact; Quest3 hardware remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Source cross-check at R84 R30CaptureStagePhysicalSource and R33 captureStageSource on latest vr-d3d9ex-focus; R33 already called MatchesCapturedOriginalWvp but R30 unconditionally stamped the last available raw game WVP serial even if its shader/epoch was from another draw.",
+    "root_cause": "R30 fixed-function/XYZRHW stage +TIME physical source accepted a captured prior game c64 matrix without verifying that its shader identity and epoch matched the current stage physical GPU command. Consequently an unrelated original writer could supply a stale raw WVP generation without the R33 shader path veto.",
+    "source_trace": [
+      "Original +TIME three animated sprite and three numeric glyph callers -> exact StageExtensionTime tagging -> queue/direct D3DX GPU batch route.",
+      "R30CaptureStagePhysicalSource -> CapturePhysicalDrawCommand -> R29OwnerCurrentShaderEpoch and GetLastRawGameWvpWrite -> MatchesCapturedOriginalWvp now validates physical current shader, written shader, epoch and nonzero serial before LEFT.",
+      "R30 physical LEFT native Draw and RIGHT pre-RT/depth/viewport state fence -> SameAfterNativeLeft verifies that the exact StageExtensionTime queue node and current original c64 generation survive; R33 already held the shader analog."
+    ],
+    "eye_ownership": "The bounded R30 source repair refuses known foreign original-game shader constant uploads before stereo; previously valid current source and missing tracker use established native routing. Quest3/VDXR left/right actual visual alignment is not established.",
+    "alternatives_rejected": [
+      "Do not classify all alpha or fixed-function HUD as stage +TIME; original source must be exact StageExtensionTime.",
+      "Do not borrow injected live GPU c64 as original game WVP when tracker is missing, force D3DX Flush of mixed batches, or discard original native draw input and state recovery."
+    ]
+  },
+  "required_gates": [
+    "DX9Ex Active Validation",
+    "Domain Isolation Guard",
+    "OutRun EXE HUD Inspector CI",
+    "DX9Ex Full Source Impact Review"
+  ],
+  "acceptance_results": {
+    "stage_exact_shader_wvp_owner": "SOURCE_IMPLEMENTED",
+    "stage_unavailable_tracker_native_fallback": "SOURCE_IMPLEMENTED",
+    "stage_final_exact_sha_windows_ci": "PENDING"
+  },
+  "result_commit_kind": "VALIDATION_BEARING_RECORD_FOR_PREVIOUS_MATERIAL_SOURCE",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "material_source_sha": "1b1fb6433f199ae8e9293cc377c3f0ca2260c002",
+    "prior_failed_active": 39186580633,
+    "prior_failure": "exact task function record missing; policy pre-build failure, not a compiler failure"
+  },
+  "next_action": "Run four required GitHub Actions exact validation-bearing SHA gates once; repair exact failures under same TASK_ID; preserve Quest3 RUNTIME_VALIDATION=UNTESTED."
+}
