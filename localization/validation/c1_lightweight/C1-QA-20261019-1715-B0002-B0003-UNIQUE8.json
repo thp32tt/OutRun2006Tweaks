@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1715-B0002-B0003-UNIQUE8",
+  "reviewer": "C1",
+  "requested_at": "2026-10-19T17:15:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json",
+    "localization/graphics/transcriptions.jsonl"
+  ],
+  "previous_qa": "localization/validation/c1_lightweight/C1-IDLE-20261019-1615-KST.json",
+  "previous_reviewed_sha_count": 10,
+  "discovered_candidate_png_A": 5,
+  "discovered_candidate_png_B": 20,
+  "legacy_png_A_excluded": 1,
+  "new_unique_sha_count": 8,
+  "summary": {
+    "PASS": 5,
+    "FAIL": 3,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "verification": "Actual N100 persisted candidate/source PNG bytes SHA256 matched B0002/B0003 exporter reports; native/source side-by-side visual inspection, Pillow RGBA/alpha bbox at 1,32,128; GitHub reviewed transcription exact mappings",
+  "outputs": [
+    {
+      "role": "B",
+      "region_id": "Q046_5f87dc8be5d0fb22",
+      "producer_batch_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "source_ordinal": 6,
+      "source_english": "GEAR DOWN",
+      "canonical_korean": "기어 다운",
+      "visible_output": "밀키 웨이",
+      "verdict": "FAIL",
+      "reason": "FAIL_TRANSLATION_PAIRING_CROSS_SWAP",
+      "candidate_file": "Q046_5f87dc8be5d0fb22_source_k.png",
+      "candidate_sha256": "351092b473ca726edd5ab5a8894feb5a2a92c962aa20355ac4d41a8d3914c9b3",
+      "source_file": "Q046_5f87dc8be5d0fb22_source.png",
+      "source_crop_sha256": "efdb76e2d70e7e5bac9ae33024a85878ddc1e4a4b49982b4d0cd814941aad200",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        203,
+        161,
+        2023,
+        536
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q046_dba61321cf7c46df",
+      "producer_batch_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "source_ordinal": 7,
+      "source_english": "GEAR UP",
+      "canonical_korean": "기어 업",
+      "visible_output": "기어 업",
+      "verdict": "PASS",
+      "reason": "C1_PNG_GLYPH_TRANSLATION_ALPHA_ONLY",
+      "candidate_file": "Q046_dba61321cf7c46df_source_k.png",
+      "candidate_sha256": "1340b65d8ff6f98c81103d38779cd6671ec88a4eeedd1511d63d0ec85fd69c7e",
+      "source_file": "Q046_dba61321cf7c46df_source.png",
+      "source_crop_sha256": "e890c2e2a9988d578f108925c677ed4583b205977f48826ef00b7a589c7b50c4",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        465,
+        161,
+        1701,
+        555
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q050_f7ff1ecef9b70121",
+      "producer_batch_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "source_ordinal": 8,
+      "source_english": "PLAYERS",
+      "canonical_korean": "플레이어",
+      "visible_output": "플레이어",
+      "verdict": "PASS",
+      "reason": "C1_PNG_GLYPH_TRANSLATION_ALPHA_ONLY",
+      "candidate_file": "Q050_f7ff1ecef9b70121_source_k.png",
+      "candidate_sha256": "f358edb7093ed362f3c141a6cb28cc45fed5e010b0b3e5d73edf514cbe3c28b3",
+      "source_file": "Q050_f7ff1ecef9b70121_source.png",
+      "source_crop_sha256": "556fcd4584715ef84a3e58ba1c463a868ef57ec605bbda9b2471d427164027c5",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        202,
+        134,
+        1957,
+        591
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q052_a59a8c29fba84397",
+      "producer_batch_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "source_ordinal": 9,
+      "source_english": "Extra Time",
+      "canonical_korean": "추가 시간",
+      "visible_output": "추가 시간",
+      "verdict": "PASS",
+      "reason": "C1_PNG_GLYPH_TRANSLATION_ALPHA_ONLY",
+      "candidate_file": "Q052_a59a8c29fba84397_source_k.png",
+      "candidate_sha256": "73526a2057548274f1f4a0b109718784f05f212c4bb71851bc9e455828f7bff4",
+      "source_file": "Q052_a59a8c29fba84397_source.png",
+      "source_crop_sha256": "664b1ec8594569d3891bdbac71329cab4884304c20ad99418f33d6cab5d36db3",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        186,
+        169,
+        2021,
+        542
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q086_cf5c6a0a497b6ce4",
+      "producer_batch_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "source_ordinal": 10,
+      "source_english": "Milky Way",
+      "canonical_korean": "밀키 웨이",
+      "visible_output": "기어 다운",
+      "verdict": "FAIL",
+      "reason": "FAIL_TRANSLATION_PAIRING_CROSS_SWAP",
+      "candidate_file": "Q086_cf5c6a0a497b6ce4_source_k.png",
+      "candidate_sha256": "a118549bec26b61040742a64aa76ee82db2bd30008289a9d26742f77ea3a3618",
+      "source_file": "Q086_cf5c6a0a497b6ce4_source.png",
+      "source_crop_sha256": "2a77c43b7112707b2bcd1f7b517b1f681f5357cc87757e926f7c31fad4dc5114",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        411,
+        216,
+        1753,
+        516
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q086_72f6f42102789a81",
+      "producer_batch_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "source_ordinal": 11,
+      "source_english": "Cape Way",
+      "canonical_korean": "케이프 웨이",
+      "visible_output": "케이프 웨이",
+      "verdict": "FAIL",
+      "reason": "FAIL_EXTRANEOUS_WHITE_SPLATTER_AND_GLYPH_DEGRADATION",
+      "candidate_file": "Q086_72f6f42102789a81_source_k.png",
+      "candidate_sha256": "e3922cbe908c1f155268527924291e63f2975b4c49365f9c29a82304015d4b4c",
+      "source_file": "Q086_72f6f42102789a81_source.png",
+      "source_crop_sha256": "6aced5918bf2b32c04d488afa76f77e8b86775145837a3792127dcee65489575",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        166,
+        200,
+        2037,
+        512
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 24,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q086_bac66d798eb23b3d",
+      "producer_batch_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "source_ordinal": 12,
+      "source_english": "Skyscrapers",
+      "canonical_korean": "스카이스크레이퍼스",
+      "visible_output": "스카이스크레이퍼스",
+      "verdict": "PASS",
+      "reason": "C1_PNG_GLYPH_TRANSLATION_ALPHA_ONLY",
+      "candidate_file": "Q086_bac66d798eb23b3d_source_k.png",
+      "candidate_sha256": "2d601214cd029d9d4e97a4212fff64ba206e3a6551adeec6a2b44c9356510162",
+      "source_file": "Q086_bac66d798eb23b3d_source.png",
+      "source_crop_sha256": "cbd003fa7c1c465fde3604ad4cfc6584fb9861a33d42916b059415014d0b2f57",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        43,
+        222,
+        2132,
+        483
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "region_id": "Q098_5112ccfe2d458ff6",
+      "producer_batch_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "source_ordinal": 13,
+      "source_english": "Challenge the course record.",
+      "canonical_korean": "코스 기록에 도전하세요.",
+      "visible_output": "코스 기록에 도전하세요.",
+      "verdict": "PASS",
+      "reason": "C1_PNG_GLYPH_TRANSLATION_ALPHA_ONLY",
+      "candidate_file": "Q098_5112ccfe2d458ff6_source_k.png",
+      "candidate_sha256": "0c35ff7fd2e0cc3b4e777074caccb7b8017ce5bc77ea53afe1ff9a4cbad508d7",
+      "source_file": "Q098_5112ccfe2d458ff6_source.png",
+      "source_crop_sha256": "c35641b5729ddcb20caaec14c4905f2f16a5664f1f96d9937371d6a9272cfcac",
+      "format": "PNG RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha32_bbox_xyxy": [
+        54,
+        257,
+        2135,
+        496
+      ],
+      "alpha32_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha1_bottom_edge_pixels": 0,
+      "ui_safe_cell_restore": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "notes": [
+    "GEAR DOWN output was visibly Milky Way translation and Milky Way output was GEAR DOWN: separate SHA, both FAIL rather than exchanging file names without provenance-safe export.",
+    "Cape Way is readable in part but contains large white scattered ink/debris beyond original clean lettering; 24 alpha>=1 pixels on bottommost row, alpha>=32 at edge zero. Reject as significant non-lettering/character distortion.",
+    "Generated canvas dimensions differ from source ROI. This alone is not a FAIL. Per-letter visual readability and actual translation/safe-zone issues govern decisions.",
+    "Previously reviewed 10 exact candidate SHA from 13:10 and 13:41 records excluded, including earlier B/Q046_71c038f285be8338 red-ring FAIL.",
+    "C1 only candidate PNG visual/transparency QA; PNG library binding, DDS composition, texture UV safe cells and in-game acceptance not confirmed."
+  ],
+  "evidence": {
+    "candidate_sheet_N100": "work/c1_qa_candidates_B0002_B0003_20261019_1715.jpg",
+    "source_sheet_N100": "work/c1_qa_sources_B0002_B0003_20261019_1715.jpg",
+    "alpha_check_N100_script": "work/c1_qa_unique8_alpha_20261019.py",
+    "export_evidence_N100": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0002-7ED146F5.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0003-93A177FC.json"
+    ]
+  },
+  "actions": {
+    "imagegen_calls": 0,
+    "A_B_queue_consumed": 0,
+    "dds_written": 0,
+    "C2_C3_ingame_PASS_created": 0,
+    "deployment": false
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_final_approval": "NOT_GRANTED",
+  "precheck_remote_head": "f315fd412fae36d72ae9f8fe5f4563e97e5bd3a6"
+}
