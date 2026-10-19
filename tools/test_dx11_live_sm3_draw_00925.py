@@ -54,7 +54,7 @@ layout = bridge.partition("bool live_sm3_input_layout(")[2].partition(
 for token in ("D3DDECLTYPE_FLOAT1", "D3DDECLTYPE_FLOAT2",
               "D3DDECLTYPE_FLOAT3", "D3DDECLTYPE_FLOAT4",
               "default: return false;", "in.Stream != 0u",
-              "static_cast<UINT>(in.Offset) + width > stride"):
+              "static_cast<UINT>(in.Offset) + width > sourceStride"):
     check(token in layout, "unsupported vertex declaration admitted: " + token)
 
 composite = (ROOT / "src/vr/d3d11/live_game_sm3_composite.hpp").read_text()
