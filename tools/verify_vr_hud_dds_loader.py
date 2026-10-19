@@ -48,7 +48,7 @@ def verify_texture_lookup_window(window_source):
         check(token, meaning)
 
 
-def verify(text, window_source=None):
+def verify(text, window_source=None, mask_policy_source=None):
     # Inspect the actual runtime decoder with or without constexpr; either
     # spelling is a valid function, and both must meet identical strict guards.
     fmt_marker=("inline constexpr D3DFORMAT GetD3DFormatFromPixelFormat("
@@ -105,6 +105,13 @@ def verify(text, window_source=None):
         (fmt,"if ((format.dwFlags & DDPF_FOURCC) != 0)","compressed DDS requires declared FourCC"),
         (fmt,"if ((format.dwFlags & DDPF_RGB) != 0)","conflicting FourCC/RGB header is not fast-decoded"),
         (fmt,"if ((format.dwFlags & DDPF_RGB) == 0)","unflagged RGB bit masks cannot select fast RGB"),
+        (fmt,"DdsAlphaMask::Classify16(","source-owned 16-bit DDS alpha classification"),
+        (fmt,"case Rgb16Intent::Rgb565: return D3DFMT_R5G6B5;","RGB565 opaque texture path"),
+        (fmt,"case Rgb16Intent::Opaque555: return D3DFMT_X1R5G5B5;","undeclared alpha-shaped RGB555 must be opaque"),
+        (fmt,"case Rgb16Intent::Alpha1555: return D3DFMT_A1R5G5B5;","declared A1 source transparency retained"),
+        (fmt,"case Rgb16Intent::Alpha4444: return D3DFMT_A4R4G4B4;","declared A4 source transparency retained"),
+        (fmt,"(format.dwFlags & (DDPF_FOURCC | DDPF_ALPHAPIXELS))","opaque RGB24 rejects false alpha/FourCC"),
+
         (loader,"(DDSCAPS2_CUBEMAP | DDSCAPS2_VOLUME)","3D DDS faces/slices fall back to D3DX"),
         (text,"static_assert(VerifyDdsPixelIntentAndNativeFallback()","compiled positive/negative DDS metadata regression retained"),
     ]
@@ -114,8 +121,38 @@ def verify(text, window_source=None):
     if (fmt.index("if ((format.dwFlags & DDPF_FOURCC) != 0)") >
             fmt.index("format.dwFourCC == FOURCC_DXT1") or
         fmt.index("if ((format.dwFlags & DDPF_RGB) == 0)") >
-            fmt.index("format.dwRGBBitCount == 16")):
+            fmt.index("const auto rgb16 = OutRunVR::DdsAlphaMask::Classify16(")):
         raise ValueError("DDS format declaration guards must precede field use")
+    # Inspect the real C++ header that classifies 16-bit source masks.
+    # An alpha-shaped bit in a DDS RGB-only header is *not* declared alpha.
+    pixel_policy = ((ROOT / "src/vr/game/dds_alpha_mask_policy.hpp")
+                    .read_text(encoding="utf-8")
+                    if mask_policy_source is None else mask_policy_source)
+    mask16 = body(pixel_policy, "constexpr Rgb16Intent Classify16(")
+    for needle in (
+        "!(flags & RgbFlag)", "(flags & FourCcFlag)", "bits != 16u",
+        "const bool declaredAlpha = (flags & AlphaFlag) != 0u",
+        "alpha == 0u && !declaredAlpha",
+        "return Rgb16Intent::Rgb565;",
+        "if (!declaredAlpha)",
+        "return Rgb16Intent::Opaque555;",
+        "alpha == 0x8000u",
+        "Rgb16Intent::Alpha1555",
+        "alpha == 0xf000u && declaredAlpha",
+        "return Rgb16Intent::Alpha4444;",
+        "return Rgb16Intent::Unsupported;",
+    ):
+        if needle not in mask16:
+            raise ValueError("16-bit DDS flag/mask admission missing: " + needle)
+    for original in (
+        "Classify16(0x40u, 16, 0x7c00, 0x03e0, 0x001f, 0x8000)",
+        "Classify16(0x41u, 16, 0x7c00, 0x03e0, 0x001f, 0x8000)",
+        "Classify16(0x41u, 16, 0x0f00, 0x00f0, 0x000f, 0xf000)",
+        "Classify16(0x40u, 16, 0x0f00, 0x00f0, 0x000f, 0xf000)",
+        "Classify16(0x41u, 16, 0xf800, 0x07e0, 0x001f, 0)",
+    ):
+        if original not in pixel_policy:
+            raise ValueError("16-bit DDS positive/negative constexpr case lost")
     # Both 24-bit opaque BGR rows and 32-bit XRGB must preserve their own
     # row pitch, channel order and explicit opaque target format.
     if ("static_assert(OpaqueBgr24Pixel(0x11, 0x22, 0x33) == 0xFF332211u" not in text or
@@ -350,6 +387,12 @@ def negatives(text):
         "if ((format.dwFlags & DDPF_FOURCC) != 0)",
         "if ((format.dwFlags & DDPF_RGB) != 0)",
         "if ((format.dwFlags & DDPF_RGB) == 0)",
+        "DdsAlphaMask::Classify16(",
+        "case Rgb16Intent::Opaque555: return D3DFMT_X1R5G5B5;",
+        "case Rgb16Intent::Alpha1555: return D3DFMT_A1R5G5B5;",
+        "case Rgb16Intent::Alpha4444: return D3DFMT_A4R4G4B4;",
+        "case Rgb16Intent::Rgb565: return D3DFMT_R5G6B5;",
+        "(format.dwFlags & (DDPF_FOURCC | DDPF_ALPHAPIXELS))",
         "(DDSCAPS2_CUBEMAP | DDSCAPS2_VOLUME)",
         "static_assert(VerifyDdsPixelIntentAndNativeFallback()",
         "if (dataSize < sizeof(DDS_FILE))",
@@ -437,6 +480,31 @@ def negatives(text):
         except ValueError as exc:
             if str(exc).startswith("mutation was NOT caught"):
                 raise
+    # The source-only verifier can pass even if the shared C++ mask policy
+    # is weakened. Intentionally corrupt its admission gates and ensure
+    # each failure is caught before a Windows game/package acceptance.
+    mask_policy = (ROOT / "src/vr/game/dds_alpha_mask_policy.hpp").read_text(
+        encoding="utf-8")
+    mask_policy_mutations = [
+        "!(flags & RgbFlag)", "(flags & FourCcFlag)", "bits != 16u",
+        "const bool declaredAlpha = (flags & AlphaFlag) != 0u",
+        "alpha == 0u && !declaredAlpha",
+        "return Rgb16Intent::Rgb565;",
+        "if (!declaredAlpha)", "return Rgb16Intent::Opaque555;",
+        "alpha == 0x8000u", "alpha == 0xf000u && declaredAlpha",
+        "return Rgb16Intent::Alpha4444;",
+        "Classify16(0x40u, 16, 0x0f00, 0x00f0, 0x000f, 0xf000)",
+    ]
+    for needle in mask_policy_mutations:
+        changed = mask_policy.replace(needle, "__DDS_BAD_CONTRACT__", 1)
+        if changed == mask_policy:
+            raise ValueError("mask policy mutation not applied: " + needle)
+        try:
+            verify(text, mask_policy_source=changed)
+            raise ValueError("mask policy mutation survived: " + needle)
+        except ValueError as exc:
+            if str(exc).startswith("mask policy mutation survived"):
+                raise
     # Mutations of the actual standalone C++ state-machine must fail too:
     # no positive-only test that ignores NULL, reused pointers or mask IDs.
     header = (ROOT / "src/vr/game/ui_texture_lookup_window.hpp").read_text(encoding="utf-8")
@@ -466,7 +534,7 @@ def negatives(text):
         except ValueError as exc:
             if str(exc).startswith("window mutation was NOT caught"):
                 raise
-    return len(needles) + len(window_needles)
+    return len(needles) + len(window_needles) + len(mask_policy_mutations)
 
 if __name__=="__main__":
     text=(ROOT/"src/hooks_textures.cpp").read_text(encoding="utf-8")
