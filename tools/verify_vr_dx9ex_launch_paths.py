@@ -114,7 +114,7 @@ if __name__ == "__main__":
         (0, '$variant -eq "R26_SAFE" -or $variant -eq "R84_TEST"', '$variant -eq "R84_TEST"'),
         (0, 'if (-not (Test-Path $slotPayload)) { throw', 'if (-not (Test-Path $slotPayload)) { Write-Warning'),
         (0, "'ACTIVE_R26_R43_R44'", "'NONEXISTENT'"),
-        (0, "'ACTIVE_FULL_R34'", "'NONEXISTENT_PC_FAST'"),
+        (0, "    $expectedVariant = if ($isPcFastPackage) {\n        'ACTIVE_FULL_R34'", "    $expectedVariant = if ($isPcFastPackage) {\n        'NONEXISTENT_PC_FAST'"),
         (0, "PC_FAST_INCREMENTAL_NOT_FINAL_CI", "PC_FAST_UNVERIFIED"),
         (0, "R51-PC-FAST-v2-R26HUD-ON", "PC_FAST_UNVERIFIED_CONTRACT"),
         (0, "    } else {\n        'R84_SPLIT_R33_R32_R31_R30_R29'\n    }", "    } else {\n        'NONEXISTENT'\n    }"),
