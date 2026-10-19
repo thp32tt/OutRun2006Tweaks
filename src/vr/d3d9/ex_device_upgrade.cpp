@@ -28,7 +28,7 @@ namespace Settings
     extern Setting<bool> VRPreferD3D9Ex;
     extern Setting<bool> VREnabled;
     extern Setting<bool> VRAutoRenderResolution;
-    extern Setting<bool> VRDesktopSourceCoordinates;
+    extern Setting<bool> VRFollowGameResolution;
     extern Setting<int> VRRenderWidth;
     extern Setting<int> VRRenderHeight;
 }
@@ -75,10 +75,11 @@ namespace OutRunVRD3D9ExUpgrade
             IDirect3D9Ex* ex, UINT adapter, D3DDEVTYPE type,
             const D3DPRESENT_PARAMETERS& params) noexcept
         {
-            // XR recommended per-eye extent cannot replace the shared game
-            // backbuffer when the VR 2D coordinate baseline is desktop-locked.
+            // XR recommended per-eye size is NOT the game's source/backbuffer
+            // size. Keep menu/HUD/gameplay in the selected game coordinates
+            // and let the OpenXR host allocate and project each eye separately.
             if (!ex || !Settings::VREnabled ||
-                Settings::VRDesktopSourceCoordinates ||
+                Settings::VRFollowGameResolution ||
                 !Settings::VRPreferD3D9Ex || !Settings::VRAutoRenderResolution ||
                 Settings::VRRenderWidth > 0 || Settings::VRRenderHeight > 0 ||
                 !params.Windowed || GameResolutionExplicitOnCommandLine())

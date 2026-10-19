@@ -59,7 +59,7 @@ namespace Settings
     extern Setting<int> VRRenderWidth;
     extern Setting<int> VRRenderHeight;
     extern Setting<bool> VRAutoRenderResolution;
-    extern Setting<bool> VRDesktopSourceCoordinates;
+    extern Setting<bool> VRFollowGameResolution;
     extern Setting<bool> VRPreferD3D9Ex;
     extern Setting<bool> VRAutoLaunchHost;
 }
@@ -832,32 +832,6 @@ namespace
         const bool manualRequested = manualW > 0 || manualH > 0;
         if (commandLineResolution)
             return; // Explicit -width/-height always wins.
-        // Native VR baseline: the game owns 2D sprite/pause/menu pixels in
-        // exactly the same desktop source coordinate system that D3D9Ex uses.
-        // The OpenXR host must never rewrite this global to its portrait
-        // per-eye extent; it only sizes the independently allocated eye images.
-        // Resolve AFTER the game config file, not only as an INI default.
-        if (Settings::VRDesktopSourceCoordinates)
-        {
-            const int desktopW = GetSystemMetrics(SM_CXSCREEN);
-            const int desktopH = GetSystemMetrics(SM_CYSCREEN);
-            if (desktopW >= 640 && desktopH >= 480 &&
-                static_cast<std::int64_t>(desktopW) * desktopH <= 16777216LL)
-            {
-                Game::screen_resolution->x = desktopW;
-                Game::screen_resolution->y = desktopH;
-                *Game::D3DWindowed = 1;
-                spdlog::info(
-                    "VR SOURCE COORDINATES: desktop lock {}x{}; original 2D/menu and D3D9Ex source agree; XR eye image extent independent; auto={} manual={}x{} suppressed",
-                    desktopW, desktopH, Settings::VRAutoRenderResolution.get(),
-                    manualW, manualH);
-                return;
-            }
-            spdlog::warn(
-                "VR SOURCE COORDINATES: invalid desktop {}x{}, retaining game resolution",
-                desktopW, desktopH);
-            return;
-        }
         if (manualRequested)
         {
             if (manualW >= 640 && manualH >= 480 &&
@@ -868,6 +842,17 @@ namespace
                 spdlog::info("VR EYE RESOLUTION: manual {}x{} after game config", manualW, manualH);
             }
             return; // Invalid manual values do not silently activate auto.
+        }
+        // Prefer the actual game resolution read from outrun2006.ini or
+        // explicit launch arguments. No Virtual Desktop "desktop mode" or XR
+        // portrait-eye dimension is allowed to rewrite these game UI pixels.
+        // Game::screen_scale stays owned by the normal 640x480->game transform.
+        if (Settings::VRFollowGameResolution)
+        {
+            spdlog::info(
+                "VR SOURCE COORDINATES: follow original game config {}x{}; XR recommended eye resolution remains independent",
+                Game::screen_resolution->x, Game::screen_resolution->y);
+            return;
         }
         if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)
             return;
