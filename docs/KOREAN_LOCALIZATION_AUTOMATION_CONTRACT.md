@@ -6,7 +6,7 @@
 - C는 검증된 unsplit/native 전체 HD PNG에서 영어 문구 원본 픽셀만 계속 추출한다. 과거 986개 분할 타일·타일 재조립본·기존 생성 한글 이미지는 신규 입력으로 금지한다.
 - 새 bridge는 C crop의 source PNG SHA, 원본 DDS SHA, crop SHA, XYXY, edge 상태를 확인하고 `transcriptions.jsonl`의 `transcribed_reviewed` 영문→한글이 정확히 하나 일치할 때만 A/B ImageGen 큐에 등록한다. 불명확·중복·경계 경고는 HOLD/skip한다.
 - A/B는 등록된 실제 PNG를 ChatGPT 프로젝트 **아웃런 한글화 신규**에 바이너리 첨부하고, ChatGPT native ImageGen으로 한글 글자/효과 PNG를 생성한다. A=홀수 queue index, B=짝수 queue index를 기본 소유한다. 한 번에 1~5개만 처리하며 전송·생성물 수·프로젝트 Library PNG SHA 증빙이 확인되기 전 다음 배치로 진행하지 않는다.
-- 브라우저 예약은 Asia/Seoul 기준 A `:00`, C1 `:10`, B `:30`, C1 `:40`. C native crop/queue bridge는 컨테이너 내부에서 60초 폴링한다.
+- 브라우저 예약은 Asia/Seoul 기준 **A `:00/:20/:40`, B `:10/:30/:50`, C1(사용자 표기 C) `:15/:45`**. C native crop/queue bridge는 컨테이너 내부에서 60초 폴링한다.
 - C1은 A/B 생성물을 4~8개 범위(적으면 있는 만큼) 독립 간이 QA한다. C1은 ImageGen 생산, A/B 큐 소비, DDS 최종 작성, C2/C3/실게임 PASS 생성을 하지 않는다. C2 탭은 계속 폐지한다.
 - 자동 범위는 **원본 crop → 번역 매칭 → A/B ImageGen → 생성 PNG 저장/증빙 → C1 간이 QA**까지다. DDS 최종 합성/승인, 게임 파일 배포, C3, 사용자 실게임 PASS, Unicode 런타임 출시 게이트는 별도이며 자동 승인하지 않는다.
 - 기존 F0~F4는 품질 확대 단계/인수 기준으로 유지한다. 현재 컨트롤러의 `F2` 표기는 자동 생산의 작업 범위 라벨일 뿐 F0/F1/F2 실게임 PASS를 새로 주장하는 증거가 아니다.
