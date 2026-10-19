@@ -20,6 +20,7 @@ def check(s,p,c):
         'RestoreScopedProjection();',
         'ctx.eax = 1u;',
     ): assert marker in owner, marker
+    assert owner.count('RestoreScopedProjection();') >= 2
     assert 'projection->_11 = newX;' in owner
     assert 'projection->_22 = newY;' in owner
     assert 'if (vr && mode == 2)' in owner
