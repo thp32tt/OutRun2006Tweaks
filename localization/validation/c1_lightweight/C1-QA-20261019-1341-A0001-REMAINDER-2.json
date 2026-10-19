@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1341-A0001-REMAINDER-2",
+  "role": "C1",
+  "branch": "korean-localization-recovery-20260928",
+  "start_head": "2af7a753b3b4524049871927c9f195f35e01f51e",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "previous_review": "localization/validation/c1_lightweight/C1-QA-20261019-1310-KST.json",
+  "previous_reviewed_unique_sha_count": 8,
+  "new_unique_sha_count": 2,
+  "result": {
+    "PASS": 2,
+    "FAIL": 0,
+    "HOLD": 0
+  },
+  "outputs": [
+    {
+      "region_id": "Q047_b08df53b8bfdbadf",
+      "candidate_file": "Q047_b08df53b8bfdbadf_source_k.png",
+      "candidate_sha256": "a89b098a445fb89d96152fe1ab1abb39ed550f2aa75a2332c581b9c35b79578d",
+      "source_file": "Q047_b08df53b8bfdbadf_source.png",
+      "source_ordinal": 4,
+      "alpha32_bbox_xyxy": [
+        388,
+        126,
+        1832,
+        596
+      ],
+      "role": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "source_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "english": "Backspace",
+      "approved_korean": "지우기",
+      "approved_mapping_basis": "A_state.json plus previously verified transcribed_reviewed mapping in C1-QA-20261019-1310-KST.json",
+      "format": "PNG RGBA",
+      "size": [
+        2172,
+        724
+      ],
+      "alpha32_outer_edge_pixel_count": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_legibility": "PASS",
+      "translation_match": "PASS",
+      "orientation": "PASS_UPRIGHT",
+      "unwanted_nontext": "NONE_VISIBLY_DETECTED",
+      "verdict": "PASS",
+      "verdict_scope": "C1_ONLY_PNG_GLYPH_AND_ALPHA_PREVIEW",
+      "ui_safe_cell_composition": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "library_binding": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "region_id": "Q047_e26cf75d44be41e8",
+      "candidate_file": "Q047_e26cf75d44be41e8_source_k.png",
+      "candidate_sha256": "270e862474971af4713c6030d77ffd8026346e21e6bb44e8d6ae0f9232a8a7b0",
+      "source_file": "Q047_e26cf75d44be41e8_source.png",
+      "source_ordinal": 5,
+      "alpha32_bbox_xyxy": [
+        421,
+        123,
+        1783,
+        599
+      ],
+      "role": "A",
+      "producer_batch_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "source_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "english": "Backspace",
+      "approved_korean": "지우기",
+      "approved_mapping_basis": "A_state.json plus previously verified transcribed_reviewed mapping in C1-QA-20261019-1310-KST.json",
+      "format": "PNG RGBA",
+      "size": [
+        2172,
+        724
+      ],
+      "alpha32_outer_edge_pixel_count": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "visual_legibility": "PASS",
+      "translation_match": "PASS",
+      "orientation": "PASS_UPRIGHT",
+      "unwanted_nontext": "NONE_VISIBLY_DETECTED",
+      "verdict": "PASS",
+      "verdict_scope": "C1_ONLY_PNG_GLYPH_AND_ALPHA_PREVIEW",
+      "ui_safe_cell_composition": "UNTESTED",
+      "dds": "NOT_CREATED",
+      "library_binding": "UNVERIFIED",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "notes": [
+    "Previous 8 exact candidate SHA256 values were already evaluated at 13:10 KST and were excluded. Previous FAIL for Q046_71c038f285be8338 red circular non-text artifact remains open.",
+    "Two pending files are distinct generated SHA256 values, while their two English source ROIs are pixel-identical and mapped to Backspace→지우기, with separate source placement IDs.",
+    "Korean being shorter than the English source is not an independent FAIL. Candidate preview readability and meaningful-alpha (>=32) canvas-edge containment passed.",
+    "The candidate PNG differs in size from its English crop; resizing and restoration into verified UI-cell, full composition, original DDS properties and any game acceptance are out of scope.",
+    "C1 did not call ImageGen, consume A/B queue, change A/B state, write DDS, invent C2/C3/ingame PASS, or perform deployment."
+  ],
+  "imagegen_calls": 0,
+  "queue_items_consumed": 0,
+  "dds_written": 0,
+  "real_game_pass_created": false,
+  "official_final_approval": "NOT_GRANTED"
+}
