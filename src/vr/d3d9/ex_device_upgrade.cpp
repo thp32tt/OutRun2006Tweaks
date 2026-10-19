@@ -28,6 +28,7 @@ namespace Settings
     extern Setting<bool> VRPreferD3D9Ex;
     extern Setting<bool> VREnabled;
     extern Setting<bool> VRAutoRenderResolution;
+    extern Setting<bool> VRDesktopSourceCoordinates;
     extern Setting<int> VRRenderWidth;
     extern Setting<int> VRRenderHeight;
 }
@@ -74,7 +75,10 @@ namespace OutRunVRD3D9ExUpgrade
             IDirect3D9Ex* ex, UINT adapter, D3DDEVTYPE type,
             const D3DPRESENT_PARAMETERS& params) noexcept
         {
+            // XR recommended per-eye extent cannot replace the shared game
+            // backbuffer when the VR 2D coordinate baseline is desktop-locked.
             if (!ex || !Settings::VREnabled ||
+                Settings::VRDesktopSourceCoordinates ||
                 !Settings::VRPreferD3D9Ex || !Settings::VRAutoRenderResolution ||
                 Settings::VRRenderWidth > 0 || Settings::VRRenderHeight > 0 ||
                 !params.Windowed || GameResolutionExplicitOnCommandLine())

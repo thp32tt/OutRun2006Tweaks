@@ -45,6 +45,14 @@ namespace Settings
         { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA", "8x MSAA (fallback 4x/2x; costly)" } };
     Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
         "Enable extra NVIDIA transparency SSAA in VR (costly). Off by default; the original 2D Graphics setting is unchanged. Restart required." };
+    // Default to the physical Virtual Desktop / Windows monitor's source
+    // coordinates for BOTH the original 2D sprite UI and the D3D9Ex source.
+    // XR eyes keep their own independently allocated dimensions in the host.
+    // A native XR-sized D3D9Ex backbuffer would otherwise overwrite
+    // Game::screen_resolution and corrupt 2D HUD/title/pause projections.
+    // Explicit opt-out is available to diagnose legacy XR-sized sources.
+    Setting<bool> VRDesktopSourceCoordinates{ "VR", "DesktopSourceCoordinates", true,
+        "Stable VR source/UI at the current Windows desktop resolution. Keeps 2D game and source coordinates together while OpenXR eyes remain independent. Overrides automatic and manual VR source-size requests. Disable to opt into legacy XR-sized source (unsafe for UI). Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
         "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
         "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };
@@ -286,7 +294,8 @@ namespace OutRunVR
             Settings::VRCullingUnionFov.hidden(true);
             Settings::VRAntiAliasing.needs_restart();
             Settings::VRTransparencySupersampling.needs_restart();
-            Settings::VRAutoRenderResolution.needs_restart();
+            Settings::VRDesktopSourceCoordinates.needs_restart();
+    Settings::VRAutoRenderResolution.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
