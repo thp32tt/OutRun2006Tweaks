@@ -1631,6 +1631,34 @@
           "needle": "PMT node-visible gate signature mismatch"
         }
       ]
+    },
+    {
+      "id": "VR-EXE-GOAL-PROGRESS-FULL-PARENT-A",
+      "rva": "0x00098924",
+      "signatureLength": 5,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e8b7f0ffff",
+      "purpose": "Exact original E8 call to graph owner 0x979E0; spans progress background clip, animated fill, percentage glyphs and stage sprites without touching its unsafe return branch targets.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "ResultProgressFullParentCallA = 0x98924"
+        }
+      ]
+    },
+    {
+      "id": "VR-EXE-GOAL-PROGRESS-FULL-PARENT-B",
+      "rva": "0x000992AC",
+      "signatureLength": 5,
+      "disassemblyWindow": 48,
+      "expectedBytes": "e82fe7ffff",
+      "purpose": "Exact original E8 call to graph owner 0x979E0; spans progress background clip, animated fill, percentage glyphs and stage sprites without touching its unsafe return branch targets.",
+      "sourceBindings": [
+        {
+          "path": "src/hooks_uiscaling.cpp",
+          "needle": "ResultProgressFullParentCallB = 0x992AC"
+        }
+      ]
     }
   ]
 }
