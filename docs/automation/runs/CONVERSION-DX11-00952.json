@@ -1,0 +1,130 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00952",
+  "production_id": "CONVERSION-DX11-00952",
+  "event_id": "CONVERSION-DX11-00952-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00952",
+  "feature_id": "DX11:LIVE_SM3_DESTINATION_MODIFIER_GAME_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_DESTINATION_MODIFIER_GAME_DRAW",
+    "goal": "Translate actual D3D9 SM3 shader destination saturate and signed shift into live native D3D11 programmable VS/PS arithmetic, texture and matrix draw output, while maintaining exact per-lane masks, predication and original game rendering/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_sm3_destination_output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_shader_materializer_and_native_draw",
+        "expected_behavior": "D3D9 shader output destination modifier and shift tokens reach guarded VS/PS HLSL after actual native arithmetic, matrix and texture operations, before predicate closure."
+      },
+      {
+        "id": "native_destination_safety_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "output_register_provenance_and_original_game_input",
+        "expected_behavior": "Unrecognized destination modifiers, extreme or reserved shifts, invalid masks fail closed; per-lane output masks, game input/FFB/SkyGlow and D3D9Ex fallback remain protected."
+      },
+      {
+        "id": "same_sha_integrated_gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_fast_backend_windows_openxr_hud",
+        "expected_behavior": "Positive and negative C++/Python shader-output regression plus all five unchanged mandatory GitHub Actions SUCCESS on exact final validation-bearing SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept live game D3D9 Draw/DrawIndexed shader bytecode and decode VS/PS SM3 destination D3DSP_DSTMOD/DSTSHIFT token fields",
+      "Validate destination saturation and signed shifts for native shader operands, preserving original per-lane write masks",
+      "Emit native D3D11 HLSL destination output transform after actual game shader arithmetic, matrix and TEXLD, inside the correct predicated scope",
+      "Connect through existing guarded native Draw/DrawIndexed to native full-frame desktop output source graph, keeping live game pixel acceptance UNTESTED"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_destination_output.hpp",
+      "tools/dx11_sm3_destination_output_probe_00952.cpp",
+      "tools/test_dx11_sm3_destination_output_00952.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ 00952 checks signed scales x2/x4/x8 and reciprocal scales, saturate, masked output lanes and predicate scope for native VS/PS output.",
+      "negative_regression": "C++/Python 00952 reject unsupported precision/centroid/shift/masks and enforce source placement; unaccepted draws retain DX9Ex/input/FFB fallback.",
+      "component_integration": "LIVE_D3D9_CALLSITE → SM3 destination token → real VS/PS HLSL shader output → D3D11_NATIVE_DRAW → VISIBLE_FRAME_OUTPUT source graph; actual desktop pixels not observed."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_DESTINATION_MODIFIER_GAME_DRAW:CONVERSION-DX11-00952"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_D3D9_SHADER_CAPTURE",
+      "SM3_DESTINATION_SATURATE_SHIFT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "ORIGINAL_GAME_FALLBACK"
+    ],
+    "visible_frame_acceptance": "SOURCE_BUILD_VERIFIED_RUNTIME_GAME_OUTPUT_UNTESTED: source graph linked to native full-frame path; real desktop menu/car/race pixels and HMD unobserved.",
+    "activation_guard_and_fallback": "NativeDrawPathActive stays opt-in/fail-closed; unsupported SM3 destination transforms use original D3D9Ex draw/input/FFB/SkyGlow; DXVK remains frozen."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_destination_output.hpp",
+    "tools/dx11_sm3_destination_output_probe_00952.cpp",
+    "tools/test_dx11_sm3_destination_output_00952.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub start HEAD 4645bf949f35718370c91e7411b54e3bab80d6f6; 00951 already terminal 5/5, no overlapping owner edits discovered.",
+    "C1_REVIEW": "Native live SM3 shader had D3DSP_DSTMOD/DSTSHIFT rejection before render emission; user-visible output shader coverage blocker.",
+    "C2_IMPLEMENT": "C++/HLSL shader destination saturation/shift implemented across arithmetic/matrix/texture output and predication plus real positive/negative narrow source tests.",
+    "C3_VALIDATE": "Initial 26a5 Fast/Backend failed on earlier 00951 source-path metadata; same task c500 repaired; initial Backend runner network checkout failure; exact-c500 Backend attempt2 success; all five Gate SUCCESS, HMD/real game UNTESTED.",
+    "C4_COMMIT": "Material 26a5e8b5281f53edfa35ee5892373571386f131c, validation-bearing c5004c77c6b79c2a28cf21533269bed02a8c0145; CI enabled on both, no skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PASS_EXACT_SHA; exact-c500 mandatory 5/5 all SUCCESS; bookkeeping separate [skip ci]; real game pixels and Quest3/VDXR UNTESTED."
+  },
+  "acceptance_results": {
+    "native_sm3_destination_output": "PASS_BUILD",
+    "native_destination_safety_fallback": "PASS_BUILD",
+    "same_sha_integrated_gates": "PASS_EXACT_SHA"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Latest known 2026-10-18 game native_draws=0 and eligible_state_draws=0; 00952 actual game count unobserved, shader and full-game compatibility not claimed complete.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "26a5e8b5281f53edfa35ee5892373571386f131c",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue filling real SM3 native shader / live Draw and DrawIndexed / full game source integration; obtain matching desktop menu/car/race draw count and published-frame evidence first, then Quest3/VDXR hardware evidence; do not promote native route by CI alone.",
+  "score_change": 0,
+  "material_result_sha": "26a5e8b5281f53edfa35ee5892373571386f131c",
+  "validation_bearing_result_sha": "c5004c77c6b79c2a28cf21533269bed02a8c0145",
+  "validation_evidence": {
+    "exact_sha": "c5004c77c6b79c2a28cf21533269bed02a8c0145",
+    "required_workflow_runs": {
+      "fast": 39201382611,
+      "backend": 39201382591,
+      "windows_build": 39201382599,
+      "openxr": 39201382677,
+      "hud": 39201382741
+    },
+    "backend_attempt": 2,
+    "ci_gate_count": "5/5",
+    "all_required_gates": "SUCCESS",
+    "github_exact_sha_workflow_runs_verified": true,
+    "gameplay": "UNTESTED",
+    "runtime": "UNTESTED",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
+  }
+}
