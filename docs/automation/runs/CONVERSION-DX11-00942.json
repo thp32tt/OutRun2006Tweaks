@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00942",
+  "production_id": "CONVERSION-DX11-00942",
+  "event_id": "CONVERSION-DX11-00942-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00942",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "c6_recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "material_result_sha": "933e8c1f9dda3f295fff6c1ae3f7354a767fd021",
+  "validation_bearing_result_sha": "ecdde980ac41001baac75707cbab27ea2e8585c1",
+  "score_change": 0,
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Translate actual D3D9 game SM3 packed UDEC3/DEC3N mesh VB/IB/UP vertex declarations into shader-visible float4 for native full-frame D3D11 Draw/DrawIndexed while rejecting unsupported instanced stream-0 and preserving original D3D9/DX9Ex Draw/Present/input/FFB fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_packed_sm3_game_mesh",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_native_vertex_unpack_and_draw",
+        "expected_behavior": "Live game UDEC3 integer and DEC3N signed-normalized packed triples unpack into native shader-visible float4 through source-owned VB/IB/UP Draw/DrawIndexed."
+      },
+      {
+        "id": "packed_boundary_and_instance_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "packed_signed_bounds_and_unhandled_stream_sources",
+        "expected_behavior": "Positive and negative packed source tests enforce DEC3N signed 10-bit normalization and UDEC3 decoding; unsupported instanced stream-0 and unknown declaration formats fail closed to original D3D9 drawing and input/FFB."
+      },
+      {
+        "id": "required_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_native_source_regression_and_win32_build",
+        "expected_behavior": "DX11 Fast Structural, Backend Conversion, Windows Build, OpenXR architecture and HUD Inspector succeed for the exact same validation-bearing source SHA without claiming Quest3/gameplay runtime proof."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept original live D3D9 game SM3 vertex declaration, VB/IB/UP streams and actual Draw/DrawIndexed",
+      "Expand UDEC3/DEC3N packed triples into shader-visible FLOAT4 including signed normalized DEC3N bounds",
+      "Bind supported decoded stream to native D3D11 draw; reject unsupported stream frequency before upload and preserve D3D9/DX9Ex render/input/FFB fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_sm3_vertex_unpack.hpp",
+      "tools/dx11_live_sm3_packed_model_probe.cpp",
+      "tools/test_dx11_live_sm3_vertex_decl_00929.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source-linked Python and portable C++ packed SM3 mesh probe plus all five required GitHub CI gates SUCCESS on validation-bearing SHA.",
+      "negative_regression": "Signed 10-bit DEC3N boundary correction and unknown vertex type/instanced stream rejection retain original D3D9 source rendering and input fallback.",
+      "component_integration": "Real intercepted D3D9 SM3 VB/IB/UP packed declaration -> FLOAT4 unpack -> native full-frame D3D11 GPU Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_PACKED_VERTEX:CONVERSION-DX11-00942"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_D3D9_SM3_PACKED_VERTEX",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and exact-SHA CI 5/5 verified; actual menu/vehicle/race frame pixels, Quest3/VDXR and gamepad runtime remain UNTESTED.",
+    "activation_guard_and_fallback": "Native diagnostic opt-in remains fail-closed; original D3D9/DX9Ex Draw/Present/input/FFB is authoritative; DXVK unchanged."
+  },
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_vertex_unpack.hpp",
+    "tools/dx11_live_sm3_packed_model_probe.cpp",
+    "tools/test_dx11_live_sm3_vertex_decl_00929.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Verified 00942 material and exact-SHA CI commits on target GitHub branch; run JSON was absent (RUN_RECORD_NOT_FOUND). This is bookkeeping only.",
+    "C1_REVIEW": "Recovered live-game SM3 UDEC3/DEC3N packed shader vertex binding, unsupported instance fail-closed, regression tests and original D3D9 fallback from actual committed source.",
+    "C2_IMPLEMENT": "Existing packed mesh material 933e8c1f9dda3f295fff6c1ae3f7354a767fd021 preserved; no source change during C6.",
+    "C3_VALIDATE": "Five required GitHub Actions SUCCESS on exact validation-bearing ecdde980ac41001baac75707cbab27ea2e8585c1; first packed probe boundary and Windows C2664 repairs belong to this same task; HMD/runtime UNTESTED.",
+    "C4_COMMIT": "material=933e8c1f9dda3f295fff6c1ae3f7354a767fd021; same-task CI fixes=5d88228691f941c5ab6ad8244d9e75c659d16f80,f42d040f102288f343ab80b29c69a9d350aaddb0; validation_bearing=ecdde980ac41001baac75707cbab27ea2e8585c1",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA_5_OF_5; RUNTIME_VALIDATION=UNTESTED; documentation-only [skip ci] result."
+  },
+  "acceptance_results": {
+    "native_packed_sm3_game_mesh": "PASS_SOURCE_BUILD_EXACT_SHA",
+    "packed_boundary_and_instance_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
+    "required_exact_sha_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "validation_evidence": {
+    "head_sha": "ecdde980ac41001baac75707cbab27ea2e8585c1",
+    "exact_sha": "ecdde980ac41001baac75707cbab27ea2e8585c1",
+    "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED",
+    "required_workflow_runs": {
+      "fast": 39180684633,
+      "backend": 39180684601,
+      "windows_build": 39180684636,
+      "openxr": 39180684576,
+      "hud": 39180684703
+    },
+    "all_required_gates": "SUCCESS",
+    "ci_gate_count": "5/5",
+    "github_exact_sha_workflow_runs_verified": true,
+    "original_material_commit": "933e8c1f9dda3f295fff6c1ae3f7354a767fd021",
+    "ci_repair_commits": [
+      "5d88228691f941c5ab6ad8244d9e75c659d16f80",
+      "f42d040f102288f343ab80b29c69a9d350aaddb0",
+      "ecdde980ac41001baac75707cbab27ea2e8585c1"
+    ],
+    "original_failure_run": 39180302064,
+    "runtime": "UNTESTED",
+    "gameplay": "UNTESTED"
+  },
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "REAL_GAME_DRAW_BLOCKER": "Matching actual game menu/car/race visible native GPU output and Quest3/VDXR runtime evidence not measured.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "933e8c1f9dda3f295fff6c1ae3f7354a767fd021",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller to select a distinct unimplemented live game native Draw/DrawIndexed feature; do not rescore this 00942 source achievement or replay exact-SHA gates.",
+  "score_policy": "C6 bookkeeping-only recovery is +0; same-task feature and causal CI fixes constitute one previously produced source achievement, and no scoreboard or validation SHA change is made."
+}
