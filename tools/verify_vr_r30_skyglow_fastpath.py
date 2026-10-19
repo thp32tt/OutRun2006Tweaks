@@ -68,6 +68,20 @@ def check(text):
     assert "device->SetTexture(0, nullptr);" in pass_fn, "avoid RT/SRV feedback hazard"
     assert "D3DRS_SRCBLEND, D3DBLEND_ONE" in pass_fn
     assert "D3DCOLORWRITEENABLE_ALPHA" in pass_fn
+    # Private fullscreen SkyGlow must override the native UI/F11 scissor
+    # exactly once per Present, before any bright/blur/composite Draw. A
+    # failure must abort the pass and let D3DSBT_ALL restore the game state.
+    scissor = ("if (FAILED(device->SetRenderState(\n"
+               "                        D3DRS_SCISSORTESTENABLE, FALSE)))\n"
+               "                    return false;")
+    assert scissor in pass_fn, "fullscreen SkyGlow inherited UI scissor"
+    assert (pass_fn.index("if (!passState.fixedConfigured)") <
+            pass_fn.index(scissor) <
+            pass_fn.index("passState.fixedConfigured = true;") <
+            pass_fn.index("device->DrawPrimitiveUP(")), "private scissor reset must precede eye Draw"
+    assert "D3DSBT_ALL, &R30SkyGlow.savedGameState" in apply
+    assert "stateBlock->Apply()" in apply, "game ScissorRect/state must be restored"
+
     # D3D9 resets the viewport on RT0 change. Skip the redundant driver
     # setter only for allocated reduced/temp surfaces with matching extent.
     # Unknown/full-eye compositor surfaces retain their explicit viewport.
@@ -153,6 +167,7 @@ mutations = (
     ("uncached every-frame setup", "if (!passState.fixedConfigured)"),
     ("missing blend transition", "if (!passState.blendConfigured || passState.additive != additive)"),
     ("missing post state restoration", "stateBlock->Apply()"),
+    ("SkyGlow inherited native UI scissor", "D3DRS_SCISSORTESTENABLE, FALSE"),
     ("drop right-eye blur source", "compositeSource = R30SkyGlow.temp[eye];"),
     ("remove compositor viewport fallback", "device->SetViewport(&viewport)"),
     ("unguard compositor viewport", "if (!knownReducedTarget)"),

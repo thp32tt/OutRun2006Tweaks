@@ -1422,6 +1422,12 @@ namespace OutRunVRStereo
                 device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
                 device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
                 device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+                // A preceding F11/native UI pass can leave a narrow scissor
+                // active. SkyGlow draws must cover each entire private eye
+                // target; the Present-owned D3DSBT_ALL restores game scissor.
+                if (FAILED(device->SetRenderState(
+                        D3DRS_SCISSORTESTENABLE, FALSE)))
+                    return false;
                 passState.fixedConfigured = true;
             }
             // Horizontal and optional vertical blur use the same shader.
