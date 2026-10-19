@@ -37,7 +37,7 @@ def integrated(r,b,h,p):
     return (0<=linear.find("if (primitives == 0u &&") <
             linear.find("observe_empty_game_draw(game, type);") <
             linear.find("game_native_primitive_element_count(") and
-            "observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u);" in zero and
+            "observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u, nullptr);" in zero and
             ("s.frameBatch.absorb_empty_source_draw(" in source and
              "sourceOrdinal, sameSourceFullClear))" in source and
              "s.clearColor.sourceDevice ==" in source) and
@@ -55,6 +55,12 @@ for a,z,_ in (
     changed=r30[:begin]+r30[begin:end].replace(
         "live::observe_empty_game_draw(device, topology);","/* absent */",1)+r30[end:]
     assert not integrated(changed,bridge,header,primitive),"hook omission not caught"
+# Removing the explicit additional-stream nullptr from the real R30 empty
+# draw must fail the same integration contract (C2660 signature regression).
+bad_arity=bridge.replace(
+    "observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u, nullptr);",
+    "observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u);", 1)
+assert not integrated(r30,bad_arity,header,primitive),"zero game draw arity omission not caught"
 bad=bridge.replace("observe_empty_game_draw(game, type);",
                    "observe_unavailable_game_draw(game);",1)
 assert not integrated(r30,bad,header,primitive),"UP shadow bypass regression not caught"
