@@ -12,6 +12,19 @@ bool Near(float a,float b,float eps=1e-4f) {
 int main() {
     using OutRunVR::StageExtensionPlane::ProjectPixel;
     using OutRunVR::StageExtensionPlane::BuildStageEyePoses;
+    // R30 fixedfn/XYZRHW must use the same original-game c64 shader
+    // provenance gate as R33 before a queued sprite or numeric +TIME eye.
+    // A captured foreign WVP is NOT an unavailable tracker and cannot be
+    // repackaged as a zero/zero source for native stereo.
+    using OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp;
+    if (!MatchesCapturedOriginalWvp(true, 0x100, 9, 0x100, 9, 50, 49) ||
+        !MatchesCapturedOriginalWvp(false, 0x100, 9, 0x200, 8, 0, 0) ||
+        !MatchesCapturedOriginalWvp(true, 0, 0, 0, 0, 50, 49) ||
+        MatchesCapturedOriginalWvp(true, 0x100, 9, 0x200, 9, 50, 49) ||
+        MatchesCapturedOriginalWvp(true, 0x100, 9, 0x100, 8, 50, 49) ||
+        MatchesCapturedOriginalWvp(true, 0x100, 9, 0x100, 9, 0, 49) ||
+        MatchesCapturedOriginalWvp(true, 0, 0, 0x100, 9, 50, 49))
+        return 70;
     // Two independent original +TIME SpriteNodes can share the same
     // ScreenHud/StageExtensionTime token. They must not share one delayed
     // GPU submission: R33 binds each left/right pair to a queue node/epoch.

@@ -5875,10 +5875,21 @@ namespace OutRunVRStereo
             std::uint64_t rawWriteSerial = 0, rawDrawSerial = 0;
             std::uintptr_t rawShader = 0;
             std::uint64_t rawShaderEpoch = 0;
-            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
-                    rawWvp, rawWriteSerial, rawDrawSerial,
-                    rawShader, rawShaderEpoch) ||
-                rawWriteSerial == 0 || rawDrawSerial == 0)
+            const bool rawCaptured = OutRunVRRenderer::GetLastRawGameWvpWrite(
+                rawWvp, rawWriteSerial, rawDrawSerial,
+                rawShader, rawShaderEpoch);
+            // R33 already rejects a known foreign shader's original c64.
+            // R30 fixedfn/XYZRHW must not label that same stale matrix as
+            // this +TIME SpriteNode's physical eye source merely because
+            // its write serial stayed stable during the native LEFT Draw.
+            // Only a genuinely unavailable tracker gets the zero/zero
+            // native fallback, never a captured mismatched shader/epoch.
+            if (!OutRunVR::StageExtensionPhysical::MatchesCapturedOriginalWvp(
+                    rawCaptured, shader, shaderEpoch,
+                    rawShader, rawShaderEpoch,
+                    rawWriteSerial, rawDrawSerial))
+                return false;
+            if (!rawCaptured)
             {
                 rawWriteSerial = 0;
                 rawDrawSerial = 0;
