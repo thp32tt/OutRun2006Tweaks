@@ -78,9 +78,9 @@
     "DX9Ex Full Source Impact Review"
   ],
   "acceptance_results": {
-    "stage_unknown_d3dx_fallback": "PENDING_BUILD",
-    "stage_known_and_foreign_preservation": "PENDING_BUILD",
-    "stage_final_exact_sha_ci": "PENDING"
+    "stage_unknown_d3dx_fallback": "PASS_BUILD",
+    "stage_known_and_foreign_preservation": "PASS_BUILD",
+    "stage_final_exact_sha_ci": "PASS_EXACT_SHA"
   },
   "result_commit_kind": "MATERIAL_SOURCE_AND_REGRESSIONS",
   "ci_evidence": {
@@ -89,6 +89,26 @@
     "exact_sha": "23030aa4030161406bbee7a27b08fa4d84114388",
     "material_source_sha": "48f46e1e4bc62ffe2c77c5e693ae16afa6b76549",
     "validator_source_sha": "23030aa4030161406bbee7a27b08fa4d84114388",
-    "status_note": "Required GitHub exact-SHA CI reported SUCCESS; HMD visual validation remains UNTESTED."
-  }
+    "status_note": "Four exact-SHA GitHub Actions workflows SUCCESS on 23030aa4030161406bbee7a27b08fa4d84114388, including Windows x86 R84 full-chain/game and x64 host/package, Domain, HUD Inspector, Full Source MSVC analysis; HMD UNTESTED.",
+    "required_workflows": {
+      "DX9Ex Active Validation": {
+        "run_id": 39180251942,
+        "conclusion": "success"
+      },
+      "Domain Isolation Guard": {
+        "run_id": 39180251931,
+        "conclusion": "success"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 39180252037,
+        "conclusion": "success"
+      },
+      "DX9Ex Full Source Impact Review": {
+        "run_id": 39180252047,
+        "conclusion": "success"
+      }
+    }
+  },
+  "c6_commit_kind": "BOOKKEEPING_ONLY",
+  "c6_completion": "4/4 exact-SHA actions SUCCESS; acceptance statuses aligned to build/static evidence only. No new runtime claim or independent score."
 }
