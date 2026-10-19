@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261019-1915-B0008-B0009-UNIQUE7",
+  "requested_at_kst": "2026-10-19T19:15:00+09:00",
+  "run_slot": "C1",
+  "reviewer": "C1",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "Independent lightweight QA of saved unapproved A/B source-matched candidate transparent Korean PNGs; does not consume A/B queue",
+  "policy_contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "policy_glyph": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+  "mapping": "localization/graphics/transcriptions.jsonl index=236 status=transcribed_reviewed",
+  "preceding_qa": "localization/validation/c1_lightweight/C1-QA-20261019-1845-A0004-B0007-UNIQUE8.json",
+  "SHA_dedup_check": "All 7 candidate SHA-256 unique against six current GitHub C1-QA records (41 candidate records); new SHA count 7.",
+  "summary": {
+    "PASS": 7,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 0
+  },
+  "evidence_on_N100": [
+    "work/c1_batch_20261019_1915/compare_1.jpg",
+    "work/c1_batch_20261019_1915/compare_2.jpg",
+    "work/c1_batch_20261019_1915/metrics.json"
+  ],
+  "notes": [
+    "Source PNG SHA = dry-run verified native ROI production manifest source SHA, export SHA equals candidate SHA for all 7.",
+    "Each Korean candidate visually compared to corresponding verified English source ROI; mapping matches reviewed index 236 exactly.",
+    "Dimensions differ from source ROI and are not final UI-cell fitting proof. Existing export status REWORK_DIMENSIONS and library binding UNVERIFIED are not waived.",
+    "C1-only image text QA PASS is not DDS/plate/UI placement/texture format/C2/C3/in-game PASS.",
+    "Candidate METROPOLIS has 11 alpha>=1 left-edge fringe pixels, but no alpha>=16 left edge pixels. Treat as non-legible fringe, not clipped glyph."
+  ],
+  "whole_sentence_width_ratio": "diagnostic_only",
+  "text_length_difference_ignored": true,
+  "final_dds": "NOT_CREATED",
+  "final_composition": "NOT_TESTED",
+  "ui_safe_cell_restore": "UNTESTED",
+  "library_binding": "UNVERIFIED",
+  "c2_c3_game_approval": "NOT_GRANTED",
+  "runtime_validation": "UNTESTED",
+  "image_generation_called": false,
+  "queue_consumed": false,
+  "assets_modified": false,
+  "outputs": [
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0008-8B8BCC1F",
+      "region_id": "Q236_6edbc0596d8820a6",
+      "source_english": "INDUSTRIAL COMPLEX",
+      "approved_korean": "인더스트리얼 컴플렉스",
+      "visually_read_korean": "인더스트리얼 컴플렉스",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_6edbc0596d8820a6_source_k.png",
+      "candidate_sha256": "3c3477af8bcfc83524d36e140516a9253cfb47e92856435412e991d7f555893e",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_6edbc0596d8820a6_source.png",
+      "source_png_sha256": "0b711537fee6e6f6f25cd0696c963d1e4dea5881b9dffb958aac7a6a771f628f",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1163,
+        112
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 INDUSTRIAL COMPLEX → 인더스트리얼 컴플렉스: 모든 음절과 받침 식별 가능. 불필요 영문/배경/프레임 없음.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0008-8B8BCC1F",
+      "region_id": "Q236_0a231e55a5b10267",
+      "source_english": "WATERFALLS",
+      "approved_korean": "워터폴스",
+      "visually_read_korean": "워터폴스",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_0a231e55a5b10267_source_k.png",
+      "candidate_sha256": "ddb249b35cfaefec07a8bbf0f8deebd3721628b215b138c1bf62d420db6a1c17",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_0a231e55a5b10267_source.png",
+      "source_png_sha256": "4443595c5e970dc2d36a5c607dd92ff1d711e5d1eb0aaac84f7aeee662b513df",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1562,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 WATERFALLS → 워터폴스: 승인 문구 정확. 받침·외곽선 분리, 가시 절단 없음.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0008-8B8BCC1F",
+      "region_id": "Q236_85087cd6916ea2cc",
+      "source_english": "PALM BEACH",
+      "approved_korean": "팜 비치",
+      "visually_read_korean": "팜 비치",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_85087cd6916ea2cc_source_k.png",
+      "candidate_sha256": "ab89f3fae50bdb0d3d3a32c9a6a4d265ba39ca5c29ffb7edc29177622e74fc0b",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_85087cd6916ea2cc_source.png",
+      "source_png_sha256": "ec28858a7984abfb3add3b70e324baddcb95efdda49b2142d5b345c2245ca9d7",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1542,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 PALM BEACH → 팜 비치: 승인 문구 정확, 음절 간격과 효과 정상.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0008-8B8BCC1F",
+      "region_id": "Q236_8ec72a445c1d7bb4",
+      "source_english": "SKYSCRAPERS",
+      "approved_korean": "스카이스크레이퍼스",
+      "visually_read_korean": "스카이스크레이퍼스",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_8ec72a445c1d7bb4_source_k.png",
+      "candidate_sha256": "9c427a4a2ee3a72d2e8589881ee127931fd4bbfea6503ffb367ae03ade82b001",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_8ec72a445c1d7bb4_source.png",
+      "source_png_sha256": "77fbab8e8458aa19dc9297ffaa282a7839c079f84d91d559c4d45e6ccd13804f",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1732,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 SKYSCRAPERS → 스카이스크레이퍼스: 승인 문구 정확, 긴 문자열도 식별 가능. 가시 절단 없음.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0008-8B8BCC1F",
+      "region_id": "Q236_dfc30de67f762d29",
+      "source_english": "NATIONAL PARK",
+      "approved_korean": "내셔널 파크",
+      "visually_read_korean": "내셔널 파크",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_dfc30de67f762d29_source_k.png",
+      "candidate_sha256": "ca2117c9082e94f92e55083d7604be12a06fe14924e3777579623f5af713df2a",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_dfc30de67f762d29_source.png",
+      "source_png_sha256": "08ee2391b7a54ddef201ab0f899a5883a88b522e5fc1ba007862c3614b36f5e9",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1858,
+        244
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 NATIONAL PARK → 내셔널 파크: 승인 문구 정확, 독립 글자/받침 식별 가능.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0009-E43EB1D6",
+      "region_id": "Q236_5aea17745f641e09",
+      "source_english": "METROPOLIS",
+      "approved_korean": "메트로폴리스",
+      "visually_read_korean": "메트로폴리스",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_5aea17745f641e09_source_k.png",
+      "candidate_sha256": "d22f7be6667b00cc7a53fe06ba0115510f63e830b04d3bd3662b1b98feb0a146",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_5aea17745f641e09_source.png",
+      "source_png_sha256": "7f4d38ff9cdc8b843833d0f5952ae8b40f7f0dc3b2af77899c84cf6d38da40e4",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1548,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        11,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 METROPOLIS → 메트로폴리스: 승인 문구 정확. alpha>=1 왼쪽 경계 11 픽셀 매우 희미한 프린지; alpha>=16 경계 0으로 실제 글자 잘림 증거 없음.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    },
+    {
+      "producer": "B",
+      "producer_batch_id": "OUTRUN-ROI-B-0009-E43EB1D6",
+      "region_id": "Q236_51379f42f1f5f1b6",
+      "source_english": "LOST CITY",
+      "approved_korean": "로스트 시티",
+      "visually_read_korean": "로스트 시티",
+      "verdict": "PASS",
+      "verdict_scope": "C1_LIGHTWEIGHT_GENERATED_PNG_ONLY",
+      "candidate_png": "work/image-src/text_roi_batches/candidate_outputs/B/Q236_51379f42f1f5f1b6_source_k.png",
+      "candidate_sha256": "cef055459af9a957665f63570101665af3748945c50f1bc2fa16daa3396fd987",
+      "source_png": "work/image-src/text_roi_batches/inputs/Q236_51379f42f1f5f1b6_source.png",
+      "source_png_sha256": "48c4c7b38d22f3155cae9eceea71dd50f71e662128d6126fe61c5e441c99854d",
+      "source_manifest_sha_match": true,
+      "export_sha_match": true,
+      "source_translation_record": "index=236 transcribed_reviewed",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1198,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha1_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha16_edge_counts_left_right_top_bottom": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "translation_mapping_exact_match": true,
+      "source_bbox_containment": "UNTESTED_FINAL_UI_CELL",
+      "protected_art_and_ui_placement": "UNTESTED_FINAL_COMPOSITION",
+      "visual_observation": "원문 LOST CITY → 로스트 시티: 승인 문구 정확, 글자 독립·배경 없음.",
+      "dds": "NOT_CREATED",
+      "runtime_validation": "UNTESTED",
+      "library_binding": "UNVERIFIED"
+    }
+  ]
+}
