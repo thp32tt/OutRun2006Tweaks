@@ -60,6 +60,7 @@ namespace Settings
     extern Setting<int> VRRenderHeight;
     extern Setting<bool> VRAutoRenderResolution;
     extern Setting<bool> VRFollowGameResolution;
+    extern Setting<bool> VRUnifiedEyeMenuSource;
     extern Setting<bool> VRPreferD3D9Ex;
     extern Setting<bool> VRAutoLaunchHost;
 }
@@ -843,11 +844,14 @@ namespace
             }
             return; // Invalid manual values do not silently activate auto.
         }
-        // Prefer the actual game resolution read from outrun2006.ini or
-        // explicit launch arguments. No Virtual Desktop "desktop mode" or XR
-        // portrait-eye dimension is allowed to rewrite these game UI pixels.
-        // Game::screen_scale stays owned by the normal 640x480->game transform.
-        if (Settings::VRFollowGameResolution)
+        // The unified source is selected once, at this original configuration
+        // hook, BEFORE the game's 640x480-to-source UI scale is computed.
+        // Never resize the D3D9Ex game source again when CreateDevice runs:
+        // doing so after menu scale creation displaced both title glyphs
+        // and HUD/rival sprites by a stale second coordinate transform.
+        // Manual and explicit game sizes already returned above.
+        if (Settings::VRFollowGameResolution &&
+            !Settings::VRUnifiedEyeMenuSource)
         {
             spdlog::info(
                 "VR SOURCE COORDINATES: follow original game config {}x{}; XR recommended eye resolution remains independent",
@@ -883,7 +887,8 @@ namespace
                 return;
             }
         }
-        spdlog::info("VR EYE RESOLUTION: XR extent pending; no startup wait, source {}x{} until CreateDevice",
+        spdlog::info(
+            "VR UNIFIED SOURCE: XR eye not ready at game-config scale initialization; keep game source/menu {}x{} for this launch (no late CreateDevice resize)",
             Game::screen_resolution->x, Game::screen_resolution->y);
     }
 }

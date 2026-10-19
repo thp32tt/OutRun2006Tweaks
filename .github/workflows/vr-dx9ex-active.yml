@@ -420,6 +420,7 @@ jobs:
             'tools/verify_vr_projected_marker_anchor.py',
             'tools/verify_vr_ui_matrix_safety.py',
             'tools/verify_vr_desktop_source_coordinates.py',
+            'tools/verify_vr_unified_menu_source.py',
             'tools/verify_vr_menu_letterbox_aspect.py',
             'tools/verify_vr_f11_font_density.py',
             'tools/verify_vr_f11_toggle_frame.py',

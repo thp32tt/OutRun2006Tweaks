@@ -50,6 +50,8 @@ namespace Settings
     // per-eye render extent are independent. Never hard-code the primary
     // monitor's current pixels into Game::screen_resolution after game config.
     // A paired VR RenderWidth/RenderHeight is still an explicit game override.
+    Setting<bool> VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,
+        "Experimental: use one VR 3D/2D menu render source. If the VDXR/OpenXR eye size is available BEFORE the original game graphics initialization, select it for both the D3D9Ex source and the game's scaled 2D menu. 640x480 logical UI coordinates remain independent. Never change the source at CreateDevice after the UI scale was calculated. When unavailable, keep the configured game resolution. Manual RenderWidth/Height and -width/-height win. Restart required." };
     Setting<bool> VRFollowGameResolution{ "VR", "FollowGameResolution", true,
         "Follow the game's configured backbuffer for VR source/UI coordinates. VD Streaming VR Graphics Quality changes OpenXR eye dimensions separately; no monitor-size lock or XR overwrite. A paired RenderWidth/RenderHeight or explicit -width/-height still wins. Disable only for legacy experimental XR-sized game source. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
@@ -293,6 +295,7 @@ namespace OutRunVR
             Settings::VRCullingUnionFov.hidden(true);
             Settings::VRAntiAliasing.needs_restart();
             Settings::VRTransparencySupersampling.needs_restart();
+            Settings::VRUnifiedEyeMenuSource.needs_restart();
             Settings::VRFollowGameResolution.needs_restart();
     Settings::VRAutoRenderResolution.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();

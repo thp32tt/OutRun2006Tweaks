@@ -29,6 +29,7 @@ namespace Settings
     extern Setting<bool> VREnabled;
     extern Setting<bool> VRAutoRenderResolution;
     extern Setting<bool> VRFollowGameResolution;
+    extern Setting<bool> VRUnifiedEyeMenuSource;
     extern Setting<int> VRRenderWidth;
     extern Setting<int> VRRenderHeight;
 }
@@ -79,7 +80,8 @@ namespace OutRunVRD3D9ExUpgrade
             // size. Keep menu/HUD/gameplay in the selected game coordinates
             // and let the OpenXR host allocate and project each eye separately.
             if (!ex || !Settings::VREnabled ||
-                Settings::VRFollowGameResolution ||
+                (Settings::VRFollowGameResolution ||
+                 Settings::VRUnifiedEyeMenuSource) ||
                 !Settings::VRPreferD3D9Ex || !Settings::VRAutoRenderResolution ||
                 Settings::VRRenderWidth > 0 || Settings::VRRenderHeight > 0 ||
                 !params.Windowed || GameResolutionExplicitOnCommandLine())

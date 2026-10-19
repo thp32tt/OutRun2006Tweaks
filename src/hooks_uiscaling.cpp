@@ -11,6 +11,7 @@
 #include "vr/hud_semantics.hpp"
 #include "vr/ui/ui_side_spacing.hpp"
 #include "vr/ui/menu_quad_transform.hpp"
+#include "vr/ui/vr_logical_coordinate_space.hpp"
 #include "vr/ui/menu_matrix_provenance.hpp"
 #include "vr/ui/multi_sprite_contain_scale.hpp"
 #include "vr/ui/frontend_affine_contain.hpp"
@@ -468,7 +469,18 @@ class UIScaling : public Hook
                     std::isfinite(pTranslation->x) &&
                     std::isfinite(pTranslation->y))
                 {
-                    const float factor = (std::min)(sx, sy);
+                    // Logical 640x480 UI -> physical source backbuffer:
+                    // prefer the game's own scaling, but bound it by the
+                    // selected render-target dimensions. This stays separate
+                    // from the OpenXR eye projection / head pose.
+                    const auto logicalViewport =
+                        OutRunVR::LogicalUI::Contain(
+                            sw, Game::screen_resolution->y,
+                            ow, Game::original_resolution.y);
+                    const float gameFactor = (std::min)(sx, sy);
+                    const float factor = logicalViewport.valid
+                        ? (std::min)(gameFactor, logicalViewport.scale)
+                        : gameFactor;
                     legacyScale.x = (pScaling->x / sx) * factor;
                     legacyScale.y = (pScaling->y / sy) * factor;
                     legacyTranslation.x =
