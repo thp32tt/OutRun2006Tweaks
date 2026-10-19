@@ -95,9 +95,9 @@
     "C6_RESULT": "COMPLETE_BUILD_VERIFIED; exact SHA five mandatory GitHub Actions SUCCESS; bookkeeping [skip ci] separate; RUNTIME_VALIDATION=UNTESTED."
   },
   "acceptance_results": {
-    "static_sm3_repeat_native_game_draw": "PASS_SOURCE_BUILD_EXACT_SHA_RUNTIME_UNTESTED",
-    "nested_flow_and_safe_d3d9_fallback": "PASS_SOURCE_REGRESSION_EXACT_SHA",
-    "five_exact_sha_gates": "PASS_EXACT_SHA_5_OF_5"
+    "static_sm3_repeat_native_game_draw": "PASS_EXACT_SHA",
+    "nested_flow_and_safe_d3d9_fallback": "PASS_EXACT_SHA",
+    "five_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
   "REAL_GAME_DRAW_BLOCKER": "Real-game native draw count and whole menu/car/race frame publication not observed; source-only implementation.",
@@ -125,5 +125,11 @@
     "runtime": "UNTESTED",
     "gameplay": "UNTESTED",
     "scope": "SOURCE_BUILD_VERIFIED_NOT_REAL_GAME_OR_HMD_RUNTIME_VERIFIED"
-  }
+  },
+  "acceptance_results_detail": {
+    "static_sm3_repeat_native_game_draw": "SOURCE_BUILD_EXACT_SHA_PASS; actual native game Draw UNTESTED",
+    "nested_flow_and_safe_d3d9_fallback": "SOURCE_REGRESSION_EXACT_SHA_PASS; game/HMD runtime UNTESTED",
+    "five_exact_sha_gates": "5/5 SUCCESS at ae04e7c6341bf124cb9b808c3097d0bc39a13d77"
+  },
+  "c6_record_repair_note": "00949 same-lineage CI failure fixed false-negative acceptance result: source gate PASS separated from runtime/HMD UNTESTED; 00948 exact SHA workflow runs unchanged."
 }
