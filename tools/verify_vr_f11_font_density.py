@@ -1033,7 +1033,8 @@ def check_first_visible_f11_frame(hook: str) -> None:
     assert hook.index(call) < hook.index("float vrFontMultiplier = 1.0f;")
     assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index(
         "overlayActive = Overlay::render();")
-    assert "if (f11VisibleThisFrame && vrGameplay &&" in hook\n    assert "!Settings::VRUnifiedEyeMenuSource)" in hook
+    assert "if (f11VisibleThisFrame && vrGameplay &&" in hook
+    assert "!Settings::VRUnifiedEyeMenuSource)" in hook
     density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "R23TryGetPublishedEyeExtentPair(extent)", 1)[0]
     assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in density
