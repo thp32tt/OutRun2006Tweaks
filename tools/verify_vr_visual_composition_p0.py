@@ -1737,9 +1737,11 @@ def check_direct_native_producer_bridge(source):
                      'sourceBefore, sourceAfter))'):
         require(expected, native_admission, 'native entry/return admission')
     for expected in ('scope, sourceBefore, sourceAfter)',
-                     'node, scope, producer, nullptr,',
+                     'ProvenProjectedVehicleMarkerProducer(',
+                     'projectedMarker = &sourceBefore.projectedMarker;',
+                     'node, scope, producer, projectedMarker,',
                      'sourceBefore.registrationSerial);'):
-        require(expected, tag, 'proven source token must reach native SpriteNode')
+        require(expected, tag, 'proven source token/marker must reach native SpriteNode')
     # Unclassified inner BA9D0 put_sprite may only inherit an E8-verified
     # text parent. Unknown indirect calls, +TIME, GOAL, rank and lens retain
     # native fallback and cannot borrow a generic HUD classifier.
@@ -1756,8 +1758,11 @@ for case, altered in (
         'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Capture();',
         'const auto vrSourceBefore = OutRunVR::DirectSpriteSource::Snapshot{};', 1)),
     ('lost producer token publication', textures.replace(
-        'node, scope, producer, nullptr,',
-        'node, scope, ProducerToken::None, nullptr,', 1)),
+        'node, scope, producer, projectedMarker,',
+        'node, scope, ProducerToken::None, projectedMarker,', 1)),
+    ('lost projected marker publication', textures.replace(
+        'node, scope, producer, projectedMarker,',
+        'node, scope, producer, nullptr,', 1)),
     ('lost nested producer generation fence', textures.replace(
         'sourceBefore.registrationSerial);', '0);', 1)),
     ('lost native exit source proof', textures.replace(
