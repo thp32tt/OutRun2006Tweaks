@@ -50,7 +50,17 @@ def verify_bundle_ci_route(workflow):
     ):
         if required not in normalized:
             raise ValueError("target push or feature PR admission missing")
-    if "branches: [ vr-openxr, vr-dx11-native-r71 ]" not in workflow.split("  pull_request:", 1)[0]:
+    # Validate the target branch as a *list entry*, not by exact literal
+    # equality with a historical two-branch YAML list. Other approved
+    # feature branches may coexist without disabling the target push Gate.
+    push_part = workflow.split("  pull_request:", 1)[0]
+    branch_lines = [line for line in push_part.splitlines()
+                    if line.lstrip().startswith("branches:")]
+    if len(branch_lines) != 1 or "[" not in branch_lines[0] or "]" not in branch_lines[0]:
+        raise ValueError("OpenXR target push trigger missing or ambiguous")
+    branch_list = branch_lines[0].split("[", 1)[1].split("]", 1)[0]
+    branches = [entry.strip().strip("'\\\"") for entry in branch_list.split(",")]
+    if "vr-dx11-native-r71" not in branches:
         raise ValueError("OpenXR target push trigger missing")
     for required in (
         "name: outrun2006-vr-x86-r26-hud-safe",
@@ -73,6 +83,13 @@ def test_bundle_ci_route():
     workflow = (Path(__file__).resolve().parents[1] /
                 ".github" / "workflows" / "vr-openxr.yml").read_text(encoding="utf-8")
     verify_bundle_ci_route(workflow)
+    # A removed/renamed target branch must still fail, even when other
+    # legitimate push branches are present.
+    must_fail(lambda: verify_bundle_ci_route(
+        workflow.replace(
+            "branches: [ vr-openxr, vr-dx11-native-r71,",
+            "branches: [ vr-openxr, vr-dx11-disabled,",
+            1)), "target push branch removed")
     for old, bad, reason in (
         ("github.event_name == 'push'", "github.event_name == 'schedule'",
          "PR-only regression"),
