@@ -9,10 +9,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00958",
   "feature_id": "DX11:LIVE_SM3_LOOP_AL_INDEXED_CONSTANT_GAME_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
   "material_result_sha": "9543ea9fc25311d31bfdfa3a3ab0ab33d4552bb7",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
   "score_change": 0,
   "REAL_GAME_DRAW_BLOCKER": "Native gameplay draw eligibility/pixels have not been retested; preexisting 2026-10-18 evidence recorded native_draws=0. Missing SM3 LOOP and aL relative constant translation addressed as a source candidate, not runtime proven.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
@@ -104,9 +104,50 @@
     "C0_RECOVER": "Latest target HEAD and 00957 exact-SHA 5/5 C6 verified; classification A source implementation.",
     "C1_REVIEW": "Add SM3 LOOP/aL indexed c# native game shader source path.",
     "C2_IMPLEMENT": "LOOP/ENDLOOP, bounded relative game constants, game i# runtime validation, targeted tests implemented.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA; first Fast/Backend 9543ea9 failed because --check-latest selected pre-existing 00957 record with no development_strategy; 00958 run created as current policy-compliant source checkpoint, with no checks disabled.",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5 at 43cdd719034fd48b30cdefdaae1a0a57efdf2fcd; run IDs 39503791016, 39503790891, 39503796956, 39503796978, 39503796871",
     "C4_COMMIT": "Source material 9543ea9fc25311d31bfdfa3a3ab0ab33d4552bb7",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA; RUNTIME_VALIDATION=UNTESTED"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; AUTOMATION_VALIDATION=PASS_EXACT_SHA; RUNTIME_VALIDATION=UNTESTED; actual menu/car/race/HMD evidence NOT_OBSERVED"
+  },
+  "acceptance_results": {
+    "game_sm3_loop_native_codegen": "PASS_EXACT_SHA_5_OF_5",
+    "index_payload_fail_closed": "PASS_EXACT_SHA_5_OF_5",
+    "source_graph_exact_sha_gate": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "exact_sha_gate_results": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39503791016,
+      "head_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39503790891,
+      "head_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39503796956,
+      "head_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39503796978,
+      "head_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39503796871,
+      "head_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
+      "conclusion": "success"
+    }
+  },
+  "c6_record": {
+    "bookkeeping_only": true,
+    "ci_rerun_requested": false,
+    "exact_sha": "43cdd719034fd48b30cdefdaae1a0a57efdf2fcd",
+    "material_result_sha": "9543ea9fc25311d31bfdfa3a3ab0ab33d4552bb7",
+    "source_runtime_tested": false,
+    "release_promoted": false,
+    "work_time_percentages": "NOT_MEASURED"
   }
 }
