@@ -1562,6 +1562,37 @@ namespace OutRunVRStereo
             return result;
         }
 
+        // Only R33's already-validated stereo raster guard may run this.
+        // Neither FVF/color nor stale one-shot HUD tokens are sufficient.
+        template<class Raw>
+        bool R33StageOpticalDirect(bool rasterReady, Raw&& raw,
+                                   HRESULT& result) noexcept
+        {
+            if (!rasterReady) return false;
+            const auto mode = OutRunVR::StageOpticalProbe::Parse(
+                Settings::VRStageOpticalProbeMode.get());
+            if (mode != OutRunVR::StageOpticalProbe::Mode::Native &&
+                mode != OutRunVR::StageOpticalProbe::Mode::Hidden)
+                return false;
+            const auto cmd =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            if (!OutRunVR::StageOpticalProbe::Selected(
+                    cmd, Settings::VRStageOpticalProbeTarget.get()))
+                return false;
+            result = mode == OutRunVR::StageOpticalProbe::Mode::Hidden
+                ? D3D_OK : raw();
+            static std::atomic<std::uint64_t> count{0};
+            const auto n = ++count;
+            if ((n & (n - 1u)) == 0)
+                spdlog::info(
+                    "VR STAGE OPTICAL PROBE: mode={} target={} hits={} queued={} qEpoch={} hr=0x{:08x}",
+                    static_cast<int>(mode),
+                    Settings::VRStageOpticalProbeTarget.get(), n,
+                    cmd.queued ? 1 : 0, cmd.queueEpoch,
+                    static_cast<unsigned>(result));
+            return true;
+        }
+
         template <typename ActualDraw, typename LowerR29Draw>
         HRESULT R33Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
@@ -1818,37 +1849,6 @@ namespace OutRunVRStereo
             // Preserve the same lower R29 fail-closed policy when neither
             // HUD nor world stereo owns this otherwise eligible draw.
             return fallbackToR29();
-        }
-
-        // Only R33's already-validated stereo raster guard may run this.
-        // Neither FVF/color nor stale one-shot HUD tokens are sufficient.
-        template<class Raw>
-        bool R33StageOpticalDirect(bool rasterReady, Raw&& raw,
-                                   HRESULT& result) noexcept
-        {
-            if (!rasterReady) return false;
-            const auto mode = OutRunVR::StageOpticalProbe::Parse(
-                Settings::VRStageOpticalProbeMode.get());
-            if (mode != OutRunVR::StageOpticalProbe::Mode::Native &&
-                mode != OutRunVR::StageOpticalProbe::Mode::Hidden)
-                return false;
-            const auto cmd =
-                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
-            if (!OutRunVR::StageOpticalProbe::Selected(
-                    cmd, Settings::VRStageOpticalProbeTarget.get()))
-                return false;
-            result = mode == OutRunVR::StageOpticalProbe::Mode::Hidden
-                ? D3D_OK : raw();
-            static std::atomic<std::uint64_t> count{0};
-            const auto n = ++count;
-            if ((n & (n - 1u)) == 0)
-                spdlog::info(
-                    "VR STAGE OPTICAL PROBE: mode={} target={} hits={} queued={} qEpoch={} hr=0x{:08x}",
-                    static_cast<int>(mode),
-                    Settings::VRStageOpticalProbeTarget.get(), n,
-                    cmd.queued ? 1 : 0, cmd.queueEpoch,
-                    static_cast<unsigned>(result));
-            return true;
         }
 
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,

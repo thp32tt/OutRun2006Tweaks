@@ -264,6 +264,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R30 POSITIONT input regression failed' }
           python tools/verify_vr_stage_extension_d3dx_batch_owner.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex +TIME D3DX batch isolation failed' }
+          python tools/verify_vr_stage_optical_probe.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex +TIME optical probe isolation failed' }
           python tools/verify_vr_skyglow_capture_boundary.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R26+HUD world/SkyGlow cutoff regression failed' }
       - name: Reject broken shipped PowerShell helpers and false HUD reports
