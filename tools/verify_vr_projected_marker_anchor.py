@@ -888,7 +888,7 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
         if token not in delta:
             fail("R84 projected marker XY/depth isolation lost: " + token)
 
-    positiont = function_body(renderer, "bool R30BuildXyzrhwState(")
+    positiont = function_body(renderer, "bool R30ConfigureXyzrhwWorldEffect(")
     for token in (
         "ProjectedMarkerOwnsVehicleDepth(",
         "state.projectedWorldMarker = true;",
