@@ -158,14 +158,18 @@ require_finite_projected_anchor(calc)
 # The exact original 0xBAEE7 return edge is authoritative, but the
 # independently hooked sub_4BAD20 rank-producer lifetime can salvage the
 # same view-space anchor if x86 inline-hook return-site provenance drifts.
-# Neither condition may become a requirement for the other; NaviPub
-# ScreenHud scopes must always block vehicle-world capture.
+# Neither condition may become a requirement for the other. NaviPub
+# ScreenHud children must not be treated as world *without a recovered
+# exact original source*. Quest3 field sample 3f9ccd3b: all valid negative-Z
+# ordinal original E8 0xBAEE2 points were rejected under navipubDepth=1.
+# Only that exact E8 may bypass the coarse parent after finite validation.
 def require_historical_rank_capture_gate(body: str) -> None:
     for marker in (
         "returnAddress == Module::exe_ptr(0xBAEE7)",
         "ordinalProducerScope = RankMarkerSubActiveDepth != 0",
         "ordinalReturnSite || ordinalProducerScope",
         "RankMarkerSubScreenHudDepth == 0",
+        "RankMarkerExactCalcEdge))",
         "recoverViewPoint(RankMarkerProjectedInfo, true);",
     ):
         if marker not in body:
@@ -175,7 +179,7 @@ def require_historical_rank_capture_gate(body: str) -> None:
                               body.index("const bool ordinalReturnSite ="))]
     if not (section.index("ordinalReturnSite || ordinalProducerScope") <
             section.index("RankMarkerSubScreenHudDepth == 0")):
-        fail("NaviPub ScreenHud exclusion must guard both ordinal sources")
+        fail("NaviPub non-spatial exclusion must guard salvage; exact E8 excepted")
     if "ordinalReturnSite && ordinalProducerScope" in section:
         fail("rank fallback must never REQUIRE optional sub-entry hook")
 
@@ -190,6 +194,9 @@ for label, bad_gate in (
     ("NaviPub exclusion lost", calc.replace(
         "RankMarkerSubScreenHudDepth == 0",
         "RankMarkerSubScreenHudDepth >= 0", 1)),
+    ("exact original car E8 override lost", calc.replace(
+        "RankMarkerExactCalcEdge))",
+        "false))", 1)),
 ):
     if bad_gate == calc:
         fail("rank capture-gate fault injection failed: " + label)
@@ -397,8 +404,28 @@ for marker in (
         fail(f"rank sub_4BAD20 must own its per-vehicle view anchor: {marker}")
 if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
     fail("original rank sub_4BAD20 hook not installed")
-if "RankMarkerSubScreenHudDepth == 0" not in calc:
-    fail("NaviPub rank HUD must not poison the next vehicle's projected anchor")
+if "RankMarkerSubScreenHudDepth == 0" not in calc or (
+    "RankMarkerExactCalcEdge))" not in calc):
+    fail("only proven 0xBAEE2 may override broad NaviPub while others remain ScreenHud")
+rank13 = function_body(ui, "static int __cdecl RankMarker_sprani(")
+for token in ("RankMarkerSubScreenHudDepth != 0 &&",
+              "!projectedAnchor.valid",
+              "const bool projectedVehicleRank ="):
+    if token not in rank13:
+        fail("rank 1-3 requires exact spatial anchor and non-spatial HUD fallback: " + token)
+rank46 = function_body(ui, "static int __cdecl RankMarker_putClipSprite(")
+for token in ("const bool projected = projectedAnchor.valid;",
+              "RankMarkerSubScreenHudDepth != 0 && !projected;"):
+    if token not in rank46:
+        fail("rank 4-6 must preserve exact projected and native HUD fallback: " + token)
+rival_calc = function_body(ui, "static void __cdecl Calc3D2D_RivalExactCall(")
+for token in ("RivalMarkerExactCalcEdge = true;",
+              "Calc3D2D_dest(a1, a2, in, out);",
+              "RivalMarkerExactCalcEdge = previous;"):
+    if token not in rival_calc:
+        fail("exact rival Calc3D2D source proof or rollback missing: " + token)
+if "Module::exe_ptr(0xBB6F0)" not in ui:
+    fail("rival original E8 source not installed")
 rank_digit = function_body(ui, "static int __cdecl RankMarker_putClipSprite(")
 exact_owned = function_body(ui, "static int ExactScreenHud_putClipSpriteOwned(")
 exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
