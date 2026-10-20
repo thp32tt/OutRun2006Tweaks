@@ -380,6 +380,8 @@ bool build_r283_sm3_mov_shader_source(
             unsigned flowKind{};
             std::string flowCondition;
             unsigned repeatCount{};
+            bool repeatDynamic{};
+            unsigned repeatRegister{};
             bool sineCosine{};
             bool signScratch{};
             UINT signInputTemp{32u};
@@ -405,6 +407,7 @@ bool build_r283_sm3_mov_shader_source(
         std::array<bool, 16> sampler2dUsed{};
         bool liveConstantsUsed = false;
         bool liveBooleansUsed = false;
+        bool liveIntegersUsed = false;
         NativeSm3ConditionalFlow writtenFlow;
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
@@ -701,8 +704,8 @@ bool build_r283_sm3_mov_shader_source(
                 continue;
             }
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_REP)) {
-                // D3D9 SM3 REP reads integer i#.x; no live device int
-                // snapshot, predicate, relative indexing or BREAK is guessed.
+                // D3D9 REP reads i#.x: DEFI is shader-local, otherwise
+                // the count must come from this game's live per-Draw i#.
                 if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
                     instruction.operandTokens.size() != 1u ||
                     operations.size() >= kMaxOps)
@@ -716,17 +719,23 @@ bool build_r283_sm3_mov_shader_source(
                     ((token & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) !=
                         D3DSPSM_NONE ||
                     (swizzle != 0u && swizzle != 0xe4u) ||
-                    reg >= intDefPresent.size() || !intDefPresent[reg])
+                    reg >= intDefPresent.size())
                     return false;
-                unsigned count = 0u;
-                if (!native_sm3_static_repeat_count(
-                        intDefBits[reg], count) ||
-                    !structuredFlow.begin_repeat(count, tempWritten, outputWritten) ||
+                const bool dynamic = !intDefPresent[reg];
+                unsigned count = 16u;
+                if ((!dynamic &&
+                     !native_sm3_static_repeat_count(intDefBits[reg], count)) ||
+                    !(dynamic
+                        ? structuredFlow.begin_live_repeat(tempWritten, outputWritten)
+                        : structuredFlow.begin_repeat(count, tempWritten, outputWritten)) ||
                     !predicateFlow.begin_repeat())
                     return false;
                 Operation loop{};
                 loop.flowKind = 4u;
                 loop.repeatCount = count;
+                loop.repeatDynamic = dynamic;
+                loop.repeatRegister = reg;
+                if (dynamic) liveIntegersUsed = true;
                 operations.push_back(std::move(loop));
                 continue;
             }
@@ -1142,6 +1151,8 @@ bool build_r283_sm3_mov_shader_source(
             translated = "cbuffer R283LiveConstants : register(b0) { float4 r283_c[256]; };\n";
         if (liveBooleansUsed)
             append_native_sm3_live_bool_declaration(translated);
+        if (liveIntegersUsed)
+            translated += "cbuffer R283LiveIntegers : register(b3) { int4 r283_i[16]; };\n";
         for (unsigned reg = 0u; reg < boolDefPresent.size(); ++reg) {
             if (boolDefPresent[reg] &&
                 !append_native_sm3_defb(translated, reg, boolDefBits[reg]))
@@ -1199,8 +1210,13 @@ bool build_r283_sm3_mov_shader_source(
                 else if (op.flowKind == 3u || op.flowKind == 5u)
                     translated += "    }\n";
                 else if (op.flowKind == 4u) {
-                    if (!append_native_sm3_repeat_begin(
-                            translated, op.repeatCount, static_cast<unsigned>(i)))
+                    if (!(op.repeatDynamic
+                              ? append_native_sm3_live_repeat_begin(
+                                    translated, op.repeatRegister,
+                                    static_cast<unsigned>(i))
+                              : append_native_sm3_repeat_begin(
+                                    translated, op.repeatCount,
+                                    static_cast<unsigned>(i))))
                         return false;
                 } else if (op.flowKind == 6u || op.flowKind == 7u) {
                     if (!append_native_sm3_break(
@@ -1835,6 +1851,13 @@ bool compile_native_live_sm3_program(
             vertexHlsl.find("cbuffer R283LiveBooleans") != std::string::npos;
         candidate.pixelBooleans =
             pixelHlsl.find("cbuffer R283LiveBooleans") != std::string::npos;
+        for (unsigned slot = 0; slot < 16u; ++slot) {
+            const auto operand = "r283_i[" + std::to_string(slot) + "].x";
+            if (vertexHlsl.find(operand) != std::string::npos)
+                candidate.vertexIntegerMask |= static_cast<std::uint16_t>(1u << slot);
+            if (pixelHlsl.find(operand) != std::string::npos)
+                candidate.pixelIntegerMask |= static_cast<std::uint16_t>(1u << slot);
+        }
         for (unsigned slot = 0; slot < 16u; ++slot) {
             const auto symbol = "r283_texture" + std::to_string(slot) +
                                 " : register(t" + std::to_string(slot) + ")";

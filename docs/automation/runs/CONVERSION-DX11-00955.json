@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00955",
+  "production_id": "CONVERSION-DX11-00955",
+  "event_id": "CONVERSION-DX11-00955-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00955",
+  "feature_id": "DX11:LIVE_SM3_INTEGER_REPEAT_TO_NATIVE_GAME_DRAW",
+  "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_INTEGER_REPEAT_TO_NATIVE_GAME_DRAW",
+    "goal": "Translate game-authored dynamic i# SM3 REP/ENDREP across captured D3D9 VS/PS integer constant registers to opt-in native D3D11 live Draw, retaining DEFI, bounds, TEMP provenance, DX9Ex fallback, and input/FFB/SkyGlow.",
+    "acceptance_items": [
+      {
+        "id": "live_integer_shader_native_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_integer_shader_capture_native_vs_ps_gpu",
+        "expected_behavior": "Program compiler emits per-stage b3 int4 and matching HLSL loops, guarded game Draw binds same-Draw VS/PS i# snapshots."
+      },
+      {
+        "id": "bounds_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "loop_bounds_register_provenance_renderer_input",
+        "expected_behavior": "Reject invalid, missing, excessive or nested i# counts and uncertain loop-only TEMP writes without disturbing original D3D9Ex Draw, gamepad or FFB."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_fast_backend_windows_openxr_hud",
+        "expected_behavior": "Positive/negative portable C++/Python regressions and mandatory Fast, Backend, Win32, OpenXR, HUD workflows success at exact SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Real D3D9 game shader REP i# or DEFI operand decoded from VS/PS function",
+      "Live per-Draw game integer i# snapshot bound to D3D11 stage b3 after range validation, retain bounded loop and TEMP provenance",
+      "Native VS/PS HLSL REP executed with exact game draw data in existing Draw/DrawIndexed path",
+      "Native visible frame publication path and DX9Ex fallback preserved; game/HMD runtime capture pending"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+      "src/vr/d3d11/native_backend.hpp",
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      ".github/workflows/dx11-fast-structural.yml",
+      "tools/dx11_sm3_live_integer_repeat_probe_00955.cpp",
+      "tools/test_dx11_sm3_live_integer_repeat_00955.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ verifies 7/16 valid game integer loop counts, HLSL source, static DEFI and per-loop TEMP provenance; Python checks source/runtime bind.",
+      "negative_regression": "C++ refuses zero/negative/17, invalid source register, excess nested loop and unproven TEMP; script checks live per-Draw queries before GPU upload and native opt-in.",
+      "component_integration": "Live D3D9 shader bytecode and stage i# data -> native shader HLSL -> D3D11 stage b3 -> existing native GPU Draw path with DX9Ex fallback."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_INTEGER_REPEAT_TO_NATIVE_GAME_DRAW:CONVERSION-DX11-00955"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "REAL_GAME_DRAW",
+      "LIVE_SM3_REP_SOURCE",
+      "VS_PS_CONSTANTI",
+      "D3D11_B3_SHADER_BIND",
+      "NATIVE_DRAW",
+      "FULL_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEW_NATIVE_SOURCE_CANDIDATE_ONLY; game menu/car/race and stereo pixels UNTESTED",
+    "activation_guard_and_fallback": "Opt-in NativeDrawPathActive only, fail-closed on invalid counts, game controls/FFB/SkyGlow and frozen DXVK unaffected."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_sm3_live_integer_repeat_probe_00955.cpp",
+    "tools/test_dx11_sm3_live_integer_repeat_00955.py"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "REAL_GAME_DRAW_BLOCKER": "2026-10-18 game capture native_draws=0. Live i# REP is currently rejected; presence in game capture UNTESTED.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "PENDING_MATERIAL_COMMIT",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Check 00955 per-component C++/Python regressions and all mandatory exact-SHA Gates; repair failures under same ID; real desktop/HMD afterwards.",
+  "pipeline": {
+    "C0_RECOVER": "GitHub 31eeeea7812b9c5456a1ef4730a6870a3a8faf32; 00954 complete, no 00955 prior run/claim",
+    "C1_REVIEW": "Game shader live i# REP refuses all non-DEFI constants; bounded per-draw capture feasible.",
+    "C2_IMPLEMENT": "VS/PS live SM3 i# dynamic repeat compiled and snapshotted with b3 stage binding and fail-closed provenance.",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING"
+  },
+  "score_change": 0
+}

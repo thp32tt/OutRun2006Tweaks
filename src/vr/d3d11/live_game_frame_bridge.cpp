@@ -19,6 +19,7 @@
 #include "live_game_blend_extrema.hpp"
 #include "native_backend.hpp"
 #include "native_sm3_constant_codegen.hpp"
+#include "native_sm3_repeat_flow.hpp"
 #include "pipeline_translation.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
@@ -1229,6 +1230,8 @@ struct LiveSm3Pipeline {
     ComPtr<ID3D11Buffer> pixelConstants;
     ComPtr<ID3D11Buffer> vertexBooleans;
     ComPtr<ID3D11Buffer> pixelBooleans;
+    ComPtr<ID3D11Buffer> vertexIntegers;
+    ComPtr<ID3D11Buffer> pixelIntegers;
     ComPtr<ID3D11Buffer> alphaReference;
     unsigned alphaCompare{};
     std::vector<DWORD> vertexTokens, pixelTokens;
@@ -4932,6 +4935,22 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                           pipeline.pixelBooleans.GetAddressOf()))))
                 return false;
         }
+        if (pipeline.program.vertexIntegerMask ||
+            pipeline.program.pixelIntegerMask) {
+            D3D11_BUFFER_DESC integerDesc{};
+            integerDesc.ByteWidth = 16u * 4u * sizeof(int);
+            integerDesc.Usage = D3D11_USAGE_DEFAULT;
+            integerDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+            if ((pipeline.program.vertexIntegerMask &&
+                 FAILED(device->CreateBuffer(
+                     &integerDesc, nullptr,
+                     pipeline.vertexIntegers.GetAddressOf()))) ||
+                (pipeline.program.pixelIntegerMask &&
+                 FAILED(device->CreateBuffer(
+                     &integerDesc, nullptr,
+                     pipeline.pixelIntegers.GetAddressOf()))))
+                return false;
+        }
         if (alphaFunc != 0u) {
             D3D11_BUFFER_DESC alphaDesc{};
             alphaDesc.ByteWidth = 16u;
@@ -5068,6 +5087,20 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         (pipeline.program.pixelBooleans &&
          FAILED(game->GetPixelShaderConstantB(0u, livePixelBool.data(), 16u))))
         return false;
+    // Read the same game-owned VS/PS i# registers used by the shader and
+    // reject unsupported counts BEFORE native vertex upload/frame mutation.
+    std::array<int, 16u * 4u> liveVertexInts{}, livePixelInts{};
+    if ((pipeline.program.vertexIntegerMask &&
+         (FAILED(game->GetVertexShaderConstantI(
+              0u, liveVertexInts.data(), 16u)) ||
+          !native_sm3_live_repeat_payload_valid(
+              liveVertexInts, pipeline.program.vertexIntegerMask))) ||
+        (pipeline.program.pixelIntegerMask &&
+         (FAILED(game->GetPixelShaderConstantI(
+              0u, livePixelInts.data(), 16u)) ||
+          !native_sm3_live_repeat_payload_valid(
+              livePixelInts, pipeline.program.pixelIntegerMask))))
+        return false;
     const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) * vertexCount;
     if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
@@ -5134,6 +5167,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (pipeline.program.pixelBooleans)
             uploadBool(pipeline.pixelBooleans.Get(), livePixelBool);
     }
+    if (pipeline.program.vertexIntegerMask)
+        context->UpdateSubresource(
+            pipeline.vertexIntegers.Get(), 0u, nullptr,
+            liveVertexInts.data(), 0u, 0u);
+    if (pipeline.program.pixelIntegerMask)
+        context->UpdateSubresource(
+            pipeline.pixelIntegers.Get(), 0u, nullptr,
+            livePixelInts.data(), 0u, 0u);
     if (alphaFunc != 0u) {
         const std::array<std::uint32_t, 4> reference{{alphaRef, 0u, 0u, 0u}};
         context->UpdateSubresource(pipeline.alphaReference.Get(), 0u, nullptr,
@@ -5149,6 +5190,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ID3D11Buffer* psBooleans = pipeline.pixelBooleans.Get();
     context->VSSetConstantBuffers(2u, 1u, &vsBooleans);
     context->PSSetConstantBuffers(2u, 1u, &psBooleans);
+    ID3D11Buffer* vsIntegers = pipeline.vertexIntegers.Get();
+    ID3D11Buffer* psIntegers = pipeline.pixelIntegers.Get();
+    context->VSSetConstantBuffers(3u, 1u, &vsIntegers);
+    context->PSSetConstantBuffers(3u, 1u, &psIntegers);
     const D3D11_VIEWPORT nativeViewport{
         static_cast<float>(viewport.X), static_cast<float>(viewport.Y),
         static_cast<float>(viewport.Width), static_cast<float>(viewport.Height),
