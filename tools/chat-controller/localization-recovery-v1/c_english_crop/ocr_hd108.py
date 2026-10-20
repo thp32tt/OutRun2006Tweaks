@@ -83,19 +83,23 @@ def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
    j=json.loads(mp.read_text(encoding="utf-8"))
    if j.get("edge_warning")!="ALPHA_TOUCHES_CROP_BORDER_REVIEW":
     continue
+   stage_index=0
    receipt=mp.parent/"edge_review_v1.json"
    if receipt.is_file():
     rec=json.loads(receipt.read_text(encoding="utf-8"))
-    if rec.get("version")==EDGE_REVIEW_VERSION and rec.get("source_crop_sha256")==j.get("crop_sha256"):
-     continue
-   pending.append((mp,j))
+    if (rec.get("version")==EDGE_REVIEW_VERSION and
+        rec.get("source_crop_sha256")==j.get("crop_sha256")):
+     if rec.get("status") in ("RESCUED_SAFE_EXPANDED_CROP","RESCUED_MAX_CONTEXT_C1_REQUIRED"):
+      continue
+     stage_index=min(int(rec.get("stage_index",-1))+1,len(EDGE_STAGES)-1)
+   pending.append((mp,j,stage_index))
   except (OSError,ValueError,TypeError):
    continue
  result={"status":"EDGE_REVIEW","version":EDGE_REVIEW_VERSION,
          "pending_before":len(pending),"reviewed":0,"rescued":0,
          "held":0,"details":[]}
- for mp,j in pending[:max_items]:
-  detail={"manifest":str(mp)}
+ for mp,j,stage_index in pending[:max_items]:
+  detail={"manifest":str(mp),"stage_index":stage_index}
   try:
    if (j.get("source_type")!="SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG" or
        j.get("old_split_tiles_used") is not False):
@@ -122,18 +126,25 @@ def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
     image=im.copy()
    x0,y0,x1,y1=box
    h=max(1,y1-y0)
-   padx=max(24,int(h*.55))
-   pady=max(16,int(h*.30))
+   xfactor,yfactor=EDGE_STAGES[stage_index]
+   padx=max(24,int(h*xfactor))
+   pady=max(16,int(h*yfactor))
    expanded=[max(0,x0-padx),max(0,y0-pady),
              min(image.width,x1+padx),min(image.height,y1+pady)]
    if expanded==box:
     raise ValueError("EDGE_REVIEW_NO_EXPANSION_POSSIBLE")
    bad=ocr.margin_check(image,expanded)
+   opaque_context=(bad=="ALPHA_TOUCHES_CROP_BORDER_REVIEW" and
+                   ocr.opaque_context_border(image,expanded))
+   max_context=(stage_index==len(EDGE_STAGES)-1 and
+                bad=="ALPHA_TOUCHES_CROP_BORDER_REVIEW")
    detail["original_bbox"]=box
    detail["expanded_bbox"]=expanded
    detail["expanded_margin_result"]=bad
+   detail["opaque_context_border"]=opaque_context
+   detail["max_context_fallback"]=max_context
    rescued_path=None
-   if bad is None:
+   if bad is None or opaque_context or max_context:
     sourceout=out_root/Path(name).stem
     label=hashlib.sha256((name+j.get("english","")+str(expanded)+EDGE_REVIEW_VERSION).encode()).hexdigest()[:16]
     target=sourceout/label
@@ -163,14 +174,18 @@ def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
        "edge_review_version":EDGE_REVIEW_VERSION,
        "edge_review_of":str(mp),
        "edge_review_original_bbox":box,
-       "edge_review_method":"DETERMINISTIC_SAFE_MARGIN_EXPANSION",
+       "edge_review_method":("PROGRESSIVE_SAFE_MARGIN_EXPANSION" if bad is None else
+                             "OPAQUE_CONTEXT_BORDER_C1_REQUIRED" if opaque_context else
+                             "PROGRESSIVE_MAX_CONTEXT_C1_REQUIRED"),
+       "edge_review_stage_index":stage_index,
        "runtime_validation":"UNTESTED",
        "old_split_tiles_used":False,
      })
      discover.save_json_atomic(target/"manifest.json",manifest)
     rescued_path=str(target/"manifest.json")
     result["rescued"]+=1
-    detail["status"]="RESCUED_SAFE_EXPANDED_CROP"
+    detail["status"]=("RESCUED_SAFE_EXPANDED_CROP" if bad is None else
+                      "RESCUED_MAX_CONTEXT_C1_REQUIRED")
     detail["rescued_manifest"]=rescued_path
    else:
     result["held"]+=1
@@ -178,6 +193,7 @@ def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
    receipt={
      "version":EDGE_REVIEW_VERSION,
      "status":detail["status"],
+     "stage_index":stage_index,
      "source_crop_sha256":j.get("crop_sha256"),
      "source_png":name,
      "original_bbox":box,
