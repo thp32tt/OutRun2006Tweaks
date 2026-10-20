@@ -185,6 +185,8 @@ def main():
     assert b"$dx11TestCase -ne 'NATIVE_GPU_DESKTOP'" in packaged_runner
     assert b"gpuDesktopFrames -gt 0" in packaged_runner
     assert b"$gameArgs += '-Stereo=false'" in packaged_runner
+    assert b"$gameArgs += '-antialiasing 0'" in packaged_runner
+    assert b"nativeBootstrapCompatibleObserved" in packaged_runner
     assert b"if ($dx11TestCase -ne 'CONTROL')" in packaged_runner
     assert b"monoStereoObserved" in packaged_runner
     assert b"D3D11_GPU_TO_D3D9EX_SHARED_DESKTOP" in packaged_runner
@@ -196,6 +198,8 @@ def main():
     assert b"D3D11 -> CPU -> D3D9 Present" in payload["DX11_TEST_README.txt"]
     assert b"D3D11 -> shared resource -> D3D9Ex Present" in payload["DX11_TEST_README.txt"]
     assert b"-Stereo=false" in payload["DX11_TEST_README.txt"]
+    assert b"-antialiasing 0" in payload["DX11_TEST_README.txt"]
+    assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_single_sample_required"] is True
     assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_mono_required"] is True
     mono = runner.replace(b"Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8", b"missing anchor")
     must_fail(lambda: construct(*args[:4], mono, *args[5:]), "missing game runner args anchor")
