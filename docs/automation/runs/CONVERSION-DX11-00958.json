@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00958",
+  "production_id": "CONVERSION-DX11-00958",
+  "event_id": "CONVERSION-DX11-00958-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00958",
+  "feature_id": "DX11:LIVE_SM3_LOOP_AL_INDEXED_CONSTANT_GAME_DRAW",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "material_result_sha": "9543ea9fc25311d31bfdfa3a3ab0ab33d4552bb7",
+  "validation_bearing_result_sha": null,
+  "score_change": 0,
+  "REAL_GAME_DRAW_BLOCKER": "Native gameplay draw eligibility/pixels have not been retested; preexisting 2026-10-18 evidence recorded native_draws=0. Missing SM3 LOOP and aL relative constant translation addressed as a source candidate, not runtime proven.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "9543ea9fc25311d31bfdfa3a3ab0ab33d4552bb7",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Repair only concrete exact-SHA CI failures for 00958; preserve native opt-in and D3D9Ex fallback; then obtain matching desktop menu/car/race game observation.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Real game D3D9 SM3 LOOP/ENDLOOP, DEFI or per-Draw i# operands and relative c[aL] are decoded from captured VS/PS bytecode",
+      "Validate loop count/start/stride, nested BREAK and physical TEMP provenance, and bound constant indexed ranges; emit native D3D11 HLSL loop with innermost aL",
+      "Fetch live game integer i# at the same Draw and reject unsupported loop payloads before GPU mutation",
+      "Preserve opt-in native Draw/DrawIndexed path to full-game output and authoritative D3D9Ex gamepad/FFB fallback; real game pixels remain untested"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_backend.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_sm3_loop_index_probe_00958.cpp",
+      "tools/test_dx11_sm3_loop_index_00958.py",
+      ".github/workflows/dx11-fast-structural.yml",
+      "docs/automation/runs/CONVERSION-DX11-00958.json"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Targeted C++ LOOP/i# tests and Python source-graph integration included in 00958 Fast Gate; result pending.",
+      "negative_regression": "Conservative reject count>16, invalid stride/bounds, DEF alias, out-of-range indexed c#, unsupported relative banks and live loop payload; runtime fallback not hardware-tested.",
+      "component_integration": "D3D9 shader token -> native VS/PS HLSL LOOP/aL indexed constants -> stage b3 game i# upload -> guarded native D3D11 Draw and visible frame publication path."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_LOOP_AL_INDEX_TO_GAME_DRAW:CONVERSION-DX11-00958"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_SM3_LOOP_AL",
+      "VS_PS_GAME_INT_CONSTANTS",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_IMPLEMENTED_CI_PENDING; no actual native menu/car/race pixels, Quest 3 stereo or input validation observed.",
+    "activation_guard_and_fallback": "NativeDrawPathActive remains opt-in; invalid relative addressing/ranges or game i# loop values fall back to D3D9Ex; original inputs/FFB/SkyGlow and frozen DXVK protected."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_LOOP_AL_INDEXED_CONSTANT_GAME_DRAW",
+    "goal": "Translate original game SM3 nested LOOP/ENDLOOP, bounded aL-indexed constant addressing and real VS/PS integer Draw-state into native D3D11 shader execution while rejecting unsupported ranges and preserving safe D3D9Ex gameplay fallback.",
+    "acceptance_items": [
+      {
+        "id": "game_sm3_loop_native_codegen",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_vs_ps_loop_addressed_constants",
+        "expected_behavior": "Parse real D3D9 LOOP/ENDLOOP and nested aL scopes, emit source-accurate bounded D3D11 HLSL indexing into game-owned float constants."
+      },
+      {
+        "id": "index_payload_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "runtime_game_constantI_and_source_provenance",
+        "expected_behavior": "Reject invalid static/live i# loop bounds, shader DEF collision, unsupported relative bank and uninitialized register; original D3D9Ex path remains authoritative."
+      },
+      {
+        "id": "source_graph_exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_fast_backend_windows_openxr_hud",
+        "expected_behavior": "Run targeted 00958 C++ and Python regressions plus five mandated exact-SHA GitHub Actions gates on final validation-bearing result without CI skip."
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_sm3_repeat_flow.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_sm3_loop_index_probe_00958.cpp",
+    "tools/test_dx11_sm3_loop_index_00958.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Latest target HEAD and 00957 exact-SHA 5/5 C6 verified; classification A source implementation.",
+    "C1_REVIEW": "Add SM3 LOOP/aL indexed c# native game shader source path.",
+    "C2_IMPLEMENT": "LOOP/ENDLOOP, bounded relative game constants, game i# runtime validation, targeted tests implemented.",
+    "C3_VALIDATE": "PENDING_EXACT_SHA; first Fast/Backend 9543ea9 failed because --check-latest selected pre-existing 00957 record with no development_strategy; 00958 run created as current policy-compliant source checkpoint, with no checks disabled.",
+    "C4_COMMIT": "Source material 9543ea9fc25311d31bfdfa3a3ab0ab33d4552bb7",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA; RUNTIME_VALIDATION=UNTESTED"
+  }
+}
