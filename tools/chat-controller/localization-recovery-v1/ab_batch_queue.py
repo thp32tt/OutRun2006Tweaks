@@ -286,6 +286,31 @@ def stage_submission(role, task_id, root="/data/imagegen"):
     _atomic_json(state_path(root, role), st)
     return "SUBMITTING"
 
+def rollback_submission(role, task_id, reason, root="/data/imagegen"):
+    if os.getenv("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
+        try:
+            from app.text_roi_queue import rollback_submission as roi_rollback
+        except ModuleNotFoundError:
+            from text_roi_queue import rollback_submission as roi_rollback
+        return roi_rollback(role, task_id, reason, root)
+    root=Path(root)
+    st=_state(root,role)
+    active=st.get("active")
+    if not active or active.get("task_id")!=task_id:
+        return "STATE_TASK_MISMATCH"
+    if active.get("status")!="SUBMITTING":
+        return "ROLLBACK_STATE_NOT_SUBMITTING"
+    if (root/"sent"/(role+"_"+task_id+".json")).exists():
+        return "ROLLBACK_BLOCKED_SENT_RECEIPT_EXISTS"
+    active["status"]="STAGED"
+    active["last_presend_failure"]=reason
+    active["last_presend_failure_at"]=_now().isoformat()
+    active["presend_retry_count"]=int(active.get("presend_retry_count",0))+1
+    st["status"]="STAGED"
+    _atomic_json(state_path(root,role),st)
+    return "ROLLED_BACK_TO_STAGED"
+
+
 def record_chat_url(role, task_id, url, root="/data/imagegen"):
     if os.getenv("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
         try:
