@@ -1,0 +1,504 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T0845KST-NEW-SHA-UNIQUE8-A0003-A0006-B0001",
+  "review_slot_kst": "2026-10-21 08:45",
+  "branch": "korean-localization-recovery-20260928",
+  "source_policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "producer_source": "N100 real A/B ImageGen candidate_outputs, export_evidence and production_manifest",
+  "selection": "Eight unreviewed unique candidate SHA256 values selected after deduplication against 20 N100 c1_batch_*/metrics.json records (128 prior unique SHAs; 156 exported files). A0003 ordinal 14-15, A0006 ordinal 26-28, B0001 ordinal 1-3. 25 still pending after this report, subject to future reconciliation.",
+  "verdict_count": {
+    "pass_png_only": 8,
+    "fail": 0,
+    "hold_png_only": 0
+  },
+  "scope": "PNG_ONLY_INDEPENDENT_STATIC_TEXT_REVIEW_NO_DDS_NO_UI_CELL_OR_GAME_APPROVAL",
+  "policy": "Shorter translated text and modest glyph size differences alone are not grounds to fail. Severe script, legibility, protected-art, actual UI-cell or orientation defects must have concrete evidence. PNG-only PASS is not production acceptance.",
+  "evidence": {
+    "metrics_json_n100": "work/c1_batch_20261021_0845/metrics.json",
+    "compare_1_n100": {
+      "path": "work/c1_batch_20261021_0845/compare_1.png",
+      "sha256": "5cabb6bc69b5e7020483fd795068c9968cd74291718741f4297738cc31db4ff3"
+    },
+    "compare_2_n100": {
+      "path": "work/c1_batch_20261021_0845/compare_2.png",
+      "sha256": "8479cfacabae240f339a3c8e6927b52f4505805d5b86888b8a7454976eb41fcc"
+    },
+    "check_scripts": [
+      "work/c1_qa_20261021_0845_inspect.py",
+      "work/c1_qa_20261021_0845_alpha.py"
+    ],
+    "sha_verification": "All 8 candidate file byte SHA256 verified equal to producer export evidence; all 8 source PNG byte SHA256 match production_manifest.json. All distinct and absent from prior 20 N100 QA metrics files.",
+    "visual_review": "Human visual review of two checkerboard comparison sheets; checkerboard is added by reviewer and is not native source or candidate PNG content."
+  },
+  "results": [
+    {
+      "index": 1,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0003-000A832E",
+      "ordinal": 14,
+      "candidate_png": "Q049_f4c08c63a50c336a_source_k.png",
+      "candidate_sha256": "382c9b11a9af8c1cd8bb6dac58e24e61b5bf42eff6fbaa04fff2fdeeb7101718",
+      "producer_sha_verified": true,
+      "source_png": "Q049_f4c08c63a50c336a_source.png",
+      "source_png_sha256": "f0a39ea3f4ae51e8a08d2b8e06c423aa8f6512414f87b0e991eb9be7ea772686",
+      "source_sha_verified": true,
+      "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "english": "Spare!",
+      "approved_korean": "스페어!",
+      "visually_read_korean": "스페어!",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        474,
+        160
+      ],
+      "generated_output_px": [
+        2158,
+        729
+      ],
+      "alpha_nonzero_bbox": [
+        0,
+        0,
+        2136,
+        729
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 2,
+        "bottom": 16,
+        "left": 30,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "Golden italic Hangul title visually matches approved Korean; relatively more pronounced dark edge than source, no obvious ghost/text clipping. Minor alpha<=15 edge artifact.",
+      "warnings": [
+        "LOW_ALPHA_EDGE_PIXELS_ONLY_1_TO_15_RECHECK_BEFORE_COMPOSE",
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 2,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0003-000A832E",
+      "ordinal": 15,
+      "candidate_png": "Q049_a47ab4333636e1d8_source_k.png",
+      "candidate_sha256": "9c179a8e163e2c2e453ef77c4e64ddab5f9829c7805fa89d2e07e4fc424beae8",
+      "producer_sha_verified": true,
+      "source_png": "Q049_a47ab4333636e1d8_source.png",
+      "source_png_sha256": "9564c358fed122bb2ae5efedc0325c240ad7a90b75337030e5a9cfa43b93db5e",
+      "source_sha_verified": true,
+      "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "english": "GOAL!",
+      "approved_korean": "골!",
+      "visually_read_korean": "골!",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        920,
+        268
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        81,
+        21,
+        2013,
+        692
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "Gold-to-red gradient Hangul title with original-style angled emphasis and dark outline; visually reads 골!, no obvious English ghost or clipping.",
+      "warnings": [
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 3,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0006-70D97486",
+      "ordinal": 26,
+      "candidate_png": "Q121_e5e8b0c3fe3e4827_source_k.png",
+      "candidate_sha256": "2b26012f2b077066921ad7dc5435461853cad1cad2621604ef03826919294f96",
+      "producer_sha_verified": true,
+      "source_png": "Q121_e5e8b0c3fe3e4827_source.png",
+      "source_png_sha256": "87fe9340f3beb9bf4a767dc9b10568a44f37ea256ec8cb3bd4bc4803fd9741c8",
+      "source_sha_verified": true,
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "View Choices",
+      "approved_korean": "선택 보기",
+      "visually_read_korean": "선택 보기",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1312,
+        280
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        313,
+        17,
+        1917,
+        644
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "White slanted lettering with black/cyan edge, correct 선택 보기, no obvious cropping, protected art not assessable until composition.",
+      "warnings": [
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 4,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0006-70D97486",
+      "ordinal": 27,
+      "candidate_png": "Q121_5d87d98c13296b4b_source_k.png",
+      "candidate_sha256": "0676d79ee152ebc6d64ac4decba68a76a4a33cca5ac90730c02eae16699d9510",
+      "producer_sha_verified": true,
+      "source_png": "Q121_5d87d98c13296b4b_source.png",
+      "source_png_sha256": "8f9121e2a0845821766bd45e2571d8c87c004ed826f1f410e558133e306d267e",
+      "source_sha_verified": true,
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "Select your music",
+      "approved_korean": "음악 선택",
+      "visually_read_korean": "음악 선택",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1958,
+        254
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        200,
+        22,
+        1933,
+        607
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "White italic shadowed lettering, correct 음악 선택, no obvious cropping or frame.",
+      "warnings": [
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 5,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0006-70D97486",
+      "ordinal": 28,
+      "candidate_png": "Q133_5ad0c55ee56b81d0_source_k.png",
+      "candidate_sha256": "0bf184ac65ac1ad87006026c362c30d50bba78669a2ad41de5254b9adce326ca",
+      "producer_sha_verified": true,
+      "source_png": "Q133_5ad0c55ee56b81d0_source.png",
+      "source_png_sha256": "09da64b191916b97964993a8c61d2d1d27a1144dd2975b783eb6d067b21495bf",
+      "source_sha_verified": true,
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "english": "ALPINE",
+      "approved_korean": "알파인",
+      "visually_read_korean": "알파인",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        932,
+        238
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        69,
+        7,
+        2043,
+        696
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "Dark gray ALPINE replacement, correct 알파인; slight outline/contrast variance, no obvious misshapen Hangul.",
+      "warnings": [
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 6,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 1,
+      "candidate_png": "Q044_cdc9fa80e5787778_source_k.png",
+      "candidate_sha256": "a98cf6dbb0d815232ce328e0ca5b08ce90c206aa5da879ce0ceb5baf6125b0d8",
+      "producer_sha_verified": true,
+      "source_png": "Q044_cdc9fa80e5787778_source.png",
+      "source_png_sha256": "c71918eeaa04b5c8ae9cae62bcc368912026baf0f92ec340076756ac759da492",
+      "source_sha_verified": true,
+      "source_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "english": "LOSE",
+      "approved_korean": "패배",
+      "visually_read_korean": "패배",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        516,
+        212
+      ],
+      "generated_output_px": [
+        1956,
+        804
+      ],
+      "alpha_nonzero_bbox": [
+        81,
+        45,
+        1796,
+        780
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "Bright white 패배 with navy outline as source text family; stronger shiny border, no evident ghost or crop.",
+      "warnings": [
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 7,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 2,
+      "candidate_png": "Q046_3f91f6c614e65f91_source_k.png",
+      "candidate_sha256": "bd573c526fd6f2f6946ef525560aa271b2d3d93ace687e11c52a81b025e73c15",
+      "producer_sha_verified": true,
+      "source_png": "Q046_3f91f6c614e65f91_source.png",
+      "source_png_sha256": "57d0e55604375cbd71f2ca2b1a58704c4e56a1c47f1485d46cb35d52daa62a51",
+      "source_sha_verified": true,
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "english": "ACCELERATE",
+      "approved_korean": "가속",
+      "visually_read_korean": "가속",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1428,
+        252
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        379,
+        64,
+        1772,
+        692
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "Dark gray metallic 가속 with black edge; noticeable effect strength difference but content is readable and within output alpha boundary.",
+      "warnings": [
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 8,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 3,
+      "candidate_png": "Q046_6425d2109138a0a6_source_k.png",
+      "candidate_sha256": "a0bbab5c0fe53bc13fd4378c83fcd601fb1a3cac338ab3a8aedaf893cf24a250",
+      "producer_sha_verified": true,
+      "source_png": "Q046_6425d2109138a0a6_source.png",
+      "source_png_sha256": "8b7f0f857df989a0ece6cf1f00b9bcc703d7d3520f80e00a877a0734de91030c",
+      "source_sha_verified": true,
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "english": "BRAKE",
+      "approved_korean": "브레이크",
+      "visually_read_korean": "브레이크",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        824,
+        256
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        31,
+        0,
+        2142,
+        694
+      ],
+      "edge_alpha16_canvas_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edge_alpha1_15_canvas_pixels": {
+        "top": 14,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_alpha_transparency_verified": true,
+      "producer_result": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_comparison": "Dark gray metallic 브레이크 with black edge; matching translation, 14 top-edge alpha<16 pixels require native compose check.",
+      "warnings": [
+        "LOW_ALPHA_EDGE_PIXELS_ONLY_1_TO_15_RECHECK_BEFORE_COMPOSE",
+        "OUTPUT_RESOLUTION_MISMATCH_WITH_NATIVE_ROI",
+        "ORIGINAL_UI_CELL_SAFE_PLACEMENT_NOT_YET_VERIFIED",
+        "DDS_AND_INGAME_UNTESTED"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "conditions": [
+    "No A/B queue consumed",
+    "No ImageGen calls",
+    "No DDS generated",
+    "No C2/C3/game PASS",
+    "No VR/FFB/DX11/DXVK changes"
+  ]
+}
