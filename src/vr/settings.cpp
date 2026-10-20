@@ -36,6 +36,15 @@ namespace Settings
         { "Off (normal Quest 3)", "Center (desktop SBS)", "Auto pose sweep (14 s)",
           "Yaw +30", "Yaw -30", "Pitch +20", "Pitch -20",
           "Move +10 cm X", "Move -10 cm X" } };
+    // Quest 3 +TIME-only diagnostic, default OFF (original R84 bit-identical).
+    // F11/INI options may be changed during play; no producer-wide heuristics.
+    Setting<int> VRStageOpticalProbeMode{ "VR", "StageOpticalProbeMode", 0,
+        "Only exact +TIME producer: Native draws original once; FiniteHud uses existing R84; ZeroDisparity copies the same optical clip to both eyes; Hidden suppresses draw.",
+        { "Off (normal R84)", "Native (original once)", "FiniteHud (current)",
+          "ZeroDisparity (common clip)", "Hidden (+TIME only)" } };
+    Setting<int> VRStageOpticalProbeTarget{ "VR", "StageOpticalProbeTarget", 0,
+        "Scope +TIME diagnostics to all, original direct numeral, or queued sprani (exact SpriteNode/epoch).",
+        { "All +TIME", "Direct numeric/text", "Queued sprani" } };
 	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
     // VR quality is independent of the original game's [DX] ANTIALIASING.

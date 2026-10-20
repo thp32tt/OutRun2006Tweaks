@@ -34,10 +34,15 @@
 #include "../game/car_base_shadow_stereo.hpp"
 #include "../game/goal_progress_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
+#include "../game/stage_extension_optical_probe.hpp"
 #include "../game/rank_marker_physical_source.hpp"
 #include "../game/hud_native_source_transaction.hpp"
 #include "../core/r29_owner_api.hpp"
 
+namespace Settings {
+    extern Setting<int> VRStageOpticalProbeMode;
+    extern Setting<int> VRStageOpticalProbeTarget;
+}
 namespace OutRunVRRenderer {
     std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
     std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
@@ -1815,6 +1820,37 @@ namespace OutRunVRStereo
             return fallbackToR29();
         }
 
+        // Only R33's already-validated stereo raster guard may run this.
+        // Neither FVF/color nor stale one-shot HUD tokens are sufficient.
+        template<class Raw>
+        bool R33StageOpticalDirect(bool rasterReady, Raw&& raw,
+                                   HRESULT& result) noexcept
+        {
+            if (!rasterReady) return false;
+            const auto mode = OutRunVR::StageOpticalProbe::Parse(
+                Settings::VRStageOpticalProbeMode.get());
+            if (mode != OutRunVR::StageOpticalProbe::Mode::Native &&
+                mode != OutRunVR::StageOpticalProbe::Mode::Hidden)
+                return false;
+            const auto cmd =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            if (!OutRunVR::StageOpticalProbe::Selected(
+                    cmd, Settings::VRStageOpticalProbeTarget.get()))
+                return false;
+            result = mode == OutRunVR::StageOpticalProbe::Mode::Hidden
+                ? D3D_OK : raw();
+            static std::atomic<std::uint64_t> count{0};
+            const auto n = ++count;
+            if ((n & (n - 1u)) == 0)
+                spdlog::info(
+                    "VR STAGE OPTICAL PROBE: mode={} target={} hits={} queued={} qEpoch={} hr=0x{:08x}",
+                    static_cast<int>(mode),
+                    Settings::VRStageOpticalProbeTarget.get(), n,
+                    cmd.queued ? 1 : 0, cmd.queueEpoch,
+                    static_cast<unsigned>(result));
+            return true;
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
@@ -1825,6 +1861,11 @@ namespace OutRunVRStereo
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&](bool resyncAlreadyFlushed) {
+                HRESULT opticalHr = D3D_OK;
+                if (R33StageOpticalDirect(resyncAlreadyFlushed, [&] {
+                    return R32ReviewCallRawDrawPrimitive(
+                        device,type,startVertex,primitiveCount);
+                }, opticalHr)) return opticalHr;
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
@@ -1894,6 +1935,12 @@ namespace OutRunVRStereo
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&](bool resyncAlreadyFlushed) {
+                HRESULT opticalHr = D3D_OK;
+                if (R33StageOpticalDirect(resyncAlreadyFlushed, [&] {
+                    return R32ReviewCallRawDrawIndexedPrimitive(
+                        device,type,baseVertexIndex,minVertexIndex,
+                        numVertices,startIndex,primitiveCount);
+                }, opticalHr)) return opticalHr;
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
@@ -1989,6 +2036,11 @@ namespace OutRunVRStereo
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&](bool resyncAlreadyFlushed) {
+                HRESULT opticalHr = D3D_OK;
+                if (R33StageOpticalDirect(resyncAlreadyFlushed, [&] {
+                    return R32ReviewCallRawDrawPrimitiveUP(
+                        device,type,primitiveCount,data,stride);
+                }, opticalHr)) return opticalHr;
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
@@ -2059,6 +2111,12 @@ namespace OutRunVRStereo
             if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&](bool resyncAlreadyFlushed) {
+                HRESULT opticalHr = D3D_OK;
+                if (R33StageOpticalDirect(resyncAlreadyFlushed, [&] {
+                    return R32ReviewCallRawDrawIndexedPrimitiveUP(
+                        device,type,minVertexIndex,numVertices,primitiveCount,
+                        indexData,indexFormat,vertexData,stride);
+                }, opticalHr)) return opticalHr;
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;

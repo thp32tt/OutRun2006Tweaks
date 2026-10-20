@@ -44,6 +44,7 @@
 #include "../game/rank_marker_raw_wvp.hpp"
 #include "../game/rank_marker_physical_source.hpp"
 #include "../game/stage_extension_physical_source.hpp"
+#include "../game/stage_extension_optical_probe.hpp"
 #include "../game/goal_progress_physical_source.hpp"
 #include "../game/hud_native_source_transaction.hpp"
 #include "../game/rank_marker_fixedfn_r62.hpp"
@@ -78,6 +79,8 @@
 namespace Settings
 {
     extern Setting<bool> VRTelemetry;
+    extern Setting<int> VRStageOpticalProbeMode;
+    extern Setting<int> VRStageOpticalProbeTarget;
     extern Setting<float> VRWorldScale;
     extern Setting<float> VRHudScale;
     extern Setting<float> VRPauseMenuScale;
@@ -3570,6 +3573,16 @@ namespace OutRunVRStereo
                     return false;
                 state.stageExtensionClipFromGameNdc[eye] = result;
             }
+            // +TIME-only diagnostic common-clip control for native XYZ/FVF142
+            // and POSITIONT sprites; never touch rival, GOAL, F11 or sky.
+            if (OutRunVR::StageOpticalProbe::Parse(
+                    Settings::VRStageOpticalProbeMode.get()) ==
+                    OutRunVR::StageOpticalProbe::Mode::ZeroDisparity &&
+                OutRunVR::StageOpticalProbe::Selected(
+                    OutRunVR::GameSemantic::CapturePhysicalDrawCommand(),
+                    Settings::VRStageOpticalProbeTarget.get()))
+                state.stageExtensionClipFromGameNdc[1] =
+                    state.stageExtensionClipFromGameNdc[0];
 
             // The exact ESC arrow ScreenHud and the paused SpriteQueue
             // ScreenOverlay2D shell converge here. Previously this common
@@ -7779,6 +7792,16 @@ namespace OutRunVRStereo
                     std::memcpy(eyeConstants[eye], &correctedT,
                         sizeof(correctedT));
                 }
+                // Shader-owned exact +TIME uses the identical probe policy;
+                // R33 restores original GPU c64 after the bilateral submit.
+                if (OutRunVR::StageOpticalProbe::Parse(
+                        Settings::VRStageOpticalProbeMode.get()) ==
+                        OutRunVR::StageOpticalProbe::Mode::ZeroDisparity &&
+                    OutRunVR::StageOpticalProbe::Selected(
+                        OutRunVR::GameSemantic::CapturePhysicalDrawCommand(),
+                        Settings::VRStageOpticalProbeTarget.get()))
+                    std::memcpy(eyeConstants[1], eyeConstants[0],
+                        sizeof(eyeConstants[0]));
                 return true;
             }
 
