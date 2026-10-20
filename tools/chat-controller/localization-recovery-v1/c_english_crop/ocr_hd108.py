@@ -236,36 +236,49 @@ def scan(max_sources=4,max_new=1000):
  rows.sort(key=lambda r:r["png_filename"])
  REPORT.mkdir(parents=True,exist_ok=True)
  OUT.mkdir(parents=True,exist_ok=True)
- done_dir=REPORT/"processed_v2"
+ done_dir=REPORT/"processed_v3"
  done_dir.mkdir(parents=True,exist_ok=True)
 
- # A source is eligible once per approved scanner revision and original SHA.
- # HOLDs remain visible but are not reprocessed without a version/source change.
  def record_for(row):
   return done_dir/(row["png_filename"]+".json")
- def cached(row):
+
+ def attempt_count(row):
   try:
    obj=json.loads(record_for(row).read_text(encoding="utf-8"))
-   return obj.get("policy_version")==POLICY_VERSION and obj.get("source_sha256")==row["png_sha256"] and obj.get("status") in ("SCANNED","NO_REVIEWED_OFFICIAL_PHRASES","HOLD")
-  except (ValueError,OSError,TypeError):return False
+   if obj.get("policy_version")==POLICY_VERSION and obj.get("source_sha256")==row["png_sha256"]:
+    return int(obj.get("attempts",0))
+  except (ValueError,OSError,TypeError):
+   pass
+  return 0
 
- cursorfile=REPORT/"cursor.json"
+ def unresolved(row):
+  return _coverage(row,OUT)[2]
+
+ cursorfile=REPORT/"cursor_v3.json"
  try:cursor=int(json.loads(cursorfile.read_text(encoding="utf-8")).get("next",0))%len(rows)
  except (OSError,ValueError,TypeError,KeyError):cursor=0
- # Pick next *unprocessed* sources. Do not spend 24 hours repeatedly OCRing
- # images already scanned when no new phrase is available.
- pending=[(i,rows[i]) for i in list(range(cursor,len(rows)))+list(range(cursor))
-          if not cached(rows[i])]
+ # Source-level SCANNED is not completion. Keep rotating until every reviewed
+ # phrase in every verified HD source has a crop manifest.
+ order=list(range(cursor,len(rows)))+list(range(cursor))
+ pending=[(i,rows[i]) for i in order if unresolved(rows[i])]
  selected=pending[:min(max_sources,len(pending))]
- result={"status":"HD108_ORIGINAL_OCR_SCAN","policy_version":POLICY_VERSION,
-         "inventory":108,"pending_before":len(pending),
+ pending_phrase_count=sum(len(unresolved(r)) for _,r in pending)
+ total_phrase_count=sum(len(_row_phrases(r)) for r in rows)
+ located_phrase_count=total_phrase_count-pending_phrase_count
+ result={"status":"HD108_CROP_COVERAGE_RUNNING","policy_version":POLICY_VERSION,
+         "inventory":108,"pending_sources_before":len(pending),
+         "pending_phrases_before":pending_phrase_count,
+         "reviewed_phrase_total":total_phrase_count,
+         "located_phrase_count":located_phrase_count,
          "selected":[r["png_filename"] for _,r in selected],
          "scanned":0,"matched":0,"new_crops":0,"duplicates":0,
          "held":0,"edge_review_crops":0,"details":[]}
  if not selected:
-  result["status"]="HD108_PASS_COMPLETE_REVIEW_PENDING"
-  result["pending_after"]=0
+  result["status"]="HD108_CROP_COVERAGE_COMPLETE"
+  result["pending_sources_after"]=0
+  result["pending_phrases_after"]=0
   result["source_records"]=len(rows)
+  discover.save_json_atomic(REPORT/"last_scan.json",result)
   return result
 
  archive=json.loads(discover.MASTER.read_text(encoding="utf-8"))
@@ -287,18 +300,20 @@ def scan(max_sources=4,max_new=1000):
     if im.format!="PNG" or im.mode!="RGBA" or im.size!=(int(r["width"]),int(r["height"])):
      raise ValueError("SOURCE_FORMAT_DIMENSION_HOLD")
     image=im.copy()
-   phrases={}
-   for val in r["queue_indexes"].split(","):
-    val=val.strip()
-    if not re.fullmatch(r"[0-9]{1,3}",val):
-     raise ValueError("QUEUE_ID_INVALID")
-    phrases.update(ocr.approved_phrases("Q"+val.zfill(3)))
-   if not phrases:
-    detail["status"]="NO_REVIEWED_OFFICIAL_PHRASES"
+   phrases,covered_before,unresolved_before=_coverage(r,OUT)
+   attempts=attempt_count(r)
+   strategy=attempts%ocr.OCR_STRATEGY_COUNT
+   detail.update({"attempt":attempts+1,"ocr_strategy":strategy,
+                  "reviewed_phrases":len(phrases),
+                  "covered_before":len(covered_before),
+                  "unresolved_before":sorted(unresolved_before.values())})
+   if not unresolved_before:
+    detail["status"]="COVERAGE_COMPLETE"
     detail["matches"]=0
    else:
-    words=ocr.ocr_words(image)
-    matches=ocr.unique_regions(words,phrases,image.width,image.height)
+    words=ocr.ocr_words(image,strategy=strategy)
+    matches=ocr.unique_regions(words,unresolved_before,image.width,image.height,
+                               allow_fuzzy=attempts>=3)
     used=[entry["bbox_xyxy"] for entry in archive["items"]
           if entry.get("source_sha256")==h and len(entry.get("bbox_xyxy",[]))==4]
     sourceout=OUT/src.stem
@@ -355,28 +370,39 @@ def scan(max_sources=4,max_new=1000):
      used.append(b)
      result["new_crops"]+=1
      if bad:result["edge_review_crops"]+=1
-    detail.update({"status":"SCANNED","words":sum(len(x) for x in words),
-                   "matches":len(matches),"hard_holds":hardhold})
+    _,covered_after,unresolved_after=_coverage(r,OUT)
+    detail.update({"status":("COVERAGE_COMPLETE" if not unresolved_after else
+                             "COVERAGE_PENDING"),
+                   "words":sum(len(x) for x in words),
+                   "matches":len(matches),"hard_holds":hardhold,
+                   "covered_after":len(covered_after),
+                   "unresolved_after":sorted(unresolved_after.values())})
    result["scanned"]+=1
   except Exception as e:
    result["held"]+=1
    detail.update({"status":"HOLD","reason":type(e).__name__+":"+str(e)[:180]})
   result["details"].append(detail)
-  # A retryable crop-count cap is the only condition that never marks done.
-  if detail.get("reason","").find("SOURCE_CROP_LIMIT_HIT")<0:
-   discover.save_json_atomic(record_for(r),{
-       "status":detail["status"],"policy_version":POLICY_VERSION,
-       "source_png":name,"source_sha256":r["png_sha256"],
-       "source_size_bytes":int(r["png_size_bytes"]),
-       "source_dimensions":[int(r["width"]),int(r["height"])],
-       "ocr_matches":detail.get("matches",0),"hard_holds":hardhold,
-       "review_only":True,"runtime_validation":"UNTESTED"})
+  discover.save_json_atomic(record_for(r),{
+      "status":detail.get("status","HOLD"),"policy_version":POLICY_VERSION,
+      "source_png":name,"source_sha256":r["png_sha256"],
+      "source_size_bytes":int(r["png_size_bytes"]),
+      "source_dimensions":[int(r["width"]),int(r["height"])],
+      "attempts":attempt_count(r)+1,
+      "ocr_strategy":detail.get("ocr_strategy"),
+      "ocr_matches":detail.get("matches",0),
+      "unresolved_after":detail.get("unresolved_after",[]),
+      "hard_holds":hardhold,"review_only":True,
+      "runtime_validation":"UNTESTED"})
 
  newcursor=(selected[-1][0]+1)%len(rows)
  discover.save_json_atomic(cursorfile,{"next":newcursor,"after":selected[-1][1]["png_filename"],
                                       "inventory":108,"policy_version":POLICY_VERSION})
- pending_after=sum(1 for row in rows if not cached(row))
- result["pending_after"]=pending_after
- if pending_after==0:result["status"]="HD108_PASS_COMPLETE_REVIEW_PENDING"
+ unresolved_rows=[row for row in rows if unresolved(row)]
+ pending_phrase_after=sum(len(unresolved(row)) for row in unresolved_rows)
+ result["pending_sources_after"]=len(unresolved_rows)
+ result["pending_phrases_after"]=pending_phrase_after
+ result["located_phrase_count"]=result["reviewed_phrase_total"]-pending_phrase_after
+ if not unresolved_rows:
+  result["status"]="HD108_CROP_COVERAGE_COMPLETE"
  discover.save_json_atomic(REPORT/"last_scan.json",result)
  return result
