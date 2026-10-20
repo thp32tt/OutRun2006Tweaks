@@ -46,6 +46,16 @@ def session_labeled_runner(runner):
         b'$variant = "${variant}-${dx11TestCase}"'
     )
     staged = runner.replace(anchor, anchor + suffix, 1)
+    # The live native mono Draw observer explicitly rejects StereoWanted().
+    # Enforce a desktop-only, single-view game run for BOTH native variants;
+    # the DX9Ex CONTROL run is intentionally untouched.
+    game_args_anchor = b"Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8"
+    if staged.count(game_args_anchor) != 1:
+        raise ValueError("game argument capture anchor changed")
+    native_mono_arg = (
+        b"if ($dx11TestCase -ne 'CONTROL') { $gameArgs += '-Stereo=false' }\n"
+    )
+    staged = staged.replace(game_args_anchor, native_mono_arg + game_args_anchor, 1)
     archiver = b"Compress-Archive -Path (Join-Path $session '*') -DestinationPath $zip -Force"
     if staged.count(archiver) != 1:
         raise ValueError("session log archive anchor changed")
@@ -59,9 +69,11 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESK
     $nativeDraws = 0L
     $published = 0L
     $gpuDesktopFrames = 0L
+    $monoStereoObserved = $false
     $fullFrameModeObserved = $false
     foreach ($file in @(Get-ChildItem -Path $session -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue)) {
         foreach ($line in [System.IO.File]::ReadLines($file.FullName)) {
+            if ($line -match '\s-\sStereo:\sfalse\s*$') { $monoStereoObserved = $true }
             $hit = [regex]::Match($line, 'DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws=(\d+) native_draws=(\d+) desktop_insets=(\d+)')
             if (!$hit.Success) { continue }
             $seen = $true
@@ -79,7 +91,7 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESK
         $env:OUTRUN_DX11_FIRST_GAME_FRAME -eq '1' -and
         $env:OUTRUN_DX11_FULL_GAME_FRAME -eq '1' -and $seen -and
         $gameDraws -gt 0 -and $nativeDraws -gt 0 -and $published -gt 0 -and
-        $fullFrameModeObserved -and
+        $fullFrameModeObserved -and $monoStereoObserved -and
         ($dx11TestCase -ne 'NATIVE_GPU_DESKTOP' -or
             ($env:OUTRUN_DX11_GPU_SHARED_DESKTOP -eq '1' -and $gpuDesktopFrames -gt 0))
     )
@@ -94,6 +106,7 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESK
         "nativeDraws=$nativeDraws",
         "gpuDesktopFrames=$gpuDesktopFrames",
         "testCase=$dx11TestCase",
+        "monoStereoObserved=$monoStereoObserved",
         "publishedBackbufferFrames=$published",
         "nativeModeRequested=$($env:OUTRUN_DX11_FULL_GAME_FRAME)",
         "fullFrameModeObserved=$fullFrameModeObserved",
@@ -148,6 +161,7 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
                                       "OUTRUN_DX11_FULL_GAME_FRAME=1",
                                       "OUTRUN_DX11_GPU_SHARED_DESKTOP=1"],
         available_test_modes=["CONTROL", "NATIVE_FULL_FRAME", "NATIVE_GPU_DESKTOP"],
+        native_desktop_mono_required=True,
         runtime_validation="UNTESTED", feature_ready=False)
     return {
         "dinput8.dll": game, "outrun-vr-host.exe": host,
@@ -161,6 +175,11 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
             "\nruntime=PreferD3D9Ex=true\n").encode("ascii"),
         "DX11_TEST_README.txt": (
             "DX11 NATIVE FULL GAME FRAME - EXPERIMENTAL TEST\n"
+            "Native DX11 desktop runs enforce -Stereo=false. R30 live\n"
+            "VB/IB observers and mono native publication are disabled\n"
+            "when original VR StereoWanted=true. This is NOT an HMD\n"
+            "stereo acceptance test. The DX9Ex control is unchanged.\n"
+            "Logs must prove Stereo: false before a native PASS.\n"
             "Extract all files beside your OWN OR2006C2C.EXE (not bundled).\n"
             "RUN_DX9EX_CONTROL.cmd: stock D3D9/DX9Ex reference, native OFF.\n"
             "RUN_DX11_FIRST_GAME_FRAME.cmd: CPU-copyback test.\n"
@@ -225,7 +244,9 @@ def verify(blob):
                 b'OUTRUN_DX11_FIRST_GAME_FRAME="' not in control or
                 b'DX11_NATIVE_EVIDENCE.txt' not in runner or
                 b'fullFrameModeObserved' not in runner or
-                b'gpuDesktopFrames -gt 0' not in runner):
+                b'gpuDesktopFrames -gt 0' not in runner or
+                b"$gameArgs += '-Stereo=false'" not in runner or
+                b'monoStereoObserved' not in runner):
             raise ValueError("native full-frame activation/evidence contract missing")
 
 
