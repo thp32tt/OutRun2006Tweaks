@@ -976,6 +976,10 @@ class UIScaling : public Hook
             RankMarkerSubScreenHudDepth == 0)
         {
             recoverViewPoint(RankMarkerProjectedInfo, true);
+            OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
+                OutRunVR::GameSemantic::ProjectedMarkerProbeStage::CalcCapture,
+                RankMarkerProjectedInfo.valid);
             static thread_local bool loggedOrdinalCalc = false;
             if (!loggedOrdinalCalc)
             {
@@ -996,7 +1000,13 @@ class UIScaling : public Hook
             }
         }
 		else if (returnAddress == Module::exe_ptr(0xBB6F5))
+		{
 			recoverViewPoint(RivalMarkerProjectedInfo, false);
+            OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
+                OutRunVR::GameSemantic::ProjectedMarkerProbeStage::CalcCapture,
+                RivalMarkerProjectedInfo.valid);
+		}
 
 		// TODO: OnlineArcade mode needs to add position here
 
@@ -1937,6 +1947,11 @@ class UIScaling : public Hook
 		}
         const bool projectedVehicleRank =
             scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+        if (RankMarkerSubScreenHudDepth == 0)
+            OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
+                OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Producer,
+                projectedAnchor.valid);
         const int anchorLiftY =
             OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
                 Settings::VREnabled, projectedVehicleRank);
@@ -2001,6 +2016,11 @@ class UIScaling : public Hook
         const int anchorLiftY =
             OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
                 Settings::VREnabled, projected);
+        if (!screenHud)
+            OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
+                OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Producer,
+                projectedAnchor.valid);
 		const auto scope = screenHud
 			? OutRunVR::GameSemantic::RenderScope::ScreenHud
 			: (projected
@@ -2163,6 +2183,10 @@ class UIScaling : public Hook
 		const auto projectedAnchor = RivalMarkerProjectedInfo;
 		RivalMarkerProjectedInfo = {};
 		const bool projected = projectedAnchor.valid;
+        OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+            OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
+            OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Producer,
+            projected);
 		const auto scope = projected
 			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;

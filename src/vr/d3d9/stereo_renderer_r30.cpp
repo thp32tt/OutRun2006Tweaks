@@ -4259,14 +4259,93 @@ namespace OutRunVRStereo
             if (OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
                     OutRunVR::GameSemantic::EffectiveScope()))
             {
+                const auto markerProducer =
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken();
                 const bool vehicleRankDepth =
                     OutRunVR::GameSemantic::ProjectedMarkerOwnsVehicleDepth(
-                        OutRunVR::GameSemantic::CurrentRenderProducerToken());
+                        markerProducer);
                 if (!haveBaseProjection ||
                     !R30BuildProjectedRankDelta(
                         state.stereo, baseProjection, state.projectedRank,
                         vehicleRankDepth))
                     return false;
+
+                const bool physicalXyzrhw =
+                    source != nullptr && vertexCount != 0u && stride != 0u;
+                if (physicalXyzrhw)
+                    OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                        markerProducer,
+                        OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Xyzrhw,
+                        true);
+
+                // Evaluate alternative depth math as a shadow route only.
+                // The actual draw remains the HMD-proven rival-style XY path.
+                if (Settings::VRTelemetry)
+                {
+                    OutRunVR::RankMarker::StereoNdcShift depthShadow{};
+                    const bool physicalDepthShadow =
+                        R30BuildProjectedRankDelta(
+                            state.stereo, baseProjection, depthShadow, true);
+                    const auto snapshot =
+                        OutRunVR::GameSemantic::
+                            CaptureProjectedMarkerProbeSnapshot();
+                    const auto idx = [](auto stage) {
+                        return static_cast<std::size_t>(stage);
+                    };
+                    const bool rank =
+                        OutRunVR::GameSemantic::IsRankMarkerProbeProducer(
+                            markerProducer);
+                    const auto& events = rank
+                        ? snapshot.rankEvents : snapshot.rivalEvents;
+                    const auto& valids = rank
+                        ? snapshot.rankValid : snapshot.rivalValid;
+                    const auto cv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::CalcCapture);
+                    const auto pv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::Producer);
+                    const auto nv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::NativeSprite);
+                    const auto qv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::Queue);
+                    const auto xv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::Xyzrhw);
+                    const auto fv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::FixedFn142);
+                    const auto sv = idx(
+                        OutRunVR::GameSemantic::
+                            ProjectedMarkerProbeStage::ShaderC64);
+                    const auto routeEvents =
+                        events[xv] + events[fv] + events[sv];
+                    if (routeEvents < 8u || (routeEvents != 0u &&
+                        (routeEvents & (routeEvents - 1u)) == 0u))
+                    {
+                        const auto* marker =
+                            OutRunVR::GameSemantic::CurrentProjectedMarker();
+                        spdlog::info(
+                            "VR MARKER ROUTE MATRIX: producer={} physical={} "
+                            "A_xy=1 B_depth_shadow={} C_worldbillboard_if_missing={} "
+                            "calc={}/{} producerStage={}/{} native={}/{} queue={}/{} "
+                            "routes[x={},f142={},c64={}] view=({:.4f},{:.4f},{:.4f})",
+                            rank ? "RANK" : "RIVAL",
+                            physicalXyzrhw ? "XYZRHW" : "DEFERRED/FVF142",
+                            physicalDepthShadow ? 1 : 0,
+                            marker && marker->valid ? 0 : 1,
+                            valids[cv], events[cv],
+                            valids[pv], events[pv],
+                            valids[nv], events[nv],
+                            valids[qv], events[qv],
+                            events[xv], events[fv], events[sv],
+                            marker ? marker->viewX : 0.0f,
+                            marker ? marker->viewY : 0.0f,
+                            marker ? marker->viewZ : 0.0f);
+                    }
+                }
                 state.projectedWorldMarker = true;
                 state.projectedVehicleRankDepth = vehicleRankDepth;
                 state.worldEffect = false;
@@ -6848,6 +6927,11 @@ namespace OutRunVRStereo
                     projected, marker && marker->valid, exactHud,
                     pauseOverlay, true, fvf, true, true))
                 return E_NOTIMPL;
+            if (projected)
+                OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken(),
+                    OutRunVR::GameSemantic::ProjectedMarkerProbeStage::FixedFn142,
+                    marker && marker->valid);
 
             R30XyzrhwState state{};
             if (!R29OwnerEnsureStereoResources(device) ||
@@ -7504,6 +7588,10 @@ namespace OutRunVRStereo
                 if (!R30BuildProjectedRankDelta(
                         stereo, baseProjection, shift, vehicleRankDepth))
                     return false;
+                OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken(),
+                    OutRunVR::GameSemantic::ProjectedMarkerProbeStage::ShaderC64,
+                    true);
                 const float requestedScale = Settings::VRHudScale.get();
                 if (!std::isfinite(requestedScale))
                     return false;

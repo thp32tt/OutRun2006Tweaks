@@ -110,6 +110,91 @@ namespace OutRunVR::GameSemantic
     static_assert(!ProjectedMarkerOwnsVehicleDepth(
         ProducerToken::RivalMarkerSprani));
 
+    // Diagnostic-only route matrix for one HMD run. Every stage is observed
+    // independently while the actual renderer keeps the proven rival-style
+    // XY-only binocular policy. No probe counter grants render ownership.
+    enum class ProjectedMarkerProbeStage : std::uint8_t
+    {
+        CalcCapture = 0,
+        Producer,
+        NativeSprite,
+        Queue,
+        Xyzrhw,
+        FixedFn142,
+        ShaderC64,
+        Count
+    };
+    inline constexpr std::size_t ProjectedMarkerProbeStageCount =
+        static_cast<std::size_t>(ProjectedMarkerProbeStage::Count);
+    inline std::array<std::atomic<std::uint64_t>,
+        ProjectedMarkerProbeStageCount> ProjectedMarkerProbeRankEvents{};
+    inline std::array<std::atomic<std::uint64_t>,
+        ProjectedMarkerProbeStageCount> ProjectedMarkerProbeRankValid{};
+    inline std::array<std::atomic<std::uint64_t>,
+        ProjectedMarkerProbeStageCount> ProjectedMarkerProbeRivalEvents{};
+    inline std::array<std::atomic<std::uint64_t>,
+        ProjectedMarkerProbeStageCount> ProjectedMarkerProbeRivalValid{};
+
+    inline constexpr bool IsRankMarkerProbeProducer(
+        ProducerToken producer) noexcept
+    {
+        return producer == ProducerToken::RankMarkerSprani ||
+            producer == ProducerToken::RankMarkerClipSprite;
+    }
+    inline constexpr bool IsRivalMarkerProbeProducer(
+        ProducerToken producer) noexcept
+    {
+        return producer == ProducerToken::RivalMarkerSprani;
+    }
+
+    inline void NoteProjectedMarkerProbe(
+        ProducerToken producer, ProjectedMarkerProbeStage stage,
+        bool valid) noexcept
+    {
+        const auto i = static_cast<std::size_t>(stage);
+        if (i >= ProjectedMarkerProbeStageCount)
+            return;
+        auto* events = IsRankMarkerProbeProducer(producer)
+            ? &ProjectedMarkerProbeRankEvents
+            : (IsRivalMarkerProbeProducer(producer)
+                ? &ProjectedMarkerProbeRivalEvents : nullptr);
+        auto* valids = IsRankMarkerProbeProducer(producer)
+            ? &ProjectedMarkerProbeRankValid
+            : (IsRivalMarkerProbeProducer(producer)
+                ? &ProjectedMarkerProbeRivalValid : nullptr);
+        if (!events || !valids)
+            return;
+        (*events)[i].fetch_add(1, std::memory_order_relaxed);
+        if (valid)
+            (*valids)[i].fetch_add(1, std::memory_order_relaxed);
+    }
+
+    struct ProjectedMarkerProbeSnapshot final
+    {
+        std::array<std::uint64_t, ProjectedMarkerProbeStageCount> rankEvents{};
+        std::array<std::uint64_t, ProjectedMarkerProbeStageCount> rankValid{};
+        std::array<std::uint64_t, ProjectedMarkerProbeStageCount> rivalEvents{};
+        std::array<std::uint64_t, ProjectedMarkerProbeStageCount> rivalValid{};
+    };
+
+    inline ProjectedMarkerProbeSnapshot
+        CaptureProjectedMarkerProbeSnapshot() noexcept
+    {
+        ProjectedMarkerProbeSnapshot out{};
+        for (std::size_t i = 0; i < ProjectedMarkerProbeStageCount; ++i)
+        {
+            out.rankEvents[i] =
+                ProjectedMarkerProbeRankEvents[i].load(std::memory_order_relaxed);
+            out.rankValid[i] =
+                ProjectedMarkerProbeRankValid[i].load(std::memory_order_relaxed);
+            out.rivalEvents[i] =
+                ProjectedMarkerProbeRivalEvents[i].load(std::memory_order_relaxed);
+            out.rivalValid[i] =
+                ProjectedMarkerProbeRivalValid[i].load(std::memory_order_relaxed);
+        }
+        return out;
+    }
+
     // The GOAL 0-99% progress, its two exact time helpers and the three
     // verified stage-result printf parents have the SAME physical XYZRHW
     // submission risk as +TIME: the source may finish before D3DX Flush.
@@ -1738,6 +1823,13 @@ namespace OutRunVR::GameSemantic
                          CurrentScope == RenderScope::WorldBillboard ||
                          CurrentScope == RenderScope::ProjectedWorldMarker2D))
             CurrentQueueExactScope = CurrentScope;
+        if (CurrentScope == RenderScope::ProjectedWorldMarker2D &&
+            (IsRankMarkerProbeProducer(CurrentSpriteQueueProducer) ||
+             IsRivalMarkerProbeProducer(CurrentSpriteQueueProducer)))
+            NoteProjectedMarkerProbe(
+                CurrentSpriteQueueProducer,
+                ProjectedMarkerProbeStage::Queue,
+                CurrentQueueProjectedMarker.valid);
     }
 
     inline void EndSpriteQueueRender() noexcept

@@ -1047,6 +1047,10 @@ class TextureReplacement : public Hook
 				OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
 			producer = projectedProducer;
 			projectedMarker = &sourceBefore.projectedMarker;
+            OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
+                producer,
+                OutRunVR::GameSemantic::ProjectedMarkerProbeStage::NativeSprite,
+                sourceBefore.projectedMarker.valid);
 		}
 		else
 		{
