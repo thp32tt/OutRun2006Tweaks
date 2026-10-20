@@ -45,3 +45,15 @@ At the time of this audit, A/B had completed 155 of the 160 currently approved R
 5. Keep C1 independent QA and DDS/game approval separate.
 
 An empty A/B queue or `EDGE_REVIEW_COMPLETE pending_after=0` must not be reported as total localization completion while the coverage backlog above remains.
+
+
+## Source-variant occurrence recount — 2026-10-21
+
+The earlier 795 figure was a conservative lower bound based on unique Q+English pairs plus already-located crop instances. A source-variant-aware recount against all 108 verified HD PNG rows gives the operational crop target used by the new C worker:
+
+- reviewed phrase occurrences across the 108 actual source variants: **992**
+- occurrences with an existing HD108 crop manifest at recount time: **225**
+- occurrences still without a crop: **767**
+- source PNGs still containing at least one uncovered reviewed phrase: **103 / 108**
+
+This source-variant occurrence count is the production coverage denominator for C. Repeated Q groups across BASE/Keyboard/PlayStation/Switch/Xbox are separate source occurrences and must each reach crop coverage. C must continue cycling until `pending_phrases=0` and edge backlog is also zero. A one-time source `SCANNED` receipt is not completion.
