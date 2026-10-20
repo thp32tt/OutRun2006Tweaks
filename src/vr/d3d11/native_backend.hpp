@@ -4790,6 +4790,9 @@ struct NativeLiveSm3Program {
     // Stage-specific D3D9 device i# registers actually used by live REP.
     std::uint16_t vertexIntegerMask{};
     std::uint16_t pixelIntegerMask{};
+    // Subset of live i# users requiring complete LOOP x/y/z/w validation.
+    std::uint16_t vertexLoopIntegerMask{};
+    std::uint16_t pixelLoopIntegerMask{};
     [[nodiscard]] bool ready() const noexcept {
         return vertexShader && pixelShader && !vertexBytecode.empty();
     }

@@ -100,6 +100,8 @@ jobs:
           python tools/test_dx11_sm3_scalar_branch_modifiers_00956.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_interface_channels_probe_00957.cpp -o /tmp/dx11_sm3_channels_00957 && /tmp/dx11_sm3_channels_00957
           python tools/test_dx11_sm3_interface_channels_00957.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc/vr/d3d11 tools/dx11_sm3_loop_index_probe_00958.cpp -o /tmp/dx11_sm3_loop_00958 && /tmp/dx11_sm3_loop_00958
+          python tools/test_dx11_sm3_loop_index_00958.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model

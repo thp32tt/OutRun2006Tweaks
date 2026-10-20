@@ -35,6 +35,38 @@ namespace outrun::vr::dx11 {
     return true;
 }
 
+// D3D9 loop i#.x/y/z controls count/start/stride, not REP's count-only i#.x.
+// This translation deliberately limits native work to 16 iterations; larger
+// game loops continue on the authoritative D3D9 renderer.
+[[nodiscard]] inline bool native_sm3_static_loop_parameters(
+    const std::array<std::uint32_t, 4>& words,
+    unsigned& count, int& start, int& stride) noexcept {
+    const auto initial = static_cast<std::int32_t>(words[1]);
+    const auto step = static_cast<std::int32_t>(words[2]);
+    if (words[0] < 1u || words[0] > 16u || initial < 0 ||
+        initial > 255 || step < -128 || step > 127 || words[3] != 0u)
+        return false;
+    const int last = initial + (static_cast<int>(words[0]) - 1) * step;
+    if (last < 0 || last > 255) return false;
+    count = words[0]; start = initial; stride = step;
+    return true;
+}
+[[nodiscard]] inline bool native_sm3_live_loop_payload_valid(
+    const std::array<int, 16u * 4u>& values,
+    std::uint16_t loopMask) noexcept {
+    for (unsigned i = 0; i < 16u; ++i) {
+        if ((loopMask & (1u << i)) == 0u) continue;
+        const int count = values[4u * i], start = values[4u * i + 1u],
+                  stride = values[4u * i + 2u];
+        if (count < 1 || count > 16 || start < 0 || start > 255 ||
+            stride < -128 || stride > 127 || values[4u * i + 3u] != 0)
+            return false;
+        const int last = start + (count - 1) * stride;
+        if (last < 0 || last > 255) return false;
+    }
+    return true;
+}
+
 class NativeSm3StructuredFlow {
 public:
     bool begin_if() {
@@ -61,7 +93,7 @@ public:
             return false;
         unsigned copies = count;
         for (const Frame& frame : frames_) {
-            if (frame.kind != 2u) continue;
+            if (frame.kind != 2u && frame.kind != 3u) continue;
             if (copies > 64u / frame.count) return false;
             copies *= frame.count;
         }
@@ -92,9 +124,32 @@ public:
         return true;
     }
 
+    // LOOP and REP share the strict nested-work budget and conservative
+    // register-provenance merge; LOOP additionally owns an aL scope.
+    bool begin_loop(unsigned count, const Temps& temps,
+                    const Outputs& outputs, bool dynamic) {
+        if (!begin_repeat(count, temps, outputs)) return false;
+        frames_.back().kind = 3u;
+        frames_.back().hasBreak = dynamic;
+        return true;
+    }
+    bool end_loop(Temps& temps, Outputs& outputs) noexcept {
+        if (frames_.empty() || frames_.back().kind != 3u ||
+            !frames_.back().tracksWrites) return false;
+        const Frame frame = frames_.back();
+        if (frame.hasBreak) {
+            for (unsigned i = 0; i < temps.size(); ++i)
+                temps[i] &= frame.entryTemps[i];
+            for (unsigned i = 0; i < outputs.size(); ++i)
+                outputs[i] &= frame.entryOutputs[i];
+        }
+        frames_.pop_back();
+        return true;
+    }
+
     bool record_break() noexcept {
         for (auto it = frames_.rbegin(); it != frames_.rend(); ++it) {
-            if (it->kind == 2u) {
+            if (it->kind == 2u || it->kind == 3u) {
                 if (!it->tracksWrites) return false;
                 it->hasBreak = true;
                 return true;
@@ -155,6 +210,25 @@ inline bool append_native_sm3_live_repeat_begin(
     const std::string index = "r283_repeat_" + std::to_string(ordinal);
     translated += "    [loop] for (int " + index + " = 0; " + index +
                   " < r283_i[" + std::to_string(reg) + "].x; ++" + index + ") {\n";
+    return true;
+}
+
+inline bool append_native_sm3_loop_begin(
+    std::string& translated, unsigned ordinal, unsigned count,
+    int start, int stride, bool dynamic, unsigned registerIndex) {
+    if (ordinal >= 512u || count < 1u || count > 16u ||
+        (dynamic && registerIndex >= 16u)) return false;
+    const auto index = "r283_loop_" + std::to_string(ordinal);
+    const auto limit = dynamic ? "r283_i[" + std::to_string(registerIndex) + "].x"
+                               : std::to_string(count);
+    const auto first = dynamic ? "r283_i[" + std::to_string(registerIndex) + "].y"
+                               : std::to_string(start);
+    const auto step = dynamic ? "r283_i[" + std::to_string(registerIndex) + "].z"
+                              : std::to_string(stride);
+    translated += "    [loop] for (int " + index + " = 0; " + index +
+                  " < " + limit + "; ++" + index + ") {\n";
+    translated += "        int r283_aL = " + first + " + " + index +
+                  " * (" + step + ");\n";
     return true;
 }
 

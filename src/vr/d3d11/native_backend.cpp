@@ -378,12 +378,14 @@ bool build_r283_sm3_mov_shader_source(
             unsigned destinationShift{};
             // Flow instructions are source operations, not synthetic register writes.
             // 1=IF, 2=ELSE, 3=ENDIF, 4=REP, 5=ENDREP,
-            // 6=BREAK, 7=BREAKC, 8=SETP, 9=BREAKP.
+            // 6=BREAK, 7=BREAKC, 8=SETP, 9=BREAKP, 10=LOOP, 11=ENDLOOP.
             // Native emitter preserves executable shader instruction order.
             unsigned flowKind{};
             std::string flowCondition;
             unsigned repeatCount{};
             bool repeatDynamic{};
+            int loopStart{};
+            int loopStride{};
             unsigned repeatRegister{};
             bool sineCosine{};
             bool signScratch{};
@@ -414,6 +416,9 @@ bool build_r283_sm3_mov_shader_source(
         NativeSm3ConditionalFlow writtenFlow;
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
+        // D3D9 aL always denotes the innermost LOOP, never REP.
+        struct LoopRange { bool dynamic; int minimum; int maximum; };
+        std::vector<LoopRange> loopRanges;
         bool predicateUsed = false;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
@@ -761,6 +766,61 @@ bool build_r283_sm3_mov_shader_source(
                 operations.push_back(std::move(loop));
                 continue;
             }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_LOOP)) {
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    instruction.operandTokens.size() != 2u ||
+                    operations.size() >= kMaxOps || loopRanges.size() >= 8u)
+                    return false;
+                const DWORD counter = instruction.operandTokens[0];
+                const DWORD source = instruction.operandTokens[1];
+                const unsigned reg = source & D3DSP_REGNUM_MASK;
+                const unsigned swizzle = (source & D3DSP_SWIZZLE_MASK) >> 16u;
+                if ((counter & 0x80000000u) == 0u ||
+                    r283_decode_register_type(counter) != D3DSPR_LOOP ||
+                    (counter & D3DSP_REGNUM_MASK) != 0u ||
+                    (counter & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    (source & 0x80000000u) == 0u ||
+                    r283_decode_register_type(source) != D3DSPR_CONSTINT ||
+                    (source & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    ((source & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) != D3DSPSM_NONE ||
+                    (swizzle != 0xe4u && swizzle != 0u) ||
+                    reg >= intDefPresent.size())
+                    return false;
+                const bool dynamic = !intDefPresent[reg];
+                unsigned count = 16u;
+                int first = 0, step = 1;
+                if ((!dynamic && !native_sm3_static_loop_parameters(
+                         intDefBits[reg], count, first, step)) ||
+                    !structuredFlow.begin_loop(count, tempWritten, outputWritten, dynamic) ||
+                    !predicateFlow.begin_repeat())
+                    return false;
+                const int last = first + (static_cast<int>(count) - 1) * step;
+                loopRanges.push_back({dynamic, first < last ? first : last,
+                                      first > last ? first : last});
+                Operation loop{};
+                loop.flowKind = 10u;
+                loop.repeatCount = count;
+                loop.repeatRegister = reg;
+                loop.repeatDynamic = dynamic;
+                loop.loopStart = first;
+                loop.loopStride = step;
+                if (dynamic) liveIntegersUsed = true;
+                operations.push_back(std::move(loop));
+                continue;
+            }
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_ENDLOOP)) {
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    !instruction.operandTokens.empty() || loopRanges.empty() ||
+                    operations.size() >= kMaxOps ||
+                    !structuredFlow.end_loop(tempWritten, outputWritten) ||
+                    !predicateFlow.end_repeat())
+                    return false;
+                loopRanges.pop_back();
+                Operation loop{};
+                loop.flowKind = 11u;
+                operations.push_back(std::move(loop));
+                continue;
+            }
             NativeSm3ArithmeticOpcode opcode{};
             unsigned sourceCount = 0u;
             switch (instruction.opcode) {
@@ -875,8 +935,10 @@ bool build_r283_sm3_mov_shader_source(
                 (instruction.instructionToken & 0x10000000u) != 0u;
             if (operations.size() >= kMaxOps ||
                 (instruction.instructionToken & 0xe0000000u) != 0u ||
-                instruction.operandTokens.size() !=
-                    sourceCount + 1u + (sourcePredicated ? 1u : 0u))
+                instruction.operandTokens.size() <
+                    sourceCount + 1u + (sourcePredicated ? 1u : 0u) ||
+                instruction.operandTokens.size() >
+                    sourceCount * 2u + 1u + (sourcePredicated ? 1u : 0u))
                 return false;
             const DWORD destination = instruction.operandTokens[0];
             const unsigned mask =
@@ -1002,12 +1064,35 @@ bool build_r283_sm3_mov_shader_source(
                 return false;
             }
 
+            std::size_t operandCursor = 1u;
             for (unsigned i = 0; i < sourceCount; ++i) {
-                const DWORD token = instruction.operandTokens[i + 1u];
-                if ((token & 0x80000000u) == 0u ||
-                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u)
+                if (operandCursor >= instruction.operandTokens.size() -
+                                         (sourcePredicated ? 1u : 0u))
                     return false;
+                const DWORD token = instruction.operandTokens[operandCursor++];
+                const bool relative =
+                    (token & D3DSHADER_ADDRESSMODE_MASK) != 0u;
+                if ((token & 0x80000000u) == 0u) return false;
+                if (relative) {
+                    if (operandCursor >= instruction.operandTokens.size() -
+                                             (sourcePredicated ? 1u : 0u) ||
+                        loopRanges.empty() || loopRanges.back().dynamic)
+                        return false;
+                    const DWORD address = instruction.operandTokens[operandCursor++];
+                    const unsigned addrSwizzle =
+                        (address & D3DSP_SWIZZLE_MASK) >> 16u;
+                    if ((address & 0x80000000u) == 0u ||
+                        r283_decode_register_type(address) != D3DSPR_LOOP ||
+                        (address & D3DSP_REGNUM_MASK) != 0u ||
+                        (address & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                        ((address & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) != D3DSPSM_NONE ||
+                        (addrSwizzle != 0u && addrSwizzle != 0xe4u))
+                        return false;
+                }
                 const auto kind = r283_decode_register_type(token);
+                // Relative source operands are supported only for bounded c#
+                // references from an authentic innermost D3D9 LOOP aL.
+                if (relative && kind != D3DSPR_CONST) return false;
                 const UINT reg = static_cast<UINT>(token & D3DSP_REGNUM_MASK);
                 const unsigned swizzle =
                     static_cast<unsigned>((token & D3DSP_SWIZZLE_MASK) >> 16u);
@@ -1017,6 +1102,9 @@ bool build_r283_sm3_mov_shader_source(
                 if (modifier == D3DSPSM_NOT)
                     return false;
                 std::string value;
+                if (relative && (op.matrixRowCount != 0u ||
+                                 (op.texture2d && i == 1u)))
+                    return false;
                 if (op.texture2d && i == 1u) {
                     // SM3 TEXLD's second source is a sampler, not an
                     // arithmetic vector. A mismatched/undeclared texture
@@ -1088,10 +1176,24 @@ bool build_r283_sm3_mov_shader_source(
                         return false;
                     value = "input.r" + std::to_string(reg);
                 } else if (kind == D3DSPR_CONST) {
-                    if (!native_sm3_const_reference(
-                            reg, constantLimit, defPresent[reg], value))
-                        return false;
-                    if (!defPresent[reg]) liveConstantsUsed = true;
+                    if (relative) {
+                        const auto& range = loopRanges.back();
+                        const int low = static_cast<int>(reg) + range.minimum;
+                        const int high = static_cast<int>(reg) + range.maximum;
+                        if (low < 0 || high >= static_cast<int>(constantLimit))
+                            return false;
+                        // HLSL constant-buffer arrays cannot silently bypass
+                        // source-owned DEF values inside an indexed span.
+                        for (int k = low; k <= high; ++k)
+                            if (defPresent[static_cast<unsigned>(k)]) return false;
+                        value = "r283_c[" + std::to_string(reg) + " + r283_aL]";
+                        liveConstantsUsed = true;
+                    } else {
+                        if (!native_sm3_const_reference(
+                                reg, constantLimit, defPresent[reg], value))
+                            return false;
+                        if (!defPresent[reg]) liveConstantsUsed = true;
+                    }
                 } else if (kind == D3DSPR_TEMP) {
                     if (reg >= tempWritten.size()) return false;
                     if (op.signScratch && i == 0u) op.signInputTemp = reg;
@@ -1131,6 +1233,10 @@ bool build_r283_sm3_mov_shader_source(
                     return false;
                 op.sources[i] = std::move(value);
             }
+
+            if (operandCursor != instruction.operandTokens.size() -
+                                     (sourcePredicated ? 1u : 0u))
+                return false;
 
             // A conditional draw-time instruction cannot initialize a
             // previously undefined game register. HLSL's zero-initialized
@@ -1230,7 +1336,8 @@ bool build_r283_sm3_mov_shader_source(
                     translated += "    if (" + op.flowCondition + ") {\n";
                 else if (op.flowKind == 2u)
                     translated += "    } else {\n";
-                else if (op.flowKind == 3u || op.flowKind == 5u)
+                else if (op.flowKind == 3u || op.flowKind == 5u ||
+                         op.flowKind == 11u)
                     translated += "    }\n";
                 else if (op.flowKind == 4u) {
                     if (!(op.repeatDynamic
@@ -1240,6 +1347,12 @@ bool build_r283_sm3_mov_shader_source(
                               : append_native_sm3_repeat_begin(
                                     translated, op.repeatCount,
                                     static_cast<unsigned>(i))))
+                        return false;
+                } else if (op.flowKind == 10u) {
+                    if (!append_native_sm3_loop_begin(
+                            translated, static_cast<unsigned>(i),
+                            op.repeatCount, op.loopStart, op.loopStride,
+                            op.repeatDynamic, op.repeatRegister))
                         return false;
                 } else if (op.flowKind == 6u || op.flowKind == 7u) {
                     if (!append_native_sm3_break(
@@ -1880,6 +1993,11 @@ bool compile_native_live_sm3_program(
                 candidate.vertexIntegerMask |= static_cast<std::uint16_t>(1u << slot);
             if (pixelHlsl.find(operand) != std::string::npos)
                 candidate.pixelIntegerMask |= static_cast<std::uint16_t>(1u << slot);
+            const auto loopOperand = "r283_i[" + std::to_string(slot) + "].y";
+            if (vertexHlsl.find(loopOperand) != std::string::npos)
+                candidate.vertexLoopIntegerMask |= static_cast<std::uint16_t>(1u << slot);
+            if (pixelHlsl.find(loopOperand) != std::string::npos)
+                candidate.pixelLoopIntegerMask |= static_cast<std::uint16_t>(1u << slot);
         }
         for (unsigned slot = 0; slot < 16u; ++slot) {
             const auto symbol = "r283_texture" + std::to_string(slot) +
