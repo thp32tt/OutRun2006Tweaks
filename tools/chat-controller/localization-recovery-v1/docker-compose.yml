@@ -33,7 +33,7 @@ services:
       OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
       OUTRUN_AB_PROJECT_NAME: "아웃런 한글화 신규"
       OUTRUN_LIBRARY_MAX_SCAN: "500" # Library grows during long unattended production; keep SHA gate, scan deeper.
-      OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
+      OUTRUN_LIBRARY_VERIFY_SECONDS: "90" # Never let one Library scan block later A/B/C1 schedule slots.\n      OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
