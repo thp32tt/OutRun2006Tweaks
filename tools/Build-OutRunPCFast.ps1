@@ -288,6 +288,17 @@ if (-not [string]::IsNullOrWhiteSpace($env:OUTRUN_TEST_DROP_ROOT)) {
     }
     $dropRoot = Join-Path $desktop 'OutRunTestBuilds'
 }
+# Never publish an older queued build over the newest test folder.
+# The runner checkout stays pinned to ExpectedSha; also verify the GitHub
+# branch tip *at publication time*, after all expensive compilation is done.
+if ($ExpectedSha) {
+    $remote = @(git ls-remote --heads origin refs/heads/vr-d3d9ex-focus)
+    if ($LASTEXITCODE -ne 0 -or $remote.Count -ne 1) { throw 'PC Fast cannot verify branch tip before publication' }
+    $remoteSha = ($remote[0] -split '\s+')[0]
+    if ($remoteSha -ne $ExpectedSha) {
+        throw "PC Fast stale build blocked before LATEST publication: expected=$ExpectedSha remote=$remoteSha"
+    }
+}
 $latestDrop = Join-Path $dropRoot 'LATEST'
 New-Item -ItemType Directory -Force $dropRoot | Out-Null
 if (Test-Path $latestDrop) { Remove-Item $latestDrop -Recurse -Force }

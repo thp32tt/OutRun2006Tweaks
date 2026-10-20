@@ -53,8 +53,14 @@ jobs:
         run: |
           $checkedOut = (git rev-parse HEAD).Trim()
           $triggerSha = '${{ github.sha }}'
-          if ($checkedOut -ne $triggerSha) {
-            Write-Host "Queued trigger $triggerSha is stale; current vr-d3d9ex-focus is $checkedOut."
+          if ($checkedOut -ne $triggerSha) { throw "PC Fast checkout drift: expected=$triggerSha actual=$checkedOut" }
+          # SHA-pinned checkout alone is insufficient. An older queued push
+          # must not overwrite LATEST after a newer branch commit.
+          $remote = @(git ls-remote --heads origin refs/heads/vr-d3d9ex-focus)
+          if ($LASTEXITCODE -ne 0 -or $remote.Count -ne 1) { throw 'PC Fast cannot verify current remote branch HEAD' }
+          $currentSha = ($remote[0] -split '\s+')[0]
+          if ($currentSha -ne $triggerSha) {
+            Write-Host "PC Fast stale push skipped: trigger=$triggerSha remote=$currentSha"
             "OUTRUN_PC_STALE=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           }
 
