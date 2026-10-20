@@ -2453,7 +2453,7 @@ async def conversion_send_lane_task(
         return False
 
     contract = None
-    if VR_FEATURE_DEVELOPMENT_ENABLED and not VR_CONTINUOUS_30M_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
+    if VR_FEATURE_DEVELOPMENT_ENABLED and not VR_CONTINUOUS_30M_ENABLED and target["lane"] == "DX11":
         try:
             contract = github_feature_contract(target["lane"], q)
         except Exception as exc:
@@ -2532,7 +2532,7 @@ async def conversion_send_lane_task(
     }
     event = append_task_event(reg, draft, "dispatch")
     feature_branch = None
-    if VR_FEATURE_DEVELOPMENT_ENABLED and not VR_CONTINUOUS_30M_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
+    if VR_FEATURE_DEVELOPMENT_ENABLED and not VR_CONTINUOUS_30M_ENABLED and target["lane"] == "DX11":
         try:
             feature_branch = await asyncio.to_thread(
                 github_create_feature_branch, target["lane"], production_id, base_sha
@@ -2729,6 +2729,90 @@ async def conversion_repair_ready_blocker(context, pages, active: dict) -> bool:
     return False
 
 
+def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, now: datetime) -> bool:
+    """Accept DX9Ex automation only when the durable task commit is review-docs-only.
+
+    REVIEW_ONLY intentionally bypasses DX9Ex Active Validation because that workflow
+    is source-path filtered. A C task is terminal only when its own TASK_ID document
+    exists and the commit changes no path outside the dedicated review directory.
+    """
+    if not DX9EX_REVIEW_ONLY or active.get("lane") != "DX9EX":
+        return False
+
+    task_id = str(active.get("task_id") or "")
+    result_sha = str(task_commit.get("sha") or "")
+    expected_path = f"docs/reviews/dx9ex/automation/{task_id}.md"
+    try:
+        payload = github_api_json(f"/repos/{GITHUB_REPO}/commits/{result_sha}")
+        changed_paths = [
+            str(item.get("filename") or "")
+            for item in (payload.get("files") or [])
+            if isinstance(item, dict)
+        ]
+    except Exception as exc:
+        write_runtime(
+            status="dx9ex_review_record_verify_deferred",
+            last_action=f"{task_id}: review-only commit verification deferred: {type(exc).__name__}",
+            queue=q,
+        )
+        return True
+
+    allowed_prefix = "docs/reviews/dx9ex/automation/"
+    forbidden_paths = [p for p in changed_paths if not p.startswith(allowed_prefix)]
+    if expected_path not in changed_paths or forbidden_paths:
+        reason = (
+            "DX9EX_REVIEW_ONLY_POLICY_VIOLATION: "
+            f"expected={expected_path}, changed={changed_paths}, forbidden={forbidden_paths}"
+        )
+        active.update(
+            result_sha=result_sha,
+            result_message=task_commit.get("message"),
+            review_only=True,
+            review_record_path=expected_path,
+            review_record_changed_paths=changed_paths,
+            failure_class="DX9EX_REVIEW_ONLY_POLICY",
+            failure_context=reason,
+            automation_validation="FAIL",
+            runtime_validation="UNTESTED",
+            blocked_at=now.isoformat(),
+            terminal="BLOCKED",
+            phase="DONE",
+        )
+        q["blocked"] = (q.get("blocked", []) + [dict(active)])[-100:]
+        save_queue_state(q)
+        write_runtime(
+            status="dx9ex_review_policy_blocked",
+            last_action=f"{task_id}: source/non-review change rejected; no automatic repair will be requested",
+            last_completed=dict(active),
+            queue=q,
+        )
+        return True
+
+    active.update(
+        result_sha=result_sha,
+        result_message=task_commit.get("message"),
+        review_only=True,
+        review_record_path=expected_path,
+        review_record_changed_paths=changed_paths,
+        validation_mode="DX9EX_REVIEW_RECORD_ONLY",
+        automation_validation="PASS",
+        runtime_validation="UNTESTED",
+        completed_at=now.isoformat(),
+        terminal_verification="DX9EX_REVIEW_DOCS_ONLY_PASS",
+        terminal="PASS",
+        phase="DONE",
+    )
+    q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+    save_queue_state(q)
+    write_runtime(
+        status="dx9ex_review_record_pass",
+        last_action=f"{task_id}: docs-only review record accepted; CODE_CHANGE=NO; next review may proceed",
+        last_completed=dict(active),
+        queue=q,
+    )
+    return True
+
+
 async def conversion_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -2779,6 +2863,8 @@ async def conversion_process_lane(
             if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
                 task_commit = None
             if task_commit:
+                if finalize_dx9ex_review_only_result(q, active, task_commit, now):
+                    return
                 active["result_sha"] = task_commit["sha"]
                 active["result_message"] = task_commit["message"]
                 active["phase"] = "WAIT_ACTIONS"
@@ -2860,6 +2946,8 @@ async def conversion_process_lane(
                 )
                 return
             else:
+                if finalize_dx9ex_review_only_result(q, active, task_commit, now):
+                    return
                 active["result_sha"] = task_commit["sha"]
                 active["result_message"] = task_commit["message"]
                 active["phase"] = "WAIT_ACTIONS"
@@ -3112,7 +3200,7 @@ def reconcile_conversion_lane_freeze(q: dict, active_by_lane: dict, now: datetim
             "frozen_reason": "DXVK frozen by user",
         })
         changed = True
-    if dx9ex_enabled and not only_slot and "C" not in active_by_lane:
+    if dx9ex_enabled and not DX9EX_REVIEW_ONLY and not only_slot and "C" not in active_by_lane:
         terminal_ids = {
             row.get("task_id")
             for group in ("completed", "blocked")
@@ -3236,8 +3324,7 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
     save_queue_state(q)
     write_runtime(
         status="vr_continuous_running",
-        last_action="Same-ID rollover and 70% implementation target; "
-                    "A(DX11)+C(DX9Ex), B(DXVK) frozen; active: " +
+        last_action="A(DX11 implementation)+C(DX9Ex REVIEW_ONLY), B(DXVK) frozen; active: " +
             ", ".join(f"{key}={x.get('task_id')}:{x.get('phase')}"
                       for key, x in sorted(active_by_lane.items())),
         vr_continuous_last_dispatch=q.get("vr_continuous_last_dispatch_at", {}),
@@ -3246,12 +3333,40 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
 
 
 async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Develop native DX11 and stabilize DX9Ex concurrently; freeze DXVK."""
+    """Develop native DX11 while DX9Ex performs review-only analysis; freeze DXVK."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reconcile_legacy_conversion_blocked(q)
     q = load_queue_state()
     active_by_lane = q.setdefault("active_by_lane", {})
+
+    if DX9EX_REVIEW_ONLY and int(q.get("dx9ex_review_only_policy_version", 0)) < 1:
+        retired = q.setdefault("retired_lane_tasks", [])
+        old_c = active_by_lane.pop("C", None)
+        if isinstance(old_c, dict):
+            retired.append({
+                **old_c,
+                "retired_lane": "C",
+                "retired_at": now.isoformat(),
+                "retired_reason": "2026-10-20 DX9Ex switched from source development to REVIEW_ONLY",
+            })
+        kept_frozen = []
+        for frozen_task in q.get("frozen_lane_tasks", []):
+            if (isinstance(frozen_task, dict)
+                    and frozen_task.get("frozen_lane") == "C"
+                    and frozen_task.get("phase") != "DONE"):
+                retired.append({
+                    **frozen_task,
+                    "retired_at": now.isoformat(),
+                    "retired_reason": "2026-10-20 DX9Ex REVIEW_ONLY; do not restore old source-development task",
+                })
+            else:
+                kept_frozen.append(frozen_task)
+        q["frozen_lane_tasks"] = kept_frozen[-100:]
+        q["retired_lane_tasks"] = retired[-100:]
+        q["dx9ex_review_only_policy_version"] = 1
+        q["dx9ex_review_only_policy_at"] = now.isoformat()
+        save_queue_state(q)
 
     if int(q.get("conversion_parallel_schema_version", 0)) < 1:
         stale = dict(active_by_lane)
@@ -3362,7 +3477,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
         return
 
     # Keep the previous two-worker architecture: A(DX11 implementation)
-    # + C(DX9Ex HUD/stability). B(DXVK) remains FROZEN.
+    # + C(DX9Ex REVIEW_ONLY analysis/docs). B(DXVK) remains FROZEN.
     # Capacity accounting includes ALL live tasks, including restored C.
     for lane_key in conversion_dispatch_plan(
         active_by_lane,
@@ -3376,7 +3491,7 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     write_runtime(
         status="conversion_parallel_running",
         last_action=(
-            "A(DX11 native) + C(DX9Ex stability); B(DXVK frozen); active: "
+            "A(DX11 native) + C(DX9Ex REVIEW_ONLY); B(DXVK frozen); active: "
             + ", ".join(
                 f"{key}={value.get('task_id')}:{value.get('phase')}"
                 for key, value in sorted(q.get("active_by_lane", {}).items())
