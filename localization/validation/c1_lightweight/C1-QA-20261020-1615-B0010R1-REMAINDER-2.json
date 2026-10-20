@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1615-B0010R1-REMAINDER-2",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T16:15:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "dedup": {
+    "previous_record": "localization/validation/c1_lightweight/C1-20261020-1545-A0004R1-B0010R1-UNIQUE8.json",
+    "prior_unreviewed_sha256": [
+      "3b836b7eb72df69e64427abafbc7e6a106836ac5e0b9ddccea7addf91ade1528",
+      "51e0fb322a9fadf2628ca5bf8ba30e0095577e8feccaee5c0d27a697a85f65dc"
+    ],
+    "new_reviewed_unique_count": 2,
+    "excluded_prior_8_sha": true
+  },
+  "cases": [
+    {
+      "producer": "B",
+      "source_ordinal": 46,
+      "file": "Q121_d7298abca9362259_source_k.png",
+      "candidate_sha256": "3b836b7eb72df69e64427abafbc7e6a106836ac5e0b9ddccea7addf91ade1528",
+      "source_roi": "Q121_d7298abca9362259_source.png",
+      "source_roi_sha256": "df8ecf651600b6874966cebce645793aafd1c2d7e4c0d43fb729e153e1a134bb",
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "OutRun2 Course",
+      "approved_korean": "아웃런2 코스",
+      "candidate_dimensions": [
+        2170,
+        725
+      ],
+      "source_dimensions": [
+        1834,
+        228
+      ],
+      "bbox_xyxy": [
+        141,
+        1375,
+        1058,
+        1489
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        170,
+        204,
+        2012,
+        521
+      ],
+      "border_alpha_pixels_at_1_16_32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "reviewed_translation_match": true,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "extra_background_or_protected_art": "NONE_OBSERVED",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "source_cell_placement": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "notes": "Native visual: gold fill, dark outer border, separate correct Hangul 아웃런2 코스, no clipped pixels. Shorter language line not a failure."
+    },
+    {
+      "producer": "B",
+      "source_ordinal": 47,
+      "file": "Q121_5d28b82190f1600a_source_k.png",
+      "candidate_sha256": "51e0fb322a9fadf2628ca5bf8ba30e0095577e8feccaee5c0d27a697a85f65dc",
+      "source_roi": "Q121_5d28b82190f1600a_source.png",
+      "source_roi_sha256": "dbb9ddf2769b20e9d7565c8c1e972ab6060f674f2f02668721893861ed468d28",
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "Select Course",
+      "approved_korean": "코스 선택",
+      "candidate_dimensions": [
+        2167,
+        726
+      ],
+      "source_dimensions": [
+        1522,
+        208
+      ],
+      "bbox_xyxy": [
+        342,
+        1115,
+        1103,
+        1219
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        399,
+        214,
+        1794,
+        513
+      ],
+      "border_alpha_pixels_at_1_16_32": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "reviewed_translation_match": true,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "extra_background_or_protected_art": "NONE_OBSERVED",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "source_cell_placement": "UNTESTED",
+      "library_binding": "UNVERIFIED",
+      "notes": "Native visual: white italic bold Korean with black shadow, correct 코스 선택, no stray original English or nontext art."
+    }
+  ],
+  "summary": {
+    "PASS_PNG_ONLY": 2,
+    "FAIL": 0,
+    "HOLD_PNG_VISUAL": 0,
+    "COMPOSITION_HOLD": 2,
+    "final_approval": 0
+  },
+  "source_evidence_warning": "Both producer exports REWORK_DIMENSIONS and ChatGPT Library binding UNVERIFIED; PNG-only visual PASS cannot become DDS/game pass.",
+  "evidence": [
+    "work/c1_batch_20261020_1615/metrics.json",
+    "work/c1_qa_20261020_1615_inspect.py",
+    "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0010-8F2213CF-R1.json"
+  ],
+  "boundary": {
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "dds_written": 0,
+    "C2_PASS": false,
+    "C3_PASS": false,
+    "user_ingame_PASS": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "AI": "AI 1",
+    "prior_confirmed": 1653,
+    "delta": 1,
+    "new_cumulative": 1654,
+    "condition": "Unique 2-SHA independent QA completed and published, not a 15:45 SHA retry"
+  }
+}
