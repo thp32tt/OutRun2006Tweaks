@@ -4,6 +4,7 @@ import asyncio
 import json
 import re
 from pathlib import Path
+from typing import Optional
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +20,9 @@ def isolated_function(name, *, async_function=False, review_only=True):
     ns = {
         "json": json,
         "re": re,
+        "Optional": Optional,
+        "BrowserContext": object,
+        "Page": object,
         "DX9EX_REVIEW_ONLY": review_only,
         "MAX_TASK_ATTEMPTS": 3,
         "CONTROLLER_MODE": "conversion",
