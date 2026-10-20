@@ -862,6 +862,45 @@ def queue_rollover_prompt(active: dict) -> str:
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
         "미완료 구현/실패 수리를 실제 소스·테스트 변경으로 진행하고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
     ]
+    if DX9EX_REVIEW_ONLY and lane == "DX9EX":
+        # The development/FEATURE_READY instructions above apply to DX11 only.
+        # A rollover must not resurrect source edits or the source-only Actions
+        # gate after the user switched DX9Ex automation to review-only.
+        lines = [
+            "[대화 자동 롤오버 재개 — DX9EX_REVIEW_ONLY]",
+            f"TASK_ID={active['task_id']}",
+            f"PRODUCTION_ID={active.get('production_id', active['task_id'])}",
+            f"EVENT_ID={active.get('event_id', '')}",
+            f"EVENT_TYPE={active.get('event_type', 'rollover')}",
+            f"LANE={lane}",
+            f"TARGET_BRANCH={active['branch']}",
+            f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
+            f"CHAT_ROLLOVER={rollover}",
+            "MODE=DX9EX_REVIEW_ONLY",
+            "CODE_CHANGE=FORBIDDEN",
+            "롤오버는 retry가 아니다. ATTEMPT와 PRODUCTION_ID를 증가시키지 마.",
+            "GitHub 최신 target HEAD와 해당 TASK_ID의 기존 리뷰 커밋 및 "
+            "docs/reviews/dx9ex/automation/<TASK_ID>.md를 먼저 확인해.",
+            "이미 review 문서가 [AUTO:TASK_ID] 커밋으로 대상 브랜치의 조상에 "
+            "있으면 동일 작업을 다시 검토하거나 커밋하지 마. 컨트롤러가 "
+            "docs-only 검증으로 완료 처리한다.",
+            "DX9Ex Active Validation은 소스 경로 기반 CI이므로 review-only "
+            "커밋에 실행되지 않는 것이 정상이다. CI 누락을 source 실패나 "
+            "retry 사유로 취급하지 마.",
+            "게임/런타임 C++/HLSL/CMake/CI/배포 소스 자동 수정, "
+            "FEATURE_READY/브랜치 승격/패키징을 금지한다.",
+            "아직 이 TASK_ID의 검토 문서가 없을 때만 R26+HUD를 기본으로 "
+            "실제 화면오류·최적화 자료와 코드 경로를 정적 분석하고 "
+            "PATCH_CANDIDATE_ONLY를 기록해.",
+            "문서 외 수정 없는 [AUTO:" + active['task_id'] +
+            "] 리뷰 커밋만 허용한다. Quest3 실기가 없다면 RUNTIME_VALIDATION=UNTESTED.",
+            "CHECKPOINT_BRANCH=" + VR_CHECKPOINT_BRANCH,
+            "CHECKPOINT_PATH=" + str(active.get("vr_checkpoint_last_path") or ""),
+            "CHECKPOINT_MODE=" + str(active.get("vr_checkpoint_fallback") or "GITHUB_VERIFIED"),
+            "BASE_SHA=" + str(active.get("base_sha") or ""),
+            "NEXT_ACTION=GitHub에서 기존 review commit 및 조상 관계를 확인하고 "
+            "미완료일 때만 문서 리뷰 수행. source-only CI 재시도 금지.",
+        ]
     if CONTROLLER_MODE == "conversion":
         lines = [GAME_MOD_CONTEXT, ""] + lines
     if str(active.get("lane", "")).upper() == "DX11":
@@ -1621,6 +1660,16 @@ async def recover_missing_gate_run(
     now: datetime,
 ) -> Optional[tuple[str, str]]:
     """Turn a missing required Actions run into a bounded repair instead of an infinite wait."""
+    if DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX":
+        # A review-only commit never triggers source-path-filtered DX9Ex CI.
+        # Reconcile the existing task-marker commit using the dedicated
+        # docs-only verifier without consuming a retry or fabricating PASS.
+        active["phase"] = "WAIT_CHAT"
+        active["validation_mode"] = "DX9EX_REVIEW_RECORD_ONLY"
+        active["last_gate_poll_at"] = None
+        active.pop("gate_run", None)
+        active.pop("missing_gate_run_reason", None)
+        return ("review_record_reconcile", "DX9Ex review-only: verify existing docs commit, not Active Validation")
     result_sha = str(active.get("result_sha") or "").strip()
     message = str(active.get("result_message") or "")
     if not message and result_sha:
@@ -3010,7 +3059,7 @@ async def conversion_process_lane(
             # verdict before polling a source-only workflow that never runs.
             if DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX":
                 review_commit = github_find_task_commit(active["branch"], active["task_id"])
-                if review_commit and review_commit.get("sha") == active.get("result_sha"):
+                if review_commit:
                     if finalize_dx9ex_review_only_result(q, active, review_commit, now):
                         return
             rebound = refresh_wait_actions_task_binding(
