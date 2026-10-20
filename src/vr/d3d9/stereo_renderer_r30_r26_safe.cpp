@@ -2428,6 +2428,11 @@ namespace OutRunVRStereo
             bool worldEvidenceAuthoritative = false;
         };
 
+        // Shared exact-result ownership is needed by both the shader HUD
+        // path and the fixed-function/XYZRHW path below. Declare it before
+        // the first consumer; unrelated HUD, menus and world effects retain R26.
+        bool R30IsExactResultHudDraw() noexcept;
+
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
@@ -4445,11 +4450,6 @@ namespace OutRunVRStereo
             vb->Release();
             return hr;
         }
-
-        // Shared exact-result ownership is needed by both the shader HUD
-        // path and the later fixed-function/XYZRHW path. Keep the predicate
-        // centralized so unrelated HUD, menus and world effects retain R26.
-        bool R30IsExactResultHudDraw() noexcept;
 
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
