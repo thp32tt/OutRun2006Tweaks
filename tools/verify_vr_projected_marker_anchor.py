@@ -10,6 +10,8 @@ R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
 R84 = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
 RANK_PHYSICAL = ROOT / "src/vr/game/rank_marker_physical_source.hpp"
 RANK_STEREO = ROOT / "src/vr/game/projected_rank_stereo.hpp"
+DIRECT_SPRITE = ROOT / "src/vr/game/direct_sprite_source_provenance.hpp"
+TEXTURES = ROOT / "src/hooks_textures.cpp"
 
 
 def fail(message: str) -> None:
@@ -52,6 +54,8 @@ r30 = read(R30)
 r84 = read(R84)
 rank_physical = read(RANK_PHYSICAL)
 rank_stereo = read(RANK_STEREO)
+direct_sprite = read(DIRECT_SPRITE)
+textures = read(TEXTURES)
 
 # Exact projected rank/rival markers must carry a recovered game-view anchor.
 for marker in (
@@ -928,5 +932,32 @@ mutated_owner = function_body(
     "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(")
 if "(void)producer;" in mutated_owner or "return false;" in mutated_owner:
     fail("projected marker rival-policy mutation did not alter depth gate")
+
+# Native put_sprite_ex/put_sprite_ex2 must preserve an exact projected
+# rank/rival parent instead of downgrading it to the broad BAD20 WorldBillboard
+# caller range and dropping the recovered vehicle anchor.
+for token in (
+    "GameSemantic::ProjectedMarkerInfo projectedMarker{};",
+    "ProvenProjectedVehicleMarkerProducer(",
+    "ProducerToken::RankMarkerSprani:",
+    "ProducerToken::RankMarkerClipSprite:",
+    "ProducerToken::RivalMarkerSprani:",
+    "SameProjectedMarker(",
+):
+    if token not in direct_sprite:
+        fail("native direct projected-marker provenance lost: " + token)
+
+tag_direct = function_body(textures, "static void TagDirectVrSpriteNodes(")
+for token in (
+    "ProvenProjectedVehicleMarkerProducer(",
+    "RenderScope::ProjectedWorldMarker2D",
+    "projectedMarker = &sourceBefore.projectedMarker;",
+    "node, scope, producer, projectedMarker,",
+):
+    if token not in tag_direct:
+        fail("native direct sprite downgraded projected owner: " + token)
+
+if "node, scope, producer, nullptr," in tag_direct:
+    fail("native direct sprite still erases projected marker payload")
 
 print("VR projected marker anchor contract PASS")

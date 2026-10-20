@@ -1026,37 +1026,60 @@ class TextureReplacement : public Hook
                 sourceBefore, sourceAfter))
             return;
 
-		const auto semantic =
-			ClassifyDirectVrSpriteCaller(returnAddress);
+		// An exact rank/rival parent is stronger evidence than this helper's
+		// broad return-RVA classifier. Preserve its recovered Calc3D2D anchor
+		// through the native put_sprite call so the queued node keeps the same
+		// binocular vehicle disparity as the already-correct rival marker.
+		const auto projectedProducer =
+			OutRunVR::DirectSpriteSource::ProvenProjectedVehicleMarkerProducer(
+				sourceBefore, sourceAfter);
 		OutRunVR::GameSemantic::RenderScope scope =
 			OutRunVR::GameSemantic::RenderScope::None;
-		switch (semantic.space)
-		{
-		case OutRunVRHudSemantics::SpacePolicy::ScreenHud:
-			scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
-			break;
-		case OutRunVRHudSemantics::SpacePolicy::WorldBillboard:
-			scope = OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-			break;
-		default:
-			// The shared 0x4BA9D0 text formatter can emit native SpriteNodes
-			// through a caller which has no independent spatial classification.
-			// Its exact original E8 HUD parent, while still on the stack, owns
-			// those nodes. Never extend this fallback to arbitrary HUD, GOAL,
-			// lens, world markers or unverified source calls.
-			if (!OutRunVR::DirectSpriteSource::CanCarryExactHudTextAtUnknownCallsite(
-				OutRunVR::DirectSpriteSource::ProvenScreenHudProducer(
-					OutRunVR::GameSemantic::RenderScope::ScreenHud,
-					sourceBefore, sourceAfter)))
-				return;
-			scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
-			break;
-		}
+		OutRunVR::GameSemantic::ProducerToken producer =
+			OutRunVR::GameSemantic::ProducerToken::None;
+		const OutRunVR::GameSemantic::ProjectedMarkerInfo* projectedMarker =
+			nullptr;
 
-		// The original call may have reentered a distinct producer. Only
-		// carry a token from a stable, source-backed HUD parent scope.
-		const auto producer = OutRunVR::DirectSpriteSource::ProvenScreenHudProducer(
-			scope, sourceBefore, sourceAfter);
+		if (projectedProducer !=
+			OutRunVR::GameSemantic::ProducerToken::None)
+		{
+			scope =
+				OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+			producer = projectedProducer;
+			projectedMarker = &sourceBefore.projectedMarker;
+		}
+		else
+		{
+			const auto semantic =
+				ClassifyDirectVrSpriteCaller(returnAddress);
+			switch (semantic.space)
+			{
+			case OutRunVRHudSemantics::SpacePolicy::ScreenHud:
+				scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+				break;
+			case OutRunVRHudSemantics::SpacePolicy::WorldBillboard:
+				scope = OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+				break;
+			default:
+				// The shared 0x4BA9D0 text formatter can emit native SpriteNodes
+				// through a caller which has no independent spatial classification.
+				// Its exact original E8 HUD parent, while still on the stack, owns
+				// those nodes. Never extend this fallback to arbitrary HUD, GOAL,
+				// lens, world markers or unverified source calls.
+				if (!OutRunVR::DirectSpriteSource::CanCarryExactHudTextAtUnknownCallsite(
+					OutRunVR::DirectSpriteSource::ProvenScreenHudProducer(
+						OutRunVR::GameSemantic::RenderScope::ScreenHud,
+						sourceBefore, sourceAfter)))
+					return;
+				scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
+				break;
+			}
+
+			// The original call may have reentered a distinct producer. Only
+			// carry a token from a stable, source-backed HUD parent scope.
+			producer = OutRunVR::DirectSpriteSource::ProvenScreenHudProducer(
+				scope, sourceBefore, sourceAfter);
+		}
 		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
 		{
 			SpriteNode* root = Game::sprite_prio_root[prio];
@@ -1078,7 +1101,7 @@ class TextureReplacement : public Hook
 				node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-					node, scope, producer, nullptr,
+					node, scope, producer, projectedMarker,
 					sourceBefore.registrationSerial);
 				if (node == tailAfter)
 					break;

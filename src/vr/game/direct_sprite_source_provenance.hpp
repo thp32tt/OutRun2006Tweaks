@@ -20,16 +20,56 @@ namespace OutRunVR::DirectSpriteSource
         bool externalOverlay = false;
         // Preserve the exact native source-entry registration generation.
         std::uint64_t registrationSerial = 0;
+        // Exact projected rank/rival parents already own the recovered
+        // Calc3D2D vehicle anchor. Native put_sprite_ex/put_sprite_ex2 must
+        // not discard this stronger source proof in favor of a broad caller
+        // RVA WorldBillboard classification.
+        GameSemantic::ProjectedMarkerInfo projectedMarker{};
     };
 
     inline Snapshot Capture() noexcept
     {
+        const auto* marker = GameSemantic::CurrentProjectedMarker();
         return { GameSemantic::CurrentScope,
                  GameSemantic::CurrentDirectExactProducer,
                  GameSemantic::QueueRenderActive(),
                  GameSemantic::ExternalOverlaySemanticDepth != 0,
                  GameSemantic::SpriteNodeSemanticNextSerial.load(
-                     std::memory_order_acquire) };
+                     std::memory_order_acquire),
+                 marker ? *marker : GameSemantic::ProjectedMarkerInfo{} };
+    }
+
+    constexpr bool SameProjectedMarker(
+        const GameSemantic::ProjectedMarkerInfo& a,
+        const GameSemantic::ProjectedMarkerInfo& b) noexcept
+    {
+        return a.valid && b.valid &&
+            a.viewX == b.viewX &&
+            a.viewY == b.viewY &&
+            a.viewZ == b.viewZ;
+    }
+
+    constexpr ProducerToken ProvenProjectedVehicleMarkerProducer(
+        Snapshot before, Snapshot after) noexcept
+    {
+        if (before.scope != RenderScope::ProjectedWorldMarker2D ||
+            after.scope != RenderScope::ProjectedWorldMarker2D ||
+            before.producer != after.producer ||
+            before.queueActive || after.queueActive ||
+            before.externalOverlay || after.externalOverlay ||
+            !SameProjectedMarker(
+                before.projectedMarker, after.projectedMarker))
+            return ProducerToken::None;
+
+        switch (before.producer)
+        {
+        case ProducerToken::RankMarkerSprani:
+        case ProducerToken::RankMarkerClipSprite:
+        case ProducerToken::RivalMarkerSprani:
+            return before.producer;
+        default:
+            return ProducerToken::None;
+        }
     }
 
     constexpr ProducerToken ProvenScreenHudProducer(
@@ -145,6 +185,35 @@ namespace OutRunVR::DirectSpriteSource
     }
     static_assert(TestNativeDirectVrAdmission(),
         "Direct native HUD sprites must reject mode/queue/producer changes");
+
+
+    constexpr Snapshot ProjectedMarkerSource(
+        ProducerToken token, float z = -64.0f) noexcept
+    {
+        return { RenderScope::ProjectedWorldMarker2D, token,
+                 false, false, 77,
+                 { true, 1.0f, 2.0f, z } };
+    }
+    static_assert(ProvenProjectedVehicleMarkerProducer(
+        ProjectedMarkerSource(ProducerToken::RankMarkerSprani),
+        ProjectedMarkerSource(ProducerToken::RankMarkerSprani)) ==
+        ProducerToken::RankMarkerSprani);
+    static_assert(ProvenProjectedVehicleMarkerProducer(
+        ProjectedMarkerSource(ProducerToken::RankMarkerClipSprite),
+        ProjectedMarkerSource(ProducerToken::RankMarkerClipSprite)) ==
+        ProducerToken::RankMarkerClipSprite);
+    static_assert(ProvenProjectedVehicleMarkerProducer(
+        ProjectedMarkerSource(ProducerToken::RivalMarkerSprani),
+        ProjectedMarkerSource(ProducerToken::RivalMarkerSprani)) ==
+        ProducerToken::RivalMarkerSprani);
+    static_assert(ProvenProjectedVehicleMarkerProducer(
+        ProjectedMarkerSource(ProducerToken::RankMarkerSprani),
+        ProjectedMarkerSource(ProducerToken::RankMarkerSprani, -32.0f)) ==
+        ProducerToken::None);
+    static_assert(ProvenProjectedVehicleMarkerProducer(
+        ProjectedMarkerSource(ProducerToken::RankMarkerSprani),
+        ProjectedMarkerSource(ProducerToken::RivalMarkerSprani)) ==
+        ProducerToken::None);
 
     // The native sprite call can reenter another exact source. Keep those
     // newly registered children, but allow unknown, same, and old tags to
