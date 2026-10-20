@@ -976,6 +976,11 @@ class UIScaling : public Hook
             RankMarkerSubScreenHudDepth == 0)
         {
             recoverViewPoint(RankMarkerProjectedInfo, true);
+            // An exact active original rank Calc3D2D call owns this payload.
+            // The R26 renderer only changes eye cant after the existing
+            // ProjectedWorldMarker2D ownership and valid-anchor checks pass.
+            RankMarkerProjectedInfo.exactOrdinalEyeCant =
+                RankMarkerProjectedInfo.valid;
             OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
                 OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
                 OutRunVR::GameSemantic::ProjectedMarkerProbeStage::CalcCapture,

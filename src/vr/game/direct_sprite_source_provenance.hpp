@@ -46,7 +46,8 @@ namespace OutRunVR::DirectSpriteSource
         return a.valid && b.valid &&
             a.viewX == b.viewX &&
             a.viewY == b.viewY &&
-            a.viewZ == b.viewZ;
+            a.viewZ == b.viewZ &&
+            a.exactOrdinalEyeCant == b.exactOrdinalEyeCant;
     }
 
     constexpr ProducerToken ProvenProjectedVehicleMarkerProducer(

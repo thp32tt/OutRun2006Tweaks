@@ -1603,18 +1603,13 @@ namespace OutRunVRStereo
                 0.0f, 0.0f, 0.0f, 1.0f
             };
 
-            // Regression isolation: original R26/R57 projected both ordinal
-            // vehicle ranks with identity eye rotations. Unlike the already
-            // working rival marker, exact ordinal ranks need the independent
-            // head-local OpenXR eye cant used by the proven R84 rank builder.
-            // Keep RivalMarkerSprani on its previous identity/IPD route.
-            // A failed rank pose proof delegates without publishing either
-            // corrected eye; no arbitrary HUD/ESC/F11/world draw enters here.
-            const auto markerProducer =
-                OutRunVR::GameSemantic::CurrentRenderProducerToken();
-            const bool exactOrdinalRank =
-                markerProducer == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
-                markerProducer == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite;
+            // The normal RenderScope + verified Calc3D2D marker MUST already
+            // admit this projected draw. Original rank source provenance only
+            // selects an eye-pose formula; it cannot grant renderer ownership.
+            // The HMD-proven rival has no ordinal flag and remains bit-for-bit
+            // on the previous R26 identity-eye/IPD path. No producer token
+            // is consulted at this physical draw boundary.
+            const bool exactOrdinalRank = marker->exactOrdinalEyeCant;
             float exactEyeOffsets[2][3]{};
             float exactEyeOrientations[2][4]{};
             const float worldScale =

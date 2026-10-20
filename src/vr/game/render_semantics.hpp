@@ -42,6 +42,10 @@ namespace OutRunVR::GameSemantic
         float viewX = 0.0f;
         float viewY = 0.0f;
         float viewZ = 0.0f;
+        // Proven original ordinal Calc3D2D parent only. This is source
+        // provenance for eye-pose mathematics, NOT render-route permission.
+        // Rival and all unknown producers retain the original R26 eye path.
+        bool exactOrdinalEyeCant = false;
     };
 
     // Bounded diagnostic identity for exact producer families recovered from
