@@ -95,6 +95,28 @@ def perf_check(root):
         ("R84 R29 perf cache", "R29" in r29 and "cache" in r29.lower()),
         ("R84 sole dispatcher", "R33" in r33 and "R30" in r33),
     ]
+    # 2026-10-20 cross-renderer evidence: these are not interchangeable
+    # implementation units even when they share native sprite/host fixes.
+    # Guard proven entrypoints in BOTH independently compiled draw owners.
+    semantic = (root / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8-sig")
+    direct = (root / "src/vr/game/direct_sprite_source_provenance.hpp").read_text(encoding="utf-8-sig")
+    textures = (root / "src/hooks_textures.cpp").read_text(encoding="utf-8-sig")
+    host = (root / "vrhost/src/main_r23.cpp").read_text(encoding="utf-8-sig")
+    menu = (root / "vrhost/src/runtime/menu_content_aspect.hpp").read_text(encoding="utf-8-sig")
+    for label, ok in (
+        ("R26 projected vehicle stereo XY owner", "R57BuildProjectedMarkerDelta(" in safe),
+        ("R26 fixed-function FVF142 rank draw owner", "R62TryFixedFunctionSpriteIndexed(" in safe and "fvf != 0x00000142u" in safe),
+        ("R84 projected vehicle stereo XY owner", "R30BuildProjectedRankDelta(" in r30),
+        ("R84 fixed-function rank eye path", "R30TryFixedFunctionOriginalSpriteStereo(" in r30),
+        ("R84 rank physical-depth gate", "ProjectedMarkerOwnsVehicleDepth(" in r30),
+        ("rival-safe XY-only depth contract", "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(" in semantic and
+          "(void)producer;\n        return false;" in semantic),
+        ("shared direct rank producer provenance", "ProvenProjectedVehicleMarkerProducer(" in direct and
+          "ProvenProjectedVehicleMarkerProducer(" in textures),
+        ("shared uncropped menu aspect fix", "ProjectMenuCapturedAspect(" in host and
+          "ProjectMenuCapturedAspect(" in menu),
+    ):
+        checks.append((label, ok))
     missing = [name for name, ok in checks if not ok]
     return missing
 
@@ -116,7 +138,7 @@ if __name__ == "__main__":
         (0, "'ACTIVE_R26_R43_R44'", "'NONEXISTENT'"),
         (0, "    $expectedVariant = if ($isPcFastPackage) {\n        'ACTIVE_R26_R43_R44'", "    $expectedVariant = if ($isPcFastPackage) {\n        'NONEXISTENT_PC_FAST'"),
         (0, "PC_FAST_INCREMENTAL_NOT_FINAL_CI", "PC_FAST_UNVERIFIED"),
-        (0, "R51-PC-FAST-v2-R26HUD-ON", "PC_FAST_UNVERIFIED_CONTRACT"),
+        (0, "R26HUD-PC-FAST-v3-EXACT-SHA", "PC_FAST_UNVERIFIED_CONTRACT"),
         (0, "    } else {\n        'ACTIVE_R26_R43_R44'\n    }", "    } else {\n        'NONEXISTENT'\n    }"),
         (0, '$sourceSha -ne (Get-Content $baselineShaFile', '$sourceSha -eq (Get-Content $baselineShaFile'),
         (0, '[System.IO.File]::Replace($staged, $installed, $backup, $true)', 'Copy-Item $staged $installed -Force'),
@@ -141,4 +163,4 @@ if __name__ == "__main__":
         changed[index] = changed[index].replace(original, mutant, 1)
         assert check(changed), f"mutation escaped: {original}"
     assert not perf_check(ROOT), "; ".join(perf_check(ROOT))
-    print(f"DX9Ex R84 MAIN + R26 rollback PASS ({len(mutations)} negative mutations); perf-source evidence PASS; HMD UNTESTED")
+    print(f"DX9Ex R26+HUD MAIN + R84 explicit A/B PASS ({len(mutations)} negative mutations); both renderer sources and shared optical contracts verified statically; HMD UNTESTED")
