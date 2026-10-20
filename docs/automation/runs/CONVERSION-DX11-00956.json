@@ -9,10 +9,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00956",
   "feature_id": "DX11:LIVE_SM3_FLOAT_BRANCH_CONTROL_TO_NATIVE_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -87,29 +87,72 @@
     "tools/dx11_sm3_scalar_branch_modifiers_probe_00956.cpp",
     "tools/test_dx11_sm3_scalar_branch_modifiers_00956.py",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-00956.json"
+    "docs/automation/runs/CONVERSION-DX11-00956.json",
+    "tools/verify_dx11_source_graph.py"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "4054618b2eb50bd75eb86d91a55d4c4224658bcd",
+  "validation_bearing_result_sha": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
   "REAL_GAME_DRAW_BLOCKER": "Last actual game observation on 2026-10-18 had native_draws=0; existence of this unsupported scalar modifier opcode in actual game shaders UNTESTED.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_RESULT_COMMIT",
+  "CODE_CHANGED_SHA": "4054618b2eb50bd75eb86d91a55d4c4224658bcd",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "If any of five exact-SHA mandatory Gates fails, perform bounded causal repair under 00956; after PASS separate HMD/game menu->vehicle->race validation and do not promote without native pixel evidence.",
+  "NEXT_IMPLEMENTATION_ACTION": "00956 code+five-gate build VERIFIED; no same-task Gate rerun or new score for C6. Controller may choose independent native menu/car/race frame or eye transport scope. Real game/Quest3/VDXR input, pixels, stereo and frame pacing remain untested.",
   "pipeline": {
     "C0_RECOVER": "GitHub HEAD 34dc88b16b9dcd50ee721e53a2afb108df5bcf47; preceding 00955 terminated 5/5; no run 00956",
     "C1_REVIEW": "Real SM3 IFC/BREAKC/SETP float operand source parser rejected all modified swizzles; preserved fail-closed state.",
     "C2_IMPLEMENT": "Native VS/PS scalar branch family and TEMP physical denominator provenance implemented; opt-in/fallback retained.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_5_REQUIRED_GATES",
-    "C4_COMMIT": "PENDING_RESULT_SHA",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING_GATES_UNTESTED_HMD"
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5 at 90299fe68d772a5372586541bd1fa5dfd6ef2dc3; GitHub Actions runs 39494264161,39494265235,39494265377,39494270857,39494270856",
+    "C4_COMMIT": "material 4054618b2eb50bd75eb86d91a55d4c4224658bcd; CI-specific regression/source graph repair 90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
+    "C5_PACKAGE": "NOT_REQUIRED (no real Quest3/VDXR game package or pixel parity evidence; controller handles test candidate separately)",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; NEED_HMD_TEST; RUNTIME_VALIDATION=UNTESTED; actual native game Draw/frame/input not tested"
   },
   "score_change": 0,
   "acceptance_results": {
-    "native_live_branch_shader": "SOURCE_IMPLEMENTED_GATE_PENDING",
-    "branch_temp_fallback": "SOURCE_IMPLEMENTED_GATE_PENDING",
-    "single_exact_sha_gate": "PENDING_EXACT_SHA"
+    "native_live_branch_shader": "PASS_SOURCE_CXX_PYTHON_AND_EXACT_SHA_5_OF_5; REAL_GAME_UNTESTED",
+    "branch_temp_fallback": "PASS_BRANCH_MASK_AND_TEMP_LANE_REGRESSION_EXACT_SHA_5_OF_5",
+    "single_exact_sha_gate": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "ci_failure_repair": {
+    "failed_sha": "4054618b2eb50bd75eb86d91a55d4c4224658bcd",
+    "backend_run_id": 39493635387,
+    "fast_run_id": 39493635470,
+    "windows_build_run_id": 39493635379,
+    "backend_root_cause": "verify_dx11_source_graph.py R283 revision/provenance V9 expected after real shader materializer V10 code change",
+    "fast_root_cause": "00956 portable THEN/ELSE TEMP lane test expected 0 rather than x lane shared by both branches",
+    "changes": [
+      "tools/verify_dx11_source_graph.py",
+      "tools/dx11_sm3_scalar_branch_modifiers_probe_00956.cpp"
+    ],
+    "scope": "one causal source-graph and conditional-probe repair; no runtime source change, CI bypass or behavioral PASS claim",
+    "material_source_commit": "4054618b2eb50bd75eb86d91a55d4c4224658bcd",
+    "validation_bearing_repair_commit": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3"
+  },
+  "exact_sha_gate_results": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39494264161,
+      "head_sha": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39494265235,
+      "head_sha": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39494265377,
+      "head_sha": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39494270857,
+      "head_sha": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39494270856,
+      "head_sha": "90299fe68d772a5372586541bd1fa5dfd6ef2dc3",
+      "conclusion": "success"
+    }
   }
 }
