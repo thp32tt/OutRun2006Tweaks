@@ -1102,6 +1102,14 @@ namespace OutRunVRStereo
             viewport.MaxZ = 1.0f;
             if (FAILED(device->SetViewport(&viewport)))
                 return false;
+            // Each SkyGlow pass is a full-target quad. The original game can
+            // leave a restrictive scissor active after an ESC/HUD batch;
+            // that rectangle belongs to the previous render target and may
+            // clip both downsampled bloom and the eye-sized composite.
+            // R30ApplyStereoSkyGlow restores the original D3DSBT_ALL state.
+            if (FAILED(device->SetRenderState(
+                    D3DRS_SCISSORTESTENABLE, FALSE)))
+                return false;
 
             const R30GlowVertex v[4]{
                 { -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f },
@@ -2729,12 +2737,23 @@ namespace OutRunVRStereo
             "F11 must also ignore enlarged gameplay HUD settings");
 
         bool R30BuildHudPlaneCoefficients(
-            R30XyzrhwState& state, bool gameplayHudOwner) noexcept
+            R30XyzrhwState& state, bool gameplayHudOwner,
+            bool screenOverlay2D = false) noexcept
         {
             const float HudPlaneViewZ =
                 R30HudPlaneViewZ(gameplayHudOwner);
             float scaleX = 1.0f, scaleY = 1.0f;
-            R30HudContainScale(state.stereo, scaleX, scaleY);
+            if (screenOverlay2D)
+            {
+                // Match the shader/c64 ScreenOverlay2D route: ESC/overlay
+                // must not inherit the gameplay-only 1080p containment.
+                // Exact ScreenHud and projected world markers retain their
+                // original, separately proven scaling policies.
+                scaleX = R30HudScaleValue();
+                scaleY = scaleX;
+            }
+            else
+                R30HudContainScale(state.stereo, scaleX, scaleY);
             scaleX = R30PlaneScaleForOwner(scaleX, gameplayHudOwner);
             scaleY = R30PlaneScaleForOwner(scaleY, gameplayHudOwner);
             const D3DMATRIX& bp = state.baseProjection;
@@ -3285,7 +3304,8 @@ namespace OutRunVRStereo
                         return false;
                 }
                 // Game SpriteNode HUD retains its saved gameplay HudScale.
-                if (!R30BuildHudPlaneCoefficients(state, true))
+                if (!R30BuildHudPlaneCoefficients(
+                        state, true, semanticOverlay2D))
                     return false;
                 state.hudWorldLockValid = true;
                 return true;
