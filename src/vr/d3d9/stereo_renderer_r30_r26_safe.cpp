@@ -19,6 +19,7 @@
 #include "lens_centre_source_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
 #include "stage_extension_eye_plane.hpp"
+#include "hud_1080p_reference.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
@@ -31,6 +32,8 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<bool> VRHud1080pReference;
+    extern Setting<float> VRHudPlaneDistance;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
@@ -1740,6 +1743,14 @@ namespace OutRunVRStereo
             return std::clamp(compensation, 0.75f, 3.50f);
         }
 
+        float R30HudPlaneViewZ(bool gameplayHudOwner) noexcept
+        {
+            // Keep external F11 ImGui's original plane and scale untouched.
+            return gameplayHudOwner
+                ? OutRunVRHud1080p::PlaneViewZ(
+                    Settings::VRHudPlaneDistance.get()) : -2.50f;
+        }
+
         void R30HudContainScale(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float& scaleX, float& scaleY) noexcept
@@ -1753,8 +1764,16 @@ namespace OutRunVRStereo
             // anisotropic aspect correction. On this run sourceOverTarget=2.569,
             // so HudScale=0.55 became X=0.55/Y=0.214 and visibly squashed the
             // complete HUD. Keep HUD scale uniform; projection handles aspect.
-            scaleX = userScale;
-            scaleY = userScale;
+            // Original UIScaling handles 640x480 sprite positions first.
+            // Fit the *final VR HUD* into the virtual 1920x1080 viewing
+            // canvas without changing original positions or eye resolution.
+            const float referenceFit =
+                Settings::VRHud1080pReference.get()
+                    ? OutRunVRHud1080p::ContainedScale(
+                        BackBufferDesc.Width, BackBufferDesc.Height)
+                    : 1.0f;
+            scaleX = userScale * referenceFit;
+            scaleY = userScale * referenceFit;
         }
 
         enum class R30ScreenSpaceKind : std::uint8_t
@@ -2674,7 +2693,8 @@ namespace OutRunVRStereo
         bool R30BuildHudPlaneCoefficients(
             R30XyzrhwState& state, bool gameplayHudOwner) noexcept
         {
-            constexpr float HudPlaneViewZ = -2.50f;
+            const float HudPlaneViewZ =
+                R30HudPlaneViewZ(gameplayHudOwner);
             float scaleX = 1.0f, scaleY = 1.0f;
             R30HudContainScale(state.stereo, scaleX, scaleY);
             scaleX = R30PlaneScaleForOwner(scaleX, gameplayHudOwner);
@@ -4772,7 +4792,9 @@ namespace OutRunVRStereo
             const D3DMATRIX scaledClip =
                 MultiplyMatrix(stockWvp, hudScale);
 
-            constexpr float HudPlaneViewZ = -2.50f;
+            const float HudPlaneViewZ =
+                R30HudPlaneViewZ(
+                    screenKind != R30ScreenSpaceKind::ScreenOverlay2D);
             const float planeClipW =
                 HudPlaneViewZ * baseProjection._34 +
                 baseProjection._44;
@@ -5175,7 +5197,8 @@ namespace OutRunVRStereo
                 // after D3DXSprite's own fixed-function projection.
                 if (!state.hudWorldLockValid)
                     return E_NOTIMPL;
-                constexpr float HudPlaneViewZ = -2.50f;
+                const float HudPlaneViewZ =
+                    R30HudPlaneViewZ(true);
                 const float planeClipW =
                     HudPlaneViewZ * state.baseProjection._34 +
                     state.baseProjection._44;
