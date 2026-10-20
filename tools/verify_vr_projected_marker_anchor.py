@@ -701,8 +701,9 @@ def require_projected_rank_desktop_lift(source: str, helper: str) -> None:
         fail("rank sprani desktop lift is not projected-only")
     if "y + RankMarkerFracY + float(anchorLiftY)" not in r13:
         fail("rank sprani desktop lift cancellation lost")
-    if "const bool projected = !screenHud && projectedAnchor.valid;" not in r46:
-        fail("rank clip desktop lift lost ScreenHud exclusion")
+    if ("const bool projected = projectedAnchor.valid;" not in r46 or
+        "RankMarkerSubScreenHudDepth != 0 && !projected;" not in r46):
+        fail("rank clip desktop lift must use exact projected vehicle anchor only")
     if "xstnum, x, y + anchorLiftY, flags" not in r46:
         fail("rank clip desktop lift cancellation lost")
     if "VehicleAnchorDesktopLiftPixels(" in rv:
