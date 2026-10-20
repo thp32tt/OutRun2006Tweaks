@@ -1010,8 +1010,7 @@ bool build_r283_sm3_mov_shader_source(
                 if (instruction.opcode == D3DSIO_TEXKILL ||
                     instruction.opcode == D3DSIO_DSX ||
                     instruction.opcode == D3DSIO_DSY ||
-                    (instruction.opcode == D3DSIO_TEX ||
-                     instruction.opcode == D3DSIO_TEXLDD))
+                    instruction.opcode == D3DSIO_TEX)
                     return false;
                 const DWORD predicate = instruction.operandTokens.back();
                 const unsigned swizzle =
@@ -1060,6 +1059,14 @@ bool build_r283_sm3_mov_shader_source(
                     op.textureMode = NativeSm3Texture2DMode::Projected;
                 else if (((instruction.instructionToken >> 16u) & 0xffu) == 2u)
                     op.textureMode = NativeSm3Texture2DMode::Bias;
+                // Conditional game shaders need explicit derivative provenance.
+                // D3D9 TEXLDD supplies gradients and TEXLDL supplies LOD;
+                // implicit TEX/TEXLDP/TEXLDB must remain D3D9-owned inside
+                // genuine pixel-varying IF or per-instruction predicates.
+                if (!native_sm3_texture_mode_allowed_in_control_flow(
+                        op.textureMode,
+                        sourcePredicated || !writtenFlow.empty()))
+                    return false;
             }
             if (op.texkill) {
                 // D3D9 TEXKILL is encoded with a destination-style TEMP

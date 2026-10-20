@@ -10,6 +10,27 @@ enum class NativeSm3Texture2DMode {
     Implicit, Projected, Bias, ExplicitLod, Gradients
 };
 
+// A D3D9 pixel shader can reach texture operations through IF/ELSE or
+// predicate control flow. D3D11 implicit LOD derivatives are not reliable
+// there when neighboring pixels take different branches. Explicit LOD and
+// explicit gradients are valid: SampleLevel and SampleGrad preserve the
+// original game's authored coordinates and derivatives. Unknown modes
+// never become native Draw candidates.
+[[nodiscard]] constexpr bool native_sm3_texture_mode_allowed_in_control_flow(
+    NativeSm3Texture2DMode mode, bool conditional) noexcept {
+    switch (mode) {
+    case NativeSm3Texture2DMode::Implicit:
+    case NativeSm3Texture2DMode::Projected:
+    case NativeSm3Texture2DMode::Bias:
+        return !conditional;
+    case NativeSm3Texture2DMode::ExplicitLod:
+    case NativeSm3Texture2DMode::Gradients:
+        return true;
+    default:
+        return false;
+    }
+}
+
 // The sampler operand is NOT a coordinate vector. Every supported texture
 // form reads only the physical lanes it actually consumes; gradients read xy.
 [[nodiscard]] constexpr unsigned native_sm3_texture_source_components(
