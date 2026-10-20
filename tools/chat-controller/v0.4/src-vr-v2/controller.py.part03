@@ -2730,11 +2730,12 @@ async def conversion_repair_ready_blocker(context, pages, active: dict) -> bool:
 
 
 def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, now: datetime) -> bool:
-    """Accept DX9Ex automation only when the durable task commit is review-docs-only.
+    """Accept DX9Ex automation only when base-to-result changes are review-docs-only.
 
     REVIEW_ONLY intentionally bypasses DX9Ex Active Validation because that workflow
     is source-path filtered. A C task is terminal only when its own TASK_ID document
-    exists and the commit changes no path outside the dedicated review directory.
+    exists and the whole task delta changes no path outside the dedicated review
+    directory. This catches unmarked source commits inserted before the final marker.
     """
     if not DX9EX_REVIEW_ONLY or active.get("lane") != "DX9EX":
         return False
@@ -2744,25 +2745,37 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
     expected_path = f"docs/reviews/dx9ex/automation/{task_id}.md"
     try:
         payload = github_api_json(f"/repos/{GITHUB_REPO}/commits/{result_sha}")
-        changed_paths = [
+        commit_paths = [
             str(item.get("filename") or "")
             for item in (payload.get("files") or [])
+            if isinstance(item, dict)
+        ]
+        base_sha = str(active.get("base_sha") or "")
+        if not re.fullmatch(r"[0-9a-fA-F]{40}", base_sha):
+            raise RuntimeError("DX9Ex review task base_sha is unavailable")
+        compare = github_api_json(
+            f"/repos/{GITHUB_REPO}/compare/{base_sha}...{result_sha}"
+        )
+        changed_paths = [
+            str(item.get("filename") or "")
+            for item in (compare.get("files") or [])
             if isinstance(item, dict)
         ]
     except Exception as exc:
         write_runtime(
             status="dx9ex_review_record_verify_deferred",
-            last_action=f"{task_id}: review-only commit verification deferred: {type(exc).__name__}",
+            last_action=f"{task_id}: review-only base-to-result verification deferred: {type(exc).__name__}",
             queue=q,
         )
         return True
 
     allowed_prefix = "docs/reviews/dx9ex/automation/"
     forbidden_paths = [p for p in changed_paths if not p.startswith(allowed_prefix)]
-    if expected_path not in changed_paths or forbidden_paths:
+    if expected_path not in commit_paths or expected_path not in changed_paths or forbidden_paths:
         reason = (
             "DX9EX_REVIEW_ONLY_POLICY_VIOLATION: "
-            f"expected={expected_path}, changed={changed_paths}, forbidden={forbidden_paths}"
+            f"expected={expected_path}, commit_paths={commit_paths}, "
+            f"base_to_result_paths={changed_paths}, forbidden={forbidden_paths}"
         )
         active.update(
             result_sha=result_sha,
@@ -2770,6 +2783,7 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
             review_only=True,
             review_record_path=expected_path,
             review_record_changed_paths=changed_paths,
+            review_record_commit_paths=commit_paths,
             failure_class="DX9EX_REVIEW_ONLY_POLICY",
             failure_context=reason,
             automation_validation="FAIL",
@@ -2794,11 +2808,12 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
         review_only=True,
         review_record_path=expected_path,
         review_record_changed_paths=changed_paths,
+        review_record_commit_paths=commit_paths,
         validation_mode="DX9EX_REVIEW_RECORD_ONLY",
         automation_validation="PASS",
         runtime_validation="UNTESTED",
         completed_at=now.isoformat(),
-        terminal_verification="DX9EX_REVIEW_DOCS_ONLY_PASS",
+        terminal_verification="DX9EX_REVIEW_BASE_TO_RESULT_DOCS_ONLY_PASS",
         terminal="PASS",
         phase="DONE",
     )
@@ -2806,7 +2821,7 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
     save_queue_state(q)
     write_runtime(
         status="dx9ex_review_record_pass",
-        last_action=f"{task_id}: docs-only review record accepted; CODE_CHANGE=NO; next review may proceed",
+        last_action=f"{task_id}: base-to-result docs-only review accepted; CODE_CHANGE=NO; next review may proceed",
         last_completed=dict(active),
         queue=q,
     )
