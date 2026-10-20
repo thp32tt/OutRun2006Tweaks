@@ -424,7 +424,8 @@ def check(ui, manifest, fraction_header=None):
         if token == "RankMarkerSprani":
             ordered(chunk, "rank screen-vs-world precedence",
                     "const auto projectedAnchor = RankMarkerProjectedInfo;",
-                    "if (RankMarkerSubScreenHudDepth != 0)", "RenderScope::ScreenHud",
+                    "if (RankMarkerSubScreenHudDepth != 0 &&", "!projectedAnchor.valid)",
+                    "RenderScope::ScreenHud",
                     "const bool projected = projectedAnchor.valid",
                     "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard",
                     "ScopedExactProducerSemantic producerScope(",
@@ -444,8 +445,9 @@ def check(ui, manifest, fraction_header=None):
         else:
             ordered(chunk, "4th+ rank clip screen-vs-world precedence",
                     "const auto projectedAnchor = RankMarkerProjectedInfo;",
-                    "const bool screenHud = RankMarkerSubScreenHudDepth != 0;",
-                    "const bool projected = !screenHud && projectedAnchor.valid;",
+                    "const bool projected = projectedAnchor.valid;",
+                    "const bool screenHud =",
+                    "RankMarkerSubScreenHudDepth != 0 && !projected;",
                     "RenderScope::ScreenHud", "RenderScope::ProjectedWorldMarker2D",
                     "RenderScope::WorldBillboard",
                     "ScopedExactProducerSemantic producerScope(",
@@ -590,14 +592,16 @@ def test_mutations(ui, manifest):
     must_fail("exact clip live-root proof removed", ui.replace(
         "RenderScope::ScreenHud, producer,\n            nullptr, &rootsBefore);",
         "RenderScope::ScreenHud, producer,\n            nullptr, nullptr);", 1))
-    must_fail("rank world first", ui.replace("if (RankMarkerSubScreenHudDepth != 0)",
-                                            "if (RankMarkerSubScreenHudDepth == 0)", 1))
+    must_fail("rank world first", ui.replace("if (RankMarkerSubScreenHudDepth != 0 &&",
+                                            "if (RankMarkerSubScreenHudDepth == 0 &&", 1))
+    must_fail("rank invalid source promoted to world", ui.replace(
+        "!projectedAnchor.valid)", "projectedAnchor.valid)", 1))
     must_fail("rank producer loses local anchor freeze",
               ui.replace("const bool projected = projectedAnchor.valid;",
                          "const bool projected = RankMarkerProjectedInfo.valid;", 1))
-    must_fail("rank clip reuses mutable TLS after draw",
-              ui.replace("const bool projected = !screenHud && projectedAnchor.valid;",
-                         "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;", 1))
+    must_fail("rank clip NaviPub depth override unguarded",
+              ui.replace("RankMarkerSubScreenHudDepth != 0 && !projected;",
+                         "RankMarkerSubScreenHudDepth != 0 && RankMarkerProjectedInfo.valid;", 1))
     must_fail("rank correction call disconnected",
               ui.replace("OutRunVR::RankMarker::RestoreAppendedRankFractions(",
                          "OutRunVR::RankMarker::NoRestore(", 1))
