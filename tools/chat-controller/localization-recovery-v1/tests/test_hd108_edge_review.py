@@ -69,6 +69,64 @@ class EdgeReviewTests(unittest.TestCase):
             self.assertEqual(new["edge_review_version"],mod.EDGE_REVIEW_VERSION)
             self.assertNotEqual(new["bbox_xyxy"],manifest["bbox_xyxy"])
 
+    def test_phrase_coverage_stays_pending_until_each_reviewed_phrase_has_crop(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            out=root/"out"
+            out.mkdir()
+            row={
+                "png_filename":"Q051_TEST.png",
+                "png_sha256":"a"*64,
+                "queue_indexes":"051",
+            }
+            old=mod.ocr.approved_phrases
+            try:
+                mod.ocr.approved_phrases=lambda q: {
+                    "SCORE":"Score",
+                    "PLAY":"Play",
+                } if q=="Q051" else {}
+                sourceout=out/"Q051_TEST"/"one"
+                sourceout.mkdir(parents=True)
+                (sourceout/"manifest.json").write_text(json.dumps({
+                    "source_sha256":"a"*64,
+                    "english":"Score",
+                }),encoding="utf-8")
+                phrases,covered,unresolved=mod._coverage(row,out)
+                self.assertEqual(set(phrases),{"SCORE","PLAY"})
+                self.assertEqual(covered,{"SCORE"})
+                self.assertEqual(unresolved,{"PLAY":"Play"})
+
+                second=out/"Q051_TEST"/"two"
+                second.mkdir(parents=True)
+                (second/"manifest.json").write_text(json.dumps({
+                    "source_sha256":"a"*64,
+                    "english":"Play",
+                }),encoding="utf-8")
+                _,covered2,unresolved2=mod._coverage(row,out)
+                self.assertEqual(covered2,{"SCORE","PLAY"})
+                self.assertEqual(unresolved2,{})
+            finally:
+                mod.ocr.approved_phrases=old
+
+    def test_icon_placeholder_does_not_prevent_coverage_match(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td); out=root/"out"; out.mkdir()
+            row={"png_filename":"Q140_TEST.png","png_sha256":"b"*64,"queue_indexes":"140"}
+            old=mod.ocr.approved_phrases
+            try:
+                key=mod.ocr.norm(mod.ocr.searchable_phrase("PRESS [ENTER-KEY ICON] KEY"))
+                mod.ocr.approved_phrases=lambda q:{key:"PRESS [ENTER-KEY ICON] KEY"} if q=="Q140" else {}
+                folder=out/"Q140_TEST"/"crop"; folder.mkdir(parents=True)
+                (folder/"manifest.json").write_text(json.dumps({
+                    "source_sha256":"b"*64,
+                    "english":"PRESS [ENTER-KEY ICON] KEY",
+                }),encoding="utf-8")
+                _,covered,unresolved=mod._coverage(row,out)
+                self.assertIn(key,covered)
+                self.assertEqual(unresolved,{})
+            finally:
+                mod.ocr.approved_phrases=old
+
     def test_tampered_warning_crop_is_held(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
