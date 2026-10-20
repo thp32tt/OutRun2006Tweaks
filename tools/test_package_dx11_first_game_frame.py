@@ -135,6 +135,48 @@ def test_native_mono_shadow_capture_source():
                       source.replace(old, bad, 1)), reason)
 
 
+def verify_native_sm3_reject_diagnostics(source):
+    """Stage buckets identify live SM3 failures without counting D3D9 as DX11."""
+    state = "std::array<std::uint64_t, 11> liveSm3RejectStages{};"
+    if source.count(state) != 1:
+        raise ValueError("missing SM3 stage diagnostics")
+    name = "bool submit_live_sm3_game_draw("
+    if source.count(name) != 1:
+        raise ValueError("missing game SM3 native conversion function")
+    body = source.split(name, 1)[1].split(
+        "// Reuse geometric growth buffers", 1)[0]
+    for required in ("struct RejectionAudit",
+                     "rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted}",
+                     "if (!succeeded) ++counters[",
+                     "submitted = true;"):
+        if required not in body:
+            raise ValueError("SM3 failure instrumentation incomplete")
+    for n in range(1, 11):
+        if body.count("rejectionStage = %du;" % n) != 1:
+            raise ValueError("missing or duplicate SM3 conversion failure stage")
+    if "sm3_reject=[source:{}" not in source:
+        raise ValueError("SM3 rejection counters absent from game log")
+    if "skipped_poisoned_draws={}" not in source:
+        raise ValueError("native poison short-circuit evidence absent")
+    if "if (fullMode && s.frameBatch.stopped) {" not in source:
+        raise ValueError("failed frame still submits redundant SM3 conversions")
+
+
+def test_native_sm3_reject_diagnostics():
+    source = (Path(__file__).resolve().parents[1] / "src" / "vr" /
+              "d3d11" / "live_game_frame_bridge.cpp").read_text(encoding="utf-8")
+    verify_native_sm3_reject_diagnostics(source)
+    for old, bad, reason in (
+        ("submitted = true;", "submitted = false;", "native success is never counted"),
+        ("sm3_reject=[source:{}", "sm3_reject=[absent:{}", "no runtime failure evidence"),
+        ("if (fullMode && s.frameBatch.stopped) {",
+         "if (false && s.frameBatch.stopped) {", "redundant poisoned-frame conversions"),
+    ):
+        assert old in source, "missing negative fixture: " + reason
+        must_fail(lambda old=old, bad=bad: verify_native_sm3_reject_diagnostics(
+            source.replace(old, bad, 1)), reason)
+
+
 def main():
     a = "a" * 40
     game = fake_pe(0x14c, 1000500, MARKER + "OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le"))
@@ -206,6 +248,7 @@ def main():
     assert json.loads(payload["BUILD_IDENTITY.json"])["test_mode"] == "NATIVE_FULL_FRAME_D3D11_GPU_COPYBACK_D3D9"
     test_bundle_ci_route()
     test_native_mono_shadow_capture_source()
+    test_native_sm3_reject_diagnostics()
     print("DX11 first-game-frame packaging PE/SHA/tamper/opt-in tests: PASS (synthetic)")
 
 
