@@ -2,9 +2,9 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00959",
   "production_id": "CONVERSION-DX11-00959",
-  "event_id": "CONVERSION-DX11-00959-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00959-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00959",
@@ -19,15 +19,15 @@
   "gameplay_test_performed": false,
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
-  "material_result_sha": null,
+  "material_result_sha": "cb7d9f62886609fef9ebbd707eb88434decb7c46",
   "validation_bearing_result_sha": null,
   "score_change": 0,
   "REAL_GAME_DRAW_BLOCKER": "2026-10-18 last real draw evidence native_draws=0; dynamic SM3 LOOP c[base+aL] was rejected. Code now emits dynamic shader and validates indexed game constants per Draw; actual pixels unobserved.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "PENDING_MATERIAL_COMMIT",
+  "CODE_CHANGED_SHA": "cb7d9f62886609fef9ebbd707eb88434decb7c46",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Exact-SHA five required Gates; repair any concrete failure under same task; desktop menu/car/race and Quest3 evidence remain UNTESTED.",
+  "NEXT_IMPLEMENTATION_ACTION": "B repair: fix ordered source-path acceptance metadata for existing material result; rerun only updated exact-SHA mandatory CI; investigate any resulting concrete failure in this TASK_ID. HMD UNTESTED.",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
@@ -56,13 +56,15 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "LIVE_D3D9_LOOP",
       "DYNAMIC_C_A_L",
       "NATIVE_VS_PS",
       "PER_DRAW_GAME_I",
-      "D3D11_DRAW_AND_FALLBACK"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "No live game pixels/frames observed on this SHA; CI pending.",
+    "visible_frame_acceptance": "CODE_PATH_ONLY: intercepted game-authored SM3 LOOP shader and per-Draw i# -> native VS/PS and guarded native Draw -> existing full-frame output path. No actual live native game pixel/frame, gameplay, or Quest3 result observed; all runtime acceptance remains UNTESTED.",
     "activation_guard_and_fallback": "opt-in native path; fail-closed on indexed range error; DX9Ex fallback and original input/FFB/SkyGlow preserved."
   },
   "feature_contract": {
@@ -100,5 +102,13 @@
     "tools/test_dx11_sm3_dynamic_loop_index_00959.py",
     "docs/automation/runs/CONVERSION-DX11-00959.json"
   ],
-  "work_time_percentages": "NOT_MEASURED"
+  "work_time_percentages": "NOT_MEASURED",
+  "last_failed_gate": {
+    "workflow": "Backend Conversion Gate",
+    "run_id": 39506586352,
+    "head_sha": "cb7d9f62886609fef9ebbd707eb88434decb7c46",
+    "conclusion": "failure",
+    "failed_step": "Verify DX11 integration-first auto-development acceptance",
+    "reason": "run record lacked ordered LIVE_D3D9_CALLSITE -> D3D11_NATIVE_DRAW -> VISIBLE_FRAME_OUTPUT path; no compiler failure observed"
+  }
 }
