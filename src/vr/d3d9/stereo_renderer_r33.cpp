@@ -22,6 +22,7 @@
 #include "../core/r32_review_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "hook_mgr.hpp"
+#include "plugin.hpp"
 #include "../game/render_semantics.hpp"
 #include "../runtime_eligibility.hpp"
 #include "../state/state_block_recovery.hpp"
