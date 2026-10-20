@@ -166,6 +166,33 @@ LIBRARY_CARD_DIGEST_JS = r"""async card=>{
   }catch(e){return{id,name,error:'LIBRARY_IMAGE_FETCH_EXCEPTION'};}
 }"""
 
+
+LIBRARY_BATCH_DIGEST_JS = r"""async ({start,end})=>{
+  const cards=[...document.querySelectorAll(
+    '[data-library-selection-id] button[aria-label]:has(img[src])')].slice(start,end);
+  return await Promise.all(cards.map(async card=>{
+    const root=card.closest('[data-library-selection-id]');
+    const id=root?.getAttribute('data-library-selection-id');
+    const name=card.getAttribute('aria-label')||'';
+    const img=card.querySelector('img[src]');
+    const src=img?.currentSrc||img?.getAttribute('src');
+    if(!/^libfile_[0-9a-zA-Z]+$/.test(id||'')||!src||
+       !src.startsWith('https://chatgpt.com/api/library/files/'+id+'/content'))
+       return {id,name,error:'INVALID_LIBRARY_CARD'};
+    try{
+      try{await img.decode();}catch(e){}
+      const r=await fetch(src,{cache:'no-store'});
+      if(!r.ok)return{id,name,error:'LIBRARY_IMAGE_FETCH_HTTP_'+r.status};
+      const blob=await r.blob();
+      if(blob.type!=='image/png'||blob.size<=100||blob.size>30000000)
+        return{id,name,error:'LIBRARY_IMAGE_NOT_PNG'};
+      const hash=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());
+      return {id,name,sha256:[...new Uint8Array(hash)]
+        .map(x=>x.toString(16).padStart(2,'0')).join(''),bytes:blob.size};
+    }catch(e){return{id,name,error:'LIBRARY_IMAGE_FETCH_EXCEPTION'};}
+  }));
+}"""
+
 async def verify_project_library_images(page,active, root=None, max_scan=MAX_SCAN):
     """Return (evidence, error), without touching queue state or files.
 
@@ -231,6 +258,7 @@ async def verify_project_library_images(page,active, root=None, max_scan=MAX_SCA
         failures=[]
         inspected=0
         idle=0
+        batch_size=12
         scan_deadline=asyncio.get_running_loop().time()+MAX_VERIFY_SECONDS
         while inspected < max_scan:
             if asyncio.get_running_loop().time() >= scan_deadline:
@@ -238,47 +266,39 @@ async def verify_project_library_images(page,active, root=None, max_scan=MAX_SCA
                              f":SCANNED={inspected}:LOAD_ERRORS={len(failures)}")
             card_count=await cards.count()
             if inspected >= card_count:
-                # Library adds 20-article chunks on scrolling. A fixed initial
-                # .count() silently misses older files still in this folder.
+                # Library adds chunks on scrolling. Load more only after every
+                # currently materialized card has been hashed.
                 await folder_page.mouse.move(900,500)
-                await folder_page.mouse.wheel(0,1250)
-                await asyncio.sleep(1.1)
+                await folder_page.mouse.wheel(0,1800)
+                await asyncio.sleep(.8)
                 if await cards.count() <= inspected:
                     idle+=1
                     if idle>=3:break
                 else:idle=0
                 continue
-            card=cards.nth(inspected)
-            inspected+=1
-            label=await card.get_attribute("aria-label")
-            if not label or not label.lower().endswith(".png"):
-                continue
-            # Explicit scrolling triggers lazy image loading.
-            await card.scroll_into_view_if_needed(timeout=7000)
-            # Image lazy-load fetches may initially route to a HTML shell.
-            # Decode means the real project PNG resource has become readable.
-            try:
-                img=card.locator("img[src]").first
-                await asyncio.wait_for(img.evaluate("im=>im.decode()"), timeout=7)
-            except Exception:
-                pass
-            rec=None
-            for retry in range(4):
-                rec=await card.evaluate(LIBRARY_CARD_DIGEST_JS)
-                if rec.get("sha256"):
-                    break
-                await asyncio.sleep(.6*(retry+1))
-            if not rec or not rec.get("sha256"):
-                failures.append((label,rec.get("error") if rec else "NONE"))
-                continue
-            attempts+=1
-            if rec["sha256"] in source_shas:
-                if rec["sha256"] in matched or rec.get("id") in seen:
-                    return None,"DUPLICATED_MATCHED_LIBRARY_ITEM"
-                seen.add(rec["id"])
-                matched[rec["sha256"]]=rec
-                if len(matched)==expected:
-                    break
+
+            end=min(card_count,inspected+batch_size,max_scan)
+            # Hash a small batch concurrently in the page. Do not require the
+            # aria-label to end in .png: recent ChatGPT Library UI can use a
+            # localized/generated-image label even though the content endpoint
+            # returns a valid PNG. The libfile id + content URL + MIME + SHA are
+            # the actual security/provenance checks.
+            records=await folder_page.evaluate(
+                LIBRARY_BATCH_DIGEST_JS,{"start":inspected,"end":end})
+            inspected=end
+            for rec in records:
+                if not rec or not rec.get("sha256"):
+                    failures.append(((rec or {}).get("name",""),
+                                     (rec or {}).get("error","NONE")))
+                    continue
+                attempts+=1
+                if rec["sha256"] in source_shas:
+                    if rec["sha256"] in matched or rec.get("id") in seen:
+                        return None,"DUPLICATED_MATCHED_LIBRARY_ITEM"
+                    seen.add(rec["id"])
+                    matched[rec["sha256"]]=rec
+            if len(matched)==expected:
+                break
         if len(matched)!=expected:
             return None,(f"PROJECT_LIBRARY_HASH_MATCH_INCOMPLETE:{len(matched)}/{expected}"
                          f":SCANNED={inspected}:LOAD_ERRORS={len(failures)}")
