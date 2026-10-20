@@ -41,6 +41,7 @@ def atomic_json(path: Path, obj) -> None:
         json.dump(obj, f, ensure_ascii=False, indent=2)
         f.write("\n")
         tmp = Path(f.name)
+    os.chmod(tmp, 0o644)
     os.replace(tmp, path)
 
 def normalized(text: str) -> str:
