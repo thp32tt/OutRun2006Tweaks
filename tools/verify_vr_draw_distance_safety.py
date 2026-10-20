@@ -27,8 +27,8 @@ for token in required:
     assert token in source, f"Missing source safety contract: {token}"
 assert source.index("if (!newPtrs || !newEntries || !newUnknown)") < source.index("buffer->MaxBuffers_4 = max_size;")
 assert 'CollisionNodesToDisplay[nodeId] = true;' in source
-assert 'if (DrawDistanceSafety::ShouldQueueNode(' in source
-assert 'if (DrawDistanceSafety::CanAppend(' in source
+assert 'if (OutRunVR::DrawDistanceSafety::ShouldQueueNode(' in source
+assert 'if (OutRunVR::DrawDistanceSafety::CanAppend(' in source
 assert 'DrawListCapacity + 1' in header
 
 compiler = shutil.which("clang++") or shutil.which("g++")

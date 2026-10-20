@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include <algorithm>
+#include <cstdlib>
 #include <array>
 #include <bitset>
 #include <imgui.h>
