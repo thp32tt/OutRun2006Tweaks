@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00960",
   "feature_id": "DX11:GAME_SM3_STATIC_ADDRESS_VS_PS_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -91,5 +91,6 @@
     "tools/test_dx11_sm3_static_address_00960.py",
     ".github/workflows/dx11-fast-structural.yml",
     "docs/automation/runs/CONVERSION-DX11-00960.json"
-  ]
+  ],
+  "validation_bearing_result_sha": "9ee0cde91f064eacbda7cbc58514bbec058397d8"
 }
