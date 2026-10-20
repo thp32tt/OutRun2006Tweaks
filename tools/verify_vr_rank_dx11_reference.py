@@ -35,7 +35,9 @@ assert "RivalMarkerProjectedInfo" in hook
 # may promote the vehicle sprite; absent evidence stays ScreenHud.
 assert "RankMarkerSubScreenHudDepth != 0 &&" in hook
 assert "!projectedAnchor.valid" in hook
-assert "RankMarkerExactCalcEdge))" in hook
+assert "RankMarkerExactCalcEdge));" in hook
+assert "recoverViewPoint(RankMarkerProjectedInfo, !dx11RankSource);" in hook
+assert "Settings::VRRankDx11ProducerReference.get()" in hook
 assert "const bool projected = projectedAnchor.valid;" in hook
 assert "RankMarkerSubScreenHudDepth != 0 && !projected;" in hook
 # RIVAL: exact original BB6F0 Calc3D2D edge must stamp the anchor before
@@ -48,7 +50,7 @@ assert "Module::exe_ptr(0xBB6F0)" in hook
 assert "RivalMarkerProjectedInfo = {};" in hook
 # Fail closed: no valid input means no projected vehicle rank/rival.
 for marker in ("!projectedAnchor.valid", "const bool projected = projectedAnchor.valid;",
-               "RivalMarkerProjectedInfo = {};", "RankMarkerExactCalcEdge))"):
+               "RivalMarkerProjectedInfo = {};", "RankMarkerExactCalcEdge));"):
     assert marker in hook, marker
 for is_ordinal in (False, True):
     for dx11_reference in (False, True):
@@ -57,4 +59,14 @@ for is_ordinal in (False, True):
             assert not chosen_canted
         if not is_ordinal:
             assert not chosen_canted
-print("PASS R26 DX11 mode6 rank+rival exact view-anchor parity, NaviPub fallback scoped, 0.55 HUD")
+assert 'VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,' in settings
+assert 'VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", true,' in settings
+assert 'VRRankDesktopLift{ "VR", "RankDesktopLift", false,' in settings
+for name,expected in (("RankDx11ProducerReference", "true"),
+                      ("RivalDx11NativeRoute","true"),
+                      ("RankDesktopLift","false")):
+    assert f"{name} = {expected}" in ini
+assert "if (!Settings::VRRivalDx11NativeRoute.get())" in hook
+assert "const int anchorLiftY = Settings::VRRankDesktopLift.get()" in hook
+assert "R62TryFixedFunctionSpriteIndexed(" in dx9
+print("PASS R26 DX11 rank direct projection, native rival + optional legacy routes, 0.55 HUD")

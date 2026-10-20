@@ -169,13 +169,15 @@ def require_historical_rank_capture_gate(body: str) -> None:
         "ordinalProducerScope = RankMarkerSubActiveDepth != 0",
         "ordinalReturnSite || ordinalProducerScope",
         "RankMarkerSubScreenHudDepth == 0",
-        "RankMarkerExactCalcEdge))",
-        "recoverViewPoint(RankMarkerProjectedInfo, true);",
+        "RankMarkerExactCalcEdge));",
+        "recoverViewPoint(RankMarkerProjectedInfo, !dx11RankSource);",
+        "Settings::VRRankDx11ProducerReference.get()",
+        "ordinalReturnSite || RankMarkerExactCalcEdge",
     ):
         if marker not in body:
             fail("rank two-path exact ownership lost: " + marker)
     section = body[body.index("const bool ordinalReturnSite ="):
-                   body.index("recoverViewPoint(RankMarkerProjectedInfo, true);",
+                   body.index("recoverViewPoint(RankMarkerProjectedInfo, !dx11RankSource);",
                               body.index("const bool ordinalReturnSite ="))]
     if not (section.index("ordinalReturnSite || ordinalProducerScope") <
             section.index("RankMarkerSubScreenHudDepth == 0")):
@@ -195,8 +197,8 @@ for label, bad_gate in (
         "RankMarkerSubScreenHudDepth == 0",
         "RankMarkerSubScreenHudDepth >= 0", 1)),
     ("exact original car E8 override lost", calc.replace(
-        "RankMarkerExactCalcEdge))",
-        "false))", 1)),
+        "RankMarkerExactCalcEdge));",
+        "false));", 1)),
 ):
     if bad_gate == calc:
         fail("rank capture-gate fault injection failed: " + label)
@@ -222,7 +224,7 @@ def require_rank_original_input(source: str) -> None:
         "info.viewX = originalInput.x;",
         "info.viewY = originalInput.y;",
         "info.viewZ = originalInput.z;",
-        "recoverViewPoint(RankMarkerProjectedInfo, true);",
+        "recoverViewPoint(RankMarkerProjectedInfo, !dx11RankSource);",
         "recoverViewPoint(RivalMarkerProjectedInfo, false);",
     ):
         if marker not in body:
@@ -235,8 +237,8 @@ def require_rank_original_input(source: str) -> None:
 
 require_rank_original_input(ui)
 for invalid in (
-    ui.replace("recoverViewPoint(RankMarkerProjectedInfo, true);",
-               "recoverViewPoint(RankMarkerProjectedInfo, false);", 1),
+    ui.replace("recoverViewPoint(RankMarkerProjectedInfo, !dx11RankSource);",
+               "recoverViewPoint(RankMarkerProjectedInfo, true);", 1),
     ui.replace("recoverViewPoint(RivalMarkerProjectedInfo, false);",
                "recoverViewPoint(RivalMarkerProjectedInfo, true);", 1),
     ui.replace("std::fabs(projectedX - out->x)",
@@ -298,7 +300,9 @@ for body, label, token in (
     (rank13, "rank 1st-3rd", "y + RankMarkerFracY + float(anchorLiftY)"),
     (rank46, "rank 4th+", "xstnum, x, y + anchorLiftY, flags"),
 ):
-    if "VehicleAnchorDesktopLiftPixels(" not in body or        "Settings::VREnabled" not in body or token not in body:
+    if ("VehicleAnchorDesktopLiftPixels(" not in body or
+        "Settings::VREnabled" not in body or
+        "Settings::VRRankDesktopLift.get()" not in body or token not in body):
         fail(label + " lost exact projected desktop-lift cancellation")
 if "VehicleAnchorDesktopLiftPixels(" in rival:
     fail("protected rival marker inherited vehicle-rank desktop lift correction")
@@ -405,7 +409,7 @@ for marker in (
 if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
     fail("original rank sub_4BAD20 hook not installed")
 if "RankMarkerSubScreenHudDepth == 0" not in calc or (
-    "RankMarkerExactCalcEdge))" not in calc):
+    "RankMarkerExactCalcEdge));" not in calc):
     fail("only proven 0xBAEE2 may override broad NaviPub while others remain ScreenHud")
 rank13 = function_body(ui, "static int __cdecl RankMarker_sprani(")
 for token in ("RankMarkerSubScreenHudDepth != 0 &&",
