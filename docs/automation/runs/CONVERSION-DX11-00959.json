@@ -9,10 +9,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00959",
   "feature_id": "DX11:LIVE_SM3_DYNAMIC_INDEXED_GAME_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -20,14 +20,14 @@
   "gamepad_test_performed": false,
   "full_dx11_renderer_complete": false,
   "material_result_sha": "cb7d9f62886609fef9ebbd707eb88434decb7c46",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "5377e02a6caa7fbba2324180b9d024d4c4b91ed6",
   "score_change": 0,
   "REAL_GAME_DRAW_BLOCKER": "2026-10-18 last real draw evidence native_draws=0; dynamic SM3 LOOP c[base+aL] was rejected. Code now emits dynamic shader and validates indexed game constants per Draw; actual pixels unobserved.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "cb7d9f62886609fef9ebbd707eb88434decb7c46",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "B repair: fix ordered source-path acceptance metadata for existing material result; rerun only updated exact-SHA mandatory CI; investigate any resulting concrete failure in this TASK_ID. HMD UNTESTED.",
+  "NEXT_IMPLEMENTATION_ACTION": "C6 exact-SHA source/build verified; no rerun for 00959. Controller owns selection of next independent incomplete native DX11 feature; HMD evidence remains separate.",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
@@ -110,5 +110,18 @@
     "conclusion": "failure",
     "failed_step": "Verify DX11 integration-first auto-development acceptance",
     "reason": "run record lacked ordered LIVE_D3D9_CALLSITE -> D3D11_NATIVE_DRAW -> VISIBLE_FRAME_OUTPUT path; no compiler failure observed"
-  }
+  },
+  "acceptance_results": {
+    "native_programmable_draw": "PASS_EXACT_SHA_5_OF_5",
+    "fallback": "PASS_EXACT_SHA_5_OF_5",
+    "exact_sha_ci": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "exact_sha_gate_runs": {
+    "DX11_Fast": 39508428648,
+    "Backend_Conversion": 39508428662,
+    "Windows_Build": 39508428743,
+    "OpenXR": 39508434161,
+    "HUD_Inspector": 39508434184
+  },
+  "c6_result_note": "5 mandatory GitHub Actions succeeded on the exact validation-bearing SHA; native programmable game Draw runtime pixels and Quest3/VDXR gameplay remain UNTESTED; original D3D9 input/FFB fallback retained."
 }
