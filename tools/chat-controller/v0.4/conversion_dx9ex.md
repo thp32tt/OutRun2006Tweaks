@@ -1,50 +1,106 @@
-[2026-10-11 AI 자율 검증·승격 정책 — 사용자 최신 지시, 이하 controller-only 문구보다 우선]
-- AI는 기능 구현→타깃 테스트→오류 수리→exact-SHA GitHub CI 증거 확인→안전한 브랜치 승격→대상 SHA 필수 게이트 확인→C6 완료 기록을 직접 수행한다. 컨트롤러는 별도 승인을 하지 않고 작업자 lease/중복·롤오버·새 TASK_ID 배정·실패 복구만 관찰한다.
-- 소유권 충돌·타인 작업은 금지한다. 승격 전 원격 feature/target 최신 HEAD와 compare를 재조회하고 feature가 target의 직계 후손(behind=0, ahead>0)이며 작업의 material commit과 정해진 acceptance/Win32-host/bundle 증거가 있을 때만 GitHub 비강제 fast-forward update_ref(force=false, expected_sha=재조회한 대상 SHA)를 사용한다. GitHub에서 갱신이 거부되면 force-push하지 말고 소유권/재베이스 여부를 해결한다.
-- 승격 결과의 TARGET_BRANCH SHA를 다시 조회하고 그 정확한 SHA의 각 required workflow·필수 jobs·acceptance steps·아티팩트 성공을 확인한다. 필수 CI 실패 시 동일 FEATURE_ID/TASK_ID의 실패 지점만 소스/검증 코드로 고쳐 재검증한다. 성공하지 않았거나 실기 미실행이면 COMPLETE_BUILD_VERIFIED·HMD PASS를 주장하지 않는다.
-- 이미 목표 SHA가 target에 통합되어 required gates가 통과했다면 컨트롤러 승인/동일 SHA 재검사/중복 커밋을 하지 않는다. C6/run 기록 정합성을 확인하고 컨트롤러는 QUEUE_NEXT_TASK_DELAY_SECONDS=0으로 다음 독립 FEATURE_ID를 자동 배정한다. 사용자가 요구한 다음 기능을 허가 대기로 세우지 않는다. 업무가 할당되지 않았을 때는 새 TASK_ID를 임의로 중복 만들지 않는다.
-- 도구 미노출/정책상 불가로 AI 직접 Git ref 반영이 불가능한 경우에만 정확한 오류와 feature/target SHA를 기록해 복구 대상으로 남긴다. CI/ownership/rollback gate는 유지하며 자동 승인 절차를 무조건 건너뛰라는 뜻이 아니다.
+# DX9Ex 자동검토 전용 — 2026-10-20 사용자 최신 지시
 
-[2026-10-11 실행 전환 규칙 — 아래 역사적 우선순위보다 우선]
-- 이번 FEATURE_CONTRACT의 미완료 acceptance만 구현한다. 복구/검토는 1회 후 실제 코드·테스트 수리로 이어간다. 같은 SHA의 PASS 재검사, 상태만 추가한 커밋, 완료 재보고는 작업 성과가 아니다.
-- FEATURE_READY는 한 번만 남긴다. 이후 승인 대기를 반복하지 않고 AI가 GitHub exact-SHA 검증·안전 승격·최종 필수 게이트·C6까지 수행한다. 같은 SHA를 재검사하지 않으며 FEATURE_BLOCKER가 있으면 실제 실패만 수리한다.
-- acceptance_results.status는 PASS 또는 PASS_FEATURE_CI를 사용하고 runtime_validation=UNTESTED는 별도로 기록한다. 각 evidence_paths는 해당 계약에서 허용한 실제 변경 파일을 사용한다.
-- AI가 GitHub에서 최종 대상 SHA의 Gate·step·패키지를 확인하고 C6를 기록한다. 컨트롤러는 해당 결과를 관찰하고 다음 기능을 자동 배정한다. 게임 브랜치에 완료 기록을 반복 커밋하지 않는다.
-- 실기 테스트만 대기하는 항목은 실기 승격만 보류한다. 기존 완료 기능을 다시 열지 않는다. DXVK 동결 및 보호 기준은 유지한다. FFB는 확정된 통합 회귀 이외 신규 작업을 하지 않는다.
+이 문서는 이 파일에 있던 모든 과거 DX9Ex 자동개발·자동소스수정·자동리팩터링·자동승격 지시보다 우선한다.
 
-OutRun 2006 DX9Ex VR 화면·안정화 자동개발 — C 슬롯 (DX11 A와 병행).
+MODE=DX9EX_REVIEW_ONLY
+TARGET_BRANCH=vr-d3d9ex-focus
+CODE_CHANGE=FORBIDDEN
+BASELINE=R26+HUD
+BASELINE_SHA=0cff83cf509c2acd6f3391b3a46c4dec1403a0d9
+RECENT_RESULT_HUD_CANDIDATE=aab9e02bcb2ad2e6253840e6267e5c5ad5040854
 
-FEATURE_BASED_DEVELOPMENT
-[2026-10-10 기능 전달 계약 v1 — 기존의 중간 push 금지·한 번만 제출·미세 작업 종료 규칙 대체]
-FEATURE_CONTRACT가 이번 작업의 기능 목표/완료 조건이다. 계약이 지정된 실행은 아래의 과거 작업 번호별 목표나 우선순위 목록으로 목표를 다시 선택하지 않는다. 계약이 없는 기존 active task는 기존 범위를 끝낸다. 대기 중에는 같은 기능의 독립적인 미완료 항목만 진행하고 다른 기능은 컨트롤러가 발급한다. feature_id는 기능에 고정되며 TASK_ID/retry/rollover와 별도로 유지한다. 목표를 자잘한 guard/probe/카운터 작업으로 바꾸지 마.
-중간 소스/테스트는 FEATURE_BRANCH에 누적 커밋한다. 5분 체크포인트는 SHA와 미완료 acceptance ID, 원인과 다음 행동을 참조한다. 검증을 마친 AI가 안전한 비강제 expected-SHA GitHub 갱신으로 TARGET_BRANCH에 직접 승격한다. 컨트롤러는 별도 승인을 하지 않는다. 30분 롤오버는 같은 기능·TASK_ID에서 이어간다.
-개발 중 변경 관련 정적검사·targeted 테스트·필요한 컴파일은 허용한다. 기능 후보 완성 후 exact-SHA 전체 Gate를 수행하며, 실패 수리 후 변경된 SHA 재빌드도 허용한다. 최초 제출에는 실제 소스 구현이 필요하지만 같은 기능의 검증 코드/테스트/workflow 수리만으로도 재제출 가능하다. 불필요한 C++ 변경을 만들지 마.
-FEATURE_READY는 중간 상태다. feature_acceptance와 함께 acceptance_results에 모든 계약 ID/status=PASS/evidence_paths/validation_command를 기록하고 지정된 ci_step의 실제 검사를 Actions에 연결한다. 필수 gate/job/step SUCCESS와 artifact_prefix에 맞는 실행 가능한 테스트 패키지가 모두 있어야 BUILD_VERIFIED다. 패키지에는 게임/host 바이너리, 설정, exact-SHA manifest, 로그 수집기를 포함한다. 실패·skip·누락을 PASS로 바꾸지 마.
-C6: status=COMPLETE_BUILD_VERIFIED, checkpoint=C6_STATE, automation_validation=PASS_EXACT_SHA, validation_bearing_result_sha=검증 SHA. material_result_sha·acceptance_results를 보존하고 실기 미수행은 RUNTIME_VALIDATION=UNTESTED. 최초 제출 및 동일 기능의 수리 커밋에 [AUTO:TASK_ID]를 넣되 CI skip을 쓰지 마. 검증 후 C6 bookkeeping은 CI와 분리한다. 점수/기능 완료는 중간 커밋·롤오버마다 가산하지 않는다.
+## 목적
 
-TARGET_BRANCH의 Actions가 완료되기 전에는 FEATURE_READY가 PASS가 아니다. 실제 CI 실패 시 실패한 원인만 같은 FEATURE_BRANCH에서 수리하고 변경된 최종 SHA를 다시 제출해. 실패한 동일 SHA를 검증·재시도 반복하지 마. CI PASS 뒤 C6 결과만 별도 bookkeeping 커밋으로 기입하고 필수 검증을 재실행하지 마. HMD 실기 미수행은 언제나 RUNTIME_VALIDATION=UNTESTED.
-DX11 A와 DX9Ex C는 서로 독립, DXVK B는 FROZEN. 기능별 원격 work_key/owner/경로 충돌을 먼저 확인하고 타 작업자 변경에 force-push·강제 reset·덮어쓰기 하지 마.
+DX9Ex C 슬롯은 계속 자동 실행하지만 더 이상 게임 코드를 스스로 개발하거나 수정하지 않는다.
+화면오류와 성능·최적화 문제를 찾기 위해 GitHub의 최신 소스, REA/디스어셈블리 자료, 런타임 로그,
+과거 정상/불량 빌드와 관련 Issue를 계속 읽고 실제 렌더링 경로를 소스 수준에서 시뮬레이션한다.
+새롭고 의미 있는 결과는 GitHub에 **검토 기록만** 남긴다.
 
-TARGET_BRANCH=vr-d3d9ex-focus. **개발 작업자 2개 A(DX11 Native 실구현)+C(DX9Ex 안정화)를 기존처럼 동시에 돌리고 B(DXVK)는 FROZEN**한다. DX11/DXVK/Localization 소스는 수정하지 말고 C의 GitHub HEAD, AGENTS.md, docs/VR_AUTODEV_STATE.json, docs/VR_WORK_QUEUE.json, docs/VR_PROBLEM_HISTORY.md, 원본 포크의 기존 HUD 관련 소스/자료, HUD Inspector, Issue #13/#14와 현재 회귀 기록을 먼저 확인해 기존 실패 가설을 재발명하지 마.
+## 절대 금지
 
-[2026-10-10 확정 개발 우선순위 — 기존 안정화 목록보다 우선]
-기준 버전은 dx9ex-baseline-20261010 브랜치의 fcd18ddd89f6dd40a8246fcf8591f086811149f1로 동결되어 있다. 해당 기준 브랜치를 수정하거나 재설정하지 않는다. 개발은 vr-d3d9ex-focus 최신 HEAD에서 수행하고 docs/DX9EX_AUTODEV_PRIORITY_20261010.md를 반드시 읽어 적용한다.
-0순위: FFB의 최신 검증된 정식 릴리스 태그/SHA를 확인하고 DX9Ex에 실제 이식 및 회귀 검증한다. 릴리스 확인 없이 HEAD를 최신 릴리스라고 단정하지 않는다.
-1순위: DX9Ex 구조 최적화/리팩터링의 남은 작업을 완료하고 HUD, hook, device-loss, OpenXR 및 domain isolation 회귀를 보호한다.
-2순위: Virtual Desktop High 화질 설정의 OpenXR 런타임 권장 눈별 렌더 타깃 해상도를 자동으로 따르도록 한다. 고정 픽셀이나 데스크톱 해상도로 대체하지 않는다.
-3순위: Quest 3 + Virtual Desktop High + RTX 4070 12GB에서 **네이티브 120FPS/120Hz**를 목표로 프레임 최적화한다. 프레임 예산은 8.33ms이며 SSW/재투영 생성 프레임을 네이티브 FPS로 계산하지 않는다. 게임 렌더 FPS와 VD 전송/디코드/표시 FPS 및 지연·드롭을 분리 측정한다. 건물 밀집, 모래사장, 모래 튐을 우선 분석한다. 실제 HMD 검증 전에는 목표 달성으로 보고하지 않는다.
-위 우선순위는 순차 진행하되 각 단계가 런타임 테스트 대기일 경우 다른 독립적인 구현 가능 작업을 계속 수행한다. 기존 화면/HUD 결함은 회귀 방지 및 관련 단계 작업으로 유지한다.
+- production source, C++, HLSL, CMake, workflow, runtime/config 파일 자동 수정.
+- 자동 patch/refactor/merge/update_ref/branch 생성/release/package 생성.
+- feature branch에서 소스를 고친 뒤 target branch로 자동 승격하는 행위.
+- R84 구조최적화를 현재 기본값으로 다시 승격하거나 R26+HUD 기준을 자동 교체하는 행위.
+- B9200 post-CALL/+5 등 과거 크래시 원인이 된 위험한 midhook 재도입.
+- 근거 없는 SpriteNode blanket HUD 승격, global alpha, IPD/깊이 수치 튜닝.
+- 빌드/정적검사 결과를 Quest 3 화면 정상 또는 runtime PASS로 표현.
+- 같은 finding을 반복 커밋하거나 같은 Issue 댓글을 반복 작성.
 
-[현재 구현 목표 — 안정화 활성 진행]
-DX9Ex는 긴급 크래시 유지보수 전용이 아니다. Quest 3/VDXR 실제 사용에서 남아 있는 화면·입력·복구 결함을 계속 고치는 **활성 안정화 lane**이다. 기존 화면 결함 목록은 다음과 같다(상위 0~3순위 정책을 대체하지 않음): 흰색 HUD/메뉴 글자와 < > 화살표의 복시/헤드락, HUD +TIME·체크포인트·골인 후 기록/결과·4~5등 순위 숫자 중복, 라이벌/순위 마커가 상대 차량 위에 고정되지 않는 문제, F11 메뉴 gameplay 복시, lens flare·시작 그림자 이중 출력, 차량 선택 흰색 텍스처/material, recenter·OpenXR pose·프레임 페이싱·Reset/ResetEx/device-loss·host reconnect 회귀. 정상화된 도로/차량/배경 스테레오 및 SkyGlow baseline 의미는 보호한다.
+## 허용 작업
 
-실제 원본 producer→semantic registry/replay→Draw owner→per-eye 경로와 역어셈블 증거를 연결하여 반증 가능한 원인부터 안전한 최소 패치를 source/tool/test에 적용한다. blanket SpriteNode=HUD, global alpha, 근거 없는 레이어 이동·IPD 수치 튜닝은 하지 않는다. 의미 없는 1000/5000회 동일 HUD 정적 검사는 중단하고, 소스 변경 관련 정적 검사 1회, 기존 HUD Inspector CI, 필요할 경우 결함 주입 자기테스트만 수행해. 검토·계획·상태 커밋만으로 구현 완료 선언하지 않는다.
+- 연결된 GitHub 도구로 vr-d3d9ex-focus 최신 HEAD/AGENTS.md/관련 docs와 Issue를 읽기.
+- 관련 소스, REA/Ghidra/디스어셈블리, 기존 런타임 로그와 과거 정상/불량 SHA 비교.
+- producer -> semantic registry/replay -> queue -> D3DX/native D3D9 draw ->
+  R30/R62 -> left/right eye -> state/projection restore -> Present/OpenXR 제출 경로 시뮬레이션.
+- 화면오류 owner/lifetime/state/viewport 경계 분석.
+- CPU/GPU draw amplification, duplicate eye draw, copy/resolve/wait, StateBlock/state churn,
+  texture/resource churn, particle overdraw, culling, XR cadence 등 최적화 병목 분석.
+- 새 finding을 docs/reviews/dx9ex/automation/ 아래 docs-only 기록으로 커밋.
+- 수정 필요성이 충분히 입증된 경우 실제 코드는 건드리지 않고 PATCH_CANDIDATE_ONLY로
+  정확한 파일/함수/라인 범위/근거/반증 조건/회귀 경계만 기록.
 
-Quest 3 실기 확인이 필요한 결함은 해당 런타임 검증 또는 보호 기준 승격만 NEED_HMD_TEST/BLOCKED_RUNTIME으로 보류한다. 그 문제 때문에 전체 자동개발을 멈추지 말고, 다른 **독립 실행 가능한 DX9Ex 안정화 소스 수정**으로 넘어가 구현→검증→GitHub 커밋까지 계속해. 빌드/CI PASS를 화면 정상 동작으로 표현하지 않고 RUNTIME_VALIDATION=UNTESTED를 유지한다.
+## 매 TASK_ID 수행 절차
 
-GitHub의 연결된 작업자 claim/lease와 동시 AI work_key 충돌을 확인하고 다른 작업의 소스·상태·TASK_ID를 중복 쓰지 않는다. GitHub 대상 브랜치의 C0→C6 전체 파이프라인, [AUTO:TASK_ID] 실제 구현 커밋, exact-SHA Actions 및 docs/automation/runs/ 기록을 충족한다. 성공한 동일 작업을 retry/rollover 시 재실행하지 않는다. 이번 변경은 **동시 작업 수 유지 + 각 작업의 개발 방향 변경**이며 DX9Ex를 중단하거나 DXVK를 재활성화하는 것이 아니다.
+1. 현재 vr-d3d9ex-focus HEAD와 AGENTS.md를 다시 읽고, 최근 DX9Ex 자동검토 기록을 확인한다.
+2. 이전 기록과 동일한 내용만 반복하지 말고 다른 호출경로·상태경계·성능 병목 또는 미검증 가설을 하나 이상 선택한다.
+3. 관련 원본 함수 호출부터 최종 GPU draw/OpenXR 제출까지 가능한 범위를 순차 추적한다.
+4. 화면오류는 다음 필드를 분리한다:
+   - USER_SYMPTOM
+   - STATIC_SOURCE_EVIDENCE
+   - DISASM_EVIDENCE
+   - RUNTIME_EVIDENCE
+   - OWNERSHIP_HYPOTHESIS
+   - FALSIFICATION_SIGNAL
+   - PATCH_CANDIDATE_ONLY
+   - REGRESSION_BOUNDARY
+5. 최적화는 MEASURED와 HYPOTHESIS를 구분한다. 실측 로그가 없으면 추정값을 측정값처럼 쓰지 않는다.
+6. 결과를 `docs/reviews/dx9ex/automation/<TASK_ID>.md`에 기록한다.
+   새 패치 후보가 없더라도 `NEW_FINDING=NONE`과 이번에 실제로 검토한 경로·근거·다음 검토 지점을 기록한다.
+7. docs-only 커밋 메시지에 정확히 `[AUTO:<TASK_ID>]`를 포함한다. CI-skip 지시어는 사용하지 않는다.
+8. Issue #13/#14/#100 등에는 실제 새 finding이 있을 때만 중복 없이 보강한다.
+9. 게임/런타임 소스 변경은 항상 `CODE_CHANGE=NO`로 남긴다.
+10. Quest 3/VDXR 실기 검증이 없으면 항상 `RUNTIME_VALIDATION=UNTESTED`다.
 
+## 우선 검토 범위
 
-[VR 체크포인트 정책]
-5분마다 컨트롤러 GitHub 체크포인트를 저장하고 실제 중간 소스/테스트는 FEATURE_BRANCH에 보존한다. 완료 기능의 대상 브랜치는 AI가 최신 SHA를 재확인한 비강제 fast-forward로 승격하고 컨트롤러는 결과만 관찰한다. 컨트롤러는 30분마다 같은 TASK_ID로 새 대화에서 재개한다. 새 대화는 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 체크포인트와 게임 브랜치 현재 HEAD·run 기록을 먼저 대조하여 완료한 소스 수정과 검증을 반복하지 마. 최종 [AUTO:TASK_ID] 표식은 실제 material commit에만 넣고, 단순 체크포인트는 구현·실기 검증 성공으로 처리하지 마.
+- +TIME 텍스트/숫자의 양안 분리, 복시, head-lock.
+- GOAL/finish stage progress, percent, time, title/glyph의 중복/헤드 추종.
+- 실제 visible result element의 최종 D3D9 API 경로가 DIP/FVF 0x142인지, 다른 Draw 경로가 섞이는지.
+- D3DX deferred Sprite batch owner, source scope, queue node/queue epoch와 semantic lifetime.
+- cached shader identity와 live GetVertexShader authority.
+- game-pixel/desktop viewport/XR eye extent 좌표 변환과 XYZRHW 처리.
+- OpenXR head-local eye orientation과 non-zero eye cant가 R26 finite HUD에 정확히 반영되는지.
+- 차량 순위/라이벌의 이전 정상 경로와 현재 owner/depth 차이.
+- lens flare, sky, ESC/F11/menu, 시작 shadow 등 stereo/head-lock 오류.
+- StateBlock, projection/world/view 복원, Reset/ResetEx/device-loss/host reconnect.
+- frame pacing, draw amplification, copy/resolve/wait, resource churn.
+- 모래/파티클 overdraw 및 밀집 건물 구간 성능.
+- VR 시야에 맞는 culling 범위와 desktop-resolution/VR-viewport 불일치.
 
+## 보호 기준
+
+- R26+HUD를 현재 비교 기준으로 사용한다.
+- 정상 동작 중인 메뉴/ESC/F11/라이벌/차량순위/sky/lens/input/FFB/recenter 등은
+  해당 검토에서 실제 회귀 증거가 없으면 수정 대상으로 승격하지 않는다.
+- 최근 result HUD 후보 SHA는 비교 자료일 뿐 HMD PASS가 아니다.
+- 과거 R84/legacy 문서는 증거 자료로 읽을 수 있지만 자동 구현 지시로 해석하지 않는다.
+
+## 종료 형식
+
+SOURCE_HEAD=<sha>
+REVIEW_SCOPE=<scope>
+NEW_FINDING=<summary or NONE>
+EVIDENCE=<source/disasm/log/docs evidence>
+PATCH_CANDIDATE_ONLY=<candidate or NONE>
+REGRESSION_RISK=<risk>
+GITHUB_RECORD=<docs-only path/commit>
+CODE_CHANGE=NO
+AUTOMATION_VALIDATION=<PASS/PENDING/FAIL>
+RUNTIME_VALIDATION=UNTESTED
+NEXT_REVIEW=<next distinct scope>
+
+TASK_ID=<TASK_ID>
+RESULT_SHA=<docs-only result sha>
+AUTOMATION_VALIDATION=<value>
+RUNTIME_VALIDATION=UNTESTED
