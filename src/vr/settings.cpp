@@ -71,8 +71,13 @@ namespace Settings
         "Keep the original 2D menu/game pixel aspect when displaying a portrait VDXR 3D/2D source on an ultrawide desktop. The PC mirror is centered with unused desktop space instead of vertically squashing the image. VR eye buffers and all source UI pixels stay unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };
-	Setting<float> VRHudScale{ "VR", "HudScale", 0.82f,
+	Setting<float> VRHudScale{ "VR", "HudScale", 0.55f,
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
+	// HMD-proven DX11 R57 mode 6 projects car ordinal and rival markers
+    // with head inverse, identity eye orientations and physical per-eye
+    // IPD/FOV. The R26 ordinal-only cant experiment is reversible.
+    Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
+        "Use the DX11 HMD-proven R57 mode-6 eye pose for car-attached rank markers. True keeps identity eye orientation and relative IPD with head inverse. False restores the R26 ordinal-only canted-eye experiment for A/B. World and rival producers are unchanged." };
 	Setting<bool> VRHud1080pReference{ "VR", "Hud1080pReference", true,
         "R26 VR gameplay HUD only: uniform 1920x1080 viewing reference for ultrawide game sources. Never rewrite native OutRun 640x480 sprite coordinates, rank/rival anchors, front-end, or F11." };
     Setting<float> VRHudPlaneDistance{ "VR", "HudPlaneDistance", 4.0f,

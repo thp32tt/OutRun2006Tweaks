@@ -33,6 +33,7 @@
 namespace Settings
 {
     extern Setting<float> VRHudScale;
+    extern Setting<bool> VRRankDx11ReferenceEyePose;
     extern Setting<bool> VRHud1080pReference;
     extern Setting<float> VRHudPlaneDistance;
     extern Setting<float> VRStereoDepth;
@@ -1614,7 +1615,14 @@ namespace OutRunVRStereo
             // The HMD-proven rival has no ordinal flag and remains bit-for-bit
             // on the previous R26 identity-eye/IPD path. No producer token
             // is consulted at this physical draw boundary.
-            const bool exactOrdinalRank = marker->exactOrdinalEyeCant;
+            // The same rank source works in the user's DX11 build using
+            // R57 mode 6: shared HeadInverse + identity eye orientation +
+            // relative IPD/FOV. R26's ordinal-only canted-eye hypothesis
+            // did not resolve Quest3 rank depth and is opt-in for A/B only.
+            // Keep the exact Calc3D2D/valid-anchor admission and preserve
+            // rival's existing identity-eye path.
+            const bool exactOrdinalRank = marker->exactOrdinalEyeCant &&
+                !Settings::VRRankDx11ReferenceEyePose.get();
             float exactEyeOffsets[2][3]{};
             float exactEyeOrientations[2][4]{};
             const float worldScale =
