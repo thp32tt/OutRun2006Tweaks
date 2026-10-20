@@ -18,7 +18,7 @@ for needle in (
     "writtenFlow.end(tempWritten, outputWritten)",
     "operations.empty() || !writtenFlow.empty()",
     "(tempWritten[reg] & (1u << component)) == 0u",
-    "if (!declared) return false;",
+    "native_sm3_declared_components_cover(",
     "if (!defPresent[reg]) liveConstantsUsed = true;",
     "branch.flowCondition", "if (op.flowKind != 0u)",
     'translated += "    } else {',
