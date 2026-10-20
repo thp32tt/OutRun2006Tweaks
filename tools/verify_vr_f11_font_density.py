@@ -45,6 +45,12 @@ def check(hook: str, font: str, header: str) -> None:
     density_guard = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// A new atlas needs a new font texture.", 1
     )[0]
+    # The field fix adds a second VR gameplay predicate for the 1.25x
+    # optical-size cap. Test the ORIGINAL font-source guard separately:
+    # a broad OR mutation must not survive only because the later cap
+    # contains the same predicate text.
+    assert "if (f11VisibleThisFrame && vrGameplay &&" in density_guard
+    assert "vrFontMultiplier = std::clamp(vrFontMultiplier, 1.0f, 1.25f);" in density_guard
     for target, needles in (
         (density_guard, (
             "f11VisibleThisFrame && vrGameplay",
