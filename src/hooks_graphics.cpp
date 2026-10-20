@@ -702,6 +702,25 @@ class VRLensFlareProjected2D : public Hook
             }
             return;
         }
+        // The previously-hidden C993 sun now executes in the main profile.
+        // Observe this original CALL and parent state so a later per-eye
+        // WVP trace can distinguish a second original sun from CABE halos.
+        if (Settings::VREnabled && Settings::VRTelemetry &&
+            objectId == 0x570002)
+        {
+            static std::atomic<std::uint64_t> draws{ 0 };
+            const auto n = draws.fetch_add(1, std::memory_order_relaxed) + 1;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR SUN C993 ORIGINAL DRAW: hits={} worldOwner={} "
+                    "parent={} nestedOwner={} queue={} requestedVisible={}",
+                    n,
+                    centreScope ==
+                        OutRunVR::GameSemantic::RenderScope::WorldBillboard,
+                    LensCentreDepth, LensCentreOwnerDepth,
+                    OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0,
+                    Settings::VRLensFlareCentreEnabled.get() ? 1 : 0);
+        }
         // An unrelated one-shot producer (for example an earlier queued
         // HUD/world draw) must not replace this exact C993 centre draw.
         // Keep its token intact for the original later owner, and leave all
