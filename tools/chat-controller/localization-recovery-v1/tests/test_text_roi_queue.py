@@ -102,6 +102,22 @@ class TextRoiQueueTests(unittest.TestCase):
         st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
         self.assertEqual(st["active"]["status"],"SUBMITTING")
 
+    def test_native_hd_roi_wider_than_2048_is_valid(self):
+        wide=self.image_path.with_name("Q101_Wide.png")
+        Image.new("RGBA",(2142,219),(0,0,0,0)).save(wide)
+        item=dict(self.item,
+                  id="Q101_Wide",
+                  imagegen_input_png=wide.name,
+                  imagegen_input_sha256=hashlib.sha256(wide.read_bytes()).hexdigest(),
+                  bbox_xyxy=[1418,1467,3560,1686],
+                  english="Versus Special Course has been selected.",
+                  korean="대전 스페셜 코스가 선택되었습니다.")
+        self.write_manifest([item])
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        self.assertEqual(binding["items"][0]["width"],2142)
+        self.assertEqual(binding["items"][0]["height"],219)
+
     def test_role_partition_never_steals_other_role(self):
         binding, reason = controller_png_attach.load_binding("B", self.root)
         self.assertIsNone(binding)
