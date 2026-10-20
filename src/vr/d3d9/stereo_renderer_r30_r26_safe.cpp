@@ -1554,12 +1554,21 @@ namespace OutRunVRStereo
                 marker.viewY * transform._24 +
                 marker.viewZ * transform._34 +
                 transform._44;
-            // The canonical perspective convention places visible vehicle
-            // anchors at positive clip W (as in R44 spatial-billboard gating).
-            // A negative W is behind the camera, not a valid projected rank
-            // marker; fabs(W) previously mirrored such anchors into the HUD.
+            // Working DX11 R57 mode 6 only rejects zero/near-zero W
+            // for the game's original vehicle ordinal anchor. The later
+            // R26 positive-W-only rejection can discard valid original
+            // negative-view-Z vehicle markers before eye correction. Admit
+            // signed W ONLY for an exact original ordinal source in the
+            // explicit DX11 comparison mode; sky/lens/general world and
+            // non-ordinal projected anchors retain the strict positive gate.
+            const bool dx11OrdinalClipW =
+                Settings::VRRankDx11ProducerReference.get() &&
+                marker.exactOrdinalEyeCant;
             if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
-                !std::isfinite(clipW) || clipW <= 1.0e-6f)
+                !std::isfinite(clipW) ||
+                (dx11OrdinalClipW
+                    ? std::fabs(clipW) <= 1.0e-6f
+                    : clipW <= 1.0e-6f))
                 return false;
 
             ndcX = clipX / clipW;
