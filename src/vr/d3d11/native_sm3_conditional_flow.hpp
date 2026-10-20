@@ -3,6 +3,8 @@
 // All paths must initialize a component before it can feed a native shader.
 #include <array>
 #include <vector>
+#include <string>
+#include "native_sm3_arithmetic_codegen.hpp"
 
 namespace outrun::vr::dx11 {
 
@@ -16,6 +18,31 @@ inline constexpr const char* native_sm3_ifc_comparison(unsigned code) noexcept {
     case 6u: return "<=";
     default: return nullptr;
     }
+}
+
+// Dynamic SM3 scalar compares consume the post-swizzle X lane. DZ/DW
+// additionally require physical Z/W denominator lanes, even though IFC,
+// BREAKC and SETP themselves read only one resulting scalar component.
+// A reserved modifier must never become a native conditional branch.
+[[nodiscard]] constexpr unsigned native_sm3_scalar_condition_required_components(
+    unsigned swizzle, unsigned modifier) noexcept {
+    if (swizzle > 255u || modifier > 12u) return 0u;
+    return native_sm3_swizzled_components(
+        native_sm3_source_modifier_components(1u, modifier), swizzle);
+}
+
+inline bool append_native_sm3_scalar_condition_operand(
+    std::string& value, unsigned swizzle, unsigned modifier) {
+    if (value.empty() ||
+        native_sm3_scalar_condition_required_components(swizzle, modifier) == 0u)
+        return false;
+    static constexpr char kLanes[] = "xyzw";
+    std::string operand = value + ".";
+    for (unsigned lane = 0u; lane < 4u; ++lane)
+        operand += kLanes[(swizzle >> (lane * 2u)) & 3u];
+    if (!append_native_sm3_source_modifier(operand, modifier)) return false;
+    value = "(" + operand + ").x";
+    return true;
 }
 
 class NativeSm3ConditionalFlow {

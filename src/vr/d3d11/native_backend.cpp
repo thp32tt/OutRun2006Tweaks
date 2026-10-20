@@ -269,14 +269,14 @@ bool compile_shader_source(
 
 std::uint64_t r283_materializer_revision_hash() noexcept {
     static constexpr char kRevision[] =
-        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V9";
+        "R283_D3D9_SM3_REGISTER_ARITHMETIC_TEXTURE2D_MATRIX_IFC_HLSL_MATERIALIZER_V10";
     return hash_observation_payload_bytes(
         kRevision, static_cast<UINT>(sizeof(kRevision) - 1u));
 }
 
 std::uint64_t r283_semantic_subset_contract_hash() noexcept {
     static constexpr char kContract[] =
-        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V9";
+        "R283_R281_R282_R276_SM3_ARITH_TEMP_CONST_DEF_MATRIX_TEX2D_IFC_PROVENANCE_V10";
     return hash_observation_payload_bytes(
         kContract, static_cast<UINT>(sizeof(kContract) - 1u));
 }
@@ -589,26 +589,32 @@ bool build_r283_sm3_mov_shader_source(
                                   !predicateFlow.begin_if())) {
                     return false;
                 }
+                // SM3 IFC/BREAKC/SETP compare scalar float operands. The
+                // game may apply signed, bias, absolute or projective source
+                // modifiers before comparing. Validate every physical TEMP
+                // lane consumed by the full expression (including DZ/DW's
+                // denominator) rather than accepting HLSL's zero-init.
                 std::array<std::string, 2> scalarOperands{};
-                static constexpr char lanes[] = "xyzw";
                 for (unsigned i = 0u; i < 2u; ++i) {
                     const DWORD token = instruction.operandTokens[i + (predicateWrite ? 1u : 0u)];
                     const unsigned swizzle =
                         static_cast<unsigned>((token & D3DSP_SWIZZLE_MASK) >> 16u);
+                    const unsigned modifier =
+                        static_cast<unsigned>((token & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT);
                     const UINT reg = static_cast<UINT>(token & D3DSP_REGNUM_MASK);
+                    const unsigned requiredComponents =
+                        native_sm3_scalar_condition_required_components(swizzle, modifier);
                     if ((token & 0x80000000u) == 0u ||
                         (token & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
-                        ((token & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) !=
-                            D3DSPSM_NONE ||
-                        (swizzle != 0x00u && swizzle != 0x55u &&
-                         swizzle != 0xaau && swizzle != 0xffu))
+                        requiredComponents == 0u)
                         return false;
                     const unsigned component = swizzle & 3u;
                     const auto kind = r283_decode_register_type(token);
                     std::string value;
                     if (kind == D3DSPR_TEMP) {
                         if (reg >= tempWritten.size() ||
-                            (tempWritten[reg] & (1u << component)) == 0u)
+                            (tempWritten[reg] & (1u << component)) == 0u ||
+                            (tempWritten[reg] & requiredComponents) != requiredComponents)
                             return false;
                         tempUsed[reg] = true;
                         value = "r283_t" + std::to_string(reg);
@@ -627,11 +633,14 @@ bool build_r283_sm3_mov_shader_source(
                             return false;
                         if (!defPresent[reg]) liveConstantsUsed = true;
                     } else {
-                        // Boolean/predicate/relative-indexed control is not a
-                        // float IFC and must remain on the original D3D9 path.
+                        // Bool, integer, predicate or relative-indexed
+                        // conditions are not float IFC/SETP/BREAKC operands.
                         return false;
                     }
-                    scalarOperands[i] = value + "." + lanes[component];
+                    if (!append_native_sm3_scalar_condition_operand(
+                            value, swizzle, modifier))
+                        return false;
+                    scalarOperands[i] = std::move(value);
                 }
                 Operation branch{};
                 branch.flowKind = predicateWrite ? 8u : (conditionalBreak ? 7u : 1u);
