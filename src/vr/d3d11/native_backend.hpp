@@ -4793,6 +4793,9 @@ struct NativeLiveSm3Program {
     // Subset of live i# users requiring complete LOOP x/y/z/w validation.
     std::uint16_t vertexLoopIntegerMask{};
     std::uint16_t pixelLoopIntegerMask{};
+    // Zero means no dynamic c[base+aL] access for this i# loop.
+    std::array<std::uint16_t, 16> vertexLoopIndexedConstantEnd{};
+    std::array<std::uint16_t, 16> pixelLoopIndexedConstantEnd{};
     [[nodiscard]] bool ready() const noexcept {
         return vertexShader && pixelShader && !vertexBytecode.empty();
     }

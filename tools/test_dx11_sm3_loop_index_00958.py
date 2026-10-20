@@ -13,9 +13,9 @@ for value in (
     "native_sm3_static_loop_parameters(",
     "structuredFlow.begin_loop(", "structuredFlow.end_loop(",
     "append_native_sm3_loop_begin(", "r283_c[",
-    '" + r283_aL]"', "loopRanges.back().dynamic",
+    '" + r283_aL]"', "indexedLoopLimits",
     "if (relative && kind != D3DSPR_CONST) return false",
-    "if (defPresent[static_cast<unsigned>(k)]) return false",
+    "if (defPresent[k]) return false",
     "operandCursor != instruction.operandTokens.size()",
     "candidate.vertexLoopIntegerMask", "candidate.pixelLoopIntegerMask",
 ):

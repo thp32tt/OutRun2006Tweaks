@@ -310,7 +310,8 @@ bool r283_hlsl_semantic(
 bool build_r283_sm3_mov_shader_source(
     const ProgrammableShaderFunctionSourceEvidence& evidence,
     bool vertexStage,
-    std::string& translated) noexcept {
+    std::string& translated,
+    std::array<std::uint16_t, 16>* dynamicRelativeLimits = nullptr) noexcept {
     translated.clear();
     try {
         if (!evidence.exact() ||
@@ -417,8 +418,10 @@ bool build_r283_sm3_mov_shader_source(
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
         // D3D9 aL always denotes the innermost LOOP, never REP.
-        struct LoopRange { bool dynamic; int minimum; int maximum; };
+        struct LoopRange { bool dynamic; int minimum; int maximum; unsigned integerRegister; };
         std::vector<LoopRange> loopRanges;
+        // Exclusive aL address limits for game-owned dynamic i# registers.
+        std::array<std::uint16_t, 16> indexedLoopLimits{};
         bool predicateUsed = false;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
@@ -796,7 +799,7 @@ bool build_r283_sm3_mov_shader_source(
                     return false;
                 const int last = first + (static_cast<int>(count) - 1) * step;
                 loopRanges.push_back({dynamic, first < last ? first : last,
-                                      first > last ? first : last});
+                                      first > last ? first : last, reg});
                 Operation loop{};
                 loop.flowKind = 10u;
                 loop.repeatCount = count;
@@ -1076,7 +1079,7 @@ bool build_r283_sm3_mov_shader_source(
                 if (relative) {
                     if (operandCursor >= instruction.operandTokens.size() -
                                              (sourcePredicated ? 1u : 0u) ||
-                        loopRanges.empty() || loopRanges.back().dynamic)
+                        loopRanges.empty())
                         return false;
                     const DWORD address = instruction.operandTokens[operandCursor++];
                     const unsigned addrSwizzle =
@@ -1178,14 +1181,27 @@ bool build_r283_sm3_mov_shader_source(
                 } else if (kind == D3DSPR_CONST) {
                     if (relative) {
                         const auto& range = loopRanges.back();
-                        const int low = static_cast<int>(reg) + range.minimum;
-                        const int high = static_cast<int>(reg) + range.maximum;
-                        if (low < 0 || high >= static_cast<int>(constantLimit))
-                            return false;
-                        // HLSL constant-buffer arrays cannot silently bypass
-                        // source-owned DEF values inside an indexed span.
-                        for (int k = low; k <= high; ++k)
-                            if (defPresent[static_cast<unsigned>(k)]) return false;
+                        if (reg >= constantLimit) return false;
+                        if (range.dynamic) {
+                            // Actual i#.xyz changes per Draw. Every dynamic
+                            // c[base+aL] reference contributes a runtime
+                            // maximum to the shader's stage-specific range.
+                            // DEF aliasing is conservatively rejected for any
+                            // reachable address until it can be proven.
+                            for (unsigned k = reg; k < constantLimit; ++k)
+                                if (defPresent[k]) return false;
+                            auto& end = indexedLoopLimits[range.integerRegister];
+                            const auto exclusive = static_cast<std::uint16_t>(
+                                constantLimit - reg);
+                            if (!end || exclusive < end) end = exclusive;
+                        } else {
+                            const int low = static_cast<int>(reg) + range.minimum;
+                            const int high = static_cast<int>(reg) + range.maximum;
+                            if (low < 0 || high >= static_cast<int>(constantLimit))
+                                return false;
+                            for (int k = low; k <= high; ++k)
+                                if (defPresent[static_cast<unsigned>(k)]) return false;
+                        }
                         value = "r283_c[" + std::to_string(reg) + " + r283_aL]";
                         liveConstantsUsed = true;
                     } else {
@@ -1416,7 +1432,9 @@ bool build_r283_sm3_mov_shader_source(
         }
         translated += vertexStage ? "    return output;\n}\n"
                                   : "    return r283_color;\n}\n";
-        return !translated.empty();
+        if (translated.empty()) return false;
+        if (dynamicRelativeLimits) *dynamicRelativeLimits = indexedLoopLimits;
+        return true;
     } catch (...) {
         translated.clear();
         return false;
@@ -1957,8 +1975,11 @@ bool compile_native_live_sm3_program(
         return false;
     try {
         std::string vertexHlsl, pixelHlsl;
-        if (!build_r283_sm3_mov_shader_source(vertexSource, true, vertexHlsl) ||
-            !build_r283_sm3_mov_shader_source(pixelSource, false, pixelHlsl) ||
+        std::array<std::uint16_t, 16> vertexIndexedLimits{}, pixelIndexedLimits{};
+        if (!build_r283_sm3_mov_shader_source(
+                vertexSource, true, vertexHlsl, &vertexIndexedLimits) ||
+            !build_r283_sm3_mov_shader_source(
+                pixelSource, false, pixelHlsl, &pixelIndexedLimits) ||
             !append_native_sm3_alpha_test(pixelHlsl, alphaCompare))
             return false;
         Microsoft::WRL::ComPtr<ID3DBlob> vertexDxbc, pixelDxbc;
@@ -1969,6 +1990,8 @@ bool compile_native_live_sm3_program(
         // Compile actual SM3 vertex fetches into VS4 SampleLevel.
         // VS sampler ownership is independent of the pixel-stage resource.
         NativeLiveSm3Program candidate{};
+        candidate.vertexLoopIndexedConstantEnd = vertexIndexedLimits;
+        candidate.pixelLoopIndexedConstantEnd = pixelIndexedLimits;
         if (FAILED(device->CreateVertexShader(
                 vertexDxbc->GetBufferPointer(), vertexDxbc->GetBufferSize(),
                 nullptr, candidate.vertexShader.GetAddressOf())) ||

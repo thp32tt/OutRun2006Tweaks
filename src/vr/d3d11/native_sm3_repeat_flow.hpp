@@ -67,6 +67,29 @@ namespace outrun::vr::dx11 {
     return true;
 }
 
+// Enforce the actual game Draw's dynamic SM3 c[base+aL] ranges before
+// touching native GPU state. Each nonzero entry is an exclusive aL limit.
+[[nodiscard]] inline bool native_sm3_live_loop_indexed_bounds_valid(
+    const std::array<int, 16u * 4u>& values,
+    const std::array<std::uint16_t, 16>& exclusiveEnds) noexcept {
+    for (unsigned reg = 0; reg < 16u; ++reg) {
+        const unsigned end = exclusiveEnds[reg];
+        if (!end) continue;
+        if (end > 256u) return false;
+        const int count = values[4u * reg];
+        const int start = values[4u * reg + 1u];
+        const int stride = values[4u * reg + 2u];
+        if (count < 1 || count > 16 || start < 0 || start > 255 ||
+            stride < -128 || stride > 127 || values[4u * reg + 3u] != 0)
+            return false;
+        const int last = start + (count - 1) * stride;
+        if (last < 0 || start >= static_cast<int>(end) ||
+            last >= static_cast<int>(end))
+            return false;
+    }
+    return true;
+}
+
 class NativeSm3StructuredFlow {
 public:
     bool begin_if() {
