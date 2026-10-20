@@ -26,6 +26,9 @@ namespace Settings
 {
 	extern Setting<bool> VREnabled;
     extern Setting<bool> VRTelemetry;
+    extern Setting<bool> VRRankDx11ProducerReference;
+    extern Setting<bool> VRRivalDx11NativeRoute;
+    extern Setting<bool> VRRankDesktopLift;
 	Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,
 		"Adjusts the UI scaling applied by the game.",
 		{ "Vanilla, stretches to screen ratio", "Scaled UI, no stretching (Outrun Online Arcade)",
