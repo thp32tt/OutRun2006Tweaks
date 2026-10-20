@@ -19,7 +19,7 @@ for needle in (
 ):
     assert needle in backend, needle
 for needle in (
-    "reg >= 16u || !defined", "reg >= 16u || literal > 1u",
+    "reg >= 16u", "reg >= 16u || literal > 1u",
     "static const bool r283_b", " = true;", " = false;",
 ):
     assert needle in helper, needle

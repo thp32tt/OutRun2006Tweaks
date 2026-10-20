@@ -404,6 +404,7 @@ bool build_r283_sm3_mov_shader_source(
         std::array<bool, 16> sampler2dDeclared{};
         std::array<bool, 16> sampler2dUsed{};
         bool liveConstantsUsed = false;
+        bool liveBooleansUsed = false;
         NativeSm3ConditionalFlow writtenFlow;
         NativeSm3StructuredFlow structuredFlow;
         NativeSm3PredicateFlow predicateFlow;
@@ -641,8 +642,8 @@ bool build_r283_sm3_mov_shader_source(
                 continue;
             }
             if (instruction.opcode == static_cast<DWORD>(D3DSIO_IF)) {
-                // Real SM3 IF consumes a scalar b# boolean.  Do not
-                // fabricate dynamic Set*ShaderConstantB state or predicates.
+                // SM3 IF consumes a shader-owned DEFB or this Draw's live
+                // D3D9 b# value bound in the native VS/PS b2 constant buffer.
                 if ((instruction.instructionToken & 0xf0000000u) != 0u ||
                     (instruction.instructionToken & 0x00ff0000u) != 0u ||
                     instruction.operandTokens.size() != 1u ||
@@ -669,6 +670,7 @@ bool build_r283_sm3_mov_shader_source(
                 Operation branch{};
                 branch.flowKind = 1u;
                 branch.flowCondition = std::move(boolCondition);
+                if (!boolDefPresent[reg]) liveBooleansUsed = true;
                 operations.push_back(std::move(branch));
                 continue;
             }
@@ -1133,6 +1135,8 @@ bool build_r283_sm3_mov_shader_source(
         // never authorizes a native Draw without a matching live upload.
         if (liveConstantsUsed)
             translated = "cbuffer R283LiveConstants : register(b0) { float4 r283_c[256]; };\n";
+        if (liveBooleansUsed)
+            append_native_sm3_live_bool_declaration(translated);
         for (unsigned reg = 0u; reg < boolDefPresent.size(); ++reg) {
             if (boolDefPresent[reg] &&
                 !append_native_sm3_defb(translated, reg, boolDefBits[reg]))
@@ -1822,6 +1826,10 @@ bool compile_native_live_sm3_program(
             vertexHlsl.find("cbuffer R283LiveConstants") != std::string::npos;
         candidate.pixelConstants =
             pixelHlsl.find("cbuffer R283LiveConstants") != std::string::npos;
+        candidate.vertexBooleans =
+            vertexHlsl.find("cbuffer R283LiveBooleans") != std::string::npos;
+        candidate.pixelBooleans =
+            pixelHlsl.find("cbuffer R283LiveBooleans") != std::string::npos;
         for (unsigned slot = 0; slot < 16u; ++slot) {
             const auto symbol = "r283_texture" + std::to_string(slot) +
                                 " : register(t" + std::to_string(slot) + ")";

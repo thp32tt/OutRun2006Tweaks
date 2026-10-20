@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - vr-dx11-native-r71
+      - feature/dx11-00952-live-sm3-device-bool
       - vr-dxvk-r71-disasm
   workflow_dispatch:
 

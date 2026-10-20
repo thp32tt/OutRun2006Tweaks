@@ -2,7 +2,7 @@ name: OpenXR VR architecture
 
 on:
   push:
-    branches: [ vr-openxr, vr-dx11-native-r71 ]
+    branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-00952-live-sm3-device-bool ]
     paths:
       - 'src/vr/**'
       - 'src/vr_shared.hpp'

@@ -4785,6 +4785,8 @@ struct NativeLiveSm3Program {
     std::uint16_t pixelSamplerMask{};
     bool vertexConstants{};
     bool pixelConstants{};
+    bool vertexBooleans{};
+    bool pixelBooleans{};
     [[nodiscard]] bool ready() const noexcept {
         return vertexShader && pixelShader && !vertexBytecode.empty();
     }

@@ -18,6 +18,7 @@
 #include "live_game_stage1_mirror_reuse.hpp"
 #include "live_game_blend_extrema.hpp"
 #include "native_backend.hpp"
+#include "native_sm3_constant_codegen.hpp"
 #include "pipeline_translation.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
@@ -1226,6 +1227,8 @@ struct LiveSm3Pipeline {
     ComPtr<ID3D11InputLayout> inputLayout;
     ComPtr<ID3D11Buffer> vertexConstants;
     ComPtr<ID3D11Buffer> pixelConstants;
+    ComPtr<ID3D11Buffer> vertexBooleans;
+    ComPtr<ID3D11Buffer> pixelBooleans;
     ComPtr<ID3D11Buffer> alphaReference;
     unsigned alphaCompare{};
     std::vector<DWORD> vertexTokens, pixelTokens;
@@ -4862,6 +4865,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             (pipeline.program.pixelConstants &&
              FAILED(device->CreateBuffer(&cb, nullptr,
                         pipeline.pixelConstants.GetAddressOf())))) return false;
+        // Native b2 constants use 16-byte strides for D3D9 b0..b15.
+        // DEFB-only shaders never need a live game device query.
+        if (pipeline.program.vertexBooleans || pipeline.program.pixelBooleans) {
+            D3D11_BUFFER_DESC boolDesc{};
+            boolDesc.ByteWidth = 16u * 4u * sizeof(std::uint32_t);
+            boolDesc.Usage = D3D11_USAGE_DEFAULT;
+            boolDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+            if ((pipeline.program.vertexBooleans &&
+                 FAILED(device->CreateBuffer(&boolDesc, nullptr,
+                          pipeline.vertexBooleans.GetAddressOf()))) ||
+                (pipeline.program.pixelBooleans &&
+                 FAILED(device->CreateBuffer(&boolDesc, nullptr,
+                          pipeline.pixelBooleans.GetAddressOf()))))
+                return false;
+        }
         if (alphaFunc != 0u) {
             D3D11_BUFFER_DESC alphaDesc{};
             alphaDesc.ByteWidth = 16u;
@@ -4988,6 +5006,14 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         (pipeline.program.pixelConstants &&
          FAILED(game->GetPixelShaderConstantF(0, pixelConstants.data(), 224u))))
         return false;
+    // Snapshot the actual game's b# registers for THIS native draw.
+    // On any D3D9 query failure keep the authoritative DX9Ex path.
+    std::array<BOOL, 16> liveVertexBool{}, livePixelBool{};
+    if ((pipeline.program.vertexBooleans &&
+         FAILED(game->GetVertexShaderConstantB(0u, liveVertexBool.data(), 16u))) ||
+        (pipeline.program.pixelBooleans &&
+         FAILED(game->GetPixelShaderConstantB(0u, livePixelBool.data(), 16u))))
+        return false;
     const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) * vertexCount;
     if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
@@ -5038,6 +5064,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     if (pipeline.program.pixelConstants)
         context->UpdateSubresource(pipeline.pixelConstants.Get(), 0, nullptr,
                                    pixelConstants.data(), 0, 0);
+    if (pipeline.program.vertexBooleans || pipeline.program.pixelBooleans) {
+        const auto uploadBool = [&](ID3D11Buffer* buffer,
+                                    const std::array<BOOL, 16>& values) {
+            std::array<std::uint32_t, 16> source{};
+            for (unsigned i = 0; i < source.size(); ++i)
+                source[i] = values[i] != FALSE ? 1u : 0u;
+            const auto packed = native_sm3_live_bool_payload(source);
+            context->UpdateSubresource(buffer, 0u, nullptr,
+                                       packed.data(), 0u, 0u);
+        };
+        if (pipeline.program.vertexBooleans)
+            uploadBool(pipeline.vertexBooleans.Get(), liveVertexBool);
+        if (pipeline.program.pixelBooleans)
+            uploadBool(pipeline.pixelBooleans.Get(), livePixelBool);
+    }
     if (alphaFunc != 0u) {
         const std::array<std::uint32_t, 4> reference{{alphaRef, 0u, 0u, 0u}};
         context->UpdateSubresource(pipeline.alphaReference.Get(), 0u, nullptr,
@@ -5049,6 +5090,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     ID3D11Buffer* psConstants = pipeline.pixelConstants.Get();
     context->VSSetConstantBuffers(0u, 1u, &vsConstants);
     context->PSSetConstantBuffers(0u, 1u, &psConstants);
+    ID3D11Buffer* vsBooleans = pipeline.vertexBooleans.Get();
+    ID3D11Buffer* psBooleans = pipeline.pixelBooleans.Get();
+    context->VSSetConstantBuffers(2u, 1u, &vsBooleans);
+    context->PSSetConstantBuffers(2u, 1u, &psBooleans);
     const D3D11_VIEWPORT nativeViewport{
         static_cast<float>(viewport.X), static_cast<float>(viewport.Y),
         static_cast<float>(viewport.Width), static_cast<float>(viewport.Height),

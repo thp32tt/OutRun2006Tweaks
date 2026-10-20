@@ -14,13 +14,24 @@ inline bool native_sm3_const_reference(unsigned reg, unsigned limit,
                   : "r283_c[" + std::to_string(reg) + "]";
     return true;
 }
-// SM3 shader-owned DEFB; a live b# from Set*ShaderConstantB must
-// fail closed until a generation-matched source snapshot is implemented.
+// Shader-owned DEFB overrides the device b# value. An unowned b# is
+// sampled on the same real game Draw from Get*ShaderConstantB, never at compile time.
 inline bool native_sm3_bool_reference(unsigned reg, bool defined,
                                      std::string& out) {
-    if (reg >= 16u || !defined) return false;
-    out = "r283_b" + std::to_string(reg);
+    if (reg >= 16u) return false;
+    out = defined ? "r283_b" + std::to_string(reg)
+                  : "(r283_live_b[" + std::to_string(reg) + "].x != 0u)";
     return true;
+}
+inline void append_native_sm3_live_bool_declaration(std::string& out) {
+    out += "cbuffer R283LiveBooleans : register(b2) { uint4 r283_live_b[16]; };\n";
+}
+inline std::array<std::uint32_t, 64> native_sm3_live_bool_payload(
+    const std::array<std::uint32_t, 16>& deviceValues) noexcept {
+    std::array<std::uint32_t, 64> packed{};
+    for (unsigned reg = 0u; reg < deviceValues.size(); ++reg)
+        packed[reg * 4u] = deviceValues[reg] != 0u ? 1u : 0u;
+    return packed;
 }
 inline bool append_native_sm3_defb(std::string& out, unsigned reg,
                                    std::uint32_t literal) {

@@ -17,7 +17,8 @@ int main() {
     std::string condition;
     assert(native_sm3_bool_reference(15u, true, condition));
     assert(condition == "r283_b15");
-    assert(!native_sm3_bool_reference(0u, false, condition));
+    assert(native_sm3_bool_reference(0u, false, condition));
+    assert(condition == "(r283_live_b[0].x != 0u)");
     assert(!native_sm3_bool_reference(16u, true, condition));
 
     NativeSm3ConditionalFlow flow;
