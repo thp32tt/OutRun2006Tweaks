@@ -105,6 +105,14 @@ def perf_check(root):
     menu = (root / "vrhost/src/runtime/menu_content_aspect.hpp").read_text(encoding="utf-8-sig")
     for label, ok in (
         ("R26 projected vehicle stereo XY owner", "R57BuildProjectedMarkerDelta(" in safe),
+        ("R26 exact-rank canted eye correction",
+         '#include "lens_centre_relative_eye_pose.hpp"' in safe and
+         "BuildHeadRelativeEyePose(" in safe and
+         "exactOrdinalRank ? exactEyeOrientations[eye] : identityOrientation" in safe),
+        ("R26 protected rival projection unchanged",
+         "markerProducer == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani" in safe and
+         "markerProducer == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite" in safe and
+         "exactOrdinalRank ? exactEyeOffsets[eye] : relativeEye" in safe),
         ("R26 fixed-function FVF142 rank draw owner", "R62TryFixedFunctionSpriteIndexed(" in safe and "fvf != 0x00000142u" in safe),
         ("R84 projected vehicle stereo XY owner", "R30BuildProjectedRankDelta(" in r30),
         ("R84 fixed-function rank eye path", "R30TryFixedFunctionOriginalSpriteStereo(" in r30),

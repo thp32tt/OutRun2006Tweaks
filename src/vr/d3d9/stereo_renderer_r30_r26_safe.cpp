@@ -17,6 +17,7 @@
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "lens_centre_relative_eye_pose.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
@@ -1602,6 +1603,29 @@ namespace OutRunVRStereo
                 0.0f, 0.0f, 0.0f, 1.0f
             };
 
+            // Regression isolation: original R26/R57 projected both ordinal
+            // vehicle ranks with identity eye rotations. Unlike the already
+            // working rival marker, exact ordinal ranks need the independent
+            // head-local OpenXR eye cant used by the proven R84 rank builder.
+            // Keep RivalMarkerSprani on its previous identity/IPD route.
+            // A failed rank pose proof delegates without publishing either
+            // corrected eye; no arbitrary HUD/ESC/F11/world draw enters here.
+            const auto markerProducer =
+                OutRunVR::GameSemantic::CurrentRenderProducerToken();
+            const bool exactOrdinalRank =
+                markerProducer == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                markerProducer == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite;
+            float exactEyeOffsets[2][3]{};
+            float exactEyeOrientations[2][4]{};
+            const float worldScale =
+                Settings::VRWorldScale * Settings::VRStereoDepth;
+            if (exactOrdinalRank &&
+                (!std::isfinite(worldScale) || worldScale <= 0.0f ||
+                 !OutRunVR::LensCentre::BuildHeadRelativeEyePose(
+                     stereo.eyeOffset, stereo.eyeOrientation,
+                     exactEyeOffsets, exactEyeOrientations)))
+                return false;
+
             for (int eye = 0; eye < 2; ++eye)
             {
                 const float relativeEye[3]{
@@ -1611,8 +1635,9 @@ namespace OutRunVRStereo
                 };
                 const D3DMATRIX eyePose =
                     MatrixFromQuaternionTranslation(
-                        identityOrientation, relativeEye,
-                        Settings::VRWorldScale * Settings::VRStereoDepth);
+                        exactOrdinalRank ? exactEyeOrientations[eye] : identityOrientation,
+                        exactOrdinalRank ? exactEyeOffsets[eye] : relativeEye,
+                        worldScale);
                 const D3DMATRIX eyeInverse = InverseRigid(eyePose);
                 const D3DMATRIX eyeProjection =
                     ProjectionFromFov(
