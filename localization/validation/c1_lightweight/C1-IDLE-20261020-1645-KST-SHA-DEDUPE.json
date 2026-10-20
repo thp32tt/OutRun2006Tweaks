@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1645-IDLE-SHA-DEDUPE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T16:45:00+09:00",
+  "inspection_type": "INDEPENDENT_SHA_DEDUP_PENDING_CHECK_ONLY",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "snapshot": {
+    "saved_png_candidates": 68,
+    "A_saved": 21,
+    "B_saved": 47,
+    "prior_reviewed_sha_match": 57,
+    "legacy_excluded": 1,
+    "new_sha_reviewed_20261020_1545": 8,
+    "new_sha_reviewed_20261020_1615": 2,
+    "pending_unreviewed_sha": 0
+  },
+  "references": [
+    "localization/validation/c1_lightweight/C1-20261020-1545-A0004R1-B0010R1-UNIQUE8.json",
+    "localization/validation/c1_lightweight/C1-QA-20261020-1615-B0010R1-REMAINDER-2.json"
+  ],
+  "verdict": "IDLE_NO_NEW_UNREVIEWED_A_B_PNG_SHA",
+  "new_qa_cases": 0,
+  "PASS_PNG_ONLY": 0,
+  "FAIL": 0,
+  "existing_candidate_notes": "Last ten reviewed PNGs are PNG-only PASS with REWORK_DIMENSIONS and UNVERIFIED_LIBRARY. No UI-cell compositing, DDS or game approval.",
+  "boundary": {
+    "imagegen_calls": 0,
+    "ab_queues_consumed": 0,
+    "dds_written": 0,
+    "C2_PASS": false,
+    "C3_PASS": false,
+    "user_ingame_PASS": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "AI": "AI 1",
+    "previous_confirmed": 1654,
+    "delta": 0,
+    "new_cumulative": 1654,
+    "reason": "Only state/dedup verification and IDLE record; no newly completed candidate QA"
+  }
+}
