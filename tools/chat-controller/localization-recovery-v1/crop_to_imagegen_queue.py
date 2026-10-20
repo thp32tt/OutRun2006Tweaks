@@ -129,6 +129,118 @@ def load_manifest(path: Path):
         raise ValueError("ACTIVE_MANIFEST_INVALID")
     return data
 
+
+REBALANCE_POLICY = "PENDING_A_TO_B_HALF_SPLIT_V1_20261020"
+
+
+def _state_for(root: Path, role: str):
+    p = root / "text_roi_batches" / (role + "_state.json")
+    if not p.is_file() or p.is_symlink():
+        return None
+    try:
+        obj = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return obj if obj.get("role") == role else None
+
+
+def _approved(data, role):
+    return [x for x in data["items"]
+            if isinstance(x, dict) and x.get("status") == "ROI_APPROVED_FOR_IMAGEGEN"
+            and x.get("role") == role]
+
+
+def rebalance_existing_pending(data, imagegen_root: Path):
+    """Move half of untouched A work to the exhausted B lane without reindexing history.
+
+    Completed B items stay the immutable prefix of B. Completed/in-flight A items
+    stay the immutable prefix of A. Rebalanced B copies are appended to the end
+    of the manifest while the original untouched A rows are retired.
+    """
+    if data.get("rebalance_policy") == REBALANCE_POLICY:
+        return data.get("rebalance_summary", {"status": "ALREADY_REBALANCED"})
+    a_state = _state_for(imagegen_root, "A")
+    b_state = _state_for(imagegen_root, "B")
+    if not a_state or not b_state:
+        return {"status": "DEFERRED_STATE_MISSING"}
+    if b_state.get("active"):
+        return {"status": "DEFERRED_B_ACTIVE"}
+    a_rows = _approved(data, "A")
+    b_rows = _approved(data, "B")
+    if b_state.get("next_ordinal") != len(b_rows) + 1:
+        return {"status": "DEFERRED_B_NOT_EXHAUSTED",
+                "b_next_ordinal": b_state.get("next_ordinal"),
+                "b_approved": len(b_rows)}
+    active = a_state.get("active")
+    protected = a_state.get("next_ordinal", 1) - 1
+    if active:
+        ordinals = active.get("ordinals") or []
+        items = active.get("items") or []
+        if not ordinals or len(ordinals) != len(items):
+            raise ValueError("A_ACTIVE_REBALANCE_BINDING_INVALID")
+        for pos, item in zip(ordinals, items):
+            if pos < 1 or pos > len(a_rows) or a_rows[pos - 1].get("id") != item.get("region_id"):
+                raise ValueError("A_ACTIVE_REBALANCE_QUEUE_CHANGED")
+        protected = max(protected, int(active.get("next_ordinal_after", max(ordinals) + 1)) - 1)
+    if protected < 0 or protected > len(a_rows):
+        raise ValueError("A_REBALANCE_PROTECTED_RANGE_INVALID")
+    candidates = a_rows[protected:]
+    move = candidates[1::2]  # Keep/move alternating so remaining work is split 1:1.
+    if not move:
+        summary = {"status": "NO_PENDING_A_TO_REBALANCE", "protected_a": protected,
+                   "a_approved": len(a_rows), "b_approved": len(b_rows), "moved": 0}
+        data["rebalance_policy"] = REBALANCE_POLICY
+        data["rebalance_summary"] = summary
+        return summary
+    existing_ids = {x.get("id") for x in data["items"] if isinstance(x, dict)}
+    clones = []
+    for original in move:
+        old_id = original["id"]
+        new_id = old_id + "_RB_B"
+        if len(new_id) > 96:
+            new_id = old_id[:91] + "_RB_B"
+        if new_id in existing_ids or not SAFE.fullmatch(new_id):
+            raise ValueError("REBALANCE_CLONE_ID_COLLISION")
+        clone = json.loads(json.dumps(original))
+        clone["id"] = new_id
+        clone["role"] = "B"
+        clone["status"] = "ROI_APPROVED_FOR_IMAGEGEN"
+        clone["rebalance_of"] = old_id
+        clone["rebalance_policy"] = REBALANCE_POLICY
+        original["status"] = "ROI_REBALANCED_TO_B"
+        original["rebalanced_to"] = "B"
+        original["rebalance_policy"] = REBALANCE_POLICY
+        clones.append(clone)
+        existing_ids.add(new_id)
+    data["items"].extend(clones)
+    summary = {
+        "status": "REBALANCED",
+        "protected_a": protected,
+        "a_before": len(a_rows),
+        "b_before": len(b_rows),
+        "moved": len(clones),
+        "a_after": len(_approved(data, "A")),
+        "b_after": len(_approved(data, "B")),
+    }
+    data["rebalance_policy"] = REBALANCE_POLICY
+    data["rebalance_summary"] = summary
+    return summary
+
+
+def choose_role(data, imagegen_root: Path, q: str):
+    """After rebalancing, keep newly salvaged work on the less-loaded live lane."""
+    if data.get("rebalance_policy") != REBALANCE_POLICY:
+        return "A" if int(q[1:]) % 2 else "B"
+    pending = {}
+    for role in ("A", "B"):
+        rows = _approved(data, role)
+        st = _state_for(imagegen_root, role)
+        done_prefix = max(0, int((st or {}).get("next_ordinal", 1)) - 1)
+        pending[role] = max(0, len(rows) - done_prefix)
+    if pending["A"] == pending["B"]:
+        return "A" if int(q[1:]) % 2 else "B"
+    return min(pending, key=pending.get)
+
 def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
     if not croot.is_dir() or not transcript.is_file():
         raise ValueError("SOURCE_ROOT_OR_TRANSCRIPT_MISSING")
@@ -138,6 +250,7 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
     inputs = base / "inputs"
     manifest_path = base / "production_manifest.json"
     data = load_manifest(manifest_path)
+    rebalance = rebalance_existing_pending(data, imagegen_root)
     existing = {x.get("source_key") for x in data["items"] if isinstance(x, dict)}
     added = 0
     held = 0
@@ -180,7 +293,7 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
             ident = f"{q}_{key[:16]}"
             if not SAFE.fullmatch(ident):
                 raise ValueError("UNSAFE_GENERATED_ID")
-            role = "A" if int(q[1:]) % 2 else "B"
+            role = choose_role(data, imagegen_root, q)
             outname = ident + "_source.png"
             outpath = inputs / outname
             if outpath.exists():
@@ -222,8 +335,8 @@ def scan_once(croot: Path, transcript: Path, imagegen_root: Path):
     data["item_count"] = len(data["items"])
     atomic_json(manifest_path, data)
     return {"status": "QUEUE_SYNC", "added": added, "held": held, "total": len(data["items"]),
-            "A": sum(x["role"] == "A" for x in data["items"]),
-            "B": sum(x["role"] == "B" for x in data["items"])}
+            "A": len(_approved(data, "A")), "B": len(_approved(data, "B")),
+            "rebalance": rebalance}
 
 def main():
     ap = argparse.ArgumentParser()
