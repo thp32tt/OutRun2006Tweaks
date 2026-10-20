@@ -135,6 +135,7 @@ def main():
         last_summary = None
         last_hd108_status = None
         last_edge_status = None
+        last_coverage_status = None
         heartbeat = 0.0
         last_discovery = -1000000.0
         while not STOP:
@@ -143,23 +144,49 @@ def main():
                 if now-last_discovery >= 60:
                     last_discovery=now
                     try:
-                        # Scan each of the 108 verified unsplit HD originals ONCE
-                        # per policy revision, not hundreds of times each day.
-                        # DDS registry already yielded the historic 94 C crops;
-                        # its repeatedly rescheduled OCR added no new output.
-                        # Preserve DDS queue processing below, but stop redundant
-                        # full-image DDS scans until an explicit separate change.
+                        # Coverage-driven scan: a source is revisited until every
+                        # reviewed phrase has a crop. OCR strategy rotates by attempt.
                         original108=ocr_hd108.scan(max_sources=4, max_new=1000)
-                        if (original108["status"]!="HD108_PASS_COMPLETE_REVIEW_PENDING"
-                            or last_hd108_status!=original108["status"]):
+                        hd_sig=(original108.get("status"),
+                                original108.get("pending_sources_after"),
+                                original108.get("pending_phrases_after"))
+                        if original108.get("new_crops") or hd_sig!=last_hd108_status:
                             write_audit(original108)
-                        last_hd108_status=original108["status"]
+                        last_hd108_status=hd_sig
+
+                        # Edge warnings are progressively expanded and only stop
+                        # blocking after a safe or max-context/C1-required crop exists.
                         edge_review=ocr_hd108.review_edge_warnings(max_items=args.max_per_cycle)
                         edge_sig=(edge_review.get("status"),edge_review.get("pending_after"),
                                   edge_review.get("rescued"),edge_review.get("held"))
                         if edge_review.get("reviewed") or edge_sig!=last_edge_status:
                             write_audit(edge_review)
                         last_edge_status=edge_sig
+
+                        phrase_pending=int(original108.get("pending_phrases_after",
+                                                           original108.get("pending_phrases_before",0)) or 0)
+                        edge_pending=int(edge_review.get("pending_after",0) or 0)
+                        coverage_status={
+                            "status":("C_CROP_COVERAGE_COMPLETE"
+                                      if phrase_pending==0 and edge_pending==0
+                                      else "C_CROP_COVERAGE_RUNNING"),
+                            "reviewed_phrase_total":original108.get("reviewed_phrase_total"),
+                            "located_phrase_count":original108.get("located_phrase_count"),
+                            "pending_sources":original108.get("pending_sources_after",
+                                                              original108.get("pending_sources_before")),
+                            "pending_phrases":phrase_pending,
+                            "edge_pending":edge_pending,
+                            "new_crops_this_cycle":original108.get("new_crops",0),
+                            "edge_rescued_this_cycle":edge_review.get("rescued",0),
+                            "RUNTIME_VALIDATION":"UNTESTED",
+                        }
+                        coverage_sig=(coverage_status["status"],coverage_status["pending_sources"],
+                                      coverage_status["pending_phrases"],coverage_status["edge_pending"])
+                        if (coverage_status["new_crops_this_cycle"] or
+                            coverage_status["edge_rescued_this_cycle"] or
+                            coverage_sig!=last_coverage_status):
+                            write_audit(coverage_status)
+                        last_coverage_status=coverage_sig
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
                 summary = process_batch(args.max_per_cycle)
