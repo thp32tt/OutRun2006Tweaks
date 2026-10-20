@@ -21,6 +21,7 @@ on:
       - 'tools/verify_dx11_native_transport_contract.py'
       - 'tools/test_dx11_*.py'
       # Genuine SM3 shader-control C++ regressions must run Fast at their own exact SHA.
+      - 'tools/dx11_sm3_*_probe.cpp'
       - 'tools/dx11_sm3_*_probe_*.cpp'
       # The real desktop GPU output restoration probe must trigger exact-SHA Fast.
       - 'tools/dx11_native_desktop_gpu_output_probe.cpp'
