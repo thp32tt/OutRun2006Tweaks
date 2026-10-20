@@ -36,6 +36,7 @@ assert 'if (Settings::VRTelemetry && R30IsExactResultHudDraw())' in shader_gate,
 assert 'RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO' in shader_gate, 'diagnose zero-cache physical shader ambiguity'
 assert 'device->GetVertexShader(&liveVs)' in shader_gate and 'liveVs->Release()' in shader_gate, 'release any observed live shader'
 assert '                return false;\n            }' in shader_gate, 'live shader diagnosis must not promote R26 source'
-assert 'stage=R62_ONLY finalRoute=UNDETERMINED api=DIP' in fixed, 'R62 failed candidate is not terminal HUD rejection'
+indexed_dispatch = src[src.index('HRESULT __stdcall DrawIndexedPrimitiveDestR30('):src.index('HRESULT __stdcall DrawPrimitiveUPDestR30(')]
+assert 'stage=R62_ONLY finalRoute=UNDETERMINED api=DIP' in indexed_dispatch, 'R62 failed candidate is not terminal HUD rejection'
 
 print('R26 result HUD pose/physical draw contract PASS')
