@@ -56,7 +56,7 @@ def _covered_codes(row, out_root=OUT):
     continue
    en=j.get("english")
    if isinstance(en,str) and en.strip():
-    covered.add(ocr.norm(en))
+    covered.add(ocr.norm(ocr.searchable_phrase(en)))
   except (OSError,ValueError,TypeError):
    continue
  return covered
