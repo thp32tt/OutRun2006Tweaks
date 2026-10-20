@@ -1149,8 +1149,7 @@ bool build_r283_sm3_mov_shader_source(
                 if (modifier == D3DSPSM_NOT)
                     return false;
                 std::string value;
-                if (relative && (op.matrixRowCount != 0u ||
-                                 (op.texture2d && i == 1u)))
+                if (relative && op.texture2d && i == 1u)
                     return false;
                 if (op.texture2d && i == 1u) {
                     // SM3 TEXLD's second source is a sampler, not an
@@ -1190,19 +1189,44 @@ bool build_r283_sm3_mov_shader_source(
                         op.textureMode, i, modifier))
                     return false;
                 if (op.matrixRowCount != 0u && i == 1u) {
-                    // Matrix source must denote consecutive real c registers
-                    // without relative indexing, modifier or row swizzle.
+                    // Each SM3 M*x* instruction reads a consecutive matrix
+                    // register block. A shader-owned a0 or authentic aL may
+                    // shift the whole block, not the individual source rows.
+                    // Reuse the same live i# draw limits as scalar c[aL];
+                    // unknown vertex-owned addresses still fail closed.
                     if (kind != D3DSPR_CONST || modifier != D3DSPSM_NONE ||
-                        swizzle != 0xe4u ||
-                        reg + op.matrixRowCount > constantLimit)
+                        swizzle != 0xe4u || reg >= constantLimit ||
+                        op.matrixRowCount > constantLimit - reg)
                         return false;
-                    for (unsigned row = 0u; row < op.matrixRowCount; ++row) {
-                        if (!native_sm3_const_reference(
-                                reg + row, constantLimit,
-                                defPresent[reg + row], op.matrixRows[row]))
+                    if (relative) {
+                        if (!staticAddress && loopRanges.empty())
                             return false;
-                        if (!defPresent[reg + row])
-                            liveConstantsUsed = true;
+                        const bool dynamicLoop =
+                            !staticAddress && loopRanges.back().dynamic;
+                        const int minimum = staticAddress ? 0 :
+                            loopRanges.back().minimum;
+                        const int maximum = staticAddress ? 0 :
+                            loopRanges.back().maximum;
+                        const unsigned integerRegister = staticAddress ? 0u :
+                            loopRanges.back().integerRegister;
+                        bool liveMatrix = false;
+                        if (!native_sm3_relative_matrix_references(
+                                reg, op.matrixRowCount, constantLimit,
+                                staticAddress, staticAddressIndex,
+                                dynamicLoop, minimum, maximum, integerRegister,
+                                defPresent, indexedLoopLimits,
+                                op.matrixRows, liveMatrix))
+                            return false;
+                        if (liveMatrix) liveConstantsUsed = true;
+                    } else {
+                        for (unsigned row = 0u; row < op.matrixRowCount; ++row) {
+                            if (!native_sm3_const_reference(
+                                    reg + row, constantLimit,
+                                    defPresent[reg + row], op.matrixRows[row]))
+                                return false;
+                            if (!defPresent[reg + row])
+                                liveConstantsUsed = true;
+                        }
                     }
                     continue;
                 }

@@ -5,6 +5,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include "native_sm3_address_codegen.hpp"
 
 namespace outrun::vr::dx11 {
 inline bool native_sm3_const_reference(unsigned reg, unsigned limit,
@@ -92,6 +93,76 @@ inline bool append_native_sm3_matrix(
         if (mask & (1u << i)) writeMask += kOutputLanes[i];
     out += "    " + destination + "." + writeMask +
            " = " + temporary + "." + writeMask + ";\n";
+    return true;
+}
+
+
+/*
+ * Bind an entire game SM3 M*x* c-register matrix, including c[base+a0]
+ * and c[base+aL]. Static a0 uses real DEF precedence; aL must refer to
+ * an actual bounded D3D9 LOOP and cannot alias shader-local DEF registers.
+ * Dynamic i# loops inherit the per-Draw exclusive upper bound, reduced
+ * to account for the final matrix row. No partial outputs on rejection.
+ */
+inline bool native_sm3_relative_matrix_references(
+    unsigned base, unsigned rows, unsigned limit,
+    bool fromStaticAddress, int staticAddress,
+    bool dynamicLoop, int loopMinimum, int loopMaximum, unsigned loopRegister,
+    const std::array<bool, 256>& defPresent,
+    std::array<std::uint16_t, 16>& loopExclusiveLimits,
+    std::array<std::string, 4>& references, bool& readsLive) {
+    readsLive = false;
+    if (rows < 2u || rows > 4u || limit == 0u || limit > 256u ||
+        base >= limit || rows > limit - base ||
+        (fromStaticAddress && dynamicLoop))
+        return false;
+    unsigned dynamicExclusive = 0u;
+    if (fromStaticAddress) {
+        if (staticAddress < 0 ||
+            static_cast<unsigned>(staticAddress) > limit - base - rows)
+            return false;
+    } else if (dynamicLoop) {
+        if (loopRegister >= loopExclusiveLimits.size())
+            return false;
+        for (unsigned reg = base; reg < limit; ++reg)
+            if (defPresent[reg]) return false;
+        // aL may address the first row through the last legal matrix.
+        // The source Draw validator checks i#.x/y/z against this bound.
+        dynamicExclusive = limit - base - rows + 1u;
+    } else {
+        const auto lowest = static_cast<long long>(base) + loopMinimum;
+        const auto highest = static_cast<long long>(base) +
+                             static_cast<long long>(rows) - 1 + loopMaximum;
+        if (loopMinimum > loopMaximum || lowest < 0 ||
+            highest >= static_cast<long long>(limit))
+            return false;
+        for (auto reg = lowest; reg <= highest; ++reg)
+            if (defPresent[static_cast<unsigned>(reg)]) return false;
+    }
+    std::array<std::string, 4> next{};
+    bool live = false;
+    for (unsigned row = 0u; row < rows; ++row) {
+        if (fromStaticAddress) {
+            unsigned index = 0u;
+            if (!native_sm3_static_address_const_index(
+                    base + row, static_cast<unsigned>(staticAddress),
+                    limit, index) ||
+                !native_sm3_const_reference(
+                    index, limit, defPresent[index], next[row]))
+                return false;
+            if (!defPresent[index]) live = true;
+        } else {
+            next[row] = "r283_c[" + std::to_string(base + row) + " + r283_aL]";
+            live = true;
+        }
+    }
+    references = std::move(next);
+    readsLive = live;
+    if (dynamicExclusive) {
+        auto& old = loopExclusiveLimits[loopRegister];
+        if (!old || dynamicExclusive < old)
+            old = static_cast<std::uint16_t>(dynamicExclusive);
+    }
     return true;
 }
 
