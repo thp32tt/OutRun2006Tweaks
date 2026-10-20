@@ -196,6 +196,7 @@ on:
       - 'vrhost/tests/goal_progress_owner_smoke.cpp'
       - 'tools/verify_vr_cross_thread_semantic_registry.py'
       - 'tools/verify_vr_projected_marker_anchor.py'
+      - 'tools/verify_vr_rank_dx11_reference.py'
       - 'tools/verify_vr_projected_marker_telemetry.py'
       - 'tools/verify_vr_visual_composition_p0.py'
       - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
@@ -418,6 +419,7 @@ jobs:
             'tools/verify_vr_producer_provenance.py',
             'tools/verify_vr_cross_thread_semantic_registry.py',
             'tools/verify_vr_projected_marker_anchor.py',
+            'tools/verify_vr_rank_dx11_reference.py',
             'tools/verify_vr_ui_matrix_safety.py',
             'tools/verify_vr_desktop_source_coordinates.py',
             'tools/verify_vr_unified_menu_source.py',
