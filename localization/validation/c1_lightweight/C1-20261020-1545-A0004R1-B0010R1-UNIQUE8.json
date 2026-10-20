@@ -1,0 +1,617 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1545-A0004R1-B0010R1-UNIQUE8",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T15:45:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "prior_branch_head": "1a31033ce61a284f35fd504e0ae02a55502ebcba",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "dedup": {
+    "previous_sha_pool": 62,
+    "stored_png_count": 68,
+    "previous_reviewed_matches": 57,
+    "excluded_legacy_count": 1,
+    "new_eligible_total": 10,
+    "reviewed_unique_count": 8,
+    "deferred_unique_count": 2,
+    "deferred_candidate_sha256": [
+      "3b836b7eb72df69e64427abafbc7e6a106836ac5e0b9ddccea7addf91ade1528",
+      "51e0fb322a9fadf2628ca5bf8ba30e0095577e8feccaee5c0d27a697a85f65dc"
+    ]
+  },
+  "qa_scope": "Transparent Korean-lettering PNG candidate itself only: visual English/approved Korean pairing, glyph integrity, no obvious extra background, alpha and border inspect. UI-cell placement, image scaling, clean plate, DDS and in-game untested.",
+  "cases": [
+    {
+      "producer": "A",
+      "source_ordinal": 16,
+      "file": "Q051_a4d20de7d73bdf1e_source_k.png",
+      "candidate_sha256": "a15224593b9e09be8630c71476fad667c04e2809767c85837298ad87b1bb9ddf",
+      "source_roi_file": "Q051_a4d20de7d73bdf1e_source.png",
+      "source_roi_sha256": "4a7fb31072c11d5e88931c7db2ff602ceba9c7d8da4f9b51b34793b2fd4617b4",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "english": "Score",
+      "approved_korean": "점수",
+      "bbox_xyxy": [
+        1317,
+        626,
+        1602,
+        710
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_reference_dimensions": [
+        570,
+        168
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        635,
+        130,
+        1609,
+        591
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "No visible hard-stop defects; original ROI and generated PNG pixel dimensions differ, so no placement acceptance."
+    },
+    {
+      "producer": "A",
+      "source_ordinal": 17,
+      "file": "Q053_f6bb9f1d4f148346_source_k.png",
+      "candidate_sha256": "b0577c1e12bfb5bc9d097bd5a5b38cfee5db082d8a0629cfb27ca5c95f429733",
+      "source_roi_file": "Q053_f6bb9f1d4f148346_source.png",
+      "source_roi_sha256": "72a3c45f21ff4144e62d620d888f2f964cd362c167159d2ca02576ea7e7629e1",
+      "source_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "english": "ANSWER",
+      "approved_korean": "정답",
+      "bbox_xyxy": [
+        2121,
+        2563,
+        3254,
+        2797
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_reference_dimensions": [
+        1133,
+        234
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox_32": [
+        491,
+        61,
+        1718,
+        664
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 15,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "Gold glow has low-alpha fringe: 15 bottom-edge pixels only at alpha>=1; zero bottom-edge pixels at alpha>=16/32. Source 'ANSWER' remains a single two-syllable Korean word '정답', not two lines."
+    },
+    {
+      "producer": "A",
+      "source_ordinal": 18,
+      "file": "Q065_4796905a3921198b_source_k.png",
+      "candidate_sha256": "ca25d0a1a7902fe67a498cf49ee2dac154ea83d123a82b23beeace1cf5ec85c3",
+      "source_roi_file": "Q065_4796905a3921198b_source.png",
+      "source_roi_sha256": "62f94a045d173ebd8b98d6e9110d62bbb2b628ce2b1bff918c7a2b81df3340f8",
+      "source_dds_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "english": "Loading",
+      "approved_korean": "로딩",
+      "bbox_xyxy": [
+        225,
+        427,
+        693,
+        547
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_reference_dimensions": [
+        936,
+        240
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        606,
+        113,
+        1576,
+        607
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "No visible hard-stop defects; original ROI and generated PNG pixel dimensions differ, so no placement acceptance."
+    },
+    {
+      "producer": "A",
+      "source_ordinal": 19,
+      "file": "Q065_1b2f9e3d8eb09bc6_source_k.png",
+      "candidate_sha256": "59bfc74cf069c8bf0be5deff6e823bfc5afb82546f4c10d4894783b6243409ba",
+      "source_roi_file": "Q065_1b2f9e3d8eb09bc6_source.png",
+      "source_roi_sha256": "43cb5a58864e7eff64e4344f0f3d1c0608d126b0a3a6a2855bff59d8e81493db",
+      "source_dds_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "english": "Loading",
+      "approved_korean": "로딩",
+      "bbox_xyxy": [
+        1145,
+        427,
+        1613,
+        547
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_reference_dimensions": [
+        936,
+        240
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        598,
+        144,
+        1583,
+        603
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "No visible hard-stop defects; original ROI and generated PNG pixel dimensions differ, so no placement acceptance."
+    },
+    {
+      "producer": "A",
+      "source_ordinal": 20,
+      "file": "Q101_14fba2230560a7b6_source_k.png",
+      "candidate_sha256": "4aec45f51c263586c0959856aba9a40dcf46089f4a0832d28995469321afb92d",
+      "source_roi_file": "Q101_14fba2230560a7b6_source.png",
+      "source_roi_sha256": "c08831115aa1ae27e315f822ed58d8d5a869566ec3a86fcbfb41028e49268b86",
+      "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "english": "You will run 15 courses continuously.",
+      "approved_korean": "15코스를 연속으로 달립니다.",
+      "bbox_xyxy": [
+        3121,
+        673,
+        4053,
+        756
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_reference_dimensions": [
+        1864,
+        166
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        50,
+        241,
+        2132,
+        466
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "Long sentence legible in one line; sentence width ratio is diagnostic only."
+    },
+    {
+      "producer": "B",
+      "source_ordinal": 43,
+      "file": "Q121_935a7d6c50e7c4dd_source_k.png",
+      "candidate_sha256": "3119daf1bb1aaff21f0b7d75a3092370785e80760398e1971ee4a5453d14d568",
+      "source_roi_file": "Q121_935a7d6c50e7c4dd_source.png",
+      "source_roi_sha256": "f7610cf5a2f487fd564a6e1dc52d97759a0a2df1f8db005c62e8be9a01e8d631",
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "Select your car",
+      "approved_korean": "차량 선택",
+      "bbox_xyxy": [
+        268,
+        992,
+        1110,
+        1119
+      ],
+      "candidate_dimensions": [
+        2170,
+        725
+      ],
+      "source_reference_dimensions": [
+        1684,
+        254
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        384,
+        211,
+        1843,
+        516
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "No visible hard-stop defects; original ROI and generated PNG pixel dimensions differ, so no placement acceptance."
+    },
+    {
+      "producer": "B",
+      "source_ordinal": 44,
+      "file": "Q121_7d9a094420ad3d79_source_k.png",
+      "candidate_sha256": "94c7b699ed871483f1b7890ce97489d40077606f799b87bbb798b38a995171ad",
+      "source_roi_file": "Q121_7d9a094420ad3d79_source.png",
+      "source_roi_sha256": "d0b7c67ca4939fd633aaf9f8f39577110ccdbcfcfe54964b038a8f2dffd09be0",
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "You will run 15 courses continuously.",
+      "approved_korean": "15코스를 연속으로 달립니다.",
+      "bbox_xyxy": [
+        1,
+        553,
+        932,
+        636
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_reference_dimensions": [
+        1862,
+        166
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        84,
+        251,
+        2104,
+        448
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "Long sentence legible in one line; sentence width ratio is diagnostic only."
+    },
+    {
+      "producer": "B",
+      "source_ordinal": 45,
+      "file": "Q121_a9fbb2d93b8b6dbd_source_k.png",
+      "candidate_sha256": "938a732e9d4b377315a68331b64e2d6c002a33907865732fefe0cbce0cfc21f3",
+      "source_roi_file": "Q121_a9fbb2d93b8b6dbd_source.png",
+      "source_roi_sha256": "1b5dfb180d39fa3635c9cd71903ff6eb3e2e7e2b85e5d7365b26de19dc7d65b2",
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "Select car setting",
+      "approved_korean": "차량 설정 선택",
+      "bbox_xyxy": [
+        2455,
+        1248,
+        3419,
+        1375
+      ],
+      "candidate_dimensions": [
+        2164,
+        727
+      ],
+      "source_reference_dimensions": [
+        1928,
+        254
+      ],
+      "png_format": "PNG",
+      "native_mode": "RGBA",
+      "source_input_sha_matches_manifest": true,
+      "producer_export_sha_matches": true,
+      "approved_mapping_matches_manifest": true,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox_32": [
+        225,
+        228,
+        1982,
+        475
+      ],
+      "border_pixel_counts": {
+        "1": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "16": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "32": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "review": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "spelling": "PASS_VISUAL",
+      "orientation": "PASS_VISUAL",
+      "nontext_art": "NONE_OBSERVED",
+      "alpha_transparency": "PASS",
+      "ui_cell_placement": "HOLD_UNTESTED",
+      "composition_gate": "HOLD_REWORK_DIMENSIONS",
+      "note": "No visible hard-stop defects; original ROI and generated PNG pixel dimensions differ, so no placement acceptance."
+    }
+  ],
+  "summary": {
+    "PASS_PNG_ONLY": 8,
+    "FAIL": 0,
+    "HOLD_PNG_VISUAL": 0,
+    "DEFERRED_NEW_SHA": 2,
+    "FINAL_APPROVAL": 0
+  },
+  "producer_receipts": [
+    "OUTRUN-ROI-A-0004-73FA0354-R1",
+    "OUTRUN-ROI-B-0010-8F2213CF-R1"
+  ],
+  "n100_visual_evidence": [
+    "work/c1_batch_20261020_1545/compare_1.png",
+    "work/c1_batch_20261020_1545/compare_2.png",
+    "work/c1_batch_20261020_1545/metrics.json"
+  ],
+  "source_evidence_warning": "Producer export records report REWORK_DIMENSIONS for all eight. PNG visual QA PASS does not supersede this producer warning and cannot be used for automated DDS release.",
+  "boundary": {
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "dds_written": 0,
+    "C2_PASS": false,
+    "C3_PASS": false,
+    "user_ingame_PASS": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "AI": "AI 1",
+    "prior_confirmed": 1652,
+    "delta": 1,
+    "new_cumulative": 1653,
+    "dedup": "New independent 8-SHA batch; prior 62 reviewed hashes excluded"
+  }
+}
