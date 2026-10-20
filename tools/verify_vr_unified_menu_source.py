@@ -11,8 +11,11 @@ ex=(root/"src/vr/d3d9/ex_device_upgrade.cpp").read_text(encoding="utf-8")
 ui=(root/"src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
 settings=(root/"src/vr/settings.cpp").read_text(encoding="utf-8")
 policy=(root/"src/vr/ui/vr_logical_coordinate_space.hpp").read_text(encoding="utf-8")
-assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", true,' in settings
+assert 'VRUnifiedEyeMenuSource{ "VR", "UnifiedEyeMenuSource", false,' in settings
 assert "Settings::VRUnifiedEyeMenuSource.needs_restart();" in settings
+ini=(root/"OutRun2006Tweaks.ini").read_text(encoding="utf-8")
+assert "UnifiedEyeMenuSource = false" in ini
+assert "FollowGameResolution = true" in ini
 assert "Settings::VRUnifiedEyeMenuSource" in cfg and "Settings::VRUnifiedEyeMenuSource" in ex
 assert "vr_logical_coordinate_space.hpp" in ui
 overlay=(root/"src/overlay/hooks_overlay.cpp").read_text(encoding="utf-8")
