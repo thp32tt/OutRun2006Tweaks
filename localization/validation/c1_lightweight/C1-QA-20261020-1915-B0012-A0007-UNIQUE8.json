@@ -1,0 +1,565 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1915-B0012-A0007-UNIQUE8",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T19:15:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "evidence_local": "work/c1_batch_20261020_1915/{metrics.json,compare_1.png,compare_2.png}",
+  "dedup": {
+    "previous_qa_head": "6cdd76d465a7204eb8bd10d2f957e6d96b717769",
+    "previous_qa_task": "OUTRUN-C1-20261020-1845-B0011-A0006-UNIQUE8",
+    "previous_newly_checked_sha_count": 8,
+    "selection": "B0012 5 and A0007 first 3; checked GitHub QA filenames: no prior B0012/A0007, candidate SHA unique across 8",
+    "unique_sha": 8
+  },
+  "cases": [
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0012-B2938986",
+      "source_ordinal": 53,
+      "file": "Q135_51d48bc0893179d1_source_k.png",
+      "candidate_sha256": "8800060b5e72507692dec35a336c8f8f6b5879ab417d6fc41ae2606281b0ca63",
+      "source_roi": "Q135_51d48bc0893179d1_source.png",
+      "source_roi_sha256": "5bebc2a6a2dbd4b27ee2889e4fdb644dc3a8906eb7cb06af2829d0f6ed110ac1",
+      "source_dds_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "english": "OUTRUN",
+      "approved_korean": "아웃런",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        632,
+        164
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        412,
+        122,
+        1761,
+        579
+      ],
+      "alpha_bbox_32": [
+        412,
+        122,
+        1761,
+        579
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 91,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 512871,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Alpha=1 bottom border 91 pixels; >=16 no edge contact. Inspect at native composition; visual lettering legible."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0012-B2938986",
+      "source_ordinal": 54,
+      "file": "Q137_49a7ab972b3d9fc7_source_k.png",
+      "candidate_sha256": "55af4a9273c2e782a923c1a4a05201f70641b1bdadc681bd0a258b0f234cd2c3",
+      "source_roi": "Q137_49a7ab972b3d9fc7_source.png",
+      "source_roi_sha256": "21c6cd151f52e4fce3c1656efcbfab59b7e5cbbc92293967f292cd4a69a15e36",
+      "source_dds_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "english": "TRANSMISSION",
+      "approved_korean": "변속기",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1206,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        542,
+        184,
+        1616,
+        551
+      ],
+      "alpha_bbox_32": [
+        546,
+        192,
+        1612,
+        545
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 415214,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Approved Hangul legible; no obvious nontext plate/frame or clipping in isolated PNG."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0012-B2938986",
+      "source_ordinal": 55,
+      "file": "Q147_1294325f6a82f164_source_k.png",
+      "candidate_sha256": "77d82b94c05dded9733fd2b73c2db6b3cc8526ab2469285eae6723bc65898983",
+      "source_roi": "Q147_1294325f6a82f164_source.png",
+      "source_roi_sha256": "f3c5b1426f1451b2e22908d39b2d369c3b9924cce5963e1f3748b44bd2f0a939",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "english": "DESERT",
+      "approved_korean": "데저트",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        638,
+        170
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        434,
+        127,
+        1751,
+        567
+      ],
+      "alpha_bbox_32": [
+        434,
+        127,
+        1751,
+        566
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 491351,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Approved Hangul legible and glyph effect contained in generated canvas."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0012-B2938986",
+      "source_ordinal": 56,
+      "file": "Q147_325b96ffe4d80317_source_k.png",
+      "candidate_sha256": "9a874891456cb8f645a8fac6bdec20d594609c9a0b091f4c6b7058fc0f9755d5",
+      "source_roi": "Q147_325b96ffe4d80317_source.png",
+      "source_roi_sha256": "e9ab7689242d6cc18a5f875cc477dcd54a696cd7239e67cb605b02fa98e23414",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "english": "METROPOLIS",
+      "approved_korean": "메트로폴리스",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        960,
+        172
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        90,
+        203,
+        2081,
+        526
+      ],
+      "alpha_bbox_32": [
+        91,
+        204,
+        2081,
+        526
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 13,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 541729,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Alpha=1 left border 13 pixels; >=16 no edge contact. Inspect at native composition."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0012-B2938986",
+      "source_ordinal": 57,
+      "file": "Q147_ec7945b0272a4494_source_k.png",
+      "candidate_sha256": "6d46f56894dbc8e6ed78bcdbb5df11c5b61c2a4056d73739d1fd636ec3e1cd32",
+      "source_roi": "Q147_ec7945b0272a4494_source.png",
+      "source_roi_sha256": "bd66686d39e93f7e339340bdda37ad54980ab2fc315fe0b1a1c9d2ac99a4ae9a",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "english": "SNOW MOUNTAIN",
+      "approved_korean": "스노 마운틴",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1270,
+        170
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        173,
+        179,
+        2050,
+        535
+      ],
+      "alpha_bbox_32": [
+        173,
+        179,
+        2049,
+        535
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 485432,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Approved Hangul legible; no obvious translation/glyph defects."
+    },
+    {
+      "producer": "A",
+      "task_id": "OUTRUN-ROI-A-0007-E9BCDB33",
+      "source_ordinal": 31,
+      "file": "Q135_2a4a33a28b774ea1_source_k.png",
+      "candidate_sha256": "e3688ed34314e69711d6bc3134f33f49044b44a635e3a7093bba7b1d68ba835b",
+      "source_roi": "Q135_2a4a33a28b774ea1_source.png",
+      "source_roi_sha256": "2894e2fd6205939242c9c1b5d7596acebedd7614022b13d93ec8b0de9e5ccb76",
+      "source_dds_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "english": "INTERMEDIATE A",
+      "approved_korean": "중급 A",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1214,
+        160
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        716,
+        234,
+        1479,
+        478
+      ],
+      "alpha_bbox_32": [
+        716,
+        234,
+        1479,
+        478
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 150902,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Stylized '중급 A' legible; faint low-alpha fringe beyond core may need composition check."
+    },
+    {
+      "producer": "A",
+      "task_id": "OUTRUN-ROI-A-0007-E9BCDB33",
+      "source_ordinal": 32,
+      "file": "Q137_8b1ae1ab48712aa0_source_k.png",
+      "candidate_sha256": "c13469e3274180e1bee6f86ce3dcd79d045b568f5a92d2bc644a392a6764d1de",
+      "source_roi": "Q137_8b1ae1ab48712aa0_source.png",
+      "source_roi_sha256": "148b498881d9ddd7f5155d366e9dce13a5a2ed86fbf2dfb851a1a7e4d8b9e1f4",
+      "source_dds_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "english": "TRANSMISSION",
+      "approved_korean": "변속기",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1268,
+        224
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        680,
+        216,
+        1509,
+        504
+      ],
+      "alpha_bbox_32": [
+        680,
+        216,
+        1509,
+        504
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 213132,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Bold white '변속기' readable; layered dark outline is ornamental, reassess after scaling."
+    },
+    {
+      "producer": "A",
+      "task_id": "OUTRUN-ROI-A-0007-E9BCDB33",
+      "source_ordinal": 33,
+      "file": "Q147_e55cf9340e4e718c_source_k.png",
+      "candidate_sha256": "f99114059f5e213d137faac457a65377e92400c2816e2a41fee5a57e72411b98",
+      "source_roi": "Q147_e55cf9340e4e718c_source.png",
+      "source_roi_sha256": "35c9b65c4f9e51944bc2b2d3dd80d287874fb276340333faa373cc4a8689c91d",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "english": "CONIFEROUS FOREST",
+      "approved_korean": "코니퍼러스 포레스트",
+      "reviewed_mapping": "transcriptions.jsonl status=transcribed_reviewed; source/korean exact segment",
+      "source_admission": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1590,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        111,
+        220,
+        2071,
+        448
+      ],
+      "alpha_bbox_32": [
+        112,
+        220,
+        2069,
+        447
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nontransparent_pixels": 385756,
+      "spelling": "PASS_VISUAL",
+      "glyph_legibility": "PASS_VISUAL",
+      "style_orientation": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "extra_background_or_protected_art": "NONE_OBSERVED_IN_PNG_SHEET",
+      "source_ui_cell_placement": "UNTESTED",
+      "source_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Approved Korean transliteration legible; outline/slant cosmetic variance acceptable."
+    }
+  ],
+  "summary": {
+    "candidates": 8,
+    "png_only_pass": 8,
+    "png_only_fail": 0,
+    "corrupt_or_non_rgba": 0,
+    "dimensions_mismatch": 8,
+    "alpha_1_border_warnings": [
+      {
+        "ordinal": 53,
+        "edge": "bottom",
+        "count": 91
+      },
+      {
+        "ordinal": 56,
+        "edge": "left",
+        "count": 13
+      }
+    ],
+    "alpha_16_border_contact": 0,
+    "composition_ready": 0,
+    "runtime_validation": "UNTESTED",
+    "C2_PASS": false,
+    "C3_PASS": false,
+    "ingame_PASS": false,
+    "dds_final_compose": false,
+    "imagegen_called": false,
+    "producer_queues_consumed": false
+  },
+  "qa_limit": "PNG candidate readability/format/source-mapping only. Not a protected-art/native placement, UI UV area, stored DDS, C2/C3, or in-game acceptance."
+}
