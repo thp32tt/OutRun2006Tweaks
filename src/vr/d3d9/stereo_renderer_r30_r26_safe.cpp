@@ -2311,6 +2311,25 @@ namespace OutRunVRStereo
                     const auto centreRoute =
                         OutRunVR::LensCentre::SelectWorldRoute(
                             exactCentre, exactRawOwned);
+                    // HMD 2026-10-21: user sees two suns even after C993
+                    // was suppressed. Probe exact WVP admission BEFORE any
+                    // world promotion: do not invent coordinates from a
+                    // neighboring SceneEffect, sky draw or CABE disc.
+                    if (exactCentre && Settings::VRTelemetry)
+                    {
+                        static std::uint64_t sunRouteHits = 0;
+                        const auto hits = ++sunRouteHits;
+                        if (hits <= 8 || (hits & (hits - 1)) == 0)
+                            spdlog::info(
+                                "VR SUN C993 WORLD PROOF: hits={} rawOwned={} "
+                                "worldRoute={} drawSerial={} poseEpoch={} "
+                                "lensEpoch={}",
+                                hits, exactRawOwned ? 1 : 0,
+                                static_cast<int>(centreRoute),
+                                TopLevelDrawSerial() + 1u,
+                                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                                OutRunVR::GameSemantic::CurrentLensCentreCallEpoch);
+                    }
                     if (centreRoute ==
                         OutRunVR::LensCentre::WorldRoute::PreserveOriginal)
                         return R30ScreenSpaceKind::None;
