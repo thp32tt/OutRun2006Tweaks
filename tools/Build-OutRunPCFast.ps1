@@ -55,17 +55,16 @@ $gameBuild = Join-Path $root 'game'
 $hostBuild = Join-Path $root 'host'
 $packageDir = Join-Path $root 'package'
 
-# Canonical PC-fast contract for the protected R51 renderer lineage.
-# Keep this single source of truth in sync with the verified R51 build.
+# Single canonical R26+HUD PC Fast build. Do not append prior v2 script bodies.
 $buildContractVersion = 'R26HUD-PC-FAST-v3-EXACT-SHA'
 $canonicalGameFlags = @(
     '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF'
     '-DOUTRUN_VR_R26_HUD_COMPARE=ON'
     '-DOUTRUN_VR_C1_COMPARE=OFF'
-    '-DOUTRUN_VR_C2_COMPARE=OFF',
-    '-DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=OFF',
-    '-DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=OFF',
-    '-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=OFF',
+    '-DOUTRUN_VR_C2_COMPARE=OFF'
+    '-DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=OFF'
+    '-DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=OFF'
+    '-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=OFF'
     '-DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=OFF'
 )
 $canonicalGameFlagString = $canonicalGameFlags -join ' '
@@ -76,23 +75,24 @@ function Assert-R26PcBuildContract {
 
     $cache = Join-Path $BuildDir 'CMakeCache.txt'
     if (-not (Test-Path $cache)) {
-        throw "R51 PC build contract: CMakeCache missing after configure: $cache"
+        throw "R26 PC build contract: CMakeCache missing after configure: $cache"
     }
 
     $required = @(
         'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF'
         'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON'
         'OUTRUN_VR_C1_COMPARE:BOOL=OFF'
-        'OUTRUN_VR_C2_COMPARE:BOOL=OFF',
-        'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=OFF',
-        'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=OFF',
-        'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=OFF',
+        'OUTRUN_VR_C2_COMPARE:BOOL=OFF'
+
+        'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=OFF'
+        'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=OFF'
+        'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=OFF'
         'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF'
     )
     $cacheText = Get-Content $cache -Raw
     foreach ($line in $required) {
         if ($cacheText -notmatch [regex]::Escape($line)) {
-            throw "R51 PC build contract mismatch: expected '$line'. Refusing to compile/package a non-R51 renderer configuration."
+            throw "R26 PC build contract mismatch: expected '$line'. Refusing to compile/package a non-R26 renderer configuration."
         }
     }
 
@@ -120,6 +120,7 @@ $r26Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r30_r26
 $r84Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r33\.cpp$' })
 if ($r26Owner.Count -ne 1 -or $r84Owner.Count -ne 0) { throw "PC FAST SOURCE GRAPH MISMATCH: R26=$($r26Owner.Count), R84=$($r84Owner.Count)" }
 Write-Host 'PC FAST SOURCE GRAPH VERIFIED: R26+HUD only'
+Patch-DependencyProject (Join-Path $gameBuild '_deps/safetyhook-build/src/safetyhook.vcxproj')
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/Zydis.vcxproj')
 Patch-DependencyProject (Join-Path $gameBuild '_deps/zydis-build/zycore/Zycore.vcxproj')
 
