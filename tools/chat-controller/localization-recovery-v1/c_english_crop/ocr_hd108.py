@@ -30,6 +30,140 @@ def digest(path):
 # Bump this to explicitly re-run the original 108 files after an approved
 # change to OCR/safety policy. No silent endless re-scanning of exhausted inputs.
 POLICY_VERSION = "hd108-pass-v2-20261018-reviewed-edge-crops"
+EDGE_REVIEW_VERSION = "edge-safe-expand-v1-20261020"
+
+
+def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
+ """Second-pass salvage for prior alpha-edge review crops.
+
+ Existing warning crops are never mutated or auto-approved. Each is re-read
+ from the SHA-pinned full-HD source, expanded with deterministic safe margins,
+ and only a new sibling crop whose expanded boundary passes margin_check is
+ emitted without edge_warning. Unresolved cases remain explicit REVIEW/HOLD.
+ """
+ pending=[]
+ for mp in sorted(out_root.glob("*/*/manifest.json")):
+  try:
+   j=json.loads(mp.read_text(encoding="utf-8"))
+   if j.get("edge_warning")!="ALPHA_TOUCHES_CROP_BORDER_REVIEW":
+    continue
+   receipt=mp.parent/"edge_review_v1.json"
+   if receipt.is_file():
+    rec=json.loads(receipt.read_text(encoding="utf-8"))
+    if rec.get("version")==EDGE_REVIEW_VERSION and rec.get("source_crop_sha256")==j.get("crop_sha256"):
+     continue
+   pending.append((mp,j))
+  except (OSError,ValueError,TypeError):
+   continue
+ result={"status":"EDGE_REVIEW","version":EDGE_REVIEW_VERSION,
+         "pending_before":len(pending),"reviewed":0,"rescued":0,
+         "held":0,"details":[]}
+ for mp,j in pending[:max_items]:
+  detail={"manifest":str(mp)}
+  try:
+   if (j.get("source_type")!="SHA_MANIFEST_VERIFIED_UNSPLIT_HD_PNG" or
+       j.get("old_split_tiles_used") is not False):
+    raise ValueError("EDGE_REVIEW_SOURCE_PROVENANCE_INVALID")
+   name=j.get("source_png")
+   if not isinstance(name,str) or Path(name).name!=name:
+    raise ValueError("EDGE_REVIEW_SOURCE_NAME_INVALID")
+   src=src_root/name
+   if not src.is_file() or src.is_symlink() or digest(src)!=j.get("source_sha256"):
+    raise ValueError("EDGE_REVIEW_SOURCE_SHA_MISMATCH")
+   box=j.get("bbox_xyxy")
+   dims=j.get("source_dimensions")
+   if not (isinstance(box,list) and len(box)==4 and all(type(v) is int for v in box)):
+    raise ValueError("EDGE_REVIEW_BBOX_INVALID")
+   with Image.open(src) as im:
+    if im.format!="PNG" or im.mode!="RGBA":
+     raise ValueError("EDGE_REVIEW_SOURCE_FORMAT_INVALID")
+    if isinstance(dims,list) and len(dims)==2 and list(im.size)!=dims:
+     raise ValueError("EDGE_REVIEW_SOURCE_DIMENSIONS_CHANGED")
+    image=im.copy()
+   x0,y0,x1,y1=box
+   h=max(1,y1-y0)
+   padx=max(24,int(h*.55))
+   pady=max(16,int(h*.30))
+   expanded=[max(0,x0-padx),max(0,y0-pady),
+             min(image.width,x1+padx),min(image.height,y1+pady)]
+   if expanded==box:
+    raise ValueError("EDGE_REVIEW_NO_EXPANSION_POSSIBLE")
+   bad=ocr.margin_check(image,expanded)
+   detail["original_bbox"]=box
+   detail["expanded_bbox"]=expanded
+   detail["expanded_margin_result"]=bad
+   rescued_path=None
+   if bad is None:
+    sourceout=out_root/Path(name).stem
+    label=hashlib.sha256((name+j.get("english","")+str(expanded)+EDGE_REVIEW_VERSION).encode()).hexdigest()[:16]
+    target=sourceout/label
+    outfile=target/"english_original_native_crop.png"
+    if target.exists():
+     manifest_path=target/"manifest.json"
+     if not manifest_path.is_file():
+      raise ValueError("EDGE_REVIEW_TARGET_COLLISION")
+     existing=json.loads(manifest_path.read_text(encoding="utf-8"))
+     if existing.get("edge_review_version")!=EDGE_REVIEW_VERSION:
+      raise ValueError("EDGE_REVIEW_TARGET_COLLISION")
+    else:
+     target.mkdir(parents=True,exist_ok=False)
+     cropped=image.crop(tuple(expanded))
+     cropped.save(outfile,format="PNG")
+     with Image.open(outfile) as proof:
+      if proof.mode!=cropped.mode or proof.size!=cropped.size or proof.tobytes()!=cropped.tobytes():
+       raise ValueError("EDGE_REVIEW_CROP_ROUNDTRIP_MISMATCH")
+     manifest={k:v for k,v in j.items() if k not in ("edge_warning","crop_dimensions","crop_sha256")}
+     manifest.update({
+       "status":"CROP_TEST_ONLY_REVIEW_REQUIRED",
+       "bbox_xyxy":expanded,
+       "crop_dimensions":list(cropped.size),
+       "crop_sha256":digest(outfile),
+       "edge_warning":None,
+       "human_review_required":True,
+       "edge_review_version":EDGE_REVIEW_VERSION,
+       "edge_review_of":str(mp),
+       "edge_review_original_bbox":box,
+       "edge_review_method":"DETERMINISTIC_SAFE_MARGIN_EXPANSION",
+       "runtime_validation":"UNTESTED",
+       "old_split_tiles_used":False,
+     })
+     discover.save_json_atomic(target/"manifest.json",manifest)
+    rescued_path=str(target/"manifest.json")
+    result["rescued"]+=1
+    detail["status"]="RESCUED_SAFE_EXPANDED_CROP"
+    detail["rescued_manifest"]=rescued_path
+   else:
+    result["held"]+=1
+    detail["status"]="REVIEW_REMAINS_HOLD"
+   receipt={
+     "version":EDGE_REVIEW_VERSION,
+     "status":detail["status"],
+     "source_crop_sha256":j.get("crop_sha256"),
+     "source_png":name,
+     "original_bbox":box,
+     "expanded_bbox":expanded,
+     "expanded_margin_result":bad,
+     "rescued_manifest":rescued_path,
+     "runtime_validation":"UNTESTED",
+   }
+   discover.save_json_atomic(mp.parent/"edge_review_v1.json",receipt)
+   result["reviewed"]+=1
+  except Exception as e:
+   result["held"]+=1
+   result["reviewed"]+=1
+   detail.update({"status":"EDGE_REVIEW_HOLD","reason":type(e).__name__+":"+str(e)[:180]})
+   try:
+    discover.save_json_atomic(mp.parent/"edge_review_v1.json",{
+      "version":EDGE_REVIEW_VERSION,"status":"EDGE_REVIEW_HOLD",
+      "source_crop_sha256":j.get("crop_sha256"),"reason":detail["reason"],
+      "runtime_validation":"UNTESTED"})
+   except Exception:
+    pass
+  result["details"].append(detail)
+ result["pending_after"]=max(0,len(pending)-min(max_items,len(pending)))
+ if not pending:
+  result["status"]="EDGE_REVIEW_COMPLETE"
+ return result
 
 def scan(max_sources=4,max_new=1000):
  if not RECEIPT.is_file() or not ZIP.is_file():
