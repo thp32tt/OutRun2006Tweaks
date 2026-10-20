@@ -13,13 +13,14 @@ def verify(src,setting,log):
     assert 'Module::exe_ptr(0xC993), DrawObjectAlphaCentre' in src
     assert 'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected' in src
     center=src.split('static void __cdecl DrawObjectAlphaCentre(',1)[1].split('public:',1)[0]
-    assert 'objectId == 0x570002' in center
+    assert 'objectId == 0x570002\n            ?' in center
+    assert 'if (Settings::VREnabled && objectId == 0x570002 &&' in center
+    assert 'VR LENS C993 CENTER HIDDEN:' in center
     assert 'LensCentreOwnerDepth == LensCentreDepth' in center
     assert '!OutRunVR::GameSemantic::QueueRenderActive()' in center
-    assert 'centreScope != OutRunVR::GameSemantic::RenderScope::None &&' in center
     assert '!Settings::VRLensFlareCentreEnabled.get()' in center
-    assert center.index('if (centreScope !=') < center.index('ScopedExactProducerSemantic')
-    assert center.index('if (centreScope !=') < center.index('Game::DrawObjectAlpha_Internal(')
+    assert center.index('if (Settings::VREnabled && objectId == 0x570002 &&') < center.index('ScopedExactProducerSemantic')
+    assert center.index('if (Settings::VREnabled && objectId == 0x570002 &&') < center.index('Game::DrawObjectAlpha_Internal(')
     assert 'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);' in center
     assert 'Get-Content $active' in log
     assert "$kv.ContainsKey('gameDllSha256')" in log
@@ -30,7 +31,7 @@ verify(source,settings,collector)
 for fname,old,bad in [
     ('source','objectId == 0x570002','objectId >= 0'),
     ('source','!Settings::VRLensFlareCentreEnabled.get()','Settings::VRLensFlareCentreEnabled.get()'),
-    ('source','centreScope != OutRunVR::GameSemantic::RenderScope::None &&','true &&'),
+    ('source','if (Settings::VREnabled && objectId == 0x570002 &&','if (objectId == 0x570002 &&'),
     ('settings','"LensFlareCentreEnabled", false,','"LensFlareCentreEnabled", true,'),
     ('collector',"$kv.ContainsKey('gameDllSha256')","$kv.gameDllSha256")]:
     values=dict(source=source,settings=settings,collector=collector)
@@ -39,4 +40,4 @@ for fname,old,bad in [
     try:verify(values['source'],values['settings'],values['collector'])
     except (AssertionError,ValueError): pass
     else:raise AssertionError('mutation escaped '+fname+' '+old)
-print('PASS VR scoped C993 center optic bypass (outer CABE retained), PC Fast StrictMode collector optional hash, 5 negative controls')
+print('PASS VR C993 exact object center hide independent of D3A5 parent, outer CABE and desktop retained, 5 negative controls')
