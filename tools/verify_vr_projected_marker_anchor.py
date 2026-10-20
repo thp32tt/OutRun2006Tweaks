@@ -852,31 +852,32 @@ for label, original, broken in (
     else:
         fail("R84 physical rank mutation escaped: " + label)
 
-# R84 projected rank must keep the exact vehicle depth all the way through
-# shader-c64, fixed-function FVF142 and POSITIONT/XYZRHW submissions. The old
-# implementation moved only XY and preserved a flat sprite Z/RHW.
+# R84 projected vehicle markers use the HMD-proven rival policy: preserve the
+# original sprite Z/RHW/clip depth and derive binocular placement from the
+# recovered per-car Calc3D2D anchor. Rank 1-5 must not re-enable the separate
+# physical-depth override that regressed RivalMarkerSprani.
 def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
-    for token in (
-        "float ndcZ[2]{}, invW[2]{};",
-        "ValidProjectedDepth(",
-        "ResolvePositionTDepth(",
-    ):
-        if token not in stereo_header:
-            fail("R84 projected rank depth header lost: " + token)
-
     depth_owner = function_body(
         semantics, "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(")
     for token in (
-        "producer == ProducerToken::RankMarkerSprani",
-        "producer == ProducerToken::RankMarkerClipSprite",
+        "(void)producer;",
+        "return false;",
     ):
         if token not in depth_owner:
-            fail("R84 vehicle-rank depth owner lost: " + token)
-    if "ProducerToken::RivalMarkerSprani" in depth_owner:
-        fail("protected rival marker inherited vehicle-rank physical depth")
-    if "!ProjectedMarkerOwnsVehicleDepth(\n        ProducerToken::RivalMarkerSprani)" not in semantics:
-        fail("rival marker negative depth static_assert lost")
+            fail("R84 rival-policy depth gate lost: " + token)
+    for producer in (
+        "ProducerToken::RankMarkerSprani",
+        "ProducerToken::RankMarkerClipSprite",
+        "ProducerToken::RivalMarkerSprani",
+    ):
+        assertion = (
+            "!ProjectedMarkerOwnsVehicleDepth(\n        " + producer + ")")
+        if assertion not in semantics:
+            fail("projected marker re-enabled physical depth: " + producer)
 
+    # Keep the dormant depth machinery isolated behind the gate so a future
+    # evidence-backed experiment can be reintroduced without changing the
+    # proven rival-style XY path. Normal rank/rival draws must pass false.
     delta = function_body(renderer, "bool R30BuildProjectedRankDelta(")
     for token in (
         "carryPhysicalDepth ? &shift.ndcZ[eye] : nullptr",
@@ -885,31 +886,21 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
         "shift.deltaY[eye] = projectedY - shift.baseY;",
     ):
         if token not in delta:
-            fail("R84 projected rank eye depth capture lost: " + token)
+            fail("R84 projected marker XY/depth isolation lost: " + token)
 
-    clip_depth = function_body(renderer, "bool R30ApplyProjectedRankClipDepth(")
+    positiont = function_body(renderer, "bool R30BuildXyzrhwState(")
     for token in (
-        "ValidProjectedDepth(",
-        "clipShift._33 = 0.0f;",
-        "clipShift._43 = shift.ndcZ[eye];",
-    ):
-        if token not in clip_depth:
-            fail("R84 projected rank clip-depth override lost: " + token)
-
-    positiont = function_body(renderer, "bool R30TransformProjectedRankXyzrhwStereo(")
-    for token in (
-        "if (state.projectedVehicleRankDepth)",
-        "ResolvePositionTDepth(",
-        "dst[2] = projectedZ[eye];",
-        "dst[3] = projectedRhw[eye];",
+        "ProjectedMarkerOwnsVehicleDepth(",
+        "state.projectedWorldMarker = true;",
+        "state.projectedVehicleRankDepth = vehicleRankDepth;",
     ):
         if token not in positiont:
-            fail("R84 projected rank POSITIONT depth lost: " + token)
+            fail("R84 projected marker POSITIONT gate lost: " + token)
 
     fixedfn = function_body(renderer, "HRESULT R30TryFixedFunctionOriginalSpriteStereo(")
     if "state.projectedVehicleRankDepth &&" not in fixedfn or \
             "R30ApplyProjectedRankClipDepth(" not in fixedfn:
-        fail("R84 projected rank FVF142 depth isolation/override lost")
+        fail("R84 projected marker fixed-function depth gate lost")
 
     shader = function_body(renderer, "bool R30BuildScreenSpaceEyeConstants(")
     for token in (
@@ -919,55 +910,23 @@ def require_r84_rank_depth_contract(stereo_header: str, renderer: str) -> None:
         "R30ApplyProjectedRankClipDepth(",
     ):
         if token not in shader:
-            fail("R84 projected rank shader depth isolation/override lost: " + token)
+            fail("R84 projected marker shader depth gate lost: " + token)
 
 
 require_r84_rank_depth_contract(rank_stereo, r84)
-for label, source_kind, original, broken in (
-    ("rank depth payload", "header",
-     "float ndcZ[2]{}, invW[2]{};", "float ndcZ[2]{};"),
-    ("rank eye depth capture", "renderer",
-     "carryPhysicalDepth ? &shift.ndcZ[eye] : nullptr",
-     "carryPhysicalDepth ? nullptr : nullptr"),
-    ("rank clip depth", "renderer",
-     "clipShift._43 = shift.ndcZ[eye];", "clipShift._43 = 0.0f;"),
-    ("rank POSITIONT Z", "renderer",
-     "dst[2] = projectedZ[eye];", "dst[2] = src[2];"),
-    ("rank POSITIONT RHW", "renderer",
-     "dst[3] = projectedRhw[eye];", "dst[3] = src[3];"),
-):
-    source = rank_stereo if source_kind == "header" else r84
-    if original not in source:
-        fail("R84 rank depth mutation setup failed: " + label)
-    mutant = source.replace(original, broken, 1)
-    try:
-        require_r84_rank_depth_contract(
-            mutant if source_kind == "header" else rank_stereo,
-            mutant if source_kind == "renderer" else r84)
-    except SystemExit:
-        pass
-    else:
-        fail("R84 rank depth mutation escaped: " + label)
 
-# A future refactor must not silently add the already-good rival marker to the
-# new rank 1-5 physical-depth policy.
-rival_depth_mutant = semantics.replace(
-    "producer == ProducerToken::RankMarkerClipSprite;",
-    "producer == ProducerToken::RankMarkerClipSprite ||\\n"
-    "            producer == ProducerToken::RivalMarkerSprani;",
+# Mutation guard: re-enabling rank-only physical depth must be detectable.
+depth_policy_mutant = semantics.replace(
+    "(void)producer;\n        return false;",
+    "return producer == ProducerToken::RankMarkerSprani ||\n"
+    "            producer == ProducerToken::RankMarkerClipSprite;",
     1)
-if rival_depth_mutant == semantics:
-    fail("rival depth-isolation mutation setup failed")
-try:
-    require_r84_rank_depth_contract(rank_stereo, r84)
-    mutated_owner = function_body(
-        rival_depth_mutant,
-        "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(")
-    if "ProducerToken::RivalMarkerSprani" in mutated_owner:
-        raise SystemExit
-except SystemExit:
-    pass
-else:
-    fail("rival physical-depth widening escaped verifier")
+if depth_policy_mutant == semantics:
+    fail("projected marker rival-policy mutation setup failed")
+mutated_owner = function_body(
+    depth_policy_mutant,
+    "inline constexpr bool ProjectedMarkerOwnsVehicleDepth(")
+if "(void)producer;" in mutated_owner or "return false;" in mutated_owner:
+    fail("projected marker rival-policy mutation did not alter depth gate")
 
 print("VR projected marker anchor contract PASS")

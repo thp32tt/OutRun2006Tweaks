@@ -90,20 +90,22 @@ namespace OutRunVR::GameSemantic
         PauseFrameShell,
     };
 
-    // Rank 1-5 were explicitly promoted from a screen-authored sprite depth
-    // to their recovered vehicle anchor depth. The existing rival marker was
-    // already HMD-correct before that change and must preserve its original
-    // sprite Z/RHW/clip depth while still using the projected anchor for XY.
+    // The rival marker was already HMD-correct with per-eye XY reprojection
+    // while preserving the game's original sprite Z/RHW/clip depth. Route
+    // the 1st-5th vehicle rank markers through that same proven stereo policy.
+    // Their recovered Calc3D2D vehicle anchors still drive binocular XY; do
+    // not promote any projected vehicle marker to a separate physical-depth
+    // transaction, which previously regressed the protected rival marker.
     inline constexpr bool ProjectedMarkerOwnsVehicleDepth(
         ProducerToken producer) noexcept
     {
-        return producer == ProducerToken::RankMarkerSprani ||
-            producer == ProducerToken::RankMarkerClipSprite;
+        (void)producer;
+        return false;
     }
 
-    static_assert(ProjectedMarkerOwnsVehicleDepth(
+    static_assert(!ProjectedMarkerOwnsVehicleDepth(
         ProducerToken::RankMarkerSprani));
-    static_assert(ProjectedMarkerOwnsVehicleDepth(
+    static_assert(!ProjectedMarkerOwnsVehicleDepth(
         ProducerToken::RankMarkerClipSprite));
     static_assert(!ProjectedMarkerOwnsVehicleDepth(
         ProducerToken::RivalMarkerSprani));
