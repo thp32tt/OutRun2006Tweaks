@@ -11,10 +11,17 @@ root = Path(__file__).resolve().parents[1]
 src = (root / 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp').read_text()
 pose = src[src.index('bool R30ConfigureXyzrhwWorldEffect('):src.index('bool R30TransformXyzrhwVertices(')]
 fixed = src[src.index('HRESULT R62TryFixedFunctionSpriteIndexed('):src.index('HRESULT __stdcall DrawPrimitiveDestR30(')]
+shader_hud = src[src.index('bool R30BuildScreenSpaceEyeConstants('):src.index('template <typename ActualDraw>\n        HRESULT R30TryScreenSpaceFovDraw(')]
+xy_prepare = src[src.index('bool R30PrepareXyzrhwState('):src.index('bool R30XyzrhwHasProjectedDepthSignature(')]
 assert 'R30IsExactResultHudDraw()' in pose, 'R26 must scope eye cant to the exact result batch'
 assert 'BuildStageEyePoses(' in pose, 'R26 drops the OpenXR eye orientations'
 assert 'state.stereo.eyeOrientation' in pose
 assert 'resultEyeOrientation[eye] : identityOrientation' in pose, 'unrelated HUD must retain its existing math'
+assert 'const bool exactResult = R30IsExactResultHudDraw();' in shader_hud, 'shader HUD must scope eye cant to exact result ownership'
+assert 'BuildStageEyePoses(' in shader_hud and 'stereo.eyeOrientation' in shader_hud, 'shader result HUD drops head-local eye rotation'
+assert 'exactResult ? resultEyeOrientation[eye] : identityOrientation' in shader_hud, 'generic shader HUD must keep legacy identity-eye math'
+assert 'const bool exactResult = R30IsExactResultHudDraw();' in xy_prepare, 'XYZRHW prepare must identify exact result before cached-VS gate'
+assert 'if (!exactResult &&' in xy_prepare and 'device->GetVertexShader(&shader)' in xy_prepare, 'exact XYZRHW result must use live VS as authority'
 assert 'if (!exactResult && CurrentVertexShaderIdentity.load(' in fixed, 'a stale cache must not veto an exact shaderless result'
 assert 'device->GetVertexShader(&shader)' in fixed and 'shader->Release()' in fixed
 assert 'fvf != 0x00000142u' in fixed, 'do not widen the live physical draw format'

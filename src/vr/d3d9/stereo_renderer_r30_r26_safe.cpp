@@ -2431,7 +2431,15 @@ namespace OutRunVRStereo
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
-            if (!R30SafeStereoBase(device) ||
+            if (!R30SafeStereoBase(device))
+                return false;
+
+            // D3DX StateBlocks can leave CurrentVertexShaderIdentity stale.
+            // Only an exact result batch may bypass that cache hint; the live
+            // device getter below is still authoritative and a real shader
+            // always rejects the XYZRHW fixed-function route.
+            const bool exactResult = R30IsExactResultHudDraw();
+            if (!exactResult &&
                 CurrentVertexShaderIdentity.load(std::memory_order_acquire) != 0)
                 return false;
 
@@ -4438,6 +4446,11 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        // Shared exact-result ownership is needed by both the shader HUD
+        // path and the later fixed-function/XYZRHW path. Keep the predicate
+        // centralized so unrelated HUD, menus and world effects retain R26.
+        bool R30IsExactResultHudDraw() noexcept;
+
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -4687,6 +4700,22 @@ namespace OutRunVRStereo
                 screenKind != R30ScreenSpaceKind::ScreenOverlay2D)
                 return false;
 
+            // R26 result-HUD convergence: shader-backed +TIME/goal/result
+            // batches must retain the same head-local OpenXR eye rotation as
+            // the fixed-function/XYZRHW owner. HeadInverse already removes
+            // shared head motion once; only exact result ownership receives
+            // the eye cant. Generic HUD/menu math remains identity-eye.
+            const bool exactResult = R30IsExactResultHudDraw();
+            float resultEyeOffset[2][3]{};
+            float resultEyeOrientation[2][4]{};
+            const float worldScale =
+                Settings::VRWorldScale * Settings::VRStereoDepth;
+            if (exactResult &&
+                !OutRunVR::StageExtensionPlane::BuildStageEyePoses(
+                    stereo.eyeOffset, stereo.eyeOrientation, worldScale,
+                    resultEyeOffset, resultEyeOrientation))
+                return false;
+
             // R40: turn all screen HUD into one finite, recentered view plane.
             // This removes head-lock. HudScale/contain is applied before the
             // plane conversion, so perspective HUD such as the large 6th/6 uses
@@ -4745,9 +4774,9 @@ namespace OutRunVRStereo
                 };
                 const D3DMATRIX eyePose =
                     MatrixFromQuaternionTranslation(
-                        identityOrientation, relativeEye,
-                        Settings::VRWorldScale *
-                            Settings::VRStereoDepth);
+                        exactResult ? resultEyeOrientation[eye] : identityOrientation,
+                        exactResult ? resultEyeOffset[eye] : relativeEye,
+                        worldScale);
                 const D3DMATRIX eyeInverse = InverseRigid(eyePose);
                 const D3DMATRIX eyeProjection =
                     ProjectionFromFov(
