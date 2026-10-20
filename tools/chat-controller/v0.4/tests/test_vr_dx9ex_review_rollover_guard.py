@@ -3,6 +3,7 @@ import ast
 import asyncio
 import json
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 import unittest
@@ -20,6 +21,7 @@ def isolated_function(name, *, async_function=False, review_only=True):
     ns = {
         "json": json,
         "re": re,
+        "datetime": datetime,
         "Optional": Optional,
         "BrowserContext": object,
         "Page": object,
