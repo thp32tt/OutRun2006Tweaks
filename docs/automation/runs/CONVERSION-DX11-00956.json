@@ -109,7 +109,7 @@
   },
   "score_change": 0,
   "acceptance_results": {
-    "native_live_branch_shader": "PASS_SOURCE_CXX_PYTHON_AND_EXACT_SHA_5_OF_5; REAL_GAME_UNTESTED",
+    "native_live_branch_shader": "PASS_SOURCE_CXX_PYTHON_AND_EXACT_SHA_5_OF_5",
     "branch_temp_fallback": "PASS_BRANCH_MASK_AND_TEMP_LANE_REGRESSION_EXACT_SHA_5_OF_5",
     "single_exact_sha_gate": "PASS_EXACT_SHA_5_OF_5"
   },
