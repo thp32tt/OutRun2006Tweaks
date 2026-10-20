@@ -39,7 +39,7 @@ int main() {
     assert(unchanged == "r283_t0");
     unchanged.clear();
     assert(!append_native_sm3_scalar_condition_operand(unchanged, 0xe4u, 0u));
-    // Existing then/else TEMP ownership stays strict when branches diverge.
+    // Both arms write x; path-local yzw must be rejected after ELSE merge.
     NativeSm3ConditionalFlow written;
     NativeSm3ConditionalFlow::Temps temps{};
     NativeSm3ConditionalFlow::Outputs outputs{};
@@ -47,6 +47,6 @@ int main() {
     temps[0] = 0x0fu;
     assert(written.otherwise(temps, outputs));
     temps[0] = 0x01u;
-    assert(written.end(temps, outputs) && temps[0] == 0u);
+    assert(written.end(temps, outputs) && temps[0] == 0x01u);
     assert(written.empty());
 }
