@@ -8,13 +8,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONPATH=/app \
     TZ=Asia/Seoul
 RUN apt-get update \
- && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng \
+ && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng tesseract-ocr-jpn \
  && rm -rf /var/lib/apt/lists/*
 RUN python3 -m pip install --no-cache-dir "Pillow==12.3.0" "numpy==2.3.5"
 WORKDIR /app
 COPY c_english_crop/*.py /app/
 RUN python3 -m py_compile /app/*.py \
- && tesseract --list-langs 2>&1 | grep -q eng
+ && tesseract --list-langs 2>&1 | grep -q eng \
+ && tesseract --list-langs 2>&1 | grep -q jpn
 USER 1002:1002
 ENTRYPOINT ["python3", "/app/loop.py"]
 CMD ["--interval-seconds", "60", "--max-per-cycle", "10"]
