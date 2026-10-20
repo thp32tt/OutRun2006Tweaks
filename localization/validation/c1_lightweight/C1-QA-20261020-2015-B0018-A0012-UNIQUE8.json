@@ -1,0 +1,492 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-2015-B0018-A0012-UNIQUE8",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T20:15:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "evidence_local": "work/c1_batch_20261020_2015/{metrics.json,compare_1.png,compare_2.png}",
+  "dedup": {
+    "previous_qa_head": "1a9e387565fd1b6c425e5dcbe71cde3420392c12",
+    "previous_qa_task": "OUTRUN-C1-20261020-1945-B0013-A0008-UNIQUE8",
+    "selection": "B0018 (ordinals 83-87) five + A0012 (ordinals 56-58) first three; prior independent QA through 19:45 contains no B0018/A0012 candidates",
+    "unique_sha": 8
+  },
+  "summary": {
+    "reviewed": 8,
+    "pass_png_only": 4,
+    "fail_png_glyph_integrity": 4,
+    "rework_dimensions": 8,
+    "alpha_border_at_1_warnings": 1,
+    "alpha_border_at_16_warnings": 0,
+    "producer_export_sha_verified": 8,
+    "source_manifest_sha_verified": 8,
+    "png_rgba_verified": 8
+  },
+  "cases": [
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0018-A46B35C4",
+      "source_ordinal": 83,
+      "source_roi_file": "Q205_5badb049218ba0bf_source.png",
+      "source_roi_sha256": "95c18097301e29f58e680735bbe029b0e00a2ef5f9022726db7dacada44edb66",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "candidate_file": "Q205_5badb049218ba0bf_source_k.png",
+      "candidate_sha256": "4dd24e4aa714c7787fc6a8f6993705bb0558df7eecfed4d941e0f31ef2e8e014",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "YOUR POSITION OK",
+      "reviewed_korean": "현재 순위 확인",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1924,
+        248
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        158,
+        204,
+        2019,
+        508
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 12,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1152511,
+      "alpha_semi_pixels": 416020,
+      "alpha_opaque_pixels": 3997,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "현재 순위 확인: 지정 번역과 일치, 읽을 수 있는 단일 행. 경미한 alpha=1 좌측 프린지 12픽셀, alpha>=16 경계 없음.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0018-A46B35C4",
+      "source_ordinal": 84,
+      "source_roi_file": "Q205_63550f737b9c4281_source.png",
+      "source_roi_sha256": "f8581821b0b6c546a029f54ca1d7ff1d10ca24b34b16f31a6c33193d83f04c0c",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "candidate_file": "Q205_63550f737b9c4281_source_k.png",
+      "candidate_sha256": "56fc81ef3ee018179a86c47798c61e6f1b654f0d252a49037ae6faab6e8ddab1",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "RANKINGS",
+      "reviewed_korean": "랭킹",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        580,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        608,
+        140,
+        1543,
+        605
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1190643,
+      "alpha_semi_pixels": 380429,
+      "alpha_opaque_pixels": 1456,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "FAIL_MALFORMED_HANGUL_DETACHED_JONGSEONG",
+      "glyph_integrity": "FAIL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "랭킹의 종성 ㅇ이 글자 하단으로 분리되어 독립 기호처럼 배치됨(원문 단일 행 및 한글 음절 구조 불일치).",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0018-A46B35C4",
+      "source_ordinal": 85,
+      "source_roi_file": "Q205_2a7b8657840a415a_source.png",
+      "source_roi_sha256": "99d067810eeeb2ea3d66cc4105e2be2855938db5ad28c3d8bc9db0b9e8006732",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "candidate_file": "Q205_2a7b8657840a415a_source_k.png",
+      "candidate_sha256": "cd1c46941c4e56315e93defb044c818ad0c50af0a688631040ed3d90ab33a6a6",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "REVERSE",
+      "reviewed_korean": "반전",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1100,
+        264
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        562,
+        106,
+        1606,
+        604
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1163631,
+      "alpha_semi_pixels": 405545,
+      "alpha_opaque_pixels": 3352,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "FAIL_MALFORMED_HANGUL_DETACHED_JONGSEONG",
+      "glyph_integrity": "FAIL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "반전의 종성 ㄴ이 글자 하단에 별도 행으로 분리되어 오독 가능; 원문 1줄 구조와 다름.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0018-A46B35C4",
+      "source_ordinal": 86,
+      "source_roi_file": "Q205_dd0d49a4f2287476_source.png",
+      "source_roi_sha256": "d0cfdd299d8ca83bb4e039838e2b90a6e27476d30c6839ff1e25016cfe86b048",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "candidate_file": "Q205_dd0d49a4f2287476_source_k.png",
+      "candidate_sha256": "cb1bac5d76080ab69f645ace276c9d50f76e36e2e14d94e1796e8011fbf121e6",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "LICENSE DETAILS",
+      "reviewed_korean": "라이선스 정보",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1114,
+        146
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        152,
+        208,
+        2051,
+        513
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1129104,
+      "alpha_semi_pixels": 438837,
+      "alpha_opaque_pixels": 4587,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "라이선스 정보: 한글 철자/가독성 적합, 원문 단일 행 구조 유지.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0018-A46B35C4",
+      "source_ordinal": 87,
+      "source_roi_file": "Q205_bc8180ea97b10e90_source.png",
+      "source_roi_sha256": "524ff385dce099cb3f336211e78f0cf33a25dc22c78c478ab4f9466a27fea4ab",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "candidate_file": "Q205_bc8180ea97b10e90_source_k.png",
+      "candidate_sha256": "1cc58f20272eb6716041bf1e3b3111d7d99931887dcc332b4b215f00006468e0",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "OPTIONS",
+      "reviewed_korean": "옵션",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        825,
+        191
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        623,
+        111,
+        1561,
+        576
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1199686,
+      "alpha_semi_pixels": 369958,
+      "alpha_opaque_pixels": 2884,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "옵션: 붉은 강조와 단일 행, 가독성 확인.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0012-EDCD4FDD",
+      "source_ordinal": 56,
+      "source_roi_file": "Q205_b9d2da331ce7f720_source.png",
+      "source_roi_sha256": "821fc5b8fba13f65ebf77cd7ee1f33bee79ea377f4eaf48bcf658de61092a597",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "candidate_file": "Q205_b9d2da331ce7f720_source_k.png",
+      "candidate_sha256": "78b9e911c371a6ecd5bace9788ade7dabb54c4320a1f0cc7aac3f46fb7704600",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "OutRun for 1 player!",
+      "reviewed_korean": "1인 아웃런 플레이!",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1310,
+        176
+      ],
+      "candidate_dimensions": [
+        2185,
+        720
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        170,
+        232,
+        2020,
+        459
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1205379,
+      "alpha_semi_pixels": 366750,
+      "alpha_opaque_pixels": 1071,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "1인 아웃런 플레이!: 승인 매핑·느낌표·가독성 적합, 단일 행.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0012-EDCD4FDD",
+      "source_ordinal": 57,
+      "source_roi_file": "Q205_d469cc46fce47f3b_source.png",
+      "source_roi_sha256": "f8581821b0b6c546a029f54ca1d7ff1d10ca24b34b16f31a6c33193d83f04c0c",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "candidate_file": "Q205_d469cc46fce47f3b_source_k.png",
+      "candidate_sha256": "2638fa2053a4e994c8759267b79c2fbc4739213cb3e0142c8a3f1b3d2740dd61",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "RANKINGS",
+      "reviewed_korean": "랭킹",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        580,
+        176
+      ],
+      "candidate_dimensions": [
+        2171,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        739,
+        175,
+        1443,
+        567
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1308661,
+      "alpha_semi_pixels": 262675,
+      "alpha_opaque_pixels": 468,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "FAIL_MALFORMED_HANGUL_DETACHED_JONGSEONG",
+      "glyph_integrity": "FAIL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "랭킹의 종성 ㅇ이 아래쪽에 분리되어 음절 구조 파손(단순한 줄바꿈이 아님).",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0012-EDCD4FDD",
+      "source_ordinal": 58,
+      "source_roi_file": "Q205_a1ece9255a67a707_source.png",
+      "source_roi_sha256": "99d067810eeeb2ea3d66cc4105e2be2855938db5ad28c3d8bc9db0b9e8006732",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "candidate_file": "Q205_a1ece9255a67a707_source_k.png",
+      "candidate_sha256": "1a77b87ab8ccdbdc953461626aed399d2c47ef2958f1dd6bebfa6d3507daff53",
+      "export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "REVERSE",
+      "reviewed_korean": "반전",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1100,
+        264
+      ],
+      "candidate_dimensions": [
+        2014,
+        781
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_16": [
+        638,
+        171,
+        1396,
+        554
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1306001,
+      "alpha_semi_pixels": 265800,
+      "alpha_opaque_pixels": 1133,
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "FAIL_MALFORMED_HANGUL_DETACHED_JONGSEONG",
+      "glyph_integrity": "FAIL",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "note": "반전의 종성 ㄴ이 아래쪽에 분리되어 정상 글자 형태가 아님.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "release_gate": "NOT_APPROVED_PNG_ONLY_QA",
+  "prohibited_actions_confirmed": [
+    "NO_IMAGEGEN",
+    "NO_A_B_QUEUE_CONSUMPTION",
+    "NO_NEW_DDS",
+    "NO_C2_C3_PASS",
+    "NO_GAME_DEPLOY",
+    "NO_VR_FFB_DX11_DXVK_CHANGES"
+  ]
+}
