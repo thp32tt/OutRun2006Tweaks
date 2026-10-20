@@ -1,0 +1,446 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T0815KST-SHA-UNIQUE-8-A0001-A0003",
+  "requested_at_kst": "2026-10-21 08:15",
+  "review_time_kst": "2026-10-21 08:19-08:25 (approx; recorded after visual review)",
+  "branch": "korean-localization-recovery-20260928",
+  "source_policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "producer_source": "N100 actual A ImageGen candidate_outputs and SHA-pinned export_evidence",
+  "selection": "8 unique SHA values not present in 19 earlier N100 c1_batch_*/metrics.json records; A ordinal 1-5 and 11-13. No A/B queue consumption or generation.",
+  "verdict_count": {
+    "pass": 0,
+    "fail": 6,
+    "hold": 2
+  },
+  "scope": "LIGHTWEIGHT_INDEPENDENT_PNG_QA_ONLY_NO_DDS_NO_GAME",
+  "policy": "Do not reject solely due to shorter Korean text or slight reduction in individual glyph size. Visible major effects mismatch is assessed separately. Different source/output image dimensions do not by themselves prove UI collision; native fit and protected-art inspection remain untested.",
+  "evidence": {
+    "n100_metrics_json": "work/c1_batch_20261021_0815/metrics.json",
+    "n100_contact_sheet_1": {
+      "path": "work/c1_batch_20261021_0815/compare_1.png",
+      "sha256": "8fd564019493ebc8ff7b18f72853c9e0f5d8b5db46dac24c05cd776466f760ba"
+    },
+    "n100_contact_sheet_2": {
+      "path": "work/c1_batch_20261021_0815/compare_2.png",
+      "sha256": "a8be5228896d70ddb28cddcc16d6e7ca3d1ea5434a50407762151a91ec6952b9"
+    },
+    "n100_script": "work/c1_qa_20261021_0815_inspect.py",
+    "sha_evidence": "N100 file content SHA256 matches producer export SHA256 for every candidate; source SHA256 matches exact SHA in N100 canonical production_manifest.json for all eight.",
+    "contact_sheet_note": "Checkerboard is a comparison-sheet visualization background added by C1, not an intrinsic part of the RGBA candidate PNG."
+  },
+  "results": [
+    {
+      "index": 1,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "ordinal": 1,
+      "candidate_png": "Q047_4413daf457459290_source_k.png",
+      "candidate_sha256": "351989088410097f2061b45ebfbc6803d874daf8c3ea226f5bef5af17b88037a",
+      "producer_sha_verified": true,
+      "source_png": "Q047_4413daf457459290_source.png",
+      "source_png_sha256": "5e5f54ac32867611b305e8c2de299a7cae85eceae8b234f4e6cc6b960298ddf2",
+      "source_sha_verified": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "english": "Accents",
+      "approved_korean": "악센트",
+      "visually_read_korean": "악센트",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        904,
+        268
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        57,
+        39,
+        1911,
+        626
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Native source is simple flat white glyphs without heavy black stroke; generated Korean is a substantially heavier embossed metallic font with prominent black outline. This is a visible foreign effect/font-family mismatch, not a failure based on shorter text. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed on the examined PNG.",
+      "c1_verdict": "FAIL_SIGNIFICANT_ORIGINAL_UI_GLYPH_EFFECT_MISMATCH",
+      "blockers": [
+        "SIGNIFICANT_FONT_EFFECT_FAMILY_MISMATCH",
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 2,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "ordinal": 2,
+      "candidate_png": "Q047_5f2c337e1f58da01_source_k.png",
+      "candidate_sha256": "0062cb2f480b84ab96e4caf08e00aadc8056fa390c4c573044366e2efee7b739",
+      "producer_sha_verified": true,
+      "source_png": "Q047_5f2c337e1f58da01_source.png",
+      "source_png_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "source_sha_verified": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "english": "Backspace",
+      "approved_korean": "지우기",
+      "visually_read_korean": "지우기",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1068,
+        312
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        108,
+        91,
+        1778,
+        670
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Native source is simple flat white glyphs without heavy black stroke; generated Korean is a substantially heavier embossed metallic font with prominent black outline. This is a visible foreign effect/font-family mismatch, not a failure based on shorter text. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed on the examined PNG.",
+      "c1_verdict": "FAIL_SIGNIFICANT_ORIGINAL_UI_GLYPH_EFFECT_MISMATCH",
+      "blockers": [
+        "SIGNIFICANT_FONT_EFFECT_FAMILY_MISMATCH",
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 3,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "ordinal": 3,
+      "candidate_png": "Q047_cb84295162aadad2_source_k.png",
+      "candidate_sha256": "8471541e8e911f0185823d85fdf9147fd15bfed8574cc699ea9d75b90b7ea3d3",
+      "producer_sha_verified": true,
+      "source_png": "Q047_cb84295162aadad2_source.png",
+      "source_png_sha256": "6c410bdff52c478ca9617a02b05d60f064d90e72f2001e9da49446483ada9a2b",
+      "source_sha_verified": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "english": "Done",
+      "approved_korean": "완료",
+      "visually_read_korean": "완료",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        604,
+        268
+      ],
+      "generated_output_px": [
+        1881,
+        836
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        41,
+        21,
+        1673,
+        788
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Native source is simple flat white glyphs without heavy black stroke; generated Korean is a substantially heavier embossed metallic font with prominent black outline. This is a visible foreign effect/font-family mismatch, not a failure based on shorter text. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed on the examined PNG.",
+      "c1_verdict": "FAIL_SIGNIFICANT_ORIGINAL_UI_GLYPH_EFFECT_MISMATCH",
+      "blockers": [
+        "SIGNIFICANT_FONT_EFFECT_FAMILY_MISMATCH",
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 4,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "ordinal": 4,
+      "candidate_png": "Q047_b08df53b8bfdbadf_source_k.png",
+      "candidate_sha256": "a89b098a445fb89d96152fe1ab1abb39ed550f2aa75a2332c581b9c35b79578d",
+      "producer_sha_verified": true,
+      "source_png": "Q047_b08df53b8bfdbadf_source.png",
+      "source_png_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "source_sha_verified": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "english": "Backspace",
+      "approved_korean": "지우기",
+      "visually_read_korean": "지우기",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1068,
+        312
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        347,
+        53,
+        2086,
+        668
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Native source is simple flat white glyphs without heavy black stroke; generated Korean is a substantially heavier embossed metallic font with prominent black outline. This is a visible foreign effect/font-family mismatch, not a failure based on shorter text. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed on the examined PNG.",
+      "c1_verdict": "FAIL_SIGNIFICANT_ORIGINAL_UI_GLYPH_EFFECT_MISMATCH",
+      "blockers": [
+        "SIGNIFICANT_FONT_EFFECT_FAMILY_MISMATCH",
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 5,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0001-173D19C9",
+      "ordinal": 5,
+      "candidate_png": "Q047_e26cf75d44be41e8_source_k.png",
+      "candidate_sha256": "270e862474971af4713c6030d77ffd8026346e21e6bb44e8d6ae0f9232a8a7b0",
+      "producer_sha_verified": true,
+      "source_png": "Q047_e26cf75d44be41e8_source.png",
+      "source_png_sha256": "855167b502a8554dec5dc543d9e6b55e7ed7ff600300c0e9ad0ca3cf82cbcdbb",
+      "source_sha_verified": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "english": "Backspace",
+      "approved_korean": "지우기",
+      "visually_read_korean": "지우기",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1068,
+        312
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        418,
+        19,
+        1786,
+        605
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Native source is simple flat white glyphs without heavy black stroke; generated Korean is a substantially heavier embossed metallic font with prominent black outline. This is a visible foreign effect/font-family mismatch, not a failure based on shorter text. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed on the examined PNG.",
+      "c1_verdict": "FAIL_SIGNIFICANT_ORIGINAL_UI_GLYPH_EFFECT_MISMATCH",
+      "blockers": [
+        "SIGNIFICANT_FONT_EFFECT_FAMILY_MISMATCH",
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 6,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0003-000A832E",
+      "ordinal": 11,
+      "candidate_png": "Q047_27fff9d87243a16b_source_k.png",
+      "candidate_sha256": "6be76392fa883f70ed8c0b7ed938cfa6ec2947c42f4a1ae041068f351378ec99",
+      "producer_sha_verified": true,
+      "source_png": "Q047_27fff9d87243a16b_source.png",
+      "source_png_sha256": "de9bf9b34204c8a3f3eb5783f67bfa7ceb8e7f2b9cb4261b54db92dae5b62f24",
+      "source_sha_verified": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "english": "Caps Lock",
+      "approved_korean": "대문자 고정",
+      "visually_read_korean": "대문자 고정",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1088,
+        312
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        25,
+        143,
+        2142,
+        628
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Native source is simple flat white glyphs without heavy black stroke; generated Korean is a substantially heavier embossed metallic font with prominent black outline. This is a visible foreign effect/font-family mismatch, not a failure based on shorter text. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed on the examined PNG.",
+      "c1_verdict": "FAIL_SIGNIFICANT_ORIGINAL_UI_GLYPH_EFFECT_MISMATCH",
+      "blockers": [
+        "SIGNIFICANT_FONT_EFFECT_FAMILY_MISMATCH",
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 7,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0003-000A832E",
+      "ordinal": 12,
+      "candidate_png": "Q049_de9a907afba73cc7_source_k.png",
+      "candidate_sha256": "7835f7243f5a40f535e81f3979ca764f9b2a21216682dd9548564855e5c0be0c",
+      "producer_sha_verified": true,
+      "source_png": "Q049_de9a907afba73cc7_source.png",
+      "source_png_sha256": "621824e84d970a5113b45a0ba569dbc90b0d910c5c86f04063630b0a94f577c4",
+      "source_sha_verified": true,
+      "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "visually_read_korean": "튜닝",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        980,
+        264
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        170,
+        78,
+        1860,
+        708
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Korean glyphs are legible and the original red/green gradient and blue edging are broadly retained. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed. Actual native ROI placement and protected pixels are not validated.",
+      "c1_verdict": "HOLD_NATIVE_ROI_FIT_UNVERIFIED",
+      "blockers": [
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 8,
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0003-000A832E",
+      "ordinal": 13,
+      "candidate_png": "Q049_3ba74067b6ccd286_source_k.png",
+      "candidate_sha256": "c8b39dd1d9fb969135405f39762f7391a289773d952b4378e1143e6d13e6079a",
+      "producer_sha_verified": true,
+      "source_png": "Q049_3ba74067b6ccd286_source.png",
+      "source_png_sha256": "1381b67f5c8f739beb66e4a080042017e81312b1dacd56d525b65c946f2018cd",
+      "source_sha_verified": true,
+      "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "english": "NORMAL",
+      "approved_korean": "일반",
+      "visually_read_korean": "일반",
+      "approved_mapping_visual_check": "MATCH",
+      "output_png_format": "PNG",
+      "output_color_mode": "RGBA",
+      "source_roi_px": [
+        1208,
+        268
+      ],
+      "generated_output_px": [
+        2172,
+        724
+      ],
+      "alpha16_canvas_edge_pixels": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_nonzero_bbox": [
+        282,
+        103,
+        1959,
+        626
+      ],
+      "producer_result": "REWORK_DIMENSIONS",
+      "visual_comparison": "Korean glyphs are legible and the original red/green gradient and blue edging are broadly retained. No clear Hangul spelling error, English ghost, opaque background, or edge clipping observed. Actual native ROI placement and protected pixels are not validated.",
+      "c1_verdict": "HOLD_NATIVE_ROI_FIT_UNVERIFIED",
+      "blockers": [
+        "SOURCE_AND_OUTPUT_PIXEL_DIMENSIONS_DIFFER",
+        "UNVERIFIED_NATIVE_UI_CELL_PLACEMENT"
+      ],
+      "production_approval": false,
+      "dds_deployment_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "remaining_work": "Other unreviewed SHA-distinct output PNG may remain. Do not infer this C1 review approves final atlas, game, runtime or C2/C3 signoffs.",
+  "prohibited_actions_not_performed": [
+    "ImageGen generation",
+    "consume or modify A/B queue",
+    "C2 PASS",
+    "C3 PASS",
+    "runtime PASS",
+    "DDS compose",
+    "game deployment",
+    "VR/FFB/DX11/DXVK changes"
+  ]
+}
