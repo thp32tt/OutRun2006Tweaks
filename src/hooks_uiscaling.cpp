@@ -1952,6 +1952,26 @@ class UIScaling : public Hook
 		}
         const bool projectedVehicleRank =
             scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+        // 2026-10-20 HMD report: rank digits still appear detached and the
+        // sampled Calc3D2D edge had navipubDepth=1/projectedValid=0.
+        // That is a valid HUD suppression, not proof that ALL vehicle
+        // markers lost their anchor. Attribute each actual rank sprite
+        // before deciding whether to alter the 3D projection route.
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t rankSpriteCalls = 0;
+            const auto n = ++rankSpriteCalls;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RANK PHYSICAL PRODUCER: hits={} navipub={} "
+                    "anchorValid={} ordinalCant={} projected={} "
+                    "sourceViewZ={} spriteId={}",
+                    n, RankMarkerSubScreenHudDepth,
+                    projectedAnchor.valid ? 1 : 0,
+                    projectedAnchor.exactOrdinalEyeCant ? 1 : 0,
+                    projectedVehicleRank ? 1 : 0,
+                    projectedAnchor.viewZ, spriteId);
+        }
         if (RankMarkerSubScreenHudDepth == 0)
             OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
                 OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
