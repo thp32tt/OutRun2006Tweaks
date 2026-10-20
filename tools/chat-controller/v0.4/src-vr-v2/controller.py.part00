@@ -1132,12 +1132,29 @@ def queue_dynamic_prefix() -> str:
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
         source_policy,
-        "이 작업에서 미완료 구현 또는 실제 실패 수리 변경을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
+        (
+            "DX9Ex 자동작업은 REVIEW_ONLY다. 게임/런타임 소스는 수정하지 말고 "
+            "docs/reviews/dx9ex/automation/<TASK_ID>.md 형태의 검토 기록만 Git에 남기며 커밋 메시지에 정확히 [AUTO:"
+            + task_id + "] 를 포함해."
+            if lane == "DX9EX"
+            else
+            "이 작업에서 미완료 구현 또는 실제 실패 수리 변경을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해."
+        ),
         "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
-    if lane in {"DX11", "DX9EX"}:
+    if lane == "DX9EX":
+        lines += [
+            "DX9EX_REVIEW_ONLY=ON. 2026-10-20 사용자 최신 지시가 모든 과거 DX9Ex 자동개발·자동수정·자동승격 지시보다 우선한다.",
+            "production source/C++/HLSL/CMake/workflow/runtime config를 자동으로 수정하지 마. source patch/refactor/merge/update_ref/branch/release/package 생성도 금지한다.",
+            "GitHub 최신 vr-d3d9ex-focus HEAD와 source/REA/디스어셈블리/로그/Issue를 읽고 화면오류·최적화 관점에서 producer→semantic→queue→D3DX/native draw→R30/R62→L/R eye→restore→Present/OpenXR 경로를 시뮬레이션해.",
+            "실제 수정이 필요해 보여도 코드를 고치지 말고 PATCH_CANDIDATE_ONLY로 정확한 파일/함수/라인 범위, 근거, 반증조건, 회귀경계를 docs/reviews/dx9ex/automation/<TASK_ID>.md에 기록해.",
+            "R26+HUD baseline 0cff83cf509c2acd6f3391b3a46c4dec1403a0d9를 기준으로 하고 R84를 자동 기본값으로 승격하지 마. 최근 result HUD 후보 aab9e02bcb2ad2e6253840e6267e5c5ad5040854는 비교 자료이며 HMD PASS가 아니다.",
+            "B9200 post-CALL/+5 등 과거 크래시 원인이 된 위험한 훅을 재도입하지 마. 실기 없으면 RUNTIME_VALIDATION=UNTESTED, 게임 소스 변경은 CODE_CHANGE=NO로 유지해.",
+            "매 TASK_ID는 docs-only [AUTO:TASK_ID] 커밋으로 durable 결과를 남겨. 새 finding이 없으면 NEW_FINDING=NONE과 실제 검토한 경로·근거·NEXT_REVIEW를 기록하되 같은 내용을 반복하지 마.",
+        ]
+    if lane == "DX11":
         lines += [
             f"DEVELOPMENT_FOCUS_20261017=ON. 유효 작업시간 중 실제 C++/HLSL/후킹/host·입력 소스 구현·실제 실패 원인 수리 ≥{DEVELOPMENT_TARGET_PERCENT}%, 분석 ≤15%, 변경 관련 검증·최종 CI 조정 ≤10%, C6·기록 ≤5%를 목표로 해. CI 원격 대기시간은 별도이고 실제 측정 없으면 달성했다고 주장하지 마. 필수 최종 CI는 보존해.",
             "분류 먼저: (A) 미완료 사용자 가시 기능/실제 결함 → 현재 TASK_ID/FEATURE_ID에서 소스 구현, (B) 정확한 필수 CI 실패 → 동일 TASK_ID에서 실패 원인 한정 수리, (C) 과거 PASS/기록 미완료 → 중복 CI 없이 최소 C6 정합화. 새로운 TASK_ID를 테스트/메타데이터/한 가지 enum 변형용으로 소모하지 마.",
@@ -1145,14 +1162,14 @@ def queue_dynamic_prefix() -> str:
             "C6·checkpoint·롤오버·기존 테스트 문자열/정규식 조정은 독립 개발 성과가 아니다. 같은 TASK_ID/FEATURE_ID에 귀속하고 구현 커밋 vs 검사·기록 커밋을 최종 보고에서 구분해. HMD 실기 미실행이면 RUNTIME_VALIDATION=UNTESTED.",
             "개발 방향: DX11은 실제 메뉴→차량 선택→레이스 전체 프레임/입력/OpenXR; DX9Ex는 R84 실게임 HUD·렌즈·+TIME·GOAL·측정 성능. 원본 입력/FFB/SkyGlow·DX9Ex 폴백, 기존 owner lease, DXVK 동결 보호.",
         ]
-    if VR_CONTINUOUS_30M_ENABLED and lane in {"DX11", "DX9EX"}:
+    if VR_CONTINUOUS_30M_ENABLED and lane == "DX11":
         lines += [
             "CONTINUOUS_DEVELOPMENT=ON. TASK_ID는 커밋·이력·점수 중복 방지 식별자일 뿐이며 이전 TASK 완료/C6, FEATURE_CONTRACT, backlog 상태는 다음 개발 착수의 선행 조건이 아니다.",
             "30분은 기존 미완료 TASK_ID의 진행 확인·동일 ID 대화 재개 기준이다. 이 시간에 새 TASK_ID를 발급해 구현을 교체하지 마.",
             "이전 대화의 미완료 구현은 동일 TASK_ID/FEATURE_ID로 완성해. 실제 terminal 이후에만 다른 기능을 시작하고, 동일 파일 충돌·강제 push/CI-skip 금지.",
             "HMD 테스트를 못 했으면 RUNTIME_VALIDATION=UNTESTED로 남기되 새로운 게임 코드 개발을 멈추지 마.",
         ]
-    if lane in {"DX11", "DXVK", "DX9EX"}:
+    if lane in {"DX11", "DXVK"}:
         lines += [
             "2026-10-08 사용자 최신 결정: DXVK 신규 개발·재개·배포·승격은 동결, DX11 네이티브 전환 완료를 최우선으로 한다. DX11 업무에서 DXVK로 이동하지 마.",
             "실기 HMD/게임 화면 테스트가 없다는 이유로 C0~C6 소스 개발을 중단하지 마. HMD 전용 결론/백엔드 승격만 NEED_HMD_TEST 또는 BLOCKED_RUNTIME으로 주차해.",
@@ -1160,7 +1177,7 @@ def queue_dynamic_prefix() -> str:
             "다른 작업자와 같은 work_key/파일/Task를 중복 수정하지 말고 원격 claim/HEAD를 확인해. 이미 진행 중인 CI는 새 상태 커밋으로 취소하지 마.",
             "배포/실기 PASS는 실제 Quest3/VDXR 검증 이후에만 선언해. 완료한 C0~C6+정확한 GitHub Gate가 확인되면 기존 TASK_ID를 재실행하지 말고 다음 독립 항목을 진행해.",
         ]
-    if lane in {"DX11", "DX9EX"} and not VR_CONTINUOUS_30M_ENABLED:
+    if lane == "DX11" and not VR_CONTINUOUS_30M_ENABLED:
         lines += [
             "FEATURE_BASED_DEVELOPMENT=ON: 작은 패치 개수/20분 종료 규칙은 폐기. "
             "기능 하나(1~3시간 이상 가능)를 C0 조사→C1 구현 범위 확정→C2 전체 경로 구현→경량 국소검사→"
