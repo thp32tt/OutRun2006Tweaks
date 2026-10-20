@@ -70,6 +70,38 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertIsNone(blocked)
         self.assertIn("BATCH_AWAITING_RESULT_AND_LIBRARY", reason)
 
+    def test_presend_failure_rolls_submitting_back_to_same_staged_task(self):
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        task=binding["task_id"]
+        self.assertEqual(text_roi_queue.stage_submission("A",task,self.root),"SUBMITTING")
+        result=text_roi_queue.rollback_submission(
+            "A",task,"IMAGE_TOOL_NOT_SELECTED:CREATE_IMAGE_OPTION_MISSING",self.root)
+        self.assertEqual(result,"ROLLED_BACK_TO_STAGED")
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],task)
+        self.assertEqual(st["active"]["status"],"STAGED")
+        self.assertEqual(st["status"],"STAGED")
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertEqual(st["active"]["presend_retry_count"],1)
+        retry,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        self.assertEqual(retry["task_id"],task)
+
+    def test_presend_rollback_refuses_existing_sent_receipt(self):
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        task=binding["task_id"]
+        self.assertEqual(text_roi_queue.stage_submission("A",task,self.root),"SUBMITTING")
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        (sent/f"A_{task}.json").write_text("{}",encoding="utf-8")
+        result=text_roi_queue.rollback_submission(
+            "A",task,"IMAGE_TOOL_NOT_SELECTED:TEST",self.root)
+        self.assertEqual(result,"ROLLBACK_BLOCKED_SENT_RECEIPT_EXISTS")
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(st["active"]["status"],"SUBMITTING")
+
     def test_role_partition_never_steals_other_role(self):
         binding, reason = controller_png_attach.load_binding("B", self.root)
         self.assertIsNone(binding)
