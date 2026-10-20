@@ -679,9 +679,29 @@ class VRLensFlareProjected2D : public Hook
         // remove this ONE source draw, not a whole SceneEffect or sun/sky
         // producer. A user setting can restore it for comparison. Desktop
         // and unknown C993 objects always execute their original draw.
-        if (centreScope != OutRunVR::GameSemantic::RenderScope::None &&
+        // Quest3 2026-10-20: C993's central point remained doubled even
+        // with LensFlareCentreEnabled=false. A transient D3A5 scope or
+        // queue state must NOT bypass the suppression of this precisely
+        // identified C993 object. This skips only original object 0x570002
+        // in VR, not other C993 objects, CABE halos, sky, or desktop.
+        // It is a temporary optical workaround, not a corrected stereo WVP.
+        if (Settings::VREnabled && objectId == 0x570002 &&
             !Settings::VRLensFlareCentreEnabled.get())
+        {
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> hits{ 0 };
+                const auto n = hits.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 8 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR LENS C993 CENTER HIDDEN: count={} "
+                        "parent={} owner={} queue={} (CABE intact)",
+                        n, LensCentreDepth, LensCentreOwnerDepth,
+                        OutRunVR::GameSemantic::QueueRenderActive() ? 1 : 0);
+            }
             return;
+        }
         // An unrelated one-shot producer (for example an earlier queued
         // HUD/world draw) must not replace this exact C993 centre draw.
         // Keep its token intact for the original later owner, and leave all
