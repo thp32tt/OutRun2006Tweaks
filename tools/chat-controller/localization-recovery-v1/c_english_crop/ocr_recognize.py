@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+import difflib
 from PIL import Image, ImageOps
 import numpy as np
 import discover
@@ -22,6 +23,7 @@ BASE=discover.BASE
 SOURCE=discover.SRC
 AUDIT=BASE/"auto_discovery"
 TESS_TIMEOUT=95
+OCR_STRATEGY_COUNT=6
 
 def norm(t):
     return re.sub(r"[^A-Z0-9]","",t.upper())
@@ -42,15 +44,22 @@ def approved_phrases(q):
                 trans.setdefault(canonical,phrase)
     return trans
 
-def ocr_words(image):
-    # Tesseract expects dark glyphs on white; source has stylized light-on-dark art.
-    image=ImageOps.autocontrast(ImageOps.invert(Image.alpha_composite(
-        Image.new("RGBA",image.size,"black"),image.convert("RGBA")).convert("L")))
+def ocr_words(image, strategy=0):
+    """Run one deterministic OCR strategy; repeated coverage scans rotate strategies."""
+    strategy=int(strategy)%OCR_STRATEGY_COUNT
+    rgba=image.convert("RGBA")
+    composed=Image.alpha_composite(Image.new("RGBA",rgba.size,"black"),rgba).convert("L")
+    psm=(11,6,12,11,6,12)[strategy]
+    if strategy < 3:
+        prepared=ImageOps.autocontrast(ImageOps.invert(composed))
+    else:
+        # Some outlined/dark UI text is read better without polarity inversion.
+        prepared=ImageOps.autocontrast(composed)
     with tempfile.TemporaryDirectory(prefix="outrun-ocr-") as td:
         test=Path(td)/"source.png"
-        image.save(test)
+        prepared.save(test)
         env={**os.environ,"OMP_THREAD_LIMIT":"1","TESSDATA_PREFIX":"/usr/share/tesseract-ocr/5/tessdata"}
-        run=subprocess.run(["tesseract",str(test),"stdout","-l","eng","--psm","11","tsv"],
+        run=subprocess.run(["tesseract",str(test),"stdout","-l","eng","--psm",str(psm),"tsv"],
                            capture_output=True,text=True,timeout=TESS_TIMEOUT,env=env)
     if run.returncode: raise RuntimeError("TESSERACT_ERROR:"+run.stderr[-500:])
     groups={}
@@ -77,17 +86,35 @@ def margin_check(im,box):
         return "ALPHA_TOUCHES_CROP_BORDER_REVIEW"
     return None
 
-def unique_regions(words,phrasemap,w,h):
+def unique_regions(words,phrasemap,w,h,allow_fuzzy=False):
     raw=[]
+    keys=list(phrasemap)
     for line in words:
         for begin in range(len(line)):
-            for end in range(begin+1,min(begin+8,len(line)+1)):
+            for end in range(begin+1,min(begin+10,len(line)+1)):
                 ws=line[begin:end]
                 code=norm(" ".join(x["word"] for x in ws))
-                if code not in phrasemap:continue
+                matched=code if code in phrasemap else None
+                mode="EXACT"
+                similarity=1.0
+                if matched is None and allow_fuzzy and len(code)>=6:
+                    ranked=[]
+                    for candidate in keys:
+                        if abs(len(candidate)-len(code)) > max(3,int(len(candidate)*.25)):
+                            continue
+                        ratio=difflib.SequenceMatcher(None,code,candidate).ratio()
+                        if ratio>=.90:
+                            ranked.append((ratio,candidate))
+                    ranked.sort(reverse=True)
+                    if ranked and (len(ranked)==1 or ranked[0][0]-ranked[1][0]>=.035):
+                        similarity,matched=ranked[0]
+                        mode="FUZZY_STRONG"
+                if matched is None:continue
                 conf=min(x["confidence"] for x in ws)
                 avg=sum(x["confidence"] for x in ws)/len(ws)
-                if conf<83 or avg<88:continue
+                min_required=83 if mode=="EXACT" else 86
+                avg_required=88 if mode=="EXACT" else 91
+                if conf<min_required or avg<avg_required:continue
                 x0=min(x["bbox"][0] for x in ws)
                 y0=min(x["bbox"][1] for x in ws)
                 x1=max(x["bbox"][2] for x in ws)
@@ -98,8 +125,9 @@ def unique_regions(words,phrasemap,w,h):
                 box=[max(0,x0-padx),max(0,y0-pady),min(w,x1+padx),min(h,y1+pady)]
                 if box[0]==0 or box[1]==0 or box[2]>=w or box[3]>=h:continue
                 if box[2]-box[0]<28 or box[3]-box[1]<20:continue
-                raw.append({"english":phrasemap[code],"bbox_xyxy":box,
-                            "ocr_exact_normalized":code,"ocr_text":" ".join(x["word"] for x in ws),
+                raw.append({"english":phrasemap[matched],"bbox_xyxy":box,
+                            "ocr_exact_normalized":matched,"ocr_text":" ".join(x["word"] for x in ws),
+                            "ocr_match_mode":mode,"ocr_similarity":round(similarity,4),
                             "min_confidence":round(conf,2),"mean_confidence":round(avg,2)})
     filtered=[]
     for candidate in sorted(raw,key=lambda r:-r["min_confidence"]):
