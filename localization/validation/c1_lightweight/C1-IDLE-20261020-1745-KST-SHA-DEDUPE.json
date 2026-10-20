@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1745-IDLE-SHA-DEDUPE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T17:45:00+09:00",
+  "inspection_type": "INDEPENDENT_SHA_DEDUP_PENDING_CHECK_ONLY",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "snapshot": {
+    "saved_png_candidates": 73,
+    "A_saved": 26,
+    "B_saved": 47,
+    "excluded_legacy_count": 1,
+    "previously_reviewed_nonlegacy_sha": 72,
+    "newest_review": "C1-QA-20261020-1715-A0005-UNIQUE5.json",
+    "previous_new_reviews": {
+      "2026-10-20T15:45+09:00": 8,
+      "2026-10-20T16:15+09:00": 2,
+      "2026-10-20T17:15+09:00": 5
+    },
+    "pending_unreviewed_sha": 0,
+    "A_active_batch": "OUTRUN-ROI-A-0006-70D97486",
+    "A_active_batch_candidate_outputs_saved": 0,
+    "B_active_batch": "OUTRUN-ROI-B-0011-A889C0FD",
+    "B_active_batch_candidate_outputs_saved": 0,
+    "latest_export_evidence_A": "OUTRUN-ROI-A-0005-27941A1F.json",
+    "latest_export_evidence_B": "OUTRUN-ROI-B-0010-8F2213CF-R1.json"
+  },
+  "references": [
+    "localization/validation/c1_lightweight/C1-20261020-1545-A0004R1-B0010R1-UNIQUE8.json",
+    "localization/validation/c1_lightweight/C1-QA-20261020-1615-B0010R1-REMAINDER-2.json",
+    "localization/validation/c1_lightweight/C1-QA-20261020-1715-A0005-UNIQUE5.json"
+  ],
+  "verdict": "IDLE_NO_NEW_UNREVIEWED_A_B_PNG_SHA",
+  "new_qa_cases": 0,
+  "PASS_PNG_ONLY": 0,
+  "FAIL": 0,
+  "existing_candidate_notes": "72 nonlegacy candidate SHA already reviewed; preserve existing PNG-only judgments and REWORK_DIMENSIONS for last batches. No final DDS/game promotion.",
+  "boundary": {
+    "imagegen_calls": 0,
+    "ab_queues_consumed": 0,
+    "dds_written": 0,
+    "C2_PASS": false,
+    "C3_PASS": false,
+    "user_ingame_PASS": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "AI": "AI 1",
+    "previous_confirmed": 1655,
+    "delta": 0,
+    "new_cumulative": 1655,
+    "reason": "No new PNG SHA independently QAed; IDLE status/dedup confirmation only"
+  }
+}
