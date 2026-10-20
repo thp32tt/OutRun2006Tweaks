@@ -174,6 +174,26 @@ class ProjectLibraryTests(unittest.TestCase):
             self.assertEqual(proof["generated_image_sha256"],local_shas)
             self.assertEqual(proof["source_hash_method"],"verified_local_export_evidence")
 
+    def test_known_verified_library_route_skips_folder_picker(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            ev=root/"text_roi_batches"/"library_evidence"
+            ev.mkdir(parents=True)
+            (ev/"old.json").write_text(__import__("json").dumps({
+                "folder":"아웃런 한글화 신규",
+                "library_folder_url":"https://chatgpt.com/library/d/abcdef123456"
+            }),encoding="utf-8")
+            class DirectFolder(FakeFolder):
+                async def goto(self,url,**kw):
+                    self.url=url
+                def get_by_role(self,*args,**kwargs):
+                    raise AssertionError("folder picker must be skipped")
+            folder=DirectFolder(self.folder.rows)
+            chat=FakeChat(folder,SHAS)
+            proof,error=asyncio.run(gate.verify_project_library_images(chat,ACTIVE,root=root,max_scan=12))
+            self.assertIsNone(error)
+            self.assertEqual(proof["library_folder_url"],"https://chatgpt.com/library/d/abcdef123456")
+
     def test_one_missing_library_png_must_not_pass(self):
         self.folder.rows[-1]["sha256"]="b"*64
         proof,error=asyncio.run(gate.verify_project_library_images(self.chat,ACTIVE,max_scan=12))
