@@ -1257,8 +1257,9 @@ for label, old, changed in (
         raise SystemExit('P0 XMT overflow guard mutation survived: ' + label)
 
 # P0 F11 fork integration: upstream Dear ImGui DX9 is XYZ+orthographic and
-# cannot enter R30's XYZRHW/VS owners. Check explicit per-eye projection and
-# scissor ownership, preserving fallback for ordinary game/menu 3D.
+# cannot enter R30's XYZRHW/VS owners. The old finite head-relative HUD plane
+# doubled F11 on Quest3. Check FOV-only eye affine + scissor and full restore,
+# preserving fallback for ordinary game/menu 3D.
 def check_f11_xyz_owner(source):
     prepare = function_body(source, 'bool R30PrepareExternalImGuiProjection(')
     draw = function_body(source, 'HRESULT R30TryExternalImGuiIndexed(')
@@ -1274,13 +1275,18 @@ def check_f11_xyz_owner(source):
         'GetTransform(D3DTS_PROJECTION',
         'stockProjection._34',
         'stockProjection._44',
-        'GetLatchedHeadInverse(',
-        'R30BuildHudPlaneCoefficients(state, false)',
+        'OutRunVRF11Screen2D::Build(bounds, f11Affine)',
+        'stockProjection.m[row][0] * f11Affine[eye].scaleX',
+        'stockProjection.m[row][1] * f11Affine[eye].scaleY',
+        'w * f11Affine[eye].offsetX',
+        'w * f11Affine[eye].offsetY',
         'projected.m[row][3]',
         'eyeScissors[eye]',
         'FrameHadWorldStereo',
     ):
-        require(token, prepare, 'F11 explicitly scoped XYZ/orthographic finite HUD plane')
+        require(token, prepare, 'F11 explicitly scoped XYZ/orthographic FOV screen overlay')
+    if 'GetLatchedHeadInverse(' in prepare or 'R30BuildHudPlaneCoefficients(state, false)' in prepare:
+        raise SystemExit('P0 F11 regression: head pose / finite gameplay plane reintroduced')
     for token in (
         'R30CaptureSkyGlowSceneBeforeHud(device)',
         'device->SetTransform(',
@@ -1331,7 +1337,7 @@ for label, needle in (
     ('broad external scope', 'ExternalOverlaySemanticDepth == 0'),
     ('XYZ vertex gate', 'D3DFVF_XYZ'),
     ('per-eye scissor', 'device->SetScissorRect(&eyeScissors[eye])'),
-    ('fixed pose plane', 'R30BuildHudPlaneCoefficients(state, false)'),
+    ('F11 eye affine', 'OutRunVRF11Screen2D::Build(bounds, f11Affine)'),
     ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, true)'),
     ('host world authority', 'if (state.worldEvidenceAuthoritative)'),
     ('global shadow budget', 'R30TotalShadowBudgetBytes'),
