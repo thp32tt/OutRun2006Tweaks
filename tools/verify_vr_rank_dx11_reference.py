@@ -30,7 +30,26 @@ assert "ProjectionFromFov(" in body
 assert "deltaX[eye] = eyeX - baseX;" in body
 assert "deltaY[eye] = eyeY - baseY;" in body
 assert "RivalMarkerProjectedInfo" in hook
-assert "if (RankMarkerSubScreenHudDepth != 0)" in hook
+# Quest3 3f9ccd3b: native 0xBAEE2 car depth was present but NaviPub
+# source tag suppressed every world anchor. A VALID exact E8 view point
+# may promote the vehicle sprite; absent evidence stays ScreenHud.
+assert "RankMarkerSubScreenHudDepth != 0 &&" in hook
+assert "!projectedAnchor.valid" in hook
+assert "RankMarkerExactCalcEdge))" in hook
+assert "const bool projected = projectedAnchor.valid;" in hook
+assert "RankMarkerSubScreenHudDepth != 0 && !projected;" in hook
+# RIVAL: exact original BB6F0 Calc3D2D edge must stamp the anchor before
+# BB796 queued/delayed sprite rendering, never the generic HUD sprite.
+assert "RivalMarkerExactCalcEdge = false;" in hook
+assert "static void __cdecl Calc3D2D_RivalExactCall(" in hook
+assert "RivalMarkerExactCalcEdge = true;" in hook
+assert "else if (RivalMarkerExactCalcEdge ||" in hook
+assert "Module::exe_ptr(0xBB6F0)" in hook
+assert "RivalMarkerProjectedInfo = {};" in hook
+# Fail closed: no valid input means no projected vehicle rank/rival.
+for marker in ("!projectedAnchor.valid", "const bool projected = projectedAnchor.valid;",
+               "RivalMarkerProjectedInfo = {};", "RankMarkerExactCalcEdge))"):
+    assert marker in hook, marker
 for is_ordinal in (False, True):
     for dx11_reference in (False, True):
         chosen_canted = is_ordinal and not dx11_reference
@@ -38,4 +57,4 @@ for is_ordinal in (False, True):
             assert not chosen_canted
         if not is_ordinal:
             assert not chosen_canted
-print("PASS R26 DX11 mode6 reference for rank, rival unchanged, 0.55 HUD scale")
+print("PASS R26 DX11 mode6 rank+rival exact view-anchor parity, NaviPub fallback scoped, 0.55 HUD")
