@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0215-IDLE-SHA-RECONCILE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-21T02:15:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "NO_UNREVIEWED_CANDIDATE_SHA",
+  "sources": {
+    "policy": [
+      "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+      "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+      "localization/controller_roles.json"
+    ],
+    "n100_producer_root": "work/image-src/text_roi_batches",
+    "export_evidence": "work/image-src/text_roi_batches/export_evidence/*.json",
+    "local_qa_metrics": "work/c1_batch_*/metrics.json",
+    "prior_github_sha_snapshot": "work/c1_qa_github_hashes_20261020_2345.txt",
+    "latest_c1_qa_commit": "99b5fa5a8ec01247fd53d1fabaa97fb1be803111"
+  },
+  "sha_reconciliation": {
+    "producer_export_files": 156,
+    "producer_unique_candidate_sha256": 156,
+    "qa_sha_snapshot_total": 314,
+    "export_candidate_sha_covered_by_prior_github_snapshot": 152,
+    "candidate_sha_missing_from_snapshot_but_reviewed_by_latest_c1_commit": 4,
+    "covered_by_combined_current_c1_evidence": 156,
+    "unreviewed_unique_sha256": 0,
+    "local_metrics_only_false_positive_unreviewed": 41,
+    "detail": "Local c1_batch metrics alone omitted earlier GitHub C1 records. The 41 apparent new SHA were already present in GitHub QA hash snapshot. The remaining four SHA were the subject of 2026-10-20 23:45 C1 evidence commit 99b5fa5a. Exports have no unreviewed SHA."
+  },
+  "selected_count": 0,
+  "new_png_qa_pass": 0,
+  "new_png_qa_fail": 0,
+  "new_png_qa_hold": 0,
+  "previously_reviewed_sha_reapproved": 0,
+  "imagegen_called": false,
+  "producer_queue_consumed": false,
+  "dds_composed_or_deployed": false,
+  "c2_c3_or_ingame_pass_created": false,
+  "runtime_validation": "UNTESTED",
+  "qa_note": "Eight previously reviewed candidate files were inspected for dedup diagnosis, but NONE was counted or reapproved in this run. Existing producer REWORK_DIMENSIONS/HOLD remains unchanged.",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "score_change": 0
+}
