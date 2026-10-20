@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0315-IDLE-SHA-RECONCILE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-21T03:15:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "NO_UNREVIEWED_CANDIDATE_SHA",
+  "policy_verified": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "sources": {
+    "n100_producer_root": "work/image-src/text_roi_batches",
+    "n100_exports": "work/image-src/text_roi_batches/export_evidence/*.json",
+    "previous_sha_reconciliation": "localization/validation/c1_lightweight/C1-IDLE-20261021-0215-SHA-RECONCILE.json",
+    "latest_new_candidate_qa_commit": "99b5fa5a8ec01247fd53d1fabaa97fb1be803111"
+  },
+  "sha_reconciliation": {
+    "n100_producer_export_files": 156,
+    "n100_producer_unique_candidate_sha256": 156,
+    "github_prior_qa_sha_snapshot_total": 314,
+    "export_candidate_sha_covered_by_prior_github_snapshot": 152,
+    "additional_sha_reviewed_by_20261020_2345_c1_commit": 4,
+    "previously_reviewed_unique_candidates": 156,
+    "unreviewed_unique_sha256": 0,
+    "note": "Re-ran current N100 export inventory; the 41 apparently NEW in local metrics are already covered by earlier GitHub QA. 4 additional local SHA were independently reviewed and committed as 99b5fa5a on 2026-10-20 23:45. No actual unreviewed candidate remains."
+  },
+  "new_qa_selected": 0,
+  "new_png_qa_pass": 0,
+  "new_png_qa_fail": 0,
+  "new_png_qa_hold": 0,
+  "previously_reviewed_sha_reapproved": 0,
+  "producer_export_state": "UNCHANGED",
+  "candidate_hold_and_rework_state": "UNCHANGED",
+  "imagegen_called": false,
+  "producer_queue_consumed": false,
+  "dds_composed_or_deployed": false,
+  "c2_c3_or_ingame_pass_created": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "score_change": 0
+}
