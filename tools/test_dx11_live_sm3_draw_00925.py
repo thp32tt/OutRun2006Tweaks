@@ -203,8 +203,12 @@ for token in (
     "if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))",
 ):
     check(token in source, "SM3 unsafe Z/scissor fallback admitted: " + token)
-check("build_r283_sm3_mov_shader_source(vertexSource, true" in backend and
-      "build_r283_sm3_mov_shader_source(pixelSource, false" in backend and
+check(re.search(
+          r"build_r283_sm3_mov_shader_source\(\s*vertexSource,\s*true,\s*vertexHlsl",
+          backend) and
+      re.search(
+          r"build_r283_sm3_mov_shader_source\(\s*pixelSource,\s*false,\s*pixelHlsl",
+          backend) and
       "candidate.vertexSamplerMask" in backend and
       "(vertexStage && reg >= 4u)" in backend and
       "candidate.pixelSamplerMask" in backend and
