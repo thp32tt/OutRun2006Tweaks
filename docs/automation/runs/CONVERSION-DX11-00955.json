@@ -9,10 +9,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00955",
   "feature_id": "DX11:LIVE_SM3_INTEGER_REPEAT_TO_NATIVE_GAME_DRAW",
-  "status": "SOURCE_IMPLEMENTED_VALIDATION_PENDING",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -92,21 +92,21 @@
     "tools/test_dx11_sm3_live_integer_repeat_00955.py"
   ],
   "material_result_sha": "341674f36fb7026b6a46c62386fa6386a4859c0f",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "194f3949b1b36a83e9ccd9bfa6c26a575d57017e",
   "REAL_GAME_DRAW_BLOCKER": "2026-10-18 game capture native_draws=0. Live i# REP is currently rejected; presence in game capture UNTESTED.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "CODE_CHANGED_SHA": "341674f36fb7026b6a46c62386fa6386a4859c0f",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Exact policy stage identifiers repaired without weakening acceptance. Validate updated integration-path record at new exact SHA and repair any real additional Gate failures within TASK_ID 00955. Native game/Quest3 runtime UNTESTED.",
+  "NEXT_IMPLEMENTATION_ACTION": "00955 source and policy CI complete; game-origin menu/car/race native frames, input and Quest3/VDXR must be tested on actual hardware by controller-selected next independent scope. No automatic gameplay claim.",
   "pipeline": {
     "C0_RECOVER": "GitHub 31eeeea7812b9c5456a1ef4730a6870a3a8faf32; 00954 complete, no 00955 prior run/claim",
     "C1_REVIEW": "Game shader live i# REP refuses all non-DEFI constants; bounded per-draw capture feasible.",
     "C2_IMPLEMENT": "VS/PS live SM3 i# dynamic repeat compiled and snapshotted with b3 stage binding and fail-closed provenance.",
-    "C3_VALIDATE": "FAIL_BACKEND_39471951437_GAMEPLAY_PATH_LABEL; original material source SHA 341674f36fb7026b6a46c62386fa6386a4859c0f, retry gate pending",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5 at 194f3949b1b36a83e9ccd9bfa6c26a575d57017e; GitHub Actions runs 39472524286,39472524261,39472524310,39472524281,39472524339",
     "C4_COMMIT": "341674f36fb7026b6a46c62386fa6386a4859c0f",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING"
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; NEED_HMD_TEST; RUNTIME_VALIDATION=UNTESTED; native published game frame UNTESTED"
   },
   "score_change": 0,
   "ci_failure_repair": {
@@ -116,5 +116,37 @@
     "root_cause": "00955 record used noncanonical REAL_GAME_DRAW / NATIVE_DRAW / FULL_FRAME_OUTPUT stage IDs, whereas enforced source-order contract requires LIVE_D3D9_CALLSITE / D3D11_NATIVE_DRAW / VISIBLE_FRAME_OUTPUT",
     "scope": "record stage identity only; no controller policy bypass or claimed runtime pixel evidence",
     "material_source_commit": "341674f36fb7026b6a46c62386fa6386a4859c0f"
+  },
+  "acceptance_results": {
+    "live_integer_shader_native_draw": "PASS_SOURCE_CXX_PYTHON_AND_EXACT_SHA_5_OF_5",
+    "bounds_fallback": "PASS_BOUND_REGRESSION_AND_EXACT_SHA_5_OF_5",
+    "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "exact_sha_gate_results": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 39472524286,
+      "head_sha": "194f3949b1b36a83e9ccd9bfa6c26a575d57017e",
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39472524261,
+      "head_sha": "194f3949b1b36a83e9ccd9bfa6c26a575d57017e",
+      "conclusion": "success"
+    },
+    "Build": {
+      "run_id": 39472524310,
+      "head_sha": "194f3949b1b36a83e9ccd9bfa6c26a575d57017e",
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39472524281,
+      "head_sha": "194f3949b1b36a83e9ccd9bfa6c26a575d57017e",
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39472524339,
+      "head_sha": "194f3949b1b36a83e9ccd9bfa6c26a575d57017e",
+      "conclusion": "success"
+    }
   }
 }
