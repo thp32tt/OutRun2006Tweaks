@@ -4785,7 +4785,15 @@ namespace OutRunVRStereo
 
             float hudScaleX = 1.0f;
             float hudScaleY = 1.0f;
-            R30HudContainScale(stereo, hudScaleX, hudScaleY);
+            if (screenKind == R30ScreenSpaceKind::ScreenOverlay2D)
+            {
+                // Original ESC/overlay scaling is independent of the new
+                // gameplay-only 1080p HUD containment. No F11/pause shrink.
+                hudScaleX = R30HudScaleValue();
+                hudScaleY = hudScaleX;
+            }
+            else
+                R30HudContainScale(stereo, hudScaleX, hudScaleY);
             D3DMATRIX hudScale = IdentityMatrix();
             hudScale._11 = hudScaleX;
             hudScale._22 = hudScaleY;
