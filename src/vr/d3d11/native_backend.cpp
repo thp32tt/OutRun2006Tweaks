@@ -8,6 +8,7 @@
 #include "native_sm3_conditional_flow.hpp"
 #include "native_sm3_interface_channels.hpp"
 #include "native_sm3_repeat_flow.hpp"
+#include "native_sm3_address_codegen.hpp"
 #include "native_sm3_predicate_flow.hpp"
 #include "native_sm3_predicated_instruction.hpp"
 #include "native_sm3_destination_output.hpp"
@@ -422,6 +423,9 @@ bool build_r283_sm3_mov_shader_source(
         std::vector<LoopRange> loopRanges;
         // Exclusive aL address limits for game-owned dynamic i# registers.
         std::array<std::uint16_t, 16> indexedLoopLimits{};
+        // a0.x from an exact shader-local DEF/MOVA is safe to resolve on
+        // the CPU. Vertex-dependent MOVA stays on the D3D9 game renderer.
+        int staticAddressIndex = -1;
         bool predicateUsed = false;
         const unsigned constantLimit = vertexStage ? 256u : 224u;
         // DEF is a shader-local register override, not an upload from the
@@ -524,6 +528,41 @@ bool build_r283_sm3_mov_shader_source(
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEFB) ||
                 instruction.opcode == static_cast<DWORD>(D3DSIO_DEFI))
                 continue;
+            // Real game shader a0.x address assignment. Only a shader-owned
+            // immutable DEF literal permits safe constant folding across
+            // DrawIndexed: unknown per-vertex inputs can exceed the VS/PS
+            // native c-register bank and must never be clipped silently.
+            if (instruction.opcode == static_cast<DWORD>(D3DSIO_MOVA)) {
+                if ((instruction.instructionToken & 0xf0ff0000u) != 0u ||
+                    instruction.operandTokens.size() != 2u ||
+                    operations.size() >= kMaxOps ||
+                    !structuredFlow.empty())
+                    return false;
+                const DWORD dst = instruction.operandTokens[0];
+                const DWORD src = instruction.operandTokens[1];
+                const unsigned srcReg = src & D3DSP_REGNUM_MASK;
+                const unsigned srcSwizzle =
+                    (src & D3DSP_SWIZZLE_MASK) >> 16u;
+                const unsigned modifier =
+                    (src & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT;
+                if ((dst & 0x80000000u) == 0u ||
+                    r283_decode_register_type(dst) != D3DSPR_ADDR ||
+                    (dst & D3DSP_REGNUM_MASK) != 0u ||
+                    ((dst & D3DSP_WRITEMASK_ALL) >> 16u) != 1u ||
+                    (dst & (D3DSHADER_ADDRESSMODE_MASK |
+                            D3DSP_DSTMOD_MASK | D3DSP_DSTSHIFT_MASK)) != 0u ||
+                    (src & 0x80000000u) == 0u ||
+                    r283_decode_register_type(src) != D3DSPR_CONST ||
+                    (src & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
+                    srcReg >= constantLimit || !defPresent[srcReg])
+                    return false;
+                unsigned address = 0u;
+                if (!native_sm3_static_mova_address(
+                        defBits[srcReg][srcSwizzle & 3u], modifier, address))
+                    return false;
+                staticAddressIndex = static_cast<int>(address);
+                continue;
+            }
             // SM3 scalar float-compare branches can change menu/race shader
             // output, including gradients and alpha. Preserve genuine control
             // flow instead of assuming both arms run. The branch-state tracker
@@ -1075,21 +1114,26 @@ bool build_r283_sm3_mov_shader_source(
                 const DWORD token = instruction.operandTokens[operandCursor++];
                 const bool relative =
                     (token & D3DSHADER_ADDRESSMODE_MASK) != 0u;
+                bool staticAddress = false;
                 if ((token & 0x80000000u) == 0u) return false;
                 if (relative) {
                     if (operandCursor >= instruction.operandTokens.size() -
                                              (sourcePredicated ? 1u : 0u) ||
-                        loopRanges.empty())
+                        (loopRanges.empty() && staticAddressIndex < 0))
                         return false;
                     const DWORD address = instruction.operandTokens[operandCursor++];
                     const unsigned addrSwizzle =
                         (address & D3DSP_SWIZZLE_MASK) >> 16u;
                     if ((address & 0x80000000u) == 0u ||
-                        r283_decode_register_type(address) != D3DSPR_LOOP ||
+                        (r283_decode_register_type(address) != D3DSPR_LOOP &&
+                         r283_decode_register_type(address) != D3DSPR_ADDR) ||
                         (address & D3DSP_REGNUM_MASK) != 0u ||
                         (address & D3DSHADER_ADDRESSMODE_MASK) != 0u ||
                         ((address & D3DSP_SRCMOD_MASK) >> D3DSP_SRCMOD_SHIFT) != D3DSPSM_NONE ||
                         (addrSwizzle != 0u && addrSwizzle != 0xe4u))
+                        return false;
+                    staticAddress = r283_decode_register_type(address) == D3DSPR_ADDR;
+                    if (staticAddress ? staticAddressIndex < 0 : loopRanges.empty())
                         return false;
                 }
                 const auto kind = r283_decode_register_type(token);
@@ -1179,7 +1223,16 @@ bool build_r283_sm3_mov_shader_source(
                         return false;
                     value = "input.r" + std::to_string(reg);
                 } else if (kind == D3DSPR_CONST) {
-                    if (relative) {
+                    if (relative && staticAddress) {
+                        unsigned index = 0u;
+                        if (!native_sm3_static_address_const_index(
+                                reg, static_cast<unsigned>(staticAddressIndex),
+                                constantLimit, index) ||
+                            !native_sm3_const_reference(
+                                index, constantLimit, defPresent[index], value))
+                            return false;
+                        if (!defPresent[index]) liveConstantsUsed = true;
+                    } else if (relative) {
                         const auto& range = loopRanges.back();
                         if (reg >= constantLimit) return false;
                         if (range.dynamic) {

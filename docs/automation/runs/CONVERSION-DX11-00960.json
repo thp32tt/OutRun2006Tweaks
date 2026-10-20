@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00960",
+  "production_id": "CONVERSION-DX11-00960",
+  "event_id": "CONVERSION-DX11-00960-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00960",
+  "feature_id": "DX11:GAME_SM3_STATIC_ADDRESS_VS_PS_DRAW",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "REAL_GAME_DRAW_BLOCKER": "2026-10-18 real game native draws=0; current missing SM3 MOVA a0.x address decode, addressed game VS/PS constants remain game-owned; runtime result unobserved.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Run five exact-SHA mandatory Gates on source candidate; fix causal build failures same TASK; then obtain matching game menu/car/race source/pixel evidence.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Live D3D9 SM3 DEF/MOVA decoded into authentic a0.x constant for shader-owned draw",
+      "Stage-specific c[base+a0] resolves native DEF or game-owned float c# and binds VS/PS at native Draw",
+      "Reject live vertex-varying / unproved a0 addresses and out-of-bank ranges; original game renderer/input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_address_codegen.hpp",
+      "tools/dx11_sm3_static_address_probe_00960.cpp",
+      "tools/test_dx11_sm3_static_address_00960.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ integer-address/VS/PS-stage tests and Python integration probe",
+      "negative_regression": "Reject NaN, infinity, fractional/out-of-bounds addresses and game-dependent MOVA, preserve DX9Ex fallback",
+      "component_integration": "D3D9 token decode -> stage-owned immutable address -> native SM3 c# materializer -> game D3D11 Draw"
+    },
+    "conflict_keys": [
+      "DX11:GAME_SM3_STATIC_ADDRESS_VS_PS_DRAW:CONVERSION-DX11-00960"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_SM3_DEF_MOVA",
+      "NATIVE_VS_PS_ADDRESS",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY: shader constant translation integrated into existing native Draw / full frame path, no actual game pixels observed.",
+    "activation_guard_and_fallback": "No automatic native activation, only proven shader-owned MOVA a0; original D3D9Ex gameplay/render/input/FFB fallback retained."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:GAME_SM3_STATIC_ADDRESS_VS_PS_DRAW",
+    "goal": "Translate actual DEF-owned MOVA address indexed VS/PS game constants as safe native shader inputs while keeping unknown per-vertex addressing on D3D9.",
+    "acceptance_items": [
+      {
+        "id": "native_shader_addressed_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "shader_decoder_and_native_draw",
+        "expected_behavior": "D3D9 game DEF/MOVA/c[a0] translated to native VS/PS constant and existing Draw path."
+      },
+      {
+        "id": "unsafe_address_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gameplay_vs_ps_input_state",
+        "expected_behavior": "Dynamic/unproven/nonfinite or out of bounds addresses reject before native GPU draw; retain original input/FFB."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "fast_backend_windows_openxr_hud",
+        "expected_behavior": "Targeted probe plus unchanged mandatory five GitHub Actions gates on validation-bearing SHA."
+      }
+    ]
+  },
+  "work_time_percentages": "NOT_MEASURED",
+  "score_change": 0,
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_address_codegen.hpp",
+    "tools/dx11_sm3_static_address_probe_00960.cpp",
+    "tools/test_dx11_sm3_static_address_00960.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00960.json"
+  ]
+}
