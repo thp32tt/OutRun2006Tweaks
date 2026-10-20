@@ -4458,9 +4458,40 @@ namespace OutRunVRStereo
             float original[16], float eyeConstants[2][16],
             float eyeScale[2], float eyeOffset[2]) noexcept
         {
-            if (!device ||
-                CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
+            if (!device)
                 return false;
+            if (CurrentVertexShaderIdentity.load(
+                    std::memory_order_acquire) == 0)
+            {
+                // Diagnostics only: R13 can intentionally mask the tracked
+                // shader during a fragile effect. A live VS by itself is
+                // never permission to borrow a shader/c64 epoch or reroute
+                // an exact result draw. Keep the established native fallback.
+                if (Settings::VRTelemetry && R30IsExactResultHudDraw())
+                {
+                    static std::atomic<std::uint64_t> cacheZeroHits{ 0 };
+                    const auto n = cacheZeroHits.fetch_add(
+                        1, std::memory_order_relaxed) + 1;
+                    if (n <= 16 || (n & (n - 1)) == 0)
+                    {
+                        IDirect3DVertexShader9* liveVs = nullptr;
+                        const HRESULT vsHr =
+                            device->GetVertexShader(&liveVs);
+                        const auto command =
+                            OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                        spdlog::info(
+                            "VR R26 RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO cachedVS=0 liveVS={} vsHr=0x{:08X} producer={} queued={} node={} epoch={} hits={}",
+                            static_cast<const void*>(liveVs),
+                            static_cast<unsigned>(vsHr),
+                            OutRunVR::GameSemantic::Name(command.producer),
+                            command.queued, command.queueNode,
+                            command.queueEpoch, n);
+                        if (liveVs)
+                            liveVs->Release();
+                    }
+                }
+                return false;
+            }
 
             if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||
                 screenKind == R30ScreenSpaceKind::Hud2D ||
@@ -5317,6 +5348,10 @@ namespace OutRunVRStereo
                 R62TryFixedFunctionSpriteIndexed(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
+            // This reports only R62's fixed-function candidate rejection:
+            // the same physical DIP can still be handled by XYZRHW, shader
+            // HUD or the original R29 fallback below. It is not a final
+            // result-HUD draw/Present rejection.
             if (device && IsGameDevice(device) && !InternalStereoPass &&
                 Settings::VRTelemetry && R30IsExactResultHudDraw() &&
                 fixedFnSprite == E_NOTIMPL)
@@ -5333,7 +5368,7 @@ namespace OutRunVRStereo
                     const HRESULT fvfHr = device->GetFVF(&liveFvf);
                     const HRESULT vsHr = device->GetVertexShader(&liveVs);
                     spdlog::info(
-                        "VR R26 RESULT_HUD_REJECT: api=DIP producer={} node={} epoch={} cachedVS={} liveVS={} vsHr=0x{:08X} fvf=0x{:X} fvfHr=0x{:08X} seeded={} incomplete={} hits={}",
+                        "VR R26 RESULT_HUD_REJECT: stage=R62_ONLY finalRoute=UNDETERMINED api=DIP producer={} node={} epoch={} cachedVS={} liveVS={} vsHr=0x{:08X} fvf=0x{:X} fvfHr=0x{:08X} seeded={} incomplete={} hits={}",
                         OutRunVR::GameSemantic::Name(command.producer),
                         command.queueNode, command.queueEpoch,
                         CurrentVertexShaderIdentity.load(std::memory_order_acquire),

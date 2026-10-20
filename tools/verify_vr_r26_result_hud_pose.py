@@ -27,4 +27,15 @@ assert 'device->GetVertexShader(&shader)' in fixed and 'shader->Release()' in fi
 assert 'fvf != 0x00000142u' in fixed, 'do not widen the live physical draw format'
 assert 'VR R26 RESULT_HUD_EYES:' in fixed, 'record actual eye attempts and restoration'
 assert 'return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;' in fixed, 'do not report successful projection restoration after failure'
+
+# A cached-zero shader can be intentional R13 masking: observe it in a
+# bounded opt-in probe, but never promote live device VS to original c64 proof.
+shader_gate = shader_hud.split('if (screenKind == R30ScreenSpaceKind::PerspectiveHud ||', 1)[0]
+assert 'CurrentVertexShaderIdentity.load(' in shader_gate, 'do not bypass original shader identity guard'
+assert 'if (Settings::VRTelemetry && R30IsExactResultHudDraw())' in shader_gate, 'probe only source-proven exact result with telemetry on'
+assert 'RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO' in shader_gate, 'diagnose zero-cache physical shader ambiguity'
+assert 'device->GetVertexShader(&liveVs)' in shader_gate and 'liveVs->Release()' in shader_gate, 'release any observed live shader'
+assert '                return false;\n            }' in shader_gate, 'live shader diagnosis must not promote R26 source'
+assert 'stage=R62_ONLY finalRoute=UNDETERMINED api=DIP' in fixed, 'R62 failed candidate is not terminal HUD rejection'
+
 print('R26 result HUD pose/physical draw contract PASS')
