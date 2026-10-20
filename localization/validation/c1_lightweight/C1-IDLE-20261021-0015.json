@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0015-IDLE",
+  "role": "C1",
+  "checked_at_kst": "2026-10-21T00:15:00+09:00",
+  "state": "IDLE",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "audit": {
+    "export_evidence_entries": 156,
+    "unique_export_candidate_shas": 156,
+    "qa_candidate_shas_previously_committed": 152,
+    "last_four_unique_sha_reviewed_in": "localization/validation/c1_lightweight/C1-QA-20261020-2345-UNIQUE4.json",
+    "last_four_qa_commit": "99b5fa5a8ec01247fd53d1fabaa97fb1be803111",
+    "last_four_actual_shas": [
+      "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+      "95b6254910854cb5999b491fa91a2b5291b51b2a3a36812423c77595d60b03f8",
+      "9df970990a8118f0e4f31b2cd1ca9ad47ab4cc135716b19d5168409b346a410b",
+      "c0605ee71bdbac74ff8190153ab335ad8e0a4133e8d4dfcaa0e02477ce3043e1"
+    ],
+    "last_four_found_in_20261020_2345_qa": 4,
+    "total_existing_sha_reviewed": 156,
+    "new_eligible_shas": 0,
+    "method": "N100 export_evidence inventory and previous QA SHA hash reconciliation; compare four previously unlisted SHAs to confirmed GitHub 23:45 QA record. Do not repeat SHA reviews."
+  },
+  "result": {
+    "reviewed_new": 0,
+    "pass_new": 0,
+    "fail_new": 0,
+    "hold_new": 0,
+    "sha_recheck_duplicate": 0
+  },
+  "operations": {
+    "imagegen_calls": 0,
+    "producer_queue_consumed": false,
+    "dds_produced": false,
+    "game_patch_deployed": false,
+    "c2_c3_or_ingame_pass_created": false
+  },
+  "existing_open_gates": [
+    "HOLD_UNVERIFIED_SOURCE_AND_MAPPING for legacy OutRun Mode",
+    "HOLD_REWORK_DIMENSIONS for output-vs-source size mismatches",
+    "RUNTIME_VALIDATION=UNTESTED"
+  ],
+  "scoreboard": {
+    "ai": "AI 1",
+    "previous_confirmed": 1666,
+    "delta": 0,
+    "new_total": 1666,
+    "reason": "No new candidate SHA; IDLE evidence only, no duplicate work scoring"
+  }
+}
