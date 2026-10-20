@@ -29,6 +29,8 @@ on:
       - 'src/hooks_textures.cpp'
       - 'src/vr/game/texture_pack_cursor.hpp'
       - 'tools/verify_vr_texture_pack_cursor.py'
+      - 'tools/verify_vr_draw_distance_safety.py'
+      - 'tools/tests/test_draw_distance_node_safety.cpp'
       - 'vrhost/**'
       - 'tools/Start-OutRunVRPacing.ps1'
       - 'tools/Collect-OutRunVRFramePacing.ps1'
@@ -411,6 +413,7 @@ jobs:
             'tools/verify_vr_stereo_restore_publication.py',
             'tools/verify_vr_r33_full_target_viewport.py',
             'tools/verify_dx9ex_dense_scene_perf.py',
+            'tools/verify_vr_draw_distance_safety.py',
             'tools/verify_vr_r29_borrowed_surface_fastpath.py',
             'tools/verify_vr_state_block_resync_fastpath.py',
             'tools/verify_vr_r22_scissor_restore_fastpath.py',

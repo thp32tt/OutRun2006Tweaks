@@ -10,6 +10,7 @@
 #include "input_manager.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/sprite_queue_tail_proof.hpp"
+#include "vr/game/draw_distance_node_safety.hpp"
 
 namespace Settings
 {
@@ -287,7 +288,8 @@ bool DrawDist_ReadExclusions()
 	for (auto& section : ini.Sections())
 	{
 		int stageNum = get_number(section);
-		if (stageNum >= ObjectExclusionsPerStage.size())
+		if (stageNum < 0 ||
+			stageNum >= static_cast<int>(ObjectExclusionsPerStage.size()))
 		{
 			spdlog::error("DrawDist_ReadExclusions - INI contains invalid stage section \"{}\", skipping...", section);
 			continue;
@@ -300,7 +302,7 @@ bool DrawDist_ReadExclusions()
 			{
 				bool skip = false;
 				if (ini.Get<bool>(section, key, skip))
-					SkipQuickSortHackStages[stageNum] = true;
+					SkipQuickSortHackStages[stageNum] = skip;
 				continue;
 			}
 
@@ -355,7 +357,9 @@ bool DrawDist_ReadExclusions()
 
 			for (auto& node : nodes)
 			{
-				ObjectExclusionsPerStage[stageNum][objectId][node] = true;
+				if (node >= 0 &&
+					static_cast<std::size_t>(node) < ObjectExclusionsPerStage[stageNum][objectId].size())
+					ObjectExclusionsPerStage[stageNum][objectId][node] = true;
 			}
 		}
 	}
@@ -415,10 +419,12 @@ class StableDrawSort : public Hook
 	inline static SafetyHookInline DrawStoredModel_Execute_hook = {};
 	static void DrawStoredModel_Execute_dest()
 	{
-		// TODO: Allow excluding stages if our new sort causes issues with them.
-		// (or remove SkipQuickSortHackStages entirely if all work fine)
-		//if (!SkipQuickSortHackStages[*Game::stg_stage_num])
-		SortDrawBuffer(Game::s_AftDrawBuffer);
+		// Keep the vanilla/default replacement sort; only explicitly skipped
+		// stages bypass it. Invalid stage indices retain the normal sort.
+		if (!Game::stg_stage_num || *Game::stg_stage_num < 0 ||
+			static_cast<std::size_t>(*Game::stg_stage_num) >= SkipQuickSortHackStages.size() ||
+			!SkipQuickSortHackStages[*Game::stg_stage_num])
+			SortDrawBuffer(Game::s_AftDrawBuffer);
 
 		Game::DrawStoredModel_Internal(Game::s_AftDrawBuffer);
 		Game::s_AftDrawBuffer->NumBuffers_0 = 0;
@@ -478,8 +484,8 @@ class DrawDistanceIncrease : public Hook
 	//   (or possibly all the faces are already included in the current maps, and it's something CullingNode-related which skips drawing them?
 	//    I'm not hopeful about that though, doubt they would have included data for parts that wouldn't be shown)
 
-	inline static uint16_t CollisionNodeIdxArray[4096];
-	inline static std::array<uint8_t, 4096> CollisionNodesToDisplay;
+	inline static uint16_t CollisionNodeIdxArray[OutRunVR::DrawDistanceSafety::DrawListStorage];
+	inline static std::array<uint8_t, OutRunVR::DrawDistanceSafety::SeenNodeCount> CollisionNodesToDisplay;
 
 	inline static SafetyHookMid dest_hook = {};
 	static void destination(safetyhook::Context& ctx)
@@ -495,6 +501,9 @@ class DrawDistanceIncrease : public Hook
 		int v6 = ctx.ebx;
 		uint32_t* v11 = (uint32_t*)(v6 + 8);
 
+		if (!Game::stg_stage_num || *Game::stg_stage_num < 0 ||
+			static_cast<std::size_t>(*Game::stg_stage_num) >= ObjectExclusionsPerStage.size())
+			return;
 		auto& objectExclusions = ObjectExclusionsPerStage[*Game::stg_stage_num];
 
 		int maxDrawDistance = Settings::DrawDistanceIncrease;
@@ -509,7 +518,11 @@ class DrawDistanceIncrease : public Hook
 		}
 
 		NumObjects = *(int*)(ctx.esp + 0x18);
-		for (int ObjectNum = 0; ObjectNum < NumObjects; ObjectNum++)
+		// The source arrays are indexed by 256 game object slots; reject
+		// malformed oversized counts instead of indexing past the buffers.
+		const int boundedObjects = std::clamp(NumObjects, 0,
+			static_cast<int>(ObjectNodes.size()));
+		for (int ObjectNum = 0; ObjectNum < boundedObjects; ObjectNum++)
 		{
 			memset(CollisionNodesToDisplay.data(), 0, CollisionNodesToDisplay.size());
 			uint16_t* cur = CollisionNodeIdxArray;
@@ -536,30 +549,27 @@ class DrawDistanceIncrease : public Hook
 				uint32_t sectionCollListOffset = *(uint32_t*)(v6 + *v11 + ((CsLengthNum + csOffset) * 4));
 				uint16_t* sectionCollList = (uint16_t*)(v6 + *v11 + sectionCollListOffset);
 
-				int num = 0;
 				while (*sectionCollList != 0xFFFF)
 				{
-					// If we haven't seen this CollisionNode idx already lets add it to our IdxArray
-					if (!CollisionNodesToDisplay[*sectionCollList])
+					const std::uint16_t nodeId = *sectionCollList++;
+					const bool excluded =
+						OutRunVR::DrawDistanceSafety::IsKnownExclusionIndex(
+							nodeId, objectExclusions[ObjectNum].size()) &&
+						objectExclusions[ObjectNum][nodeId];
+					if (OutRunVR::DrawDistanceSafety::ShouldQueueNode(
+						CollisionNodesToDisplay[nodeId] != 0, excluded,
+						csOffset, Settings::DrawDistanceIncrease > 0))
 					{
-						CollisionNodesToDisplay[*sectionCollList] = true;
+						// Keep one extra slot for the original DrawObject sentinel.
+						// A rejected node stays eligible for the current section.
+						CollisionNodesToDisplay[nodeId] = true;
+						if (OutRunVR::DrawDistanceSafety::CanAppend(
+							static_cast<std::size_t>(cur - CollisionNodeIdxArray)))
+							*cur++ = nodeId;
 
-						// DEBUG: check exclusions here before adding to *cur
-						// (if we're at csOffset = 0 exclusions are ignored, since this is what vanilla game would display)
-						if ((csOffset == 0 && Settings::DrawDistanceIncrease > 0) || !objectExclusions[ObjectNum][*sectionCollList])
-						{
-							*cur = *sectionCollList;
-							cur++;
-						}
-
-						// DEBUG: add *sectionCollList to lastadds list here
 						if (DrawDistanceDebug::instance.visible && csOffset == maxDrawDistance)
-							ObjectNodes[ObjectNum].push_back(*sectionCollList);
-
-						num++;
+							ObjectNodes[ObjectNum].push_back(nodeId);
 					}
-
-					sectionCollList++;
 				}
 			}
 
@@ -619,16 +629,31 @@ class DrawBufferExtension : public Hook
 
 		auto resize_buffer = [](DrawBuffer* buffer, int max_size)
 		{
-			int bufferPtrsSize_Imm = max_size * sizeof(DrawEntry*);
-			int buffersSize_Imm = max_size * sizeof(DrawEntry);
-			int unkbuffersSize_Imm = max_size * 0x40; // todo: what 0x40 byte struct is this?
+			const std::size_t ptrBytes = static_cast<std::size_t>(max_size) * sizeof(DrawEntry*);
+			const std::size_t entryBytes = static_cast<std::size_t>(max_size) * sizeof(DrawEntry);
+			const std::size_t unknownBytes = static_cast<std::size_t>(max_size) * 0x40;
 
+			// Keep vanilla buffers/capacities intact until all three allocations
+			// succeed. On failure do not publish a partial enlarged draw buffer.
+			auto* newPtrs = static_cast<DrawEntry**>(std::malloc(ptrBytes));
+			auto* newEntries = static_cast<DrawEntry*>(std::malloc(entryBytes));
+			void* newUnknown = std::malloc(unknownBytes);
+			if (!newPtrs || !newEntries || !newUnknown)
+			{
+				std::free(newPtrs);
+				std::free(newEntries);
+				std::free(newUnknown);
+				spdlog::error("DrawBufferExtension: allocation failed for capacity {}; retaining original buffers", max_size);
+				return;
+			}
+
+			// Original draw-buffer allocation ownership is not established here.
+			// Do not free original pointers without its allocator contract.
+			buffer->BufferPtrs_10 = newPtrs;
+			buffer->Buffer_14 = newEntries;
+			buffer->UnkBuffer_18 = newUnknown;
 			buffer->MaxBuffers_4 = max_size;
 			buffer->MaxBuffers_C = max_size;
-
-			buffer->BufferPtrs_10 = (DrawEntry**)malloc(bufferPtrsSize_Imm);
-			buffer->Buffer_14 = (DrawEntry*)malloc(buffersSize_Imm);
-			buffer->UnkBuffer_18 = malloc(unkbuffersSize_Imm);
 		};
 
 		constexpr int s_ImmDrawBufferSizeVanilla = 0x100;
