@@ -105,13 +105,15 @@ def perf_check(root):
     menu = (root / "vrhost/src/runtime/menu_content_aspect.hpp").read_text(encoding="utf-8-sig")
     for label, ok in (
         ("R26 projected vehicle stereo XY owner", "R57BuildProjectedMarkerDelta(" in safe),
-        ("R26 exact-rank canted eye correction",
+        ("R26 exact-rank DX11 baseline with reversible canted-eye correction",
          '#include "lens_centre_relative_eye_pose.hpp"' in safe and
          "BuildHeadRelativeEyePose(" in safe and
          "exactOrdinalRank ? exactEyeOrientations[eye] : identityOrientation" in safe and
-         "const bool exactOrdinalRank = marker->exactOrdinalEyeCant;" in safe),
-        ("R26 protected rival projection unchanged",
-         "const bool exactOrdinalRank = marker->exactOrdinalEyeCant;" in safe and
+         "const bool exactOrdinalRank = marker->exactOrdinalEyeCant &&" in safe and
+         "!Settings::VRRankDx11ReferenceEyePose.get()" in safe),
+        ("R26 protected rival projection unchanged under DX11 baseline",
+         "const bool exactOrdinalRank = marker->exactOrdinalEyeCant &&" in safe and
+         "!Settings::VRRankDx11ReferenceEyePose.get()" in safe and
          "exactOrdinalRank ? exactEyeOffsets[eye] : relativeEye" in safe and
          "RankMarkerProjectedInfo.exactOrdinalEyeCant =" in
          (root / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8-sig") and
