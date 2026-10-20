@@ -77,7 +77,7 @@ def check(data):
     assert "Title='MAIN R26+HUD" in data["gui"]
     assert "Title='R84 TEST" in data["gui"]
 
-    assert "ref: \${{ github.sha }}" in data["pcworkflow"]
+    assert "ref: ${{ github.sha }}" in data["pcworkflow"]
     assert "-ExpectedSha $expectedSha" in data["pcworkflow"]
     for marker in ("PC Fast WRONG CHECKOUT", "PC FAST SOURCE GRAPH VERIFIED",
                    "PC FAST COMPILED R26 DLL SHA256", "GAME_DLL_SHA256.txt",
@@ -113,7 +113,7 @@ def main():
         ("ci", "FallbackRendererSlot = 'R84_TEST'", "FallbackRendererSlot = 'R26_SAFE'"),
         ("selector", "R26HUD-PC-FAST-v3-EXACT-SHA", "UNVERIFIED"),
         ("gui", "Title='MAIN R26+HUD", "Title='MAIN R84"),
-        ("pcworkflow", "ref: \${{ github.sha }}", "ref: vr-d3d9ex-focus"),
+        ("pcworkflow", "ref: ${{ github.sha }}", "ref: vr-d3d9ex-focus"),
         ("pc", "PC FAST SOURCE GRAPH VERIFIED", "UNTESTED"),
         ("inspector", "'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON'", "'OUTRUN_VR_R26_HUD_COMPARE:BOOL=OFF'"),
         ("queue", '"mainRenderer": "R26_WORLD_R30_HUD_SKYGLOW"', '"mainRenderer": "R84"'),
