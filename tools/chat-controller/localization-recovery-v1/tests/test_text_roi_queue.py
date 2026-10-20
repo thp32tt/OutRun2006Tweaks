@@ -175,7 +175,7 @@ class TextRoiQueueTests(unittest.TestCase):
 
         can_continue,status=asyncio.run(text_roi_queue.inspect_slot("B",Page(),self.root))
         self.assertTrue(can_continue)
-        self.assertEqual(status,"SINGLE_OF_FIVE_QUARANTINED_RETRY_STAGED")
+        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
         st=json.loads((self.root/"text_roi_batches/B_state.json").read_text())
         self.assertEqual(st["active"]["task_id"],old_task+"-R1")
         self.assertEqual(st["active"]["status"],"STAGED")
@@ -191,6 +191,83 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertEqual(retry["task_id"],old_task+"-R1")
         self.assertEqual(retry["expected_images"],5)
         self.assertEqual([x["ordinal"] for x in retry["tiles"]],[1,2,3,4,5])
+
+    def test_zero_of_five_library_match_quarantines_exports_and_retries_same_ordinals(self):
+        items=[]
+        for i in range(5):
+            name=f"Q205_Library_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(96+i,36),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q205_Library_{i}",
+                "role":"A",
+                "queue_index":"205",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"Source {i}",
+                "korean":f"번역 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        old_task=binding["task_id"]
+        text_roi_queue.stage_submission("A",old_task,self.root)
+        target="https://chatgpt.com/c/library-zero-five"
+        text_roi_queue.record_chat_url("A",old_task,target,self.root)
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        (sent/f"A_{old_task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":old_task,"role":"A",
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        outdir=self.root/"text_roi_batches/candidate_outputs/A"
+        outdir.mkdir(parents=True)
+        files=[]
+        for item in binding["items"]:
+            binary=(b"candidate-"+item["filename"].encode())*20
+            name=item["output_filename"]
+            (outdir/name).write_bytes(binary)
+            files.append({"name":name,"sha256":hashlib.sha256(binary).hexdigest()})
+        ev=self.root/"text_roi_batches/export_evidence"; ev.mkdir(parents=True)
+        (ev/f"{old_task}.json").write_text(json.dumps({
+            "task_id":old_task,"role":"A",
+            "status":"UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS",
+            "files":files
+        }),encoding="utf-8")
+        gv=self.root/"text_roi_batches/generated_visible"; gv.mkdir(parents=True)
+        (gv/f"{old_task}.json").write_text(json.dumps({
+            "task_id":old_task,"role":"A","distinct_generated_images":5,
+            "verification_method":"TEST","status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
+            "export_status":"EXISTING_CANDIDATES_VERIFIED"
+        }),encoding="utf-8")
+
+        class Page:
+            url=target
+            async def evaluate(self,*args,**kwargs):
+                raise AssertionError("persisted evidence should skip source DOM")
+        async def fake_verify(*args,**kwargs):
+            return None,"PROJECT_LIBRARY_HASH_MATCH_INCOMPLETE:0/5:SCANNED=500:LOAD_ERRORS=0"
+
+        import project_library_gate
+        with patch.object(project_library_gate,"verify_project_library_images",new=fake_verify):
+            can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
+        self.assertTrue(can_continue)
+        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],old_task+"-R1")
+        self.assertEqual(st["active"]["ordinals"],[1,2,3,4,5])
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertFalse((ev/f"{old_task}.json").exists())
+        self.assertFalse((gv/f"{old_task}.json").exists())
+        qroot=self.root/"text_roi_batches/quarantine"/old_task
+        self.assertTrue((qroot/"export_evidence.json").is_file())
+        self.assertTrue((qroot/"generated_visible.json").is_file())
+        for row in files:
+            self.assertFalse((outdir/row["name"]).exists())
+            self.assertTrue((qroot/"candidate_outputs"/row["name"]).is_file())
 
     def test_two_roles_do_not_share_state(self):
         b = dict(self.item, id="Q104_Second_Text", role="B", imagegen_input_png="Q104_OutRunModeB.png")
