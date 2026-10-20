@@ -1,0 +1,516 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-2245-A0009-A0010-UNIQUE8",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T22:45:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "evidence_local": "N100 work/c1_batch_20261020_2245/{metrics.json,compare_1.png,compare_2.png}",
+  "dedup": {
+    "prior_non_idle_c1_records_checked": 20,
+    "prior_candidate_sha_matches": 0,
+    "selected_unique_candidate_shas": 8,
+    "checked_all_prior_records": true
+  },
+  "summary": {
+    "reviewed": 8,
+    "pass_png_only": 8,
+    "fail_png": 0,
+    "hold_rework_dimensions": 8,
+    "alpha_edge_warnings_at_1": 1,
+    "alpha_edge_warnings_at_16": 0,
+    "source_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "png_rgba_verified": 8,
+    "asset_composition_approved": 0
+  },
+  "cases": [
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0009-76C865F4",
+      "source_ordinal": 41,
+      "source_roi_file": "Q161_c4bae570e6e8780a_source.png",
+      "source_roi_sha256": "4beaca28e0460838be4bc91576d0bc09653f6e6f41c95854df803814e2d694ab",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "candidate_file": "Q161_c4bae570e6e8780a_source_k.png",
+      "candidate_sha256": "dc7ce866d4b1cd243f2f90ca40f343f767c38e5fb84efab8d52fbf48b1aba509",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "AUSTRIA",
+      "reviewed_korean": "오스트리아",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1148,
+        296
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        139,
+        9,
+        2142,
+        658
+      ],
+      "alpha_bbox_16": [
+        141,
+        163,
+        2056,
+        538
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "오스트리아: 완결된 5음절을 단일 행으로 확인. 비문자 아트/원문 잔상 없음.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0009-76C865F4",
+      "source_ordinal": 42,
+      "source_roi_file": "Q161_835f21f8b3b20bd1_source.png",
+      "source_roi_sha256": "f1d3a62a783df50e19744f740b3901c88280f9f36b67242ad04961613066093e",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "candidate_file": "Q161_835f21f8b3b20bd1_source_k.png",
+      "candidate_sha256": "786217be7f3ef76b6ed6c904437168200d47c5a7733252de033f7af212819607",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "HONG KONG",
+      "reviewed_korean": "홍콩",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1484,
+        296
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        91,
+        127,
+        1778,
+        724
+      ],
+      "alpha_bbox_16": [
+        680,
+        142,
+        1497,
+        573
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 1,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "홍콩: 홍·콩 받침 포함 2음절 읽힘. 출력 하단 alpha=1의 1픽셀 저강도 프린지 경고, alpha>=16 경계 없음.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0009-76C865F4",
+      "source_ordinal": 43,
+      "source_roi_file": "Q161_8140a5326af839a7_source.png",
+      "source_roi_sha256": "c5dd9b91215ba33d3270a725f6026a223b922f3e8a9293129d8b99376734935c",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "candidate_file": "Q161_8140a5326af839a7_source_k.png",
+      "candidate_sha256": "cf493a6c3fe3b69f304285cfbe5f530b7608414c67ff074f7611bc7fb3f6e75e",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "NORWAY",
+      "reviewed_korean": "노르웨이",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1128,
+        296
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        272,
+        17,
+        2011,
+        657
+      ],
+      "alpha_bbox_16": [
+        275,
+        148,
+        1889,
+        582
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "노르웨이: 음절·받침과 단일 행 가독성 확인.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0009-76C865F4",
+      "source_ordinal": 44,
+      "source_roi_file": "Q161_54b6f457507d3066_source.png",
+      "source_roi_sha256": "a5de03737c4c1344051b1741d5c32423c660f0ad629f9a42b9df3a9aa994e31b",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "candidate_file": "Q161_54b6f457507d3066_source_k.png",
+      "candidate_sha256": "0622a5316d10cbef30343578341e3bbb9c96bf803482c00d8e518fd296515c70",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "NETHERLANDS",
+      "reviewed_korean": "네덜란드",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1820,
+        296
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        428,
+        79,
+        1808,
+        607
+      ],
+      "alpha_bbox_16": [
+        431,
+        202,
+        1730,
+        530
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "네덜란드: 네·덜·란·드 4음절 및 종성 구조 양호.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0009-76C865F4",
+      "source_ordinal": 45,
+      "source_roi_file": "Q161_9c1095bac503b8c5_source.png",
+      "source_roi_sha256": "b494a87c40036b5aa1c36d89180d7bb73867ee7884fd12e90083b67f1757dc8f",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "candidate_file": "Q161_9c1095bac503b8c5_source_k.png",
+      "candidate_sha256": "730ee95ff625edd0f0d908ff3cac6e1d9147bf83f03bed99c4052a5465d53547",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "SAGITTARIUS",
+      "reviewed_korean": "사수자리",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1624,
+        296
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        442,
+        39,
+        1820,
+        642
+      ],
+      "alpha_bbox_16": [
+        444,
+        185,
+        1729,
+        517
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "사수자리: 네 음절과 획·모서리·윤곽 단일 행 정상.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0010-3F5E8C9A",
+      "source_ordinal": 47,
+      "source_roi_file": "Q193_44f38adfd37a3e63_source.png",
+      "source_roi_sha256": "68cf9855d7c5d36838cb671f8f14087a30a3419c3be111d2f24f8a64ffb7f35f",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "candidate_file": "Q193_44f38adfd37a3e63_source_k.png",
+      "candidate_sha256": "e2b8808b6586bd63b47b431dabcb2628ab4ada6b5faa0abe4ea3e635dfb221c3",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "Goal D",
+      "reviewed_korean": "골 D",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        764,
+        280
+      ],
+      "candidate_dimensions": [
+        2068,
+        760
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        65,
+        29,
+        1603,
+        735
+      ],
+      "alpha_bbox_16": [
+        531,
+        117,
+        1549,
+        646
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "골 D: 한글 골과 라틴 D가 reviewed 번역과 정확히 일치하고 원문 Goal D의 혼합 문자 위계 유지.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0010-3F5E8C9A",
+      "source_ordinal": 48,
+      "source_roi_file": "Q193_424fbd5c3fcdb81e_source.png",
+      "source_roi_sha256": "b5756de58ce3d26615965baf2ecfb899610a1ef12553652c0721e2bf83ed4543",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "candidate_file": "Q193_424fbd5c3fcdb81e_source_k.png",
+      "candidate_sha256": "b8ed5a6dae36eab783ce9372ba5611f2f47b0ec6fc6112fa866f01052e1e65a2",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "MULTIPLAYER",
+      "reviewed_korean": "멀티플레이",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        762,
+        178
+      ],
+      "candidate_dimensions": [
+        1983,
+        793
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        90,
+        68,
+        1811,
+        767
+      ],
+      "alpha_bbox_16": [
+        178,
+        210,
+        1801,
+        573
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "멀티플레이: 다섯 음절 획·받침 구조 및 단일 행 표시 확인.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0010-3F5E8C9A",
+      "source_ordinal": 49,
+      "source_roi_file": "Q193_e1dd5f64c17c4124_source.png",
+      "source_roi_sha256": "e5eee03e094a01e074091d29098f81d959c79b1609a24cf9bfcbe548e5a6d322",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "candidate_file": "Q193_e1dd5f64c17c4124_source_k.png",
+      "candidate_sha256": "4bc6b4318835c890614bea11c44817141a904a498550a159cc90b6b8f063b869",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "ONLINE",
+      "reviewed_korean": "온라인",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        832,
+        248
+      ],
+      "candidate_dimensions": [
+        1912,
+        823
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        133,
+        29,
+        1842,
+        728
+      ],
+      "alpha_bbox_16": [
+        197,
+        159,
+        1706,
+        670
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "온라인: 네 음절, 받침·내부 공간과 단일 행 표시 정상.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "release_gate": "NOT_APPROVED_AS_DDS_OR_INGAME",
+  "prohibited_actions_confirmed": {
+    "called_imagegen": false,
+    "consumed_A_B_production_queues": false,
+    "created_C2_C3_or_ingame_pass": false,
+    "dds_auto_deployment": false,
+    "changed_VR_FFB_DX11_DXVK": false
+  }
+}
