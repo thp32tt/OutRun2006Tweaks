@@ -1452,6 +1452,9 @@ struct State {
     std::uint64_t gpuDesktopFrames = 0;
     // Exclusive per-stage rejection totals from live programmable DX11 draws.
     std::array<std::uint64_t, 11> liveSm3RejectStages{};
+    // Exclusive first-failed contract in the live SM3 state admission.
+    // Preserve all original fail-closed conditions and game HRESULTs.
+    std::array<std::uint64_t, 8> liveSm3StateRejectReasons{};
     std::uint64_t skippedPoisonedDraws = 0;
     UINT failed = 0;
 };
@@ -4578,11 +4581,34 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fill)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
-        FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-        fog || clipPlanes || fill != D3DFILL_SOLID ||
-        (colorMask & ~0x0fu) != 0u || srgbWrite != FALSE ||
-        !game_native_backbuffer_ready(game, viewport))
+        FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite))) {
+        ++s.liveSm3StateRejectReasons[0]; // COM viewport/state query failure
         return false;
+    }
+    if (fog != FALSE) {
+        ++s.liveSm3StateRejectReasons[1]; // DX9 fog still enabled
+        return false;
+    }
+    if (clipPlanes != 0u) {
+        ++s.liveSm3StateRejectReasons[2]; // user clip-plane unsupported
+        return false;
+    }
+    if (fill != D3DFILL_SOLID) {
+        ++s.liveSm3StateRejectReasons[3]; // wire/point raster unsupported
+        return false;
+    }
+    if ((colorMask & ~0x0fu) != 0u) {
+        ++s.liveSm3StateRejectReasons[4]; // invalid RT0 write mask
+        return false;
+    }
+    if (srgbWrite != FALSE) {
+        ++s.liveSm3StateRejectReasons[5]; // exact sRGB output not translated
+        return false;
+    }
+    if (!game_native_backbuffer_ready(game, viewport)) {
+        ++s.liveSm3StateRejectReasons[6]; // source geometry/backbuffer mismatch
+        return false;
+    }
     // Original D3D9 menu/race line strips and lists use one-pixel
     // LASTPIXEL raster rules. An antialiased or last-pixel-disabled line
     // cannot be silently converted to a single-sample D3D11 line.
@@ -4592,8 +4618,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (FAILED(game->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)) ||
             FAILED(game->GetRenderState(D3DRS_LASTPIXEL, &lastPixel)) ||
             !game_native_sm3_line_raster(static_cast<std::uint32_t>(type),
-                                         lineAA != FALSE, lastPixel != FALSE))
+                                         lineAA != FALSE, lastPixel != FALSE)) {
+            ++s.liveSm3StateRejectReasons[7]; // unsupported line rasterization
             return false;
+        }
     }
     // A real programmable game Draw can use ALWAYS/one-sided stencil with
     // zero write mask; that is pixel-equivalent to disabled stencil. A
@@ -8454,7 +8482,7 @@ void before_game_present(IDirect3DDevice9* game,
         // visible, so a menu->vehicle->race session can be audited.
         if (s.presents % 300u == 0u || (fullMode && s.visible == 1u)) {
             spdlog::info(
-                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={} gpu_desktop_frames={} sm3_reject=[source:{},state:{},stencil_blend:{},target_seed:{},depth:{},declaration:{},backend:{},shader_compile:{},samplers:{},uploads:{},submit:{}] skipped_poisoned_draws={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={} gpu_desktop_frames={} sm3_reject=[source:{},state:{},stencil_blend:{},target_seed:{},depth:{},declaration:{},backend:{},shader_compile:{},samplers:{},uploads:{},submit:{}] sm3_state_reject=[query:{},fog:{},clip:{},fill:{},mask:{},srgb:{},backbuffer:{},line:{}] skipped_poisoned_draws={}; unsupported draws stay DX9Ex; HMD UNTESTED",
                 s.observed, s.issued, s.visible, s.failed, s.presents,
                 s.eligible, s.staleReadbacks, s.probeSlot, fullMode ? 1 : 0,
                 s.gpuDesktopFrames,
@@ -8463,7 +8491,12 @@ void before_game_present(IDirect3DDevice9* game,
                 s.liveSm3RejectStages[4], s.liveSm3RejectStages[5],
                 s.liveSm3RejectStages[6], s.liveSm3RejectStages[7],
                 s.liveSm3RejectStages[8], s.liveSm3RejectStages[9],
-                s.liveSm3RejectStages[10], s.skippedPoisonedDraws);
+                s.liveSm3RejectStages[10],
+                s.liveSm3StateRejectReasons[0], s.liveSm3StateRejectReasons[1],
+                s.liveSm3StateRejectReasons[2], s.liveSm3StateRejectReasons[3],
+                s.liveSm3StateRejectReasons[4], s.liveSm3StateRejectReasons[5],
+                s.liveSm3StateRejectReasons[6], s.liveSm3StateRejectReasons[7],
+                s.skippedPoisonedDraws);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.

@@ -53,7 +53,7 @@ def session_labeled_runner(runner):
     if staged.count(game_args_anchor) != 1:
         raise ValueError("game argument capture anchor changed")
     native_mono_arg = (
-        b"if ($dx11TestCase -ne 'CONTROL') { $gameArgs += '-Stereo=false'; $gameArgs += '-antialiasing 0' }\n"
+        b"if ($dx11TestCase -ne 'CONTROL') { $gameArgs += '-Stereo=false'; $gameArgs += '-antialiasing 0'; $gameArgs += '-nofog' }\n"
     )
     staged = staged.replace(game_args_anchor, native_mono_arg + game_args_anchor, 1)
     archiver = b"Compress-Archive -Path (Join-Path $session '*') -DestinationPath $zip -Force"
@@ -71,6 +71,7 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESK
     $gpuDesktopFrames = 0L
     $monoStereoObserved = $false
     $nativeBootstrapCompatibleObserved = $false
+    $noFogDiagnosticRequested = $env:OUTRUN_DX11_TEST_CASE -ne 'CONTROL'
     $fullFrameModeObserved = $false
     foreach ($file in @(Get-ChildItem -Path $session -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue)) {
         foreach ($line in [System.IO.File]::ReadLines($file.FullName)) {
@@ -113,6 +114,8 @@ if ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -or $dx11TestCase -eq 'NATIVE_GPU_DESK
         "testCase=$dx11TestCase",
         "monoStereoObserved=$monoStereoObserved",
         "nativeBootstrapCompatibleObserved=$nativeBootstrapCompatibleObserved",
+        "noFogDiagnosticRequested=$noFogDiagnosticRequested",
+        "fogVisualParity=UNTESTED_IN_NATIVE_DIAGNOSTIC",
         "publishedBackbufferFrames=$published",
         "nativeModeRequested=$($env:OUTRUN_DX11_FULL_GAME_FRAME)",
         "fullFrameModeObserved=$fullFrameModeObserved",
@@ -169,6 +172,7 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         available_test_modes=["CONTROL", "NATIVE_FULL_FRAME", "NATIVE_GPU_DESKTOP"],
         native_desktop_mono_required=True,
         native_desktop_single_sample_required=True,
+        native_desktop_fog_disabled_diagnostic=True,
         runtime_validation="UNTESTED", feature_ready=False)
     return {
         "dinput8.dll": game, "outrun-vr-host.exe": host,
@@ -184,6 +188,9 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
             "DX11 NATIVE FULL GAME FRAME - EXPERIMENTAL TEST\n"
             "Native DX11 desktop runs enforce -Stereo=false and\n"
             "-antialiasing 0 for a single-sample D3D9 backbuffer.\n"
+            "Native-only diagnostic also uses -nofog, since current\n"
+            "SM3 D3D11 output has no translated D3D9 fog stage.\n"
+            "Fog/full visual parity is therefore NOT VALIDATED.\n"
             "The exact DX11 census bootstrapCompatible=1 is required\n"
             "before this test can claim any native-frame evidence.\n"
             "R30 live\n"
@@ -258,6 +265,7 @@ def verify(blob):
                 b'gpuDesktopFrames -gt 0' not in runner or
                 b"$gameArgs += '-Stereo=false'" not in runner or
                 b"$gameArgs += '-antialiasing 0'" not in runner or
+                b"$gameArgs += '-nofog'" not in runner or
                 b'nativeBootstrapCompatibleObserved' not in runner or
                 b'monoStereoObserved' not in runner):
             raise ValueError("native full-frame activation/evidence contract missing")

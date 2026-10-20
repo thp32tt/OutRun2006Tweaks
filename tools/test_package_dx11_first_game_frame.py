@@ -156,6 +156,13 @@ def verify_native_sm3_reject_diagnostics(source):
             raise ValueError("missing or duplicate SM3 conversion failure stage")
     if "sm3_reject=[source:{}" not in source:
         raise ValueError("SM3 rejection counters absent from game log")
+    if "sm3_state_reject=[query:{}" not in source:
+        raise ValueError("detailed SM3 state failure reasons absent from log")
+    if "std::array<std::uint64_t, 8> liveSm3StateRejectReasons{};" not in source:
+        raise ValueError("detailed SM3 state counters missing")
+    for n in range(8):
+        if "++s.liveSm3StateRejectReasons[%d];" % n not in source:
+            raise ValueError("SM3 state guard no longer accounts for reason")
     if "skipped_poisoned_draws={}" not in source:
         raise ValueError("native poison short-circuit evidence absent")
     if "if (fullMode && s.frameBatch.stopped) {" not in source:
@@ -228,6 +235,8 @@ def main():
     assert b"gpuDesktopFrames -gt 0" in packaged_runner
     assert b"$gameArgs += '-Stereo=false'" in packaged_runner
     assert b"$gameArgs += '-antialiasing 0'" in packaged_runner
+    assert b"$gameArgs += '-nofog'" in packaged_runner
+    assert b"noFogDiagnosticRequested=" in packaged_runner
     assert b"nativeBootstrapCompatibleObserved" in packaged_runner
     assert b"if ($dx11TestCase -ne 'CONTROL')" in packaged_runner
     assert b"monoStereoObserved" in packaged_runner
@@ -241,6 +250,9 @@ def main():
     assert b"D3D11 -> shared resource -> D3D9Ex Present" in payload["DX11_TEST_README.txt"]
     assert b"-Stereo=false" in payload["DX11_TEST_README.txt"]
     assert b"-antialiasing 0" in payload["DX11_TEST_README.txt"]
+    assert b"-nofog" in payload["DX11_TEST_README.txt"]
+    assert b"Fog/full visual parity is therefore NOT VALIDATED" in payload["DX11_TEST_README.txt"]
+    assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_fog_disabled_diagnostic"] is True
     assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_single_sample_required"] is True
     assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_mono_required"] is True
     mono = runner.replace(b"Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8", b"missing anchor")
