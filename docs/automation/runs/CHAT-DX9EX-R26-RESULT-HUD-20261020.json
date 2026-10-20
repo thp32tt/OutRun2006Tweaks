@@ -1,0 +1,69 @@
+{
+  "task_id": "CHAT-DX9EX-R26-RESULT-HUD-20261020",
+  "branch": "vr-d3d9ex-focus",
+  "lane": "C_DX9EX",
+  "attempt": 1,
+  "base_head": "3ed5290c90bbff5b98a5ca6d09ae66c8776464c8",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI_AND_HMD",
+  "feature_ids": [
+    "DX9EX:VIS:EXTENDED_TIME",
+    "DX9EX:VIS:GOAL_PROGRESS"
+  ],
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "ownership": "Explicit user direct-chat request; catalog entries READY with attempts=0, no active task lease observed. Existing feature/work keys retained; no automation completion or score credit.",
+  "result_sha": "Containing material commit; resolve this record with git log --follow",
+  "baseline": {
+    "sha": "0cff83cf509c2acd6f3391b3a46c4dec1403a0d9",
+    "package": "PC-FAST-20261020-012805-0cff83cf509c",
+    "variant": "CURRENT_FOCUS_CORRECTNESS",
+    "cmake": "OUTRUN_VR_R26_HUD_COMPARE=ON",
+    "immutable": true
+  },
+  "evidence": {
+    "confirmed_runtime": "Baseline OutRun2006Tweaks.log 1680-1682 at 01:51:35.272: state20 ResultProgress, ScreenHud, DrawIndexedPrimitive, FVF142, shader0, queueEpoch1122393. This proves physical entry, not successful binocular finite-plane submission.",
+    "confirmed_static": [
+      "R26 finite HUD used identity eye rotation despite available head-local OpenXR eyeOrientation.",
+      "R62 indexed fixed-function gate rejected cached VS!=0 before checking the actual device VS.",
+      "Existing -2.50 plane and sequence-matched HeadInverse already exist; not a missing HeadInverse implementation."
+    ],
+    "hypotheses": [
+      "Head-local cant omission contributes to perceived result diplopia; requires actual Quest3 acceptance.",
+      "D3DX StateBlock/live-VS disagreement may cause finite-plane rejection and fallback/headlock; no paired cached/live evidence in supplied baseline.",
+      "Other Draw APIs lack FVF142 coverage, but observed result draw is indexed. Do not widen unrelated API routes from this fact alone."
+    ],
+    "source_trace": [
+      "+TIME sprani RVAs9898E/98A36, print989AD/98A10/98A89 -> source scope -> SpriteNode or homogeneous D3DX Flush/End.",
+      "GOAL progress97BE4/97DEC, helpersBEA5A/BEA5F and safely captured B9200 parent ownership -> queue/batch.",
+      "ConsumeForDraw -> R62 fixedfn indexed (live VS null, FVF142, main target, valid pose) -> existing finite coefficients -> left/right GPU calls -> projection/target restoration."
+    ],
+    "disassembly": "Canonical EXE SHA68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3; docs/research/REA_R84_EXACT_DIRECT_EVIDENCE_20261018.md and REA_STAGE_EXTENSION_MODE2_SOURCE_SCOPE_20261019.md. Mode2 98AC6 excluded. No unsafe B9200 post-call hooks restored.",
+    "resolution": "No resolution/UV crop/backbuffer/Game::screen_resolution changes. Observed fixedfn draw retains original D3DX projection. XYZRHW game-pixel/eye-viewport mismatch remains separately unverified."
+  },
+  "changes": [
+    "Exact source-owned result batch preserves centered eye offsets and actual head-local eye rotations using validated existing helper; unrelated HUD retains identity math.",
+    "Exact result FVF142 uses live VS authority, retaining shader/FVF/device/pose checks.",
+    "Bounded separate result draw/reject counters record producer, node, epoch, pose, viewport, eye attempts and projection restoration. Right E_PENDING means not attempted, not GPU success. frameIncomplete exposes transaction poisoning.",
+    "Projection restoration failure returns E_FAIL only for exact result owner."
+  ],
+  "validation": {
+    "before": "New R26 wiring contract fails on base: missing scoped exact-result eye pose.",
+    "after": "New wiring contract PASS; g++ C++17 stage_extension_eye_plane_smoke PASS.",
+    "limitations": "Not a Windows build or HMD optical test. Counters do not establish final XR presentation."
+  },
+  "protected": [
+    "Sky/SkyGlow and lens paths",
+    "F11 external ImGui",
+    "ESC/ordinary HUD and projected vehicle rank",
+    "input/FFB",
+    "native timer and D3DX batching",
+    "19 disabled B9200 post-CALL hooks"
+  ],
+  "quest_acceptance": [
+    "OutRun +TIME sprite and all digits form one binocular image; yaw/pitch/roll and lateral head movement do not drag the plane with the head.",
+    "Finish all stages: progress graph, percent, time/title/glyphs remain readable and binocular during animation and final results; replay a second race.",
+    "Recenter, ESC resume, sky and vehicle ranks retain baseline behavior; compare same game source resolution and XR extent.",
+    "Correlate matching build/session logs RESULT_HUD_EYES/REJECT. If rejects or headlock persist, perform source-specific Native/FiniteHud/ZeroDisparity optical probe before widening routes."
+  ],
+  "next_action": "Run final exact-SHA DX9Ex Active Win32 game/x64 host/package plus Domain/Full Source/Inspector; then matching Quest3 build. Do not mark either visible feature complete before headset evidence."
+}

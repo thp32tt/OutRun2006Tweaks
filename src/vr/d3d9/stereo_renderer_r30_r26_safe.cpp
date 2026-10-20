@@ -18,6 +18,7 @@
 #include "r30_shadow_scratch.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
+#include "stage_extension_eye_plane.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
@@ -3011,6 +3012,18 @@ namespace OutRunVRStereo
             return leftHr;
         }
 
+        bool R30IsExactResultHudDraw() noexcept
+        {
+            const auto command =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            // Direct draws retain the homogeneous D3DX Flush/End proof;
+            // queued draws must still carry their live node and epoch.
+            return OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                command.IsExactFiniteResultHud() &&
+                (!command.queued ||
+                 (command.queueNode && command.queueEpoch != 0));
+        }
+
         bool R30ConfigureXyzrhwWorldEffect(
             IDirect3DDevice9* device, const void* source,
             UINT vertexCount, UINT stride, R30XyzrhwState& state,
@@ -3176,6 +3189,18 @@ namespace OutRunVRStereo
                 const float identityOrientation[4]{
                     0.0f, 0.0f, 0.0f, 1.0f
                 };
+                const bool exactResult = R30IsExactResultHudDraw();
+                float resultEyeOffset[2][3]{};
+                float resultEyeOrientation[2][4]{};
+                // HeadInverse already removes shared head motion once.
+                // Keep the remaining OpenXR eye-local rotations for the
+                // exact +TIME/result batch; preserve all other HUD math.
+                if (exactResult &&
+                    !OutRunVR::StageExtensionPlane::BuildStageEyePoses(
+                        state.stereo.eyeOffset, state.stereo.eyeOrientation,
+                        Settings::VRWorldScale * Settings::VRStereoDepth,
+                        resultEyeOffset, resultEyeOrientation))
+                    return false;
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const float relativeEye[3]{
@@ -3185,7 +3210,8 @@ namespace OutRunVRStereo
                     };
                     const D3DMATRIX eyePose =
                         MatrixFromQuaternionTranslation(
-                            identityOrientation, relativeEye,
+                            exactResult ? resultEyeOrientation[eye] : identityOrientation,
+                            exactResult ? resultEyeOffset[eye] : relativeEye,
                             Settings::VRWorldScale *
                                 Settings::VRStereoDepth);
                     const D3DMATRIX eyeInverse = InverseRigid(eyePose);
@@ -5004,7 +5030,11 @@ namespace OutRunVRStereo
             // fixed-function XYZ|DIFFUSE|TEX1 indexed quad:
             // DrawIndexedPrimitive(TRIANGLELIST), FVF 0x142, no vertex shader.
             // Do not widen this to arbitrary fixed-function content.
-            if (CurrentVertexShaderIdentity.load(
+            const bool exactResult = R30IsExactResultHudDraw();
+            // D3DX StateBlocks may leave a stale shader tracking hint.
+            // A proven result batch uses the live getter below; a real VS
+            // still rejects this fixed-function path.
+            if (!exactResult && CurrentVertexShaderIdentity.load(
                     std::memory_order_acquire) != 0)
                 return E_NOTIMPL;
             IDirect3DVertexShader9* shader = nullptr;
@@ -5125,14 +5155,17 @@ namespace OutRunVRStereo
                 }
             }
 
+            HRESULT eyeHr[2]{ E_PENDING, E_PENDING };
             auto drawEye = [&](int eye) -> HRESULT {
                 InternalPassScope guard;
-                if (FAILED(device->SetTransform(
-                        D3DTS_PROJECTION, &eyeProjection[eye])))
+                eyeHr[eye] = device->SetTransform(
+                    D3DTS_PROJECTION, &eyeProjection[eye]);
+                if (FAILED(eyeHr[eye]))
                     return E_FAIL;
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+                eyeHr[eye] = DrawIndexedPrimitiveHook.stdcall<HRESULT>(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
+                return eyeHr[eye];
             };
             auto leftDraw = [&]() { return drawEye(0); };
             auto rightDraw = [&]() { return drawEye(1); };
@@ -5171,7 +5204,29 @@ namespace OutRunVRStereo
                     primitiveCount,
                     OutRunVR::GameSemantic::CurrentProjectedMarker() ? 1 : 0,
                     hit);
-            return hr;
+            if (exactResult && Settings::VRTelemetry)
+            {
+                // Ordinary HUD/rank traffic must not consume result samples.
+                static std::atomic<std::uint64_t> resultDraws{ 0 };
+                const auto n = resultDraws.fetch_add(1,
+                    std::memory_order_relaxed) + 1;
+                if (n <= 16 || (n & (n - 1)) == 0)
+                {
+                    const auto command =
+                        OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                    spdlog::info(
+                        "VR R26 RESULT_HUD_EYES: route=FiniteHud api=DIP producer={} queued={} node={} epoch={} pose={} viewport={},{},{},{} fvf=0x{:X} VS=0 left=0x{:08X} right=0x{:08X} projectionRestored={} frameIncomplete={} hits={}",
+                        OutRunVR::GameSemantic::Name(command.producer),
+                        command.queued, command.queueNode, command.queueEpoch,
+                        state.stereo.poseSequence, state.viewport.X,
+                        state.viewport.Y, state.viewport.Width,
+                        state.viewport.Height, static_cast<unsigned>(fvf),
+                        static_cast<unsigned>(eyeHr[0]),
+                        static_cast<unsigned>(eyeHr[1]), restored,
+                        FrameStereoIncomplete, n);
+                }
+            }
+            return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
         }
 
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
@@ -5233,6 +5288,35 @@ namespace OutRunVRStereo
                 R62TryFixedFunctionSpriteIndexed(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
+            if (device && IsGameDevice(device) && !InternalStereoPass &&
+                Settings::VRTelemetry && R30IsExactResultHudDraw() &&
+                fixedFnSprite == E_NOTIMPL)
+            {
+                static std::atomic<std::uint64_t> rejectedResults{ 0 };
+                const auto n = rejectedResults.fetch_add(1,
+                    std::memory_order_relaxed) + 1;
+                if (n <= 16 || (n & (n - 1)) == 0)
+                {
+                    const auto command =
+                        OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+                    DWORD liveFvf = 0;
+                    IDirect3DVertexShader9* liveVs = nullptr;
+                    const HRESULT fvfHr = device->GetFVF(&liveFvf);
+                    const HRESULT vsHr = device->GetVertexShader(&liveVs);
+                    spdlog::info(
+                        "VR R26 RESULT_HUD_REJECT: api=DIP producer={} node={} epoch={} cachedVS={} liveVS={} vsHr=0x{:08X} fvf=0x{:X} fvfHr=0x{:08X} seeded={} incomplete={} hits={}",
+                        OutRunVR::GameSemantic::Name(command.producer),
+                        command.queueNode, command.queueEpoch,
+                        CurrentVertexShaderIdentity.load(std::memory_order_acquire),
+                        static_cast<const void*>(liveVs),
+                        static_cast<unsigned>(vsHr),
+                        static_cast<unsigned>(liveFvf),
+                        static_cast<unsigned>(fvfHr), R9StereoSeeded,
+                        FrameStereoIncomplete, n);
+                    if (liveVs)
+                        liveVs->Release();
+                }
+            }
             if (fixedFnSprite != E_NOTIMPL)
                 return fixedFnSprite;
 
@@ -5481,3 +5565,4 @@ namespace OutRunVRStereo
             VRR26HudSafeCompareMarkerHook::instance;
     }
 }
+
