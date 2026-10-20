@@ -21,6 +21,9 @@ assert backend.index("native_sm3_source_modifier_components(") < backend.index(
 for required in ("modifier == 9u", "modifier == 10u",
                  "case 9u:", "case 10u:", ".zzzz)", ".wwww)"):
     assert required in header, required
-assert "if (op.texture2d && modifier != D3DSPSM_NONE)" in backend
+# 00954 extends the actual texture coordinate and derivative shader path
+# while retaining the non-vector sampler and reserved modifier fallback.
+assert "!native_sm3_texture_modifier_supported(" in backend
+assert "modifier != D3DSPSM_NONE || swizzle != 0xe4u" in backend
 assert "(token & D3DSHADER_ADDRESSMODE_MASK) != 0u" in backend
 print("SM3 live projective operand DIV + TEMP provenance PASS")

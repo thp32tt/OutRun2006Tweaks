@@ -24,6 +24,20 @@ enum class NativeSm3Texture2DMode {
 }
 
 
+// TEXLD/TEXLDP/TEXLDB/TEXLDL/TEXLDD coordinates and TEXLDD gradients
+// are float source registers. Preserve real D3D9 source modifiers before
+// sampling; the caller validates physical TEMP read-mask provenance.
+// The sampler sN operand and non-existent gradient operands are not vectors.
+// NOT and reserved encodings 13..15 remain on the original D3D9 renderer.
+[[nodiscard]] constexpr bool native_sm3_texture_modifier_supported(
+    NativeSm3Texture2DMode mode, unsigned sourceIndex,
+    unsigned modifier) noexcept {
+    if (sourceIndex == 1u)
+        return modifier == 0u;
+    return native_sm3_texture_source_components(mode, sourceIndex) != 0u &&
+           modifier <= 12u;
+}
+
 inline bool append_native_sm3_texture2d_declarations(
     std::string& out, unsigned samplerRegister) {
     if (samplerRegister >= 16u) return false;

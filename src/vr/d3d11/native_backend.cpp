@@ -1025,7 +1025,12 @@ bool build_r283_sm3_mov_shader_source(
                     tempUsed[reg] = true;
                     continue;
                 }
-                if (op.texture2d && modifier != D3DSPSM_NONE)
+                // Real game texture coordinate/gradient modifiers execute
+                // before Sample*. The sampler sN has its own strict guard;
+                // TEMP source provenance below includes swizzle and DZ/DW.
+                if (op.texture2d &&
+                    !native_sm3_texture_modifier_supported(
+                        op.textureMode, i, modifier))
                     return false;
                 if (op.matrixRowCount != 0u && i == 1u) {
                     // Matrix source must denote consecutive real c registers

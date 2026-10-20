@@ -92,6 +92,8 @@ jobs:
           python tools/test_dx11_sm3_destination_output_00952.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_projective_source_probe_00953.cpp -o /tmp/dx11_sm3_projective_00953 && /tmp/dx11_sm3_projective_00953
           python tools/test_dx11_sm3_projective_source_00953.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_texture_modifiers_probe_00954.cpp -o /tmp/dx11_sm3_texture_mod_00954 && /tmp/dx11_sm3_texture_mod_00954
+          python tools/test_dx11_sm3_texture_modifiers_00954.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model
