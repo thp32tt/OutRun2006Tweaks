@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Configure exact R84 MAIN game for MSVC static analysis
+      - name: Configure exact R26+HUD MAIN game for MSVC static analysis
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
@@ -105,11 +105,11 @@ jobs:
           $cache = Get-Content build-analysis/CMakeCache.txt
           foreach ($entry in @(
             'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF',
-            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=OFF',
-            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=ON',
-            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=ON',
-            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=ON',
-            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON')) {
+            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF')) {
             if ($cache -notcontains $entry) { throw "R84 main static analyzer owner mismatch: $entry" }
           }
       - name: Apply same dependency compatibility fixes as DX9Ex Active

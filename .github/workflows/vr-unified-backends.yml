@@ -52,8 +52,8 @@ jobs:
             flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=ON"
             purpose: "P1 plus R30 HUD/XYZRHW/SkyGlow correction"
           - variant: P3_R84_MAIN
-            flags: ""
-            purpose: "Default independent R84 R29-R33 development/test mainline; no CMake overrides"
+            flags: "-DOUTRUN_VR_R26_HUD_COMPARE=OFF"
+            purpose: "Explicit R84 independent R29-R33 comparison, not the R26 default"
           - variant: P4_R26_HUD_SAFE
             flags: "-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON"
             purpose: "Conservative R26 world plus R30 HUD/effect overlay"

@@ -14,7 +14,9 @@
       "requires": "EXACT_SHA_ACTIVE_AND_DOMAIN_CI_PLUS_REAL_QUEST3_HMD_ACCEPTANCE",
       "runtimeValidation": "UNTESTED",
       "scope": "DX9EX_C_ONLY_DX11_A_INDEPENDENT_DXVK_B_FROZEN",
-      "autoDeveloperRule": "All new DX9Ex changes and regressions must target actual R29-R33 independent R84 owners/shared runtime; R26-only patch does not complete a feature. Existing feature lease/ID remains."
+      "autoDeveloperRule": "All new DX9Ex changes and regressions must target actual R29-R33 independent R84 owners/shared runtime; R26-only patch does not complete a feature. Existing feature lease/ID remains.",
+      "supersededBy": "dx9exR26HudMainline",
+      "status": "SUPERSEDED_20261020_R84_EXPLICIT_COMPARISON_ONLY"
     },
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -23,7 +25,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX11 A independent; DX9Ex C R84 independent R29-R33 MAIN for all new development and test, R26_SAFE only opt-in rollback; P0 optical/HUD and measured P0-B performance; DXVK frozen.",
+    "primaryBackend": "DX9Ex C R26+HUD CURRENT_FOCUS / option-free CMake DEFAULT for all new reviews, source edits and tests; R84_TEST explicit comparison only; DX11 A independent, DXVK frozen.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -67,7 +69,7 @@
       "disabledReason": "Historical evening HMD matrix disabled, not active A/C source execution."
     },
     "automationCycle": {
-      "mode": "DX9EX_R84_MAINLINE_UI_P0A_PERFORMANCE_P0B_PARALLEL_DX11_A_INDEPENDENT",
+      "mode": "DX9EX_R26_HUD_MAINLINE_P0_SCREEN_PERFORMANCE_R84_COMPARISON_ONLY",
       "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
       "cadenceAuthority": "EXTERNAL_DOCKER",
       "repositorySsot": [
@@ -229,6 +231,17 @@
       "runtime_validation": "UNTESTED",
       "controller_adoption": "NOT_VERIFIED",
       "no_documentation_completion_score": true
+    },
+    "dx9exR26HudMainline": {
+      "authority": "AGENTS.md#2026-10-20-user-override--r26hud-is-dx9ex-default",
+      "branch": "vr-d3d9ex-focus",
+      "mainRenderer": "R26_WORLD_R30_HUD_SKYGLOW",
+      "developmentBuild": "CMAKE_OPTION_FREE_R26_HUD_DEFAULT",
+      "testBuild": "DX9EX_ACTIVE_CURRENT_FOCUS_R26_HUD",
+      "r84": "EXPLICIT_R84_TEST_ONLY",
+      "protectedTestSha": "0cff83cf509c2acd6f3391b3a46c4dec1403a0d9",
+      "runtimeValidation": "UNTESTED",
+      "autoDeveloperRule": "All NEW DX9Ex changes, P0 screen reviews, fixes and performance measurements target compiled R26+HUD main first; R84 R29-R33 cannot satisfy primary acceptance. Preserve existing task IDs/leases. DX11 independent, DXVK frozen."
     }
   },
   "candidateWip": {

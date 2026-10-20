@@ -8,12 +8,12 @@
 
 After the 2026-10-19 Quest 3 visual patch set failed as a group, stop stacking symptom-specific renderer guesses on the active R84 chain.
 
-R84 remains the development mainline. `R26_SAFE` remains a protected comparison/control, not a production fallback.
+**Superseded 2026-10-20 14:36 KST:** R26+HUD is now the development and test mainline, with R26_SAFE an alias/control and R84_TEST an explicit comparison only. The original rationale below is historical.
 
 For every reopened visual defect, use this order:
 
 1. Freeze unrelated visual edits.
-2. Compare the same source/package inputs with `CURRENT_FOCUS` (R84) versus `R26_SAFE`.
+2. Compare the same source/package inputs with `CURRENT_FOCUS` (R26+HUD) versus `R84_TEST`.
 3. Identify the actual physical GPU draw with a bounded per-draw fingerprint.
 4. Run an **Optical Route Probe** for that draw only.
 5. Permanently change routing only after one route is positively identified.
@@ -29,7 +29,7 @@ Interpret the first R26/R84 comparison as follows:
 - **Both good:** reject the suspected renderer cause and inspect packaging/config/build identity.
 - **Different visual failure in each:** keep both routes isolated; do not merge fixes.
 
-Do not silently switch the user package to R26_SAFE. It is a diagnostic control only.
+Do not silently switch the user package to R84_TEST. R26+HUD is the default and R84 is a diagnostic control only.
 
 ## Physical Draw Fingerprint
 

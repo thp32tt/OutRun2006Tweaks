@@ -43,9 +43,9 @@ $variant = if ($requestedVariant -eq "AUTO") { $defaultVariant } else { $request
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
 $backendPayload = Join-Path $backendRoot $payloadBackend
-# CURRENT_FOCUS is now R84 R29-R33; all other normal DX9Ex profiles
-# use that same canonical DLL. Only explicitly requested R26_SAFE or
-# R84_TEST may use a dedicated slot. Never load stale HUD/perf slots.
+# CURRENT_FOCUS is R26+HUD by explicit 2026-10-20 user direction.
+# R26_SAFE is the protected same-SHA alias; R84_TEST remains explicit.
+# Never silently fall back from an absent slot.
 $src = if ($Backend -eq "d3d9" -and ($variant -eq "R26_SAFE" -or $variant -eq "R84_TEST")) {
     # An unavailable fallback must never silently select a different DLL.
     if (-not (Test-Path $slotPayload)) { throw "R26_SAFE/R84_TEST payload missing: $slotPayload" }
@@ -107,16 +107,16 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
                 throw 'DX9Ex PC Fast package manifest/build contract mismatch.'
             }
         } elseif ([string]$buildInputs.VariantId -ne
-            'R84_SPLIT_R33_R32_R31_R30_R29') {
-            throw 'DX9Ex release manifest does not identify the R84 main and exact source SHA.'
+            'ACTIVE_R26_R43_R44') {
+            throw 'DX9Ex release manifest does not identify the R26+HUD main and exact source SHA.'
         }
     }
     $expectedVariant = if ($isPcFastPackage) {
         'ACTIVE_FULL_R34'
-    } elseif ($variant -eq 'R26_SAFE') {
-        'ACTIVE_R26_R43_R44'
-    } else {
+    } elseif ($variant -eq 'R84_TEST') {
         'R84_SPLIT_R33_R32_R31_R30_R29'
+    } else {
+        'ACTIVE_R26_R43_R44'
     }
 
     if ($isPcFastPackage) {
@@ -141,9 +141,9 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
                 ($contractFailures -join '; '))
         }
     } elseif ($rendererBuildVariant -ne $expectedVariant -or
-        ($variant -ne 'R26_SAFE' -and
+        ($variant -eq 'R84_TEST' -and
          $rendererCmakeFlags -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') -or
-        ($variant -eq 'R26_SAFE' -and
+        ($variant -ne 'R84_TEST' -and
          $rendererCmakeFlags -notmatch 'OUTRUN_VR_R26_HUD_COMPARE=ON')) {
         throw "DX9Ex selected renderer build variant mismatch: $variant."
     }

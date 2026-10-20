@@ -81,7 +81,13 @@ set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r26_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
-option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" OFF)
+# 2026-10-20 user override: R26+HUD is the default; explicit comparison
+# modes take precedence when requested on a fresh CMake cache.
+set(OUTRUN_VR_R26_HUD_DEFAULT ON)
+if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+    set(OUTRUN_VR_R26_HUD_DEFAULT OFF)
+endif()
+option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" ${OUTRUN_VR_R26_HUD_DEFAULT})
 if(OUTRUN_VR_SAFE_DRAW_COMPARE)
     set_source_files_properties(
         src/vr/d3d9/stereo_renderer_r33.cpp
@@ -108,7 +114,8 @@ endif()
 # C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R33 stay excluded in both.
 option(OUTRUN_VR_C1_COMPARE "Build C1: R29 fast L+R with R27/R28 classification" OFF)
 option(OUTRUN_VR_C2_COMPARE "Build C2: C1 plus R30 HUD correction" OFF)
-# Fresh, option-free CMake = R84 mainline. Explicit comparison builds
+# Fresh, option-free CMake = R26+HUD mainline. R84 is explicit with
+# -DOUTRUN_VR_R26_HUD_COMPARE=OFF. Explicit comparison builds
 # automatically disable all four split owners on first configure, so preserved
 # R26_SAFE/C1/C2 validation jobs never compile two owners.
 set(OUTRUN_VR_R84_MAIN_DEFAULT ON)

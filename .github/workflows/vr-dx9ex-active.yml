@@ -574,11 +574,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Configure Win32 R26_SAFE fallback (explicit comparison)
+      - name: Configure Win32 R26+HUD DEFAULT from option-free CMake
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32
           $fallbackCache = Get-Content build-game/CMakeCache.txt
           foreach ($entry in @(
             'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON',
@@ -587,7 +587,7 @@ jobs:
             'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=OFF',
             'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF')) {
             if ($fallbackCache -notcontains $entry) {
-              throw "DX9Ex R26_SAFE explicit fallback owner drift: $entry"
+              throw "DX9Ex R26+HUD default owner drift: $entry"
             }
           }
       - name: Apply VC2022 dependency workarounds
@@ -623,13 +623,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Configure Win32 R84 MAIN from option-free CMake
+      - name: Configure Win32 R84 explicit independent comparison
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
-          # This option-FREE configuration is the canonical development and test
-          # build, not an isolated R84 opt-in compiler probe.
-          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32
+          # Explicit R84 comparison preserves the independent R29-R33 render chain;
+          # normal option-free builds instead select the R26+HUD game owner.
+          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_R26_HUD_COMPARE=OFF
           $mainCache = Get-Content build-full-chain/CMakeCache.txt
           foreach ($entry in @(
             'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF',
@@ -641,7 +641,7 @@ jobs:
             'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=ON',
             'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON')) {
             if ($mainCache -notcontains $entry) {
-              throw "DX9Ex unqualified CMake does not select R84 MAIN: $entry"
+              throw "DX9Ex explicit R84 comparison owner drift: $entry"
             }
           }
       - name: Apply VC2022 dependency workarounds for full-chain gate
@@ -663,7 +663,7 @@ jobs:
           Copy-Item $dll.FullName stage-r84-chain/dinput8.dll
           Set-Content stage-r84-chain/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
           Set-Content stage-r84-chain/BUILD_VARIANT.txt 'R84_SPLIT_R33_R32_R31_R30_R29' -Encoding ascii
-          Set-Content stage-r84-chain/MAINLINE_BUILD_MODE.txt 'R84_DEFAULT_CMAKE_OPTIONS' -Encoding ascii
+          Set-Content stage-r84-chain/MAINLINE_BUILD_MODE.txt 'R84_EXPLICIT_COMPARISON' -Encoding ascii
           $bytes = [IO.File]::ReadAllBytes((Resolve-Path stage-r84-chain/dinput8.dll))
           if ($bytes.Length -lt 512 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'R84 Win32 DLL PE header invalid' }
           $pe = [BitConverter]::ToInt32($bytes,0x3c)
@@ -699,17 +699,17 @@ jobs:
           $dir = 'package'
           $backend = Join-Path $dir 'backends/d3d9'
           New-Item -ItemType Directory -Force $backend | Out-Null
-          # R84 R29-R33 is now the CURRENT_FOCUS production test renderer.
-          # The previously shipped R26+HUD owner is retained in R26_SAFE.
+          # CURRENT_FOCUS is the user-selected R26+HUD renderer.
+          # R84 remains an explicit diagnostic/performance comparison slot.
           # Both paths use the identical, exact-SHA x64 OpenXR host.
-          Copy-Item payload/r84/dinput8.dll (Join-Path $backend 'dinput8.dll')
+          Copy-Item payload/game/dinput8.dll (Join-Path $backend 'dinput8.dll')
           Copy-Item payload/host/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
-          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'VARIANT_ID.txt')
-          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'BUILD_VARIANT.txt')
-          Copy-Item payload/r84/MAINLINE_BUILD_MODE.txt (Join-Path $backend 'MAINLINE_BUILD_MODE.txt')
+          Copy-Item payload/game/VARIANT_ID.txt (Join-Path $backend 'VARIANT_ID.txt')
+          Copy-Item payload/game/VARIANT_ID.txt (Join-Path $backend 'BUILD_VARIANT.txt')
+          Set-Content (Join-Path $backend 'MAINLINE_BUILD_MODE.txt') 'R26_HUD_DEFAULT_CMAKE_OPTIONS' -Encoding ascii
           $r84CmakeFlags = '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON'
-          Set-Content (Join-Path $backend 'CMAKE_FLAGS.txt') $r84CmakeFlags -Encoding ascii
+          Copy-Item payload/game/CMAKE_FLAGS.txt (Join-Path $backend 'CMAKE_FLAGS.txt')
           $r26 = Join-Path $dir 'slots/R26_SAFE'
           New-Item -ItemType Directory -Force $r26 | Out-Null
           Copy-Item payload/game/dinput8.dll (Join-Path $r26 'dinput8.dll')
@@ -751,11 +751,11 @@ jobs:
             '   ZIP 내용물을 OR2006C2C.EXE가 있는 게임 폴더에 풀어주세요.'
             '2. Double-click START_DX9EX_TEST.cmd (visible direct launch; optional GUI selector available).'
             '   START_DX9EX_TEST.cmd를 더블클릭하세요. 실패 원인과 로그 위치가 표시됩니다.'
-            '3. CURRENT FOCUS / CORRECTNESS loads R84 R29-R33 independent renderer by default.'
-            '   기본 실행은 구조 개편된 R84이며, Quest3/VDXR 시각·성능 검증은 아직 필요합니다.'
+            '3. CURRENT FOCUS / CORRECTNESS loads R26+HUD renderer by default.'
+            '   기본 실행은 R26+HUD이며, 최신 빌드의 Quest3 검증은 별도로 필요합니다.'
             '   GUI는 OutRunVR-Slot-Selector.cmd에서 선택적으로 사용할 수 있습니다.'
-            '   R26 SAFE 슬롯은 기존 R26+HUD 보호판으로 즉시 복귀하는 옵션입니다.'
-            '   R84 상태로 돌아가려면 CURRENT FOCUS를 선택하세요.'
+            '   R26 SAFE 슬롯은 동일 소스의 R26+HUD 보호판입니다.'
+            '   R84는 R84 TEST에서만 비교하고 CURRENT FOCUS는 R26+HUD로 복귀합니다.'
             '4. The selector configures the DX9Ex backend and runs OR2006C2C.EXE.'
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
@@ -792,12 +792,12 @@ jobs:
             SchemaVersion = 1
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'R84_SPLIT_R33_R32_R31_R30_R29'
+            VariantId = 'ACTIVE_R26_R43_R44'
             DefaultRendererSlot = 'CURRENT_FOCUS'
-            DefaultBuildMode = 'R84_DEFAULT_CMAKE_OPTIONS'
+            DefaultBuildMode = 'R26_HUD_DEFAULT_CMAKE_OPTIONS'
             PreviousR84AliasSlot = 'R84_TEST'
-            FallbackRendererSlot = 'R26_SAFE'
-            FallbackVariantId = 'ACTIVE_R26_R43_R44'
+            FallbackRendererSlot = 'R84_TEST'
+            FallbackVariantId = 'R84_SPLIT_R33_R32_R31_R30_R29'
             R84HmdRuntimeValidation = 'UNTESTED'
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE')
@@ -881,12 +881,12 @@ jobs:
               (Get-Content (Join-Path $r26Dir 'VARIANT_ID.txt') -Raw).Trim() -ne 'ACTIVE_R26_R43_R44') {
             throw 'R26 rollback source SHA or build variant mismatch'
           }
-          if ((Get-Content 'verify/backends/d3d9/MAINLINE_BUILD_MODE.txt' -Raw).Trim() -ne 'R84_DEFAULT_CMAKE_OPTIONS') {
-            throw 'DX9Ex packaged main was not built with the default R84 CMake options'
+          if ((Get-Content 'verify/backends/d3d9/MAINLINE_BUILD_MODE.txt' -Raw).Trim() -ne 'R26_HUD_DEFAULT_CMAKE_OPTIONS') {
+            throw 'DX9Ex packaged main was not built with the default R26+HUD CMake options'
           }
-          if ((Get-Content 'verify/backends/d3d9/VARIANT_ID.txt' -Raw).Trim() -ne 'R84_SPLIT_R33_R32_R31_R30_R29' -or
-              (Get-Content 'verify/backends/d3d9/CMAKE_FLAGS.txt' -Raw) -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') {
-            throw 'CURRENT_FOCUS is not the R84 independent full-chain renderer'
+          if ((Get-Content 'verify/backends/d3d9/VARIANT_ID.txt' -Raw).Trim() -ne 'ACTIVE_R26_R43_R44' -or
+              (Get-Content 'verify/backends/d3d9/CMAKE_FLAGS.txt' -Raw) -notmatch 'OUTRUN_VR_R26_HUD_COMPARE=ON') {
+            throw 'CURRENT_FOCUS is not the R26+HUD renderer'
           }
           foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','BUILD_VARIANT.txt','CMAKE_FLAGS.txt')) {
             if (-not (Test-Path (Join-Path $r84Dir $file))) { throw "R84 test payload missing $file" }
@@ -906,8 +906,8 @@ jobs:
           & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
           if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'default R84 main selection failed' }
           $mainState = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
-          if ($mainState.RendererBuildVariant -ne 'R84_SPLIT_R33_R32_R31_R30_R29') {
-            throw 'CURRENT_FOCUS installed a non-R84 renderer'
+          if ($mainState.RendererBuildVariant -ne 'ACTIVE_R26_R43_R44') {
+            throw 'CURRENT_FOCUS installed a non-R26+HUD renderer'
           }
           if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
               (Get-FileHash verify-r84-smoke/backends/d3d9/dinput8.dll -Algorithm SHA256).Hash) {
@@ -937,7 +937,7 @@ jobs:
           if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R84 main restore failed' }
           if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
               (Get-FileHash verify-r84-smoke/backends/d3d9/dinput8.dll -Algorithm SHA256).Hash) {
-            throw 'R84 main restore did not install the refactored R29-R33 DLL'
+            throw 'R26+HUD main restore did not install the default R26+HUD DLL'
           }
 
           # Regression: extracting a new package over an older R71 test folder

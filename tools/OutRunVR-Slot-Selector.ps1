@@ -9,9 +9,9 @@ $slots=[ordered]@{
     'A_SEAT_STOCK'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.00';Title='A 운전석 기본 크기 100%';Help='안정화: native 카메라 좌표계 고정. 차량 1.00x, 위치 F11 조절.'}
     'B_SEAT_115'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.15';Title='B 운전석 차량 115%';Help='안정화: native 카메라 좌표계 고정. 차량 1.15x.'}
     'C_SEAT_130'=[ordered]@{Backend='d3d9';Profile='COCKPIT_PARTICLES';Variant='G_COCKPIT';Scale='1.30';Title='C 운전석 차량 130%';Help='안정화: native 카메라 좌표계 고정. 차량 1.30x.'}
-    'CURRENT_FOCUS'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='MAIN R84 / R29-R33';Help='기본 구조 개선 렌더러. Quest3 검증 필요.'}
-    'R26_SAFE'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R26 SAFE / 기존 보호판';Help='기존 R26+HUD 렌더러 복귀. CURRENT FOCUS로 R84 재선택.'}
-    'R84_TEST'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R84 TEST / 개편 경로';Help='기본 R84와 동일한 독립 렌더러 A/B 진단.'}
+    'CURRENT_FOCUS'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='MAIN R26+HUD / 안정화';Help='R26+HUD가 기본입니다. 새 빌드는 Quest3 검증 필요.'}
+    'R26_SAFE'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R26 SAFE / 보호판';Help='CURRENT FOCUS와 같은 R26+HUD 소스 계열의 백업 슬롯.'}
+    'R84_TEST'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R84 TEST / 구조 비교';Help='R84 비교·최적화 전용. 기본은 R26+HUD입니다.'}
     'A_CONTROL'=[ordered]@{Backend='d3d9';Profile='CONTROL';Title='A CONTROL / R51 기준';Help='R51 보호 기준 비교.'}
     'B_HUD'=[ordered]@{Backend='d3d9';Profile='HUD_SCREEN';Title='B HUD';Help='6th/6, YES/NO, 시간/랭크 HUD 확인.'}
     'C_FLARE'=[ordered]@{Backend='d3d9';Profile='HUD_WORLD';Title='C FLARE / WORLD';Help='렌즈 플레어/월드 마커 producer 진단.'}
