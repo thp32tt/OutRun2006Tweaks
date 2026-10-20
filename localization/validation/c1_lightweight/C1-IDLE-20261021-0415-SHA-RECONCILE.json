@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0415-IDLE-SHA-RECONCILE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-21T04:15:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "NO_UNREVIEWED_CANDIDATE_SHA",
+  "policy_verified": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "sources": {
+    "n100_producer_root": "work/image-src/text_roi_batches",
+    "n100_exports": "work/image-src/text_roi_batches/export_evidence/*.json",
+    "n100_candidate_outputs": "work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+    "previous_qa_record": "localization/validation/c1_lightweight/C1-IDLE-20261021-0315-SHA-RECONCILE.json",
+    "final_four_qa_record": "localization/validation/c1_lightweight/C1-QA-20261020-2345-UNIQUE4.json"
+  },
+  "sha_reconciliation": {
+    "n100_A_candidate_png": 69,
+    "n100_B_candidate_png": 87,
+    "n100_total_exports": 156,
+    "unique_export_candidate_sha256": 156,
+    "local_metrics_sha256": 120,
+    "local_only_unreviewed_count_misleading": 41,
+    "prior_github_qa_snapshot_export_matches": 152,
+    "additional_four_qa_reported_20261020_2345": 4,
+    "prior_reviewed_unique_export_candidates": 156,
+    "new_unreviewed_unique_candidate_sha256": 0,
+    "missing_export_candidate_files": 0,
+    "note": "N100 local-only metrics mark 41 exports NEW because they are absent from local metrics, but all were already included in GitHub prior C1 QA. The remaining 4 candidates were reviewed in GitHub 2026-10-20 23:45; SHA is not reused for a new QA decision."
+  },
+  "new_qa_selected": 0,
+  "new_png_qa_pass": 0,
+  "new_png_qa_fail": 0,
+  "new_png_qa_hold": 0,
+  "previously_reviewed_sha_reapproved": 0,
+  "producer_export_state": "UNCHANGED",
+  "candidate_hold_and_rework_state": "UNCHANGED",
+  "imagegen_called": false,
+  "producer_queue_consumed": false,
+  "dds_composed_or_deployed": false,
+  "c2_c3_or_ingame_pass_created": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "score_change": 0
+}
