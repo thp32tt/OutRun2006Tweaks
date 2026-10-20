@@ -69,6 +69,7 @@ CONVERSION_DXVK_ENABLED = (not DXVK_FROZEN) and os.getenv("CONVERSION_DXVK_ENABL
 # DX9Ex is the active visual/stability lane alongside native DX11.
 # DXVK remains frozen independently of the C lane.
 CONVERSION_DX9EX_ENABLED = os.getenv("CONVERSION_DX9EX_ENABLED", "true").lower() == "true"
+DX9EX_REVIEW_ONLY = os.getenv("DX9EX_REVIEW_ONLY", "true").lower() == "true"
 CONVERSION_ONLY_SLOT = os.getenv("CONVERSION_ONLY_SLOT", "").strip().upper()
 if CONVERSION_ONLY_SLOT not in {"", "A", "B", "C"}:
     raise ValueError(f"Unsupported CONVERSION_ONLY_SLOT={CONVERSION_ONLY_SLOT!r}; expected A, B, C, or empty")
@@ -299,6 +300,7 @@ runtime = {
     "conversion_dxvk_enabled": CONVERSION_DXVK_ENABLED,
     "dxvk_frozen": DXVK_FROZEN,
     "conversion_dx9ex_enabled": CONVERSION_DX9EX_ENABLED,
+    "dx9ex_review_only": DX9EX_REVIEW_ONLY,
     "conversion_only_slot": CONVERSION_ONLY_SLOT,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
