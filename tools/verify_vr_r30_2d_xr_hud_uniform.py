@@ -25,9 +25,24 @@ def check(code):
     assert "R30HudAspectCompensation(" in hud
     assert "R30HudContain.pauseResponsive == pauseResponsive" in hud
     return hud
-assert "scaleX = userScale;\n            scaleY = userScale;" in r26.split(
-    "void R30HudContainScale(",1)[1].split(
-    "enum class R30ScreenSpaceKind",1)[0]
+r26_hud = r26.split("void R30HudContainScale(", 1)[1].split(
+    "enum class R30ScreenSpaceKind", 1)[0]
+r26_header = (root / "src/vr/d3d9/hud_1080p_reference.hpp").read_text()
+assert "scaleX = userScale * referenceFit;" in r26_hud
+assert "scaleY = userScale * referenceFit;" in r26_hud
+assert "OutRunVRHud1080p::ContainedScale(" in r26_hud
+assert "BackBufferDesc.Width, BackBufferDesc.Height" in r26_hud
+assert "VRHud1080pReference.get()" in r26_hud
+assert "ReferenceWidth = 1920u" in r26_header
+assert "ReferenceHeight = 1080u" in r26_header
+assert "PlaneViewZ(float userDistance)" in r26_header
+# Regression: don't turn native game 640x480 logical input into a
+# fabricated 1920x1080 producer, or stretch only Y on ultra-wide.
+assert "Game::original_resolution" not in r26_hud
+assert "scaleY = userScale /" not in r26_hud
+assert "R30HudPlaneViewZ(gameplayHudOwner)" in r26
+assert "R30HudPlaneViewZ(true)" in r26
+assert "screenKind != R30ScreenSpaceKind::ScreenOverlay2D" in r26
 check(r84)
 for mutant in (
     r84.replace(guard,"if (false) {} /* incorrect R84 gameplay contain */",1),
@@ -46,8 +61,12 @@ for i in range(1000):
     assert math.isfinite(ratio) and ratio>0
     # Gameplay must retain exactly one uniform scale; ESC-only branch
     # may apply the asymmetric contain split by 2D/XR target aspect.
-    gameplay=(hud_scale,hud_scale)
+    # R26: 1920x1080 reference contains ultra-wide game source, while
+    # preserving one uniform physical HUD scale; R84 remains unchanged.
+    reference_fit=min(1.0,max(0.50,(1920/1080)/(native_w/native_h)))
+    gameplay=(hud_scale*reference_fit,hud_scale*reference_fit)
     esc=(hud_scale, hud_scale/ratio) if ratio>=1 else (hud_scale*ratio,hud_scale)
     assert gameplay[0]==gameplay[1] and all(math.isfinite(v) for v in esc)
+    assert 0.50*hud_scale<=gameplay[0]<=hud_scale
 assert 0.21 < 0.55/((3440/1440)/(2496/2688)) < 0.22
-print("PASS 1000 2D/XR pairs, R26 uniform gameplay HUD parity, ESC-only containment and 3 negative mutations; HMD UNTESTED")
+print("PASS 1000 2D/XR pairs, R26 uniform 1080p gameplay HUD containment, ESC-only R84 containment and 3 negative mutations; HMD UNTESTED")
