@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-2345-UNIQUE4",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T23:45:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "scope": "SHA_UNIQUE_UNAPPROVED_AB_KOREAN_PNG_INDEPENDENT_LIGHTWEIGHT_QA",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "local_evidence": "N100 work/c1_batch_20261020_2345/{metrics.json,compare_1.png}",
+  "sha_dedup": {
+    "producer_exports": 156,
+    "github_previous_qa_candidate_sha_matches": 152,
+    "new_sha_selected": 4,
+    "overlap_with_prior_qa": 0,
+    "prior_records_reconciled": 22,
+    "method": "Compared producer export SHA256 with actual previous GitHub C1 QA commit evidence (2026-10-19 and 2026-10-20), plus N100 local C1 metrics; no previously reviewed candidate SHA repeated."
+  },
+  "summary": {
+    "reviewed": 4,
+    "pass_png_only": 3,
+    "fail_png": 0,
+    "hold_unverified_mapping": 1,
+    "hold_rework_dimensions": 4,
+    "source_sha_verified": 3,
+    "candidate_export_sha_verified": 4,
+    "png_rgba_verified": 4,
+    "alpha_edge_warnings_at_1": 2,
+    "alpha_edge_warnings_at_16": 0,
+    "composition_approved": 0
+  },
+  "cases": [
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0001-8A042E83",
+      "source_ordinal": 1,
+      "source_roi_file": "Q104_OutRunMode_FullHD_TextROI_2x.png",
+      "source_roi_sha256": "69b94a31fed5533acb2e08b678befe03996587d25c1ad9d0fd764c598d788555",
+      "source_dds_sha256": null,
+      "candidate_file": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+      "candidate_sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+      "source_manifest_sha_match": null,
+      "producer_export_sha_match": true,
+      "english": "OutRun Mode",
+      "reviewed_korean": null,
+      "visually_observed_korean": "아웃런 모드",
+      "translation_mapping": "HOLD_LEGACY_SOURCE_NOT_PRESENT_IN_REVIEWED_PRODUCTION_MANIFEST",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1952,
+        336
+      ],
+      "candidate_dimensions": [
+        2135,
+        736
+      ],
+      "alpha_bbox_1": [
+        0,
+        35,
+        2089,
+        736
+      ],
+      "alpha_bbox_16": [
+        72,
+        157,
+        2076,
+        576
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 33,
+        "left": 7,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "independent_qa": "HOLD_UNVERIFIED_SOURCE_AND_MAPPING",
+      "glyph_integrity": "VISUAL_LEGIBLE_NO_APPROVED_MAPPING",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "OUTRUN MODE→아웃런 모드: 시각상 읽힘. 그러나 2026-10-15 레거시 2x ROI이며 production_manifest의 reviewed 영문→한글 매핑 및 검증된 native source SHA가 없음. 승인 번역 일치성을 판정할 수 없어 HOLD. alpha=1 수준 가장자리(bottom 33px,left 7px)도 추후 검토.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0006-70D97486",
+      "source_ordinal": 29,
+      "source_roi_file": "Q133_c47c389e06722e87_source.png",
+      "source_roi_sha256": "84f36f86e8a57752d457f617d34a5ee53a250263c9ebdafa5e04e18361167fa6",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "candidate_file": "Q133_c47c389e06722e87_source_k.png",
+      "candidate_sha256": "95b6254910854cb5999b491fa91a2b5291b51b2a3a36812423c77595d60b03f8",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "english": "GRIGIO ALLOY",
+      "reviewed_korean": "그리지오 알로이",
+      "visually_observed_korean": "그리지오 알로이",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1760,
+        288
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_bbox_1": [
+        43,
+        55,
+        2109,
+        674
+      ],
+      "alpha_bbox_16": [
+        79,
+        195,
+        2106,
+        529
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "GRIGIO ALLOY→그리지오 알로이: 화면상 자소, 공백, 획 가독성 양호. 원문 잔상/프레임/의미 없는 선 확인되지 않음. 폭 차이는 반려 근거 아님.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0006-70D97486",
+      "source_ordinal": 30,
+      "source_roi_file": "Q133_52b576e3922553ec_source.png",
+      "source_roi_sha256": "5efbed5d686d77dbf15def17cf5f5d34bf8d2d6fffbe7da2c402b452a8da6b13",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "candidate_file": "Q133_52b576e3922553ec_source_k.png",
+      "candidate_sha256": "9df970990a8118f0e4f31b2cd1ca9ad47ab4cc135716b19d5168409b346a410b",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "english": "GIALLO MODENA",
+      "reviewed_korean": "지알로 모데나",
+      "visually_observed_korean": "지알로 모데나",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        1032,
+        144
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_bbox_1": [
+        0,
+        19,
+        2142,
+        666
+      ],
+      "alpha_bbox_16": [
+        149,
+        196,
+        2038,
+        518
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 12,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "GIALLO MODENA→지알로 모데나: 자소·받침·가독성 양호, 원문 잔상·보호아트 침범 징후 없음. alpha=1 좌측 12픽셀 미세 잡음 경고(alpha>=16 경계 없음).",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0008-CCA71936",
+      "source_ordinal": 39,
+      "source_roi_file": "Q159_6505ccb3e25ce42c_source.png",
+      "source_roi_sha256": "ddd935212c782f923b3ada13f2047d6b7973ee7c3c719619bc6f8e0c2b85260e",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "candidate_file": "Q159_6505ccb3e25ce42c_source_k.png",
+      "candidate_sha256": "c0605ee71bdbac74ff8190153ab335ad8e0a4133e8d4dfcaa0e02477ce3043e1",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "english": "BIG FOREST",
+      "reviewed_korean": "빅 포레스트",
+      "visually_observed_korean": "빅 포레스트",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "format": "PNG",
+      "mode": "RGBA",
+      "source_dimensions": [
+        934,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "alpha_bbox_1": [
+        33,
+        19,
+        2092,
+        675
+      ],
+      "alpha_bbox_16": [
+        195,
+        193,
+        1979,
+        534
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "english_remnant": "NONE_OBSERVED",
+      "unwanted_background_or_frame": "NONE_OBSERVED",
+      "observation": "BIG FOREST→빅 포레스트: 철자/자소 가독성, 원문 대비 레이아웃, 투명 배경/프레임 부재 확인. 문장 폭 차이만으로 반려하지 않음.",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    }
+  ],
+  "restrictions": {
+    "imagegen_called": false,
+    "producer_queues_consumed": false,
+    "dds_written": false,
+    "final_deployed": false,
+    "C2_PASS": false,
+    "C3_PASS": false,
+    "ingame_PASS": false,
+    "runtime_validation": "UNTESTED"
+  }
+}
