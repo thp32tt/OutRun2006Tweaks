@@ -26,7 +26,11 @@ required = [
 for token in required:
     assert token in source, f"Missing source safety contract: {token}"
 assert source.index("if (!newPtrs || !newEntries || !newUnknown)") < source.index("buffer->MaxBuffers_4 = max_size;")
-assert 'CollisionNodesToDisplay[nodeId] = true;' in source
+assert 'CollisionNodesToDisplay[nodeId] = CollisionNodeSeenEpoch;' in source
+assert 'CollisionNodesToDisplay[nodeId] == CollisionNodeSeenEpoch' in source
+assert 'if (++CollisionNodeSeenEpoch == 0)' in source
+assert 'CollisionNodesToDisplay.fill(0);' in source
+assert 'memset(CollisionNodesToDisplay.data()' not in source
 assert 'if (OutRunVR::DrawDistanceSafety::ShouldQueueNode(' in source
 assert 'if (OutRunVR::DrawDistanceSafety::CanAppend(' in source
 assert 'DrawListCapacity + 1' in header

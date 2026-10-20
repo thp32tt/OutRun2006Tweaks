@@ -486,7 +486,10 @@ class DrawDistanceIncrease : public Hook
 	//    I'm not hopeful about that though, doubt they would have included data for parts that wouldn't be shown)
 
 	inline static uint16_t CollisionNodeIdxArray[OutRunVR::DrawDistanceSafety::DrawListStorage];
-	inline static std::array<uint8_t, OutRunVR::DrawDistanceSafety::SeenNodeCount> CollisionNodesToDisplay;
+	// The full uint16 node domain is tracked by generation, so clearing
+	// 65,536 entries is NOT repeated for every original stage object.
+	inline static std::array<std::uint16_t, OutRunVR::DrawDistanceSafety::SeenNodeCount> CollisionNodesToDisplay;
+	inline static std::uint16_t CollisionNodeSeenEpoch = 0;
 
 	inline static SafetyHookMid dest_hook = {};
 	static void destination(safetyhook::Context& ctx)
@@ -525,7 +528,13 @@ class DrawDistanceIncrease : public Hook
 			static_cast<int>(ObjectNodes.size()));
 		for (int ObjectNum = 0; ObjectNum < boundedObjects; ObjectNum++)
 		{
-			memset(CollisionNodesToDisplay.data(), 0, CollisionNodesToDisplay.size());
+			// One epoch per object: reject duplicates only for THIS object's
+			// admission list. Clear stale stamps solely on 16-bit wraparound.
+			if (++CollisionNodeSeenEpoch == 0)
+			{
+				CollisionNodesToDisplay.fill(0);
+				CollisionNodeSeenEpoch = 1;
+			}
 			uint16_t* cur = CollisionNodeIdxArray;
 
 			for (int csOffset = -Settings::DrawDistanceBehind; csOffset < (maxDrawDistance + 1); csOffset++)
@@ -558,12 +567,12 @@ class DrawDistanceIncrease : public Hook
 							nodeId, objectExclusions[ObjectNum].size()) &&
 						objectExclusions[ObjectNum][nodeId];
 					if (OutRunVR::DrawDistanceSafety::ShouldQueueNode(
-						CollisionNodesToDisplay[nodeId] != 0, excluded,
+						CollisionNodesToDisplay[nodeId] == CollisionNodeSeenEpoch, excluded,
 						csOffset, Settings::DrawDistanceIncrease > 0))
 					{
 						// Keep one extra slot for the original DrawObject sentinel.
 						// A rejected node stays eligible for the current section.
-						CollisionNodesToDisplay[nodeId] = true;
+						CollisionNodesToDisplay[nodeId] = CollisionNodeSeenEpoch;
 						if (OutRunVR::DrawDistanceSafety::CanAppend(
 							static_cast<std::size_t>(cur - CollisionNodeIdxArray)))
 							*cur++ = nodeId;
