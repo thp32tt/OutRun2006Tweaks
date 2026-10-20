@@ -9,9 +9,9 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00961",
   "feature_id": "DX11:LIVE_SM3_RELATIVE_MATRIX_DRAW",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -22,9 +22,9 @@
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Check exact-SHA mandatory DX11 Fast/Backend/Windows/OpenXR/HUD gates once; only repair causal failures under 00961; obtain real game menu/car/race frame evidence separately.",
-  "CODE_CHANGED_SHA": "PENDING_COMMIT",
-  "score_change": 0,
+  "NEXT_IMPLEMENTATION_ACTION": "Exact SHA passed all five GitHub Gates. Obtain matching desktop real-game menu/car/race native Draw and frame output evidence; Quest3/VDXR HMD runtime remains UNTESTED. Controller owns next independent feature.",
+  "CODE_CHANGED_SHA": "b883152dd2887a740284c26b36aa60f760f7cba8",
+  "score_change": 1,
   "work_time_percentages": "NOT_MEASURED",
   "development_strategy": {
     "work_class": "integration",
@@ -93,6 +93,24 @@
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_sm3_relative_matrix_probe_00961.cpp",
     "tools/test_dx11_sm3_relative_matrix_00961.py",
-    "docs/automation/runs/CONVERSION-DX11-00961.json"
-  ]
+    "docs/automation/runs/CONVERSION-DX11-00961.json",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "material_result_sha": "b883152dd2887a740284c26b36aa60f760f7cba8",
+  "validation_bearing_result_sha": "dd7c6049fc20efb1f57e968658c0aabda7eb570c",
+  "acceptance_results": {
+    "native_relative_matrix": "PASS_SOURCE_AND_EXACT_SHA_5_OF_5_RUNTIME_UNTESTED",
+    "unsafe_matrix_fallback": "PASS_CXX_NEGATIVE_AND_EXACT_SHA_5_OF_5",
+    "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "exact_sha_gate_runs": {
+    "DX11_Fast": 39515412511,
+    "Backend_Conversion": 39515412494,
+    "Windows_Build": 39515412534,
+    "OpenXR": 39515417436,
+    "HUD_Inspector": 39515417441
+  },
+  "c6_result_note": "Five mandatory GitHub Actions succeeded on validation-bearing exact SHA dd7c6049. Material shader Draw change b883152d, source-graph/test-only causal CI repairs 232bf733 and dd7c6049; source/CI is not live game/HMD proof. No native game pixels, gameplay or Quest3 validated."
 }
