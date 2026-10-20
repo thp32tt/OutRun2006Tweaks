@@ -38,6 +38,9 @@ on:
       - 'tools/dx11_live_sm3_multistream_probe.cpp'
       - 'src/vr/d3d11/live_game_sm3_stream_assembly.hpp'
       - 'docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json'
+      # Native desktop launch+packaging changes must re-enter exact-SHA Fast gate.
+      - 'tools/package_dx11_first_game_frame.py'
+      - 'tools/test_package_dx11_first_game_frame.py'
       - 'docs/automation/runs/CONVERSION-DX11-*.json'
       # Backend workflow edits must trigger all exact-SHA validation gates.
       - '.github/workflows/backend-conversion-gate.yml'
