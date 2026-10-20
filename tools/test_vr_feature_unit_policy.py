@@ -162,6 +162,7 @@ guarded_commands = (
     "python tools/verify_vr_hud_edge_transition.py",
     "python tools/verify_vr_r30_positiont_decl.py",
     "python tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "python tools/verify_vr_stage_optical_probe.py",
     "python tools/verify_vr_skyglow_capture_boundary.py",
 )
 for command in guarded_commands:
