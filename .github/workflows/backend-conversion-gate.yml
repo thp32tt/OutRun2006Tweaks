@@ -367,7 +367,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: backend-autovalidated-${{ github.ref_name }}-${{ github.sha }}
+          name: backend-autovalidated-${{ github.sha }}
           path: |
             build-auto/bin/dinput8.dll
           if-no-files-found: error
