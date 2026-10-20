@@ -5,8 +5,8 @@ root = Path(__file__).resolve().parents[1]
 backend = (root / "src/vr/d3d11/native_backend.cpp").read_text()
 texture = (root / "src/vr/d3d11/native_sm3_texture_codegen.hpp").read_text()
 bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
-start = backend.index("const bool sourcePredicated =")
-end = backend.index("const DWORD destination =", start)
+start = backend.index("if (sourcePredicated) {")
+end = backend.index("op.sineCosine =", start)
 predication = backend[start:end]
 assert "instruction.opcode == D3DSIO_TEX)" in predication
 assert "instruction.opcode == D3DSIO_TEXLDD)" not in predication
