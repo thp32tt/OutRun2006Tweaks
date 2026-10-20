@@ -1,3 +1,37 @@
+## 2026-10-20 — CURRENT OVERRIDE: DX9Ex C = review-only
+
+이 항목은 아래의 모든 과거 DX9Ex C 자동개발·구조개선·소스수정 정책보다 우선한다.
+
+- A(DX11): 기존 자동 네이티브 DX11 구현 정책을 유지한다.
+- B(DXVK): 기존대로 FROZEN/비활성 유지한다.
+- C(DX9Ex): **자동실행은 유지하지만 REVIEW_ONLY**다. 게임/런타임 소스는 스스로 수정하지 않는다.
+- C는 `vr-d3d9ex-focus` 최신 HEAD, R26+HUD 기준, REA/디스어셈블리/런타임 로그/관련 Issue를 읽고 화면오류와 최적화 문제의 실제 렌더 경로를 계속 시뮬레이션한다.
+- 수정 필요성이 확인돼도 실제 C++/HLSL/CMake/workflow/config를 건드리지 않고 `PATCH_CANDIDATE_ONLY`로 정확한 파일/함수/라인/근거/반증조건/회귀위험만 기록한다.
+- C의 durable result는 `docs/reviews/dx9ex/automation/<TASK_ID>.md` docs-only 커밋이며 커밋 메시지에 `[AUTO:<TASK_ID>]`를 포함한다.
+- C에서 source patch/refactor/merge/update_ref/새 branch/release/package 생성은 금지한다.
+- R26+HUD baseline `0cff83cf509c2acd6f3391b3a46c4dec1403a0d9`를 기준으로 하고 R84를 자동 기본값으로 재승격하지 않는다.
+- 최근 result HUD 후보 `aab9e02bcb2ad2e6253840e6267e5c5ad5040854`는 비교 자료이며 Quest 3 HMD PASS가 아니다.
+- B9200 post-CALL/+5 등 과거 크래시 원인이 된 위험한 midhook은 재도입하지 않는다.
+- 실기 검증이 없으면 C 결과는 항상 `RUNTIME_VALIDATION=UNTESTED`, `CODE_CHANGE=NO`다.
+
+Portainer 스케줄 구조는 기존 A+C 병행을 유지할 수 있다. 따라서 C를 꺼버리는 것이 아니라
+`CONVERSION_DX9EX_ENABLED=true`인 상태에서 prompt/controller policy가 review-only를 강제한다.
+기존 `CONVERSION_PARALLEL=true`, `CONVERSION_ACTIVE_LIMIT=2`, DXVK freeze 설정은 그대로 사용할 수 있다.
+
+이 정책을 실제 실행 컨테이너에 반영하려면 **chat-controller-downloads 최신 HEAD에서 VR stack을 Pull and redeploy하며 image를 rebuild**해야 한다.
+`Dockerfile.portainer-vr`는 `src-vr-v2/controller.py.part00..03`,
+`conversion_dx9ex.md`, `conversion_continuous_dx9ex.md`를 image에 COPY하므로 단순 container restart만으로는 이 변경이 반영되지 않는다.
+기존 `outrun_chat_vr_data`와 `outrun_chat_vr_logs` volume, browser login, queue/task state는 보존한다.
+
+재배포 후 확인:
+1. `/status`에서 DX9Ex C가 enabled이고 B/DXVK는 frozen인지 확인한다.
+2. 새 C TASK가 source 수정 지시가 아니라 `DX9EX_REVIEW_ONLY=ON`을 받는지 확인한다.
+3. C 결과가 docs-only `[AUTO:TASK_ID]` 커밋인지 확인한다.
+4. 동일 C TASK에서 `src/`, CMake, workflow, runtime config 변경이 생기지 않는지 확인한다.
+5. GitHub source 변경만으로 live Portainer 적용을 주장하지 않는다.
+
+---
+
 ## 2026-10-10 VR 기능 전달 수정 배포
 
 - 대상: `chat-controller-downloads`, VR `Dockerfile.portainer-vr` 및 기존 VR compose. 기존 볼륨/인증/큐를 유지하고 최신 소스로 이미지를 **다시 빌드하여 재배포**한다. 단순 컨테이너 재시작은 이미지에 COPY된 Python/프롬프트를 갱신하지 않는다.
