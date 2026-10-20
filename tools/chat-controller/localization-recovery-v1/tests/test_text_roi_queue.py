@@ -133,6 +133,65 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertEqual(page.opened,[target])
         self.assertTrue(status.startswith("IMAGEGEN_OUTPUT_COUNT_MISMATCH:"))
 
+    def test_five_input_single_output_is_quarantined_and_retried_as_five(self):
+        items=[]
+        for i in range(5):
+            name=f"Q121_Item_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(80+i,30),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q121_Item_{i}",
+                "role":"B",
+                "queue_index":"121",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"English {i}",
+                "korean":f"한글 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("B",self.root)
+        self.assertIsNone(error)
+        self.assertEqual(binding["expected_images"],5)
+        self.assertIn("BATCH_COUNT=5",binding["prompt"])
+        self.assertIn("출력 개수(n)를 반드시 BATCH_COUNT=5",binding["prompt"])
+        self.assertIn("총 5장을 생성하세요",binding["prompt"])
+        old_task=binding["task_id"]
+        text_roi_queue.stage_submission("B",old_task,self.root)
+        target="https://chatgpt.com/c/five-image-batch"
+        text_roi_queue.record_chat_url("B",old_task,target,self.root)
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        (sent/f"B_{old_task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":old_task,"role":"B",
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        class Page:
+            url=target
+            async def evaluate(self,*args,**kwargs):
+                return {"count":1,"expected":5,"busy":False,
+                        "verified_by":"SINGLE_VISIBLE_PREVIEW_FALLBACK","error":None}
+
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("B",Page(),self.root))
+        self.assertTrue(can_continue)
+        self.assertEqual(status,"SINGLE_OF_FIVE_QUARANTINED_RETRY_STAGED")
+        st=json.loads((self.root/"text_roi_batches/B_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],old_task+"-R1")
+        self.assertEqual(st["active"]["status"],"STAGED")
+        self.assertEqual(st["active"]["retry_count"],1)
+        self.assertEqual(st["active"]["ordinals"],[1,2,3,4,5])
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertEqual(st["quarantined"][-1]["task_id"],old_task)
+        self.assertEqual(st["quarantined"][-1]["observed_generated_images"],1)
+
+        retry,error=text_roi_queue.next_binding("B",self.root)
+        self.assertIsNone(error)
+        self.assertEqual(retry["task_id"],old_task+"-R1")
+        self.assertEqual(retry["expected_images"],5)
+        self.assertEqual([x["ordinal"] for x in retry["tiles"]],[1,2,3,4,5])
+
     def test_two_roles_do_not_share_state(self):
         b = dict(self.item, id="Q104_Second_Text", role="B", imagegen_input_png="Q104_OutRunModeB.png")
         dest = self.image_path.with_name(b["imagegen_input_png"])
