@@ -4480,12 +4480,13 @@ namespace OutRunVRStereo
                         const auto command =
                             OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
                         spdlog::info(
-                            "VR R26 RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO cachedVS=0 liveVS={} vsHr=0x{:08X} producer={} queued={} node={} epoch={} hits={}",
+                            "VR R26 RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO cachedVS=0 liveVS={} vsHr=0x{:08X} producer={} queued={} node={} epoch={} poseSeq={} drawSerial={} hits={}",
                             static_cast<const void*>(liveVs),
                             static_cast<unsigned>(vsHr),
                             OutRunVR::GameSemantic::Name(command.producer),
                             command.queued, command.queueNode,
-                            command.queueEpoch, n);
+                            command.queueEpoch, stereo.poseSequence,
+                            TopLevelDrawSerial() + 1u, n);
                         if (liveVs)
                             liveVs->Release();
                     }

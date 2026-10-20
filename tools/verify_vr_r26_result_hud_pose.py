@@ -34,6 +34,7 @@ shader_gate = shader_hud.split('if (screenKind == R30ScreenSpaceKind::Perspectiv
 assert 'CurrentVertexShaderIdentity.load(' in shader_gate, 'do not bypass original shader identity guard'
 assert 'if (Settings::VRTelemetry && R30IsExactResultHudDraw())' in shader_gate, 'probe only source-proven exact result with telemetry on'
 assert 'RESULT_HUD_SHADER_GATE: decision=FALLBACK_CACHE_ZERO' in shader_gate, 'diagnose zero-cache physical shader ambiguity'
+assert 'poseSeq={} drawSerial={}' in shader_gate and 'TopLevelDrawSerial() + 1u' in shader_gate, 'correlate one exact GPU draw with a single pose and serial'
 assert 'device->GetVertexShader(&liveVs)' in shader_gate and 'liveVs->Release()' in shader_gate, 'release any observed live shader'
 assert '                return false;\n            }' in shader_gate, 'live shader diagnosis must not promote R26 source'
 indexed_dispatch = src[src.index('HRESULT __stdcall DrawIndexedPrimitiveDestR30('):src.index('HRESULT __stdcall DrawPrimitiveUPDestR30(')]
