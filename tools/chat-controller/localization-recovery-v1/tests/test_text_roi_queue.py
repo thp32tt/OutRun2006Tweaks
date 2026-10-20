@@ -269,6 +269,81 @@ class TextRoiQueueTests(unittest.TestCase):
             self.assertFalse((outdir/row["name"]).exists())
             self.assertTrue((qroot/"candidate_outputs"/row["name"]).is_file())
 
+    def test_stale_generated_five_is_retried_before_library_scan(self):
+        items=[]
+        for i in range(5):
+            name=f"Q231_Stale_{i}.png"
+            path=self.image_path.with_name(name)
+            Image.new("RGBA",(100+i,40),(0,0,0,0)).save(path)
+            items.append({
+                **self.item,
+                "id":f"Q231_Stale_{i}",
+                "role":"A",
+                "queue_index":"231",
+                "imagegen_input_png":name,
+                "imagegen_input_sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
+                "english":f"Old {i}",
+                "korean":f"오래됨 {i}",
+            })
+        self.write_manifest(items)
+        binding,error=text_roi_queue.next_binding("A",self.root)
+        self.assertIsNone(error)
+        old_task=binding["task_id"]
+        text_roi_queue.stage_submission("A",old_task,self.root)
+        target="https://chatgpt.com/c/stale-five"
+        text_roi_queue.record_chat_url("A",old_task,target,self.root)
+
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        st["active"]["created_at"]="2026-10-19T00:00:00+00:00"
+        (self.root/"text_roi_batches/A_state.json").write_text(json.dumps(st),encoding="utf-8")
+
+        sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
+        (sent/f"A_{old_task}.json").write_text(json.dumps({
+            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+            "task_id":old_task,"role":"A",
+            "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
+        }),encoding="utf-8")
+
+        outdir=self.root/"text_roi_batches/candidate_outputs/A"
+        outdir.mkdir(parents=True)
+        files=[]
+        for item in binding["items"]:
+            binary=(b"stale-"+item["filename"].encode())*20
+            name=item["output_filename"]
+            (outdir/name).write_bytes(binary)
+            files.append({"name":name,"sha256":hashlib.sha256(binary).hexdigest()})
+        ev=self.root/"text_roi_batches/export_evidence"; ev.mkdir(parents=True)
+        (ev/f"{old_task}.json").write_text(json.dumps({
+            "task_id":old_task,"role":"A",
+            "status":"UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS",
+            "files":files
+        }),encoding="utf-8")
+        gv=self.root/"text_roi_batches/generated_visible"; gv.mkdir(parents=True)
+        (gv/f"{old_task}.json").write_text(json.dumps({
+            "task_id":old_task,"role":"A","distinct_generated_images":5,
+            "verification_method":"TEST","status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
+            "export_status":"EXISTING_CANDIDATES_VERIFIED"
+        }),encoding="utf-8")
+
+        class Page:
+            url=target
+            async def evaluate(self,*args,**kwargs):
+                raise AssertionError("stale generated evidence must avoid source DOM")
+        async def should_not_verify(*args,**kwargs):
+            raise AssertionError("stale batch must be restaged before Library scan")
+
+        import project_library_gate
+        with patch.object(project_library_gate,"verify_project_library_images",new=should_not_verify):
+            can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
+        self.assertTrue(can_continue)
+        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
+        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
+        self.assertEqual(st["active"]["task_id"],old_task+"-R1")
+        self.assertEqual(st["next_ordinal"],1)
+        self.assertEqual(st["completed_files"],0)
+        self.assertEqual(st["quarantined"][-1]["retry_reason"],
+                         "STALE_GENERATED_NOT_LIBRARY_VERIFIED")
+
     def test_two_roles_do_not_share_state(self):
         b = dict(self.item, id="Q104_Second_Text", role="B", imagegen_input_png="Q104_OutRunModeB.png")
         dest = self.image_path.with_name(b["imagegen_input_png"])
