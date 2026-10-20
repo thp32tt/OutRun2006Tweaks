@@ -562,6 +562,10 @@ class DrawDistanceIncrease : public Hook
 				while (*sectionCollList != 0xFFFF)
 				{
 					const std::uint16_t nodeId = *sectionCollList++;
+					// The game's collision node domain must fit our per-object epoch bitmap.
+					// Never index the bitmap with an untrusted stage-list ID.
+					if (nodeId >= CollisionNodesToDisplay.size())
+						continue;
 					const bool excluded =
 						OutRunVR::DrawDistanceSafety::IsKnownExclusionIndex(
 							nodeId, objectExclusions[ObjectNum].size()) &&
