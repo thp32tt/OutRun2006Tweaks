@@ -433,6 +433,9 @@ class UIScaling : public Hook
     // Bind this exact CALL edge, rather than relying on _ReturnAddress()
     // from the shared 0x49940 inline trampoline alone.
     inline static thread_local bool RankMarkerExactCalcEdge = false;
+    // Exact 0xBB6F0 source CALL: preserve rival projector identity across
+    // the inline trampoline (whose local return address is not 0xBB6F5).
+    inline static thread_local bool RivalMarkerExactCalcEdge = false;
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -971,9 +974,14 @@ class UIScaling : public Hook
         const bool ordinalReturnSite =
             returnAddress == Module::exe_ptr(0xBAEE7);
         const bool ordinalProducerScope = RankMarkerSubActiveDepth != 0;
+        // Field log: ALL 0xBAEE2 world car inputs (sourceZ=-109/-69/-29)
+        // were suppressed by NaviPubDepth=1 despite their original source
+        // CALL proof. Only this exact E8 may override NaviPub when its
+        // recovered view-space anchor is valid; other HUD nodes remain 2D.
         if ((ordinalReturnSite || ordinalProducerScope ||
              RankMarkerExactCalcEdge) &&
-            RankMarkerSubScreenHudDepth == 0)
+            (RankMarkerSubScreenHudDepth == 0 ||
+             RankMarkerExactCalcEdge))
         {
             recoverViewPoint(RankMarkerProjectedInfo, true);
             // An exact active original rank Calc3D2D call owns this payload.
@@ -1004,7 +1012,8 @@ class UIScaling : public Hook
                     RankMarkerSubScreenHudDepth);
             }
         }
-		else if (returnAddress == Module::exe_ptr(0xBB6F5))
+		else if (RivalMarkerExactCalcEdge ||
+                 returnAddress == Module::exe_ptr(0xBB6F5))
 		{
 			recoverViewPoint(RivalMarkerProjectedInfo, false);
             OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
@@ -1049,6 +1058,28 @@ class UIScaling : public Hook
                     RankMarkerProjectedInfo.valid ? 1 : 0,
                     in ? in->z : 0.f, out ? out->z : 0.f,
                     RankMarkerSubScreenHudDepth);
+        }
+    }
+
+    // Original rival view-space project E8 0xBB6F0 -> Calc3D2D 0x49940.
+    // No game/physics or base UI coordinate transformations are changed.
+    static void __cdecl Calc3D2D_RivalExactCall(
+        float a1, float a2, D3DVECTOR* in, D3DVECTOR* out)
+    {
+        const bool previous = RivalMarkerExactCalcEdge;
+        RivalMarkerExactCalcEdge = true;
+        Calc3D2D_dest(a1, a2, in, out);
+        RivalMarkerExactCalcEdge = previous;
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t hits = 0;
+            const auto n = ++hits;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL EXACT CALC EDGE: e8=0xBB6F0 hits={} "
+                    "anchorValid={} sourceZ={} outputZ={}",
+                    n, RivalMarkerProjectedInfo.valid ? 1 : 0,
+                    in ? in->z : 0.f, out ? out->z : 0.f);
         }
     }
 
@@ -1938,7 +1969,8 @@ class UIScaling : public Hook
 		const auto projectedAnchor = RankMarkerProjectedInfo;
 		OutRunVR::GameSemantic::RenderScope scope{};
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
-		if (RankMarkerSubScreenHudDepth != 0)
+		if (RankMarkerSubScreenHudDepth != 0 &&
+            !projectedAnchor.valid)
 		{
 			scope = OutRunVR::GameSemantic::RenderScope::ScreenHud;
 		}
@@ -2036,8 +2068,11 @@ class UIScaling : public Hook
         // original producer can reenter and change its thread-local owner.
         const float frozenFractionX = RankMarkerFracX;
         const float frozenFractionY = RankMarkerFracY;
-		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
-		const bool projected = !screenHud && projectedAnchor.valid;
+        const bool projected = projectedAnchor.valid;
+        // Exact car-depth evidence wins over a broad NaviPub UI wrapper;
+        // invalid/absent world input continues on native ScreenHud.
+        const bool screenHud =
+            RankMarkerSubScreenHudDepth != 0 && !projected;
         const int anchorLiftY =
             OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
                 Settings::VREnabled, projected);
@@ -2223,6 +2258,16 @@ class UIScaling : public Hook
 			result = Game::sprani_play_ae_auth_alpha(
 				spriteId, x, y, a4, a5, alpha);
 		}
+        if (Settings::VREnabled && Settings::VRTelemetry)
+        {
+            static thread_local std::uint64_t rivalDraws = 0;
+            const auto n = ++rivalDraws;
+            if (n <= 8 || (n & (n - 1)) == 0)
+                spdlog::info(
+                    "VR RIVAL PHYSICAL PRODUCER: hits={} anchorValid={} "
+                    "viewZ={} spriteId={}",
+                    n, projected ? 1 : 0, projectedAnchor.viewZ, spriteId);
+        }
 		// The prior HMD-accepted queued rival nodes retain exactly the same
 		// scope and anchor, with no widening to generic world/HUD sprites.
 		TagAppendedNodes(before, scope,
@@ -2812,6 +2857,10 @@ public:
 			Module::exe_ptr(0xBAD20), RankMarkerSub_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
+        // Only the exact verified x86 E8 rival projector, before BB796
+        // queues its marker. No generic NaviPub/game sprite hooks widened.
+        Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
+            Calc3D2D_RivalExactCall, Memory::HookType::Call);
 		for (int addr : RankMarkerSubScreenHudCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
