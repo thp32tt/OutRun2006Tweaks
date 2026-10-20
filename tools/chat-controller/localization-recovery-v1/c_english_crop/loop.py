@@ -134,6 +134,7 @@ def main():
                           "RUNTIME_VALIDATION":"UNTESTED"}),flush=True)
         last_summary = None
         last_hd108_status = None
+        last_edge_status = None
         heartbeat = 0.0
         last_discovery = -1000000.0
         while not STOP:
@@ -153,6 +154,12 @@ def main():
                             or last_hd108_status!=original108["status"]):
                             write_audit(original108)
                         last_hd108_status=original108["status"]
+                        edge_review=ocr_hd108.review_edge_warnings(max_items=args.max_per_cycle)
+                        edge_sig=(edge_review.get("status"),edge_review.get("pending_after"),
+                                  edge_review.get("rescued"),edge_review.get("held"))
+                        if edge_review.get("reviewed") or edge_sig!=last_edge_status:
+                            write_audit(edge_review)
+                        last_edge_status=edge_sig
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
                 summary = process_batch(args.max_per_cycle)
