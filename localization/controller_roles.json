@@ -129,7 +129,7 @@
     "append_only_to_B": true,
     "new_salvage_assignment": "least_pending_lane"
   },
-  "policy_version": "native-roi-imagegen-auto-v5-20261020-balanced-edge-review",
+  "policy_version": "native-roi-imagegen-auto-v6-20261020-local-sha-nonblocking-library",
   "deployment": {
     "mode": "PORTAINER_GIT_MANUAL_REDEPLOY",
     "auto_deploy": false,
@@ -177,7 +177,10 @@
     "template_directory": "tools/localization/imagegen_prompts",
     "prompt_builder": "tools/localization/build_imagegen_prompt.py",
     "max_same_failure_attempts": 2,
-    "automatic_pipeline_status": "CONTROLLED_PNG_AUTOMATION_ENABLED_DDS_GAME_GATES_SEPARATE"
+    "automatic_pipeline_status": "CONTROLLED_PNG_AUTOMATION_ENABLED_DDS_GAME_GATES_SEPARATE",
+    "production_completion_gate": "GENERATED_COUNT_PLUS_N100_LOCAL_OUTPUT_SHA256",
+    "project_library_gate": "SUPPLEMENTAL_NONBLOCKING",
+    "local_candidate_status": "UNAPPROVED_PENDING_C1"
   },
   "policy_review_record": "localization/policy_reviews/OUTRUN-HD-IMAGEGEN-POLICY-MANUAL-20261012-1333.json",
   "policy_review_record_C": "docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md",
