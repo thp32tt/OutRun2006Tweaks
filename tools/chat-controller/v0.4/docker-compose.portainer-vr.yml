@@ -28,6 +28,7 @@ services:
       DXVK_FROZEN: "true"
       CONVERSION_DXVK_ENABLED: "false"
       CONVERSION_DX9EX_ENABLED: "true"
+      DX9EX_REVIEW_ONLY: "true"
       CONVERSION_ONLY_SLOT: ""
       QUEUE_CHECK_SECONDS: "15"
       # GUI Chrome/noVNC stays enabled; only failed tabs are replaced.
