@@ -3018,7 +3018,8 @@ async def conversion_process_lane(
 
             task_commit = (None if active.get("feature_branch") else
                            github_find_task_commit(active["branch"], active["task_id"]))
-            if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
+            if (task_commit and task_commit.get("sha") == active.get("retry_failed_sha")
+                    and not (DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX")):
                 task_commit = None
             if not task_commit:
                 sent_at = _parse_iso(active.get("sent_at")) or now

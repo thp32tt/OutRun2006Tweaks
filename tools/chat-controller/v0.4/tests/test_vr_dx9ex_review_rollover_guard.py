@@ -83,6 +83,18 @@ class DX9ExReviewRolloverGuardTest(unittest.TestCase):
         self.assertIn("DEVELOPMENT_FOCUS_20261017", prompt)
         self.assertNotIn("MODE=DX9EX_REVIEW_ONLY", prompt)
 
+    def test_stable_wait_chat_reaccepts_retry_review_document(self):
+        # A recovered marker is valid in both pre-response and stable-response
+        # branches. A stale failed CI SHA must not hide a docs-only result.
+        node = next(n for n in ast.parse(SOURCE).body
+                    if isinstance(n, ast.AsyncFunctionDef) and n.name == "conversion_process_lane")
+        source = ast.get_source_segment(SOURCE, node)
+        wait_chat = source.split('if active["phase"] == "WAIT_CHAT":', 1)[1].split(
+            'if active["phase"] == "WAIT_ACTIONS":', 1)[0]
+        allowed = 'and not (DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX")'
+        self.assertEqual(wait_chat.count(allowed), 2)
+        self.assertEqual(wait_chat.count('finalize_dx9ex_review_only_result('), 2)
+
     def test_legacy_ci_wait_reconciles_without_spending_attempt(self):
         fn = isolated_function("recover_missing_gate_run", async_function=True)
         active = {
