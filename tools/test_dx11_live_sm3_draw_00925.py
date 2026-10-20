@@ -360,7 +360,8 @@ for token in (
 ):
     check(token in bridge, "masked real SM3 Draw GPU output missing: " + token)
 check("colorMask != 0x0fu || srgbWrite" not in source and
-      "(colorMask & ~0x0fu) != 0u || srgbWrite" in source,
+      "if ((colorMask & ~0x0fu) != 0u) {" in source and
+      "if (srgbWrite != FALSE) {" in source,
       "valid per-game-Draw partial channel mask still rejected")
 check("if (customBlend &&" in source and
       "sm3_live_masked_blend_desc(" in source,
