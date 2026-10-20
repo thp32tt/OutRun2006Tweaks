@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1945-B0013-A0008-UNIQUE8",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T19:45:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "evidence_local": "work/c1_batch_20261020_1945/{metrics.json,compare_1.png,compare_2.png}",
+  "dedup": {
+    "previous_qa_head": "c48eda1f6d2710a9535d016164e127d241c4c096",
+    "previous_qa_task": "OUTRUN-C1-20261020-1915-B0012-A0007-UNIQUE8",
+    "selection": "B0013 5 and A0008 first 3, disjoint from last QA B0012 5/A0007 first 3; 8 distinct candidate SHA256; no previous QA for B0013/A0008 at branch HEAD",
+    "unique_sha": 8
+  },
+  "summary": {
+    "reviewed": 8,
+    "pass_png_only": 7,
+    "fail_png_layout": 1,
+    "rework_dimensions": 8,
+    "alpha_border_at_1_warnings": 2,
+    "alpha_border_at_16_warnings": 0,
+    "producer_export_sha_verified": 8,
+    "source_manifest_sha_verified": 8,
+    "png_rgba_verified": 8
+  },
+  "cases": [
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0013-68BA94D7",
+      "source_ordinal": 58,
+      "file": "Q159_90e94cc805b7cc63_source_k.png",
+      "candidate_sha256": "e7c43b3864023d4a6ece646d70b56c651793379226d00b49d797c431e008ed53",
+      "source_roi": "Q159_90e94cc805b7cc63_source.png",
+      "source_roi_sha256": "d91537552b3709f0994ac6a86376fafebe68116bb083cb11d17f1bde33538eb0",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "english": "CASINO TOWN",
+      "approved_korean": "카지노 타운",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1100,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        350,
+        227,
+        1841,
+        496
+      ],
+      "alpha_bbox_at_32": [
+        351,
+        228,
+        1839,
+        494
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1220232,
+      "alpha_semi_pixels": 351323,
+      "alpha_opaque_pixels": 973,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Glyph-only candidate on transparent alpha; legible, same single-line structure."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0013-68BA94D7",
+      "source_ordinal": 59,
+      "file": "Q159_ecd038ade09186f8_source_k.png",
+      "candidate_sha256": "7922d477fcf36ee71b213a171929d6b8129e841ecf774865225978deeba4b89b",
+      "source_roi": "Q159_ecd038ade09186f8_source.png",
+      "source_roi_sha256": "9dc75cc16f90955a0726852c3cdc9da682c4a3a8f253eb835371dd86ac052a3b",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "english": "JUNGLE",
+      "approved_korean": "정글",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        654,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        613,
+        134,
+        1581,
+        595
+      ],
+      "alpha_bbox_at_32": [
+        614,
+        134,
+        1581,
+        595
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 9,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1179612,
+      "alpha_semi_pixels": 390884,
+      "alpha_opaque_pixels": 2032,
+      "layout_check": "FAIL_LAYOUT_TWO_LINES",
+      "glyph_legibility": "TEXT_READABLE_BUT_LAYOUT_REJECTED",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "FAIL_PNG_LAYOUT",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Original JUNGLE is a single horizontal line; generated 정글 puts 정 above 글, changing line count, vertical text layout and alignment. This is not a short-width/underfill rejection. Alpha=1 left edge 9 pixels, alpha>=16 no border touch."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0013-68BA94D7",
+      "source_ordinal": 60,
+      "file": "Q159_1949bd92935acd84_source_k.png",
+      "candidate_sha256": "5d7b58cc6bbf3143a6de49e184d69c7223de8f7c6cb75d9fdc66dcbdef892a20",
+      "source_roi": "Q159_1949bd92935acd84_source.png",
+      "source_roi_sha256": "c0f03b92a48f0106550a180c3634d233b4a85ebc3cc0bb65ba5a1b26f32038ce",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "english": "NATIONAL PARK",
+      "approved_korean": "내셔널 파크",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1230,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        393,
+        230,
+        1785,
+        495
+      ],
+      "alpha_bbox_at_32": [
+        394,
+        230,
+        1785,
+        492
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1269486,
+      "alpha_semi_pixels": 299768,
+      "alpha_opaque_pixels": 3274,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Source one-line layout and approved lettering are visually legible; no frame or clipped strong-alpha pixels observed."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0013-68BA94D7",
+      "source_ordinal": 61,
+      "file": "Q161_af7f7f05c566151f_source_k.png",
+      "candidate_sha256": "05ccad29ac4c456ffd84b82b5fe8a9b4de94ee12290f2943eb26eb2e300449cf",
+      "source_roi": "Q161_af7f7f05c566151f_source.png",
+      "source_roi_sha256": "091243819035a04ad30d3861576c2ec0a35b49a8a6a976bffb7773dc818a2e4f",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "english": "SINGAPORE",
+      "approved_korean": "싱가포르",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1456,
+        296
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        431,
+        176,
+        1740,
+        525
+      ],
+      "alpha_bbox_at_32": [
+        431,
+        176,
+        1737,
+        520
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1167847,
+      "alpha_semi_pixels": 401968,
+      "alpha_opaque_pixels": 2713,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Source one-line layout and approved lettering are visually legible; no frame or clipped strong-alpha pixels observed."
+    },
+    {
+      "producer": "B",
+      "task_id": "OUTRUN-ROI-B-0013-68BA94D7",
+      "source_ordinal": 62,
+      "file": "Q161_3d3133e135f518b1_source_k.png",
+      "candidate_sha256": "f261e28e53c2c47701fbc67ee087ce08b61241ddd5547651be9161fb9ec45e5a",
+      "source_roi": "Q161_3d3133e135f518b1_source.png",
+      "source_roi_sha256": "b0064560a8b76f50e15a827334dd249414ac06e5ffb473fc82a7961744392df1",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "english": "SPAIN",
+      "approved_korean": "스페인",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        808,
+        296
+      ],
+      "candidate_dimensions": [
+        2072,
+        759
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        176,
+        109,
+        1917,
+        627
+      ],
+      "alpha_bbox_at_32": [
+        176,
+        109,
+        1916,
+        626
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 873577,
+      "alpha_semi_pixels": 696492,
+      "alpha_opaque_pixels": 2579,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Legible 스페인, single baseline; minor differences acceptable."
+    },
+    {
+      "producer": "A",
+      "task_id": "OUTRUN-ROI-A-0008-CCA71936",
+      "source_ordinal": 36,
+      "file": "Q147_a7c1972309dd88bf_source_k.png",
+      "candidate_sha256": "6185276fecaa1b46a915462d6bf394f3c54b112a26dfca00773689703f79b6c9",
+      "source_roi": "Q147_a7c1972309dd88bf_source.png",
+      "source_roi_sha256": "24d7cc8ed522893afd745b5f2c98090368f80466c665e0859b3815d369895d9e",
+      "source_dds_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "english": "IMPERIAL AVENUE",
+      "approved_korean": "임페리얼 애비뉴",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1370,
+        168
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        232,
+        244,
+        1942,
+        478
+      ],
+      "alpha_bbox_at_32": [
+        232,
+        244,
+        1941,
+        478
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1213706,
+      "alpha_semi_pixels": 355946,
+      "alpha_opaque_pixels": 2876,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Source one-line layout and approved lettering are visually legible; no frame or clipped strong-alpha pixels observed."
+    },
+    {
+      "producer": "A",
+      "task_id": "OUTRUN-ROI-A-0008-CCA71936",
+      "source_ordinal": 37,
+      "file": "Q159_768bd1cdd8a213b4_source_k.png",
+      "candidate_sha256": "11ca0ffe18597f29f29c3353c94a0f54534d27a6d5f8aa3c58f9e21af442f8f7",
+      "source_roi": "Q159_768bd1cdd8a213b4_source.png",
+      "source_roi_sha256": "439b61ada849dc1d7f8fb163610b7dcd83fec3bdb753101585ca35645cecbfa1",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "english": "LOST CITY",
+      "approved_korean": "로스트 시티",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        824,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        261,
+        175,
+        1902,
+        526
+      ],
+      "alpha_bbox_at_32": [
+        261,
+        176,
+        1901,
+        526
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 5,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1137434,
+      "alpha_semi_pixels": 432173,
+      "alpha_opaque_pixels": 2921,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Alpha=1 top-edge 5 pixels; alpha>=16 no border contact; requires future native placement check."
+    },
+    {
+      "producer": "A",
+      "task_id": "OUTRUN-ROI-A-0008-CCA71936",
+      "source_ordinal": 38,
+      "file": "Q159_6038fbd8bf6d0aa2_source_k.png",
+      "candidate_sha256": "155d8b12221295ea42a3586627075789fe46948f4d8188320f8db5ea3701024f",
+      "source_roi": "Q159_6038fbd8bf6d0aa2_source.png",
+      "source_roi_sha256": "b0a4002e4f47a7a9ce633ba66e084ceb6a9c143c32b70eeba1d04aa13521bded",
+      "source_dds_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "english": "GIANT STATUES",
+      "approved_korean": "자이언트 스태추스",
+      "translation_source": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_manifest_sha_match": true,
+      "producer_export_sha_match": true,
+      "source_dimensions": [
+        1202,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "png_format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_at_16": [
+        78,
+        214,
+        2088,
+        486
+      ],
+      "alpha_bbox_at_32": [
+        78,
+        214,
+        2088,
+        486
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_transparent_pixels": 1155160,
+      "alpha_semi_pixels": 413005,
+      "alpha_opaque_pixels": 4363,
+      "layout_check": "PASS_ONE_LINE_ORIGINAL_LAYOUT",
+      "glyph_legibility": "PASS_VISUAL",
+      "english_remnant": "NONE_OBSERVED",
+      "nontext_background_frame": "NONE_OBSERVED",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "review": "PASS_PNG_ONLY",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED",
+      "notes": "Source one-line layout and approved lettering are visually legible; no frame or clipped strong-alpha pixels observed."
+    }
+  ],
+  "production_or_queue_mutation": false,
+  "imagegen_invoked": false,
+  "final_dds_produced": false,
+  "new_c2_c3_ingame_pass": false,
+  "runtime_validation": "UNTESTED"
+}
