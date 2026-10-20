@@ -19,6 +19,7 @@
 #include "lens_centre_source_provenance.hpp"
 #include "lens_centre_relative_eye_pose.hpp"
 #include "stage_extension_eye_plane.hpp"
+#include "f11_screen_2d.hpp"
 #include "hud_1080p_reference.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
@@ -2809,85 +2810,49 @@ namespace OutRunVRStereo
                 !state.viewport.Width || !state.viewport.Height)
                 return false;
 
-            float baseRaw[16]{};
-            if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))
-                return false;
-            std::memcpy(&state.baseProjection, baseRaw,
-                sizeof(state.baseProjection));
-            if (!MatrixFinite(state.baseProjection) ||
-                !OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
+            // F11 is an external 2D screen overlay, not a gameplay HUD at
+            // finite view-Z. The old R26 finite HeadInverse/IPD route placed
+            // ImGui twice at incompatible screen coordinates on Quest3.
+            // Build one shared tangent-space rectangle and remap it to each
+            // asymmetric XR FOV. No head pose, gameplay HUD scale, 3D marker
+            // projection or 640x480 native sprite transform participates.
+            if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
                 !state.stereo.poseSequence ||
                 (FrameStereoPoseSequence &&
                  FrameStereoPoseSequence != state.stereo.poseSequence))
                 return false;
 
-            float headRaw[16]{};
-            std::uint32_t headSequence = 0;
-            if (!OutRunVRRenderer::GetLatchedHeadInverse(
-                    headRaw, headSequence) ||
-                headSequence != state.stereo.poseSequence)
-                return false;
-            D3DMATRIX headInverse{};
-            std::memcpy(&headInverse, headRaw, sizeof(headInverse));
-            if (!MatrixFinite(headInverse))
-                return false;
-
-            const float centre[3]{
-                0.5f * (state.stereo.eyeOffset[0][0] +
-                        state.stereo.eyeOffset[1][0]),
-                0.5f * (state.stereo.eyeOffset[0][1] +
-                        state.stereo.eyeOffset[1][1]),
-                0.5f * (state.stereo.eyeOffset[0][2] +
-                        state.stereo.eyeOffset[1][2])
-            };
-            constexpr float noRotation[4]{0,0,0,1};
+            OutRunVRF11Screen2D::TangentBounds bounds[2]{};
             for (int eye = 0; eye < 2; ++eye)
             {
-                const float relative[3]{
-                    state.stereo.eyeOffset[eye][0] - centre[0],
-                    state.stereo.eyeOffset[eye][1] - centre[1],
-                    state.stereo.eyeOffset[eye][2] - centre[2]
+                const auto& fov = state.stereo.eyeFov[eye];
+                bounds[eye] = {
+                    std::tan(fov.angleLeft), std::tan(fov.angleRight),
+                    std::tan(fov.angleDown), std::tan(fov.angleUp)
                 };
-                const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(
-                    noRotation, relative,
-                    Settings::VRWorldScale * Settings::VRStereoDepth);
-                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
-                const D3DMATRIX eyeProjection = ProjectionFromFov(
-                    state.baseProjection, state.stereo.eyeFov[eye]);
-                state.hudViewProjection[eye] = MultiplyMatrix(
-                    MultiplyMatrix(headInverse, eyeInverse), eyeProjection);
-                if (!MatrixFinite(state.hudViewProjection[eye]))
-                    return false;
             }
-            // External F11: correct the source ImGui orthographic pixels into
-            // a finite stereo plane without the game's HUD size setting.
-            if (!R30BuildHudPlaneCoefficients(state, false))
+            OutRunVRF11Screen2D::EyeAffine f11Affine[2]{};
+            if (!OutRunVRF11Screen2D::Build(bounds, f11Affine))
                 return false;
 
-            // Compose the stock orthographic pixel->NDC projection with the
-            // existing finite, recentered R30 HUD plane. z=0.5*w keeps this
-            // depth-disabled ImGui draw within D3D9 clipping bounds.
+            // F11 per-eye FOV-only affine follows the game's original ortho pixels.
+            // z=0.5*w keeps this depth-disabled ImGui draw within D3D9 clipping bounds.
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX projected{};
                 for (int row = 0; row < 4; ++row)
                 {
-                    const float ndcX = stockProjection.m[row][0];
-                    const float ndcY = stockProjection.m[row][1];
                     const float w = stockProjection.m[row][3];
+                    // Original ImGui ortho maps source pixels to stock NDC.
+                    // Compose only the exact per-eye screen FOV affine.
                     projected.m[row][0] =
-                        ndcX * state.hudClipX[eye][0] +
-                        ndcY * state.hudClipX[eye][1] +
-                        w * state.hudClipX[eye][2];
+                        stockProjection.m[row][0] * f11Affine[eye].scaleX +
+                        w * f11Affine[eye].offsetX;
                     projected.m[row][1] =
-                        ndcX * state.hudClipY[eye][0] +
-                        ndcY * state.hudClipY[eye][1] +
-                        w * state.hudClipY[eye][2];
-                    projected.m[row][3] =
-                        ndcX * state.hudClipW[eye][0] +
-                        ndcY * state.hudClipW[eye][1] +
-                        w * state.hudClipW[eye][2];
-                    projected.m[row][2] = 0.5f * projected.m[row][3];
+                        stockProjection.m[row][1] * f11Affine[eye].scaleY +
+                        w * f11Affine[eye].offsetY;
+                    projected.m[row][2] = 0.5f * w;
+                    projected.m[row][3] = w;
                 }
                 if (!MatrixFinite(projected))
                     return false;
