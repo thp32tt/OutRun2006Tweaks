@@ -98,6 +98,33 @@ class BridgeTests(unittest.TestCase):
         result=bridge.scan_once(self.croot,self.trans,self.ig)
         self.assertEqual(result["total"],0)
 
+    def test_rebalance_preserves_completed_prefix_and_splits_only_pending_a(self):
+        base=self.ig/"text_roi_batches"
+        def row(ident,role):
+            return {"id":ident,"role":role,"status":"ROI_APPROVED_FOR_IMAGEGEN",
+                    "imagegen_input_png":ident+".png","source_key":"k-"+ident}
+        data={"schema":bridge.SCHEMA,"activation":bridge.ACTIVATION,
+              "items":[row("A1","A"),row("B1","B"),row("A2","A"),row("A3","A"),
+                       row("B2","B"),row("A4","A"),row("A5","A"),row("A6","A")]}
+        (base/"A_state.json").write_text(json.dumps({
+            "version":3,"role":"A","range":[1,99999],"next_ordinal":1,
+            "active":{"ordinals":[1,2],"next_ordinal_after":3,
+                      "items":[{"region_id":"A1"},{"region_id":"A2"}]},
+            "completed_files":0,"completed_batches":0
+        }),encoding="utf-8")
+        (base/"B_state.json").write_text(json.dumps({
+            "version":3,"role":"B","range":[1,99999],"next_ordinal":3,
+            "active":None,"completed_files":2,"completed_batches":1
+        }),encoding="utf-8")
+        summary=bridge.rebalance_existing_pending(data,self.ig)
+        self.assertEqual(summary["status"],"REBALANCED")
+        self.assertEqual(summary["protected_a"],2)
+        self.assertEqual(summary["moved"],2)
+        self.assertEqual([x["id"] for x in bridge._approved(data,"A")],["A1","A2","A3","A5"])
+        self.assertEqual([x["id"] for x in bridge._approved(data,"B")][:2],["B1","B2"])
+        self.assertEqual(len(bridge._approved(data,"B")),4)
+        self.assertEqual(bridge.rebalance_existing_pending(data,self.ig)["status"],"REBALANCED")
+
     def test_old_pilot_state_is_archived_once(self):
         base=self.ig/"text_roi_batches"
         (base/"A_state.json").write_text('{"old":true}\n',encoding="utf-8")
