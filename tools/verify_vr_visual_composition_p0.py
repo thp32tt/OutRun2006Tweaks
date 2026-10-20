@@ -1551,25 +1551,37 @@ for token in ['0xBEB98','0xBED83','0xBED9E','0xBEDAE']:
     require(token, ui, 'canonical NaviPub -> sub_4BAD20 SCREEN_HUD call site')
 require('RankMarkerSubScreenHudCall', ui, 'NaviPub exact sub_4BAD20 screen ownership predicate')
 require('RankMarkerSubSemanticDest', ui, 'sub_4BAD20 caller semantic wrapper')
+# A positively captured original car Calc3D2D anchor is more specific
+# than a broad NaviPub wrapper. The 2026-10-21 rank repair explicitly
+# preserved the world route for valid car-depth evidence, and only uses the
+# original screen HUD when that evidence is absent. The old guard inverted
+# this precedence and rejected the intentionally repaired active renderer.
 rank_sprani = function_body(ui, 'static int __cdecl RankMarker_sprani(')
 require_order(
-    rank_sprani, 'screen-owned sub_4BAD20 must outrank projected/world marker tagging',
+    rank_sprani, 'valid per-car anchor must survive NaviPub; missing anchor stays ScreenHud',
     'const auto projectedAnchor = RankMarkerProjectedInfo;',
-    'if (RankMarkerSubScreenHudDepth != 0)',
+    'if (RankMarkerSubScreenHudDepth != 0 &&',
+    '!projectedAnchor.valid)',
     'RenderScope::ScreenHud',
-    'const bool projected = projectedAnchor.valid'
+    'const bool projected = projectedAnchor.valid;'
 )
 rank_clip = function_body(ui, 'static int __cdecl RankMarker_putClipSprite(')
 require_order(
-    rank_clip, 'screen-owned 4th+ rank digits must outrank projected/world tagging',
+    rank_clip, 'valid per-car rank digits must survive NaviPub screen scope',
     'const auto projectedAnchor = RankMarkerProjectedInfo;',
-    'const bool screenHud = RankMarkerSubScreenHudDepth != 0;',
-    'const bool projected = !screenHud && projectedAnchor.valid;',
+    'const bool projected = projectedAnchor.valid;',
+    'const bool screenHud =',
+    'RankMarkerSubScreenHudDepth != 0 && !projected;',
     'RenderScope::ScreenHud',
     'RenderScope::ProjectedWorldMarker2D',
     'RenderScope::WorldBillboard',
     'TagAppendedNodes(tailsBefore, scope,'
 )
+for navipub in (False, True):
+    for anchored in (False, True):
+        screen_hud = navipub and not anchored
+        assert not (screen_hud and anchored), '3D car depth must not become screen HUD'
+        assert not screen_hud if anchored else (screen_hud == navipub)
 for label, body in (
     ('4th+ multi-digit car mark', rank_clip),
     ('menu/result clip', function_body(ui, 'static int ExactScreenHud_putClipSpriteOwned(')),
