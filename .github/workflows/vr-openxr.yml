@@ -29,6 +29,8 @@ on:
       - 'tools/dx11_autodev_policy.py'
       - 'tools/test_dx11_autodev_policy.py'
       - 'docs/automation/runs/CONVERSION-DX11-*.json'
+      # Revalidate native artifacts on exact SHA when backend CI changes.
+      - '.github/workflows/backend-conversion-gate.yml'
       - '.github/workflows/build.yml'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
       - '.github/workflows/vr-openxr.yml'
