@@ -340,6 +340,73 @@ def _retry_same_five(st, active, root, reason, observed=None):
     _atomic_json(state_path(root,active["role"]),st)
     return True,"FIVE_IMAGE_BATCH_RETRY_STAGED"
 
+def _local_export_confirmed(root, active):
+    """Require exact locally persisted generated PNG bytes before queue advance.
+
+    Library UI persistence is supplemental. Production may advance only when the
+    active task/role/count, expected output filenames, candidate bytes and SHA256
+    all match the export evidence created from the verified five-image turn.
+    """
+    root=Path(root).resolve()
+    task=active.get("task_id")
+    role=active.get("role")
+    expected=active.get("count")
+    items=active.get("items") or []
+    if role not in ("A","B") or not isinstance(task,str) or not isinstance(expected,int):
+        return None,"LOCAL_EXPORT_ACTIVE_BINDING_INVALID"
+    if len(items)!=expected:
+        return None,"LOCAL_EXPORT_ITEM_COUNT_INVALID"
+    ep=root/STATE_DIR/"export_evidence"/(task+".json")
+    if not ep.is_file() or ep.is_symlink():
+        return None,"LOCAL_EXPORT_EVIDENCE_MISSING"
+    try:
+        doc=json.loads(ep.read_text(encoding="utf-8"))
+    except Exception:
+        return None,"LOCAL_EXPORT_EVIDENCE_INVALID"
+    if (doc.get("task_id")!=task or doc.get("role")!=role or
+        doc.get("status")!="UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS"):
+        return None,"LOCAL_EXPORT_EVIDENCE_BINDING_MISMATCH"
+    rows=doc.get("files")
+    if not isinstance(rows,list) or len(rows)!=expected:
+        return None,"LOCAL_EXPORT_FILE_COUNT_INVALID"
+    by_name={r.get("name"):r for r in rows if isinstance(r,dict)}
+    names=[x.get("output_filename") for x in items]
+    if len(by_name)!=expected or set(by_name)!=set(names):
+        return None,"LOCAL_EXPORT_FILENAME_SET_MISMATCH"
+    outdir=root/STATE_DIR/"candidate_outputs"/role
+    hashes=[]
+    statuses=[]
+    for name in names:
+        row=by_name.get(name) or {}
+        sha=row.get("sha256")
+        p=outdir/name
+        if not isinstance(sha,str) or not re.fullmatch(r"[0-9a-f]{64}",sha):
+            return None,"LOCAL_EXPORT_SHA_INVALID"
+        if not p.is_file() or p.is_symlink():
+            return None,"LOCAL_EXPORT_FILE_MISSING"
+        actual=hashlib.sha256(p.read_bytes()).hexdigest()
+        if actual!=sha:
+            return None,"LOCAL_EXPORT_SHA_CHANGED"
+        hashes.append(sha)
+        statuses.append(row.get("status"))
+    if len(set(hashes))!=expected:
+        return None,"LOCAL_EXPORT_DUPLICATE_SHA"
+    return {
+        "task_id":task,"role":role,"count":expected,
+        "output_filenames":names,"sha256":hashes,
+        "candidate_statuses":statuses,
+        "verification_method":"local_candidate_file_sha256_recheck",
+        "library_status":"PENDING_NONBLOCKING",
+        "verified_at":_now().isoformat(),
+        "qa_status":"PENDING_C1",
+        "dds_status":"UNTESTED",
+    },None
+
+
+def _local_completion_path(root, task):
+    return Path(root)/STATE_DIR/"local_completion"/(task+".json")
+
+
 def _library_confirmed(root, active):
     """Read *content-hash-matched* existing project Library proof.
 
@@ -524,21 +591,6 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         except Exception:
             persisted_generated=False
 
-    if persisted_generated and not _library_evidence_path(root,task).is_file():
-        try:
-            created=dt.datetime.fromisoformat(str(active.get("created_at","")).replace("Z","+00:00"))
-            if created.tzinfo is None:
-                created=created.replace(tzinfo=dt.timezone.utc)
-            stale_age=_now()-created.astimezone(dt.timezone.utc)
-        except Exception:
-            stale_age=dt.timedelta(0)
-        if active.get("count")==5 and stale_age >= dt.timedelta(hours=2):
-            retried,msg=_retry_same_five(
-                st,active,root,"STALE_GENERATED_NOT_LIBRARY_VERIFIED",observed=5)
-            if retried:
-                return True,msg
-            return False,msg
-
     if not persisted_generated:
         if not active.get("source_chat_url"):
             return False, "CHAT_URL_NOT_RECORDED"
@@ -618,38 +670,28 @@ async def inspect_slot(role, page, root="/data/imagegen"):
                                "verification_method":result.get("verified_by"),
                                "status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
                                "export_status":export_status,"checked_at":_now().isoformat()})
-    verified, reason=_library_confirmed(root,active)
-    if not verified:
-        # Inspect ChatGPT's actual existing project Library (no extra folder).
-        # The verifier opens a disposable read-only tab and matches every PNG
-        # by full SHA256 to this batch's five generated image carousel blobs.
-        try:
-            from app.project_library_gate import verify_project_library_images
-        except ModuleNotFoundError:
-            from project_library_gate import verify_project_library_images
-        proof, error = await verify_project_library_images(page,active,root=root)
-        if error or not proof:
-            liberr=str(error or "NO_PROOF")
-            if (active.get("count")==5 and
-                liberr.startswith("PROJECT_LIBRARY_HASH_MATCH_INCOMPLETE:0/5:") and
-                generated_evidence.is_file()):
-                retried,msg=_retry_same_five(
-                    st,active,root,"PROJECT_LIBRARY_ZERO_OF_FIVE",observed=5)
-                if retried:
-                    return True,msg
-                return False,msg
-            return False,"PROJECT_LIBRARY_NOT_VERIFIED:"+liberr
-        _atomic_json(_library_evidence_path(root,task),proof)
-        verified,reason=_library_confirmed(root,active)
-        if not verified:
-            return False,reason
+    # Production advancement is bound to the actual generated bytes persisted
+    # on N100. Project Library is useful supplemental evidence but its UI is not
+    # a durable queue transport and must not stall later A/B/C1 schedule slots.
+    local_proof,local_error=_local_export_confirmed(root,active)
+    if local_error or not local_proof:
+        return False,"LOCAL_EXPORT_NOT_VERIFIED:"+str(local_error or "NO_PROOF")
+    completion=_local_completion_path(root,task)
+    completion.parent.mkdir(parents=True,exist_ok=True)
+    _atomic_json(completion,local_proof)
+
+    # Preserve any already-existing positive Library evidence, but do not probe
+    # or block on Library here. A separate audit can fill Library evidence later.
+    library_verified,library_reason=_library_confirmed(root,active)
     st["next_ordinal"]=active["next_ordinal_after"]
     st["completed_files"]+=active["count"]
     st["completed_batches"]+=1
     st["active"]=None
-    st["status"]="BATCH_COMPLETE_LIBRARY_VERIFIED"
+    st["status"]="BATCH_COMPLETE_LOCAL_SHA_VERIFIED"
+    st["last_library_status"]=(library_reason if library_verified
+                               else "PENDING_NONBLOCKING")
     _atomic_json(state_path(root,role),st)
-    return True, "BATCH_COMPLETE_LIBRARY_VERIFIED"
+    return True, "BATCH_COMPLETE_LOCAL_SHA_VERIFIED"
 
 def expected_counts(root):
     """Inspection summary, never count raw/hash-only files as translated."""
