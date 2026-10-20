@@ -21,8 +21,9 @@ SOURCE = ''.join(p.read_text() for p in sorted((ROOT / 'src-vr-v2').glob('contro
 def functions():
     tree = ast.parse(SOURCE)
     tree.body = [ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0)] + [
-        x for x in tree.body if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)) and (x.name.startswith(('vr_', 'github_feature_', 'conversion_')) or x.name in {'refresh_wait_actions_task_binding', '_parse_iso'})]
-    ns = dict(re=re, json=json, datetime=datetime, TZ=timezone.utc, base64=base64, urllib=urllib)
+        x for x in tree.body if isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)) and (x.name.startswith(('vr_', 'github_feature_', 'conversion_')) or x.name in {'refresh_wait_actions_task_binding', '_parse_iso', 'finalize_dx9ex_review_only_result'})]
+    ns = dict(re=re, json=json, datetime=datetime, TZ=timezone.utc, base64=base64, urllib=urllib,
+              DX9EX_REVIEW_ONLY=False)
     exec(compile(ast.fix_missing_locations(tree), '<controller>', 'exec'), ns)
     return ns
 
