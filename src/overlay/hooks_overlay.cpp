@@ -466,7 +466,14 @@ class D3DHooks : public Hook
 			// Quantised quarter-steps prevent continuous atlas churn when the
 			// OpenXR host updates aspect hints or the window is reset/resized.
 			// Reset and menu/desktop transitions return to the original atlas.
-			if (Overlay::VrFontMultiplier != vrFontMultiplier)
+			// Quest3 2026-10-21 HMD: F11 in gameplay was 2.75x and
+            // covered every option. XR eye density should not enlarge the
+            // virtual screen-space window to the entire source viewport.
+            // Keep the native menu/desktop untouched and keep the existing
+            // FOV-only binocular overlay (which now appears as one image).
+            if (f11VisibleThisFrame && vrGameplay)
+                vrFontMultiplier = std::clamp(vrFontMultiplier, 1.0f, 1.25f);
+            if (Overlay::VrFontMultiplier != vrFontMultiplier)
 			{
 				Overlay::VrFontMultiplier = vrFontMultiplier;
 				Overlay::FontsDirty = true;
