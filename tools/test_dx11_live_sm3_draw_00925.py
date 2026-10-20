@@ -292,10 +292,15 @@ for token in (
     "case D3DSIO_M4x3:", "case D3DSIO_M3x4:", "case D3DSIO_M3x2:",
     "op.matrixRowCount != 0u", "op.matrixVectorComponents == 4u ? 15u : 7u",
     "op.matrixRowCount, static_cast<unsigned>(i)",
-    "reg + op.matrixRowCount > constantLimit",
     "(tempWritten[reg] & required) != required",
 ):
     check(token in backend, "SM3 partial-register source/negative path missing: " + token)
+# Matrix address arithmetic now uses subtraction after a base bound check,
+# avoiding unsigned base+rows wrap and checking relative row coverage.
+check("reg >= constantLimit ||" in backend and
+      "op.matrixRowCount > constantLimit - reg" in backend and
+      "native_sm3_relative_matrix_references(" in backend,
+      "SM3 matrix relative source range/fail-closed admission absent")
 # Game-created matrix operands must translate into native row-dot GPU
 # shaders; unsupported destination lanes and unwritten TEMP xyz/w must
 # still reject rather than borrow D3D9's undefined data.
