@@ -36,15 +36,17 @@
   "lanes": {
     "A": {
       "mode": "verified_native_roi_chatgpt_imagegen_production_and_self_qa",
-      "primary_index_parity": "odd",
+      "primary_index_parity": "odd_initial_assignment_only",
       "independent_qa_owner": "C1",
-      "runtime_status": "ACTIVE_CONTROLLED_AUTOSEND"
+      "runtime_status": "ACTIVE_CONTROLLED_AUTOSEND",
+      "pending_work_rebalance": "eligible_after_current_inflight_prefix_is_preserved"
     },
     "B": {
       "mode": "verified_native_roi_chatgpt_imagegen_production_and_self_qa",
-      "primary_index_parity": "even",
+      "primary_index_parity": "even_initial_assignment_only",
       "independent_qa_owner": "C1",
-      "runtime_status": "ACTIVE_CONTROLLED_AUTOSEND"
+      "runtime_status": "ACTIVE_CONTROLLED_AUTOSEND",
+      "pending_work_rebalance": "append_rebalanced_A_pending_and_new_salvage_when_less_loaded"
     },
     "C1": {
       "mode": "batch_independent_lightweight_qa_only",
@@ -91,7 +93,14 @@
       "runtime_status": "IN_CONTAINER_BACKGROUND_WORKER_REDEPLOY_PENDING",
       "output_status": "CROP_TEST_ONLY_REVIEW_REQUIRED",
       "RUNTIME_VALIDATION": "UNTESTED",
-      "deployment": "ALREADY_RUNNING_AS_SEPARATE_N100_COMPOSE_NO_ADDITIONAL_DEPLOY"
+      "deployment": "ALREADY_RUNNING_AS_SEPARATE_N100_COMPOSE_NO_ADDITIONAL_DEPLOY",
+      "edge_warning_second_pass": {
+        "enabled": true,
+        "source": "ALPHA_TOUCHES_CROP_BORDER_REVIEW",
+        "method": "SHA_REVERIFY_AND_DETERMINISTIC_SAFE_MARGIN_EXPANSION",
+        "admit_only_when_expanded_margin_check_passes": true,
+        "original_warning_crop_immutable": true
+      }
     }
   },
   "legacy_C2": {
@@ -114,9 +123,13 @@
   "controller_mode": "A_B_IMAGEGEN_ACTIVE_C1_QA_ACTIVE_C_NATIVE_CROP_BACKGROUND",
   "source_refresh": "Always read latest HEAD/contract/HD policy/queue and verify remote HEAD",
   "work_steal": {
-    "enabled": false
+    "enabled": true,
+    "policy": "PENDING_A_TO_B_HALF_SPLIT_V1_20261020",
+    "preserve_completed_and_inflight_prefixes": true,
+    "append_only_to_B": true,
+    "new_salvage_assignment": "least_pending_lane"
   },
-  "policy_version": "native-roi-imagegen-auto-v4-20261019",
+  "policy_version": "native-roi-imagegen-auto-v5-20261020-balanced-edge-review",
   "deployment": {
     "mode": "PORTAINER_GIT_MANUAL_REDEPLOY",
     "auto_deploy": false,
