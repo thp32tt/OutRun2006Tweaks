@@ -98,8 +98,8 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
             }
             $rendererBuildVariant = (Get-Content -LiteralPath $pcFastVariantFile -Raw).Trim()
             $pcFastMarker = Join-Path $root 'PC_FAST_BUILD.txt'
-            if ([string]$buildInputs.VariantId -ne 'ACTIVE_FULL_R34' -or
-                [string]$buildInputs.BuildContract -ne 'R51-PC-FAST-v2-R26HUD-ON' -or
+            if ([string]$buildInputs.VariantId -ne 'ACTIVE_R26_R43_R44' -or
+                [string]$buildInputs.BuildContract -ne 'R26HUD-PC-FAST-v3-EXACT-SHA' -or
                 [string]$buildInputs.BuildMode -notin @('INCREMENTAL','CLEAN') -or
                 !(Test-Path -LiteralPath $pcFastMarker) -or
                 (Get-Content $pcFastMarker -Raw).Trim() -ne
@@ -112,7 +112,7 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
         }
     }
     $expectedVariant = if ($isPcFastPackage) {
-        'ACTIVE_FULL_R34'
+        'ACTIVE_R26_R43_R44'
     } elseif ($variant -eq 'R84_TEST') {
         'R84_SPLIT_R33_R32_R31_R30_R29'
     } else {
@@ -135,6 +135,431 @@ if ($Backend -eq 'd3d9' -and $enforceReleaseIdentity) {
         }
         if ($rendererCmakeFlags -notmatch 'OUTRUN_VR_SAFE_DRAW_COMPARE=OFF') {
             $contractFailures += 'SAFE DRAW flag mismatch'
+        }
+        $expectedDllHash = [string]$buildInputs.GameDllSha256
+        $dllHashFile = Join-Path $src 'GAME_DLL_SHA256.txt'
+        if ($expectedDllHash -notmatch '^[a-fA-F0-9]{64}
+            throw ("DX9Ex PC Fast compiled renderer contract mismatch: " +
+                ($contractFailures -join '; '))
+        }
+    } elseif ($rendererBuildVariant -ne $expectedVariant -or
+        ($variant -eq 'R84_TEST' -and
+         $rendererCmakeFlags -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') -or
+        ($variant -ne 'R84_TEST' -and
+         $rendererCmakeFlags -notmatch 'OUTRUN_VR_R26_HUD_COMPARE=ON')) {
+        throw "DX9Ex selected renderer build variant mismatch: $variant."
+    }
+    foreach ($name in @('dinput8.dll','outrun-vr-host.exe')) {
+        if (!(Test-Path (Join-Path $src $name))) { throw "DX9Ex missing $name" }
+    }
+    if ((Get-FileHash (Join-Path $src 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
+        (Get-FileHash (Join-Path $backendPayload 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
+        throw 'DX9Ex selected host is not the matching exact-SHA host.'
+    }
+}
+
+function Get-PeMachine([string]$Path) {
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -lt 256) { throw "PE file is too small: $Path" }
+    if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw "Missing MZ header: $Path" }
+    $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+    if ($peOffset -lt 0 -or $peOffset + 6 -gt $bytes.Length) { throw "Invalid PE header offset: $Path" }
+    if ($bytes[$peOffset] -ne 0x50 -or $bytes[$peOffset + 1] -ne 0x45 -or
+        $bytes[$peOffset + 2] -ne 0 -or $bytes[$peOffset + 3] -ne 0) {
+        throw "Missing PE signature: $Path"
+    }
+    return [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+}
+
+function Assert-X86Pe([string]$Path,[string]$Label) {
+    if (-not (Test-Path $Path)) { throw "$Label missing: $Path" }
+    $machine = Get-PeMachine $Path
+    if ($machine -ne 0x014C) {
+        throw ("$Label must be x86 PE32 for OR2006C2C.EXE; machine=0x{0:X4}: {1}" -f $machine,$Path)
+    }
+}
+
+function Get-Sha256Lower([string]$Path) {
+    return (Get-FileHash $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+
+$backendProvider = switch ($Backend) {
+    "2d"        { "D3D9_NATIVE_2D" }
+    "d3d9"      { "D3D9EX_NATIVE" }
+    "dxvk-safe" { "DXVK_X86_SAFE" }
+    "dxvk"      { "DXVK_X86_MULTIVIEW" }
+    "dx12"      { "D3D9ON12_OS" }
+}
+$dxvkD3D9Source = $null
+$dxvkD3D9Sha256 = ""
+$multiviewPatcherSource = $null
+$multiviewPatcherSha256 = ""
+
+if ($Backend -eq "dxvk-safe") {
+    $dxvkD3D9Source = Join-Path (Join-Path $backendRoot "dxvk") "d3d9.dll"
+    Assert-X86Pe $dxvkD3D9Source "DXVK d3d9.dll"
+    $dxvkD3D9Sha256 = Get-Sha256Lower $dxvkD3D9Source
+} elseif ($Backend -eq "dxvk") {
+    $dxvkD3D9Source = Join-Path $src "d3d9.dll"
+    $multiviewPatcherSource = Join-Path $src "multiviewpatcher.dll"
+    Assert-X86Pe $dxvkD3D9Source "DXVK d3d9.dll"
+    Assert-X86Pe $multiviewPatcherSource "DXVK multiviewpatcher.dll"
+    $dxvkD3D9Sha256 = Get-Sha256Lower $dxvkD3D9Source
+    $multiviewPatcherSha256 = Get-Sha256Lower $multiviewPatcherSource
+}
+
+$logPatterns=@(
+    'OutRun2006Tweaks*.log',
+    'OutRun2006Tweaks-hudtrace*.csv',
+    'OutRun2006Tweaks-xstmap*.csv',
+    'outrun-vr-host*.log',
+    'outrun-vr-host-pipeline*.log',
+    'outrun-vr-watchdog*.log',
+    'backend*.log',
+    'OR2006C2C_d3d9.log',
+    'OR2006C2C_dxgi.log',
+    'OR2006C2C_d3d11.log',
+    'OR2006C2C_vkd3d*.log',
+    'dxvk*.log',
+    'vkd3d*.log',
+    'crash.log',
+    'OR2006C2C.EXE.*.zip',
+    '*.dmp'
+)
+
+function Get-SessionFiles {
+    $seen=@{}
+    $files=@()
+    foreach($pattern in $logPatterns){
+        foreach($file in Get-ChildItem $root -Filter $pattern -File -ErrorAction SilentlyContinue){
+            if($seen.ContainsKey($file.FullName)){continue}
+            $seen[$file.FullName]=$true
+            $files+=$file
+        }
+    }
+    return $files
+}
+
+function Seal-PendingSessionLogs {
+    $files=Get-SessionFiles
+    if(-not $files -or $files.Count -eq 0){return}
+
+    $current=Join-Path $root 'CURRENT_VR_SESSION.json'
+    $dest=$null
+    $oldState=$null
+    if(Test-Path $current){
+        try{$oldState=Get-Content $current -Raw|ConvertFrom-Json}catch{$oldState=$null}
+    }
+
+    if($oldState -and $oldState.SessionId -and $oldState.BuildMatrixId -and $oldState.VariantId){
+        $oldProfile=if($oldState.TestProfile){[string]$oldState.TestProfile}else{'CORRECTNESS'}
+        $dest=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $oldState.BuildMatrixId,$oldState.VariantId,$oldProfile,$oldState.SessionId)
+    }else{
+        $stamp=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
+        $dest=Join-Path $root ("logs/_orphaned/{0}" -f $stamp)
+    }
+    New-Item -ItemType Directory -Force $dest|Out-Null
+
+    $moved=@()
+    foreach($file in $files){
+        $target=Join-Path $dest $file.Name
+        if(Test-Path $target){
+            $prefix=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffZ')
+            $target=Join-Path $dest ($prefix+'_'+$file.Name)
+        }
+        Move-Item $file.FullName $target -Force
+        $moved+=[IO.Path]::GetFileName($target)
+    }
+    @(
+        "AUTO_ARCHIVED_UTC=$((Get-Date).ToUniversalTime().ToString('o'))"
+        "REASON=backend-selection-started-new-session"
+        "FILES=$($moved -join ',')"
+    )|Set-Content (Join-Path $dest 'AUTO_ARCHIVED_ON_NEXT_SESSION.txt') -Encoding UTF8
+}
+
+function Copy-Required([string]$name) {
+    $p = Join-Path $src $name
+    if (-not (Test-Path $p)) { throw "Required backend file missing: $p" }
+    $installed = Join-Path $root $name
+    if ($name -notin @('dinput8.dll','outrun-vr-host.exe')) {
+        Copy-Item -LiteralPath $p -Destination $installed -Force
+        return
+    }
+    # Stage on the SAME volume and verify the complete file before replacing
+    # the runnable x86 DLL or x64 host. The old executable survives a failed
+    # write/hash check, and the game/host running guard is enforced above.
+    $staged = Join-Path $root (".$name.stage.$PID.$([guid]::NewGuid().ToString('N'))")
+    # Windows File.Replace requires a nonempty backup pathname. Preserve the
+    # prior complete DLL/host until the newly installed hash has been checked.
+    $backup = Join-Path $root (".$name.rollback.$PID.$([guid]::NewGuid().ToString('N'))")
+    $verifiedInstall = $false
+    try {
+        Copy-Item -LiteralPath $p -Destination $staged -Force
+        if ((Get-Sha256Lower $p) -ne (Get-Sha256Lower $staged)) {
+            throw "Staged $name hash mismatch; existing installation preserved."
+        }
+        if (Test-Path -LiteralPath $installed) {
+            [System.IO.File]::Replace($staged, $installed, $backup, $true)
+        } else {
+            [System.IO.File]::Move($staged, $installed)
+        }
+        if ((Get-Sha256Lower $p) -ne (Get-Sha256Lower $installed)) {
+            # A complete prior executable is kept in the backup and can be
+            # restored on disk without exposing a partially copied DLL.
+            if (Test-Path -LiteralPath $backup) {
+                [System.IO.File]::Replace(
+                    $backup, $installed, ($backup + '.rejected'), $true)
+            }
+            throw "Installed $name hash mismatch; previous executable restored if present."
+        }
+        $verifiedInstall = $true
+    } finally {
+        if (Test-Path -LiteralPath $staged) {
+            Remove-Item -LiteralPath $staged -Force
+        }
+        if ($verifiedInstall -and (Test-Path -LiteralPath $backup)) {
+            Remove-Item -LiteralPath $backup -Force
+        }
+    }
+}
+
+function Remove-RootVerified([string]$name) {
+    $p = Join-Path $root $name
+    if (Test-Path $p) {
+        Remove-Item $p -Force
+        if (Test-Path $p) { throw "Could not remove $name. Close OutRun/VR host and retry." }
+    }
+}
+
+function Repair-IniSectionHeaders([string]$text) {
+    $text = $text -replace '(?m)^\[VR\]\\\s*$', '[VR]'
+    $text = $text -replace '(?m)^\\\s*$\r?\n?', ''
+    return $text
+}
+
+function Set-IniSectionValue([string]$text,[string]$section,[string]$key,[string]$value) {
+    $escapedSection = [regex]::Escape($section)
+    $escapedKey = [regex]::Escape($key)
+    $sectionPattern = "(?ms)(^\[$escapedSection\]\s*\r?\n)(.*?)(?=^\[|\z)"
+    $m = [regex]::Match($text,$sectionPattern)
+    $nl = [Environment]::NewLine
+    if (-not $m.Success) {
+        if ($text.Length -gt 0 -and -not $text.EndsWith($nl)) { $text += $nl }
+        return $text + "[$section]" + $nl + "$key = $value" + $nl
+    }
+
+    $body = $m.Groups[2].Value
+    $keyPattern = "(?m)^$escapedKey\s*=.*$"
+    if ([regex]::IsMatch($body,$keyPattern)) {
+        $body = [regex]::Replace($body,$keyPattern,"$key = $value",1)
+    } else {
+        $body = "$key = $value" + $nl + $body
+    }
+    return $text.Substring(0,$m.Groups[2].Index) + $body +
+        $text.Substring($m.Groups[2].Index + $m.Groups[2].Length)
+}
+
+$running = Get-Process -ErrorAction SilentlyContinue | Where-Object {
+    $_.ProcessName -ieq "OR2006C2C" -or $_.ProcessName -ieq "outrun-vr-host"
+}
+if ($running) { throw "OutRun or outrun-vr-host.exe is still running. Close it before switching." }
+
+# Preserve any uncollected logs before touching the backend or starting a new
+# session. This makes game-side truncate/overwrite behavior harmless.
+Seal-PendingSessionLogs
+
+Copy-Required "dinput8.dll"
+# SOURCE_SHA.txt describes the selected payload, not the DLL that Windows
+# actually loads. A stale root dinput8.dll must never pass silently.
+$selectedGameDll = Join-Path $src "dinput8.dll"
+$rootGameDll = Join-Path $root "dinput8.dll"
+Assert-X86Pe $selectedGameDll "Selected game dinput8.dll"
+Assert-X86Pe $rootGameDll "Installed game dinput8.dll"
+$selectedGameDllSha256 = Get-Sha256Lower $selectedGameDll
+$installedGameDllSha256 = Get-Sha256Lower $rootGameDll
+if ($installedGameDllSha256 -ne $selectedGameDllSha256) {
+    throw "Game DLL identity mismatch after selection: expected $selectedGameDllSha256, installed $installedGameDllSha256"
+}
+
+if ($Backend -eq "2d") {
+    Remove-RootVerified "d3d9.dll"
+    Remove-RootVerified "multiviewpatcher.dll"
+    Remove-RootVerified "outrun-vr-host.exe"
+} else {
+    Copy-Required "outrun-vr-host.exe"
+    if ($Backend -eq "dxvk") {
+        Copy-Required "d3d9.dll"
+        Copy-Required "multiviewpatcher.dll"
+    } elseif ($Backend -eq "dxvk-safe") {
+        Copy-Item $dxvkD3D9Source (Join-Path $root "d3d9.dll") -Force
+        Remove-RootVerified "multiviewpatcher.dll"
+    } else {
+        Remove-RootVerified "d3d9.dll"
+        Remove-RootVerified "multiviewpatcher.dll"
+        if (Test-Path (Join-Path $root "d3d9.dll")) {
+            throw "Local d3d9.dll is still present; refusing $Backend mode."
+        }
+    }
+}
+
+if ($dxvkD3D9Sha256) {
+    $installedDxvk = Join-Path $root "d3d9.dll"
+    if (-not (Test-Path $installedDxvk)) { throw "DXVK installation verification failed: d3d9.dll missing" }
+    $installedDxvkHash = Get-Sha256Lower $installedDxvk
+    if ($installedDxvkHash -ne $dxvkD3D9Sha256) {
+        throw "DXVK installation verification failed: d3d9.dll SHA256 mismatch"
+    }
+}
+if ($multiviewPatcherSha256) {
+    $installedPatcher = Join-Path $root "multiviewpatcher.dll"
+    if (-not (Test-Path $installedPatcher)) { throw "DXVK multiview verification failed: multiviewpatcher.dll missing" }
+    $installedPatcherHash = Get-Sha256Lower $installedPatcher
+    if ($installedPatcherHash -ne $multiviewPatcherSha256) {
+        throw "DXVK multiview verification failed: multiviewpatcher.dll SHA256 mismatch"
+    }
+}
+
+$ini = Join-Path $root "OutRun2006Tweaks.ini"
+if (Test-Path $ini) {
+    $text = Get-Content $ini -Raw
+    $text = Repair-IniSectionHeaders $text
+
+    if ($Backend -eq "2d") {
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "false"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "false"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "false"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+    } elseif ($Backend -eq "dxvk-safe") {
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+        $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
+    } elseif ($Backend -eq "d3d9") {
+        # DX9Ex focus branch: D3D9 is the reference backend. DirectGPU remains optional
+        # so SBS/Desktop Duplication can still fail open while Ex promotion is tested.
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+    } else {
+        $value = switch ($Backend) {
+            "dxvk" { "2" }
+            "dx12" { "3" }
+        }
+        $text = Set-IniSectionValue $text "VR" "RenderBackend" $value
+        $text = Set-IniSectionValue $text "VR" "Enabled" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
+        $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
+        $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
+        if ($Backend -eq "dxvk") {
+            $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
+        }
+    }
+
+    # Keep the experimental cockpit camera completely isolated from normal
+    # A/B/HUD/performance/backend sessions. It is enabled only by G_COCKPIT.
+    $driverSeatValue = if ($variant -eq "G_COCKPIT") { "true" } else { "false" }
+    $text = Set-IniSectionValue $text "VR" "DriverSeatView" $driverSeatValue
+
+    Set-Content $ini $text -Encoding UTF8
+}
+
+$nl = [Environment]::NewLine
+$matrixFile = Join-Path $root "BUILD_MATRIX_ID.txt"
+$matrix = if (Test-Path $matrixFile) { (Get-Content $matrixFile -Raw).Trim() } else { "UNIFIED_LOCAL" }
+$startedUtc = (Get-Date).ToUniversalTime()
+$session = $startedUtc.ToString("yyyyMMddTHHmmssfffZ") + "-" + [guid]::NewGuid().ToString("N").Substring(0,8)
+$sessionRoot = Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $matrix,$variant,$TestProfile,$session)
+New-Item -ItemType Directory -Force $sessionRoot | Out-Null
+
+$activeText = @(
+    "backend=$Backend"
+    "variant=$variant"
+    "profile=$TestProfile"
+    "sourceSha=$sourceSha"
+    "rendererBuildVariant=$rendererBuildVariant"
+    "rendererCmakeFlags=$rendererCmakeFlags"
+    "gameDllSha256=$installedGameDllSha256"
+    "selectedGameDllSha256=$selectedGameDllSha256"
+    "provider=$backendProvider"
+    "dxvkD3D9Sha256=$dxvkD3D9Sha256"
+    "multiviewPatcherSha256=$multiviewPatcherSha256"
+    "matrix=$matrix"
+    "session=$session"
+    "startedUtc=$($startedUtc.ToString('o'))"
+    "selected=$((Get-Date).ToString('o'))"
+) -join $nl
+Set-Content (Join-Path $root "ACTIVE_VR_BACKEND.txt") $activeText -Encoding ascii
+
+$configHash = "missing"
+if (Test-Path $ini) { $configHash = (Get-FileHash $ini -Algorithm SHA256).Hash.ToLowerInvariant() }
+$sessionManifest = [ordered]@{
+    SchemaVersion = 4
+    BuildMatrixId = $matrix
+    VariantId = $variant
+    Backend = $Backend
+    BackendProvider = $backendProvider
+    DxvkD3D9Sha256 = $dxvkD3D9Sha256
+    MultiviewPatcherSha256 = $multiviewPatcherSha256
+    TestProfile = $TestProfile
+    SourceSha = $sourceSha
+    RendererBuildVariant = $rendererBuildVariant
+    RendererCmakeFlags = $rendererCmakeFlags
+    SelectedGameDllSha256 = $selectedGameDllSha256
+    InstalledGameDllSha256 = $installedGameDllSha256
+    SessionId = $session
+    StartedUtc = $startedUtc.ToString("o")
+    ConfigSha256 = $configHash
+    CollectionStatus = "started-before-game-launch"
+    PreexistingLogs = @()
+}
+$sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $root "CURRENT_VR_SESSION.json") -Encoding UTF8
+$sessionManifest | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $sessionRoot "session_manifest.json") -Encoding UTF8
+
+if (Test-Path $ini) {
+    $allowed = '^(Enabled|AutoLaunchHost|AutoEnableWhenHostPresent|RenderBackend|PreferD3D9Ex|DirectGpuOnly|DisableDesktopDuplication|SkyGlowFactor|DriverSeatView)\s*='
+    Get-Content $ini | Where-Object { $_ -match $allowed } |
+        Set-Content (Join-Path $sessionRoot "VR_CONFIG_SNAPSHOT.txt") -Encoding UTF8
+}
+Copy-Item (Join-Path $root "ACTIVE_VR_BACKEND.txt") $sessionRoot -Force
+if (Test-Path (Join-Path $root "BUILD_INPUTS.json")) {
+    Copy-Item (Join-Path $root "BUILD_INPUTS.json") $sessionRoot -Force
+}
+
+Write-Host "OutRun renderer mode activated: $Backend"
+Write-Host "Test variant: $variant"
+Write-Host "Test profile: $TestProfile"
+Write-Host "Source SHA: $sourceSha"
+Write-Host "Compiled renderer: $rendererBuildVariant"
+Write-Host "Backend provider: $backendProvider"
+if ($dxvkD3D9Sha256) { Write-Host "DXVK d3d9.dll SHA256: $dxvkD3D9Sha256" }
+if ($multiviewPatcherSha256) { Write-Host "Multiview patcher SHA256: $multiviewPatcherSha256" }
+Write-Host "Diagnostic session prepared before launch: $session"
+Write-Host "Any previous root logs were archived before this session was created."
+switch ($Backend) {
+    "2d"   { Write-Host "2D ORIGINAL: classic D3D9, VR disabled, D3D9Ex promotion disabled, no VR host." }
+    "d3d9" { Write-Host "D3D9Ex REFERENCE: PreferD3D9Ex enabled; DirectGPU optional; profile=$TestProfile." }
+    "dxvk-safe" { Write-Host "DXVK SAFE: classic D3D9 calls translated by DXVK; validated two-pass VR, multiview patcher disabled." }
+    "dxvk" { Write-Host "DXVK MULTIVIEW: local d3d9.dll + multiviewpatcher.dll active." }
+    "dx12" { Write-Host "DX12 STRICT: local d3d9.dll verified absent; Windows D3D9On12 required." }
+} -or !(Test-Path $dllHashFile) -or
+            $expectedDllHash -ne (Get-Content $dllHashFile -Raw).Trim() -or
+            $expectedDllHash -ne (Get-FileHash (Join-Path $src 'dinput8.dll') -Algorithm SHA256).Hash.ToLowerInvariant()) {
+            $contractFailures += 'PC Fast game DLL SHA256 mismatch'
+        }
+        if ([string]$buildInputs.RendererSourceOwner -ne 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp') {
+            $contractFailures += 'PC Fast compiled R26+HUD owner not declared'
         }
         if ($contractFailures.Count -gt 0) {
             throw ("DX9Ex PC Fast compiled renderer contract mismatch: " +
