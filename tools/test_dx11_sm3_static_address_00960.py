@@ -4,6 +4,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 source = (root / "src/vr/d3d11/native_backend.cpp").read_text()
 helper = (root / "src/vr/d3d11/native_sm3_address_codegen.hpp").read_text()
+backend_header = (root / "src/vr/d3d11/native_backend.hpp").read_text()
 bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 assert "D3DSIO_MOVA" in source and "D3DSPR_ADDR" in source
 assert "defBits[srcReg][srcSwizzle & 3u]" in source
@@ -15,5 +16,5 @@ assert "native_sm3_const_reference(" in source
 assert "native_sm3_live_loop_indexed_bounds_valid(" in bridge
 assert "stageLimit - base" in helper
 assert "std::isfinite(value)" in helper
-assert "NativeDrawPathActive" in bridge
+assert "NativeDrawPathActive" in backend_header
 print("SM3 constant DEF MOVA a0 indexed game shader integration: source guards present; gameplay UNTESTED")
