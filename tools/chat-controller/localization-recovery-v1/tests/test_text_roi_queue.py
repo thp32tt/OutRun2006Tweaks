@@ -192,15 +192,15 @@ class TextRoiQueueTests(unittest.TestCase):
         self.assertEqual(retry["expected_images"],5)
         self.assertEqual([x["ordinal"] for x in retry["tiles"]],[1,2,3,4,5])
 
-    def test_zero_of_five_library_match_quarantines_exports_and_retries_same_ordinals(self):
+    def test_verified_local_five_advances_without_library_ui(self):
         items=[]
         for i in range(5):
-            name=f"Q205_Library_{i}.png"
+            name=f"Q205_Local_{i}.png"
             path=self.image_path.with_name(name)
             Image.new("RGBA",(96+i,36),(0,0,0,0)).save(path)
             items.append({
                 **self.item,
-                "id":f"Q205_Library_{i}",
+                "id":f"Q205_Local_{i}",
                 "role":"A",
                 "queue_index":"205",
                 "imagegen_input_png":name,
@@ -211,14 +211,14 @@ class TextRoiQueueTests(unittest.TestCase):
         self.write_manifest(items)
         binding,error=text_roi_queue.next_binding("A",self.root)
         self.assertIsNone(error)
-        old_task=binding["task_id"]
-        text_roi_queue.stage_submission("A",old_task,self.root)
-        target="https://chatgpt.com/c/library-zero-five"
-        text_roi_queue.record_chat_url("A",old_task,target,self.root)
+        task=binding["task_id"]
+        text_roi_queue.stage_submission("A",task,self.root)
+        target="https://chatgpt.com/c/local-five"
+        text_roi_queue.record_chat_url("A",task,target,self.root)
         sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
-        (sent/f"A_{old_task}.json").write_text(json.dumps({
+        (sent/f"A_{task}.json").write_text(json.dumps({
             "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
-            "task_id":old_task,"role":"A",
+            "task_id":task,"role":"A",
             "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
         }),encoding="utf-8")
 
@@ -229,16 +229,17 @@ class TextRoiQueueTests(unittest.TestCase):
             binary=(b"candidate-"+item["filename"].encode())*20
             name=item["output_filename"]
             (outdir/name).write_bytes(binary)
-            files.append({"name":name,"sha256":hashlib.sha256(binary).hexdigest()})
+            files.append({"name":name,"sha256":hashlib.sha256(binary).hexdigest(),
+                          "status":"REWORK_DIMENSIONS"})
         ev=self.root/"text_roi_batches/export_evidence"; ev.mkdir(parents=True)
-        (ev/f"{old_task}.json").write_text(json.dumps({
-            "task_id":old_task,"role":"A",
+        (ev/f"{task}.json").write_text(json.dumps({
+            "task_id":task,"role":"A",
             "status":"UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS",
             "files":files
         }),encoding="utf-8")
         gv=self.root/"text_roi_batches/generated_visible"; gv.mkdir(parents=True)
-        (gv/f"{old_task}.json").write_text(json.dumps({
-            "task_id":old_task,"role":"A","distinct_generated_images":5,
+        (gv/f"{task}.json").write_text(json.dumps({
+            "task_id":task,"role":"A","distinct_generated_images":5,
             "verification_method":"TEST","status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
             "export_status":"EXISTING_CANDIDATES_VERIFIED"
         }),encoding="utf-8")
@@ -246,38 +247,32 @@ class TextRoiQueueTests(unittest.TestCase):
         class Page:
             url=target
             async def evaluate(self,*args,**kwargs):
-                raise AssertionError("persisted evidence should skip source DOM")
-        async def fake_verify(*args,**kwargs):
-            return None,"PROJECT_LIBRARY_HASH_MATCH_INCOMPLETE:0/5:SCANNED=500:LOAD_ERRORS=0"
+                raise AssertionError("persisted generated evidence must skip source DOM")
 
-        import project_library_gate
-        with patch.object(project_library_gate,"verify_project_library_images",new=fake_verify):
-            can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
         self.assertTrue(can_continue)
-        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
+        self.assertEqual(status,"BATCH_COMPLETE_LOCAL_SHA_VERIFIED")
         st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
-        self.assertEqual(st["active"]["task_id"],old_task+"-R1")
-        self.assertEqual(st["active"]["ordinals"],[1,2,3,4,5])
-        self.assertEqual(st["next_ordinal"],1)
-        self.assertEqual(st["completed_files"],0)
-        self.assertFalse((ev/f"{old_task}.json").exists())
-        self.assertFalse((gv/f"{old_task}.json").exists())
-        qroot=self.root/"text_roi_batches/quarantine"/old_task
-        self.assertTrue((qroot/"export_evidence.json").is_file())
-        self.assertTrue((qroot/"generated_visible.json").is_file())
-        for row in files:
-            self.assertFalse((outdir/row["name"]).exists())
-            self.assertTrue((qroot/"candidate_outputs"/row["name"]).is_file())
+        self.assertEqual(st["next_ordinal"],6)
+        self.assertEqual(st["completed_files"],5)
+        self.assertEqual(st["completed_batches"],1)
+        self.assertIsNone(st["active"])
+        self.assertEqual(st["status"],"BATCH_COMPLETE_LOCAL_SHA_VERIFIED")
+        self.assertEqual(st["last_library_status"],"PENDING_NONBLOCKING")
+        proof=json.loads((self.root/"text_roi_batches/local_completion"/f"{task}.json").read_text())
+        self.assertEqual(proof["count"],5)
+        self.assertEqual(proof["library_status"],"PENDING_NONBLOCKING")
+        self.assertEqual(proof["qa_status"],"PENDING_C1")
 
-    def test_stale_generated_five_is_retried_before_library_scan(self):
+    def test_local_export_sha_change_holds_even_without_library_gate(self):
         items=[]
         for i in range(5):
-            name=f"Q231_Stale_{i}.png"
+            name=f"Q231_Tamper_{i}.png"
             path=self.image_path.with_name(name)
             Image.new("RGBA",(100+i,40),(0,0,0,0)).save(path)
             items.append({
                 **self.item,
-                "id":f"Q231_Stale_{i}",
+                "id":f"Q231_Tamper_{i}",
                 "role":"A",
                 "queue_index":"231",
                 "imagegen_input_png":name,
@@ -288,19 +283,14 @@ class TextRoiQueueTests(unittest.TestCase):
         self.write_manifest(items)
         binding,error=text_roi_queue.next_binding("A",self.root)
         self.assertIsNone(error)
-        old_task=binding["task_id"]
-        text_roi_queue.stage_submission("A",old_task,self.root)
-        target="https://chatgpt.com/c/stale-five"
-        text_roi_queue.record_chat_url("A",old_task,target,self.root)
-
-        st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
-        st["active"]["created_at"]="2026-10-19T00:00:00+00:00"
-        (self.root/"text_roi_batches/A_state.json").write_text(json.dumps(st),encoding="utf-8")
-
+        task=binding["task_id"]
+        text_roi_queue.stage_submission("A",task,self.root)
+        target="https://chatgpt.com/c/tampered-five"
+        text_roi_queue.record_chat_url("A",task,target,self.root)
         sent=self.root/"sent"; sent.mkdir(parents=True,exist_ok=True)
-        (sent/f"A_{old_task}.json").write_text(json.dumps({
+        (sent/f"A_{task}.json").write_text(json.dumps({
             "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
-            "task_id":old_task,"role":"A",
+            "task_id":task,"role":"A",
             "tiles":[{"filename":x["filename"]} for x in binding["tiles"]]
         }),encoding="utf-8")
 
@@ -308,19 +298,21 @@ class TextRoiQueueTests(unittest.TestCase):
         outdir.mkdir(parents=True)
         files=[]
         for item in binding["items"]:
-            binary=(b"stale-"+item["filename"].encode())*20
+            binary=(b"stable-"+item["filename"].encode())*20
             name=item["output_filename"]
             (outdir/name).write_bytes(binary)
             files.append({"name":name,"sha256":hashlib.sha256(binary).hexdigest()})
+        # Tamper one candidate after evidence was written.
+        (outdir/files[2]["name"]).write_bytes(b"tampered")
         ev=self.root/"text_roi_batches/export_evidence"; ev.mkdir(parents=True)
-        (ev/f"{old_task}.json").write_text(json.dumps({
-            "task_id":old_task,"role":"A",
+        (ev/f"{task}.json").write_text(json.dumps({
+            "task_id":task,"role":"A",
             "status":"UNAPPROVED_LOCAL_CANDIDATES_NOT_LIBRARY_PASS",
             "files":files
         }),encoding="utf-8")
         gv=self.root/"text_roi_batches/generated_visible"; gv.mkdir(parents=True)
-        (gv/f"{old_task}.json").write_text(json.dumps({
-            "task_id":old_task,"role":"A","distinct_generated_images":5,
+        (gv/f"{task}.json").write_text(json.dumps({
+            "task_id":task,"role":"A","distinct_generated_images":5,
             "verification_method":"TEST","status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
             "export_status":"EXISTING_CANDIDATES_VERIFIED"
         }),encoding="utf-8")
@@ -328,21 +320,15 @@ class TextRoiQueueTests(unittest.TestCase):
         class Page:
             url=target
             async def evaluate(self,*args,**kwargs):
-                raise AssertionError("stale generated evidence must avoid source DOM")
-        async def should_not_verify(*args,**kwargs):
-            raise AssertionError("stale batch must be restaged before Library scan")
+                raise AssertionError("persisted generated evidence must skip source DOM")
 
-        import project_library_gate
-        with patch.object(project_library_gate,"verify_project_library_images",new=should_not_verify):
-            can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
-        self.assertTrue(can_continue)
-        self.assertEqual(status,"FIVE_IMAGE_BATCH_RETRY_STAGED")
+        can_continue,status=asyncio.run(text_roi_queue.inspect_slot("A",Page(),self.root))
+        self.assertFalse(can_continue)
+        self.assertEqual(status,"LOCAL_EXPORT_NOT_VERIFIED:LOCAL_EXPORT_SHA_CHANGED")
         st=json.loads((self.root/"text_roi_batches/A_state.json").read_text())
-        self.assertEqual(st["active"]["task_id"],old_task+"-R1")
         self.assertEqual(st["next_ordinal"],1)
         self.assertEqual(st["completed_files"],0)
-        self.assertEqual(st["quarantined"][-1]["retry_reason"],
-                         "STALE_GENERATED_NOT_LIBRARY_VERIFIED")
+        self.assertIsNotNone(st["active"])
 
     def test_two_roles_do_not_share_state(self):
         b = dict(self.item, id="Q104_Second_Text", role="B", imagegen_input_png="Q104_OutRunModeB.png")
