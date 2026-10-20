@@ -992,8 +992,7 @@ bool build_r283_sm3_mov_shader_source(
                 const unsigned modifier =
                     static_cast<unsigned>((token & D3DSP_SRCMOD_MASK) >>
                                           D3DSP_SRCMOD_SHIFT);
-                if (modifier == D3DSPSM_DZ || modifier == D3DSPSM_DW ||
-                    modifier == D3DSPSM_NOT)
+                if (modifier == D3DSPSM_NOT)
                     return false;
                 std::string value;
                 if (op.texture2d && i == 1u) {
@@ -1074,7 +1073,8 @@ bool build_r283_sm3_mov_shader_source(
                         native_sm3_source_components(op.opcode, mask, i);
                     const unsigned required =
                         native_sm3_swizzled_components(
-                            logicalComponents, swizzle);
+                            native_sm3_source_modifier_components(
+                                logicalComponents, modifier), swizzle);
                     // VS LIT/DST may write literal-only destination lanes.
                     // Such operands consume no TEMP component; all other
                     // zero-read modes remain unsupported and fail closed.

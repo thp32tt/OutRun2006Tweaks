@@ -94,9 +94,19 @@ enum class NativeSm3ArithmeticOpcode {
     return physical;
 }
 
-// Translate only D3D9 source modifiers with exact component-wise SM3
-// semantics. Unknown address/predicate/depth-divide modes stay rejected by
-// the bytecode materializer; no source modifier can silently be ignored.
+// A projective source modifier reads an additional physical denominator
+// component even when a game shader writes only x or y. Require the actual
+// swizzled z/w TEMP lane before emitting DIV, not HLSL's zero placeholder.
+[[nodiscard]] constexpr unsigned native_sm3_source_modifier_components(
+    unsigned logicalMask, unsigned modifier) noexcept {
+    if (logicalMask == 0u || (logicalMask & ~15u) != 0u)
+        return 0u;
+    return logicalMask | (modifier == 9u ? 4u : modifier == 10u ? 8u : 0u);
+}
+
+// Preserve D3D9 SM3 per-lane projective divides through live VS/PS HLSL.
+// Address, predicate and reserved modifiers still fail closed; a modifier
+// must never silently disappear from the produced native shader.
 inline bool append_native_sm3_source_modifier(std::string& operand,
                                               unsigned modifier) {
     if (operand.empty()) return false;
@@ -111,9 +121,11 @@ inline bool append_native_sm3_source_modifier(std::string& operand,
     case 6u: operand = "(1.0f - " + value + ")"; break; // COMP
     case 7u: operand = "(2.0f * " + value + ")"; break; // X2
     case 8u: operand = "-(2.0f * " + value + ")"; break; // X2NEG
+    case 9u: operand = "(" + value + " / " + value + ".zzzz)"; break; // DZ
+    case 10u: operand = "(" + value + " / " + value + ".wwww)"; break; // DW
     case 11u: operand = "abs(" + operand + ")"; break; // ABS
     case 12u: operand = "-abs(" + operand + ")"; break; // ABSNEG
-    default: return false; // DZ/DW/NOT and reserved modifier encodings
+    default: return false; // NOT and reserved modifier encodings
     }
     return true;
 }
