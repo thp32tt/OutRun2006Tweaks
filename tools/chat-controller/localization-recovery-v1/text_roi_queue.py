@@ -524,6 +524,21 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         except Exception:
             persisted_generated=False
 
+    if persisted_generated and not _library_evidence_path(root,task).is_file():
+        try:
+            created=dt.datetime.fromisoformat(str(active.get("created_at","")).replace("Z","+00:00"))
+            if created.tzinfo is None:
+                created=created.replace(tzinfo=dt.timezone.utc)
+            stale_age=_now()-created.astimezone(dt.timezone.utc)
+        except Exception:
+            stale_age=dt.timedelta(0)
+        if active.get("count")==5 and stale_age >= dt.timedelta(hours=2):
+            retried,msg=_retry_same_five(
+                st,active,root,"STALE_GENERATED_NOT_LIBRARY_VERIFIED",observed=5)
+            if retried:
+                return True,msg
+            return False,msg
+
     if not persisted_generated:
         if not active.get("source_chat_url"):
             return False, "CHAT_URL_NOT_RECORDED"
