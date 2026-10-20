@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0515-IDLE-SHA-RECONCILE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-21T05:15:00+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "status": "IDLE",
+  "reason": "NO_UNREVIEWED_CANDIDATE_SHA",
+  "policies_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "producer_source": "N100 work/image-src/text_roi_batches",
+  "previous_asset_branch_head": "239e1bc6f08849f7a27d579a49506d998cb38838",
+  "evidence": {
+    "export_evidence_directory": "work/image-src/text_roi_batches/export_evidence",
+    "candidate_output_A_count": 69,
+    "candidate_output_B_count": 87,
+    "export_records": 156,
+    "unique_export_sha256": 156,
+    "local_metrics_shas": 120,
+    "old_github_qa_shas_matching_export": 152,
+    "final_four_qa_record": "localization/validation/c1_lightweight/C1-QA-20261020-2345-UNIQUE4.json",
+    "final_four_already_reviewed": 4,
+    "prior_idle_record": "localization/validation/c1_lightweight/C1-IDLE-20261021-0415-SHA-RECONCILE.json",
+    "reviewed_union_count": 156,
+    "unique_new_sha_count": 0,
+    "missing_candidate_png_files": 0,
+    "interpretation": "Local metrics alone misleadingly indicate 41 candidates as new; prior GitHub QA records already cover those 41. The remaining 4 SHA also have committed 23:45 QA evidence."
+  },
+  "new_candidate_qa_count": 0,
+  "new_png_pass": 0,
+  "new_png_fail": 0,
+  "new_png_hold": 0,
+  "queue_consumed": false,
+  "imagegen_called": false,
+  "dds_composed_or_deployed": false,
+  "c2_c3_or_ingame_pass_created": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "scoreboard_ai_1_previous_confirmed": 1666,
+  "score_change": 0,
+  "scoreboard_ai_1_after": 1666
+}
