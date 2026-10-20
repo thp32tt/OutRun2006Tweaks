@@ -251,6 +251,34 @@ def stage_submission(role, task_id, root="/data/imagegen"):
     _atomic_json(state_path(root, role), st)
     return "SUBMITTING"
 
+def rollback_submission(role, task_id, reason, root="/data/imagegen"):
+    """Return a definitely-unsent active task to STAGED.
+
+    This is allowed only before any persisted sent receipt exists. It prevents a
+    composer/tool-selection failure from leaving the queue permanently stuck in
+    SUBMITTING while preserving the same task id and source ordinals.
+    """
+    root=Path(root)
+    st=_state(root,role)
+    active=st.get("active")
+    if not active or active.get("task_id")!=task_id:
+        return "STATE_TASK_MISMATCH"
+    if active.get("status")!="SUBMITTING":
+        return "ROLLBACK_STATE_NOT_SUBMITTING"
+    receipt=root/"sent"/(role+"_"+task_id+".json")
+    if receipt.exists():
+        return "ROLLBACK_BLOCKED_SENT_RECEIPT_EXISTS"
+    if not isinstance(reason,str) or not reason or len(reason)>180:
+        return "ROLLBACK_REASON_INVALID"
+    active["status"]="STAGED"
+    active["last_presend_failure"]=reason
+    active["last_presend_failure_at"]=_now().isoformat()
+    active["presend_retry_count"]=int(active.get("presend_retry_count",0))+1
+    st["status"]="STAGED"
+    _atomic_json(state_path(root,role),st)
+    return "ROLLED_BACK_TO_STAGED"
+
+
 def record_chat_url(role, task_id, url, root="/data/imagegen"):
     if not re.fullmatch(r"https://chatgpt\.com/(?:g/[^?#]+/)?c/[a-zA-Z0-9-]+",url):
         return "CHAT_URL_UNVERIFIED"
