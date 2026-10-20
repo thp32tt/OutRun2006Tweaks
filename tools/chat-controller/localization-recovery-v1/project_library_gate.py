@@ -32,6 +32,26 @@ def _hex64(s):
     return isinstance(s,str) and bool(re.fullmatch(r"[0-9a-f]{64}",s))
 
 
+def _known_library_url(root, project):
+    """Reuse a previously SHA-verified project Library folder route."""
+    if root is None:
+        return None
+    evidence=Path(root)/"text_roi_batches"/"library_evidence"
+    if not evidence.is_dir():
+        return None
+    candidates=sorted(evidence.glob("*.json"), key=lambda p:p.stat().st_mtime, reverse=True)
+    for p in candidates[:40]:
+        try:
+            j=json.loads(p.read_text(encoding="utf-8"))
+            url=j.get("library_folder_url")
+            if (j.get("folder")==project and isinstance(url,str) and
+                re.fullmatch(r"https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+",url)):
+                return url
+        except Exception:
+            continue
+    return None
+
+
 def _trusted_export_hashes(active, root):
     """Return SHA-bound generated candidate hashes from prior verified export.
 
@@ -175,18 +195,29 @@ async def verify_project_library_images(page,active, root=None, max_scan=MAX_SCA
     folder_page=None
     try:
         folder_page=await page.context.new_page()
-        await folder_page.goto("https://chatgpt.com/library?tab=folders",
-                               wait_until="domcontentloaded",timeout=35000)
-        await folder_page.get_by_role("tab",name="Folders",exact=True).wait_for(
-            state="visible",timeout=45000)
-        # ChatGPT can render duplicate responsive copies of the same folder
-        # card. Duplicate DOM nodes are presentation duplicates, not Library
-        # identity ambiguity. Destination route + exact PNG SHA remain mandatory.
-        located=folder_page.get_by_role("button",name=project,exact=True)
-        await located.last.wait_for(state="visible",timeout=25000)
-        await located.last.click(timeout=20000)
-        await folder_page.wait_for_url(re.compile(r"^https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+(?:[?].*)?$"),
-                                       timeout=25000)
+        known=_known_library_url(root,project)
+        if known:
+            # The project Library folder route is stable across batches and was
+            # already proven by earlier exact SHA matches. Reuse it directly so
+            # a slow responsive folder-card click cannot stall production.
+            await folder_page.goto(known,wait_until="domcontentloaded",timeout=35000)
+            await folder_page.wait_for_url(
+                re.compile(r"^https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+(?:[?].*)?$"),
+                timeout=15000)
+        else:
+            await folder_page.goto("https://chatgpt.com/library?tab=folders",
+                                   wait_until="domcontentloaded",timeout=35000)
+            await folder_page.get_by_role("tab",name="Folders",exact=True).wait_for(
+                state="visible",timeout=45000)
+            # ChatGPT can render duplicate responsive copies of the same folder
+            # card. Duplicate DOM nodes are presentation duplicates, not Library
+            # identity ambiguity. Destination route + exact PNG SHA remain mandatory.
+            located=folder_page.get_by_role("button",name=project,exact=True)
+            await located.last.wait_for(state="visible",timeout=25000)
+            await located.last.click(timeout=20000)
+            await folder_page.wait_for_url(
+                re.compile(r"^https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+(?:[?].*)?$"),
+                timeout=25000)
         library_url=folder_page.url.split("?")[0]
         if not re.fullmatch(r"https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+",library_url):
             return None,"LIBRARY_URL_NOT_PROJECT_FOLDER"
