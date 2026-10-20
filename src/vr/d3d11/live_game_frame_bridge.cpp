@@ -1451,6 +1451,8 @@ struct State {
     UINT probeSlot = 0;
     UINT issued = 0;
     UINT visible = 0;
+    // Only D3D11 -> D3D9Ex shared GPU desktop publications.
+    std::uint64_t gpuDesktopFrames = 0;
     UINT failed = 0;
 };
 State& state() noexcept { static State s; return s; }
@@ -7904,6 +7906,7 @@ void before_game_present(IDirect3DDevice9* game,
             // must record any GPU CopyResource synchronously on this same
             // immediate context; original D3D9 Draw/input remain intact.
             bool gpuHandoffQueued = false;
+            bool nativeGpuDesktopPublished = false;
             // This synchronous native D3D11 GPU consumer does not touch the
             // D3D9 backbuffer. Unlike CPU staging / UpdateSurface and the
             // shared-desktop fallback below, it needs no writable D3D9 format,
@@ -7966,7 +7969,7 @@ void before_game_present(IDirect3DDevice9* game,
                             static_cast<LONG>(tile.right),
                             static_cast<LONG>(tile.bottom)};
                     }
-                    gpuHandoffQueued = s.sharedDesktop.try_present_regions(
+                    nativeGpuDesktopPublished = s.sharedDesktop.try_present_regions(
                         game, presentBackbuffer.Get(), s.backend.device(), ctx,
                         s.backend.color_texture(), surfaceWidth, surfaceHeight,
                         s.outputGeneration, gpuTiles, sharedMultiDesktop.count);
@@ -7975,10 +7978,17 @@ void before_game_present(IDirect3DDevice9* game,
                     const RECT visibleRect{
                         static_cast<LONG>(region.left), static_cast<LONG>(region.top),
                         static_cast<LONG>(region.right), static_cast<LONG>(region.bottom)};
-                    gpuHandoffQueued = s.sharedDesktop.try_present(
+                    nativeGpuDesktopPublished = s.sharedDesktop.try_present(
                         game, presentBackbuffer.Get(), s.backend.device(), ctx,
                         s.backend.color_texture(), surfaceWidth, surfaceHeight,
                         s.outputGeneration, visibleRect);
+                }
+                // Successful native shared GPU publication is tracked
+                // separately from readback / CPU fallback.
+                gpuHandoffQueued = nativeGpuDesktopPublished;
+                if (nativeGpuDesktopPublished) {
+                    ++s.visible;
+                    ++s.gpuDesktopFrames;
                 }
             }
             // Full-resolution publication must be sampled before THIS D3D9
@@ -8456,9 +8466,10 @@ void before_game_present(IDirect3DDevice9* game,
         // visible, so a menu->vehicle->race session can be audited.
         if (s.presents % 300u == 0u || (fullMode && s.visible == 1u)) {
             spdlog::info(
-                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={} gpu_desktop_frames={}; unsupported draws stay DX9Ex; HMD UNTESTED",
                 s.observed, s.issued, s.visible, s.failed, s.presents,
-                s.eligible, s.staleReadbacks, s.probeSlot, fullMode ? 1 : 0);
+                s.eligible, s.staleReadbacks, s.probeSlot, fullMode ? 1 : 0,
+                s.gpuDesktopFrames);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.

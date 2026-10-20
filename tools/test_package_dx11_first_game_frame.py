@@ -129,6 +129,10 @@ def main():
     assert json.loads(payload["BUILD_IDENTITY.json"])["runtime_validation"] == "UNTESTED"
     assert b"OUTRUN_DX11_FIRST_GAME_FRAME=1" in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
     assert b"OUTRUN_DX11_FULL_GAME_FRAME=1" in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
+    assert b'OUTRUN_DX11_GPU_SHARED_DESKTOP=1' in payload["RUN_DX11_GPU_DESKTOP.cmd"]
+    assert b'OUTRUN_DX11_TEST_CASE=NATIVE_GPU_DESKTOP' in payload["RUN_DX11_GPU_DESKTOP.cmd"]
+    assert b'OUTRUN_DX11_GPU_SHARED_DESKTOP="' in payload["RUN_DX11_FIRST_GAME_FRAME.cmd"]
+    assert b'OUTRUN_DX11_GPU_SHARED_DESKTOP="' in payload["RUN_DX9EX_CONTROL.cmd"]
     assert b'OUTRUN_DX11_FULL_GAME_FRAME="' in payload["RUN_DX9EX_CONTROL.cmd"]
     assert b'OUTRUN_DX11_FIRST_GAME_FRAME="' in payload["RUN_DX9EX_CONTROL.cmd"]
     assert b"OUTRUN_DX11_TEST_CASE=CONTROL" in payload["RUN_DX9EX_CONTROL.cmd"]
@@ -138,12 +142,16 @@ def main():
     assert b"OUTRUN_DX11_TEST_CASE" in packaged_runner
     assert b"DX11_NATIVE_EVIDENCE.txt" in packaged_runner
     assert b"$dx11TestCase -ne 'NATIVE_FULL_FRAME'" in packaged_runner
+    assert b"$dx11TestCase -ne 'NATIVE_GPU_DESKTOP'" in packaged_runner
+    assert b"gpuDesktopFrames -gt 0" in packaged_runner
+    assert b"D3D11_GPU_TO_D3D9EX_SHARED_DESKTOP" in packaged_runner
     assert b"fullFrameModeObserved" in packaged_runner
     assert b"gameDraws -gt 0" in packaged_runner
     assert b"nativeDraws -gt 0" in packaged_runner
     assert b"published -gt 0" in packaged_runner
     assert b"throw 'DX11 full native game frame NOT observed" in packaged_runner
     assert b"D3D11 -> CPU -> D3D9 Present" in payload["DX11_TEST_README.txt"]
+    assert b"D3D11 -> shared resource -> D3D9Ex Present" in payload["DX11_TEST_README.txt"]
     assert json.loads(payload["BUILD_IDENTITY.json"])["test_mode"] == "NATIVE_FULL_FRAME_D3D11_GPU_COPYBACK_D3D9"
     test_bundle_ci_route()
     print("DX11 first-game-frame packaging PE/SHA/tamper/opt-in tests: PASS (synthetic)")
