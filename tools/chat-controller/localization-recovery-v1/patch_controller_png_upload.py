@@ -129,6 +129,13 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
                 send_result = "CHAT_URL_NOT_RECORDED:" + url_status
         elif png_binding is not None and send_result == "SEND_UNVERIFIED":
             mark_sent(png_binding, status="SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY")
+        elif png_binding is not None and (
+                send_result.startswith("IMAGE_TOOL_NOT_SELECTED:") or
+                send_result.startswith("SOURCE_REFERENCE_NOT_BOUND:")):
+            rollback_status = rollback_submission(
+                slot.name, png_binding["task_id"], send_result)
+            if rollback_status != "ROLLED_BACK_TO_STAGED":
+                send_result += ":ROLLBACK_FAILED:" + rollback_status
     else:
         png_binding = None
         send_result = await send_message(page, prompt)
@@ -193,7 +200,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
     )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\nfrom app.ab_batch_queue import inspect_slot, stage_submission, record_chat_url\nimport os as _outrun_smoke_os\n'
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\nfrom app.ab_batch_queue import inspect_slot, stage_submission, record_chat_url, rollback_submission\nimport os as _outrun_smoke_os\n'
     lines = source.splitlines(keepends=True)
     future_imports = [i for i, line in enumerate(lines)
                       if line.startswith("from __future__ import ")]
