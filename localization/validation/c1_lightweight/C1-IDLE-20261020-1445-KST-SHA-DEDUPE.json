@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1445-KST-SHA-DEDUPE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T14:45:00+09:00",
+  "inspected_at_kst": "2026-10-20T14:51:07+09:00",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "observed_branch_head_before": "70a2b51e18db0e467143a686bebb0f4ec2f8a990",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_source": "N100 work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+  "dedup_method": "Executed existing read-only N100 work/c1_sha_dedup_20261019_2145.py; SHA256 of each saved A/B PNG compared against 62 reviewed hashes from work/c1_batch_20261019_2015/previous_shas.json and metrics.json. Excluded legacy non-native ROI output.",
+  "sha_inventory": {
+    "saved_candidate_folder_png": 58,
+    "producer_A_saved_png": 16,
+    "producer_B_saved_png": 42,
+    "reviewed_sha_pool": 62,
+    "reviewed_sha_matches": 57,
+    "legacy_excluded_png": 1,
+    "eligible_new_sha": 0,
+    "excluded_legacy": {
+      "file": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+      "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+      "reason": "LEGACY_NO_CURRENT_NATIVE_ROI_PRODUCER_RECEIPT"
+    }
+  },
+  "quarantine": {
+    "location": "work/image-src/text_roi_batches/quarantine/OUTRUN-ROI-A-0004-73FA0354",
+    "archived_png_count": 5,
+    "reason": "Previously exported A0004 candidates are quarantined while A0004-R1 is active; all five hashes already in prior reviewed SHA pool; excluded from new QA."
+  },
+  "producer_state": {
+    "A": "OUTRUN-ROI-A-0004-73FA0354-R1 active, ordinals 16-20, new candidate folder exports not yet present",
+    "B": "OUTRUN-ROI-B-0010-8F2213CF active, ordinals 43-47, new candidate folder exports not yet present"
+  },
+  "previous_idle_record": "localization/validation/c1_lightweight/C1-IDLE-20261020-1415-KST-SHA-DEDUPE.json",
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1,
+    "new_visual_QA": 0
+  },
+  "boundaries": {
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "dds_written": 0,
+    "final_approval_created": false,
+    "c2_c3_ingame_pass_created": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "AI": "AI 1",
+    "prior_confirmed": 1652,
+    "delta": 0,
+    "result": 1652,
+    "reason": "No eligible new candidate SHA. Rechecking and IDLE audit do not count as new production/QA outcome under user's cumulative-score dedup rule."
+  },
+  "notes": "No repeated SHA review; isolated outdated legacy PNG and quarantined A0004; no C2/C3/ingame PASS; no VR/FFB/DX11/DXVK modifications."
+}
