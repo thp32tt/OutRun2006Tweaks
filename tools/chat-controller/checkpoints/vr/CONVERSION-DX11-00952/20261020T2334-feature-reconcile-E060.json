@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_resume_checkpoint",
+  "captured_at_kst": "2026-10-20T23:34:41+09:00",
+  "task_id": "CONVERSION-DX11-00952",
+  "production_id": "CONVERSION-DX11-00952",
+  "event_id": "CONVERSION-DX11-00952-E060",
+  "event_type": "rollover",
+  "attempt": "3/3",
+  "rollover_count": 66,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_branch": "feature/dx11-00952-live-sm3-device-bool",
+  "feature_id": "DX11:LIVE_SM3_DEVICE_BOOL_NATIVE_GAME_DRAW",
+  "feature_stage": "FEATURE_CI_PENDING",
+  "feature_last_head": "85f0f36a590f39909d10bb7a172a3af2785531c0",
+  "feature_base_sha": "68f77d5bb47a4d7fbcefb9b8af6dcf2a79550fa8",
+  "target_expected_sha": "7fbbccc89e5ead6879a696bf122b93739e7b0c77",
+  "feature_behind_target": 0,
+  "feature_ahead_target": 5,
+  "merge_parents": [
+    "d0751871b3e768bbb11d4a0e0ef065b02ef29a23",
+    "7fbbccc89e5ead6879a696bf122b93739e7b0c77"
+  ],
+  "previous_feature_ci": {
+    "exact_sha": "d0751871b3e768bbb11d4a0e0ef065b02ef29a23",
+    "status": "PASS_5_OF_5",
+    "fast": 39437417604,
+    "backend": 39437417854,
+    "windows_build": 39437417550,
+    "windows_attempt": 2,
+    "openxr": 39437417868,
+    "hud": 39437418161,
+    "backend_artifact_id": 12272173342
+  },
+  "final_merge_ci": {
+    "exact_sha": "85f0f36a590f39909d10bb7a172a3af2785531c0",
+    "status": "PENDING_NOT_FEATURE_READY",
+    "fast": 39440426450,
+    "backend": 39440426492,
+    "windows_build": 39440426429,
+    "openxr": 39440426486,
+    "hud": 39440426473
+  },
+  "real_game_observation_from_other_owner": {
+    "target_commit": "7fbbccc89e5ead6879a696bf122b93739e7b0c77",
+    "draws": 11891792,
+    "native_draws": 0,
+    "gpu_desktop_frames": 0,
+    "original_stereo": true,
+    "source": "commit message; not independently reproduced in this task"
+  },
+  "acceptance_results": {
+    "status": "PENDING",
+    "evidence_paths": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_backend.hpp",
+      "src/vr/d3d11/native_sm3_constant_codegen.hpp",
+      "tools/dx11_sm3_live_boolean_probe_00952.cpp",
+      "tools/test_dx11_sm3_live_boolean_00952.py",
+      "tools/test_dx11_backend_artifact_identity_00952.py",
+      ".github/workflows/backend-conversion-gate.yml",
+      ".github/workflows/dx11-fast-structural.yml",
+      ".github/workflows/vr-openxr.yml",
+      ".github/workflows/outrun-exe-hud-inspector.yml",
+      "tools/package_dx11_first_game_frame.py",
+      "tools/test_package_dx11_first_game_frame.py"
+    ],
+    "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_live_boolean_probe_00952.cpp -o /tmp/dx11_sm3_live_bool_00952 && /tmp/dx11_sm3_live_bool_00952; python tools/test_dx11_sm3_live_boolean_00952.py; python tools/test_dx11_backend_artifact_identity_00952.py; full GitHub CI 5 gates pending on 85f0"
+  },
+  "runtime_validation": "UNTESTED",
+  "blocker": "Concurrent target mono game frame test commit had to be merged after five-gate verified d075; do not promote until merge exact-SHA five gates SUCCESS.",
+  "next_action": "Read current feature and target heads; validate 5 required exact-SHA runs for 85f0; on PASS compare behind=0 and lease update_ref target force=false expected_sha from fresh target HEAD; then validate target SHA, OpenXR diagnostic bundle, C6. On failure only correct actual failed gate; preserve runtime UNTESTED and DX9Ex fallback; no duplicate score.",
+  "score_change": 0,
+  "score_basis": "AI2 1569 pre-existing RUN_KEY CONVERSION-DX11-00952 counted; E060/reconcile must not count again"
+}
