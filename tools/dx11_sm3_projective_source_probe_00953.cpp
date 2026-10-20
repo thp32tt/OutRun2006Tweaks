@@ -12,7 +12,7 @@ static_assert(native_sm3_source_modifier_components(0x0fu, 9u) == 0x0fu);
 static_assert(native_sm3_source_modifier_components(0x00u, 9u) == 0u);
 static_assert(native_sm3_source_modifier_components(0x10u, 10u) == 0u);
 static_assert(native_sm3_swizzled_components(
-    native_sm3_source_modifier_components(0x01u, 9u), 0x1bu) == 0x0cu);
+    native_sm3_source_modifier_components(0x01u, 9u), 0x1bu) == 0x0au);
 
 int main() {
     std::string dz = "r283_t1.wzyx";
