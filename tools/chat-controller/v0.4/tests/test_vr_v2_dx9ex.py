@@ -48,7 +48,7 @@ def load_task_record_helpers():
 def load_freeze_reconcile():
     tree = ast.parse(SOURCE)
     fn = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == 'reconcile_conversion_lane_freeze')
-    ns = {'datetime': datetime}
+    ns = {'datetime': datetime, 'DX9EX_REVIEW_ONLY': False}
     exec(compile(ast.Module(body=[fn], type_ignores=[]), '<freeze>', 'exec'), ns)
     return ns['reconcile_conversion_lane_freeze']
 
@@ -597,7 +597,7 @@ class VRV2DX9ExTests(unittest.TestCase):
                 return {'status': 'ahead', 'behind_by': 0, 'files': [{'filename': doc}]}
             raise AssertionError('Unexpected API ' + url)
         ns = {
-            'DX9EX_REVIEW_ONLY': True, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
+            'DX9EX_REVIEW_ONLY': True, 'datetime': datetime, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
             'github_api_json': Mock(side_effect=response),
             'github_branch_head': Mock(return_value=head),
             'save_queue_state': Mock(), 'write_runtime': Mock(),
@@ -624,7 +624,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         doc = f'docs/reviews/dx9ex/automation/{task_id}.md'
         result, head = 'a' * 40, 'b' * 40
         lookup = Mock()
-        ns = {'DX9EX_REVIEW_ONLY': True, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
+        ns = {'DX9EX_REVIEW_ONLY': True, 'datetime': datetime, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
               'github_api_json': lookup,
               'github_branch_head': Mock(return_value=head),
               'save_queue_state': Mock(), 'write_runtime': Mock()}
