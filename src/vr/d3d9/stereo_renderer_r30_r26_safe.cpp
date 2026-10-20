@@ -2991,9 +2991,9 @@ namespace OutRunVRStereo
             ++R30ExternalImGuiStereoDraws;
             if (R30ExternalImGuiStereoDraws == 1)
                 spdlog::info(
-                    "VR R30 F11 IMGUI: explicit external XYZ/orthographic UI "
-                    "now uses finite recentered L/R projection + per-eye "
-                    "scissor; stock fixed-function WORLD/VIEW preserved");
+                    "VR R30 F11 IMGUI SCREEN2D: exact external XYZ/orthographic UI "
+                    "uses FOV-only L/R screen affine + matching per-eye "
+                    "scissor; no 3D HUD plane, head inverse or IPD pose");
             // The 2026-10-20 Quest3 F11 was doubled in the upper-left with
             // the entire game rendered into a 2496x2688 portrait XR extent.
             // Trace actual SOURCE and per-eye raster placement after the
@@ -3004,14 +3004,13 @@ namespace OutRunVRStereo
                   (R30ExternalImGuiStereoDraws - 1)) == 0))
                 spdlog::info(
                     "VR F11 SOURCE-ASPECT PROBE: hits={} game={}x{} "
-                    "viewport={},{},{},{} planeZ={} "
+                    "viewport={},{},{},{} mode=FOV_ONLY_SCREEN2D "
                     "scissorL={},{},{},{} scissorR={},{},{},{} "
                     "leftHr=0x{:08X} rightHr=0x{:08X}",
                     R30ExternalImGuiStereoDraws,
                     BackBufferDesc.Width, BackBufferDesc.Height,
                     state.viewport.X, state.viewport.Y,
                     state.viewport.Width, state.viewport.Height,
-                    R30HudPlaneViewZ(false),
                     eyeScissors[0].left, eyeScissors[0].top,
                     eyeScissors[0].right, eyeScissors[0].bottom,
                     eyeScissors[1].left, eyeScissors[1].top,
