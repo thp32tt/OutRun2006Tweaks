@@ -69,4 +69,19 @@ for name,expected in (("RankDx11ProducerReference", "true"),
 assert "if (!Settings::VRRivalDx11NativeRoute.get())" in hook
 assert "const int anchorLiftY = Settings::VRRankDesktopLift.get()" in hook
 assert "R62TryFixedFunctionSpriteIndexed(" in dx9
+# The additional DX9-only positive-W gate must not reject an original
+# negative-view-Z rank that the user-good DX11 R57 mode 6 projects.
+# No other source (lens, scene, HUD, rival) may gain this exception.
+wview = dx9.split("bool R57ProjectViewPoint(", 1)[1].split(
+    "bool R57BuildProjectedMarkerDelta(", 1)[0]
+for token in (
+    "Settings::VRRankDx11ProducerReference.get()",
+    "marker.exactOrdinalEyeCant",
+    "std::fabs(clipW) <= 1.0e-6f",
+    "clipW <= 1.0e-6f",
+):
+    assert token in wview
+assert "dx11OrdinalClipW" in wview and "marker.exactOrdinalEyeCant;" in wview
+for token in ("marker.exactOrdinalEyeCant", "std::fabs(clipW) <= 1.0e-6f"):
+    assert token not in wview.replace(token, "/* forbidden broad W gate */", 1)
 print("PASS R26 DX11 rank direct projection, native rival + optional legacy routes, 0.55 HUD")
