@@ -8,6 +8,7 @@
 - C는 `vr-d3d9ex-focus` 최신 HEAD, R26+HUD 기준, REA/디스어셈블리/런타임 로그/관련 Issue를 읽고 화면오류와 최적화 문제의 실제 렌더 경로를 계속 시뮬레이션한다.
 - 수정 필요성이 확인돼도 실제 C++/HLSL/CMake/workflow/config를 건드리지 않고 `PATCH_CANDIDATE_ONLY`로 정확한 파일/함수/라인/근거/반증조건/회귀위험만 기록한다.
 - C의 durable result는 `docs/reviews/dx9ex/automation/<TASK_ID>.md` docs-only 커밋이며 커밋 메시지에 `[AUTO:<TASK_ID>]`를 포함한다.
+- C review-only는 아래의 일반 `Controller completion rule` 중 source-path GitHub Actions Gate 요구의 예외다. 컨트롤러가 커밋 변경 파일을 직접 조회하여 정확한 TASK_ID 문서가 있고 `docs/reviews/dx9ex/automation/` 밖의 변경이 0개일 때만 PASS한다. 다른 경로가 섞이면 자동 수리 없이 BLOCKED 처리한다.
 - C에서 source patch/refactor/merge/update_ref/새 branch/release/package 생성은 금지한다.
 - R26+HUD baseline `0cff83cf509c2acd6f3391b3a46c4dec1403a0d9`를 기준으로 하고 R84를 자동 기본값으로 재승격하지 않는다.
 - 최근 result HUD 후보 `aab9e02bcb2ad2e6253840e6267e5c5ad5040854`는 비교 자료이며 Quest 3 HMD PASS가 아니다.
