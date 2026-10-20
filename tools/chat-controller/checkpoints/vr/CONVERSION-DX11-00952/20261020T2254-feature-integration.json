@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_continuation_checkpoint",
+  "captured_at_kst": "2026-10-20T22:54:00+09:00",
+  "task_id": "CONVERSION-DX11-00952",
+  "production_id": "CONVERSION-DX11-00952",
+  "event_id": "CONVERSION-DX11-00952-E058",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "attempt": "3/3",
+  "chat_rollover": 65,
+  "feature_id": "DX11:LIVE_SM3_DESTINATION_MODIFIER_GAME_DRAW",
+  "feature_branch": "feature/dx11-00952-live-sm3-device-bool",
+  "feature_stage": "C3_FEATURE_CI_IN_PROGRESS",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head_at_merge": "68f77d5bb47a4d7fbcefb9b8af6dcf2a79550fa8",
+  "previous_terminal_head": "75bf82abaf21cf48d6132b15f54491681f103fa8",
+  "previous_validation_bearing_sha": "c5004c77c6b79c2a28cf21533269bed02a8c0145",
+  "previous_backend_run": 39201382591,
+  "previous_backend_status": "SUCCESS_AFTER_RERUN",
+  "previous_c6_build": "PASS_EXACT_SHA_5_OF_5",
+  "material_source_sha": "4591d2403c935b33f0bcfd11c59306272c89235c",
+  "merged_feature_sha": "cf982a8d6b6e7d59e377efd088a5d4e0bcd5eef7",
+  "new_work": "Live game D3D9 SM3 b# IF constants now sampled from GetVertexShaderConstantB and GetPixelShaderConstantB, packed into stage-specific native D3D11 b2 and used only on guarded original game Draw. Shader-owned DEFB preserved; original DX9Ex fallback preserved. Concurrent GPU desktop route-proof target commit 68f77d was merged without source loss.",
+  "feature_ci_runs": {
+    "fast": 39434020525,
+    "backend": 39434020526,
+    "build": 39434020512,
+    "openxr": 39434020596,
+    "hud": 39434020521
+  },
+  "confirmed_feature_ci": {
+    "fast": "SUCCESS",
+    "backend": "PENDING",
+    "build": "IN_PROGRESS",
+    "openxr": "IN_PROGRESS",
+    "hud": "IN_PROGRESS"
+  },
+  "compare_at_checkpoint": {
+    "ahead": 2,
+    "behind": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "feature_ready": false,
+  "blockers": [
+    "Exact merged-feature SHA mandatory five workflows not yet all PASS",
+    "Real game native source draws/published frames not observed"
+  ],
+  "next_implementation_action": "Inspect exact merged-feature CI. Repair any concrete failure on same feature branch and TASK_ID, preserve DX9Ex and GPU desktop concurrent owner changes. Only after all required 5 feature checks success and live compare behind=0, read latest target HEAD and update_ref with force=false expected_sha; then verify final target exact-SHA 5 gates and finish C6. No new score for 00952 rerun/rollover."
+}
