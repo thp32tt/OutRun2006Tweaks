@@ -67,6 +67,10 @@ def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
    name=j.get("source_png")
    if not isinstance(name,str) or Path(name).name!=name:
     raise ValueError("EDGE_REVIEW_SOURCE_NAME_INVALID")
+   original_crop=mp.parent/"english_original_native_crop.png"
+   if (not original_crop.is_file() or original_crop.is_symlink() or
+       digest(original_crop)!=j.get("crop_sha256")):
+    raise ValueError("EDGE_REVIEW_ORIGINAL_CROP_SHA_MISMATCH")
    src=src_root/name
    if not src.is_file() or src.is_symlink() or digest(src)!=j.get("source_sha256"):
     raise ValueError("EDGE_REVIEW_SOURCE_SHA_MISMATCH")
