@@ -255,24 +255,67 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
 
 
 async def ensure_image_tool(page):
-    """Prove the actual Create image tool pill in ChatGPT composer."""
+    """Select and prove the actual Create image tool pill in ChatGPT composer.
+
+    ChatGPT can render duplicate responsive controls and localized labels. Only
+    visible controls are eligible; identity is finally proven by picture_v2 pill.
+    """
+    async def first_visible(locator, limit=12):
+        for i in range(min(await locator.count(),limit)):
+            item=locator.nth(i)
+            try:
+                if await item.is_visible():
+                    return item
+            except Exception:
+                continue
+        return None
+
     try:
-        pill = page.locator('[data-inline-selection-pill][data-system-hint-type="picture_v2"]')
-        if await pill.count() and await pill.first.is_visible():
+        pill=page.locator('[data-inline-selection-pill][data-system-hint-type="picture_v2"]')
+        selected=await first_visible(pill)
+        if selected is not None:
             return "CREATE_IMAGE_TOOL_SELECTED"
-        menu = page.get_by_role("button", name="Add files and more")
-        if await menu.count() != 1:
+
+        menu_candidates=[
+            page.get_by_role("button",name="Add files and more"),
+            page.get_by_role("button",name="파일 및 기타 추가"),
+            page.locator('button[aria-label*="Add files"]'),
+            page.locator('button[aria-label*="파일"]'),
+        ]
+        menu=None
+        for loc in menu_candidates:
+            menu=await first_visible(loc)
+            if menu is not None: break
+        if menu is None:
             return "IMAGE_TOOL_MENU_MISSING"
-        await menu.click(timeout=5000)
-        option = page.get_by_text("Create image", exact=True)
-        if await option.count() != 1:
-            await page.keyboard.press("Escape")
+        await menu.click(timeout=6000)
+
+        option_candidates=[
+            page.get_by_text("Create image",exact=True),
+            page.get_by_text("이미지 만들기",exact=True),
+            page.get_by_text("이미지 생성",exact=True),
+            page.get_by_role("menuitem",name="Create image"),
+            page.locator('[data-testid*="create-image"]'),
+        ]
+        option=None
+        for loc in option_candidates:
+            option=await first_visible(loc)
+            if option is not None: break
+        if option is None:
+            try: await page.keyboard.press("Escape")
+            except Exception: pass
             return "CREATE_IMAGE_OPTION_MISSING"
-        await option.click(timeout=6000)
-        await pill.first.wait_for(state="visible", timeout=5000)
-        return "CREATE_IMAGE_TOOL_SELECTED"
-    except Exception:
-        return "CREATE_IMAGE_TOOL_NOT_VERIFIED"
+        await option.click(timeout=7000)
+
+        # Responsive UIs may re-render the composer after selection.
+        for _ in range(12):
+            selected=await first_visible(pill)
+            if selected is not None:
+                return "CREATE_IMAGE_TOOL_SELECTED"
+            await page.wait_for_timeout(250)
+        return "CREATE_IMAGE_PILL_NOT_VISIBLE"
+    except Exception as exc:
+        return "CREATE_IMAGE_TOOL_NOT_VERIFIED:"+type(exc).__name__
 
 
 async def attach_batch_pngs(page, binding):
