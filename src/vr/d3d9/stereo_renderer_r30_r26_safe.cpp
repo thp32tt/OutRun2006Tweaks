@@ -3029,6 +3029,30 @@ namespace OutRunVRStereo
                     "VR R30 F11 IMGUI: explicit external XYZ/orthographic UI "
                     "now uses finite recentered L/R projection + per-eye "
                     "scissor; stock fixed-function WORLD/VIEW preserved");
+            // The 2026-10-20 Quest3 F11 was doubled in the upper-left with
+            // the entire game rendered into a 2496x2688 portrait XR extent.
+            // Trace actual SOURCE and per-eye raster placement after the
+            // landscape-game-source fix, without changing render routing.
+            if (Settings::VRTelemetry &&
+                (R30ExternalImGuiStereoDraws <= 8 ||
+                 (R30ExternalImGuiStereoDraws &
+                  (R30ExternalImGuiStereoDraws - 1)) == 0))
+                spdlog::info(
+                    "VR F11 SOURCE-ASPECT PROBE: hits={} game={}x{} "
+                    "viewport={},{},{},{} planeZ={} "
+                    "scissorL={},{},{},{} scissorR={},{},{},{} "
+                    "leftHr=0x{:08X} rightHr=0x{:08X}",
+                    R30ExternalImGuiStereoDraws,
+                    BackBufferDesc.Width, BackBufferDesc.Height,
+                    state.viewport.X, state.viewport.Y,
+                    state.viewport.Width, state.viewport.Height,
+                    R30HudPlaneViewZ(false),
+                    eyeScissors[0].left, eyeScissors[0].top,
+                    eyeScissors[0].right, eyeScissors[0].bottom,
+                    eyeScissors[1].left, eyeScissors[1].top,
+                    eyeScissors[1].right, eyeScissors[1].bottom,
+                    static_cast<unsigned>(leftHr),
+                    static_cast<unsigned>(rightHr));
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
