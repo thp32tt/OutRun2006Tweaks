@@ -266,6 +266,80 @@ def record_chat_url(role, task_id, url, root="/data/imagegen"):
 def _library_evidence_path(root, task):
     return Path(root) / STATE_DIR / "library_evidence" / (task + ".json")
 
+
+def _retry_same_five(st, active, root, reason, observed=None):
+    """Quarantine an ambiguous/unsaved five-image turn and restage identical inputs.
+
+    Ordinals never advance. Any exported candidate bytes are SHA-verified before
+    being moved out of the active candidate namespace so the retry cannot
+    accidentally overwrite or reuse them.
+    """
+    if active.get("count") != 5:
+        return False, "RETRY_REQUIRES_FIVE_IMAGE_BATCH"
+    retry=int(active.get("retry_count",0))
+    if retry >= 2:
+        return False, "FIVE_IMAGE_RETRY_LIMIT_REACHED:"+reason
+    task=active["task_id"]
+    qroot=Path(root)/STATE_DIR/"quarantine"/task
+    qroot.mkdir(parents=True,exist_ok=True)
+
+    export=Path(root)/STATE_DIR/"export_evidence"/(task+".json")
+    if export.exists():
+        if export.is_symlink():
+            return False,"RETRY_EXPORT_EVIDENCE_SYMLINK"
+        try:
+            doc=json.loads(export.read_text(encoding="utf-8"))
+        except Exception:
+            return False,"RETRY_EXPORT_EVIDENCE_INVALID"
+        rows=doc.get("files")
+        if doc.get("task_id")!=task or not isinstance(rows,list) or len(rows)!=5:
+            return False,"RETRY_EXPORT_EVIDENCE_BINDING_MISMATCH"
+        outdir=Path(root)/STATE_DIR/"candidate_outputs"/active["role"]
+        archived=qroot/"candidate_outputs"
+        archived.mkdir(exist_ok=True)
+        for row in rows:
+            name=row.get("name")
+            sha=row.get("sha256")
+            if (not isinstance(name,str) or Path(name).name!=name or
+                not isinstance(sha,str) or not re.fullmatch(r"[0-9a-f]{64}",sha)):
+                return False,"RETRY_CANDIDATE_METADATA_INVALID"
+            src=outdir/name
+            if not src.is_file() or src.is_symlink():
+                return False,"RETRY_CANDIDATE_MISSING"
+            if hashlib.sha256(src.read_bytes()).hexdigest()!=sha:
+                return False,"RETRY_CANDIDATE_SHA_CHANGED"
+        for row in rows:
+            src=outdir/row["name"]
+            os.replace(src,archived/row["name"])
+        os.replace(export,qroot/"export_evidence.json")
+
+    generated=Path(root)/STATE_DIR/"generated_visible"/(task+".json")
+    if generated.exists() and not generated.is_symlink():
+        os.replace(generated,qroot/"generated_visible.json")
+    library=_library_evidence_path(root,task)
+    if library.exists() and not library.is_symlink():
+        os.replace(library,qroot/"library_evidence.json")
+
+    failed=dict(active)
+    failed["status"]="QUARANTINED_FOR_SAME_FIVE_RETRY"
+    failed["retry_reason"]=reason
+    failed["observed_generated_images"]=observed
+    failed["quarantined_at"]=_now().isoformat()
+    st.setdefault("quarantined",[]).append(failed)
+
+    base_task=re.sub(r"-R[0-9]+$","",task)
+    replacement=dict(active)
+    replacement["task_id"]=base_task+f"-R{retry+1}"
+    replacement["retry_count"]=retry+1
+    replacement["retry_of"]=task
+    replacement["status"]="STAGED"
+    replacement["source_chat_url"]=None
+    replacement["created_at"]=_now().isoformat()
+    st["active"]=replacement
+    st["status"]="STAGED_RETRY_EXACT_FIVE_OUTPUTS"
+    _atomic_json(state_path(root,active["role"]),st)
+    return True,"FIVE_IMAGE_BATCH_RETRY_STAGED"
+
 def _library_confirmed(root, active):
     """Read *content-hash-matched* existing project Library proof.
 
@@ -514,25 +588,11 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         if result.get("count") != expected:
             observed=result.get("count")
             if expected == 5 and observed == 1:
-                retry=int(active.get("retry_count",0))
-                if retry < 2:
-                    failed=dict(active)
-                    failed["status"]="QUARANTINED_AMBIGUOUS_SINGLE_OF_FIVE"
-                    failed["observed_generated_images"]=1
-                    failed["quarantined_at"]=_now().isoformat()
-                    st.setdefault("quarantined",[]).append(failed)
-                    base_task=re.sub(r"-R[0-9]+$","",task)
-                    replacement=dict(active)
-                    replacement["task_id"]=base_task+f"-R{retry+1}"
-                    replacement["retry_count"]=retry+1
-                    replacement["retry_of"]=task
-                    replacement["status"]="STAGED"
-                    replacement["source_chat_url"]=None
-                    replacement["created_at"]=_now().isoformat()
-                    st["active"]=replacement
-                    st["status"]="STAGED_RETRY_EXACT_FIVE_OUTPUTS"
-                    _atomic_json(state_path(root,role),st)
-                    return True, "SINGLE_OF_FIVE_QUARANTINED_RETRY_STAGED"
+                retried,msg=_retry_same_five(
+                    st,active,root,"IMAGEGEN_SINGLE_OF_FIVE",observed=1)
+                if retried:
+                    return True,msg
+                return False,msg
             return False, "IMAGEGEN_OUTPUT_COUNT_MISMATCH:"+str(observed)+"/"+str(expected)
         try:
             export_status=await export_unapproved_k_candidates(page,active,root)
@@ -554,7 +614,16 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             from project_library_gate import verify_project_library_images
         proof, error = await verify_project_library_images(page,active,root=root)
         if error or not proof:
-            return False,"PROJECT_LIBRARY_NOT_VERIFIED:"+str(error or "NO_PROOF")
+            liberr=str(error or "NO_PROOF")
+            if (active.get("count")==5 and
+                liberr.startswith("PROJECT_LIBRARY_HASH_MATCH_INCOMPLETE:0/5:") and
+                generated_evidence.is_file()):
+                retried,msg=_retry_same_five(
+                    st,active,root,"PROJECT_LIBRARY_ZERO_OF_FIVE",observed=5)
+                if retried:
+                    return True,msg
+                return False,msg
+            return False,"PROJECT_LIBRARY_NOT_VERIFIED:"+liberr
         _atomic_json(_library_evidence_path(root,task),proof)
         verified,reason=_library_confirmed(root,active)
         if not verified:
