@@ -320,6 +320,9 @@ namespace OutRunVR
             Settings::VRAntiAliasing.needs_restart();
             Settings::VRTransparencySupersampling.needs_restart();
             Settings::VRUnifiedEyeMenuSource.needs_restart();
+            // Exact x86 rival detours are installed at startup only.
+            // Treat F11 edits as pending until the next game launch.
+            Settings::VRRivalDx11NativeRoute.needs_restart();
             Settings::VRFollowGameResolution.needs_restart();
     Settings::VRAutoRenderResolution.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
