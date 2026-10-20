@@ -118,11 +118,11 @@ namespace Settings
 		"Applies 6DoF HMD X/Y/Z movement in addition to orientation. Disable this option if a title-specific camera/culling issue is observed; stereo eye separation is independent." };
     // The precise central 0x570002 / EXE+C993 flare sometimes duplicates
     // across binocular views when its original game WVP proof is missing.
-    // Suppress ONLY that known central draw in VR by default; surrounding
+    // Preserve the original central draw in VR by default; surrounding
     // EXE+CABE lens discs, actual sky/lighting and desktop remain unchanged.
-    // Turn back on for optical A/B after the source-WVP producer is repaired.
-    Setting<bool> VRLensFlareCentreEnabled{ "VR", "LensFlareCentreEnabled", false,
-        "VR only: render the central 0x570002 flare at the exact original C993 call. False hides just the duplicated center; outer CABE discs and world sky remain intact. Enable for diagnostic A/B." };
+    // User confirmed hiding C993 did not remove duplicate sun; A/B hiding is optional only.
+    Setting<bool> VRLensFlareCentreEnabled{ "VR", "LensFlareCentreEnabled", true,
+        "VR only: render the central 0x570002 flare at the exact original C993 call. Default true keeps the real sun visible for exact stereo repair; false hides only this draw for explicit optical A/B, not as a fix. Outer CABE discs and sky remain intact." };
     // F11 VR PMT visibility policy; the desktop/legacy gate stays unchanged.
     Setting<int> VRStageCullingMode{ "VR", "StageCullingMode", 1,
         "VR PMT culling: Legacy follows Graphics/DisableStageCulling; VR Wide keeps culling with a stereo FOV and safety margin; Off disables PMT culling. HMD validation required.",
