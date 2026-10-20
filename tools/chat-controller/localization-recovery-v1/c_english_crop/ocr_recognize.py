@@ -86,6 +86,17 @@ def margin_check(im,box):
         return "ALPHA_TOUCHES_CROP_BORDER_REVIEW"
     return None
 
+def opaque_context_border(im,box,threshold=.88):
+    """True when crop boundary is overwhelmingly opaque context, not isolated glyph alpha."""
+    a=np.asarray(im.getchannel("A").crop(tuple(box)),dtype=np.uint8)
+    if a.size==0:return False
+    k=min(4,a.shape[0]//6,a.shape[1]//6)
+    if k<2:return False
+    edges=(a[:k,:],a[-k:,:],a[:,:k],a[:,-k:])
+    ratios=[float((e>120).mean()) for e in edges]
+    return min(ratios)>=threshold
+
+
 def unique_regions(words,phrasemap,w,h,allow_fuzzy=False):
     raw=[]
     keys=list(phrasemap)
