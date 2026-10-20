@@ -29,8 +29,44 @@ def digest(path):
 
 # Bump this to explicitly re-run the original 108 files after an approved
 # change to OCR/safety policy. No silent endless re-scanning of exhausted inputs.
-POLICY_VERSION = "hd108-pass-v2-20261018-reviewed-edge-crops"
-EDGE_REVIEW_VERSION = "edge-safe-expand-v1-20261020"
+POLICY_VERSION = "hd108-coverage-v3-20261021-phrase-complete"
+EDGE_REVIEW_VERSION = "edge-safe-expand-v2-20261021-progressive"
+EDGE_STAGES = ((.55,.30),(.90,.50),(1.40,.80),(2.00,1.20))
+
+
+def _row_phrases(row):
+ phrases={}
+ for val in row["queue_indexes"].split(","):
+  val=val.strip()
+  if not re.fullmatch(r"[0-9]{1,3}",val):
+   raise ValueError("QUEUE_ID_INVALID")
+  phrases.update(ocr.approved_phrases("Q"+val.zfill(3)))
+ return phrases
+
+
+def _covered_codes(row, out_root=OUT):
+ sourceout=out_root/Path(row["png_filename"]).stem
+ covered=set()
+ if not sourceout.is_dir():
+  return covered
+ for saved in sourceout.glob("*/manifest.json"):
+  try:
+   j=json.loads(saved.read_text(encoding="utf-8"))
+   if j.get("source_sha256")!=row["png_sha256"]:
+    continue
+   en=j.get("english")
+   if isinstance(en,str) and en.strip():
+    covered.add(ocr.norm(en))
+  except (OSError,ValueError,TypeError):
+   continue
+ return covered
+
+
+def _coverage(row, out_root=OUT):
+ phrases=_row_phrases(row)
+ covered=_covered_codes(row,out_root)
+ unresolved={k:v for k,v in phrases.items() if k not in covered}
+ return phrases,covered,unresolved
 
 
 def review_edge_warnings(max_items=10, src_root=SRC, out_root=OUT):
