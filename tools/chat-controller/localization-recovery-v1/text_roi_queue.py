@@ -162,6 +162,8 @@ def _prompt(role, batch_id, tiles, translations):
         f"RUN_SLOT={role}; BATCH_ID={batch_id}; BATCH_COUNT={len(tiles)}; LIBRARY_FOLDER={LIBRARY_FOLDER}",
         "입력 이미지는 검증된 원본 HD 전체 이미지에서 추출한 서로 독립된 한 문구 ROI입니다.",
         f"입력 {len(tiles)}개 → 투명 RGBA 한글 글자/외곽선/그림자 결과 {len(tiles)}개, 각각 완전히 분리하여 생성하세요.",
+        f"중요: 이미지 생성 도구 호출의 출력 개수(n)를 반드시 BATCH_COUNT={len(tiles)}로 설정하세요. 결과 이미지 파일은 정확히 {len(tiles)}개여야 합니다.",
+        f"한 장만 생성하거나 한 장 안에 {len(tiles)}개를 합치는 것은 실패입니다. 입력 1개당 독립 출력 1개씩 총 {len(tiles)}장을 생성하세요.",
         "원문 문구의 채움, 기울기 방향, 외곽선, 광택과 그림자를 가능한 보존하면서 표시된 한국어 정확한 텍스트만 생성하세요.",
         "결과에 영문 원문, 다른 이미지의 글자, 차량, 배경, 버튼/아이콘, 합본·콜라주, 구석에 설명/번호를 넣지 마세요.",
         "글자와 그림자는 PNG 가장자리에서 잘리지 않으며, 글자 사이 충돌/가짜 글자가 없어야 합니다.",
@@ -510,7 +512,28 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         if result.get("busy"):
             return False, "IMAGEGEN_STILL_RUNNING"
         if result.get("count") != expected:
-            return False, "IMAGEGEN_OUTPUT_COUNT_MISMATCH:"+str(result.get("count"))+"/"+str(expected)
+            observed=result.get("count")
+            if expected == 5 and observed == 1:
+                retry=int(active.get("retry_count",0))
+                if retry < 2:
+                    failed=dict(active)
+                    failed["status"]="QUARANTINED_AMBIGUOUS_SINGLE_OF_FIVE"
+                    failed["observed_generated_images"]=1
+                    failed["quarantined_at"]=_now().isoformat()
+                    st.setdefault("quarantined",[]).append(failed)
+                    base_task=re.sub(r"-R[0-9]+$","",task)
+                    replacement=dict(active)
+                    replacement["task_id"]=base_task+f"-R{retry+1}"
+                    replacement["retry_count"]=retry+1
+                    replacement["retry_of"]=task
+                    replacement["status"]="STAGED"
+                    replacement["source_chat_url"]=None
+                    replacement["created_at"]=_now().isoformat()
+                    st["active"]=replacement
+                    st["status"]="STAGED_RETRY_EXACT_FIVE_OUTPUTS"
+                    _atomic_json(state_path(root,role),st)
+                    return True, "SINGLE_OF_FIVE_QUARANTINED_RETRY_STAGED"
+            return False, "IMAGEGEN_OUTPUT_COUNT_MISMATCH:"+str(observed)+"/"+str(expected)
         try:
             export_status=await export_unapproved_k_candidates(page,active,root)
         except Exception as exc:
