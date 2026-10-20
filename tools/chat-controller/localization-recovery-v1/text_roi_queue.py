@@ -137,7 +137,7 @@ def _filemap(source_row, ordinal, src, original):
     if len(raw) > 32_000_000:
         raise ValueError("ROI_IMAGE_TOO_LARGE")
     with Image.open(srcpath) as im:
-        if im.format != "PNG" or im.mode != "RGBA" or not (8 <= im.width <= 2048 and 8 <= im.height <= 2048):
+        if im.format != "PNG" or im.mode != "RGBA" or not (8 <= im.width <= 8192 and 8 <= im.height <= 8192):
             raise ValueError("ROI_INVALID_RGBA_OR_SIZE")
         w,h=im.size
     return {
