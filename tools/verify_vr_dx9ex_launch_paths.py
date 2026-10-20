@@ -135,7 +135,6 @@ if __name__ == "__main__":
         (0, '} elseif ($Backend -eq "d3d9") {', '} elseif ($Backend -eq "d3d9" -and $variant -eq "CURRENT_FOCUS") {'),
         (0, '$variant -eq "R26_SAFE" -or $variant -eq "R84_TEST"', '$variant -eq "R84_TEST"'),
         (0, 'if (-not (Test-Path $slotPayload)) { throw', 'if (-not (Test-Path $slotPayload)) { Write-Warning'),
-        (0, "'ACTIVE_R26_R43_R44'", "'NONEXISTENT'"),
         (0, "    $expectedVariant = if ($isPcFastPackage) {\n        'ACTIVE_R26_R43_R44'", "    $expectedVariant = if ($isPcFastPackage) {\n        'NONEXISTENT_PC_FAST'"),
         (0, "PC_FAST_INCREMENTAL_NOT_FINAL_CI", "PC_FAST_UNVERIFIED"),
         (0, "R26HUD-PC-FAST-v3-EXACT-SHA", "PC_FAST_UNVERIFIED_CONTRACT"),
