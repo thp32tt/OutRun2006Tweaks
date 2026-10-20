@@ -16,7 +16,9 @@ def check(b,s,r,cmd):
                   'Run-OutRunVRTest.ps1','SOURCE_SHA.txt','BUILD_INPUTS.json',
                   'SHA256SUMS.txt','dinput8.dll','outrun-vr-host.exe'):
         assert token in b, ("PC FAST package item missing",token)
-    assert 'CURRENT_VR_SESSION.json' not in b.split("$runtimeFiles = @(",1)[1].split(")",1)[0]
+    runtime_items = b.split("$runtimeFiles = @(",1)[1].split(")",1)[0]
+    assert "'START_DX9EX_PC_FAST.cmd'," in runtime_items, 'PC Fast direct launcher must be packaged'
+    assert 'CURRENT_VR_SESSION.json' not in runtime_items
     assert "PC_FAST_INCREMENTAL_NOT_FINAL_CI" in b
     assert "ValidationClass = 'PC_FAST_INCREMENTAL_NOT_FINAL_CI'" in b
     for token in ("$activeMissing = !(Test-Path -LiteralPath $active)",
