@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0715-IDLE-SHA-RECONCILE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-21T07:15:00+09:00",
+  "checked_at_kst": "2026-10-21T07:19:00+09:00",
+  "status": "IDLE",
+  "reason": "NO_UNREVIEWED_CANDIDATE_SHA",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "b0b1cc8e57fd7008284763b65d0c551fdda96321",
+  "policies_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "evidence": {
+    "candidate_outputs_A_count": 69,
+    "candidate_outputs_B_count": 87,
+    "export_manifest_files": 33,
+    "export_manifest_candidate_sha_entries": 156,
+    "unique_export_candidate_count": 156,
+    "missing_candidate_files_observed": 0,
+    "last_candidate_mtime_utc": "2026-10-20T11:40:05.862Z",
+    "last_export_mtime_utc": "2026-10-20T11:40:05.862Z",
+    "prior_qa": "localization/validation/c1_lightweight/C1-IDLE-20261021-0615-SHA-RECONCILE.json",
+    "prior_qa_confirmed_unique_sha_reviewed": 156,
+    "previous_github_reviewed_sha_list_matches": 152,
+    "additional_4_in_last_qa": "localization/validation/c1_lightweight/C1-QA-20261020-2345-UNIQUE4.json",
+    "additional_4_sha256": [
+      "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+      "95b6254910854cb5999b491fa91a2b5291b51b2a3a36812423c77595d60b03f8",
+      "9df970990a8118f0e4f31b2cd1ca9ad47ab4cc135716b19d5168409b346a410b",
+      "c0605ee71bdbac74ff8190153ab335ad8e0a4133e8d4dfcaa0e02477ce3043e1"
+    ],
+    "reconcile_script": "work/c1_qa_github_reconcile_20261020_2345.py",
+    "reconcile_script_result": "152/156 already in snapshot GitHub SHA list; 4 listed as absent are confirmed by the GitHub 2026-10-20 23:45 UNIQUE4 evidence",
+    "note": "Candidate/export names and mtime unchanged since 2026-10-21 06:15 QA. This pass did not recompute bytes SHA of all 156 files; no new visual QA claimed."
+  },
+  "new_unique_sha_count": 0,
+  "new_png_qa_count": 0,
+  "new_png_pass": 0,
+  "new_png_fail": 0,
+  "new_png_hold": 0,
+  "queue_consumed": false,
+  "imagegen_called": false,
+  "dds_composed_or_deployed": false,
+  "c2_c3_or_ingame_pass_created": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "scoreboard_source": "thp32tt/ai-dev-lab AI_SCOREBOARD.md main blob SHA 94a4aff685d1b3332948342e1b1e8eb8753c989a",
+  "ai1_score_previous_confirmed": 1666,
+  "score_delta": 0,
+  "ai1_score_after": 1666
+}
