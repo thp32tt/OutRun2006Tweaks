@@ -17,6 +17,7 @@ import re
 DEFAULT_PROJECT_LIBRARY = "아웃런 한글화 신규"
 MAX_SCAN = max(25, min(1000, int(os.environ.get("OUTRUN_LIBRARY_MAX_SCAN", "500"))))
 MAX_IMAGE_BYTES = 30_000_000
+MAX_VERIFY_SECONDS = max(30, min(180, int(os.environ.get("OUTRUN_LIBRARY_VERIFY_SECONDS", "90"))))
 
 def _now():
     return dt.datetime.now(dt.timezone.utc).isoformat()
@@ -230,7 +231,11 @@ async def verify_project_library_images(page,active, root=None, max_scan=MAX_SCA
         failures=[]
         inspected=0
         idle=0
+        scan_deadline=asyncio.get_running_loop().time()+MAX_VERIFY_SECONDS
         while inspected < max_scan:
+            if asyncio.get_running_loop().time() >= scan_deadline:
+                return None,(f"PROJECT_LIBRARY_SCAN_TIME_BUDGET:{len(matched)}/{expected}"
+                             f":SCANNED={inspected}:LOAD_ERRORS={len(failures)}")
             card_count=await cards.count()
             if inspected >= card_count:
                 # Library adds 20-article chunks on scrolling. A fixed initial
