@@ -117,8 +117,14 @@ int main() {
     assert(operand == "abs(input.r0.xyzw)");
     assert(append_native_sm3_source_modifier(operand, 12u));
     assert(operand == "-abs(abs(input.r0.xyzw))");
-    assert(!append_native_sm3_source_modifier(operand, 9u));
-    assert(!append_native_sm3_source_modifier(operand, 10u));
+    // Projective SM3 DZ/DW are now true source expressions; NOT remains
+    // rejected, and the previously valid ABS/ABSNEG chain is unchanged.
+    std::string projectiveZ = "input.r0.xyzw";
+    assert(append_native_sm3_source_modifier(projectiveZ, 9u));
+    assert(projectiveZ == "((input.r0.xyzw) / (input.r0.xyzw).zzzz)");
+    std::string projectiveW = "input.r0.xyzw";
+    assert(append_native_sm3_source_modifier(projectiveW, 10u));
+    assert(projectiveW == "((input.r0.xyzw) / (input.r0.xyzw).wwww)");
     assert(!append_native_sm3_source_modifier(operand, 13u));
     assert(operand == "-abs(abs(input.r0.xyzw))");
     assert(!emit(static_cast<NativeSm3ArithmeticOpcode>(255), 15u, 3u));
