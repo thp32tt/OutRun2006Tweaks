@@ -14,7 +14,7 @@
   "v2_batch_sheet_dispatch_implemented": false,
   "runtime_activation_approved": true,
   "controller_auto_send": true,
-  "auto_scope": "NATIVE_CROP_TO_A_B_IMAGEGEN_AND_C1_LIGHT_QA",
+  "auto_scope": "NATIVE_CROP_TO_A_B_IMAGEGEN_LOCAL_SHA_PERSIST_AND_C1_LIGHT_QA",
   "auto_dds_write": false,
   "auto_game_pass": false,
   "auto_deploy": false,
@@ -32,12 +32,14 @@
     "native_unsplit_hd_source_only": true,
     "actual_chatgpt_png_attachment": true,
     "generated_output_count_verified": true,
-    "project_library_content_sha_verified": true,
+    "project_library_content_sha_verified": false,
     "c1_independent_light_qa": true,
     "legacy_986_tiles_forbidden": true,
     "dds_single_writer_and_mip_preserved": true,
     "protected_pixels_zero_change": true,
-    "runtime_and_game_approval_separate": true
+    "runtime_and_game_approval_separate": true,
+    "local_generated_png_sha_verified": true,
+    "project_library_status": "SUPPLEMENTAL_NONBLOCKING"
   },
   "release_owner": "USER_MANUAL_PORTAINER_REDEPLOY_ONLY",
   "no_live_or_other_projects_modified": true
