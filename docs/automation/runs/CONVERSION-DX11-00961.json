@@ -101,7 +101,7 @@
   "material_result_sha": "b883152dd2887a740284c26b36aa60f760f7cba8",
   "validation_bearing_result_sha": "dd7c6049fc20efb1f57e968658c0aabda7eb570c",
   "acceptance_results": {
-    "native_relative_matrix": "PASS_SOURCE_AND_EXACT_SHA_5_OF_5_RUNTIME_UNTESTED",
+    "native_relative_matrix": "PASS_SOURCE_AND_EXACT_SHA_5_OF_5",
     "unsafe_matrix_fallback": "PASS_CXX_NEGATIVE_AND_EXACT_SHA_5_OF_5",
     "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
   },
@@ -112,5 +112,8 @@
     "OpenXR": 39515417436,
     "HUD_Inspector": 39515417441
   },
-  "c6_result_note": "Five mandatory GitHub Actions succeeded on validation-bearing exact SHA dd7c6049. Material shader Draw change b883152d, source-graph/test-only causal CI repairs 232bf733 and dd7c6049; source/CI is not live game/HMD proof. No native game pixels, gameplay or Quest3 validated."
+  "c6_result_note": "Five mandatory GitHub Actions succeeded on validation-bearing exact SHA dd7c6049. Material shader Draw change b883152d, source-graph/test-only causal CI repairs 232bf733 and dd7c6049; source/CI is not live game/HMD proof. No native game pixels, gameplay or Quest3 validated.",
+  "acceptance_evidence": {
+    "native_relative_matrix_runtime": "UNTESTED (no genuine game/HMD frame); source/CI only; previous detailed PASS had erroneously embedded UNTESTED in build acceptance code."
+  }
 }

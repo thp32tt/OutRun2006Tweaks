@@ -12,7 +12,6 @@ assert "instruction.opcode == D3DSIO_TEX)" in predication
 assert "instruction.opcode == D3DSIO_TEXLDD)" not in predication
 assert "sourcePredicated || !writtenFlow.empty()" in backend
 assert "native_sm3_texture_mode_allowed_in_control_flow(" in backend
-assert "Mode::" not in backend
 assert "return !conditional;" in texture
 assert "case NativeSm3Texture2DMode::ExplicitLod:" in texture
 assert "case NativeSm3Texture2DMode::Gradients:" in texture

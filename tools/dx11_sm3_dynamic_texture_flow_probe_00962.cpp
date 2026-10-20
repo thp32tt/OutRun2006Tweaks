@@ -1,6 +1,7 @@
 #include "native_sm3_texture_codegen.hpp"
 #include <string>
 #include <iostream>
+#include <initializer_list>
 using namespace outrun::vr::dx11;
 int main() {
     using Mode = NativeSm3Texture2DMode;
