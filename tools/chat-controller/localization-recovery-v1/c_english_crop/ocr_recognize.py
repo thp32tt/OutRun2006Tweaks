@@ -26,7 +26,13 @@ TESS_TIMEOUT=95
 OCR_STRATEGY_COUNT=6
 
 def norm(t):
-    return re.sub(r"[^A-Z0-9]","",t.upper())
+    return "".join(ch for ch in str(t).upper() if ch.isalnum())
+
+
+def searchable_phrase(t):
+    # Transcript placeholders such as [ENTER-KEY ICON] describe protected art,
+    # not literal glyphs. OCR the surrounding real text only.
+    return re.sub(r"\[[^\]]+\]"," ",str(t))
 
 def approved_phrases(q):
     path=SOURCE/"transcriptions.jsonl"
@@ -39,12 +45,14 @@ def approved_phrases(q):
         if entry.get("status")!="transcribed_reviewed":continue
         for seg in entry.get("segments",[]):
             phrase=seg.get("source","")
-            canonical=norm(phrase)
-            if len(canonical)>=4 and re.fullmatch(r"[A-Za-z0-9 ?!:.&'()+,-]{4,90}",phrase):
+            if not isinstance(phrase,str) or not phrase.strip() or len(phrase)>180:
+                continue
+            canonical=norm(searchable_phrase(phrase))
+            if len(canonical)>=2 and all((ch.isprintable() or ch.isspace()) for ch in phrase):
                 trans.setdefault(canonical,phrase)
     return trans
 
-def ocr_words(image, strategy=0):
+def ocr_words(image, strategy=0, languages="eng+jpn"):
     """Run one deterministic OCR strategy; repeated coverage scans rotate strategies."""
     strategy=int(strategy)%OCR_STRATEGY_COUNT
     rgba=image.convert("RGBA")
@@ -59,7 +67,7 @@ def ocr_words(image, strategy=0):
         test=Path(td)/"source.png"
         prepared.save(test)
         env={**os.environ,"OMP_THREAD_LIMIT":"1","TESSDATA_PREFIX":"/usr/share/tesseract-ocr/5/tessdata"}
-        run=subprocess.run(["tesseract",str(test),"stdout","-l","eng","--psm",str(psm),"tsv"],
+        run=subprocess.run(["tesseract",str(test),"stdout","-l",languages,"--psm",str(psm),"tsv"],
                            capture_output=True,text=True,timeout=TESS_TIMEOUT,env=env)
     if run.returncode: raise RuntimeError("TESSERACT_ERROR:"+run.stderr[-500:])
     groups={}
@@ -123,8 +131,11 @@ def unique_regions(words,phrasemap,w,h,allow_fuzzy=False):
                 if matched is None:continue
                 conf=min(x["confidence"] for x in ws)
                 avg=sum(x["confidence"] for x in ws)/len(ws)
-                min_required=83 if mode=="EXACT" else 86
-                avg_required=88 if mode=="EXACT" else 91
+                if mode=="EXACT" and len(matched)<4:
+                    min_required,avg_required=92,95
+                else:
+                    min_required=83 if mode=="EXACT" else 86
+                    avg_required=88 if mode=="EXACT" else 91
                 if conf<min_required or avg<avg_required:continue
                 x0=min(x["bbox"][0] for x in ws)
                 y0=min(x["bbox"][1] for x in ws)
