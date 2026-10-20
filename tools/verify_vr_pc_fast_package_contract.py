@@ -12,7 +12,7 @@ runner=(R/"tools/Run-OutRunVRTest.ps1").read_text(encoding="utf-8")
 start=(R/"tools/START_DX9EX_PC_FAST.cmd").read_text(encoding="utf-8")
 workflow=(R/".github/workflows/vr-pc-fast-build.yml").read_text(encoding="utf-8")
 def check(b,s,r,cmd):
-    for token in ('START_DX9EX_PC_FAST.cmd', 'Select-OutRunVRBackend.ps1',
+    for token in ('START_DX9EX_PC_FAST.cmd', 'GAME_DLL_SHA256.txt', 'Select-OutRunVRBackend.ps1',
                   'Run-OutRunVRTest.ps1','SOURCE_SHA.txt','BUILD_INPUTS.json',
                   'SHA256SUMS.txt','dinput8.dll','outrun-vr-host.exe'):
         assert token in b, ("PC FAST package item missing",token)
@@ -28,8 +28,8 @@ def check(b,s,r,cmd):
                   "if(-not $? -or !(Test-Path -LiteralPath $active)"):
         assert token in r, ("first-run safety missing",token)
     assert r.index("if(!(Test-Path $game))") < r.index("$activeMissing =")
-    for token in ("$isPcFastPackage", "ACTIVE_FULL_R34",
-                  "R51-PC-FAST-v2-R26HUD-ON",
+    for token in ("$isPcFastPackage", "ACTIVE_R26_R43_R44",
+                  "R26HUD-PC-FAST-v3-EXACT-SHA",
                   "PC_FAST_INCREMENTAL_NOT_FINAL_CI",
                   "$rendererCmakeFlags -ne [string]$buildInputs.CMakeFlags",
                   "OUTRUN_VR_SAFE_DRAW_COMPARE=OFF", 
@@ -46,10 +46,16 @@ def check(b,s,r,cmd):
                   "if ($parseErrors -and $parseErrors.Count -gt 0)",
                   "PC Fast launcher syntax invalid:"):
         assert token in b, ("PowerShell compile-time prepackage guard missing", token)
+    assert "GameDllSha256" in s and "RendererSourceOwner" in s
+    assert "GAME_DLL_SHA256.txt" in s and "PC Fast game DLL SHA256 mismatch" in s
     assert s.count("function Get-PeMachine(") == 1
     assert s.count("$logPatterns=@(") == 1
     assert "$sourceSha -notmatch '^[0-9a-fA-F]{40}$' -or" in s
     assert "DX9Ex PC Fast package manifest/build contract mismatch." in s
+    assert "ref: ${{ github.sha }}" in workflow
+    assert "./tools/Build-OutRunPCFast.ps1 -ExpectedSha $expectedSha" in workflow
+    for token in ("PC FAST SOURCE GRAPH VERIFIED", "PC FAST COMPILED R26 DLL SHA256", "PC Fast WRONG CHECKOUT", "R26HUD-PC-FAST-v3-EXACT-SHA"):
+        assert token in b, ("PC Fast exact source guard missing", token)
     assert workflow.count("runs-on: [self-hosted, Windows, X64, outrun-pc]") == 1
     assert "contains(github.event.head_commit.message, '[pc-build]')" in workflow
     return True
@@ -58,7 +64,7 @@ for source,old,new in (
     ("runner","if(-not ($activeMissing -and $currentMissing))",
      "if($activeMissing -or $currentMissing)"),
     ("runner","-VariantId CURRENT_FOCUS","-VariantId R26_SAFE"),
-    ("selector","R51-PC-FAST-v2-R26HUD-ON","R51-PC-FAST-v3"),
+    ("selector","R26HUD-PC-FAST-v3-EXACT-SHA","PC_FAST_WRONG_CONTRACT"),
     ("selector","$rendererCmakeFlags -ne [string]$buildInputs.CMakeFlags",
      "$rendererCmakeFlags -eq [string]$buildInputs.CMakeFlags"),
     ("build","'START_DX9EX_PC_FAST.cmd',","'Run-OutRunVRTest.cmd',"),

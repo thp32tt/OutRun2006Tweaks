@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the R84-default DX9Ex release path and the protected R26 rollback.
+"""Verify R26+HUD default DX9Ex release and explicit R84 A/B without silent renderer drift.
 
 Source mutation tests run without Quest3/HMD; they protect installer routing,
 exact-source identity, portable performance invariants, and visible errors.
@@ -16,11 +16,11 @@ def check(src):
     failures = []
     expected = [
         (selector, r'\$src\s*=\s*if\s*\(\$Backend\s*-eq\s*"d3d9"\s*-and\s*\(\$variant\s*-eq\s*"R26_SAFE"\s*-or\s*\$variant\s*-eq\s*"R84_TEST"\)\)', "R26/R84 optional variants require dedicated payloads"),
-        (selector, r'\}\s*elseif\s*\(\$Backend\s*-eq\s*"d3d9"\)\s*\{\s*\$backendPayload', "all ordinary DX9Ex profiles must use main R84 payload"),
+        (selector, r'\}\s*elseif\s*\(\$Backend\s*-eq\s*"d3d9"\)\s*\{\s*\$backendPayload', "all ordinary DX9Ex profiles must use main R26+HUD payload"),
         (selector, r'if\s*\(-not\s*\(Test-Path\s+\$slotPayload\)\)\s*\{\s*throw', "absent R26 fallback must fail closed"),
-        (selector, r"\$expectedVariant\s*=\s*if\s*\(\$isPcFastPackage\)\s*\{\s*'ACTIVE_FULL_R34'\s*\}\s*elseif\s*\(\$variant\s*-eq\s*'R26_SAFE'\)\s*\{\s*'ACTIVE_R26_R43_R44'\s*\}\s*else\s*\{\s*'R84_SPLIT_R33_R32_R31_R30_R29'", "PC Fast/R26 rollback/R84 release must have three distinct compiled identities"),
+        (selector, r"\$expectedVariant\s*=\s*if\s*\(\$isPcFastPackage\)\s*\{\s*'ACTIVE_R26_R43_R44'\s*\}\s*elseif\s*\(\$variant\s*-eq\s*'R84_TEST'\)\s*\{\s*'R84_SPLIT_R33_R32_R31_R30_R29'\s*\}\s*else\s*\{\s*'ACTIVE_R26_R43_R44'", "PC Fast/default R26/R84 opt-in must have exact compiled identities"),
         (selector, r"\$isPcFastPackage\s*=\s*\[string\]\$buildInputs\.ValidationClass\s*-eq\s*'PC_FAST_INCREMENTAL_NOT_FINAL_CI'", "PC Fast identity must be explicit and not silently inherit a release"),
-        (selector, r"\[string\]\$buildInputs\.BuildContract\s*-ne\s*'R51-PC-FAST-v2-R26HUD-ON'", "PC Fast safe HUD build contract must be verified"),
+        (selector, r"\[string\]\$buildInputs\.BuildContract\s*-ne\s*'R26HUD-PC-FAST-v3-EXACT-SHA'", "PC Fast safe HUD build contract must be verified"),
         (selector, r"\$rendererBuildVariant\s*-ne\s*\$expectedVariant", "active selected DLL must retain variant identity check"),
         (selector, r'\$sourceSha\s*-ne\s*\(Get-Content\s+\$baselineShaFile', "all variants must use the same source SHA"),
         (selector, r'\[System\.IO\.File\]::Replace\(\$staged, \$installed, \$backup, \$true\)', "DLL/host change must replace an already-installed file atomically"),
@@ -32,11 +32,11 @@ def check(src):
         (selector, r'finally\s*\{\s*if\s*\(Test-Path\s+-LiteralPath\s+\$staged\)', "aborted stage must be cleaned up"),
         (selector, r'\$enforceReleaseIdentity\s*=\s*\(Test-Path\s+\$packageInputsFile\)', "released package must enforce main/fallback identity"),
         (selector, r'\$sourceSha\s*-ne\s*\[string\]\$buildInputs\.IntegrationSha', "released variant must match the build manifest exact SHA"),
-        (selector, r"\}\s*elseif\s*\(\[string\]\$buildInputs\.VariantId\s*-ne\s*'R84_SPLIT_R33_R32_R31_R30_R29'\)", "released default must be compiled R84"),
+        (selector, r"\}\s*elseif\s*\(\[string\]\$buildInputs\.VariantId\s*-ne\s*'ACTIVE_R26_R43_R44'\)", "released default must be R26+HUD"),
         (selector, r'\$rendererCmakeFlags\s*-notmatch\s*\x27OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON\x27', "R84 must be the fully split owner"),
         (selector, r'\$rendererCmakeFlags\s*-notmatch\s*\x27OUTRUN_VR_R26_HUD_COMPARE=ON\x27', "R26 fallback must retain its shipped HUD owner"),
         (selector, r'DX9Ex selected host is not the matching exact-SHA host', "different OpenXR host hashes must fail closed"),
-        (gui, r"'CURRENT_FOCUS'=\[ordered\]@\{Backend='d3d9'.*?Title='MAIN R84", "default GUI entry must identify R84"),
+        (gui, r"'CURRENT_FOCUS'=\[ordered\]@\{Backend='d3d9'.*?Title='MAIN R26\+HUD", "default GUI entry must identify R26+HUD"),
         (gui, r"'R26_SAFE'=\[ordered\]@\{Backend='d3d9'", "explicit R26 safe rollback must be visible"),
         (gui, r"\$effectivePath=if\(\$cfg\.Backend -eq 'd3d9' -and \(\$slot -eq 'R84_TEST' -or \$slot -eq 'R26_SAFE'\)\)", "GUI dedicated R26 and R84 payload gating"),
         (gui, r"\$actualVariant=if\(\$cfg\.Contains\('Variant'\)\)", "A/B/C canonical cockpit alias must be explicit"),
@@ -47,12 +47,12 @@ def check(src):
         (gui, r'\$quotedRunner\s*=\s*\x27"\x27 \+ \$runner \+ \x27"\x27', "quoted launcher path"),
         (gui, r"Start-Process -FilePath \(Join-Path \$PSHOME 'powershell.exe'\) -ArgumentList \$launchArgs", "visible runner must be started"),
         (runner, r"trap\s*\{.*?\$errorFile\s*=\s*Join-Path\s+\$root\s+'OUTRUNVR_LAUNCH_ERROR\.txt'.*?Set-Content\s+-LiteralPath\s+\$errorFile.*?MessageBox\]::Show", "early failures must be visible and logged"),
-        (workflow, r"Copy-Item payload/r84/dinput8\.dll \(Join-Path \$backend 'dinput8\.dll'\)", "main package must contain actual R84 DLL"),
+        (workflow, r"Copy-Item payload/game/dinput8\.dll \(Join-Path \$backend 'dinput8\.dll'\)", "main package must contain the exact R26+HUD DLL"),
         (workflow, r"Copy-Item payload/game/dinput8\.dll \(Join-Path \$r26 'dinput8\.dll'\)", "fallback package must contain protected R26 DLL"),
-        (workflow, r"FallbackRendererSlot = 'R26_SAFE'", "package manifest must advertise rollback"),
-        (workflow, r"CURRENT_FOCUS installed a non-R84 renderer", "CI must compare default installed renderer variant"),
+        (workflow, r"FallbackRendererSlot = 'R84_TEST'", "package manifest must advertise rollback"),
+        (workflow, r"CURRENT_FOCUS installed a non-R26\+HUD renderer", "CI must compare installed R26+HUD variant"),
         (workflow, r"R26_SAFE did not install protected R26\+HUD DLL", "CI must verify rollback DLL bytes"),
-        (workflow, r"R84 main restore did not install the refactored R29-R33 DLL", "CI must verify rollback reversal"),
+        (workflow, r"R26\+HUD main restore did not install the default R26\+HUD DLL", "CI must verify rollback reversal"),
         (workflow, r'verify_vr_dx9ex_launch_paths\.py', "Active CI must run this verifier"),
     ]
     for value, pattern, label in expected:
@@ -114,10 +114,10 @@ if __name__ == "__main__":
         (0, '$variant -eq "R26_SAFE" -or $variant -eq "R84_TEST"', '$variant -eq "R84_TEST"'),
         (0, 'if (-not (Test-Path $slotPayload)) { throw', 'if (-not (Test-Path $slotPayload)) { Write-Warning'),
         (0, "'ACTIVE_R26_R43_R44'", "'NONEXISTENT'"),
-        (0, "    $expectedVariant = if ($isPcFastPackage) {\n        'ACTIVE_FULL_R34'", "    $expectedVariant = if ($isPcFastPackage) {\n        'NONEXISTENT_PC_FAST'"),
+        (0, "    $expectedVariant = if ($isPcFastPackage) {\n        'ACTIVE_R26_R43_R44'", "    $expectedVariant = if ($isPcFastPackage) {\n        'NONEXISTENT_PC_FAST'"),
         (0, "PC_FAST_INCREMENTAL_NOT_FINAL_CI", "PC_FAST_UNVERIFIED"),
         (0, "R51-PC-FAST-v2-R26HUD-ON", "PC_FAST_UNVERIFIED_CONTRACT"),
-        (0, "    } else {\n        'R84_SPLIT_R33_R32_R31_R30_R29'\n    }", "    } else {\n        'NONEXISTENT'\n    }"),
+        (0, "    } else {\n        'ACTIVE_R26_R43_R44'\n    }", "    } else {\n        'NONEXISTENT'\n    }"),
         (0, '$sourceSha -ne (Get-Content $baselineShaFile', '$sourceSha -eq (Get-Content $baselineShaFile'),
         (0, '[System.IO.File]::Replace($staged, $installed, $backup, $true)', 'Copy-Item $staged $installed -Force'),
         (0, 'if ((Get-Sha256Lower $p) -ne (Get-Sha256Lower $staged))', 'if ($false)'),
@@ -131,9 +131,9 @@ if __name__ == "__main__":
         (1, '$session.VariantId -ne $actualVariant', '$session.VariantId -eq $actualVariant'),
         (1, '-VariantId $actualVariant', '-VariantId $slot'),
         (2, "OUTRUNVR_LAUNCH_ERROR.txt", "SILENT_FAILURE"),
-        (3, "Copy-Item payload/r84/dinput8.dll (Join-Path $backend 'dinput8.dll')", "Copy-Item payload/game/dinput8.dll (Join-Path $backend 'dinput8.dll')"),
+        (3, "Copy-Item payload/game/dinput8.dll (Join-Path $backend 'dinput8.dll')", "Copy-Item payload/r84/dinput8.dll (Join-Path $backend 'dinput8.dll')"),
         (3, "Copy-Item payload/game/dinput8.dll (Join-Path $r26 'dinput8.dll')", "Copy-Item payload/r84/dinput8.dll (Join-Path $r26 'dinput8.dll')"),
-        (3, "FallbackRendererSlot = 'R26_SAFE'", "FallbackRendererSlot = 'NONE'"),
+        (3, "FallbackRendererSlot = 'R84_TEST'", "FallbackRendererSlot = 'NONE'"),
     ]
     for index, original, mutant in mutations:
         assert original in src[index], f"mutation fixture missing {original}"
