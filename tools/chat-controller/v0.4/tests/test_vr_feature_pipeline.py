@@ -213,7 +213,7 @@ class FeatureModeTests(unittest.TestCase):
         src = path.read_text(encoding="utf-8")
         self.assertIn('if active.get("feature_branch"):', src)
         self.assertIn("VR_FEATURE_DEVELOPMENT_ENABLED", src)
-        self.assertIn('target["lane"] in {"DX11", "DX9EX"}', src)
+        self.assertIn('dx9ex_enabled and not DX9EX_REVIEW_ONLY', src)
 
     def test_prompt_and_checkpoint_durability(self):
         part0 = (PARTS / "controller.py.part00").read_text(encoding="utf-8")
@@ -222,11 +222,12 @@ class FeatureModeTests(unittest.TestCase):
         self.assertIn("FEATURE_BRANCH", part0)
         self.assertIn('"feature_id", "feature_branch", "feature_stage"', part3)
         self.assertIn("FEATURE_BRANCH=", part3)
-        for name in ("conversion_dx11.md", "conversion_dx9ex.md"):
-            prompt = (ROOT / name).read_text(encoding="utf-8")
-            self.assertIn("FEATURE_BASED_DEVELOPMENT", prompt)
-            self.assertIn("FEATURE_READY", prompt)
-            self.assertIn("체크포인트", prompt)
+        prompt = (ROOT / "conversion_dx11.md").read_text(encoding="utf-8")
+        for marker in ("FEATURE_BASED_DEVELOPMENT", "FEATURE_READY", "체크포인트"):
+            self.assertIn(marker, prompt)
+        review = (ROOT / "conversion_dx9ex.md").read_text(encoding="utf-8")
+        self.assertIn("MODE=DX9EX_REVIEW_ONLY", review)
+        self.assertIn("CODE_CHANGE=FORBIDDEN", review)
 
     def test_autonomous_ai_promotion_without_controller_approval(self):
         part0 = (PARTS / "controller.py.part00").read_text(encoding="utf-8")
@@ -243,12 +244,13 @@ class FeatureModeTests(unittest.TestCase):
         observed = section.index('task_commit = github_find_task_commit(active["branch"], active["task_id"])')
         legacy_promotion = section.index('and VR_FEATURE_PROMOTION_MODE == "controller":')
         self.assertLess(observed, legacy_promotion)
-        for prompt_name in ("conversion_dx9ex.md", "conversion_dx11.md"):
-            prompt = (ROOT / prompt_name).read_text(encoding="utf-8")
-            self.assertIn("AI 자율 검증·승격 정책", prompt)
-            self.assertIn("expected_sha", prompt)
-            self.assertIn("force=false", prompt)
-            self.assertIn("컨트롤러는 별도 승인을 하지 않는다", prompt)
+        prompt = (ROOT / "conversion_dx11.md").read_text(encoding="utf-8")
+        for marker in ("AI 자율 검증·승격 정책", "expected_sha",
+                       "force=false", "컨트롤러는 별도 승인을 하지 않는다"):
+            self.assertIn(marker, prompt)
+        review = (ROOT / "conversion_dx9ex.md").read_text(encoding="utf-8")
+        self.assertIn("MODE=DX9EX_REVIEW_ONLY", review)
+        self.assertIn("자동 patch/refactor/merge/update_ref/branch 생성", review)
 
     def test_compose_and_legacy_dedup(self):
         compose = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
