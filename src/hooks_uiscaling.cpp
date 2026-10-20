@@ -974,16 +974,20 @@ class UIScaling : public Hook
         const bool ordinalReturnSite =
             returnAddress == Module::exe_ptr(0xBAEE7);
         const bool ordinalProducerScope = RankMarkerSubActiveDepth != 0;
-        // Field log: ALL 0xBAEE2 world car inputs (sourceZ=-109/-69/-29)
-        // were suppressed by NaviPubDepth=1 despite their original source
-        // CALL proof. Only this exact E8 may override NaviPub when its
-        // recovered view-space anchor is valid; other HUD nodes remain 2D.
-        if ((ordinalReturnSite || ordinalProducerScope ||
-             RankMarkerExactCalcEdge) &&
-            (RankMarkerSubScreenHudDepth == 0 ||
-             RankMarkerExactCalcEdge))
+        // DX11 reference captures the original 0xBAEE7 rank projection
+        // without the later R26 raw-input round-trip/parent admission.
+        // RankMarkerExactCalcEdge preserves that original source identity
+        // through the inline x86 Calc3D2D trampoline.
+        const bool dx11RankSource = Settings::VRRankDx11ProducerReference.get();
+        const bool acceptRankSource = dx11RankSource
+            ? (ordinalReturnSite || RankMarkerExactCalcEdge)
+            : ((ordinalReturnSite || ordinalProducerScope ||
+                RankMarkerExactCalcEdge) &&
+               (RankMarkerSubScreenHudDepth == 0 ||
+                RankMarkerExactCalcEdge));
+        if (acceptRankSource)
         {
-            recoverViewPoint(RankMarkerProjectedInfo, true);
+            recoverViewPoint(RankMarkerProjectedInfo, !dx11RankSource);
             // An exact active original rank Calc3D2D call owns this payload.
             // The R26 renderer only changes eye cant after the existing
             // ProjectedWorldMarker2D ownership and valid-anchor checks pass.
@@ -2009,9 +2013,10 @@ class UIScaling : public Hook
                 OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani,
                 OutRunVR::GameSemantic::ProjectedMarkerProbeStage::Producer,
                 projectedAnchor.valid);
-        const int anchorLiftY =
-            OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
-                Settings::VREnabled, projectedVehicleRank);
+        const int anchorLiftY = Settings::VRRankDesktopLift.get()
+            ? OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
+                Settings::VREnabled, projectedVehicleRank)
+            : 0;
 
         // Scope the actual original draw AFTER determining NaviPub vs
         // vehicle owner; this preserves the historical precedence contract.
@@ -2073,9 +2078,10 @@ class UIScaling : public Hook
         // invalid/absent world input continues on native ScreenHud.
         const bool screenHud =
             RankMarkerSubScreenHudDepth != 0 && !projected;
-        const int anchorLiftY =
-            OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
-                Settings::VREnabled, projected);
+        const int anchorLiftY = Settings::VRRankDesktopLift.get()
+            ? OutRunVR::RankMarker::VehicleAnchorDesktopLiftPixels(
+                Settings::VREnabled, projected)
+            : 0;
         if (!screenHud)
             OutRunVR::GameSemantic::NoteProjectedMarkerProbe(
                 OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
@@ -2859,8 +2865,13 @@ public:
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
         // Only the exact verified x86 E8 rival projector, before BB796
         // queues its marker. No generic NaviPub/game sprite hooks widened.
-        Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
-            Calc3D2D_RivalExactCall, Memory::HookType::Call);
+        if (!Settings::VRRivalDx11NativeRoute.get())
+            Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
+                Calc3D2D_RivalExactCall, Memory::HookType::Call);
+        else
+            spdlog::info(
+                "VR RIVAL DX11 REFERENCE: stock BB6F0 projector and "
+                "BB796 rival sprite calls retained");
 		for (int addr : RankMarkerSubScreenHudCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
@@ -2890,9 +2901,10 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite,
 				Memory::HookType::Call);
-		Memory::VP::InjectHook(
-			Module::exe_ptr(RivalMarker_SpraniCall),
-			RivalMarker_sprani, Memory::HookType::Call);
+        if (!Settings::VRRivalDx11NativeRoute.get())
+            Memory::VP::InjectHook(
+                Module::exe_ptr(RivalMarker_SpraniCall),
+                RivalMarker_sprani, Memory::HookType::Call);
 		for (int addr : TextGlyph_PutSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,

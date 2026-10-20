@@ -76,6 +76,12 @@ namespace Settings
 	// HMD-proven DX11 R57 mode 6 projects car ordinal and rival markers
     // with head inverse, identity eye orientations and physical per-eye
     // IPD/FOV. The R26 ordinal-only cant experiment is reversible.
+    Setting<bool> VRRankDx11ProducerReference{ "VR", "RankDx11ProducerReference", true,
+        "DX11 R57 mode6 direct original Calc3D2D output rank source; false restores the guarded R26 input check for A/B." };
+    Setting<bool> VRRivalDx11NativeRoute{ "VR", "RivalDx11NativeRoute", true,
+        "DX11-equivalent stock rival: do not install additional R26 0xBB6F0 and 0xBB796 E8 detours. False restores old detours; requires restart." };
+    Setting<bool> VRRankDesktopLift{ "VR", "RankDesktopLift", false,
+        "Reversible optional +32 original UI pixel rank vertical lift, absent in tested DX11. Default off. Does not affect rival." };
     Setting<bool> VRRankDx11ReferenceEyePose{ "VR", "RankDx11ReferenceEyePose", true,
         "Use the DX11 HMD-proven R57 mode-6 eye pose for car-attached rank markers. True keeps identity eye orientation and relative IPD with head inverse. False restores the R26 ordinal-only canted-eye experiment for A/B. World and rival producers are unchanged." };
 	Setting<bool> VRHud1080pReference{ "VR", "Hud1080pReference", true,
