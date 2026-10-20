@@ -35,6 +35,9 @@ def test(root, patch_path=None):
     assert 'slot.name in ("A", "B"):\n        project_name' in expanded
     assert 'elif CONTROLLER_MODE == "localization" and slot.name == "C1":' in expanded
     assert 'send_result = await send_message(page, png_binding["prompt"], png_binding)' in expanded
+    assert 'rollback_submission' in expanded
+    assert 'send_result.startswith("IMAGE_TOOL_NOT_SELECTED:")' in expanded
+    assert 'send_result.startswith("SOURCE_REFERENCE_NOT_BOUND:")' in expanded
     assert 'send_result = await send_message(page, prompt)' in expanded
     assert 'for retired_name in ("C2",):' in expanded
     # Existing C from the prior deployment migrates to C1 once and preserves its tab URL.
