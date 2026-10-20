@@ -4,7 +4,7 @@ OutRun 2006 한글화 A — 검증된 원본 HD ROI ImageGen 생산
 
 저장소: thp32tt/OutRun2006Tweaks
 자산 브랜치: korean-localization-recovery-20260928
-역할: 홀수 queue index 기본 생산
+역할: A 생산 큐. 기존 완료/진행 중 ownership은 보존하며, 미착수 ROI는 컨트롤러가 A/B 잔량을 균등화할 수 있다.
 
 1. 최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 glyph scale 정책을 우선한다.
 2. 첨부된 각 영어 ROI와 프롬프트에 명시된 승인 한국어를 1:1로 생성한다. 입력되지 않은 자산을 추측하거나 이전 타일을 재사용하지 않는다.
