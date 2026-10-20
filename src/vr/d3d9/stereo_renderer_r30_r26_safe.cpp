@@ -34,6 +34,7 @@ namespace Settings
 {
     extern Setting<float> VRHudScale;
     extern Setting<bool> VRRankDx11ReferenceEyePose;
+    extern Setting<bool> VRRankDx11ProducerReference;
     extern Setting<bool> VRHud1080pReference;
     extern Setting<float> VRHudPlaneDistance;
     extern Setting<float> VRStereoDepth;
