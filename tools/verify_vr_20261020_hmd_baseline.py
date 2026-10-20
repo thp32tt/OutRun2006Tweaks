@@ -8,7 +8,7 @@ source=(root/'src/hooks_graphics.cpp').read_text(encoding='utf-8')
 settings=(root/'src/vr/settings.cpp').read_text(encoding='utf-8')
 collector=(root/'tools/Collect-OutRunVRLogs.ps1').read_text(encoding='utf-8')
 def verify(src,setting,log):
-    assert 'VRLensFlareCentreEnabled{ "VR", "LensFlareCentreEnabled", false,' in setting
+    assert 'VRLensFlareCentreEnabled{ "VR", "LensFlareCentreEnabled", true,' in setting
     assert 'extern Setting<bool> VRLensFlareCentreEnabled;' in src
     assert 'Module::exe_ptr(0xC993), DrawObjectAlphaCentre' in src
     assert 'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected' in src
@@ -32,7 +32,7 @@ for fname,old,bad in [
     ('source','objectId == 0x570002','objectId >= 0'),
     ('source','!Settings::VRLensFlareCentreEnabled.get()','Settings::VRLensFlareCentreEnabled.get()'),
     ('source','if (Settings::VREnabled && objectId == 0x570002 &&','if (objectId == 0x570002 &&'),
-    ('settings','"LensFlareCentreEnabled", false,','"LensFlareCentreEnabled", true,'),
+    ('settings','"LensFlareCentreEnabled", true,','"LensFlareCentreEnabled", false,'),
     ('collector',"$kv.ContainsKey('gameDllSha256')","$kv.gameDllSha256")]:
     values=dict(source=source,settings=settings,collector=collector)
     assert old in values[fname],old
