@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-2215-A0011-B0017-A0010-UNIQUE8",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T22:15:00+09:00",
+  "inspection_type": "INDEPENDENT_LIGHTWEIGHT_SHA_DEDUP_PNG_CANDIDATES",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_local": "N100 work/c1_batch_20261020_2215/{metrics.json,compare_1.png,compare_2.png}",
+  "dedup": {
+    "prior_non_idle_C1_QA_JSON_checked": 19,
+    "prior_candidate_sha_matches": 0,
+    "selected_unique_candidate_shas": 8,
+    "checked_all_prior_json_contents_for_full_candidate_SHA256": true
+  },
+  "summary": {
+    "reviewed": 8,
+    "pass_png_only": 6,
+    "fail_png": 2,
+    "hold_rework_dimensions": 8,
+    "alpha_edge_warnings_at_1": 2,
+    "alpha_edge_warnings_at_16": 0,
+    "source_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "png_rgba_verified": 8,
+    "asset_composition_approved": 0
+  },
+  "cases": [
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0011-CC7EDC4B",
+      "source_ordinal": 51,
+      "source_roi_file": "Q201_69fd0e9614e43659_source.png",
+      "source_roi_sha256": "112cb088b8c6e72145c9c901e0a238f0ef4fc96a6e56b0bd454e44ec9497f124",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "candidate_file": "Q201_69fd0e9614e43659_source_k.png",
+      "candidate_sha256": "ce76846244308b0ff7f85c39b81625efab55f10de3743324bb7293e51634db8f",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "FLORAL VILLAGE",
+      "reviewed_korean": "플로럴 빌리지",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1936,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        75,
+        83,
+        2100,
+        561
+      ],
+      "alpha_bbox_16": [
+        210,
+        209,
+        1953,
+        497
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "observation": "FLORAL VILLAGE→플로럴 빌리지: 문구·받침 구조·효과 육안 확인, 투명 PNG 글자만 정상.",
+      "alpha_edge_warning": null,
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0011-CC7EDC4B",
+      "source_ordinal": 52,
+      "source_roi_file": "Q201_fd23f4ba1ec80c46_source.png",
+      "source_roi_sha256": "fc899826c2fb451b4a6c42750752234de5598d373c691890a7ff54b8204e70ab",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "candidate_file": "Q201_fd23f4ba1ec80c46_source_k.png",
+      "candidate_sha256": "e583ce25c08eb1cdfd367dad38283ae8d67de106b2860f2006bf744cac142442",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "CAPE WAY",
+      "reviewed_korean": "케이프 웨이",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1262,
+        246
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        23,
+        0,
+        2136,
+        692
+      ],
+      "alpha_bbox_16": [
+        147,
+        175,
+        2024,
+        526
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 3,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "observation": "CAPE WAY→케이프 웨이: 문구·가독성 OK. alpha=1 상단 3px 경고로 합성 시 경계 검사 필요.",
+      "alpha_edge_warning": "BORDER_PIXEL_ALPHA_1_ONLY_RECHECK_BEFORE_COMPOSITION",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0011-CC7EDC4B",
+      "source_ordinal": 53,
+      "source_roi_file": "Q205_09aa4e1f4651936c_source.png",
+      "source_roi_sha256": "534007390a2927f0d55a9a96523f19c499d4650129dcaa6f64bbd4e5355f3aef",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "candidate_file": "Q205_09aa4e1f4651936c_source_k.png",
+      "candidate_sha256": "905a9e1843382a8891a7822eb4cf70729bf91c19c2d1d3e21eb8cfa13336731b",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "REVERSE",
+      "reviewed_korean": "반전",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1100,
+        264
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        672,
+        160,
+        2110,
+        724
+      ],
+      "alpha_bbox_16": [
+        675,
+        164,
+        1496,
+        543
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 21,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "FAIL_GLYPH_DECOMPOSED_JONGSEONG",
+      "glyph_integrity": "FAIL_VISUAL_JONGSEONG_DECOMPOSITION",
+      "observation": "REVERSE→반전: 각 음절의 종성 ㄴ이 아래 별도 행으로 분리되어 한글 음절 구조 훼손. 원문 한 줄 대비 비정상적인 2단 배열.",
+      "alpha_edge_warning": "BORDER_PIXEL_ALPHA_1_ONLY_RECHECK_BEFORE_COMPOSITION",
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0011-CC7EDC4B",
+      "source_ordinal": 54,
+      "source_roi_file": "Q205_10e5e41cecc715df_source.png",
+      "source_roi_sha256": "1cca4722cd8b73107b20a9547fbbd436c12bc93e3bd16f3bc27e2f7cf7604c6c",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "candidate_file": "Q205_10e5e41cecc715df_source_k.png",
+      "candidate_sha256": "5ddc116c1dcc62b56b851807782397e6630cd5fc7474a15f8ef7b16d90829de9",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "RANKINGS",
+      "reviewed_korean": "랭킹",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        580,
+        176
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        540,
+        63,
+        1635,
+        652
+      ],
+      "alpha_bbox_16": [
+        620,
+        121,
+        1541,
+        608
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "FAIL_GLYPH_DECOMPOSED_JONGSEONG",
+      "glyph_integrity": "FAIL_VISUAL_JONGSEONG_DECOMPOSITION",
+      "observation": "RANKINGS→랭킹: 랭/킹 아래 종성 ㅇ이 크게 분리되어 두 음절 구조 파손. 표기 자체가 읽기 곤란.",
+      "alpha_edge_warning": null,
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0011-CC7EDC4B",
+      "source_ordinal": 55,
+      "source_roi_file": "Q205_c42cac247c3c65f9_source.png",
+      "source_roi_sha256": "35b3438619645e5e2dbace00e5ccdd97a21181300ba4880cfcdf582eb2f2b554",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "candidate_file": "Q205_c42cac247c3c65f9_source_k.png",
+      "candidate_sha256": "3322002feb4ac298afe6c8789b41bd73b9d3b334b0951000f5f38705fe5fad53",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "CANCEL",
+      "reviewed_korean": "취소",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        872,
+        256
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        67,
+        23,
+        1637,
+        680
+      ],
+      "alpha_bbox_16": [
+        637,
+        138,
+        1561,
+        589
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "observation": "CANCEL→취소: 두 음절 가독성, 비문자 프레임 및 영문 잔상 없음.",
+      "alpha_edge_warning": null,
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0017-94AEC8DC",
+      "source_ordinal": 81,
+      "source_roi_file": "Q205_d41489aeb701c7cb_source.png",
+      "source_roi_sha256": "95c18097301e29f58e680735bbe029b0e00a2ef5f9022726db7dacada44edb66",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "candidate_file": "Q205_d41489aeb701c7cb_source_k.png",
+      "candidate_sha256": "668fb9a50cfd633c5178e13fd9eb98f94fa35487b5899f001980e9f06b235303",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "YOUR POSITION OK",
+      "reviewed_korean": "현재 순위 확인",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        1924,
+        248
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        89,
+        202,
+        2142,
+        604
+      ],
+      "alpha_bbox_16": [
+        92,
+        205,
+        2079,
+        518
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "observation": "YOUR POSITION OK→현재 순위 확인: 승인 매핑과 일치, 문장 구분·가독성 OK.",
+      "alpha_edge_warning": null,
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0017-94AEC8DC",
+      "source_ordinal": 82,
+      "source_roi_file": "Q205_b51700d09a9cc844_source.png",
+      "source_roi_sha256": "524ff385dce099cb3f336211e78f0cf33a25dc22c78c478ab4f9466a27fea4ab",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "candidate_file": "Q205_b51700d09a9cc844_source_k.png",
+      "candidate_sha256": "d4bf9106ca73c370ca0e2ffb4e029f1883ad597a3d5d65fe20980e5721bb8777",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "OPTIONS",
+      "reviewed_korean": "옵션",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        825,
+        191
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        468,
+        149,
+        1695,
+        700
+      ],
+      "alpha_bbox_16": [
+        684,
+        152,
+        1482,
+        549
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "observation": "OPTIONS→옵션: 붉은 원문 효과 계열, 글자 내용 및 투명 PNG 육안 확인.",
+      "alpha_edge_warning": null,
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0010-3F5E8C9A",
+      "source_ordinal": 46,
+      "source_roi_file": "Q193_ed9b7c69cdee8955_source.png",
+      "source_roi_sha256": "46c2ca6afb798f173ab4ce2c67606f40b409736b7b3fe15b39623d742d18e2ee",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "candidate_file": "Q193_ed9b7c69cdee8955_source_k.png",
+      "candidate_sha256": "a2554dd0f05d0b45468c027bbe944b2ebc9284ef8e3850672a62e9a5b6151772",
+      "producer_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "english": "15 Cont.",
+      "reviewed_korean": "15코스",
+      "translation_mapping": "EXACT_REVIEWED_TRANSLATION_AND_SHA_VERIFIED_NATIVE_CROP",
+      "source_dimensions": [
+        976,
+        280
+      ],
+      "candidate_dimensions": [
+        1937,
+        812
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_bbox_1": [
+        53,
+        31,
+        1827,
+        702
+      ],
+      "alpha_bbox_16": [
+        143,
+        157,
+        1778,
+        652
+      ],
+      "border_alpha_pixels_at_1": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_alpha_pixels_at_16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "independent_qa": "PASS_PNG_ONLY",
+      "glyph_integrity": "PASS_VISUAL_INSPECTION",
+      "observation": "15 Cont.→15코스: 숫자·한글 매핑 일치, 영문 잔상/프레임 관찰 없음.",
+      "alpha_edge_warning": null,
+      "composition": "HOLD_REWORK_DIMENSIONS",
+      "ui_cell_bbox_containment": "UNTESTED_NATIVE_COMPOSITION",
+      "dds_c2_c3_ingame": "UNTESTED"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "release_gate": "NOT_APPROVED_PNG_ONLY_QA",
+  "prohibited_actions_confirmed": [
+    "NO_IMAGEGEN",
+    "NO_A_B_QUEUE_CONSUMPTION",
+    "NO_NEW_DDS",
+    "NO_C2_C3_PASS",
+    "NO_GAME_DEPLOY",
+    "NO_VR_FFB_DX11_DXVK_CHANGES"
+  ]
+}
