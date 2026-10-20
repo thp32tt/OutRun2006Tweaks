@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0615-IDLE-SHA-RECONCILE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-21T06:15:00+09:00",
+  "checked_at_kst": "2026-10-21T06:18:35+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before": "1aae87bc60acb0c8dd38ea698920c9aa44456833",
+  "status": "IDLE",
+  "reason": "NO_UNREVIEWED_CANDIDATE_SHA",
+  "policies_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "producer_source": "N100 work/image-src/text_roi_batches",
+  "evidence": {
+    "export_evidence_directory": "work/image-src/text_roi_batches/export_evidence",
+    "candidate_output_a_count": 69,
+    "candidate_output_b_count": 87,
+    "export_records": 156,
+    "unique_export_sha256": 156,
+    "missing_candidate_files": 0,
+    "locally_recorded_candidate_shas": 120,
+    "github_previous_qa_export_sha_matches": 152,
+    "final_four_qa_record": "localization/validation/c1_lightweight/C1-QA-20261020-2345-UNIQUE4.json",
+    "final_four_qa_export_shas": 4,
+    "reviewed_union_count": 156,
+    "unique_new_sha_count": 0,
+    "verification": "2026-10-21 06:15 KST independently reran N100 c1_qa_inventory_20261020_2345.py and c1_qa_github_reconcile_20261020_2345.py, read GitHub 23:45 UNIQUE4 evidence and 05:15 IDLE reconciliation; export count remains 156.",
+    "caution": "Local-only metrics flag 41 as new; prior GitHub C1 QA already reviews all 41. Do not re-review same SHA.",
+    "producer_export_status": "UNAPPROVED_REWORK_DIMENSIONS_EXIST; DOES_NOT_MEAN_DDS_COMPOSITION_PASS"
+  },
+  "new_candidate_qa_count": 0,
+  "new_png_pass": 0,
+  "new_png_fail": 0,
+  "new_png_hold": 0,
+  "queue_consumed": false,
+  "imagegen_called": false,
+  "dds_composed_or_deployed": false,
+  "c2_c3_or_ingame_pass_created": false,
+  "runtime_validation": "UNTESTED",
+  "excluded_workstreams": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "scoreboard_source": "thp32tt/ai-dev-lab AI_SCOREBOARD.md, most recent change aac785d0a0f0d07be0fc0f44e4cdad6033165025 2026-10-21 05:57 KST",
+  "scoreboard_ai1_previous_confirmed": 1666,
+  "score_change": 0,
+  "scoreboard_ai1_after": 1666
+}
