@@ -73,6 +73,8 @@ class FakeFolder:
     def locator(self,selector):
         return Locator(self,"cards")
     async def evaluate(self,js,arg):
+        if isinstance(arg,dict) and "start" in arg and "end" in arg:
+            return [row.copy() for row in self.rows[arg["start"]:arg["end"]]]
         return 1 # one project Library folder card with exact name
     async def wait_for_url(self,*args,**kwargs):
         assert "/library/d/" in self.url
