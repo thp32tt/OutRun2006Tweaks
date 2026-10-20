@@ -100,11 +100,14 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('resized chat slots from %s to %s while preserving state', SOURCE)
         self.assertTrue((ROOT / 'conversion_dx9ex.md').stat().st_size > 0)
 
-    def test_dx9ex_active_visual_stabilization_policy(self):
+    def test_dx9ex_review_only_policy(self):
         prompt = (ROOT / 'conversion_dx9ex.md').read_text()
-        for marker in ('동시', '흰색 HUD', '+TIME', 'lens flare', 'NEED_HMD_TEST', '1000/5000회', '원본 포크의'):
+        compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
+        for marker in ('MODE=DX9EX_REVIEW_ONLY', 'CODE_CHANGE=FORBIDDEN',
+                       'R26+HUD', 'docs/reviews/dx9ex/automation/',
+                       'RUNTIME_VALIDATION=UNTESTED', 'PATCH_CANDIDATE_ONLY'):
             self.assertIn(marker, prompt)
-        self.assertIn('실기', prompt)
+        self.assertIn('DX9EX_REVIEW_ONLY: "true"', compose)
 
     def test_conversion_lanes_are_independent(self):
         self.assertIn('async def conversion_parallel_cycle', SOURCE)
@@ -575,6 +578,98 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertNotIn('Default/Cookies', entrypoint)
         self.assertNotIn('Default/Local Storage', entrypoint)
         self.assertNotIn('Default/IndexedDB', entrypoint)
+
+
+    def test_dx9ex_review_retry_adopts_reachable_docs_only_commit(self):
+        """A retry caused by the old source gate must not duplicate a review."""
+        tree = ast.parse(SOURCE)
+        node = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                    and n.name == 'finalize_dx9ex_review_only_result')
+        task_id = 'CONVERSION-DX9EX-01076'
+        doc = f'docs/reviews/dx9ex/automation/{task_id}.md'
+        result, head = 'a' * 40, 'b' * 40
+        def response(url):
+            if url.endswith('/commits/' + result):
+                return {'files': [{'filename': doc}]}
+            if url.endswith('/compare/' + head + '...' + result):
+                return {'status': 'behind', 'behind_by': 1, 'files': []}
+            if url.endswith('/compare/' + result + '...' + head):
+                return {'status': 'ahead', 'behind_by': 0, 'files': [{'filename': doc}]}
+            raise AssertionError('Unexpected API ' + url)
+        ns = {
+            'DX9EX_REVIEW_ONLY': True, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
+            'github_api_json': Mock(side_effect=response),
+            'github_branch_head': Mock(return_value=head),
+            'save_queue_state': Mock(), 'write_runtime': Mock(),
+        }
+        exec(compile(ast.Module(body=[node], type_ignores=[]), '<review-finalizer>', 'exec'), ns)
+        active = {'task_id': task_id, 'lane': 'DX9EX', 'branch': 'vr-d3d9ex-focus',
+                  'base_sha': head, 'retry_failed_sha': result, 'attempt': 2}
+        q = {'completed': [], 'blocked': []}
+        accepted = ns['finalize_dx9ex_review_only_result'](
+            q, active, {'sha': result, 'message': f'[AUTO:{task_id}]'}, datetime.now(timezone.utc))
+        self.assertTrue(accepted)
+        self.assertEqual(active['terminal'], 'PASS')
+        self.assertEqual(active['result_sha'], result)
+        self.assertTrue(active['review_record_recovered'])
+        self.assertEqual(active['runtime_validation'], 'UNTESTED')
+        self.assertEqual(len(q['completed']), 1)
+        self.assertFalse(q['blocked'])
+
+    def test_dx9ex_review_cannot_recover_source_or_divergent_history(self):
+        tree = ast.parse(SOURCE)
+        node = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                    and n.name == 'finalize_dx9ex_review_only_result')
+        task_id = 'CONVERSION-DX9EX-01076'
+        doc = f'docs/reviews/dx9ex/automation/{task_id}.md'
+        result, head = 'a' * 40, 'b' * 40
+        lookup = Mock()
+        ns = {'DX9EX_REVIEW_ONLY': True, 'GITHUB_REPO': 'thp32tt/OutRun2006Tweaks',
+              'github_api_json': lookup,
+              'github_branch_head': Mock(return_value=head),
+              'save_queue_state': Mock(), 'write_runtime': Mock()}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), '<review-finalizer>', 'exec'), ns)
+        base = {'task_id': task_id, 'lane': 'DX9EX', 'branch': 'vr-d3d9ex-focus',
+                'base_sha': head, 'retry_failed_sha': result}
+        now = datetime.now(timezone.utc)
+        # A material source file in the review commit must fail closed.
+        lookup.side_effect = [
+            {'files': [{'filename': doc}, {'filename': 'src/vr/d3d9/unsafe.cpp'}]},
+            {'status': 'behind', 'behind_by': 1, 'files': []}
+        ]
+        q = {'completed': [], 'blocked': []}
+        active = dict(base)
+        self.assertTrue(ns['finalize_dx9ex_review_only_result'](
+            q, active, {'sha': result, 'message': 'review'}, now))
+        self.assertEqual(active['terminal'], 'BLOCKED')
+        self.assertFalse(q['completed'])
+
+        # A docs-only marker on a branch that does not contain the commit
+        # is not enough to resurrect a failed task as PASS.
+        lookup.reset_mock()
+        lookup.side_effect = [
+            {'files': [{'filename': doc}]},
+            {'status': 'behind', 'behind_by': 1, 'files': []},
+            {'status': 'diverged', 'behind_by': 1, 'files': []}
+        ]
+        q = {'completed': [], 'blocked': []}
+        active = dict(base)
+        self.assertTrue(ns['finalize_dx9ex_review_only_result'](
+            q, active, {'sha': result, 'message': 'review'}, now))
+        self.assertNotIn('terminal', active)
+        self.assertFalse(q['completed'])
+        self.assertFalse(q['blocked'])
+
+    def test_review_only_wait_paths_precede_source_workflow(self):
+        tree = ast.parse(SOURCE)
+        node = next(n for n in tree.body if isinstance(n, ast.AsyncFunctionDef)
+                    and n.name == 'conversion_process_lane')
+        body = ast.get_source_segment(SOURCE, node)
+        self.assertIn('finalize_dx9ex_review_only_result(q, active, task_commit, now)', body)
+        self.assertIn('not (DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX")', body)
+        self.assertIn('review_commit = github_find_task_commit(active["branch"], active["task_id"])', body)
+        self.assertLess(body.index('review_commit = github_find_task_commit('),
+                        body.index('bound_run_id = (active.get("gate_run") or {}).get("id")'))
 
 
 if __name__ == '__main__':
