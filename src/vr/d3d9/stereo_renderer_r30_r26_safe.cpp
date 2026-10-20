@@ -766,6 +766,24 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        // Live DX11 game Draws need the game's original Lock/Unlock bytes.
+        // R30's normal lazy activation is triggered only by an XYZRHW
+        // stereo draw. With native desktop test -Stereo=false that never
+        // happens, leaving ALL VB/IB shadows uninitialized for the game.
+        // This opt-in mono path is restricted to diagnostic DX11 desktop:
+        // normal VR stereo retains the original lazy policy and cost.
+        void R30ArmDx11NativeMonoBufferCapture() noexcept
+        {
+            if (Settings::VRStereo ||
+                !outrun::vr::dx11::live_game_frame::diagnostic_enabled())
+                return;
+            const bool wasArmed = R30BufferShadowCaptureArmed.exchange(
+                true, std::memory_order_acq_rel);
+            if (!wasArmed)
+                spdlog::info(
+                    "VR R30 DX11 NATIVE MONO: VB/IB Lock/Unlock CPU shadow capture ARMED; stereo XYZRHW lazy capture unchanged");
+        }
+
         void R30InstallBufferCreationHooks(IDirect3DDevice9* device)
         {
             if (!device)
@@ -796,6 +814,10 @@ namespace OutRunVRStereo
                 !R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
                 spdlog::warn(
                     "VR R30.6 RESOURCE OBSERVER: buffer/texture creation or update hook incomplete; DX11 census remains fail-closed");
+            // Begin capture before future game-created buffers are locked,
+            // not after a stereo-only XYZRHW draw that mono never executes.
+            if (R30CreateVertexBufferHook && R30CreateIndexBufferHook)
+                R30ArmDx11NativeMonoBufferCapture();
         }
 
         void R30RollbackBufferShadowHooks() noexcept
@@ -1426,6 +1448,10 @@ namespace OutRunVRStereo
             const HRESULT hr =
                 R30ResetR29Hook.stdcall<HRESULT>(device, params);
             outrun::vr::dx11::observe_device_reset_generation(hr);
+            // Reset invalidates resource generations. Resume collecting only
+            // after a successful reset while the mono DX11 test remains active.
+            if (SUCCEEDED(hr))
+                R30ArmDx11NativeMonoBufferCapture();
             return hr;
         }
 

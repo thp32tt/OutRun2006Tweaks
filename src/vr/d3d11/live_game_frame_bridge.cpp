@@ -1451,8 +1451,14 @@ struct State {
     UINT probeSlot = 0;
     UINT issued = 0;
     UINT visible = 0;
-    // Only D3D11 -> D3D9Ex shared GPU desktop publications.
+    // Count only D3D11 -> D3D9Ex shared-GPU desktop publications.
     std::uint64_t gpuDesktopFrames = 0;
+    // Exclusive per-stage rejection totals from live programmable DX11 draws.
+    std::array<std::uint64_t, 11> liveSm3RejectStages{};
+    // Exclusive first-failed contract in the live SM3 state admission.
+    // Preserve all original fail-closed conditions and game HRESULTs.
+    std::array<std::uint64_t, 8> liveSm3StateRejectReasons{};
+    std::uint64_t skippedPoisonedDraws = 0;
     UINT failed = 0;
 };
 State& state() noexcept { static State s; return s; }
@@ -4516,6 +4522,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                const std::uint32_t* indices, UINT indexCount,
                                std::uint64_t sourceOrdinal,
                                const NativeGameAdditionalStreams* extra) noexcept {
+    // Preserve exact one-bucket cause evidence through every early return and
+    // exception, without changing the game's D3D9 Draw or controller input.
+    unsigned rejectionStage = 0u;
+    bool submitted = false;
+    struct RejectionAudit {
+        std::array<std::uint64_t, 11>& counters;
+        unsigned& stage;
+        bool& succeeded;
+        ~RejectionAudit() noexcept {
+            if (!succeeded) ++counters[stage < counters.size() ? stage : 0u];
+        }
+    } rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted};
     try {
     if (!env_full_game_opt_in() || !game || !bytes || !stride ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
@@ -4547,6 +4565,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         nativeIndices = nativeFanTriangles.data();
         nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());
     }
+    rejectionStage = 1u;
     DWORD blend = TRUE, alpha = TRUE, stencil = TRUE, depth = TRUE;
     DWORD fog = TRUE, scissor = TRUE, clipPlanes = 1u, fill = 0u;
     DWORD colorMask = 0u, cull = 0u, srgbWrite = TRUE;
@@ -4565,11 +4584,34 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fill)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cull)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
-        FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-        fog || clipPlanes || fill != D3DFILL_SOLID ||
-        (colorMask & ~0x0fu) != 0u || srgbWrite != FALSE ||
-        !game_native_backbuffer_ready(game, viewport))
+        FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite))) {
+        ++s.liveSm3StateRejectReasons[0]; // COM viewport/state query failure
         return false;
+    }
+    if (fog != FALSE) {
+        ++s.liveSm3StateRejectReasons[1]; // DX9 fog still enabled
+        return false;
+    }
+    if (clipPlanes != 0u) {
+        ++s.liveSm3StateRejectReasons[2]; // user clip-plane unsupported
+        return false;
+    }
+    if (fill != D3DFILL_SOLID) {
+        ++s.liveSm3StateRejectReasons[3]; // wire/point raster unsupported
+        return false;
+    }
+    if ((colorMask & ~0x0fu) != 0u) {
+        ++s.liveSm3StateRejectReasons[4]; // invalid RT0 write mask
+        return false;
+    }
+    if (srgbWrite != FALSE) {
+        ++s.liveSm3StateRejectReasons[5]; // exact sRGB output not translated
+        return false;
+    }
+    if (!game_native_backbuffer_ready(game, viewport)) {
+        ++s.liveSm3StateRejectReasons[6]; // source geometry/backbuffer mismatch
+        return false;
+    }
     // Original D3D9 menu/race line strips and lists use one-pixel
     // LASTPIXEL raster rules. An antialiased or last-pixel-disabled line
     // cannot be silently converted to a single-sample D3D11 line.
@@ -4579,12 +4621,15 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (FAILED(game->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)) ||
             FAILED(game->GetRenderState(D3DRS_LASTPIXEL, &lastPixel)) ||
             !game_native_sm3_line_raster(static_cast<std::uint32_t>(type),
-                                         lineAA != FALSE, lastPixel != FALSE))
+                                         lineAA != FALSE, lastPixel != FALSE)) {
+            ++s.liveSm3StateRejectReasons[7]; // unsupported line rasterization
             return false;
+        }
     }
     // A real programmable game Draw can use ALWAYS/one-sided stencil with
     // zero write mask; that is pixel-equivalent to disabled stencil. A
     // conditional test or any possible write must stay on original D3D9.
+    rejectionStage = 2u;
     DWORD stencilFunc = 0u, stencilWriteMask = 0xffffffffu, twoSided = TRUE;
     const bool stencilKnown = stencil == FALSE ||
         (SUCCEEDED(game->GetRenderState(D3DRS_STENCILFUNC, &stencilFunc)) &&
@@ -4654,6 +4699,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             blend != FALSE, colorMask, srcBlend, dstBlend, blendOp,
             separateAlpha != FALSE, srcBlendAlpha, dstBlendAlpha,
             blendOpAlpha, extendedDesc)) return false;
+    rejectionStage = 3u;
     ComPtr<IDirect3DSurface9> target;
     ComPtr<IUnknown> targetIdentity;
     D3DSURFACE_DESC source{};
@@ -4670,6 +4716,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Intercept the REAL programmable game Draw's Z contract. Depth history
     // is owned by the isolated native DSV, never by the game's D3D9 surface.
     // A different/unknown main Z, W-buffering, bias or MSAA returns to D3D9.
+    rejectionStage = 4u;
     GameNativeDepthAdmission liveDepth{};
     if (depth != D3DZB_FALSE) {
         DWORD zWrite = TRUE, zFunc = 0u, bias = ~0u, slopeBias = ~0u;
@@ -4723,6 +4770,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         liveScissor = {static_cast<LONG>(l), static_cast<LONG>(t),
                        static_cast<LONG>(r), static_cast<LONG>(b)};
     }
+    rejectionStage = 5u;
     ComPtr<IDirect3DVertexShader9> vertexShader;
     ComPtr<IDirect3DPixelShader9> pixelShader;
     ComPtr<IDirect3DVertexDeclaration9> sourceDecl;
@@ -4802,6 +4850,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         nativeBytes=unpacked.data();
     }
+    rejectionStage = 6u;
     ProgrammableShaderFunctionSourceEvidence vertexEvidence, pixelEvidence;
     if (!live_sm3_shader_bytes(vertexShader.Get(), pixelShader.Get(),
                               vertexEvidence, pixelEvidence)) return false;
@@ -4841,6 +4890,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         extendedBlend = found->second.Get();
         if (!extendedBlend) return false;
     }
+    rejectionStage = 7u;
     const auto key = live_sm3_pipeline_identity(
         vertexEvidence, pixelEvidence, declaration, alphaFunc);
     if (!key) return false;
@@ -4971,6 +5021,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // VS s0..s3 resolves to D3DVERTEXTEXTURESAMPLER0..3 on the game device;
     // native VS tN/sN uses the same ordinal with independent stage bindings.
     // Any unsupported vertex texture fails before the native GPU Draw.
+    rejectionStage = 8u;
     std::array<ComPtr<ID3D11ShaderResourceView>,4> vertexViews{};
     std::array<ComPtr<ID3D11SamplerState>,4> vertexSamplers{};
     std::array<ID3D11ShaderResourceView*,4> boundVertexViews{};
@@ -5008,6 +5059,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         (pipeline.program.pixelConstants &&
          FAILED(game->GetPixelShaderConstantF(0, pixelConstants.data(), 224u))))
         return false;
+    rejectionStage = 9u;
     // Snapshot the actual game's b# registers for THIS native draw.
     // On any D3D9 query failure keep the authoritative DX9Ex path.
     std::array<BOOL, 16> liveVertexBool{}, livePixelBool{};
@@ -5036,6 +5088,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                                      s.fullGameIndexCapacity, nativeIndices, indexBytes))
             return false;
     }
+    rejectionStage = 10u;
     if (liveBatch.first_draw()) {
         s.backend.begin_frame(s.clearColor.native_color(
             reinterpret_cast<std::uintptr_t>(game),
@@ -5180,6 +5233,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ++s.eligibleThisFrame;
     liveBatch.succeeded(liveDepth.enabled, reverseDepth);
     liveBatch.record_source_draw(sourceOrdinal);
+    submitted = true;
     return true;
     } catch (...) {
         s.frameBatch.abort();
@@ -6277,6 +6331,13 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;
         const bool fullMode = env_full_game_opt_in();
         if (!observe_source_frame_mode(s, fullMode)) return;
+        // A rejected source draw has poisoned the full native frame.
+        // No later draw can revive it before a new true Clear or Present.
+        // Skip expensive repeated SM3 conversion but preserve D3D9 drawing.
+        if (fullMode && s.frameBatch.stopped) {
+            ++s.skippedPoisonedDraws;
+            return;
+        }
         const bool multiBatch = fullMode || env_batch_opt_in();
         // A successful zero-primitive game Draw changes no target pixels.
         // Before or after the first real native Draw, keep successful no-op
@@ -7983,8 +8044,8 @@ void before_game_present(IDirect3DDevice9* game,
                         s.backend.color_texture(), surfaceWidth, surfaceHeight,
                         s.outputGeneration, visibleRect);
                 }
-                // Successful native shared GPU publication is tracked
-                // separately from readback / CPU fallback.
+                // Only a successful GPU-shared backbuffer handoff proves
+                // visible native D3D11 pixels; failed imports retain fallback.
                 gpuHandoffQueued = nativeGpuDesktopPublished;
                 if (nativeGpuDesktopPublished) {
                     ++s.visible;
@@ -8466,10 +8527,21 @@ void before_game_present(IDirect3DDevice9* game,
         // visible, so a menu->vehicle->race session can be audited.
         if (s.presents % 300u == 0u || (fullMode && s.visible == 1u)) {
             spdlog::info(
-                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={} gpu_desktop_frames={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={} full_frame_mode={} gpu_desktop_frames={} sm3_reject=[source:{},state:{},stencil_blend:{},target_seed:{},depth:{},declaration:{},backend:{},shader_compile:{},samplers:{},uploads:{},submit:{}] sm3_state_reject=[query:{},fog:{},clip:{},fill:{},mask:{},srgb:{},backbuffer:{},line:{}] skipped_poisoned_draws={}; unsupported draws stay DX9Ex; HMD UNTESTED",
                 s.observed, s.issued, s.visible, s.failed, s.presents,
                 s.eligible, s.staleReadbacks, s.probeSlot, fullMode ? 1 : 0,
-                s.gpuDesktopFrames);
+                s.gpuDesktopFrames,
+                s.liveSm3RejectStages[0], s.liveSm3RejectStages[1],
+                s.liveSm3RejectStages[2], s.liveSm3RejectStages[3],
+                s.liveSm3RejectStages[4], s.liveSm3RejectStages[5],
+                s.liveSm3RejectStages[6], s.liveSm3RejectStages[7],
+                s.liveSm3RejectStages[8], s.liveSm3RejectStages[9],
+                s.liveSm3RejectStages[10],
+                s.liveSm3StateRejectReasons[0], s.liveSm3StateRejectReasons[1],
+                s.liveSm3StateRejectReasons[2], s.liveSm3StateRejectReasons[3],
+                s.liveSm3StateRejectReasons[4], s.liveSm3StateRejectReasons[5],
+                s.liveSm3StateRejectReasons[6], s.liveSm3StateRejectReasons[7],
+                s.skippedPoisonedDraws);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.

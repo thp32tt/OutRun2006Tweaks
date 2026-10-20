@@ -96,6 +96,94 @@ def test_bundle_ci_route():
             prefix + marker + bundle_job.replace(old, bad, 1)), reason)
 
 
+def verify_native_mono_shadow_capture_source(source):
+    """Mono DX11 must arm VB/IB source capture independently of stereo XYZRHW."""
+    method = "void R30ArmDx11NativeMonoBufferCapture() noexcept"
+    if source.count(method) != 1:
+        raise ValueError("missing/ambiguous DX11 mono buffer capture arm")
+    helper = source.split(method, 1)[1].split(
+        "void R30InstallBufferCreationHooks(", 1)[0]
+    for required in ("Settings::VRStereo",
+                     "live_game_frame::diagnostic_enabled()",
+                     "R30BufferShadowCaptureArmed.exchange("):
+        if required not in helper:
+            raise ValueError("native mono capture is not restricted to opt-in")
+    install = source.split("void R30InstallBufferCreationHooks(", 1)[1].split(
+        "void R30RollbackBufferShadowHooks(", 1)[0]
+    if "R30ArmDx11NativeMonoBufferCapture();" not in install:
+        raise ValueError("DX11 buffer capture not armed at resource setup")
+    reset = source.split("HRESULT __stdcall ResetDestR30(", 1)[1].split(
+        "float R30HudScaleValue()", 1)[0]
+    if "if (SUCCEEDED(hr))\n                R30ArmDx11NativeMonoBufferCapture();" not in reset:
+        raise ValueError("DX11 mono capture not rearmed after successful Reset")
+
+
+def test_native_mono_shadow_capture_source():
+    source = (Path(__file__).resolve().parents[1] / "src" / "vr" / "d3d9" /
+              "stereo_renderer_r30_r26_safe.cpp").read_text(encoding="utf-8")
+    verify_native_mono_shadow_capture_source(source)
+    for old, bad, reason in (
+        ("Settings::VRStereo", "false", "stereo guard removed"),
+        ("live_game_frame::diagnostic_enabled()", "true", "opt-in guard removed"),
+        ("if (SUCCEEDED(hr))\n                R30ArmDx11NativeMonoBufferCapture();",
+         "if (false)\n                R30ArmDx11NativeMonoBufferCapture();",
+         "post-Reset rearm disabled"),
+    ):
+        assert old in source, "missing fixture: " + reason
+        must_fail(lambda old=old, bad=bad:
+                  verify_native_mono_shadow_capture_source(
+                      source.replace(old, bad, 1)), reason)
+
+
+def verify_native_sm3_reject_diagnostics(source):
+    """Stage buckets identify live SM3 failures without counting D3D9 as DX11."""
+    state = "std::array<std::uint64_t, 11> liveSm3RejectStages{};"
+    if source.count(state) != 1:
+        raise ValueError("missing SM3 stage diagnostics")
+    name = "bool submit_live_sm3_game_draw("
+    if source.count(name) != 1:
+        raise ValueError("missing game SM3 native conversion function")
+    body = source.split(name, 1)[1].split(
+        "// Reuse geometric growth buffers", 1)[0]
+    for required in ("struct RejectionAudit",
+                     "rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted}",
+                     "if (!succeeded) ++counters[",
+                     "submitted = true;"):
+        if required not in body:
+            raise ValueError("SM3 failure instrumentation incomplete")
+    for n in range(1, 11):
+        if body.count("rejectionStage = %du;" % n) != 1:
+            raise ValueError("missing or duplicate SM3 conversion failure stage")
+    if "sm3_reject=[source:{}" not in source:
+        raise ValueError("SM3 rejection counters absent from game log")
+    if "sm3_state_reject=[query:{}" not in source:
+        raise ValueError("detailed SM3 state failure reasons absent from log")
+    if "std::array<std::uint64_t, 8> liveSm3StateRejectReasons{};" not in source:
+        raise ValueError("detailed SM3 state counters missing")
+    for n in range(8):
+        if "++s.liveSm3StateRejectReasons[%d];" % n not in source:
+            raise ValueError("SM3 state guard no longer accounts for reason")
+    if "skipped_poisoned_draws={}" not in source:
+        raise ValueError("native poison short-circuit evidence absent")
+    if "if (fullMode && s.frameBatch.stopped) {" not in source:
+        raise ValueError("failed frame still submits redundant SM3 conversions")
+
+
+def test_native_sm3_reject_diagnostics():
+    source = (Path(__file__).resolve().parents[1] / "src" / "vr" /
+              "d3d11" / "live_game_frame_bridge.cpp").read_text(encoding="utf-8")
+    verify_native_sm3_reject_diagnostics(source)
+    for old, bad, reason in (
+        ("submitted = true;", "submitted = false;", "native success is never counted"),
+        ("sm3_reject=[source:{}", "sm3_reject=[absent:{}", "no runtime failure evidence"),
+        ("if (fullMode && s.frameBatch.stopped) {",
+         "if (false && s.frameBatch.stopped) {", "redundant poisoned-frame conversions"),
+    ):
+        assert old in source, "missing negative fixture: " + reason
+        must_fail(lambda old=old, bad=bad: verify_native_sm3_reject_diagnostics(
+            source.replace(old, bad, 1)), reason)
+
+
 def main():
     a = "a" * 40
     game = fake_pe(0x14c, 1000500, MARKER + "OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le"))
@@ -146,6 +234,10 @@ def main():
     assert b"$dx11TestCase -ne 'NATIVE_GPU_DESKTOP'" in packaged_runner
     assert b"gpuDesktopFrames -gt 0" in packaged_runner
     assert b"$gameArgs += '-Stereo=false'" in packaged_runner
+    assert b"$gameArgs += '-antialiasing 0'" in packaged_runner
+    assert b"$gameArgs += '-nofog'" in packaged_runner
+    assert b"noFogDiagnosticRequested=" in packaged_runner
+    assert b"nativeBootstrapCompatibleObserved" in packaged_runner
     assert b"if ($dx11TestCase -ne 'CONTROL')" in packaged_runner
     assert b"monoStereoObserved" in packaged_runner
     assert b"D3D11_GPU_TO_D3D9EX_SHARED_DESKTOP" in packaged_runner
@@ -157,11 +249,18 @@ def main():
     assert b"D3D11 -> CPU -> D3D9 Present" in payload["DX11_TEST_README.txt"]
     assert b"D3D11 -> shared resource -> D3D9Ex Present" in payload["DX11_TEST_README.txt"]
     assert b"-Stereo=false" in payload["DX11_TEST_README.txt"]
+    assert b"-antialiasing 0" in payload["DX11_TEST_README.txt"]
+    assert b"-nofog" in payload["DX11_TEST_README.txt"]
+    assert b"Fog/full visual parity is therefore NOT VALIDATED" in payload["DX11_TEST_README.txt"]
+    assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_fog_disabled_diagnostic"] is True
+    assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_single_sample_required"] is True
     assert json.loads(payload["BUILD_IDENTITY.json"])["native_desktop_mono_required"] is True
     mono = runner.replace(b"Set-Content (Join-Path $session 'RUN_ARGS.txt') ($gameArgs -join ' ') -Encoding UTF8", b"missing anchor")
     must_fail(lambda: construct(*args[:4], mono, *args[5:]), "missing game runner args anchor")
     assert json.loads(payload["BUILD_IDENTITY.json"])["test_mode"] == "NATIVE_FULL_FRAME_D3D11_GPU_COPYBACK_D3D9"
     test_bundle_ci_route()
+    test_native_mono_shadow_capture_source()
+    test_native_sm3_reject_diagnostics()
     print("DX11 first-game-frame packaging PE/SHA/tamper/opt-in tests: PASS (synthetic)")
 
 

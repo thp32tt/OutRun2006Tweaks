@@ -32,7 +32,9 @@ for condition in (
     check(condition in source, "missing real game source-to-GPU binding: " + condition)
 
 for rejection in (
-    "fog || clipPlanes || fill != D3DFILL_SOLID",
+    "if (fog != FALSE) {",
+    "if (clipPlanes != 0u) {",
+    "if (fill != D3DFILL_SOLID) {",
     "D3DRS_ALPHAFUNC", "D3DRS_ALPHAREF", "alphaRef > 255u",
     "alphaFunc < D3DCMP_NEVER", "alphaFunc > D3DCMP_ALWAYS",
     "pipeline.alphaCompare != alphaFunc", "pipeline.alphaReference",
@@ -42,8 +44,18 @@ for rejection in (
     "if (!liveBatch.accepts_depth(liveDepth.enabled, reverseDepth))",
     "if (scissor != FALSE)", "gameRect.right <= gameRect.left",
     "r <= l || b <= t",
-    "(colorMask & ~0x0fu) != 0u || srgbWrite != FALSE",
-    "srgbWrite != FALSE", "if (nativeIndices[i] >= vertexCount) return false;",
+    "if ((colorMask & ~0x0fu) != 0u) {",
+    "if (srgbWrite != FALSE) {",
+    "if (!game_native_backbuffer_ready(game, viewport)) {",
+    "++s.liveSm3StateRejectReasons[0];",
+    "++s.liveSm3StateRejectReasons[1];",
+    "++s.liveSm3StateRejectReasons[2];",
+    "++s.liveSm3StateRejectReasons[3];",
+    "++s.liveSm3StateRejectReasons[4];",
+    "++s.liveSm3StateRejectReasons[5];",
+    "++s.liveSm3StateRejectReasons[6];",
+    "++s.liveSm3StateRejectReasons[7];",
+    "if (nativeIndices[i] >= vertexCount) return false;",
     "if (s.liveSm3Pipelines.size() >= 64u) return false;",
     "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
@@ -348,7 +360,8 @@ for token in (
 ):
     check(token in bridge, "masked real SM3 Draw GPU output missing: " + token)
 check("colorMask != 0x0fu || srgbWrite" not in source and
-      "(colorMask & ~0x0fu) != 0u || srgbWrite" in source,
+      "if ((colorMask & ~0x0fu) != 0u) {" in source and
+      "if (srgbWrite != FALSE) {" in source,
       "valid per-game-Draw partial channel mask still rejected")
 check("if (customBlend &&" in source and
       "sm3_live_masked_blend_desc(" in source,
