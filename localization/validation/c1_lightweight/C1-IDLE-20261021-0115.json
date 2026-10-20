@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261021-0115-IDLE",
+  "role": "C1",
+  "requested_slot_kst": "2026-10-21T01:15:00+09:00",
+  "checked_at_kst": "2026-10-21T01:20:01+09:00",
+  "state": "IDLE",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "N100 work/image-src/text_roi_batches",
+  "audit": {
+    "producer_export_evidence_count": 156,
+    "unique_export_candidate_shas": 156,
+    "local_metrics_recorded_candidate_sha_count": 115,
+    "local_metrics_only_unseen_count": 41,
+    "github_qa_sha_file_entries": 314,
+    "previously_reviewed_export_shas_in_github_sha_set": 152,
+    "remaining_four_shas_reviewed_in_commit": "99b5fa5a8ec01247fd53d1fabaa97fb1be803111",
+    "previously_recorded_total": 156,
+    "new_unique_sha_count": 0,
+    "method": "Re-ran N100 source export inventory, SHA cross-check against GitHub reviewed SHA list and verified last four in GitHub 23:45 QA record. Local-only metrics inventory overstates new count by 41; those are already committed reviews. No duplicate reviews."
+  },
+  "result": {
+    "new_reviewed": 0,
+    "new_pass": 0,
+    "new_fail": 0,
+    "new_hold": 0,
+    "reason": "NO_NEW_UNREVIEWED_AB_CANDIDATE_SHA"
+  },
+  "operations": {
+    "imagegen_calls": 0,
+    "producer_queues_consumed": false,
+    "new_dds_written": false,
+    "game_deployment": false,
+    "c2_c3_ingame_pass_created": false
+  },
+  "known_open_gates": [
+    "HOLD_REWORK_DIMENSIONS on previously exported outputs",
+    "HOLD_UNVERIFIED_SOURCE_AND_MAPPING for legacy OutRun Mode",
+    "RUNTIME_VALIDATION=UNTESTED"
+  ],
+  "scoreboard": {
+    "ai": "AI 1",
+    "previous_confirmed": 1666,
+    "delta": 0,
+    "new_total": 1666,
+    "reason": "Status check and IDLE record do not earn additional performance points"
+  }
+}
