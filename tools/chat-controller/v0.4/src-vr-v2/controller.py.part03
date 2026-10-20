@@ -2761,6 +2761,27 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
             for item in (compare.get("files") or [])
             if isinstance(item, dict)
         ]
+        # A retry may start after another docs-only lane moved the target HEAD.
+        # Recover only the already-reported exact TASK_ID commit, not a new
+        # implementation or an unrelated ancestor. GitHub must confirm that
+        # the result is an ancestor of the live target and its own diff is the
+        # single expected review document. Never waive source-change checks
+        # for a normal forward base-to-result comparison.
+        recovered_prior_review = False
+        if (compare.get("status") == "behind"
+                and active.get("retry_failed_sha") == result_sha
+                and commit_paths == [expected_path]):
+            head = github_branch_head(active["branch"])
+            if not head:
+                raise RuntimeError("DX9Ex review recovery target HEAD unavailable")
+            reach = github_api_json(
+                f"/repos/{GITHUB_REPO}/compare/{result_sha}...{head}"
+            )
+            if (reach.get("status") not in {"ahead", "identical"}
+                    or reach.get("behind_by") != 0):
+                raise RuntimeError("DX9Ex review recovery result is not target ancestor")
+            changed_paths = list(commit_paths)
+            recovered_prior_review = True
     except Exception as exc:
         write_runtime(
             status="dx9ex_review_record_verify_deferred",
@@ -2809,6 +2830,7 @@ def finalize_dx9ex_review_only_result(q: dict, active: dict, task_commit: dict, 
         review_record_path=expected_path,
         review_record_changed_paths=changed_paths,
         review_record_commit_paths=commit_paths,
+        review_record_recovered=recovered_prior_review,
         validation_mode="DX9EX_REVIEW_RECORD_ONLY",
         automation_validation="PASS",
         runtime_validation="UNTESTED",
@@ -2875,7 +2897,8 @@ async def conversion_process_lane(
                 feature_tip = github_branch_head(active["feature_branch"])
                 if not feature_tip or head != feature_tip or not task_commit or task_commit.get("sha") != head:
                     task_commit = None
-            if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
+            if (task_commit and task_commit.get("sha") == active.get("retry_failed_sha")
+                    and not (DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX")):
                 task_commit = None
             if task_commit:
                 if finalize_dx9ex_review_only_result(q, active, task_commit, now):
@@ -2983,6 +3006,13 @@ async def conversion_process_lane(
                 return
 
         if active["phase"] == "WAIT_ACTIONS":
+            # Upgrade persisted pre-policy WAIT_ACTIONS to the docs-only
+            # verdict before polling a source-only workflow that never runs.
+            if DX9EX_REVIEW_ONLY and active.get("lane") == "DX9EX":
+                review_commit = github_find_task_commit(active["branch"], active["task_id"])
+                if review_commit and review_commit.get("sha") == active.get("result_sha"):
+                    if finalize_dx9ex_review_only_result(q, active, review_commit, now):
+                        return
             rebound = refresh_wait_actions_task_binding(
                 active,
                 force_refresh=bool(active.get("startup_reconcile_pending")),
