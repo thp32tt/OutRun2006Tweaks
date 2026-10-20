@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "OUTRUN-C1-20261020-1415-KST-SHA-DEDUPE",
+  "role": "C1",
+  "requested_at_kst": "2026-10-20T14:15:00+09:00",
+  "inspected_at_kst": "2026-10-20T14:18:05+09:00",
+  "status": "IDLE",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "observed_branch_head_before": "712bd31c568e6ac1ad7866e6dfd2ca1861aa879c",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_source": "N100 work/image-src/text_roi_batches/candidate_outputs/{A,B}",
+  "dedup_method": "Read A_state.json and B_state.json, independently list candidate_outputs/A and /B, execute existing read-only N100 script work/c1_sha_dedup_20261019_2145.py, comparing actual PNG SHA256 to 62 previously reviewed SHA in work/c1_batch_20261019_2015.",
+  "sha_inventory": {
+    "stored_png": 63,
+    "producer_A_stored_png": 21,
+    "producer_B_stored_png": 42,
+    "reviewed_sha_matches": 62,
+    "excluded_legacy_png": 1,
+    "eligible_new_sha": 0,
+    "excluded_legacy": {
+      "file": "Q104_OutRunMode_FullHD_TextROI_2x_k.png",
+      "sha256": "9a62d19fe4813eacfafb65d1759cc6845c1cc5ac2f401f08fb92bf4e288c1fb3",
+      "reason": "LEGACY_NO_CURRENT_NATIVE_ROI_PRODUCER_RECEIPT"
+    }
+  },
+  "producer_state": {
+    "A": "SENT_AWAITING_GENERATED_IMAGES (A0004 active, 15 completed files)",
+    "B": "SENT_AWAITING_GENERATED_IMAGES (B0010 active, 42 completed files; new B0010 candidate PNG absent)"
+  },
+  "previous_idle_record": "localization/validation/c1_lightweight/C1-IDLE-20261020-1245-KST-SHA-DEDUPE.json",
+  "summary": {
+    "PASS": 0,
+    "FAIL": 0,
+    "HOLD": 0,
+    "IDLE": 1,
+    "new_visual_QA": 0
+  },
+  "boundaries": {
+    "imagegen_calls": 0,
+    "ab_queue_consumed": 0,
+    "dds_written": 0,
+    "final_approval_created": false,
+    "c2_c3_ingame_pass_created": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "score": {
+    "AI": "AI 1",
+    "prior_confirmed": 1652,
+    "delta": 0,
+    "result": 1652,
+    "reason": "No newly eligible candidate SHA; repeated IDLE check is +0 under SSOT dedup rules."
+  },
+  "notes": "No repeated SHA QA, no ImageGen generation, no A/B queue changes, no C2/C3/game approval, and no VR/FFB/DX11/DXVK changes."
+}
