@@ -197,6 +197,9 @@ private:
         ID3D11RenderTargetView* gameTarget) const noexcept;
     // Genuine offscreen game Draw -> exact source subresource -> GPU postpass.
     void remember_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
+    void remember_offscreen_color_region(
+        ID3D11Texture2D* texture, UINT arraySlice, UINT mipSlice,
+        NativeGameOffscreenColorRegion region) noexcept;
     void invalidate_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     [[nodiscard]] bool offscreen_color_source_proven(
         ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,

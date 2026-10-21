@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00984",
+  "production_id": "CONVERSION-DX11-00984",
+  "event_id": "CONVERSION-DX11-00984-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00984",
+  "feature_id": "DX11_MENU_RACE_CAMERA_REGION_COMPACTION_TO_GPU_EYE_POSTPASS",
+  "work_key": "DX11:MENU_RACE_CAMERA_SOURCE_COMPACTION",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "source_head": "21734fdca05069ba604573779cf6fc478096d159",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "full_dx11_renderer_complete": false,
+  "score_change": 0,
+  "code_change": "YES",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "summary": "Native D3D11 camera Draw/Clear color footprints now coalesce only exact rectangular unions with matching texture/mip/slice, avoiding 32-slot exhaustion for tiled genuine menu/car/race GPU postpasses while never certifying gaps or unrelated eyes; native runtime still untested.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_camera_compact_postpass_00984.cpp",
+    "tools/test_dx11_game_camera_compact_postpass_00984.py",
+    "docs/automation/runs/CONVERSION-DX11-00984.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_MENU_RACE_CAMERA_REGION_COMPACTION_TO_GPU_EYE_POSTPASS",
+    "goal": "Preserve genuine game menu, vehicle and race offscreen GPU Draw plus Clear camera color across many bounded viewport segments into distinct stereo Copy/Stretch eye postpasses, without inventing unwritten pixels or breaking the D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "gpu_camera_segments_to_eye",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_camera_draw_clear_to_native_gpu_eye",
+        "expected_behavior": "More than 32 adjacent Draw/Clear source strips compact into a fully covered exact-key camera postpass region for native per-eye Copy and Stretch."
+      },
+      {
+        "id": "source_keys_and_gaps_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "stereo_physical_subresource_provenance_and_dx9ex_fallback",
+        "expected_behavior": "Disconnected, corner-only, L-shaped, and foreign mip or eye regions never create fabricated camera pixels; original D3D9 game render, FFB and input are untouched."
+      },
+      {
+        "id": "exact_sha_required_actions",
+        "category": "integrated_validation",
+        "behavior_area": "five_required_actions_source_integrity",
+        "expected_behavior": "All five required DX11 GitHub Actions pass on the final exact material commit, without CI skip; HMD and gameplay remain explicitly untested."
+      }
+    ]
+  },
+  "acceptance_results": {},
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Native Draw/DrawIndexed game camera viewport and actual TARGET Clear emitted to D3D11 RTV, physically keyed by texture/mip/slice",
+      "Exact union GPU-written region compaction preserves camera source provenance through real game GPU Copy/Stretch to L/R eyes while rejecting unrendered gaps and stale/foreign resources",
+      "Partial/stale path remains fail-closed with original DX9Ex game drawing/input/FFB authoritative; Quest3 pending"
+    ],
+    "batch_components": [
+      "NativeGameEyeDrawEncoder keyed Draw/Clear source admission refactored to shared exact region union and bounded compaction",
+      "NativeGameOffscreenColorRegion precise rectangular union helper and C++ 64 segment full coverage plus negative regression",
+      "DX11 Fast targeted source link Python regression and full final unchanged five GitHub Actions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ bounded fixture 64 adjacent genuine camera strips and contiguous Clear row retains exact full native eye Copy/Stretch coverage",
+      "negative_regression": "Camera gaps, foreign mip/eye, corner and L-shape merges all rejected; exhausted disjoint ledger omits unproved color and leaves DX9Ex fallback untouched",
+      "component_integration": "Real native GPU offscreen camera Draw and Clear feed same keyed/compacted footprint ledger queried by GPU Copy/Stretch into L/R OpenXR eye targets"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_CAMERA_SOURCE_COMPACTION",
+      "DX11:EYE_XR_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_CI_PENDING_NOT_RUNTIME: live game native pixel output, positive counters and Quest3/VDXR require exact matching external runtime session",
+    "activation_guard_and_fallback": "No native activation from source change. Coverage failure denies camera postpass evidence, and original D3D9Ex graphics/gamepad/FFB/SkyGlow stays authoritative."
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD/AGENTS/00983 C6 checked; 00984 marker absent",
+    "C1_REVIEW": "32-slot camera GPU color evidence ledger exhausted by adjacent Draw/Clear segments",
+    "C2_IMPLEMENT": "Exact-key rectangular union compaction for Draw and GPU Clear with local fixture",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  }
+}

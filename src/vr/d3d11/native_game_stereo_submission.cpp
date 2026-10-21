@@ -453,26 +453,49 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_source(
         rasterDesc.ScissorEnable != FALSE,
         scissor.left, scissor.top, scissor.right, scissor.bottom);
     if (!native_game_offscreen_color_region_valid(region)) return;
+    remember_offscreen_color_region(
+        texture.Get(), view.arraySlice, view.mip, region);
+
+}
+// Keep the exact per-camera GPU-written color union bounded without letting
+// a sequence of narrow real game Draws/Clears exhaust the evidence ledger.
+// Merge only matching physical texture/mip/slice rectangles whose geometric
+// union is rectangular. A disjoint gap or foreign eye never becomes color.
+void NativeGameEyeDrawEncoder::remember_offscreen_color_region(
+    ID3D11Texture2D* texture, UINT arraySlice, UINT mipSlice,
+    NativeGameOffscreenColorRegion region) noexcept {
+    if (!texture || !native_game_offscreen_color_region_valid(region)) return;
     const NativeGameOffscreenColorKey key{
-        reinterpret_cast<std::uintptr_t>(texture.Get()), view.arraySlice, view.mip};
-    for (const auto& record : offscreenColorSources_)
-        if (native_game_offscreen_color_key_matches(
-                key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
-                      record.arraySlice, record.mipSlice}) &&
-            record.region.left == region.left &&
-            record.region.top == region.top &&
-            record.region.right == region.right &&
-            record.region.bottom == region.bottom) return;
-    for (auto& record : offscreenColorSources_) {
-        if (!record.texture) {
-            record.texture = std::move(texture);
-            record.arraySlice = view.arraySlice;
-            record.mipSlice = view.mip;
-            record.region = region;
-            return;
+        reinterpret_cast<std::uintptr_t>(texture), arraySlice, mipSlice};
+    // A new strip can bridge multiple old strips; restart after each merge.
+    // Already written pixels are never broadened into a bounding-box gap.
+    bool joined = true;
+    while (joined) {
+        joined = false;
+        for (auto& record : offscreenColorSources_) {
+            if (!record.texture ||
+                !native_game_offscreen_color_key_matches(
+                    key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                          record.arraySlice, record.mipSlice}))
+                continue;
+            NativeGameOffscreenColorRegion exact{};
+            if (!native_game_offscreen_exact_rect_union(
+                    region, record.region, exact)) continue;
+            region = exact;
+            record = {};
+            joined = true;
         }
     }
-    // Full ledger: keep original GPU commands but do not invent source proof.
+    for (auto& record : offscreenColorSources_) {
+        if (record.texture) continue;
+        record.texture = texture;
+        record.arraySlice = arraySlice;
+        record.mipSlice = mipSlice;
+        record.region = region;
+        return;
+    }
+    // No exact merge and no free slot: omit this extra evidence; original
+    // D3D9 game output/input remains authoritative (never invent coverage).
 }
 void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
     ID3D11RenderTargetView* target) noexcept {
@@ -973,14 +996,8 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
             actual ? actual->left : 0, actual ? actual->top : 0,
             actual ? actual->right : 0, actual ? actual->bottom : 0);
         if (!native_game_offscreen_color_region_valid(filled)) return;
-        for (auto& record : offscreenColorSources_) {
-            if (record.texture) continue;
-            record.texture = texture;
-            record.arraySlice = camera.arraySlice;
-            record.mipSlice = camera.mip;
-            record.region = filled;
-            return;
-        }
+        remember_offscreen_color_region(
+            texture.Get(), camera.arraySlice, camera.mip, filled);
     };
     switch (route) {
     case live_game_stereo::NativeColorClearRoute::FullRtv:

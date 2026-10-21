@@ -73,6 +73,41 @@ static_assert(!native_game_offscreen_color_region_valid(
     native_game_offscreen_clear_written_region(
         100u, 80u, true, -1, 0, 80, 70)));
 
+// Merge only a rectangle union that is itself an exact rectangle. Camera
+// menu panels frequently issue many side-by-side Draw/Clear writes; a
+// 32-entry ring must preserve them without accepting holes between panels.
+// Containment is valid; an L-shape, corner touch or separated slices are not.
+[[nodiscard]] constexpr bool native_game_offscreen_exact_rect_union(
+    NativeGameOffscreenColorRegion a,
+    NativeGameOffscreenColorRegion b,
+    NativeGameOffscreenColorRegion& joined) noexcept {
+    joined = {};
+    if (!native_game_offscreen_color_region_valid(a) ||
+        !native_game_offscreen_color_region_valid(b)) return false;
+    if (a.left <= b.left && a.top <= b.top &&
+        a.right >= b.right && a.bottom >= b.bottom) {
+        joined = a;
+        return true;
+    }
+    if (b.left <= a.left && b.top <= a.top &&
+        b.right >= a.right && b.bottom >= a.bottom) {
+        joined = b;
+        return true;
+    }
+    if (a.top == b.top && a.bottom == b.bottom &&
+        a.left <= b.right && b.left <= a.right) {
+        joined = {(std::min)(a.left, b.left), a.top,
+                  (std::max)(a.right, b.right), a.bottom};
+        return true;
+    }
+    if (a.left == b.left && a.right == b.right &&
+        a.top <= b.bottom && b.top <= a.bottom) {
+        joined = {a.left, (std::min)(a.top, b.top),
+                  a.right, (std::max)(a.bottom, b.bottom)};
+        return true;
+    }
+    return false;
+}
 [[nodiscard]] constexpr bool native_game_offscreen_color_regions_intersect(
     NativeGameOffscreenColorRegion draw,
     NativeGameOffscreenColorRegion copied) noexcept {
