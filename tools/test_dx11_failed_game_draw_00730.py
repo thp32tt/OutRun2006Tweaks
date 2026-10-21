@@ -20,7 +20,7 @@ def integrated(hook_source: str, header: str, source: str) -> bool:
     for name, observed in (
         ("DrawPrimitive", "R30ObserveNativeLinearVB("),
         ("DrawIndexedPrimitive", "R30ObserveNativeIndexedVB("),
-        ("DrawPrimitiveUP", "live_game_frame::observe_linear("),
+        ("DrawPrimitiveUP", "R30ObserveNativeLinearUP("),
         ("DrawIndexedPrimitiveUP", "R30ObserveNativeIndexedUP("),
     ):
         marker = "HRESULT __stdcall " + name + "DestR30("
