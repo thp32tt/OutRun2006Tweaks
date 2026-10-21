@@ -17,7 +17,7 @@ assert hook.count("game_indexed_up_index_source_range(") == 1
 indexed = hook.split("void R30ObserveNativeIndexedUP(", 1)[1].split(
     "// Preserve game-absolute D3D9 slot identities", 1)[0]
 assert indexed.index("game_indexed_up_index_source_range(") < indexed.index(
-    "std::memcpy(&shortIndex")
+    "std::memcpy(&x,p,2)")
 assert "format == D3DFMT_INDEX16 ? 2u : 4u" in indexed
 assert "game_indexed_up_index_source_range(" in (
     r / "src/vr/d3d11/live_game_primitive_span.hpp").read_text()
