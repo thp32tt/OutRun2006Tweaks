@@ -14,7 +14,7 @@
   "feature_branch": "feature/dx11-00966-live-game-frame",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
   "feature_last_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
-  "status": "C3_VALIDATE",
+  "status": "C3_EXACT_SHA_CI_PASS_RUNTIME_ACCEPTANCE_PENDING",
   "material_commit": "0faf8807b2cebd429496b08a66f9370535a293ec",
   "code_change": "YES: 17 files source capture + SM3 OM blend CI integration",
   "ci_candidate_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
@@ -25,20 +25,44 @@
     "OpenXR VR architecture": 39557705443,
     "OutRun EXE HUD Inspector CI": 39557705455
   },
-  "ci_status_at_checkpoint": "Fast PASS; remaining four IN_PROGRESS/PENDING; NOT yet exact-SHA PASS",
+  "ci_status_at_checkpoint": "PASS_EXACT_SHA_5_OF_5; actual game/HMD runtime still UNTESTED",
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "runtime_validation": "UNTESTED",
   "source_integrated_from": "feature/dx11-00966-live-source-capture@a8ea3ce392da6fc4770157fdd45c8dff45657b24",
   "acceptance_pending": [
-    "Exact-SHA required five gate results; repair any causal CI failure within same TASK_ID",
-    "Actual menu/car/race full-resolution game-native Draw and published pixel evidence in one matching user-side run",
-    "Retain explicit opt-in, original D3D9Ex Draw/Present/input/FFB and no DXVK changes",
-    "No FEATURE_READY until source and fallback acceptance; no gameplay/HMD assertion"
+    "Actual game menu/car/race full-resolution same-launch native D3D11 Draw/DrawIndexed > 0, published frame > 0, screenshot/game pixel evidence at exact tested SHA; counters remain UNTESTED",
+    "Any further real-game source repair remains under same TASK_ID/FEATURE_ID and needs new exact-SHA CI",
+    "Original D3D9Ex Draw/Present/input/FFB fallback, opt-in native path and DXVK ownership must remain preserved",
+    "FEATURE_READY and safe non-force target promotion NOT performed until integrated actual native frame acceptance has evidence"
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "next_implementation_action": "If an exact-SHA CI job fails, repair its specific source/test cause; else collect opt-in same-launch native Draw/published frame evidence and complete real full-frame menu->car->race bridge. Preserve safety fallbacks; do not reward rollover or replay completed work.",
+  "next_implementation_action": "Use source SHA 0faf8807b2ce for a bounded opt-in real-game launch; capture native eligible/reject/native_draws/published pixels for menu/car/race. Patch only verified failing source admission/Draw path, and repeat necessary exact-SHA five gates for new material SHA. Do not claim full gameplay/Quest3 until hardware evidence.",
   "feature_ready": false,
   "target_promoted": false,
-  "score_change": 0
+  "score_change": 0,
+  "ci_completed": {
+    "exact_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+    "DX11 Fast Structural Checks": {
+      "run_id": 39557705574,
+      "conclusion": "success"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 39557705584,
+      "conclusion": "success"
+    },
+    "Build (Win32 Release)": {
+      "run_id": 39557705520,
+      "conclusion": "success"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 39557705443,
+      "conclusion": "success"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 39557705455,
+      "conclusion": "success"
+    }
+  },
+  "feature_stage": "SOURCE_INTEGRATED_BUILD_VERIFIED_RUNTIME_PENDING"
 }
