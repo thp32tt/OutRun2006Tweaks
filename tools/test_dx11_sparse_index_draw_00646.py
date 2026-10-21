@@ -21,7 +21,7 @@ for token in ("std::sort(sorted.begin(), sorted.end())",
 # IndexedUP physical-stream function legitimately repeats the same overflow
 # guard; mutating only the gather must still fail even with that second guard.
 up_capture = span.split("inline bool game_gather_indexed_up_vertices(", 1)[1].split(
-    "inline bool game_indexed_up_physical_slots(", 1)[0]
+    "[[nodiscard]] constexpr bool game_indexed_up_index_source_range(", 1)[0]
 up_safe_tokens = (
     "minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices",
     "absoluteIndices[i] < minVertex",
