@@ -19,6 +19,7 @@ on:
       - 'tools/verify_vr_proven_baseline.py'
       # Keep game-source regression repairs on the same architecture SHA.
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      - 'tools/test_dx11_live_source_stride_00966.py'
       - 'docs/VR_ARCHITECTURE.md'
       - 'tools/package_dx11_first_game_frame.py'
       - 'tools/Invoke-OutRunVROneClick.ps1'
@@ -53,6 +54,7 @@ on:
       - 'tools/verify_vr_proven_baseline.py'
       # Keep game-source regression repairs on the same architecture SHA.
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      - 'tools/test_dx11_live_source_stride_00966.py'
       - 'docs/VR_ARCHITECTURE.md'
       - 'tools/package_dx11_first_game_frame.py'
       - 'tools/Invoke-OutRunVROneClick.ps1'

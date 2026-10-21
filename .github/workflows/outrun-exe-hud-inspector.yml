@@ -27,6 +27,7 @@ on:
       - 'tools/analyze_outrun_exe.py'
       # Source-to-native game frame contract changes require the same HUD SHA.
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      - 'tools/test_dx11_live_source_stride_00966.py'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
@@ -68,6 +69,7 @@ on:
       - 'tools/analyze_outrun_exe.py'
       # Source-to-native game frame contract changes require the same HUD SHA.
       - 'tools/test_dx11_first_game_frame_regressions.py'
+      - 'tools/test_dx11_live_source_stride_00966.py'
       - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/Run-OutRunVRTest.ps1'
       - 'docs/VR_EXE_HUD_INSPECTOR.md'
