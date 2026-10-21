@@ -116,5 +116,35 @@ int main()
         !CameraAndBodyEligible(true, true, 0.f, 1, 1,
             nativePos, nativeLook, -1.35f, -0.32f, 0.65f))
         return 16;
+
+    // Once a selected native view has fully settled, transient pulses of the
+    // secondary +0x340/+0x344 counters must not eject the cockpit for one
+    // frame and create a visible zoom/pullback cycle. A real mode/timer
+    // transition still clears the latch and requires a fresh settled sample.
+    using OutRunVR::DriverSeatCamera::StableNativeViewEligible;
+    bool settledLatch = false;
+    if (StableNativeViewEligible(true, true, 0.f, 1, 1, 1, 0,
+            settledLatch) || settledLatch)
+        return 17;
+    if (!StableNativeViewEligible(true, true, 0.f, 1, 1, 0, 0,
+            settledLatch) || !settledLatch)
+        return 18;
+    if (!StableNativeViewEligible(true, true, 0.f, 1, 1, 2, 0,
+            settledLatch) ||
+        !StableNativeViewEligible(true, true, 0.f, 1, 1, 0, 3,
+            settledLatch) || !settledLatch)
+        return 19;
+    if (StableNativeViewEligible(true, true, 1.f, 1, 1, 0, 0,
+            settledLatch) || settledLatch)
+        return 20;
+    if (StableNativeViewEligible(true, true, 0.f, 1, 1, 5, 0,
+            settledLatch) || settledLatch)
+        return 21;
+    if (!StableNativeViewEligible(true, true, 0.f, 1, 1, 0, 0,
+            settledLatch) || !settledLatch)
+        return 22;
+    if (StableNativeViewEligible(true, true, 0.f, 2, 1, 0, 0,
+            settledLatch) || settledLatch)
+        return 23;
     return 0;
 }
