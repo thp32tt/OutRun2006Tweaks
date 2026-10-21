@@ -486,6 +486,40 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_region(
             joined = true;
         }
     }
+    // A full ledger may still contain an exact camera mosaic which could
+    // certify the following game-authored GPU Copy/Stretch into an XR eye.
+    // Recover only real same-texture/mip/array pixels, not a bounding-box gap.
+    const bool saturated = (std::all_of)(
+        offscreenColorSources_.begin(), offscreenColorSources_.end(),
+        [](const OffscreenColorSource& entry) { return entry.texture != nullptr; });
+    if (saturated) {
+        std::array<NativeGameOffscreenColorRegion, 32u> sameKey{};
+        std::size_t count = 0u;
+        for (const auto& record : offscreenColorSources_) {
+            if (native_game_offscreen_color_key_matches(
+                    key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                          record.arraySlice, record.mipSlice}))
+                sameKey[count++] = record.region;
+        }
+        const auto mosaic = native_game_offscreen_color_mosaic_compaction(
+            region, sameKey, count);
+        if (mosaic.left != region.left || mosaic.top != region.top ||
+            mosaic.right != region.right || mosaic.bottom != region.bottom) {
+            region = mosaic;
+            for (auto& record : offscreenColorSources_) {
+                if (!native_game_offscreen_color_key_matches(
+                        key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                              record.arraySlice, record.mipSlice}))
+                    continue;
+                const auto& r = record.region;
+                // Keep disjoint/foreign fragments; consume only rectangles
+                // certified inside the complete mosaic envelope.
+                if (r.left >= region.left && r.top >= region.top &&
+                    r.right <= region.right && r.bottom <= region.bottom)
+                    record = {};
+            }
+        }
+    }
     for (auto& record : offscreenColorSources_) {
         if (record.texture) continue;
         record.texture = texture;
@@ -494,8 +528,8 @@ void NativeGameEyeDrawEncoder::remember_offscreen_color_region(
         record.region = region;
         return;
     }
-    // No exact merge and no free slot: omit this extra evidence; original
-    // D3D9 game output/input remains authoritative (never invent coverage).
+    // If genuine GPU pixels cannot prove a gap-free island, omit ONLY
+    // extra evidence; original D3D9 game rendering/input stays authoritative.
 }
 void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
     ID3D11RenderTargetView* target) noexcept {

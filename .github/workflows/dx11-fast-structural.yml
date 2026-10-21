@@ -77,6 +77,8 @@ jobs:
           python tools/dx11_autodev_policy.py --check-latest
       - name: Run focused DX11 source-only regression checks
         run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_mosaic_postpass_00985.cpp -o /tmp/dx11_camera_mosaic_00985 && /tmp/dx11_camera_mosaic_00985
+          python tools/test_dx11_game_camera_mosaic_postpass_00985.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_compact_postpass_00984.cpp -o /tmp/dx11_camera_compact_00984 && /tmp/dx11_camera_compact_00984
           python tools/test_dx11_game_camera_compact_postpass_00984.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_offscreen_clear_postpass_00983.cpp -o /tmp/dx11_camera_clear_00983 && /tmp/dx11_camera_clear_00983

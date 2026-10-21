@@ -219,6 +219,54 @@ native_game_visible_stretch_sample_region(
      return true;
  }
 
+// When many authentic game camera Draw/Clear tiles form a non-slicing
+// mosaic, pairwise union alone cannot compact its 32-slot GPU pixel ledger.
+// Consider only edge-connected tiles of the SAME physical mip and eye,
+// and accept their bounding rectangle only with complete raster coverage.
+template <std::size_t N>
+[[nodiscard]] constexpr NativeGameOffscreenColorRegion
+native_game_offscreen_color_mosaic_compaction(
+    NativeGameOffscreenColorRegion incoming,
+    const std::array<NativeGameOffscreenColorRegion, N>& sameKey,
+    std::size_t count) noexcept {
+    if (!native_game_offscreen_color_region_valid(incoming) || count > N)
+        return incoming;
+    auto envelope = incoming;
+    bool expanded = true;
+    while (expanded) {
+        expanded = false;
+        for (std::size_t i = 0u; i < count; ++i) {
+            const auto r = sameKey[i];
+            if (!native_game_offscreen_color_region_valid(r)) continue;
+            const bool vertical =
+                (r.bottom == envelope.top || r.top == envelope.bottom) &&
+                r.left < envelope.right && envelope.left < r.right;
+            const bool horizontal =
+                (r.right == envelope.left || r.left == envelope.right) &&
+                r.top < envelope.bottom && envelope.top < r.bottom;
+            if (!native_game_offscreen_color_regions_intersect(r, envelope) &&
+                !vertical && !horizontal) continue;
+            const NativeGameOffscreenColorRegion next{
+                (std::min)(r.left,envelope.left), (std::min)(r.top,envelope.top),
+                (std::max)(r.right,envelope.right),
+                (std::max)(r.bottom,envelope.bottom)};
+            if (next.left != envelope.left || next.top != envelope.top ||
+                next.right != envelope.right || next.bottom != envelope.bottom) {
+                envelope = next;
+                expanded = true;
+            }
+        }
+    }
+    if (envelope.left == incoming.left && envelope.top == incoming.top &&
+        envelope.right == incoming.right && envelope.bottom == incoming.bottom)
+        return incoming;
+    std::array<NativeGameOffscreenColorRegion, N + 1u> proof{};
+    proof[0] = incoming;
+    for (std::size_t i = 0u; i < count; ++i) proof[i+1u] = sameKey[i];
+    return native_game_offscreen_color_region_fully_covered(
+        envelope, proof, count+1u) ? envelope : incoming;
+}
+
 // Viewports have fractional origins and extents. Record only source pixels
 // whose centers are inside the current viewport/scissor and physical RTV;
 // malformed / NaN raster state cannot supply provenance. This is intentionally
