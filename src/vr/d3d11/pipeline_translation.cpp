@@ -1,4 +1,5 @@
 #include "pipeline_translation.hpp"
+#include "native_sm3_trig_sign_opcode.hpp"
 
 #include <d3dcompiler.h>
 #include <cmath>
@@ -1640,7 +1641,9 @@ namespace outrun::vr::dx11
             UINT sources = 0;
         };
 
-        const auto plan_for = [](DWORD opcode) noexcept -> OpcodePlan
+        const unsigned shaderMajor = (decode.versionToken >> 8u) & 0xffu;
+        const bool vertexStage = decode.vertexStage;
+        const auto plan_for = [shaderMajor, vertexStage](DWORD opcode) noexcept -> OpcodePlan
         {
             switch (opcode)
             {
@@ -1698,6 +1701,27 @@ namespace outrun::vr::dx11
             case D3DSIO_TEXLDD:
                 return { PlanKind::Registers, 1u, 4u };
 
+            case D3DSIO_SINCOS: {
+                // The live native VS/PS compiler consumes the same exact
+                // SM3 single-angle operand; SM2 has two polynomial constants.
+                const auto operands = native_sm3_trig_sign_operand_plan(
+                    NativeSm3TrigSignOpcode::SineCosine,
+                    shaderMajor, vertexStage);
+                return operands.valid
+                    ? OpcodePlan{PlanKind::Registers, 1u, operands.sourceCount}
+                    : OpcodePlan{};
+            }
+            case D3DSIO_SGN: {
+                // The last two SGN vertex TEMP operands are scratch
+                // destinations, never shader constant/sampler reads.
+                const auto operands = native_sm3_trig_sign_operand_plan(
+                    NativeSm3TrigSignOpcode::Sign,
+                    shaderMajor, vertexStage);
+                return operands.valid
+                    ? OpcodePlan{PlanKind::Registers, 1u, operands.sourceCount}
+                    : OpcodePlan{};
+            }
+
             case D3DSIO_CALL:
             case D3DSIO_LABEL:
             case D3DSIO_REP:
@@ -1721,7 +1745,6 @@ namespace outrun::vr::dx11
             case D3DSIO_DEFB:
                 return { PlanKind::DefBool, 1u, 0u };
             default:
-                // SGN/SINCOS have shader-model-dependent operand layouts.
                 // Legacy texture opcodes are outside the R266 SM2/SM3 exact
                 // role table. Preserve R265 evidence but fail R266 closed.
                 return {};

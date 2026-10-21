@@ -2,6 +2,7 @@
 
 #include "pipeline_translation.hpp"
 #include "native_sm3_arithmetic_codegen.hpp"
+#include "native_sm3_trig_sign_opcode.hpp"
 #include "native_sm3_constant_codegen.hpp"
 #include "native_sm3_texture_codegen.hpp"
 #include "native_sm3_fragment_codegen.hpp"
@@ -933,11 +934,28 @@ bool build_r283_sm3_mov_shader_source(
                 // source lane requirements for the two operands.
                 if (!vertexStage) return false;
                 opcode = NativeSm3ArithmeticOpcode::Distance; sourceCount = 2u; break;
-            case D3DSIO_SINCOS:
-                opcode = NativeSm3ArithmeticOpcode::SineCosine; sourceCount = 1u; break;
-            case D3DSIO_SGN:
-                if (!vertexStage) return false;
-                opcode = NativeSm3ArithmeticOpcode::Sign; sourceCount = 3u; break;
+            case D3DSIO_SINCOS: {
+                // Real game SM3 uses one angle; SM2's three-source
+                // polynomial variant is not a native DX11 compiler input.
+                const auto operands = native_sm3_trig_sign_operand_plan(
+                    NativeSm3TrigSignOpcode::SineCosine, 3u, vertexStage);
+                if (!operands.valid || operands.sourceCount != 1u)
+                    return false;
+                opcode = NativeSm3ArithmeticOpcode::SineCosine;
+                sourceCount = operands.sourceCount;
+                break;
+            }
+            case D3DSIO_SGN: {
+                // SGN src1/src2 are writable TEMP scratch registers.
+                // Keep their lifetime tracking in the native compiler.
+                const auto operands = native_sm3_trig_sign_operand_plan(
+                    NativeSm3TrigSignOpcode::Sign, 3u, vertexStage);
+                if (!operands.valid || !operands.scratchDestinations)
+                    return false;
+                opcode = NativeSm3ArithmeticOpcode::Sign;
+                sourceCount = operands.sourceCount;
+                break;
+            }
             case D3DSIO_CRS:
                 opcode = NativeSm3ArithmeticOpcode::Cross3; sourceCount = 2u; break;
             case D3DSIO_DP2ADD:
