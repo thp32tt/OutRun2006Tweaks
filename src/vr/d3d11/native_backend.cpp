@@ -7,6 +7,7 @@
 #include "native_sm3_fragment_codegen.hpp"
 #include "native_sm3_conditional_flow.hpp"
 #include "native_sm3_interface_channels.hpp"
+#include "live_game_sm3_interface_capacity.hpp"
 #include "native_sm3_repeat_flow.hpp"
 #include "native_sm3_address_codegen.hpp"
 #include "native_sm3_predicate_flow.hpp"
@@ -359,9 +360,11 @@ bool build_r283_sm3_mov_shader_source(
                 outputs.push_back(semantic);
             } else return false;
         }
-        if (inputs.empty() || inputs.size() > 8u ||
-            (vertexStage && (outputs.empty() || outputs.size() > 8u)) ||
-            (!vertexStage && !outputs.empty()))
+        // Accept the complete real SM3 declared shader interface before
+        // HLSL generation; later semantic/write-mask and live IA checks
+        // still reject unknown, missing or partially initialized registers.
+        if (!native_sm3_interface_decl_capacity(
+                vertexStage, inputs.size(), outputs.size()))
             return false;
 
         struct Operation {

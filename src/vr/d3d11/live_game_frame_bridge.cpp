@@ -5,6 +5,7 @@
 #include "live_game_sm3_composite.hpp"
 #include "live_game_sm3_vertex_unpack.hpp"
 #include "live_game_sm3_stream_assembly.hpp"
+#include "live_game_sm3_interface_capacity.hpp"
 #include "live_game_sm3_sampler_slots.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
@@ -4467,6 +4468,10 @@ bool live_sm3_input_layout(
         element.InputSlot = 0u;
         element.AlignedByteOffset = in.Offset;
         element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        // The full 16-register SM3 interface may use mixed physical D3D9
+        // streams, but D3D11 IA has a strict 32-element maximum. Reject
+        // oversized real game declarations before shader/GPU allocation.
+        if (!native_sm3_ia_element_capacity(layout.size() + 1u)) return false;
         layout.push_back(element);
     }
     const auto& end = declaration.back();
