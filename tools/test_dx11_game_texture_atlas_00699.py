@@ -19,6 +19,7 @@ def integrated(src, budget):
         "base.Width > kMaxNativeGameAtlasDimension" in mirror,
         "base.Height > kMaxNativeGameAtlasDimension" in mirror,
         "if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))" in mirror,
+        "nativeFormat == DXGI_FORMAT_R16_FLOAT ? 2u" in mirror,
         "nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u" in mirror,
         "nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT" in mirror,
         "nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM" in mirror,
@@ -87,7 +88,13 @@ static_assert(native_game_texture_upload_bytes(2048, 2048, 0, 4, 0) == 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 1, 4, 8) == 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 1, 0, 0) == 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 1, 0, 12) == 0);
-static_assert(native_game_texture_upload_bytes(2048, 2048, 1, 2, 0) == 0);
+// Native R16F uploaded mip rows occupy two bytes, not a BGRA8-sized budget.
+static_assert(native_game_texture_upload_bytes(2048, 2048, 1, 2, 0)
+              == 2048ull*2048ull*2ull);
+static_assert(native_game_texture_upload_bytes(4096, 2048, 13, 2, 0) > 0);
+static_assert(native_game_texture_upload_bytes(4096, 2048, 13, 4, 0) == 0);
+static_assert(native_game_texture_upload_bytes(4096, 4096, 13, 2, 0) == 0);
+static_assert(native_game_texture_upload_bytes(4096, 2048, 1, 3, 0) == 0);
 int main() { return 0; }
 """
 with TemporaryDirectory(prefix="dx11-00699-") as temp:

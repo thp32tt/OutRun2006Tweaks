@@ -4105,7 +4105,12 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Use the actual destination DXGI pixel size. This keeps the existing
     // per-format D3D9 source-byte contracts unique for destructive regression
     // tests while correctly budgeting the converted *native* SRV payload.
+    // R16F game mips are 2 bytes/texel all the way through LockRect,
+    // native DXGI R16_FLOAT SRV creation and Draw/DrawIndexed binding.
+    // Budget the physical destination layout, not a guessed BGRA8 size:
+    // an exact 4K x 2K R16F texture must not be rejected as 32 MiB.
     const UINT atlasTexelBytes =
+        nativeFormat == DXGI_FORMAT_R16_FLOAT ? 2u :
         nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u :
         (nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ||
          nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM ||

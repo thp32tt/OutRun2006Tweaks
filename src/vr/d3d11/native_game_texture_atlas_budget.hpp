@@ -11,6 +11,8 @@ inline constexpr std::uint64_t kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull 
 
 // A compressed texture supplies exactly one BC block byte width (8/16),
 // whereas an uncompressed texture supplies its D3D11 texel byte width.
+// Do not round a real 16-bit R16_FLOAT game mip up to 32 bits: doing so
+// spuriously rejects the 4096x2048 gameplay/vehicle atlas before live Draw.
 // Returns zero for unsupported dimensions, excessive allocation or metadata.
 [[nodiscard]] constexpr std::uint64_t native_game_texture_upload_bytes(
     std::uint32_t width, std::uint32_t height, std::uint32_t levels,
@@ -20,8 +22,9 @@ inline constexpr std::uint64_t kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull 
         height > kMaxNativeGameAtlasDimension ||
         ((blockBytes != 0u) == (nativeTexelBytes != 0u)) ||
         (blockBytes && blockBytes != 8u && blockBytes != 16u) ||
-        (nativeTexelBytes && nativeTexelBytes != 4u &&
-         nativeTexelBytes != 8u && nativeTexelBytes != 16u))
+        (nativeTexelBytes && nativeTexelBytes != 2u &&
+         nativeTexelBytes != 4u && nativeTexelBytes != 8u &&
+         nativeTexelBytes != 16u))
         return 0u;
     // D3D9's mip chain cannot contain repeated 1x1 terminal levels.
     // 4K needs 13 levels; a 2K resource still has at most 12.
