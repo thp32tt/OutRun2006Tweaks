@@ -27,15 +27,22 @@ for required in ("modifier == 9u", "modifier == 10u",
 # A cube-sampler extension shares the actual fail-closed TEX* operand guard.
 # Check the complete ternary so neither branch can bypass source validation.
 def valid_texture_guard(text: str) -> bool:
-    pattern = (r"if\s*\(op\.texture2d\s*&&\s*!\s*\(op\.textureCube\s*\?"
-               r"\s*native_sm3_cube_modifier_supported\(op\.textureMode, i, modifier\)"
-               r"\s*:\s*native_sm3_texture_modifier_supported\(op\.textureMode, i, modifier\)\)\)")
+    # A live source must select exactly one of 2D, cube or volume modifier
+    # checks, not default to an unguarded native path for new sampler types.
+    pattern = (
+        r"if\s*\(op\.texture2d\s*&&\s*!\s*\(op\.textureCube\s*\?"
+        r"\s*native_sm3_cube_modifier_supported\(op\.textureMode, i, modifier\)"
+        r"\s*:\s*op\.textureVolume\s*\?"
+        r"\s*native_sm3_volume_modifier_supported\(op\.textureMode, i, modifier\)"
+        r"\s*:\s*native_sm3_texture_modifier_supported\(op\.textureMode, i, modifier\)\)\)"
+    )
     return re.search(pattern, text) is not None
 
-assert valid_texture_guard(backend), "TEX* cube/2D source modifier guard missing"
+assert valid_texture_guard(backend), "TEX* cube/volume/2D modifier guard missing"
 for original, mutation in (
     ("!(op.textureCube", "(op.textureCube"),
     ("native_sm3_cube_modifier_supported(op.textureMode, i, modifier)", "true"),
+    ("native_sm3_volume_modifier_supported(op.textureMode, i, modifier)", "true"),
     ("native_sm3_texture_modifier_supported(op.textureMode, i, modifier)", "true"),
 ):
     assert original in backend, original
