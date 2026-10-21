@@ -37,7 +37,7 @@ def connected(s):
             "capture.mipFilter != D3DTEXF_LINEAR ||",
             "capture.maxAnisotropy < 2u",
             "capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY",
-            "const UINT levels = usesMips ? sourceLevels : 1u;",
+            "const UINT levels = live_game_mip_lod::captured_levels(",
             "initial[level].pSysMem = copied[level].data();",
             "state.Filter = D3D11_FILTER_ANISOTROPIC;",
             "state.MaxAnisotropy = capture.minFilter == D3DTEXF_ANISOTROPIC ?",

@@ -25,7 +25,7 @@ def wired(s: str) -> bool:
         "capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip)",
     ]
     required_mirror = [
-        "const UINT levels = usesMips ? sourceLevels : 1u;",
+        "const UINT levels = live_game_mip_lod::captured_levels(",
         "const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||",
         "capture.mipFilter == D3DTEXF_LINEAR;",
         "usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)",
@@ -67,7 +67,7 @@ def main() -> None:
         ("(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)", "mip != D3DTEXF_NONE"),
         ("(mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias", "maxMip > 16u && mipBias != 0u"),
         ("capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip)", "capture.mipFilter = D3DTEXF_NONE"),
-        ("const UINT levels = usesMips ? sourceLevels : 1u;", "const UINT levels = 1u;"),
+        ("const UINT levels = live_game_mip_lod::captured_levels(", "const UINT levels = 1u;"),
         ("usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)", "false && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)"),
         ("capture.texture->GetLOD(), capture.maxMipLevel).valid",
          "0u, capture.maxMipLevel).valid"),
