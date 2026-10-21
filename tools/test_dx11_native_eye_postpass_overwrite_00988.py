@@ -13,10 +13,10 @@ assert "reset();" in hpp
 # Both genuine GAME GPU writes happen BEFORE their corresponding proof
 # correction; unsupported writes must fail closed before GPU mutation.
 assert copy.index("native_game_gpu_eye_composite_write_admissible(") < copy.index("copy_game_surface(")
-assert copy.index("copy_game_surface(") < copy.index("eyePostpassCoverage_.invalidate(visibleDest);")
-assert copy.index("eyePostpassCoverage_.record(visibleDest);") < copy.index("eyePostpassCoverage_.invalidate(visibleDest);")
+assert copy.index("copy_game_surface(") < copy.index("eyeColorChronology_.record_unproven_gpu_postpass(visibleDest);")
+assert copy.index("eyeColorChronology_.record_proven_gpu_postpass(visibleDest);") < copy.index("eyeColorChronology_.record_unproven_gpu_postpass(visibleDest);")
 assert stretch.index("native_game_gpu_eye_composite_write_admissible(") < stretch.index("stretch_game_surface(")
-assert stretch.index("stretch_game_surface(") < stretch.index("eyePostpassCoverage_.invalidate(")
-assert stretch.index("eyePostpassCoverage_.record(") < stretch.index("eyePostpassCoverage_.invalidate(")
+assert stretch.index("stretch_game_surface(") < stretch.index("eyeColorChronology_.record_unproven_gpu_postpass(")
+assert stretch.index("eyeColorChronology_.record_proven_gpu_postpass(") < stretch.index("eyeColorChronology_.record_unproven_gpu_postpass(")
 assert "encoder.postpass_full_eye_coverage()" in cpp
 print("DX11 chronological game Copy/Stretch eye overwrite integration PASS")
