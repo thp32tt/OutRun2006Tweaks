@@ -108,6 +108,14 @@ class EdgeReviewTests(unittest.TestCase):
             finally:
                 mod.ocr.approved_phrases=old
 
+    def test_non_english_source_phrases_are_excluded(self):
+        self.assertTrue(mod.ocr.is_english_source_phrase("OK"))
+        self.assertTrue(mod.ocr.is_english_source_phrase("PRESS [ENTER-KEY ICON] KEY"))
+        self.assertTrue(mod.ocr.is_english_source_phrase("OutRun2 · 15 Continuous Course"))
+        self.assertFalse(mod.ocr.is_english_source_phrase("加速度:"))
+        self.assertFalse(mod.ocr.is_english_source_phrase("操作が難しい車です。"))
+        self.assertFalse(mod.ocr.is_english_source_phrase("한글"))
+
     def test_icon_placeholder_does_not_prevent_coverage_match(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td); out=root/"out"; out.mkdir()
