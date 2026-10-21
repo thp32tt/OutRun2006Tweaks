@@ -1,0 +1,570 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2118KST-BACKLOG-SHA8",
+  "prior_reviewed_sha": 276,
+  "total_unreviewed_before": 42,
+  "count": 8,
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0024-9BDE43D8",
+      "ordinal": 117,
+      "candidate_file": "Q225_32fc1e1c02de992f_source_k.png",
+      "source_file": "Q225_32fc1e1c02de992f_source.png",
+      "candidate_sha256": "432150cfbedf9cb073d4f221956299d49d63b4f4a6585043afe4d33b8c4c8f52",
+      "source_sha256": "cf6059e70c63a8147e4e4d2496dfb89c128a5d323945e111ed9ee5eaa0d48f91",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "SETUP",
+      "approved_korean": "설정",
+      "source_dds_sha256": "a0c8c67f88dfdc93385b821452f0175a6a951c238f5f3d8b012afa113ef37fc9",
+      "original_dimensions": [
+        592,
+        281
+      ],
+      "dimensions": [
+        1820,
+        864
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        81,
+        119,
+        1454,
+        784
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "원본 SETUP은 금속 바 위쪽의 제한된 흰 제목 영역이다. 생성된 ‘설정’은 해당 표제 폭/높이보다 과도하게 커서 원래 UI cell 배치에 맞지 않는다. 한글은 판독 가능하지만 그대로 합성하면 보호 판과 충돌 위험.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_1.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0024-9BDE43D8",
+      "ordinal": 118,
+      "candidate_file": "Q230_3d0ea0b7713bb599_source_k.png",
+      "source_file": "Q230_3d0ea0b7713bb599_source.png",
+      "candidate_sha256": "7c6c99a81dd3eadf815c8b10c397726e9262ed15a86136477334ea3f202eced2",
+      "source_sha256": "e94cc7f179d12d409a8b8a6208eef2b0b2bd0fedf7d08d3521581746c581f2bf",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "UNAVAILABLE",
+      "approved_korean": "이용 불가",
+      "source_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "original_dimensions": [
+        591,
+        175
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        256,
+        9,
+        1989,
+        724
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 32,
+          "gt32": 0,
+          "max": 1
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "원본 UNAVAILABLE은 빨간 좁은 배너 안의 흰 글자이며 바로 아래 노란 UI 바가 있다. 후보 ‘이용 불가’의 글리프 높이/효과가 원본 배너보다 과도해 아래 보호 UI 영역을 침범할 위험이 높다.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_1.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0025-B6C49BDC",
+      "ordinal": 122,
+      "candidate_file": "Q161_a354bf5e3a7b6177_source_k.png",
+      "source_file": "Q161_a354bf5e3a7b6177_source.png",
+      "candidate_sha256": "183d80acc3e8a3c1c40e959cb89285048003d56c8a91d1ba86c226160810e0a2",
+      "source_sha256": "b00520aad4148fad1bd6049a24e6b53b814a6ff21c6c0b17f5fcca84414a0a25",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "JAPAN",
+      "approved_korean": "일본",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "original_dimensions": [
+        868,
+        292
+      ],
+      "dimensions": [
+        2162,
+        727
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        517,
+        64,
+        1684,
+        675
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘일본’ 승인 매핑과 일치하고 자소·받침·독립 PNG 가독성·읽기 방향 정상. 원본 JAPAN보다 금속 광택/검정 테두리가 있으나 경미한 스타일 차이로 허용. 실제 atlas 배치·DDS 검증 전 임시 PNG만 PASS.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_2.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0025-B6C49BDC",
+      "ordinal": 123,
+      "candidate_file": "Q193_6b80ecb03de1f5f0_source_k.png",
+      "source_file": "Q193_6b80ecb03de1f5f0_source.png",
+      "candidate_sha256": "b22f0209ea06d07a9c93489f9297c31cb2c4550f97595c66549435aca353770b",
+      "source_sha256": "a5300af913d9aeb001aea0d441bbbba2654faf59c40d8a3283c274c4eabaa052",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Goal A",
+      "approved_korean": "골 A",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "original_dimensions": [
+        800,
+        280
+      ],
+      "dimensions": [
+        2120,
+        742
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        162,
+        16,
+        1723,
+        698
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 Goal A는 평면적이고 어두운 회색 글자이나 ‘골 A’ 후보는 두꺼운 검정 외곽선과 강한 금속 입체 윤곽으로 다른 UI 문구 계열과 현저히 불일치. 한글 표기는 정확하고 가독성은 있으나 현저한 효과 변형으로 FAIL.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_2.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0026-FFFD2409",
+      "ordinal": 127,
+      "candidate_file": "Q050_6aff0aa0cafea634_source_k.png",
+      "source_file": "Q050_6aff0aa0cafea634_source.png",
+      "candidate_sha256": "d7dabc3b9272ad26f460bf5cb4e20561a41814f541b47132ef2dfc1a8eb5edfb",
+      "source_sha256": "12e125e1f033fd7af461dee5f7608281fe404c9beebb4f8a734e22d22625d2e5",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Time Over",
+      "approved_korean": "시간 종료",
+      "source_dds_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "original_dimensions": [
+        2259,
+        995
+      ],
+      "dimensions": [
+        1890,
+        832
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        0,
+        73,
+        1874,
+        814
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 8,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "원본 Time Over는 여러 다른 문구/스티어링휠 UI가 있는 atlas 문맥에 배치된다. ‘시간 종료’는 올바르게 읽히지만 후보 글자/효과가 거의 전체 출력 폭을 차지해 원본 Time Over 영역에 맞추면 옆 문구/보호 아트 침범 위험. 원본 비교 입력에도 여러 문구가 혼재함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_3.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0026-FFFD2409",
+      "ordinal": 128,
+      "candidate_file": "Q101_829f0c8f0f0de072_source_k.png",
+      "source_file": "Q101_829f0c8f0f0de072_source.png",
+      "candidate_sha256": "fd58ba8111d5bc0782fe941055ac10e50fa9a13e27c03d72605f1d105e2a4764",
+      "source_sha256": "a00f9418da028258300e2e358ba0c0698663833ae991afc952c831900eedb461",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "NORMAL",
+      "approved_korean": "일반",
+      "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "original_dimensions": [
+        763,
+        335
+      ],
+      "dimensions": [
+        1893,
+        831
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        83,
+        70,
+        1863,
+        652
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "원본 NORMAL은 녹색 사다리꼴 버튼 내부의 노란 이탤릭 레이블. ‘일반’ 후보도 노란색 우향 기울기지만 원본 글자 안전영역/버튼 폭 대비 너무 커서 보호된 녹색 판을 넘을 위험.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0035-3D9FAE71",
+      "ordinal": 171,
+      "candidate_file": "Q057_05a921c3af27f2e7_source_k.png",
+      "source_file": "Q057_05a921c3af27f2e7_source.png",
+      "candidate_sha256": "2936696f61cd852249df8c32e28ca9112bc56ed0d423f86b678b840cca65a0ef",
+      "source_sha256": "c0f8fb9709adf0d64a3744bf9c2af445d6e6324add9ea9087f61fd61554b4dfc",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "EXIT",
+      "approved_korean": "종료",
+      "source_dds_sha256": "234b03ef02c7f5184ae35a280cfe7eb01c2e4fdfdd722737f54bb87b7cf58256",
+      "original_dimensions": [
+        1586,
+        975
+      ],
+      "dimensions": [
+        1600,
+        983
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        91,
+        61,
+        1378,
+        934
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "원본 EXIT는 다수의 게임 UI 문구/아이콘과 인접한 작은 영역. 후보 ‘종료’ 핑크 텍스트/짙은 테두리 방향과 색 계열은 유사하지만 글자 효과 폭이 원본 레이블에 비해 지나치게 커 다른 UI 침범 위험.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_4.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0035-3D9FAE71",
+      "ordinal": 172,
+      "candidate_file": "Q057_d9f4bdf0b9d64ecd_source_k.png",
+      "source_file": "Q057_d9f4bdf0b9d64ecd_source.png",
+      "candidate_sha256": "8964c15cb126b2db9ffd7f115b8f9d17c9fa962d474c3c514453e20ccdbd44b3",
+      "source_sha256": "00c45f4c1ebb5e7efda74df9037940f04ea12f7c513a74e4361465999ef74cbd",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "EXIT",
+      "approved_korean": "종료",
+      "source_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "original_dimensions": [
+        1098,
+        527
+      ],
+      "dimensions": [
+        1810,
+        869
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        83,
+        48,
+        1758,
+        869
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 2,
+          "gt32": 0,
+          "max": 1
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "원본 EXIT는 다른 Hit the ghost, Collect the stars 등과 인접. 후보 ‘종료’ 문구는 읽히고 색 계열이 맞지만 원본 텍스트 셀보다 훨씬 커서 주변 보호 UI와 충돌 위험.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2118/compare_4.jpg"
+    }
+  ],
+  "summary": {
+    "qa_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+    "pass": 1,
+    "fail": 7,
+    "prior_reviewed_sha": 276,
+    "unreviewed_before": 42,
+    "unreviewed_after_if_log_included": 34,
+    "source_export_sha_verified": 8,
+    "png_rgba_verified": 8,
+    "producer_rework_dimensions": 8,
+    "no_imagegen": true,
+    "queue_unchanged": true,
+    "no_dds_deployment": true,
+    "c2_c3_game_unapproved": true,
+    "runtime_validation": "UNTESTED",
+    "safety_note": "No pixel-based native UI composition validated; no DDS/ingame PASS; do not reinterpret png-only PASS as publish approval.",
+    "dedup": "Compared 313 producer export SHA declarations against local C1 report/metrics existing 276 distinct candidate SHA; chose eight unique unreviewed SHA."
+  }
+}
