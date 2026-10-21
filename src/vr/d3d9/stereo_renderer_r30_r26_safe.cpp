@@ -1827,8 +1827,11 @@ namespace OutRunVRStereo
         // loses its genuine raw c64 rather than reverting the unsafe policy.
         void R30TraceGoalOriginalC64Status(bool recovered) noexcept
         {
-            if (!Settings::VRTelemetry || !Game::current_mode ||
-                !OutRunVR::GameSemantic::QueueRenderActive())
+            if (!Settings::VRTelemetry || !Game::current_mode)
+                return;
+            const bool queued = OutRunVR::GameSemantic::QueueRenderActive();
+            const auto cmd = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            if (!queued && !cmd.IsExactFiniteResultHud())
                 return;
             const auto state = *Game::current_mode;
             unsigned stateIndex = 0;
@@ -1840,8 +1843,9 @@ namespace OutRunVRStereo
                 stateIndex = 2u;
             else
                 return;
-            const auto producer =
-                OutRunVR::GameSemantic::CurrentQueueProducerToken();
+            const auto producer = queued
+                ? OutRunVR::GameSemantic::CurrentQueueProducerToken()
+                : cmd.producer;
             const unsigned token = static_cast<unsigned>(producer);
             if (token >= 32u)
                 return;
@@ -1853,13 +1857,14 @@ namespace OutRunVRStereo
                     bit, std::memory_order_relaxed) & bit) != 0u)
                 return;
             spdlog::info(
-                "VR P0 GOAL RAW_C64_OWNER: status={} state={} producer={} scope={} queueEpoch={} missTotal={} recoveredTotal={}",
+                "VR P0 GOAL RAW_C64_OWNER: status={} state={} producer={} queued={} node={} scope={} queueEpoch={} missTotal={} recoveredTotal={}",
                 recovered ? "RECOVERED" : "MISSING_FALLBACK_TO_R29",
                 static_cast<int>(state),
                 OutRunVR::GameSemantic::Name(producer),
+                queued ? 1 : 0, cmd.queueNode,
                 OutRunVR::GameSemantic::Name(
                     OutRunVR::GameSemantic::EffectiveScope()),
-                OutRunVR::GameSemantic::CurrentQueueNodeEpoch(),
+                cmd.queueEpoch,
                 R30ExactHudRawWvpMiss, R30ExactHudExtendedRawWvp);
         }
 
@@ -4978,6 +4983,10 @@ namespace OutRunVRStereo
             float eyeConstants[2][16]{};
             float eyeScale[2]{};
             float eyeOffset[2]{};
+            // Immutable pre-eye producer identity for diagnostic evidence.
+            const auto traceCmd = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool traceResult = Settings::VRTelemetry &&
+                traceCmd.IsExactFiniteResultHud();
             if (!R30BuildScreenSpaceEyeConstants(device, stereo,
                     screenKind, original, eyeConstants,
                     eyeScale, eyeOffset))
@@ -5050,6 +5059,7 @@ namespace OutRunVRStereo
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
+            bool rightDrawAttempted = false;
             bool restoreOk = true;
             {
                 InternalPassScope guard;
@@ -5072,6 +5082,7 @@ namespace OutRunVRStereo
                 if (SUCCEEDED(rightHr))
                 {
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
+                    rightDrawAttempted = true;
                     rightHr = actualDraw();
                 }
                 restoreOk = RestoreRightPassState(device, savedRt, savedDepth,
@@ -5114,6 +5125,19 @@ namespace OutRunVRStereo
                     "VR R45 PERSPECTIVE HUD: outer-hook draw serial fixed; 6th/6 and flat white overlays use the raw game c64 before stereo head correction, then uniform HudScale on the world-locked finite HUD plane");
             }
 
+            if (traceResult)
+            {
+                static std::atomic<std::uint64_t> hits{0};
+                const auto n = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+                if (n <= 24 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR R26 RESULT_SHADER_EYES: site={} producer={} queued={} node={} epoch={} pose={} left=0x{:08X} right=0x{:08X} rightDrawAttempted={} restored={} hits={}",
+                        site, OutRunVR::GameSemantic::Name(traceCmd.producer),
+                        traceCmd.queued, traceCmd.queueNode, traceCmd.queueEpoch,
+                        stereo.poseSequence, static_cast<unsigned>(leftHr),
+                        static_cast<unsigned>(rightHr),
+                        rightDrawAttempted ? 1 : 0, restoreOk ? 1 : 0, n);
+            }
             if (FAILED(rightHr))
             {
                 FrameRightDrawFailed = true;
@@ -5366,6 +5390,60 @@ namespace OutRunVRStereo
             return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
         }
 
+        // Pure diagnosis; never grants a render route or hides any object.
+        // Samples only exact game producer families at native GPU entry, not
+        // internal per-eye replay. Deferred D3DX mixed batches remain unknown.
+        void R30TraceOpticalPhysicalEntry(IDirect3DDevice9* device,
+            unsigned api, D3DPRIMITIVETYPE type, UINT primitives) noexcept
+        {
+            if (!Settings::VRTelemetry || !device ||
+                !IsGameDevice(device) || InternalStereoPass)
+                return;
+            const auto cmd = OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            using Token = OutRunVR::GameSemantic::ProducerToken;
+            const unsigned family = cmd.producer == Token::LensFlareCentre ? 0u :
+                (cmd.producer == Token::StageExtensionTime ? 1u :
+                (cmd.IsExactFiniteResultHud() ? 2u : 3u));
+            if (family == 3u)
+                return;
+            static std::atomic<std::uint64_t> counts[3]{};
+            const auto n = counts[family].fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            if (n > 24 && (n & (n - 1)) != 0)
+                return;
+            DWORD fvf = 0, minF = 0, magF = 0, mipF = 0;
+            IDirect3DVertexShader9* vs = nullptr;
+            IDirect3DPixelShader9* ps = nullptr;
+            IDirect3DBaseTexture9* tex = nullptr;
+            IDirect3DSurface9* rt = nullptr;
+            const HRESULT fvfHr = device->GetFVF(&fvf);
+            const HRESULT vsHr = device->GetVertexShader(&vs);
+            const HRESULT psHr = device->GetPixelShader(&ps);
+            const HRESULT texHr = device->GetTexture(0, &tex);
+            const HRESULT rtHr = device->GetRenderTarget(0, &rt);
+            device->GetSamplerState(0, D3DSAMP_MINFILTER, &minF);
+            device->GetSamplerState(0, D3DSAMP_MAGFILTER, &magF);
+            device->GetSamplerState(0, D3DSAMP_MIPFILTER, &mipF);
+            spdlog::info(
+                "VR R26 OPTICAL_PHYSICAL_ENTRY: family={} api={} type={} primitives={} producer={} queued={} node={} epoch={} nextDrawSerial={} poseEpoch={} lensEpoch={} fvf=0x{:X} fvfHr=0x{:08X} vs={} vsHr=0x{:08X} ps={} psHr=0x{:08X} texture={} texHr=0x{:08X} rt={} rtHr=0x{:08X} min={} mag={} mip={} samples={}",
+                family == 0u ? "C993_CENTRE" :
+                    (family == 1u ? "STAGE_PLUS_TIME" : "GOAL_RESULT"),
+                api, static_cast<unsigned>(type), primitives,
+                OutRunVR::GameSemantic::Name(cmd.producer), cmd.queued,
+                cmd.queueNode, cmd.queueEpoch, TopLevelDrawSerial() + 1u,
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                cmd.lensCentreCallEpoch, fvf, static_cast<unsigned>(fvfHr),
+                static_cast<const void*>(vs), static_cast<unsigned>(vsHr),
+                static_cast<const void*>(ps), static_cast<unsigned>(psHr),
+                static_cast<const void*>(tex), static_cast<unsigned>(texHr),
+                static_cast<const void*>(rt), static_cast<unsigned>(rtHr),
+                minF, magF, mipF, n);
+            if (rt) rt->Release();
+            if (tex) tex->Release();
+            if (ps) ps->Release();
+            if (vs) vs->Release();
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
@@ -5375,6 +5453,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TraceOpticalPhysicalEntry(device, 0u, type, primitiveCount);
             R30TracePreRestartHudEligibility(device, 0u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
@@ -5405,6 +5484,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TraceOpticalPhysicalEntry(device, 1u, type, primitiveCount);
             R30TracePreRestartHudEligibility(device, 1u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             // F11 external ImGui uses fixed-function XYZ+orthographic
@@ -5491,6 +5571,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TraceOpticalPhysicalEntry(device, 2u, type, primitiveCount);
             R30TracePreRestartHudEligibility(device, 2u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
@@ -5522,6 +5603,7 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            R30TraceOpticalPhysicalEntry(device, 3u, type, primitiveCount);
             R30TracePreRestartHudEligibility(device, 3u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
