@@ -11,8 +11,10 @@ clear = cpp[cpp.index("bool NativeGameEyeDrawEncoder::clear_target_argb("):
             cpp.index("bool NativeGameEyeDrawEncoder::clear_depth_stencil(")]
 assert "NativeGameEyeColorChronology eyeColorChronology_{};" in hpp
 assert "bool eye_color_chronology_safe() const noexcept" in hpp
-assert "unprovenGpuOverwrite_ = true;" in coverage
-assert "return !unprovenGpuOverwrite_ || postpasses_.full_eye(width, height);" in coverage
+assert "unprovenGpuRegions_.record(dest);" in coverage
+assert "unknownLedgerOverflow_ = true;" in coverage
+assert "!unprovenGpuRegions_.full_eye(width, height)" in coverage
+assert "postpasses_.full_eye(width, height)" in coverage
 assert replay.count("eyeColorChronology_.record_unproven_gpu_postpass(") == 2
 assert replay.count("eyeColorChronology_.record_proven_gpu_postpass(") == 2
 assert replay.index("copy_game_surface(") < replay.index("eyeColorChronology_.record_unproven_gpu_postpass(")

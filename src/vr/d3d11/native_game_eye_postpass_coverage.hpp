@@ -96,6 +96,7 @@ public:
         regions_ = survivors;
         count_ = kept;
     }
+    [[nodiscard]] bool at_capacity() const noexcept { return count_ >= kCapacity; }
     [[nodiscard]] bool full_eye(std::uint32_t width,
                                 std::uint32_t height) const noexcept {
         if (!width || !height || !count_) return false;
@@ -114,7 +115,8 @@ class NativeGameEyeColorChronology final {
 public:
     void reset_after_full_target_clear() noexcept {
         postpasses_.reset();
-        unprovenGpuOverwrite_ = false;
+        unprovenGpuRegions_.reset();
+        unknownLedgerOverflow_ = false;
     }
     void record_proven_gpu_postpass(NativeGameOffscreenColorRegion dest) noexcept {
         postpasses_.record(dest);
@@ -125,7 +127,15 @@ public:
         // Later partial geometry cannot prove it repainted the foreign
         // region. Keep the native XR frame fail-closed until source-proven
         // GPU work covers the entire eye, or a real full-eye Clear resets it.
-        unprovenGpuOverwrite_ = true;
+        // Separate the GPU region covered by the unverified intermediate
+        // from unrelated native scene Draw/Clear pixels. Small, real game
+        // postpasses are valid overlays over an existing native scene, while
+        // a complete unverified eye replacement cannot certify that scene.
+        // On ledger saturation fail closed instead of dropping any unknown
+        // source rectangles and manufacturing coverage.
+        if (unprovenGpuRegions_.at_capacity())
+            unknownLedgerOverflow_ = true;
+        unprovenGpuRegions_.record(dest);
     }
     [[nodiscard]] bool full_postpass_eye(std::uint32_t width,
                                          std::uint32_t height) const noexcept {
@@ -133,10 +143,13 @@ public:
     }
     [[nodiscard]] bool publication_safe(std::uint32_t width,
                                         std::uint32_t height) const noexcept {
-        return !unprovenGpuOverwrite_ || postpasses_.full_eye(width, height);
+        return (!unknownLedgerOverflow_ &&
+                !unprovenGpuRegions_.full_eye(width, height)) ||
+               postpasses_.full_eye(width, height);
     }
 private:
     NativeGameEyePostpassCoverage postpasses_{};
-    bool unprovenGpuOverwrite_{};
+    NativeGameEyePostpassCoverage unprovenGpuRegions_{};
+    bool unknownLedgerOverflow_{};
 };
 } // namespace outrun::vr::dx11

@@ -8,10 +8,10 @@ int main() {
     // color, but cannot authenticate a later untracked GPU pixel overwrite.
     assert(eye.publication_safe(W, H));
     eye.record_unproven_gpu_postpass({200u, 100u, 900u, 600u});
-    assert(!eye.publication_safe(W, H));
+    assert(eye.publication_safe(W, H)); // still genuine Draw/Clear elsewhere
     // A cropped real camera repaint is not proof of a complete eye.
     eye.record_proven_gpu_postpass({200u, 100u, 900u, 600u});
-    assert(!eye.publication_safe(W, H));
+    assert(eye.publication_safe(W, H));
     assert(!eye.full_postpass_eye(W, H));
     // Adjacent authentic GPU camera tiles restore the complete eye.
     eye.record_proven_gpu_postpass({0u, 0u, 1920u, H});
@@ -21,13 +21,17 @@ int main() {
     // An untracked HUD overlay after full coverage again revokes proof.
     eye.record_unproven_gpu_postpass({320u, 80u, 330u, 90u});
     assert(!eye.full_postpass_eye(W, H));
-    assert(!eye.publication_safe(W, H));
+    assert(eye.publication_safe(W, H)); // partial texture/HUD overlay
     eye.record_proven_gpu_postpass({320u, 80u, 330u, 90u});
     assert(eye.full_postpass_eye(W, H));
     assert(eye.publication_safe(W, H));
     // Full genuine D3D9 TARGET Clear physically replaces every foreign pixel.
     eye.record_unproven_gpu_postpass({0u, 0u, W, H});
-    assert(!eye.publication_safe(W, H));
+    assert(!eye.publication_safe(W, H)); // unverified full eye replacement
+    eye.reset_after_full_target_clear();
+    eye.record_unproven_gpu_postpass({0u, 0u, W / 2u, H});
+    eye.record_unproven_gpu_postpass({W / 2u, 0u, W, H});
+    assert(!eye.publication_safe(W, H)); // adjacent unknown tiles cover eye
     eye.reset_after_full_target_clear();
     assert(eye.publication_safe(W, H));
     assert(!eye.full_postpass_eye(W, H)); // no invented postpass/Draw
