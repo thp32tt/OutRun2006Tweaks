@@ -220,14 +220,14 @@ namespace OutRunVRD3D9ExUpgradeR13
                     "VR EVIDENCE R15 INSTALL_PRE deviceEx={} resetHealthy={} finalGate={}",
                     static_cast<const void*>(deviceEx),
                     R15ResetStateHealthy.load(std::memory_order_acquire) ? 1 : 0,
-                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady.load(std::memory_order_acquire) ? 1 : 0);
             const bool installed =
                 R15InstallCompatR14Hook.call<bool>(deviceEx);
             if (Settings::VREvidenceTrace)
                 spdlog::info(
                     "VR EVIDENCE R15 INSTALL_R14_RESULT deviceEx={} installed={} finalGate={}",
                     static_cast<const void*>(deviceEx), installed ? 1 : 0,
-                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady.load(std::memory_order_acquire) ? 1 : 0);
             if (!installed || !deviceEx)
                 return installed;
 
@@ -257,7 +257,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     spdlog::info(
                         "VR EVIDENCE R15 STEREO_HANDOFF device={} result=FAIL finalGateBefore={}",
                         static_cast<const void*>(device),
-                        OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
+                        OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady.load(std::memory_order_acquire) ? 1 : 0);
                 R15ResetStateHealthy.store(false, std::memory_order_release);
                 OutRunVRD3D9ExUpgrade::SetFinalCompatOverlayReady(false);
                 R14AbandonCompatDevice(device);
@@ -276,7 +276,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     "VR EVIDENCE R15 INSTALL_POST device={} result=SUCCESS resetHealthy={} finalGate={}",
                     static_cast<const void*>(device),
                     R15ResetStateHealthy.load(std::memory_order_acquire) ? 1 : 0,
-                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady.load(std::memory_order_acquire) ? 1 : 0);
             spdlog::info(
                 "VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay; partial-RECT and generated-mip correctness overlay ACTIVE");
             return true;
@@ -517,7 +517,7 @@ namespace OutRunVRD3D9ExUpgradeR13
                     params ? params->BackBufferHeight : 0,
                     params ? (params->Windowed ? 1 : 0) : -1,
                     R15ResetStateHealthy.load(std::memory_order_acquire) ? 1 : 0,
-                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady.load(std::memory_order_acquire) ? 1 : 0);
             R15ResetStateHealthy.store(false, std::memory_order_release);
             if (IsCompatDevice(device))
                 OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
