@@ -9,10 +9,13 @@ def integrated(source):
     begin = source.index("bool mirror_texture(")
     end = source.index("bool submit(", begin)
     mirror = source[begin:end]
-    budget = mirror.index("native_rt_readback::bounded_gpu_snapshot(")
-    snap = mirror.index("GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())")
-    decode = mirror.index("native_rt_readback::unpack_row(")
-    bind = mirror.index("CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())")
+    try:
+        budget = mirror.index("native_rt_readback::bounded_gpu_snapshot(")
+        snap = mirror.index("GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())")
+        decode = mirror.index("native_rt_readback::unpack_row(")
+        bind = mirror.index("CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())")
+    except ValueError:
+        return False
     return all((
         "base.Width, base.Height, levels, rtLayout))" in mirror,
         budget < snap < decode < bind,
