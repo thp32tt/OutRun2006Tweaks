@@ -2331,8 +2331,16 @@ def main() -> None:
                 and "ctx->DrawIndexed(indexCount, 0, 0);" in draw
                 and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in draw)
     assert rt_game_native_connected(bridge)
+    # An earlier cube-RT producer can legally contain the same D3D9 usage
+    # token. Mutate THIS tested 2D mirror function, not the first occurrence
+    # elsewhere in the 9k-line bridge. Keep every destructive negative check.
+    mirror_start = bridge.index("bool mirror_texture(")
+    mirror_end = bridge.index("bool submit(", mirror_start)
+    mirror_body = bridge[mirror_start:mirror_end]
     for token in rt_tokens:
-        mutant = bridge.replace(token, "/* disconnected 00560 RT producer */", 1)
+        assert token in mirror_body, token
+        damaged = mirror_body.replace(token, "/* disconnected 00560 RT producer */", 1)
+        mutant = bridge[:mirror_start] + damaged + bridge[mirror_end:]
         assert mutant != bridge and not rt_game_native_connected(mutant), token
     for pool, usage_rt, fmt, srgb, expected in (
         ("DEFAULT", True, "A8R8G8B8", False, True),
