@@ -34,16 +34,24 @@ for name in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     caller = file(name)
     # Active R30 has a fourth real DrawPrimitiveUP native source observer.
     # R26-safe intentionally retains three shadow families and original Draw.
-    expected = 4 if name == "src/vr/d3d9/stereo_renderer_r30.cpp" else 3
-    for token in (
-            "game_native_primitive_element_count(",
-            "topology != D3DPT_LINELIST",
-            "topology != D3DPT_LINESTRIP"):
+    active = name == "src/vr/d3d9/stereo_renderer_r30.cpp"
+    # LinearUP uses the shared primitive-span validator for all six D3D9
+    # primitive kinds; the three VB/IB/IndexedUP paths keep explicit type
+    # predicates. Assert both, rather than require a nonexistent fourth copy
+    # of the legacy literal LINELIST/LINESTRIP checks.
+    for token, expected in (
+            ("game_native_primitive_element_count(", 4 if active else 3),
+            ("topology != D3DPT_LINELIST", 3),
+            ("topology != D3DPT_LINESTRIP", 3)):
         assert caller.count(token) == expected, (name, token)
-        # Removing even one source-family admission check must fail this
-        # bounded line/triangle topology census without relaxing fallback.
         broken = caller.replace(token, "BROKEN_NATIVE_TOPOLOGY", 1)
         assert broken != caller and broken.count(token) != expected
+    if active:
+        up = caller.split("void R30ObserveNativeLinearUP(", 1)[1].split(
+            "void R30ObserveNativeIndexedUP(", 1)[0]
+        assert "live::game_native_primitive_element_count(" in up
+        assert "if (!live::game_native_primitive_element_count(" in up
+        assert "live::observe_linear(" in up
     assert "R30CopyVertexShadow" in caller and "R30CopyIndexShadow" in caller
     assert "live::observe_linear" in caller and "live::observe_indexed" in caller
     if name == "src/vr/d3d9/stereo_renderer_r30.cpp":
