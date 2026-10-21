@@ -6,7 +6,8 @@ cov=(root/"src/vr/d3d11/native_game_eye_postpass_coverage.hpp").read_text(encodi
 replay=cpp[cpp.index("bool NativeGameEyeDrawEncoder::replay_due_source_clears()"):cpp.index("bool NativeGameEyeDrawEncoder::finish_source_clear_timeline()")]
 ready=cpp[cpp.index("if (!live_game_stereo::authored_visible_eye_frame_ready("):]
 assert replay.count("eyePostpassCoverage_.record(")==2
-assert replay.count("if (proven) {")==2
+assert replay.count("if (proven) {")==1
+assert replay.count("if (proven && visibleDest.valid) {")==1
 assert replay.index("if (!copy_game_surface(")<replay.index("eyePostpassCoverage_.record(")
 assert replay.index("if (!stretch_game_surface(")<replay.rindex("eyePostpassCoverage_.record(")
 assert "clipped.destX" in replay and "visibleDest.valid" in replay
