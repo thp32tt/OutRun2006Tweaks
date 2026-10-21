@@ -12,6 +12,15 @@ assert hook.count("game_native_source_stride_valid(stride)") == 5
 assert "stride < 16 || stride > 512" not in hook
 assert "R30CopyVertexShadow(" in hook and "R30CopySparseVertexShadow(" in hook
 assert "R30CaptureNativeAdditionalStreams(" in hook
+# A game-created IndexedUP index pointer must be bounded before any read.
+assert hook.count("game_indexed_up_index_source_range(") == 1
+indexed = hook.split("void R30ObserveNativeIndexedUP(", 1)[1].split(
+    "// Preserve game-absolute D3D9 slot identities", 1)[0]
+assert indexed.index("game_indexed_up_index_source_range(") < indexed.index(
+    "std::memcpy(&shortIndex")
+assert "format == D3DFMT_INDEX16 ? 2u : 4u" in indexed
+assert "game_indexed_up_index_source_range(" in (
+    r / "src/vr/d3d11/live_game_primitive_span.hpp").read_text()
 assert "game_indexed_up_dense_source_range(" in hook
 assert "reinterpret_cast<const std::uint8_t*>(firstAddress)" in hook
 assert "game_indexed_up_dense_source_range(" in (

@@ -3772,6 +3772,13 @@ namespace OutRunVRStereo
                 return;
             try {
                 const UINT count=nativeElements;
+                // Check the complete game-owned IB/UP address window BEFORE
+                // reading a 16/32-bit index or advancing a 32-bit pointer.
+                // Unknown/unbounded source leaves the original game Draw.
+                if (!live::game_indexed_up_index_source_range(
+                        reinterpret_cast<std::uintptr_t>(indices), count,
+                        format == D3DFMT_INDEX16 ? 2u : 4u))
+                    return;
                 // Source address/window size is not the bounded native Draw
                 // vertex count. Large menu/vehicle/race IndexedUP windows can
                 // be compacted to only the game-referenced source vertices.

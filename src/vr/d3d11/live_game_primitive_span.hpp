@@ -165,6 +165,26 @@ inline bool game_compact_sparse_indices(
      return true;
  }
 
+// The game supplies the original D3D9 IndexedUP index pointer, not a
+// backend-owned buffer. Bound the full 16/32-bit index snapshot before any
+// native diagnostic dereference or pointer arithmetic. This is only an
+// address-wrap check; it does not claim the source pages are readable.
+// Invalid native sources leave the original D3D9 draw/input untouched.
+[[nodiscard]] constexpr bool game_indexed_up_index_source_range(
+    std::uintptr_t sourceAddress, std::uint32_t indexCount,
+    std::uint32_t indexWidth,
+    std::uintptr_t addressLimit =
+        (std::numeric_limits<std::uintptr_t>::max)()) noexcept {
+    if (sourceAddress == 0u || sourceAddress > addressLimit ||
+        indexCount == 0u || indexCount > kMaxNativeGameVertices ||
+        (indexWidth != 2u && indexWidth != 4u))
+        return false;
+    const std::uint64_t lastByte =
+        static_cast<std::uint64_t>(indexCount) * indexWidth - 1u;
+    return lastByte <= static_cast<std::uint64_t>(
+        addressLimit - sourceAddress);
+}
+
 // The dense IndexedUP fast path rebases D3D9's MinVertexIndex and must
 // advance its *source pointer* by that same physical offset. On x86 the
 // native CPU snapshot must not wrap a 32-bit UP address before D3D9 gets

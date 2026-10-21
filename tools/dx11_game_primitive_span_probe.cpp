@@ -166,6 +166,29 @@ int main() {
         kMaxNativeGameVertices + 1u, sparseMin, 40000u,
         upPacked, upRemapped));
     assert(upPacked == keptUp && upRemapped == keptUpIndices);
+    // 00966: native diagnostic must not wrap a game-owned x86 IB/UP
+    // pointer before the original D3D9 DrawIndexedPrimitiveUP executes.
+    using outrun::vr::dx11::live_game_frame::game_indexed_up_index_source_range;
+    static_assert(game_indexed_up_index_source_range(
+        0xfffffffcu, 2u, 2u, 0xffffffffu));
+    static_assert(game_indexed_up_index_source_range(
+        0xfffffffeu, 1u, 2u, 0xffffffffu));
+    static_assert(!game_indexed_up_index_source_range(
+        0xffffffffu, 1u, 2u, 0xffffffffu));
+    static_assert(!game_indexed_up_index_source_range(
+        0xfffffffcu, 2u, 4u, 0xffffffffu));
+    assert(game_indexed_up_index_source_range(
+        0x1000u, 3u, 4u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0u, 3u, 4u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, 0u, 2u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, kMaxNativeGameVertices + 1u, 2u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, 3u, 1u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, 3u, 8u, 0xffffffffu));
     // 00966: the dense IndexedUP source span must rebase the pointer
     // without overflowing x86 address space or mutating output on failure.
     using outrun::vr::dx11::live_game_frame::game_indexed_up_dense_source_range;
