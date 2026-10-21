@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T0317KST-INVENTORY",
+  "qa_date_kst": "2026-10-22 03:17",
+  "lane": "C1",
+  "scope": "A_B_GENERATED_LOCAL_KOREAN_PNG_SHA_DEDUP_INVENTORY",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "3734cf2f49774bf27f3117fc415682dfd849e64a",
+  "n100_evidence": "work/c1_20261022_0317_inventory_result.json",
+  "n100_candidate_root": "work/image-src/text_roi_batches",
+  "inventory": {
+    "export_evidence_files": 66,
+    "exported_candidate_records": 313,
+    "unique_actual_candidate_sha256": 313,
+    "prior_c1_qa_report_files_scanned": 53,
+    "historical_reviewed_sha256": 318,
+    "unreviewed_unique_sha256": 0,
+    "sha_mismatch": 0,
+    "missing_candidate_or_source": 0
+  },
+  "overall": "IDLE",
+  "reviewed_new": 0,
+  "pass_new": 0,
+  "fail_new": 0,
+  "notes": "No A/B new candidate output SHA256 exists beyond prior C1 report records; do not issue new PASS/FAIL, consume queue, or rescore prior work.",
+  "unchanged": {
+    "imagegen_called": false,
+    "A_B_queue_consumed": false,
+    "C2_C3_game_pass_created": false,
+    "DDS_final_deployment": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_source": "thp32tt/ai-dev-lab@main AI_SCOREBOARD.md",
+    "scoreboard_ssot_head": "843d140c57736e22594897770770f54dda621dfb",
+    "AI_1_previous": 1695,
+    "change": 0,
+    "AI_1_new": 1695,
+    "reason": "Status check / same reviewed SHA inventory, no genuinely new QA result; +0."
+  }
+}
