@@ -1,0 +1,187 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00967",
+  "production_id": "CONVERSION-DX11-00967",
+  "event_id": "CONVERSION-DX11-00967-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00967",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "SOURCE_BUILD_VERIFIED_RUNTIME_PENDING",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "material_result_sha": "9f6452b431581e770967cd7fc7fe0af8be98e2b8",
+  "validation_bearing_result_sha": "2d01ab270ffcb4f09948f021ea74d7347fda3bca",
+  "result_sha": "2d01ab270ffcb4f09948f021ea74d7347fda3bca",
+  "CODE_CHANGED_SHA": "9f6452b431581e770967cd7fc7fe0af8be98e2b8",
+  "REAL_GAME_DRAW_BLOCKER": "No same-SHA actual game menu/car/race native full-frame capture or Quest3/VDXR output evidence; past native_draws=0 must not be applied to this source SHA.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Controller selects the next unfinished native menu-to-race full-frame or stereo source integration after this source/CI-verified sRGB feature; require real game native Draw/published frame and Quest3 proof for runtime promotion; preserve D3D9Ex/gamepad/FFB/SkyGlow fallback and DXVK freeze.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_SM3_SRGBWRITEENABLE_CAPTURE",
+      "SHARED_NATIVE_LINEAR_SRGB_RTVS",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_backend.hpp",
+      "tools/test_dx11_live_sm3_srgb_output_00967.py",
+      "tools/test_dx11_live_sm3_draw_00925.py",
+      "tools/test_dx11_native_target_resize.py",
+      "tools/dx11_autodev_policy.py",
+      "tools/test_dx11_autodev_policy.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native SM3 per-draw D3DRS_SRGBWRITEENABLE dispatch to paired typed linear/sRGB RTV backed by one typeless BGRA target; dedicated source regression and Windows/Backend CI compile SUCCESS.",
+      "negative_regression": "Invalid source state/missing sRGB view or unsafe replacement fails closed; positive and negative sRGB, masked write, transactional resize, documented prior 00966 acceptance and CI evidence mutations validated.",
+      "component_integration": "Live game D3D9 SM3 Draw state and native frame renderer target -> D3D11 RTV linear/sRGB creation and binding -> guarded Draw/DrawIndexed; original D3D9Ex/gamepad/FFB path remains authoritative on rejection."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00967"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SM3_SRGB_OUTPUT_STATE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY; real matching menu/car/race native pixel output and complete frame coverage UNTESTED; Quest3/VDXR untested, no gameplay promotion.",
+    "activation_guard_and_fallback": "Native full-resolution Draw opt-in remains guarded; malformed state/resources/RTV and unsafe output abort native submission; D3D9Ex Present, original gamepad/FFB/SkyGlow, DXVK freeze intact."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Integrate live game SM3 per-Draw native D3D11 linear/sRGB render output and preserved D3D9Ex fallback as one coherent source build capability, without claiming actual gameplay pixels.",
+    "acceptance_items": [
+      {
+        "id": "native_sm3_srgb_output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_shader_draw_to_d3d11_target",
+        "expected_behavior": "D3D9 SRGBWRITEENABLE chooses paired native D3D11 linear or sRGB RTV over one BGRA game-owned frame target"
+      },
+      {
+        "id": "renderer_input_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_render_and_controls",
+        "expected_behavior": "Invalid sRGB states, missing views, unsupported formats and failed target resize retain original D3D9 Draw, gamepad and FFB fallback"
+      },
+      {
+        "id": "same_sha_five_gate",
+        "category": "integrated_validation",
+        "behavior_area": "windows_backend_openxr_hud",
+        "expected_behavior": "Unmodified mandatory five GitHub Actions gates succeed on the same validation-bearing source SHA"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_sm3_srgb_output": {
+      "status": "PASS_SOURCE_AND_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_backend.hpp",
+        "tools/test_dx11_live_sm3_srgb_output_00967.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39568453448 and Backend Conversion Gate 39568453415 on 2d01ab27; source regression not hardware observation"
+    },
+    "renderer_input_fallback": {
+      "status": "PASS_SOURCE_AND_CI",
+      "evidence_paths": [
+        "tools/test_dx11_native_target_resize.py",
+        "tools/test_dx11_live_sm3_draw_00925.py",
+        "tools/test_dx11_autodev_policy.py"
+      ],
+      "validation_command": "DX11 Fast Structural Checks 39568453448; Backend Conversion Gate 39568453415 including readiness smoke probes"
+    },
+    "same_sha_five_gate": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "GitHub Actions exact SHA 2d01ab27 five workflows: Fast 39568453448, Backend 39568453415, Build 39568453403, OpenXR 39568453459, HUD 39568453443"
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "tools/test_dx11_live_sm3_srgb_output_00967.py",
+    "tools/dx11_autodev_policy.py",
+    "tools/test_dx11_autodev_policy.py",
+    "tools/test_dx11_native_target_resize.py",
+    "tools/test_dx11_live_sm3_draw_00925.py"
+  ],
+  "ci": {
+    "exact_sha": "2d01ab270ffcb4f09948f021ea74d7347fda3bca",
+    "branch": "vr-dx11-native-r71",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39568453448,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39568453415,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 39568453403,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39568453459,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39568453443,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered original 00967 source SHA 9f6452b4 and exact failed Backend run 39567197895.",
+    "C1_REVIEW": "PASS: traced 00966 structured acceptance rejection; separated actual CI errors from obsolete regex/string-only test assertions.",
+    "C2_IMPLEMENT": "PASS: original 00967 native SM3 sRGB output source preserved; causal policy and two failed regressions repaired at source-linked SHA 934fd87f -> 290e9b4f -> 2d01ab27.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 2d01ab27 Fast/Backend/Win32/OpenXR/HUD all success; Backend validate+smoke all success; hardware not run.",
+    "C4_COMMIT": "PASS: material renderer source 9f6452b4 plus same TASK repair commits 934fd87f/290e9b4f/2d01ab27, expected-sha nonforce ref updates; no CI-skip in validated source.",
+    "C5_PACKAGE": "NOT_REQUIRED: only CI build artifacts; no deployment/game install or Quest3 evidence.",
+    "C6_RESULT": "PASS_SOURCE_BUILD_VERIFIED: separate bookkeeping checkpoint; validation-bearing SHA 2d01ab27 unchanged; RUNTIME_VALIDATION=UNTESTED; no new score for retry or CI repair."
+  },
+  "work_time_percentages": "NOT_MEASURED",
+  "time_allocation_claim": "NOT_MEASURED"
+}
