@@ -115,7 +115,15 @@ Assert-R26PcBuildContract -BuildDir $gameBuild
 $vcxproj = Join-Path $gameBuild 'outrun2006tweaks.vcxproj'
 if (!(Test-Path $vcxproj)) { throw "Missing generated Win32 target: $vcxproj" }
 [xml]$projXml = Get-Content $vcxproj -Raw
-$compileInputs = @($projXml.Project.ItemGroup.ClCompile | ForEach-Object { $_.Include } | Where-Object { $_ })
+# PowerShell XML property projection is brittle when an ItemGroup contains no
+# ClCompile child (common on clean GitHub-hosted runners). Select by local-name
+# across all MSBuild ItemGroups so the source-graph proof works with or without
+# the default MSBuild XML namespace.
+$compileInputs = @(
+    $projXml.SelectNodes("//*[local-name()='ClCompile']") |
+        ForEach-Object { $_.GetAttribute('Include') } |
+        Where-Object { $_ }
+)
 $r26Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r30_r26_safe\.cpp$' })
 $r84Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r33\.cpp$' })
 if ($r26Owner.Count -ne 1 -or $r84Owner.Count -ne 0) { throw "PC FAST SOURCE GRAPH MISMATCH: R26=$($r26Owner.Count), R84=$($r84Owner.Count)" }
