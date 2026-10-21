@@ -176,14 +176,44 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     if (!player)
         return false;
     const auto& m = player->matrix_B0;
+    // A car-space matrix can intermittently be stale during interpolation,
+    // looping, camera switches, respawn or a new stage. Previously each
+    // rejected frame fell back to the bumper camera, then the very next
+    // valid frame returned to car space, yielding an apparent cockpit
+    // zoom-in/zoom-out oscillation. Latch that fallback for the remainder
+    // of the selected native camera-mode session; do not alternate bases.
+    // Reset only after actually leaving the game or changing native mode,
+    // not after an incidental invalid render-time matrix.
+    static thread_local bool carSpaceFallbackLatched = false;
+    static thread_local int lastCameraMode = -1;
+    static thread_local const EvWorkCamera* lastCamera = nullptr;
+    const int mode = static_cast<int>(camera->cam_mode_34A);
+    if (mode != lastCameraMode || camera != lastCamera ||
+        !VRDriverSeatGameplayActive())
+        carSpaceFallbackLatched = false;
+    lastCameraMode = mode;
+    lastCamera = camera;
+    const bool carSpaceRequested =
+        Settings::VRDriverSeatCarSpaceBasis && !carSpaceFallbackLatched;
+    bool usedCarSpace = false;
     if (!OutRunVR::DriverSeatCamera::ComputeStableSeatPose(
             {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
-            Settings::VRDriverSeatCarSpaceBasis,
+            carSpaceRequested,
             {{m._31, m._32, m._33}, {m._21, m._22, m._23}},
             Settings::VRDriverSeatForward.get(),
             Settings::VRDriverSeatRight.get(),
-            Settings::VRDriverSeatUp.get(), newPos, newLook))
+            Settings::VRDriverSeatUp.get(), newPos, newLook,
+            &usedCarSpace))
         return false;
+    if (carSpaceRequested && !usedCarSpace)
+    {
+        carSpaceFallbackLatched = true;
+        spdlog::warn(
+            "VR DRIVER SEAT BASIS STABILIZED: car-space source invalid; "
+            "keep native-camera offset until camera mode/session resets");
+    }
+    if (!Settings::VRDriverSeatCarSpaceBasis)
+        carSpaceFallbackLatched = false;
     translatedPosition = {newPos.x, newPos.y, newPos.z};
     translatedLook = {newLook.x, newLook.y, newLook.z};
     return true;
