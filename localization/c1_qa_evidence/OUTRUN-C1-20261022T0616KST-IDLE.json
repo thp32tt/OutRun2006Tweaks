@@ -1,0 +1,37 @@
+{
+  "run_key": "OUTRUN-C1-20261022T0616KST-SHA-RECHECK",
+  "lane": "C1",
+  "verdict": "IDLE",
+  "scope": "A/B exported local Korean PNG candidates only",
+  "branch": "korean-localization-recovery-20260928",
+  "provenance": {
+    "source_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence_glob": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-*.json",
+    "candidate_root": "work/image-src/text_roi_batches/candidate_outputs",
+    "qa_history": "work/c1_batch_*/report.json and work/c1_batch_*/metrics.json",
+    "verification_script": "work/c1_20261022_0616_inventory.py",
+    "verification_output": "work/c1_20261022_0616_inventory_result.json",
+    "verification_method": "local file SHA256 compared with export evidence; SHA dedup against historical C1 report/metrics; source file availability and producer manifest matched"
+  },
+  "counts": {
+    "prior_qa_reports_and_metrics": 53,
+    "historical_reviewed_sha": 318,
+    "producer_export_evidence_files": 66,
+    "producer_exported_candidate_records": 313,
+    "actual_unique_candidate_sha": 313,
+    "unreviewed_unique_sha": 0,
+    "missing_source_or_candidate_files": 0,
+    "export_sha_mismatches": 0
+  },
+  "qa_actions": {
+    "new_candidates_reviewed": 0,
+    "pass": 0,
+    "fail": 0,
+    "no_imagegen": true,
+    "no_A_B_queue_consumption": true,
+    "no_new_dds": true,
+    "no_C2_C3_ingame_approval": true
+  },
+  "runtime_validation": "UNTESTED",
+  "note": "IDLE evidence only; previous C1 outcomes remain unchanged. Evidence scope excludes candidates not present in producer export evidence."
+}
