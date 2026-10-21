@@ -431,6 +431,13 @@ def _local_export_confirmed(root, active):
     },None
 
 
+def _chat_conversation_id(url):
+    if not isinstance(url,str):
+        return None
+    m=re.search(r"/c/([^/?#]+)",url)
+    return m.group(1) if m else None
+
+
 def _local_completion_path(root, task):
     return Path(root)/STATE_DIR/"local_completion"/(task+".json")
 
@@ -625,14 +632,17 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         target=active["source_chat_url"].strip()
         if not re.fullmatch(r"https://chatgpt\.com/(?:g/g-p-[^/]+/)?c/[^?#]+(?:[?#].*)?", target):
             return False, "ACTIVE_CHAT_URL_UNSAFE"
-        if page.url.rstrip("/") != target.rstrip("/"):
-            # Reopen the exact recorded chat only when we still need fresh DOM
-            # evidence. A prior SHA-bound export can survive browser restarts.
+        target_chat=_chat_conversation_id(target)
+        current_chat=_chat_conversation_id(page.url)
+        if current_chat != target_chat:
+            # Reopen the recorded conversation. ChatGPT may normalize between
+            # /g/g-p-.../c/<id> and /c/<id>; the conversation id is the durable
+            # identity, not the surrounding project route.
             try:
                 await page.goto(target, wait_until="domcontentloaded", timeout=45000)
             except Exception as exc:
                 return False, "ACTIVE_CHAT_REOPEN_FAILED:" + type(exc).__name__
-            if page.url.rstrip("/") != target.rstrip("/"):
+            if _chat_conversation_id(page.url) != target_chat:
                 return False, "ACTIVE_CHAT_REOPEN_MISMATCH"
         try:
             result=await page.evaluate(r"""async ({task,expected})=>{
