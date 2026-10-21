@@ -3695,6 +3695,44 @@ namespace OutRunVRStereo
             } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
         }
 
+        // A real game's nonindexed UP source lives at its transient stream-0
+        // pointer; programmable shaders may also reference D3D9 VB streams 1..3.
+        // Capture every referenced source-epoch shadow BEFORE D3D9 executes.
+        void R30ObserveNativeLinearUP(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, UINT primitiveCount,
+            const void* vertices, UINT stride) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device || StereoWanted()) return;
+            R30NativeGameSourceGuard nativeSource{device};
+            if (primitiveCount == 0u &&
+                live::game_native_empty_primitive_type(
+                    static_cast<std::uint32_t>(topology))) {
+                nativeSource.forwarded = true;
+                live::observe_empty_game_draw(device, topology);
+                return;
+            }
+            UINT nativeElements = 0u;
+            if (!live::game_native_primitive_element_count(
+                    static_cast<std::uint32_t>(topology), primitiveCount,
+                    nativeElements) || !vertices || stride < 16u ||
+                stride > 512u) return;
+            try {
+                // Unindexed UP stream-0 and the bound side VBs must share
+                // physical 0..N-1 slots; never use unrelated compact indices.
+                std::vector<std::uint32_t> physical(nativeElements);
+                for (UINT i = 0u; i < nativeElements; ++i) physical[i] = i;
+                live::NativeGameAdditionalStreams extra{};
+                std::array<std::vector<std::uint8_t>,3> owned{};
+                if (!R30CaptureNativeAdditionalStreams(
+                        device, physical, extra, owned))
+                    return; // Fail closed; game Draw/input/FFB remain intact.
+                nativeSource.forwarded = true;
+                live::observe_linear(
+                    device, topology, primitiveCount, vertices, stride, &extra);
+            } catch (...) { /* The original game UP Draw remains authoritative. */ }
+        }
+
         void R30ObserveNativeIndexedUP(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE topology, UINT minVertex, UINT numVertices,
             UINT primitiveCount, const void* indices, D3DFORMAT format,
@@ -3870,11 +3908,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
-            if (outrun::vr::dx11::live_game_frame::diagnostic_enabled()) {
-                if (!StereoWanted())
-                    outrun::vr::dx11::live_game_frame::observe_linear(
-                    device, type, primitiveCount, data, stride);
-            }
+            R30ObserveNativeLinearUP(device, type, primitiveCount, data, stride);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL) {

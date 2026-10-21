@@ -3503,6 +3503,48 @@ def main() -> None:
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
+    # 00966: DrawPrimitiveUP must also capture source-matched secondary
+    # SM3 streams 1..3, or native full-frame admission is lost at this callsite.
+    # Deleting any capture or fallback token must fail this structural oracle.
+    r30_path = next(r for r in RENDERERS if r.name == "stereo_renderer_r30.cpp")
+    r30_source = r30_path.read_text(encoding="utf-8")
+    up_start = r30_source.find("void R30ObserveNativeLinearUP(")
+    up_end = r30_source.find("void R30ObserveNativeIndexedUP(", up_start)
+    call_start = r30_source.find("HRESULT __stdcall DrawPrimitiveUPDestR30(")
+    call_end = r30_source.find("HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(", call_start)
+    assert up_start >= 0 and up_end > up_start
+    assert call_start >= 0 and call_end > call_start
+    native_up = r30_source[up_start:up_end]
+    native_call = r30_source[call_start:call_end]
+    native_up_required = (
+        "R30NativeGameSourceGuard nativeSource{device};",
+        "game_native_empty_primitive_type(",
+        "game_native_primitive_element_count(",
+        "std::vector<std::uint32_t> physical(nativeElements);",
+        "physical[i] = i;",
+        "if (!R30CaptureNativeAdditionalStreams(",
+        "device, physical, extra, owned",
+        "live::observe_linear(",
+        "vertices, stride, &extra",
+    )
+    native_call_required = (
+        "R30ObserveNativeLinearUP(device, type, primitiveCount, data, stride);",
+        "const HRESULT gameHr = R30GuardScreenSpace(",
+        "R30CompleteNativeGameSource(device, gameHr);",
+    )
+    def up_contract(region, required):
+        return all(token in region for token in required)
+    assert up_contract(native_up, native_up_required)
+    assert up_contract(native_call, native_call_required)
+    assert "live_game_frame::observe_linear(" not in native_call, (
+        "UP callsite skipped native secondary stream capture")
+    for region, required in ((native_up, native_up_required),
+                             (native_call, native_call_required)):
+        for token in required:
+            deleted = region.replace(token, "", 1)
+            assert deleted != region and not up_contract(deleted, required), (
+                "nonindexed SM3 UP native source mutation escaped: " + token)
+
     # R240: the opt-in real D3D9 IndexedUP hook must forward nonzero
     # MinVertexIndex through the native DrawIndexed diagnostic bridge.
     # Static mutation tests are not Quest3 / game-frame runtime proof.
