@@ -115,7 +115,8 @@ Assert-R26PcBuildContract -BuildDir $gameBuild
 $vcxproj = Join-Path $gameBuild 'outrun2006tweaks.vcxproj'
 if (!(Test-Path $vcxproj)) { throw "Missing generated Win32 target: $vcxproj" }
 [xml]$projXml = Get-Content $vcxproj -Raw
-$compileInputs = @($projXml.Project.ItemGroup.ClCompile | ForEach-Object { $_.Include } | Where-Object { $_ })
+# Test-build portability fix: XML ItemGroup nodes need not contain ClCompile under PowerShell strict mode.
+$compileInputs = @($projXml.SelectNodes('//*[local-name()="ClCompile"][@Include]') | ForEach-Object { $_.GetAttribute('Include') } | Where-Object { $_ })
 $r26Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r30_r26_safe\.cpp$' })
 $r84Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r33\.cpp$' })
 if ($r26Owner.Count -ne 1 -or $r84Owner.Count -ne 0) { throw "PC FAST SOURCE GRAPH MISMATCH: R26=$($r26Owner.Count), R84=$($r84Owner.Count)" }
