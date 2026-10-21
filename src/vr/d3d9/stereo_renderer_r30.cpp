@@ -17,6 +17,7 @@
 #include "vr/d3d11/native_game_source_mutation.hpp"
 #include "vr/d3d11/native_game_surface_copy_region.hpp"
 #include "vr/d3d11/live_game_primitive_span.hpp"
+#include "vr/d3d11/live_game_source_stride.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <array>
@@ -3460,7 +3461,7 @@ namespace OutRunVRStereo
                 IDirect3DVertexBuffer9* vb=nullptr;
                 UINT offset=0u,stride=0u;
                 if (FAILED(device->GetStreamSource(slot,&vb,&offset,&stride)) ||
-                    !vb || !stride || stride>512u) {
+                    !vb || !outrun::vr::dx11::game_native_source_stride_valid(stride)) {
                     if (vb) vb->Release();
                     return false;
                 }
@@ -3513,7 +3514,7 @@ namespace OutRunVRStereo
                 IDirect3DVertexBuffer9* vb = nullptr;
                 UINT offset=0, stride=0;
                 if (FAILED(device->GetStreamSource(0, &vb, &offset, &stride)) ||
-                    !vb || stride < 16 || stride > 512) {
+                    !vb || !outrun::vr::dx11::game_native_source_stride_valid(stride)) {
                     if (vb) vb->Release();
                     return;
                 }
@@ -3586,7 +3587,7 @@ namespace OutRunVRStereo
                 if (FAILED(device->GetStreamSource(
                         0, &vb, &streamOffset, &stride)) || !vb ||
                     FAILED(device->GetIndices(&ib)) || !ib ||
-                    stride < 16 || stride > 512) {
+                    !outrun::vr::dx11::game_native_source_stride_valid(stride)) {
                     if (ib) ib->Release();
                     if (vb) vb->Release();
                     return;
@@ -3729,7 +3730,7 @@ namespace OutRunVRStereo
                 !live::game_native_primitive_element_count(
                      static_cast<std::uint32_t>(topology),
                      primitiveCount, nativeElements) ||
-                !indices || !vertices || stride < 16 || stride > 512 ||
+                !indices || !vertices || !outrun::vr::dx11::game_native_source_stride_valid(stride) ||
                 (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
                 return;
             try {

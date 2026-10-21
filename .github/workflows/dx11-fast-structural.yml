@@ -114,6 +114,8 @@ jobs:
           python tools/test_dx11_sm3_interface_draw_00964.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_cube_draw_probe_00965.cpp -o /tmp/dx11_sm3_cube_00965 && /tmp/dx11_sm3_cube_00965
           python tools/test_dx11_sm3_cube_draw_00965.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_source_stride_probe_00966.cpp -o /tmp/dx11_game_source_stride_00966 && /tmp/dx11_game_source_stride_00966
+          python tools/test_dx11_live_source_stride_00966.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_alpha_test_probe.cpp -o /tmp/dx11_sm3_alpha && /tmp/dx11_sm3_alpha
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_constant_codegen_probe.cpp -o /tmp/dx11_sm3_constant && /tmp/dx11_sm3_constant
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_sm3_packed_model_probe.cpp -o /tmp/dx11_sm3_packed_model && /tmp/dx11_sm3_packed_model
