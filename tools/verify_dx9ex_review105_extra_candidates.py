@@ -65,6 +65,55 @@ def check_direct_eye(source: str) -> None:
         "D3DTEXF_NONE")
 
 
+
+def check_optical_provenance(source: str) -> None:
+    """Do not lose direct GOAL or mislabel scene/queue draws as physical owners."""
+    goal = source.split("void R30TraceGoalOriginalC64Status(", 1)[1].split(
+        "bool R30GetExtendedRawWvpForExactHud(", 1)[0]
+    for token in (
+        "const bool queued = OutRunVR::GameSemantic::QueueRenderActive();",
+        "if (!queued && !cmd.IsExactFiniteResultHud())",
+        "OutRunVR::GameSemantic::CurrentQueueProducerToken()",
+        ": cmd.producer;",
+        "cmd.queueEpoch,",
+    ):
+        assert token in goal, token
+
+    optical = source.split("void R30TraceOpticalPhysicalEntry(", 1)[1].split(
+        "HRESULT __stdcall DrawPrimitiveDestR30(", 1)[0]
+    for token in (
+        "!IsGameDevice(device) || InternalStereoPass",
+        "Token::LensFlareCentre",
+        "Token::StageExtensionTime",
+        "cmd.IsExactFiniteResultHud()",
+        "if (family == 3u)",
+        "if (n > 24 && (n & (n - 1)) != 0)",
+        "GetVertexShader(&vs)",
+        "GetPixelShader(&ps)",
+        "GetTexture(0, &tex)",
+        "GetRenderTarget(0, &rt)",
+        "GetSamplerState(0, D3DSAMP_MINFILTER",
+        "if (rt) rt->Release();",
+        "if (tex) tex->Release();",
+        "if (ps) ps->Release();",
+        "if (vs) vs->Release();",
+    ):
+        assert token in optical, token
+    assert "SetRenderState" not in optical and "SetTexture" not in optical
+    for api in range(4):
+        entry = f"R30TraceOpticalPhysicalEntry(device, {api}u, type, primitiveCount);"
+        assert source.count(entry) == 1, entry
+
+    shader = source.split("HRESULT R30TryScreenSpaceFovDraw(", 1)[1].split(
+        "template <typename ActualDraw, typename R29Draw>", 1)[0]
+    assert shader.index("const auto traceCmd") < shader.index(
+        "R30BuildScreenSpaceEyeConstants(device, stereo")
+    assert "traceCmd.IsExactFiniteResultHud()" in shader
+    assert "rightDrawAttempted = true;" in shader
+    assert "rightDrawAttempted ? 1 : 0" in shader
+    assert "VR R26 RESULT_SHADER_EYES:" in shader
+
+
 def main() -> None:
     f11 = F11.read_text(encoding="utf-8")
     shader = SHADER.read_text(encoding="utf-8")
@@ -72,6 +121,23 @@ def main() -> None:
     check_direct_eye(transport)
     check_f11(f11)
     check_shader(shader)
+    renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(
+        encoding="utf-8")
+    check_optical_provenance(renderer)
+    for original, mutated in (
+        ("if (!queued && !cmd.IsExactFiniteResultHud())",
+         "if (!queued)"),
+        ("!IsGameDevice(device) || InternalStereoPass",
+         "!IsGameDevice(device)"),
+        ("rightDrawAttempted = true;", "rightDrawAttempted = false;"),
+    ):
+        assert original in renderer, original
+        try:
+            check_optical_provenance(renderer.replace(original, mutated, 1))
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("Optical provenance mutation escaped: " + original)
     f11_mutations = (
         ("fov[0].left > fov[1].left", "fov[0].left < fov[1].left"),
         ("fov[0].right < fov[1].right", "fov[0].right > fov[1].right"),
@@ -103,7 +169,7 @@ def main() -> None:
         pass
     else:
         raise AssertionError("DirectGPU point-filter unconditional mutation escaped")
-    print("PASS DX9Ex review105 F11, shader lifetime and safe DirectGPU A/B; 6 negative mutations; HMD UNTESTED")
+    print("PASS DX9Ex review105 F11, shader lifetime, DirectGPU A/B and R26 optical provenance; 9 negative mutations; HMD UNTESTED")
 
 
 if __name__ == "__main__":
