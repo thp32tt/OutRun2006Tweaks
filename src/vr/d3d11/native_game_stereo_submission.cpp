@@ -566,21 +566,19 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
     if (!native_game_offscreen_color_region_valid(copied)) return false;
     const NativeGameOffscreenColorKey key{
         reinterpret_cast<std::uintptr_t>(source), arraySlice, mipSlice};
-    // Certify an XR eye postpass only when every copied source pixel was
-    // covered by this exact camera resource/slice/mip's native GPU Draws.
-    // An overlap-only check falsely certified untouched/stale camera pixels.
-    std::array<NativeGameOffscreenColorRegion, 32u> matching{};
-    std::size_t matchingCount = 0u;
+    // Match the real GPU source pixel raster, not the eye destination.
+    // Both COPY and filtered STRETCH share this same exact physical proof.
+    std::array<NativeGameOffscreenColorKey, 32u> keys{};
+    std::array<NativeGameOffscreenColorRegion, 32u> regions{};
+    std::size_t count = 0u;
     for (const auto& record : offscreenColorSources_) {
-        if (!native_game_offscreen_color_key_matches(
-                key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
-                      record.arraySlice, record.mipSlice}))
-            continue;
-        if (matchingCount == matching.size()) return false;
-        matching[matchingCount++] = record.region;
+        if (!record.texture) continue;
+        keys[count] = {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
+                       record.arraySlice, record.mipSlice};
+        regions[count++] = record.region;
     }
-    return native_game_offscreen_color_region_fully_covered(
-        copied, matching, matchingCount);
+    return native_game_gpu_eye_composite_source_proven(
+        key, copied, keys, regions, count);
 }
 
 bool NativeGameEyeDrawEncoder::color_writable_for_samples(
@@ -1179,6 +1177,10 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 offscreen_color_source_proven(
                     clear.source, clear.sourceArraySlice,
                     clear.sourceMipSlice, sampledBox);
+            // Prevent stale/foreign GPU camera bytes from overwriting genuine
+            // XR-eye Draw color before the frame-validity decision.
+            // Unsupported source reverts to the original D3D9Ex output.
+            if (!proven) return false;
             if (!copy_game_surface(clear.source, &clear.sourceBox,
                                    clear.destX, clear.destY,
                                    clear.sourceArraySlice, clear.sourceMipSlice))
@@ -1217,6 +1219,9 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 offscreen_color_source_proven(
                     clear.source, clear.sourceArraySlice,
                     clear.sourceMipSlice, sampledBox);
+            // Bilinear neighbors must be GPU-authored on this very eye/mip;
+            // do not queue a filtered native postpass on unproven pixels.
+            if (!proven) return false;
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice, clear.sourceMipSlice))

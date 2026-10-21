@@ -219,6 +219,27 @@ native_game_visible_stretch_sample_region(
      return true;
  }
 
+// Require exact real GPU Draw/Clear footprints for each eye composite.
+// The target pixels alone cannot authenticate a foreign mip/array eye or a
+// source camera whose menu/car/race color was never written this frame.
+template <std::size_t N>
+[[nodiscard]] constexpr bool native_game_gpu_eye_composite_source_proven(
+    NativeGameOffscreenColorKey sampledKey,
+    NativeGameOffscreenColorRegion sampled,
+    const std::array<NativeGameOffscreenColorKey, N>& keys,
+    const std::array<NativeGameOffscreenColorRegion, N>& regions,
+    std::size_t count) noexcept {
+    if (!native_game_offscreen_color_region_valid(sampled) ||
+        !sampledKey.resource || count > N) return false;
+    std::array<NativeGameOffscreenColorRegion, N> matching{};
+    std::size_t matchingCount = 0u;
+    for (std::size_t i = 0u; i < count; ++i)
+        if (native_game_offscreen_color_key_matches(sampledKey, keys[i]))
+            matching[matchingCount++] = regions[i];
+    return native_game_offscreen_color_region_fully_covered(
+        sampled, matching, matchingCount);
+}
+
 // When many authentic game camera Draw/Clear tiles form a non-slicing
 // mosaic, pairwise union alone cannot compact its 32-slot GPU pixel ledger.
 // Consider only edge-connected tiles of the SAME physical mip and eye,
