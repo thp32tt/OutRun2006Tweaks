@@ -1,0 +1,438 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1115KST-NEW-SHA-UNIQUE8-A0015-A0016-A0017",
+  "review_slot_kst": "2026-10-21 11:15",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "f78e3265726d51334bb451971f37f58052952f8e",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "Eight new SHA-unique unapproved A/B Korean PNG candidates (all A in this selection), separate from producer, no queue consumption or ImageGen, no DDS/game approval.",
+  "counts": {
+    "previous_qa_log_files": 25,
+    "previous_unique_qa_sha": 170,
+    "unreviewed_available_at_selection": 26,
+    "reviewed_new_unique": 8,
+    "pass_png_text_only": 7,
+    "fail_unnecessary_background_plate": 1,
+    "producer_rework_dimensions": 8,
+    "unreviewed_after_selection_at_snapshot": 18
+  },
+  "evidence": {
+    "n100_metrics_path": "work/c1_batch_20261021_1115/metrics.json",
+    "n100_source_output_sheets": [
+      "work/c1_batch_20261021_1115/compare_1.jpg",
+      "work/c1_batch_20261021_1115/compare_2.jpg"
+    ],
+    "source_manifest_and_producer_export_sha_verified": true,
+    "all_png_rgba": true,
+    "alpha_ge16_border_pixel_counts_all_zero": true,
+    "visual": "Manually viewed both 4-row source/generated checkerboard comparison JPGs and native A ordinal 73 generated PNG. The blue enlarged connected plate behind Sector4 translation violates lettering-only requirement."
+  },
+  "results": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0015-BC244807",
+      "ordinal": 72,
+      "candidate_file": "Q046_452a74043379e7ea_source_k.png",
+      "source_file": "Q046_452a74043379e7ea_source.png",
+      "candidate_sha256": "753eea3ad3064ba64e668f7c0df0bafd746a44b7b1fbefd157c2952f1a9775b7",
+      "export_sha_match": true,
+      "source_sha256": "fa3775d774f0b1c0b5ce75417a09211d2a8e43580a498abc8b1625e2156f8769",
+      "source_sha_match": true,
+      "english": "Offline",
+      "approved_korean": "오프라인",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1962,
+        801
+      ],
+      "source_dimensions": [
+        414,
+        169
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        41,
+        55,
+        1930,
+        767
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'오프라인' 글자/받침 정상, 투명 글자 레이어. 다만 원문 Offline의 흰색 평서체 대비 결과는 금색 기울임 서체로 크게 달라 합성 전 스타일 재확인 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0015-BC244807",
+      "ordinal": 73,
+      "candidate_file": "Q046_a38172a1371d1d6c_source_k.png",
+      "source_file": "Q046_a38172a1371d1d6c_source.png",
+      "candidate_sha256": "eba04465feb1fa54a531a7cb0dfb12876c57baa19c7de4438553102df6bb2ecd",
+      "export_sha_match": true,
+      "source_sha256": "648d0c44d599aa027c51c9cf12cae942b0e08e7d77e57b8f296b094ab68c8e14",
+      "source_sha_match": true,
+      "english": "Sector4",
+      "approved_korean": "섹터 4",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1825,
+        862
+      ],
+      "source_dimensions": [
+        432,
+        204
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        108,
+        25,
+        1787,
+        846
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_UNNECESSARY_SOLID_BLUE_PLATE",
+      "visual_reason": "'섹터 4' 매핑은 정확하지만 원본 Sector4의 얇은 네이비 윤곽선 대신 글자 전체 뒤에 두꺼운 연속 파란색 방패/플레이트가 생성됨. 원문에 없는 넓은 배경 효과여서 텍스트 전용 조건 위반.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0016-36B089B6",
+      "ordinal": 75,
+      "candidate_file": "Q043_6b4d345859625c57_source_k.png",
+      "source_file": "Q043_6b4d345859625c57_source.png",
+      "candidate_sha256": "539de876f384fe047f12ca8ce93b828726dd715dcc95f7142d3f6dec751f3f09",
+      "export_sha_match": true,
+      "source_sha256": "772cbafca50ca38b20fd689fe369a89a457e9f7ab60ed03bc0c4a74de7bc2c09",
+      "source_sha_match": true,
+      "english": "PASSED!",
+      "approved_korean": "통과!",
+      "source_dds_sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1909,
+        824
+      ],
+      "source_dimensions": [
+        1892,
+        816
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        133,
+        53,
+        1505,
+        636
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'통과!' 정확, 녹색/검정 채움과 외곽 및 받침/느낌표 정상. 보호 아트 없이 투명.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0016-36B089B6",
+      "ordinal": 76,
+      "candidate_file": "Q043_a40f8b1296e3d500_source_k.png",
+      "source_file": "Q043_a40f8b1296e3d500_source.png",
+      "candidate_sha256": "6f2c00284d6e8746cc44a4b168df840443555c037ca186ceee6aa014000925c2",
+      "export_sha_match": true,
+      "source_sha256": "8b39f632db94218f122e3fb897647d2e19025826d20e260431eba05105bc3ad7",
+      "source_sha_match": true,
+      "english": "PASSED!",
+      "approved_korean": "통과!",
+      "source_dds_sha256": "1fa47bdb02c6c8eb1a74b9cf700e2b7d24f70ec2fa2262d843618bd505ec771c",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1909,
+        824
+      ],
+      "source_dimensions": [
+        1892,
+        816
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        355,
+        29,
+        1775,
+        782
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'통과!' 정확, 원본 PASSED! 녹색 금속 효과와 읽기 방향 일치. 보호 요소 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0016-36B089B6",
+      "ordinal": 77,
+      "candidate_file": "Q047_b7a27283565db804_source_k.png",
+      "source_file": "Q047_b7a27283565db804_source.png",
+      "candidate_sha256": "a62ba4b01ad1626581aed64012e1fd28c9e024bb006adb2a2864dba6cab5536d",
+      "export_sha_match": true,
+      "source_sha256": "039e58d810bfb3a16f4cedd2dbcc8d81a2b0002dfa44681e947524da6caf341b",
+      "source_sha_match": true,
+      "english": "Space",
+      "approved_korean": "공백",
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1693,
+        929
+      ],
+      "source_dimensions": [
+        481,
+        264
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        44,
+        126,
+        1663,
+        761
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'공백' 정확, 잘림/잔상/프레임 없음. 원문 Space의 흰색 글자와 결과 금색 효과 차이는 합성 단계 확인.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0016-36B089B6",
+      "ordinal": 78,
+      "candidate_file": "Q048_579f1becfdd1e5e7_source_k.png",
+      "source_file": "Q048_579f1becfdd1e5e7_source.png",
+      "candidate_sha256": "d619382dda14011c440671ed57bb34b4d4e25037a3a9b86a4cca3dd3b67c1129",
+      "export_sha_match": true,
+      "source_sha256": "25481b42caf2a3d8251de7edcee17fff13c2d151e53e0be5472e122949eceab9",
+      "source_sha_match": true,
+      "english": "Stage",
+      "approved_korean": "스테이지",
+      "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1686,
+        933
+      ],
+      "source_dimensions": [
+        405,
+        224
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        325,
+        85,
+        1546,
+        788
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'스테이지' 정확, 노란 채움/네이비 윤곽과 기울기·자소 정상. 원본 주변 UI 아트는 복제되지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0017-DDC9FE13",
+      "ordinal": 79,
+      "candidate_file": "Q051_984d6dd0b7883fed_source_k.png",
+      "source_file": "Q051_984d6dd0b7883fed_source.png",
+      "candidate_sha256": "73cfa85a48889ece5c363b2158b29609d3ef44547afb409a68de85b8477cf278",
+      "export_sha_match": true,
+      "source_sha256": "0ce69169bd79e4d5d11a75190718e8c45e962298c49c26eb5dc6cc200e4e4ec4",
+      "source_sha_match": true,
+      "english": "Stage Lap!",
+      "approved_korean": "스테이지 랩!",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1900,
+        828
+      ],
+      "source_dimensions": [
+        1068,
+        465
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        326,
+        123,
+        1807,
+        804
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'스테이지 랩!' 정확, 한글 띄어쓰기/받침/느낌표 판독 가능. 원본 노란 레이블 효과에 대체로 부합.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0017-DDC9FE13",
+      "ordinal": 80,
+      "candidate_file": "Q051_efb8452673be8dbe_source_k.png",
+      "source_file": "Q051_efb8452673be8dbe_source.png",
+      "candidate_sha256": "bfa218b80ef53daa6440b0fdb42109a664729be7beca6d5eb142f6618c1ae789",
+      "export_sha_match": true,
+      "source_sha256": "755d0adb0013598b5d10374476db5af80ebc3087be4a833e20108b4c3a261e8b",
+      "source_sha_match": true,
+      "english": "PLAYER FEEDBACK",
+      "approved_korean": "플레이어 피드백",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2126,
+        740
+      ],
+      "source_dimensions": [
+        1132,
+        301
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        85,
+        31,
+        2064,
+        696
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'플레이어 피드백' 정확, 문자 간격/자소 판독 가능, 투명 글자만 존재. 원문 PLAYER FEEDBACK의 흰색과 결과 노란색 차이는 합성 단계 확인.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "conditions": {
+    "all_eight_producer_rework_dimensions": true,
+    "composited_UI_safety_area": "UNTESTED",
+    "dds_composition": "NOT_RUN",
+    "c2_c3_game_status": "UNTESTED_NOT_AUTHORIZED",
+    "imagegen": false,
+    "a_b_queue_consumption": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "scoreboard_recorded_separately": false
+  }
+}
