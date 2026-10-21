@@ -32,9 +32,18 @@ assert "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in bridge
 for name in ("src/vr/d3d9/stereo_renderer_r30.cpp",
              "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"):
     caller = file(name)
-    assert caller.count("game_native_primitive_element_count(") == 3
-    assert caller.count("topology != D3DPT_LINELIST") == 3
-    assert caller.count("topology != D3DPT_LINESTRIP") == 3
+    # Active R30 has a fourth real DrawPrimitiveUP native source observer.
+    # R26-safe intentionally retains three shadow families and original Draw.
+    expected = 4 if name == "src/vr/d3d9/stereo_renderer_r30.cpp" else 3
+    for token in (
+            "game_native_primitive_element_count(",
+            "topology != D3DPT_LINELIST",
+            "topology != D3DPT_LINESTRIP"):
+        assert caller.count(token) == expected, (name, token)
+        # Removing even one source-family admission check must fail this
+        # bounded line/triangle topology census without relaxing fallback.
+        broken = caller.replace(token, "BROKEN_NATIVE_TOPOLOGY", 1)
+        assert broken != caller and broken.count(token) != expected
     assert "R30CopyVertexShadow" in caller and "R30CopyIndexShadow" in caller
     assert "live::observe_linear" in caller and "live::observe_indexed" in caller
     if name == "src/vr/d3d9/stereo_renderer_r30.cpp":
