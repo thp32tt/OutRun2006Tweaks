@@ -1,0 +1,85 @@
+name: DX9Ex 2026-10-21 Standalone Test
+
+on:
+  push:
+    branches:
+      - test/dx9ex-all-improvements-20261021
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dx9ex-oct21-standalone-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-test-zip:
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - name: Checkout exact pinned test source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Confirm independent source and validate today's changes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $actual = (git rev-parse HEAD).Trim()
+          if ($actual -ne '${{ github.sha }}') { throw "Checkout not pinned: $actual" }
+          $provenance = Get-Content 'docs/test-builds/DX9EX_ALL_IMPROVEMENTS_20261021.md' -Raw
+          if (-not $provenance.Contains('b746eb6b854e40797c98ea3ecb2f5ed3a14a7f90')) {
+            throw 'Provenance source revision missing'
+          }
+          python tools/verify_vr_driver_seat_basis_stability.py
+          if ($LASTEXITCODE -ne 0) { throw 'Cockpit stability verification failed' }
+          python tools/verify_vr_rank_dx11_reference.py
+          if ($LASTEXITCODE -ne 0) { throw 'Rank/rival parity verification failed' }
+          python tools/verify_vr_draw_distance_safety.py
+          if ($LASTEXITCODE -ne 0) { throw 'Draw-distance safety verification failed' }
+
+      - name: Build exact R26 DX9Ex DLL and OpenXR host, package separate test ZIP
+        shell: pwsh
+        env:
+          OUTRUN_TEST_DROP_ROOT: ${{ runner.temp }}\OutRunDX9ExOct21
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ./tools/Build-OutRunPCFast.ps1
+          if ($LASTEXITCODE -ne 0) { throw 'Standalone PC Fast build failed' }
+          $zip = (Get-Content 'out/pc-fast/LAST_ZIP_PATH.txt' -Raw).Trim()
+          if (-not (Test-Path $zip)) { throw 'Expected ZIP missing' }
+          $infoPath = 'out/pc-fast/package/BUILD_INPUTS.json'
+          $info = Get-Content $infoPath -Raw | ConvertFrom-Json
+          if ($info.IntegrationSha -ne '${{ github.sha }}') {
+            throw "Package source mismatch $($info.IntegrationSha)"
+          }
+          if ($info.RendererSourceOwner -ne 'src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp') {
+            throw "Wrong DX9Ex renderer $($info.RendererSourceOwner)"
+          }
+          foreach ($path in @(
+            'out/pc-fast/package/backends/d3d9/dinput8.dll',
+            'out/pc-fast/package/backends/d3d9/outrun-vr-host.exe',
+            'out/pc-fast/package/SHA256SUMS.txt'
+          )) {
+            if (-not (Test-Path $path)) { throw "Missing payload $path" }
+          }
+          $zipHash = (Get-FileHash $zip -Algorithm SHA256).Hash
+          "TEST_ZIP=$zip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "### October 21 DX9Ex standalone test package" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Parent DX9Ex source: b746eb6b854e40797c98ea3ecb2f5ed3a14a7f90" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Packaged SHA: ${{ github.sha }}" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- ZIP SHA256: $zipHash" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Renderer: $($info.RendererSourceOwner)" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Runtime/Quest3 validation: UNTESTED" | Out-File $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload Oct 21 DX9Ex independent test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-DX9Ex-20261021-AllImprovements-${{ github.sha }}
+          path: ${{ env.TEST_ZIP }}
+          if-no-files-found: error
+          retention-days: 14
