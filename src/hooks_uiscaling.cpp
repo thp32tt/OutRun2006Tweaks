@@ -26,6 +26,7 @@ namespace Settings
 {
 	extern Setting<bool> VREnabled;
     extern Setting<bool> VRTelemetry;
+    extern Setting<bool> VREvidenceTrace;
     extern Setting<bool> VRRankDx11ProducerReference;
     extern Setting<bool> VRRivalDx11NativeRoute;
     extern Setting<bool> VRRankDesktopLift;
@@ -3361,6 +3362,42 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     inline static std::atomic<std::uint64_t> StageFallbacks{ 0 };
     inline static std::atomic<std::uint64_t> GoalFlushes{ 0 };
     inline static std::atomic<std::uint64_t> GoalFallbacks{ 0 };
+    inline static std::atomic<std::uint64_t> EvidenceSeq{ 0 };
+
+    static void EvidenceD3DX(const char* event, void* self,
+        HRESULT hr = S_OK, IDirect3DTexture9* texture = nullptr,
+        const RECT* rect = nullptr, const D3DVECTOR* center = nullptr,
+        const D3DVECTOR* pos = nullptr) noexcept
+    {
+        if (!Settings::VREvidenceTrace)
+            return;
+        const auto seq = EvidenceSeq.fetch_add(1, std::memory_order_relaxed) + 1;
+        const auto command =
+            OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+        spdlog::info(
+            "VR EVIDENCE D3DX seq={} event={} self={} liveSprite={} hr=0x{:08X} active={} generation={} draws={} homogeneous={} scope={} producer={} queued={} qnode={} qepoch={} boundaryReady={} directB9200={} cmdScope={} cmdProducer={} cmdQueued={} cmdNode={} cmdEpoch={} texture={} rect={},{},{},{} center={},{},{} pos={},{},{} colorOwnerStage={} colorOwnerGoal={}",
+            seq, event, self, *Module::exe_ptr<void*>(0x55B218),
+            static_cast<unsigned>(hr), HudBatch.active ? 1 : 0,
+            HudBatch.generation, HudBatch.drawCount,
+            HudBatch.homogeneous ? 1 : 0,
+            static_cast<unsigned>(HudBatch.scope),
+            OutRunVR::GameSemantic::Name(HudBatch.producer),
+            HudBatch.queued ? 1 : 0, HudBatch.queueNode,
+            HudBatch.queueEpoch, HudBatch.boundaryReady ? 1 : 0,
+            HudBatch.provenDirectB9200 ? 1 : 0,
+            static_cast<unsigned>(command.scope),
+            OutRunVR::GameSemantic::Name(command.producer),
+            command.queued ? 1 : 0, command.queueNode, command.queueEpoch,
+            static_cast<const void*>(texture),
+            rect ? rect->left : 0, rect ? rect->top : 0,
+            rect ? rect->right : 0, rect ? rect->bottom : 0,
+            center ? center->x : 0.0f, center ? center->y : 0.0f,
+            center ? center->z : 0.0f,
+            pos ? pos->x : 0.0f, pos ? pos->y : 0.0f,
+            pos ? pos->z : 0.0f,
+            StageOwner(HudBatch.scope, HudBatch.producer) ? 1 : 0,
+            GoalOwner(HudBatch.scope, HudBatch.producer) ? 1 : 0);
+    }
 
     // A D3DXSprite::Draw may queue triangles until Flush/End. A source-call
     // scope is NOT sufficient ownership for a deferred GPU Draw. We only
@@ -3406,6 +3443,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall BeginDest(void* self, DWORD flags)
     {
+        EvidenceD3DX("BEGIN_PRE", self);
         const auto beforeBegin = HudBatch.snapshot();
         // A nested Begin returning INVALIDCALL cannot close the prior native
         // batch; its +TIME/GOAL owner must survive to the original Flush/End.
@@ -3426,12 +3464,14 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             // A previously tracked object is no longer proof of a live batch.
             HudBatch.invalidate();
         }
+        EvidenceD3DX("BEGIN_POST", self, hr);
         return hr;
     }
 
     static HRESULT __stdcall FlushDest(void* self)
     {
         using namespace OutRunVR::GameSemantic;
+        EvidenceD3DX("FLUSH_PRE", self);
         const auto submission = HudBatch.snapshot();
         // The game's normal Flush is allowed to occur after the original
         // +TIME/GOAL source leaves. Recover the proven producer for the
@@ -3467,12 +3507,14 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // Never clear that NEW generation; a changed same-generation batch
         // cannot safely keep its old exact +TIME/GOAL GPU owner either.
         HudBatch.completeNativeFlush(submission, SUCCEEDED(hr));
+        EvidenceD3DX("FLUSH_POST", self, hr);
         return hr;
     }
 
     static HRESULT __stdcall EndDest(void* self)
     {
         using namespace OutRunVR::GameSemantic;
+        EvidenceD3DX("END_PRE", self);
         const auto submission = HudBatch.snapshot();
         // ID3DXSprite::End may be the first physical submission when neither
         // a source-exit nor a queue boundary was able to flush safely.
@@ -3505,6 +3547,7 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         // End consumed the previous native session, not a reentrant new
         // Begin issued from within the driver's original End callback.
         HudBatch.completeNativeEnd(submission);
+        EvidenceD3DX("END_POST", self, hr);
         return hr;
     }
 
@@ -3524,19 +3567,23 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall LostDeviceDest(void* self)
     {
+        EvidenceD3DX("LOST_DEVICE_PRE", self);
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
             self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
         InvalidateForDeviceLifecycle(ownsBatch);
+        EvidenceD3DX("LOST_DEVICE_POST", self, hr);
         return hr;
     }
 
     static HRESULT __stdcall ResetDeviceDest(void* self)
     {
+        EvidenceD3DX("RESET_DEVICE_PRE", self);
         const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
             self, HudBatch.sprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
         InvalidateForDeviceLifecycle(ownsBatch);
+        EvidenceD3DX("RESET_DEVICE_POST", self, hr);
         return hr;
     }
 
@@ -3918,8 +3965,10 @@ private:
             source == ProducerToken::ResultTextB9200 &&
             (exactB9200Direct || OriginalB9200GoalStackActive());
         const auto submission = HudBatch.snapshot();
+        EvidenceD3DX("DRAW_PRE", self, S_OK, texture, rect, center, pos);
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
+        EvidenceD3DX("DRAW_NATIVE_POST", self, hr, texture, rect, center, pos);
         // D3DXSprite::Draw can call its own hooked Flush before returning.
         // If that native Flush completed successfully, the newly queued
         // Draw is the FIRST command of the next texture batch, not a failed
