@@ -44,6 +44,35 @@ struct NativeGameOffscreenColorRegion {
     NativeGameOffscreenColorRegion r) noexcept {
     return r.left < r.right && r.top < r.bottom;
 }
+// A successful game-authored camera TARGET Clear writes real GPU pixels,
+// including untouched menu/vehicle background areas. Its physical RTV
+// subresource is still keyed separately; clear pixels are color source
+// provenance for a later genuine GPU Copy/Stretch, not game Draw evidence.
+// A partial Clear must certify only its actual clipped region.
+[[nodiscard]] constexpr NativeGameOffscreenColorRegion
+native_game_offscreen_clear_written_region(
+    std::uint32_t width, std::uint32_t height, bool partial,
+    std::int64_t left, std::int64_t top,
+    std::int64_t right, std::int64_t bottom) noexcept {
+    if (!width || !height) return {};
+    if (!partial) return {0u, 0u, width, height};
+    if (left < 0 || top < 0 || right <= left || bottom <= top ||
+        right > static_cast<std::int64_t>(width) ||
+        bottom > static_cast<std::int64_t>(height))
+        return {};
+    return {static_cast<std::uint32_t>(left),
+            static_cast<std::uint32_t>(top),
+            static_cast<std::uint32_t>(right),
+            static_cast<std::uint32_t>(bottom)};
+}
+static_assert(native_game_offscreen_clear_written_region(
+    100u, 80u, false, 0, 0, 0, 0).right == 100u);
+static_assert(native_game_offscreen_clear_written_region(
+    100u, 80u, true, 20, 10, 80, 70).left == 20u);
+static_assert(!native_game_offscreen_color_region_valid(
+    native_game_offscreen_clear_written_region(
+        100u, 80u, true, -1, 0, 80, 70)));
+
 [[nodiscard]] constexpr bool native_game_offscreen_color_regions_intersect(
     NativeGameOffscreenColorRegion draw,
     NativeGameOffscreenColorRegion copied) noexcept {

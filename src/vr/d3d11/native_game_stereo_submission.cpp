@@ -960,14 +960,38 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
             survivors[survivorCount++] = std::move(extras[i]);
         offscreenColorSources_ = std::move(survivors);
     };
+    // Actual camera GPU Clears supply the missing source background pixels
+    // for subsequent game-authored Copy/Stretch into an OpenXR eye. Deleting
+    // pre-Clear Draw footprints above is necessary, but WITHOUT recording the
+    // successfully cleared pixels the native compositor rejects a genuinely
+    // complete menu/car camera. Never increment game Draw counters here.
+    // An exhausted 32-region provenance ledger stays fail-closed: the GPU
+    // Clear still executes and the original D3D9 render remains authoritative.
+    const auto rememberClearedPixels = [&]() noexcept {
+        const auto filled = native_game_offscreen_clear_written_region(
+            camera.width, camera.height, actual != nullptr,
+            actual ? actual->left : 0, actual ? actual->top : 0,
+            actual ? actual->right : 0, actual ? actual->bottom : 0);
+        if (!native_game_offscreen_color_region_valid(filled)) return;
+        for (auto& record : offscreenColorSources_) {
+            if (record.texture) continue;
+            record.texture = texture;
+            record.arraySlice = camera.arraySlice;
+            record.mipSlice = camera.mip;
+            record.region = filled;
+            return;
+        }
+    };
     switch (route) {
     case live_game_stereo::NativeColorClearRoute::FullRtv:
         context_->ClearRenderTargetView(gameTarget, rgba);
         invalidateWrittenPixels();
+        rememberClearedPixels();
         return true;
     case live_game_stereo::NativeColorClearRoute::ClearView:
         rectContext->ClearView(gameTarget, rgba, actual, 1u);
         invalidateWrittenPixels();
+        rememberClearedPixels();
         return true;
     case live_game_stereo::NativeColorClearRoute::ShaderRaster: {
         // Keep the original audited D3D11.0 shader-raster Clear dispatch.
@@ -977,7 +1001,10 @@ bool NativeGameEyeDrawEncoder::clear_offscreen_game_color(
                 context_, gameTarget, camera.width, camera.height,
                 *actual, rgba);
         }();
-        if (issued) invalidateWrittenPixels();
+        if (issued) {
+            invalidateWrittenPixels();
+            rememberClearedPixels();
+        }
         return issued;
     }
     default:
