@@ -11,6 +11,10 @@ def valid(source):
     d = source.index("void observe(", c)
     fixed, sm3, draw = source[a:b], source[b:c], source[c:d]
     state = fixed.index("GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)")
+    # A destructive negative control intentionally removes the admission:
+    # report rejection, not an uncaught ValueError that masks the contract.
+    if "GameNativeSrgbDraw::admit(srgbWrite, fullFrame)" not in fixed:
+        return False
     admit = fixed.index("GameNativeSrgbDraw::admit(srgbWrite, fullFrame)")
     select = fixed.index("output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite)")
     sampler = fixed.index("if (capture.enabled) {", select)
