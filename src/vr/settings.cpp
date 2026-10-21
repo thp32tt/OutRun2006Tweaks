@@ -180,9 +180,9 @@ namespace Settings
 		{ "WorldView * HeadInverse * Projection", "World * HeadInverse * View * Projection" } };
 	Setting<bool> VRTelemetry{ "VR", "Telemetry", true,
 		"Logs renderer-boundary verification, stereo draw duplication, pose source/fallback and head-tracking diagnostics." };
-    Setting<bool> VREvidenceTrace{ "VR", "EvidenceTrace", false,
+    Setting<bool> VREvidenceTrace{ "VR", "EvidenceTrace", true,
         "Heavy developer evidence mode. Logs every relevant D3D9 draw route/state snapshot, D3DX batch transition, cockpit anchor decision, Present outcome and host OpenXR submission. Intentionally expensive; use only for debugging." };
-    Setting<int> VREvidenceTraceMaxDrawsPerFrame{ "VR", "EvidenceTraceMaxDrawsPerFrame", 8192,
+    Setting<int> VREvidenceTraceMaxDrawsPerFrame{ "VR", "EvidenceTraceMaxDrawsPerFrame", 0,
         "Maximum detailed D3D9 draw records per Present while EvidenceTrace is enabled. 0 = unlimited. High values can cause severe frame stutter and very large logs.", Range<int>{ 0, 65535 } };
     Setting<bool> VREvidenceTraceMatrices{ "VR", "EvidenceTraceMatrices", true,
         "EvidenceTrace: include full world/view/projection matrix snapshots on detailed D3D9 draw records." };
