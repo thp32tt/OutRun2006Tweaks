@@ -114,6 +114,39 @@ def check_optical_provenance(source: str) -> None:
     assert "VR R26 RESULT_SHADER_EYES:" in shader
 
 
+
+def check_r62_goal_boundary(renderer: str, ui: str) -> None:
+    """R62 restore failure is fatal for all physical owners; counters stay source-owned."""
+    fixed = renderer.split("HRESULT R62TryFixedFunctionSpriteIndexed(", 1)[1].split(
+        "void R30TraceOpticalPhysicalEntry(", 1)[0]
+    assert "NoteRestoreFailure(" in fixed
+    assert "R30ArmSafeFallback();" in fixed
+    assert "return !restored && SUCCEEDED(hr) ? E_FAIL : hr;" in fixed
+    assert "return exactResult && !restored" not in fixed
+    assert fixed.index("R30ExecuteXyzrhwStereo(") < fixed.index(
+        "bool restored = false;") < fixed.index(
+        "return !restored && SUCCEEDED(hr) ? E_FAIL : hr;")
+
+    queue = ui.split("static void BeforeQueueNode(const void* nextNode)", 1)[1].split(
+        "static void BeforeQueueEnd() noexcept", 1)[0]
+    assert "HudBatch.homogeneous &&" in queue
+    assert "GoalOwner(HudBatch.scope, HudBatch.producer);" in queue
+    assert "(outgoingGoal ? GoalFlushes : StageFlushes).fetch_add(" in queue
+    assert "(outgoingGoal ? GoalFallbacks : StageFallbacks).fetch_add(" in queue
+    assert queue.index("const bool outgoingGoal =") < queue.index(
+        "FlushTracked(sprite)")
+    assert "HudBatch.boundaryReady = enteringStage || enteringGoal;" in queue
+
+    end = ui.split("static void BeforeQueueEnd() noexcept", 1)[1].split(
+        "private:\n    static HRESULT __stdcall DrawDest(", 1)[0]
+    assert "GoalOwner(HudBatch.scope, HudBatch.producer);" in end
+    assert "(outgoingGoal ? GoalFlushes : StageFlushes).fetch_add(" in end
+    assert "(outgoingGoal ? GoalFallbacks : StageFallbacks).fetch_add(" in end
+    assert "HudBatch.matchesGpuOwner(" in end
+    assert "HudBatch.producer == CurrentRenderProducerToken()" in end
+    assert "HudBatch.boundaryReady = false;" in end
+
+
 def main() -> None:
     f11 = F11.read_text(encoding="utf-8")
     shader = SHADER.read_text(encoding="utf-8")
@@ -124,6 +157,25 @@ def main() -> None:
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(
         encoding="utf-8")
     check_optical_provenance(renderer)
+    ui = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
+    check_r62_goal_boundary(renderer, ui)
+    for changed_renderer, changed_ui in (
+        (renderer.replace(
+            "return !restored && SUCCEEDED(hr) ? E_FAIL : hr;",
+            "return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;", 1), ui),
+        (renderer, ui.replace(
+            "(outgoingGoal ? GoalFlushes : StageFlushes).fetch_add(",
+            "StageFlushes.fetch_add(", 1)),
+        (renderer, ui.replace(
+            "(outgoingGoal ? GoalFallbacks : StageFallbacks).fetch_add(",
+            "StageFallbacks.fetch_add(", 1)),
+    ):
+        try:
+            check_r62_goal_boundary(changed_renderer, changed_ui)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("R62/GOAL negative source mutation escaped")
     for original, mutated in (
         ("if (!queued && !cmd.IsExactFiniteResultHud())",
          "if (!queued)"),
@@ -169,7 +221,7 @@ def main() -> None:
         pass
     else:
         raise AssertionError("DirectGPU point-filter unconditional mutation escaped")
-    print("PASS DX9Ex review105 F11, shader lifetime, DirectGPU A/B and R26 optical provenance; 9 negative mutations; HMD UNTESTED")
+    print("PASS DX9Ex review105 F11, shader lifetime, DirectGPU A/B and R26 optical provenance; 12 negative mutations; HMD UNTESTED")
 
 
 if __name__ == "__main__":
