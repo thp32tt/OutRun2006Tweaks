@@ -509,13 +509,21 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
     if (!native_game_offscreen_color_region_valid(copied)) return false;
     const NativeGameOffscreenColorKey key{
         reinterpret_cast<std::uintptr_t>(source), arraySlice, mipSlice};
-    for (const auto& record : offscreenColorSources_)
-        if (native_game_offscreen_color_key_matches(
+    // Certify an XR eye postpass only when every copied source pixel was
+    // covered by this exact camera resource/slice/mip's native GPU Draws.
+    // An overlap-only check falsely certified untouched/stale camera pixels.
+    std::array<NativeGameOffscreenColorRegion, 32u> matching{};
+    std::size_t matchingCount = 0u;
+    for (const auto& record : offscreenColorSources_) {
+        if (!native_game_offscreen_color_key_matches(
                 key, {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
-                      record.arraySlice, record.mipSlice}) &&
-            native_game_offscreen_color_regions_intersect(record.region, copied))
-            return true;
-    return false;
+                      record.arraySlice, record.mipSlice}))
+            continue;
+        if (matchingCount == matching.size()) return false;
+        matching[matchingCount++] = record.region;
+    }
+    return native_game_offscreen_color_region_fully_covered(
+        copied, matching, matchingCount);
 }
 
 bool NativeGameEyeDrawEncoder::color_writable_for_samples(

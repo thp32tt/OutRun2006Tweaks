@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <array>
 namespace outrun::vr::dx11 {
 struct NativeGameOffscreenColorKey {
     std::uintptr_t resource{};
@@ -50,6 +51,48 @@ struct NativeGameOffscreenColorRegion {
         draw.left < copied.right && copied.left < draw.right &&
         draw.top < copied.bottom && copied.top < draw.bottom;
 }
+
+ // Real game camera postpasses can copy more than the source's proven
+ // color-written region. One intersecting Draw is NOT enough to certify
+ // the complete native eye: require full 2D coverage by actual same-key
+ // GPU Draw footprints, including disjoint adjacent viewport fragments.
+ // Partition at every X edge so each slab has constant rectangle
+ // membership, then prove Y has no gap. Bounded by the 32-entry ledger;
+ // no allocation and no changes to the authoritative D3D9 game Draw.
+ template <std::size_t N>
+ [[nodiscard]] constexpr bool native_game_offscreen_color_region_fully_covered(
+     NativeGameOffscreenColorRegion copied,
+     const std::array<NativeGameOffscreenColorRegion, N>& written,
+     std::size_t count) noexcept {
+     if (!native_game_offscreen_color_region_valid(copied) || count > N)
+         return false;
+     auto x = copied.left;
+     while (x < copied.right) {
+         auto next = copied.right;
+         for (std::size_t i = 0u; i < count; ++i) {
+             const auto r = written[i];
+             if (!native_game_offscreen_color_region_valid(r)) continue;
+             if (r.left > x && r.left < next) next = r.left;
+             if (r.right > x && r.right < next) next = r.right;
+         }
+         if (next <= x) return false;
+         auto y = copied.top;
+         while (y < copied.bottom) {
+             auto furthest = y;
+             for (std::size_t i = 0u; i < count; ++i) {
+                 const auto r = written[i];
+                 if (r.left <= x && r.right >= next &&
+                     r.top <= y && r.bottom > furthest)
+                     furthest = r.bottom;
+             }
+             if (furthest == y) return false;
+             y = furthest;
+         }
+         x = next;
+     }
+     return true;
+ }
+
 // Viewports have fractional origins and extents. Record only source pixels
 // whose centers are inside the current viewport/scissor and physical RTV;
 // malformed / NaN raster state cannot supply provenance. This is intentionally
