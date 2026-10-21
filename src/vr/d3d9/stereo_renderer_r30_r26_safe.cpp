@@ -22,6 +22,7 @@
 #include "f11_screen_2d.hpp"
 #include "hud_1080p_reference.hpp"
 #include "r30_early_rhw_shadow.hpp"
+#include "../game/universal_draw_trace.hpp"
 #include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -1440,6 +1441,35 @@ namespace OutRunVRStereo
             if (now - R30LastTelemetryMs < 5000)
                 return;
             R30LastTelemetryMs = now;
+            // R26+HUD default is an independent owner; R33's Present
+            // and its UniversalTrace drain are absent from this build.
+            // Preserve unknown-producer and unverified-eye semantics.
+            for (const auto& entry : OutRunVR::UniversalTrace::DrainWindow())
+            {
+                if (!entry.attempts) continue;
+                spdlog::info(
+                    "VR R26 DRAW TRACE 5s: family={} total={} ok={} fail={} "
+                    "eyes[r30Both={},r30Failed={},unverified={}] "
+                    "source[queued={},unknown={},badQueue={},scope={},producer={},qEpoch={}] "
+                    "route[none={},fixed={},xyzrhw={},r33Hud={},r33World={},r29={},raw={},sbRaw={},screen={},lower={},f11={}] "
+                    "api[dp={},dip={},dpup={},dipup={}] lastDraw={} centreCallEpoch={}",
+                    OutRunVR::UniversalTrace::Name(entry.family),
+                    entry.attempts, entry.success, entry.failure,
+                    entry.r30BothEyes, entry.r30EyeOrRestoreFailed,
+                    entry.noR33EyeEvidence,
+                    entry.queued, entry.unknownProducer, entry.badQueueProvenance,
+                    OutRunVR::GameSemantic::Name(static_cast<
+                        OutRunVR::GameSemantic::RenderScope>(entry.lastScope)),
+                    OutRunVR::GameSemantic::Name(static_cast<
+                        OutRunVR::GameSemantic::ProducerToken>(entry.lastProducer)),
+                    entry.lastQueueEpoch,
+                    entry.route[0], entry.route[1], entry.route[2],
+                    entry.route[3], entry.route[4], entry.route[5],
+                    entry.route[6], entry.route[7], entry.route[8],
+                    entry.route[9], entry.route[10],
+                    entry.api[0], entry.api[1], entry.api[2], entry.api[3],
+                    entry.latestDrawId, entry.latestCentreCall);
+            }
             spdlog::info(
                 "VR R51: bufferShadow[armed={},writes={},hits={},misses={},discardInvalid={},drawReadLocks=0] xyzrhw[world={},hud={},hudWorldLock={},semanticHudAcceptedXyzrhw={},semanticUnknownRejected={},overlay2DAccepted={},overlay2DDraws={},rhwPromote={},rhwOnlyDepth={},zOnlyDepth={},atomicFallback={},depthPreserve={},bilateralFallback={}] screen[all={},hud2d={},perspectiveHud={},worldBillboard={},semanticHudAcceptedVs={},c64SameNode={},c64OtherNode={},c64NoNode={}] fingerprint[draws={},sameNode={},otherNode={},noNode={},scopeMismatch={}] projected[semantic={},missingPayload={},buildAttempts={},buildOk={},buildFail={}] registry[published={},registered={},consumed={},staleCleared={}] r44[ownedWvp={},groupReuse={},spatial={},flat={}] skyGlow[frames={},failures={},factor={},buffer={}x{}]",
                 R30BufferShadowCaptureArmed.load(std::memory_order_acquire) ? 1 : 0,
@@ -3941,6 +3971,9 @@ namespace OutRunVRStereo
                 NoteRestoreFailure("R30.2 XYZRHW right-eye draw");
                 R30ArmSafeFallback();
             }
+            if (Settings::VRTelemetry)
+                OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                    SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk);
             return leftHr;
         }
 
@@ -5107,6 +5140,9 @@ namespace OutRunVRStereo
                 NoteRestoreFailure("R30 HUD right-eye draw");
                 R30ArmSafeFallback();
             }
+            if (Settings::VRTelemetry)
+                OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                    SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk);
             return leftHr;
         }
 
@@ -5118,8 +5154,16 @@ namespace OutRunVRStereo
             const HRESULT hr = R30TryScreenSpaceFovDraw(
                 device, std::forward<ActualDraw>(actualDraw), site);
             if (hr != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R26ScreenSpace);
                 return hr;
+            }
             ++R30ScreenSpaceFallbacks;
+            if (Settings::VRTelemetry)
+                OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R26LowerFallback);
             return r29Draw();
         }
 
@@ -5343,7 +5387,28 @@ namespace OutRunVRStereo
                         FrameStereoIncomplete, n);
                 }
             }
+            if (Settings::VRTelemetry)
+                OutRunVR::UniversalTrace::ScopedDraw::RecordR30EyePair(
+                    SUCCEEDED(eyeHr[0]), SUCCEEDED(eyeHr[1]), restored);
             return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
+        }
+
+        // Opt-in physical Draw provenance. Semantic was consumed by the
+        // caller; disabled telemetry does no trace initialization or D3D reads.
+        template <typename Draw>
+        HRESULT R26TraceTopLevelDraw(IDirect3DDevice9* device,
+            OutRunVR::UniversalTrace::DrawApi api, Draw&& draw)
+        {
+            const bool enabled = Settings::VRTelemetry && device &&
+                IsGameDevice(device) && !InternalStereoPass;
+            OutRunVR::UniversalTrace::ScopedDraw trace(enabled, api);
+            if (enabled)
+                OutRunVR::UniversalTrace::ScopedDraw::
+                    RefreshAfterSemanticSelection();
+            const HRESULT hr = draw();
+            if (enabled)
+                trace.SetResult(SUCCEEDED(hr));
+            return hr;
         }
 
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
@@ -5355,12 +5420,20 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            return R26TraceTopLevelDraw(device,
+                OutRunVR::UniversalTrace::DrawApi::Primitive,
+                [&]() -> HRESULT {
             R30TracePreRestartHudEligibility(device, 0u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawPrimitiveHook.stdcall<HRESULT>(
@@ -5372,6 +5445,7 @@ namespace OutRunVRStereo
             };
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitive");
+                });
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR30(
@@ -5385,6 +5459,9 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            return R26TraceTopLevelDraw(device,
+                OutRunVR::UniversalTrace::DrawApi::Indexed,
+                [&]() -> HRESULT {
             R30TracePreRestartHudEligibility(device, 1u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             // F11 external ImGui uses fixed-function XYZ+orthographic
@@ -5396,7 +5473,12 @@ namespace OutRunVRStereo
                         numVertices, startIndex, primitiveCount);
                 });
             if (externalImGui != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R26ExternalImGui);
                 return externalImGui;
+            }
 
             // HMD-confirmed R62 path for ordinal 4th/5th and exact ScreenHud
             // D3DXSprite fixed-function indexed quads. The external ImGui
@@ -5439,13 +5521,23 @@ namespace OutRunVRStereo
                 }
             }
             if (fixedFnSprite != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R30FixedSprite);
                 return fixedFnSprite;
+            }
 
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
@@ -5459,6 +5551,7 @@ namespace OutRunVRStereo
             };
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitive");
+                });
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR30(
@@ -5471,12 +5564,20 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            return R26TraceTopLevelDraw(device,
+                OutRunVR::UniversalTrace::DrawApi::PrimitiveUP,
+                [&]() -> HRESULT {
             R30TracePreRestartHudEligibility(device, 2u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
@@ -5488,6 +5589,7 @@ namespace OutRunVRStereo
             };
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitiveUP");
+                });
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
@@ -5502,13 +5604,21 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            return R26TraceTopLevelDraw(device,
+                OutRunVR::UniversalTrace::DrawApi::IndexedUP,
+                [&]() -> HRESULT {
             R30TracePreRestartHudEligibility(device, 3u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
             if (xyzrhw != E_NOTIMPL)
+            {
+                if (Settings::VRTelemetry)
+                    OutRunVR::UniversalTrace::ScopedDraw::RecordRoute(
+                        OutRunVR::UniversalTrace::Route::R30Xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
@@ -5522,6 +5632,7 @@ namespace OutRunVRStereo
             };
             return R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+                });
         }
 
         void R30RollbackHooks() noexcept
