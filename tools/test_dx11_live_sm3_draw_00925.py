@@ -45,7 +45,7 @@ for rejection in (
     "if (scissor != FALSE)", "gameRect.right <= gameRect.left",
     "r <= l || b <= t",
     "if ((colorMask & ~0x0fu) != 0u) {",
-    "if (srgbWrite != FALSE) {",
+    "if (srgbWrite != FALSE && srgbWrite != TRUE) {",
     "if (!game_native_backbuffer_ready(game, viewport)) {",
     "++s.liveSm3StateRejectReasons[0];",
     "++s.liveSm3StateRejectReasons[1];",
@@ -60,6 +60,16 @@ for rejection in (
     "pipeline.vertexTokens != vertexEvidence.tokens",
 ):
     check(rejection in source, "missing fail-closed source/state rejection: " + rejection)
+
+# A valid source sRGB write is now natively encoded via a typed sRGB
+# RTV sharing the same color surface; invalid enum/missing view is fail-closed.
+for token in (
+    "GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)",
+    "srgbWrite == TRUE",
+    "s.backend.color_rtv_srgb() : s.backend.color_rtv()",
+    "if (!rtv) return false;",
+):
+    check(token in source, "unsafe native SM3 sRGB output binding: " + token)
 
 layout = bridge.partition("bool live_sm3_input_layout(")[2].partition(
     "bool live_sm3_shader_bytes(")[0]

@@ -40,17 +40,32 @@ def check(source: str) -> None:
     for forbidden in ("color_srv_.Reset()", "color_rtv_.Reset()",
                       "color_texture_.Reset()"):
         assert forbidden not in resize, "resize releases previous target early"
+    # Paired sRGB and linear RTVs must be staged on the same typeless
+    # texture. The legacy typed target stays the default; both modes must
+    # complete all GPU creation before mutating the old live target.
     staged = (
         "Microsoft::WRL::ComPtr<ID3D11Texture2D> candidateTexture;",
         "Microsoft::WRL::ComPtr<ID3D11RenderTargetView> candidateRtv;",
+        "Microsoft::WRL::ComPtr<ID3D11RenderTargetView> candidateSrgbRtv;",
         "Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> candidateSrv;",
         "candidateTexture.GetAddressOf()",
-        "candidateTexture.Get(), nullptr, candidateRtv.GetAddressOf()",
-        "candidateTexture.Get(), nullptr, candidateSrv.GetAddressOf()",
+        "candidateTexture.Get(), pairedSrgb ? &linearView : nullptr,",
+        "candidateRtv.GetAddressOf()",
+        "candidateSrgbRtv.GetAddressOf()",
+        "candidateTexture.Get(), pairedSrgb ? &shaderView : nullptr,",
+        "candidateSrv.GetAddressOf()",
         "color_srv_ = std::move(candidateSrv);",
+        "color_rtv_srgb_ = std::move(candidateSrgbRtv);",
         "color_rtv_ = std::move(candidateRtv);",
         "color_texture_ = std::move(candidateTexture);",
     )
+    for token in (
+        "if (pairedSrgb && format != DXGI_FORMAT_B8G8R8A8_UNORM)",
+        "DXGI_FORMAT_B8G8R8A8_TYPELESS : format;",
+        "srgbView.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;",
+        "if (pairedSrgb) {",
+    ):
+        assert token in create, "sRGB paired/legacy target isolation lost: " + token
     positions = []
     for token in staged:
         assert token in create, "missing candidate or commit: " + token
