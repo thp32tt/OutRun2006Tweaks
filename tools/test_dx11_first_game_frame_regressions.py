@@ -3551,13 +3551,36 @@ def main() -> None:
             assert "R30CaptureNativeAdditionalStreams(" not in region, (
                 "R26-safe fallback must not pretend to have SM3 side streams"
             )
-        assert all(token in region for token in required), "missing live IndexedUP vertex window"
-        assert "minVertex != 0" not in region, "nonzero source window silently discarded"
+        def indexed_up_contract(sample: str) -> bool:
+            if not all(token in sample for token in required):
+                return False
+            if "minVertex != 0" in sample:
+                return False
+            if renderer.name == "stereo_renderer_r30.cpp":
+                return (
+                    sample.count("R30CaptureNativeAdditionalStreams(") == 2
+                    and sample.count("game_indexed_up_physical_slots(") == 2
+                    and "unpacked[i] -= minVertex;" not in sample
+                )
+            return "R30CaptureNativeAdditionalStreams(" not in sample
+
+        assert indexed_up_contract(region), "missing live IndexedUP vertex window"
         for token in required:
             damaged = region.replace(token, "", 1)
-            assert damaged != region and not all(x in damaged for x in required), (
+            assert damaged != region and not indexed_up_contract(damaged), (
                 "live IndexedUP destructive mutation escaped: " + token
             )
+        # Per-branch destructive checks independently remove each copy of a
+        # duplicated physical-slot contract, not only both at once.
+        if renderer.name == "stereo_renderer_r30.cpp":
+            for token in ("R30CaptureNativeAdditionalStreams(",
+                          "game_indexed_up_physical_slots("):
+                assert region.count(token) == 2
+                first, second = region.split(token, 1)
+                damaged_second = first + token + second.replace(token, "", 1)
+                assert not indexed_up_contract(damaged_second), (
+                    "second IndexedUP source branch lost its native-side stream guard"
+                )
 
 if __name__ == "__main__":
     main()
