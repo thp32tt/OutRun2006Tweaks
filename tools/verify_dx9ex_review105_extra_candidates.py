@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 F11 = ROOT / "src/vr/d3d9/f11_screen_2d.hpp"
 SHADER = ROOT / "src/vr/d3d9/shader_fingerprint_gpl.hpp"
+TRANSPORT = ROOT / "src/vr/d3d9/stereo_renderer_r7.inc"
 
 
 def check_f11(source: str) -> None:
@@ -46,9 +47,29 @@ def check_shader(source: str) -> None:
     assert "std::array<Seen, 256> seen{};" in source
 
 
+def check_direct_eye(source: str) -> None:
+    body = source.split("HRESULT StretchDirectEye(", 1)[1].split(
+        "bool EnsureDirectTransportResources(", 1
+    )[0]
+    for token in (
+        "OUTRUN_VR_DIRECT_EYE_POINT_TEST",
+        "pointTest ? D3DTEXF_POINT : D3DTEXF_LINEAR",
+        "if (FAILED(hr) && pointTest)",
+        "if (FAILED(hr))",
+        "D3DTEXF_NONE",
+        "return hr;",
+    ):
+        assert token in body, token
+    assert body.index("D3DTEXF_POINT") < body.index(
+        "if (FAILED(hr) && pointTest)") < body.index(
+        "D3DTEXF_NONE")
+
+
 def main() -> None:
     f11 = F11.read_text(encoding="utf-8")
     shader = SHADER.read_text(encoding="utf-8")
+    transport = TRANSPORT.read_text(encoding="utf-8")
+    check_direct_eye(transport)
     check_f11(f11)
     check_shader(shader)
     f11_mutations = (
@@ -73,7 +94,16 @@ def main() -> None:
         except AssertionError:
             continue
         raise AssertionError("shader identity mutation escaped: " + old)
-    print("PASS DX9Ex review105 F11 binocular containment, shader lifetime, 5 negative mutations; HMD UNTESTED")
+    mutated_transport = transport.replace(
+        "pointTest ? D3DTEXF_POINT : D3DTEXF_LINEAR",
+        "D3DTEXF_POINT", 1)
+    try:
+        check_direct_eye(mutated_transport)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("DirectGPU point-filter unconditional mutation escaped")
+    print("PASS DX9Ex review105 F11, shader lifetime and safe DirectGPU A/B; 6 negative mutations; HMD UNTESTED")
 
 
 if __name__ == "__main__":
