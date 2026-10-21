@@ -14,6 +14,78 @@ namespace OutRunVR::DriverSeatCamera
         Vec3 up{};
     };
 
+
+    // Quest-style cockpit owner: derive the seat anchor entirely from the
+    // player-car local->world matrix. Unlike the legacy PC path, this does not
+    // depend on the stock race camera eye/look pair, so native camera smoothing
+    // or transition pulses cannot move the VR seat.
+    inline bool ComputeCarAnchoredSeatPose(
+        Vec3 carOrigin, CarAxes axes,
+        float forwardOffset, float rightOffset, float upOffset,
+        Vec3& outPosition, Vec3& outLook,
+        float lookDistance = 1.0f) noexcept
+    {
+        const auto finite = [](Vec3 v) noexcept {
+            return std::isfinite(v.x) && std::isfinite(v.y) &&
+                std::isfinite(v.z);
+        };
+        if (!finite(carOrigin) || !finite(axes.forward) || !finite(axes.up) ||
+            !std::isfinite(forwardOffset) || !std::isfinite(rightOffset) ||
+            !std::isfinite(upOffset) || !std::isfinite(lookDistance) ||
+            std::fabs(forwardOffset) > 10.0f ||
+            std::fabs(rightOffset) > 10.0f ||
+            std::fabs(upOffset) > 10.0f ||
+            lookDistance < 0.05f || lookDistance > 100.0f)
+            return false;
+
+        const auto norm = [&](Vec3 v, Vec3& n) noexcept {
+            const double length = std::sqrt(
+                double(v.x) * v.x + double(v.y) * v.y +
+                double(v.z) * v.z);
+            if (!std::isfinite(length) || length < 1.0e-5 ||
+                length > 100.0)
+                return false;
+            n = {float(v.x / length), float(v.y / length),
+                 float(v.z / length)};
+            return finite(n);
+        };
+        const auto dot = [](Vec3 a, Vec3 b) noexcept {
+            return double(a.x) * b.x + double(a.y) * b.y +
+                double(a.z) * b.z;
+        };
+        const auto cross = [](Vec3 a, Vec3 b) noexcept {
+            return Vec3{a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
+                a.x * b.y - a.y * b.x};
+        };
+
+        Vec3 forward{}, seedUp{}, right{}, up{};
+        if (!norm(axes.forward, forward) || !norm(axes.up, seedUp) ||
+            std::fabs(dot(forward, seedUp)) > 0.2 ||
+            !norm(cross(forward, seedUp), right) ||
+            !norm(cross(right, forward), up))
+            return false;
+
+        const Vec3 seat{
+            float(double(carOrigin.x) + double(forward.x) * forwardOffset +
+                  double(right.x) * rightOffset + double(up.x) * upOffset),
+            float(double(carOrigin.y) + double(forward.y) * forwardOffset +
+                  double(right.y) * rightOffset + double(up.y) * upOffset),
+            float(double(carOrigin.z) + double(forward.z) * forwardOffset +
+                  double(right.z) * rightOffset + double(up.z) * upOffset)
+        };
+        const Vec3 look{
+            float(double(seat.x) + double(forward.x) * lookDistance),
+            float(double(seat.y) + double(forward.y) * lookDistance),
+            float(double(seat.z) + double(forward.z) * lookDistance)
+        };
+        if (!finite(seat) || !finite(look))
+            return false;
+        outPosition = seat;
+        outLook = look;
+        return true;
+    }
+
     inline bool ComputeCarSpaceTranslatedCamera(
         Vec3 position, Vec3 look, CarAxes axes,
         float forwardOffset, float rightOffset, float upOffset,
