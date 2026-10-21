@@ -83,6 +83,8 @@ jobs:
           python tools/test_dx11_live_sm3_srgb_output_00967.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_stencil_game_probe_00968.cpp -o /tmp/dx11_live_stencil_00968 && /tmp/dx11_live_stencil_00968
           python tools/test_dx11_live_stencil_draw_00968.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_fvf_srgb_game_probe_00969.cpp -o /tmp/dx11_live_fvf_srgb_00969 && /tmp/dx11_live_fvf_srgb_00969
+          python tools/test_dx11_live_fvf_srgb_draw_00969.py
           python tools/test_dx11_backend_artifact_identity_00952.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_repeat_flow_probe_00948.cpp -o /tmp/dx11_sm3_repeat_00948 && /tmp/dx11_sm3_repeat_00948
           python tools/test_dx11_sm3_repeat_flow_00948.py

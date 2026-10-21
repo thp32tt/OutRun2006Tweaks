@@ -59,6 +59,7 @@
 #include "native_game_scissor_clip.hpp"
 #include "native_game_offscreen_pass.hpp"
 #include "native_game_inert_stencil_mrt.hpp"
+#include "native_game_srgb_draw.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
 #include "native_game_main_stencil_clear.hpp"
@@ -1201,6 +1202,7 @@ struct TextureCapture {
 
 struct OutputCapture {
     bool alphaBlend = false;
+    bool nativeSrgbWrite = false; // Live FVF RT0 encoding; independent of sampler decode.
     bool additiveBlend = false; // D3D9 ONE/ONE
     bool sourceAlphaAddBlend = false; // D3D9 SRCALPHA/ONE
     bool premultipliedAlphaBlend = false; // D3D9 ONE/INVSRCALPHA
@@ -2529,7 +2531,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         return false;
     }
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
-    DWORD fog=TRUE, scissor=TRUE;
+    DWORD fog=TRUE, scissor=TRUE, srgbWrite=~0u;
     DWORD colorMask=0, cullMode=0, fillMode=0;
     // Keep the diagnostic raster conservative: no cull/fill/fog translation.
     // The source color-write channels are mirrored into the D3D11 OM blend
@@ -2541,12 +2543,17 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_ZENABLE, &depth)) ||
         FAILED(game->GetRenderState(D3DRS_CLIPPING, &clip)) ||
         FAILED(game->GetRenderState(D3DRS_FOGENABLE, &fog)) ||
+        FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
         FAILED(game->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)) ||
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        !clip || fog || fillMode != D3DFILL_SOLID)
+        !clip || fog || fillMode != D3DFILL_SOLID ||
+        !GameNativeSrgbDraw::admit(srgbWrite, fullFrame))
         return false;
+    // FVF UI/HUD fades may request sRGB output without a texture; preserve
+    // their exact RT encoding independently of the SM3 state from prior Draws.
+    output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite);
     // The live game's stencil-enabled Draw can still write real main color:
     // ALWAYS + a zero write mask + one-sided stencil is pixel-equivalent to
     // disabled stencil for every D3D11 fragment (no stencil dependency/write).
@@ -2882,7 +2889,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD coordIndex=~0u, transformFlags=~0u;
         DWORD addressU=0, addressV=0, mag=0, min=0, mip=0, srgb=1;
         DWORD borderColor = 0u;
-        DWORD maxMip=~0u, mipBias=~0u, maxAniso=0u, srgbWrite=TRUE;
+        DWORD maxMip=~0u, mipBias=~0u, maxAniso=0u;
         if (FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
@@ -2896,9 +2903,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)) ||
-            FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)) ||
-            FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
-            srgbWrite != FALSE)
+            FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
             return false;
         // Capture the live D3D9 anisotropy only when the game uses it.
         if (min == D3DTEXF_ANISOTROPIC &&
@@ -3420,8 +3425,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
             (mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias)
             return false;
-        // Preserve game sRGB reads only when the diagnostic UNORM target does
-        // not require sRGB writes. Incompatible output remains D3D9-owned.
+        // Game sampler sRGB decode and RT0 sRGB encode are independent.
+        // Native output binding below selects the live per-draw RTV.
         capture.srgbTexture = srgb == TRUE;
         capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
         capture.maxMipLevel = maxMip;
@@ -5595,6 +5600,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
             const OutputCapture& output) noexcept {
     if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
+    // Missing paired RTV is not permission to encode sRGB into linear UNORM.
+    if (!s.backend.color_rtv() ||
+        (output.nativeSrgbWrite && !s.backend.color_rtv_srgb())) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
     if (!dev || !ctx) return false;
@@ -6110,9 +6118,14 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         }
         s.preDrawFills.discard();
     }
+    // Rebind on every live FVF Draw/DrawIndexed, including depth-free HUD
+    // draws after a programmable sRGB pass, avoiding stale immediate OM state.
+    ID3D11RenderTargetView* gameRtv = output.nativeSrgbWrite
+        ? s.backend.color_rtv_srgb() : s.backend.color_rtv();
+    if (!gameRtv) return false;
+    ctx->OMSetRenderTargets(1u, &gameRtv,
+        output.nativeDepthTest ? s.diagnosticDepthView.Get() : nullptr);
     if (output.nativeDepthTest) {
-        ID3D11RenderTargetView* rtv = s.backend.color_rtv();
-        ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());
         // Independent diagnostic depth cannot reuse earlier D3D9 history.
         // Reversed ordering needs a zero baseline to show positive fragments.
         // Mirror first game Z and later verified Z-only Clears before next depth Draw.
