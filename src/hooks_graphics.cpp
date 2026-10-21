@@ -164,6 +164,8 @@ UseHiDefCharacters UseHiDefCharacters::instance;
 // Keep camera placement and the native car/occupant render pass eligible
 // under the same validated basis, following the standalone Quest's separation
 // of cockpit-active, vehicle and occupant rendering responsibilities.
+static bool VRDriverSeatGameplayActive() noexcept;
+
 static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     D3DVECTOR& translatedPosition, D3DVECTOR& translatedLook) noexcept
 {
