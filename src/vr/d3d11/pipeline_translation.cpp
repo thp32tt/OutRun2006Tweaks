@@ -1825,7 +1825,9 @@ namespace outrun::vr::dx11
                         role ==
                         ProgrammableShaderRegisterOperandRole::Source ||
                         role ==
-                        ProgrammableShaderRegisterOperandRole::RelativeAddress)
+                        ProgrammableShaderRegisterOperandRole::RelativeAddress ||
+                        role ==
+                        ProgrammableShaderRegisterOperandRole::ScratchDestination)
                     {
                         operand.sourceSwizzle =
                             (token & D3DSP_SWIZZLE_MASK) >>
@@ -1836,8 +1838,21 @@ namespace outrun::vr::dx11
                         if (role ==
                             ProgrammableShaderRegisterOperandRole::Source)
                             ++out.sourceOperandCount;
-                        else
+                        else if (role ==
+                                 ProgrammableShaderRegisterOperandRole::RelativeAddress)
                             ++out.relativeAddressOperandCount;
+                        else
+                        {
+                            // The last two SGN operands are writable scratch
+                            // TEMP registers. They must not create constant/
+                            // sampler provenance or use relative addressing.
+                            if (operand.registerType != D3DSPR_TEMP ||
+                                operand.relativeAddressing ||
+                                operand.sourceModifier != D3DSPSM_NONE ||
+                                operand.sourceSwizzle != 0xe4u)
+                                return false;
+                            ++out.scratchDestinationOperandCount;
+                        }
                     }
                     else
                     {
@@ -2012,10 +2027,34 @@ namespace outrun::vr::dx11
                                 ProgrammableShaderRegisterOperandRole::Destination))
                             return out;
                     }
+                    const auto firstOperand = out.operands.size() - plan.destinations;
                     for (UINT i = 0; i < plan.sources; ++i)
                     {
-                        if (!parse_parameter(
-                                ProgrammableShaderRegisterOperandRole::Source))
+                        const bool scratch =
+                            instruction.opcode == D3DSIO_SGN && i >= 1u;
+                        if (!parse_parameter(scratch
+                            ? ProgrammableShaderRegisterOperandRole::ScratchDestination
+                            : ProgrammableShaderRegisterOperandRole::Source))
+                            return out;
+                    }
+                    if (instruction.opcode == D3DSIO_SGN)
+                    {
+                        // Match the native SM3 compiler: two unique,
+                        // non-aliasing TEMP scratch destinations. A TEMP
+                        // read from the same register may not be clobbered.
+                        if (out.operands.size() < firstOperand + 4u)
+                            return out;
+                        const auto& destination = out.operands[firstOperand];
+                        const auto& source0 = out.operands[firstOperand + 1u];
+                        const auto& scratch0 = out.operands[out.operands.size() - 2u];
+                        const auto& scratch1 = out.operands.back();
+                        if (destination.registerType != D3DSPR_TEMP ||
+                            scratch0.registerIndex == scratch1.registerIndex ||
+                            scratch0.registerIndex == destination.registerIndex ||
+                            scratch1.registerIndex == destination.registerIndex ||
+                            (source0.registerType == D3DSPR_TEMP &&
+                             (scratch0.registerIndex == source0.registerIndex ||
+                              scratch1.registerIndex == source0.registerIndex)))
                             return out;
                     }
                 }

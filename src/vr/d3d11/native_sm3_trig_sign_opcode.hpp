@@ -27,7 +27,7 @@ native_sm3_trig_sign_operand_plan(
         if (shaderMajor == 3u) return {1u, false, true};
         if (shaderMajor == 2u) return {3u, false, true};
     } else if (opcode == NativeSm3TrigSignOpcode::Sign &&
-               vertexStage && shaderMajor == 3u) {
+               vertexStage && (shaderMajor == 2u || shaderMajor == 3u)) {
         return {3u, true, true};
     }
     return {};

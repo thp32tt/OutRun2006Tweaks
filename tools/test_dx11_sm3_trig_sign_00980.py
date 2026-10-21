@@ -22,6 +22,9 @@ def connected(pipeline: str, backend: str, helper: str) -> bool:
         "shaderMajor, vertexStage", "operands.sourceCount",
         "NativeSm3TrigSignOpcode::SineCosine",
         "NativeSm3TrigSignOpcode::Sign",
+        "ProgrammableShaderRegisterOperandRole::ScratchDestination",
+        "++out.scratchDestinationOperandCount",
+        "scratch0.registerIndex == scratch1.registerIndex",
     ]) and all(s in live for s in [
         "case D3DSIO_SINCOS:", "case D3DSIO_SGN:",
         "NativeSm3TrigSignOpcode::SineCosine, 3u, vertexStage",
@@ -42,6 +45,9 @@ def main() -> None:
     assert not connected(p.replace("case D3DSIO_SGN:", "case D3DSIO_NOP:", 1), n, h)
     assert not connected(p, n.replace("operands.scratchDestinations", "false", 1), h)
     assert not connected(p, n, h.replace("return {3u, true, true};", "return {};"))
+    assert not connected(p.replace(
+        "++out.scratchDestinationOperandCount", "++out.sourceOperandCount", 1
+    ), n, h)
     print("DX11 00980 live SM3 trig/sign source integration: PASS")
 
 

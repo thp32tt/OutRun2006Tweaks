@@ -20,8 +20,10 @@ static_assert(sgn3v.valid && sgn3v.sourceCount == 3u &&
               sgn3v.scratchDestinations);
 static_assert(!native_sm3_trig_sign_operand_plan(
     NativeSm3TrigSignOpcode::Sign, 3u, false).valid);
-static_assert(!native_sm3_trig_sign_operand_plan(
-    NativeSm3TrigSignOpcode::Sign, 2u, true).valid);
+constexpr auto sgn2v = native_sm3_trig_sign_operand_plan(
+    NativeSm3TrigSignOpcode::Sign, 2u, true);
+static_assert(sgn2v.valid && sgn2v.sourceCount == 3u &&
+              sgn2v.scratchDestinations);
 static_assert(!native_sm3_trig_sign_operand_plan(
     NativeSm3TrigSignOpcode::SineCosine, 1u, true).valid);
 static_assert(!native_sm3_trig_sign_operand_plan(

@@ -391,6 +391,8 @@ namespace outrun::vr::dx11
         Source = 1,
         RelativeAddress = 2,
         Declaration = 3,
+        // SGN source1/source2 are TEMP scratch outputs, never reads.
+        ScratchDestination = 4,
     };
 
     struct ProgrammableShaderRegisterOperand
@@ -425,6 +427,7 @@ namespace outrun::vr::dx11
         UINT semanticInstructionCount = 0;
         UINT destinationOperandCount = 0;
         UINT sourceOperandCount = 0;
+        UINT scratchDestinationOperandCount = 0;
         UINT relativeAddressOperandCount = 0;
         UINT declarationOperandCount = 0;
         UINT literalDwordCount = 0;
