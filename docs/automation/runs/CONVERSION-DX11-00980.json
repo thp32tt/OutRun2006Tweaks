@@ -163,12 +163,15 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "LIVE_D3D9_SHADER_SOURCE",
       "R266_OPCODE_SOURCE_SEMANTICS",
       "R283_NATIVE_HLSL_COMPILER",
-      "GUARDED_NATIVE_D3D11_DRAW"
+      "GUARDED_NATIVE_D3D11_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "SOURCE_AND_CI_BUILD_VERIFIED_NOT_RUNTIME: no OutRun 2006 menu/vehicle/race frame, native Draw count or Quest3 pixels observed on matching SHA.",
+    "visible_frame_acceptance": "SOURCE_AND_CI_BUILD_VERIFIED_NOT_RUNTIME: real D3D9 game callsite to existing native GPU output is only a structural integration path; no OutRun 2006 menu/vehicle/race frame, native Draw count, visible pixels or Quest3/VDXR gameplay observed on matching SHA.",
     "activation_guard_and_fallback": "Native D3D11 game-frame opt-in/fail-closed; original D3D9 game renderer, SkyGlow, gamepad and FFB remain authoritative for failed shader/state admission."
   },
   "pipeline": {
@@ -178,7 +181,7 @@
     "C3_VALIDATE": "One final exact SHA fd72bc5d2b1aa77248f1014fef8d23ac9e9e40ce five required GitHub Actions PASS",
     "C4_COMMIT": "Non-force CAS branch updates; validation-bearing SHA fd72bc5d2b1aa77248f1014fef8d23ac9e9e40ce",
     "C5_PACKAGE": "NOT_REQUIRED; no Quest3 real-game executable deployment",
-    "C6_RESULT": "BUILD_VERIFIED with exact five CI at fd72bc5d2b1aa77248f1014fef8d23ac9e9e40ce; HMD/gameplay RUNTIME_VALIDATION=UNTESTED"
+    "C6_RESULT": "BUILD_VERIFIED with exact five CI at fd72bc5d2b1aa77248f1014fef8d23ac9e9e40ce; historical SOURCE_GRAPH path clarification only; HMD/gameplay RUNTIME_VALIDATION=UNTESTED"
   },
   "score_change": 0,
   "score_run_key": "CONVERSION-DX11-00980",
