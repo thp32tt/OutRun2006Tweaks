@@ -1,0 +1,573 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1845KST-B0032-A0027-SHA8",
+  "review_slot_kst": "2026-10-21 18:45",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "provenance": {
+    "source": "N100 actual A/B ChatGPT ImageGen locally saved unapproved candidate PNG",
+    "previously_reviewed_unique_candidate_sha256": 246,
+    "new_unique_candidate_sha256": 8,
+    "source_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0032-DAF80758.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0027-8CF27F6F.json"
+    ],
+    "n100_preflight": "work/c1_batch_20261021_1845/preflight.json",
+    "n100_comparison_images": [
+      "work/c1_batch_20261021_1845/compare_1.jpg",
+      "work/c1_batch_20261021_1845/compare_2.jpg",
+      "work/c1_batch_20261021_1845/compare_3.jpg",
+      "work/c1_batch_20261021_1845/compare_4.jpg"
+    ]
+  },
+  "authority": "Independent C1 original-vs-transparent-PNG lightweight QA only; A/B queues unchanged. No ImageGen, DDS export, C2/C3 approval, or game PASS.",
+  "counts": {
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 2,
+    "fail_major_style_effect": 3,
+    "fail_major_color_effect": 3,
+    "producer_rework_dimensions": 8,
+    "export_sha_match": 8,
+    "source_manifest_sha_match": 8,
+    "rgba_png": 8,
+    "visible_edge_opacity_gt32": 0
+  },
+  "reviews": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0032-DAF80758",
+      "ordinal": 153,
+      "candidate_file": "Q173_c9a0652083abce51_source_k.png",
+      "source_file": "Q173_c9a0652083abce51_source.png",
+      "candidate_sha256": "a742afe3a6c2b24a48676e7d0a2f2a3974b6fbf467b0d107e339fb23182f8346",
+      "source_sha256": "191aff3b5d11815bbeec1d99491da9f657488c3908dd476a582543997e75958a",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "FLORAL VILLAGE",
+      "approved_korean": "플로럴 빌리지",
+      "source_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        973,
+        357
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        17,
+        9,
+        2114,
+        668
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "플로럴 빌리지: 원문 FLORAL VILLAGE는 평면 회청색 굵은 산세리프이며, 후보는 두꺼운 검은 입체 돌출/금속 광택을 추가함. 원본에는 다른 인접 레이블도 포함되어 배치 검증 별도 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0032-DAF80758",
+      "ordinal": 154,
+      "candidate_file": "Q232_5fcdb481cac79a0b_source_k.png",
+      "source_file": "Q232_5fcdb481cac79a0b_source.png",
+      "candidate_sha256": "3d05c92a6abf7b45361adb1bf447f53557b12f8609a5f1f28de7eff784fe6201",
+      "source_sha256": "25615d4aa85159f6eccee1ca7096b6c3d988cfc1e9be54c236cc13b81fa966be",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Join your friends in a game of OutRun!",
+      "approved_korean": "친구들과 OutRun 게임에 참가하세요!",
+      "source_dds_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1131,
+        144
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        25,
+        120,
+        2154,
+        668
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "친구들과 OutRun 게임에 참가하세요!: 문구는 매핑과 일치하나 원문 회색 평면 안내문과 달리 두꺼운 검정 외곽/입체·심한 우향 기울기. 단순 경미 스타일 차이 아님.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0032-DAF80758",
+      "ordinal": 155,
+      "candidate_file": "Q035_85915414047266e6_source_k.png",
+      "source_file": "Q035_85915414047266e6_source.png",
+      "candidate_sha256": "37571ea1ce6e54232cc83cd9fd5642a9a4234d2e4b7bc386ffc603a810b523b1",
+      "source_sha256": "8724d2048ada49a0b2c8c9b656b900bb045a8d64401a8cc8571c6082a02d23fc",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Total Rank",
+      "approved_korean": "종합 랭킹",
+      "source_dds_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "original_dimensions": [
+        1302,
+        590
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        315,
+        167,
+        1478,
+        817
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "종합 랭킹: 흰 채움+짙은 남색 외곽과 우향 이탤릭이 원문과 대체로 일치, 음절 판독 가능. 원본 분홍 패널이 투명 글자 레이어에 포함되지 않은 것은 정상.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0032-DAF80758",
+      "ordinal": 156,
+      "candidate_file": "Q048_06af081464a3219b_source_k.png",
+      "source_file": "Q048_06af081464a3219b_source.png",
+      "candidate_sha256": "a162e315a2fa37187e61a3d8cc105266caf3c1e0219cb701d60e0e6ecd6975a3",
+      "source_sha256": "1cf6e63cc0b909efa8700cd2c3d9e9285bbec307c2c29abacf69e700767d0e96",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "NAME",
+      "approved_korean": "이름",
+      "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "original_dimensions": [
+        337,
+        196
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        154,
+        234,
+        1568,
+        627
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "이름: 원문 NAME은 회색 평면 UI 칸의 얇은 블록체이나 후보는 큰 어두운 금속형 입체 글자/돌출 그림자로 강조 계열이 크게 다름.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0032-DAF80758",
+      "ordinal": 157,
+      "candidate_file": "Q050_ca50ce55360635ba_source_k.png",
+      "source_file": "Q050_ca50ce55360635ba_source.png",
+      "candidate_sha256": "f204178717d13b5d89551a7fcc3a1c799b9d77675a93b65d2102ff5f14855fb1",
+      "source_sha256": "6f8034418e8e7d51a451b6d72e3e9de52e77c4b470ebbe3918f55e05d6826389",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "YOUR FRIENDS",
+      "approved_korean": "내 친구",
+      "source_dds_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        995,
+        315
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        49,
+        20,
+        1973,
+        692
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_COLOR_EFFECT",
+      "visual_reason": "내 친구: 원문 YOUR FRIENDS는 평면 흰색 정자 굵은 글씨이나 후보는 형광 청록 그라데이션+검은 두꺼운 윤곽 및 뚜렷한 우향 기울기로 핵심 색상·스타일 변경.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0027-8CF27F6F",
+      "ordinal": 129,
+      "candidate_file": "Q051_b1b43c6f0f1307b5_source_k.png",
+      "source_file": "Q051_b1b43c6f0f1307b5_source.png",
+      "candidate_sha256": "8bae5e1a747b665b1788fbce9e7997f40b9b95299fd3b867c7975607b0bce230",
+      "source_sha256": "e5b6c7db609afa6824a706e16631c0316a6b0fe597487d4f83611d286892df3f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "ENTER XBOX PASSCODE",
+      "approved_korean": "XBOX 패스코드 입력",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1471,
+        360
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        109,
+        60,
+        2066,
+        589
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_COLOR_EFFECT",
+      "visual_reason": "XBOX 패스코드 입력: 글자 판독과 번역 매핑은 맞지만 원문은 평면 흰색의 기울기 없는 안내문, 후보는 강한 노란색/남색 테두리 이탤릭 강조문으로 주요 색상·위계 불일치.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0027-8CF27F6F",
+      "ordinal": 130,
+      "candidate_file": "Q086_5b9e8ab56194f979_source_k.png",
+      "source_file": "Q086_5b9e8ab56194f979_source.png",
+      "candidate_sha256": "379787b06576b0e6c299f9b533bd47c721f2b21fe83f2bb114bfde81eb359ddb",
+      "source_sha256": "85675246a08a12152ee6d17fa097121077a5c6d9ea5a7a5054af47b8b158dd11",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Tulip Garden",
+      "approved_korean": "튤립 가든",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1890,
+        832
+      ],
+      "original_dimensions": [
+        502,
+        221
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        213,
+        116,
+        1608,
+        568
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "튤립 가든: 원문 Tulip Garden은 흰색 채움/검은 윤곽의 우향 기울기, 후보도 같은 기본 색·방향이며 자소 판독 가능. 검정 그림자 굵기 차이는 허용.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0027-8CF27F6F",
+      "ordinal": 131,
+      "candidate_file": "Q188_4e7272fce9dfd96b_source_k.png",
+      "source_file": "Q188_4e7272fce9dfd96b_source.png",
+      "candidate_sha256": "88d4b541eb6f0e86cc73a237664690d06df563800a6fdecb16fd97ea04c38493",
+      "source_sha256": "8d97642362ae5a39d800efaea393a6fed89027da77698048eb2331f2166883cd",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Complete Race and Heart Attack missions to win OR Miles!",
+      "approved_korean": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!",
+      "source_dds_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1454,
+        78
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        21,
+        140,
+        2155,
+        620
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_COLOR_EFFECT",
+      "visual_reason": "레이스와 하트 어택 미션을 완료해 OR 마일을 획득하세요!: 원문은 무기울기 회색 평면 도움말인데 후보는 흰/파랑 테두리의 심한 우향 이탤릭 입체 효과. 문구는 일치하나 UI 위계/효과가 명백히 바뀜.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
