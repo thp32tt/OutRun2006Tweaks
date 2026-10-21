@@ -31,7 +31,8 @@ def connected(s: str) -> bool:
         "capture.mipFilter == D3DTEXF_LINEAR;",
         "const UINT levels = usesMips ? sourceLevels : 1u;",
         "usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)",
-        "usesMips && capture.texture->GetLOD() != 0u",
+        "if (!live_game_mip_lod::select(levels, usesMips,",
+        "capture.texture->GetLOD(), capture.maxMipLevel).valid",
         "capture.texture->GetSurfaceLevel(level, sourceSurface.GetAddressOf())",
         "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
         "initial[level].pSysMem = copied[level].data();",
@@ -49,7 +50,8 @@ def connected(s: str) -> bool:
         "D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR",
         "D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR",
         "D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR",
-        "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
+        "state.MinLOD = static_cast<float>(lod.minLevel);",
+        "state.MaxLOD = static_cast<float>(lod.maxLevel);",
     )
     return (all(x in gate for x in a) and
             all(x in sampler_impl for x in sampler_required) and
@@ -78,7 +80,7 @@ def main() -> None:
         ("D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR", "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT"),
         ("D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR", "D3D11_FILTER_MIN_MAG_MIP_POINT"),
         ("usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)", "false && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)"),
-        ("usesMips && capture.texture->GetLOD() != 0u", "false && capture.texture->GetLOD() != 0u"),
+        ("capture.texture->GetLOD(), capture.maxMipLevel).valid", "0u, capture.maxMipLevel).valid"),
         ("const UINT levels = usesMips ? sourceLevels : 1u;", "const UINT levels = 1u;"),
         ("capture.texture->GetSurfaceLevel(level, sourceSurface.GetAddressOf())",
          "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())"),

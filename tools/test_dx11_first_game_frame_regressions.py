@@ -2401,8 +2401,8 @@ def main() -> None:
             "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :",
             "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
             "D3D11_FILTER_MIN_MAG_MIP_POINT);",
-            "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;",
-            "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
+            "state.MinLOD = static_cast<float>(lod.minLevel);",
+            "state.MaxLOD = static_cast<float>(lod.maxLevel);",
             "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
         )) and all(token in submit for token in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -2418,7 +2418,7 @@ def main() -> None:
         "capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);",
         "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :",
         "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
-        "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;",
+        "state.MinLOD = static_cast<float>(lod.minLevel);",
         "ctx->PSSetSamplers(0, 1, &boundSampler)",
     ):
         broken = bridge.replace(token, "/* disconnected 00561 filter link */", 1)
