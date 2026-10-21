@@ -1,0 +1,170 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00974",
+  "production_id": "CONVERSION-DX11-00974",
+  "event_id": "CONVERSION-DX11-00974-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00974",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "IN_PROGRESS_CI_VALIDATION",
+  "feature_stage": "LIVE_GPU_CUBE_COLOR_RT_NATIVE_SM3_SOURCE_INTEGRATED_CI_PENDING",
+  "checkpoint": "C3_EXACT_SHA_CI",
+  "base_sha": "374731da4b20fc1f63f6632ce8e5e0638a43a571",
+  "material_result_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "source_head": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00974",
+  "score_status": "NOT_AWARDED_PENDING_EXACT_SHA_CI_AND_PROMOTION",
+  "work_time_percentages": "NOT_MEASURED",
+  "changed_files": [
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/vr-openxr.yml",
+    "docs/automation/runs/CONVERSION-DX11-00974.json",
+    "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_game_cube_color_00974.cpp",
+    "tools/test_dx11_live_game_cube_color_00974.py",
+    "tools/test_dx11_game_rt_16bit_00692.py",
+    "tools/test_dx11_live_game_rt_frame_00970.py",
+    "tools/test_dx11_native_rgba_texture_00660.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CUBE_FACE_COLOR_CAPTURE",
+      "SAFE_MULTI_FORMAT_GPU_SIX_FACE_READBACK",
+      "D3D11_SM3_SRV_AND_NATIVE_DRAW",
+      "GUARDED_FULL_RESOLUTION_FRAME_PUBLICATION"
+    ],
+    "batch_components": [
+      ".github/workflows/backend-conversion-gate.yml",
+      ".github/workflows/build.yml",
+      ".github/workflows/dx11-fast-structural.yml",
+      ".github/workflows/vr-openxr.yml",
+      "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_live_game_cube_color_00974.cpp",
+      "tools/test_dx11_live_game_cube_color_00974.py",
+      "tools/test_dx11_game_rt_16bit_00692.py",
+      "tools/test_dx11_live_game_rt_frame_00970.py",
+      "tools/test_dx11_native_rgba_texture_00660.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real game cube multi-format color family, GPU six-face staging and native BGRA8 SRV integration through existing SM3 Draw path, with independent C++ and destructive Python regressions.",
+      "negative_regression": "Malformed/unsupported/sRGB-unsafe, oversized, multisampled or unreadable live cube sources fail closed without overriding original DX9Ex Draw/Present/input/FFB.",
+      "component_integration": "Captured live D3D9 cube face/mip color selects GPU readback, native_rt_readback::unpack_row feeds D3D11 immutable cube SRV; same native SM3 Draw submits indexed triangles into guarded full-size frame source."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00974"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "An actual OutRun native shader-bound draw and desktop menu/vehicle/race frame must be observed at exact source SHA. Source CI only cannot establish real-game visibility.",
+    "activation_guard_and_fallback": "Opt-in diagnostic only; unsupported live cube GPU readback, missing shader/image, MSAA and stale source abort native publication while original DX9Ex Draw/Present/input/FFB continue unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Extend existing full-resolution real OutRun D3D9 game-source to native D3D11 SM3 Draw/full-size frame path for 16/10-bit, swapped RGBA and BGRA cube reflection render targets; fail closed to DX9Ex.",
+    "acceptance_items": [
+      {
+        "id": "live_game_multi_format_cube_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_sm3_game_cube_srv_and_draw",
+        "expected_behavior": "Real D3D9 GPU reflection cube RGB565, ARGB1555/4444, swapped RGBA, 10-bit and native BGRA face/mip pixels decode into a correct native cube SRV consumed by the live D3D11 SM3 Draw path."
+      },
+      {
+        "id": "unsupported_cube_original_dx9ex_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_d3d9_render_and_input_safety",
+        "expected_behavior": "Malformed/sRGB-incompatible/oversized or unreadable cube sources fail closed and preserve original D3D9 Draw/Present/input/FFB."
+      },
+      {
+        "id": "five_exact_sha_feature_ci",
+        "category": "integrated_validation",
+        "behavior_area": "backend_win32_fast_openxr_hud_build",
+        "expected_behavior": "Required five GitHub Actions pipelines validate a single final source and run-record SHA before target fast-forward promotion."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_game_multi_format_cube_draw": {
+      "status": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+        "tools/dx11_live_game_cube_color_00974.cpp",
+        "tools/test_dx11_live_game_cube_color_00974.py"
+      ],
+      "validation_command": "PENDING exact-SHA GitHub Actions; no actual hardware/OutRun test"
+    },
+    "unsupported_cube_original_dx9ex_fallback": {
+      "status": "UNTESTED",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+        "tools/dx11_live_game_cube_color_00974.cpp",
+        "tools/test_dx11_live_game_cube_color_00974.py"
+      ],
+      "validation_command": "PENDING exact-SHA GitHub Actions; no actual hardware/OutRun test"
+    },
+    "five_exact_sha_feature_ci": {
+      "status": "UNTESTED",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml"
+      ],
+      "validation_command": "PENDING exact-SHA GitHub Actions; no actual hardware/OutRun test"
+    }
+  },
+  "ci": {
+    "exact_sha": null,
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "gates": {},
+    "artifacts": []
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: 23:00 checkpoint on chat-controller-downloads 374731da; target same SHA; recovered feature branch d1941608 ahead=5 behind=0; 00974 run absent.",
+    "C1_REVIEW": "PASS: Previous 00974 integration/CI causal repairs already committed, 00477 owner stays separate; no duplicate R175 branch.",
+    "C2_IMPLEMENT": "PASS: five existing 00974 material source/CI-repair commits on feature/dx11-00974-live-cube-color-frame; live cube multi-format GPU staging -> SM3 game draw.",
+    "C3_VALIDATE": "PENDING: exact-SHA five workflows; existing GitHub connector exposes PR-triggered runs only, so absence of fetch_commit_workflow_runs results is not a CI failure.",
+    "C4_COMMIT": "PARTIAL: 00974 feature branch source+test commits protected; target unchanged while CI unresolved.",
+    "C5_PACKAGE": "NOT_READY: source tests/Windows CI/artifact not yet confirmed for 00974 final SHA.",
+    "C6_RESULT": "NOT_READY: no verified exact-SHA five gates and no real OutRun desktop/HMD runtime tests."
+  },
+  "REAL_GAME_DRAW_BLOCKER": "Exact feature CI pending; real game-native Draw, published desktop and HMD pixels not measured.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Run exact-SHA mandatory five GitHub Actions; repair only observed failures on this feature branch; promote compare behind=0 force=false expected target SHA; preserve DX9Ex fallback, hardware UNTESTED.",
+  "feature_branch": "feature/dx11-00974-live-cube-color-frame"
+}
