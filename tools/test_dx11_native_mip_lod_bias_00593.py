@@ -32,12 +32,12 @@ def wired(s):
     native = (
         "capture.mipFilter == D3DTEXF_POINT ||",
         "capture.mipFilter == D3DTEXF_LINEAR;",
-        "if (usesMips && capture.maxMipLevel >= sourceLevels) return false;",
+        "if (!live_game_mip_lod::select(levels, usesMips,",
         "std::isfinite(capture.mipLodBias)",
         "capture.mipLodBias < kMinMipLodBias",
         "capture.mipLodBias > kMaxMipLodBias",
         "(!usesMips && capture.mipLodBias != 0.0f)",
-        "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;",
+        "state.MinLOD = static_cast<float>(lod.minLevel);",
         "state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;",
         "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
     )
