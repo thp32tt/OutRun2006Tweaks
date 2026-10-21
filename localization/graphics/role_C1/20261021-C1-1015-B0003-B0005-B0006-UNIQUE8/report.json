@@ -1,0 +1,436 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1015KST-NEW-SHA-UNIQUE8-B0003-B0005-B0006",
+  "review_slot_kst": "2026-10-21 10:15",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "ef20a4e51e7d2c7ad348464539ed8f52e277ee61",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "Independent lightweight QA of existing unapproved local A/B ImageGen PNG lettering only, never DDS/compose/ingame approval.",
+  "selection": "From 23 existing N100 C1 batch metrics logs and 154 known unique reviewed SHA hashes, selected 8 new distinct SHA256 B candidate outputs with matching N100 producer export SHA and SHA-pinned native HD source manifest (8/8). No duplicate SHA, ImageGen generation or A/B queue consumption.",
+  "counts": {
+    "previous_qa_log_files": 23,
+    "previous_unique_qa_sha": 154,
+    "unreviewed_available_at_selection": 27,
+    "reviewed_new_unique": 8,
+    "pass_png_text_only": 7,
+    "fail_png_glyph_integrity": 1,
+    "producer_rework_dimensions": 8,
+    "unreviewed_after_selection_at_snapshot": 19
+  },
+  "evidence": {
+    "n100_metrics_path": "work/c1_batch_20261021_1015/metrics.json",
+    "source_output_sheets": [
+      "work/c1_batch_20261021_1015/compare_1.jpg",
+      "work/c1_batch_20261021_1015/compare_2.jpg"
+    ],
+    "source_output_sheet_sha256": [
+      "c09eeb0e3ba2a6d01d77a311e6e8d6bacbe9331fcd6342008be5962bf55eafba",
+      "0813ff5b49eef9d0a57f5107932f3d33ba2b50d993118ea34aacbc7d33d6d2e1"
+    ],
+    "source_manifest_and_producer_export_sha_verified": true,
+    "visual": "Reviewed both side-by-side original English vs Korean transparency checkerboard sheets plus Q230 full native Korean PNG for suspect '쇼' glyph.",
+    "qa_backend": "GitHub SSOT+N100 asset store read and metadata/sheet script, visual review by C1",
+    "alpha_all_png_rgba": true,
+    "alpha_ge16_border_pixel_counts_all_zero": true
+  },
+  "results": [
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "ordinal": 12,
+      "source_file": "Q086_bac66d798eb23b3d_source.png",
+      "source_sha256": "cbd003fa7c1c465fde3604ad4cfc6584fb9861a33d42916b059415014d0b2f57",
+      "source_manifest_match": true,
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "candidate_file": "Q086_bac66d798eb23b3d_source_k.png",
+      "candidate_sha256": "2d601214cd029d9d4e97a4212fff64ba206e3a6551adeec6a2b44c9356510162",
+      "producer_export_sha_match": true,
+      "english": "Skyscrapers",
+      "approved_korean": "스카이스크레이퍼스",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 스카이스크레이퍼스와 일치. 개별 획/받침 읽힘. 검은 외곽선·기울기 유지; 길이 차이는 불문.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_nonzero_bbox": [
+        35,
+        69,
+        2166,
+        684
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        1116,
+        260
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "ordinal": 13,
+      "source_file": "Q098_5112ccfe2d458ff6_source.png",
+      "source_sha256": "c35641b5729ddcb20caaec14c4905f2f16a5664f1f96d9937371d6a9272cfcac",
+      "source_manifest_match": true,
+      "source_dds_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "candidate_file": "Q098_5112ccfe2d458ff6_source_k.png",
+      "candidate_sha256": "0c35ff7fd2e0cc3b4e777074caccb7b8017ce5bc77ea53afe1ff9a4cbad508d7",
+      "producer_export_sha_match": true,
+      "english": "Challenge the course record.",
+      "approved_korean": "코스 기록에 도전하세요.",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 코스 기록에 도전하세요.와 일치. 한글 획·문장부호 분명하고 영문 잔상/프레임 없음.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        41,
+        106,
+        2143,
+        660
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        1279,
+        119
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "ordinal": 21,
+      "source_file": "Q220_19f323d9fbd47a3d_source.png",
+      "source_sha256": "4002734f7242157783e60352c61f52e1fe632e65be0c86cda5fe257fa096b0d8",
+      "source_manifest_match": true,
+      "source_dds_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "candidate_file": "Q220_19f323d9fbd47a3d_source_k.png",
+      "candidate_sha256": "8b198e8c0c0ceb77679f9c42abec1eb92ada59011882df5f9b3efc8407c7b73a",
+      "producer_export_sha_match": true,
+      "english": "OUTRUN",
+      "approved_korean": "아웃런",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 아웃런과 일치. 획 형태·외곽선·그림자 완성; 원본보다 강한 금속 효과는 미관 차이로만 기록.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        41,
+        22,
+        1822,
+        698
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        664,
+        172
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "ordinal": 22,
+      "source_file": "Q226_8d217552ac176753_source.png",
+      "source_sha256": "671064af3df5bf8ff480c2bc881eb1ac9c3a8854727b5ef68d3afab5911694ba",
+      "source_manifest_match": true,
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "candidate_file": "Q226_8d217552ac176753_source_k.png",
+      "candidate_sha256": "f6551326ef0c8eb018077acb2ffe3d8c18a77faf8dfdd37c586c759dd18f29f3",
+      "producer_export_sha_match": true,
+      "english": "GOAL A",
+      "approved_korean": "골 A",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 골 A와 일치. 글리프 식별 가능하고 개별 잘림 없음. 금속 스타일 차이는 독립 PNG 하드 FAIL이 아님.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        315,
+        32,
+        1754,
+        712
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        596,
+        174
+      ],
+      "candidate_dimensions": [
+        1774,
+        887
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "ordinal": 23,
+      "source_file": "Q226_6cd397ded315829e_source.png",
+      "source_sha256": "402fc5e25fa94d9669807d9142184bed6daf7cd2465cdfd337a9986c0d91e7fe",
+      "source_manifest_match": true,
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "candidate_file": "Q226_6cd397ded315829e_source_k.png",
+      "candidate_sha256": "d7c18f2dc1fb52fbbb51e8c41dba89727a3aacef2ca4f139880ee188ba0662a2",
+      "producer_export_sha_match": true,
+      "english": "GOAL C",
+      "approved_korean": "골 C",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 골 C와 일치. 문자/라틴 C가 올바르고 투명 영역이 유지됨.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        378,
+        23,
+        1495,
+        680
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        586,
+        174
+      ],
+      "candidate_dimensions": [
+        1983,
+        793
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "ordinal": 24,
+      "source_file": "Q226_7e7a1b899b288e3d_source.png",
+      "source_sha256": "a62f378d39292f200ee116f1c96ff8d30e671efde4cdd67109035eae03b98747",
+      "source_manifest_match": true,
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "candidate_file": "Q226_7e7a1b899b288e3d_source_k.png",
+      "candidate_sha256": "4c66db04037074236369122679f658e851d9c73c5f4395de4db93a53ba7b4bc3",
+      "producer_export_sha_match": true,
+      "english": "GOAL E",
+      "approved_korean": "골 E",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 골 E와 일치. 문자/라틴 E가 올바르고 투명 영역이 유지됨.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        291,
+        23,
+        1724,
+        698
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        592,
+        174
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0005-C8B02A8D",
+      "ordinal": 25,
+      "source_file": "Q226_082b68b9b88afe91_source.png",
+      "source_sha256": "8da688e11eeed015fe9a52e3e56f99a24905a4db457635b66f03a845a144b344",
+      "source_manifest_match": true,
+      "source_dds_sha256": "fb31e9f62e0d46c4554646be2f32d70cb015e8fdbc269189bf9d76a26eab5b72",
+      "candidate_file": "Q226_082b68b9b88afe91_source_k.png",
+      "candidate_sha256": "42c356cf7a0a7e59089f3eddbdba6c6a46a4d2aa6926b3b1b248411f2c241ef3",
+      "producer_export_sha_match": true,
+      "english": "15 STAGE CONTINUOUS",
+      "approved_korean": "15코스 연속",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "정본 15코스 연속과 일치. 숫자와 모든 한글 음절 가독성 확보, 글자/효과 절단 없음.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        41,
+        56,
+        2055,
+        639
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        1738,
+        176
+      ],
+      "candidate_dimensions": [
+        2109,
+        745
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0006-76F3BB9C",
+      "ordinal": 26,
+      "source_file": "Q230_bc049596ef751d8d_source.png",
+      "source_sha256": "a8e6a7fea2787bd4e68564a25bfe885bf9d53afcdcea8a4f5ce21695945a5b25",
+      "source_manifest_match": true,
+      "source_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "candidate_file": "Q230_bc049596ef751d8d_source_k.png",
+      "candidate_sha256": "41e0243e52c94281efaf677fb5dc5da1fe77b0fcf344ef18b3616aeec689b467",
+      "producer_export_sha_match": true,
+      "english": "SHOWROOM ITEMS",
+      "approved_korean": "쇼룸 아이템",
+      "c1_verdict": "FAIL_PNG_GLYPH_INTEGRITY",
+      "visual_reason": "FAIL_GLYPH_INTEGRITY: 첫 음절 '쇼'의 하부 모음 ㅛ가 정상적인 두 수직획 구조 대신 검은 십자(+) 모양의 부정확한 획으로 생성됨. 원문 쇼룸 아이템 의미는 맞으나 자소 형태 불량으로 재작업 필요.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        172,
+        69,
+        2136,
+        672
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        1192,
+        152
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "conditions": {
+    "all_eight_producer_rework_dimensions": true,
+    "composited_UI_safety_area": "UNTESTED",
+    "dds_composition": "NOT_RUN",
+    "c2_c3_game_status": "UNTESTED_NOT_AUTHORIZED",
+    "imagegen": false,
+    "a_b_queue_consumption": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "scoreboard_recorded_separately": false
+  }
+}
