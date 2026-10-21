@@ -24,7 +24,7 @@ jobs:
           submodules: recursive
 
       - name: Verify exact pushed DX11 source checkout
-        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame' || github.ref_name == 'feature/dx11-00970-live-game-rt-frame')
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame' || github.ref_name == 'feature/dx11-00970-live-game-rt-frame' || github.ref_name == 'feature/dx11-00973-live-cube-rt-game-frame')
         shell: pwsh
         run: |
           $actual = (git rev-parse HEAD).Trim()

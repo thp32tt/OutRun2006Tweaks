@@ -28,6 +28,7 @@
 #include "live_game_rgb24_texture.hpp"
 #include "live_game_rgba_texture.hpp"
 #include "live_game_render_target_readback.hpp"
+#include "live_game_cube_rt_readback.hpp"
 #include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
@@ -4034,10 +4035,19 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (!levels || levels > 11u ||
         FAILED(capture.cubeTexture->GetLevelDesc(0u, &base)) ||
         !base.Width || base.Width != base.Height || base.Width > 1024u ||
-        (base.Pool != D3DPOOL_MANAGED && base.Pool != D3DPOOL_SYSTEMMEM) ||
-        (base.Usage & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL |
-                       D3DUSAGE_AUTOGENMIPMAP)) != 0u)
+        (base.Usage & (D3DUSAGE_DEPTHSTENCIL | D3DUSAGE_AUTOGENMIPMAP)) != 0u)
         return false;
+    // GPU-authored D3D9 reflection cubes cannot use LockRect. Mirror the
+    // genuine six faces and sampled mips via matching SYSTEMMEM readbacks,
+    // then feed the existing native VS/PS Draw SRV. Never guess source pixels.
+    const bool cpuLocked = (base.Pool == D3DPOOL_MANAGED ||
+                            base.Pool == D3DPOOL_SYSTEMMEM) &&
+                           (base.Usage & D3DUSAGE_RENDERTARGET) == 0u;
+    const bool gpuCubeRt = base.Pool == D3DPOOL_DEFAULT &&
+                           (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
+                           (base.Format == D3DFMT_A8R8G8B8 ||
+                            base.Format == D3DFMT_X8R8G8B8);
+    if (!cpuLocked && !gpuCubeRt) return false;
     const bool bc1 = D3DFMT_DXT1 == base.Format;
     const bool bc3 = D3DFMT_DXT3 == base.Format || D3DFMT_DXT5 == base.Format;
     const bool compressed = bc1 || bc3;
@@ -4051,6 +4061,10 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
         (!usesMips && capture.maxMipLevel != 0u))
         return false;
     const UINT uploadedLevels = usesMips ? levels : 1u;
+    // Entire six-face cube must fit before a single D3D9 GPU readback.
+    if (gpuCubeRt &&
+        !cube_rt_readback::bounded_six_face_bgra8(base.Width, uploadedLevels))
+        return false;
     std::uint64_t budget = 0u;
     for (UINT level = 0u; level < uploadedLevels; ++level) {
         const UINT edge = (std::max)(1u, base.Width >> level);
@@ -4068,6 +4082,10 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
         ? (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM)
         : (capture.srgbTexture ? DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
                                : DXGI_FORMAT_B8G8R8A8_UNORM);
+    ComPtr<IDirect3DDevice9> gameDevice;
+    if (gpuCubeRt &&
+        (FAILED(capture.cubeTexture->GetDevice(gameDevice.GetAddressOf())) ||
+         !gameDevice)) return false;
     std::vector<std::vector<std::uint8_t>> pixels(6u * uploadedLevels);
     std::vector<D3D11_SUBRESOURCE_DATA> subs(6u * uploadedLevels);
     for (UINT face=0u; face<6u; ++face) {
@@ -4081,11 +4099,33 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                 desc.Width != edge || desc.Height != edge ||
                 desc.Format != base.Format || desc.Pool != base.Pool)
                 return false;
-            D3DLOCKED_RECT locked{};
             const auto cubeFace = static_cast<D3DCUBEMAP_FACES>(face);
-            if (FAILED(capture.cubeTexture->LockRect(
-                    cubeFace, level, &locked, nullptr, D3DLOCK_READONLY)))
-                return false;
+            ComPtr<IDirect3DSurface9> sourceFace, readback;
+            if (gpuCubeRt) {
+                D3DSURFACE_DESC faceDesc{};
+                if (FAILED(capture.cubeTexture->GetCubeMapSurface(
+                        cubeFace, level, sourceFace.GetAddressOf())) ||
+                    !sourceFace || FAILED(sourceFace->GetDesc(&faceDesc)) ||
+                    faceDesc.Pool != D3DPOOL_DEFAULT ||
+                    (faceDesc.Usage & D3DUSAGE_RENDERTARGET) == 0u ||
+                    faceDesc.Format != base.Format ||
+                    faceDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+                    !native_rt_readback::matching_mip_extent(
+                        base.Width, base.Height, level,
+                        faceDesc.Width, faceDesc.Height) ||
+                    FAILED(gameDevice->CreateOffscreenPlainSurface(
+                        edge, edge, base.Format, D3DPOOL_SYSTEMMEM,
+                        readback.GetAddressOf(), nullptr)) ||
+                    FAILED(gameDevice->GetRenderTargetData(
+                        sourceFace.Get(), readback.Get())))
+                    return false;
+            }
+            D3DLOCKED_RECT locked{};
+            const HRESULT lockResult = gpuCubeRt
+                ? readback->LockRect(&locked, nullptr, D3DLOCK_READONLY)
+                : capture.cubeTexture->LockRect(
+                      cubeFace, level, &locked, nullptr, D3DLOCK_READONLY);
+            if (FAILED(lockResult)) return false;
             const bool readable = locked.pBits && locked.Pitch > 0 &&
                 static_cast<std::uint64_t>(locked.Pitch) >= pitch;
             if (readable) {
@@ -4099,7 +4139,9 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                     if (opaque) for (UINT x=3u; x<pitch; x+=4u) to[x]=0xffu;
                 }
             }
-            const HRESULT unlocked = capture.cubeTexture->UnlockRect(cubeFace, level);
+            const HRESULT unlocked = gpuCubeRt
+                ? readback->UnlockRect()
+                : capture.cubeTexture->UnlockRect(cubeFace, level);
             if (!readable || FAILED(unlocked)) return false;
             auto& sub = subs[face * uploadedLevels + level];
             sub.pSysMem = pixels[face * uploadedLevels + level].data();
