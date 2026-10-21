@@ -1,0 +1,430 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2045KST-NEW-SHA8",
+  "prior_log_count": 46,
+  "prior_unique_sha": 270,
+  "count": 6,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0036-76CB1DAF",
+      "ordinal": 173,
+      "candidate_file": "Q097_eafd108f449feccc_source_k.png",
+      "source_file": "Q097_eafd108f449feccc_source.png",
+      "candidate_sha256": "8ae41a7a048ce5cbe90cecdedfce8a47bac99875eb29228413d7adb3b7598dc7",
+      "source_sha256": "28c6dc1bba66dac8353bf6b791b868b2dad67b19747c135d8bec2d31728f4428",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2158,
+        729
+      ],
+      "original_dimensions": [
+        1208,
+        408
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        608,
+        147,
+        1620,
+        711
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "‘튜닝’ 문구 자체는 정확하지만 원본 TUNED가 작은 붉은 버튼 내에 있는 데 비해 후보는 대형 금색 글자로 생성됨. 원본 버튼 레이블 대비 크기/셀 배치 심각하게 불일치; 직접 합성 금지.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2045/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0037-1A6E266A",
+      "ordinal": 174,
+      "candidate_file": "Q036_d07f28da0732fb06_source_k.png",
+      "source_file": "Q036_d07f28da0732fb06_source.png",
+      "candidate_sha256": "46ebb7f4481453d032f5947fdf10e167670c259f1c32db505bee718cdc072e42",
+      "source_sha256": "407d3998f63e80134003ab4d691731db5c08c2bbd759a47919797a1f273449d5",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Total Rank",
+      "approved_korean": "종합 랭킹",
+      "source_dds_sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2054,
+        765
+      ],
+      "original_dimensions": [
+        1020,
+        380
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        97,
+        29,
+        1960,
+        713
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SCALE_UI_PLACEMENT",
+      "visual_reason": "‘종합 랭킹’ 문구와 흰 채움/남색 윤곽은 정확하나 원본 왕관 위의 작은 Total Rank보다 후보 글자 폭과 높이가 현저히 큼. 원래 글자 영역/왕관 침범 위험으로 문구 후보 배치 FAIL.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2045/compare_1.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0028-3257DA8B",
+      "ordinal": 137,
+      "candidate_file": "Q205_3e204dbd69f1fe44_source_k.png",
+      "source_file": "Q205_3e204dbd69f1fe44_source.png",
+      "candidate_sha256": "c6a05842cf2ddaee05aedded076643e865ff2f1414214dea8daf873a400bf13d",
+      "source_sha256": "9726f0f50b262f33fd0a2c1f276126f089d2552bc6d8f314611f7083c75229e0",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "OutRun for 1 player!",
+      "approved_korean": "1인 아웃런 플레이!",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1310,
+        176
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        39,
+        2144,
+        571
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 9,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘1인 아웃런 플레이!’ 승인 한글과 일치. 회색 계열, 충분한 개별 자소·받침 가독성, 읽기 방향 정상. 검정 윤곽/약한 입체감은 경미한 효과 차이로 허용. 실제 UI 합성 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2045/compare_2.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0028-3257DA8B",
+      "ordinal": 138,
+      "candidate_file": "Q188_15728552125c9660_source_k.png",
+      "source_file": "Q188_15728552125c9660_source.png",
+      "candidate_sha256": "09e174a8faf4bac5c55f9536fb2aaf0ec89250a72babb34a5a9c018a563284dd",
+      "source_sha256": "2ad9e3966e81160034b8c6e3e6e8fed2d118f5630d6a5c054058d91abb7f2657",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Online and LAN OutRun for up to 6 players",
+      "approved_korean": "온라인/LAN 아웃런 최대 6인 플레이",
+      "source_dds_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1434,
+        301
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        26,
+        95,
+        2164,
+        676
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "‘온라인/LAN 아웃런 최대 6인 플레이’ 표기는 정확하지만 원본의 작고 평면적인 짙은 회색 도움말과 달리 밝은 청색 광택·굵은 우향 이탤릭으로 생성. 원본 UI 문구 계열과 심각한 스타일/글자 크기 불일치, 주변 다른 문구와 합성 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2045/compare_2.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0027-8CF27F6F",
+      "ordinal": 132,
+      "candidate_file": "Q193_ec75be38118e36d5_source_k.png",
+      "source_file": "Q193_ec75be38118e36d5_source.png",
+      "candidate_sha256": "8dd9a766110ba6d0315c276918f939f16ffe6122459beec1f2c646b3393928b5",
+      "source_sha256": "ae600b3a038d46cebc1d1f3584a98889e08185606555f0b8a59cb2b24a1fce73",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "View OutRun2SP arcade rankings!",
+      "approved_korean": "아웃런2 SP 아케이드 랭킹 보기",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1854,
+        178
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        58,
+        168,
+        2122,
+        601
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘아웃런2 SP 아케이드 랭킹 보기’ 승인 번역 일치, 자소 선명·방향 정상. 원본 평면 회색 대비 진한 외곽/약간의 입체 효과는 문구 독립 간이 QA에서 허용; 셀 안전영역 및 DDS 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2045/compare_3.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0027-8CF27F6F",
+      "ordinal": 133,
+      "candidate_file": "Q193_57b3061165d4d6b1_source_k.png",
+      "source_file": "Q193_57b3061165d4d6b1_source.png",
+      "candidate_sha256": "03b6d0dd47e430f827b746ef6c258a0ac238220bb66d389a8b9469fceab3e301",
+      "source_sha256": "5f1ad87d33b0483ea009f8c32f2531c506b7fd9bbc0c7f59631a16d1715e51fa",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "View OutRun single player rankings!",
+      "approved_korean": "아웃런 싱글 플레이 랭킹 보기",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1112,
+        177
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        33,
+        65,
+        2116,
+        603
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘아웃런 싱글 플레이 랭킹 보기’ 승인 번역 일치, 받침/내부 공간 읽힘. 원본 평면 회색 대비 다소 굵은 어두운 글자/외곽은 문구 독립 QA 허용; 원본 영문 ROI 좌단 ‘Vi’가 잘려 보이므로 원본 crop 사후 보완 권고, 후보 판정과 분리.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2045/compare_3.jpg"
+    }
+  ],
+  "summary": {
+    "qa_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+    "pass": 3,
+    "fail": 3,
+    "source_export_sha_verified": 6,
+    "png_rgba_verified": 6,
+    "producer_rework_dimensions": 6,
+    "no_imagegen": true,
+    "queue_unchanged": true,
+    "no_dds_deployment": true,
+    "c2_c3_game_unapproved": true,
+    "runtime_validation": "UNTESTED",
+    "purpose": "C1 independent QA of six unique, unapproved local A/B candidates; previous SHA checked"
+  }
+}
