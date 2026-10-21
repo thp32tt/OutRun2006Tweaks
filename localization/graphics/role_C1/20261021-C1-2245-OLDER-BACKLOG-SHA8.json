@@ -1,0 +1,575 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2245KST-OLDER-BACKLOG-SHA8",
+  "prior_reviewed_sha": 300,
+  "total_unreviewed_before": 18,
+  "count": 8,
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "ordinal": 92,
+      "candidate_file": "Q097_96e9f336e7f8446c_source_k.png",
+      "source_file": "Q097_96e9f336e7f8446c_source.png",
+      "candidate_sha256": "2acad784a404cecb8ebf3039d237964b143c87e9ce0a9b2d640c15e45500a99e",
+      "source_sha256": "dbb8cf526edc4163b51e33884e637548583b53de417cf6751048b63f91a422d5",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "seconds",
+      "approved_korean": "초",
+      "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "original_dimensions": [
+        711,
+        249
+      ],
+      "dimensions": [
+        2119,
+        742
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        689,
+        88,
+        1583,
+        686
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘초’ 글자가 승인 번역과 일치하며 단독 한글/외곽선으로 식별됨. 원문 주변의 Ferrari/2P/타 문구를 복제하지 않았고 경계 알파 잘림 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_1.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "ordinal": 93,
+      "candidate_file": "Q101_b524921be8864cda_source_k.png",
+      "source_file": "Q101_b524921be8864cda_source.png",
+      "candidate_sha256": "a0ac5150bc8a6f5ee9bd4d48a232a9bdebc8a28ffc3adc7612f9835ecdbfb8ff",
+      "source_sha256": "5ebd4e2bc427d0f810bbe1bff9ab58a4974799c15ebe2284714f16689e721d1c",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "original_dimensions": [
+        740,
+        329
+      ],
+      "dimensions": [
+        1881,
+        836
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        35,
+        128,
+        1501,
+        740
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘튜닝’의 자소와 받침이 식별되며 승인 번역과 일치. 원문의 붉은 배경판은 복제되지 않았고 글자/효과만 출력됨.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_1.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "ordinal": 94,
+      "candidate_file": "Q111_367c2226ed993362_source_k.png",
+      "source_file": "Q111_367c2226ed993362_source.png",
+      "candidate_sha256": "476ab24250e8bc8c0498fb429d4ba0c462286b7a42413a7de500b858bfcd66cd",
+      "source_sha256": "5e2ab20199e3aa2befe6924c8d029cd8fa829ba2db9c3eb45afeca22f1a63bb7",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Normal balance",
+      "approved_korean": "일반 밸런스",
+      "source_dds_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "original_dimensions": [
+        801,
+        360
+      ],
+      "dimensions": [
+        1870,
+        841
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        194,
+        88,
+        1612,
+        752
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘일반 밸런스’ 6음절이 일치하고 획·받침 판독 가능. 원본의 주황색 판·옆 문구나 컨트롤 아트 재생성 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_2.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "ordinal": 95,
+      "candidate_file": "Q205_4ea01e6106ac6443_source_k.png",
+      "source_file": "Q205_4ea01e6106ac6443_source.png",
+      "candidate_sha256": "158d7f93aab90ac1648b586525b36ccc9561cbe6a086b4ef9793258ec8d72d07",
+      "source_sha256": "e3ea518e214d6403decc34e82bdfd8e7e79fb69d92965bda28d191e6ef54be9a",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "NO",
+      "approved_korean": "아니오",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "original_dimensions": [
+        444,
+        300
+      ],
+      "dimensions": [
+        1526,
+        1031
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        65,
+        21,
+        1492,
+        1007
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘아니오’ 3음절이 일치하며 네이티브 이미지에서 판독 가능. 별도 배경/프레임·영어 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_2.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "ordinal": 96,
+      "candidate_file": "Q205_1606f7a0b5b4de5c_source_k.png",
+      "source_file": "Q205_1606f7a0b5b4de5c_source.png",
+      "candidate_sha256": "2206b64d0698ba006d37e948fe3a01bc0e2afba48e827e443e9f3f8f49115a58",
+      "source_sha256": "7fcf2cbd5987d30d933faf4edb97e22c53bc52866a84c6b7f0ef475b70582f8b",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "NO",
+      "approved_korean": "아니오",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "original_dimensions": [
+        444,
+        300
+      ],
+      "dimensions": [
+        1526,
+        1031
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        63,
+        67,
+        1492,
+        971
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘아니오’ 3음절이 일치하며 받침·내부 공간과 외곽선 유지. 별도 배경/프레임·영어 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0021-DA6AB878",
+      "ordinal": 101,
+      "candidate_file": "Q051_c165b62f63c4f86e_source_k.png",
+      "source_file": "Q051_c165b62f63c4f86e_source.png",
+      "candidate_sha256": "faa812d68b47a8ff2726a940a9eeb3aeb58ba608649c65390cdfa8f9ee004c64",
+      "source_sha256": "aa08b9fc7aca1780570990b0cf9a5ddae4a55067ee58e8def1d98a6f90c5de0b",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Leader!",
+      "approved_korean": "선두!",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        926,
+        363
+      ],
+      "dimensions": [
+        2048,
+        768
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        73,
+        51,
+        2034,
+        718
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘선두!’의 자소 및 느낌표가 일치. 원문의 HUD 경로/차량 아이콘/다른 문구를 복제하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0021-DA6AB878",
+      "ordinal": 102,
+      "candidate_file": "Q052_94ba15f4940e19ed_source_k.png",
+      "source_file": "Q052_94ba15f4940e19ed_source.png",
+      "candidate_sha256": "9bc04492fe57d7e4c1ab6a9c09fb947e327a39496b8144672dd3a3011be8d156",
+      "source_sha256": "979eca6ab7678b7f8aa800d2ace7739a31ca9d0a046d69f7affa86199aef864e",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Start",
+      "approved_korean": "출발",
+      "source_dds_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "original_dimensions": [
+        361,
+        193
+      ],
+      "dimensions": [
+        1774,
+        887
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        162,
+        53,
+        1754,
+        871
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘출발’ 2음절이 일치하고 판독 가능. 원문의 4P/3P/2P/1P 및 HUD 경로는 출력에서 제외됨.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_4.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0023-DAC9BDDC",
+      "ordinal": 111,
+      "candidate_file": "Q094_eb6629f5cc29cfa1_source_k.png",
+      "source_file": "Q094_eb6629f5cc29cfa1_source.png",
+      "candidate_sha256": "c6f60fdea24068274bf830bd34e8f738072fc947dc885342b917d74512751425",
+      "source_sha256": "ad1cb806734443392d89f8f447ed7ff38e3a87ca353e6474d5011cddd032f948",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "View Change Button :",
+      "approved_korean": "시점 변경 버튼:",
+      "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "original_dimensions": [
+        762,
+        275
+      ],
+      "dimensions": [
+        2169,
+        725
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        41,
+        23,
+        2151,
+        643
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘시점 변경 버튼:’의 전체 승인 번역 및 콜론 일치. 개별 자소/받침 판독 가능, 비문자 컨트롤 아이콘/영문 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2245/compare_4.jpg"
+    }
+  ],
+  "qa_summary": {
+    "png_text_only_pass": 8,
+    "png_text_only_fail": 0,
+    "remaining_unreviewed_after": 10,
+    "producer_REWORK_DIMENSIONS_not_overridden": true,
+    "disallowed_actions": "No ImageGen, A/B queue consumption, C2/C3, DDS or in-game PASS"
+  }
+}
