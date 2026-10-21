@@ -216,7 +216,15 @@ $runtimeFiles = @(
 foreach ($file in $runtimeFiles) {
     $src = Join-Path 'tools' $file
     if (-not (Test-Path $src)) { throw "Runtime packaging file missing: $src" }
-    Copy-Item $src (Join-Path $packageDir $file)
+    $dst = Join-Path $packageDir $file
+    Copy-Item $src $dst
+    # Windows PowerShell 5.1 treats UTF-8 without BOM as the active ANSI code
+    # page. Re-emit packaged PS1 launchers as UTF-8-with-BOM so Korean UI text
+    # cannot corrupt quotes/tokens on GitHub-hosted Windows runners or user PCs.
+    if ([IO.Path]::GetExtension($file) -ieq '.ps1') {
+        $utf8Text = Get-Content -LiteralPath $src -Raw -Encoding UTF8
+        Set-Content -LiteralPath $dst -Value $utf8Text -Encoding UTF8
+    }
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
 
