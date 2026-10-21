@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00975",
+  "production_id": "CONVERSION-DX11-00975",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_branch": "feature/dx11-00975-live-sm3-volume-frame",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00975",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "hold_resolution": "MISSING_RUN_RECORD_CREATED_AS_C6_BOOKKEEPING",
+  "implementation_sha": "c28b309655af0975ef2bd37af662bc3f4c086cbd",
+  "material_result_sha": "c28b309655af0975ef2bd37af662bc3f4c086cbd",
+  "validation_bearing_result_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791",
+  "result_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791",
+  "source_head": "8de9d01e28ac678db0cc5a91a44bec7e2661a791",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "feature_stage": "LIVE_SM3_SAMPLER3D_NATIVE_VOLUME_TEXTURE_AND_DRAW_INTEGRATED",
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Support actual D3D9 SM3 volume texture sampling (Texture3D, implicit/explicit LOD and gradients) in D3D11 native game VS/PS Draw/DrawIndexed via bounded CPU-readable volume mip/slice mirroring, without replacing the original DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_volume_texture3d",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_vs_ps_sampler3d_and_draw",
+        "expected_behavior": "Reflect D3DSTT_VOLUME with native Texture3D codegen, VS/PS volume sampler masks and D3D9 volume texture source to an immutable D3D11 Texture3D SRV."
+      },
+      {
+        "id": "volume_fail_closed_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_dx9ex_render_and_input",
+        "expected_behavior": "Reject inaccessible/GPU-only, mismatched, out-of-bounds or unsupported volume sources rather than generating speculative native pixels; retain original D3D9 Draw/input/FFB fallback."
+      },
+      {
+        "id": "five_same_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_openxr_backend_build_hud",
+        "expected_behavior": "Five mandatory GitHub Actions success at the exact validation-bearing source SHA, without re-running CI for C6 bookkeeping."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_sm3_volume_texture3d": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_volume_texture.hpp",
+        "src/vr/d3d11/native_backend.hpp"
+      ],
+      "validation_command": "Exact-SHA DX11 Fast Structural Checks #39621104112 and Build #39621103924 concluded success; actual game visual output UNTESTED."
+    },
+    "volume_fail_closed_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_volume_budget.hpp",
+        "tools/dx11_live_sm3_volume_00975.cpp",
+        "tools/test_dx11_live_sm3_volume_00975.py",
+        "tools/test_dx11_native_address_mirror_00591.py"
+      ],
+      "validation_command": "Exact-SHA DX11 Fast #39621104112 and Backend Conversion Gate #39621104113 success; hardware fallback UNTESTED."
+    },
+    "five_same_sha_ci": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml"
+      ],
+      "validation_command": "Five mandatory GitHub Actions conclusions success for 8de9d01e28ac678db0cc5a91a44bec7e2661a791; no workflow manually re-run."
+    }
+  },
+  "ci": {
+    "exact_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "gates": {
+      "DX11 Fast Structural Checks": {
+        "id": 39621104112,
+        "conclusion": "success",
+        "head_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791"
+      },
+      "Backend Conversion Gate": {
+        "id": 39621104113,
+        "conclusion": "success",
+        "head_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791"
+      },
+      "Build": {
+        "id": 39621103924,
+        "conclusion": "success",
+        "head_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791"
+      },
+      "OpenXR VR architecture": {
+        "id": 39621103951,
+        "conclusion": "success",
+        "head_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "id": 39621104111,
+        "conclusion": "success",
+        "head_sha": "8de9d01e28ac678db0cc5a91a44bec7e2661a791"
+      }
+    },
+    "conclusion": "success"
+  },
+  "change_classes": {
+    "implementation_commit": "c28b309655af0975ef2bd37af662bc3f4c086cbd",
+    "exact_sha_ci_repair_commits": [
+      "64e8ecfc1197e393337c81bb78e1faedfe90d163",
+      "839c70db119ef14337bb273a1401a4cc2b718e43",
+      "47c52aec50ef474d205f558c5123ad6a663ea587",
+      "a8123190406d66b38647e6b72ba2c158c00a28a4",
+      "8bdc256756f6ec4ff7a82fba815ea21406b8d82b",
+      "609fa19c26c458a52ed2957b8e8ad1332dc7df18",
+      "8de9d01e28ac678db0cc5a91a44bec7e2661a791"
+    ],
+    "c6_checkpoint_commit": "SEPARATE_DOCS_ONLY_AFTER_MATERIAL_SHA"
+  },
+  "pipeline": {
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA for existing source commit; actual OutRun gameplay and Quest3 HMD UNTESTED; RUN_RECORD_NOT_FOUND reconciled by one docs-only [skip ci] record."
+  },
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00975",
+  "score_status": "C6_RECONCILIATION_ONLY_NO_DUPLICATE_SCORING",
+  "bookkeeping_only": true,
+  "runtime_blocker": "Actual matching OutRun game and Quest 3 HMD runtime evidence not performed; feature CI cannot prove displayed native gameplay frames.",
+  "next_action": "User-run actual OutRun desktop/HMD test if required; do not count this C6 reconciliation as a new production achievement."
+}
