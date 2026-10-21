@@ -25,11 +25,14 @@ def integrated(x,h):
         "captured.texture.Get()" in block,
         "captured.srgbTexture, chain, cube, volume" in block,
         "draw_mirror_cache::same_view(key, previous.key)" in block,
+        "draw_mirror_cache::mirrored_source_levels(" in block,
+        "draw_mirror_cache::cached_sampler_compatible(" in block,
+        "previous.levels, sourceLevels, chain, sourceLod," in block,
         "create_game_sampler(device, captured, previous.levels, sampler)" in block,
         "view = previous.view" in block,
         "mirror_texture(device, captured, view, sampler)" in block,
         "captured.cubeTexture->GetLevelCount()" in block,
-        "drawMirrors[drawMirrorCount++] = {key, levels, view};" in block,
+        "drawMirrors[drawMirrorCount++] = {key, mirrorLevels, view};" in block,
         "mirror_cube_texture(dev, capture, view, sampler)" in x,
         "create_game_sampler(dev, capture, uploadedLevels, sampler)" in x,
         start < vs < ps < native,
@@ -37,7 +40,11 @@ def integrated(x,h):
         "a.volume == b.volume" in h,
     ))
 assert integrated(src,hdr)
-for needle in ("captured.cubeTexture.Get()","captured.cubeTexture->GetLevelCount()",
+for needle in ("draw_mirror_cache::mirrored_source_levels(",
+               "draw_mirror_cache::cached_sampler_compatible(",
+               "previous.levels, sourceLevels, chain, sourceLod,",
+               "drawMirrors[drawMirrorCount++] = {key, mirrorLevels, view};",
+               "captured.cubeTexture.Get()","captured.cubeTexture->GetLevelCount()",
                "create_game_sampler(device, captured, previous.levels, sampler)",
                """(static_cast<unsigned>(captured.texture != nullptr) +
              static_cast<unsigned>(captured.cubeTexture != nullptr) +

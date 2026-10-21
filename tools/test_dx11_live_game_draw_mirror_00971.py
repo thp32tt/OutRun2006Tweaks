@@ -18,6 +18,9 @@ def integrated(x):
     return all((
         "std::array<DrawMirror, 20u> drawMirrors{}" in x,
         "draw_mirror_cache::same_view(key, previous.key)" in block,
+        "draw_mirror_cache::mirrored_source_levels(" in block,
+        "draw_mirror_cache::cached_sampler_compatible(" in block,
+        "previous.levels, sourceLevels, chain, sourceLod," in block,
         "create_game_sampler(device, captured, previous.levels, sampler)" in block,
         "view = previous.view" in block,
         "mirror_texture(device, captured, view, sampler)" in block,
@@ -25,7 +28,7 @@ def integrated(x):
         """(static_cast<unsigned>(captured.texture != nullptr) +
              static_cast<unsigned>(captured.cubeTexture != nullptr) +
              static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u""" in block,
-        "drawMirrors[drawMirrorCount++] = {key, levels, view};" in block,
+        "drawMirrors[drawMirrorCount++] = {key, mirrorLevels, view};" in block,
         start < v < p < draw,
         "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in x,
         "a.srgb == b.srgb" in hdr,
@@ -34,7 +37,11 @@ def integrated(x):
         "a.volume == b.volume" in hdr,
     ))
 assert integrated(src)
-for needle in ("draw_mirror_cache::same_view(key, previous.key)",
+for needle in ("draw_mirror_cache::mirrored_source_levels(",
+               "draw_mirror_cache::cached_sampler_compatible(",
+               "previous.levels, sourceLevels, chain, sourceLod,",
+               "drawMirrors[drawMirrorCount++] = {key, mirrorLevels, view};",
+               "draw_mirror_cache::same_view(key, previous.key)",
                "create_game_sampler(device, captured, previous.levels, sampler)",
                "view = previous.view",
                """(static_cast<unsigned>(captured.texture != nullptr) +
