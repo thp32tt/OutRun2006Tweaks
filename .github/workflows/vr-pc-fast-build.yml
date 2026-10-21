@@ -47,25 +47,20 @@ jobs:
           fetch-depth: 1
           clean: false
 
-      - name: Skip stale queued push
+      - name: Verify exact SHA checkout
         if: ${{ github.event_name == 'push' }}
         shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           $checkedOut = (git rev-parse HEAD).Trim()
           $triggerSha = '${{ github.sha }}'
           if ($checkedOut -ne $triggerSha) { throw "PC Fast checkout drift: expected=$triggerSha actual=$checkedOut" }
-          # SHA-pinned checkout alone is insufficient. An older queued push
-          # must not overwrite LATEST after a newer branch commit.
-          $remote = @(git ls-remote --heads origin refs/heads/vr-d3d9ex-focus)
-          if ($LASTEXITCODE -ne 0 -or $remote.Count -ne 1) { throw 'PC Fast cannot verify current remote branch HEAD' }
-          $currentSha = ($remote[0] -split '\s+')[0]
-          if ($currentSha -ne $triggerSha) {
-            Write-Host "PC Fast stale push skipped: trigger=$triggerSha remote=$currentSha"
-            "OUTRUN_PC_STALE=true" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-          }
+          # GitHub-hosted artifacts are immutable and SHA-named. Do not discard
+          # a valid exact-SHA test package merely because review/docs commits
+          # advance the branch while this clean Windows build is queued.
+          Write-Host "PC Fast exact-SHA hosted build retained: $triggerSha"
 
       - name: Fast incremental build and local package
-        if: ${{ env.OUTRUN_PC_STALE != 'true' }}
+
         shell: powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -Command ". '{0}'"
         run: |
           # Parse the ACTUAL script before running it; a concatenated, truncated
@@ -98,7 +93,7 @@ jobs:
           "- Build policy: exact SHA pinned; x86 R26+HUD compiled DLL and manifest SHA256 must agree`n          - Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
       - name: Upload PC fast artifact
-        if: ${{ env.OUTRUN_PC_STALE != 'true' && (github.event_name == 'push' || inputs.upload_artifact) }}
+        if: ${{ github.event_name == 'push' || inputs.upload_artifact }}
         uses: actions/upload-artifact@v4
         with:
           name: OutRun2-VR-PC-FAST-${{ github.sha }}
