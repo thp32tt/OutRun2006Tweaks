@@ -2354,6 +2354,53 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     return true;
 }
 
+// One shared live-game stencil admission for fixed-function and SM3 sources.
+// A per-Draw D3D9 read is required: stale scene state cannot authorize a
+// D3D11 Draw. Both raster paths keep using the original D3D9 game draw as
+// fallback; no native stencil attachment is created for proven inert tests.
+bool game_live_stencil_inert(IDirect3DDevice9* game, DWORD enabled) noexcept {
+    if (enabled == FALSE) return true;
+    if (enabled != TRUE || !game) return false;
+    DWORD frontFunc = 0u, backFunc = 0u, writeMask = 0xffffffffu;
+    DWORD twoSided = TRUE;
+    if (FAILED(game->GetRenderState(D3DRS_STENCILFUNC, &frontFunc)) ||
+        FAILED(game->GetRenderState(D3DRS_STENCILWRITEMASK, &writeMask)) ||
+        FAILED(game->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)) ||
+        (twoSided != FALSE && twoSided != TRUE))
+        return false;
+    if (twoSided == TRUE &&
+        FAILED(game->GetRenderState(D3DRS_CCW_STENCILFUNC, &backFunc)))
+        return false;
+    GameNativeStencilEvidence evidence{};
+    evidence.enabled = evidence.known = true;
+    evidence.twoSided = twoSided == TRUE;
+    evidence.frontCompare = frontFunc;
+    evidence.backCompare = backFunc;
+    evidence.writeMask = writeMask;
+    // Do not query irrelevant operations when hardware write masking
+    // guarantees zero changes. Otherwise prove KEEP on both face paths.
+    if (writeMask != 0u) {
+        constexpr D3DRENDERSTATETYPE frontStates[3] = {
+            D3DRS_STENCILFAIL, D3DRS_STENCILZFAIL, D3DRS_STENCILPASS};
+        constexpr D3DRENDERSTATETYPE backStates[3] = {
+            D3DRS_CCW_STENCILFAIL, D3DRS_CCW_STENCILZFAIL,
+            D3DRS_CCW_STENCILPASS};
+        for (unsigned i = 0u; i < 3u; ++i) {
+            DWORD value = 0u;
+            if (FAILED(game->GetRenderState(frontStates[i], &value)))
+                return false;
+            evidence.frontOps[i] = value;
+            if (evidence.twoSided) {
+                if (FAILED(game->GetRenderState(backStates[i], &value)))
+                    return false;
+                evidence.backOps[i] = value;
+            }
+        }
+        evidence.operationsKnown = true;
+    }
+    return GameNativeInertStencilMrt::draw_inert(evidence);
+}
+
 // A native diagnostic draw must originate in the same primary game backbuffer
 // to which before_game_present() will upload its GPU-fenced inset. An auxiliary
 // render-to-texture pass cannot be promoted solely by D3D9 device identity.
@@ -2511,7 +2558,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
          SUCCEEDED(game->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)));
     if (!GameNativeInertStencilMrt::stencil_equivalent_to_disabled(
             stencil != FALSE, stencilKnown, stencilFunc,
-            stencilWriteMask, twoSided != FALSE))
+            stencilWriteMask, twoSided != FALSE) &&
+        !game_live_stencil_inert(game, stencil))
         return false;
     if (fullFrame) {
         // Live menu/vehicle/race Draws can leave MRT1..3 bound with their
@@ -4810,7 +4858,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
          SUCCEEDED(game->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)));
     if (!GameNativeInertStencilMrt::stencil_equivalent_to_disabled(
             stencil != FALSE, stencilKnown, stencilFunc,
-            stencilWriteMask, twoSided != FALSE))
+            stencilWriteMask, twoSided != FALSE) &&
+        !game_live_stencil_inert(game, stencil))
         return false;
     // The native SM3 frame has exactly one color output. Extra D3D9 game
     // targets can remain bound across menu/car/race Draws, but only when
