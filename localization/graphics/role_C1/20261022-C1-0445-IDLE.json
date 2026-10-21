@@ -1,0 +1,34 @@
+{
+  "run_key": "OUTRUN-C1-20261022T0445KST-SHA-RECHECK",
+  "checked_at_kst": "2026-10-22 04:45",
+  "lane": "C1",
+  "scope": "A_B_N100_LOCAL_GENERATED_KOREAN_PNG_INDEPENDENT_QA",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "authoritative_policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence_source": "N100 work/image-src/text_roi_batches/{export_evidence,candidate_outputs,inputs,production_manifest.json} and work/c1_batch_*/{report,metrics}.json",
+  "verification": "sha256 of existing candidate bytes cross-compared with producer evidence and historical reviewed SHA; source/candidate file existence checked",
+  "snapshot": {
+    "historical_report_files": 53,
+    "historical_reviewed_sha_count": 318,
+    "export_evidence_files": 66,
+    "exported_candidate_records": 313,
+    "unique_candidate_sha256": 313,
+    "new_unreviewed_unique_sha256": 0,
+    "invalid_candidate_sha256_claims": 0,
+    "missing_source_or_candidate_files": 0
+  },
+  "new_reviews": [],
+  "status": "IDLE",
+  "reason": "All 313 unique exported candidate PNG SHA256 values already appear in prior C1 review evidence. No eligible new SHA for independent review.",
+  "no_new_imagegen": true,
+  "no_A_B_queue_consumption": true,
+  "no_new_dds": true,
+  "no_C2_C3_user_ingame_pass": true,
+  "runtime_validation": "UNTESTED",
+  "duplicate_score_award": false,
+  "local_inventory": "work/c1_20261022_0445_inventory_result.json"
+}
