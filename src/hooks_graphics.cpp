@@ -243,30 +243,18 @@ static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
     // displace the camera, force a near plane, or hide any occupant.
     if (!camera || !Game::pl_car())
         return false;
-    // Native camera switch at EXE RVA 0x84A40 uses +0x340/+0x344.
-    // Require those counters to settle before ENTERING the selected view, but
-    // do not let later one-frame counter pulses repeatedly eject an already
-    // stable cockpit back to the stock bumper camera. The legacy mode/timer
-    // remains authoritative for a real camera switch and clears this latch.
-    static thread_local bool nativeViewSettledLatched = false;
-    static thread_local const EvWorkCamera* lastNativeCamera = nullptr;
-    if (camera != lastNativeCamera)
-    {
-        nativeViewSettledLatched = false;
-        lastNativeCamera = camera;
-    }
-    if (!OutRunVR::DriverSeatCamera::StableNativeViewEligible(
+    // DriverSeatView owns the cockpit for the whole playable session.
+    // Do NOT use the game's native camera mode/timer/switch counters as an
+    // OFF switch: those values can change while the stock camera controller
+    // updates, which previously prevented entry or repeatedly bounced the
+    // view back to the native bumper camera.
+    if (!OutRunVR::DriverSeatCamera::PersistentDriverSeatSessionEligible(
             Settings::VREnabled && Settings::VRDriverSeatView,
-            VRDriverSeatGameplayActive(), camera->cam_mode_timer_364,
-            static_cast<int>(camera->cam_mode_34A),
-            Settings::VRDriverSeatNativeMode.get(),
-            camera->word340, camera->word344,
-            nativeViewSettledLatched))
+            VRDriverSeatGameplayActive()))
         return false;
 
-    // Native scene/mode eligibility is now stable for this camera session.
-    // Check the selected pose once and use this SAME result for camera, body,
-    // driver and near clip.
+    // Validate the seat pose itself, but camera-mode transitions no longer
+    // deactivate the cockpit. Use the same result for camera/body/driver/near.
     D3DVECTOR correctedPosition{}, correctedLook{};
     return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
 }
