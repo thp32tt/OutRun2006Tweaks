@@ -146,5 +146,15 @@ int main()
     if (StableNativeViewEligible(true, true, 0.f, 2, 1, 0, 0,
             settledLatch) || settledLatch)
         return 23;
+    // Live DriverSeatView no longer depends on native camera mode/timer/
+    // switch counters. Only explicit enable + playable gameplay own the
+    // session-level ON/OFF state.
+    using OutRunVR::DriverSeatCamera::PersistentDriverSeatSessionEligible;
+    if (!PersistentDriverSeatSessionEligible(true, true))
+        return 24;
+    if (PersistentDriverSeatSessionEligible(false, true) ||
+        PersistentDriverSeatSessionEligible(true, false))
+        return 25;
+
     return 0;
 }
