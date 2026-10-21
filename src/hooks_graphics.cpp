@@ -36,6 +36,7 @@ namespace Settings
 	extern Setting<bool> VREnabled;
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRTelemetry;
+    extern Setting<bool> VREvidenceTrace;
 	extern Setting<bool> VRMirrorFitDesktop;
     extern Setting<bool> VRMirrorPreserveAspect;
     extern Setting<bool> VRAutoRenderResolution;
@@ -201,12 +202,15 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     }
 
     OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
-    if (OutRunVR::DriverSeatCamera::ComputeCarAnchoredSeatPose(
+    bool usedLastValid = false;
+    const bool freshPose =
+        OutRunVR::DriverSeatCamera::ComputeCarAnchoredSeatPose(
             carOrigin, axes,
             Settings::VRDriverSeatForward.get(),
             Settings::VRDriverSeatRight.get(),
             Settings::VRDriverSeatUp.get(),
-            newPos, newLook))
+            newPos, newLook);
+    if (freshPose)
     {
         lastPosition = newPos;
         lastLook = newLook;
@@ -216,14 +220,43 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
     {
         newPos = lastPosition;
         newLook = lastLook;
+        usedLastValid = true;
     }
     else
     {
+        if (Settings::VREvidenceTrace)
+            spdlog::info(
+                "VR EVIDENCE COCKPIT pose=FAIL_NO_FALLBACK camera={} player={} gameState={} origin={},{},{} forward={},{},{} up={},{},{} offsets={},{},{}",
+                static_cast<const void*>(camera),
+                static_cast<const void*>(player),
+                Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+                carOrigin.x, carOrigin.y, carOrigin.z,
+                axes.forward.x, axes.forward.y, axes.forward.z,
+                axes.up.x, axes.up.y, axes.up.z,
+                Settings::VRDriverSeatForward.get(),
+                Settings::VRDriverSeatRight.get(),
+                Settings::VRDriverSeatUp.get());
         return false;
     }
 
     translatedPosition = {newPos.x, newPos.y, newPos.z};
     translatedLook = {newLook.x, newLook.y, newLook.z};
+    if (Settings::VREvidenceTrace)
+        spdlog::info(
+            "VR EVIDENCE COCKPIT pose={} camera={} player={} gameState={} origin={},{},{} forward={},{},{} up={},{},{} offsets={},{},{} seat={},{},{} look={},{},{} lastValid={} playerChanged={}",
+            usedLastValid ? "HELD_LAST_VALID" : "FRESH_CAR_ANCHOR",
+            static_cast<const void*>(camera), static_cast<const void*>(player),
+            Game::current_mode ? static_cast<int>(*Game::current_mode) : -1,
+            carOrigin.x, carOrigin.y, carOrigin.z,
+            axes.forward.x, axes.forward.y, axes.forward.z,
+            axes.up.x, axes.up.y, axes.up.z,
+            Settings::VRDriverSeatForward.get(),
+            Settings::VRDriverSeatRight.get(),
+            Settings::VRDriverSeatUp.get(),
+            newPos.x, newPos.y, newPos.z,
+            newLook.x, newLook.y, newLook.z,
+            hasLastValidPose ? 1 : 0,
+            player != lastPlayer ? 1 : 0);
     return true;
 }
 
@@ -243,26 +276,50 @@ static bool VRDriverSeatGameplayActive() noexcept
 
 static bool VRDriverSeatCameraEligible(const EvWorkCamera* camera) noexcept
 {
-    if (!OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass())
+    const bool renderPassOk =
+        OutRunVR::DriverSeatRenderPass::IsWorldOrCockpitPass();
+    const bool haveCamera = camera != nullptr;
+    const bool havePlayer = Game::pl_car() != nullptr;
+    const bool gameplay = VRDriverSeatGameplayActive();
+    if (!renderPassOk || !haveCamera || !havePlayer)
+    {
+        if (Settings::VREvidenceTrace)
+            spdlog::info(
+                "VR EVIDENCE COCKPIT eligible=0 reason=PRECONDITION renderPass={} camera={} player={} gameplay={} enabled={} view={}",
+                renderPassOk ? 1 : 0, haveCamera ? 1 : 0,
+                havePlayer ? 1 : 0, gameplay ? 1 : 0,
+                Settings::VREnabled ? 1 : 0,
+                Settings::VRDriverSeatView ? 1 : 0);
         return false;
-    // A missing player vehicle has no seat geometry to render. Do not
-    // displace the camera, force a near plane, or hide any occupant.
-    if (!camera || !Game::pl_car())
-        return false;
+    }
     // DriverSeatView owns the cockpit for the whole playable session.
     // Do NOT use the game's native camera mode/timer/switch counters as an
     // OFF switch: those values can change while the stock camera controller
     // updates, which previously prevented entry or repeatedly bounced the
     // view back to the native bumper camera.
     if (!OutRunVR::DriverSeatCamera::PersistentDriverSeatSessionEligible(
-            Settings::VREnabled && Settings::VRDriverSeatView,
-            VRDriverSeatGameplayActive()))
+            Settings::VREnabled && Settings::VRDriverSeatView, gameplay))
+    {
+        if (Settings::VREvidenceTrace)
+            spdlog::info(
+                "VR EVIDENCE COCKPIT eligible=0 reason=SESSION_GATE gameplay={} enabled={} view={}",
+                gameplay ? 1 : 0, Settings::VREnabled ? 1 : 0,
+                Settings::VRDriverSeatView ? 1 : 0);
         return false;
+    }
 
     // Validate the seat pose itself, but camera-mode transitions no longer
     // deactivate the cockpit. Use the same result for camera/body/driver/near.
     D3DVECTOR correctedPosition{}, correctedLook{};
-    return VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
+    const bool poseOk =
+        VRDriverSeatCameraPose(camera, correctedPosition, correctedLook);
+    if (Settings::VREvidenceTrace)
+        spdlog::info(
+            "VR EVIDENCE COCKPIT eligible={} reason={} seat={},{},{} look={},{},{}",
+            poseOk ? 1 : 0, poseOk ? "POSE_OK" : "POSE_FAIL",
+            correctedPosition.x, correctedPosition.y, correctedPosition.z,
+            correctedLook.x, correctedLook.y, correctedLook.z);
+    return poseOk;
 }
 
 class VRDriverSeatRenderTest : public Hook
