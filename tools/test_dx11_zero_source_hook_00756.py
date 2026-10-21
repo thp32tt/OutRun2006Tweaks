@@ -19,7 +19,8 @@ def integrated(r,b,h,p):
         return False
     for a,z,expensive in (
         ("void R30ObserveNativeLinearVB(","void R30ObserveNativeIndexedVB(","GetStreamSource("),
-        ("void R30ObserveNativeIndexedVB(","void R30ObserveNativeIndexedUP(","GetStreamSource("),
+        ("void R30ObserveNativeIndexedVB(","void R30ObserveNativeLinearUP(","GetStreamSource("),
+        ("void R30ObserveNativeLinearUP(","void R30ObserveNativeIndexedUP(","live::game_native_primitive_element_count("),
         ("void R30ObserveNativeIndexedUP(","void R30CompleteNativeGameSource(","!numVertices"),
     ):
         s=part(r,a,z)
@@ -43,12 +44,13 @@ def integrated(r,b,h,p):
              "s.clearColor.sourceDevice ==" in source) and
             "live_game_frame::observe_failed_game_draw(device)" in complete and
             hooks.count("R30CompleteNativeGameSource(device,")>=4 and
-            "live_game_frame::observe_linear(" in hooks)
+            "R30ObserveNativeLinearUP(device, type, primitiveCount, data, stride);" in hooks)
 
 assert integrated(r30,bridge,header,primitive),"real R30 zero Draw source cannot reach native bridge"
 for a,z,_ in (
     ("void R30ObserveNativeLinearVB(","void R30ObserveNativeIndexedVB(",0),
-    ("void R30ObserveNativeIndexedVB(","void R30ObserveNativeIndexedUP(",0),
+    ("void R30ObserveNativeIndexedVB(","void R30ObserveNativeLinearUP(",0),
+    ("void R30ObserveNativeLinearUP(","void R30ObserveNativeIndexedUP(",0),
     ("void R30ObserveNativeIndexedUP(","void R30CompleteNativeGameSource(",0),
 ):
     begin=r30.index(a);end=r30.index(z,begin+len(a))
