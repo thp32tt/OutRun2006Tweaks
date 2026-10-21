@@ -37,7 +37,9 @@ def wired(s: str) -> bool:
         "state.AddressU = translateAddress(capture.addressU);",
         "state.AddressV = translateAddress(capture.addressV);",
         "if (!state.AddressU || !state.AddressV) return false;",
-        "state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;",
+        "state.AddressW = capture.cubeTexture ?",
+        "translateAddress(capture.addressW) : D3D11_TEXTURE_ADDRESS_CLAMP;",
+        "if (!state.AddressW) return false;",
         "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
     ]
     draw_required = [
@@ -78,6 +80,8 @@ def main() -> None:
         ("default: return static_cast<D3D11_TEXTURE_ADDRESS_MODE>(0);", "default: return D3D11_TEXTURE_ADDRESS_CLAMP;"),
         ("state.AddressU = translateAddress(capture.addressU);", "state.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;"),
         ("state.AddressV = translateAddress(capture.addressV);", "state.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;"),
+        ("translateAddress(capture.addressW) : D3D11_TEXTURE_ADDRESS_CLAMP;", "D3D11_TEXTURE_ADDRESS_CLAMP : D3D11_TEXTURE_ADDRESS_CLAMP;"),
+        ("if (!state.AddressW) return false;", "if (false) return false;"),
         ("if (!state.AddressU || !state.AddressV) return false;", "if (false) return false;"),
         ("capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);", "capture.addressU = D3DTADDRESS_CLAMP;"),
         ("capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);", "capture.addressV = D3DTADDRESS_CLAMP;"),
