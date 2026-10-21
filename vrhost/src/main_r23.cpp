@@ -82,8 +82,8 @@ namespace
             char value[32]{};
             const DWORD n = GetEnvironmentVariableA(
                 "OUTRUN_VR_EVIDENCE_TRACE", value,
-                static_cast<DWORD>(std::size(value)));
-            if (!n || n >= std::size(value))
+                static_cast<DWORD>(sizeof(value)));
+            if (!n || n >= sizeof(value))
                 return false;
             return _stricmp(value, "1") == 0 ||
                 _stricmp(value, "true") == 0 ||
