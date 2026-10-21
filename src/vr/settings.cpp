@@ -180,6 +180,14 @@ namespace Settings
 		{ "WorldView * HeadInverse * Projection", "World * HeadInverse * View * Projection" } };
 	Setting<bool> VRTelemetry{ "VR", "Telemetry", true,
 		"Logs renderer-boundary verification, stereo draw duplication, pose source/fallback and head-tracking diagnostics." };
+    Setting<bool> VREvidenceTrace{ "VR", "EvidenceTrace", false,
+        "Heavy developer evidence mode. Logs every relevant D3D9 draw route/state snapshot, D3DX batch transition, cockpit anchor decision, Present outcome and host OpenXR submission. Intentionally expensive; use only for debugging." };
+    Setting<int> VREvidenceTraceMaxDrawsPerFrame{ "VR", "EvidenceTraceMaxDrawsPerFrame", 8192,
+        "Maximum detailed D3D9 draw records per Present while EvidenceTrace is enabled. 0 = unlimited. High values can cause severe frame stutter and very large logs.", Range<int>{ 0, 65535 } };
+    Setting<bool> VREvidenceTraceMatrices{ "VR", "EvidenceTraceMatrices", true,
+        "EvidenceTrace: include full world/view/projection matrix snapshots on detailed D3D9 draw records." };
+    Setting<bool> VREvidenceTraceFlushEveryPresent{ "VR", "EvidenceTraceFlushEveryPresent", true,
+        "EvidenceTrace: flush the game log at every Present so a crash still leaves the latest evidence on disk. Intentionally expensive." };
 }
 
 namespace OutRunVR
@@ -228,6 +236,8 @@ namespace OutRunVR
 					Settings::VRDirectGpuOnly ? "1" : "0");
 				SetEnvironmentVariableA("OUTRUN_VR_DISABLE_DESKTOP_DUPLICATION",
 					Settings::VRDisableDesktopDuplication ? "1" : "0");
+                SetEnvironmentVariableA("OUTRUN_VR_EVIDENCE_TRACE",
+                    Settings::VREvidenceTrace ? "1" : "0");
 				const std::string refreshHz =
 					std::to_string(Settings::VRTargetRefreshRateHz.get());
 				SetEnvironmentVariableA("OUTRUN_VR_TARGET_REFRESH_HZ",
