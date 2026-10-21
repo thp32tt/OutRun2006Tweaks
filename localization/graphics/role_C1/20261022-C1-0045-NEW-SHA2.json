@@ -1,0 +1,160 @@
+{
+  "run_key": "OUTRUN-C1-20261022T0045KST-SHA-NEW",
+  "prior_reviewed_sha": 316,
+  "total_unreviewed_before": 2,
+  "count": 2,
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0024-9BDE43D8",
+      "ordinal": 115,
+      "candidate_file": "Q205_f5593859251b7fdf_source_k.png",
+      "source_file": "Q205_f5593859251b7fdf_source.png",
+      "candidate_sha256": "7c4100c25acea0293fe656b00bf936eccfed775cfe3d643c7029acfb0bee53d1",
+      "source_sha256": "a0de1afc311b9b292c1ce88daed3933a9fe6840358147132491ddf70901a3902",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "LOCAL MT",
+      "approved_korean": "로컬 MT",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "original_dimensions": [
+        527,
+        216
+      ],
+      "dimensions": [
+        1959,
+        803
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        145,
+        133,
+        1634,
+        707
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘로컬 MT’가 승인 번역과 일치하며 ‘로컬’의 음절·받침 및 ‘MT’가 명료함. 원본 NORMAL/황색 UI 요소나 잔여 영문·불필요한 프레임을 출력물에 복제하지 않음. 투명 RGBA 확인.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_0045/compare_1.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0024-9BDE43D8",
+      "ordinal": 116,
+      "candidate_file": "Q051_28d7d23a577531eb_source_k.png",
+      "source_file": "Q051_28d7d23a577531eb_source.png",
+      "candidate_sha256": "3ded2e6eaff5e7eeaeb4f9f43cf613e9722679e85fcd9a49894962dca0b4ad16",
+      "source_sha256": "6ada22f3b0dadaeea885eca9dba583eed283e519d71daebc8931436c5c76d20b",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Lap Time",
+      "approved_korean": "랩 타임",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "original_dimensions": [
+        813,
+        318
+      ],
+      "dimensions": [
+        2005,
+        784
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        91,
+        19,
+        1983,
+        702
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘랩 타임’이 승인 번역과 일치하고 획·받침·외곽선이 명료함. 원본의 주변 영문/배경 장면·고스트 카드 문구와 프레임은 출력물에 없음. 투명 RGBA 확인.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261022_0045/compare_1.jpg"
+    }
+  ],
+  "qa_date_kst": "2026-10-22 00:45",
+  "qa_scope": "C1_INDEPENDENT_LIGHT_QA_OF_A_B_LOCAL_PNG",
+  "post_review_unreviewed_in_snapshot": 0,
+  "no_new_imagegen": true,
+  "no_A_B_queue_consumption": true,
+  "no_new_dds": true,
+  "no_C2_C3_runtime_pass": true,
+  "overall": "2_NEW_SHA_REVIEWED_TEXT_ONLY_PASS_REWORK_DIMENSIONS_PRESERVED",
+  "reviewed_sha": [
+    "7c4100c25acea0293fe656b00bf936eccfed775cfe3d643c7029acfb0bee53d1",
+    "3ded2e6eaff5e7eeaeb4f9f43cf613e9722679e85fcd9a49894962dca0b4ad16"
+  ]
+}
