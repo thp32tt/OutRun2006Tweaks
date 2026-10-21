@@ -278,19 +278,25 @@ for required in (
     check(required not in source.replace(required, "", 1),
           "source mutation failed to remove required VS/PS binding: " + required)
 
-# The D3D9 vertex sampler namespace and pixel sampler namespace must each
-# select their own cube flag before touching the native GPU.
-for stage, mask in (("true", "vertexCubeSamplerMask"),
-                    ("false", "pixelCubeSamplerMask")):
+# D3D9 vertex and pixel shader namespaces independently select the real
+# 2D, cube or volume dimension. Both cube and volume flags participate in
+# the same fail-closed game texture capture, not a synthetic native source.
+for stage, cube_mask, volume_mask in (
+    ("true", "vertexCubeSamplerMask", "vertexVolumeSamplerMask"),
+    ("false", "pixelCubeSamplerMask", "pixelVolumeSamplerMask"),
+):
     capture_pattern = (
         r"capture_live_sm3_sampler\(\s*game,\s*slot,\s*capture,\s*" +
-        stage + r"\s*,\s*\(pipeline\.program\." + mask +
+        stage + r"\s*,\s*\(pipeline\.program\." + cube_mask +
+        r"\s*&\s*\(1u\s*<<\s*slot\)\)\s*!=\s*0u\s*,\s*"
+        r"\(pipeline\.program\." + volume_mask +
         r"\s*&\s*\(1u\s*<<\s*slot\)\)\s*!=\s*0u\)"
     )
     check(re.search(capture_pattern, source) is not None,
-          "missing stage-owned live SM3 sampler/cube dispatch: " + mask)
-    check(re.search(capture_pattern, source.replace(mask, "removed_mask", 1)) is None,
-          "sampler cube negative mutation survived: " + mask)
+          "missing stage-owned live SM3 cube/volume dispatch: " + cube_mask)
+    for mask in (cube_mask, volume_mask):
+        check(re.search(capture_pattern, source.replace(mask, "removed_mask", 1)) is None,
+              "sampler dimension negative mutation survived: " + mask)
 
 # Programmable shader translation must admit only actually-read TEMP lanes:
 # native VS/PS code generation consumes the helper directly; real unwritten
