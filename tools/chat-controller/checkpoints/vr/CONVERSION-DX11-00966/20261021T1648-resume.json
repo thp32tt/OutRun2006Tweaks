@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "vr_queue_checkpoint",
-  "purpose": "rollover_resume_verified",
+  "purpose": "rollover_resume_finalized",
   "captured_at_kst": "2026-10-21T16:48:00+09:00",
   "task_id": "CONVERSION-DX11-00966",
   "production_id": "CONVERSION-DX11-00966",
@@ -11,12 +11,12 @@
   "chat_rollover": 12,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "target_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "target_head": "c4e5f2a129932c67e9bfb15c0d819b4ca37bb444",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_branch": "feature/dx11-00966-live-game-frame",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
   "feature_last_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
-  "feature_stage": "PROMOTED_TARGET_CI_PENDING",
+  "feature_stage": "FEATURE_READY_PROMOTED_C6_SOURCE_CI_VERIFIED",
   "feature_ready_evidence_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
   "behind": 0,
   "force": false,
@@ -34,29 +34,34 @@
   "target_ci": {
     "exact_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
     "fast": "success",
-    "backend": "in_progress",
-    "build": "in_progress",
-    "openxr": "in_progress",
-    "hud": "in_progress",
+    "backend": "success",
+    "build": "success",
+    "openxr": "success",
+    "hud": "success",
     "runs": [
       39564130518,
       39564130486,
       39564130565,
       39564130437,
       39564130576
-    ]
+    ],
+    "bundle_artifact_id": 12328569187,
+    "backend_artifact_id": 12328738789
   },
   "pending_acceptance": [
-    "Confirm five required target-branch exact-SHA Actions conclusions",
-    "Confirm promoted Build/backend artifacts and bundle",
-    "Write C6 run record on game target after evidence, keeping validation-bearing SHA unchanged",
-    "Real game menu/car/race native Draw and published-frame evidence not available; do not claim full gameplay or HMD success"
+    "First genuine full game-authored D3D9 SM3 menu/car/race Draw -> D3D11 Draw -> native full-resolution published image is not runtime verified",
+    "Capture game native eligible/drawn/published counters and original input/FFB parity on exact SHA",
+    "Do not declare complete native DX11 gameplay or Quest3 HMD evidence from source/CI or WARP probe"
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "next_implementation_action": "If any exact-SHA CI fails repair causal source/test/workflow under this task; otherwise finish C6 without duplicate source commit. Resume full-resolution genuine D3D9 game Draw->D3D11 Draw->native published frame evidence; preserve DX9Ex fallback/input/FFB.",
+  "next_implementation_action": "C6 source validation is durable and complete; do not rerun 0faf SHA PASS gates or duplicate commits. Preserve same full-resolution FEATURE_ID and implement/capture next genuinely missing live game native Draw/published-frame path under the responsible future dispatch; preserve fail-closed opt-in and DX9Ex fallback.",
   "runtime_validation": "UNTESTED",
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
   "score_change": 0,
-  "source_owned_commits_present": true
+  "source_owned_commits_present": true,
+  "finalized_at_kst": "2026-10-21T16:56:00+09:00",
+  "validation_bearing_source_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "result_document_path": "docs/automation/runs/CONVERSION-DX11-00966.json",
+  "result_document_commit": "c4e5f2a129932c67e9bfb15c0d819b4ca37bb444"
 }
