@@ -15,11 +15,13 @@
   "feature_id": "DX11:LIVE_GAME_DRAW_SOURCE_CAPTURE_TO_NATIVE_FRAME",
   "feature_branch": "feature/dx11-00966-live-source-capture",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
-  "feature_last_head": "8054f0d56414e9726f2e5a7ef8bf1838ce9513ca",
+  "feature_last_head": "a8ea3ce392da6fc4770157fdd45c8dff45657b24",
   "material_result_sha": "ed42e793722d5d642ddf52f55fbbb9b6d83172bc",
   "ci_repair_shas": [
     "3b8f7f331103dc85cad69c581cd1069123de79ff",
-    "8054f0d56414e9726f2e5a7ef8bf1838ce9513ca"
+    "8054f0d56414e9726f2e5a7ef8bf1838ce9513ca",
+    "02b9ac494bb64c0ae58e3064a69bebb9743bcf59",
+    "a8ea3ce392da6fc4770157fdd45c8dff45657b24"
   ],
   "feature_stage": "C3_VALIDATE",
   "feature_ready": false,
@@ -33,14 +35,14 @@
       "validation_command": "opt-in real game menu→vehicle→race source/native/published pixel+HMD test NOT RUN"
     },
     "safe_fallback_and_source_guard": {
-      "status": "PENDING",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/d3d9/stereo_renderer_r30.cpp",
         "src/vr/d3d11/live_game_primitive_span.hpp",
         "tools/dx11_game_primitive_span_probe.cpp",
         "tools/test_dx11_live_source_stride_00966.py"
       ],
-      "validation_command": "GitHub Actions DX11 Fast Structural Checks + Windows Build at exact validation-bearing SHA"
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks run 39551833750 SUCCESS, remaining mandatory Windows/Backend/OpenXR/HUD PENDING"
     },
     "mandatory_exact_sha_ci": {
       "status": "PENDING",
@@ -48,23 +50,24 @@
         ".github/workflows/vr-openxr.yml",
         ".github/workflows/outrun-exe-hud-inspector.yml"
       ],
-      "validation_command": "GitHub Actions five mandatory gates at SHA 8054f0d56414e9726f2e5a7ef8bf1838ce9513ca"
+      "validation_command": "GitHub Actions five required gates on a8ea3ce392da6fc4770157fdd45c8dff45657b24 (Fast PASS; 4 running/pending)"
     }
   },
   "ci_latest": {
-    "exact_sha": "8054f0d56414e9726f2e5a7ef8bf1838ce9513ca",
+    "exact_sha": "a8ea3ce392da6fc4770157fdd45c8dff45657b24",
     "runs": [
-      39551574946,
-      39551574974,
-      39551574890,
-      39551574959,
-      39551574759
+      39551833750,
+      39551833770,
+      39551833779,
+      39551833763,
+      39551833751
     ],
-    "status": "IN_PROGRESS"
+    "fast": "SUCCESS",
+    "others": "IN_PROGRESS"
   },
   "source_implementation": "Bound transient D3D9 IndexedUP 16/32-bit original game index pointer window before first CPU dereference, and add real source and C++ overflow/malformed source regression. Existing 00966 source pipeline and original renderer/input/FFB opt-in unchanged.",
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "reason_no_score": "Same TASK_ID previously scored by scoreboard at 2026-10-21 14:18 KST; rollover and CI repairs no duplicate score",
-  "next_action": "Read latest feature branch + five exact-SHA CI outcomes; fix causal failures only within same task. Full real-game Draw→native GPU→published visible menu/car/race and Quest3 evidence still required before FEATURE_READY or target promotion; retain 00477 ownership."
+  "next_action": "Verify remaining four exact-SHA Actions on feature a8ea3ce3; repair causal failures if any. Do not promote until real-game native Draw and published menu/car/race frame with HMD evidence. Preserve opt-in and DX9Ex fallback."
 }
