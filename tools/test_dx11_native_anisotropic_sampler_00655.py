@@ -45,7 +45,7 @@ def connected(s: str) -> bool:
             "capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY",
             "capture.magFilter != D3DTEXF_LINEAR",
             "capture.mipFilter != D3DTEXF_LINEAR",
-            "const UINT levels = usesMips ? sourceLevels : 1u;",
+            "const UINT levels = live_game_mip_lod::captured_levels(",
             "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
             "initial[level].pSysMem = copied[level].data();",
             "if (capture.minFilter == D3DTEXF_ANISOTROPIC)",
