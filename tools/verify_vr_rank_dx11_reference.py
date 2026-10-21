@@ -66,7 +66,14 @@ for name,expected in (("RankDx11ProducerReference", "true"),
                       ("RivalDx11NativeRoute","true"),
                       ("RankDesktopLift","false")):
     assert f"{name} = {expected}" in ini
-assert "if (!Settings::VRRivalDx11NativeRoute.get())" in hook
+# Quest3 field regression 2026-10-22: rival marker must stay on the
+# previously HMD-proven exact projector regardless of the experimental
+# VRRivalDx11NativeRoute toggle. Ordinal rank remains independently configurable.
+assert "VR RIVAL RESTORED: exact BB6F0 Calc3D2D + BB796 projected" in hook
+assert "Module::exe_ptr(0xBB6F0)" in hook
+assert "Calc3D2D_RivalExactCall, Memory::HookType::Call" in hook
+assert "Module::exe_ptr(RivalMarker_SpraniCall)" in hook
+assert "RivalMarker_sprani, Memory::HookType::Call" in hook
 assert "const int anchorLiftY = Settings::VRRankDesktopLift.get()" in hook
 assert "R62TryFixedFunctionSpriteIndexed(" in dx9
 # The additional DX9-only positive-W gate must not reject an original
@@ -84,4 +91,4 @@ for token in (
 assert "dx11OrdinalClipW" in wview and "marker.exactOrdinalEyeCant;" in wview
 for token in ("marker.exactOrdinalEyeCant", "std::fabs(clipW) <= 1.0e-6f"):
     assert token not in wview.replace(token, "/* forbidden broad W gate */", 1)
-print("PASS R26 DX11 rank direct projection, native rival + optional legacy routes, 0.55 HUD")
+print("PASS R26 DX11 rank direct projection + restored exact rival projector, 0.55 HUD; HMD runtime untested")
