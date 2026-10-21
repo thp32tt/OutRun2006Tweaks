@@ -1,0 +1,286 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T0945KST-NEW-SHA-UNIQUE5-B0019-A0016",
+  "review_slot_kst": "2026-10-21 09:45",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "544d771d18fe9b5b9eaebdf9cbd1f534745eb4a3",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "Five unique N100 PNG candidates saved by B0019 and A0016 after earlier C1 review; 22 prior metrics.json logs contain 150 unique reviewed hashes, none of these five were previously QA-reviewed. No A/B queue consumption.",
+  "counts": {
+    "previous_qa_log_files": 22,
+    "previous_unique_qa_sha": 150,
+    "new_reviewed": 5,
+    "pass_png_text_only": 5,
+    "fail_png_text": 0,
+    "producer_rework_dimensions": 5
+  },
+  "evidence": {
+    "n100_metrics_path": "work/c1_batch_20261021_0945/metrics.json",
+    "source_output_sheet": "work/c1_batch_20261021_0945/comparison_5.jpg",
+    "source_output_sheet_sha256": null,
+    "script": "work/c1_qa_20261021_0945_sample_metrics.py",
+    "source_manifest_and_producer_export_sha_verified": true,
+    "visual": "Manually inspected 5 English-to-Korean side-by-side checkerboard comparisons, with exact approved mapping and PNG alpha border >=16 checked."
+  },
+  "results": [
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0019-5B7E704F",
+      "ordinal": 88,
+      "source_file": "Q205_93f789db1381be42_source.png",
+      "source_sha256": "95c18097301e29f58e680735bbe029b0e00a2ef5f9022726db7dacada44edb66",
+      "source_manifest_match": true,
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "candidate_file": "Q205_93f789db1381be42_source_k.png",
+      "candidate_sha256": "455ac78ec46f47b8dee008bc3dbd6ffd2a9ff59de0239680014fc726716f3e92",
+      "producer_export_sha_match": true,
+      "previously_reviewed": false,
+      "english": "YOUR POSITION OK",
+      "approved_korean": "현재 순위 확인",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "현재 순위 확인: complete Hangul text, source dark metallic family approximated, no glyph truncation or unrelated art.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        177,
+        103,
+        2124,
+        595
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        1924,
+        248
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0019-5B7E704F",
+      "ordinal": 89,
+      "source_file": "Q227_50fdfd89e985791b_source.png",
+      "source_sha256": "ca2d7cce86a7eb82ab17fc88be1470c38d5ec27411f76c9133454f92990c6947",
+      "source_manifest_match": true,
+      "source_dds_sha256": "769308121df7229766b50eea1d43c68703e1720df4147ec8f34b735e2a9527f3",
+      "candidate_file": "Q227_50fdfd89e985791b_source_k.png",
+      "candidate_sha256": "fc37176e50c153e06cff857a6fc19b77fea1b7cc4ad9a4f7e520cea2ae55c973",
+      "producer_export_sha_match": true,
+      "previously_reviewed": false,
+      "english": "NOVICE",
+      "approved_korean": "초급",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "초급: correct 2 syllables, intact strokes and outline; very faint alpha may touch border but alpha>=16 zero.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        0,
+        134,
+        1619,
+        724
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        766,
+        196
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0019-5B7E704F",
+      "ordinal": 90,
+      "source_file": "Q231_5fc05a932980a11d_source.png",
+      "source_sha256": "c79dd661918298ec0d509a9561aba061372a62e4728b897083f8d5137b1d1fc7",
+      "source_manifest_match": true,
+      "source_dds_sha256": "29b87a5c8a652fda0e107291bfa410ba492f44d4cc9c9ccefd55de26fc674b34",
+      "candidate_file": "Q231_5fc05a932980a11d_source_k.png",
+      "candidate_sha256": "3d6db5a164be8662c3b80003660f5c6fb12e3df284fe9c926039138f1848b946",
+      "producer_export_sha_match": true,
+      "previously_reviewed": false,
+      "english": "ONLINE",
+      "approved_korean": "온라인",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "온라인: correct Hangul, readable and no extraneous background; very faint alpha may touch border but alpha>=16 zero.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        278,
+        57,
+        1909,
+        724
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        864,
+        312
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0019-5B7E704F",
+      "ordinal": 91,
+      "source_file": "Q101_6d5f1574bc8aa55e_source.png",
+      "source_sha256": "b44a8e2c4a95c967eb40610f1e1a165102b357b927e0373cf530ca69ca974e0f",
+      "source_manifest_match": true,
+      "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "candidate_file": "Q101_6d5f1574bc8aa55e_source_k.png",
+      "candidate_sha256": "41347b5e3fd58705102ecaa41f2959d387e751aa63a4041e749bcc38986cfecc",
+      "producer_export_sha_match": true,
+      "previously_reviewed": false,
+      "english": "Versus Special Course has been selected.",
+      "approved_korean": "대전 스페셜 코스가 선택되었습니다.",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "대전 스페셜 코스가 선택되었습니다.: exact approved mapping, mixed yellow/white text hierarchy retained, single readable line.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        37,
+        130,
+        2102,
+        575
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        2142,
+        219
+      ],
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "producer_role": "A",
+      "producer_task_id": "OUTRUN-ROI-A-0016-36B089B6",
+      "ordinal": 74,
+      "source_file": "Q047_67f2b358a8d3b480_source.png",
+      "source_sha256": "fc3bcc3c2c204b8787862ff6b01ec14f25729314c6193e1c2912a317f090257e",
+      "source_manifest_match": true,
+      "source_dds_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "candidate_file": "Q047_67f2b358a8d3b480_source_k.png",
+      "candidate_sha256": "df1718bcc9fe2e7abd5e13ffb3d9c2a18b2158116e7d67f3e6cfea9725f3ea30",
+      "producer_export_sha_match": true,
+      "previously_reviewed": false,
+      "english": "Space",
+      "approved_korean": "공백",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "공백: correct label; input also includes V/W/X/Y keyboard labels and red button art, not copied into output; text-only output.",
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        227,
+        133,
+        1665,
+        815
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "source_roi_dimensions": [
+        481,
+        264
+      ],
+      "candidate_dimensions": [
+        1693,
+        929
+      ],
+      "producer_status": "REWORK_DIMENSIONS",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "conditions": {
+    "png_text_pass_not_final_approval": true,
+    "all_five_producer_rework_dimensions": true,
+    "ui_cell_and_protected_art_composition": "UNTESTED",
+    "dds_composition": "NOT_RUN",
+    "c2_c3_game_status": "UNTESTED_NOT_AUTHORIZED",
+    "imagegen": false,
+    "a_b_queue_consumption": false,
+    "vr_ffb_dx11_dxvk_changed": false
+  }
+}
