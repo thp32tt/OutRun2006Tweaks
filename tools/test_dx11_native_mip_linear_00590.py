@@ -12,7 +12,7 @@ def connected(s: str) -> bool:
         # mirror must remain connected after 00716 sampler extraction.
         if "return create_game_sampler(dev, capture, levels, sampler);" not in mirror:
             return False
-        sampler_impl = s.split("bool create_game_sampler(", 1)[1].split("bool mirror_cube_texture(", 1)[0]
+        sampler_impl = s.split("bool create_game_sampler(", 1)[1].split("bool mirror_volume_texture(", 1)[0]
         texture2d = s.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
         if not all(x in sampler_impl for x in ("capture.mipFilter == D3DTEXF_LINEAR;", "if (capture.mipFilter == D3DTEXF_LINEAR) {")):
             return False
