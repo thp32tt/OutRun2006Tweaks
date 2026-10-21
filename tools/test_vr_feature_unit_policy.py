@@ -163,6 +163,7 @@ guarded_commands = (
     "python tools/verify_vr_r30_positiont_decl.py",
     "python tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     "python tools/verify_vr_skyglow_capture_boundary.py",
+    "python tools/verify_dx9ex_review105_extra_candidates.py",
 )
 for command in guarded_commands:
     pos = step.index(command)

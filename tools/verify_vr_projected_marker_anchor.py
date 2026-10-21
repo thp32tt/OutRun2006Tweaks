@@ -545,36 +545,48 @@ for label, changed in (
     else:
         fail("Sumo projected-marker semantic negative control escaped: " + label)
 
-# Exact projected world markers must only project points in front of the
-# camera. R44's spatial-billboard gate already uses positive clip W. The
-# historical fabs(W) condition accepted negative/behind-eye coordinates.
+# Generic rank/rival markers reject negative/zero clip W. An opt-in
+# source-exact original ordinal DX11 comparison may accept signed W ONLY
+# when its provenance flag is present; never grant this to arbitrary sprites.
 def require_front_facing_projected_marker(source: str) -> None:
     project = function_body(source, "bool R57ProjectViewPoint(")
-    required = "clipW <= 1.0e-6f"
-    valid = project.find(required)
-    perspective = project.find("!std::isfinite(clipW)")
-    divide = project.find("ndcX = clipX / clipW;")
-    if min(valid, perspective, divide) < 0 or not (
-        perspective < valid < divide
-    ) or "std::fabs(clipW)" in project:
-        fail("R57 per-eye rank/rival projection must reject negative/zero clip W")
+    for marker in (
+        "Settings::VRRankDx11ProducerReference.get() &&",
+        "marker.exactOrdinalEyeCant;",
+        "const bool dx11OrdinalClipW =",
+        "dx11OrdinalClipW",
+        "? std::fabs(clipW) <= 1.0e-6f",
+        ": clipW <= 1.0e-6f",
+        "!std::isfinite(clipW)",
+        "ndcX = clipX / clipW;",
+    ):
+        if marker not in project:
+            fail("R57 exact-ordinal conditional clip-W gate lost: " + marker)
+    if not (project.index("Settings::VRRankDx11ProducerReference.get()") <
+            project.index("? std::fabs(clipW) <= 1.0e-6f") <
+            project.index(": clipW <= 1.0e-6f") <
+            project.index("ndcX = clipX / clipW;")):
+        fail("R57 projection W gates must precede the divide")
 
 
 require_front_facing_projected_marker(r30)
-# Two distinct deliberate regressions; no repeated static cycles.
+# Reject unconditional signed W, removal of the original-producer opt-in,
+# or accidental rejection of original negative-W ordinal comparison cases.
 for original, replacement in (
-    ("clipW <= 1.0e-6f", "std::fabs(clipW) <= 1.0e-6f"),
-    ("clipW <= 1.0e-6f", "clipW < -1.0e-6f"),
+    ("Settings::VRRankDx11ProducerReference.get() &&", "true &&"),
+    ("marker.exactOrdinalEyeCant;", "true;"),
+    (": clipW <= 1.0e-6f", ": std::fabs(clipW) <= 1.0e-6f"),
+    ("? std::fabs(clipW) <= 1.0e-6f", "? clipW <= 1.0e-6f"),
 ):
     mutated = r30.replace(original, replacement, 1)
     if mutated == r30:
-        fail("projected-marker negative-W mutation did not modify source")
+        fail("projected-marker W gate mutation did not modify source")
     try:
         require_front_facing_projected_marker(mutated)
     except SystemExit:
         pass
     else:
-        fail("projected-marker negative-W mutant escaped the verifier")
+        fail("projected-marker W gate mutant escaped the verifier")
 
 # R30 must classify only the explicit projected semantic and then reproject the
 # recovered view-space anchor through the latched head+per-eye OpenXR transform.
