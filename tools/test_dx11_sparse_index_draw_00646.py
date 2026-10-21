@@ -86,7 +86,7 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
                   "numVertices > live::kMaxNativeGameVertices",
                   "live::game_gather_indexed_up_vertices(",
                   "compactVertices.data()", "compactIndices.data()",
-                  "firstVertex, stride, numVertices, unpacked.data(), count"):
+                  "firstVertex, stride, numVertices"):
         assert token in up, (path, token)
     if path.endswith("/stereo_renderer_r30.cpp"):
         # Real IndexedUP stream 0 is rebased for native IA, while secondary
@@ -111,6 +111,7 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
         # R26-safe has no physical secondary IA remap; retain original
         # explicitly rebased stream-0 legacy behavior.
         assert "if (!sparseWindow) unpacked[i] -= minVertex;" in up
+        assert "firstVertex, stride, numVertices, unpacked.data(), count" in up
         assert "if (ok) live::observe_indexed(device, topology, primitiveCount," in source
         assert "vertices.data(), stride, nativeVertexCount," in source
     assert "const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(" in source
