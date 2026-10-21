@@ -26,7 +26,10 @@ def integrated(c,h,p):
         "s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u), 0);",
         "s.frameBatch.consume_depth_clear();",
         "ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(), D3D11_CLEAR_DEPTH,",
-        "ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());",
+        "ID3D11RenderTargetView* gameRtv = output.nativeSrgbWrite",
+        "? s.backend.color_rtv_srgb() : s.backend.color_rtv();",
+        "ctx->OMSetRenderTargets(1u, &gameRtv,",
+        "output.nativeDepthTest ? s.diagnosticDepthView.Get() : nullptr",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
       and c.count("else if (output.nativeDepthOrderingMode != 0u)")==2

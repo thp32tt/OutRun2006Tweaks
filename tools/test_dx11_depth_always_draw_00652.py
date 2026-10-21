@@ -18,7 +18,10 @@ def connected(c: str, h: str, p: str) -> bool:
         "ds.DepthFunc = D3D11_COMPARISON_ALWAYS;",
         "D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO",
         "dev->CreateDepthStencilState(&ds,",
-        "ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());",
+        "ID3D11RenderTargetView* gameRtv = output.nativeSrgbWrite",
+        "? s.backend.color_rtv_srgb() : s.backend.color_rtv();",
+        "ctx->OMSetRenderTargets(1u, &gameRtv,",
+        "output.nativeDepthTest ? s.diagnosticDepthView.Get() : nullptr",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
         and "s.diagnosticDepthAlwaysStates[output.nativeDepthWrite ? 1u : 0u].Get(), 0)" in draw

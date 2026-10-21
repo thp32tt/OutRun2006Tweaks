@@ -31,7 +31,8 @@ def connected(source: str) -> bool:
         and all(value in cap for value in (
             "GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)",
             "GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)",
-            "srgbWrite != FALSE",
+            "!GameNativeSrgbDraw::admit(srgbWrite, fullFrame)",
+            "output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite);",
             "srgb > 1u",
             "capture.srgbTexture = srgb == TRUE;",
         ))
@@ -95,7 +96,8 @@ def main() -> None:
     mutations = (
         ("GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)", "GetSamplerState(0, D3DSAMP_ADDRESSW, &srgb)"),
         ("GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)", "GetRenderState(D3DRS_ALPHATESTENABLE, &srgbWrite)"),
-        ("srgbWrite != FALSE", "srgbWrite != TRUE"),
+        ("!GameNativeSrgbDraw::admit(srgbWrite, fullFrame)", "!GameNativeSrgbDraw::admit(srgbWrite, true)"),
+        ("output.nativeSrgbWrite = GameNativeSrgbDraw::uses_srgb(srgbWrite);", "output.nativeSrgbWrite = false;"),
         ("srgb > 1u", "srgb > 2u"),
         ("capture.srgbTexture = srgb == TRUE;", "capture.srgbTexture = false;"),
         ("if (capture.srgbTexture && packed16) return false;", "if (false && packed16) return false;"),
