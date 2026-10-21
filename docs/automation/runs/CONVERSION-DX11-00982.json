@@ -8,14 +8,14 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00982",
   "feature_id": "DX11_MENU_RACE_GPU_POSTPASS_VISIBLE_SOURCE_TO_NATIVE_STEREO",
-  "status": "CI_REPAIR_IN_PROGRESS",
-  "checkpoint": "C4_MATERIAL_COMMITTED_CI_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "material_result_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
-  "validation_bearing_result_sha": null,
-  "result_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
-  "automation_validation": "FAILED_INITIAL_SHA_CI_POLICY_LATEST_RUN",
+  "validation_bearing_result_sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1",
+  "result_sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "AUTOMATION_VALIDATION": "CI_REPAIR_PENDING",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
   "gameplay_test_performed": false,
@@ -48,23 +48,23 @@
   },
   "acceptance_results": {
     "camera_copy_visible_source": {
-      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_stereo_submission.cpp",
         "src/vr/d3d11/native_game_stretch_source.hpp"
       ],
-      "validation_command": "Pending exact-SHA C++ targeted GPU postpass source unit test and DX11 Fast required gate. Not runtime verified."
+      "validation_command": "Exact SHA 6253c3ef3c7ef23f06859480ab90d2b073eed7d1 DX11 Fast Structural Checks run 39652752370 C++ 00982 clipped Copy and point/linear filtered source fixtures success; Windows Build run 39652752333 success; real game/HMD not tested."
     },
     "camera_stretch_filtered_source": {
-      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
         "tools/dx11_game_visible_postpass_source_00982.cpp"
       ],
-      "validation_command": "Pending exact-SHA native C++ positive/negative test, fail-closed D3D9 parity retained."
+      "validation_command": "Exact SHA 6253c3ef3c7ef23f06859480ab90d2b073eed7d1 DX11 Fast 39652752370 success with partial source positive and uncovered/linear neighbor/foreign-slice negative cases, original DX9Ex fallback structurally guarded; Quest3/VDXR untested."
     },
     "exact_sha_five_gates": {
-      "status": "PENDING",
+      "status": "PASS_EXACT_SHA",
       "evidence_paths": [
         ".github/workflows/dx11-fast-structural.yml",
         ".github/workflows/backend-conversion-gate.yml",
@@ -72,7 +72,7 @@
         ".github/workflows/vr-openxr.yml",
         ".github/workflows/outrun-exe-hud-inspector.yml"
       ],
-      "validation_command": "Initial 83ef4202 DX11 Fast failed on inherited 00981 latest-run-record missing development_strategy; adding valid 00982 task record under same task for causal recovery."
+      "validation_command": "Five exact-SHA workflows all SUCCESS at 6253c3ef3c7ef23f06859480ab90d2b073eed7d1: DX11 Fast 39652752370; Backend 39652752401; Build 39652752333; OpenXR 39652752352; HUD Inspector 39652752377."
     }
   },
   "development_strategy": {
@@ -130,15 +130,64 @@
       "OpenXR VR architecture",
       "OutRun EXE HUD Inspector CI"
     ],
-    "status": "REPAIR_PENDING"
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1",
+    "mandatory_gate_results": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39652752370,
+        "status": "success",
+        "sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39652752401,
+        "status": "success",
+        "sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1"
+      },
+      {
+        "name": "Build",
+        "run_id": 39652752333,
+        "status": "success",
+        "sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39652752352,
+        "status": "success",
+        "sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39652752377,
+        "status": "success",
+        "sha": "6253c3ef3c7ef23f06859480ab90d2b073eed7d1"
+      }
+    ]
   },
-  "score_change": 0,
+  "score_change": 1,
   "score_run_key": "CONVERSION-DX11-00982",
-  "score_status": "UNSCORED_PENDING_REAL_INTEGRATED_CI_OUTCOME",
-  "runtime_blocker": "Real OutRun 2006 menu/car/race graphics, positive native draws, published eye pixels, gamepad, Quest3 VDXR session not tested.",
+  "score_status": "RECORDED_ONCE_GITHUB_SSOT_COMMIT_adf9021512185b49b51e8a83133d90013ea6d44c",
+  "runtime_blocker": "No actual OutRun 2006 menu/vehicle/race scene or Quest3/VDXR HMD gameplay and input measurement; no runtime PASS. Real stereo/visual parity remains NEED_HMD_TEST.",
   "next_source_file": "src/vr/d3d11/native_game_stereo_submission.cpp",
   "real_game_draw_blocker": "Native full live game Draw/Publish remain runtime unproven",
   "native_game_draw_count": "UNTESTED",
   "native_published_frame_count": "UNTESTED",
-  "next_implementation_action": "Repair actual exact-SHA Gate failures under CONVERSION-DX11-00982, keep existing game-to-stereo GPU path, then request real menu/car/race desktop/HMD evidence"
+  "next_implementation_action": "Repair actual exact-SHA Gate failures under CONVERSION-DX11-00982, keep existing game-to-stereo GPU path, then request real menu/car/race desktop/HMD evidence",
+  "implementation_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
+  "initial_implementation_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
+  "bookkeeping_only": true,
+  "pipeline": {
+    "C0": "DONE_GITHUB_HEAD",
+    "C1": "DONE_SOURCE_DEFECT",
+    "C2": "DONE_CPP_NATIVE_SOURCE",
+    "C3": "PASS_EXACT_SHA_FIVE_GATES",
+    "C4": "MATERIAL_COMMIT_83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
+    "C5": "NOT_REQUIRED",
+    "C6": "PASS_EXACT_SHA_CHECKPOINT"
+  },
+  "score_previous": 1771,
+  "score_current": 1772,
+  "next_action": "A distinct new DX11 source capability is controller-selected after terminal C6; do not re-run 00982 or its exact-SHA successful Gate. Only actual HMD/session may clear runtime UNTESTED.",
+  "c6_metadata_only": true
 }
