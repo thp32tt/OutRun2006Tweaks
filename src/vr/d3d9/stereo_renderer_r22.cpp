@@ -15,6 +15,11 @@
 #include "../state/state_block_tracker.hpp"
 #include "../state/state_block_events.hpp"
 
+namespace Settings
+{
+    extern Setting<bool> VREvidenceTrace;
+}
+
 namespace OutRunVRStereo
 {
     namespace
@@ -154,6 +159,16 @@ namespace OutRunVRStereo
 
         HRESULT __stdcall R22StateBlockApplyDest(IDirect3DStateBlock9* block)
         {
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE STATEBLOCK APPLY_PRE present={} draw={} block={} target={} reliable={} r22Reliable={} coverageLost={} replayDepth={} shadowValid={}",
+                    PresentEpoch, TopLevelDrawSerial(),
+                    static_cast<const void*>(block), R22StateBlockApplyTarget,
+                    OutRunVR::State::StateBlockTracker::Reliable() ? 1 : 0,
+                    OutRunVR::State::StateBlockTracker::R22Reliable() ? 1 : 0,
+                    OutRunVR::State::StateBlockTracker::CoverageLost() ? 1 : 0,
+                    R22InternalReplayDepth,
+                    R22ShadowState.Valid() ? 1 : 0);
             const HRESULT hr =
                 R22StateBlockApplyHook.stdcall<HRESULT>(block);
             IDirect3DDevice9* device = nullptr;
@@ -176,6 +191,18 @@ namespace OutRunVRStereo
                 OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
             }
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE STATEBLOCK APPLY_POST present={} draw={} block={} hr=0x{:08X} reliable={} r22Reliable={} coverageLost={} replayDepth={} rasterTouched={} shadowValid={}",
+                    PresentEpoch, TopLevelDrawSerial(),
+                    static_cast<const void*>(block),
+                    static_cast<unsigned>(hr),
+                    OutRunVR::State::StateBlockTracker::Reliable() ? 1 : 0,
+                    OutRunVR::State::StateBlockTracker::R22Reliable() ? 1 : 0,
+                    OutRunVR::State::StateBlockTracker::CoverageLost() ? 1 : 0,
+                    R22InternalReplayDepth,
+                    R22InternalRasterTouched ? 1 : 0,
+                    R22ShadowState.Valid() ? 1 : 0);
             return hr;
         }
 
@@ -201,6 +228,12 @@ namespace OutRunVRStereo
                 const bool same = R22StateBlockApplyTarget == target;
                 if (!same)
                 {
+                    if (Settings::VREvidenceTrace)
+                        spdlog::info(
+                            "VR EVIDENCE STATEBLOCK ALT_TARGET present={} draw={} oldTarget={} newTarget={} block={}",
+                            PresentEpoch, TopLevelDrawSerial(),
+                            R22StateBlockApplyTarget, target,
+                            static_cast<const void*>(block));
                     OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
                     OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                     if (!R22FirstAlternateStateBlockLogged)
@@ -236,6 +269,15 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R22CreateStateBlockHook.stdcall<HRESULT>(
                 device, type, block);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE STATEBLOCK CREATE present={} draw={} device={} type={} hr=0x{:08X} outBlock={} gameDevice={} internal={}",
+                    PresentEpoch, TopLevelDrawSerial(),
+                    static_cast<const void*>(device), static_cast<unsigned>(type),
+                    static_cast<unsigned>(hr),
+                    (block && *block) ? static_cast<const void*>(*block) : nullptr,
+                    IsGameDevice(device) ? 1 : 0,
+                    InternalStereoPass ? 1 : 0);
             if (SUCCEEDED(hr) && IsGameDevice(device) && block && *block)
                 R22EnsureStateBlockApplyHook(*block);
             return hr;
@@ -245,6 +287,15 @@ namespace OutRunVRStereo
         {
             const HRESULT hr =
                 R22BeginStateBlockHook.stdcall<HRESULT>(device);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE STATEBLOCK BEGIN present={} draw={} device={} hr=0x{:08X} gameDevice={} internal={} recordingBeforeNotify={}",
+                    PresentEpoch, TopLevelDrawSerial(),
+                    static_cast<const void*>(device),
+                    static_cast<unsigned>(hr),
+                    IsGameDevice(device) ? 1 : 0,
+                    InternalStereoPass ? 1 : 0,
+                    OutRunVR::State::StateBlockTracker::Recording() ? 1 : 0);
             if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
             {
                 R22ShadowState = {};
@@ -259,6 +310,16 @@ namespace OutRunVRStereo
         {
             const HRESULT hr =
                 R22EndStateBlockHook.stdcall<HRESULT>(device, block);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE STATEBLOCK END present={} draw={} device={} hr=0x{:08X} outBlock={} gameDevice={} internal={} recording={}",
+                    PresentEpoch, TopLevelDrawSerial(),
+                    static_cast<const void*>(device),
+                    static_cast<unsigned>(hr),
+                    (block && *block) ? static_cast<const void*>(*block) : nullptr,
+                    IsGameDevice(device) ? 1 : 0,
+                    InternalStereoPass ? 1 : 0,
+                    OutRunVR::State::StateBlockTracker::Recording() ? 1 : 0);
             const bool game = IsGameDevice(device);
             const bool recording =
                 OutRunVR::State::StateBlockTracker::Recording();
