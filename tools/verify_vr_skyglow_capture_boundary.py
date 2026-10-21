@@ -76,3 +76,32 @@ for mutated in bad_variants:
         continue
     raise AssertionError("R84 pre-HUD SkyGlow mutation escaped")
 print("PASS R84 main SkyGlow screen-only cutoff and three negative mutations; HMD UNTESTED")
+
+# Isolated DX9Ex review105 integration guard. These are source-level
+# invariants; a Windows compile and a Quest3 optical A/B are separate gates.
+def check_review105_patch(renderer: str) -> None:
+    sky = renderer.split("bool R30DrawSkyGlowPass(", 1)[1].split(
+        "bool R30CaptureSkyGlowSceneBeforeHud(", 1)[0]
+    assert sky.index("device->SetViewport(&viewport)") < sky.index(
+        "D3DRS_SCISSORTESTENABLE, FALSE"
+    ) < sky.index("device->DrawPrimitiveUP(")
+    overlay = renderer.split("bool R30BuildHudPlaneCoefficients(", 1)[1].split(
+        "bool R30ExternalImGuiIdentity(", 1)[0]
+    assert "bool screenOverlay2D = false" in overlay
+    assert "if (screenOverlay2D)" in overlay
+    assert "scaleX = R30HudScaleValue();" in overlay
+    assert "R30HudContainScale(state.stereo, scaleX, scaleY);" in overlay
+    assert "state, true, semanticOverlay2D" in renderer
+
+check_review105_patch(source)
+for replacement in (
+    source.replace("D3DRS_SCISSORTESTENABLE, FALSE", "D3DRS_SCISSORTESTENABLE, TRUE", 1),
+    source.replace("state, true, semanticOverlay2D", "state, true, false", 1),
+):
+    try:
+        check_review105_patch(replacement)
+    except (AssertionError, IndexError, ValueError):
+        pass
+    else:
+        raise AssertionError("DX9Ex review105 regression mutation escaped")
+print("PASS R26 SkyGlow target-scissor and ScreenOverlay2D scalar route; HMD UNTESTED")
