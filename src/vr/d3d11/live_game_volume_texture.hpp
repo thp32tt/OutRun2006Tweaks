@@ -4,6 +4,7 @@
 // No guessed pixels, and no GPU-only DEFAULT-pool readback.
 #include "live_game_volume_budget.hpp"
 #include "live_game_volume_pixels.hpp"
+#include "live_game_mip_lod.hpp"
 #include <d3d9.h>
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -23,8 +24,9 @@ inline bool mirror_image(ID3D11Device* device, IDirect3DVolumeTexture9* source,
           (base.Pool == D3DPOOL_DEFAULT && (base.Usage & D3DUSAGE_DYNAMIC))) ||
         (base.Usage & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL |
                        D3DUSAGE_AUTOGENMIPMAP)) != 0u ||
-        (chain && (source->GetLOD() != 0u || maxMip >= sourceLevels)) ||
-        (!chain && maxMip != 0u)) return false;
+        !live_game_mip_lod::select(
+             chain ? sourceLevels : 1u, chain,
+             source->GetLOD(), maxMip).valid) return false;
     // Preserve actual game sample channels across 8-bit swizzles, dynamic
     // volume writes and half-float scalar/RGBA 3D shader sources.
     const PixelLayout layout =

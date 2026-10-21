@@ -1,5 +1,6 @@
 #include "../src/vr/d3d11/live_game_volume_budget.hpp"
 #include "../src/vr/d3d11/live_game_volume_pixels.hpp"
+#include "../src/vr/d3d11/live_game_mip_lod.hpp"
 #include "../src/vr/d3d11/live_game_draw_mirror_cache.hpp"
 #include "../src/vr/d3d11/native_sm3_texture_codegen.hpp"
 #include <cassert>
@@ -8,6 +9,19 @@ using namespace outrun::vr::dx11;
 using namespace outrun::vr::dx11::live_game_frame;
 int main() {
     using namespace live_volume;
+    using namespace live_game_mip_lod;
+    // All live 2D/cube/volume shader Draw samplers must respect both the
+    // game's managed source SetLOD and D3DSAMP_MAXMIPLEVEL.
+    static_assert(select(6u, true, 2u, 0u).valid);
+    static_assert(select(6u, true, 2u, 0u).minLevel == 2u);
+    static_assert(select(6u, true, 1u, 3u).minLevel == 3u);
+    static_assert(select(6u, true, 1u, 3u).maxLevel == 5u);
+    static_assert(select(1u, false, 0u, 0u).valid);
+    static_assert(!select(6u, true, 6u, 0u).valid);
+    static_assert(!select(6u, true, 0u, 6u).valid);
+    static_assert(!select(1u, false, 1u, 0u).valid);
+    static_assert(!select(1u, false, 0u, 1u).valid);
+    static_assert(!select(0u, true, 0u, 0u).valid);
     static_assert(bounded_chain_bytes(4u, 2u, 2u, 3u, 8u));
     static_assert(!bounded_chain_bytes(512u, 512u, 256u, 10u, 8u));
     static_assert(bytes_per_texel(PixelLayout::r16f) == 2u);

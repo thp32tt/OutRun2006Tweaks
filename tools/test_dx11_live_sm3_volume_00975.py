@@ -4,7 +4,14 @@ frame=(p/"live_game_frame_bridge.cpp").read_text()
 backend=(p/"native_backend.cpp").read_text()
 shader=(p/"native_sm3_texture_codegen.hpp").read_text()
 volume=(p/"live_game_volume_texture.hpp").read_text()
+lod=(p/"live_game_mip_lod.hpp").read_text()
 assert "D3DRTYPE_VOLUMETEXTURE" in frame
+assert "live_game_mip_lod::select" in frame and "textureLod" in frame
+assert "capture.texture->GetLOD()" in frame and "capture.cubeTexture->GetLOD()" in frame
+assert "state.MinLOD = static_cast<float>(lod.minLevel)" in frame
+assert "state.MaxLOD = static_cast<float>(lod.maxLevel)" in frame
+assert "source->GetLOD()" in volume and "live_game_mip_lod::select" in volume
+assert "sourceLod > maxMipLevel" in lod and "uploadedLevels - 1u" in lod
 assert "mirror_volume_texture" in frame and "vertexVolumeSamplerMask" in frame
 assert "pixelVolumeSamplerMask" in frame and "captured.volumeTexture.Get()" in frame
 assert "CreateTexture3D" in volume and "D3D11_SRV_DIMENSION_TEXTURE3D" in volume

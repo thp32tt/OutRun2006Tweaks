@@ -30,6 +30,7 @@
 #include "live_game_render_target_readback.hpp"
 #include "live_game_cube_rt_readback.hpp"
 #include "live_game_volume_texture.hpp"
+#include "live_game_mip_lod.hpp"
 #include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
@@ -3961,7 +3962,15 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
          capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY)) return false;
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
-    if (usesMips && capture.maxMipLevel >= levels) return false;
+    // Texture SetLOD and sampler MAXMIPLEVEL are separate D3D9 lower
+    // bounds. Keep all captured mips, but constrain native sampling to the
+    // most restrictive bound; never substitute a guessed fallback level.
+    const DWORD textureLod = capture.volumeTexture ? capture.volumeTexture->GetLOD() :
+        capture.cubeTexture ? capture.cubeTexture->GetLOD() :
+        capture.texture ? capture.texture->GetLOD() : 0u;
+    const auto lod = live_game_mip_lod::select(levels, usesMips,
+                                             textureLod, capture.maxMipLevel);
+    if (!lod.valid) return false;
     D3D11_SAMPLER_DESC state{};
     // Independent D3D9 MIN/MAG filtering with point or linear mip selection. For
     // MIPFILTER=NONE force LOD 0 even if the source has additional mips.
@@ -4017,8 +4026,8 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
         (!usesMips && capture.mipLodBias != 0.0f)) return false;
     // D3D9 MAXMIPLEVEL discards finer (lower-indexed) mip levels.
     // D3D11 MinLOD clamps to that same source level; all levels are mirrored.
-    state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;
-    state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;
+    state.MinLOD = static_cast<float>(lod.minLevel);
+    state.MaxLOD = static_cast<float>(lod.maxLevel);
     state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;
     state.MaxAnisotropy = capture.minFilter == D3DTEXF_ANISOTROPIC ?
         capture.maxAnisotropy : 1u;
@@ -4086,11 +4095,12 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                            cubeColor, capture.srgbTexture)) return false;
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
-    if ((usesMips && (capture.cubeTexture->GetLOD() != 0u ||
-                      capture.maxMipLevel >= levels)) ||
-        (!usesMips && capture.maxMipLevel != 0u))
-        return false;
     const UINT uploadedLevels = usesMips ? levels : 1u;
+    // Live managed cube LOD may discard finer faces; retain full snapshots
+    // and let the native sampler select the same coarsest permitted face/mip.
+    if (!live_game_mip_lod::select(uploadedLevels, usesMips,
+             capture.cubeTexture->GetLOD(), capture.maxMipLevel).valid)
+        return false;
     // Entire six-face cube must fit before a single D3D9 GPU readback.
     if (gpuCubeRt &&
         !cube_rt_readback::bounded_six_face_bgra8(base.Width, uploadedLevels))
@@ -4258,10 +4268,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // AUTOGENMIPMAP exposes one level to LockRect even though the D3D9
     // sampler consumes generated levels. Never claim those mips were copied.
     if (usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)) return false;
-    if (usesMips && capture.texture->GetLOD() != 0u) return false;
-    // Reject invalid game mip requests rather than silently clamping a native sampler.
-    if (usesMips && capture.maxMipLevel >= sourceLevels) return false;
     const UINT levels = usesMips ? sourceLevels : 1u;
+    // Managed 2D menu/car/race sources can expose an intentional streaming
+    // LOD. Native Draw/DrawIndexed keeps the same bound without dropping
+    // source subresources or accidentally restoring finer detail.
+    if (!live_game_mip_lod::select(levels, usesMips,
+             capture.texture->GetLOD(), capture.maxMipLevel).valid)
+        return false;
     // Admit real full-resolution D3D9 offscreen menu/car/race targets when
     // *each* source mip and the entire chain fit strict readback budgets.
     // Every admitted call still snapshots its current game GPU pixels before
