@@ -56,19 +56,27 @@ def main() -> None:
     # Draw even when CPU shadow bytes/indices are unavailable. The diagnostic
     # native batch must never splice Draws across a failed source capture.
     def complete_shadow_source_contract(code: str) -> bool:
-        if code.count("R30NativeGameSourceGuard nativeSource{device};") != 3:
+        has_linear_up = "void R30ObserveNativeLinearUP(" in code
+        expected_guards = 4 if has_linear_up else 3
+        if code.count("R30NativeGameSourceGuard nativeSource{device};") != expected_guards:
             return False
         if "if (!forwarded)" not in code or \
                 "observe_unavailable_game_draw(device);" not in code:
             return False
-        for start, end, success in (
+        sections = [
             ("void R30ObserveNativeLinearVB(", "void R30ObserveNativeIndexedVB(",
              "live::observe_linear("),
-            ("void R30ObserveNativeIndexedVB(", "void R30ObserveNativeIndexedUP(",
-             "live::observe_indexed("),
+            ("void R30ObserveNativeIndexedVB(",
+             "void R30ObserveNativeLinearUP(" if has_linear_up
+             else "void R30ObserveNativeIndexedUP(", "live::observe_indexed("),
             ("void R30ObserveNativeIndexedUP(", "HRESULT __stdcall DrawPrimitiveDestR30(",
              "live::observe_indexed("),
-        ):
+        ]
+        if has_linear_up:
+            sections.append(
+                ("void R30ObserveNativeLinearUP(", "void R30ObserveNativeIndexedUP(",
+                 "live::observe_linear("))
+        for start, end, success in sections:
             a = code.find(start)
             b = code.find(end, a)
             if a < 0 or b <= a:
@@ -603,10 +611,13 @@ def main() -> None:
         end = source.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
         assert start >= 0 and end > start
         observed = source[start:end]
-        assert observed.count("stride < 16") == 3
+        expected_source_families = (
+            4 if "void R30ObserveNativeLinearUP(" in observed else 3)
+        assert observed.count("stride < 16") == expected_source_families
         assert "stride < 20" not in observed
         invalid = observed.replace("stride < 16", "stride < 20", 1)
-        assert invalid != observed and invalid.count("stride < 16") != 3
+        assert invalid != observed and (
+            invalid.count("stride < 16") != expected_source_families)
     # Row-vector WVP order: object (1,2,3), translated by (5,7,11),
     # then scaled by (2,3,4) gives (12,27,56,1).
     vector = [1.0, 2.0, 3.0, 1.0]
@@ -1507,7 +1518,11 @@ def main() -> None:
         assert start >= 0 and end > start
         entrypoints = source[start:end]
         assert entrypoints.count("topology != D3DPT_TRIANGLESTRIP") == 3
-        assert entrypoints.count("live::game_native_primitive_element_count(") == 3
+        # The active SM3 linear-UP helper shares the same bounded source
+        # primitive-span decoder, while R26-safe keeps three source copiers.
+        expected_span_users = (
+            4 if "void R30ObserveNativeLinearUP(" in entrypoints else 3)
+        assert entrypoints.count("live::game_native_primitive_element_count(") == expected_span_users
         assert "static_cast<std::uint64_t>(nativeElements)*stride" in entrypoints
         assert "const UINT count = nativeElements;" in entrypoints
         assert "const UINT count=nativeElements;" in entrypoints
