@@ -21,7 +21,7 @@
   "evidence": {
     "n100_metrics_path": "work/c1_batch_20261021_0945/metrics.json",
     "source_output_sheet": "work/c1_batch_20261021_0945/comparison_5.jpg",
-    "source_output_sheet_sha256": null,
+    "source_output_sheet_sha256": "6f6864dbd45c75543d67bd7ad5623861d90c97895911cd6ddf2d49b691469c72",
     "script": "work/c1_qa_20261021_0945_sample_metrics.py",
     "source_manifest_and_producer_export_sha_verified": true,
     "visual": "Manually inspected 5 English-to-Korean side-by-side checkerboard comparisons, with exact approved mapping and PNG alpha border >=16 checked."
