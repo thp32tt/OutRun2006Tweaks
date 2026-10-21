@@ -1,0 +1,30 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-idle-v1",
+  "run_key": "OUTRUN-C1-20261022T0545KST-SHA-RECHECK",
+  "review_slot_kst": "2026-10-22 05:45",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "lane": "C1",
+  "status": "IDLE",
+  "method": "N100 SHA256 byte-level export-evidence/production-manifest/source and historical C1 report deduplication; no new image visual review because no unique unreviewed candidates",
+  "evidence": {
+    "local_inventory": "work/c1_20261022_0545_inventory_result.json",
+    "local_script": "work/c1_20261022_0545_inventory.py",
+    "historical_review_report_files": 53,
+    "historical_reviewed_sha_count": 318,
+    "export_evidence_file_count": 66,
+    "exported_candidate_records": 313,
+    "unique_actual_candidate_sha_count": 313,
+    "unreviewed_unique_candidate_sha_count": 0,
+    "export_sha_mismatches": 0,
+    "missing_candidate_or_source_files": 0
+  },
+  "new_c1_pass": 0,
+  "new_c1_fail": 0,
+  "no_new_imagegen": true,
+  "no_A_B_queue_consumption": true,
+  "no_new_dds": true,
+  "no_new_C2_C3_or_ingame_pass": true,
+  "runtime_validation": "UNTESTED",
+  "score_classification": "NO_NEW_CANDIDATE_OR_DISTINCT_QA_FINDING__NO_DUPLICATE_CREDIT",
+  "notes": "IDLE only. No existing C1 SHA was re-reviewed; no producer state, crop worker, queue, DDS, VR/FFB/DX11/DXVK or game deployment touched."
+}
