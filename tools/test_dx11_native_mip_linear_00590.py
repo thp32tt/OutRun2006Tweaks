@@ -12,7 +12,8 @@ def connected(s: str) -> bool:
         # mirror must remain connected after 00716 sampler extraction.
         if "return create_game_sampler(dev, capture, levels, sampler);" not in mirror:
             return False
-        sampler_impl = s.split("bool create_game_sampler(", 1)[1].split("bool mirror_texture(", 1)[0]
+        sampler_impl = s.split("bool create_game_sampler(", 1)[1].split("bool mirror_cube_texture(", 1)[0]
+        texture2d = s.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
         if not all(x in sampler_impl for x in ("capture.mipFilter == D3DTEXF_LINEAR;", "if (capture.mipFilter == D3DTEXF_LINEAR) {")):
             return False
         submit = s.split("bool submit(", 1)[1].split("void observe(", 1)[0]
@@ -36,18 +37,24 @@ def connected(s: str) -> bool:
         "initial[level].pSysMem = copied[level].data();",
         "initial[level].SysMemPitch = pitches[level];",
         "desc.MipLevels = levels; desc.ArraySize = 1;",
-        "if (capture.mipFilter == D3DTEXF_LINEAR) {",
-        "D3D11_FILTER_MIN_MAG_MIP_LINEAR",
-        "D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR",
-        "D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR",
-        "D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR",
-        "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;"
     ]
     c = ["mirror_texture(dev, capture, sampledView, sampledSampler)",
          "ctx->PSSetSamplers(0, 1, &boundSampler);",
          "ctx->DrawIndexed(indexCount, 0, 0);",
          "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"]
-    return all(x in gate for x in a) and all(x in mirror for x in b) and all(x in submit for x in c)
+    sampler_required = (
+        "capture.mipFilter == D3DTEXF_LINEAR;",
+        "if (capture.mipFilter == D3DTEXF_LINEAR) {",
+        "D3D11_FILTER_MIN_MAG_MIP_LINEAR",
+        "D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR",
+        "D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR",
+        "D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR",
+        "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
+    )
+    return (all(x in gate for x in a) and
+            all(x in sampler_impl for x in sampler_required) and
+            all(x in texture2d for x in b) and
+            all(x in submit for x in c))
 
 def sampler(min_linear: bool, mag_linear: bool, mip_linear: bool) -> str:
     suffix = "LINEAR" if mip_linear else "POINT"
@@ -87,6 +94,16 @@ def main() -> None:
     for before, after in mutations:
         assert before in s, before
         assert not connected(s.replace(before, after, 1)), before
+    # An independent mutation in the live 2D mirror cannot be hidden by the
+    # sampler helper or an unchanged cube-texture mip branch.
+    old = "capture.mipFilter == D3DTEXF_LINEAR;"
+    prefix, rest = s.split("bool mirror_texture(", 1)
+    texture2d, suffix = rest.split("bool submit(", 1)
+    assert old in texture2d
+    mutated = (prefix + "bool mirror_texture(" +
+               texture2d.replace(old, "capture.mipFilter == D3DTEXF_POINT;", 1) +
+               "bool submit(" + suffix)
+    assert not connected(mutated), "2D MIP_LINEAR mutation survived"
     values = {sampler(mn, mg, mp) for mn in (False, True) for mg in (False, True) for mp in (False, True)}
     assert len(values) == 8
     assert all(v in s for v in values), "missing MIN/MAG/MIP filter variant"

@@ -254,7 +254,7 @@ for required in (
 ):
     check(required in bridge, "missing source game vertex sampler capture: " + required)
 for required in (
-    "capture_live_sm3_sampler(game, slot, capture, true)",
+    "capture_live_sm3_sampler(",
     "vertexViews[slot], vertexSamplers[slot]",
     "boundVertexViews[slot] = vertexViews[slot].Get();",
     "boundVertexSamplers[slot] = vertexSamplers[slot].Get();",
@@ -268,6 +268,20 @@ for required in (
     # this remains a negative safety check, not a string-only readiness PASS.
     check(required not in source.replace(required, "", 1),
           "source mutation failed to remove required VS/PS binding: " + required)
+
+# The D3D9 vertex sampler namespace and pixel sampler namespace must each
+# select their own cube flag before touching the native GPU.
+for stage, mask in (("true", "vertexCubeSamplerMask"),
+                    ("false", "pixelCubeSamplerMask")):
+    capture_pattern = (
+        r"capture_live_sm3_sampler\(\s*game,\s*slot,\s*capture,\s*" +
+        stage + r"\s*,\s*\(pipeline\.program\." + mask +
+        r"\s*&\s*\(1u\s*<<\s*slot\)\)\s*!=\s*0u\)"
+    )
+    check(re.search(capture_pattern, source) is not None,
+          "missing stage-owned live SM3 sampler/cube dispatch: " + mask)
+    check(re.search(capture_pattern, source.replace(mask, "removed_mask", 1)) is None,
+          "sampler cube negative mutation survived: " + mask)
 
 # Programmable shader translation must admit only actually-read TEMP lanes:
 # native VS/PS code generation consumes the helper directly; real unwritten
