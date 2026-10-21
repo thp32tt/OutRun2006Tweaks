@@ -5414,6 +5414,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         const bool volume = captured.volumeTexture != nullptr;
         const bool chain = captured.mipFilter == D3DTEXF_POINT ||
                            captured.mipFilter == D3DTEXF_LINEAR;
+        // A non-mipped managed source with SetLOD(n) still uploads levels
+        // [0..n], because D3D11 sampler MinLOD/MaxLOD names the original
+        // subresource n. Share that exact SRV across real VS/PS samplers.
+        const UINT sourceLevels = cube ? captured.cubeTexture->GetLevelCount() :
+            volume ? captured.volumeTexture->GetLevelCount() :
+                     captured.texture->GetLevelCount();
+        const UINT sourceLod = cube ? captured.cubeTexture->GetLOD() :
+            volume ? captured.volumeTexture->GetLOD() :
+                     captured.texture->GetLOD();
+        const UINT mirrorLevels = draw_mirror_cache::mirrored_source_levels(
+            sourceLevels, chain, sourceLod);
+        if (!mirrorLevels) return false;
         const draw_mirror_cache::ViewKey key{
             cube ? static_cast<const void*>(captured.cubeTexture.Get())
                  : volume ? static_cast<const void*>(captured.volumeTexture.Get())
@@ -5424,7 +5436,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             if (!draw_mirror_cache::same_view(key, previous.key))
                 continue;
             // Sharing an SRV cannot share D3D9 address/filter/LOD/border.
-            if (!create_game_sampler(device, captured, previous.levels, sampler))
+            if (!draw_mirror_cache::cached_sampler_compatible(
+                    previous.levels, sourceLevels, chain, sourceLod,
+                    captured.maxMipLevel) ||
+                !create_game_sampler(device, captured, previous.levels, sampler))
                 return false;
             view = previous.view;
             return view.Get() != nullptr && sampler.Get() != nullptr;
@@ -5434,13 +5449,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             return false;
         // A cube view covers its validated six faces; a second shader slot
         // shares SRV pixels but re-creates its game-authored sampler state.
-        const UINT levels = chain
-            ? (cube ? captured.cubeTexture->GetLevelCount()
-                    : volume ? captured.volumeTexture->GetLevelCount()
-                             : captured.texture->GetLevelCount())
-            : 1u;
         if (drawMirrorCount < drawMirrors.size())
-            drawMirrors[drawMirrorCount++] = {key, levels, view};
+            drawMirrors[drawMirrorCount++] = {key, mirrorLevels, view};
         return true;
     };
     std::array<ComPtr<ID3D11ShaderResourceView>,4> vertexViews{};
@@ -5805,7 +5815,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                 second.mipFilter != D3DTEXF_NONE,
                 sampledView.Get() != nullptr && sampledSampler.Get() != nullptr)) {
             const UINT sourceLevels = capture.texture->GetLevelCount();
-            const UINT mirroredLevels = live_game_mip_lod::captured_levels(
+            const UINT mirroredLevels = draw_mirror_cache::mirrored_source_levels(
                 sourceLevels, capture.mipFilter != D3DTEXF_NONE,
                 capture.texture->GetLOD());
             if (!create_game_sampler(dev, second, mirroredLevels, stage1Sampler))

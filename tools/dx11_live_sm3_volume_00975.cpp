@@ -64,6 +64,19 @@ int main() {
     static_assert(native_sm3_volume_source_components(M::Projected,0u)==0u);
     static_assert(!native_sm3_volume_modifier_supported(M::Projected,0u,0u));
     int id=1;
+    // Actual VS/PS sampler reuse with MIPFILTER=NONE and managed SetLOD(3)
+    // must bind native levels [0..3], never a fabricated single-level SRV.
+    using draw_mirror_cache::mirrored_source_levels;
+    using draw_mirror_cache::cached_sampler_compatible;
+    static_assert(mirrored_source_levels(6u, false, 3u) == 4u);
+    static_assert(cached_sampler_compatible(4u, 6u, false, 3u, 0u));
+    static_assert(!cached_sampler_compatible(1u, 6u, false, 3u, 0u));
+    static_assert(!cached_sampler_compatible(4u, 6u, false, 3u, 1u));
+    static_assert(!cached_sampler_compatible(4u, 6u, false, 4u, 0u));
+    static_assert(!cached_sampler_compatible(6u, 6u, false, 6u, 0u));
+    static_assert(cached_sampler_compatible(6u, 6u, true, 3u, 2u));
+    static_assert(!cached_sampler_compatible(4u, 6u, true, 3u, 2u));
+    static_assert(!cached_sampler_compatible(6u, 6u, true, 3u, 6u));
     const draw_mirror_cache::ViewKey volume{&id,false,true,false,true};
     const draw_mirror_cache::ViewKey cube{&id,false,true,true,false};
     assert(draw_mirror_cache::same_view(volume,volume));
