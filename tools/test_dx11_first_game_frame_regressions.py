@@ -3512,14 +3512,45 @@ def main() -> None:
         end = hook.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
         assert start >= 0 and end > start, "game IndexedUP hook not located"
         region = hook[start:end]
-        required = (
+        common = (
             "minVertex > live::kMaxNativeGameVertices - numVertices",
             "unpacked[i] < minVertex ||",
             "unpacked[i] - minVertex >= numVertices",
-            "unpacked[i] -= minVertex;",
             "static_cast<std::size_t>(minVertex) * stride",
-            "firstVertex, stride, numVertices, unpacked.data(), count",
         )
+        # The active native SM3 path preserves the original game's absolute
+        # source indices until it has captured all secondary VB streams.
+        # The R26-safe fallback intentionally retains its previous stream-0
+        # conversion and must not be silently promoted as multistream-ready.
+        if renderer.name == "stereo_renderer_r30.cpp":
+            required = common + (
+                "std::vector<std::uint32_t> rebasedIndices = unpacked;",
+                "for (auto& index : rebasedIndices) index -= minVertex;",
+                "game_indexed_up_physical_slots(",
+                "compactIndices, true, physical",
+                "rebasedIndices, false, physical",
+                "R30CaptureNativeAdditionalStreams(",
+                "compactIndices.data(), count, &extra",
+                "rebasedIndices.data(), count, &extra",
+                "firstVertex, stride, numVertices,",
+            )
+            assert region.count("R30CaptureNativeAdditionalStreams(") == 2, (
+                "both sparse and dense IndexedUP must snapshot SM3 side streams"
+            )
+            assert region.count("game_indexed_up_physical_slots(") == 2, (
+                "both source windows must verify physical stream alignment"
+            )
+            assert "unpacked[i] -= minVertex;" not in region, (
+                "live absolute stream identities were prematurely rebased"
+            )
+        else:
+            required = common + (
+                "unpacked[i] -= minVertex;",
+                "firstVertex, stride, numVertices, unpacked.data(), count",
+            )
+            assert "R30CaptureNativeAdditionalStreams(" not in region, (
+                "R26-safe fallback must not pretend to have SM3 side streams"
+            )
         assert all(token in region for token in required), "missing live IndexedUP vertex window"
         assert "minVertex != 0" not in region, "nonzero source window silently discarded"
         for token in required:
