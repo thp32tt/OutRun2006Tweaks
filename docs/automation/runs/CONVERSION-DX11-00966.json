@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00966",
+  "production_id": "CONVERSION-DX11-00966",
+  "event_id": "CONVERSION-DX11-00966-E017",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00966",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_branch": "feature/dx11-00966-live-game-frame",
+  "feature_stage": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "feature_last_head": "a93f8d2f97967e9a5b9fbd766ed0c5dde11823cf",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C2_IMPLEMENT_C3_VALIDATE_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "material_result_sha": "2b35c8d565238596e00a045473be45fea86c0ebc",
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "score_change": 0,
+  "REAL_GAME_DRAW_BLOCKER": "No actual game-launch evidence after the 2026-10-18 eligible/native/published-zero observation; live SM3 dynamic BLENDFACTOR no longer statically rejected, actual impact UNTESTED.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Repair exact-SHA CI failures without weakening fail-closed game drawing. Then capture real menu/car/race live SM3 state-rejection buckets and complete contiguous game-authored D3D9 Draw/DrawIndexed -> native D3D11 Draw -> published 3440x1440 frame, with original input/FFB fallback; no playability claim without runtime proof.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_SM3_BLENDFACTOR_CAPTURE",
+      "NATIVE_BLEND_DESC",
+      "PER_DRAW_D3D11_BLEND_FACTOR",
+      "D3D11_NATIVE_DRAW",
+      "FULL_RESOLUTION_FRAME_PUBLICATION_PENDING_GAME_RUNTIME"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_live_sm3_blend_factor_00966.py",
+      ".github/workflows/dx11-fast-structural.yml",
+      ".github/workflows/backend-conversion-gate.yml",
+      ".github/workflows/vr-openxr.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Actual hooked shader-bound game source Draw now translates D3DRS_BLENDFACTOR/INVBLENDFACTOR to dynamic D3D11 OM BlendFactor; static C++ compile-time ARGB channel cases and targeted Python source assertions.",
+      "negative_regression": "Unknown color/independent-alpha blend factors still fail closed; D3D9 query failure remains original game Draw/input/FFB fallback; no invented native game pixels.",
+      "component_integration": "Live D3D9 GetRenderState per Draw -> exact RGBA normalized OM factors and immutable BlendState shader pipeline -> native Draw/DrawIndexed -> guarded full game frame publication (runtime pending)."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00966"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_SM3_BLENDFACTOR_CAPTURE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_NOT_RUNTIME_VERIFIED: exact-SHA mandatory CI pending. No real game Draw/published frame/Quest3 evidence; no native gameplay completion claim.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 plus OUTRUN_DX11_FULL_GAME_FRAME=1 remain opt-in; failed/unsupported native draws abort publication and preserve D3D9Ex game Present, original input/FFB and separate DXVK."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Connect game-authored D3D9 SM3 menu-to-race Draw/DrawIndexed through correct native D3D11 state, shaders and resources to one complete visible full-resolution frame while preserving safe D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_game_native_draw_pipeline",
+        "category": "end_to_end_behavior",
+        "behavior_area": "shader_state_gpu_draw",
+        "expected_behavior": "Actual D3D9 SM3 draw uses correct per-draw color/alpha blend factors and real native D3D11 Draw/DrawIndexed."
+      },
+      {
+        "id": "no_invalid_game_frame_or_input_change",
+        "category": "fallback_regression",
+        "behavior_area": "game_frame_publication_and_original_controls",
+        "expected_behavior": "Unknown blend and unavailable resources never publish partial native frames or alter original gamepad/FFB/D3D9Ex behavior."
+      },
+      {
+        "id": "mandatory_five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "windows_backend_and_openxr_integrity",
+        "expected_behavior": "All five mandatory Windows/backend/fast/OpenXR/HUD CI succeed on the same promoted source SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_game_native_draw_pipeline": {
+      "status": "PENDING_REAL_GAME_EVIDENCE",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_blend_factor_00966.py"
+    },
+    "no_invalid_game_frame_or_input_change": {
+      "status": "PENDING_EXACT_SHA_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_live_sm3_blend_factor_00966.py"
+      ],
+      "validation_command": "python tools/test_dx11_live_sm3_blend_factor_00966.py"
+    },
+    "mandatory_five_gate_exact_sha": {
+      "status": "PENDING_EXACT_SHA_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "GitHub Actions exact head SHA"
+    }
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_live_sm3_blend_factor_00966.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/vr-openxr.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/outrun-exe-hud-inspector.yml"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: remote checkpoint 20261021T1500 and target fc2065e5...",
+    "C1_REVIEW": "PASS: 00965 C6 complete, 00477 R175 owner released, 00966 absent before restart",
+    "C2_IMPLEMENT": "PASS: meaningful live SM3 dynamic per-draw blend constant mapping source commit 2b35c8d5",
+    "C3_VALIDATE": "IN_PROGRESS: exact feature HEAD a93f8d2; Fast first failed due legacy 00965 policy acceptance, 00966 pending record now supersedes highest run",
+    "C4_COMMIT": "PASS: feature source commits 2b35c8d5/a93f8d2 with exact marker; no target promotion",
+    "C5_PACKAGE": "NOT_REQUIRED until feature proven",
+    "C6_RESULT": "NOT_READY; original runtime UNTESTED"
+  }
+}
