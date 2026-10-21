@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "rollover_resume_verified",
+  "captured_at_kst": "2026-10-21T16:48:00+09:00",
+  "task_id": "CONVERSION-DX11-00966",
+  "production_id": "CONVERSION-DX11-00966",
+  "event_id": "CONVERSION-DX11-00966-E023",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 12,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "target_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_branch": "feature/dx11-00966-live-game-frame",
+  "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "feature_last_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "feature_stage": "PROMOTED_TARGET_CI_PENDING",
+  "feature_ready_evidence_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "behind": 0,
+  "force": false,
+  "feature_ci": {
+    "exact_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+    "all_five": "success",
+    "runs": [
+      39557705574,
+      39557705584,
+      39557705520,
+      39557705443,
+      39557705455
+    ]
+  },
+  "target_ci": {
+    "exact_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+    "fast": "success",
+    "backend": "in_progress",
+    "build": "in_progress",
+    "openxr": "in_progress",
+    "hud": "in_progress",
+    "runs": [
+      39564130518,
+      39564130486,
+      39564130565,
+      39564130437,
+      39564130576
+    ]
+  },
+  "pending_acceptance": [
+    "Confirm five required target-branch exact-SHA Actions conclusions",
+    "Confirm promoted Build/backend artifacts and bundle",
+    "Write C6 run record on game target after evidence, keeping validation-bearing SHA unchanged",
+    "Real game menu/car/race native Draw and published-frame evidence not available; do not claim full gameplay or HMD success"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "If any exact-SHA CI fails repair causal source/test/workflow under this task; otherwise finish C6 without duplicate source commit. Resume full-resolution genuine D3D9 game Draw->D3D11 Draw->native published frame evidence; preserve DX9Ex fallback/input/FFB.",
+  "runtime_validation": "UNTESTED",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "score_change": 0,
+  "source_owned_commits_present": true
+}
