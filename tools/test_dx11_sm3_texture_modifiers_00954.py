@@ -9,7 +9,17 @@ arithmetic = (root / "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp").read_text
 assert "native_sm3_texture_modifier_supported(" in texture
 assert "return modifier == 0u;" in texture
 assert "modifier <= 12u" in texture
-assert "!native_sm3_texture_modifier_supported(" in backend
+# Confirm the live fail-closed guard now selects the cube or 2D source
+# modifier validator. The former single-call guard was generalized, not removed.
+import re
+texture_guard = (r"if\s*\(op\.texture2d\s*&&\s*!\s*\(op\.textureCube\s*\?"
+                 r"\s*native_sm3_cube_modifier_supported\(op\.textureMode, i, modifier\)"
+                 r"\s*:\s*native_sm3_texture_modifier_supported\(op\.textureMode, i, modifier\)\)\)")
+assert re.search(texture_guard, backend), "cube/2D TEX source modifier fallback missing"
+for valid_call in ("native_sm3_cube_modifier_supported(op.textureMode, i, modifier)",
+                   "native_sm3_texture_modifier_supported(op.textureMode, i, modifier)"):
+    assert valid_call in backend
+    assert re.search(texture_guard, backend.replace(valid_call, "true", 1)) is None
 assert "if (op.texture2d && modifier != D3DSPSM_NONE)" not in backend
 for condition in ("!samplerDeclared[reg]", "!sampler2dDeclared[reg]",
                   "modifier != D3DSPSM_NONE || swizzle != 0xe4u"):

@@ -116,9 +116,11 @@ def main() -> None:
         assert not connected(source.replace(old, bad, 1)), "mutation survived: " + old
         # The first occurrence may belong to a cube mirror; also mutate the
         # 2D route on its own when both paths carry the same source fragment.
-        prefix, texture2d = source.split("bool mirror_texture(", 1)
+        prefix, rest = source.split("bool mirror_texture(", 1)
+        texture2d, suffix = rest.split("bool submit(", 1)
         if old in texture2d:
-            changed = prefix + "bool mirror_texture(" + texture2d.replace(old, bad, 1)
+            changed = (prefix + "bool mirror_texture(" +
+                       texture2d.replace(old, bad, 1) + "bool submit(" + suffix)
             assert not connected(changed), "2D mutation survived: " + old
     formats = ("a8", "x8", "dxt1", "dxt3", "dxt5", "565", "1555", "4444", "unknown")
     valid = 0
