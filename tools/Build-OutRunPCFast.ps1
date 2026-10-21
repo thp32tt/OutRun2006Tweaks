@@ -115,8 +115,15 @@ Assert-R26PcBuildContract -BuildDir $gameBuild
 $vcxproj = Join-Path $gameBuild 'outrun2006tweaks.vcxproj'
 if (!(Test-Path $vcxproj)) { throw "Missing generated Win32 target: $vcxproj" }
 [xml]$projXml = Get-Content $vcxproj -Raw
-# Test-build portability fix: XML ItemGroup nodes need not contain ClCompile under PowerShell strict mode.
-$compileInputs = @($projXml.SelectNodes('//*[local-name()="ClCompile"][@Include]') | ForEach-Object { $_.GetAttribute('Include') } | Where-Object { $_ })
+# PowerShell XML property projection is brittle when an ItemGroup contains no
+# ClCompile child (common on clean GitHub-hosted runners). Select by local-name
+# across all MSBuild ItemGroups so the source-graph proof works with or without
+# the default MSBuild XML namespace.
+$compileInputs = @(
+    $projXml.SelectNodes("//*[local-name()='ClCompile']") |
+        ForEach-Object { $_.GetAttribute('Include') } |
+        Where-Object { $_ }
+)
 $r26Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r30_r26_safe\.cpp$' })
 $r84Owner = @($compileInputs | Where-Object { $_ -match 'stereo_renderer_r33\.cpp$' })
 if ($r26Owner.Count -ne 1 -or $r84Owner.Count -ne 0) { throw "PC FAST SOURCE GRAPH MISMATCH: R26=$($r26Owner.Count), R84=$($r84Owner.Count)" }
@@ -209,7 +216,15 @@ $runtimeFiles = @(
 foreach ($file in $runtimeFiles) {
     $src = Join-Path 'tools' $file
     if (-not (Test-Path $src)) { throw "Runtime packaging file missing: $src" }
-    Copy-Item $src (Join-Path $packageDir $file)
+    $dst = Join-Path $packageDir $file
+    Copy-Item $src $dst
+    # Windows PowerShell 5.1 treats UTF-8 without BOM as the active ANSI code
+    # page. Re-emit packaged PS1 launchers as UTF-8-with-BOM so Korean UI text
+    # cannot corrupt quotes/tokens on GitHub-hosted Windows runners or user PCs.
+    if ([IO.Path]::GetExtension($file) -ieq '.ps1') {
+        $utf8Text = Get-Content -LiteralPath $src -Raw -Encoding UTF8
+        Set-Content -LiteralPath $dst -Value $utf8Text -Encoding UTF8
+    }
 }
 Copy-Item 'docs/VR_TEST_STRATEGY.md' (Join-Path $packageDir 'VR_TEST_STRATEGY.md')
 
@@ -292,13 +307,25 @@ if (-not [string]::IsNullOrWhiteSpace($env:OUTRUN_TEST_DROP_ROOT)) {
 # Never publish an older queued build over the newest test folder.
 # The runner checkout stays pinned to ExpectedSha; also verify the GitHub
 # branch tip *at publication time*, after all expensive compilation is done.
-if ($ExpectedSha) {
-    $remote = @(git ls-remote --heads origin refs/heads/vr-d3d9ex-focus)
+$hostedArtifactBuild = $env:GITHUB_ACTIONS -eq 'true'
+if ($ExpectedSha -and -not $hostedArtifactBuild) {
+    $publicationBranch = if ([string]::IsNullOrWhiteSpace($env:GITHUB_REF_NAME)) {
+        'vr-d3d9ex-focus'
+    } else {
+        $env:GITHUB_REF_NAME
+    }
+    $remote = @(git ls-remote --heads origin ("refs/heads/{0}" -f $publicationBranch))
     if ($LASTEXITCODE -ne 0 -or $remote.Count -ne 1) { throw 'PC Fast cannot verify branch tip before publication' }
     $remoteSha = ($remote[0] -split '\s+')[0]
     if ($remoteSha -ne $ExpectedSha) {
         throw "PC Fast stale build blocked before LATEST publication: expected=$ExpectedSha remote=$remoteSha"
     }
+} elseif ($ExpectedSha -and $hostedArtifactBuild) {
+    # GitHub artifacts are immutable and SHA-named. A docs-only branch advance
+    # during a long clean hosted build must not discard an already verified
+    # exact-SHA ZIP; only the persistent self-hosted LATEST path needs the
+    # branch-tip publication fence.
+    Write-Host "PC Fast hosted artifact: exact SHA package retained even if branch tip advances ($ExpectedSha)"
 }
 $latestDrop = Join-Path $dropRoot 'LATEST'
 New-Item -ItemType Directory -Force $dropRoot | Out-Null
