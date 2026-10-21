@@ -1,0 +1,41 @@
+{
+  "run_key": "OUTRUN-C1-20261022T0815KST-NEW-SHA",
+  "inspection_time_kst": "2026-10-22T08:17:19+09:00",
+  "role": "C1",
+  "status": "IDLE",
+  "reason": "No newly unreviewed SHA256 among N100 A/B actual exported local PNG candidates. Existing 313 SHA-verified PNG candidates match historical C1 SHA records.",
+  "repo_branch": "korean-localization-recovery-20260928",
+  "policy_files_checked": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "source_root": "/home/chatgpt-runner2/work/image-src/text_roi_batches",
+  "inventory_evidence": "/home/chatgpt-runner2/work/c1_20261022_0815_inventory_result.json",
+  "inventory_script": "/home/chatgpt-runner2/work/c1_20261022_0815_inventory.py",
+  "reports_read": 53,
+  "reviewed_historical_sha": 318,
+  "export_evidence_files": 66,
+  "export_candidate_records": 313,
+  "unique_actual_candidate_sha": 313,
+  "candidate_png_files_by_role": {
+    "A": 139,
+    "B": 174
+  },
+  "new_unreviewed_sha": 0,
+  "sha_mismatch_count": 0,
+  "missing_input_or_output_count": 0,
+  "unexported_png_count": 0,
+  "new_visual_reviews": 0,
+  "new_pass": 0,
+  "new_fail": 0,
+  "duplicate_sha_skipped": true,
+  "no_image_generation": true,
+  "no_queue_consumption": true,
+  "no_dds_export": true,
+  "new_C2_or_C3_pass": false,
+  "new_ingame_pass": false,
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "notes": "IDLE evidence only. Historical C1 QA outcomes unchanged. User-scoped C1-only QA, no edits to VR/FFB/DX11/DXVK."
+}
