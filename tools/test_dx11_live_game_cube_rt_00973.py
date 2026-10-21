@@ -31,5 +31,5 @@ for needle in ("if (!cpuLocked && !gpuCubeRt) return false;",
 assert "24ull << 20u" in hdr and "face > (maximum - total) / 6u" in hdr
 assert "dx11_live_game_cube_rt_00973.cpp" in wf
 assert "test_dx11_live_game_cube_rt_00973.py" in wf
-assert "mirrorLiveSampler(capture," in src and "context->DrawIndexed(nativeIndexCount, 0u, 0)" in src
+assert "mirrorLiveSampler(capture," in src and "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in src
 print("PASS live game GPU cube six-face mip mirror with DX9Ex fallback")

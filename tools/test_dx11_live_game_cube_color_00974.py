@@ -34,6 +34,6 @@ for token in ("D3DFMT_A2R10G10B10", "D3DFMT_X4R4G4B4",
     assert not integrated(SRC.replace(token, "/* removed */", 1)), token
 assert "dx11_live_game_cube_color_00974.cpp" in FAST
 assert "test_dx11_live_game_cube_color_00974.py" in FAST
-assert "context->DrawIndexed(nativeIndexCount, 0u, 0)" in SRC
+assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in SRC
 assert "mirrorLiveSampler(capture," in SRC
 print("PASS live SM3 cube format family, GPU readback and DX9Ex fallback")
