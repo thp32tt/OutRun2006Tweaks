@@ -1,0 +1,428 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1145KST-NEW-SHA-UNIQUE8-A0017-A0018",
+  "review_slot_kst": "2026-10-21 11:45",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "417b7aa491c93484da08d7d803befc1c91d1c8f4",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "Eight SHA-unique, unapproved A-generated Korean PNG outputs; independent C1 QA only; no producer queue consumption, ImageGen, DDS, C2/C3 or in-game signoff.",
+  "counts": {
+    "previous_qa_log_files": 26,
+    "previous_unique_qa_sha": 178,
+    "unreviewed_available_at_selection": 18,
+    "reviewed_new_unique": 8,
+    "pass_png_text_only": 6,
+    "fail_major_style_color_mismatch": 2,
+    "producer_rework_dimensions": 8,
+    "unreviewed_after_selection_at_snapshot": 10
+  },
+  "evidence": {
+    "n100_metrics_path": "work/c1_batch_20261021_1145/metrics.json",
+    "n100_source_output_sheets": [
+      "work/c1_batch_20261021_1145/compare_1.jpg",
+      "work/c1_batch_20261021_1145/compare_2.jpg"
+    ],
+    "source_manifest_and_producer_export_sha_verified": true,
+    "all_png_rgba": true,
+    "alpha_ge16_border_pixel_counts_all_zero": true,
+    "visual": "Compared all 8 source/generated text ROI previews in two 4-row checkerboard sheets. The original source crops include adjacent UI/atlas art, but output is lettering-only. Original source/translation mapping checked for each. Ordinals 85 and 87 have severe orange-metallic changes from white SPECIAL REQUEST lettering."
+  },
+  "results": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0017-DDC9FE13",
+      "ordinal": 81,
+      "candidate_file": "Q051_e729eb91931f820e_source_k.png",
+      "source_file": "Q051_e729eb91931f820e_source.png",
+      "candidate_sha256": "fa9749a4bc0d1044b098231757053d04c52d8540083336e918f570befc8a7b89",
+      "export_sha_match": true,
+      "source_sha256": "3658b6e4e00f10957b5593c8ef595c877b14dff1e6bc6fea4a593a3160a3d652",
+      "source_sha_match": true,
+      "english": "Start",
+      "approved_korean": "시작",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1720,
+        914
+      ],
+      "source_dimensions": [
+        368,
+        196
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        551,
+        309,
+        1237,
+        695
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'시작' 글자/획이 정상이며 원문의 흰색 채움과 짙은 남색 윤곽이 유지됨. 글자 레이어에 배경 요소 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0017-DDC9FE13",
+      "ordinal": 82,
+      "candidate_file": "Q051_f3f412964382b8cf_source_k.png",
+      "source_file": "Q051_f3f412964382b8cf_source.png",
+      "candidate_sha256": "b3452fdbdc493a08d83a7a95a74c23b066fd7b9e8f006cfaff18ff426a011aa7",
+      "export_sha_match": true,
+      "source_sha256": "885b8ba560410a895c80041b1483c5cc1fb0de1389d5c152ea6a5cfb06647b79",
+      "source_sha_match": true,
+      "english": "Rival",
+      "approved_korean": "라이벌",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1739,
+        904
+      ],
+      "source_dimensions": [
+        404,
+        210
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        43,
+        160,
+        1449,
+        808
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'라이벌' 글자와 받침 정확. 원문 노란색 채움·짙은 남색 윤곽 및 기울임 계열 유지.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0017-DDC9FE13",
+      "ordinal": 83,
+      "candidate_file": "Q051_cf1eb0f81ca6763c_source_k.png",
+      "source_file": "Q051_cf1eb0f81ca6763c_source.png",
+      "candidate_sha256": "ad5379b973cd79a1412495adde08d4c9ef091552fb8432dd3c12ca74ec7c310a",
+      "export_sha_match": true,
+      "source_sha256": "edae69bd3e238b52db1fb24183889823f4f118a2b3cce1d1c1ffb19ef792cad1",
+      "source_sha_match": true,
+      "english": "Brake pedal + Shift : Player Only Mode Entry",
+      "approved_korean": "브레이크 페달 + 시프트: 플레이어 전용 모드 진입",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2046,
+        769
+      ],
+      "source_dimensions": [
+        1368,
+        267
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        98,
+        55,
+        2016,
+        591
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'브레이크 페달 + 시프트: 플레이어 전용 모드 진입'으로 의미와 한글 매핑 일치. 흰색 이탤릭 텍스트만 확인, 배경 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0018-7E7FE9F9",
+      "ordinal": 84,
+      "candidate_file": "Q057_8c8f9b124f72cca9_source_k.png",
+      "source_file": "Q057_8c8f9b124f72cca9_source.png",
+      "candidate_sha256": "85ce8080ee15660d2dc0e33a9dc4d13450a60268bb9c1fa43b734c83b67cd735",
+      "export_sha_match": true,
+      "source_sha256": "68849f0786d7ba60ca8acc8b8fc32727d277232343d36b1c6550fe21794b3e6e",
+      "source_sha_match": true,
+      "english": "Target",
+      "approved_korean": "목표",
+      "source_dds_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1738,
+        905
+      ],
+      "source_dimensions": [
+        463,
+        241
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_nonzero_bbox": [
+        226,
+        100,
+        1517,
+        784
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'목표' 정확하며 원문 Target의 은색/회색 메탈릭 채움과 외곽을 대체로 유지. 비문자 아트는 생성물에 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0018-7E7FE9F9",
+      "ordinal": 85,
+      "candidate_file": "Q057_1c81e01f0616906e_source_k.png",
+      "source_file": "Q057_1c81e01f0616906e_source.png",
+      "candidate_sha256": "903125351e08947a214752561d0ea15ade5e5d9405f8b36efae5d2237194273c",
+      "export_sha_match": true,
+      "source_sha256": "5675f51b0b2f6e58849b799a9f098a235c5929bb8685b95da5437c66506c5497",
+      "source_sha_match": true,
+      "english": "SPECIAL REQUEST",
+      "approved_korean": "스페셜 요청",
+      "source_dds_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2004,
+        785
+      ],
+      "source_dimensions": [
+        2372,
+        928
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        113,
+        67,
+        1916,
+        729
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_COLOR_MISMATCH",
+      "visual_reason": "원본 SPECIAL REQUEST는 굵은 흰색 단색 이탤릭 글자인데 생성물 '스페셜 요청'이 금색/주황색 메탈릭 입체 글자로 전체 변경됨. 경미한 스타일 편차를 넘음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0018-7E7FE9F9",
+      "ordinal": 86,
+      "candidate_file": "Q057_505cd1de7132a8d6_source_k.png",
+      "source_file": "Q057_505cd1de7132a8d6_source.png",
+      "candidate_sha256": "61781f8a6979ca0d7c53a59cf2d6f80003d9943a03452d683eba04026a1b9d28",
+      "export_sha_match": true,
+      "source_sha256": "20e3d62ef401641fc146c06e8a2be4b30ec6a979370a1ddf873e1e235eabe5bb",
+      "source_sha_match": true,
+      "english": "Technical Bonus",
+      "approved_korean": "테크니컬 보너스",
+      "source_dds_sha256": "f039f935c899b222c8532584e0d79bb286c55a99c2f69df45342711298e1be05",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2320,
+        691
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        144,
+        89,
+        2118,
+        692
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'테크니컬 보너스' 정확. 원문 Technical Bonus와 같은 밝은 채움/주황색 계열 하단 음영 및 어두운 외곽 효과를 보존. 배경 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0018-7E7FE9F9",
+      "ordinal": 87,
+      "candidate_file": "Q057_507d223cb7ab13b9_source_k.png",
+      "source_file": "Q057_507d223cb7ab13b9_source.png",
+      "candidate_sha256": "b3ae6a73a0a6b102f76eddbf44a53e5c729f24fd979ffa36ca0a8c7a9634015a",
+      "export_sha_match": true,
+      "source_sha256": "53289255cddcd8328ee4261d411812fcce02629549d642e31b15c35e56965246",
+      "source_sha_match": true,
+      "english": "SPECIAL REQUEST",
+      "approved_korean": "스페셜 요청",
+      "source_dds_sha256": "f039f935c899b222c8532584e0d79bb286c55a99c2f69df45342711298e1be05",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2004,
+        785
+      ],
+      "source_dimensions": [
+        2372,
+        928
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        160,
+        67,
+        1878,
+        729
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_COLOR_MISMATCH",
+      "visual_reason": "원본 SPECIAL REQUEST의 흰색 단색 볼드 이탤릭이 전체 주황색/금색 메탈릭 효과로 변경됨. 85와는 SHA가 다른 별도 원본/결과 자산.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0018-7E7FE9F9",
+      "ordinal": 88,
+      "candidate_file": "Q057_ccaefbb8a794ca78_source_k.png",
+      "source_file": "Q057_ccaefbb8a794ca78_source.png",
+      "candidate_sha256": "39bbba2b92ac34b13cdd9d5c56e4e6fdace7fa5a9fd4c774e75f1fe97d682245",
+      "export_sha_match": true,
+      "source_sha256": "328036f15f50914555fc42c97703861d3c5290069a925fd8c03d25acf0387afd",
+      "source_sha_match": true,
+      "english": "Technical Bonus",
+      "approved_korean": "테크니컬 보너스",
+      "source_dds_sha256": "234b03ef02c7f5184ae35a280cfe7eb01c2e4fdfdd722737f54bb87b7cf58256",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2320,
+        691
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        169,
+        9,
+        2013,
+        684
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'테크니컬 보너스' 정확. 원문 Technical Bonus의 금속 광택·오렌지 음영·남색 외곽 계열 유지. 배경 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
