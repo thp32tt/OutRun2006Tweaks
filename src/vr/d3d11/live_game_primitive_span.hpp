@@ -5,6 +5,7 @@
 #include <cstring>
 #include <limits>
 #include <vector>
+#include "live_game_source_stride.hpp"
 
 namespace outrun::vr::dx11::live_game_frame {
 // Game-authored mesh snapshots can span 2048 primitives. One shared,
@@ -128,7 +129,7 @@ inline bool game_compact_sparse_indices(
      std::vector<std::uint8_t>& packedVertices,
      std::vector<std::uint32_t>& packedIndices) {
      if (!vertexBase || !absoluteIndices || !numVertices ||
-         stride < 16u || stride > 512u || !indexCount ||
+         !game_native_source_stride_valid(stride) || !indexCount ||
          indexCount > kMaxNativeGameVertices ||
          minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices)
          return false;
@@ -163,6 +164,91 @@ inline bool game_compact_sparse_indices(
      packedIndices.swap(remapped);
      return true;
  }
+
+// The game supplies the original D3D9 IndexedUP index pointer, not a
+// backend-owned buffer. Bound the full 16/32-bit index snapshot before any
+// native diagnostic dereference or pointer arithmetic. This is only an
+// address-wrap check; it does not claim the source pages are readable.
+// Invalid native sources leave the original D3D9 draw/input untouched.
+[[nodiscard]] constexpr bool game_indexed_up_index_source_range(
+    std::uintptr_t sourceAddress, std::uint32_t indexCount,
+    std::uint32_t indexWidth,
+    std::uintptr_t addressLimit =
+        (std::numeric_limits<std::uintptr_t>::max)()) noexcept {
+    if (sourceAddress == 0u || sourceAddress > addressLimit ||
+        indexCount == 0u || indexCount > kMaxNativeGameVertices ||
+        (indexWidth != 2u && indexWidth != 4u))
+        return false;
+    const std::uint64_t lastByte =
+        static_cast<std::uint64_t>(indexCount) * indexWidth - 1u;
+    return lastByte <= static_cast<std::uint64_t>(
+        addressLimit - sourceAddress);
+}
+
+// The dense IndexedUP fast path rebases D3D9's MinVertexIndex and must
+// advance its *source pointer* by that same physical offset. On x86 the
+// native CPU snapshot must not wrap a 32-bit UP address before D3D9 gets
+// its original Draw. Check the final readable byte without dereferencing;
+// on failure the original D3D9 call remains authoritative. The caller still
+// owns actual pointer readability and source lifetime.
+[[nodiscard]] constexpr bool game_indexed_up_dense_source_range(
+    std::uintptr_t sourceAddress, std::uint32_t minVertex,
+    std::uint32_t numVertices, std::uint32_t stride,
+    std::uintptr_t& firstAddress,
+    std::uintptr_t addressLimit =
+        (std::numeric_limits<std::uintptr_t>::max)()) noexcept {
+    if (sourceAddress == 0u || sourceAddress > addressLimit ||
+        numVertices == 0u || numVertices > kMaxNativeGameVertices ||
+        !game_native_source_stride_valid(stride))
+        return false;
+    const std::uint64_t firstOffset =
+        static_cast<std::uint64_t>(minVertex) * stride;
+    const std::uint64_t finalOffset =
+        (static_cast<std::uint64_t>(minVertex) + numVertices) * stride - 1u;
+    if (finalOffset > static_cast<std::uint64_t>(addressLimit - sourceAddress))
+        return false;
+    firstAddress = sourceAddress + static_cast<std::uintptr_t>(firstOffset);
+    return true;
+}
+
+// IndexedUP stream 0 comes from the call's user pointer while any referenced
+// secondary streams still belong to the game's D3D9 stream bindings. Reconstruct
+// the SAME physical slots in exactly the same native IA order, not the rebased
+// index values. A bad index/window or a sparse compaction mismatch must abort
+// before any secondary VB bytes are copied or native GPU work is queued.
+// On failure preserve the previous vector; D3D9 Draw remains authoritative.
+inline bool game_indexed_up_physical_slots(
+    const std::uint32_t* absoluteIndices, std::uint32_t indexCount,
+    std::uint32_t minVertex, std::uint32_t numVertices,
+    const std::vector<std::uint32_t>& rebasedIndices, bool sparse,
+    std::vector<std::uint32_t>& physical) {
+    if (!absoluteIndices || indexCount == 0u ||
+        indexCount > kMaxNativeGameVertices || numVertices == 0u ||
+        minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices ||
+        rebasedIndices.size() != indexCount)
+        return false;
+    for (std::uint32_t i = 0u; i < indexCount; ++i)
+        if (absoluteIndices[i] < minVertex ||
+            absoluteIndices[i] - minVertex >= numVertices)
+            return false;
+    std::vector<std::uint32_t> slots, checked;
+    if (sparse) {
+        if (!game_compact_sparse_indices(absoluteIndices, indexCount,
+                                         kMaxNativeGameVertices, slots, checked) ||
+            checked != rebasedIndices)
+            return false;
+    } else {
+        if (numVertices > kMaxNativeGameVertices) return false;
+        for (std::uint32_t i = 0u; i < indexCount; ++i)
+            if (rebasedIndices[i] != absoluteIndices[i] - minVertex)
+                return false;
+        slots.resize(numVertices);
+        for (std::uint32_t i = 0u; i < numVertices; ++i)
+            slots[i] = minVertex + i;
+    }
+    physical.swap(slots);
+    return true;
+}
 
 // D3D9 single-sample line raster parity for *programmable* VS/PS draws.
  // The fixed-function game raster already uses these same exclusions.

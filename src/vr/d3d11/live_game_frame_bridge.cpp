@@ -1,5 +1,6 @@
 #include "live_game_frame_bridge.hpp"
 #include "live_game_primitive_span.hpp"
+#include "live_game_source_stride.hpp"
 #include "live_game_depth_state.hpp"
 #include "live_game_cull_state.hpp"
 #include "live_game_sm3_composite.hpp"
@@ -4552,7 +4553,7 @@ bool live_sm3_input_layout(
     std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
     bool& repack, UINT& nativeStride) noexcept {
     try {
-    if (declaration.size() < 2u || stride == 0u) return false;
+    if (declaration.size() < 2u || !game_native_source_stride_valid(stride)) return false;
     static constexpr const char* kPosition = "POSITION";
     static constexpr const char* kTexcoord = "TEXCOORD";
     static constexpr const char* kNormal = "NORMAL";
@@ -4702,7 +4703,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         }
     } rejectionAudit{s.liveSm3RejectStages, rejectionStage, submitted};
     try {
-    if (!env_full_game_opt_in() || !game || !bytes || !stride ||
+    if (!env_full_game_opt_in() || !game || !bytes ||
+        !game_native_source_stride_valid(stride) ||
         vertexCount == 0u || vertexCount > kMaxVertices ||
         type != D3DPT_POINTLIST && type != D3DPT_TRIANGLELIST &&
         type != D3DPT_TRIANGLESTRIP && type != D3DPT_TRIANGLEFAN &&

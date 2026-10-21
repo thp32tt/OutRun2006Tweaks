@@ -166,6 +166,88 @@ int main() {
         kMaxNativeGameVertices + 1u, sparseMin, 40000u,
         upPacked, upRemapped));
     assert(upPacked == keptUp && upRemapped == keptUpIndices);
+    // 00966: native diagnostic must not wrap a game-owned x86 IB/UP
+    // pointer before the original D3D9 DrawIndexedPrimitiveUP executes.
+    using outrun::vr::dx11::live_game_frame::game_indexed_up_index_source_range;
+    static_assert(game_indexed_up_index_source_range(
+        0xfffffffcu, 2u, 2u, 0xffffffffu));
+    static_assert(game_indexed_up_index_source_range(
+        0xfffffffeu, 1u, 2u, 0xffffffffu));
+    static_assert(!game_indexed_up_index_source_range(
+        0xffffffffu, 1u, 2u, 0xffffffffu));
+    static_assert(!game_indexed_up_index_source_range(
+        0xfffffffcu, 2u, 4u, 0xffffffffu));
+    assert(game_indexed_up_index_source_range(
+        0x1000u, 3u, 4u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0u, 3u, 4u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, 0u, 2u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, kMaxNativeGameVertices + 1u, 2u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, 3u, 1u, 0xffffffffu));
+    assert(!game_indexed_up_index_source_range(
+        0x1000u, 3u, 8u, 0xffffffffu));
+    // 00966: the dense IndexedUP source span must rebase the pointer
+    // without overflowing x86 address space or mutating output on failure.
+    using outrun::vr::dx11::live_game_frame::game_indexed_up_dense_source_range;
+    std::uintptr_t firstAddress = 0xdeadu;
+    assert(game_indexed_up_dense_source_range(
+        0x1000u, 5u, 3u, 12u, firstAddress, 0xffffffffu));
+    assert(firstAddress == 0x103cu);
+    firstAddress = 0xdeadu;
+    assert(!game_indexed_up_dense_source_range(
+        0xfffffff0u, 1u, 2u, 16u, firstAddress, 0xffffffffu));
+    assert(firstAddress == 0xdeadu);
+    assert(game_indexed_up_dense_source_range(
+        0xfffffff0u, 0u, 1u, 16u, firstAddress, 0xffffffffu));
+    assert(firstAddress == 0xfffffff0u);
+    firstAddress = 0xdeadu;
+    assert(!game_indexed_up_dense_source_range(
+        0x1000u, 0u, 0u, 12u, firstAddress, 0xffffffffu));
+    assert(!game_indexed_up_dense_source_range(
+        0x1000u, 0u, 3u, 0u, firstAddress, 0xffffffffu));
+    assert(!game_indexed_up_dense_source_range(
+        0x1000u, 0u, kMaxNativeGameVertices + 1u, 12u,
+        firstAddress, 0xffffffffu));
+    assert(firstAddress == 0xdeadu);
+    // 00966: source-absolute IndexedUP stream-1..3 slots must match
+    // the same ordered native vertices as stream 0 for DrawIndexed.
+    using outrun::vr::dx11::live_game_frame::game_indexed_up_physical_slots;
+    const std::uint32_t denseAbsolute[] = {7u, 5u, 7u};
+    const std::vector<std::uint32_t> denseNative{2u, 0u, 2u};
+    std::vector<std::uint32_t> streamSlots{777u};
+    assert(game_indexed_up_physical_slots(
+        denseAbsolute, 3u, 5u, 3u, denseNative, false, streamSlots));
+    assert((streamSlots == std::vector<std::uint32_t>{5u, 6u, 7u}));
+    const auto denseSlots = streamSlots;
+    assert(!game_indexed_up_physical_slots(
+        denseAbsolute, 3u, 5u, 3u, std::vector<std::uint32_t>{0u, 0u, 2u},
+        false, streamSlots) && streamSlots == denseSlots);
+    assert(!game_indexed_up_physical_slots(
+        denseAbsolute, 3u, 6u, 3u, denseNative, false, streamSlots) &&
+        streamSlots == denseSlots);
+    assert(!game_indexed_up_physical_slots(
+        denseAbsolute, 3u, 5u, 0u, denseNative, false, streamSlots) &&
+        streamSlots == denseSlots);
+    assert(!game_indexed_up_physical_slots(
+        denseAbsolute, 3u, 0xfffffffeu, 4u, denseNative, false,
+        streamSlots) && streamSlots == denseSlots);
+    assert(game_indexed_up_physical_slots(
+        upIndices, 3u, sparseMin, 40000u, upRemapped, true, streamSlots));
+    assert((streamSlots == std::vector<std::uint32_t>{9000u, 10000u}));
+    const auto sparseSlots = streamSlots;
+    assert(!game_indexed_up_physical_slots(
+        upIndices, 3u, sparseMin, 40000u,
+        std::vector<std::uint32_t>{0u, 1u, 0u}, true, streamSlots) &&
+        streamSlots == sparseSlots);
+    assert(!game_indexed_up_physical_slots(
+        badUp, 3u, sparseMin, 40000u, upRemapped, true, streamSlots) &&
+        streamSlots == sparseSlots);
+    assert(!game_indexed_up_physical_slots(
+        nullptr, 3u, sparseMin, 40000u, upRemapped, true, streamSlots) &&
+        streamSlots == sparseSlots);
     const auto fullUnique = uniqueSlots, fullRemap = remapped;
     assert(!game_compact_sparse_indices(
         fullMesh.data(), static_cast<std::uint32_t>(fullMesh.size()),

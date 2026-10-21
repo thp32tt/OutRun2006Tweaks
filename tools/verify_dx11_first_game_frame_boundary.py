@@ -123,10 +123,35 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "NativeDrawPathActive" not in caller and
             "NativeDrawPathActive" not in header,
             "production native activation flag cannot be promoted")
+    # Source-accurate four-family gate: the active R30 IndexedUP/UP path
+    # snapshots live multi-stream CPU shadows before the game's transient UP
+    # pointer expires. R26-safe deliberately uses its old stream-0 only path.
+    # Do not weaken either callsite or change the guarded DX9Ex return path.
+    up_start = caller.find("HRESULT __stdcall DrawPrimitiveUPDestR30(")
+    up_end = caller.find("HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(", up_start)
+    require(up_start >= 0 and up_end > up_start,
+            "DrawPrimitiveUP must retain its original real-game hook")
+    up_caller = caller[up_start:up_end]
+    if "void R30ObserveNativeLinearUP(" in caller:
+        source_start = caller.find("void R30ObserveNativeLinearUP(")
+        source_end = caller.find("void R30ObserveNativeIndexedUP(", source_start)
+        source_capture = caller[source_start:source_end]
+        require(source_start >= 0 and source_end > source_start and
+                "R30NativeGameSourceGuard nativeSource{device};" in source_capture and
+                "game_native_primitive_element_count(" in source_capture and
+                "if (!R30CaptureNativeAdditionalStreams(" in source_capture and
+                "device, physical, extra, owned" in source_capture and
+                "vertices, stride, &extra" in source_capture and
+                "R30ObserveNativeLinearUP(device, type, primitiveCount, data, stride);" in up_caller and
+                "live_game_frame::observe_linear(" not in up_caller,
+                "native DrawPrimitiveUP must capture all referenced secondary streams")
+    else:
+        require("live_game_frame::observe_linear(" in up_caller and
+                "R30ObserveNativeLinearUP(" not in up_caller,
+                "R26-safe DrawPrimitiveUP stream-0 forwarding must remain")
     require('R30ObserveNativeLinearVB(device, type, startVertex, primitiveCount);' in caller and
             'R30ObserveNativeIndexedVB(device, type, baseVertexIndex,' in caller and
-            'R30ObserveNativeIndexedUP(device, type, minVertexIndex, numVertices,' in caller and
-            'live_game_frame::observe_linear(' in caller,
+            'R30ObserveNativeIndexedUP(device, type, minVertexIndex, numVertices,' in caller,
             "all four live D3D9 source families must be hooked")
     require("R30PresentR29Hook.stdcall<HRESULT>(" in caller and
             "R30DrawPrimitiveR29Hook.stdcall<HRESULT>(" in caller and

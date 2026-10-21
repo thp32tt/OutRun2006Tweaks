@@ -56,19 +56,27 @@ def main() -> None:
     # Draw even when CPU shadow bytes/indices are unavailable. The diagnostic
     # native batch must never splice Draws across a failed source capture.
     def complete_shadow_source_contract(code: str) -> bool:
-        if code.count("R30NativeGameSourceGuard nativeSource{device};") != 3:
+        has_linear_up = "void R30ObserveNativeLinearUP(" in code
+        expected_guards = 4 if has_linear_up else 3
+        if code.count("R30NativeGameSourceGuard nativeSource{device};") != expected_guards:
             return False
         if "if (!forwarded)" not in code or \
                 "observe_unavailable_game_draw(device);" not in code:
             return False
-        for start, end, success in (
+        sections = [
             ("void R30ObserveNativeLinearVB(", "void R30ObserveNativeIndexedVB(",
              "live::observe_linear("),
-            ("void R30ObserveNativeIndexedVB(", "void R30ObserveNativeIndexedUP(",
-             "live::observe_indexed("),
+            ("void R30ObserveNativeIndexedVB(",
+             "void R30ObserveNativeLinearUP(" if has_linear_up
+             else "void R30ObserveNativeIndexedUP(", "live::observe_indexed("),
             ("void R30ObserveNativeIndexedUP(", "HRESULT __stdcall DrawPrimitiveDestR30(",
              "live::observe_indexed("),
-        ):
+        ]
+        if has_linear_up:
+            sections.append(
+                ("void R30ObserveNativeLinearUP(", "void R30ObserveNativeIndexedUP(",
+                 "live::observe_linear("))
+        for start, end, success in sections:
             a = code.find(start)
             b = code.find(end, a)
             if a < 0 or b <= a:
@@ -595,18 +603,38 @@ def main() -> None:
         assert changed != bridge and not object_space_draw_safe(changed), (
             "object-space native geometry negative mutation escaped: " + good
         )
-    # Observe both buffer and UP input families: a 16-byte XYZ+DIFFUSE
-    # source cannot be captured behind an old 20-byte-only stride gate.
+    # The opt-in active R30 producer admits compact real game declarations
+    # (FLOAT3 POSITION / packed D3D9 operands), not the old 16-byte floor.
+    # R26-safe remains intentionally unchanged; validate both independently.
+    # A lower-bound relaxation must never remove the mandatory bounded source
+    # predicate or silently widen the upper limit to an arbitrary byte count.
+    stride_contract = (ROOT / "src/vr/d3d11/live_game_source_stride.hpp").read_text(
+        encoding="utf-8")
+    assert "stride >= 4u && stride <= 512u" in stride_contract
+    for wrong in ("stride >= 16u", "stride >= 0u", "stride <= 1024u"):
+        changed = stride_contract.replace(
+            "stride >= 4u && stride <= 512u", wrong, 1)
+        assert changed != stride_contract and (
+            "stride >= 4u && stride <= 512u" not in changed)
     for path in RENDERERS:
         source = path.read_text(encoding="utf-8")
         start = source.find("void R30ObserveNativeLinearVB(")
         end = source.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
         assert start >= 0 and end > start
         observed = source[start:end]
-        assert observed.count("stride < 16") == 3
-        assert "stride < 20" not in observed
-        invalid = observed.replace("stride < 16", "stride < 20", 1)
-        assert invalid != observed and invalid.count("stride < 16") != 3
+        if path.name == "stereo_renderer_r30.cpp":
+            guard = "game_native_source_stride_valid(stride)"
+            assert observed.count(guard) == 4
+            assert "stride < 16" not in observed and "stride < 20" not in observed
+            # Fail when even one real game VB/IB/UP source path drops its guard.
+            invalid = observed.replace(guard, "true", 1)
+            assert invalid != observed and invalid.count(guard) != 4
+            assert "#include \"vr/d3d11/live_game_source_stride.hpp\"" in source
+        else:
+            assert observed.count("stride < 16") == 3
+            assert "stride < 20" not in observed
+            invalid = observed.replace("stride < 16", "stride < 20", 1)
+            assert invalid != observed and invalid.count("stride < 16") != 3
     # Row-vector WVP order: object (1,2,3), translated by (5,7,11),
     # then scaled by (2,3,4) gives (12,27,56,1).
     vector = [1.0, 2.0, 3.0, 1.0]
@@ -1507,7 +1535,11 @@ def main() -> None:
         assert start >= 0 and end > start
         entrypoints = source[start:end]
         assert entrypoints.count("topology != D3DPT_TRIANGLESTRIP") == 3
-        assert entrypoints.count("live::game_native_primitive_element_count(") == 3
+        # The active SM3 linear-UP helper shares the same bounded source
+        # primitive-span decoder, while R26-safe keeps three source copiers.
+        expected_span_users = (
+            4 if "void R30ObserveNativeLinearUP(" in entrypoints else 3)
+        assert entrypoints.count("live::game_native_primitive_element_count(") == expected_span_users
         assert "static_cast<std::uint64_t>(nativeElements)*stride" in entrypoints
         assert "const UINT count = nativeElements;" in entrypoints
         assert "const UINT count=nativeElements;" in entrypoints
@@ -3503,6 +3535,48 @@ def main() -> None:
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
+    # 00966: DrawPrimitiveUP must also capture source-matched secondary
+    # SM3 streams 1..3, or native full-frame admission is lost at this callsite.
+    # Deleting any capture or fallback token must fail this structural oracle.
+    r30_path = next(r for r in RENDERERS if r.name == "stereo_renderer_r30.cpp")
+    r30_source = r30_path.read_text(encoding="utf-8")
+    up_start = r30_source.find("void R30ObserveNativeLinearUP(")
+    up_end = r30_source.find("void R30ObserveNativeIndexedUP(", up_start)
+    call_start = r30_source.find("HRESULT __stdcall DrawPrimitiveUPDestR30(")
+    call_end = r30_source.find("HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(", call_start)
+    assert up_start >= 0 and up_end > up_start
+    assert call_start >= 0 and call_end > call_start
+    native_up = r30_source[up_start:up_end]
+    native_call = r30_source[call_start:call_end]
+    native_up_required = (
+        "R30NativeGameSourceGuard nativeSource{device};",
+        "game_native_empty_primitive_type(",
+        "game_native_primitive_element_count(",
+        "std::vector<std::uint32_t> physical(nativeElements);",
+        "physical[i] = i;",
+        "if (!R30CaptureNativeAdditionalStreams(",
+        "device, physical, extra, owned",
+        "live::observe_linear(",
+        "vertices, stride, &extra",
+    )
+    native_call_required = (
+        "R30ObserveNativeLinearUP(device, type, primitiveCount, data, stride);",
+        "const HRESULT gameHr = R30GuardScreenSpace(",
+        "R30CompleteNativeGameSource(device, gameHr);",
+    )
+    def up_contract(region, required):
+        return all(token in region for token in required)
+    assert up_contract(native_up, native_up_required)
+    assert up_contract(native_call, native_call_required)
+    assert "live_game_frame::observe_linear(" not in native_call, (
+        "UP callsite skipped native secondary stream capture")
+    for region, required in ((native_up, native_up_required),
+                             (native_call, native_call_required)):
+        for token in required:
+            deleted = region.replace(token, "", 1)
+            assert deleted != region and not up_contract(deleted, required), (
+                "nonindexed SM3 UP native source mutation escaped: " + token)
+
     # R240: the opt-in real D3D9 IndexedUP hook must forward nonzero
     # MinVertexIndex through the native DrawIndexed diagnostic bridge.
     # Static mutation tests are not Quest3 / game-frame runtime proof.
@@ -3512,21 +3586,77 @@ def main() -> None:
         end = hook.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
         assert start >= 0 and end > start, "game IndexedUP hook not located"
         region = hook[start:end]
-        required = (
+        common = (
             "minVertex > live::kMaxNativeGameVertices - numVertices",
             "unpacked[i] < minVertex ||",
             "unpacked[i] - minVertex >= numVertices",
-            "unpacked[i] -= minVertex;",
-            "static_cast<std::size_t>(minVertex) * stride",
-            "firstVertex, stride, numVertices, unpacked.data(), count",
         )
-        assert all(token in region for token in required), "missing live IndexedUP vertex window"
-        assert "minVertex != 0" not in region, "nonzero source window silently discarded"
+        # The active native SM3 path preserves the original game's absolute
+        # source indices until it has captured all secondary VB streams.
+        # The R26-safe fallback intentionally retains its previous stream-0
+        # conversion and must not be silently promoted as multistream-ready.
+        if renderer.name == "stereo_renderer_r30.cpp":
+            required = common + (
+                "game_indexed_up_dense_source_range(",
+                "reinterpret_cast<const std::uint8_t*>(firstAddress)",
+                "std::vector<std::uint32_t> rebasedIndices = unpacked;",
+                "for (auto& index : rebasedIndices) index -= minVertex;",
+                "game_indexed_up_physical_slots(",
+                "compactIndices, true, physical",
+                "rebasedIndices, false, physical",
+                "R30CaptureNativeAdditionalStreams(",
+                "compactIndices.data(), count, &extra",
+                "rebasedIndices.data(), count, &extra",
+                "firstVertex, stride, numVertices,",
+            )
+            assert region.count("R30CaptureNativeAdditionalStreams(") == 2, (
+                "both sparse and dense IndexedUP must snapshot SM3 side streams"
+            )
+            assert region.count("game_indexed_up_physical_slots(") == 2, (
+                "both source windows must verify physical stream alignment"
+            )
+            assert "unpacked[i] -= minVertex;" not in region, (
+                "live absolute stream identities were prematurely rebased"
+            )
+        else:
+            required = common + (
+                "static_cast<std::size_t>(minVertex) * stride",
+                "unpacked[i] -= minVertex;",
+                "firstVertex, stride, numVertices, unpacked.data(), count",
+            )
+            assert "R30CaptureNativeAdditionalStreams(" not in region, (
+                "R26-safe fallback must not pretend to have SM3 side streams"
+            )
+        def indexed_up_contract(sample: str) -> bool:
+            if not all(token in sample for token in required):
+                return False
+            if "minVertex != 0" in sample:
+                return False
+            if renderer.name == "stereo_renderer_r30.cpp":
+                return (
+                    sample.count("R30CaptureNativeAdditionalStreams(") == 2
+                    and sample.count("game_indexed_up_physical_slots(") == 2
+                    and "unpacked[i] -= minVertex;" not in sample
+                )
+            return "R30CaptureNativeAdditionalStreams(" not in sample
+
+        assert indexed_up_contract(region), "missing live IndexedUP vertex window"
         for token in required:
             damaged = region.replace(token, "", 1)
-            assert damaged != region and not all(x in damaged for x in required), (
+            assert damaged != region and not indexed_up_contract(damaged), (
                 "live IndexedUP destructive mutation escaped: " + token
             )
+        # Per-branch destructive checks independently remove each copy of a
+        # duplicated physical-slot contract, not only both at once.
+        if renderer.name == "stereo_renderer_r30.cpp":
+            for token in ("R30CaptureNativeAdditionalStreams(",
+                          "game_indexed_up_physical_slots("):
+                assert region.count(token) == 2
+                first, second = region.split(token, 1)
+                damaged_second = first + token + second.replace(token, "", 1)
+                assert not indexed_up_contract(damaged_second), (
+                    "second IndexedUP source branch lost its native-side stream guard"
+                )
 
 if __name__ == "__main__":
     main()
