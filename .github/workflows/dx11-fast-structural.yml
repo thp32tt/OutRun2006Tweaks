@@ -6,6 +6,7 @@ on:
       - vr-dx11-native-r71
       - feature/dx11-00952-live-sm3-device-bool
       - feature/dx11-00966-live-game-frame
+      - feature/dx11-00970-live-game-rt-frame
     paths:
       - 'src/vr/d3d11/**'
       - 'src/vr/d3d9/stereo_renderer_r30.cpp'
