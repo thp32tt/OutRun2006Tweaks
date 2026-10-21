@@ -2534,6 +2534,10 @@ namespace OutRunVRStereo
         // path and the fixed-function/XYZRHW path below. Declare it before
         // the first consumer; unrelated HUD, menus and world effects retain R26.
         bool R30IsExactResultHudDraw() noexcept;
+        bool R30ConfigureXyzrhwWorldEffect(
+            IDirect3DDevice9* device, const void* source,
+            UINT vertexCount, UINT stride, R30XyzrhwState& state,
+            const std::vector<std::uint8_t>* usedMask) noexcept;
 
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
@@ -2756,22 +2760,23 @@ namespace OutRunVRStereo
                 maxZ - minZ <= 0.0025f;
         }
 
-        // The game HUD obeys HudScale, but F11 ImGui already owns an
-        // independently rasterised eye-density atlas and a native-sized shell.
-        // R26+HUD's fixed-function external draw used to apply the gameplay
-        // HudScale (typically 0.55) *again* during the final per-eye projection.
-        // Keep both X/Y unchanged only for the explicitly proven F11 producer.
+        // Gameplay HUD continues to obey HudScale. F11 is a distinct
+        // external ImGui surface: the 2026-10-22 Quest3 trace proved the
+        // FOV-only 1.0 projection is both head-locked and much too large.
+        // Keep its size independent from HudScale while placing it on the
+        // same finite world-locked plane machinery.
+        constexpr float R30ExternalF11Scale = 0.65f;
         constexpr float R30PlaneScaleForOwner(
             float gameHudScale, bool gameplayHudOwner) noexcept
         {
-            return gameplayHudOwner ? gameHudScale : 1.0f;
+            return gameplayHudOwner ? gameHudScale : R30ExternalF11Scale;
         }
-        static_assert(R30PlaneScaleForOwner(0.55f, false) == 1.0f,
-            "F11 must not inherit 0.55 gameplay HUD shrink");
+        static_assert(R30PlaneScaleForOwner(0.55f, false) == 0.65f,
+            "F11 keeps its independent 0.65 finite-plane scale");
         static_assert(R30PlaneScaleForOwner(0.55f, true) == 0.55f,
             "original gameplay HUD scale must survive");
-        static_assert(R30PlaneScaleForOwner(1.5f, false) == 1.0f,
-            "F11 must also ignore enlarged gameplay HUD settings");
+        static_assert(R30PlaneScaleForOwner(1.5f, false) == 0.65f,
+            "F11 must ignore enlarged gameplay HUD settings");
 
         bool R30BuildHudPlaneCoefficients(
             R30XyzrhwState& state, bool gameplayHudOwner) noexcept
@@ -2904,37 +2909,84 @@ namespace OutRunVRStereo
                  FrameStereoPoseSequence != state.stereo.poseSequence))
                 return false;
 
-            OutRunVRF11Screen2D::TangentBounds bounds[2]{};
-            for (int eye = 0; eye < 2; ++eye)
-            {
-                const auto& fov = state.stereo.eyeFov[eye];
-                bounds[eye] = {
-                    std::tan(fov.angleLeft), std::tan(fov.angleRight),
-                    std::tan(fov.angleDown), std::tan(fov.angleUp)
-                };
-            }
-            OutRunVRF11Screen2D::EyeAffine f11Affine[2]{};
-            if (!OutRunVRF11Screen2D::Build(bounds, f11Affine))
-                return false;
+            // The 2026-10-22 Quest3 evidence recorded 3,136 F11_IMGUI
+            // draws on the old FOV-only route. That route intentionally omitted
+            // HeadInverse/IPD and therefore behaved like a head-locked oversized
+            // desktop sheet. Reuse the already-proven finite HUD-plane math for
+            // this exact external overlay instead. If finite-plane provenance is
+            // unavailable, retain the previous FOV-only affine as a fail-safe.
+            const bool finiteWorldLock =
+                R30ConfigureXyzrhwWorldEffect(
+                    device, nullptr, 0, 0, state, nullptr) &&
+                state.hudWorldLockValid;
 
-            // F11 per-eye FOV-only affine follows the game's original ortho pixels.
-            // z=0.5*w keeps this depth-disabled ImGui draw within D3D9 clipping bounds.
+            OutRunVRF11Screen2D::EyeAffine f11Affine[2]{};
+            if (!finiteWorldLock)
+            {
+                OutRunVRF11Screen2D::TangentBounds bounds[2]{};
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const auto& fov = state.stereo.eyeFov[eye];
+                    bounds[eye] = {
+                        std::tan(fov.angleLeft), std::tan(fov.angleRight),
+                        std::tan(fov.angleDown), std::tan(fov.angleUp)
+                    };
+                }
+                if (!OutRunVRF11Screen2D::Build(bounds, f11Affine))
+                    return false;
+            }
+
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX projected{};
-                for (int row = 0; row < 4; ++row)
+                if (finiteWorldLock)
                 {
-                    const float w = stockProjection.m[row][3];
-                    // Original ImGui ortho maps source pixels to stock NDC.
-                    // Compose only the exact per-eye screen FOV affine.
-                    projected.m[row][0] =
-                        stockProjection.m[row][0] * f11Affine[eye].scaleX +
-                        w * f11Affine[eye].offsetX;
-                    projected.m[row][1] =
-                        stockProjection.m[row][1] * f11Affine[eye].scaleY +
-                        w * f11Affine[eye].offsetY;
-                    projected.m[row][2] = 0.5f * w;
-                    projected.m[row][3] = w;
+                    const float hudPlaneViewZ = R30HudPlaneViewZ(false);
+                    const float planeClipW =
+                        hudPlaneViewZ * state.baseProjection._34 +
+                        state.baseProjection._44;
+                    const float planeClipZ =
+                        hudPlaneViewZ * state.baseProjection._33 +
+                        state.baseProjection._43;
+                    if (!std::isfinite(planeClipW) ||
+                        !std::isfinite(planeClipZ) ||
+                        std::fabs(planeClipW) <= 1.0e-6f)
+                        return false;
+                    const float planeNdcZ = planeClipZ / planeClipW;
+                    if (!std::isfinite(planeNdcZ))
+                        return false;
+
+                    D3DMATRIX clipMap{};
+                    clipMap._11 = state.hudClipX[eye][0];
+                    clipMap._21 = state.hudClipX[eye][1];
+                    clipMap._41 = state.hudClipX[eye][2];
+                    clipMap._12 = state.hudClipY[eye][0];
+                    clipMap._22 = state.hudClipY[eye][1];
+                    clipMap._42 = state.hudClipY[eye][2];
+                    clipMap._14 = state.hudClipW[eye][0];
+                    clipMap._24 = state.hudClipW[eye][1];
+                    clipMap._44 = state.hudClipW[eye][2];
+                    clipMap._13 = planeNdcZ * clipMap._14;
+                    clipMap._23 = planeNdcZ * clipMap._24;
+                    clipMap._43 = planeNdcZ * clipMap._44;
+                    projected = MultiplyMatrix(stockProjection, clipMap);
+                }
+                else
+                {
+                    for (int row = 0; row < 4; ++row)
+                    {
+                        const float w = stockProjection.m[row][3];
+                        projected.m[row][0] =
+                            stockProjection.m[row][0] *
+                                f11Affine[eye].scaleX +
+                            w * f11Affine[eye].offsetX;
+                        projected.m[row][1] =
+                            stockProjection.m[row][1] *
+                                f11Affine[eye].scaleY +
+                            w * f11Affine[eye].offsetY;
+                        projected.m[row][2] = 0.5f * w;
+                        projected.m[row][3] = w;
+                    }
                 }
                 if (!MatrixFinite(projected))
                     return false;
@@ -3074,8 +3126,8 @@ namespace OutRunVRStereo
             if (R30ExternalImGuiStereoDraws == 1)
                 spdlog::info(
                     "VR R30 F11 IMGUI SCREEN2D: exact external XYZ/orthographic UI "
-                    "uses FOV-only L/R screen affine + matching per-eye "
-                    "scissor; no 3D HUD plane, head inverse or IPD pose");
+                    "uses finite world-locked L/R HUD-plane projection at independent "
+                    "0.65 scale; FOV-only affine remains fail-safe only");
             // The 2026-10-20 Quest3 F11 was doubled in the upper-left with
             // the entire game rendered into a 2496x2688 portrait XR extent.
             // Trace actual SOURCE and per-eye raster placement after the
@@ -3093,6 +3145,9 @@ namespace OutRunVRStereo
                     BackBufferDesc.Width, BackBufferDesc.Height,
                     state.viewport.X, state.viewport.Y,
                     state.viewport.Width, state.viewport.Height,
+                    state.hudWorldLockValid
+                        ? "FINITE_WORLD_LOCK_065"
+                        : "FOV_ONLY_FAILSAFE",
                     eyeScissors[0].left, eyeScissors[0].top,
                     eyeScissors[0].right, eyeScissors[0].bottom,
                     eyeScissors[1].left, eyeScissors[1].top,
@@ -3329,8 +3384,13 @@ namespace OutRunVRStereo
                     if (!MatrixFinite(state.hudViewProjection[eye]))
                         return false;
                 }
-                // Game SpriteNode HUD retains its saved gameplay HudScale.
-                if (!R30BuildHudPlaneCoefficients(state, true))
+                // Game SpriteNode HUD/overlay keeps the existing gameplay
+                // scale. Only the explicit external F11 semantic depth uses
+                // the independent smaller F11 finite-plane scale.
+                const bool externalF11 =
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 &&
+                    semanticOverlay2D;
+                if (!R30BuildHudPlaneCoefficients(state, !externalF11))
                     return false;
                 state.hudWorldLockValid = true;
                 return true;
