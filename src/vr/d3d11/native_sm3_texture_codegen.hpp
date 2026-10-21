@@ -59,6 +59,66 @@ enum class NativeSm3Texture2DMode {
            modifier <= 12u;
 }
 
+// SM3 cube samplers require XYZ direction and separate face/mip data.
+[[nodiscard]] constexpr unsigned native_sm3_cube_source_components(
+    NativeSm3Texture2DMode mode, unsigned i) noexcept {
+    if (mode == NativeSm3Texture2DMode::Projected) return 0u;
+    if (i == 0u) {
+        switch (mode) {
+        case NativeSm3Texture2DMode::Implicit:
+        case NativeSm3Texture2DMode::Gradients: return 0x07u;
+        case NativeSm3Texture2DMode::Bias:
+        case NativeSm3Texture2DMode::ExplicitLod: return 0x0fu;
+        default: return 0u;
+        }
+    }
+    return mode == NativeSm3Texture2DMode::Gradients && (i == 2u || i == 3u)
+        ? 0x07u : 0u;
+}
+[[nodiscard]] constexpr bool native_sm3_cube_modifier_supported(
+    NativeSm3Texture2DMode mode, unsigned i, unsigned modifier) noexcept {
+    return i == 1u ? modifier == 0u :
+        native_sm3_cube_source_components(mode, i) != 0u && modifier <= 12u;
+}
+inline bool append_native_sm3_texturecube_declarations(
+    std::string& out, unsigned samplerRegister) {
+    if (samplerRegister >= 16u) return false;
+    auto n = std::to_string(samplerRegister);
+    out += "TextureCube<float4> r283_texture" + n + " : register(t" + n + ");\n";
+    out += "SamplerState r283_sampler" + n + " : register(s" + n + ");\n";
+    return true;
+}
+inline bool append_native_sm3_texturecube_sample(
+    std::string& out, const std::string& destination, unsigned mask,
+    const std::string& coordinates, unsigned samplerRegister, unsigned ordinal,
+    NativeSm3Texture2DMode mode, const std::string& dx,
+    const std::string& dy) {
+    if (destination.empty() || coordinates.empty() || !mask || (mask & ~15u) ||
+        samplerRegister >= 16u ||
+        !native_sm3_cube_source_components(mode, 0u) ||
+        (mode == NativeSm3Texture2DMode::Gradients
+            ? (dx.empty() || dy.empty()) : (!dx.empty() || !dy.empty())))
+        return false;
+    const auto n = std::to_string(samplerRegister);
+    const auto value = "r283_cube_texel_" + std::to_string(ordinal);
+    const char* operation = mode == NativeSm3Texture2DMode::Bias ? ".SampleBias(" :
+        mode == NativeSm3Texture2DMode::ExplicitLod ? ".SampleLevel(" :
+        mode == NativeSm3Texture2DMode::Gradients ? ".SampleGrad(" : ".Sample(";
+    out += "    float4 " + value + " = r283_texture" + n +
+           operation + "r283_sampler" + n + ", (" + coordinates + ").xyz";
+    if (mode == NativeSm3Texture2DMode::Bias ||
+        mode == NativeSm3Texture2DMode::ExplicitLod)
+        out += ", (" + coordinates + ").w";
+    else if (mode == NativeSm3Texture2DMode::Gradients)
+        out += ", (" + dx + ").xyz, (" + dy + ").xyz";
+    out += ");\n";
+    std::string channels;
+    for (unsigned i=0; i<4u; ++i)
+        if (mask & (1u << i)) channels += "xyzw"[i];
+    out += "    " + destination + "." + channels + " = " + value + "." +
+           channels + ";\n";
+    return true;
+}
 inline bool append_native_sm3_texture2d_declarations(
     std::string& out, unsigned samplerRegister) {
     if (samplerRegister >= 16u) return false;

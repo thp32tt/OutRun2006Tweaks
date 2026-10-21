@@ -376,6 +376,7 @@ bool build_r283_sm3_mov_shader_source(
             unsigned matrixRowCount{};
             unsigned matrixVectorComponents{};
             bool texture2d{};
+            bool textureCube{};
             bool texkill{};
             bool predicated{};
             bool negatePredicate{};
@@ -414,7 +415,9 @@ bool build_r283_sm3_mov_shader_source(
         std::array<std::array<std::uint32_t, 4>, 16> intDefBits{};
         std::array<bool, 16> samplerDeclared{};
         std::array<bool, 16> sampler2dDeclared{};
+        std::array<bool, 16> samplerCubeDeclared{};
         std::array<bool, 16> sampler2dUsed{};
+        std::array<bool, 16> samplerCubeUsed{};
         bool liveConstantsUsed = false;
         bool liveBooleansUsed = false;
         bool liveIntegersUsed = false;
@@ -454,6 +457,9 @@ bool build_r283_sm3_mov_shader_source(
                     sampler2dDeclared[reg] =
                         (info & D3DSP_TEXTURETYPE_MASK) ==
                         static_cast<DWORD>(D3DSTT_2D);
+                    samplerCubeDeclared[reg] =
+                        (info & D3DSP_TEXTURETYPE_MASK) ==
+                        static_cast<DWORD>(D3DSTT_CUBE);
                 }
                 continue;
             }
@@ -1167,11 +1173,18 @@ bool build_r283_sm3_mov_shader_source(
                     // dimensionality must stay on D3D9.
                     if (kind != D3DSPR_SAMPLER || reg >= samplerDeclared.size() ||
                         (vertexStage && reg >= 4u) ||
-                        !samplerDeclared[reg] || !sampler2dDeclared[reg] ||
+                        !samplerDeclared[reg] ||
+                        (!sampler2dDeclared[reg] && !samplerCubeDeclared[reg]) ||
                         modifier != D3DSPSM_NONE || swizzle != 0xe4u)
                         return false;
                     op.samplerRegister = reg;
-                    sampler2dUsed[reg] = true;
+                    op.textureCube = samplerCubeDeclared[reg];
+                    // Projected cube semantics not proven for the game.
+                    if (op.textureCube &&
+                        op.textureMode == NativeSm3Texture2DMode::Projected)
+                        return false;
+                    if (op.textureCube) samplerCubeUsed[reg] = true;
+                    else sampler2dUsed[reg] = true;
                     continue;
                 }
                 if (op.sineCosine && i == 0u &&
@@ -1195,8 +1208,9 @@ bool build_r283_sm3_mov_shader_source(
                 // before Sample*. The sampler sN has its own strict guard;
                 // TEMP source provenance below includes swizzle and DZ/DW.
                 if (op.texture2d &&
-                    !native_sm3_texture_modifier_supported(
-                        op.textureMode, i, modifier))
+                    !(op.textureCube
+                        ? native_sm3_cube_modifier_supported(op.textureMode, i, modifier)
+                        : native_sm3_texture_modifier_supported(op.textureMode, i, modifier)))
                     return false;
                 if (op.matrixRowCount != 0u && i == 1u) {
                     // Each SM3 M*x* instruction reads a consecutive matrix
@@ -1243,7 +1257,9 @@ bool build_r283_sm3_mov_shader_source(
                 if (kind == D3DSPR_INPUT) {
                     const unsigned logicalComponents =
                         op.texture2d
-                            ? native_sm3_texture_source_components(op.textureMode, i) :
+                            ? (op.textureCube
+                                 ? native_sm3_cube_source_components(op.textureMode, i)
+                                 : native_sm3_texture_source_components(op.textureMode, i)) :
                         op.matrixRowCount != 0u ?
                             (op.matrixVectorComponents == 4u ? 15u : 7u) :
                         native_sm3_source_components(op.opcode, mask, i);
@@ -1307,7 +1323,9 @@ bool build_r283_sm3_mov_shader_source(
                     // HLSL TEMP zero initialization is never valid evidence.
                     const unsigned logicalComponents =
                         op.texture2d
-                            ? native_sm3_texture_source_components(op.textureMode, i) :
+                            ? (op.textureCube
+                                 ? native_sm3_cube_source_components(op.textureMode, i)
+                                 : native_sm3_texture_source_components(op.textureMode, i)) :
                         op.matrixRowCount != 0u ?
                             (op.matrixVectorComponents == 4u ? 15u : 7u) :
                         native_sm3_source_components(op.opcode, mask, i);
@@ -1399,6 +1417,9 @@ bool build_r283_sm3_mov_shader_source(
             if (sampler2dUsed[reg] &&
                 !append_native_sm3_texture2d_declarations(translated, reg))
                 return false;
+            if (samplerCubeUsed[reg] &&
+                !append_native_sm3_texturecube_declarations(translated, reg))
+                return false;
         }
         translated += "struct R283Input {\n";
         for (const auto& semantic : inputs) {
@@ -1488,11 +1509,15 @@ bool build_r283_sm3_mov_shader_source(
                         op.texkillWrittenMask, static_cast<unsigned>(i)))
                     return false;
             } else if (op.texture2d) {
-                if (!append_native_sm3_texture2d_sample(
-                        translated, dest, op.destinationMask,
-                        op.sources[0], op.samplerRegister,
-                        static_cast<unsigned>(i), op.textureMode,
-                        op.sources[2], op.sources[3]))
+                if (!(op.textureCube
+                    ? append_native_sm3_texturecube_sample(
+                          translated, dest, op.destinationMask, op.sources[0],
+                          op.samplerRegister, static_cast<unsigned>(i),
+                          op.textureMode, op.sources[2], op.sources[3])
+                    : append_native_sm3_texture2d_sample(
+                          translated, dest, op.destinationMask, op.sources[0],
+                          op.samplerRegister, static_cast<unsigned>(i),
+                          op.textureMode, op.sources[2], op.sources[3])))
                     return false;
             } else if (op.matrixRowCount != 0u) {
                 if (!append_native_sm3_matrix(
@@ -2115,9 +2140,14 @@ bool compile_native_live_sm3_program(
             if (vertexHlsl.find(symbol) != std::string::npos) {
                 if (slot >= 4u) return false;
                 candidate.vertexSamplerMask |= static_cast<std::uint8_t>(1u << slot);
+                if (vertexHlsl.find("TextureCube<float4> " + symbol) != std::string::npos)
+                    candidate.vertexCubeSamplerMask |= static_cast<std::uint8_t>(1u << slot);
             }
-            if (pixelHlsl.find(symbol) != std::string::npos)
+            if (pixelHlsl.find(symbol) != std::string::npos) {
                 candidate.pixelSamplerMask |= static_cast<std::uint16_t>(1u << slot);
+                if (pixelHlsl.find("TextureCube<float4> " + symbol) != std::string::npos)
+                    candidate.pixelCubeSamplerMask |= static_cast<std::uint16_t>(1u << slot);
+            }
         }
         if (!candidate.ready()) return false;
         output = std::move(candidate);

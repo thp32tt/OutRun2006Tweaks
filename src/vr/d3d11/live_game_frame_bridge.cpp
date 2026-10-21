@@ -1144,6 +1144,8 @@ struct TextureCapture {
     bool transformUv = false; // Live D3D9 stage0 COUNT2 texture0 transform.
     D3DMATRIX uvTransform{};
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
+    Microsoft::WRL::ComPtr<IDirect3DCubeTexture9> cubeTexture;
+    D3DTEXTUREADDRESS addressW = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
     DWORD borderColor = 0u; // Live game D3D9 sampler ARGB.
@@ -3898,7 +3900,9 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     state.AddressU = translateAddress(capture.addressU);
     state.AddressV = translateAddress(capture.addressV);
     if (!state.AddressU || !state.AddressV) return false;
-    state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    state.AddressW = capture.cubeTexture ?
+        translateAddress(capture.addressW) : D3D11_TEXTURE_ADDRESS_CLAMP;
+    if (!state.AddressW) return false;
     // D3D9 COLORREF-like D3DCOLOR is 0xAARRGGBB; native BorderColor is RGBA.
     state.BorderColor[0] = static_cast<float>((capture.borderColor >> 16) & 0xffu) / 255.0f;
     state.BorderColor[1] = static_cast<float>((capture.borderColor >> 8) & 0xffu) / 255.0f;
@@ -3920,10 +3924,114 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
 
+// Reflective game cube sources: copy complete six-face mip generations, not
+// a guessed texture2D. Unsupported GPU-only or dirty source stays DX9Ex-owned.
+bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
+                         ComPtr<ID3D11ShaderResourceView>& view,
+                         ComPtr<ID3D11SamplerState>& sampler) noexcept {
+    if (!dev || !capture.cubeTexture) return false;
+    const UINT levels = capture.cubeTexture->GetLevelCount();
+    D3DSURFACE_DESC base{};
+    if (!levels || levels > 11u ||
+        FAILED(capture.cubeTexture->GetLevelDesc(0u, &base)) ||
+        !base.Width || base.Width != base.Height || base.Width > 1024u ||
+        (base.Pool != D3DPOOL_MANAGED && base.Pool != D3DPOOL_SYSTEMMEM) ||
+        (base.Usage & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL |
+                       D3DUSAGE_AUTOGENMIPMAP)) != 0u)
+        return false;
+    const bool bc1 = base.Format == D3DFMT_DXT1;
+    const bool bc3 = base.Format == D3DFMT_DXT3 || base.Format == D3DFMT_DXT5;
+    const bool compressed = bc1 || bc3;
+    const bool opaque = base.Format == D3DFMT_X8R8G8B8;
+    if (!compressed && !opaque && base.Format != D3DFMT_A8R8G8B8)
+        return false;
+    const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
+                          capture.mipFilter == D3DTEXF_LINEAR;
+    if ((usesMips && (capture.cubeTexture->GetLOD() != 0u ||
+                      capture.maxMipLevel >= levels)) ||
+        (!usesMips && capture.maxMipLevel != 0u))
+        return false;
+    const UINT uploadedLevels = usesMips ? levels : 1u;
+    std::uint64_t budget = 0u;
+    for (UINT level = 0u; level < uploadedLevels; ++level) {
+        const UINT edge = (std::max)(1u, base.Width >> level);
+        const std::uint64_t pitch = compressed
+            ? static_cast<std::uint64_t>((edge + 3u) / 4u) * (bc1 ? 8u : 16u)
+            : static_cast<std::uint64_t>(edge) * 4u;
+        budget += pitch * (compressed ? (edge + 3u) / 4u : edge) * 6u;
+        if (budget > (24ull << 20u)) return false;
+    }
+    const DXGI_FORMAT format = bc1
+        ? (capture.srgbTexture ? DXGI_FORMAT_BC1_UNORM_SRGB : DXGI_FORMAT_BC1_UNORM)
+        : base.Format == D3DFMT_DXT3
+        ? (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM)
+        : base.Format == D3DFMT_DXT5
+        ? (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM)
+        : (capture.srgbTexture ? DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
+                               : DXGI_FORMAT_B8G8R8A8_UNORM);
+    std::vector<std::vector<std::uint8_t>> pixels(6u * uploadedLevels);
+    std::vector<D3D11_SUBRESOURCE_DATA> subs(6u * uploadedLevels);
+    for (UINT face=0u; face<6u; ++face) {
+        for (UINT level=0u; level<uploadedLevels; ++level) {
+            D3DSURFACE_DESC desc{};
+            const UINT edge = (std::max)(1u, base.Width >> level);
+            const UINT pitch = compressed ? ((edge + 3u) / 4u) * (bc1 ? 8u : 16u)
+                                           : edge * 4u;
+            const UINT rows = compressed ? (edge + 3u) / 4u : edge;
+            if (FAILED(capture.cubeTexture->GetLevelDesc(level, &desc)) ||
+                desc.Width != edge || desc.Height != edge ||
+                desc.Format != base.Format || desc.Pool != base.Pool)
+                return false;
+            D3DLOCKED_RECT locked{};
+            const auto cubeFace = static_cast<D3DCUBEMAP_FACES>(face);
+            if (FAILED(capture.cubeTexture->LockRect(
+                    cubeFace, level, &locked, nullptr, D3DLOCK_READONLY)))
+                return false;
+            const bool readable = locked.pBits && locked.Pitch > 0 &&
+                static_cast<std::uint64_t>(locked.Pitch) >= pitch;
+            if (readable) {
+                auto& dest = pixels[face * uploadedLevels + level];
+                dest.resize(static_cast<std::size_t>(pitch) * rows);
+                for (UINT row=0u; row<rows; ++row) {
+                    auto* to = dest.data() + static_cast<std::size_t>(pitch) * row;
+                    const auto* from = static_cast<const std::uint8_t*>(locked.pBits) +
+                                       static_cast<std::size_t>(locked.Pitch) * row;
+                    std::memcpy(to, from, pitch);
+                    if (opaque) for (UINT x=3u; x<pitch; x+=4u) to[x]=0xffu;
+                }
+            }
+            const HRESULT unlocked = capture.cubeTexture->UnlockRect(cubeFace, level);
+            if (!readable || FAILED(unlocked)) return false;
+            auto& sub = subs[face * uploadedLevels + level];
+            sub.pSysMem = pixels[face * uploadedLevels + level].data();
+            sub.SysMemPitch = pitch;
+        }
+    }
+    D3D11_TEXTURE2D_DESC native{};
+    native.Width=base.Width; native.Height=base.Height;
+    native.MipLevels=uploadedLevels; native.ArraySize=6u;
+    native.Format=format; native.SampleDesc.Count=1u;
+    native.Usage=D3D11_USAGE_IMMUTABLE;
+    native.BindFlags=D3D11_BIND_SHADER_RESOURCE;
+    native.MiscFlags=D3D11_RESOURCE_MISC_TEXTURECUBE;
+    ComPtr<ID3D11Texture2D> texture;
+    D3D11_SHADER_RESOURCE_VIEW_DESC srv{};
+    srv.Format=format; srv.ViewDimension=D3D11_SRV_DIMENSION_TEXTURECUBE;
+    srv.TextureCube.MostDetailedMip=0u;
+    srv.TextureCube.MipLevels=uploadedLevels;
+    return SUCCEEDED(dev->CreateTexture2D(
+               &native, subs.data(), texture.GetAddressOf())) &&
+           SUCCEEDED(dev->CreateShaderResourceView(
+               texture.Get(), &srv, view.GetAddressOf())) &&
+           create_game_sampler(dev, capture, uploadedLevels, sampler);
+}
 bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
-    if (!dev || !capture.enabled || !capture.texture) return false;
+    if (!dev || !capture.enabled) return false;
+    if (capture.cubeTexture)
+        return mirror_cube_texture(dev, capture, view, sampler);
+    if (!capture.texture) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
     // A 4K menu/vehicle atlas may use thirteen distinct mip levels;
     // actual source extents and converted-byte budget are checked below.
@@ -4328,14 +4436,19 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
 
 bool capture_live_sm3_sampler(IDirect3DDevice9* game, unsigned slot,
                               TextureCapture& out,
-                              bool vertexStage = false) noexcept {
+                              bool vertexStage = false,
+                              bool cubeSampler = false) noexcept {
     const unsigned sourceSlot =
         game_sm3_sampler_source_slot(vertexStage, slot);
     if (!game || sourceSlot == kGameSm3InvalidSamplerSlot) return false;
     ComPtr<IDirect3DBaseTexture9> source;
     if (FAILED(game->GetTexture(sourceSlot, source.GetAddressOf())) ||
-        !source || source->GetType() != D3DRTYPE_TEXTURE ||
-        FAILED(source.As(&out.texture))) return false;
+        !source ||
+        (cubeSampler
+            ? (source->GetType() != D3DRTYPE_CUBETEXTURE ||
+               FAILED(source.As(&out.cubeTexture)))
+            : (source->GetType() != D3DRTYPE_TEXTURE ||
+               FAILED(source.As(&out.texture))))) return false;
     DWORD u{}, v{}, mag{}, min{}, mip{}, maxMip{}, anisotropy{}, srgb{}, border{}, bias{};
     if (FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSU, &u)) ||
         FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSV, &v)) ||
@@ -4355,6 +4468,7 @@ bool capture_live_sm3_sampler(IDirect3DDevice9* game, unsigned slot,
     out.enabled = true;
     out.addressU = static_cast<D3DTEXTUREADDRESS>(u);
     out.addressV = static_cast<D3DTEXTUREADDRESS>(v);
+    out.addressW = static_cast<D3DTEXTUREADDRESS>(addressW);
     out.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
     out.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
     out.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
@@ -5059,7 +5173,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if ((pipeline.program.vertexSamplerMask & (1u << slot)) == 0u)
             continue;
         TextureCapture capture{};
-        if (!capture_live_sm3_sampler(game, slot, capture, true) ||
+        if (!capture_live_sm3_sampler(
+                game, slot, capture, true,
+                (pipeline.program.vertexCubeSamplerMask & (1u << slot)) != 0u) ||
             !mirror_texture(device, capture,
                             vertexViews[slot], vertexSamplers[slot]))
             return false;
@@ -5075,7 +5191,9 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if ((pipeline.program.pixelSamplerMask & (1u << slot)) == 0u)
             continue;
         TextureCapture capture{};
-        if (!capture_live_sm3_sampler(game, slot, capture) ||
+        if (!capture_live_sm3_sampler(
+                game, slot, capture, false,
+                (pipeline.program.pixelCubeSamplerMask & (1u << slot)) != 0u) ||
             !mirror_texture(device, capture, views[slot], samplers[slot]))
             return false;
         boundViews[slot] = views[slot].Get();

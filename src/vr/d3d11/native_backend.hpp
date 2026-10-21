@@ -4783,6 +4783,8 @@ struct NativeLiveSm3Program {
     // D3D9 VS stage has four independent sampler registers (s0..s3).
     std::uint8_t vertexSamplerMask{};
     std::uint16_t pixelSamplerMask{};
+    std::uint8_t vertexCubeSamplerMask{};
+    std::uint16_t pixelCubeSamplerMask{};
     bool vertexConstants{};
     bool pixelConstants{};
     bool vertexBooleans{};
