@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T0415KST-INVENTORY",
+  "qa_date_kst": "2026-10-22 04:15",
+  "lane": "C1",
+  "scope": "A_B_GENERATED_LOCAL_KOREAN_PNG_SHA_DEDUP_INVENTORY",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "61997bb594be45b1dcda0eed3198709f98fe8806",
+  "n100_evidence": "work/c1_20261022_0415_inventory_result.json",
+  "n100_candidate_root": "work/image-src/text_roi_batches",
+  "inventory": {
+    "export_evidence_files": 66,
+    "exported_candidate_records": 313,
+    "unique_actual_candidate_sha256": 313,
+    "prior_c1_qa_report_files_scanned": 53,
+    "historical_reviewed_sha256": 318,
+    "unreviewed_unique_sha256": 0,
+    "sha_mismatch": 0,
+    "missing_candidate_or_source": 0
+  },
+  "overall": "IDLE",
+  "reviewed_new": 0,
+  "pass_new": 0,
+  "fail_new": 0,
+  "notes": "Current SHA256 inventory of N100 export evidence is fully covered by historical C1 reports. No new candidate for independent visual QA. Historical reviewed SHA count can exceed currently exported unique SHA due to prior output versions.",
+  "unchanged": {
+    "imagegen_called": false,
+    "A_B_queue_consumed": false,
+    "C2_C3_game_pass_created": false,
+    "DDS_final_deployment": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "scoreboard_source": "thp32tt/ai-dev-lab@main AI_SCOREBOARD.md",
+    "AI_1_previous": 1695,
+    "change": 0,
+    "AI_1_new": 1695,
+    "reason": "Status recheck, no genuinely new QA result; no duplicate scoring."
+  }
+}
