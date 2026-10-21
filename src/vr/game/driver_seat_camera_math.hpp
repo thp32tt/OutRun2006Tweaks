@@ -110,6 +110,35 @@ namespace OutRunVR::DriverSeatCamera
         return switchTicks == 0 && delayedSwitchTicks == 0;
     }
 
+    // The native +0x340/+0x344 counters are useful while ENTERING a camera
+    // mode, but runtime evidence shows they can pulse again after the selected
+    // bumper/in-car mode is already stable. Treating every pulse as a hard
+    // per-frame veto alternates the synthetic seat view with the stock camera,
+    // which appears as repeated zoom-in/zoom-out. Require one fully settled
+    // sample to arm the selected mode, then keep that mode armed while the
+    // authoritative legacy mode/timer/gameplay gate stays unchanged.
+    // Any real mode/timer/gameplay transition clears the latch and requires a
+    // new settled sample before the seat camera is re-enabled.
+    inline bool StableNativeViewEligible(bool enabled, bool gameplayActive,
+        float transitionTime, int nativeMode, int selectedMode,
+        std::uint16_t switchTicks, std::uint16_t delayedSwitchTicks,
+        bool& settledLatch) noexcept
+    {
+        const bool baseEligible =
+            enabled && gameplayActive && nativeMode == selectedMode &&
+            std::isfinite(transitionTime) && transitionTime == 0.0f;
+        if (!baseEligible)
+        {
+            settledLatch = false;
+            return false;
+        }
+
+        if (!settledLatch)
+            settledLatch =
+                NativeViewTransitionSettled(switchTicks, delayedSwitchTicks);
+        return settledLatch;
+    }
+
     // Separate the original game's camera-mode/transition gate from the
     // choice of mathematical pose basis. In a vertical loop the smoothed
     // native view has no horizontal right vector, although matrix_B0 still
