@@ -127,8 +127,8 @@ def main() -> None:
     for original, mutated in (
         ("if (!queued && !cmd.IsExactFiniteResultHud())",
          "if (!queued)"),
-        ("!IsGameDevice(device) || InternalStereoPass",
-         "!IsGameDevice(device)"),
+        ("if (!Settings::VRTelemetry || !device ||\n                !IsGameDevice(device) || InternalStereoPass)",
+         "if (!Settings::VRTelemetry || !device ||\n                !IsGameDevice(device))"),
         ("rightDrawAttempted = true;", "rightDrawAttempted = false;"),
     ):
         assert original in renderer, original
