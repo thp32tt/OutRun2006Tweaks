@@ -40,6 +40,9 @@ namespace Settings
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
+    extern Setting<bool> VREvidenceTrace;
+    extern Setting<int> VREvidenceTraceMaxDrawsPerFrame;
+    extern Setting<bool> VREvidenceTraceMatrices;
 }
 
 namespace OutRunVRRenderer
@@ -64,6 +67,135 @@ namespace OutRunVRStereo
         // R26-safe comparison owner: R26 remains the world/effect authority;
         // only R30 HUD, XYZRHW correction and stereo SkyGlow are layered above.
         std::uint64_t R30SafeTwoEyeDraws = 0;
+
+        std::atomic<std::uint64_t> R30EvidenceSequence{ 0 };
+        thread_local std::uint64_t R30EvidenceBudgetEpoch =
+            std::numeric_limits<std::uint64_t>::max();
+        thread_local std::uint32_t R30EvidenceDrawsThisFrame = 0;
+
+        bool R30EvidenceTakeDrawTicket(
+            const char* api, OutRunVR::GameSemantic::RenderScope scope,
+            std::uint64_t& ticket) noexcept
+        {
+            if (!Settings::VREvidenceTrace)
+                return false;
+            if (R30EvidenceBudgetEpoch != PresentEpoch)
+            {
+                R30EvidenceBudgetEpoch = PresentEpoch;
+                R30EvidenceDrawsThisFrame = 0;
+            }
+            const int configuredMax =
+                Settings::VREvidenceTraceMaxDrawsPerFrame.get();
+            if (configuredMax > 0 &&
+                R30EvidenceDrawsThisFrame >=
+                    static_cast<std::uint32_t>(configuredMax))
+                return false;
+            ++R30EvidenceDrawsThisFrame;
+            ticket = R30EvidenceSequence.fetch_add(
+                1, std::memory_order_relaxed) + 1;
+            spdlog::info(
+                "VR EVIDENCE DRAW BEGIN seq={} present={} draw={} api={} scope={} internal={} gameDevice={} backbuffer={} stereoWanted={} seeded={} frameWorld={} frameDup={} rightFailed={} incomplete={} poseSeq={}",
+                ticket, PresentEpoch, R30EvidenceDrawsThisFrame, api,
+                static_cast<unsigned>(scope), InternalStereoPass ? 1 : 0,
+                IsGameDevice(Game::D3DDevice_ptr ? *Game::D3DDevice_ptr : nullptr) ? 1 : 0,
+                TargetIsBackBuffer() ? 1 : 0, StereoWanted() ? 1 : 0,
+                R9StereoSeeded ? 1 : 0, FrameHadWorldStereo ? 1 : 0,
+                FrameHadDuplicatedDraw ? 1 : 0,
+                FrameRightDrawFailed ? 1 : 0,
+                FrameStereoIncomplete ? 1 : 0,
+                FrameStereoPoseSequence);
+            return true;
+        }
+
+        void R30EvidenceState(IDirect3DDevice9* device,
+            std::uint64_t ticket, const char* api, const char* phase,
+            const char* route, HRESULT routeHr,
+            OutRunVR::GameSemantic::RenderScope scope) noexcept
+        {
+            if (!ticket || !Settings::VREvidenceTrace || !device)
+                return;
+
+            D3DVIEWPORT9 vp{};
+            RECT scissor{};
+            DWORD fvf = 0, zEnable = 0, zWrite = 0, alphaBlend = 0;
+            DWORD srcBlend = 0, dstBlend = 0, scissorEnable = 0;
+            IDirect3DSurface9* rt0 = nullptr;
+            IDirect3DSurface9* depth = nullptr;
+            IDirect3DBaseTexture9* tex0 = nullptr;
+            IDirect3DVertexShader9* vs = nullptr;
+            IDirect3DPixelShader9* ps = nullptr;
+            const HRESULT vpHr = device->GetViewport(&vp);
+            const HRESULT scHr = device->GetScissorRect(&scissor);
+            const HRESULT fvfHr = device->GetFVF(&fvf);
+            const HRESULT rtHr = device->GetRenderTarget(0, &rt0);
+            const HRESULT depthHr = device->GetDepthStencilSurface(&depth);
+            const HRESULT texHr = device->GetTexture(0, &tex0);
+            const HRESULT vsHr = device->GetVertexShader(&vs);
+            const HRESULT psHr = device->GetPixelShader(&ps);
+            const HRESULT zHr = device->GetRenderState(D3DRS_ZENABLE, &zEnable);
+            const HRESULT zwHr = device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite);
+            const HRESULT abHr = device->GetRenderState(D3DRS_ALPHABLENDENABLE, &alphaBlend);
+            const HRESULT sbHr = device->GetRenderState(D3DRS_SRCBLEND, &srcBlend);
+            const HRESULT dbHr = device->GetRenderState(D3DRS_DESTBLEND, &dstBlend);
+            const HRESULT seHr = device->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissorEnable);
+            const auto command =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+
+            spdlog::info(
+                "VR EVIDENCE DRAW STATE seq={} present={} api={} phase={} route={} hr=0x{:08X} scope={} producer={} queued={} node={} qepoch={} vpHr=0x{:08X} vp={},{},{},{} z={:.5f},{:.5f} scHr=0x{:08X} sc={},{},{},{} fvfHr=0x{:08X} fvf=0x{:X} rtHr=0x{:08X} rt0={} depthHr=0x{:08X} depth={} texHr=0x{:08X} tex0={} vsHr=0x{:08X} vs={} psHr=0x{:08X} ps={} zHr=0x{:08X} zEnable={} zwHr=0x{:08X} zWrite={} abHr=0x{:08X} alphaBlend={} srcHr=0x{:08X} srcBlend={} dstHr=0x{:08X} dstBlend={} scissorEnableHr=0x{:08X} scissorEnable={} failure={} directBackpressure={}",
+                ticket, PresentEpoch, api, phase, route,
+                static_cast<unsigned>(routeHr), static_cast<unsigned>(scope),
+                OutRunVR::GameSemantic::Name(command.producer),
+                command.queued ? 1 : 0, command.queueNode, command.queueEpoch,
+                static_cast<unsigned>(vpHr), vp.X, vp.Y, vp.Width, vp.Height,
+                vp.MinZ, vp.MaxZ, static_cast<unsigned>(scHr),
+                scissor.left, scissor.top, scissor.right, scissor.bottom,
+                static_cast<unsigned>(fvfHr), static_cast<unsigned>(fvf),
+                static_cast<unsigned>(rtHr), static_cast<const void*>(rt0),
+                static_cast<unsigned>(depthHr), static_cast<const void*>(depth),
+                static_cast<unsigned>(texHr), static_cast<const void*>(tex0),
+                static_cast<unsigned>(vsHr), static_cast<const void*>(vs),
+                static_cast<unsigned>(psHr), static_cast<const void*>(ps),
+                static_cast<unsigned>(zHr), zEnable,
+                static_cast<unsigned>(zwHr), zWrite,
+                static_cast<unsigned>(abHr), alphaBlend,
+                static_cast<unsigned>(sbHr), srcBlend,
+                static_cast<unsigned>(dbHr), dstBlend,
+                static_cast<unsigned>(seHr), scissorEnable,
+                static_cast<unsigned>(FrameFailureReason),
+                R30SupportDirectTransportRingBackpressureCount());
+
+            if (Settings::VREvidenceTraceMatrices)
+            {
+                D3DMATRIX world{}, view{}, projection{};
+                const HRESULT wHr = device->GetTransform(D3DTS_WORLD, &world);
+                const HRESULT vHr = device->GetTransform(D3DTS_VIEW, &view);
+                const HRESULT pHr = device->GetTransform(D3DTS_PROJECTION, &projection);
+                spdlog::info(
+                    "VR EVIDENCE MATRIX seq={} phase={} worldHr=0x{:08X} world=[{},{},{},{};{},{},{},{};{},{},{},{};{},{},{},{}] viewHr=0x{:08X} view=[{},{},{},{};{},{},{},{};{},{},{},{};{},{},{},{}] projHr=0x{:08X} proj=[{},{},{},{};{},{},{},{};{},{},{},{};{},{},{},{}]",
+                    ticket, phase, static_cast<unsigned>(wHr),
+                    world._11,world._12,world._13,world._14,
+                    world._21,world._22,world._23,world._24,
+                    world._31,world._32,world._33,world._34,
+                    world._41,world._42,world._43,world._44,
+                    static_cast<unsigned>(vHr),
+                    view._11,view._12,view._13,view._14,
+                    view._21,view._22,view._23,view._24,
+                    view._31,view._32,view._33,view._34,
+                    view._41,view._42,view._43,view._44,
+                    static_cast<unsigned>(pHr),
+                    projection._11,projection._12,projection._13,projection._14,
+                    projection._21,projection._22,projection._23,projection._24,
+                    projection._31,projection._32,projection._33,projection._34,
+                    projection._41,projection._42,projection._43,projection._44);
+            }
+
+            if (rt0) rt0->Release();
+            if (depth) depth->Release();
+            if (tex0) tex0->Release();
+            if (vs) vs->Release();
+            if (ps) ps->Release();
+        }
 
         void R30ArmSafeFallback(std::uint64_t = 2) noexcept
         {
