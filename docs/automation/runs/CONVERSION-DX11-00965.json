@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00965",
+  "production_id": "CONVERSION-DX11-00965",
+  "event_id": "CONVERSION-DX11-00965-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00965",
+  "feature_id": "DX11:LIVE_SM3_CUBETEXTURE_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "REAL_GAME_DRAW_BLOCKER": "No matching 00965 exact-SHA real-game menu/car/race frame or HMD evidence; prior 2026-10-18 observation native_draws=0, do not assume changed",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Use safe opt-in to capture actual menu→vehicle→race game-created native Draw/DrawIndexed, eligible/native/published counters and pixel/frame evidence; continue full resolution and OpenXR stereo while retaining original D3D9Ex/input/FFB fallback.",
+  "CODE_CHANGED_SHA": "dda6894700734539280a2296305ad3f8e395404d",
+  "material_result_sha": "dda6894700734539280a2296305ad3f8e395404d",
+  "validation_bearing_result_sha": "88651a8ac3b23531921238fae4aa7d20e52656f2",
+  "result_sha": "88651a8ac3b23531921238fae4aa7d20e52656f2",
+  "score_change": 1,
+  "work_time_percentages": "NOT_MEASURED",
+  "time_allocation_claim": "NOT_MEASURED; no unsupported ≥70% assertion",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_SM3_TEXTURECUBE_SHADER_OPERANDS",
+      "D3D9_CUBETEXTURE_6_FACE_MIP_CAPTURE",
+      "D3D11_CUBE_SRV_NATIVE_DRAW",
+      "SOURCE_ONLY_VISIBLE_FRAME_OUTPUT_UNTESTED"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_backend.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+      "tools/dx11_sm3_cube_draw_probe_00965.cpp",
+      "tools/test_dx11_sm3_cube_draw_00965.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "SM3 D3DSTT_CUBE operand -> native HLSL cube sampling, game D3D9 CubeTexture six-face mip LockRect -> native cube SRV -> VS/PS resources and native Draw/DrawIndexed; built under mandatory five exact-SHA CI",
+      "negative_regression": "Unknown cube shader operands, projection and unsupported formats/cube source lock states fail-closed; dedicated Cube/2D SRGB/MIP/addressW and SM3 source modifier negative regression repairs retained, original game D3D9 fallback untouched",
+      "component_integration": "D3D9 vertex/pixel shader bytecode+sampler register capture -> CubeTexture six-face upload and sampler state -> D3D11 resource bindings and shader translation -> guarded native GPU Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_CUBETEXTURE_NATIVE_DRAW:CONVERSION-DX11-00965"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_SM3_CUBE_TEXTURE",
+      "NATIVE_VS_PS_HLSL",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT_UNTESTED"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CI_ONLY; menu/car/race rendered pixels, native published frame count, original controller/gamepad parity and Quest3 HMD UNTESTED",
+    "activation_guard_and_fallback": "Native Draw remains explicit diagnostic opt-in; existing D3D9/DX9Ex Draw/Present, original input/FFB/SkyGlow, owner leases and frozen DXVK unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_CUBETEXTURE_NATIVE_DRAW",
+    "goal": "Connect game-created SM3 cube-reflection shader/texture to native D3D11 VS/PS GPU Draw/DrawIndexed without admitting unsupported states or replacing original D3D9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "native_sm3_cube_gpu_path",
+        "category": "end_to_end_behavior",
+        "behavior_area": "shader_and_texture_gpu_integration",
+        "expected_behavior": "Game shader cube operands and six-face texture data bind valid native cube SRV and sample through VS/PS native Draw"
+      },
+      {
+        "id": "original_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input_and_invalid_gpu_sources",
+        "expected_behavior": "Malformed cube operand/format/resource and invalid sampler states retain original renderer/input/FFB behavior; guard regressions detect negative mutations"
+      },
+      {
+        "id": "mandatory_five_gate_exact_sha",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_windows_backend_openxr_hud_integrity",
+        "expected_behavior": "Mandatory 5 CI gates on exact validation-bearing result SHA; no HMD/runtime claims"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_sm3_cube_gpu_path": "PASS_EXACT_SHA_SOURCE_ONLY",
+    "original_game_fallback": "PASS_EXACT_SHA_SOURCE_ONLY",
+    "mandatory_five_gate_exact_sha": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: Existing 00965 material result and exact failing Backend run 39529060645 inspected without duplicate work ID.",
+    "C1_REVIEW": "PASS: Identified legacy test assumptions incompatible with real Cube/2D staged source and immutable live shader guards.",
+    "C2_IMPLEMENT": "PASS: Original 00965 integrated native game SM3 six-face cube texture shader and D3D11 binding C++ sources at material SHA; same ID causal CI repair changes retained.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast 39530577364, Backend 39530577433, Windows Build 39530583191, OpenXR 39530583105, HUD 39530583128 SUCCESS on 88651a8a...",
+    "C4_COMMIT": "PASS: non-force, no CI-skip validation-bearing 88651a8a...; original material commit dda68947...; retries under same TASK_ID.",
+    "C5_PACKAGE": "NOT_REQUIRED: source+CI validation only; real desktop/Quest3 native frame parity not yet tested, no unsafe promotion.",
+    "C6_STATE": "PASS: Durable bookkeeping-only exact-SHA result; validation-bearing SHA unaffected, runtime remains UNTESTED."
+  },
+  "ci": {
+    "exact_sha": "88651a8ac3b23531921238fae4aa7d20e52656f2",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build (Win32 Release)",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39530577364,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39530577433,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 39530583191,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39530583105,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39530583128,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+    "tools/dx11_sm3_cube_draw_probe_00965.cpp",
+    "tools/test_dx11_sm3_cube_draw_00965.py",
+    "tools/test_dx11_native_srgb_texture_00657.py",
+    "tools/test_dx11_sm3_projective_source_00953.py",
+    "tools/test_dx11_sm3_texture_modifiers_00954.py",
+    "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+    "tools/test_dx11_native_mip_linear_00590.py",
+    "tools/test_dx11_live_sm3_draw_00925.py",
+    "tools/test_dx11_native_address_mirror_00591.py"
+  ],
+  "c6_result_note": "C6 bookkeeping must never be validation-bearing; first real game/hardware evidence outstanding, no repeated exact SHA gate or new task/feature score for test-only repairs."
+}
