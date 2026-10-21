@@ -9,12 +9,12 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00970",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
-  "status": "FEATURE_READY_PROMOTED_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "feature_stage": "FEATURE_READY_PROMOTED",
-  "checkpoint": "C6_RESULT",
-  "automation_validation": "PASS_EXACT_SHA_FULL_GATE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA_FULL_GATE",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
@@ -24,10 +24,10 @@
   "time_allocation_claim": "NOT_MEASURED",
   "score_change": 0,
   "score_run_key": "CONVERSION-DX11-00970",
-  "score_status": "NO_DUPLICATE_ROLLOVER_AWARD_PENDING_SSOT_RECONCILIATION",
+  "score_status": "NO_NEW_AWARD_C6_BOOKKEEPING_ALREADY_CREDITED",
   "source_head": "e4a63381feb01e0256ff6a74836c87ba76351f5a",
   "material_result_sha": "be14e0af3d7963418988cfe4d1ff332d7c92ef6b",
-  "validation_bearing_result_sha": "55496c5927daecb4066376997e5943bb0d4cb256",
+  "validation_bearing_result_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716",
   "result_sha": "55496c5927daecb4066376997e5943bb0d4cb256",
   "CODE_CHANGED_SHA": "be14e0af3d7963418988cfe4d1ff332d7c92ef6b",
   "changed_files": [
@@ -135,7 +135,7 @@
     }
   },
   "ci": {
-    "exact_sha": "55496c5927daecb4066376997e5943bb0d4cb256",
+    "exact_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716",
     "required": [
       "DX11 Fast Structural Checks",
       "Backend Conversion Gate",
@@ -146,33 +146,33 @@
     "runs": [
       {
         "name": "DX11 Fast Structural Checks",
-        "run_id": 39583651989,
+        "run_id": 39585926381,
         "conclusion": "success",
-        "head_sha": "55496c5927daecb4066376997e5943bb0d4cb256"
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
       },
       {
         "name": "Backend Conversion Gate",
-        "run_id": 39583652005,
+        "run_id": 39585926486,
         "conclusion": "success",
-        "head_sha": "55496c5927daecb4066376997e5943bb0d4cb256"
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
       },
       {
         "name": "Build",
-        "run_id": 39583651911,
+        "run_id": 39585932772,
         "conclusion": "success",
-        "head_sha": "55496c5927daecb4066376997e5943bb0d4cb256"
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
       },
       {
         "name": "OpenXR VR architecture",
-        "run_id": 39583651903,
+        "run_id": 39585932801,
         "conclusion": "success",
-        "head_sha": "55496c5927daecb4066376997e5943bb0d4cb256"
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
       },
       {
         "name": "OutRun EXE HUD Inspector CI",
-        "run_id": 39583651927,
+        "run_id": 39585932775,
         "conclusion": "success",
-        "head_sha": "55496c5927daecb4066376997e5943bb0d4cb256"
+        "head_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
       }
     ],
     "artifacts": [
@@ -200,7 +200,8 @@
     "C3_VALIDATE": "PASS: Five mandatory GitHub Actions success on exact feature SHA 55496c5927daecb4066376997e5943bb0d4cb256; backend readiness WARP probes success, build and backend artifacts verified.",
     "C4_COMMIT": "PASS: four source/test/workflow commits on feature branch; non-force expected-SHA fast-forward to target from e4a63381feb01e0256ff6a74836c87ba76351f5a, compare ahead=4 behind=0.",
     "C5_PACKAGE": "BUILD_ARTIFACTS_AVAILABLE: artifacts outrun2006tweaks, wheel-source, backend-autovalidated at exact source SHA; no HMD test, user deployment not performed.",
-    "C6_RESULT": "PASS_FEATURE_BUILD_VERIFIED: target at exact source SHA 55496c5927daecb4066376997e5943bb0d4cb256 after CAS promotion; game/menu/race native pixel proof not established; runtime UNTESTED."
+    "C6_RESULT": "PASS_EXACT_SHA: mandatory five GitHub Actions completed SUCCESS at a35efc7740f9ccf5353d9bc101f1b6930c1c8716; C6 terminal status COMPLETE_BUILD_VERIFIED (bookkeeping only); parent material/code SHA preserved; real-game/Quest3 RUNTIME_VALIDATION=UNTESTED.",
+    "C6_STATE": "PASS_EXACT_SHA at a35efc7740f9ccf5353d9bc101f1b6930c1c8716; prior hold TERMINAL_STATUS_NOT_COMPLETE resolved; no source changes, no CI rerun."
   },
   "REAL_GAME_DRAW_BLOCKER": "No observed native full-game pixels from a real OutRun launch and no Quest3/VDXR stereo evidence; source/CI success does not prove menu/car/race playable.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
@@ -215,7 +216,7 @@
     "status": "PASS_FEATURE_CI",
     "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
     "scope": "Bounded current-mip real-game render-target mirror into native Draw/DrawIndexed, opt-in with DX9Ex fallback",
-    "ci_exact_sha": "55496c5927daecb4066376997e5943bb0d4cb256",
+    "ci_exact_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716",
     "target_branch": "vr-dx11-native-r71",
     "promoted": true,
     "promotion": {
@@ -257,5 +258,8 @@
     },
     "runtime_validation": "UNTESTED",
     "game_frame_observed": "UNTESTED"
-  }
+  },
+  "c6_previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_hold_resolution": "RESOLVED_BY_PASS_EXACT_SHA",
+  "c6_validation_sha": "a35efc7740f9ccf5353d9bc101f1b6930c1c8716"
 }
