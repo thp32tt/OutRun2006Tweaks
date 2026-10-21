@@ -74,6 +74,37 @@ namespace OutRunVRStereo
             std::numeric_limits<std::uint64_t>::max();
         thread_local std::uint32_t R30EvidenceDrawsThisFrame = 0;
 
+        bool R30EvidenceTargetedProducer(
+            OutRunVR::GameSemantic::ProducerToken producer) noexcept
+        {
+            using OutRunVR::GameSemantic::ProducerToken;
+            switch (producer)
+            {
+            case ProducerToken::RivalMarkerSprani:
+            case ProducerToken::StageExtensionTime:
+            case ProducerToken::GoalTimeHelper:
+            case ProducerToken::GoalTime020:
+            case ProducerToken::GoalTime150:
+            case ProducerToken::ResultProgress:
+            case ProducerToken::ResultTextB9200:
+            case ProducerToken::OutRunStagePrintf:
+            case ProducerToken::LensFlareCentre:
+                return true;
+            default:
+                return false;
+            }
+        }
+
+        bool R30EvidenceTargetedScope(
+            OutRunVR::GameSemantic::RenderScope scope) noexcept
+        {
+            using OutRunVR::GameSemantic::RenderScope;
+            return scope == RenderScope::SceneEffect ||
+                scope == RenderScope::SkyGlow ||
+                scope == RenderScope::ProjectedScreenEffect2D ||
+                scope == RenderScope::ProjectedWorldMarker2D;
+        }
+
         bool R30EvidenceTakeDrawTicket(
             const char* api, OutRunVR::GameSemantic::RenderScope scope,
             std::uint64_t& ticket) noexcept
@@ -85,9 +116,15 @@ namespace OutRunVRStereo
                 R30EvidenceBudgetEpoch = PresentEpoch;
                 R30EvidenceDrawsThisFrame = 0;
             }
+            const auto command =
+                OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+            const bool targeted =
+                R30EvidenceTargetedProducer(command.producer) ||
+                R30EvidenceTargetedScope(scope) ||
+                R30EvidenceTargetedScope(command.scope);
             const int configuredMax =
                 Settings::VREvidenceTraceMaxDrawsPerFrame.get();
-            if (configuredMax > 0 &&
+            if (!targeted && configuredMax > 0 &&
                 R30EvidenceDrawsThisFrame >=
                     static_cast<std::uint32_t>(configuredMax))
                 return false;
