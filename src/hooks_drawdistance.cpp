@@ -127,8 +127,12 @@ public:
 						bool areAllExcluded = true;
 						for (int i = 0; i < ObjectNodes[objectIdx].size(); i++)
 						{
-							auto nodeId = ObjectNodes[objectIdx][i];
-							if (!objectExclusions[objectIdx][nodeId])
+							const auto nodeId = ObjectNodes[objectIdx][i];
+							// Runtime node IDs use the full uint16 domain, while the
+							// persisted exclusion bitset intentionally covers 0..16383.
+							// An unrepresentable node cannot be considered excluded.
+							if (nodeId >= objectExclusions[objectIdx].size() ||
+								!objectExclusions[objectIdx][nodeId])
 							{
 								areAllExcluded = false;
 								break;
@@ -137,8 +141,10 @@ public:
 
 						for (int i = 0; i < ObjectNodes[objectIdx].size(); i++)
 						{
-							auto nodeId = ObjectNodes[objectIdx][i];
-							objectExclusions[objectIdx][nodeId] = areAllExcluded ? false : true;
+							const auto nodeId = ObjectNodes[objectIdx][i];
+							if (nodeId < objectExclusions[objectIdx].size())
+								objectExclusions[objectIdx][nodeId] =
+									areAllExcluded ? false : true;
 						}
 					}
 
@@ -147,13 +153,26 @@ public:
 						{
 							ImGui::PushID(i + 1);
 
-							auto nodeId = ObjectNodes[objectIdx][i];
-							bool excluded = objectExclusions[objectIdx][nodeId];
+							const auto nodeId = ObjectNodes[objectIdx][i];
+							const bool canExclude =
+								nodeId < objectExclusions[objectIdx].size();
+							bool excluded =
+								canExclude && objectExclusions[objectIdx][nodeId];
 
-							if (ImGui::Checkbox("", &excluded))
-								objectExclusions[objectIdx][nodeId] = excluded;
+							if (canExclude)
+							{
+								if (ImGui::Checkbox("", &excluded))
+									objectExclusions[objectIdx][nodeId] = excluded;
+							}
+							else
+							{
+								ImGui::TextDisabled("N/A");
+							}
 
-							ImGui::SetItemTooltip("Stage %d, object 0x%X, node 0x%X", cur_stage_num, objectIdx, nodeId);
+							ImGui::SetItemTooltip(
+								"Stage %d, object 0x%X, node 0x%X%s",
+								cur_stage_num, objectIdx, nodeId,
+								canExclude ? "" : " (outside exclusion range)");
 
 							ImGui::PopID();
 						}
