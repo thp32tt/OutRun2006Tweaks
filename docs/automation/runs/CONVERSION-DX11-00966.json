@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00966",
   "production_id": "CONVERSION-DX11-00966",
-  "event_id": "CONVERSION-DX11-00966-E017",
+  "event_id": "CONVERSION-DX11-00966-E023",
   "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
@@ -10,25 +10,25 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00966",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "feature_branch": "feature/dx11-00966-live-game-frame",
-  "feature_stage": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_stage": "FEATURE_READY_PROMOTED_C6_SOURCE_CI_VERIFIED",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
-  "feature_last_head": "a93f8d2f97967e9a5b9fbd766ed0c5dde11823cf",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C2_IMPLEMENT_C3_VALIDATE_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "feature_last_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "status": "SOURCE_CI_VERIFIED_GAME_FRAME_PENDING",
+  "checkpoint": "C6_SOURCE_CI_VERIFIED_GAME_FRAME_PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
-  "material_result_sha": "2b35c8d565238596e00a045473be45fea86c0ebc",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "validation_bearing_result_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "result_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
   "score_change": 0,
-  "REAL_GAME_DRAW_BLOCKER": "No actual game-launch evidence after the 2026-10-18 eligible/native/published-zero observation; live SM3 dynamic BLENDFACTOR no longer statically rejected, actual impact UNTESTED.",
+  "REAL_GAME_DRAW_BLOCKER": "No same-SHA live OutRun game launch evidence for eligible/native/published menu, vehicle or race frame; 2026-10-18 last recorded native_draws=0 is historical and must not be projected onto this source SHA.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Repair exact-SHA CI failures without weakening fail-closed game drawing. Then capture real menu/car/race live SM3 state-rejection buckets and complete contiguous game-authored D3D9 Draw/DrawIndexed -> native D3D11 Draw -> published 3440x1440 frame, with original input/FFB fallback; no playability claim without runtime proof.",
+  "NEXT_IMPLEMENTATION_ACTION": "Keep DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME and CONVERSION-DX11-00966 identity for the next genuinely unfinished integration; obtain real game menu/car/race D3D9 Draw to D3D11 native draw and complete 3440x1440 published pixel/frame evidence; repair only evidenced failures. DX9Ex/input/FFB fail-closed, native activation opt-in; no gameplay/HMD completion claim.",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
@@ -92,22 +92,32 @@
   },
   "acceptance_results": {
     "live_game_native_draw_pipeline": {
-      "status": "PENDING_REAL_GAME_EVIDENCE",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
-        "src/vr/d3d11/live_game_frame_bridge.cpp"
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_primitive_span.hpp",
+        "src/vr/d3d11/live_game_source_stride.hpp",
+        "tools/dx11_live_game_source_stride_probe_00966.cpp",
+        "tools/test_dx11_live_sm3_blend_factor_00966.py",
+        "tools/test_dx11_live_source_stride_00966.py"
       ],
-      "validation_command": "python tools/test_dx11_live_sm3_blend_factor_00966.py"
+      "validation_command": "GitHub Actions DX11 Fast Structural Checks 39564130518; Backend Conversion Gate 39564130486; python tools/test_dx11_live_sm3_blend_factor_00966.py; python tools/test_dx11_live_source_stride_00966.py",
+      "evidence_scope": "source_and_ci_only_not_gameplay"
     },
     "no_invalid_game_frame_or_input_change": {
-      "status": "PENDING_EXACT_SHA_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "tools/test_dx11_first_game_frame_regressions.py",
         "tools/test_dx11_live_sm3_blend_factor_00966.py"
       ],
-      "validation_command": "python tools/test_dx11_live_sm3_blend_factor_00966.py"
+      "validation_command": "GitHub Actions Backend Conversion Gate 39564130486 and DX11 Fast Structural Checks 39564130518",
+      "evidence_scope": "fail_closed_source_and_ci_not_real_HMD"
     },
     "mandatory_five_gate_exact_sha": {
-      "status": "PENDING_EXACT_SHA_CI",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         ".github/workflows/dx11-fast-structural.yml",
         ".github/workflows/backend-conversion-gate.yml",
@@ -115,7 +125,7 @@
         ".github/workflows/vr-openxr.yml",
         ".github/workflows/outrun-exe-hud-inspector.yml"
       ],
-      "validation_command": "GitHub Actions exact head SHA"
+      "validation_command": "GitHub Actions target branch 0faf8807b2cebd429496b08a66f9370535a293ec: Fast 39564130518; Backend 39564130486; Build 39564130565; OpenXR 39564130437; HUD 39564130576"
     }
   },
   "changed_files": [
@@ -128,12 +138,85 @@
     ".github/workflows/outrun-exe-hud-inspector.yml"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS: remote checkpoint 20261021T1500 and target fc2065e5...",
-    "C1_REVIEW": "PASS: 00965 C6 complete, 00477 R175 owner released, 00966 absent before restart",
-    "C2_IMPLEMENT": "PASS: meaningful live SM3 dynamic per-draw blend constant mapping source commit 2b35c8d5",
-    "C3_VALIDATE": "IN_PROGRESS: exact feature HEAD a93f8d2; Fast first failed due legacy 00965 policy acceptance, 00966 pending record now supersedes highest run",
-    "C4_COMMIT": "PASS: feature source commits 2b35c8d5/a93f8d2 with exact marker; no target promotion",
-    "C5_PACKAGE": "NOT_REQUIRED until feature proven",
-    "C6_RESULT": "NOT_READY; original runtime UNTESTED"
+    "C0_RECOVER": "PASS: GitHub target HEAD fc2065..., original 00966 feature branch already 7 ahead, behind=0, existing E017 result recovered without new attempt.",
+    "C1_REVIEW": "PASS: Follow existing 00966 source and CI repairs; no 00477 TEXCOORD6 duplicate work or new feature.",
+    "C2_IMPLEMENT": "PASS: Existing 00966 committed live source/UP stride and SM3 BLENDFACTOR integrated on original feature branch, final validated source 0faf8807...",
+    "C3_VALIDATE": "PASS_EXACT_SHA: feature branch five runs 39557705574/39557705584/39557705520/39557705443/39557705455 and post-promotion target five runs 39564130518/39564130486/39564130565/39564130437/39564130576 all SUCCESS for 0faf8807...",
+    "C4_COMMIT": "PASS: target branch safely fast-forwarded to 0faf8807... from fc2065... with compare behind=0, expected_sha and force=false. Original material source commit retains exact task marker.",
+    "C5_PACKAGE": "PASS_SOURCE_BUNDLE: Windows Release outrun2006tweaks-0faf8807... and backend-autovalidated-0faf8807... produced; no real game installation/HMD execution.",
+    "C6_RESULT": "PASS_DURABLE_SOURCE_CI_CHECKPOINT: this docs-only record updates exact validated source evidence after required target CI; native menu/car/race pixels, source coverage and Quest3 runtime still UNTESTED."
+  },
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "CODE_CHANGED_SHA": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "ci": {
+    "exact_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+    "branch": "vr-dx11-native-r71",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build (Win32 Release)",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39564130518,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39564130486,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 39564130565,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39564130437,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39564130576,
+        "conclusion": "success"
+      }
+    ],
+    "artifacts": [
+      {
+        "workflow": "Build",
+        "run_id": 39564130565,
+        "artifact_id": 12328569187,
+        "name": "outrun2006tweaks-0faf8807b2cebd429496b08a66f9370535a293ec",
+        "bytes": 5309679
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 39564130486,
+        "artifact_id": 12328738789,
+        "name": "backend-autovalidated-0faf8807b2cebd429496b08a66f9370535a293ec",
+        "bytes": 2584266
+      }
+    ],
+    "feature_branch_runs": [
+      39557705574,
+      39557705584,
+      39557705520,
+      39557705443,
+      39557705455
+    ]
+  },
+  "c6_result_note": "C6 source/CI evidence only; do not treat this bookkeeping commit as validation-bearing or feature/gameplay completion, and do not award another score for this rollover. FEATURE_ID preserved for actual first visible native game frame.",
+  "promoted_target_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "evidence_sha": "0faf8807b2cebd429496b08a66f9370535a293ec",
+    "promoted": true,
+    "compare_behind": 0,
+    "force": false
   }
 }
