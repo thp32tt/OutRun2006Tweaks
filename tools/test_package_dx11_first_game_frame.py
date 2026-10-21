@@ -43,13 +43,21 @@ def verify_bundle_ci_route(workflow):
         raise ValueError("CI admission or binary dependencies missing")
     guard = job.split("    if: >-", 1)[1].split("    needs:", 1)[0]
     normalized = "".join(guard.split())
-    for required in (
-        "github.event_name=='pull_request'&&github.head_ref=='vr-d3d9ex-review-feature-dx11-00537'",
-        "github.event_name=='push'&&github.ref=='refs/heads/vr-dx11-native-r71'",
-        "||",
-    ):
-        if required not in normalized:
-            raise ValueError("target push or feature PR admission missing")
+    # Accept either a lone target push or a parenthesized target/feature
+    # disjunction. The feature branch must not replace the mandatory target
+    # ref; both variants must retain the *same* push-event admission.
+    required_pr = (
+        "github.event_name=='pull_request'&&"
+        "github.head_ref=='vr-d3d9ex-review-feature-dx11-00537'"
+    )
+    target = "github.ref=='refs/heads/vr-dx11-native-r71'"
+    required_push_variants = (
+        "github.event_name=='push'&&" + target,
+        "github.event_name=='push'&&(" + target + "||",
+    )
+    if (required_pr not in normalized or "||" not in normalized or
+            not any(route in normalized for route in required_push_variants)):
+        raise ValueError("target push or feature PR admission missing")
     # Validate the target branch as a *list entry*, not by exact literal
     # equality with a historical two-branch YAML list. Other approved
     # feature branches may coexist without disabling the target push Gate.
