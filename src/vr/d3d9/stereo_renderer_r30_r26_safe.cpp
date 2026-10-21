@@ -2009,9 +2009,13 @@ namespace OutRunVRStereo
         {
             using namespace OutRunVR::GameSemantic;
             const auto drawCommand = CapturePhysicalDrawCommand();
+            const auto currentLensCentreCallEpoch =
+                CurrentLensCentreCallEpoch;
             if (!out || QueueRenderActive() ||
                 EffectiveScope() != RenderScope::WorldBillboard ||
                 CurrentRenderProducerToken() != ProducerToken::LensFlareCentre ||
+                currentLensCentreCallEpoch == 0 ||
+                currentLensCentreCallEpoch != drawCommand.lensCentreCallEpoch ||
                 !drawCommand.IsDirectWorldLensCentre())
                 return false;
             std::uint64_t writeSerial = 0, writeDraw = 0;
@@ -2041,10 +2045,10 @@ namespace OutRunVRStereo
             const bool spatialCentreSource =
                 OutRunVR::LensCentre::AdmitsCentreRawSourceScope(
                     sourceScope, sourceProducer, queueNode,
-                    drawCommand.lensCentreCallEpoch, writtenCall,
+                    currentLensCentreCallEpoch, writtenCall,
                     currentDraw, writeDraw);
             const bool owned = OutRunVR::LensCentre::OwnsRawWvp({
-                drawCommand.lensCentreCallEpoch,
+                currentLensCentreCallEpoch,
                 writtenCall,
                 OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
                 OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
@@ -2066,7 +2070,7 @@ namespace OutRunVRStereo
                         owned ? 1 : 0,
                         static_cast<unsigned>(sourceScope),
                         OutRunVR::GameSemantic::Name(sourceProducer),
-                        drawCommand.lensCentreCallEpoch, writtenCall,
+                        currentLensCentreCallEpoch, writtenCall,
                         currentDraw, writeDraw,
                         currentShader != 0 && currentShader == writeShader ? 1 : 0,
                         currentShaderEpoch != 0 &&
