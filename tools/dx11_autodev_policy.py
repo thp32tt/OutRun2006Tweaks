@@ -100,7 +100,21 @@ def validate_policy(policy: dict) -> list[str]:
 
 
 def verified_build_acceptance(value: object) -> bool:
-    """Detailed positive build probes are not a substitute for an exact-SHA Gate."""
+    """Require auditable source/CI evidence for structured acceptance entries.
+
+    The persisted 00966 feature result uses an object with status and evidence,
+    unlike older string-valued results. Reject missing evidence/status instead
+    of treating every structured result as UNTESTED (or blindly trusting it).
+    The separate exact-SHA and source gates remain mandatory in validate_task.
+    """
+    if isinstance(value, dict):
+        paths = value.get("evidence_paths")
+        command = value.get("validation_command")
+        if (not isinstance(paths, list) or not paths
+                or any(not isinstance(path, str) or not path.strip() for path in paths)
+                or not isinstance(command, str) or not command.strip()):
+            return False
+        value = value.get("status")
     if value in ("PASS", "PASS_BUILD", "PASS_EXACT_SHA"):
         return True
     if not isinstance(value, str) or not re.fullmatch(

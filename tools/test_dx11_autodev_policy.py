@@ -247,6 +247,32 @@ for label, mutate in (
     mutate(bad)
     assert validate_task(bad, p), "00900 source-only negative admitted: " + label
 
+# CONVERSION-DX11-00967 causal CI repair: 00966 stores audited acceptance
+# entries as structured objects, not legacy strings. Source/CI is proven by
+# five exact-SHA Gates; gameplay/HMD remains explicitly UNTESTED.
+historical_00966 = json.loads((POLICY_FILE.parent / "runs" /
+    "CONVERSION-DX11-00966.json").read_text(encoding="utf-8"))
+assert historical_00966["runtime_validation"] == "UNTESTED"
+assert not validate_task(historical_00966, p), validate_task(historical_00966, p)
+# Acceptance is still fail-closed: a claimed PASS without a meaningful
+# evidence path or validation command cannot become completed feature proof.
+for label, mutate in (
+    ("missing status", lambda e: e.pop("status")),
+    ("pending CI", lambda e: e.update(status="PENDING_EXACT_SHA")),
+    ("runtime untested masquerading as acceptance", lambda e: e.update(status="PASS_UNTESTED")),
+    ("missing evidence paths", lambda e: e.update(evidence_paths=[])),
+    ("blank evidence path", lambda e: e.update(evidence_paths=[""])),
+    ("missing validation command", lambda e: e.pop("validation_command")),
+    ("blank validation command", lambda e: e.update(validation_command=" ")),
+):
+    bad = copy.deepcopy(historical_00966)
+    mutate(bad["acceptance_results"]["live_game_native_draw_pipeline"])
+    assert validate_task(bad, p), "unproven structured acceptance admitted: " + label
+# Explicit failure of the terminal exact-SHA gate remains a hard error.
+failed_00966 = copy.deepcopy(historical_00966)
+failed_00966["automation_validation"] = "FAIL_EXACT_SHA"
+assert validate_task(failed_00966, p)
+
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
