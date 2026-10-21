@@ -466,14 +466,23 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (Settings::VREvidenceTrace)
             {
                 const auto registry = R14EvidenceRegistry();
+                std::uint64_t trackedBytes = 0;
+                std::uint32_t trackedValidMask = 0;
+                const auto tracked = R14Find(gpu);
+                if (tracked)
+                {
+                    std::lock_guard<std::mutex> evidenceLock(tracked->mutex);
+                    trackedBytes = tracked->shadowBytes;
+                    trackedValidMask = tracked->validMask;
+                }
                 spdlog::info(
                     "VR EVIDENCE R14 TRACK_SHADOW device={} gpu={} cpu={} bytes={} totalBytes={} validMask=0x{:08X} registryCount={}",
                     static_cast<const void*>(device),
                     static_cast<const void*>(gpu),
                     static_cast<const void*>(cpu),
-                    entry->shadowBytes,
+                    trackedBytes,
                     R14ShadowBytes.load(std::memory_order_acquire),
-                    entry->validMask, registry.count);
+                    trackedValidMask, registry.count);
             }
             if (!R14FirstActiveLogged.exchange(true))
             {
