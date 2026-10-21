@@ -1,0 +1,368 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1615KST-A0023-SHA5",
+  "review_slot_kst": "2026-10-21 16:15",
+  "reviewed_at": "2026-10-21",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "provenance": {
+    "source": "N100 actual A-generated locally saved unapproved PNG",
+    "previous_unique_candidate_sha256": 225,
+    "distinct_new_sha256_count": 5,
+    "source_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0023-78B36677.json",
+    "n100_preflight": "work/c1_batch_20261021_1615/preflight.json",
+    "n100_comparison_images": [
+      "work/c1_batch_20261021_1615/compare_1.jpg",
+      "work/c1_batch_20261021_1615/compare_2.jpg",
+      "work/c1_batch_20261021_1615/compare_3.jpg"
+    ]
+  },
+  "authority": "Independent C1 PNG text-only QA, not ImageGen producer queue DDS C2/C3 or in-game PASS. Producer REWORK_DIMENSIONS preserved.",
+  "counts": {
+    "new_unique_reviewed": 5,
+    "pass_png_text_only": 0,
+    "fail_major_style_effect": 5,
+    "producer_rework_dimensions": 5,
+    "export_sha_match": 5,
+    "source_manifest_sha_match": 5,
+    "rgba_png": 5,
+    "visible_edge_opacity_gt32": 0
+  },
+  "reviews": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0023-78B36677",
+      "ordinal": 109,
+      "candidate_file": "Q201_6942834bb995a7bf_source_k.png",
+      "source_file": "Q201_6942834bb995a7bf_source.png",
+      "candidate_sha256": "f0bc2b6f925ab0d149da9f432115fae7b855739fa381144eb6cf2885ada19acf",
+      "source_sha256": "f21d10b729635c73d90698c1efe7f516f9c51c218a819939b30bc1d4dd7027a8",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "BAY AREA",
+      "approved_korean": "베이 에어리어",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2067,
+        761
+      ],
+      "original_dimensions": [
+        1071,
+        394
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        105,
+        98,
+        1925,
+        745
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "BAY AREA → 베이 에어리어 reads correctly, but the original is upright flat dark-gray bold sans serif. Output uses strongly slanted, heavily beveled black-metal lettering, thick rims and dark shadow; major style/orientation mismatch. BIG FOREST/CANYON are source context, not candidate residue.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0023-78B36677",
+      "ordinal": 110,
+      "candidate_file": "Q205_7626b77585666ef0_source_k.png",
+      "source_file": "Q205_7626b77585666ef0_source.png",
+      "candidate_sha256": "5be15a050691da92d6cccdfb1e482f5de4ddc7b548014d7b6c369cd6afb70178",
+      "source_sha256": "39e9e912d13d5f6b74ff881cd895b76cf7d091f8480d51cee67f3b99625bee89",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "LOCAL AT",
+      "approved_korean": "로컬 AT",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1938,
+        811
+      ],
+      "original_dimensions": [
+        516,
+        216
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        167,
+        152,
+        1460,
+        785
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "LOCAL AT → 로컬 AT reads correctly and output is text-only; original small flat dark-gray upright text over progress bars becomes much larger slanted embossed metallic lettering with thick black outline/shadow. Major style/effect mismatch; output bars correctly omitted as protected art.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0023-78B36677",
+      "ordinal": 111,
+      "candidate_file": "Q205_c50d5fffffc23a7f_source_k.png",
+      "source_file": "Q205_c50d5fffffc23a7f_source.png",
+      "candidate_sha256": "9a23f4d8a41a7428faec8c996c40941817190f4795d04112fa3df3d23ab49f35",
+      "source_sha256": "6f62c9de230a4d35dd73dcea98f4bddc742840e92c4fce4e6ec45578a132b834",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "FRIENDS",
+      "approved_korean": "친구",
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1906,
+        825
+      ],
+      "original_dimensions": [
+        499,
+        216
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        716,
+        292,
+        1236,
+        558
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "FRIENDS → 친구 reads correctly; original upright flat dark-gray small label becomes beveled, heavily outlined/shadowed 3D black-metal Hangul. Major source-style mismatch; source gray rounded bar is not output artwork.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0023-78B36677",
+      "ordinal": 112,
+      "candidate_file": "Q205_0a943e3cce5355b1_source_k.png",
+      "source_file": "Q205_0a943e3cce5355b1_source.png",
+      "candidate_sha256": "a18d46dbb0b35a1ca74edfb99312d5b95cdecd163c9790ed825d66a3f75b254c",
+      "source_sha256": "a3fdaa246095eeb1cbeb1b587aaeb4878d1fec4f52a63f3d1e99834bfd230c99",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "FRIENDS",
+      "approved_korean": "친구",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1906,
+        825
+      ],
+      "original_dimensions": [
+        499,
+        216
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        161,
+        102,
+        1638,
+        661
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "FRIENDS → 친구 reads correctly; strong rightward shear, oversized beveled black-metal face, thick dark rim/shadow diverge materially from the original upright flat sans label. No visible source bar replicated.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0023-78B36677",
+      "ordinal": 113,
+      "candidate_file": "Q205_0ffb5ffc7300a50f_source_k.png",
+      "source_file": "Q205_0ffb5ffc7300a50f_source.png",
+      "candidate_sha256": "8b28b9ac4d459ae6ec6851ef4d085e1950d1bad62360760a1458747dd5e43e10",
+      "source_sha256": "4fab75aa0dc5de14e7c74430141e76a6c62b127e14c726140d1ec593c9acaa35",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "LOCAL AT",
+      "approved_korean": "로컬 AT",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1938,
+        811
+      ],
+      "original_dimensions": [
+        516,
+        216
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        233,
+        138,
+        1756,
+        785
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "LOCAL AT → 로컬 AT reads correctly; original small upright flat gray label turns into oversized inclined embossed metallic lettering with thick black outline and shadow, a major style effect mismatch. No source progress bars replicated.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
