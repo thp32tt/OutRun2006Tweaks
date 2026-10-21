@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_ai_development_checkpoint",
+  "captured_at_kst": "2026-10-21T12:05:44+09:00",
+  "task_id": "CONVERSION-DX11-00966",
+  "production_id": "CONVERSION-DX11-00966",
+  "event_id": "CONVERSION-DX11-00966-E005",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_branch": "feature/dx11-00966-first-visible-game-frame",
+  "feature_id": "DX11:FIRST_VISIBLE_GAME_FRAME",
+  "feature_stage": "C2_IMPLEMENT_C3_TARGETED_VALIDATE",
+  "target_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "controller_original_base_sha": "e82835a4deb9a71a5903f00433453c3ba3b8efb8",
+  "feature_last_head": "398c6b159d2b1366802eea2c7ce180435b1f4a4e",
+  "source_progress": [
+    "5c49723c184447cc90eb7f7784738d4eebea8773: IndexedUP game-authored stream 1..3 physical shadow forwarding",
+    "40ba27e981d9da477db1e6c3dbaf8ff07a382d6a: nonindexed game DrawPrimitiveUP physical additional stream snapshot, originals preserved",
+    "8c273a0de00e23b40e9698db045e570ea00fab9a: source graph CI accepts active R30 helper while requiring R26-safe legacy",
+    "398c6b159d2b1366802eea2c7ce180435b1f4a4e: regressions cover four R30 native source families, three R26-safe; causal CI repair"
+  ],
+  "first_error": {
+    "sha": "40ba27e981d9da477db1e6c3dbaf8ff07a382d6a",
+    "run_id": 39536102984,
+    "step": "Verify DX11 source graph",
+    "cause": "Legacy fourth-family assertion required direct observe_linear token, now delegated to guarded R30 UP capture helper",
+    "fixed_sha": "8c273a0de00e23b40e9698db045e570ea00fab9a"
+  },
+  "second_error": {
+    "sha": "8c273a0de00e23b40e9698db045e570ea00fab9a",
+    "run_id": 39536412302,
+    "step": "Feature acceptance: DX11-SAFE-RETURN",
+    "cause": "Existing structural regression oracle assumed exactly three native source guards, now four active and three R26-safe",
+    "fixed_sha": "398c6b159d2b1366802eea2c7ce180435b1f4a4e"
+  },
+  "latest_ci": {
+    "sha": "398c6b159d2b1366802eea2c7ce180435b1f4a4e",
+    "workflow": "Build",
+    "run_id": 39536634943,
+    "observation": "IN_PROGRESS at 2026-10-21T12:05 KST; not yet PASS"
+  },
+  "acceptance": {
+    "source_up_multistream": "SOURCE_EDIT_COMMITTED",
+    "structural_regressions": "PENDING_CI",
+    "mandatory_five_exact_sha": "NOT_RUN",
+    "feature_ready": false
+  },
+  "conflict": {
+    "r175_owner": "CONVERSION-DX11-00477 C6 completed; no R175 edits in this feature",
+    "behind_target_at_40ba": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "real_game_draw_blocker": "No same-SHA evidence of complete live menu->car->race D3D11 pixels or published full game frames. Source/CI only, never assert playability",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Inspect latest exact-SHA feature Build 39536634943; only repair concrete failing gate. Continue real-game SM3 source -> native Draw -> same-Present full-size publish integration, preserving opt-in/DX9Ex. Prepare FEATURE_READY only after full source contract + positive/negative validation; final five exact-SHA gates and safe non-force promotion afterward.",
+  "no_score_awarded": true,
+  "not_feature_ready": true
+}
