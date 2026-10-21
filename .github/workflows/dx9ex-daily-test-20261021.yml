@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: dx9ex-oct21-standalone-${{ github.ref }}
+  group: dx9ex-oct21-standalone-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
