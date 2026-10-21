@@ -1,0 +1,483 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1245KST-NEW-SHA-UNIQUE8-A0019-A0020",
+  "review_slot_kst": "2026-10-21 12:45",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "1ecf404799e592fd94025c9f0bc2529606aa0288",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "Independent C1 text-only QA: eight previously unreviewed SHA-unique A-generated ROI Korean PNGs (A-0019 ordinal 89-93 and A-0020 ordinal 94-96). Does not consume A/B queues or approve DDS/game.",
+  "counts": {
+    "prior_n100_batch_reports_available": 6,
+    "prior_sha_local_reports": 45,
+    "github_20261021_prior_reports_sha_collision": 0,
+    "reviewed_new_unique": 8,
+    "pass_png_text_only": 7,
+    "fail_source_style_color_outline": 1,
+    "producer_rework_dimensions": 8
+  },
+  "evidence": {
+    "n100_preflight": "work/c1_batch_20261021_1245/preflight.json",
+    "n100_compare_jpg": [
+      "work/c1_batch_20261021_1245/compare_1.jpg",
+      "work/c1_batch_20261021_1245/compare_2.jpg"
+    ],
+    "source_manifest_and_export_sha_verified": true,
+    "all_png_rgba": true,
+    "all_alpha_ge16_border_zero": true,
+    "visual": "All eight English-source/Korean-output comparison panels inspected independently, using checkerboard-alpha previews. Only ordinal 94 has obvious severe fill/color/outline mismatch. Others limited to text-only assessment; placement not verified."
+  },
+  "results": [
+    {
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "role": "A",
+      "ordinal": 89,
+      "candidate_file": "Q057_2c0dad6837bce264_source_k.png",
+      "source_file": "Q057_2c0dad6837bce264_source.png",
+      "candidate_sha256": "ee7a83375598ea433fc1e26e88ccce17b7f11472a6bfdc268836ada5f7e1e459",
+      "export_sha_match": true,
+      "source_sha256": "68849f0786d7ba60ca8acc8b8fc32727d277232343d36b1c6550fe21794b3e6e",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "english": "Target",
+      "approved_korean": "목표",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1738,
+        905
+      ],
+      "source_dimensions": [
+        463,
+        241
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        550,
+        194,
+        1215,
+        711
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'목표' 가독성·철자 정확, 무채색 계열 유지. 원문보다 입체감이 증가했으나 독립 PNG의 핵심 결함은 관찰되지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "role": "A",
+      "ordinal": 90,
+      "candidate_file": "Q057_947f0577f0e8fc60_source_k.png",
+      "source_file": "Q057_947f0577f0e8fc60_source.png",
+      "candidate_sha256": "2f0bd88071b52c2e0fc28742108a2bb94befa7493abf2cdba73b21c75efb5d9b",
+      "export_sha_match": true,
+      "source_sha256": "d38fda94ee0be5f3683aadfe503af8dd27f76c2851d11f5004cbc698b0b46529",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "english": "Technical Bonus",
+      "approved_korean": "테크니컬 보너스",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2320,
+        691
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        31,
+        8,
+        2124,
+        682
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'테크니컬 보너스' 철자와 금속성 채움/외곽을 확인. 원문 대비 문구 크기 차이는 단독 반려 사유가 아님.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "role": "A",
+      "ordinal": 91,
+      "candidate_file": "Q161_85450ed07d3da830_source_k.png",
+      "source_file": "Q161_85450ed07d3da830_source.png",
+      "candidate_sha256": "8f68f6a8fe4555719f47b7708e68e18a7600cee551f9e7be1c01ec356210251b",
+      "export_sha_match": true,
+      "source_sha256": "08e6de4157bd2e5d3a5ed613e295b81d8f4319614f4f87a664151fecf7f451b8",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "english": "USA",
+      "approved_korean": "미국",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1786,
+        881
+      ],
+      "source_dimensions": [
+        600,
+        296
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        146,
+        2,
+        1669,
+        823
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'미국'의 자소와 받침 가독성 양호, 어두운 회청색 텍스트 계열 유지. 더 두꺼운 외곽선은 합성 전 확인 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "role": "A",
+      "ordinal": 92,
+      "candidate_file": "Q097_96e9f336e7f8446c_source_k.png",
+      "source_file": "Q097_96e9f336e7f8446c_source.png",
+      "candidate_sha256": "2acad784a404cecb8ebf3039d237964b143c87e9ce0a9b2d640c15e45500a99e",
+      "export_sha_match": true,
+      "source_sha256": "dbb8cf526edc4163b51e33884e637548583b53de417cf6751048b63f91a422d5",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "english": "seconds",
+      "approved_korean": "초",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2119,
+        742
+      ],
+      "source_dimensions": [
+        711,
+        249
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        689,
+        88,
+        1583,
+        686
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'초' 가독성 양호, 흰 채움과 짙은 파란 외곽 계열 대응. 다른 문구/배경은 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "role": "A",
+      "ordinal": 93,
+      "candidate_file": "Q101_b524921be8864cda_source_k.png",
+      "source_file": "Q101_b524921be8864cda_source.png",
+      "candidate_sha256": "a0ac5150bc8a6f5ee9bd4d48a232a9bdebc8a28ffc3adc7612f9835ecdbfb8ff",
+      "export_sha_match": true,
+      "source_sha256": "5ebd4e2bc427d0f810bbe1bff9ab58a4974799c15ebe2284714f16689e721d1c",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1881,
+        836
+      ],
+      "source_dimensions": [
+        740,
+        329
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        35,
+        128,
+        1501,
+        740
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'튜닝' 철자 정확, 노랑·주황 채움과 오른쪽 기울기 계열 유지. 원문보다 두꺼운 장식 효과·원본 붉은 패널 내 합성 적합성 별도 확인 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "role": "A",
+      "ordinal": 94,
+      "candidate_file": "Q111_367c2226ed993362_source_k.png",
+      "source_file": "Q111_367c2226ed993362_source.png",
+      "candidate_sha256": "476ab24250e8bc8c0498fb429d4ba0c462286b7a42413a7de500b858bfcd66cd",
+      "export_sha_match": true,
+      "source_sha256": "5e2ab20199e3aa2befe6924c8d029cd8fa829ba2db9c3eb45afeca22f1a63bb7",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "english": "Normal balance",
+      "approved_korean": "일반 밸런스",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1870,
+        841
+      ],
+      "source_dimensions": [
+        801,
+        360
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        194,
+        88,
+        1612,
+        752
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_SOURCE_STYLE_COLOR_OUTLINE",
+      "visual_reason": "원본 'Normal balance'는 주황 패널 위 검은색 얇은 이탤릭 글자이나 출력 '일반 밸런스'는 주황색 두꺼운 장식체·검은 입체 외곽. 원문 색상·두께·외곽 계열이 현저히 달라 재생성 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "role": "A",
+      "ordinal": 95,
+      "candidate_file": "Q205_4ea01e6106ac6443_source_k.png",
+      "source_file": "Q205_4ea01e6106ac6443_source.png",
+      "candidate_sha256": "158d7f93aab90ac1648b586525b36ccc9561cbe6a086b4ef9793258ec8d72d07",
+      "export_sha_match": true,
+      "source_sha256": "e3ea518e214d6403decc34e82bdfd8e7e79fb69d92965bda28d191e6ef54be9a",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "english": "NO",
+      "approved_korean": "아니오",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1526,
+        1031
+      ],
+      "source_dimensions": [
+        444,
+        300
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        65,
+        21,
+        1492,
+        1007
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'아니오' 철자/받침 식별 가능하고 회색 계열 유지. 원문 무광보다 외곽·입체감 증가했으므로 본 PNG 이후 합성 정밀 QA 필요.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "role": "A",
+      "ordinal": 96,
+      "candidate_file": "Q205_1606f7a0b5b4de5c_source_k.png",
+      "source_file": "Q205_1606f7a0b5b4de5c_source.png",
+      "candidate_sha256": "2206b64d0698ba006d37e948fe3a01bc0e2afba48e827e443e9f3f8f49115a58",
+      "export_sha_match": true,
+      "source_sha256": "7fcf2cbd5987d30d933faf4edb97e22c53bc52866a84c6b7f0ef475b70582f8b",
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "english": "NO",
+      "approved_korean": "아니오",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1526,
+        1031
+      ],
+      "source_dimensions": [
+        444,
+        300
+      ],
+      "candidate_mode": "RGBA",
+      "candidate_format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        63,
+        67,
+        1492,
+        971
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'아니오' 철자/받침 식별 가능하며 독립 레이어. 회색 계열 유지, 원문 대비 외곽 강조는 후속 합성 검수.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "imagegen_invoked": false,
+  "producer_queues_consumed": false,
+  "dds_generated": false,
+  "c2_pass_created": false,
+  "c3_pass_created": false,
+  "user_ingame_pass_created": false,
+  "vr_ffb_dx11_dxvk_touched": false
+}
