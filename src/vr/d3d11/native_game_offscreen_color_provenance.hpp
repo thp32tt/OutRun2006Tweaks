@@ -240,6 +240,19 @@ template <std::size_t N>
         sampled, matching, matchingCount);
 }
 
+// An ordinary game GPU copy-only texture may carry legitimate preloaded
+// menu/vehicle pixels without a native Draw in this eye. Preserve that
+// original GPU postpass but NEVER count it as native Draw-authored color.
+// Once this physical allocation HAS native Draw/Clear writes, fail closed
+// unless the exact copied eye/mip sample footprint is proven complete.
+[[nodiscard]] constexpr bool native_game_gpu_eye_composite_write_admissible(
+    bool nativeCameraAllocationTouched, bool sourceRegionProven) noexcept {
+    return !nativeCameraAllocationTouched || sourceRegionProven;
+}
+static_assert(native_game_gpu_eye_composite_write_admissible(false, false));
+static_assert(native_game_gpu_eye_composite_write_admissible(true, true));
+static_assert(!native_game_gpu_eye_composite_write_admissible(true, false));
+
 // When many authentic game camera Draw/Clear tiles form a non-slicing
 // mosaic, pairwise union alone cannot compact its 32-slot GPU pixel ledger.
 // Consider only edge-connected tiles of the SAME physical mip and eye,

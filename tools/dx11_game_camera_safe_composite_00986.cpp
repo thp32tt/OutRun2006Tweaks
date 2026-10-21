@@ -10,6 +10,12 @@ int main() {
     constexpr std::array<Region,5> areas{{
         {0u,0u,2u,4u},{2u,0u,4u,2u},{2u,2u,4u,4u},
         {4u,0u,8u,4u},{0u,4u,4u,8u}}};
+    // Untracked original GPU Copy-only sources are legal transfers without
+    // native game Draw evidence; partially written native camera allocations
+    // must never silently composite an unrendered source patch into an eye.
+    static_assert(native_game_gpu_eye_composite_write_admissible(false,false));
+    static_assert(native_game_gpu_eye_composite_write_admissible(true,true));
+    static_assert(!native_game_gpu_eye_composite_write_admissible(true,false));
     // Genuine camera Draw/Clear tiles fill a COPY or visible STRETCH crop.
     static_assert(native_game_gpu_eye_composite_source_proven(
         cam,{0u,0u,4u,4u},keys,areas,5u));

@@ -557,7 +557,10 @@ void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(
 }
 bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
     ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
-    const D3D11_BOX& sourceRegion) const noexcept {
+    const D3D11_BOX& sourceRegion,
+    bool* nativeCameraAllocationTouched) const noexcept {
+    if (nativeCameraAllocationTouched)
+        *nativeCameraAllocationTouched = false;
     if (!source || sourceRegion.front != 0u || sourceRegion.back != 1u)
         return false;
     const NativeGameOffscreenColorRegion copied{
@@ -573,6 +576,12 @@ bool NativeGameEyeDrawEncoder::offscreen_color_source_proven(
     std::size_t count = 0u;
     for (const auto& record : offscreenColorSources_) {
         if (!record.texture) continue;
+        // Any GPU Draw/Clear into this physical camera allocation makes its
+        // later COPY/STRETCH dependent on the exact source mip and array eye.
+        // A different eye/mip may not authorize an unrendered camera slice.
+        if (nativeCameraAllocationTouched &&
+            record.texture.Get() == source)
+            *nativeCameraAllocationTouched = true;
         keys[count] = {reinterpret_cast<std::uintptr_t>(record.texture.Get()),
                        record.arraySlice, record.mipSlice};
         regions[count++] = record.region;
@@ -1172,15 +1181,19 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             const D3D11_BOX sampledBox{
                 sampled.left, sampled.top, 0u,
                 sampled.right, sampled.bottom, 1u};
+            bool nativeCameraAllocationTouched = false;
             const bool proven =
                 native_game_offscreen_color_region_valid(sampled) &&
                 offscreen_color_source_proven(
                     clear.source, clear.sourceArraySlice,
-                    clear.sourceMipSlice, sampledBox);
+                    clear.sourceMipSlice, sampledBox,
+                    &nativeCameraAllocationTouched);
             // Prevent stale/foreign GPU camera bytes from overwriting genuine
             // XR-eye Draw color before the frame-validity decision.
             // Unsupported source reverts to the original D3D9Ex output.
-            if (!proven) return false;
+            if (!native_game_gpu_eye_composite_write_admissible(
+                    nativeCameraAllocationTouched, proven))
+                return false;
             if (!copy_game_surface(clear.source, &clear.sourceBox,
                                    clear.destX, clear.destY,
                                    clear.sourceArraySlice, clear.sourceMipSlice))
@@ -1214,14 +1227,18 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             const D3D11_BOX sampledBox{
                 sampled.left, sampled.top, 0u,
                 sampled.right, sampled.bottom, 1u};
+            bool nativeCameraAllocationTouched = false;
             const bool proven =
                 native_game_offscreen_color_region_valid(sampled) &&
                 offscreen_color_source_proven(
                     clear.source, clear.sourceArraySlice,
-                    clear.sourceMipSlice, sampledBox);
+                    clear.sourceMipSlice, sampledBox,
+                    &nativeCameraAllocationTouched);
             // Bilinear neighbors must be GPU-authored on this very eye/mip;
             // do not queue a filtered native postpass on unproven pixels.
-            if (!proven) return false;
+            if (!native_game_gpu_eye_composite_write_admissible(
+                    nativeCameraAllocationTouched, proven))
+                return false;
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice, clear.sourceMipSlice))

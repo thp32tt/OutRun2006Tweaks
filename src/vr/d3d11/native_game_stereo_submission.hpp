@@ -203,7 +203,8 @@ private:
     void invalidate_offscreen_color_source(ID3D11RenderTargetView* target) noexcept;
     [[nodiscard]] bool offscreen_color_source_proven(
         ID3D11Texture2D* source, UINT arraySlice, UINT mipSlice,
-        const D3D11_BOX& sourceRegion) const noexcept;
+        const D3D11_BOX& sourceRegion,
+        bool* nativeCameraAllocationTouched = nullptr) const noexcept;
     [[nodiscard]] bool color_writable_for_samples(UINT sampleCount) const noexcept;
     [[nodiscard]] bool unpredicated_color_evidence() const noexcept;
     // A real Draw still advances the source ordinal even if the current
