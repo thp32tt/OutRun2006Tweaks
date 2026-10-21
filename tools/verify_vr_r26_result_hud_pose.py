@@ -26,7 +26,12 @@ assert 'if (!exactResult && CurrentVertexShaderIdentity.load(' in fixed, 'a stal
 assert 'device->GetVertexShader(&shader)' in fixed and 'shader->Release()' in fixed
 assert 'fvf != 0x00000142u' in fixed, 'do not widen the live physical draw format'
 assert 'VR R26 RESULT_HUD_EYES:' in fixed, 'record actual eye attempts and restoration'
-assert 'return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;' in fixed, 'do not report successful projection restoration after failure'
+assert 'return !restored && SUCCEEDED(hr) ? E_FAIL : hr;' in fixed, 'all R62 owners must report projection restoration failure'
+
+# A non-exact R62 draw can also leave the game projection stale; reject the
+# old exactResult-only condition (without changing R62 draw/restore ordering).
+assert "return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;" not in fixed, (
+    "non-result rank/HUD R62 restores must not silently return S_OK")
 
 # A cached-zero shader can be intentional R13 masking: observe it in a
 # bounded opt-in probe, but never promote live device VS to original c64 proof.
