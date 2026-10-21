@@ -23,7 +23,7 @@ BASE=discover.BASE
 SOURCE=discover.SRC
 AUDIT=BASE/"auto_discovery"
 TESS_TIMEOUT=95
-OCR_STRATEGY_COUNT=6
+OCR_STRATEGY_COUNT=12
 
 def norm(t):
     return "".join(ch for ch in str(t).upper() if ch.isalnum())
@@ -70,12 +70,16 @@ def ocr_words(image, strategy=0, languages="eng"):
     strategy=int(strategy)%OCR_STRATEGY_COUNT
     rgba=image.convert("RGBA")
     composed=Image.alpha_composite(Image.new("RGBA",rgba.size,"black"),rgba).convert("L")
-    psm=(11,6,12,11,6,12)[strategy]
-    if strategy < 3:
+    base_strategy=strategy%6
+    scale=2 if strategy>=6 else 1
+    psm=(11,6,12,11,6,12)[base_strategy]
+    if base_strategy < 3:
         prepared=ImageOps.autocontrast(ImageOps.invert(composed))
     else:
         # Some outlined/dark UI text is read better without polarity inversion.
         prepared=ImageOps.autocontrast(composed)
+    if scale==2:
+        prepared=prepared.resize((prepared.width*2,prepared.height*2),Image.Resampling.LANCZOS)
     with tempfile.TemporaryDirectory(prefix="outrun-ocr-") as td:
         test=Path(td)/"source.png"
         prepared.save(test)
@@ -91,8 +95,13 @@ def ocr_words(image, strategy=0, languages="eng"):
             conf=float(row["conf"])
             x,y,w,h=[int(row[k]) for k in ("left","top","width","height")]
             if not 0<=conf<=100 or w<=1 or h<=1 or x<0 or y<0:continue
+            if scale==2:
+                x0=x//2; y0=y//2
+                x1=(x+w+1)//2; y1=(y+h+1)//2
+            else:
+                x0,y0,x1,y1=x,y,x+w,y+h
             line=(row["page_num"],row["block_num"],row["par_num"],row["line_num"])
-            groups.setdefault(line,[]).append({"word":txt,"confidence":conf,"bbox":[x,y,x+w,y+h]})
+            groups.setdefault(line,[]).append({"word":txt,"confidence":conf,"bbox":[x0,y0,x1,y1]})
         except (ValueError,KeyError,TypeError):continue
     return list(groups.values())
 
