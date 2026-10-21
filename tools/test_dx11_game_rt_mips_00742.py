@@ -70,8 +70,20 @@ mutations = [
      "false /* missing second sampler */"),
     ("ctx->DrawIndexed(indexCount, 0, 0);", "/* lost indexed game draw */"),
 ]
+# Scope texture-producer mutations to the 2D RT mirror being tested.
+# Earlier GPU cube-RT support may use identical provenance helper names;
+# mutating its unrelated first occurrence would not test this 2D contract.
+mirror_begin = source.index("bool mirror_texture(")
+mirror_end = source.index("bool submit(", mirror_begin)
+mirror_body = source[mirror_begin:mirror_end]
 for old, new in mutations:
-    assert old in source and not wired(source.replace(old, new, 1), header), old
+    if old in mirror_body:
+        altered = source[:mirror_begin] + mirror_body.replace(old, new, 1) + source[mirror_end:]
+    else:
+        # Stage-1 Draw/DrawIndexed mutations are in the downstream submit path.
+        assert old in source, old
+        altered = source.replace(old, new, 1)
+    assert altered != source and not wired(altered, header), old
 assert not wired(source, header.replace(
     "level >= 32u", "level >= 0u", 1)), "header mutation undetected"
 
