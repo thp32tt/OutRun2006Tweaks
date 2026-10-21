@@ -1,0 +1,482 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1415KST-B0026-B0027-SHA8",
+  "review_slot_kst": "2026-10-21 14:15",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "qa_scope": "Eight SHA-unique previously unreviewed B-generated Korean PNG candidates. No image generation, A/B queue mutation, DDS, C2/C3 or ingame approval.",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "counts": {
+    "previous_local_sha_unique": 197,
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 6,
+    "fail_major_style_slant": 2,
+    "producer_rework_dimensions": 8
+  },
+  "evidence": {
+    "n100_preflight": "work/c1_batch_20261021_1415/preflight.json",
+    "n100_compare_images": [
+      "work/c1_batch_20261021_1415/compare_1.jpg",
+      "work/c1_batch_20261021_1415/compare_2.jpg",
+      "work/c1_batch_20261021_1415/compare_3.jpg",
+      "work/c1_batch_20261021_1415/compare_4.jpg"
+    ],
+    "all_source_manifest_and_export_sha_verified": true,
+    "all_rgba_png": true,
+    "all_alpha_border_zero": true,
+    "inspection": "Viewed four side-by-side source/candidate comparison sheets. B123/B124 fail for obvious typography slant/effect departures. Others legible and text-only; all dimension mismatch REWORK and not verified in original UI cell."
+  },
+  "results": [
+    {
+      "task_id": "OUTRUN-ROI-B-0026-375BDD5F",
+      "role": "B",
+      "ordinal": 123,
+      "candidate_file": "Q161_2ad4d17612e81c03_source_k.png",
+      "source_file": "Q161_2ad4d17612e81c03_source.png",
+      "candidate_sha256": "6522ce1ac11f62ef0dad81e99238ef90c348ea90d1ad603668eb4bc2ab245712",
+      "export_sha_match": true,
+      "source_sha256": "91fe83513ec98a8150749a9e3f1e29ad7e5d6a394143a8ee2c317abcd6b77c85",
+      "source_sha_match": true,
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "english": "AQUARIUS",
+      "approved_korean": "물병자리",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1964,
+        801
+      ],
+      "source_dimensions": [
+        640,
+        261
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        504,
+        101,
+        1562,
+        657
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_SLANT_MISMATCH",
+      "visual_reason": "AQUARIUS는 검은빛 청회색의 수직 굵은 산세리프인데 '물병자리' 결과는 현저하게 오른쪽으로 기운 광택/입체/외곽선 글꼴. 승인 번역은 맞지만 기울기·효과 차이가 중대.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": false,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0026-375BDD5F",
+      "role": "B",
+      "ordinal": 124,
+      "candidate_file": "Q164_d613714cc9cbe4a2_source_k.png",
+      "source_file": "Q164_d613714cc9cbe4a2_source.png",
+      "candidate_sha256": "b78bcee5d838c5e8e67beab574d8570488e89229801b414d6e4b5d722a3b007b",
+      "export_sha_match": true,
+      "source_sha256": "d267fa506472087cba8d0bd938b9ff77379fd45e574f59cd0450a6e8f771cae2",
+      "source_sha_match": true,
+      "source_dds_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+      "english": "SELECT LICENSE",
+      "approved_korean": "라이선스 선택",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1465,
+        420
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        89,
+        9,
+        2055,
+        578
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_SLANT_MISMATCH",
+      "visual_reason": "SELECT LICENSE는 평평한 흰색 정자체인데 '라이선스 선택'은 심한 이탤릭 경사와 검은 베벨 윤곽·그림자. 문구는 정확하지만 원문 UI 스타일에서 크게 벗어남.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": false,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0026-375BDD5F",
+      "role": "B",
+      "ordinal": 125,
+      "candidate_file": "Q205_337727fff753fc09_source_k.png",
+      "source_file": "Q205_337727fff753fc09_source.png",
+      "candidate_sha256": "8a25874998558fa19912a3b689131f943bf882d46e621ff5f4c5c9f56106d1d0",
+      "export_sha_match": true,
+      "source_sha256": "a0de1afc311b9b292c1ce88daed3933a9fe6840358147132491ddf70901a3902",
+      "source_sha_match": true,
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "english": "LOCAL MT",
+      "approved_korean": "로컬 MT",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1959,
+        803
+      ],
+      "source_dimensions": [
+        527,
+        216
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        621,
+        294,
+        1347,
+        537
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'로컬 MT' 한글/영문 표기 명료하며 별도 영문 잔상·배경이 재현되지 않음. 원문의 무윤곽 회색에서 다소 두꺼운 검은 베벨 외곽선으로 바뀐 것은 미관 차이로 기록.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0026-375BDD5F",
+      "role": "B",
+      "ordinal": 126,
+      "candidate_file": "Q205_6c35ed05f19acdeb_source_k.png",
+      "source_file": "Q205_6c35ed05f19acdeb_source.png",
+      "candidate_sha256": "3c121ebc2436617ba26a968ee3af89b62d4adefe032b501269e189ef0631d3b5",
+      "export_sha_match": true,
+      "source_sha256": "4fab75aa0dc5de14e7c74430141e76a6c62b127e14c726140d1ec593c9acaa35",
+      "source_sha_match": true,
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "english": "LOCAL AT",
+      "approved_korean": "로컬 AT",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1938,
+        811
+      ],
+      "source_dimensions": [
+        516,
+        216
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        257,
+        322,
+        1780,
+        721
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'로컬 AT' 철자/자소 선명, 투명 글자만 포함. 원문의 다소 단순한 진회색 글꼴과 검은 외곽선 차이는 비차단 cosmetic.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0026-375BDD5F",
+      "role": "B",
+      "ordinal": 127,
+      "candidate_file": "Q205_25a25ea70a7c60bd_source_k.png",
+      "source_file": "Q205_25a25ea70a7c60bd_source.png",
+      "candidate_sha256": "50e4db84fc5912d6b2b8a05c8217057d048c3c4540027d05651ad855b90e08b4",
+      "export_sha_match": true,
+      "source_sha256": "a0de1afc311b9b292c1ce88daed3933a9fe6840358147132491ddf70901a3902",
+      "source_sha_match": true,
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "english": "LOCAL MT",
+      "approved_korean": "로컬 MT",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1959,
+        803
+      ],
+      "source_dimensions": [
+        527,
+        216
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        547,
+        151,
+        1696,
+        610
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'로컬 MT' 철자/받침 선명; 보호 UI 배경 생성 없음. 다소 강한 검은 윤곽은 기록하되 읽기/방향/자소 훼손 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0027-78D8F5F0",
+      "role": "B",
+      "ordinal": 128,
+      "candidate_file": "Q205_577a4b82bb0daaa1_source_k.png",
+      "source_file": "Q205_577a4b82bb0daaa1_source.png",
+      "candidate_sha256": "63d7386053427f9b15346afb3cee10453c28a0e18de48ec61d4078ec7dc54c3b",
+      "export_sha_match": true,
+      "source_sha256": "a3fdaa246095eeb1cbeb1b587aaeb4878d1fec4f52a63f3d1e99834bfd230c99",
+      "source_sha_match": true,
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "english": "FRIENDS",
+      "approved_korean": "친구",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1906,
+        825
+      ],
+      "source_dimensions": [
+        499,
+        216
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        763,
+        102,
+        1876,
+        750
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'친구' 글자와 받침 읽힘; 검정 윤곽 추가 외에 배경/프레임 생성 없음. 원문 짧은 점유폭과 무관하게 PASS.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0027-78D8F5F0",
+      "role": "B",
+      "ordinal": 129,
+      "candidate_file": "Q205_52459c200912d499_source_k.png",
+      "source_file": "Q205_52459c200912d499_source.png",
+      "candidate_sha256": "4f0518b0ce664147b0ff735d909f9c9ece3f4a0981d44bf506ecd86ad297c86a",
+      "export_sha_match": true,
+      "source_sha256": "4fab75aa0dc5de14e7c74430141e76a6c62b127e14c726140d1ec593c9acaa35",
+      "source_sha_match": true,
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "english": "LOCAL AT",
+      "approved_korean": "로컬 AT",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1938,
+        811
+      ],
+      "source_dimensions": [
+        516,
+        216
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        576,
+        143,
+        1362,
+        624
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'로컬 AT' 번역/영문 AT 정확, 획과 받침 선명. 글자 외곽선 추가는 중대 오차가 아님.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0027-78D8F5F0",
+      "role": "B",
+      "ordinal": 130,
+      "candidate_file": "Q051_9f750bfb7dc3f4ac_source_k.png",
+      "source_file": "Q051_9f750bfb7dc3f4ac_source.png",
+      "candidate_sha256": "c545471f6d05609df42d4975a9d421c0ec9048b5896129d259a2f9a35e12eec9",
+      "export_sha_match": true,
+      "source_sha256": "323df0bb754704404df9536f4c623e97bd94ab2eb558c07a058deb7d41df73af",
+      "source_sha_match": true,
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "english": "Total Time",
+      "approved_korean": "총 시간",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1930,
+        815
+      ],
+      "source_dimensions": [
+        651,
+        275
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        41,
+        19,
+        1821,
+        782
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'총 시간' 글자 정상, 노란 채움/짙은 남색 외곽 및 오른쪽 경사 원문 계열 유지. 텍스트 외 배경/타 문구 재현 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "png_text_only_pass": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
