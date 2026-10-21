@@ -1,0 +1,144 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00982",
+  "production_id": "CONVERSION-DX11-00982",
+  "event_id": "CONVERSION-DX11-00982-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00982",
+  "feature_id": "DX11_MENU_RACE_GPU_POSTPASS_VISIBLE_SOURCE_TO_NATIVE_STEREO",
+  "status": "CI_REPAIR_IN_PROGRESS",
+  "checkpoint": "C4_MATERIAL_COMMITTED_CI_PENDING",
+  "material_result_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
+  "validation_bearing_result_sha": null,
+  "result_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
+  "automation_validation": "FAILED_INITIAL_SHA_CI_POLICY_LATEST_RUN",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "CI_REPAIR_PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "feature_stage": "VISIBLE_CLIPPED_GAME_GPU_CAMERA_COPY_STRETCH_TO_NATIVE_EYE_SOURCE_INTEGRATED_NOT_RUNTIME",
+  "feature_contract": {
+    "feature_id": "DX11_MENU_RACE_GPU_POSTPASS_VISIBLE_SOURCE_TO_NATIVE_STEREO",
+    "goal": "Carry genuinely game-authored menu, vehicle and race offscreen D3D11 camera color through clipped GPU Copy and Stretch into distinct native OpenXR eye targets while proving only the visible sampled source area, preserving the original D3D9 renderer/input/FFB fallback and not claiming HMD pixels.",
+    "acceptance_items": [
+      {
+        "id": "camera_copy_visible_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_native_gpu_camera_copy_to_eye",
+        "expected_behavior": "NativeGameEyeDrawEncoder replay of a game-authored SourceCopy preserves exact eye-edge clipping and admits only full GPU Draw provenance of the visible source pixels, keyed by camera texture/mip/slice."
+      },
+      {
+        "id": "camera_stretch_filtered_source",
+        "category": "fallback_regression",
+        "behavior_area": "native_gpu_camera_stretch_filter_and_dx9_fallback",
+        "expected_behavior": "GPU point/linear Stretch source tracking includes linear neighbor texels, rejects gaps and foreign eye/mip evidence, and never alters original D3D9 Draw, input, FFB or SkyGlow fallback on unsupported source."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "five_mandatory_github_actions",
+        "expected_behavior": "One exact validation-bearing source SHA must PASS all five required DX11 Fast, Backend, Windows Build, OpenXR, HUD GitHub Actions gates; game/HMD runtime remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "camera_copy_visible_source": {
+      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_stretch_source.hpp"
+      ],
+      "validation_command": "Pending exact-SHA C++ targeted GPU postpass source unit test and DX11 Fast required gate. Not runtime verified."
+    },
+    "camera_stretch_filtered_source": {
+      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+        "tools/dx11_game_visible_postpass_source_00982.cpp"
+      ],
+      "validation_command": "Pending exact-SHA native C++ positive/negative test, fail-closed D3D9 parity retained."
+    },
+    "exact_sha_five_gates": {
+      "status": "PENDING",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "Initial 83ef4202 DX11 Fast failed on inherited 00981 latest-run-record missing development_strategy; adding valid 00982 task record under same task for causal recovery."
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Actual D3D9 game menu/car/race Draw/DrawIndexed -> native programmable D3D11 Draw to source camera RTV with verified color-footprint ledger",
+      "Game-authored source Copy/Stretch with eye-edge cropping -> per-eye D3D11 GPU Copy/filtered sampling -> OpenXR ring L/R publication gated by exact camera texture, slice, mip and GPU pixel coverage",
+      "Unsupported or incomplete provenance leaves GPU replay authentic but source color unproven and original D3D9 game output/input/FFB authoritative"
+    ],
+    "batch_components": [
+      "NativeGameEyeDrawEncoder GPU postpass replay and exact copied visible-source region tracking",
+      "NativeGameOffscreenColorRegion real point/linear sampled-texel bounds helper and mandatory focused C++ negative fixtures",
+      "Existing complete same-SHA five GitHub Actions Gate retained without CI-skip or new DXVK development"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ focused fixture tests visible half-camera Copy, GPU point Stretch and full complete camera coverage in 00982; final required CI pending.",
+      "negative_regression": "C++ fixture rejects uncovered left/right camera source, missing bilinear neighboring texel, foreign array slice, fully invisible GPU postpass; D3D9 fallback unaffected.",
+      "component_integration": "Live game Draw/DrawIndexed offscreen RTV -> verified native GPU source footprint -> NativeGameEyeDrawEncoder Copy/Stretch GPU eye replay -> existing OpenXR shared ring; true game/HMD pixels UNTESTED."
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_CAMERA_POSTPASS",
+      "DX11:EYE_XR_HANDOFF"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_D3D9_SHADER_SOURCE",
+      "GUARDED_NATIVE_D3D11_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "GAME_CAMERA_GPU_SOURCE_COPY_STRETCH",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_CI_PENDING_NOT_RUNTIME: genuine live-game pixels/positive native Draw or published frame counters are unobserved; fail closed and require later real OutRun 2006/Quest3 VDXR session.",
+    "activation_guard_and_fallback": "No implicit native D3D11 activation or DXVK modifications; original D3D9 game render/gamepad/FFB/SkyGlow continues, incomplete sampled coverage never asserts postpass color output."
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/dx11_game_visible_postpass_source_00982.cpp",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "ci": {
+    "initial_exact_sha": "83ef4202d2e184d144cdb6e4fc1817ee5b624b1c",
+    "initial_failure": {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 39652306999,
+      "cause": "docs/automation/runs/CONVERSION-DX11-00981.json missing development_strategy; --check-latest selected prior 00981 in absence of task 00982 record"
+    },
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "status": "REPAIR_PENDING"
+  },
+  "score_change": 0,
+  "score_run_key": "CONVERSION-DX11-00982",
+  "score_status": "UNSCORED_PENDING_REAL_INTEGRATED_CI_OUTCOME",
+  "runtime_blocker": "Real OutRun 2006 menu/car/race graphics, positive native draws, published eye pixels, gamepad, Quest3 VDXR session not tested.",
+  "next_source_file": "src/vr/d3d11/native_game_stereo_submission.cpp",
+  "real_game_draw_blocker": "Native full live game Draw/Publish remain runtime unproven",
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "next_implementation_action": "Repair actual exact-SHA Gate failures under CONVERSION-DX11-00982, keep existing game-to-stereo GPU path, then request real menu/car/race desktop/HMD evidence"
+}
