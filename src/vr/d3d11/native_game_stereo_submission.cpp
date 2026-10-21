@@ -1072,9 +1072,35 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 return false;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceCopy) {
-            const bool proven = offscreen_color_source_proven(
-                clear.source, clear.sourceArraySlice, clear.sourceMipSlice,
-                clear.sourceBox);
+            // CopySubresourceRegion clips at the XR eye boundary BEFORE
+            // sampling. A negative menu/camera destination can expose just
+            // the right/bottom of the source. Certify the actual GPU pixel
+            // box, never require an invisible portion of the camera atlas.
+            D3D11_TEXTURE2D_DESC cameraDesc{};
+            clear.source->GetDesc(&cameraDesc);
+            const auto cameraMip = native_game_postpass_mip_extent(
+                cameraDesc.Width, cameraDesc.Height, cameraDesc.MipLevels,
+                clear.sourceMipSlice, cameraDesc.ArraySize,
+                clear.sourceArraySlice, cameraDesc.SampleDesc.Count);
+            NativeGameOffscreenColorRegion sampled{};
+            if (cameraMip.valid) {
+                const auto clipped = native_game_copy_clipped_region(
+                    cameraMip.width, cameraMip.height,
+                    clear.sourceBox.left, clear.sourceBox.top,
+                    clear.sourceBox.right, clear.sourceBox.bottom,
+                    targetWidth_, targetHeight_, clear.destX, clear.destY);
+                if (clipped.valid)
+                    sampled = {clipped.sourceLeft, clipped.sourceTop,
+                               clipped.sourceRight, clipped.sourceBottom};
+            }
+            const D3D11_BOX sampledBox{
+                sampled.left, sampled.top, 0u,
+                sampled.right, sampled.bottom, 1u};
+            const bool proven =
+                native_game_offscreen_color_region_valid(sampled) &&
+                offscreen_color_source_proven(
+                    clear.source, clear.sourceArraySlice,
+                    clear.sourceMipSlice, sampledBox);
             if (!copy_game_surface(clear.source, &clear.sourceBox,
                                    clear.destX, clear.destY,
                                    clear.sourceArraySlice, clear.sourceMipSlice))
@@ -1086,9 +1112,33 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             if (proven) ++authoredColorPostpassCount_;
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
-            const bool proven = offscreen_color_source_proven(
-                clear.source, clear.sourceArraySlice, clear.sourceMipSlice,
-                clear.sourceBox);
+            // The native point/linear GPU shader samples only visible
+            // eye pixels. Include the linear filter's adjacent source taps
+            // without demanding non-sampled parts of a cropped camera RT.
+            D3D11_TEXTURE2D_DESC cameraDesc{};
+            clear.source->GetDesc(&cameraDesc);
+            const auto cameraMip = native_game_postpass_mip_extent(
+                cameraDesc.Width, cameraDesc.Height, cameraDesc.MipLevels,
+                clear.sourceMipSlice, cameraDesc.ArraySize,
+                clear.sourceArraySlice, cameraDesc.SampleDesc.Count);
+            const auto sampled = cameraMip.valid
+                ? native_game_visible_stretch_sample_region(
+                    cameraMip.width, cameraMip.height,
+                    {clear.sourceBox.left, clear.sourceBox.top,
+                     clear.sourceBox.right, clear.sourceBox.bottom},
+                    targetWidth_, targetHeight_,
+                    clear.destination.left, clear.destination.top,
+                    clear.destination.right, clear.destination.bottom,
+                    clear.linearFilter)
+                : NativeGameOffscreenColorRegion{};
+            const D3D11_BOX sampledBox{
+                sampled.left, sampled.top, 0u,
+                sampled.right, sampled.bottom, 1u};
+            const bool proven =
+                native_game_offscreen_color_region_valid(sampled) &&
+                offscreen_color_source_proven(
+                    clear.source, clear.sourceArraySlice,
+                    clear.sourceMipSlice, sampledBox);
             if (!stretch_game_surface(clear.source, clear.sourceBox,
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice, clear.sourceMipSlice))

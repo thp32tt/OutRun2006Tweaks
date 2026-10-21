@@ -1,4 +1,5 @@
 #pragma once
+#include "native_game_stretch_source.hpp"
 #include <cstdint>
 #include <algorithm>
 #include <cmath>
@@ -50,6 +51,67 @@ struct NativeGameOffscreenColorRegion {
         native_game_offscreen_color_region_valid(copied) &&
         draw.left < copied.right && copied.left < draw.right &&
         draw.top < copied.bottom && copied.top < draw.bottom;
+}
+
+
+// A GPU StretchRect may display only part of the game camera when its
+// destination straddles an eye edge. Replaying the real shader samples ONLY
+// the visible destination pixel centers (with source crop clamping).
+// Track those source texels, including both taps of a linear filter;
+// unobserved clipped-out atlas texels must not reject a genuine camera
+// postpass. At the same time, do not declare a missing sampled texel drawn.
+[[nodiscard]] inline NativeGameOffscreenColorRegion
+native_game_visible_stretch_sample_region(
+    std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+    NativeGameOffscreenColorRegion source,
+    std::uint32_t eyeWidth, std::uint32_t eyeHeight,
+    std::int32_t destLeft, std::int32_t destTop,
+    std::int32_t destRight, std::int32_t destBottom,
+    bool linear) noexcept {
+    if (!native_game_offscreen_color_region_valid(source)) return {};
+    const auto visible = native_game_stretch_clipped_region(
+        sourceWidth, sourceHeight, source.left, source.top,
+        source.right, source.bottom, eyeWidth, eyeHeight,
+        destLeft, destTop, destRight, destBottom);
+    if (!visible.valid) return {};
+    // Use double for the signed destination span (up to UINT32_MAX).
+    // Hardware SampleLevel clamp is to the camera crop's edge texel centers.
+    const auto sampleAxis = [linear](
+        std::uint32_t srcStart, std::uint32_t srcEnd,
+        std::uint32_t clippedStart, std::uint32_t clippedEnd,
+        std::int32_t dstStart, std::int32_t dstEnd)
+        noexcept -> std::array<std::uint32_t, 2u> {
+        const double span = double(std::int64_t(dstEnd) - dstStart);
+        if (span <= 0.0 || clippedStart >= clippedEnd)
+            return {};
+        const double srcSpan = double(srcEnd - srcStart);
+        const double startCenter = double(srcStart) + 0.5;
+        const double lastCenter = double(srcEnd) - 0.5;
+        const auto sample = [&](double pixelCenter) noexcept {
+            const double scaled = double(srcStart) +
+                (pixelCenter - double(dstStart)) * srcSpan / span;
+            return (std::max)(startCenter, (std::min)(lastCenter, scaled));
+        };
+        const double first = sample(double(clippedStart) + 0.5);
+        const double last = sample(double(clippedEnd) - 0.5);
+        const double tap = linear ? 0.5 : 0.0;
+        // floor(u * sourceWidth) for point; bilinear also reads the
+        // adjacent texel at u * sourceWidth +/- 0.5. One end is exclusive.
+        const auto firstTexel = static_cast<std::uint32_t>(
+            (std::max)(double(srcStart), std::floor(first - tap)));
+        const auto lastTexel = static_cast<std::uint32_t>(
+            (std::min)(double(srcEnd), std::floor(last + tap) + 1.0));
+        return {firstTexel, lastTexel};
+    };
+    const auto x = sampleAxis(
+        source.left, source.right, visible.left, visible.right,
+        destLeft, destRight);
+    const auto y = sampleAxis(
+        source.top, source.bottom, visible.top, visible.bottom,
+        destTop, destBottom);
+    const NativeGameOffscreenColorRegion samples{x[0], y[0], x[1], y[1]};
+    return native_game_offscreen_color_region_valid(samples) ? samples :
+        NativeGameOffscreenColorRegion{};
 }
 
  // Real game camera postpasses can copy more than the source's proven
