@@ -30,6 +30,12 @@
 #include <cstring>
 #include "stereo_renderer_r7.inc"
 
+namespace Settings
+{
+    extern Setting<bool> VREvidenceTrace;
+    extern Setting<bool> VREvidenceTraceFlushEveryPresent;
+}
+
 namespace OutRunVRStereo
 {
 	namespace
@@ -700,6 +706,27 @@ namespace OutRunVRStereo
 				!FrameRightDrawFailed && !FrameStereoIncomplete && FrameStereoPoseSequence &&
 				FrameStereoMetadata.valid && EnsureStereoResources(device);
 
+            if (Settings::VREvidenceTrace)
+            {
+                spdlog::info(
+                    "VR EVIDENCE PRESENT PRE present={} calls={} pendingFrame={} stereoRequested={} frameEligible={} directOnly={} seeded={} monoSeeded={} monoGap={} world={} duplicated={} rightFailed={} incomplete={} poseSeq={} metadataValid={} failure={} activeQueries={} queryTrackingUnavailable={} beginDelta={}",
+                    PresentEpoch, R9PresentCalls, pendingFrameId,
+                    stereoRequested ? 1 : 0, frameEligible ? 1 : 0,
+                    directOnly ? 1 : 0, R9StereoSeeded ? 1 : 0,
+                    R9MonoSeeded ? 1 : 0, R9MonoBackupGap ? 1 : 0,
+                    FrameHadWorldStereo ? 1 : 0,
+                    FrameHadDuplicatedDraw ? 1 : 0,
+                    FrameRightDrawFailed ? 1 : 0,
+                    FrameStereoIncomplete ? 1 : 0,
+                    FrameStereoPoseSequence,
+                    FrameStereoMetadata.valid ? 1 : 0,
+                    static_cast<unsigned>(FrameFailureReason),
+                    ActiveOcclusionQueries.load(std::memory_order_acquire),
+                    OcclusionQueryTrackingUnavailable.load(
+                        std::memory_order_acquire) ? 1 : 0,
+                    beginDelta);
+            }
+
 			if (frameEligible)
 			{
 				directTransport = ResolveDirectTransport(device, pendingFrameId);
@@ -775,6 +802,21 @@ namespace OutRunVRStereo
 			const HRESULT rawPresentHr = PresentHook.stdcall<HRESULT>(device, sourceRect, destRect, destWindowOverride, dirtyRegion);
 			const HRESULT hr = OutRunVRD3D9ExUpgradeR13::NormalizeLegacyPresentResult(
 				device, rawPresentHr);
+            if (Settings::VREvidenceTrace)
+            {
+                spdlog::info(
+                    "VR EVIDENCE PRESENT POST present={} pendingFrame={} rawHr=0x{:08X} normalizedHr=0x{:08X} composed={} directTransport={} directOnly={} poseSeq={} incomplete={} rightFailed={} failure={} backpressure={} transportFrames={} fallbacks={}",
+                    PresentEpoch, pendingFrameId,
+                    static_cast<unsigned>(rawPresentHr),
+                    static_cast<unsigned>(hr),
+                    composedStereo ? 1 : 0, directTransport ? 1 : 0,
+                    directOnly ? 1 : 0, pendingPoseSequence,
+                    FrameStereoIncomplete ? 1 : 0,
+                    FrameRightDrawFailed ? 1 : 0,
+                    static_cast<unsigned>(FrameFailureReason),
+                    DirectTransportRingBackpressure,
+                    DirectTransportFrames, DirectTransportFallbacks);
+            }
 			if (composedStereo && SUCCEEDED(hr) && !FrameStereoIncomplete)
 			{
 				PublishStereoState(OutRunVR::StereoSbsActive, true, pendingPoseSequence, pendingFrameId);
@@ -818,12 +860,32 @@ namespace OutRunVRStereo
 			R9StereoSeeded = false;
 			R9MonoSeeded = false;
 			R9MonoBackupGap = false;
+			if (Settings::VREvidenceTrace &&
+                Settings::VREvidenceTraceFlushEveryPresent)
+            {
+                if (auto logger = spdlog::default_logger())
+                    logger->flush();
+            }
 			if (++PresentEpoch == 0) PresentEpoch = 1;
 			return hr;
 		}
 
 		HRESULT __stdcall ResetDestR9(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 		{
+            if (Settings::VREvidenceTrace)
+            {
+                spdlog::info(
+                    "VR EVIDENCE RESET PRE present={} device={} bb={}x{} windowed={} interval={} seeded={} monoSeeded={} incomplete={} failure={}",
+                    PresentEpoch, static_cast<const void*>(device),
+                    params ? params->BackBufferWidth : 0,
+                    params ? params->BackBufferHeight : 0,
+                    params ? (params->Windowed ? 1 : 0) : -1,
+                    params ? static_cast<unsigned>(
+                        params->PresentationInterval) : 0u,
+                    R9StereoSeeded ? 1 : 0, R9MonoSeeded ? 1 : 0,
+                    FrameStereoIncomplete ? 1 : 0,
+                    static_cast<unsigned>(FrameFailureReason));
+            }
 			R9ReleaseMonoResources();
 			R9ReleaseDepthIdentity();
 			R9StereoSeeded = false;
@@ -831,6 +893,14 @@ namespace OutRunVRStereo
 			R9MonoBackupGap = false;
 			R9ExpectMainDepthAfterReset = true;
 			const HRESULT hr = R9ResetCallbackHook.stdcall<HRESULT>(device, params);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE RESET POST present={} device={} hr=0x{:08X} gameDevice={} trackedDepth={} recoveryPending={}",
+                    PresentEpoch, static_cast<const void*>(device),
+                    static_cast<unsigned>(hr), IsGameDevice(device) ? 1 : 0,
+                    static_cast<const void*>(TrackedDepthStencil),
+                    OutRunVR::RuntimeEligibility::RecoveryPending.load(
+                        std::memory_order_acquire) ? 1 : 0);
 			if (SUCCEEDED(hr) && IsGameDevice(device) && TrackedDepthStencil)
 			{
 				R9CaptureMainDepth(TrackedDepthStencil, "reset-complete");
