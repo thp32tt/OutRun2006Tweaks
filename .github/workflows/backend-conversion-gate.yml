@@ -5,6 +5,7 @@ on:
     branches:
       - vr-dx11-native-r71
       - feature/dx11-00952-live-sm3-device-bool
+      - feature/dx11-00966-live-game-frame
       - vr-dxvk-r71-disasm
   workflow_dispatch:
 
@@ -33,7 +34,7 @@ jobs:
         run: python tools/verify_queue_controller_contract.py
 
       - name: Verify DX11 integration-first auto-development acceptance
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           python tools/test_dx11_autodev_policy.py
@@ -48,12 +49,12 @@ jobs:
         run: ./tools/Test-VROneClickContract.ps1
 
       - name: Test DX11 XR source-resolution A/B policy
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_xr_source_resolution_policy.py
 
       - name: Verify DX11 host game-eye SRGB to OpenXR composite
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_host_srgb_handoff_00697.py
 
@@ -74,41 +75,41 @@ jobs:
         run: python tools/verify_dx11_dual_source_contract.py
 
       - name: Test DX11 static surface contract analyzer
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_static_surface_contract.py
 
       - name: Verify DX11 static surface contract
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/dx11_native_static_surface_contract_check.py src/vr/d3d11/resource_translation.cpp src/vr/d3d11/surface_mirror.cpp
 
       - name: Verify DX11 PM RGB SELECTARG1 vertex-alpha 00631
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_diffuse_arg1_00631.py
       - name: Verify DX11 PM RGB complemented alpha 00632
         run: python tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py
       - name: Verify DX11 PM RGB SELECTARG2 complemented alpha 00633
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_inverse_arg2_00633.py
       - name: Verify DX11 PM complemented CURRENT/DIFFUSE alpha 00634
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_inverse_diffuse_00634.py
       - name: Verify DX11 PM complemented TFACTOR alpha 00635
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_inverse_factor_00635.py
 
       - name: Verify DX11 PM texture/TFACTOR modulate alpha 00636
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_modulate_factor_00636.py
 
       - name: Verify DX11 PM complemented-factor MODULATE alpha 00637
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_inverse_modulate_factor_00637.py
       - name: DX11 PM scaled factor native Draw regression 00638
@@ -125,12 +126,12 @@ jobs:
         run: python tools/test_dx11_stage0_pm_current_dispatch_00643.py
 
       - name: Verify DX11 live line Draw/DrawIndexed bridge 00644
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_live_line_draw_00644.py
 
       - name: Verify DX11 live 1px point Draw/DrawIndexed bridge 00645
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_live_point_draw_00645.py
 
@@ -153,60 +154,60 @@ jobs:
         if: startsWith(github.ref_name, 'vr-dx11-native')
         run: python tools/test_dx11_depth_state_binding_00651.py
       - name: Verify live D3D9 ZFUNC ALWAYS native DSV 00652
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_depth_always_draw_00652.py
       - name: Verify live D3D9 EQUAL/NOTEQUAL native depth Draw 00653
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_depth_equality_draw_00653.py
       - name: Verify live GREATER/GREATEREQUAL native depth Draw 00654
         run: python tools/test_dx11_depth_ordering_draw_00654.py
       - name: Verify live D3D9 anisotropic sampler in native Draw 00655
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_anisotropic_sampler_00655.py
       - name: Check live MAG-anisotropic sampler -> D3D11 Draw 00656
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_anisotropic_mag_00656.py
       - name: Verify native D3D9 SRGBTEXTURE sampling to game Draw 00657
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_srgb_texture_00657.py
       - name: Check native game A8 L8 A8L8 texture draw 00658
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_luminance_texture_00658.py
       - name: Verify live RGB24 native Draw bridge 00659
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_rgb24_texture_00659.py
 
       - name: Verify live RGBA8/XRGB8 native game Draw 00660
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_rgba_texture_00660.py
 
       - name: Verify native X1R5G5B5/X4R4G4B4 game Draw 00661
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_xrgb16_texture_00661.py
 
       - name: Verify live game A2R10G10B10/A2B10G10R10 native Draw 00662
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_10bit_texture_00662.py
 
       - name: Verify native game A4L4/L16 mip Draw 00663
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_extended_luminance_00663.py
 
       - name: Verify native game G16R16 mip Draw 00664
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_rg16_00664.py
 
       - name: Verify native game A8P8 palette/alpha mip Draw 00665
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_a8p8_00665.py
 
       - name: Verify DX11 game stage1 factor/native Draw integration 00673
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_stage1_factor_00673.py
 
       - name: Verify DX11 source hygiene
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $matches = git grep -n -F -- '[executed on device:' -- src/vr/d3d11 tools/verify_dx11_source_graph.py tools/verify_dx11_activation_boundary.py tools/dx11_constant_buffer_probe.cpp
@@ -220,92 +221,92 @@ jobs:
           exit 0
 
       - name: Verify exclusive DX11 pair staging R180
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_surface_pair_readback_r180.py
 
       - name: Verify DX11 triangle-fan actual GPU DrawIndexed R181
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_triangle_fan_gpu_draw_r181.py
 
       - name: Verify DX11 resource format role isolation R179
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_resource_role_format_r179.py
 
       - name: Verify DX11 transactional native resize R177
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_target_resize.py
 
       - name: Verify DX11 live SELECTARG ADDSMOOTH alpha 00582
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_addsmooth_00582.py
 
       - name: Verify DX11 live SELECTARG scaled alpha 00583
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_modulate_scaled_00583.py
 
       - name: Verify DX11 live SELECTARG BLENDFACTOR alpha 00584
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_factor_alpha_00584.py
 
       - name: Verify DX11 live SELECTARG BLENDTEXTUREALPHA 00585
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_blend_texture_alpha_00585.py
 
       - name: Verify DX11 live SELECTARG BLENDDIFFUSEALPHA 00586
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_blend_diffuse_alpha_00586.py
 
       - name: Verify DX11 native SELECTARG TFACTOR alpha 00587
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_tfactor_input_00587.py
 
       - name: Verify DX11 native SELECTARG2 TFACTOR alpha 00588
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_selectarg_tfactor_arg2_00588.py
 
       - name: Verify DX11 live D3D9 mip-point chain 00589
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_mip_chain_00589.py
 
       - name: Verify DX11 live D3D9 mip-linear Draw 00590
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_mip_linear_00590.py
 
       - name: Verify DX11 game reflected UV sampler 00591
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_address_mirror_00591.py
 
       - name: Verify DX11 game MAXMIPLEVEL native LOD 00592
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_maxmiplevel_00592.py
 
       - name: Verify DX11 live game signed mip bias 00593
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_mip_lod_bias_00593.py
 
       - name: Verify DX11 live D3D9 BORDER sampler 00594
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_border_color_00594.py
 
       - name: Verify DX11 live D3D9 COUNT2 stage0 texture UV 00595
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_native_tex_transform_00595.py
       - name: DX11 real-game additive blend 00596
@@ -374,7 +375,7 @@ jobs:
 
   dx11-smoke:
     name: DX11 readiness smoke probes
-    if: github.ref_name == 'vr-dx11-native-r71'
+    if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
     needs: validate
     runs-on: windows-2022
     timeout-minutes: 25
@@ -492,7 +493,7 @@ jobs:
 
       # R182 native guarded dispatch contract is verified once per changed source.
       - name: Verify R182 guarded native DrawIndexed
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_dormant_fan_draw_r182.py
 
@@ -510,92 +511,92 @@ jobs:
 
       # R183: source delta once + real WARP VB/IB-owned indexed GPU pixels.
       - name: Verify DX11 native linear VB/IB R183 source contract
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_buffer_owner_r183.py
 
       # R184: source-accurate, conservative DrawIndexed VB/IB bounds fence.
       - name: Verify DX11 native VB/IB R184 indexed bounds contract
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_buffer_range_r184.py
 
       # R199: independent non-indexed native Draw exact RTV/viewport/scissor owner.
       - name: Verify R199 native linear target and viewport fence
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_target_r199.py
 
       # R197: reject retained GS/HS/DS for the independent non-indexed Draw path.
       - name: Verify R197 native linear shader stage fence
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_stage_r197.py
 
       # R185: new native Draw entrypoint is dormant but genuinely GPU-exercised.
       - name: Verify DX11 native Draw R185 source contract
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_linear_draw_r185.py
 
       # R209: same-device alien PS/RTV cannot satisfy exact non-indexed
       # pipeline provenance; R183 WARP confirms actual changed GPU pixels.
       - name: Verify R209 native linear exact pipeline identity
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_pipeline_identity_r209.py
 
       # R210: dormant non-indexed depth DSV/state exact identity and GPU pixels.
       - name: Verify R210 native linear depth OM identity
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_depth_om_r210.py
 
       # R211: depth-aware non-indexed eye must reject unexpected MRT outputs.
       - name: Verify R211 linear single-eye OM target ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_linear_single_eye_mrt_r211.py
 
       # R195: exact immutable IB sub-slice bounds, no duplicate WARP target.
       - name: Verify R195 native indexed slice ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_index_slice_r195.py
 
       # R214: strict opaque non-indexed OM blend/mask identity plus real WARP.
       - name: Verify R214 linear exact opaque OM ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_linear_opaque_om_r214.py
 
       # R215: full-eye viewport, exact raster and opaque OM composition.
       - name: Verify R215 sealed opaque eye scope
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_sealed_opaque_eye_r215.py
 
       # R216: typed D32_FLOAT eye precision/read-only seal.
       - name: Verify R216 float depth eye ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_float_depth_eye_r216.py
 
       # R221: non-indexed OM UAV eye isolation before WARP GPU draw.
       - name: Verify R221 linear OM UAV isolation
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_linear_uav_eye_r221.py
 
       # R230: non-indexed owned-eye GPU predicate exclusion.
       - name: Verify R230 non-indexed predication guard
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_linear_predication_r230.py
 
       # R232: exclude all SO buffer targets from dormant non-indexed eye.
       - name: Verify R232 non-indexed stream-output isolation
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_linear_stream_output_r232.py
 
       - name: Build DX11 linear VB/IB mirror R183 WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_linear_buffer_mirror_probe
 
       - name: Run DX11 linear VB/IB mirror R183 WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_linear_buffer_mirror_probe.exe | Select-Object -First 1
@@ -605,57 +606,57 @@ jobs:
 
       # R196: disallow retained GS/HS/DS that mutate a native FVF triangle.
       - name: Verify R196 native indexed shader stage fence
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_shader_stage_r196.py
 
       # R186: independent indexed-native device/pipeline/IA readiness and real WARP pixels.
       - name: Verify R186 native indexed Draw ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_draw_r186.py
 
       # R207: exact same-device IA layout/VS/PS/RTV provenance and WARP alien-PS pixels.
       - name: Verify R207 native indexed exact pipeline identity
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_pipeline_identity_r207.py
 
       # R212 indexed MRT secondary-eye prevention + actual WARP leak evidence.
       - name: Verify R212 indexed OM eye ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_single_eye_mrt_r212.py
 
       # R218 one-shot indexed full-eye depth, raster and WARP proof.
       - name: Verify R218 sealed indexed depth eye
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_indexed_sealed_eye_r218.py
       - name: Verify DX11 R226 indexed D32 depth-only ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: python tools/test_dx11_indexed_depth_dedicated_r226.py
 
 
       # R219: no hidden OM UAV/second-eye writes during indexed DrawIndexed.
       - name: Verify R219 indexed OM UAV isolation
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_uav_eye_r219.py
 
       # R229: no live conditional GPU query during owned DrawIndexed.
       - name: Verify R229 indexed GPU predication fence
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_predication_r229.py
 
 
       # R231: a hidden stream-output binding cannot be another eye write.
       - name: Verify R231 indexed stream-output isolation
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_stream_output_r231.py
 
       - name: Build R186 owned indexed Draw WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_indexed_draw_probe_r186
 
       - name: Run R186 owned indexed Draw WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_draw_probe_r186.exe | Select-Object -First 1
@@ -666,30 +667,30 @@ jobs:
 
       # 00608: real D3D9 game Draw SRCALPHASAT native OM, masks and regression.
       - name: Verify 00608 game native SRCALPHASAT copy and add
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_src_alpha_sat_00608.py
 
       # 00607: game-state D3D9 destination-alpha crossfade native OM + destructive tests.
       - name: Verify 00607 native dest-alpha crossfade
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_destalpha_crossfade_00607.py
 
       # 00606: game-authored native Draw/DrawIndexed destination/source complement OM.
       - name: Verify 00606 native inverse-modulation blend and failure mutants
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_native_inverse_multiply_00606.py
 
       # R238: immutable transient D3D9 indexed-UP data to native WARP GPU output.
       - name: Verify R238 indexed UP native source integration
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_up_r238.py
 
       - name: Build R238 indexed UP WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_indexed_up_probe_r238
 
       - name: Run R238 indexed UP WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_up_probe_r238.exe | Select-Object -First 1
@@ -700,15 +701,15 @@ jobs:
 
       # R239: independent indexed-UP triangle-strip GPU output through R238 IA.
       - name: Verify R239 strip adapter and GPU proof contract
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_indexed_up_strip_r239.py
 
       - name: Build R239 strip indexed-UP WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_indexed_up_strip_probe_r239
 
       - name: Run R239 strip indexed-UP WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_indexed_up_strip_probe_r239.exe | Select-Object -First 1
@@ -718,15 +719,15 @@ jobs:
 
       # R187 isolated owned indexed GPU path: exact RTV and full viewport.
       - name: Verify R187 native indexed viewport ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_viewport_draw_r187.py
 
       - name: Build R187 indexed viewport WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_viewport_draw_probe_r187
 
       - name: Run R187 indexed viewport WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_viewport_draw_probe_r187.exe | Select-Object -First 1
@@ -736,15 +737,15 @@ jobs:
 
       # R203: non-indexed Draw live PS SRV/sampler object ownership and red/blue/red pixels.
       - name: Verify R203 native linear PS texture ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_textured_linear_r203.py
 
       - name: Build R203 textured linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_textured_linear_probe_r203
 
       - name: Run R203 textured linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_textured_linear_probe_r203.exe | Select-Object -First 1
@@ -754,15 +755,15 @@ jobs:
 
       # R188: verify PS SRV/sampler object identity, texture descriptor and read/write hazard.
       - name: Verify R188 native indexed PS texture binding
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_textured_indexed_r188.py
 
       - name: Build R188 textured indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_textured_indexed_probe_r188
 
       - name: Run R188 textured indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_textured_indexed_probe_r188.exe | Select-Object -First 1
@@ -772,15 +773,15 @@ jobs:
 
       # R202: non-indexed live DSV/depth-state and real near/far GPU occlusion.
       - name: Verify R202 native linear depth ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_depth_linear_r202.py
 
       - name: Build R202 depth linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_depth_linear_probe_r202
 
       - name: Run R202 depth linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_depth_linear_probe_r202.exe | Select-Object -First 1
@@ -790,7 +791,7 @@ jobs:
 
       # R189: verify same-device exact DSV, depth state, and real GPU depth occlusion.
       - name: Verify R189 native indexed depth ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_depth_indexed_r189.py
 
       # R213 exact shader/layout + depth ownership; isolated WARP pixel path.
@@ -799,11 +800,11 @@ jobs:
         run: python tools/test_dx11_indexed_depth_pipeline_identity_r213.py
 
       - name: Build R189 depth indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_depth_indexed_probe_r189
 
       - name: Run R189 depth indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_depth_indexed_probe_r189.exe | Select-Object -First 1
@@ -813,15 +814,15 @@ jobs:
 
       # R190: live owned blend state + real alpha GPU DrawIndexed ahead of separate R175.
       - name: Verify R190 native indexed OM blend ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_blend_indexed_r190.py
 
       - name: Build R190 blend indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_blend_indexed_probe_r190
 
       - name: Run R190 blend indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_blend_indexed_probe_r190.exe | Select-Object -First 1
@@ -832,15 +833,15 @@ jobs:
 
       # R200: independent non-indexed live alpha OM object with real WARP pixels.
       - name: Verify R200 native linear OM alpha ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_blend_linear_r200.py
 
       - name: Build R200 blend linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_blend_linear_probe_r200
 
       - name: Run R200 blend linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_blend_linear_probe_r200.exe | Select-Object -First 1
@@ -850,15 +851,15 @@ jobs:
 
       # R191: real VS b0 ownership/revision and shifted indexed GPU pixel proof.
       - name: Verify R191 VS constant indexed ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_vs_constant_indexed_r191.py
 
       - name: Build R191 VS constant indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_vs_constant_indexed_probe_r191
 
       - name: Run R191 VS constant indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_vs_constant_indexed_probe_r191.exe | Select-Object -First 1
@@ -868,15 +869,15 @@ jobs:
 
       # R192: immutable PS b0 source version, identity, and actual indexed GPU colors.
       - name: Verify R192 PS constant indexed ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_ps_constant_indexed_r192.py
 
       - name: Build R192 PS constant indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_ps_constant_indexed_probe_r192
 
       - name: Run R192 PS constant indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_ps_constant_indexed_probe_r192.exe | Select-Object -First 1
@@ -887,15 +888,15 @@ jobs:
 
       # R193: owned live scissor, exact RTV and actual clipped indexed WARP pixels.
       - name: Verify R193 scissor indexed ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_scissor_indexed_r193.py
 
       - name: Build R193 scissor indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_scissor_indexed_probe_r193
 
       - name: Run R193 scissor indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_scissor_indexed_probe_r193.exe | Select-Object -First 1
@@ -905,15 +906,15 @@ jobs:
 
       # R201: isolated non-indexed native Draw exact raster owner and WARP winding pixels.
       - name: Verify R201 native linear raster cull ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_cull_linear_r201.py
 
       - name: Build R201 cull linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_cull_linear_probe_r201
 
       - name: Run R201 cull linear WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_cull_linear_probe_r201.exe | Select-Object -First 1
@@ -923,15 +924,15 @@ jobs:
 
       # R194: independent winding/cull polarity on an owned dormant indexed GPU path.
       - name: Verify R194 native raster cull ownership
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: python tools/test_dx11_cull_indexed_r194.py
 
       - name: Build R194 cull indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         run: cmake --build build-auto --config Release --target dx11_cull_indexed_probe_r194
 
       - name: Run R194 cull indexed WARP probe
-        if: github.ref_name == 'vr-dx11-native-r71'
+        if: (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $probe = Get-ChildItem build-auto -Recurse -Filter dx11_cull_indexed_probe_r194.exe | Select-Object -First 1

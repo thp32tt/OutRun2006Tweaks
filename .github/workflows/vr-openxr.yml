@@ -2,7 +2,7 @@ name: OpenXR VR architecture
 
 on:
   push:
-    branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-00952-live-sm3-device-bool ]
+    branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-00952-live-sm3-device-bool, feature/dx11-00966-live-game-frame ]
     paths:
       - 'src/vr/**'
       - 'src/vr_shared.hpp'
@@ -73,7 +73,7 @@ jobs:
           submodules: recursive
 
       - name: Verify exact pushed DX11 source checkout
-        if: github.event_name == 'push' && github.ref_name == 'vr-dx11-native-r71'
+        if: github.event_name == 'push' && (github.ref_name == 'vr-dx11-native-r71' || github.ref_name == 'feature/dx11-00966-live-game-frame')
         shell: pwsh
         run: |
           $actual = (git rev-parse HEAD).Trim()
@@ -806,7 +806,7 @@ jobs:
     name: DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle
     if: >-
       (github.event_name == 'pull_request' && github.head_ref == 'vr-d3d9ex-review-feature-dx11-00537') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/vr-dx11-native-r71')
+      (github.event_name == 'push' && (github.ref == 'refs/heads/vr-dx11-native-r71' || github.ref == 'refs/heads/feature/dx11-00966-live-game-frame'))
     needs: [game-x86-r26-hud-safe, host-x64]
     runs-on: windows-2022
     permissions:
