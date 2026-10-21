@@ -4788,6 +4788,8 @@ struct NativeLiveSm3Program {
     std::uint16_t pixelSamplerMask{};
     std::uint8_t vertexCubeSamplerMask{};
     std::uint16_t pixelCubeSamplerMask{};
+    std::uint8_t vertexVolumeSamplerMask{};
+    std::uint16_t pixelVolumeSamplerMask{};
     bool vertexConstants{};
     bool pixelConstants{};
     bool vertexBooleans{};

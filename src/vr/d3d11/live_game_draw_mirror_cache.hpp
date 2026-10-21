@@ -8,10 +8,11 @@ struct ViewKey {
     bool mipChain = false;
     // Keep reflected six-face images distinct from 2D shader views.
     bool cube = false;
+    bool volume = false;
 };
 [[nodiscard]] constexpr bool same_view(ViewKey a, ViewKey b) noexcept {
     return a.source != nullptr && b.source != nullptr &&
            a.source == b.source && a.srgb == b.srgb &&
-           a.mipChain == b.mipChain && a.cube == b.cube;
+           a.mipChain == b.mipChain && a.cube == b.cube && a.volume == b.volume;
 }
 } // namespace outrun::vr::dx11::live_game_frame::draw_mirror_cache

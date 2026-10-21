@@ -119,6 +119,56 @@ inline bool append_native_sm3_texturecube_sample(
            channels + ";\n";
     return true;
 }
+// SM3 D3DSTT_VOLUME uses XYZ, explicit LOD/bias in W and XYZ gradients.
+[[nodiscard]] constexpr unsigned native_sm3_volume_source_components(
+    NativeSm3Texture2DMode mode, unsigned index) noexcept {
+    if (mode == NativeSm3Texture2DMode::Projected) return 0u;
+    if (index == 0u)
+        return mode == NativeSm3Texture2DMode::Bias ||
+               mode == NativeSm3Texture2DMode::ExplicitLod ? 15u : 7u;
+    return mode == NativeSm3Texture2DMode::Gradients &&
+           (index == 2u || index == 3u) ? 7u : 0u;
+}
+[[nodiscard]] constexpr bool native_sm3_volume_modifier_supported(
+    NativeSm3Texture2DMode mode, unsigned index, unsigned modifier) noexcept {
+    return index == 1u ? modifier == 0u :
+        native_sm3_volume_source_components(mode, index) != 0u && modifier <= 12u;
+}
+inline bool append_native_sm3_texture3d_declarations(std::string& out,
+                                                       unsigned slot) {
+    if (slot >= 16u) return false;
+    const auto n = std::to_string(slot);
+    out += "Texture3D<float4> r283_texture" + n + " : register(t" + n + ");\n";
+    out += "SamplerState r283_sampler" + n + " : register(s" + n + ");\n";
+    return true;
+}
+inline bool append_native_sm3_texture3d_sample(
+    std::string& out, const std::string& destination, unsigned mask,
+    const std::string& coordinates, unsigned slot, unsigned ordinal,
+    NativeSm3Texture2DMode mode, const std::string& dx, const std::string& dy) {
+    if (destination.empty() || coordinates.empty() || !mask || (mask & ~15u) ||
+        slot >= 16u || !native_sm3_volume_source_components(mode, 0u) ||
+        (mode == NativeSm3Texture2DMode::Gradients
+            ? (dx.empty() || dy.empty()) : (!dx.empty() || !dy.empty()))) return false;
+    const auto n = std::to_string(slot);
+    const auto texel = "r283_volume_texel_" + std::to_string(ordinal);
+    const char* operation = mode == NativeSm3Texture2DMode::Bias ? ".SampleBias(" :
+        mode == NativeSm3Texture2DMode::ExplicitLod ? ".SampleLevel(" :
+        mode == NativeSm3Texture2DMode::Gradients ? ".SampleGrad(" : ".Sample(";
+    out += "    float4 " + texel + " = r283_texture" + n +
+           operation + "r283_sampler" + n + ", (" + coordinates + ").xyz";
+    if (mode == NativeSm3Texture2DMode::Bias ||
+        mode == NativeSm3Texture2DMode::ExplicitLod)
+        out += ", (" + coordinates + ").w";
+    else if (mode == NativeSm3Texture2DMode::Gradients)
+        out += ", (" + dx + ").xyz, (" + dy + ").xyz";
+    out += ");\n";
+    std::string channels;
+    for (unsigned i=0u;i<4u;++i) if (mask & (1u << i)) channels += "xyzw"[i];
+    out += "    " + destination + "." + channels + " = " +
+           texel + "." + channels + ";\n";
+    return true;
+}
 inline bool append_native_sm3_texture2d_declarations(
     std::string& out, unsigned samplerRegister) {
     if (samplerRegister >= 16u) return false;

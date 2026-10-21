@@ -29,6 +29,7 @@
 #include "live_game_rgba_texture.hpp"
 #include "live_game_render_target_readback.hpp"
 #include "live_game_cube_rt_readback.hpp"
+#include "live_game_volume_texture.hpp"
 #include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
@@ -1189,6 +1190,7 @@ struct TextureCapture {
     D3DMATRIX uvTransform{};
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     Microsoft::WRL::ComPtr<IDirect3DCubeTexture9> cubeTexture;
+    Microsoft::WRL::ComPtr<IDirect3DVolumeTexture9> volumeTexture;
     D3DTEXTUREADDRESS addressW = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
@@ -4000,7 +4002,7 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     state.AddressU = translateAddress(capture.addressU);
     state.AddressV = translateAddress(capture.addressV);
     if (!state.AddressU || !state.AddressV) return false;
-    state.AddressW = capture.cubeTexture ?
+    state.AddressW = (capture.cubeTexture || capture.volumeTexture) ?
         translateAddress(capture.addressW) : D3D11_TEXTURE_ADDRESS_CLAMP;
     if (!state.AddressW) return false;
     // D3D9 COLORREF-like D3DCOLOR is 0xAARRGGBB; native BorderColor is RGBA.
@@ -4024,6 +4026,18 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
 
+// Game-authored volume source -> native Texture3D SRV -> SM3 Draw.
+bool mirror_volume_texture(ID3D11Device* dev, const TextureCapture& capture,
+    ComPtr<ID3D11ShaderResourceView>& view,
+    ComPtr<ID3D11SamplerState>& sampler) noexcept {
+    const bool chain = capture.mipFilter == D3DTEXF_POINT ||
+                       capture.mipFilter == D3DTEXF_LINEAR;
+    UINT levels = 0u;
+    return live_volume::mirror_image(
+              dev, capture.volumeTexture.Get(), capture.srgbTexture,
+              chain, capture.maxMipLevel, view, levels) &&
+           create_game_sampler(dev, capture, levels, sampler);
+}
 // Reflective game cube sources: copy complete six-face mip generations, not
 // a guessed texture2D. Unsupported GPU-only or dirty source stays DX9Ex-owned.
 bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
@@ -4194,6 +4208,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
     if (!dev || !capture.enabled) return false;
+    if (capture.volumeTexture)
+        return mirror_volume_texture(dev, capture, view, sampler);
     if (capture.cubeTexture)
         return mirror_cube_texture(dev, capture, view, sampler);
     if (!capture.texture) return false;
@@ -4607,18 +4623,23 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
 bool capture_live_sm3_sampler(IDirect3DDevice9* game, unsigned slot,
                               TextureCapture& out,
                               bool vertexStage = false,
-                              bool cubeSampler = false) noexcept {
+                              bool cubeSampler = false,
+                               bool volumeSampler = false) noexcept {
     const unsigned sourceSlot =
         game_sm3_sampler_source_slot(vertexStage, slot);
     if (!game || sourceSlot == kGameSm3InvalidSamplerSlot) return false;
     ComPtr<IDirect3DBaseTexture9> source;
     if (FAILED(game->GetTexture(sourceSlot, source.GetAddressOf())) ||
         !source ||
-        (cubeSampler
-            ? (source->GetType() != D3DRTYPE_CUBETEXTURE ||
-               FAILED(source.As(&out.cubeTexture)))
-            : (source->GetType() != D3DRTYPE_TEXTURE ||
-               FAILED(source.As(&out.texture))))) return false;
+        (cubeSampler && volumeSampler) ||
+        (volumeSampler
+            ? (source->GetType() != D3DRTYPE_VOLUMETEXTURE ||
+               FAILED(source.As(&out.volumeTexture)))
+            : cubeSampler
+                ? (source->GetType() != D3DRTYPE_CUBETEXTURE ||
+                   FAILED(source.As(&out.cubeTexture)))
+                : (source->GetType() != D3DRTYPE_TEXTURE ||
+                   FAILED(source.As(&out.texture))))) return false;
     DWORD u{}, v{}, mag{}, min{}, mip{}, maxMip{}, anisotropy{}, srgb{}, border{}, bias{};
     if (FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSU, &u)) ||
         FAILED(game->GetSamplerState(sourceSlot, D3DSAMP_ADDRESSV, &v)) ||
@@ -5369,15 +5390,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         // Bind exactly one real D3D9 source image. Missing/ambiguous sources
         // cannot certify a native game frame; original DX9Ex Draw survives.
         if (!captured.enabled ||
-            (!captured.texture && !captured.cubeTexture) ||
-            (captured.texture && captured.cubeTexture)) return false;
+            (static_cast<unsigned>(captured.texture != nullptr) +
+             static_cast<unsigned>(captured.cubeTexture != nullptr) +
+             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u) return false;
         const bool cube = captured.cubeTexture != nullptr;
+        const bool volume = captured.volumeTexture != nullptr;
         const bool chain = captured.mipFilter == D3DTEXF_POINT ||
                            captured.mipFilter == D3DTEXF_LINEAR;
         const draw_mirror_cache::ViewKey key{
             cube ? static_cast<const void*>(captured.cubeTexture.Get())
-                 : static_cast<const void*>(captured.texture.Get()),
-            captured.srgbTexture, chain, cube};
+                 : volume ? static_cast<const void*>(captured.volumeTexture.Get())
+                          : static_cast<const void*>(captured.texture.Get()),
+            captured.srgbTexture, chain, cube, volume};
         for (std::size_t i = 0u; i < drawMirrorCount; ++i) {
             const auto& previous = drawMirrors[i];
             if (!draw_mirror_cache::same_view(key, previous.key))
@@ -5395,7 +5419,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         // shares SRV pixels but re-creates its game-authored sampler state.
         const UINT levels = chain
             ? (cube ? captured.cubeTexture->GetLevelCount()
-                    : captured.texture->GetLevelCount())
+                    : volume ? captured.volumeTexture->GetLevelCount()
+                             : captured.texture->GetLevelCount())
             : 1u;
         if (drawMirrorCount < drawMirrors.size())
             drawMirrors[drawMirrorCount++] = {key, levels, view};
@@ -5411,7 +5436,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         TextureCapture capture{};
         if (!capture_live_sm3_sampler(
                 game, slot, capture, true,
-                (pipeline.program.vertexCubeSamplerMask & (1u << slot)) != 0u) ||
+                (pipeline.program.vertexCubeSamplerMask & (1u << slot)) != 0u,
+                (pipeline.program.vertexVolumeSamplerMask & (1u << slot)) != 0u) ||
             !mirrorLiveSampler(capture,
                                vertexViews[slot], vertexSamplers[slot]))
             return false;
@@ -5429,7 +5455,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         TextureCapture capture{};
         if (!capture_live_sm3_sampler(
                 game, slot, capture, false,
-                (pipeline.program.pixelCubeSamplerMask & (1u << slot)) != 0u) ||
+                (pipeline.program.pixelCubeSamplerMask & (1u << slot)) != 0u,
+                (pipeline.program.pixelVolumeSamplerMask & (1u << slot)) != 0u) ||
             !mirrorLiveSampler(capture, views[slot], samplers[slot]))
             return false;
         boundViews[slot] = views[slot].Get();
