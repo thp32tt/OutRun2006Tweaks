@@ -4692,7 +4692,7 @@ std::uint64_t live_sm3_pipeline_identity(
     const ProgrammableShaderFunctionSourceEvidence& vertex,
     const ProgrammableShaderFunctionSourceEvidence& pixel,
     const std::vector<D3DVERTEXELEMENT9>& declaration,
-    unsigned alphaCompare) noexcept {
+    unsigned alphaCompare, bool packedFloat4) noexcept {
     if (!vertex.exact() || !pixel.exact() || declaration.empty() ||
         alphaCompare > 8u) return 0u;
     std::uint64_t h = 1469598103934665603ull;
@@ -4709,6 +4709,9 @@ std::uint64_t live_sm3_pipeline_identity(
     // Distinct alpha comparisons compile distinct native pixel shaders.
     // Do not reuse a cached no-alpha shader for a menu alpha-tested Draw.
     hashBytes(&alphaCompare, sizeof(alphaCompare));
+    // The same live SM3 shader/declaration can alternate packed
+    // instancing and ordinary IA input; never reuse the wrong layout.
+    hashBytes(&packedFloat4, sizeof(packedFloat4));
     return h != 0u ? h : 1u;
 }
 
@@ -5165,22 +5168,62 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // Draw in shader-visible FLOAT4 register order (not format bitcasts).
     // DEC3N normals / UDEC3 mesh values now feed genuine shader FLOAT4
     // registers from the intercepted game's VB/IB/UP snapshots.
-    // An instanced stream-0 source cannot be replicated by a single
-    // non-instanced D3D11 Draw. Retain D3D9 output and input in that case.
+    // D3D9 source instancing uses INDEXEDDATA | instanceCount on stream 0
+    // and INSTANCEDATA | step on secondary streams. Materialize each
+    // instance's genuine per-vertex/instance attributes into one FLOAT4
+    // native VB and issue separate GPU draws at original primitive boundaries.
+    // Never repeat a strip as one continuous Draw or confuse one stream's
+    // instance records with ordinary vertex-rate data.
+    constexpr UINT kStreamIndexed = 0x40000000u;
+    constexpr UINT kStreamInstanced = 0x80000000u;
+    constexpr UINT kStreamFrequencyMask = 0x3fffffffu;
     UINT sourceFrequency = 0u;
-    if (FAILED(game->GetStreamSourceFreq(0u, &sourceFrequency)) ||
-        sourceFrequency != 1u) return false;
+    if (FAILED(game->GetStreamSourceFreq(0u, &sourceFrequency)))
+        return false;
+    const bool sourceInstancing = sourceFrequency != 1u;
+    UINT instanceCount = 1u;
+    if (sourceInstancing) {
+        if ((sourceFrequency & ~kStreamFrequencyMask) != kStreamIndexed ||
+            (sourceFrequency & kStreamFrequencyMask) == 0u)
+            return false;
+        instanceCount = sourceFrequency & kStreamFrequencyMask;
+    }
+    const std::uint64_t expandedVertices =
+        static_cast<std::uint64_t>(vertexCount) * instanceCount;
+    if (!expandedVertices || expandedVertices > kMaxVertices)
+        return false;
+    std::array<std::uint32_t,4> instanceSteps{};
     std::array<bool,4> referenced{};
-    for (std::size_t i=0u; i+1u<declaration.size(); ++i)
-        referenced[declaration[i].Stream]=true;
-    for (UINT slot=1u; slot<referenced.size(); ++slot) {
+    for (std::size_t i = 0u; i + 1u < declaration.size(); ++i)
+        referenced[declaration[i].Stream] = true;
+    for (UINT slot = 1u; slot < referenced.size(); ++slot) {
         if (!referenced[slot]) continue;
-        UINT frequency=0u;
-        // Instance-rate/unknown stream stepping is not ordinary vertex-rate.
-        if (!extra || !extra->extra[slot-1u].bytes ||
-            extra->extra[slot-1u].vertexCount < vertexCount ||
-            FAILED(game->GetStreamSourceFreq(slot,&frequency)) ||
-            frequency != 1u) return false;
+        UINT frequency = 0u;
+        if (!extra || !extra->extra[slot - 1u].bytes ||
+            FAILED(game->GetStreamSourceFreq(slot, &frequency)))
+            return false;
+        if (sourceInstancing &&
+            (frequency & ~kStreamFrequencyMask) == kStreamInstanced &&
+            (frequency & kStreamFrequencyMask) != 0u) {
+            instanceSteps[slot] = frequency & kStreamFrequencyMask;
+            const UINT required =
+                (instanceCount - 1u) / instanceSteps[slot] + 1u;
+            if (extra->extra[slot - 1u].vertexCount < required)
+                return false;
+        } else if (frequency != 1u ||
+                   extra->extra[slot - 1u].vertexCount < vertexCount) {
+            return false;
+        }
+    }
+    // Keep input-layout cache identity separate when an instanced draw
+    // requires source FLOAT4 packing even for already-float declarations.
+    if (sourceInstancing && !repack) {
+        repack = true;
+        nativeStride = static_cast<UINT>(input.size() * 16u);
+        for (std::size_t i = 0u; i < input.size(); ++i) {
+            input[i].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+            input[i].AlignedByteOffset = static_cast<UINT>(i * 16u);
+        }
     }
     // Reject oversized, malformed or untranslatable data before any upload.
     std::vector<std::uint8_t> unpacked;
@@ -5198,7 +5241,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
             elements.push_back({
                 static_cast<std::uint8_t>(declaration[i].Stream),
                 declaration[i].Offset, declaration[i].Type});
-        if (!game_sm3_assemble_streams(elements,streams,vertexCount,unpacked))
+        if (sourceInstancing
+                ? !game_sm3_assemble_instanced_streams(
+                      elements, streams, vertexCount, instanceCount,
+                      instanceSteps, unpacked)
+                : !game_sm3_assemble_streams(
+                      elements, streams, vertexCount, unpacked))
             return false;
         nativeBytes=unpacked.data();
     }
@@ -5244,7 +5292,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     }
     rejectionStage = 7u;
     const auto key = live_sm3_pipeline_identity(
-        vertexEvidence, pixelEvidence, declaration, alphaFunc);
+        vertexEvidence, pixelEvidence, declaration, alphaFunc, repack);
     if (!key) return false;
     auto it = s.liveSm3Pipelines.find(key);
     if (it == s.liveSm3Pipelines.end()) {
@@ -5527,7 +5575,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
            !native_sm3_live_loop_indexed_bounds_valid(
               livePixelInts, pipeline.program.pixelLoopIndexedConstantEnd)))))
         return false;
-    const auto nativeByteCount = static_cast<std::uint64_t>(nativeStride) * vertexCount;
+    const auto nativeByteCount = nativeStride * expandedVertices;
     if (!nativeByteCount || nativeByteCount > (1ull << 25u)) return false;
     const UINT vertexBytes = static_cast<UINT>(nativeByteCount);
     if (!ensure_full_game_upload_buffer(device, s.fullGameVertexUpload,
@@ -5702,8 +5750,16 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     context->VSSetSamplers(0u, 4u, boundVertexSamplers.data());
     context->PSSetShaderResources(0u, 16u, boundViews.data());
     context->PSSetSamplers(0u, 16u, boundSamplers.data());
-    if (nativeIndices) context->DrawIndexed(nativeIndexCount, 0u, 0);
-    else context->Draw(vertexCount, 0u);
+    // D3D9 single-source Draw with stream frequency N submits N native GPU
+    // primitives. Each independent strip/fan/list keeps its own topology;
+    // indexed draws reuse the original IB but rebase into each packed VB slice.
+    for (UINT instance = 0u; instance < instanceCount; ++instance) {
+        const UINT base = instance * vertexCount;
+        if (nativeIndices)
+            context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));
+        else
+            context->Draw(vertexCount, base);
+    }
     s.pending = true;
     ++s.issued;
     ++s.eligible;
