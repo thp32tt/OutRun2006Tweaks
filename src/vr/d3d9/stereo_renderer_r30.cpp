@@ -3828,8 +3828,16 @@ namespace OutRunVRStereo
                 if (!R30CaptureNativeAdditionalStreams(
                         device, physical, extra, owned))
                     return; // Original D3D9 IndexedUP/input still execute.
-                const auto* firstVertex = static_cast<const std::uint8_t*>(vertices) +
-                    static_cast<std::size_t>(minVertex) * stride;
+                // A rebased UP index is only valid when its physical source
+                // bytes remain within the process address space. Validate
+                // the complete dense range BEFORE advancing the pointer.
+                std::uintptr_t firstAddress = 0u;
+                if (!live::game_indexed_up_dense_source_range(
+                        reinterpret_cast<std::uintptr_t>(vertices),
+                        minVertex, numVertices, stride, firstAddress))
+                    return; // Fail closed to the original game Draw.
+                const auto* firstVertex =
+                    reinterpret_cast<const std::uint8_t*>(firstAddress);
                 nativeSource.forwarded = true;
                 live::observe_indexed(device, topology, primitiveCount,
                     firstVertex, stride, numVertices,

@@ -166,6 +166,29 @@ int main() {
         kMaxNativeGameVertices + 1u, sparseMin, 40000u,
         upPacked, upRemapped));
     assert(upPacked == keptUp && upRemapped == keptUpIndices);
+    // 00966: the dense IndexedUP source span must rebase the pointer
+    // without overflowing x86 address space or mutating output on failure.
+    using outrun::vr::dx11::live_game_frame::game_indexed_up_dense_source_range;
+    std::uintptr_t firstAddress = 0xdeadu;
+    assert(game_indexed_up_dense_source_range(
+        0x1000u, 5u, 3u, 12u, firstAddress, 0xffffffffu));
+    assert(firstAddress == 0x103cu);
+    firstAddress = 0xdeadu;
+    assert(!game_indexed_up_dense_source_range(
+        0xfffffff0u, 1u, 2u, 16u, firstAddress, 0xffffffffu));
+    assert(firstAddress == 0xdeadu);
+    assert(game_indexed_up_dense_source_range(
+        0xfffffff0u, 0u, 1u, 16u, firstAddress, 0xffffffffu));
+    assert(firstAddress == 0xfffffff0u);
+    firstAddress = 0xdeadu;
+    assert(!game_indexed_up_dense_source_range(
+        0x1000u, 0u, 0u, 12u, firstAddress, 0xffffffffu));
+    assert(!game_indexed_up_dense_source_range(
+        0x1000u, 0u, 3u, 0u, firstAddress, 0xffffffffu));
+    assert(!game_indexed_up_dense_source_range(
+        0x1000u, 0u, kMaxNativeGameVertices + 1u, 12u,
+        firstAddress, 0xffffffffu));
+    assert(firstAddress == 0xdeadu);
     // 00966: source-absolute IndexedUP stream-1..3 slots must match
     // the same ordered native vertices as stream 0 for DrawIndexed.
     using outrun::vr::dx11::live_game_frame::game_indexed_up_physical_slots;

@@ -165,6 +165,32 @@ inline bool game_compact_sparse_indices(
      return true;
  }
 
+// The dense IndexedUP fast path rebases D3D9's MinVertexIndex and must
+// advance its *source pointer* by that same physical offset. On x86 the
+// native CPU snapshot must not wrap a 32-bit UP address before D3D9 gets
+// its original Draw. Check the final readable byte without dereferencing;
+// on failure the original D3D9 call remains authoritative. The caller still
+// owns actual pointer readability and source lifetime.
+[[nodiscard]] constexpr bool game_indexed_up_dense_source_range(
+    std::uintptr_t sourceAddress, std::uint32_t minVertex,
+    std::uint32_t numVertices, std::uint32_t stride,
+    std::uintptr_t& firstAddress,
+    std::uintptr_t addressLimit =
+        (std::numeric_limits<std::uintptr_t>::max)()) noexcept {
+    if (sourceAddress == 0u || sourceAddress > addressLimit ||
+        numVertices == 0u || numVertices > kMaxNativeGameVertices ||
+        !game_native_source_stride_valid(stride))
+        return false;
+    const std::uint64_t firstOffset =
+        static_cast<std::uint64_t>(minVertex) * stride;
+    const std::uint64_t finalOffset =
+        (static_cast<std::uint64_t>(minVertex) + numVertices) * stride - 1u;
+    if (finalOffset > static_cast<std::uint64_t>(addressLimit - sourceAddress))
+        return false;
+    firstAddress = sourceAddress + static_cast<std::uintptr_t>(firstOffset);
+    return true;
+}
+
 // IndexedUP stream 0 comes from the call's user pointer while any referenced
 // secondary streams still belong to the game's D3D9 stream bindings. Reconstruct
 // the SAME physical slots in exactly the same native IA order, not the rebased

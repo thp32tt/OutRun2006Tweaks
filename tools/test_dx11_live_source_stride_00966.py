@@ -12,6 +12,10 @@ assert hook.count("game_native_source_stride_valid(stride)") == 5
 assert "stride < 16 || stride > 512" not in hook
 assert "R30CopyVertexShadow(" in hook and "R30CopySparseVertexShadow(" in hook
 assert "R30CaptureNativeAdditionalStreams(" in hook
+assert "game_indexed_up_dense_source_range(" in hook
+assert "reinterpret_cast<const std::uint8_t*>(firstAddress)" in hook
+assert "game_indexed_up_dense_source_range(" in (
+    r / "src/vr/d3d11/live_game_primitive_span.hpp").read_text()
 assert "observe_linear(device,topology,primitiveCount," in hook
 assert "observe_indexed(device,topology,primitiveCount," in hook
 layout = bridge.split("bool live_sm3_input_layout(", 1)[1].split(
