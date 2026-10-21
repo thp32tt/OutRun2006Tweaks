@@ -4043,17 +4043,33 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool cpuLocked = (base.Pool == D3DPOOL_MANAGED ||
                             base.Pool == D3DPOOL_SYSTEMMEM) &&
                            (base.Usage & D3DUSAGE_RENDERTARGET) == 0u;
+    // Each real game-authored reflection cube face/mip carries its own
+    // D3D9 color layout, shared with the offscreen 2D render target path.
+    // Decode packed 16/10-bit and swapped RGBA into native BGRA8 pixels.
+    const native_rt_readback::Layout cubeColor =
+        base.Format == D3DFMT_A8R8G8B8 ? native_rt_readback::Layout::argb8 :
+        base.Format == D3DFMT_X8R8G8B8 ? native_rt_readback::Layout::xrgb8 :
+        base.Format == D3DFMT_A8B8G8R8 ? native_rt_readback::Layout::a8b8g8r8 :
+        base.Format == D3DFMT_X8B8G8R8 ? native_rt_readback::Layout::x8b8g8r8 :
+        base.Format == D3DFMT_A2R10G10B10 ? native_rt_readback::Layout::a2r10g10b10 :
+        base.Format == D3DFMT_A2B10G10R10 ? native_rt_readback::Layout::a2b10g10r10 :
+        base.Format == D3DFMT_R5G6B5 ? native_rt_readback::Layout::rgb565 :
+        base.Format == D3DFMT_A1R5G5B5 ? native_rt_readback::Layout::argb1555 :
+        base.Format == D3DFMT_A4R4G4B4 ? native_rt_readback::Layout::argb4444 :
+        base.Format == D3DFMT_X1R5G5B5 ? native_rt_readback::Layout::xrgb1555 :
+        base.Format == D3DFMT_X4R4G4B4 ? native_rt_readback::Layout::xrgb4444 :
+                                          native_rt_readback::Layout::unsupported;
     const bool gpuCubeRt = base.Pool == D3DPOOL_DEFAULT &&
                            (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
-                           (base.Format == D3DFMT_A8R8G8B8 ||
-                            base.Format == D3DFMT_X8R8G8B8);
+                           cube_rt_readback::sampleable_color(cubeColor, capture.srgbTexture);
     if (!cpuLocked && !gpuCubeRt) return false;
     const bool bc1 = D3DFMT_DXT1 == base.Format;
     const bool bc3 = D3DFMT_DXT3 == base.Format || D3DFMT_DXT5 == base.Format;
     const bool compressed = bc1 || bc3;
-    const bool opaque = base.Format == D3DFMT_X8R8G8B8;
-    if (!compressed && !opaque && base.Format != D3DFMT_A8R8G8B8)
-        return false;
+    // CPU BC1/BC2/BC3 keeps its block bytes; other cube colors are
+    // decoded before the actual SM3 VS/PS native SRV. Unproven sRGB fails closed.
+    if (!compressed && !cube_rt_readback::sampleable_color(
+                           cubeColor, capture.srgbTexture)) return false;
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
     if ((usesMips && (capture.cubeTexture->GetLOD() != 0u ||
@@ -4094,6 +4110,9 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
             const UINT edge = (std::max)(1u, base.Width >> level);
             const UINT pitch = compressed ? ((edge + 3u) / 4u) * (bc1 ? 8u : 16u)
                                            : edge * 4u;
+            // D3D9 packed-16 source rows are half the BGRA8 output pitch.
+            const UINT sourcePitch = compressed ? pitch :
+                edge * native_rt_readback::source_texel_bytes(cubeColor);
             const UINT rows = compressed ? (edge + 3u) / 4u : edge;
             if (FAILED(capture.cubeTexture->GetLevelDesc(level, &desc)) ||
                 desc.Width != edge || desc.Height != edge ||
@@ -4126,8 +4145,8 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                 : capture.cubeTexture->LockRect(
                       cubeFace, level, &locked, nullptr, D3DLOCK_READONLY);
             if (FAILED(cubeFaceLockHr)) return false;
-            const bool readable = locked.pBits && locked.Pitch > 0 &&
-                static_cast<std::uint64_t>(locked.Pitch) >= pitch;
+            bool readable = locked.pBits && locked.Pitch > 0 &&
+                static_cast<std::uint64_t>(locked.Pitch) >= sourcePitch;
             if (readable) {
                 auto& dest = pixels[face * uploadedLevels + level];
                 dest.resize(static_cast<std::size_t>(pitch) * rows);
@@ -4135,8 +4154,13 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                     auto* to = dest.data() + static_cast<std::size_t>(pitch) * row;
                     const auto* from = static_cast<const std::uint8_t*>(locked.pBits) +
                                        static_cast<std::size_t>(locked.Pitch) * row;
-                    std::memcpy(to, from, pitch);
-                    if (opaque) for (UINT x=3u; x<pitch; x+=4u) to[x]=0xffu;
+                    if (compressed) {
+                        std::memcpy(to, from, pitch);
+                    } else if (!native_rt_readback::unpack_row(
+                                   from, to, edge, cubeColor)) {
+                        readable = false;
+                        break;
+                    }
                 }
             }
             const HRESULT unlocked = gpuCubeRt

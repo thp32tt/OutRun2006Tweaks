@@ -1,7 +1,15 @@
 #pragma once
 #include <cstdint>
+#include "live_game_render_target_readback.hpp"
 namespace outrun::vr::dx11::live_game_frame::cube_rt_readback {
-// Bound all six GPU-authored BGRA8 faces including sampled mip levels.
+// Source D3D9 face rows may be two or four bytes/texel. Every decoded
+// D3D11 cube mip is BGRA8; unknown/sRGB-incompatible color remains D3D9-owned.
+[[nodiscard]] constexpr bool sampleable_color(
+    native_rt_readback::Layout format, bool srgb) noexcept {
+    return native_rt_readback::sampleable(format, srgb) &&
+           native_rt_readback::source_texel_bytes(format) != 0u;
+}
+// Bound all six decoded GPU-authored BGRA8 faces including sampled mip levels.
 // 24 MiB is one complete cube budget, never a per-face limit.
 [[nodiscard]] constexpr bool bounded_six_face_bgra8(
     std::uint32_t edge, std::uint32_t levels) noexcept {
