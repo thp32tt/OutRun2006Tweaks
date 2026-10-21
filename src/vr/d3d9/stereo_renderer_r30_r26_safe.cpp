@@ -164,7 +164,7 @@ namespace OutRunVRStereo
                 static_cast<unsigned>(dbHr), dstBlend,
                 static_cast<unsigned>(seHr), scissorEnable,
                 static_cast<unsigned>(FrameFailureReason),
-                R30SupportDirectTransportRingBackpressureCount());
+                static_cast<std::uint64_t>(DirectTransportRingBackpressure));
 
             if (Settings::VREvidenceTraceMatrices)
             {
