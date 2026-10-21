@@ -497,7 +497,7 @@ async def export_unapproved_k_candidates(page, active, root):
         return "EXISTING_CANDIDATES_VERIFIED"
     entries=await page.evaluate(r"""task=>{
       const text=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
-       .find(n=>(n.innerText||'').includes('UPLOAD_TASK_ID='+task));
+       .find(n=>((n.innerText||'').includes('BATCH_ID='+task)||(n.innerText||'').includes('UPLOAD_TASK_ID='+task)));
       const turn=text?.closest('[data-turn-key]');
       if(!turn)return[];
       // ChatGPT renders N generated images as ONE large preview plus N image
@@ -638,7 +638,7 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             result=await page.evaluate(r"""async ({task,expected})=>{
           if(location.hostname!=='chatgpt.com'|| !location.pathname.includes('/c/'))return{error:'NOT_CHAT'};
           const usr=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
-            .find(n=>(n.innerText||'').includes('UPLOAD_TASK_ID='+task));
+            .find(n=>((n.innerText||'').includes('BATCH_ID='+task)||(n.innerText||'').includes('UPLOAD_TASK_ID='+task)));
           const turn=usr?.closest('[data-turn-key]');
           if(!turn)return{error:'USER_TURN_MISSING'};
           const buttons=[...turn.querySelectorAll('button[aria-label^="Show generated image "]')];
@@ -682,9 +682,10 @@ async def inspect_slot(role, page, root="/data/imagegen"):
             return False, "IMAGEGEN_STILL_RUNNING"
         if result.get("count") != expected:
             observed=result.get("count")
-            if expected == 5 and observed == 1:
+            if (expected == 5 and isinstance(observed,int) and
+                0 < observed < expected):
                 retried,msg=_retry_same_five(
-                    st,active,root,"IMAGEGEN_SINGLE_OF_FIVE",observed=1)
+                    st,active,root,"IMAGEGEN_INCOMPLETE_FIVE",observed=observed)
                 if retried:
                     return True,msg
                 return False,msg
