@@ -895,12 +895,11 @@ namespace OutRunVRStereo
 			const HRESULT hr = R9ResetCallbackHook.stdcall<HRESULT>(device, params);
             if (Settings::VREvidenceTrace)
                 spdlog::info(
-                    "VR EVIDENCE RESET POST present={} device={} hr=0x{:08X} gameDevice={} trackedDepth={} recoveryPending={}",
+                    "VR EVIDENCE RESET POST present={} device={} hr=0x{:08X} gameDevice={} trackedDepth={} expectMainDepth={}",
                     PresentEpoch, static_cast<const void*>(device),
                     static_cast<unsigned>(hr), IsGameDevice(device) ? 1 : 0,
                     static_cast<const void*>(TrackedDepthStencil),
-                    OutRunVR::RuntimeEligibility::RecoveryPending.load(
-                        std::memory_order_acquire) ? 1 : 0);
+                    R9ExpectMainDepthAfterReset ? 1 : 0);
 			if (SUCCEEDED(hr) && IsGameDevice(device) && TrackedDepthStencil)
 			{
 				R9CaptureMainDepth(TrackedDepthStencil, "reset-complete");
