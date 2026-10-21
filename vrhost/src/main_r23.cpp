@@ -76,6 +76,31 @@
 
 namespace
 {
+    bool R23EvidenceTraceEnabled() noexcept
+    {
+        static const bool enabled = [] {
+            char value[32]{};
+            const DWORD n = GetEnvironmentVariableA(
+                "OUTRUN_VR_EVIDENCE_TRACE", value,
+                static_cast<DWORD>(std::size(value)));
+            if (!n || n >= std::size(value))
+                return false;
+            return _stricmp(value, "1") == 0 ||
+                _stricmp(value, "true") == 0 ||
+                _stricmp(value, "on") == 0 ||
+                _stricmp(value, "yes") == 0;
+        }();
+        return enabled;
+    }
+
+    std::ofstream& R23EvidenceFile()
+    {
+        static std::ofstream file(
+            "outrun-vr-evidence-host.log",
+            std::ios::out | std::ios::app);
+        return file;
+    }
+
     // Read the GAME process's UI settings, not the x64 host's working
     // directory. The game can live in another folder/drive. Missing config,
     // inaccessible process, or a transient Reset never guesses letterboxing.
@@ -3588,6 +3613,82 @@ int main(int argc, char** argv)
             R23Pixels.NoteFinalSubmission();
             CheckXr(endResult, "xrEndFrame");
             const double endFrameMs = timings.Ms(es, ee);
+            if (R23EvidenceTraceEnabled())
+            {
+                static std::uint64_t evidenceSeq = 0;
+                ++evidenceSeq;
+                const auto& left = views[0];
+                const auto& right = views[1];
+                std::ostringstream e;
+                e << "[VR EVIDENCE XR] seq=" << evidenceSeq
+                  << " hostBuild=" << OUTRUN_VR_BUILD_SHA
+                  << " hostPid=" << GetCurrentProcessId()
+                  << " gamePid=" << gamePid
+                  << " predictedDisplayTime=" << fs.predictedDisplayTime
+                  << " predictedDisplayPeriod=" << fs.predictedDisplayPeriod
+                  << " shouldRender=" << (fs.shouldRender ? 1 : 0)
+                  << " requestedLayer=" << finalLayerKind
+                  << " layerReady=" << (layerReady ? 1 : 0)
+                  << " intentionalMono=" << (intentionalMonoProjection ? 1 : 0)
+                  << " frameFresh=" << (frameFreshProjection ? 1 : 0)
+                  << " frameCached=" << (frameCachedProjection ? 1 : 0)
+                  << " candidateFrame=" << candidateGameFrameId
+                  << " candidatePose=" << candidatePoseSequence
+                  << " candidateReject=" << candidateRejectReason
+                  << " candidatePresentQpc=" << candidateGamePresentQpc
+                  << " captureQpc=" << candidateCaptureQpc
+                  << " captureAgeMs=" << candidateCaptureAgeMs
+                  << " consumeAgeMs=" << candidateConsumeAgeMs
+                  << " captureMs=" << candidateCaptureMs
+                  << " copyMs=" << candidateCommitCopyMs
+                  << " renderMs=" << frameRenderMs
+                  << " xrWaitMs=" << xrWaitFrameMs
+                  << " xrEndMs=" << endFrameMs
+                  << " xrEndResult=" << static_cast<long long>(endResult)
+                  << " actualFinal=" << actualFinalLayerKind
+                  << " actualFrame=" << actualSubmittedFrameId
+                  << " actualSourceKind=" << actualSubmittedSourceKind
+                  << " actualLayer=" << (actualSubmittedLayer ? 1 : 0)
+                  << " leftPos=" << left.pose.position.x << ','
+                    << left.pose.position.y << ',' << left.pose.position.z
+                  << " leftOri=" << left.pose.orientation.x << ','
+                    << left.pose.orientation.y << ','
+                    << left.pose.orientation.z << ','
+                    << left.pose.orientation.w
+                  << " leftFov=" << left.fov.angleLeft << ','
+                    << left.fov.angleRight << ','
+                    << left.fov.angleUp << ','
+                    << left.fov.angleDown
+                  << " rightPos=" << right.pose.position.x << ','
+                    << right.pose.position.y << ',' << right.pose.position.z
+                  << " rightOri=" << right.pose.orientation.x << ','
+                    << right.pose.orientation.y << ','
+                    << right.pose.orientation.z << ','
+                    << right.pose.orientation.w
+                  << " rightFov=" << right.fov.angleLeft << ','
+                    << right.fov.angleRight << ','
+                    << right.fov.angleUp << ','
+                    << right.fov.angleDown
+                  << " leftSubImage=" << pv[0].subImage.imageRect.offset.x << ','
+                    << pv[0].subImage.imageRect.offset.y << ','
+                    << pv[0].subImage.imageRect.extent.width << ','
+                    << pv[0].subImage.imageRect.extent.height << ','
+                    << pv[0].subImage.imageArrayIndex
+                  << " rightSubImage=" << pv[1].subImage.imageRect.offset.x << ','
+                    << pv[1].subImage.imageRect.offset.y << ','
+                    << pv[1].subImage.imageRect.extent.width << ','
+                    << pv[1].subImage.imageRect.extent.height << ','
+                    << pv[1].subImage.imageArrayIndex
+                  << '\n';
+                const std::string line = e.str();
+                std::cout << line;
+                auto& file = R23EvidenceFile();
+                if (file.is_open())
+                {
+                    file << line;
+                    file.flush();
+                }
+            }
             timings.end.Add(endFrameMs);
             cadence.NoteFrame(frameFreshProjection,
                 frameCachedProjection, layerReady,
