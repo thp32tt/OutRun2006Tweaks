@@ -16,9 +16,9 @@ def integrated(x,h):
     except ValueError:
         return False
     return all((
-        "(static_cast<unsigned>(captured.texture != nullptr) +
+        """(static_cast<unsigned>(captured.texture != nullptr) +
              static_cast<unsigned>(captured.cubeTexture != nullptr) +
-             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u" in block,
+             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u""" in block,
         "captured.volumeTexture != nullptr" in block,
         "captured.cubeTexture != nullptr" in block,
         "captured.cubeTexture.Get()" in block,
@@ -39,9 +39,9 @@ def integrated(x,h):
 assert integrated(src,hdr)
 for needle in ("captured.cubeTexture.Get()","captured.cubeTexture->GetLevelCount()",
                "create_game_sampler(device, captured, previous.levels, sampler)",
-               "(static_cast<unsigned>(captured.texture != nullptr) +
+               """(static_cast<unsigned>(captured.texture != nullptr) +
              static_cast<unsigned>(captured.cubeTexture != nullptr) +
-             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u",
+             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u""",
                "captured.volumeTexture != nullptr",
                "mirror_cube_texture(dev, capture, view, sampler)"):
     assert not integrated(src.replace(needle,"/* removed */",1),hdr),needle

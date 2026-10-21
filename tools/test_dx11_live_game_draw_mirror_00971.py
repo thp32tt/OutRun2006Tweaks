@@ -22,9 +22,9 @@ def integrated(x):
         "view = previous.view" in block,
         "mirror_texture(device, captured, view, sampler)" in block,
         "captured.texture->GetLevelCount()" in block,
-        "(static_cast<unsigned>(captured.texture != nullptr) +
+        """(static_cast<unsigned>(captured.texture != nullptr) +
              static_cast<unsigned>(captured.cubeTexture != nullptr) +
-             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u" in block,
+             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u""" in block,
         "drawMirrors[drawMirrorCount++] = {key, levels, view};" in block,
         start < v < p < draw,
         "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in x,
@@ -37,9 +37,9 @@ assert integrated(src)
 for needle in ("draw_mirror_cache::same_view(key, previous.key)",
                "create_game_sampler(device, captured, previous.levels, sampler)",
                "view = previous.view",
-               "(static_cast<unsigned>(captured.texture != nullptr) +
+               """(static_cast<unsigned>(captured.texture != nullptr) +
              static_cast<unsigned>(captured.cubeTexture != nullptr) +
-             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u",
+             static_cast<unsigned>(captured.volumeTexture != nullptr)) != 1u""",
                "!mirrorLiveSampler(capture, views[slot], samplers[slot])"):
     assert needle in src
     assert not integrated(src.replace(needle,"/* removed */",1)), needle
