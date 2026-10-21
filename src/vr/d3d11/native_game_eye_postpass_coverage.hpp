@@ -59,9 +59,12 @@ public:
     // old proof would publish a partially foreign menu/vehicle/race XR eye.
     // Preserve unaffected tiles, with a conservative reset on fragmentation
     // overflow so the authoritative D3D9 renderer remains the fallback.
-    void invalidate(NativeGameOffscreenColorRegion overwritten) noexcept {
+    // Return whether the exact remaining region ledger was retained.
+    // A proven-color ledger may safely drop all proof on overflow, but an
+    // *unproven* overwrite ledger must latch fail-closed instead.
+    [[nodiscard]] bool invalidate(NativeGameOffscreenColorRegion overwritten) noexcept {
         if (!native_game_offscreen_color_region_valid(overwritten) || !count_)
-            return;
+            return true;
         std::array<NativeGameOffscreenColorRegion, kCapacity> survivors{};
         std::size_t kept = 0u;
         const auto retain = [&](NativeGameOffscreenColorRegion fragment) noexcept {
@@ -74,7 +77,7 @@ public:
         for (std::size_t i = 0u; i < count_; ++i) {
             const auto existing = regions_[i];
             if (!native_game_offscreen_color_regions_intersect(existing, overwritten)) {
-                if (!retain(existing)) { reset(); return; }
+                if (!retain(existing)) { reset(); return false; }
                 continue;
             }
             const NativeGameOffscreenColorRegion hit{
@@ -90,12 +93,14 @@ public:
                 !retain({existing.left, hit.top, hit.left, hit.bottom}) ||
                 !retain({hit.right, hit.top, existing.right, hit.bottom})) {
                 reset();
-                return;
+                return false;
             }
         }
         regions_ = survivors;
         count_ = kept;
+        return true;
     }
+    [[nodiscard]] bool empty() const noexcept { return count_ == 0u; }
     [[nodiscard]] bool at_capacity() const noexcept { return count_ >= kCapacity; }
     [[nodiscard]] bool full_eye(std::uint32_t width,
                                 std::uint32_t height) const noexcept {
@@ -117,13 +122,34 @@ public:
         postpasses_.reset();
         unprovenGpuRegions_.reset();
         unknownLedgerOverflow_ = false;
+        completeUnknownReplacement_ = false;
     }
+    // Physically later native GPU camera pixels supersede earlier foreign
+    // pixels, but only for their exact clipped destination rectangle.
     void record_proven_gpu_postpass(NativeGameOffscreenColorRegion dest) noexcept {
-        postpasses_.record(dest);
-    }
-    void record_unproven_gpu_postpass(NativeGameOffscreenColorRegion dest) noexcept {
         if (!native_game_offscreen_color_region_valid(dest)) return;
-        postpasses_.invalidate(dest);
+        if (!unprovenGpuRegions_.invalidate(dest))
+            unknownLedgerOverflow_ = true;
+        postpasses_.record(dest);
+        if (unprovenGpuRegions_.empty() && !unknownLedgerOverflow_)
+            completeUnknownReplacement_ = false;
+    }
+    // Actual game TARGET Clears repaint their clipped pixels. They do not
+    // constitute a camera Copy/Stretch, so they must REMOVE rather than
+    // manufacture source-proven GPU postpass coverage.
+    void record_authored_target_clear(NativeGameOffscreenColorRegion dest) noexcept {
+        if (!native_game_offscreen_color_region_valid(dest)) return;
+        (void)postpasses_.invalidate(dest);
+        if (!unprovenGpuRegions_.invalidate(dest))
+            unknownLedgerOverflow_ = true;
+        if (unprovenGpuRegions_.empty() && !unknownLedgerOverflow_)
+            completeUnknownReplacement_ = false;
+    }
+    void record_unproven_gpu_postpass(
+        NativeGameOffscreenColorRegion dest,
+        std::uint32_t eyeWidth = 0u, std::uint32_t eyeHeight = 0u) noexcept {
+        if (!native_game_offscreen_color_region_valid(dest)) return;
+        (void)postpasses_.invalidate(dest);
         // Later partial geometry cannot prove it repainted the foreign
         // region. Keep the native XR frame fail-closed until source-proven
         // GPU work covers the entire eye, or a real full-eye Clear resets it.
@@ -136,6 +162,13 @@ public:
         if (unprovenGpuRegions_.at_capacity())
             unknownLedgerOverflow_ = true;
         unprovenGpuRegions_.record(dest);
+        // Once untracked GPU work has physically replaced the entire eye,
+        // a later tiny authentic paint cannot make the unknown remainder safe.
+        // Latch this fact across subsequent partial Clear/Copy/Stretch writes;
+        // clear it only after every unknown pixel was actually repainted.
+        if (eyeWidth && eyeHeight &&
+            unprovenGpuRegions_.full_eye(eyeWidth, eyeHeight))
+            completeUnknownReplacement_ = true;
     }
     [[nodiscard]] bool full_postpass_eye(std::uint32_t width,
                                          std::uint32_t height) const noexcept {
@@ -143,7 +176,7 @@ public:
     }
     [[nodiscard]] bool publication_safe(std::uint32_t width,
                                         std::uint32_t height) const noexcept {
-        return (!unknownLedgerOverflow_ &&
+        return (!unknownLedgerOverflow_ && !completeUnknownReplacement_ &&
                 !unprovenGpuRegions_.full_eye(width, height)) ||
                postpasses_.full_eye(width, height);
     }
@@ -151,5 +184,6 @@ private:
     NativeGameEyePostpassCoverage postpasses_{};
     NativeGameEyePostpassCoverage unprovenGpuRegions_{};
     bool unknownLedgerOverflow_{};
+    bool completeUnknownReplacement_{};
 };
 } // namespace outrun::vr::dx11

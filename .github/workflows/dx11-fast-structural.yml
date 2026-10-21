@@ -83,6 +83,8 @@ jobs:
           python tools/test_dx11_native_eye_postpass_overwrite_00988.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_color_chronology_00989.cpp -o /tmp/dx11_eye_chronology_00989 && /tmp/dx11_eye_chronology_00989
           python tools/test_dx11_native_eye_color_chronology_00989.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_native_eye_clear_recovery_00990.cpp -o /tmp/dx11_eye_clear_recovery_00990 && /tmp/dx11_eye_clear_recovery_00990
+          python tools/test_dx11_native_eye_clear_recovery_00990.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_safe_composite_00986.cpp -o /tmp/dx11_camera_safe_composite_00986 && /tmp/dx11_camera_safe_composite_00986
           python tools/test_dx11_game_camera_safe_composite_00986.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_camera_mosaic_postpass_00985.cpp -o /tmp/dx11_camera_mosaic_00985 && /tmp/dx11_camera_mosaic_00985

@@ -1214,7 +1214,8 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 // Real GPU Copy may import an untracked game intermediate.
                 // Preserve the Copy, but it overwrote any earlier certified
                 // color in this destination. Invalidate BEFORE publication.
-                eyeColorChronology_.record_unproven_gpu_postpass(visibleDest);
+                eyeColorChronology_.record_unproven_gpu_postpass(
+                    visibleDest, targetWidth_, targetHeight_);
             }
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
@@ -1275,7 +1276,8 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 // no longer current until authentic game color repaints it.
                 eyeColorChronology_.record_unproven_gpu_postpass(
                     {visibleDest.left, visibleDest.top,
-                     visibleDest.right, visibleDest.bottom});
+                     visibleDest.right, visibleDest.bottom},
+                    targetWidth_, targetHeight_);
             }
         } else {
             return false; // Reject unrecognized source commands, never fabricate a Clear.
@@ -1458,6 +1460,15 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
             eyeColorChronology_.reset_after_full_target_clear();
             unpredicatedAtLastFullClear_ = unpredicatedGameDrawCount_;
             unpredicatedEyeAtLastFullClear_ = unpredicatedEyeDrawCount_;
+        } else if (actual) {
+            // Real clipped D3D9 TARGET Clear occurred AFTER game GPU
+            // postpasses: its native RTV pixels replace unknown/old camera
+            // pixels without borrowing Draw or Copy/Stretch coverage.
+            eyeColorChronology_.record_authored_target_clear({
+                static_cast<std::uint32_t>(actual->left),
+                static_cast<std::uint32_t>(actual->top),
+                static_cast<std::uint32_t>(actual->right),
+                static_cast<std::uint32_t>(actual->bottom)});
         }
     }
     return written;
