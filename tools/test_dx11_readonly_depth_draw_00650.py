@@ -25,7 +25,10 @@ def connected(cpp: str, adm: str) -> bool:
         'game_native_depth_slot(',
         'output.nativeDepthWrite, output.nativeDepthLessEqual',
         'ctx->OMSetDepthStencilState(',
-        'ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());',
+        'ID3D11RenderTargetView* gameRtv = output.nativeSrgbWrite',
+         '? s.backend.color_rtv_srgb() : s.backend.color_rtv();',
+         'ctx->OMSetRenderTargets(1u, &gameRtv,',
+         'output.nativeDepthTest ? s.diagnosticDepthView.Get() : nullptr',
         'ctx->DrawIndexed(indexCount, 0, 0);',
         'ctx->Draw(static_cast<UINT>(vertices.size()), 0);',
     )
