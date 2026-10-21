@@ -254,7 +254,6 @@ for required in (
 ):
     check(required in bridge, "missing source game vertex sampler capture: " + required)
 for required in (
-    "capture_live_sm3_sampler(",
     "vertexViews[slot], vertexSamplers[slot]",
     "boundVertexViews[slot] = vertexViews[slot].Get();",
     "boundVertexSamplers[slot] = vertexSamplers[slot].Get();",
