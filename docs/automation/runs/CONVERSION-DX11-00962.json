@@ -57,8 +57,8 @@
       "LIVE_D3D9_CALLSITE",
       "GAME_SM3_TEXLDD_TEXLDL",
       "HLSL_TRANSLATION_AND_TEXTURE_BIND",
-      "NATIVE_D3D11_DRAW",
-      "VISIBLE_NATIVE_FRAME_UNTESTED"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "SOURCE_ONLY: compiled native Draw translation proven with exact-SHA CI; live-game pixels, menu/car/race parity, frame count and HMD remain UNTESTED.",
     "activation_guard_and_fallback": "Native opt-in only; original D3D9Ex game rendering, input/FFB and SkyGlow unchanged; frozen DXVK untouched."
