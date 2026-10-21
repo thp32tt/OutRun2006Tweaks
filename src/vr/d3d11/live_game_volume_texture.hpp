@@ -25,8 +25,9 @@ inline bool mirror_image(ID3D11Device* device, IDirect3DVolumeTexture9* source,
         (base.Usage & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL |
                        D3DUSAGE_AUTOGENMIPMAP)) != 0u ||
         !live_game_mip_lod::select(
-             chain ? sourceLevels : 1u, chain,
-             source->GetLOD(), maxMip).valid) return false;
+             live_game_mip_lod::captured_levels(sourceLevels, chain,
+                                                   source->GetLOD()),
+             chain, source->GetLOD(), maxMip).valid) return false;
     // Preserve actual game sample channels across 8-bit swizzles, dynamic
     // volume writes and half-float scalar/RGBA 3D shader sources.
     const PixelLayout layout =
@@ -44,7 +45,8 @@ inline bool mirror_image(ID3D11Device* device, IDirect3DVolumeTexture9* source,
         DXGI_FORMAT_R16_FLOAT : layout == PixelLayout::rgba16f ?
         DXGI_FORMAT_R16G16B16A16_FLOAT : srgb ?
         DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
-    const UINT levels = chain ? sourceLevels : 1u;
+    const UINT levels = live_game_mip_lod::captured_levels(
+        sourceLevels, chain, source->GetLOD());
     if (!bounded_chain_bytes(base.Width, base.Height, base.Depth, levels, bpp))
         return false;
     std::vector<std::vector<std::uint8_t>> copies(levels);

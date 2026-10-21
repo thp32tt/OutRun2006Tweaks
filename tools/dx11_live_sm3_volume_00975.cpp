@@ -17,6 +17,14 @@ int main() {
     static_assert(select(6u, true, 1u, 3u).minLevel == 3u);
     static_assert(select(6u, true, 1u, 3u).maxLevel == 5u);
     static_assert(select(1u, false, 0u, 0u).valid);
+    // Non-mip point sampling must use SetLOD(3)'s real managed source mip.
+    static_assert(captured_levels(6u, false, 3u) == 4u);
+    static_assert(captured_levels(6u, true, 3u) == 6u);
+    static_assert(captured_levels(6u, false, 6u) == 0u);
+    static_assert(select(4u, false, 3u, 0u).valid);
+    static_assert(select(4u, false, 3u, 0u).minLevel == 3u);
+    static_assert(select(4u, false, 3u, 0u).maxLevel == 3u);
+    static_assert(!select(4u, false, 3u, 1u).valid);
     static_assert(!select(6u, true, 6u, 0u).valid);
     static_assert(!select(6u, true, 0u, 6u).valid);
     static_assert(!select(1u, false, 1u, 0u).valid);

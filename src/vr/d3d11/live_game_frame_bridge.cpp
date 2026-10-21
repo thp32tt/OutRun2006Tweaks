@@ -3973,7 +3973,8 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     if (!lod.valid) return false;
     D3D11_SAMPLER_DESC state{};
     // Independent D3D9 MIN/MAG filtering with point or linear mip selection. For
-    // MIPFILTER=NONE force LOD 0 even if the source has additional mips.
+    // MIPFILTER=NONE pins sampling to the managed source LOD even when
+    // the actual game source exposes more mip levels.
     state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
         (capture.magFilter == D3DTEXF_LINEAR ?
             D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
@@ -4025,7 +4026,8 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
         capture.mipLodBias < kMinMipLodBias || capture.mipLodBias > kMaxMipLodBias ||
         (!usesMips && capture.mipLodBias != 0.0f)) return false;
     // D3D9 MAXMIPLEVEL discards finer (lower-indexed) mip levels.
-    // D3D11 MinLOD clamps to that same source level; all levels are mirrored.
+    // MIPFILTER=NONE pins both native sampler bounds to the real
+    // selected source level; no guessing or source-level promotion.
     state.MinLOD = static_cast<float>(lod.minLevel);
     state.MaxLOD = static_cast<float>(lod.maxLevel);
     state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;
@@ -4095,7 +4097,8 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                            cubeColor, capture.srgbTexture)) return false;
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
-    const UINT uploadedLevels = usesMips ? levels : 1u;
+    const UINT uploadedLevels = live_game_mip_lod::captured_levels(
+        levels, usesMips, capture.cubeTexture->GetLOD());
     // Live managed cube LOD may discard finer faces; retain full snapshots
     // and let the native sampler select the same coarsest permitted face/mip.
     if (!live_game_mip_lod::select(uploadedLevels, usesMips,
@@ -4268,7 +4271,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // AUTOGENMIPMAP exposes one level to LockRect even though the D3D9
     // sampler consumes generated levels. Never claim those mips were copied.
     if (usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)) return false;
-    const UINT levels = usesMips ? sourceLevels : 1u;
+    const UINT levels = live_game_mip_lod::captured_levels(
+        sourceLevels, usesMips, capture.texture->GetLOD());
     // Managed 2D menu/car/race sources can expose an intentional streaming
     // LOD. Native Draw/DrawIndexed keeps the same bound without dropping
     // source subresources or accidentally restoring finer detail.
@@ -5801,8 +5805,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                 second.mipFilter != D3DTEXF_NONE,
                 sampledView.Get() != nullptr && sampledSampler.Get() != nullptr)) {
             const UINT sourceLevels = capture.texture->GetLevelCount();
-            const UINT mirroredLevels =
-                capture.mipFilter != D3DTEXF_NONE ? sourceLevels : 1u;
+            const UINT mirroredLevels = live_game_mip_lod::captured_levels(
+                sourceLevels, capture.mipFilter != D3DTEXF_NONE,
+                capture.texture->GetLOD());
             if (!create_game_sampler(dev, second, mirroredLevels, stage1Sampler))
                 return false;
             stage1View = sampledView;
