@@ -1,4 +1,5 @@
 #include "../src/vr/d3d11/live_game_volume_budget.hpp"
+#include "../src/vr/d3d11/live_game_volume_pixels.hpp"
 #include "../src/vr/d3d11/live_game_draw_mirror_cache.hpp"
 #include "../src/vr/d3d11/native_sm3_texture_codegen.hpp"
 #include <cassert>
@@ -7,6 +8,27 @@ using namespace outrun::vr::dx11;
 using namespace outrun::vr::dx11::live_game_frame;
 int main() {
     using namespace live_volume;
+    static_assert(bounded_chain_bytes(4u, 2u, 2u, 3u, 8u));
+    static_assert(!bounded_chain_bytes(512u, 512u, 256u, 10u, 8u));
+    static_assert(bytes_per_texel(PixelLayout::r16f) == 2u);
+    static_assert(bytes_per_texel(PixelLayout::rgba16f) == 8u);
+    static_assert(bytes_per_texel(PixelLayout::unsupported) == 0u);
+    const std::uint8_t source[8]{1,2,3,4,5,6,7,8};
+    std::uint8_t dest[8]{};
+    assert(convert_row(source, dest, 2u, PixelLayout::bgra8));
+    assert(dest[0] == 3u && dest[2] == 1u && dest[3] == 4u);
+    assert(dest[4] == 7u && dest[6] == 5u && dest[7] == 8u);
+    assert(convert_row(source, dest, 2u, PixelLayout::bgrx8));
+    assert(dest[3] == 255u && dest[7] == 255u);
+    assert(convert_row(source, dest, 2u, PixelLayout::rgba8));
+    assert(dest[0] == 1u && dest[2] == 3u && dest[3] == 4u);
+    assert(convert_row(source, dest, 2u, PixelLayout::rgbx8));
+    assert(dest[3] == 255u && dest[7] == 255u);
+    assert(convert_row(source, dest, 1u, PixelLayout::r16f));
+    assert(dest[0] == 1u && dest[1] == 2u);
+    assert(convert_row(source, dest, 1u, PixelLayout::rgba16f));
+    assert(dest[0] == 1u && dest[7] == 8u);
+    assert(!convert_row(source, dest, 2u, PixelLayout::unsupported));
     static_assert(bounded_chain(4u,2u,2u,3u));
     static_assert(!bounded_chain(512u,512u,256u,10u));
     static_assert(!bounded_chain(0u,2u,2u,1u));

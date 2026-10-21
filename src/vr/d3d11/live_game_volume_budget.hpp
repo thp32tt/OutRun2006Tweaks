@@ -1,10 +1,10 @@
 #pragma once
 #include <cstdint>
 namespace outrun::vr::dx11::live_game_frame::live_volume {
-[[nodiscard]] constexpr bool bounded_chain(std::uint32_t w, std::uint32_t h,
- std::uint32_t d, std::uint32_t levels) noexcept {
+[[nodiscard]] constexpr bool bounded_chain_bytes(std::uint32_t w, std::uint32_t h,
+ std::uint32_t d, std::uint32_t levels, std::uint32_t bpp) noexcept {
     if (!w || !h || !d || w > 512u || h > 512u || d > 256u ||
-        !levels || levels > 10u) return false;
+        !levels || levels > 10u || bpp == 0u || bpp > 16u) return false;
     auto largest = w > h ? w : h;
     if (d > largest) largest = d;
     std::uint32_t possible = 0;
@@ -16,11 +16,15 @@ namespace outrun::vr::dx11::live_game_frame::live_volume {
         const auto x = (w >> mip) ? (w >> mip) : 1u;
         const auto y = (h >> mip) ? (h >> mip) : 1u;
         const auto z = (d >> mip) ? (d >> mip) : 1u;
-        const auto bytes = static_cast<std::uint64_t>(x) * y * z * 4u;
+        const auto bytes = static_cast<std::uint64_t>(x) * y * z * bpp;
         if (bytes > limit - used) return false;
         used += bytes;
     }
     return true;
+}
+[[nodiscard]] constexpr bool bounded_chain(std::uint32_t w, std::uint32_t h,
+ std::uint32_t d, std::uint32_t levels) noexcept {
+    return bounded_chain_bytes(w, h, d, levels, 4u);
 }
 [[nodiscard]] constexpr bool matching_mip(std::uint32_t w, std::uint32_t h,
  std::uint32_t d, std::uint32_t mip, std::uint32_t x,
