@@ -3363,6 +3363,27 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     inline static std::atomic<std::uint64_t> GoalFallbacks{ 0 };
     inline static std::atomic<std::uint64_t> EvidenceSeq{ 0 };
 
+    static bool EvidenceTargetProducer(
+        OutRunVR::GameSemantic::ProducerToken producer) noexcept
+    {
+        using OutRunVR::GameSemantic::ProducerToken;
+        switch (producer)
+        {
+        case ProducerToken::RivalMarkerSprani:
+        case ProducerToken::StageExtensionTime:
+        case ProducerToken::GoalTimeHelper:
+        case ProducerToken::GoalTime020:
+        case ProducerToken::GoalTime150:
+        case ProducerToken::ResultProgress:
+        case ProducerToken::ResultTextB9200:
+        case ProducerToken::OutRunStagePrintf:
+        case ProducerToken::LensFlareCentre:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     static void EvidenceD3DX(const char* event, void* self,
         HRESULT hr = S_OK, IDirect3DTexture9* texture = nullptr,
         const RECT* rect = nullptr, const D3DVECTOR* center = nullptr,
@@ -3370,9 +3391,21 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     {
         if (!Settings::VREvidenceTrace)
             return;
-        const auto seq = EvidenceSeq.fetch_add(1, std::memory_order_relaxed) + 1;
         const auto command =
             OutRunVR::GameSemantic::CapturePhysicalDrawCommand();
+        const bool lifecycle =
+            event && (event[0] == 'L' || event[0] == 'R');
+        const bool targeted =
+            lifecycle ||
+            EvidenceTargetProducer(HudBatch.producer) ||
+            EvidenceTargetProducer(command.producer) ||
+            command.scope ==
+                OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+            command.scope ==
+                OutRunVR::GameSemantic::RenderScope::SceneEffect;
+        if (!targeted)
+            return;
+        const auto seq = EvidenceSeq.fetch_add(1, std::memory_order_relaxed) + 1;
         spdlog::info(
             "VR EVIDENCE D3DX seq={} event={} self={} liveSprite={} hr=0x{:08X} active={} generation={} draws={} homogeneous={} scope={} producer={} queued={} qnode={} qepoch={} boundaryReady={} directB9200={} cmdScope={} cmdProducer={} cmdQueued={} cmdNode={} cmdEpoch={} texture={} rect={},{},{},{} center={},{},{} pos={},{},{} colorOwnerStage={} colorOwnerGoal={}",
             seq, event, self, *Module::exe_ptr<void*>(0x55B218),
