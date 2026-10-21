@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: dx9ex-oct21-standalone-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-test-zip:
