@@ -116,6 +116,18 @@ namespace OutRunVRD3D9ExUpgradeR13
         IDirect3DDevice9* R14RegistryDevice = nullptr; // identity only
         thread_local std::uint32_t R14InternalUploadDepth = 0;
 
+        struct R14EvidenceRegistrySnapshot
+        {
+            IDirect3DDevice9* device = nullptr;
+            std::size_t count = 0;
+        };
+
+        R14EvidenceRegistrySnapshot R14EvidenceRegistry() noexcept
+        {
+            std::lock_guard<std::mutex> lock(R14RegistryMutex);
+            return { R14RegistryDevice, R14Shadows.size() };
+        }
+
         std::atomic<std::uint64_t> R14ShadowCreated{0};
         std::atomic<std::uint64_t> R14ShadowCreateFailed{0};
         std::atomic<std::uint64_t> R14DirectOnlyFallbacks{0};
@@ -193,13 +205,16 @@ namespace OutRunVRD3D9ExUpgradeR13
         {
             if (!device) return;
             if (Settings::VREvidenceTrace)
+            {
+                const auto registry = R14EvidenceRegistry();
                 spdlog::info(
                     "VR EVIDENCE R14 ADOPT_DEVICE newDevice={} registryDevice={} shadows={} bytes={} budgetRejects={}",
                     static_cast<const void*>(device),
-                    static_cast<const void*>(R14RegistryDevice),
-                    R14Shadows.size(),
+                    static_cast<const void*>(registry.device),
+                    registry.count,
                     R14ShadowBytes.load(std::memory_order_acquire),
                     R14ShadowBudgetRejects.load(std::memory_order_acquire));
+            }
 
             std::vector<R14EntryPtr> oldDeviceEntries;
             {
@@ -449,6 +464,8 @@ namespace OutRunVRD3D9ExUpgradeR13
 
             ++R14ShadowCreated;
             if (Settings::VREvidenceTrace)
+            {
+                const auto registry = R14EvidenceRegistry();
                 spdlog::info(
                     "VR EVIDENCE R14 TRACK_SHADOW device={} gpu={} cpu={} bytes={} totalBytes={} validMask=0x{:08X} registryCount={}",
                     static_cast<const void*>(device),
@@ -456,7 +473,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                     static_cast<const void*>(cpu),
                     entry->shadowBytes,
                     R14ShadowBytes.load(std::memory_order_acquire),
-                    entry->validMask, R14Shadows.size());
+                    entry->validMask, registry.count);
+            }
             if (!R14FirstActiveLogged.exchange(true))
             {
                 spdlog::info(
@@ -493,11 +511,14 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
             ++R14DirectOnlyFallbacks;
             if (Settings::VREvidenceTrace)
+            {
+                const auto registry = R14EvidenceRegistry();
                 spdlog::info(
                     "VR EVIDENCE R14 TRACK_DIRECT_ONLY device={} gpu={} registryCount={} totalBytes={}",
                     static_cast<const void*>(device),
-                    static_cast<const void*>(gpu), R14Shadows.size(),
+                    static_cast<const void*>(gpu), registry.count,
                     R14ShadowBytes.load(std::memory_order_acquire));
+            }
             return true;
         }
 
@@ -557,12 +578,15 @@ namespace OutRunVRD3D9ExUpgradeR13
             const ULONG remaining =
                 R14TextureReleaseHook.stdcall<ULONG>(texture);
             if (Settings::VREvidenceTrace)
+            {
+                const auto registry = R14EvidenceRegistry();
                 spdlog::info(
                     "VR EVIDENCE R14 RELEASE texture={} remaining={} trackedBefore={} internalReleaseDepth={} registryCount={} totalBytes={}",
                     static_cast<const void*>(texture), remaining,
                     trackedBefore ? 1 : 0, R14InternalReleaseDepth,
-                    R14Shadows.size(),
+                    registry.count,
                     R14ShadowBytes.load(std::memory_order_acquire));
+            }
             if (remaining == 0 && R14InternalReleaseDepth == 0)
                 R14Erase(texture);
             return remaining;
@@ -902,6 +926,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                 device, width, height, levels, usage, format, pool,
                 texture, sharedHandle);
             if (Settings::VREvidenceTrace)
+            {
+                const auto registry = R14EvidenceRegistry();
                 spdlog::info(
                     "VR EVIDENCE R14 CREATE_TEXTURE device={} requested={}x{} levels={} usage=0x{:08X} format={} pool={} hr=0x{:08X} texture={} compat={} shadowBytes={} registryCount={}",
                     static_cast<const void*>(device), width, height, levels,
@@ -911,7 +937,8 @@ namespace OutRunVRD3D9ExUpgradeR13
                         ? static_cast<const void*>(*texture) : nullptr,
                     OutRunVRD3D9ExUpgrade::IsCompatDevice(device) ? 1 : 0,
                     R14ShadowBytes.load(std::memory_order_acquire),
-                    R14Shadows.size());
+                    registry.count);
+            }
             if (FAILED(hr) || pool != D3DPOOL_MANAGED || !texture || !*texture ||
                 !OutRunVRD3D9ExUpgrade::IsCompatDevice(device))
                 return hr;
