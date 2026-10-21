@@ -4,7 +4,11 @@ cpp=(root/"src/vr/d3d11/native_game_stereo_submission.cpp").read_text(encoding="
 hpp=(root/"src/vr/d3d11/native_game_stereo_submission.hpp").read_text(encoding="utf-8")
 cov=(root/"src/vr/d3d11/native_game_eye_postpass_coverage.hpp").read_text(encoding="utf-8")
 replay=cpp[cpp.index("bool NativeGameEyeDrawEncoder::replay_due_source_clears()"):cpp.index("bool NativeGameEyeDrawEncoder::finish_source_clear_timeline()")]
-ready=cpp[cpp.index("if (!live_game_stereo::authored_visible_eye_frame_ready("):]
+# Both the legacy game Draw/postpass gate and the new, strictly
+# evidenced partial-clear mosaic path must remain in the producer admission.
+ready=cpp[cpp.index("const bool partialClearEyeReady ="):]
+assert "live_game_stereo::authored_visible_eye_frame_ready(" in ready
+assert "!partialClearEyeReady" in ready
 assert replay.count("eyeColorChronology_.record_proven_gpu_postpass(")==2
 assert replay.count("if (proven) {")==1
 assert replay.count("if (proven && visibleDest.valid) {")==1
