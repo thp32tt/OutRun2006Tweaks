@@ -3590,7 +3590,6 @@ def main() -> None:
             "minVertex > live::kMaxNativeGameVertices - numVertices",
             "unpacked[i] < minVertex ||",
             "unpacked[i] - minVertex >= numVertices",
-            "static_cast<std::size_t>(minVertex) * stride",
         )
         # The active native SM3 path preserves the original game's absolute
         # source indices until it has captured all secondary VB streams.
@@ -3598,6 +3597,8 @@ def main() -> None:
         # conversion and must not be silently promoted as multistream-ready.
         if renderer.name == "stereo_renderer_r30.cpp":
             required = common + (
+                "game_indexed_up_dense_source_range(",
+                "reinterpret_cast<const std::uint8_t*>(firstAddress)",
                 "std::vector<std::uint32_t> rebasedIndices = unpacked;",
                 "for (auto& index : rebasedIndices) index -= minVertex;",
                 "game_indexed_up_physical_slots(",
@@ -3619,6 +3620,7 @@ def main() -> None:
             )
         else:
             required = common + (
+                "static_cast<std::size_t>(minVertex) * stride",
                 "unpacked[i] -= minVertex;",
                 "firstVertex, stride, numVertices, unpacked.data(), count",
             )
