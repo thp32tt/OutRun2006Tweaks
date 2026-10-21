@@ -115,29 +115,6 @@ namespace OutRunVR::GplShaderFingerprint
         }
     }
 
-    template <typename ShaderT, std::size_t Capacity>
-    inline ShaderHash HashBytecodeCached(
-        ShaderT* shader,
-        std::array<std::pair<std::uintptr_t, ShaderHash>, Capacity>& cache,
-        std::size_t& nextSlot) noexcept
-    {
-        if (!shader)
-            return {};
-
-        const auto identity = reinterpret_cast<std::uintptr_t>(shader);
-        for (const auto& entry : cache)
-            if (entry.first == identity)
-                return entry.second;
-
-        const ShaderHash hash = HashBytecode(shader);
-        if (hash.valid)
-        {
-            cache[nextSlot] = { identity, hash };
-            nextSlot = (nextSlot + 1) % Capacity;
-        }
-        return hash;
-    }
-
     inline ShaderPair CaptureCurrent(IDirect3DDevice9* device) noexcept
     {
         ShaderPair result{};
@@ -158,19 +135,14 @@ namespace OutRunVR::GplShaderFingerprint
         result.vertexIdentity = reinterpret_cast<std::uintptr_t>(vertex);
         result.pixelIdentity = reinterpret_cast<std::uintptr_t>(pixel);
 
-        // D3D9 rendering for OutRun is effectively render-thread owned here.
-        // Keep the cache protected anyway so diagnostics remain safe if a
-        // wrapper/runtime changes call threading later.
-        static std::mutex cacheMutex;
-        static std::array<std::pair<std::uintptr_t, ShaderHash>, 256> vsCache{};
-        static std::array<std::pair<std::uintptr_t, ShaderHash>, 256> psCache{};
-        static std::size_t vsNext = 0;
-        static std::size_t psNext = 0;
-        {
-            std::lock_guard<std::mutex> lock(cacheMutex);
-            result.vertex = HashBytecodeCached(vertex, vsCache, vsNext);
-            result.pixel = HashBytecodeCached(pixel, psCache, psNext);
-        }
+        // Opt-in fingerprint diagnostics must never reuse a bytecode hash
+        // solely by COM pointer. Reset/Release can recycle the same address
+        // for a *different* shader. Obtain bytecode from the live referenced
+        // object instead: CaptureCurrent is used for diagnostic tracing, not
+        // the production per-draw fast path. The independent bounded Seen
+        // cache below is keyed by resulting bytecode hashes, not pointers.
+        result.vertex = HashBytecode(vertex);
+        result.pixel = HashBytecode(pixel);
 
         if (vertex) vertex->Release();
         if (pixel) pixel->Release();
