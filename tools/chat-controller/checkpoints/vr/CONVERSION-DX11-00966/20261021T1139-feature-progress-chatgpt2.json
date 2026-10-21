@@ -1,0 +1,64 @@
+{
+  "schema": 2,
+  "kind": "dx11_feature_progress_checkpoint",
+  "captured_at_kst": "2026-10-21T11:39:07+09:00",
+  "task_id": "CONVERSION-DX11-00966",
+  "production_id": "CONVERSION-DX11-00966",
+  "event_id": "CONVERSION-DX11-00966-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "attempt": "1/3",
+  "lane": "DX11",
+  "feature_id": "DX11:FIRST_VISIBLE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-00966-first-visible-game-frame",
+  "feature_stage": "C2_IMPLEMENT_C3_TARGETED_VALIDATE",
+  "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "feature_last_head": "80080a7f938b3371966638ac51bd13c67d754ecf",
+  "target_branch": "vr-dx11-native-r71",
+  "target_verified_head": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "material_source_sha": "5c49723c184447cc90eb7f7784738d4eebea8773",
+  "causal_ci_repairs": [
+    "0f015639d8e43afd4b5b34b6c213d22cf08ccf37",
+    "80080a7f938b3371966638ac51bd13c67d754ecf"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "feature_goal": "Genuine live D3D9 Draw/DrawIndexed to D3D11 Draw to first observable full game frame with opt-in and DX9Ex fallback; no standalone WARP feature.",
+  "acceptance_results": {
+    "indexedup_multistream_source": "IMPLEMENTED_SOURCE_ONLY",
+    "indexedup_destructive_regression": "CI_RERUN_IN_PROGRESS",
+    "native_draw_and_published_game_frame": "UNTESTED",
+    "original_game_fallback": "SOURCE_PRESERVED_RUNTIME_UNTESTED",
+    "mandatory_five_exact_sha": "NOT_YET_RUN"
+  },
+  "evidence": {
+    "checkout_and_checkpoint": "GITHUB_VERIFIED",
+    "previous_checkpoint": "20261021T1115-periodic.json",
+    "first_build_run": 39533421656,
+    "first_build_failure": "old indexedUP token oracle",
+    "second_build_run": 39533801239,
+    "second_build_failure": "duplicate token destructive mutation false negative",
+    "latest_build_run": 39533963328,
+    "latest_build_state": "IN_PROGRESS_AS_OF_CHECKPOINT",
+    "hud_inspector_win32_build_run": 39533421690,
+    "hud_inspector_win32_compile": "SUCCESS",
+    "r175_owner": "CONVERSION-DX11-00477 COMPLETE_R175_SOURCE_WARP_PARITY"
+  },
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "uncompleted_items": [
+    "Build and focused source regression successful on current feature SHA",
+    "Portable indexed-UP C++ probe compilation and execution",
+    "Mandatory five exact-SHA Actions for ready integrated candidate",
+    "Genuine menu/vehicle/race native game GPU pixels observed with source provenance",
+    "Separate L/R native OpenXR game stereo and HMD/runtime evidence"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Continue same FEATURE_ID: repair only evidence-backed current feature CI error, then implement missing actual-game visible-frame integration using real draw/publish counters. Do not promote target before complete FEATURE_READY and exact-SHA CI. Never duplicate R175 owner.",
+  "no_score_for_rollover": true
+}
