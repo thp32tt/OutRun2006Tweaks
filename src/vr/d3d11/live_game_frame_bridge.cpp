@@ -4121,11 +4121,11 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
                     return false;
             }
             D3DLOCKED_RECT locked{};
-            const HRESULT lockResult = gpuCubeRt
+            const HRESULT cubeFaceLockHr = gpuCubeRt
                 ? readback->LockRect(&locked, nullptr, D3DLOCK_READONLY)
                 : capture.cubeTexture->LockRect(
                       cubeFace, level, &locked, nullptr, D3DLOCK_READONLY);
-            if (FAILED(lockResult)) return false;
+            if (FAILED(cubeFaceLockHr)) return false;
             const bool readable = locked.pBits && locked.Pitch > 0 &&
                 static_cast<std::uint64_t>(locked.Pitch) >= pitch;
             if (readable) {
