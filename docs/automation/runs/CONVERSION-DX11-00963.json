@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00963",
+  "production_id": "CONVERSION-DX11-00963",
+  "event_id": "CONVERSION-DX11-00963-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00963",
+  "feature_id": "DX11:LIVE_FLOAT_TEXTURE_NATIVE_DRAW",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_MATERIAL_COMMITTED_CI_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "REAL_GAME_DRAW_BLOCKER": "2026-10-18 last observed source game native_draws=0; source-level R16F atlas acceptance repaired; no matching live game pixels at this SHA",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Complete five exact-SHA CI Gates, then obtain real menu/car/race screen and gamepad evidence; continue native Draw/OpenXR integration with DX9Ex fallback",
+  "CODE_CHANGED_SHA": "b6288c671c67312ddc67d1aebc897a1b899b54d0",
+  "score_change": 0,
+  "work_time_percentages": "NOT_MEASURED",
+  "material_result_sha": "b6288c671c67312ddc67d1aebc897a1b899b54d0",
+  "validation_bearing_result_sha": null,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_R16F_TEXTURE_LOCKRECT",
+      "NATIVE_FLOAT_TEXTURE_MIP_UPLOAD",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT_SOURCE_ONLY_UNTESTED"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_game_texture_atlas_00699.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "True D3D9 R16F mip row bytes propagate as 2-byte DXGI R16_FLOAT native texture atlas into existing Draw/DrawIndexed path; 4096x2048 full mip remains within 24MiB",
+      "negative_regression": "Over-budget 4-byte 4096x2048 atlas, invalid 3-byte texels, over-budget 4096 square float atlas and unsupported source states remain fail closed; original DX9Ex render/input/FFB preserved",
+      "component_integration": "Game texture GetTexture and LockRect -> exact per-mip source copy -> DXGI R16_FLOAT CreateTexture2D/SRV -> native sampler binding -> guarded native Draw and source-only output"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_FLOAT_TEXTURE_NATIVE_DRAW:CONVERSION-DX11-00963"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_R16F_TEXTURE_LOCKRECT",
+      "NATIVE_D3D11_SHADER_RESOURCE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY: visible frame output is a wired source stage, NOT observed game output. Game pixels and HMD remain UNTESTED; no gameplay promotion until exact SHA real runtime evidence.",
+    "activation_guard_and_fallback": "Native Draw opt-in only; original D3D9/DX9Ex Draw/Present and input/FFB/SkyGlow remain authoritative; frozen DXVK unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_FLOAT_TEXTURE_NATIVE_DRAW",
+    "goal": "Keep real game R16F full-size mip texture assets eligible for native D3D11 Draw/DrawIndexed by preserving exact 16-bit SRV upload budget, guarding unsafe formats and retaining original game fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_game_native_texture_upload",
+        "category": "end_to_end_behavior",
+        "behavior_area": "texture_capture_to_native_gpu_draw",
+        "expected_behavior": "Live D3D9 R16F source rows transfer to D3D11 R16_FLOAT SRV with correct 2-byte full-mip bound before native Draw"
+      },
+      {
+        "id": "fail_closed_atlas_budget",
+        "category": "fallback_regression",
+        "behavior_area": "game_safety_and_fallback",
+        "expected_behavior": "Oversize and incompatible format layouts reject native Draw without affecting original D3D9Ex render/input/FFB"
+      },
+      {
+        "id": "exact_sha_5_gate",
+        "category": "integrated_validation",
+        "behavior_area": "windows_host_backend_openxr_hud",
+        "expected_behavior": "All mandatory five GitHub Actions Gates succeed for same validation-bearing SHA; real game remains separately UNTESTED"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_game_texture_atlas_00699.py",
+    "docs/automation/runs/CONVERSION-DX11-00963.json"
+  ],
+  "acceptance_results": {
+    "live_game_native_texture_upload": "SOURCE_COMMITTED_GATE_PENDING",
+    "fail_closed_atlas_budget": "SOURCE_COMMITTED_GATE_PENDING",
+    "exact_sha_5_gate": "PENDING_EXACT_SHA"
+  },
+  "first_attempt_run": {
+    "material_sha": "b6288c671c67312ddc67d1aebc897a1b899b54d0",
+    "fast_run": 39521445822,
+    "backend_run": 39521445769,
+    "first_attempt_gate_cause": "Prior latest 00962 run record missing required named D3D11_NATIVE_DRAW and VISIBLE_FRAME_OUTPUT path elements; no C++ compile failure in those jobs."
+  },
+  "c6_result_note": "Causal exact-sha acceptance repair only. CI pending; runtime/HMD UNTESTED. Not complete and not independently scored."
+}
