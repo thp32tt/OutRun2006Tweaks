@@ -8,7 +8,7 @@ hook = (r / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text()
 bridge = (r / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 header = (r / "src/vr/d3d11/live_game_source_stride.hpp").read_text()
 assert "stride >= 4u && stride <= 512u" in header
-assert hook.count("game_native_source_stride_valid(stride)") == 4
+assert hook.count("game_native_source_stride_valid(stride)") == 5
 assert "stride < 16 || stride > 512" not in hook
 assert "R30CopyVertexShadow(" in hook and "R30CopySparseVertexShadow(" in hook
 assert "R30CaptureNativeAdditionalStreams(" in hook
