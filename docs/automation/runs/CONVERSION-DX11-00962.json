@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00962",
+  "production_id": "CONVERSION-DX11-00962",
+  "event_id": "CONVERSION-DX11-00962-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00962",
+  "feature_id": "DX11:LIVE_SM3_CONDITIONAL_TEXTURE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "full_dx11_renderer_complete": false,
+  "REAL_GAME_DRAW_BLOCKER": "Last observed 2026-10-18 native_draws=0 (historical runtime). Conditional real-game PS 3.0 texture gradient/LOD branch conversion is source-implemented, but no same-SHA menu/car/race native Draw/pixel evidence exists.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/native_backend.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Obtain matching real-game desktop menu/car/race native Draw and full frame output evidence on exact compiled candidate; retain DX9Ex input/FFB fallback; Quest3/VDXR remains UNTESTED.",
+  "CODE_CHANGED_SHA": "651261b1605363b2bdb44ccb01601058b6bcd32a",
+  "score_change": 1,
+  "work_time_percentages": "NOT_MEASURED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_PS3_CONDITIONAL_TEXLDD_TEXLDL",
+      "NATIVE_HLSL_SAMPLEGRAD_SAMPLELEVEL",
+      "D3D11_NATIVE_DRAW",
+      "GAME_FULL_FRAME_OUTPUT_UNTESTED"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_backend.cpp",
+      "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+      "tools/dx11_sm3_dynamic_texture_flow_probe_00962.cpp",
+      "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Authentic conditional TEXLDD SampleGrad and TEXLDL SampleLevel bind authored game shaders with source/portable C++ positive codegen checks.",
+      "negative_regression": "Implicit derivative TEX/TEXLDP/TEXLDB remains rejected in varying conditional flow; missing gradients, unsupported texture modes fail closed before native Draw; original D3D9Ex game/input/FFB retained.",
+      "component_integration": "D3D9 decoded shader predicate and IFC flow -> source HLSL codegen -> live texture/cbuffer binding -> guarded Draw/DrawIndexed."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_CONDITIONAL_TEXTURE_DRAW:CONVERSION-DX11-00962"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_SM3_TEXLDD_TEXLDL",
+      "HLSL_TRANSLATION_AND_TEXTURE_BIND",
+      "NATIVE_D3D11_DRAW",
+      "VISIBLE_NATIVE_FRAME_UNTESTED"
+    ],
+    "visible_frame_acceptance": "SOURCE_ONLY: compiled native Draw translation proven with exact-SHA CI; live-game pixels, menu/car/race parity, frame count and HMD remain UNTESTED.",
+    "activation_guard_and_fallback": "Native opt-in only; original D3D9Ex game rendering, input/FFB and SkyGlow unchanged; frozen DXVK untouched."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_SM3_CONDITIONAL_TEXTURE_DRAW",
+    "goal": "Translate real game PS 3.0 conditional explicit-gradient and explicit-LOD sampling to native shader-bound D3D11 Draw while preserving unsafe derivative fallback.",
+    "acceptance_items": [
+      {
+        "id": "conditional_explicit_texture",
+        "category": "end_to_end_behavior",
+        "behavior_area": "shader_decoder_and_native_draw",
+        "expected_behavior": "Live game explicit gradient/LOD pixel shader translation emits SampleGrad/Level under IF/predication and binds native live textures before Draw."
+      },
+      {
+        "id": "unsafe_implicit_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_game_input_and_renderer",
+        "expected_behavior": "Implicit-derivative textures within varying flow and invalid gradients are rejected; original D3D9Ex rendering/input/FFB remains authoritative."
+      },
+      {
+        "id": "exact_sha_five_gates",
+        "category": "integrated_validation",
+        "behavior_area": "windows_openxr_hud_backend",
+        "expected_behavior": "All five unmodified mandatory GitHub Actions gates succeed for same final source/CI SHA."
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/native_sm3_texture_codegen.hpp",
+    "tools/dx11_sm3_dynamic_texture_flow_probe_00962.cpp",
+    "tools/test_dx11_sm3_dynamic_texture_flow_00962.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00961.json",
+    "docs/automation/runs/CONVERSION-DX11-00962.json"
+  ],
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "material_result_sha": "651261b1605363b2bdb44ccb01601058b6bcd32a",
+  "validation_bearing_result_sha": "0ca833a5f696f59641fdeca8bb1f406d55786eb2",
+  "acceptance_results": {
+    "conditional_explicit_texture": "PASS_CXX_CODEGEN_AND_EXACT_SHA_5_OF_5",
+    "unsafe_implicit_fallback": "PASS_NEGATIVE_REGRESSION_AND_EXACT_SHA_5_OF_5",
+    "exact_sha_five_gates": "PASS_EXACT_SHA_5_OF_5"
+  },
+  "exact_sha_gate_runs": {
+    "DX11_Fast": 39517947876,
+    "Backend_Conversion": 39517947852,
+    "Windows_Build": 39517947847,
+    "OpenXR": 39517952870,
+    "HUD_Inspector": 39517952908
+  },
+  "c6_result_note": "Five mandatory GitHub Actions passed on final exact SHA 0ca833a5: Fast 39517947876, Backend 39517947852, Build 39517947847, OpenXR 39517952870, HUD 39517952908. Material source 651261b1, causal CI test/00961 acceptance repairs 5127f4de and 0ca833a5. CI is not game/HMD evidence; no real game pixels, input or Quest3 validated."
+}
