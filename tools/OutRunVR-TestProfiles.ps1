@@ -21,16 +21,18 @@ function Get-OutRunVRTestProfile {
         '-NearPlane=0.10'
     )
 
-    # Runtime-proven visual path. Keep CONTROL/PERFORMANCE able to exercise
-    # fallback transport, but correctness/HUD sessions must use the R49
-    # DirectGPU owner and keep union-FOV mutation disabled.
+    # Correctness must remain usable when the game device stays plain D3D9.
+    # Runtime evidence 2026-10-22 showed PreferD3D9Ex=true can still yield
+    # D3D9Ex=0, while DirectGpuOnly=true then suppresses the proven SBS /
+    # Desktop Duplication stereo fallback and leaves the OpenXR host with
+    # gameFrameId=0. Keep fallback transport enabled for correctness/HUD.
+    # DirectGPU remains preferred automatically whenever the shared-eye path
+    # is actually verified and ready.
     $visualSafeVr = @(
         $commonVr | Where-Object {
-            $_ -notmatch '^-DirectGpuOnly=' -and
             $_ -notmatch '^-CullingUnionFov='
         }
     ) + @(
-        '-DirectGpuOnly=true',
         '-CullingUnionFov=false'
     )
 
