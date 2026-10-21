@@ -1,0 +1,705 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1515KST-A0021-B0028-SHA8",
+  "review_slot_kst": "2026-10-21 15:15",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "scope": "Independent C1 human visual comparison and automatic source/export sha256/PNG RGBA/alpha QA for A/B 8 previously unreviewed candidates; only local PNG text-level verdict, no imagegen/producer-queue activity, DDS, C2/C3, or in-game approval.",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "counts": {
+    "prior_local_sha_unique": 209,
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 6,
+    "fail_major_style_effect": 2,
+    "producer_rework_dimensions": 8
+  },
+  "evidence": {
+    "n100_preflight": "work/c1_batch_20261021_1515/preflight.json",
+    "n100_edge_metrics": "work/c1_batch_20261021_1515/edge_metrics.json",
+    "n100_comparison_images": [
+      "work/c1_batch_20261021_1515/compare_1.jpg",
+      "work/c1_batch_20261021_1515/compare_2.jpg",
+      "work/c1_batch_20261021_1515/compare_3.jpg",
+      "work/c1_batch_20261021_1515/compare_4.jpg"
+    ],
+    "all_export_source_sha_matched": true,
+    "all_eight_distinct_from_prior_209_sha": true,
+    "all_rgba_png": true,
+    "visible_alpha_edge_gt32_pixels_zero_all": true,
+    "dimension_mismatch_original_roi_all": true,
+    "source_crop_includes_other_labels_for_ordinals": [
+      134,
+      135
+    ]
+  },
+  "note": "Source crop may include neighboring UI art. Text-only visual pass does not prove the original UI cell bounding box, safe-region containment or overlay placement. Preserve producer REWORK_DIMENSIONS. Alpha=1 boundary-only noise not treated as visible glyph clipping.",
+  "results": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0021-280C2EFE",
+      "ordinal": 99,
+      "candidate_file": "Q197_37573e75f895a4fb_source_k.png",
+      "source_file": "Q197_37573e75f895a4fb_source.png",
+      "candidate_sha256": "d3904c084b52dce7819e275e845df86a9a42c15f324a2b87803bbde199dc45b6",
+      "source_sha256": "a1dbff12f258e886dce259ec593dfb58b3e2ec90d426f2ea11e3b282292ea192",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "VS RANK",
+      "approved_korean": "VS 랭크",
+      "source_dds_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        660,
+        214
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        2150,
+        724
+      ],
+      "border_nonzero": {
+        "top": 21,
+        "bottom": 158,
+        "left": 15,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 1,
+          "gt0": 21,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 1,
+          "gt0": 158,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 1,
+          "gt0": 15,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'2. VS 랭크:' accurately reproduces the original visible '2. VS RANK:' in a similar dark navy bold hierarchy. Light outline variance accepted; background panel correctly absent. Border pixels have alpha=1 only, not visible glyph clipping.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Only alpha=1 on canvas edge; no alpha>32 edge pixels"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0021-280C2EFE",
+      "ordinal": 100,
+      "candidate_file": "Q205_b6aa00a18f71ad22_source_k.png",
+      "source_file": "Q205_b6aa00a18f71ad22_source.png",
+      "candidate_sha256": "92f35e394bf3ee0ec967a32a7f8330742d6e030d7d4a12fa786109cd7342e852",
+      "source_sha256": "3341c4682c49b09416ed3a0bee927b365a4d7f53c8313b01662a102e630f71a5",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "YES",
+      "approved_korean": "예",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1802,
+        872
+      ],
+      "original_dimensions": [
+        620,
+        300
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        355,
+        0,
+        1718,
+        838
+      ],
+      "border_nonzero": {
+        "top": 56,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 1,
+          "gt0": 56,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "Source YES uses simple flat mid-gray bold lettering; candidate '예' is a heavy metallic beveled glyph with prominent double black outline, a major departure in source hierarchy and visual treatment. Hangul itself is readable.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Only alpha=1 on canvas edge; no alpha>32 edge pixels"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0021-280C2EFE",
+      "ordinal": 101,
+      "candidate_file": "Q205_ba5925cb2187264d_source_k.png",
+      "source_file": "Q205_ba5925cb2187264d_source.png",
+      "candidate_sha256": "40c8885829ebf06f392c0ab3fd33ce07d4528ed73079d8143fc84d6918a5dc2f",
+      "source_sha256": "7fcf2cbd5987d30d933faf4edb97e22c53bc52866a84c6b7f0ef475b70582f8b",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "NO",
+      "approved_korean": "아니오",
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1526,
+        1031
+      ],
+      "original_dimensions": [
+        444,
+        300
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        59,
+        128,
+        1506,
+        884
+      ],
+      "border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "Source NO uses simple flat gray sans-serif; '아니오' is substantially embossed/metallic with an extra heavy black double outline. Legible and correctly translated but substantial, not minor, effect mismatch.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Fully transparent border"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0021-280C2EFE",
+      "ordinal": 102,
+      "candidate_file": "Q197_82735ab03e9b2096_source_k.png",
+      "source_file": "Q197_82735ab03e9b2096_source.png",
+      "candidate_sha256": "8c184765528e200c9e5f65aa815ec853d8919f3ae1b0db0ca764ea91c127e641",
+      "source_sha256": "83252681ae05789cbe5cb8bfd76c4ed3e04fdeb3f35b8d71f7f5118b45e9441f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "DRIVE TIME",
+      "approved_korean": "주행 시간",
+      "source_dds_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        816,
+        206
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        0,
+        2160,
+        724
+      ],
+      "border_nonzero": {
+        "top": 183,
+        "bottom": 130,
+        "left": 25,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 1,
+          "gt0": 183,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 1,
+          "gt0": 130,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 1,
+          "gt0": 25,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'4. 주행 시간:' matches the source numbered DRIVE TIME dark navy bold text and removes the English plate; white/navy edging differences are not critical. Boundary samples are alpha=1 only.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Only alpha=1 on canvas edge; no alpha>32 edge pixels"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0021-280C2EFE",
+      "ordinal": 103,
+      "candidate_file": "Q197_8cd32e5f7463c930_source_k.png",
+      "source_file": "Q197_8cd32e5f7463c930_source.png",
+      "candidate_sha256": "7dc3d324a4163c62bee2cc8927781834bc37331d6268b16209f1118cdcf3269b",
+      "source_sha256": "61eb62cc97962de461193b4aafdf630ac7c2b3a58fbdef90b81e02f9e844dd3d",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "WIN RATIO",
+      "approved_korean": "승률",
+      "source_dds_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        762,
+        214
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        71,
+        9,
+        2063,
+        724
+      ],
+      "border_nonzero": {
+        "top": 0,
+        "bottom": 74,
+        "left": 0,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 1,
+          "gt0": 74,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'3. 승률:' uses the approved translation and retains bold navy hierarchy; white edge is somewhat stronger than source but lettering is intact and readable, accepted as cosmetic variation.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Only alpha=1 on canvas edge; no alpha>32 edge pixels"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0028-5B8359C7",
+      "ordinal": 133,
+      "candidate_file": "Q095_7930af1fe385424d_source_k.png",
+      "source_file": "Q095_7930af1fe385424d_source.png",
+      "candidate_sha256": "92d832c2ae09268a8a464d0373301ca0f0460b6002cdc6a5e62484751ba4b473",
+      "source_sha256": "1d88aaaaf8ebcd6e4504170e3393f4f24ef9b3494389228acc8c4cd5076682d2",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Entry has been closed.",
+      "approved_korean": "참가 접수가 종료되었습니다.",
+      "source_dds_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1720,
+        179
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        37,
+        46,
+        2172,
+        684
+      ],
+      "border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 9
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 1,
+          "gt0": 9,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'참가 접수가 종료되었습니다.' is complete, readable, yellow-to-white italic lettering with dark blue outline similar to the source sentence. Right-edge samples only alpha=1 noise.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Only alpha=1 on canvas edge; no alpha>32 edge pixels"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0028-5B8359C7",
+      "ordinal": 134,
+      "candidate_file": "Q060_5244f0171b35a226_source_k.png",
+      "source_file": "Q060_5244f0171b35a226_source.png",
+      "candidate_sha256": "afc214b8672a7c22dcfa6be8fb3783985b9bba47ee87d63fa2a0bf4cdb058a77",
+      "source_sha256": "79f5363e2cf9550d219d838d9c6aceff64e7ccd561c06c5d3073609cdbc939c4",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "PLEASE WAIT",
+      "approved_korean": "잠시만요",
+      "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1860,
+        522
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        23,
+        38,
+        2102,
+        706
+      ],
+      "border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'잠시만요' is legible gold-to-white italic text with dark-blue outline, consistent with source PLEASE WAIT; output does not recreate other source UI. Source crop contains other protected text/art; placement collision remains untested without UI composition.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Fully transparent border"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0028-5B8359C7",
+      "ordinal": 135,
+      "candidate_file": "Q060_7cce1a9a91ebb4dc_source_k.png",
+      "source_file": "Q060_7cce1a9a91ebb4dc_source.png",
+      "candidate_sha256": "747840ec11d9b438c0c216812552491d7de08733e0eeaf5e72c54ad83fc67951",
+      "source_sha256": "e16baacba230d6afc9675b2fb8923e4fb812ad20afcd3782a7b9d68ba6703c4e",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Rank",
+      "approved_korean": "랭크",
+      "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1798,
+        875
+      ],
+      "original_dimensions": [
+        909,
+        442
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        129,
+        90,
+        1654,
+        851
+      ],
+      "border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "previous_seen": [],
+      "edge_opacity": {
+        "top": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "bottom": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "left": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        },
+        "right": {
+          "max": 0,
+          "gt0": 0,
+          "gt32": 0,
+          "gt128": 0,
+          "gt240": 0
+        }
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'랭크' is correct and legible, with light purple/white fill and dark contour appropriate to source Rank. Adjacent source UI art absent from output; placement collision remains untested.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "edge_note": "Fully transparent border"
+    }
+  ]
+}
