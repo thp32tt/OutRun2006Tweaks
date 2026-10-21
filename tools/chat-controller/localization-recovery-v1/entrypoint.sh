@@ -85,12 +85,24 @@ while ! curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; do
   sleep 7
 done
 
-if [[ "${OUTRUN_CROP_ENABLED:-true}" == "true" ]]; then
+start_crop_worker() {
   echo "$(date -Is) starting native English crop worker in shared controller container" >>/logs/c-english-crop.log
   python -u /opt/outrun/c_english_crop/loop.py \
     --interval-seconds "${OUTRUN_CROP_INTERVAL_SECONDS:-60}" \
     --max-per-cycle "${OUTRUN_CROP_MAX_PER_CYCLE:-10}" \
     >>/logs/c-english-crop.log 2>&1 &
+}
+
+if [[ "${OUTRUN_CROP_ENABLED:-true}" == "true" ]]; then
+  start_crop_worker
+  (
+    while sleep 20; do
+      if ! pgrep -f "python -u /opt/outrun/c_english_crop/loop.py" >/dev/null 2>&1; then
+        echo "$(date -Is) C crop worker missing; restarting" >>/logs/c-english-crop.log
+        start_crop_worker
+      fi
+    done
+  ) &
 fi
 
 if [[ "${OUTRUN_ROI_BRIDGE_ENABLED:-true}" == "true" ]]; then
