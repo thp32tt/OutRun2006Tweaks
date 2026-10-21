@@ -1,0 +1,575 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2218KST-OLDER-BACKLOG-SHA8",
+  "prior_reviewed_sha": 292,
+  "total_unreviewed_before": 26,
+  "count": 8,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0011-A889C0FD",
+      "ordinal": 48,
+      "candidate_file": "Q121_e8a6cc531a953cc9_source_k.png",
+      "source_file": "Q121_e8a6cc531a953cc9_source.png",
+      "candidate_sha256": "563ee0feec3003e9c43832658123c5d2849b5be41781dfc775827ff455d84761",
+      "source_sha256": "62fefeb7e8f65d16a616ae41220d3bb0bfccd4859499bbcb62050d45992c0283",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Enter Selection",
+      "approved_korean": "선택 확정",
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "original_dimensions": [
+        1516,
+        280
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        452,
+        19,
+        1746,
+        523
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘선택 확정’ 텍스트 일치, 개별 자소·받침 정상, 방향/획 식별 명확. 투명 RGBA, 불필요한 도형·영문 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0011-A889C0FD",
+      "ordinal": 49,
+      "candidate_file": "Q133_2eba9842463a3a26_source_k.png",
+      "source_file": "Q133_2eba9842463a3a26_source.png",
+      "candidate_sha256": "5e675bc599a51c7b675e57226d7196828c1695cbf259fee3639773370924e877",
+      "source_sha256": "b7053a7c73d0fe55f67601c99d702e169413df5ab9119ee68fe1996464e96e88",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "BLU MIRABEAU",
+      "approved_korean": "블루 미라보",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "original_dimensions": [
+        1936,
+        288
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        33,
+        0,
+        2121,
+        660
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 2,
+          "gt32": 0,
+          "max": 1
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘블루 미라보’ 텍스트 일치. 상단 경계의 alpha=1인 두 픽셀은 비가시적 AA로 실질 잘림 아님. 전체 글자 읽힘, 투명 레이어 정상.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0011-A889C0FD",
+      "ordinal": 50,
+      "candidate_file": "Q133_325b1b11f63545fd_source_k.png",
+      "source_file": "Q133_325b1b11f63545fd_source.png",
+      "candidate_sha256": "33c96170cb9db09f6a4d544564301907b015196764ae884ec17ffbb1a01d0c0f",
+      "source_sha256": "897386b391c22f67416fbd38bbcc135a7d6b3576e7667bc93673306cf4943e53",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "ARGENTO NURBURGRING",
+      "approved_korean": "아르젠토 뉘르부르크링",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "original_dimensions": [
+        1504,
+        152
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        122,
+        86,
+        2126,
+        589
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘아르젠토 뉘르부르크링’ 번역 일치. 획/받침 명료, 배경·영문 잔상 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0011-A889C0FD",
+      "ordinal": 51,
+      "candidate_file": "Q133_2ea0dcfe351600d6_source_k.png",
+      "source_file": "Q133_2ea0dcfe351600d6_source.png",
+      "candidate_sha256": "ad536370c420d0d1adc6d51bbe49e82037fe55e9e5864ea18911a0992ef4337b",
+      "source_sha256": "50b6d3e1af76a21cd10d6697151687cd70476d536b385f85b7d8a8bcdf875010",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "ANCIENT RUINS",
+      "approved_korean": "에인션트 루인스",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "original_dimensions": [
+        1814,
+        246
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        57,
+        69,
+        2134,
+        635
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘에인션트 루인스’ 번역 일치, 글리프 손상·비문자 요소 없이 정상 판독.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0011-A889C0FD",
+      "ordinal": 52,
+      "candidate_file": "Q135_c6d8d23c8732a8de_source_k.png",
+      "source_file": "Q135_c6d8d23c8732a8de_source.png",
+      "candidate_sha256": "dc58f5ca02e0863fde67a191a69757b2153eea6290fa078dcf021133b358f8e2",
+      "source_sha256": "b94d22e1d8211912cb57430aea1bb7056d0224edbcdf7fa1b1726875b507c9f6",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "CHANGE CLASS",
+      "approved_korean": "클래스 변경",
+      "source_dds_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "original_dimensions": [
+        1752,
+        280
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        362,
+        99,
+        1949,
+        635
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘클래스 변경’ 번역 일치. 글자별 판독성 및 투명 PNG 경계 정상.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_3.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "ordinal": 89,
+      "candidate_file": "Q057_2c0dad6837bce264_source_k.png",
+      "source_file": "Q057_2c0dad6837bce264_source.png",
+      "candidate_sha256": "ee7a83375598ea433fc1e26e88ccce17b7f11472a6bfdc268836ada5f7e1e459",
+      "source_sha256": "68849f0786d7ba60ca8acc8b8fc32727d277232343d36b1c6550fe21794b3e6e",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Target",
+      "approved_korean": "목표",
+      "source_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "original_dimensions": [
+        463,
+        241
+      ],
+      "dimensions": [
+        1738,
+        905
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        550,
+        194,
+        1215,
+        711
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘목표’ 번역 일치, 기울어진 회색 글리프 및 효과 선명. 원본에 있는 자동차·HUD 아트는 후보에서 복제되지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_3.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "ordinal": 90,
+      "candidate_file": "Q057_947f0577f0e8fc60_source_k.png",
+      "source_file": "Q057_947f0577f0e8fc60_source.png",
+      "candidate_sha256": "2f0bd88071b52c2e0fc28742108a2bb94befa7493abf2cdba73b21c75efb5d9b",
+      "source_sha256": "d38fda94ee0be5f3683aadfe503af8dd27f76c2851d11f5004cbc698b0b46529",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Technical Bonus",
+      "approved_korean": "테크니컬 보너스",
+      "source_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "original_dimensions": [
+        2320,
+        691
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        31,
+        8,
+        2124,
+        682
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘테크니컬 보너스’ 번역 일치. 가독성 확보, 원본의 주변 하트·자동차 등 보호 아트가 후보 PNG에 복제되지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_4.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0019-0A4FD03A",
+      "ordinal": 91,
+      "candidate_file": "Q161_85450ed07d3da830_source_k.png",
+      "source_file": "Q161_85450ed07d3da830_source.png",
+      "candidate_sha256": "8f68f6a8fe4555719f47b7708e68e18a7600cee551f9e7be1c01ec356210251b",
+      "source_sha256": "08e6de4157bd2e5d3a5ed613e295b81d8f4319614f4f87a664151fecf7f451b8",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "USA",
+      "approved_korean": "미국",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "original_dimensions": [
+        600,
+        296
+      ],
+      "dimensions": [
+        1786,
+        881
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        146,
+        2,
+        1669,
+        823
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘미국’ 번역 일치. 획·받침 및 외곽선 완전하고 투명 RGBA 정상.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2218/compare_4.jpg"
+    }
+  ],
+  "qa_summary": {
+    "png_text_only_pass": 8,
+    "png_text_only_fail": 0,
+    "remaining_unreviewed_after": 18,
+    "producer_REWORK_DIMENSIONS_not_overridden": true,
+    "disallowed_actions": "No ImageGen, A/B queue, C2/C3, DDS or in-game PASS"
+  }
+}
