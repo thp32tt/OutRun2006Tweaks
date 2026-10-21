@@ -27,7 +27,11 @@ def integrated(s, m, h, g, src):
         "return create_game_sampler(dev, capture, levels, sampler);",
         "CreateTexture2D(&desc, initial.data()", "CreateShaderResourceView(texture.Get()",
     )) and all(k in h for k in (
-        "D3D11_SAMPLER_DESC state{};", "capture.maxMipLevel >= levels",
+        "D3D11_SAMPLER_DESC state{};",
+        "live_game_mip_lod::select(levels, usesMips,",
+        "textureLod, capture.maxMipLevel",
+        "if (!lod.valid) return false;",
+        "state.MinLOD = static_cast<float>(lod.minLevel);",
         "CreateSamplerState(&state, sampler.GetAddressOf())",
     )) and all(k in g for k in (
         "sameSourceTexture && sameSrgbEncoding",
