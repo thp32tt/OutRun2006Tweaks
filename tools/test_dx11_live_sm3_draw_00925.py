@@ -395,8 +395,11 @@ for token in (
     check(token in bridge, "masked real SM3 Draw GPU output missing: " + token)
 check("colorMask != 0x0fu || srgbWrite" not in source and
       "if ((colorMask & ~0x0fu) != 0u) {" in source and
-      "if (srgbWrite != FALSE) {" in source,
-      "valid per-game-Draw partial channel mask still rejected")
+      "if (srgbWrite != FALSE && srgbWrite != TRUE) {" in source and
+      "srgbWrite == TRUE" in source and
+      "s.backend.color_rtv_srgb() : s.backend.color_rtv()" in source and
+      "if (!rtv) return false;" in source,
+      "valid partial color mask/sRGB combination or invalid sRGB state was mishandled")
 check("if (customBlend &&" in source and
       "sm3_live_masked_blend_desc(" in source,
       "native game draw must fail before GPU mutation for invalid OM states")
