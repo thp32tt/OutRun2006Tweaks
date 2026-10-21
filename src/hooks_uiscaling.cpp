@@ -3362,6 +3362,9 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     inline static std::atomic<std::uint64_t> GoalFlushes{ 0 };
     inline static std::atomic<std::uint64_t> GoalFallbacks{ 0 };
     inline static std::atomic<std::uint64_t> EvidenceSeq{ 0 };
+    // Keep the native D3DX batch ledger visible to the evidence filter so
+    // deferred Flush/End remains observable even after the source scope exits.
+    inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};
 
     static bool EvidenceTargetProducer(
         OutRunVR::GameSemantic::ProducerToken producer) noexcept
@@ -3437,7 +3440,6 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     // reassign an unknown pre-hook/mixed buffer to ScreenHud.
     // Single coherent Quest-style HUD command ledger. The live original
     // ID3DXSprite is still authoritative for physical draw/Flush/End.
-    inline static thread_local OutRunVR::HudCommandBatch::Ledger HudBatch{};
 
     static bool IsExactSprite(void* self) noexcept
     {
