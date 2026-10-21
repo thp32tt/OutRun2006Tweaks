@@ -11,7 +11,7 @@
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
   "status": "COMPLETE_BUILD_VERIFIED",
   "feature_stage": "SOURCE_BUILD_VERIFIED_RUNTIME_PENDING",
-  "checkpoint": "C6_RESULT",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
@@ -105,12 +105,14 @@
     "C3_VALIDATE": "PASS_EXACT_SHA: repair actual Windows Build negative mutation false failure at e994a7f4; all five same-SHA mandatory workflows successful.",
     "C4_COMMIT": "PASS: ec651a4c material game-native C++ and e994a7f4 targeted CI repair committed with task marker; no CI-skip on validation-bearing commits.",
     "C5_PACKAGE": "NOT_REQUIRED: GitHub builds only; no Quest3 runtime deployment.",
-    "C6_RESULT": "PASS_SOURCE_BUILD_VERIFIED: C6 is separate docs-only checkpoint; material SHA ec651a4c, validated exact-SHA e994a7f4; RUNTIME_VALIDATION=UNTESTED."
+    "C6_RESULT": "PASS_EXACT_SHA: exact validated commit e994a7f4fe091c114e847bed6339c548777bb910 has all five mandatory GitHub CI gates SUCCESS; material result ec651a4c0fbd37556a0800f586c3f6a22418e30e unchanged. C6_STATE bookkeeping only [skip ci], no new source/build/CI run or award (C6 score delta 0); real OutRun game/Quest3 HMD RUNTIME_VALIDATION=UNTESTED."
   },
   "REAL_GAME_DRAW_BLOCKER": "No same-SHA original OutRun menu/car/race native-drawn full-frame published-pixel evidence; Quest3/VDXR gamepad/FFB runtime observation absent.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "NEXT_IMPLEMENTATION_ACTION": "Continue native full-frame real game menu/car/race DRAW/DrawIndexed and stereo OpenXR source flow after this compile-and-CI verified stencil-inert integration; preserve D3D9Ex, original input/FFB, SkyGlow and DXVK freeze.",
-  "note": "This record is checkpoint-only; not the exact-SHA five-gate result commit, not a gameplay or HMD PASS."
+  "note": "This record is checkpoint-only; not the exact-SHA five-gate result commit, not a gameplay or HMD PASS.",
+  "c6_score_change": 0,
+  "c6_result_note": "Reconciled pre-existing [skip ci] run record from 9c7b78d8; exact SHA and prior material/score history preserved. Missing record blocker resolved; this follow-up is bookkeeping only."
 }
