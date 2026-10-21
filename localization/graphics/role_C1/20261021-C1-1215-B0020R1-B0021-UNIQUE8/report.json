@@ -1,0 +1,440 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1215KST-NEW-SHA-UNIQUE8-B0020R1-B0021",
+  "review_slot_kst": "2026-10-21 12:15",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "9fd2c2313fff8184650729806e267026245d49ea",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "scope": "Eight SHA-unique, unapproved B-generated Korean PNGs only. Independent C1 source/translation/style/alpha review; no ImageGen, queue consumption, DDS writes, C2/C3 or in-game signoff.",
+  "counts": {
+    "previous_qa_log_files": 27,
+    "previous_unique_qa_sha": 186,
+    "unreviewed_available_at_selection": 20,
+    "reviewed_new_unique": 8,
+    "pass_png_text_only": 6,
+    "fail_source_style_color_or_outline": 2,
+    "producer_rework_dimensions": 8,
+    "unreviewed_after_selection_at_snapshot": 12
+  },
+  "evidence": {
+    "n100_metrics_path": "work/c1_batch_20261021_1215/metrics.json",
+    "n100_source_output_sheets": [
+      "work/c1_batch_20261021_1215/compare_1.jpg",
+      "work/c1_batch_20261021_1215/compare_2.jpg"
+    ],
+    "source_manifest_and_producer_export_sha_verified": true,
+    "all_png_rgba": true,
+    "alpha_ge16_border_pixel_counts_all_zero": true,
+    "low_alpha_border_fringes_detected_for_ordinals": [
+      95,
+      97
+    ],
+    "visual": "Source/KR panels independently inspected for all eight. Ordinals 98 and 100 have large, evident text style divergence from white plain source title; text-only acceptance for six others, not runtime/placement approval."
+  },
+  "results": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0020-5EC22594-R1",
+      "ordinal": 93,
+      "candidate_file": "Q051_622665d42c2ba8f5_source_k.png",
+      "source_file": "Q051_622665d42c2ba8f5_source.png",
+      "candidate_sha256": "1b41d99c36c98998e981a4d0c766735f7a2f60e192f72ce965c812e81ef655b8",
+      "export_sha_match": true,
+      "source_sha256": "ca9526d282ae6aa9d3f4d3947708098be050ef196b784b7aea68cfdf7c035706",
+      "source_sha_match": true,
+      "english": "Lap",
+      "approved_korean": "랩",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1672,
+        941
+      ],
+      "source_dimensions": [
+        576,
+        316
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        274,
+        25,
+        1487,
+        803
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'랩' 초성·중성·받침 조합이 읽히고 노란 채움과 짙은 파란 외곽 유지; 별도 배경/아이콘 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0020-5EC22594-R1",
+      "ordinal": 94,
+      "candidate_file": "Q043_1ae7024795abd9d8_source_k.png",
+      "source_file": "Q043_1ae7024795abd9d8_source.png",
+      "candidate_sha256": "c51f8168a7a9f38887cca83de51e85f2058e04a8299ce5db2c00060fd980b1d7",
+      "export_sha_match": true,
+      "source_sha256": "a404212621896fc8f6c3fe1241091b6ee0bde417d1827da4a7a6cb8313b32487",
+      "source_sha_match": true,
+      "english": "PASSED!",
+      "approved_korean": "통과!",
+      "source_dds_sha256": "fb7bb0dc0842547cb52d5d9290d21c009149400e4ec2ec17322da0c411f7f2bc",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1916,
+        821
+      ],
+      "source_dimensions": [
+        1892,
+        816
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        81,
+        22,
+        1854,
+        733
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'통과!' 철자·광택 녹색 그라데이션·검은 외곽 식별, 출력은 문자 레이어만 포함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0020-5EC22594-R1",
+      "ordinal": 95,
+      "candidate_file": "Q043_25d15705129f6077_source_k.png",
+      "source_file": "Q043_25d15705129f6077_source.png",
+      "candidate_sha256": "54401e2e8e4edd7aec06d376b9fa1bb3cb1f78c9e4f47ee51b7356b7ae244078",
+      "export_sha_match": true,
+      "source_sha256": "87fd6c84c350516503a80f88267963f499a01e980e42cd0b3c9300d84a2a0f60",
+      "source_sha_match": true,
+      "english": "PASSED!",
+      "approved_korean": "통과!",
+      "source_dds_sha256": "6fe91b81c15ea740ae3d54d10b4479a7ac1bd554942c51ab9483d9e2ea53a011",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1916,
+        821
+      ],
+      "source_dimensions": [
+        1892,
+        816
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        0,
+        45,
+        1793,
+        821
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'통과!' 철자·녹색 그라데이션과 외곽 식별; alpha 1~15 경계 흔적은 합성 전 확인 권고.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0020-5EC22594-R1",
+      "ordinal": 96,
+      "candidate_file": "Q048_51a266d28f13b33f_source_k.png",
+      "source_file": "Q048_51a266d28f13b33f_source.png",
+      "candidate_sha256": "f3a4b37b2a388a7b34c43b824afa06f1e62c817bfe829578ce1047e085864158",
+      "export_sha_match": true,
+      "source_sha256": "af2755d8e78c71eac13ad94ec04e3b44efd7ba15026c2f65b9298dd002f4b41d",
+      "source_sha_match": true,
+      "english": "Extend Time",
+      "approved_korean": "시간 연장",
+      "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1568,
+        360
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        95,
+        23,
+        1979,
+        690
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'시간 연장' 가독성·원문 흰색에서 주황색으로 이어지는 광택/외곽 계열 대응, 배경 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0020-5EC22594-R1",
+      "ordinal": 97,
+      "candidate_file": "Q048_44bd5c9f1b33fad4_source_k.png",
+      "source_file": "Q048_44bd5c9f1b33fad4_source.png",
+      "candidate_sha256": "4df15228191af8f6d3934e811eb21acc60e3e1e7a535f1c23f989b7072eddf99",
+      "export_sha_match": true,
+      "source_sha256": "916717870297432b7a5e4abe780c7e7ebd2f03572076f6727a2cfc3e99a538bc",
+      "source_sha_match": true,
+      "english": "Ghost",
+      "approved_korean": "고스트",
+      "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1672,
+        941
+      ],
+      "source_dimensions": [
+        457,
+        241
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        0,
+        86,
+        1658,
+        860
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'고스트' 정확·노란색 채움/진남색 외곽 유지; alpha 1~15 경계 흔적은 합성 전 확인 권고.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0021-DA6AB878",
+      "ordinal": 98,
+      "candidate_file": "Q050_7f9cc3cfc5a7f301_source_k.png",
+      "source_file": "Q050_7f9cc3cfc5a7f301_source.png",
+      "candidate_sha256": "50992eb4e431be477f43b67175cd48704962398680d3740fa26631866c007ed6",
+      "export_sha_match": true,
+      "source_sha256": "358c547fbff5a5b066e4d78c6405fa2a7529c385817b670b3ba5247f186c9009",
+      "source_sha_match": true,
+      "english": "FRIEND REQUEST",
+      "approved_korean": "친구 요청",
+      "source_dds_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1305,
+        454
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        33,
+        85,
+        2023,
+        684
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_SOURCE_STYLE_COLOR",
+      "visual_reason": "원본 FRIEND REQUEST 글자는 흰색 고딕 본문이지만 출력 '친구 요청'은 선명한 노란색 기울임/굵은 진남색 외곽. 원문 제목 계열과 명백한 채움·윤곽·스타일 불일치.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0021-DA6AB878",
+      "ordinal": 99,
+      "candidate_file": "Q051_8bf3deb8d908799a_source_k.png",
+      "source_file": "Q051_8bf3deb8d908799a_source.png",
+      "candidate_sha256": "4c88f6472793cb40a7e0ba353d152beb7e5b84eb2aaebe371bd3b3a516d7e429",
+      "export_sha_match": true,
+      "source_sha256": "a7d01f45b3ce410a85e9981ec8418c8202b11b843f17e57faa2e5833552fc066",
+      "source_sha_match": true,
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        1662,
+        946
+      ],
+      "source_dimensions": [
+        355,
+        193
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        57,
+        183,
+        1093,
+        888
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'골' 정확·흰색 글자와 짙은 파랑 외곽, 다른 게이지/보호 아트 미포함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0021-DA6AB878",
+      "ordinal": 100,
+      "candidate_file": "Q051_bf44216163755c6f_source_k.png",
+      "source_file": "Q051_bf44216163755c6f_source.png",
+      "candidate_sha256": "17413883f0ebd815126ee80bd93c107346b3330c004e84b7e1367b3b5b48e9f5",
+      "export_sha_match": true,
+      "source_sha256": "5fee580bd0ca8dcc8d759b74f7de61ad6910bc0dce5570d09ebb23b5e1fbb058",
+      "source_sha_match": true,
+      "english": "REGISTER NEW ACCOUNT",
+      "approved_korean": "새 계정 등록",
+      "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_format": "PNG",
+      "candidate_mode": "RGBA",
+      "candidate_dimensions": [
+        2135,
+        737
+      ],
+      "source_dimensions": [
+        1307,
+        292
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_nonzero_bbox": [
+        91,
+        19,
+        2097,
+        689
+      ],
+      "alpha_border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_SOURCE_STYLE_OUTLINE",
+      "visual_reason": "원본 REGISTER NEW ACCOUNT는 수평 흰색 산세리프 표제인데 출력 '새 계정 등록'은 기울어진 장식체와 굵은 진남색 외곽. 원문 글자 효과/기울기 계열 중대한 불일치.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "imagegen_invoked": false,
+  "producer_queues_consumed": false,
+  "dds_generated": false,
+  "c2_pass_created": false,
+  "c3_pass_created": false,
+  "user_ingame_pass_created": false,
+  "vr_ffb_dx11_dxvk_touched": false
+}
