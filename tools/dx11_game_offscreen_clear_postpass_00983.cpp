@@ -37,7 +37,7 @@ int main() {
         clearUpper, Region{0u, 31u, 100u, 80u}};
     assert(!native_game_offscreen_color_region_fully_covered(
         whole, withHole, withHole.size()));
-    constexpr auto clippedCamera = native_game_visible_stretch_sample_region(
+    const auto clippedCamera = native_game_visible_stretch_sample_region(
         100u, 80u, whole, 100u, 80u, -100, 0, 100, 80, false);
     assert(clippedCamera.left == 50u && clippedCamera.right == 100u);
     assert(native_game_offscreen_color_region_fully_covered(

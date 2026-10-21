@@ -12,12 +12,25 @@ writer = method[begin:done]
 required = [
     "native_game_offscreen_clear_written_region(",
     "if (!native_game_offscreen_color_region_valid(filled)) return;",
-    "record.texture = texture;",
-    "record.arraySlice = camera.arraySlice;",
-    "record.mipSlice = camera.mip;",
-    "record.region = filled;",
+    "remember_offscreen_color_region(",
+    "texture.Get(), camera.arraySlice, camera.mip, filled);",
 ]
 assert all(s in writer for s in required), "Cleared camera pixel provenance missing"
+# The shared Draw/Clear admission method must retain exact physical keys,
+# conservative rectangular unions and each actual source footprint.
+helper_start = src.index("void NativeGameEyeDrawEncoder::remember_offscreen_color_region(")
+helper_end = src.index("void NativeGameEyeDrawEncoder::invalidate_offscreen_color_source(", helper_start)
+helper = src[helper_start:helper_end]
+assert all(s in helper for s in [
+    "native_game_offscreen_color_key_matches(",
+    "native_game_offscreen_exact_rect_union(",
+    "region = exact;",
+    "record.texture = texture;",
+    "record.arraySlice = arraySlice;",
+    "record.mipSlice = mipSlice;",
+    "record.region = region;",
+]), "Shared camera Draw/Clear pixel evidence must remain exact-key and fail-closed"
+
 for name, arm in [
     ("full", "case live_game_stereo::NativeColorClearRoute::FullRtv:"),
     ("rect", "case live_game_stereo::NativeColorClearRoute::ClearView:"),
