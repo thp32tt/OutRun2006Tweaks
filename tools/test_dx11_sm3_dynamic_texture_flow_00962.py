@@ -28,5 +28,6 @@ for stage in ("true", "false"):
 assert "vertexCubeSamplerMask" in bridge and "pixelCubeSamplerMask" in bridge
 assert "context->PSSetShaderResources(0u, 16u, boundViews.data())" in bridge
 assert "context->VSSetShaderResources(0u, 4u, boundVertexViews.data())" in bridge
-assert "if (nativeIndices) context->DrawIndexed" in bridge
+assert re.search(r"if \(nativeIndices\)\s*context->DrawIndexed\(nativeIndexCount", bridge)
+assert "for (UINT instance = 0u; instance < instanceCount; ++instance)" in bridge
 print("Native game shader TEXLDD / TEXLDL conditional translation + fail-closed sampler path linked; HMD untested")

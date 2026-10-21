@@ -67,8 +67,9 @@ def sm3_fan_connected(src):
         "type == D3DPT_TRIANGLESTRIP ?",
         "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST",
         "context->IASetIndexBuffer(s.fullGameIndexUpload.Get(),",
-        "context->DrawIndexed(nativeIndexCount, 0u, 0);",
-        "else context->Draw(vertexCount, 0u);",
+        "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
+        "context->Draw(vertexCount, base);",
+        "for (UINT instance = 0u; instance < instanceCount; ++instance)",
         "liveBatch.record_source_draw(sourceOrdinal);",
     ))
 assert sm3_fan_connected(c)
@@ -78,8 +79,8 @@ for old, bad in (
     ("nativeIndexCount = static_cast<UINT>(nativeFanTriangles.size());",
      "nativeIndexCount = indexCount;"),
     ("nativeFanTriangles.size() > kMaxIndices", "nativeFanTriangles.empty()"),
-    ("context->DrawIndexed(nativeIndexCount, 0u, 0);",
-     "context->DrawIndexed(indexCount, 0u, 0);"),
+    ("context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
+     "context->DrawIndexed(indexCount, 0u, static_cast<INT>(base));"),
 ):
     altered = c.replace(old, bad, 1)
     assert altered != c and not sm3_fan_connected(altered), old
