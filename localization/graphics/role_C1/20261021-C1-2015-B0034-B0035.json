@@ -1,0 +1,559 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2015KST-B0034-B0035-SHA8",
+  "prior_log_count": 45,
+  "prior_unique_sha": 262,
+  "count": 8,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0034-C39B801C",
+      "ordinal": 163,
+      "candidate_file": "Q057_a67374f43b6149e8_source_k.png",
+      "source_file": "Q057_a67374f43b6149e8_source.png",
+      "candidate_sha256": "e36183c64a5323ff94bdf756aa3a53983e91037eddbc29683bfb93bd37461e5e",
+      "source_sha256": "933e5758d9fa915c364db52f796934cb049cad2377d4cfee4305d6137c9b129f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Total Rank",
+      "approved_korean": "종합 랭크",
+      "source_dds_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2054,
+        765
+      ],
+      "original_dimensions": [
+        1020,
+        380
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        322,
+        98,
+        1705,
+        678
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "종합 랭크: 원본 흰색 채움·남색 외곽·우향 기울기와 유사. 정확한 한글, 투명 배경. 왕관 아트는 별도 합성 단계에서 유지해야 함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0034-C39B801C",
+      "ordinal": 164,
+      "candidate_file": "Q057_b585158864df85bc_source_k.png",
+      "source_file": "Q057_b585158864df85bc_source.png",
+      "candidate_sha256": "098a1ef54e633e41a1d3b3ff76e82b9a545eb3b9162e5593244c64ae59348f37",
+      "source_sha256": "933e5758d9fa915c364db52f796934cb049cad2377d4cfee4305d6137c9b129f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Total Rank",
+      "approved_korean": "종합 랭크",
+      "source_dds_sha256": "f039f935c899b222c8532584e0d79bb286c55a99c2f69df45342711298e1be05",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2054,
+        765
+      ],
+      "original_dimensions": [
+        1020,
+        380
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        392,
+        32,
+        1729,
+        647
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "종합 랭크: 원본 흰색 채움·남색 외곽·우향 기울기와 유사. 철자·자소 문제 없음. 원본 왕관은 후보에서 제외됨.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0034-C39B801C",
+      "ordinal": 165,
+      "candidate_file": "Q057_cc9e7eedec64ff9b_source_k.png",
+      "source_file": "Q057_cc9e7eedec64ff9b_source.png",
+      "candidate_sha256": "007fa13ac414f4d3c5a7e681f6ceb6cd283fd03353b7746191f1f34e424a9cf9",
+      "source_sha256": "933e5758d9fa915c364db52f796934cb049cad2377d4cfee4305d6137c9b129f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Total Rank",
+      "approved_korean": "종합 랭크",
+      "source_dds_sha256": "234b03ef02c7f5184ae35a280cfe7eb01c2e4fdfdd722737f54bb87b7cf58256",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2054,
+        765
+      ],
+      "original_dimensions": [
+        1020,
+        380
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        346,
+        105,
+        1733,
+        678
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "종합 랭크: 흰색 채움·남색 외곽, 기울기 유지. 글자 가독성 양호. 원본 크라운/배경 보존은 미합성 상태.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0034-C39B801C",
+      "ordinal": 166,
+      "candidate_file": "Q212_5551ceaee898059d_source_k.png",
+      "source_file": "Q212_5551ceaee898059d_source.png",
+      "candidate_sha256": "3750289295121d92a2d86b7daf12f3c8b3cfc0d27a6a656badd1f2d92db309af",
+      "source_sha256": "f37076bf837e00bc2ff3da08cf05395bc92538719b7a969197d6dcc306c81930",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "DONE",
+      "approved_korean": "완료",
+      "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1639,
+        960
+      ],
+      "original_dimensions": [
+        847,
+        496
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        87,
+        103,
+        1456,
+        920
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 DONE은 어두운 회색 평면 블록 글자이나 생성된 완료는 반짝이는 은색·검정 입체 서체. 원본 스타일과 효과의 심각한 불일치. 한글 철자는 정확.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0034-C39B801C",
+      "ordinal": 167,
+      "candidate_file": "Q046_e32e01957d09461a_source_k.png",
+      "source_file": "Q046_e32e01957d09461a_source.png",
+      "candidate_sha256": "aa267bb0d93c766251b7ecbbde66131e49ab7a9bc80ce0d4c21845ee36881338",
+      "source_sha256": "1dd3a4b2b6687eedf8b5fd63351eaba11165313a1bd08e63f9803463651bdcc1",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Metropolis",
+      "approved_korean": "메트로폴리스",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1930,
+        815
+      ],
+      "original_dimensions": [
+        651,
+        275
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        86,
+        1911,
+        742
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 9,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "메트로폴리스 정확함. 원본의 흰색 채움·짙은 남색 두꺼운 외곽을 대체로 보존. 크기·UI 아이콘 안전영역은 원본 DDS 합성 전 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0035-3D9FAE71",
+      "ordinal": 168,
+      "candidate_file": "Q046_469dd463f4457ca4_source_k.png",
+      "source_file": "Q046_469dd463f4457ca4_source.png",
+      "candidate_sha256": "9ac6c471b4fd68a0a34c2f9b550c48c7637efa0cdecb78d0084f45bb09c96520",
+      "source_sha256": "2e0b221723e287560d2ed7a78a0cc315080fdac5bf3af63932d027653a2035b3",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Cape Way",
+      "approved_korean": "케이프 웨이",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1680,
+        936
+      ],
+      "original_dimensions": [
+        1164,
+        649
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        37,
+        1602,
+        863
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 3,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_SLANT_AND_SCALE",
+      "visual_reason": "원본 Cape Way는 비교적 작은 직립형 흰색/남색 글자이나 생성된 케이프 웨이는 현저히 큰 우향 이탤릭·두꺼운 획/효과. 같은 UI 목록의 인접 텍스트/아이콘 침범 위험; 합성 PASS 불가.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0035-3D9FAE71",
+      "ordinal": 169,
+      "candidate_file": "Q057_9aadbfaddf88efcf_source_k.png",
+      "source_file": "Q057_9aadbfaddf88efcf_source.png",
+      "candidate_sha256": "dbb5e0d8896e5ddf07808eeef66a00054fd04fc758f6ddd9b85bb0e13a120b3c",
+      "source_sha256": "9bf75ffc30918f8a3acf0e36a0e12ba6634e2ce55b3342be4ffee443b18157dd",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "EXIT",
+      "approved_korean": "종료",
+      "source_dds_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1600,
+        983
+      ],
+      "original_dimensions": [
+        1586,
+        975
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        31,
+        21,
+        1574,
+        930
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "종료 표기 정확함. 원본 EXIT의 분홍/흰 그라데이션, 남색 외곽, 우향 기울기 대체로 유지. 후보 별도 투명 배경이며 UI 셀 합성 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0035-3D9FAE71",
+      "ordinal": 170,
+      "candidate_file": "Q057_45f29d15cf40360b_source_k.png",
+      "source_file": "Q057_45f29d15cf40360b_source.png",
+      "candidate_sha256": "d000803430010b4c98b775102a848a6f70afe79db5fbebcaa73bd6555157659c",
+      "source_sha256": "bf78b01aa9dc86b291a1dfd635b0460ab21c68d09c18d50d469889f5008eb51c",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "EXIT",
+      "approved_korean": "종료",
+      "source_dds_sha256": "f039f935c899b222c8532584e0d79bb286c55a99c2f69df45342711298e1be05",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1600,
+        983
+      ],
+      "original_dimensions": [
+        1586,
+        975
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        129,
+        23,
+        1568,
+        959
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "종료 표기 정확함. 원본 EXIT의 분홍 채움·남색 윤곽·기울기 대체로 유지. 후보 별도 투명 배경이며 UI 셀 합성 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "review_slot_kst": "2026-10-21 20:15",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "counts": {
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 6,
+    "fail_major_style_effect": 1,
+    "fail_major_slant_and_scale": 1,
+    "producer_rework_dimensions": 8,
+    "sha_matches": 8,
+    "rgba_png": 8,
+    "edge_opacity_gt32": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "authority": "C1 independent PNG QA only. No ImageGen, queue consumption, DDS export, C2/C3 or game PASS."
+}
