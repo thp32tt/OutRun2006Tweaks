@@ -39,8 +39,18 @@ for old in (
     "ctx->PSSetShaderResources(0, 1, &boundView);",
     "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)",
 ):
-    assert old in bridge
-    assert not integrated(bridge.replace(old, "/* removed source boundary */", 1)), old
+    begin = bridge.index("bool mirror_texture(")
+    end = bridge.index("bool submit(", begin)
+    # 00974 adds a preceding cube decoder with an identical unpack symbol;
+    # preserve the 00970 real 2D RT destructive test's original scope.
+    if old in bridge[begin:end]:
+        mutant = (bridge[:begin] +
+                  bridge[begin:end].replace(old, "/* removed source boundary */", 1) +
+                  bridge[end:])
+    else:
+        assert old in bridge, old
+        mutant = bridge.replace(old, "/* removed source boundary */", 1)
+    assert not integrated(mutant), old
 assert "tools/dx11_live_game_rt_frame_probe_00970.cpp" in workflow
 assert "python tools/test_dx11_live_game_rt_frame_00970.py" in workflow
 print("00970 live full-size D3D9 RT -> native SRV/Draw -> guarded frame source PASS")
