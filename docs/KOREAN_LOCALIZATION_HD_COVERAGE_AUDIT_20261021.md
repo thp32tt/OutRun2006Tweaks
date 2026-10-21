@@ -57,3 +57,23 @@ The earlier 795 figure was a conservative lower bound based on unique Q+English 
 - source PNGs still containing at least one uncovered reviewed phrase: **103 / 108**
 
 This source-variant occurrence count is the production coverage denominator for C. Repeated Q groups across BASE/Keyboard/PlayStation/Switch/Xbox are separate source occurrences and must each reach crop coverage. C must continue cycling until `pending_phrases=0` and edge backlog is also zero. A one-time source `SCANNED` receipt is not completion.
+
+
+## English-only coverage correction — 2026-10-21
+
+Per user direction, Japanese and all other non-English source text are not localization inputs for this automated crop pipeline.
+
+The C worker now:
+- includes only source phrases containing ASCII Latin text and no non-ASCII alphabetic script;
+- excludes Japanese/Korean/other-language source strings from coverage, pending counts and rescans;
+- retains short English UI strings such as OK/NO/WIN/Go!;
+- removes bracketed icon placeholders from OCR matching while preserving the full reviewed English phrase as metadata;
+- uses Tesseract English only; no Japanese OCR language pack is installed.
+
+Recount against all 108 verified source variants:
+- English reviewed source occurrences: **983**
+- currently located under the English-only coverage rules at the recount checkpoint: **225**
+- pending English source occurrences at that checkpoint: **758**
+- source PNGs with at least one pending English phrase: **103 / 108**
+
+These figures replace the prior 992-occurrence denominator for C production completion.
