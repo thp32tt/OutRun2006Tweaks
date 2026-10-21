@@ -54,6 +54,13 @@ def archive_keys():
 def stamp():
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
+def touch_heartbeat(state="alive"):
+    hb=BASE/"crop_worker_heartbeat.json"
+    tmp=BASE/"crop_worker_heartbeat.json.tmp"
+    tmp.write_text(json.dumps({"time_utc":stamp(),"state":state},ensure_ascii=False)+"\n",encoding="utf-8")
+    os.replace(tmp,hb)
+
+
 def write_audit(row):
     row = {"time_utc":stamp(),"worker":"docker-c-original-english-v1",**row}
     with (BASE/"docker_run_audit.jsonl").open("a",encoding="utf-8") as f:
@@ -140,6 +147,7 @@ def main():
         last_discovery = -1000000.0
         while not STOP:
             try:
+                touch_heartbeat("cycle_start")
                 now=time.monotonic()
                 if now-last_discovery >= 60:
                     last_discovery=now
@@ -189,6 +197,7 @@ def main():
                         last_coverage_status=coverage_sig
                     except Exception as e:
                         write_audit({"status":"DISCOVERY_HOLD","reason":type(e).__name__+":"+str(e)})
+                touch_heartbeat("coverage_done")
                 summary = process_batch(args.max_per_cycle)
                 if summary != last_summary or summary["completed"] or time.monotonic()-heartbeat>1800:
                     print(json.dumps({"timestamp":stamp(),**summary}),flush=True)
@@ -196,6 +205,7 @@ def main():
                     heartbeat = time.monotonic()
             except Exception as e:
                 write_audit({"status":"WORKER_HOLD","error":str(e)})
+            touch_heartbeat("cycle_end")
             if args.once: break
             for _ in range(args.interval_seconds):
                 if STOP: break
