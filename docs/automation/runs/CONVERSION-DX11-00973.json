@@ -68,7 +68,7 @@
     "conflict_keys": [
       "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00973"
     ],
-    "full_gate_plan": "final_exact_sha_after_causal_ci_repair",
+    "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
