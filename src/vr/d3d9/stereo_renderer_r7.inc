@@ -1346,10 +1346,35 @@ bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
             height = exact.height;
             return true;
         }
-		HRESULT StretchDirectEye(IDirect3DDevice9* device,IDirect3DSurface9* source,IDirect3DSurface9* target)
-		{
-			if(!device||!source||!target)return D3DERR_INVALIDCALL;HRESULT hr=device->StretchRect(source,nullptr,target,nullptr,D3DTEXF_LINEAR);if(FAILED(hr))hr=device->StretchRect(source,nullptr,target,nullptr,D3DTEXF_NONE);return hr;
-		}
+        HRESULT StretchDirectEye(IDirect3DDevice9* device,
+            IDirect3DSurface9* source, IDirect3DSurface9* target)
+        {
+            if (!device || !source || !target)
+                return D3DERR_INVALIDCALL;
+
+            // TEST-ONLY: isolate DirectGPU whole-eye resampling from native
+            // DDS glyph sampling. The shipping/default LINEAR->NONE path is
+            // unchanged. POINT can exaggerate texel edges and is deliberately
+            // never enabled without the explicit process environment flag.
+            static const bool pointTest = []() noexcept {
+                char value[8]{};
+                return ::GetEnvironmentVariableA(
+                    "OUTRUN_VR_DIRECT_EYE_POINT_TEST",
+                    value, sizeof(value)) == 1 && value[0] == '1';
+            }();
+            HRESULT hr = device->StretchRect(
+                source, nullptr, target, nullptr,
+                pointTest ? D3DTEXF_POINT : D3DTEXF_LINEAR);
+            // Unsupported POINT must not turn a previously working
+            // DirectGPU stereo transfer into an empty/black eye.
+            if (FAILED(hr) && pointTest)
+                hr = device->StretchRect(
+                    source, nullptr, target, nullptr, D3DTEXF_LINEAR);
+            if (FAILED(hr))
+                hr = device->StretchRect(
+                    source, nullptr, target, nullptr, D3DTEXF_NONE);
+            return hr;
+        }
 		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
 		{
 			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState()||!EnsureDirectInteropProbe(device))return false;UINT targetWidth=0,targetHeight=0;if(!DirectTransportTargetSize(device,targetWidth,targetHeight))return false;if(DirectTransportResourcesReady&&DirectEyeExtentGeneration.Matches({targetWidth,targetHeight})&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;DirectEyeExtentGeneration.Commit({targetWidth,targetHeight});if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
