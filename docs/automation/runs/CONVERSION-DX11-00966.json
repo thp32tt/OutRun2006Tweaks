@@ -13,9 +13,9 @@
   "feature_branch": "feature/dx11-00966-live-source-capture",
   "feature_stage": "C3_VALIDATE",
   "status": "IN_PROGRESS",
-  "checkpoint": "SOURCE_STREAM_MERGED_FAST_CI_POLICY_REPAIR",
+  "checkpoint": "SOURCE_INTEGRATED_FAST_PASS_FIVE_GATE_CANDIDATE",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
-  "feature_last_head": "104dec843ecf1b1c85ebb30926065c1a84a576e7",
+  "feature_last_head": "919ab8a35d40748d4de61bf372b231d4c233b88c",
   "material_result_sha": "9cccfba82ee1356d07b9b459b863a3689edcbc2e",
   "target_head_at_recovery": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
   "base_sha_from_dispatch": "e82835a4deb9a71a5903f00433453c3ba3b8efb8",
@@ -65,10 +65,10 @@
     ".github/workflows/vr-openxr.yml"
   ],
   "targeted_validation": {
-    "result": "PENDING_MERGED_EXACT_SHA_CI",
-    "evidence": "Nine read-back GitHub source static invariants PASS; C++17 portable source-stride semantic compile probe PASS in ChatGPT local environment; GitHub compare branch ahead_by=1, behind_by=0 before checkpoint.",
+    "result": "PASS_FAST_EXACT_SHA_SOURCE_ONLY",
+    "evidence": "DX11 Fast Structural Checks run 39542802431 SUCCESS at source-and-regression SHA 919ab8a35d40748d4de61bf372b231d4c233b88c; game/HMD native pixels still UNTESTED; consolidated 5-gate validation pending this candidate checkpoint SHA",
     "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_source_stride_probe_00966.cpp -o /tmp/dx11_game_source_stride_00966 && /tmp/dx11_game_source_stride_00966; python tools/test_dx11_live_source_stride_00966.py",
-    "caveat": "Pre-merge portable checks were on earlier source SHA; merged feature exact SHA Build/Fast/Backend/OpenXR/HUD are being run. Fast 104dec fails policy due missing development_strategy, repaired by this same feature checkpoint commit."
+    "caveat": "Actual DX11 published game frame/menu/car/race/Quest3 UNTESTED. Fast 919ab8 PASS only. Required all five at same SHA remain PENDING and may expose independent Windows/GPU/HUD validation failures."
   },
   "acceptance_results": {
     "live_game_draw_to_visible_frame": {
@@ -84,7 +84,7 @@
       "evidence": "All 5 mandatory Actions not yet run at integrated feature SHA"
     }
   },
-  "automation_validation": "NOT_READY",
+  "automation_validation": "FAST_PASS_FULL_PENDING",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
@@ -93,9 +93,9 @@
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "NEXT_IMPLEMENTATION_ACTION": "On this same feature, continue genuine D3D9 programmable Draw capture to D3D11 full-frame output, using actual game failure cause counters and same-launch native/published pixel evidence; preserve original D3D9 fallback. After integrated feature completion run all five mandatory exact-SHA Actions once, repair causal failures, then non-force expected-sha compare behind=0 promotion.",
   "next_actions": [
-    "Confirm Fast policy and structural regressions at new exact SHA, repair causal failures only under same TASK_ID",
-    "Require all five mandatory Actions PASS on a single exact SHA before FEATURE_READY or target promotion",
-    "Obtain same-run game menu/car/race native Draw, publish and framebuffer pixel evidence and Quest3 separately; keep runtime_validation=UNTESTED until measured"
+    "Run five exact-SHA required Actions on validation-bearing candidate and repair only confirmed causes within same TASK_ID",
+    "After all five PASS, require opt-in real-game same-run native_draws>0, published frames>0, visible pixel/menu-car-race evidence to complete runtime acceptance",
+    "Do not promote vr-dx11-native-r71 or declare FEATURE_READY until all contract acceptance and source ownership conditions are met"
   ],
   "feature_ready": false,
   "promotion_performed": false,
@@ -139,5 +139,13 @@
     ],
     "visible_frame_acceptance": "SOURCE_INTEGRATED_CI_PENDING; no actual menu/car/race game frame pixels, native published count or Quest3 HMD runtime proof at current SHA.",
     "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit opt-in, stereo/game source validation fail-closed, original D3D9/DX9Ex Draw/Present/input/FFB retained."
+  },
+  "ci_candidate": {
+    "source_sha": "919ab8a35d40748d4de61bf372b231d4c233b88c",
+    "fast_run_id": 39542802431,
+    "fast_conclusion": "success",
+    "mandatory_five_exact_sha": "PENDING",
+    "runtime": "UNTESTED",
+    "source_ownership": "same TASK_ID 00966; feature/dx11-00966-live-source-capture"
   }
 }
