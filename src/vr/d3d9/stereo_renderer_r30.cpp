@@ -3750,8 +3750,12 @@ namespace OutRunVRStereo
                     } else std::memcpy(&unpacked[i],p,4);
                     if (unpacked[i] < minVertex ||
                         unpacked[i] - minVertex >= numVertices) return;
-                    if (!sparseWindow) unpacked[i] -= minVertex;
                 }
+                // Preserve game-absolute D3D9 slot identities for all
+                // referenced secondary streams; only IA indices are rebased.
+                std::vector<std::uint32_t> rebasedIndices = unpacked;
+                if (!sparseWindow)
+                    for (auto& index : rebasedIndices) index -= minVertex;
                 if (sparseWindow) {
                     std::vector<std::uint8_t> compactVertices;
                     std::vector<std::uint32_t> compactIndices;
@@ -3759,18 +3763,39 @@ namespace OutRunVRStereo
                             vertices, stride, unpacked.data(), count,
                             minVertex, numVertices, compactVertices, compactIndices))
                         return; // Keep the original D3D9 Draw/input intact.
+                    std::vector<std::uint32_t> physical;
+                    if (!live::game_indexed_up_physical_slots(
+                            unpacked.data(), count, minVertex, numVertices,
+                            compactIndices, true, physical))
+                        return;
+                    live::NativeGameAdditionalStreams extra{};
+                    std::array<std::vector<std::uint8_t>,3> owned{};
+                    if (!R30CaptureNativeAdditionalStreams(
+                            device, physical, extra, owned))
+                        return; // Missing/stale stream: never splice a native frame.
                     nativeSource.forwarded = true;
                     live::observe_indexed(
                         device, topology, primitiveCount, compactVertices.data(),
                         stride, static_cast<UINT>(compactVertices.size() / stride),
-                        compactIndices.data(), count);
+                        compactIndices.data(), count, &extra);
                     return;
                 }
+                std::vector<std::uint32_t> physical;
+                if (!live::game_indexed_up_physical_slots(
+                        unpacked.data(), count, minVertex, numVertices,
+                        rebasedIndices, false, physical))
+                    return;
+                live::NativeGameAdditionalStreams extra{};
+                std::array<std::vector<std::uint8_t>,3> owned{};
+                if (!R30CaptureNativeAdditionalStreams(
+                        device, physical, extra, owned))
+                    return; // Original D3D9 IndexedUP/input still execute.
                 const auto* firstVertex = static_cast<const std::uint8_t*>(vertices) +
                     static_cast<std::size_t>(minVertex) * stride;
                 nativeSource.forwarded = true;
                 live::observe_indexed(device, topology, primitiveCount,
-                    firstVertex, stride, numVertices, unpacked.data(), count);
+                    firstVertex, stride, numVertices,
+                    rebasedIndices.data(), count, &extra);
             } catch (...) { /* Original UP path remains authoritative. */ }
         }
 

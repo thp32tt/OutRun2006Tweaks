@@ -164,6 +164,45 @@ inline bool game_compact_sparse_indices(
      return true;
  }
 
+// IndexedUP stream 0 comes from the call's user pointer while any referenced
+// secondary streams still belong to the game's D3D9 stream bindings. Reconstruct
+// the SAME physical slots in exactly the same native IA order, not the rebased
+// index values. A bad index/window or a sparse compaction mismatch must abort
+// before any secondary VB bytes are copied or native GPU work is queued.
+// On failure preserve the previous vector; D3D9 Draw remains authoritative.
+inline bool game_indexed_up_physical_slots(
+    const std::uint32_t* absoluteIndices, std::uint32_t indexCount,
+    std::uint32_t minVertex, std::uint32_t numVertices,
+    const std::vector<std::uint32_t>& rebasedIndices, bool sparse,
+    std::vector<std::uint32_t>& physical) {
+    if (!absoluteIndices || indexCount == 0u ||
+        indexCount > kMaxNativeGameVertices || numVertices == 0u ||
+        minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices ||
+        rebasedIndices.size() != indexCount)
+        return false;
+    for (std::uint32_t i = 0u; i < indexCount; ++i)
+        if (absoluteIndices[i] < minVertex ||
+            absoluteIndices[i] - minVertex >= numVertices)
+            return false;
+    std::vector<std::uint32_t> slots, checked;
+    if (sparse) {
+        if (!game_compact_sparse_indices(absoluteIndices, indexCount,
+                                         kMaxNativeGameVertices, slots, checked) ||
+            checked != rebasedIndices)
+            return false;
+    } else {
+        if (numVertices > kMaxNativeGameVertices) return false;
+        for (std::uint32_t i = 0u; i < indexCount; ++i)
+            if (rebasedIndices[i] != absoluteIndices[i] - minVertex)
+                return false;
+        slots.resize(numVertices);
+        for (std::uint32_t i = 0u; i < numVertices; ++i)
+            slots[i] = minVertex + i;
+    }
+    physical.swap(slots);
+    return true;
+}
+
 // D3D9 single-sample line raster parity for *programmable* VS/PS draws.
  // The fixed-function game raster already uses these same exclusions.
  // A rejected raster never mutates the native color/depth output; original
