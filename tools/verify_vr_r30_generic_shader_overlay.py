@@ -43,7 +43,9 @@ def check(code, h):
     assert "e.writtenScope == RenderScope::ScreenOverlay2D" in h
 
 assert "R30ScreenSpaceKind::ScreenOverlay2D" in safe
-assert "R30BuildHudPlaneCoefficients(state, true)" in safe
+assert "state, true, semanticOverlay2D" in safe
+assert "if (screenOverlay2D)" in safe
+assert "scaleX = R30HudScaleValue();" in safe
 check(current,proof)
 assert "for (int i = 0; i < 1000; ++i)" in test
 assert "'outrun-vr-hud-original-wvp-smoke.exe'," in workflow
