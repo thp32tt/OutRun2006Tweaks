@@ -1,0 +1,585 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2145KST-OLDER-BACKLOG-SHA8",
+  "prior_reviewed_sha": 284,
+  "total_unreviewed_before": 34,
+  "count": 8,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 4,
+      "candidate_file": "Q046_71c038f285be8338_source_k.png",
+      "source_file": "Q046_71c038f285be8338_source.png",
+      "candidate_sha256": "f77dff2cd63ba29a4ecf3a174fd6554596a33bcaba5515334b8ff28c6987b336",
+      "source_sha256": "25cc48a96997f2a6c6859eddf7eabd32ab1d091eca84c8ed0c28a4e76b6621e5",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "GEAR DOWN",
+      "approved_korean": "기어 다운",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "original_dimensions": [
+        1332,
+        256
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        112,
+        0,
+        2072,
+        698
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 3,
+          "gt32": 0,
+          "max": 1
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_NON_TEXT_ART_CONTAMINATION",
+      "visual_reason": "승인 문구 ‘기어 다운’은 읽히지만 붉은 비문자 곡선/파편 2개가 한글 자소 사이에 독립 삽입되었다. 영문 원본에도 붉은 아이콘성 요소가 있으나 이를 생성 한글 글자 레이어에 복사하면 원본 보호 아트 중복/위치 변형 위험. 글자 전용 레이어 요구에 위배.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 5,
+      "candidate_file": "Q046_0d765b14d3cb7d96_source_k.png",
+      "source_file": "Q046_0d765b14d3cb7d96_source.png",
+      "candidate_sha256": "d94bd5b7ea50f43c9ac830589fb400fdea27c72f52139f6822b5f507cbf840d5",
+      "source_sha256": "c5e5ea0a0d65bd83408db8c88530bb3358080de419d3c915362f7ada66f29f26",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "BRAKE",
+      "approved_korean": "브레이크",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "original_dimensions": [
+        824,
+        256
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        6,
+        1929,
+        724
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 1,
+          "gt32": 0,
+          "max": 1
+        },
+        "left": {
+          "gt0": 1,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘브레이크’ 승인 매핑 일치. 자소·받침·가독성 및 투명 RGBA 정상. 원문 평면 회색과 달리 검정 외곽선/명암 효과가 있으나 문구 정체성/독립 판독을 해치는 치명적 결함은 확인되지 않아 경미한 스타일 차이 허용.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 6,
+      "candidate_file": "Q046_5f87dc8be5d0fb22_source_k.png",
+      "source_file": "Q046_5f87dc8be5d0fb22_source.png",
+      "candidate_sha256": "351092b473ca726edd5ab5a8894feb5a2a92c962aa20355ac4d41a8d3914c9b3",
+      "source_sha256": "efdb76e2d70e7e5bac9ae33024a85878ddc1e4a4b49982b4d0cd814941aad200",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "GEAR DOWN",
+      "approved_korean": "기어 다운",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "original_dimensions": [
+        1332,
+        256
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        114,
+        39,
+        2027,
+        603
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_APPROVED_TRANSLATION_MISMATCH",
+      "visual_reason": "원문 GEAR DOWN, 승인 번역 ‘기어 다운’이어야 하나 실제 후보는 ‘밀키 웨이’로 판독됨. 다른 번역이 삽입된 명백한 오매핑.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "WRONG_TEXT",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 7,
+      "candidate_file": "Q046_dba61321cf7c46df_source_k.png",
+      "source_file": "Q046_dba61321cf7c46df_source.png",
+      "candidate_sha256": "1340b65d8ff6f98c81103d38779cd6671ec88a4eeedd1511d63d0ec85fd69c7e",
+      "source_sha256": "e890c2e2a9988d578f108925c677ed4583b205977f48826ef00b7a589c7b50c4",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "GEAR UP",
+      "approved_korean": "기어 업",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "original_dimensions": [
+        1000,
+        256
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        378,
+        25,
+        1829,
+        682
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘기어 업’ 승인 문구 일치, 자소 완전하고 텍스트 읽기 방향·투명도 정상. 원문보다 짧고 금속 명암·검정 윤곽이 추가됐으나 문구 길이/미세 스타일만으로 반려하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 8,
+      "candidate_file": "Q050_f7ff1ecef9b70121_source_k.png",
+      "source_file": "Q050_f7ff1ecef9b70121_source.png",
+      "candidate_sha256": "f358edb7093ed362f3c141a6cb28cc45fed5e010b0b3e5d73edf514cbe3c28b3",
+      "source_sha256": "556fcd4584715ef84a3e58ba1c463a868ef57ec605bbda9b2471d427164027c5",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "PLAYERS",
+      "approved_korean": "플레이어",
+      "source_dds_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "original_dimensions": [
+        850,
+        194
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        199,
+        87,
+        2023,
+        700
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘플레이어’ 승인 매핑과 일치하며 자소·받침 또렷하고 경계 잘림/영문 잔상 없음. 원본 흰색 레이블보다 윤곽선이 두꺼우나 글자 전용 임시 PNG 간이 QA 범위에서 허용.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 9,
+      "candidate_file": "Q052_a59a8c29fba84397_source_k.png",
+      "source_file": "Q052_a59a8c29fba84397_source.png",
+      "candidate_sha256": "73526a2057548274f1f4a0b109718784f05f212c4bb71851bc9e455828f7bff4",
+      "source_sha256": "664b1ec8594569d3891bdbac71329cab4884304c20ad99418f33d6cab5d36db3",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Extra Time",
+      "approved_korean": "추가 시간",
+      "source_dds_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "original_dimensions": [
+        992,
+        162
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        180,
+        25,
+        2134,
+        700
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘추가 시간’ 정확한 번역, 골드 그라데이션·짙은 파란 외곽선 및 우향 기울기가 원문의 핵심 효과와 유사함. 글자 개별 가독성/투명 PNG 확인.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 10,
+      "candidate_file": "Q086_cf5c6a0a497b6ce4_source_k.png",
+      "source_file": "Q086_cf5c6a0a497b6ce4_source.png",
+      "candidate_sha256": "a118549bec26b61040742a64aa76ee82db2bd30008289a9d26742f77ea3a3618",
+      "source_sha256": "2a77c43b7112707b2bcd1f7b517b1f681f5357cc87757e926f7c31fad4dc5114",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Milky Way",
+      "approved_korean": "밀키 웨이",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "original_dimensions": [
+        952,
+        256
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        408,
+        35,
+        1860,
+        684
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_APPROVED_TRANSLATION_MISMATCH",
+      "visual_reason": "원문 Milky Way, 승인 ‘밀키 웨이’와 달리 출력은 ‘기어 다운’임. 승인 영문→한글 매핑 불일치.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "WRONG_TEXT",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_4.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "ordinal": 11,
+      "candidate_file": "Q086_72f6f42102789a81_source_k.png",
+      "source_file": "Q086_72f6f42102789a81_source.png",
+      "candidate_sha256": "e3922cbe908c1f155268527924291e63f2975b4c49365f9c29a82304015d4b4c",
+      "source_sha256": "6aced5918bf2b32c04d488afa76f77e8b86775145837a3792127dcee65489575",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Cape Way",
+      "approved_korean": "케이프 웨이",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "original_dimensions": [
+        936,
+        296
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        87,
+        9,
+        2100,
+        724
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 24,
+          "gt32": 0,
+          "max": 1
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_EFFECT_LOSS",
+      "visual_reason": "원본 Cape Way는 흰색 내부를 두꺼운 검은 윤곽이 둘러싼 표제인데 ‘케이프 웨이’ 후보는 검은 윤곽이 사실상 통째로 사라진 흰색 글자로 변함. 투명 UI 오버레이에서 원래 대비/보호 효과가 소실되는 명확한 중대 효과 누락. 철자·읽기 방향 자체는 정상.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2145/compare_4.jpg"
+    }
+  ],
+  "summary": {
+    "qa_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+    "pass": 4,
+    "fail": 4,
+    "prior_reviewed_unique_sha": 284,
+    "unreviewed_before": 34,
+    "unreviewed_after_if_logged": 26,
+    "source_export_sha_verified": 8,
+    "png_rgba_verified": 8,
+    "producer_rework_dimensions": 8,
+    "no_imagegen": true,
+    "queue_unchanged": true,
+    "no_dds_deployment": true,
+    "c2_c3_game_unapproved": true,
+    "runtime_validation": "UNTESTED",
+    "evidence_limits": "No native UI-cell atlas composition or actual DDS/runtime PASS claimed; FAIL reason based on candidate versus source visual only."
+  }
+}
