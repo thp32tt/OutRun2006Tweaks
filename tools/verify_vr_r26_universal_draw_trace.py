@@ -48,7 +48,7 @@ def main():
                   "regression", "texture-debug"):
         p = ROOT / ".github" / "skills" / ("outrun-vr-" + skill) / "SKILL.md"
         data = p.read_text(encoding="utf-8")
-        assert data.startswith("---\\n"), p
+        assert data.startswith("---\n"), p
         assert "name: outrun-vr-" + skill in data, p
         assert "description:" in data, p
     assert not valid(src.replace("VR R26 DRAW TRACE 5s:", "TRACE_REMOVED:", 1), hdr)
