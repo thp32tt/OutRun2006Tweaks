@@ -5286,9 +5286,10 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // native VS tN/sN uses the same ordinal with independent stage bindings.
     // Any unsupported vertex texture fails before the native GPU Draw.
     rejectionStage = 8u;
-    // Real shader-bound game Draws often alias a full-size D3D9 RT in VS/PS
-    // sampler slots. Capture one GPU source per draw; independent samplers
-    // preserve each slot's D3D9 state. Reset/Present/next Draw cannot reuse it.
+    // Source game VS and PS may bind the same 2D image or reflection cube.
+    // Copy all six cube faces only once per Draw, not per sampler slot.
+    // Preserve independent address/filter/LOD/border samplers; the view cache
+    // expires on the next source Draw, Present or Reset.
     struct DrawMirror {
         draw_mirror_cache::ViewKey key{};
         UINT levels = 0u;
@@ -5299,14 +5300,18 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     const auto mirrorLiveSampler = [&](const TextureCapture& captured,
                                       ComPtr<ID3D11ShaderResourceView>& view,
                                       ComPtr<ID3D11SamplerState>& sampler) -> bool {
-        // Cubes use the existing six-face copy and validation; unsupported
-        // source textures must still fail closed to original D3D9.
-        if (!captured.enabled || !captured.texture || captured.cubeTexture)
-            return mirror_texture(device, captured, view, sampler);
+        // Bind exactly one real D3D9 source image. Missing/ambiguous sources
+        // cannot certify a native game frame; original DX9Ex Draw survives.
+        if (!captured.enabled ||
+            (!captured.texture && !captured.cubeTexture) ||
+            (captured.texture && captured.cubeTexture)) return false;
+        const bool cube = captured.cubeTexture != nullptr;
         const bool chain = captured.mipFilter == D3DTEXF_POINT ||
                            captured.mipFilter == D3DTEXF_LINEAR;
         const draw_mirror_cache::ViewKey key{
-            captured.texture.Get(), captured.srgbTexture, chain};
+            cube ? static_cast<const void*>(captured.cubeTexture.Get())
+                 : static_cast<const void*>(captured.texture.Get()),
+            captured.srgbTexture, chain, cube};
         for (std::size_t i = 0u; i < drawMirrorCount; ++i) {
             const auto& previous = drawMirrors[i];
             if (!draw_mirror_cache::same_view(key, previous.key))
@@ -5320,7 +5325,12 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (!mirror_texture(device, captured, view, sampler) ||
             !view || !sampler)
             return false;
-        const UINT levels = chain ? captured.texture->GetLevelCount() : 1u;
+        // A cube view covers its validated six faces; a second shader slot
+        // shares SRV pixels but re-creates its game-authored sampler state.
+        const UINT levels = chain
+            ? (cube ? captured.cubeTexture->GetLevelCount()
+                    : captured.texture->GetLevelCount())
+            : 1u;
         if (drawMirrorCount < drawMirrors.size())
             drawMirrors[drawMirrorCount++] = {key, levels, view};
         return true;

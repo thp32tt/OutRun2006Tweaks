@@ -22,18 +22,19 @@ def integrated(x):
         "view = previous.view" in block,
         "mirror_texture(device, captured, view, sampler)" in block,
         "captured.texture->GetLevelCount()" in block,
-        "!captured.enabled || !captured.texture || captured.cubeTexture" in block,
+        "(!captured.texture && !captured.cubeTexture)" in block,
         "drawMirrors[drawMirrorCount++] = {key, levels, view};" in block,
         start < v < p < draw,
         "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in x,
         "a.srgb == b.srgb" in hdr,
         "a.mipChain == b.mipChain" in hdr,
+        "a.cube == b.cube" in hdr,
     ))
 assert integrated(src)
 for needle in ("draw_mirror_cache::same_view(key, previous.key)",
                "create_game_sampler(device, captured, previous.levels, sampler)",
                "view = previous.view",
-               "!captured.enabled || !captured.texture || captured.cubeTexture",
+               "(!captured.texture && !captured.cubeTexture)",
                "!mirrorLiveSampler(capture, views[slot], samplers[slot])"):
     assert needle in src
     assert not integrated(src.replace(needle,"/* removed */",1)), needle

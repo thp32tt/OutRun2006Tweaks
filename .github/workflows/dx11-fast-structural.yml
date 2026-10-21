@@ -307,6 +307,8 @@ jobs:
           python tools/test_dx11_live_game_rt_frame_00970.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_draw_mirror_probe_00971.cpp -o /tmp/dx11_live_draw_mirror_00971 && /tmp/dx11_live_draw_mirror_00971
           python tools/test_dx11_live_game_draw_mirror_00971.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_draw_mirror_probe_00972.cpp -o /tmp/dx11_live_draw_mirror_00972 && /tmp/dx11_live_draw_mirror_00972
+          python tools/test_dx11_live_game_draw_mirror_00972.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_viewport_depth_probe_00687.cpp -o /tmp/dx11_00687 && /tmp/dx11_00687
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_untextured_game_probe_00686.cpp -o /tmp/dx11_00686 && /tmp/dx11_00686
           python tools/test_dx11_stage1_factor_00673.py
