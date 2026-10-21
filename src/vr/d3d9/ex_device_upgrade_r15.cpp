@@ -215,8 +215,19 @@ namespace OutRunVRD3D9ExUpgradeR13
         bool InstallManagedResourceCompatR15(
             IDirect3DDevice9Ex* deviceEx) noexcept
         {
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 INSTALL_PRE deviceEx={} resetHealthy={} finalGate={}",
+                    static_cast<const void*>(deviceEx),
+                    R15ResetStateHealthy.load(std::memory_order_acquire) ? 1 : 0,
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
             const bool installed =
                 R15InstallCompatR14Hook.call<bool>(deviceEx);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 INSTALL_R14_RESULT deviceEx={} installed={} finalGate={}",
+                    static_cast<const void*>(deviceEx), installed ? 1 : 0,
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
             if (!installed || !deviceEx)
                 return installed;
 
@@ -242,6 +253,11 @@ namespace OutRunVRD3D9ExUpgradeR13
             DisarmLegacyResetHook();
             if (!OutRunVRStereo::InstallStereoHooksSynchronously(device))
             {
+                if (Settings::VREvidenceTrace)
+                    spdlog::info(
+                        "VR EVIDENCE R15 STEREO_HANDOFF device={} result=FAIL finalGateBefore={}",
+                        static_cast<const void*>(device),
+                        OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
                 R15ResetStateHealthy.store(false, std::memory_order_release);
                 OutRunVRD3D9ExUpgrade::SetFinalCompatOverlayReady(false);
                 R14AbandonCompatDevice(device);
@@ -255,6 +271,12 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return false;
             }
 
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 INSTALL_POST device={} result=SUCCESS resetHealthy={} finalGate={}",
+                    static_cast<const void*>(device),
+                    R15ResetStateHealthy.load(std::memory_order_acquire) ? 1 : 0,
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
             spdlog::info(
                 "VR R15 EX: explicit fresh-device state baselines + synchronous Reset/stereo handoff ACTIVE; no pre-Reset state-block replay; partial-RECT and generated-mip correctness overlay ACTIVE");
             return true;
@@ -323,6 +345,25 @@ namespace OutRunVRD3D9ExUpgradeR13
             UINT level)
         {
             const R14EntryPtr entry = R14Find(texture);
+            if (Settings::VREvidenceTrace)
+            {
+                std::uint32_t validMask = 0, dirtyMask = 0, lockedMask = 0;
+                bool retirePending = false, externalWrite = false;
+                if (entry)
+                {
+                    std::lock_guard<std::mutex> evidenceLock(entry->mutex);
+                    validMask = entry->validMask;
+                    dirtyMask = entry->dirtyMask;
+                    lockedMask = entry->lockedMask;
+                    retirePending = entry->retirePending;
+                    externalWrite = entry->externalWriteDuringLock;
+                }
+                spdlog::info(
+                    "VR EVIDENCE R15 UNLOCK_PRE texture={} level={} tracked={} validMask=0x{:08X} dirtyMask=0x{:08X} lockedMask=0x{:08X} retirePending={} externalWrite={}",
+                    static_cast<const void*>(texture), level, entry ? 1 : 0,
+                    validMask, dirtyMask, lockedMask,
+                    retirePending ? 1 : 0, externalWrite ? 1 : 0);
+            }
             if (!entry || level >= R14MaxTrackedLevels)
                 return R14TextureUnlockR13Hook.stdcall<HRESULT>(texture, level);
 
@@ -388,6 +429,14 @@ namespace OutRunVRD3D9ExUpgradeR13
             if (cpuToRelease) cpuToRelease->Release();
             if (retired)
                 R14LogRetiredShadow("R15 coherency path retired at Unlock");
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 UNLOCK_POST texture={} level={} result=0x{:08X} retired={} uploads={} uploadFailed={} partialFailClosed={}",
+                    static_cast<const void*>(texture), level,
+                    static_cast<unsigned>(result), retired ? 1 : 0,
+                    R14ShadowUploads.load(std::memory_order_acquire),
+                    R14ShadowUploadFailed.load(std::memory_order_acquire),
+                    R15PartialUploadFailClosed.load(std::memory_order_acquire));
             return result;
         }
 
@@ -440,16 +489,35 @@ namespace OutRunVRD3D9ExUpgradeR13
         void __stdcall TextureGenerateMipSubLevelsDestR15(
             IDirect3DTexture9* texture)
         {
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 GENERATE_MIPS_PRE texture={} internalUploadDepth={} invalidations={}",
+                    static_cast<const void*>(texture), R14InternalUploadDepth,
+                    R15GeneratedMipInvalidations.load(std::memory_order_acquire));
             // Bypass R14's conservative whole-shadow retirement while retaining
             // its underlying device-method trampoline.
             R14TextureGenerateMipSubLevelsHook.stdcall<void>(texture);
             if (R14InternalUploadDepth == 0)
                 R15InvalidateGeneratedMipShadows(texture);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 GENERATE_MIPS_POST texture={} internalUploadDepth={} invalidations={}",
+                    static_cast<const void*>(texture), R14InternalUploadDepth,
+                    R15GeneratedMipInvalidations.load(std::memory_order_acquire));
         }
 
         bool ResetCompatDeviceR15(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params, HRESULT& result) noexcept
         {
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 RESET_PRE device={} bb={}x{} windowed={} resetHealthy={} finalGate={}",
+                    static_cast<const void*>(device),
+                    params ? params->BackBufferWidth : 0,
+                    params ? params->BackBufferHeight : 0,
+                    params ? (params->Windowed ? 1 : 0) : -1,
+                    R15ResetStateHealthy.load(std::memory_order_acquire) ? 1 : 0,
+                    OutRunVRD3D9ExUpgrade::FinalCompatOverlayReady() ? 1 : 0);
             R15ResetStateHealthy.store(false, std::memory_order_release);
             if (IsCompatDevice(device))
                 OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
@@ -473,6 +541,14 @@ namespace OutRunVRD3D9ExUpgradeR13
             R15ResetStateHealthy.store(healthy, std::memory_order_release);
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
 
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R15 RESET_POST device={} handled={} result=0x{:08X} coreHealthy={} extraHealthy={} healthy={} restores={} failures={}",
+                    static_cast<const void*>(device), handled ? 1 : 0,
+                    static_cast<unsigned>(result), coreHealthy ? 1 : 0,
+                    extraHealthy ? 1 : 0, healthy ? 1 : 0,
+                    R15ResetStateRestores.load(std::memory_order_acquire),
+                    R15ResetStateFailures.load(std::memory_order_acquire));
             if (healthy)
             {
                 ++R15ResetStateRestores;
