@@ -229,11 +229,32 @@ static_assert(native_game_separate_alpha_contract(),
 // Live programmable D3D9 color and independent-alpha factors map to a
 // per-game-Draw D3D11 output-merger state. No guessed blend constants or
 // dual-source/factor modes: anything not representable falls back to D3D9.
+constexpr bool sm3_live_uses_blend_factor(DWORD factor) noexcept {
+    return factor == D3DBLEND_BLENDFACTOR ||
+           factor == D3DBLEND_INVBLENDFACTOR;
+}
+constexpr std::array<float, 4> sm3_live_blend_factor_rgba(DWORD argb) noexcept {
+    // D3D9 D3DRS_BLENDFACTOR is A8R8G8B8; D3D11 expects normalized RGBA.
+    // This value is per-Draw OM dynamic state, never part of the cached
+    // immutable D3D11_BLEND_DESC.
+    return {{
+        static_cast<float>((argb >> 16u) & 0xffu) / 255.0f,
+        static_cast<float>((argb >>  8u) & 0xffu) / 255.0f,
+        static_cast<float>( argb         & 0xffu) / 255.0f,
+        static_cast<float>((argb >> 24u) & 0xffu) / 255.0f
+    }};
+}
+static_assert(sm3_live_blend_factor_rgba(0xff000000u)[0] == 0.0f &&
+              sm3_live_blend_factor_rgba(0xff000000u)[3] == 1.0f &&
+              sm3_live_blend_factor_rgba(0x0000ff00u)[1] == 1.0f &&
+              sm3_live_blend_factor_rgba(0x000000ffu)[2] == 1.0f,
+              "Live game D3D9 blend factor ARGB -> native OM RGBA regression");
 constexpr bool sm3_live_factor(DWORD f, bool alpha, bool independent,
                               D3D11_BLEND& out) noexcept {
     if (independent && f != D3DBLEND_ZERO && f != D3DBLEND_ONE &&
         f != D3DBLEND_SRCALPHA && f != D3DBLEND_INVSRCALPHA &&
-        f != D3DBLEND_DESTALPHA && f != D3DBLEND_INVDESTALPHA) return false;
+        f != D3DBLEND_DESTALPHA && f != D3DBLEND_INVDESTALPHA &&
+        !sm3_live_uses_blend_factor(f)) return false;
     switch (f) {
     case D3DBLEND_ZERO: out = D3D11_BLEND_ZERO; break;
     case D3DBLEND_ONE: out = D3D11_BLEND_ONE; break;
@@ -245,6 +266,8 @@ constexpr bool sm3_live_factor(DWORD f, bool alpha, bool independent,
     case D3DBLEND_INVDESTALPHA: out = D3D11_BLEND_INV_DEST_ALPHA; break;
     case D3DBLEND_DESTCOLOR: out = alpha ? D3D11_BLEND_DEST_ALPHA : D3D11_BLEND_DEST_COLOR; break;
     case D3DBLEND_INVDESTCOLOR: out = alpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR; break;
+    case D3DBLEND_BLENDFACTOR: out = D3D11_BLEND_BLEND_FACTOR; break;
+    case D3DBLEND_INVBLENDFACTOR: out = D3D11_BLEND_INV_BLEND_FACTOR; break;
     default: return false;
     }
     return true;
@@ -330,12 +353,21 @@ constexpr bool sm3_live_masked_blend_regression() noexcept {
         b.SrcBlendAlpha != D3D11_BLEND_ONE ||
         b.DestBlendAlpha != D3D11_BLEND_ZERO ||
         sm3_live_blend_key(b) == redKey) return false;
+    if (!sm3_live_masked_blend_desc(
+            true, 0x0fu, D3DBLEND_BLENDFACTOR, D3DBLEND_INVBLENDFACTOR,
+            D3DBLENDOP_ADD, true, D3DBLEND_BLENDFACTOR,
+            D3DBLEND_INVBLENDFACTOR, D3DBLENDOP_ADD, b) ||
+        b.SrcBlend != D3D11_BLEND_BLEND_FACTOR ||
+        b.DestBlend != D3D11_BLEND_INV_BLEND_FACTOR ||
+        b.SrcBlendAlpha != D3D11_BLEND_BLEND_FACTOR ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_BLEND_FACTOR)
+        return false;
     const auto saved = b;
     return !sm3_live_masked_blend_desc(
                 true, 0x10u, D3DBLEND_ONE, D3DBLEND_ZERO,
                 D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
            !sm3_live_masked_blend_desc(
-                true, 0x0fu, D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,
+                true, 0x0fu, 0xdeadbeefu, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
            b.RenderTargetWriteMask == saved.RenderTargetWriteMask &&
            b.BlendEnable == saved.BlendEnable;
@@ -4814,6 +4846,21 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
          FAILED(game->GetRenderState(D3DRS_DESTBLENDALPHA, &dstBlendAlpha)) ||
          FAILED(game->GetRenderState(D3DRS_BLENDOPALPHA, &blendOpAlpha))))
         return false;
+    // Game fades can animate D3DRS_BLENDFACTOR while reusing their shader
+    // and BlendState. Query its *current* ARGB value for every source Draw
+    // only if one of the active color/independent-alpha factors consumes it.
+    // Failed source queries cannot silently use an all-zero factor.
+    const bool usesBlendFactor = blend != FALSE &&
+        (sm3_live_uses_blend_factor(srcBlend) ||
+         sm3_live_uses_blend_factor(dstBlend) ||
+         (separateAlpha != FALSE &&
+          (sm3_live_uses_blend_factor(srcBlendAlpha) ||
+           sm3_live_uses_blend_factor(dstBlendAlpha))));
+    DWORD gameBlendFactor = 0u;
+    if (usesBlendFactor &&
+        FAILED(game->GetRenderState(D3DRS_BLENDFACTOR, &gameBlendFactor)))
+        return false;
+    const auto nativeBlendFactor = sm3_live_blend_factor_rgba(gameBlendFactor);
     const auto nativeBlend = live_sm3_blend(
         blend != FALSE, srcBlend, dstBlend, blendOp, separateAlpha != FALSE);
     // Game menu/race fades may write only RGB or destination alpha.
@@ -5377,7 +5424,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (!extendedBlend) return false;
         liveBlend = extendedBlend;
     }
-    context->OMSetBlendState(liveBlend, nullptr, 0xffffffffu);
+    context->OMSetBlendState(liveBlend,
+        usesBlendFactor ? nativeBlendFactor.data() : nullptr, 0xffffffffu);
     const UINT offset = 0u;
     ID3D11Buffer* stream = s.fullGameVertexUpload.Get();
     context->IASetInputLayout(pipeline.inputLayout.Get());
