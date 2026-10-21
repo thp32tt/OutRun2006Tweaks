@@ -41,6 +41,9 @@ struct NativeBackendConfig {
     bool adapter_luid_valid = false;
     bool require_adapter_luid = false;
     LUID adapter_luid{};
+    // Only explicit native full-game diagnostics need both linear and sRGB
+    // output views over one backbuffer. Ordinary targets retain typed BGRA8.
+    bool enable_srgb_write = false;
 };
 
 // Live binding proof for the R96 transform owner. A snapshot is valid only
@@ -4843,7 +4846,8 @@ public:
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
-        return device_ && context_ && color_texture_ && color_rtv_ && color_srv_;
+        return device_ && context_ && color_texture_ && color_rtv_ && color_srv_ &&
+               (!config_.enable_srgb_write || color_rtv_srgb_);
     }
     [[nodiscard]] D3D_FEATURE_LEVEL feature_level() const noexcept { return feature_level_; }
     [[nodiscard]] const NativeBackendConfig& config() const noexcept { return config_; }
@@ -4851,6 +4855,7 @@ public:
     [[nodiscard]] ID3D11DeviceContext* context() const noexcept { return context_.Get(); }
     [[nodiscard]] ID3D11Texture2D* color_texture() const noexcept { return color_texture_.Get(); }
     [[nodiscard]] ID3D11RenderTargetView* color_rtv() const noexcept { return color_rtv_.Get(); }
+    [[nodiscard]] ID3D11RenderTargetView* color_rtv_srgb() const noexcept { return color_rtv_srgb_.Get(); }
     [[nodiscard]] ID3D11ShaderResourceView* color_srv() const noexcept { return color_srv_.Get(); }
     [[nodiscard]] NativeProgrammableShaderBackendOwnership&
     programmable_shader_ownership() noexcept {
@@ -4879,6 +4884,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> color_texture_;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> color_rtv_;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> color_rtv_srgb_;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> color_srv_;
 };
 

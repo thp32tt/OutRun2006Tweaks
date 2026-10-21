@@ -1853,6 +1853,10 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     cfg.width = width;
     cfg.height = height;
     cfg.color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    // Real shader-bound game draws can toggle SRGBWRITEENABLE between
+    // menu fades and race passes. Allocate paired RTVs only in the guarded
+    // full-resolution route, never in the ordinary fallback/inset path.
+    cfg.enable_srgb_write = env_full_game_opt_in();
     if (!s.backend.initialize(cfg)) return false;
     s.nativeWidth = width; s.nativeHeight = height;
     auto* dev = s.backend.device();
@@ -4773,8 +4777,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         ++s.liveSm3StateRejectReasons[4]; // invalid RT0 write mask
         return false;
     }
-    if (srgbWrite != FALSE) {
-        ++s.liveSm3StateRejectReasons[5]; // exact sRGB output not translated
+    if (srgbWrite != FALSE && srgbWrite != TRUE) {
+        ++s.liveSm3StateRejectReasons[5]; // malformed D3D9 sRGB state
         return false;
     }
     if (!game_native_backbuffer_ready(game, viewport)) {
@@ -5402,7 +5406,13 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
                 : (scissor != FALSE ? s.scissorRaster.Get() : s.raster.Get());
     // Raster selection mirrors the source winding on both Draw/DrawIndexed.
     context->RSSetState(liveRaster);
-    ID3D11RenderTargetView* rtv = s.backend.color_rtv();
+    // D3D9 SRGBWRITEENABLE is live per shader-bound Draw. Its sRGB view
+    // performs output encoding, including blend and destination-alpha
+    // preservation, into the same native BGRA target as earlier linear draws.
+    // An unallocated/failed sRGB RTV is NOT permission to draw linearly.
+    ID3D11RenderTargetView* rtv = srgbWrite == TRUE
+        ? s.backend.color_rtv_srgb() : s.backend.color_rtv();
+    if (!rtv) return false; // Source D3D9 game Draw/input remains authoritative.
     context->OMSetRenderTargets(
         1u, &rtv, liveDepth.enabled ? s.diagnosticDepthView.Get() : nullptr);
     // A preceding successful full game Z Clear owns the native depth seed.

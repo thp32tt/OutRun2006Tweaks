@@ -80,6 +80,7 @@ jobs:
           python tools/test_dx11_sm3_boolean_flow_00947.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_live_boolean_probe_00952.cpp -o /tmp/dx11_sm3_live_bool_00952 && /tmp/dx11_sm3_live_bool_00952
           python tools/test_dx11_sm3_live_boolean_00952.py
+          python tools/test_dx11_live_sm3_srgb_output_00967.py
           python tools/test_dx11_backend_artifact_identity_00952.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_repeat_flow_probe_00948.cpp -o /tmp/dx11_sm3_repeat_00948 && /tmp/dx11_sm3_repeat_00948
           python tools/test_dx11_sm3_repeat_flow_00948.py

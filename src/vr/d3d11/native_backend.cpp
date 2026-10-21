@@ -16452,6 +16452,7 @@ void NativeBackend::begin_frame(const std::array<float, 4>& clear_color) noexcep
 void NativeBackend::shutdown() noexcept {
     programmable_shader_ownership_.shutdown();
     color_srv_.Reset();
+    color_rtv_srgb_.Reset();
     color_rtv_.Reset();
     color_texture_.Reset();
     context_.Reset();
@@ -16471,7 +16472,14 @@ bool NativeBackend::create_color_target(
     desc.Height = height;
     desc.MipLevels = 1;
     desc.ArraySize = 1;
-    desc.Format = format;
+    // The D3D9 SRGBWRITEENABLE state is per Draw. Native full-game BGRA8
+    // therefore needs paired linear/sRGB RTVs over the SAME physical pixels.
+    // Use a typeless resource only for this explicit diagnostic backend;
+    // unconfigured users and any other format preserve the previous layout.
+    const bool pairedSrgb = config_.enable_srgb_write;
+    if (pairedSrgb && format != DXGI_FORMAT_B8G8R8A8_UNORM)
+        return false;
+    desc.Format = pairedSrgb ? DXGI_FORMAT_B8G8R8A8_TYPELESS : format;
     desc.SampleDesc.Count = 1;
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -16481,21 +16489,43 @@ bool NativeBackend::create_color_target(
     // these candidates and preserves the old texture/RTV/SRV/config.
     Microsoft::WRL::ComPtr<ID3D11Texture2D> candidateTexture;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> candidateRtv;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> candidateSrgbRtv;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> candidateSrv;
     if (FAILED(device_->CreateTexture2D(
             &desc, nullptr, candidateTexture.GetAddressOf())) ||
         !candidateTexture)
         return false;
+    // Explicit typed views are compulsory for typeless BGRA8; a null view
+    // description would otherwise inherit an invalid typeless format.
+    D3D11_RENDER_TARGET_VIEW_DESC linearView{};
+    linearView.Format = format;
+    linearView.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+    D3D11_SHADER_RESOURCE_VIEW_DESC shaderView{};
+    shaderView.Format = format;
+    shaderView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    shaderView.Texture2D.MostDetailedMip = 0u;
+    shaderView.Texture2D.MipLevels = 1u;
     if (FAILED(device_->CreateRenderTargetView(
-            candidateTexture.Get(), nullptr, candidateRtv.GetAddressOf())) ||
-        !candidateRtv)
+            candidateTexture.Get(), pairedSrgb ? &linearView : nullptr,
+            candidateRtv.GetAddressOf())) || !candidateRtv)
         return false;
+    if (pairedSrgb) {
+        D3D11_RENDER_TARGET_VIEW_DESC srgbView = linearView;
+        srgbView.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+        if (FAILED(device_->CreateRenderTargetView(
+                candidateTexture.Get(), &srgbView,
+                candidateSrgbRtv.GetAddressOf())) || !candidateSrgbRtv)
+            return false;
+    }
     if (FAILED(device_->CreateShaderResourceView(
-            candidateTexture.Get(), nullptr, candidateSrv.GetAddressOf())) ||
-        !candidateSrv)
+            candidateTexture.Get(), pairedSrgb ? &shaderView : nullptr,
+            candidateSrv.GetAddressOf())) || !candidateSrv)
         return false;
 
+    // Publish all views transactionally. No failed Reset/resize may leave a
+    // linear RTV referring to a different GPU surface than the sRGB RTV.
     color_srv_ = std::move(candidateSrv);
+    color_rtv_srgb_ = std::move(candidateSrgbRtv);
     color_rtv_ = std::move(candidateRtv);
     color_texture_ = std::move(candidateTexture);
     return true;
