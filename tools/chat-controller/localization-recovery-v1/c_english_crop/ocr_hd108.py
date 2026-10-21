@@ -30,7 +30,7 @@ def digest(path):
 
 # Bump this to explicitly re-run the original 108 files after an approved
 # change to OCR/safety policy. No silent endless re-scanning of exhausted inputs.
-POLICY_VERSION = "hd108-coverage-v3-20261021-phrase-complete"
+POLICY_VERSION = "hd108-coverage-v4-20261021-12strategy-parallel"
 EDGE_REVIEW_VERSION = "edge-safe-expand-v2-20261021-progressive"
 EDGE_STAGES = ((.55,.30),(.90,.50),(1.40,.80),(2.00,1.20))
 
