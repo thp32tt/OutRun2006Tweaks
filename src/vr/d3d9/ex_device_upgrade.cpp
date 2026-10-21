@@ -1008,6 +1008,11 @@ namespace OutRunVRD3D9ExUpgrade
         }
     }
 
+    bool IsFinalCompatOverlayReady() noexcept
+    {
+        return FinalCompatOverlayReady.load(std::memory_order_acquire);
+    }
+
     void SetFinalCompatOverlayReady(bool ready) noexcept
     {
         FinalCompatOverlayReady.store(ready, std::memory_order_release);
