@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_source_checkpoint",
+  "task_id": "CONVERSION-DX11-00970",
+  "production_id": "CONVERSION-DX11-00970",
+  "event_id": "CONVERSION-DX11-00970-E003",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "recovered_target_head": "e4a63381feb01e0256ff6a74836c87ba76351f5a",
+  "checkpoint_source": "20261021T1900-periodic.json",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_branch": "feature/dx11-00970-live-game-rt-frame",
+  "feature_stage": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "feature_base_sha": "e4a63381feb01e0256ff6a74836c87ba76351f5a",
+  "feature_last_head": "55496c5927daecb4066376997e5943bb0d4cb256",
+  "material_source_sha": "be14e0af3d7963418988cfe4d1ff332d7c92ef6b",
+  "implementation": "bounded live 1080p/2K real D3D9 render-target mip GPU readback -> current D3D11 sampled texture Draw/DrawIndexed; maintain native full-frame publication source coverage and fail-closed DX9Ex fallback",
+  "ci_fast": {
+    "id": 39583651989,
+    "status": "PASS",
+    "exact_sha": "55496c5927daecb4066376997e5943bb0d4cb256"
+  },
+  "ci_other": {
+    "backend": 39583652005,
+    "build": 39583651911,
+    "openxr": 39583651903,
+    "hud": 39583651927,
+    "status": "PENDING"
+  },
+  "runtime_validation": "UNTESTED",
+  "real_game_native_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "unfinished": [
+    "Four remaining exact-SHA mandatory workflow results need confirmation",
+    "Any proven failing CI must be repaired under same TASK_ID without weakening guards",
+    "Perform non-force behind=0 target promotion only after five PASS",
+    "Actual menu/car/race native GPU output and Quest3/OpenXR distinct L/R remain untested"
+  ],
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_action": "Check all 5 GitHub Actions on current feature SHA; repair actual cause under same ID if fail; compare behind=0 + expected_sha CAS nonforce target advance, then C6, no hardware-success claim.",
+  "score_change": 0
+}
