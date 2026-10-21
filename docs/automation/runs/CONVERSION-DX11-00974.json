@@ -1,0 +1,197 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00974",
+  "production_id": "CONVERSION-DX11-00974",
+  "event_id": "CONVERSION-DX11-00974-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00974",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "LIVE_CUBE_COLOR_FAMILY_SM3_NATIVE_DRAW_SOURCE_INTEGRATED",
+  "checkpoint": "C6_RESULT",
+  "base_sha": "374731da4b20fc1f63f6632ce8e5e0638a43a571",
+  "implementation_sha": "42d93becb7baceb8713c2b8bdcc9101acd1bf198",
+  "material_result_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "validation_bearing_result_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "result_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "source_head": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "work_time_percentages": "NOT_MEASURED",
+  "score_change": 1,
+  "score_run_key": "CONVERSION-DX11-00974",
+  "score_status": "SSOT_RECORDED_ON_ai-dev-lab:4a50bf2c8c5c99b27ec0cb1f42d71f9e0cfc69b2;PREVIOUS_1723+1=1724;CI_REPAIRS_AND_C6_NOT_INDEPENDENT",
+  "feature_branch": "feature/dx11-00974-live-cube-color-frame",
+  "change_classes": {
+    "implementation_commit": "42d93becb7baceb8713c2b8bdcc9101acd1bf198",
+    "exact_sha_ci_repair_commits": [
+      "70e1e47b561f7415086363c10585a5ea751b8a1e",
+      "ed85a21dedf4a90c5ba9fb76031c5d8c2a08d6a2",
+      "7a3dee9a97d672ad636dce52de0aadf8fd8558c9",
+      "d194160809d1e024d344bc7ab8052ebffe6fcca0"
+    ],
+    "c6_checkpoint_commit": "SEPARATE_DOCS_ONLY_AFTER_MATERIAL_SHA"
+  },
+  "changed_files": [
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_game_cube_color_00974.cpp",
+    "tools/test_dx11_game_rt_16bit_00692.py",
+    "tools/test_dx11_live_game_cube_color_00974.py",
+    "tools/test_dx11_live_game_rt_frame_00970.py",
+    "tools/test_dx11_native_rgba_texture_00660.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "REAL_GAME_D3D9_SM3_DRAW_CAPTURE",
+      "SIX_FACE_GPU_MANAGED_CUBE_COLOR_AND_MIP_SNAPSHOT",
+      "FORMAT_CORRECT_NATIVE_D3D11_VS_PS_TEXTURE_SRV",
+      "GUARDED_NATIVE_DRAW_INDEXED_AND_FRAME_PUBLICATION"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+      "tools/dx11_live_game_cube_color_00974.cpp",
+      "tools/test_dx11_live_game_cube_color_00974.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real-game D3D9 cube face/mip source captured with source-accurate 16/32-bit rows, each packed/swapped/10-bit color converted to BGRA8 and bound to native VS/PS Draw/DrawIndexed via existing SM3 game path; portable C++ pixel probes.",
+      "negative_regression": "Unknown color, unavailable D3D9 readback, unsupported sRGB and mip/budget failures return false without fabricating DX11 pixels; original DX9Ex Draw/Present/input/FFB are unmodified. Legacy 00660, 00692, 00970 destructive regression mutations preserved and scoped to 2D source.",
+      "component_integration": "New per-face source pitch and decoder coupled with D3D11 immutable cube SRV and live game shader-bound Draw/Indexed, with full five exact-SHA mandatory GitHub Actions."
+    },
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00974"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI acceptance only; real OutRun menu, vehicle-selection and race pixels plus native draw/publication metrics require an actual matching game launch.",
+    "activation_guard_and_fallback": "Explicit opt-in fail-closed; original D3D9 render/gamepad/FFB/SkyGlow remain authoritative until native game and Quest3 proven."
+  },
+  "feature_contract": {
+    "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+    "goal": "Extend actual game SM3 native D3D11 Draw/DrawIndexed sampling from 8-bit GPU reflection cubes to real D3D9 game-created swapped, packed16 and packed10 cube color/mip sources, without relaxing DX9Ex fail-closed rendering and input.",
+    "acceptance_items": [
+      {
+        "id": "live_sm3_cube_color_family",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_game_shader_resources_and_draw",
+        "expected_behavior": "Six real game-authored cube faces and all sampled mips read back or locked, independently decoded to BGRA8 and bound to the shader-bound native D3D11 game Draw."
+      },
+      {
+        "id": "cube_color_unsupported_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_dx9ex_renderer_and_input",
+        "expected_behavior": "Source pitch, color, sRGB, GPU-readback, viewport and budget invalid cases abort native candidate while D3D9 DX9Ex path remains active."
+      },
+      {
+        "id": "five_same_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_openxr_backend_build_hud",
+        "expected_behavior": "All five required GitHub Actions success at the exact final source SHA without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live_sm3_cube_color_family": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+        "tools/dx11_live_game_cube_color_00974.cpp"
+      ],
+      "validation_command": "DX11 Fast #39611119303 and Windows Build #39611119161 success; actual game pixels UNTESTED."
+    },
+    "cube_color_unsupported_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/test_dx11_live_game_cube_color_00974.py",
+        "tools/test_dx11_game_rt_16bit_00692.py",
+        "tools/test_dx11_native_rgba_texture_00660.py",
+        "tools/test_dx11_live_game_rt_frame_00970.py"
+      ],
+      "validation_command": "DX11 Fast #39611119303 destructive and portable C++ regressions; actual DX9Ex runtime UNTESTED."
+    },
+    "five_same_sha_ci": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml"
+      ],
+      "validation_command": "Five same exact d1941608 jobs all completed success; see ci.gates."
+    }
+  },
+  "ci": {
+    "exact_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "gates": {
+      "DX11 Fast Structural Checks": {
+        "id": 39611119303,
+        "conclusion": "success",
+        "head_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0"
+      },
+      "Backend Conversion Gate": {
+        "id": 39611119404,
+        "conclusion": "success",
+        "head_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0"
+      },
+      "Build": {
+        "id": 39611119161,
+        "conclusion": "success",
+        "head_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0"
+      },
+      "OpenXR VR architecture": {
+        "id": 39611119173,
+        "conclusion": "success",
+        "head_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "id": 39611119390,
+        "conclusion": "success",
+        "head_sha": "d194160809d1e024d344bc7ab8052ebffe6fcca0"
+      }
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: checked target 374731da after 00973 C6, latest AGENTS and policy, 00973 source and release and feature owner isolation.",
+    "C1_REVIEW": "PASS: selected color layout mismatch in real D3D9 cube RT→SM3 resource path without touching DXVK/DX9Ex branches.",
+    "C2_IMPLEMENT": "PASS: actual live cube GPU+managed RT conversion supporting A/XRGB, swizzled, packed16 and packed10 in six-face mip stream, independent input pitches, fail-closed per source; material 42d93bec.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast/Backend/Windows Build/OpenXR/HUD five mandatory checks success at d1941608, with 00660/00692/00970 causal destructive-negative repair in same task; game/HMD UNTESTED.",
+    "C4_COMMIT": "PASS: GitHub feature branch ahead=5 behind=0 and target update_ref expected_sha=374731da force=false; re-read target material HEAD d1941608.",
+    "C5_PACKAGE": "NOT_REQUIRED: no user deployed artifact or hardware runtime test. GitHub Actions build and host results only.",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED for this source integration, not full gameplay native renderer or Quest3. Original DX9Ex opt-in fallback maintained; single RUN_KEY 1 point recorded."
+  },
+  "REAL_GAME_DRAW_BLOCKER": "Need actual matching OutRun menu/vehicle/race launch to show native_draws>0, native_published_frames>0 and full-screen frame parity. Exact-SHA CI is not hardware proof.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "CODE_CHANGED_SHA": "d194160809d1e024d344bc7ab8052ebffe6fcca0",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Early controlled desktop OutRun menu→vehicle→race game test of d1941608 and capture native SM3 draw and published frame counters; repair measured unsupported draw/texture states within full-resolution native game renderer, then Quest3/VDXR separate. Do not resume DXVK."
+}
