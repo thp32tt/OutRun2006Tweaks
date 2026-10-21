@@ -378,7 +378,9 @@ for token in (
     "sm3_live_masked_blend_regression()",
     "D3D11_COLOR_WRITE_ENABLE_ALPHA", "if (customBlend)",
     "liveBlend = extendedBlend;",
-    "context->OMSetBlendState(liveBlend, nullptr, 0xffffffffu);",
+    "context->OMSetBlendState(liveBlend,",
+    "usesBlendFactor ? nativeBlendFactor.data() : nullptr",
+    "FAILED(game->GetRenderState(D3DRS_BLENDFACTOR, &gameBlendFactor))",
 ):
     check(token in bridge, "masked real SM3 Draw GPU output missing: " + token)
 check("colorMask != 0x0fu || srgbWrite" not in source and

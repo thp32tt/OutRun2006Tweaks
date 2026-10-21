@@ -5,6 +5,8 @@ on:
     branches: [ vr-openxr, vr-dx11-native-r71, feature/dx11-00952-live-sm3-device-bool, feature/dx11-00966-live-game-frame ]
     paths:
       - 'src/vr/**'
+      - 'tools/test_dx11_live_sm3_draw_00925.py'
+      - 'tools/test_dx11_live_sm3_blend_factor_00966.py'
       - 'src/vr_shared.hpp'
       - 'src/hooks_framerate.cpp'
       - 'src/hooks_wheel_ffb*.cpp'
