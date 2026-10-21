@@ -171,51 +171,57 @@ static bool VRDriverSeatCameraPose(const EvWorkCamera* camera,
 {
     if (!camera)
         return false;
-    OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
-    const auto& pos = camera->cam_pos_F8;
-    const auto& look = camera->look_pos_104;
     const auto* player = Game::pl_car();
     if (!player)
         return false;
+
     const auto& m = player->matrix_B0;
-    // A car-space matrix can intermittently be stale during interpolation,
-    // looping, camera switches, respawn or a new stage. Previously each
-    // rejected frame fell back to the bumper camera, then the very next
-    // valid frame returned to car space, yielding an apparent cockpit
-    // zoom-in/zoom-out oscillation. Latch that fallback for the remainder
-    // of the selected native camera-mode session; do not alternate bases.
-    // Reset only after actually leaving the game or changing native mode,
-    // not after an incidental invalid render-time matrix.
-    static thread_local bool carSpaceFallbackLatched = false;
-    static thread_local int lastCameraMode = -1;
-    static thread_local const EvWorkCamera* lastCamera = nullptr;
-    const int mode = static_cast<int>(camera->cam_mode_34A);
-    if (mode != lastCameraMode || camera != lastCamera ||
-        !VRDriverSeatGameplayActive())
-        carSpaceFallbackLatched = false;
-    lastCameraMode = mode;
-    lastCamera = camera;
-    const bool carSpaceRequested =
-        Settings::VRDriverSeatCarSpaceBasis && !carSpaceFallbackLatched;
-    bool usedCarSpace = false;
-    if (!OutRunVR::DriverSeatCamera::ComputeStableSeatPose(
-            {pos.x, pos.y, pos.z}, {look.x, look.y, look.z},
-            carSpaceRequested,
-            {{m._31, m._32, m._33}, {m._21, m._22, m._23}},
+    const OutRunVR::DriverSeatCamera::Vec3 carOrigin{
+        m._41, m._42, m._43
+    };
+    const OutRunVR::DriverSeatCamera::CarAxes axes{
+        {m._31, m._32, m._33},
+        {m._21, m._22, m._23}
+    };
+
+    // Standalone Quest owns the cockpit independently from the stock PC
+    // camera. Mirror that contract: once gameplay owns DriverSeatView, build
+    // the seat directly from the player-car transform. If the interpolated
+    // render matrix is invalid for one frame, hold the last valid cockpit pose
+    // instead of exposing the bumper camera and producing a visible zoom pulse.
+    static thread_local bool hasLastValidPose = false;
+    static thread_local OutRunVR::DriverSeatCamera::Vec3 lastPosition{};
+    static thread_local OutRunVR::DriverSeatCamera::Vec3 lastLook{};
+    static thread_local const EVWORK_CAR* lastPlayer = nullptr;
+
+    if (!VRDriverSeatGameplayActive() || player != lastPlayer)
+    {
+        hasLastValidPose = false;
+        lastPlayer = player;
+    }
+
+    OutRunVR::DriverSeatCamera::Vec3 newPos{}, newLook{};
+    if (OutRunVR::DriverSeatCamera::ComputeCarAnchoredSeatPose(
+            carOrigin, axes,
             Settings::VRDriverSeatForward.get(),
             Settings::VRDriverSeatRight.get(),
-            Settings::VRDriverSeatUp.get(), newPos, newLook,
-            &usedCarSpace))
-        return false;
-    if (carSpaceRequested && !usedCarSpace)
+            Settings::VRDriverSeatUp.get(),
+            newPos, newLook))
     {
-        carSpaceFallbackLatched = true;
-        spdlog::warn(
-            "VR DRIVER SEAT BASIS STABILIZED: car-space source invalid; "
-            "keep native-camera offset until camera mode/session resets");
+        lastPosition = newPos;
+        lastLook = newLook;
+        hasLastValidPose = true;
     }
-    if (!Settings::VRDriverSeatCarSpaceBasis)
-        carSpaceFallbackLatched = false;
+    else if (hasLastValidPose)
+    {
+        newPos = lastPosition;
+        newLook = lastLook;
+    }
+    else
+    {
+        return false;
+    }
+
     translatedPosition = {newPos.x, newPos.y, newPos.z};
     translatedLook = {newLook.x, newLook.y, newLook.z};
     return true;
