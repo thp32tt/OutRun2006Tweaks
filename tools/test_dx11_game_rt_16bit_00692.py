@@ -44,8 +44,13 @@ assert wired(src,decoder), "RT16 staging/source/native Draw disconnected"
 mutations=0
 for f,v in formats.items():
     old="base.Format == "+f+" ? native_rt_readback::Layout::"+v
-    assert old in src
-    assert not wired(src.replace(old,"false ? native_rt_readback::Layout::"+v,1),decoder)
+    # Cube reflections also carry 16-bit D3D9 color formats. Mutation must
+    # strike the original 00692 offscreen 2D RT producer, not its cube sibling.
+    prefix, sep, suffix = src.partition("bool mirror_texture(")
+    assert sep and old in suffix, "2D RT color layout missing"
+    broken = prefix + sep + suffix.replace(
+        old, "false ? native_rt_readback::Layout::"+v, 1)
+    assert not wired(broken, decoder), "2D RT negative mutation escaped"
     mutations+=1
 for old in (
     "native_rt_readback::sampleable(rtLayout, capture.srgbTexture)",
