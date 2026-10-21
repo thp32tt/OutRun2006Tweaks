@@ -6,15 +6,18 @@ replay = cpp[cpp.index("bool NativeGameEyeDrawEncoder::replay_due_source_clears(
              cpp.index("bool NativeGameEyeDrawEncoder::finish_source_clear_timeline()")]
 copy = replay[replay.index("Kind::SourceCopy"):replay.index("Kind::SourceStretch")]
 stretch = replay[replay.index("Kind::SourceStretch"):]
-assert "void invalidate(NativeGameOffscreenColorRegion overwritten)" in hpp
+# Causal 00990 source API change: returning false exposes unknown-ledger
+# fragmentation loss; retain all original exact overwrite assertions.
+assert "bool invalidate(NativeGameOffscreenColorRegion overwritten)" in hpp
+assert "return false;" in hpp[hpp.index("bool invalidate("):hpp.index("bool empty()")]
 assert "native_game_offscreen_color_regions_intersect(existing, overwritten)" in hpp
 assert "regions_ = survivors;" in hpp
 assert "reset();" in hpp
 # Both genuine GAME GPU writes happen BEFORE their corresponding proof
 # correction; unsupported writes must fail closed before GPU mutation.
 assert copy.index("native_game_gpu_eye_composite_write_admissible(") < copy.index("copy_game_surface(")
-assert copy.index("copy_game_surface(") < copy.index("eyeColorChronology_.record_unproven_gpu_postpass(visibleDest);")
-assert copy.index("eyeColorChronology_.record_proven_gpu_postpass(visibleDest);") < copy.index("eyeColorChronology_.record_unproven_gpu_postpass(visibleDest);")
+assert copy.index("copy_game_surface(") < copy.index("eyeColorChronology_.record_unproven_gpu_postpass(")
+assert copy.index("eyeColorChronology_.record_proven_gpu_postpass(visibleDest);") < copy.index("eyeColorChronology_.record_unproven_gpu_postpass(")
 assert stretch.index("native_game_gpu_eye_composite_write_admissible(") < stretch.index("stretch_game_surface(")
 assert stretch.index("stretch_game_surface(") < stretch.index("eyeColorChronology_.record_unproven_gpu_postpass(")
 assert stretch.index("eyeColorChronology_.record_proven_gpu_postpass(") < stretch.index("eyeColorChronology_.record_unproven_gpu_postpass(")

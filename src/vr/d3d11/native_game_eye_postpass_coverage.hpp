@@ -62,7 +62,7 @@ public:
     // Return whether the exact remaining region ledger was retained.
     // A proven-color ledger may safely drop all proof on overflow, but an
     // *unproven* overwrite ledger must latch fail-closed instead.
-    [[nodiscard]] bool invalidate(NativeGameOffscreenColorRegion overwritten) noexcept {
+    bool invalidate(NativeGameOffscreenColorRegion overwritten) noexcept {
         if (!native_game_offscreen_color_region_valid(overwritten) || !count_)
             return true;
         std::array<NativeGameOffscreenColorRegion, kCapacity> survivors{};
