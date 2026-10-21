@@ -302,6 +302,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_clear_color_probe_00725.cpp -o /tmp/dx11_clear_00725 && /tmp/dx11_clear_00725
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_fallback_probe_00724.cpp -o /tmp/dx11_fallback_00724 && /tmp/dx11_fallback_00724
           python tools/test_dx11_game_texture_atlas_00699.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_rt_frame_probe_00970.cpp -o /tmp/dx11_live_game_rt_frame_00970 && /tmp/dx11_live_game_rt_frame_00970
+          python tools/test_dx11_live_game_rt_frame_00970.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_viewport_depth_probe_00687.cpp -o /tmp/dx11_00687 && /tmp/dx11_00687
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_untextured_game_probe_00686.cpp -o /tmp/dx11_00686 && /tmp/dx11_00686
           python tools/test_dx11_stage1_factor_00673.py

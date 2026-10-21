@@ -4159,11 +4159,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
         (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
         native_rt_readback::sampleable(rtLayout, capture.srgbTexture);
-    // Large immutable atlases are byte-budgeted, but a live render target would
-    // synchronously GetRenderTargetData in every game Draw: retain the prior
-    // 1K GPU-source bound to protect menu/race input and frame pacing.
-    if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))
-        return false;
+    // Live game RT source mips are GPU-backed. Their synchronous readback
+    // budget is checked after the actual sampled mip count is known, below.
+    // Oversized menu/vehicle targets must not silently become stale SRVs.
     // DEFAULT DYNAMIC textures are game-writable LockRect resources, unlike
     // ordinary DEFAULT textures. Re-snapshot their actual contents at every
     // observed game Draw/DrawIndexed; never reuse a stale frame or assume
@@ -4181,6 +4179,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Reject invalid game mip requests rather than silently clamping a native sampler.
     if (usesMips && capture.maxMipLevel >= sourceLevels) return false;
     const UINT levels = usesMips ? sourceLevels : 1u;
+    // Admit real full-resolution D3D9 offscreen menu/car/race targets when
+    // *each* source mip and the entire chain fit strict readback budgets.
+    // Every admitted call still snapshots its current game GPU pixels before
+    // native Draw/DrawIndexed; unknown/oversized layouts fail closed to DX9Ex.
+    if (gpuRenderTarget && !native_rt_readback::bounded_gpu_snapshot(
+            base.Width, base.Height, levels, rtLayout))
+        return false;
     // A game-created mipmapped render target needs one D3D9 GPU readback per
     // sampled mip. Each source level is independently validated and captured
     // before creating the immutable DX11 SRV; failure stays on DX9Ex.

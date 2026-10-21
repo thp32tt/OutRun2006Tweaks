@@ -18,7 +18,8 @@ def integrated(src, budget):
         "sourceLevels > kMaxNativeGameAtlasMipLevels" in mirror,
         "base.Width > kMaxNativeGameAtlasDimension" in mirror,
         "base.Height > kMaxNativeGameAtlasDimension" in mirror,
-        "if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))" in mirror,
+        "if (gpuRenderTarget && !native_rt_readback::bounded_gpu_snapshot(" in mirror,
+        "base.Width, base.Height, levels, rtLayout))" in mirror,
         "nativeFormat == DXGI_FORMAT_R16_FLOAT ? 2u" in mirror,
         "nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u" in mirror,
         "nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT" in mirror,
@@ -107,4 +108,4 @@ with TemporaryDirectory(prefix="dx11-00699-") as temp:
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert subprocess.run([str(path / "probe")]).returncode == 0
-print("PASS 00699/00783: game 2K/4K atlas native SRV/Draw/IndexedDraw, natural mip cap, 24MiB budget, 1K live RT and D3D9 fallback")
+print("PASS 00699/00783: game 2K/4K atlas native SRV/Draw/IndexedDraw, natural mip cap, 24MiB budget, bounded full-size live RT and D3D9 fallback")

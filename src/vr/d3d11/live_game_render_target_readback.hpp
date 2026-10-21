@@ -38,6 +38,47 @@ constexpr bool sampleable(Layout layout, bool srgb) noexcept {
                       layout != Layout::xrgb1555 &&
                       layout != Layout::xrgb4444));
 }
+
+ // A live game offscreen render target can be larger than 1024px (vehicle
+ // preview / menu composition). Snapshot each actual D3D9 mip with a bounded
+ // GetRenderTargetData + SYSTEMMEM resource, not an invented CPU atlas.
+ // This is a per-Draw diagnostic fallback, NOT a GPU->GPU texture bridge.
+ inline constexpr std::uint64_t kMaxLiveRtReadbackSurfaceBytes = 16ull << 20u;
+ inline constexpr std::uint64_t kMaxLiveRtReadbackMipChainBytes = 24ull << 20u;
+ [[nodiscard]] constexpr std::uint32_t source_texel_bytes(Layout layout) noexcept {
+     switch (layout) {
+     case Layout::rgb565:
+     case Layout::argb1555:
+     case Layout::argb4444:
+     case Layout::xrgb1555:
+     case Layout::xrgb4444: return 2u;
+     case Layout::unsupported: return 0u;
+     default: return 4u;
+     }
+ }
+ [[nodiscard]] constexpr bool bounded_gpu_snapshot(
+     std::uint32_t width, std::uint32_t height,
+     std::uint32_t levels, Layout layout) noexcept {
+     if (!width || !height || width > 4096u || height > 4096u ||
+         !levels || levels > 13u || !sampleable(layout, false)) return false;
+     std::uint32_t maxDimension = width > height ? width : height;
+     std::uint32_t possibleLevels = 0u;
+     while (maxDimension != 0u) { ++possibleLevels; maxDimension >>= 1u; }
+     if (levels > possibleLevels) return false;
+     const std::uint32_t texelBytes = source_texel_bytes(layout);
+     if (!texelBytes) return false;
+     std::uint64_t total = 0u;
+     for (std::uint32_t mip = 0u; mip < levels; ++mip) {
+         const std::uint64_t mipWidth = (width >> mip) ? (width >> mip) : 1u;
+         const std::uint64_t mipHeight = (height >> mip) ? (height >> mip) : 1u;
+         const std::uint64_t bytes = mipWidth * mipHeight * texelBytes;
+         if (bytes > kMaxLiveRtReadbackSurfaceBytes ||
+             bytes > kMaxLiveRtReadbackMipChainBytes - total) return false;
+         total += bytes;
+     }
+     return true;
+ }
+
 inline bool unpack_row(const std::uint8_t* source, std::uint8_t* destination,
                        unsigned width, Layout layout) noexcept {
     if (!source || !destination || !width || layout == Layout::unsupported)
