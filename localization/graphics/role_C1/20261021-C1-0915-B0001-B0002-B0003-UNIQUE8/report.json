@@ -1,0 +1,466 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T0915KST-NEW-SHA-UNIQUE8-B0001-B0002-B0003",
+  "review_slot_kst": "2026-10-21 09:15",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "df8dd62b2101e8ad88d1050b183bf601f01cec5c",
+  "policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "selection": "N100 156 A/B files, 136 unique previously QA-reported candidate SHA values across 21 prior metrics.json logs; 25 pending SHA before run. Selected B ordinal 4-11 (8 unique SHA), leaving 17.",
+  "counts": {
+    "previous_unique_qa_sha": 136,
+    "available_candidates": 156,
+    "new_reviewed": 8,
+    "pass_png_text_only": 4,
+    "fail": 4,
+    "remaining_unreviewed": 17
+  },
+  "evidence": {
+    "n100_metrics_path": "work/c1_batch_20261021_0915/metrics.json",
+    "metrics_sha256": "4798062300de3858afd39c535e64016ff3d1c57d7e6816f61c742d8b71e01e70",
+    "compare_sheets": [
+      {
+        "path": "work/c1_batch_20261021_0915/compare_1.png",
+        "sha256": "81388477a2b2ee10910b0026a05797a229b8d88e288b0c94861b6ecbe05467c2"
+      },
+      {
+        "path": "work/c1_batch_20261021_0915/compare_2.png",
+        "sha256": "bb9a5564cf5266421dadb7f87c283aea5a3bb335ca8f35c1241a8bb66d4c2d84"
+      }
+    ],
+    "script": "work/c1_qa_20261021_0915_inspect.py",
+    "sha_audit": "all 8 local candidate sha256 equal export_evidence sha256 and input source sha256 equal native manifest sha256; 8 unique and absent from 136 prior QA sha",
+    "visual": "Manual inspection of two transparent-checkerboard side-by-side English originals and Korean outputs; black/checkerboard is generated inspection background only."
+  },
+  "results": [
+    {
+      "index": 1,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 4,
+      "candidate_file": "Q046_71c038f285be8338_source_k.png",
+      "candidate_sha256": "f77dff2cd63ba29a4ecf3a174fd6554596a33bcaba5515334b8ff28c6987b336",
+      "source_file": "Q046_71c038f285be8338_source.png",
+      "source_sha256": "25cc48a96997f2a6c6859eddf7eabd32ab1d091eca84c8ed0c28a4e76b6621e5",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "english": "GEAR DOWN",
+      "approved_korean": "기어 다운",
+      "c1_verdict": "FAIL_NON_TEXT_DECORATION",
+      "reason": "Original red gear-shift icon/arcs reproduced in candidate lettering-only layer; protected non-text graphic must not be duplicated during compose.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        1332,
+        256
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        112,
+        0,
+        2072,
+        698
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 3,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "FAIL_OR_HOLD_PER_STATED_REASON",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 2,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0001-0C1BAFA9",
+      "ordinal": 5,
+      "candidate_file": "Q046_0d765b14d3cb7d96_source_k.png",
+      "candidate_sha256": "d94bd5b7ea50f43c9ac830589fb400fdea27c72f52139f6822b5f507cbf840d5",
+      "source_file": "Q046_0d765b14d3cb7d96_source.png",
+      "source_sha256": "c5e5ea0a0d65bd83408db8c88530bb3358080de419d3c915362f7ada66f29f26",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "english": "BRAKE",
+      "approved_korean": "브레이크",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "reason": "Correct 브레이크, intact glyphs with gray style; tiny low-alpha edge pixels only, no material clipping.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        824,
+        256
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        0,
+        6,
+        1929,
+        724
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 1,
+        "left": 1,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "PASS_READABILITY_ONLY",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 3,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 6,
+      "candidate_file": "Q046_5f87dc8be5d0fb22_source_k.png",
+      "candidate_sha256": "351092b473ca726edd5ab5a8894feb5a2a92c962aa20355ac4d41a8d3914c9b3",
+      "source_file": "Q046_5f87dc8be5d0fb22_source.png",
+      "source_sha256": "efdb76e2d70e7e5bac9ae33024a85878ddc1e4a4b49982b4d0cd814941aad200",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "english": "GEAR DOWN",
+      "approved_korean": "기어 다운",
+      "c1_verdict": "FAIL_APPROVED_KOREAN_MISMATCH",
+      "reason": "Expected 기어 다운 for GEAR DOWN but candidate visibly says 밀키 웨이; incorrect pair/order.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        1332,
+        256
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        114,
+        39,
+        2027,
+        603
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "FAIL_OR_HOLD_PER_STATED_REASON",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 4,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 7,
+      "candidate_file": "Q046_dba61321cf7c46df_source_k.png",
+      "candidate_sha256": "1340b65d8ff6f98c81103d38779cd6671ec88a4eeedd1511d63d0ec85fd69c7e",
+      "source_file": "Q046_dba61321cf7c46df_source.png",
+      "source_sha256": "e890c2e2a9988d578f108925c677ed4583b205977f48826ef00b7a589c7b50c4",
+      "source_dds_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "english": "GEAR UP",
+      "approved_korean": "기어 업",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "reason": "Correct 기어 업, legible gray Hangul, no clear clipping or intrusive background.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        1000,
+        256
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        378,
+        25,
+        1829,
+        682
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "PASS_READABILITY_ONLY",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 5,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 8,
+      "candidate_file": "Q050_f7ff1ecef9b70121_source_k.png",
+      "candidate_sha256": "f358edb7093ed362f3c141a6cb28cc45fed5e010b0b3e5d73edf514cbe3c28b3",
+      "source_file": "Q050_f7ff1ecef9b70121_source.png",
+      "source_sha256": "556fcd4584715ef84a3e58ba1c463a868ef57ec605bbda9b2471d427164027c5",
+      "source_dds_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "english": "PLAYERS",
+      "approved_korean": "플레이어",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "reason": "Correct 플레이어, legible white lettering, no obvious corruption.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        850,
+        194
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        199,
+        87,
+        2023,
+        700
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "PASS_READABILITY_ONLY",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 6,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 9,
+      "candidate_file": "Q052_a59a8c29fba84397_source_k.png",
+      "candidate_sha256": "73526a2057548274f1f4a0b109718784f05f212c4bb71851bc9e455828f7bff4",
+      "source_file": "Q052_a59a8c29fba84397_source.png",
+      "source_sha256": "664b1ec8594569d3891bdbac71329cab4884304c20ad99418f33d6cab5d36db3",
+      "source_dds_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "english": "Extra Time",
+      "approved_korean": "추가 시간",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "reason": "Correct 추가 시간, gold italic fill and blue outline reasonably preserved; readable.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        992,
+        162
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        180,
+        25,
+        2134,
+        700
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "PASS_READABILITY_ONLY",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 7,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0002-7ED146F5",
+      "ordinal": 10,
+      "candidate_file": "Q086_cf5c6a0a497b6ce4_source_k.png",
+      "candidate_sha256": "a118549bec26b61040742a64aa76ee82db2bd30008289a9d26742f77ea3a3618",
+      "source_file": "Q086_cf5c6a0a497b6ce4_source.png",
+      "source_sha256": "2a77c43b7112707b2bcd1f7b517b1f681f5357cc87757e926f7c31fad4dc5114",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "english": "Milky Way",
+      "approved_korean": "밀키 웨이",
+      "c1_verdict": "FAIL_APPROVED_KOREAN_MISMATCH",
+      "reason": "Expected 밀키 웨이 for Milky Way but candidate visibly says 기어 다운; cross-paired with ordinal 6.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        952,
+        256
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        408,
+        35,
+        1860,
+        684
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "FAIL_OR_HOLD_PER_STATED_REASON",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "index": 8,
+      "producer_role": "B",
+      "producer_task_id": "OUTRUN-ROI-B-0003-93A177FC",
+      "ordinal": 11,
+      "candidate_file": "Q086_72f6f42102789a81_source_k.png",
+      "candidate_sha256": "e3922cbe908c1f155268527924291e63f2975b4c49365f9c29a82304015d4b4c",
+      "source_file": "Q086_72f6f42102789a81_source.png",
+      "source_sha256": "6aced5918bf2b32c04d488afa76f77e8b86775145837a3792127dcee65489575",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "english": "Cape Way",
+      "approved_korean": "케이프 웨이",
+      "c1_verdict": "FAIL_SEVERE_EFFECT_ARTIFACTS",
+      "reason": "Candidate 케이프 웨이 has large extraneous white speckles/splash outside letters and omits the source's substantial dark outline; not a clean lettering-only rendering.",
+      "producer_sha_verified": true,
+      "source_sha_verified": true,
+      "png_format": "PNG",
+      "color_mode": "RGBA",
+      "native_source_roi_px": [
+        936,
+        296
+      ],
+      "candidate_output_px": [
+        2172,
+        724
+      ],
+      "alpha_nonzero_bbox": [
+        87,
+        9,
+        2100,
+        724
+      ],
+      "alpha_edge_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "alpha_edge_1_15": {
+        "top": 0,
+        "bottom": 24,
+        "left": 0,
+        "right": 0
+      },
+      "per_glyph_size_and_readability": "FAIL_OR_HOLD_PER_STATED_REASON",
+      "text_length_difference_ignored": true,
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "producer_status": "REWORK_DIMENSIONS",
+      "final_production_approval": false,
+      "dds_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "conditions": {
+    "png_pass_not_game_acceptance": true,
+    "rework_dimensions_all_8": true,
+    "c2_c3_user_game_status": "UNTESTED_NOT_AUTHORIZED",
+    "dds_composition": "NOT_RUN",
+    "A_B_queue_consumption": false,
+    "imagegen": false,
+    "vr_ffb_dx11_dxvk_changed": false,
+    "probable_cross_pair": "Ordinal 6 GEAR DOWN and ordinal 10 Milky Way have each other's Korean text; producer pair field OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED; request A/B rerouting or per-file relabel verification before further acceptance."
+  }
+}
