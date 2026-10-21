@@ -595,18 +595,38 @@ def main() -> None:
         assert changed != bridge and not object_space_draw_safe(changed), (
             "object-space native geometry negative mutation escaped: " + good
         )
-    # Observe both buffer and UP input families: a 16-byte XYZ+DIFFUSE
-    # source cannot be captured behind an old 20-byte-only stride gate.
+    # The opt-in active R30 producer admits compact real game declarations
+    # (FLOAT3 POSITION / packed D3D9 operands), not the old 16-byte floor.
+    # R26-safe remains intentionally unchanged; validate both independently.
+    # A lower-bound relaxation must never remove the mandatory bounded source
+    # predicate or silently widen the upper limit to an arbitrary byte count.
+    stride_contract = (ROOT / "src/vr/d3d11/live_game_source_stride.hpp").read_text(
+        encoding="utf-8")
+    assert "stride >= 4u && stride <= 512u" in stride_contract
+    for wrong in ("stride >= 16u", "stride >= 0u", "stride <= 1024u"):
+        changed = stride_contract.replace(
+            "stride >= 4u && stride <= 512u", wrong, 1)
+        assert changed != stride_contract and (
+            "stride >= 4u && stride <= 512u" not in changed)
     for path in RENDERERS:
         source = path.read_text(encoding="utf-8")
         start = source.find("void R30ObserveNativeLinearVB(")
         end = source.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
         assert start >= 0 and end > start
         observed = source[start:end]
-        assert observed.count("stride < 16") == 3
-        assert "stride < 20" not in observed
-        invalid = observed.replace("stride < 16", "stride < 20", 1)
-        assert invalid != observed and invalid.count("stride < 16") != 3
+        if path.name == "stereo_renderer_r30.cpp":
+            guard = "game_native_source_stride_valid(stride)"
+            assert observed.count(guard) == 3
+            assert "stride < 16" not in observed and "stride < 20" not in observed
+            # Fail when even one real game VB/IB/UP source path drops its guard.
+            invalid = observed.replace(guard, "true", 1)
+            assert invalid != observed and invalid.count(guard) != 3
+            assert "#include \"vr/d3d11/live_game_source_stride.hpp\"" in source
+        else:
+            assert observed.count("stride < 16") == 3
+            assert "stride < 20" not in observed
+            invalid = observed.replace("stride < 16", "stride < 20", 1)
+            assert invalid != observed and invalid.count("stride < 16") != 3
     # Row-vector WVP order: object (1,2,3), translated by (5,7,11),
     # then scaled by (2,3,4) gives (12,27,56,1).
     vector = [1.0, 2.0, 3.0, 1.0]
