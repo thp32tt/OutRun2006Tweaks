@@ -1,0 +1,155 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00987",
+  "production_id": "CONVERSION-DX11-00987",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00987",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "e737526f4bbcec2f40b867dfd64606d76fe5d0c9",
+  "material_result_sha": "d6b2bf823cc4d474895c1a2d67cbee5862c56f1b",
+  "validation_bearing_result_sha": "08dfad824c9d691919353b788d35c836138303da",
+  "result_sha": "08dfad824c9d691919353b788d35c836138303da",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "code_change": "YES",
+  "c6_code_change": "NO",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "summary": "C6 result-only recovery after missing run JSON. Genuine game-camera GPU Copy/Stretch destination pixel coverage is recorded from successful, proven postpasses, with exact complete native eye destination coverage checked before frame admission. Partial, clipped, foreign or gapped pixels cannot certify an entire eye. Existing D3D9Ex renderer/input/FFB fallback remains authoritative; DXVK is unchanged. Mandatory GitHub CI passed on the exact validation-bearing source SHA; actual Quest3/VDXR HMD and game input remain UNTESTED.",
+  "changed_files": [
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_eye_postpass_coverage.hpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.hpp",
+    "tools/dx11_native_eye_postpass_coverage_00987.cpp",
+    "tools/test_dx11_native_eye_postpass_coverage_00987.py"
+  ],
+  "validation_repair_files": [
+    "tools/test_dx11_native_eye_postpass_coverage_00987.py"
+  ],
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Admit native stereo-eye game frames only after successful, authentic game-camera GPU Copy/Stretch destination postpasses cover all pixels of the actual eye, rather than accepting a small source-proven camera tile as a full eye.",
+    "acceptance_items": [
+      {
+        "id": "real_gpu_copy_stretch_destination_coverage",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_camera_gpu_copy_stretch_native_eye_destination",
+        "expected_behavior": "Successful game-camera GPU Copy and clipped Stretch contribute only their exact proven, visible destination pixel regions; gap-free full eye coverage may complete frame admission without synthetic full-frame draw."
+      },
+      {
+        "id": "incomplete_or_foreign_pixels_fail_closed",
+        "category": "fallback_regression",
+        "behavior_area": "eye_coverage_clipping_clear_reset_and_original_d3d9ex_fallback",
+        "expected_behavior": "Missing rows, gaps, clipped HUD fragments, invalid/saturated evidence or foreign camera source must not imply full eye; real full TARGET Clear resets prior postpass coverage; original D3D9Ex, input, FFB and OpenXR ownership semantics are preserved."
+      },
+      {
+        "id": "exact_sha_five_ci_gates",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_positive_negative_and_mandatory_github_ci",
+        "expected_behavior": "New C++ coverage positive/negative fixture, Python source linkage checks and the five mandatory CI workflows all pass at the same validation-bearing source commit SHA; HMD gameplay remains independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real_gpu_copy_stretch_destination_coverage": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_eye_postpass_coverage.hpp",
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/dx11_native_eye_postpass_coverage_00987.cpp"
+      ],
+      "validation_command": "DX11 Fast Structural Checks GitHub Actions run 39672421033 SUCCESS at exact source SHA; no device run."
+    },
+    "incomplete_or_foreign_pixels_fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/dx11_native_eye_postpass_coverage_00987.cpp",
+        "tools/test_dx11_native_eye_postpass_coverage_00987.py"
+      ],
+      "validation_command": "C++ gap, invalid, saturated, clipped and Clear-reset cases plus Python source wiring included in DX11 Fast Structural Checks run 39672421033 SUCCESS; runtime UNTESTED."
+    },
+    "exact_sha_five_ci_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        "tools/test_dx11_native_eye_postpass_coverage_00987.py"
+      ],
+      "validation_command": "At exact 08dfad824c9d691919353b788d35c836138303da: Fast 39672421033, Backend 39672421238, Build 39672421386, OpenXR 39672421069, HUD 39672421020 all SUCCESS; no CI rerun."
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub target ref and 00986 prior record read; requested 00987 run JSON absent on target branch (RUN_RECORD_NOT_FOUND).",
+    "C1_REVIEW": "PASS: source commit d6b2bf82 adds exact native destination eye postpass coverage; validation repair 08dfad82 fixes only source-link regression assertion.",
+    "C2_IMPLEMENT": "UNCHANGED: code already committed as material result d6b2bf82; C6 does not modify game or test source.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five mandatory existing workflow runs SUCCESS at validation-bearing 08dfad82; no CI/build rerun and no HMD test.",
+    "C4_COMMIT": "PASS: earlier material d6b2bf82, subsequent source-only regression assertion repair 08dfad82; C6 bookkeeping commit [skip ci] separate.",
+    "C5_PACKAGE": "NOT_REQUIRED: user-controlled deployment; no HMD build installation.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: recovered missing JSON with exact SHA CI provenance; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "08dfad824c9d691919353b788d35c836138303da",
+    "mandatory_gate_results": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39672421033,
+        "status": "success",
+        "sha": "08dfad824c9d691919353b788d35c836138303da"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39672421238,
+        "status": "success",
+        "sha": "08dfad824c9d691919353b788d35c836138303da"
+      },
+      {
+        "name": "Build",
+        "run_id": 39672421386,
+        "status": "success",
+        "sha": "08dfad824c9d691919353b788d35c836138303da"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39672421069,
+        "status": "success",
+        "sha": "08dfad824c9d691919353b788d35c836138303da"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39672421020,
+        "status": "success",
+        "sha": "08dfad824c9d691919353b788d35c836138303da"
+      }
+    ],
+    "skipped_optional_gate": {
+      "name": "VR PC Fast Test Build",
+      "run_id": 39672421274,
+      "status": "skipped",
+      "sha": "08dfad824c9d691919353b788d35c836138303da"
+    }
+  },
+  "record_recovery": {
+    "reason": "RUN_RECORD_NOT_FOUND",
+    "source_of_material_result_sha": "Initial 00987 implementation GitHub commit d6b2bf823cc4d474895c1a2d67cbee5862c56f1b",
+    "source_of_feature_contract_and_acceptance_results": "Reconstructed from 00987 source/test commits and exact-SHA existing GitHub workflow run outcomes; no prior 00987 run JSON existed on the target branch to copy.",
+    "existing_record_preserved": false,
+    "c6_result_only": true
+  },
+  "next_action": "User Quest3/VDXR real HMD menu/car/race eye output and input/FFB runtime validation remains required; do not treat CI as runtime success.",
+  "score": {
+    "run_key": "CONVERSION-DX11-00987",
+    "c6_revalidation_score_change": 0,
+    "scoreboard_modified": false
+  }
+}
