@@ -110,7 +110,7 @@ for token in (
     "for (UINT i = 0; i < nativeIndexCount; ++i)",
     "if (nativeIndices[i] >= vertexCount) return false;",
     "s.fullGameIndexCapacity, nativeIndices, indexBytes",
-    "context->DrawIndexed(nativeIndexCount, 0u, 0);",
+    "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
 ):
     check(token in source, "SM3 converted game index ownership missing: " + token)
 
@@ -143,8 +143,8 @@ for token in (
     "D3DRS_POINTSCALEENABLE, &scaled",
     "declaration[i].Usage == D3DDECLUSAGE_PSIZE",
     "!game_native_unit_point_raster(",
-    "context->Draw(vertexCount, 0u);",
-    "context->DrawIndexed(nativeIndexCount, 0u, 0);",
+    "context->Draw(vertexCount, base);",
+    "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base));",
 ):
     check(token in source, "real game SM3 point/fallback integration missing: " + token)
     check(token not in source.replace(token, "", 1),

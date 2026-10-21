@@ -19,6 +19,6 @@ for t in ("IDirect3DCubeTexture9", "D3DRTYPE_CUBETEXTURE",
 assert "native_sm3_cube_source_components(" in helper
 assert "context->PSSetShaderResources(0u, 16u, boundViews.data())" in bridge
 assert "context->VSSetShaderResources(0u, 4u, boundVertexViews.data())" in bridge
-assert "if (nativeIndices) context->DrawIndexed" in bridge
+assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge
 assert "s.frameBatch.abort();" in bridge
 print("Native game cube shader and 6-face SRV connected; game/HMD UNTESTED")

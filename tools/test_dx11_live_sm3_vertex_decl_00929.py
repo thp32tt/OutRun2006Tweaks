@@ -55,11 +55,11 @@ for token in ("case 4u:", "case 5u:", "case 8u:", "case 9u:",
     require(token in unpack, "packed shader attribute decode not proven: " + token)
 # R30 secondary VB streams must reach a real Draw only after correct
 # physical-index mapping, bounded attribute repack and non-instance admission.
-for token in ("referenced[declaration[i].Stream]=true",
-              "GetStreamSourceFreq(slot,&frequency)",
-              "frequency != 1u", "extra->extra[slot-1u].vertexCount < vertexCount",
+for token in ("referenced[declaration[i].Stream] = true",
+              "GetStreamSourceFreq(slot, &frequency)",
+              "frequency != 1u", "extra->extra[slot - 1u].vertexCount < vertexCount",
               "static_cast<std::uint8_t>(declaration[i].Stream)",
-              "game_sm3_assemble_streams(elements,streams,vertexCount,unpacked)"):
+              "elements, streams, vertexCount, unpacked)"):
     require(token in p, "missing multistream VB/IB native admission " + token)
 # The C2397 repair only permits narrowing after live_sm3_input_layout has
 # rejected Stream >= 4. Removing that validation invalidates this proof.

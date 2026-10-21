@@ -12,10 +12,10 @@ assert "outputs <= 12u" in header and "outputs == 0u" in header
 assert "native_sm3_interface_decl_capacity(" in backend
 assert "inputs.size() > 8u" not in backend
 assert "native_sm3_ia_element_capacity(layout.size() + 1u)" in bridge
-assert "game_sm3_assemble_streams(elements,streams,vertexCount,unpacked)" in bridge
+assert "elements, streams, vertexCount, unpacked)" in bridge
 assert "device->CreateInputLayout(" in bridge
 assert "context->IASetInputLayout(pipeline.inputLayout.Get())" in bridge
-assert "if (nativeIndices) context->DrawIndexed" in bridge
+assert "context->DrawIndexed(nativeIndexCount, 0u, static_cast<INT>(base))" in bridge
 assert "destination.swap(candidate)" in stream
 assert "if (!submit_live_sm3_game_draw(" in bridge
 assert "s.frameBatch.abort();" in bridge
