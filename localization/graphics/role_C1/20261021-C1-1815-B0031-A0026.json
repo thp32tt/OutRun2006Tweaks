@@ -1,0 +1,573 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1815KST-B0031-A0026-NEW",
+  "review_slot_kst": "2026-10-21 18:15",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "provenance": {
+    "source": "N100 actual A/B native ChatGPT ImageGen locally saved unapproved candidate PNG",
+    "previously_reviewed_unique_candidate_sha256": 238,
+    "new_unique_candidate_sha256": 8,
+    "source_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0031-2A91E752.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0026-FFFD2409.json"
+    ],
+    "n100_preflight": "work/c1_batch_20261021_1815/preflight.json",
+    "n100_comparison_images": [
+      "work/c1_batch_20261021_1815/compare_1.jpg",
+      "work/c1_batch_20261021_1815/compare_2.jpg",
+      "work/c1_batch_20261021_1815/compare_3.jpg",
+      "work/c1_batch_20261021_1815/compare_4.jpg"
+    ]
+  },
+  "authority": "Independent C1 source-vs-transparent-PNG lightweight QA only. No producer queue consumption, ImageGen generation, DDS final export, C2/C3 or user in-game PASS.",
+  "counts": {
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 4,
+    "fail_major_style_effect": 3,
+    "fail_major_color_effect": 1,
+    "producer_rework_dimensions": 8,
+    "export_sha_match": 8,
+    "source_manifest_sha_match": 8,
+    "rgba_png": 8,
+    "visible_edge_opacity_gt32": 0
+  },
+  "reviews": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0031-2A91E752",
+      "ordinal": 148,
+      "candidate_file": "Q086_11895901f9313213_source_k.png",
+      "source_file": "Q086_11895901f9313213_source.png",
+      "candidate_sha256": "809d72df3683f8adcc2754fc19fb3c23596d39563ac92b4416718b25e1413ea1",
+      "source_sha256": "2535761ff1146947a9cdce7e06dc5272b4f3c7948f41d1462ed039c03b0c6ee0",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "15 Continuous Course Ranking",
+      "approved_korean": "15코스 연속 랭킹",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1751,
+        417
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        71,
+        2134,
+        666
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 5,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "15코스 연속 랭킹: 승인 번역과 정확히 일치하고 글자/받침 읽힘. 영문 원본은 다른 UI가 같은 ROI에 있으나 후보는 텍스트만 분리되어 있음. 굵은 검정 외곽선은 경미한 차이.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0031-2A91E752",
+      "ordinal": 149,
+      "candidate_file": "Q086_8fc0625662b8725f_source_k.png",
+      "source_file": "Q086_8fc0625662b8725f_source.png",
+      "candidate_sha256": "8054cbbf4801e173787d3b083fbb8cf18b7d2c13645a934bf0f02b8e4bb7791d",
+      "source_sha256": "aedcf893fff2218b71b97cbfd7ab4904af8f225b2e1c52c05a7ead9982fe64ee",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "GOAL D",
+      "approved_korean": "골 D",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "original_dimensions": [
+        1079,
+        564
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        96,
+        37,
+        1566,
+        774
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_COLOR_EFFECT",
+      "visual_reason": "골 D: 한글 골은 황색 계열이나 D는 원본 GOAL D의 황색 채움과 달리 진한 남색/검정으로 바뀌어 동일 라벨 안의 핵심 색채/효과가 일관되지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0031-2A91E752",
+      "ordinal": 150,
+      "candidate_file": "Q086_deaf9fd898e08025_source_k.png",
+      "source_file": "Q086_deaf9fd898e08025_source.png",
+      "candidate_sha256": "2d7762eb83e04a4b43f83cfd17e4df4a2e3bf756a0ef76fb388159dcfbd901af",
+      "source_sha256": "92569cb178c5ad7fa803afdd347ddb62ca30ef511f1025aaff2fdcf092829ea4",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Top Runners of Each Goal",
+      "approved_korean": "각 골별 최고 기록",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1484,
+        329
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        97,
+        75,
+        2111,
+        682
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "각 골별 최고 기록: 승인 번역과 일치; 한 줄 판독 가능하며 원문의 노랑/남색 외곽선과 우향 기울기가 보존됨.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0031-2A91E752",
+      "ordinal": 151,
+      "candidate_file": "Q100_fe82b5a79217c955_source_k.png",
+      "source_file": "Q100_fe82b5a79217c955_source.png",
+      "candidate_sha256": "8cadabb48ef86a5203fb4b2b77044a0479de8b840f8d4c2a8b11c095b8e67853",
+      "source_sha256": "7040c62f761f9d2502712587399fb6d1ed504dde6b28167d5523384f3ab8a934",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "RANDOM",
+      "approved_korean": "무작위",
+      "source_dds_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        525,
+        175
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        178,
+        28,
+        1971,
+        670
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "무작위: 승인 번역 일치, 우향 기울기/흰색 계열/짙은 가장자리 유지. 원본 파란 패널이 후보에서 빠진 것은 투명 글자 레이어 목적에 부합함. 실제 배치 크기는 미검증.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0031-2A91E752",
+      "ordinal": 152,
+      "candidate_file": "Q214_19ba187cb0cf6ab4_source_k.png",
+      "source_file": "Q214_19ba187cb0cf6ab4_source.png",
+      "candidate_sha256": "8f8270a73278925f84be90802bacf906babdae718b4014bd58b5844307cd8139",
+      "source_sha256": "67c92f701b620fef1bfea9d3085218102bf5550b5a3d70824c1323d94d50b221",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "GOAL",
+      "approved_korean": "골",
+      "source_dds_sha256": "225afde209bf8439884d59eba001f7cb6615b030fcd61c6f5d666a26eb319071",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "original_dimensions": [
+        640,
+        316
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        18,
+        1633,
+        849
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 5,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "골: 읽힘, 승인 매핑 일치, 빨강/노랑 계열 원문 효과와 대체로 일치함. 원문 사진 배경이 후보에 없는 것은 투명 레터링 출력 목적에 부합.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0026-FFFD2409",
+      "ordinal": 124,
+      "candidate_file": "Q193_321d953f979d6b8e_source_k.png",
+      "source_file": "Q193_321d953f979d6b8e_source.png",
+      "candidate_sha256": "95b0634ed886138a1e24952017b811cca7e96d6eaac093bca9c2779cdd4bfa4d",
+      "source_sha256": "df4fd8576b7519f596851b99e1fe50c4b804d2f76b276b99fd99a2a868c1c17d",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Goal E",
+      "approved_korean": "골 E",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2093,
+        751
+      ],
+      "original_dimensions": [
+        780,
+        280
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        561,
+        23,
+        1735,
+        733
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "골 E: 원문은 평면적인 짙은 회색 산세리프이나 후보가 두꺼운 입체 금속 외곽선과 검은 돌출 그림자를 추가하여 강조 단계가 크게 변함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0026-FFFD2409",
+      "ordinal": 125,
+      "candidate_file": "Q201_00f74091f6b8a70f_source_k.png",
+      "source_file": "Q201_00f74091f6b8a70f_source.png",
+      "candidate_sha256": "69ec0163d337dee1d27fd4b0b79926e11d4aad537b165900124b874b023b8b9a",
+      "source_sha256": "fe710148a49ae39eda5d3d1630c106d1630b2e762a2d2e3592f88d091eca8475",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "DESERT",
+      "approved_korean": "데저트",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        990,
+        246
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        291,
+        23,
+        1909,
+        638
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "데저트: 원문은 외곽선 없는 평면 회색 블록 문자이나 후보는 입체 금속 그라데이션/검은 외곽선/돌출 그림자가 뚜렷함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0026-FFFD2409",
+      "ordinal": 126,
+      "candidate_file": "Q236_72923a85953611d6_source_k.png",
+      "source_file": "Q236_72923a85953611d6_source.png",
+      "candidate_sha256": "e92a3ea25799a03f773725cf37a1031d601a428c7ca748fab32fb94b308155df",
+      "source_sha256": "3607c0a62b3cb738afc5605035423453419ed66a628be40d7b3e1681518deb1b",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "JUNGLE",
+      "approved_korean": "정글",
+      "source_dds_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        970,
+        246
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        293,
+        41,
+        1836,
+        704
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "정글: 원문은 평면 회색 블록 문자이나 후보는 3D 입체 효과와 두꺼운 검정 윤곽을 적용해 텍스트 계열 스타일을 크게 바꿈.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
