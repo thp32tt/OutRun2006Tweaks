@@ -26,6 +26,7 @@
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
+#include <limits>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
@@ -5487,12 +5488,21 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            std::uint64_t evidence = 0;
+            if (R30EvidenceTakeDrawTicket(
+                    "DP", drawSemanticValue, evidence))
+                R30EvidenceState(device, evidence, "DP", "PRE",
+                    "ENTRY", S_OK, drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 0u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
+            {
+                R30EvidenceState(device, evidence, "DP", "POST",
+                    "XYZRHW_VB", xyzrhw, drawSemanticValue);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawPrimitiveHook.stdcall<HRESULT>(
@@ -5502,8 +5512,11 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            return R30GuardScreenSpace(
+            const HRESULT hr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitive");
+            R30EvidenceState(device, evidence, "DP", "POST",
+                "GUARD_R29_NATIVE", hr, drawSemanticValue);
+            return hr;
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR30(
@@ -5517,6 +5530,11 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            std::uint64_t evidence = 0;
+            if (R30EvidenceTakeDrawTicket(
+                    "DIP", drawSemanticValue, evidence))
+                R30EvidenceState(device, evidence, "DIP", "PRE",
+                    "ENTRY", S_OK, drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 1u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             // F11 external ImGui uses fixed-function XYZ+orthographic
@@ -5528,7 +5546,11 @@ namespace OutRunVRStereo
                         numVertices, startIndex, primitiveCount);
                 });
             if (externalImGui != E_NOTIMPL)
+            {
+                R30EvidenceState(device, evidence, "DIP", "POST",
+                    "F11_IMGUI", externalImGui, drawSemanticValue);
                 return externalImGui;
+            }
 
             // HMD-confirmed R62 path for ordinal 4th/5th and exact ScreenHud
             // D3DXSprite fixed-function indexed quads. The external ImGui
@@ -5571,13 +5593,21 @@ namespace OutRunVRStereo
                 }
             }
             if (fixedFnSprite != E_NOTIMPL)
+            {
+                R30EvidenceState(device, evidence, "DIP", "POST",
+                    "R62_FIXED_FUNCTION", fixedFnSprite, drawSemanticValue);
                 return fixedFnSprite;
+            }
 
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
+            {
+                R30EvidenceState(device, evidence, "DIP", "POST",
+                    "XYZRHW_VB", xyzrhw, drawSemanticValue);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
@@ -5589,8 +5619,11 @@ namespace OutRunVRStereo
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
-            return R30GuardScreenSpace(
+            const HRESULT hr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitive");
+            R30EvidenceState(device, evidence, "DIP", "POST",
+                "GUARD_R29_NATIVE", hr, drawSemanticValue);
+            return hr;
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR30(
@@ -5603,12 +5636,21 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            std::uint64_t evidence = 0;
+            if (R30EvidenceTakeDrawTicket(
+                    "DPUP", drawSemanticValue, evidence))
+                R30EvidenceState(device, evidence, "DPUP", "PRE",
+                    "ENTRY", S_OK, drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 2u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
+            {
+                R30EvidenceState(device, evidence, "DPUP", "POST",
+                    "XYZRHW_UP", xyzrhw, drawSemanticValue);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
@@ -5618,8 +5660,11 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            return R30GuardScreenSpace(
+            const HRESULT hr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitiveUP");
+            R30EvidenceState(device, evidence, "DPUP", "POST",
+                "GUARD_R29_NATIVE", hr, drawSemanticValue);
+            return hr;
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
@@ -5634,13 +5679,22 @@ namespace OutRunVRStereo
                 : OutRunVR::GameSemantic::EffectiveScope();
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
+            std::uint64_t evidence = 0;
+            if (R30EvidenceTakeDrawTicket(
+                    "DIPUP", drawSemanticValue, evidence))
+                R30EvidenceState(device, evidence, "DIPUP", "PRE",
+                    "ENTRY", S_OK, drawSemanticValue);
             R30TracePreRestartHudEligibility(device, 3u);
             R30BeforeScreenDrawForSkyGlow(device, drawSemanticValue);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
             if (xyzrhw != E_NOTIMPL)
+            {
+                R30EvidenceState(device, evidence, "DIPUP", "POST",
+                    "XYZRHW_INDEXED_UP", xyzrhw, drawSemanticValue);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
@@ -5652,8 +5706,11 @@ namespace OutRunVRStereo
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
-            return R30GuardScreenSpace(
+            const HRESULT hr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+            R30EvidenceState(device, evidence, "DIPUP", "POST",
+                "GUARD_R29_NATIVE", hr, drawSemanticValue);
+            return hr;
         }
 
         void R30RollbackHooks() noexcept
