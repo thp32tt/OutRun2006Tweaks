@@ -21,7 +21,10 @@ def wired(src, hdr):
         "if (gpuRenderTarget && levels != 1u) return false;" not in mirror
         and "native_game_texture_upload_bytes(" in mirror
         and "sourceLevels > kMaxNativeGameAtlasMipLevels" in mirror
-        and "if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))" in mirror
+        and "if (gpuRenderTarget && !native_rt_readback::bounded_gpu_snapshot(" in mirror
+        and "base.Width, base.Height, levels, rtLayout))" in mirror
+        and "kMaxLiveRtReadbackSurfaceBytes = 16ull << 20u" in hdr
+        and "kMaxLiveRtReadbackMipChainBytes = 24ull << 20u" in hdr
         and "FAILED(capture.texture->GetDevice(gameDevice.GetAddressOf()))" in mirror
         and "if (gpuRenderTarget) {" in sampled
         and "readbackSurface.Reset();" in sampled
@@ -50,6 +53,7 @@ def wired(src, hdr):
 assert wired(source, header), "Each real RT mip must be captured, uploaded and sampled in Draw/Indexed"
 assert "python tools/test_dx11_game_rt_mips_00742.py" in workflow
 mutations = [
+    ("native_rt_readback::bounded_gpu_snapshot(", "/* removed current-mip budget */("),
     ("sourceLevels > kMaxNativeGameAtlasMipLevels",
      "sourceLevels > 99u /* invalid mip provenance */"),
     ("capture.texture->GetSurfaceLevel(level, sourceSurface.GetAddressOf())",
