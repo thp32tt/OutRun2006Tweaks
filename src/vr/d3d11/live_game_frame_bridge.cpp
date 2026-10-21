@@ -28,6 +28,7 @@
 #include "live_game_rgb24_texture.hpp"
 #include "live_game_rgba_texture.hpp"
 #include "live_game_render_target_readback.hpp"
+#include "live_game_draw_mirror_cache.hpp"
 #include "live_game_float_vector_texture.hpp"
 #include "live_game_dynamic_texture.hpp"
 #include "live_game_10bit_texture.hpp"
@@ -5285,6 +5286,45 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
     // native VS tN/sN uses the same ordinal with independent stage bindings.
     // Any unsupported vertex texture fails before the native GPU Draw.
     rejectionStage = 8u;
+    // Real shader-bound game Draws often alias a full-size D3D9 RT in VS/PS
+    // sampler slots. Capture one GPU source per draw; independent samplers
+    // preserve each slot's D3D9 state. Reset/Present/next Draw cannot reuse it.
+    struct DrawMirror {
+        draw_mirror_cache::ViewKey key{};
+        UINT levels = 0u;
+        ComPtr<ID3D11ShaderResourceView> view;
+    };
+    std::array<DrawMirror, 20u> drawMirrors{};
+    std::size_t drawMirrorCount = 0u;
+    const auto mirrorLiveSampler = [&](const TextureCapture& captured,
+                                      ComPtr<ID3D11ShaderResourceView>& view,
+                                      ComPtr<ID3D11SamplerState>& sampler) -> bool {
+        // Cubes use the existing six-face copy and validation; unsupported
+        // source textures must still fail closed to original D3D9.
+        if (!captured.enabled || !captured.texture || captured.cubeTexture)
+            return mirror_texture(device, captured, view, sampler);
+        const bool chain = captured.mipFilter == D3DTEXF_POINT ||
+                           captured.mipFilter == D3DTEXF_LINEAR;
+        const draw_mirror_cache::ViewKey key{
+            captured.texture.Get(), captured.srgbTexture, chain};
+        for (std::size_t i = 0u; i < drawMirrorCount; ++i) {
+            const auto& previous = drawMirrors[i];
+            if (!draw_mirror_cache::same_view(key, previous.key))
+                continue;
+            // Sharing an SRV cannot share D3D9 address/filter/LOD/border.
+            if (!create_game_sampler(device, captured, previous.levels, sampler))
+                return false;
+            view = previous.view;
+            return view.Get() != nullptr && sampler.Get() != nullptr;
+        }
+        if (!mirror_texture(device, captured, view, sampler) ||
+            !view || !sampler)
+            return false;
+        const UINT levels = chain ? captured.texture->GetLevelCount() : 1u;
+        if (drawMirrorCount < drawMirrors.size())
+            drawMirrors[drawMirrorCount++] = {key, levels, view};
+        return true;
+    };
     std::array<ComPtr<ID3D11ShaderResourceView>,4> vertexViews{};
     std::array<ComPtr<ID3D11SamplerState>,4> vertexSamplers{};
     std::array<ID3D11ShaderResourceView*,4> boundVertexViews{};
@@ -5296,8 +5336,8 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (!capture_live_sm3_sampler(
                 game, slot, capture, true,
                 (pipeline.program.vertexCubeSamplerMask & (1u << slot)) != 0u) ||
-            !mirror_texture(device, capture,
-                            vertexViews[slot], vertexSamplers[slot]))
+            !mirrorLiveSampler(capture,
+                               vertexViews[slot], vertexSamplers[slot]))
             return false;
         boundVertexViews[slot] = vertexViews[slot].Get();
         boundVertexSamplers[slot] = vertexSamplers[slot].Get();
@@ -5314,7 +5354,7 @@ bool submit_live_sm3_game_draw(State& s, IDirect3DDevice9* game,
         if (!capture_live_sm3_sampler(
                 game, slot, capture, false,
                 (pipeline.program.pixelCubeSamplerMask & (1u << slot)) != 0u) ||
-            !mirror_texture(device, capture, views[slot], samplers[slot]))
+            !mirrorLiveSampler(capture, views[slot], samplers[slot]))
             return false;
         boundViews[slot] = views[slot].Get();
         boundSamplers[slot] = samplers[slot].Get();
