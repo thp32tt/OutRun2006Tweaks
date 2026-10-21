@@ -3,6 +3,7 @@
 Separate from DDS queue. Results are TEST_ONLY, without claiming DDS pixel proof.
 """
 import csv
+import concurrent.futures
 import hashlib
 import io
 import json
@@ -283,6 +284,46 @@ def scan(max_sources=4,max_new=1000):
 
  archive=json.loads(discover.MASTER.read_text(encoding="utf-8"))
  if len(archive.get("items",[]))!=255:raise ValueError("MASTER_255_ARCHIVE_CHANGED")
+
+ # OCR is the expensive step. Run at most two Tesseract jobs concurrently,
+ # matching the container's 2 CPU limit; source verification is repeated below
+ # before any crop bytes are written.
+ def _prefetch_ocr(pair):
+  index,row=pair
+  name=row["png_filename"]
+  src=SRC/name
+  if (Path(name).name!=name or
+      not re.fullmatch(r"Q[0-9]{3}_[a-zA-Z0-9_]+[.]png",name) or
+      not src.is_file() or src.is_symlink() or
+      src.stat().st_size!=int(row["png_size_bytes"])):
+   return index,None,None
+  h=digest(src)
+  if h!=row["png_sha256"]:
+   return index,None,None
+  with Image.open(src) as im:
+   if im.format!="PNG" or im.mode!="RGBA" or im.size!=(int(row["width"]),int(row["height"])):
+    return index,None,None
+   image=im.copy()
+  _,_,unresolved_before=_coverage(row,OUT)
+  if not unresolved_before:
+   return index,h,[]
+  attempts=attempt_count(row)
+  words=ocr.ocr_words(image,strategy=attempts%ocr.OCR_STRATEGY_COUNT)
+  return index,h,words
+
+ ocr_cache={}
+ if selected:
+  with concurrent.futures.ThreadPoolExecutor(max_workers=min(2,len(selected))) as pool:
+   futures=[pool.submit(_prefetch_ocr,pair) for pair in selected]
+   for fut in concurrent.futures.as_completed(futures):
+    try:
+     idx,source_sha,words=fut.result()
+     if source_sha is not None and words is not None:
+      ocr_cache[idx]=(source_sha,words)
+    except Exception:
+     # The main verified path below retains fail-closed error handling.
+     pass
+
  for index,r in selected:
   name=r["png_filename"]; detail={"source":name}
   hardhold=[]
@@ -311,7 +352,11 @@ def scan(max_sources=4,max_new=1000):
     detail["status"]="COVERAGE_COMPLETE"
     detail["matches"]=0
    else:
-    words=ocr.ocr_words(image,strategy=strategy)
+    cached=ocr_cache.get(index)
+    if cached and cached[0]==h:
+     words=cached[1]
+    else:
+     words=ocr.ocr_words(image,strategy=strategy)
     matches=ocr.unique_regions(words,unresolved_before,image.width,image.height,
                                allow_fuzzy=attempts>=3)
     used=[entry["bbox_xyxy"] for entry in archive["items"]
