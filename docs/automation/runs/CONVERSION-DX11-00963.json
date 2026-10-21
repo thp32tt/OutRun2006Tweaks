@@ -9,10 +9,10 @@
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00963",
   "feature_id": "DX11:LIVE_FLOAT_TEXTURE_NATIVE_DRAW",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMITTED_CI_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
   "hmd_test_performed": false,
@@ -23,12 +23,12 @@
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Complete five exact-SHA CI Gates, then obtain real menu/car/race screen and gamepad evidence; continue native Draw/OpenXR integration with DX9Ex fallback",
+  "NEXT_IMPLEMENTATION_ACTION": "Obtain real menu/car/race screen and gamepad evidence; continue native Draw/OpenXR integration with DX9Ex fallback",
   "CODE_CHANGED_SHA": "b6288c671c67312ddc67d1aebc897a1b899b54d0",
   "score_change": 0,
   "work_time_percentages": "NOT_MEASURED",
   "material_result_sha": "b6288c671c67312ddc67d1aebc897a1b899b54d0",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "63b1e6faee16a60b13a93f92b26f943d4e3364ec",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
@@ -105,5 +105,5 @@
     "backend_run": 39521445769,
     "first_attempt_gate_cause": "Prior latest 00962 run record missing required named D3D11_NATIVE_DRAW and VISIBLE_FRAME_OUTPUT path elements; no C++ compile failure in those jobs."
   },
-  "c6_result_note": "Causal exact-sha acceptance repair only. CI pending; runtime/HMD UNTESTED. Not complete and not independently scored."
+  "c6_result_note": "C6 PASS_EXACT_SHA: 63b1e6faee16a60b13a93f92b26f943d4e3364ec GitHub CI SUCCESS. Bookkeeping-only [skip ci] result; source material_result_sha unchanged; no HMD/gameplay/gamepad runtime validation, no new score."
 }
