@@ -1,0 +1,559 @@
+{
+  "run_key": "OUTRUN-C1-20261021T1915KST-B0033-A0028-SHA8",
+  "prior_log_count": 44,
+  "prior_unique_sha": 254,
+  "count": 8,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0033-0EC4883A",
+      "ordinal": 158,
+      "candidate_file": "Q060_773770af7ce8d02a_source_k.png",
+      "source_file": "Q060_773770af7ce8d02a_source.png",
+      "candidate_sha256": "3d801eaf391c91c60af7f5717dc411e25a59320204db5fc6316a25f23a244423",
+      "source_sha256": "b2124b6b633775a14337f1371432898e3d34008e098fca99c5ec0b0aa3a1c64f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "DUMPED!",
+      "approved_korean": "차였어요!",
+      "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2041,
+        770
+      ],
+      "original_dimensions": [
+        819,
+        309
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        49,
+        37,
+        1961,
+        750
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "붉은 그라데이션과 남색 외곽/기울기가 원본과 유사하며 차였어요! 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0033-0EC4883A",
+      "ordinal": 159,
+      "candidate_file": "Q060_c8f5068ad89a5b9c_source_k.png",
+      "source_file": "Q060_c8f5068ad89a5b9c_source.png",
+      "candidate_sha256": "2575953452870520ce34655208bc9a22b3b9a8f8ae4b589a8eafcaa4eba20bfa",
+      "source_sha256": "355e171948627ee09331bd6dac5c1c6fdeb76f9bfd4832b740331fb0dbda7826",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "OUTRUN MILES:",
+      "approved_korean": "아웃런 마일:",
+      "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1113,
+        315
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        146,
+        39,
+        2061,
+        689
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "크림·노란색 채움, 남색 외곽 및 우향 기울기 유지. 아웃런 마일: 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0033-0EC4883A",
+      "ordinal": 160,
+      "candidate_file": "Q060_f9ce6b3e4e60ef34_source_k.png",
+      "source_file": "Q060_f9ce6b3e4e60ef34_source.png",
+      "candidate_sha256": "1d7c46af8bc4964c13fcba23a6321452bb1a19469a7bf1c5a5c11f4c3b6becb7",
+      "source_sha256": "657a5253fee47c1080f0e2677b753ba5036242521c1808bf2009c33417699e2f",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "KNOCKOUT!",
+      "approved_korean": "탈락!",
+      "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1394,
+        460
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        266,
+        31,
+        1981,
+        689
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_COLOR_EFFECT",
+      "visual_reason": "원본의 흰/연크림 채움과 달리 강한 금색 입체감. 탈락!은 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0033-0EC4883A",
+      "ordinal": 161,
+      "candidate_file": "Q034_a445c566d7d448b1_source_k.png",
+      "source_file": "Q034_a445c566d7d448b1_source.png",
+      "candidate_sha256": "6c37221da853a58e3c273c6781570b266915f483b6f49435ea247d5efa8a06fe",
+      "source_sha256": "407d3998f63e80134003ab4d691731db5c08c2bbd759a47919797a1f273449d5",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Total Rank",
+      "approved_korean": "종합 랭킹",
+      "source_dds_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2054,
+        765
+      ],
+      "original_dimensions": [
+        1020,
+        380
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        97,
+        56,
+        1886,
+        733
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 가는 흰색 이탤릭 대비 지나치게 두꺼운 직립형 글자. 종합 랭킹은 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0033-0EC4883A",
+      "ordinal": 162,
+      "candidate_file": "Q049_933dc2d9364976fd_source_k.png",
+      "source_file": "Q049_933dc2d9364976fd_source.png",
+      "candidate_sha256": "8fbe8471b074119fca6222654d4cbeff7abd94564177df773e628f7c0eb71b9b",
+      "source_sha256": "3e827e6fecd3592a4e4fc9eebf17658539e83836f2406eec9798b12d9d7aec6e",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Rank",
+      "approved_korean": "랭크",
+      "source_dds_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1619,
+        972
+      ],
+      "original_dimensions": [
+        1563,
+        938
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        151,
+        64,
+        1583,
+        895
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 작은 흰색 이탤릭 대비 큰 자주색 입체 글자. 랭크는 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0028-3257DA8B",
+      "ordinal": 134,
+      "candidate_file": "Q188_2d4044082d79a38a_source_k.png",
+      "source_file": "Q188_2d4044082d79a38a_source.png",
+      "candidate_sha256": "ace59e85f7ad2d2173e568ad198e83f5655d05e3b9f1b19a42b43d30edcb0f42",
+      "source_sha256": "487ae97316abe4d58ed5a44ffdf5328dc488b9fb25b4eddb36c8b196bb9794f4",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Try to reach the goal with your girlfriend!",
+      "approved_korean": "여자친구와 함께 골에 도착하세요!",
+      "source_dds_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1350,
+        231
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        34,
+        87,
+        2150,
+        553
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 평면 회색 안내문 대신 굵은 검정 외곽/입체 효과. 한글 문구 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0028-3257DA8B",
+      "ordinal": 135,
+      "candidate_file": "Q205_efbdd6f78d5379bd_source_k.png",
+      "source_file": "Q205_efbdd6f78d5379bd_source.png",
+      "candidate_sha256": "b2867242ed896e724e7701045aa2f3fe1aa6985256cc0d2e8655a7564aaf9012",
+      "source_sha256": "9726f0f50b262f33fd0a2c1f276126f089d2552bc6d8f314611f7083c75229e0",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "OutRun for 1 player!",
+      "approved_korean": "1인 아웃런 플레이!",
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1310,
+        176
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        73,
+        55,
+        2152,
+        587
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 평면 회색 서체 대신 두꺼운 검정 외곽/입체 이탤릭. 한글 문구 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0028-3257DA8B",
+      "ordinal": 136,
+      "candidate_file": "Q205_dd0119473200867a_source_k.png",
+      "source_file": "Q205_dd0119473200867a_source.png",
+      "candidate_sha256": "223c8f46c1ee202b48fa60eac3e7cff2fbffd9edeb6c6ee187bb32c6abbb3719",
+      "source_sha256": "9726f0f50b262f33fd0a2c1f276126f089d2552bc6d8f314611f7083c75229e0",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "OutRun for 1 player!",
+      "approved_korean": "1인 아웃런 플레이!",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1310,
+        176
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        49,
+        85,
+        2104,
+        571
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "원본 평면 회색 서체 대신 과도한 굵기·외곽·기울기. 한글 문구 정확함.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "review_slot_kst": "2026-10-21 19:15",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "counts": {
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 2,
+    "fail_major_style_effect": 5,
+    "fail_major_color_effect": 1,
+    "producer_rework_dimensions": 8,
+    "sha_matches": 8,
+    "rgba_png": 8,
+    "edge_opacity_gt32": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "authority": "C1 independent PNG QA only. No ImageGen, queue consumption, DDS export, C2/C3 or game PASS."
+}
