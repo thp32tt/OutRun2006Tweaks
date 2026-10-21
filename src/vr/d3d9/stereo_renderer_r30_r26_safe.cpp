@@ -2009,7 +2009,8 @@ namespace OutRunVRStereo
         {
             using namespace OutRunVR::GameSemantic;
             const auto drawCommand = CapturePhysicalDrawCommand();
-            if (!out || !drawCommand.IsDirectWorldLensCentre())
+            if (!out || QueueRenderActive() ||
+                !drawCommand.IsDirectWorldLensCentre())
                 return false;
             std::uint64_t writeSerial = 0, writeDraw = 0;
             std::uintptr_t writeShader = 0, currentShader = 0;
