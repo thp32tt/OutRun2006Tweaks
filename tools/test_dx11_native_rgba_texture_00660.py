@@ -113,8 +113,18 @@ def test_native_render_target_readback():
         ('dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())', 'E_FAIL'),
         ('ctx->DrawIndexed(indexCount, 0, 0);', 'ctx->DrawIndexed(0, 0, 0);'),
     ):
-        assert before in src, before
-        assert not wired(src.replace(before, after, 1)), "escaped destructive case: " + before
+        # The cube producer now uses the same D3D9 color-layout literals.
+        # Mutate the 00691 2D RT producer itself, never the preceding six-face
+        # cube source. Preserve the original destructive check and negative.
+        prefix, sep, rest = src.partition("bool mirror_texture(")
+        mirror, end, suffix = rest.partition("bool capture_live_sm3_sampler(")
+        assert sep and end, "2D game render-target producer missing"
+        if before in mirror:
+            mutant = prefix + sep + mirror.replace(before, after, 1) + end + suffix
+        else:
+            assert before in src, before
+            mutant = src.replace(before, after, 1)
+        assert not wired(mutant), "escaped destructive case: " + before
     cxx = shutil.which("g++") or shutil.which("clang++")
     assert cxx, "portable C++ compiler required"
     with TemporaryDirectory(prefix="dx11-game-rt-00691-") as temp:
