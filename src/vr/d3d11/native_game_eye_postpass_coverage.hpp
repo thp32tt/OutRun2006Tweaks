@@ -106,4 +106,37 @@ private:
     std::array<NativeGameOffscreenColorRegion, kCapacity> regions_{};
     std::size_t count_{};
 };
+// Real game GPU composites can replace authentic native-eye Draw/Clear
+// pixels after those commands executed. Track this physical chronology
+// separately from source draw counters: an untracked GPU overwrite requires
+// a later completely proven camera repaint or a newer full TARGET Clear.
+class NativeGameEyeColorChronology final {
+public:
+    void reset_after_full_target_clear() noexcept {
+        postpasses_.reset();
+        unprovenGpuOverwrite_ = false;
+    }
+    void record_proven_gpu_postpass(NativeGameOffscreenColorRegion dest) noexcept {
+        postpasses_.record(dest);
+    }
+    void record_unproven_gpu_postpass(NativeGameOffscreenColorRegion dest) noexcept {
+        if (!native_game_offscreen_color_region_valid(dest)) return;
+        postpasses_.invalidate(dest);
+        // Later partial geometry cannot prove it repainted the foreign
+        // region. Keep the native XR frame fail-closed until source-proven
+        // GPU work covers the entire eye, or a real full-eye Clear resets it.
+        unprovenGpuOverwrite_ = true;
+    }
+    [[nodiscard]] bool full_postpass_eye(std::uint32_t width,
+                                         std::uint32_t height) const noexcept {
+        return postpasses_.full_eye(width, height);
+    }
+    [[nodiscard]] bool publication_safe(std::uint32_t width,
+                                        std::uint32_t height) const noexcept {
+        return !unprovenGpuOverwrite_ || postpasses_.full_eye(width, height);
+    }
+private:
+    NativeGameEyePostpassCoverage postpasses_{};
+    bool unprovenGpuOverwrite_{};
+};
 } // namespace outrun::vr::dx11

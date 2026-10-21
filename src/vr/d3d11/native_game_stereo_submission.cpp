@@ -1209,12 +1209,12 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             // subresource; unrelated stale textures never certify this eye.
             if (proven) {
                 ++authoredColorPostpassCount_;
-                eyePostpassCoverage_.record(visibleDest);
+                eyeColorChronology_.record_proven_gpu_postpass(visibleDest);
             } else {
                 // Real GPU Copy may import an untracked game intermediate.
                 // Preserve the Copy, but it overwrote any earlier certified
                 // color in this destination. Invalidate BEFORE publication.
-                eyePostpassCoverage_.invalidate(visibleDest);
+                eyeColorChronology_.record_unproven_gpu_postpass(visibleDest);
             }
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
@@ -1267,13 +1267,13 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 return false;
             if (proven && visibleDest.valid) {
                 ++authoredColorPostpassCount_;
-                eyePostpassCoverage_.record({visibleDest.left, visibleDest.top,
+                eyeColorChronology_.record_proven_gpu_postpass({visibleDest.left, visibleDest.top,
                                              visibleDest.right, visibleDest.bottom});
             } else if (visibleDest.valid) {
                 // An unproven but admissible GPU Stretch changes these
                 // actual clipped XR pixels. Earlier Copy/Stretch proof is
                 // no longer current until authentic game color repaints it.
-                eyePostpassCoverage_.invalidate(
+                eyeColorChronology_.record_unproven_gpu_postpass(
                     {visibleDest.left, visibleDest.top,
                      visibleDest.right, visibleDest.bottom});
             }
@@ -1455,7 +1455,7 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         authoredFullColorClearCount_ = history.fullTargetClears;
         lastFullClearDrawOrdinal_ = history.lastFullClearDrawOrdinal;
         if (lastTargetClearFull_) {
-            eyePostpassCoverage_.reset();
+            eyeColorChronology_.reset_after_full_target_clear();
             unpredicatedAtLastFullClear_ = unpredicatedGameDrawCount_;
             unpredicatedEyeAtLastFullClear_ = unpredicatedEyeDrawCount_;
         }
@@ -3000,7 +3000,11 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                  encoder.authored_full_color_clear_count() == 0u &&
                  encoder.authored_color_postpass_count() != 0u &&
                  !encoder.postpass_full_eye_coverage()) ||
-                evidence.drawCount != encoder.draw_count() ||
+                // A later unproven GPU Copy/Stretch replaces real Draw and
+                 // full TARGET Clear color without rewinding Draw counts.
+                 // Demand an authentic complete eye repaint or full Clear.
+                 !encoder.eye_color_chronology_safe() ||
+                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||
                 (eyeIndex == 1u &&

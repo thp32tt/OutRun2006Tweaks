@@ -168,7 +168,12 @@ public:
     // A collection of genuine GPU postpasses must cover every eye pixel
     // when no direct eye Draw or real full-eye TARGET Clear seeds the frame.
     [[nodiscard]] bool postpass_full_eye_coverage() const noexcept {
-        return eyePostpassCoverage_.full_eye(targetWidth_, targetHeight_);
+        return eyeColorChronology_.full_postpass_eye(targetWidth_, targetHeight_);
+    }
+    // Do not certify a native Eye from Draw/Clear evidence predating a
+    // later foreign GPU Copy/Stretch. Real full-eye repaint can recover.
+    [[nodiscard]] bool eye_color_chronology_safe() const noexcept {
+        return eyeColorChronology_.publication_safe(targetWidth_, targetHeight_);
     }
     // Only the submission owner can supply the original D3D9 full TARGET
     // seed. Later full-size game rectangle clears supersede prior eye color;
@@ -238,7 +243,7 @@ private:
     std::uint64_t unpredicatedEyeAtLastFullClear_{};
     std::uint64_t colorDrawCount_{};
     std::uint32_t authoredColorPostpassCount_{};
-    NativeGameEyePostpassCoverage eyePostpassCoverage_{};
+    NativeGameEyeColorChronology eyeColorChronology_{};
     struct OffscreenColorSource {
         Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
         UINT arraySlice{}, mipSlice{};
