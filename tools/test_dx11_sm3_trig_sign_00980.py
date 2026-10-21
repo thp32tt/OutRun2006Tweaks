@@ -22,6 +22,9 @@ def connected(pipeline: str, backend: str, helper: str) -> bool:
         "shaderMajor, vertexStage", "operands.sourceCount",
         "NativeSm3TrigSignOpcode::SineCosine",
         "NativeSm3TrigSignOpcode::Sign",
+    ]) and all(s in pipeline for s in [
+        # Scratch-register parsing executes after semanticHash initialization,
+        # not inside plan_for's opcode table. Check the full decode function.
         "ProgrammableShaderRegisterOperandRole::ScratchDestination",
         "++out.scratchDestinationOperandCount",
         "scratch0.registerIndex == scratch1.registerIndex",
