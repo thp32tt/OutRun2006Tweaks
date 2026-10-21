@@ -1,0 +1,66 @@
+#pragma once
+#include "native_game_offscreen_color_provenance.hpp"
+#include <array>
+#include <cstddef>
+#include <cstdint>
+
+namespace outrun::vr::dx11 {
+// Only successful, source-proven GAME GPU Copy/Stretch destinations may
+// contribute to a full native XR eye. A single small menu postpass must
+// never be mistaken for the entire game color frame. Keep exact rectangles:
+// copying a camera's full source does not certify an unclipped destination.
+class NativeGameEyePostpassCoverage final {
+public:
+    static constexpr std::size_t kCapacity = 32u;
+    void reset() noexcept { count_ = 0u; }
+    void record(NativeGameOffscreenColorRegion region) noexcept {
+        if (!native_game_offscreen_color_region_valid(region)) return;
+        // Collapse only exact rectangular unions, including bridged strips.
+        // This never fills an L-shaped corner, a foreign patch or a gap.
+        bool merged = true;
+        while (merged) {
+            merged = false;
+            for (std::size_t i = 0u; i < count_; ++i) {
+                NativeGameOffscreenColorRegion joined{};
+                if (!native_game_offscreen_exact_rect_union(
+                        region, regions_[i], joined)) continue;
+                region = joined;
+                regions_[i] = regions_[--count_];
+                merged = true;
+                break;
+            }
+        }
+        if (count_ < kCapacity) {
+            regions_[count_++] = region;
+            return;
+        }
+        // Overlapping camera tiles may form an exact non-slicing mosaic.
+        // Admit it ONLY if their real pixel union covers its full envelope.
+        // Otherwise drop this additional proof and keep the D3D9 fallback.
+        const auto mosaic = native_game_offscreen_color_mosaic_compaction(
+            region, regions_, count_);
+        if (mosaic.left == region.left && mosaic.top == region.top &&
+            mosaic.right == region.right && mosaic.bottom == region.bottom)
+            return;
+        std::size_t kept = 0u;
+        for (std::size_t i = 0u; i < count_; ++i) {
+            const auto& old = regions_[i];
+            if (old.left >= mosaic.left && old.top >= mosaic.top &&
+                old.right <= mosaic.right && old.bottom <= mosaic.bottom)
+                continue;
+            regions_[kept++] = old;
+        }
+        count_ = kept;
+        if (count_ < kCapacity) regions_[count_++] = mosaic;
+    }
+    [[nodiscard]] bool full_eye(std::uint32_t width,
+                                std::uint32_t height) const noexcept {
+        if (!width || !height || !count_) return false;
+        return native_game_offscreen_color_region_fully_covered(
+            {0u, 0u, width, height}, regions_, count_);
+    }
+private:
+    std::array<NativeGameOffscreenColorRegion, kCapacity> regions_{};
+    std::size_t count_{};
+};
+} // namespace outrun::vr::dx11

@@ -1,5 +1,6 @@
 #pragma once
 #include "native_game_offscreen_color_provenance.hpp"
+#include "native_game_eye_postpass_coverage.hpp"
 
 #include "native_shared_eye_ring.hpp"
 #include <array>
@@ -164,6 +165,11 @@ public:
     [[nodiscard]] std::uint32_t authored_color_postpass_count() const noexcept {
         return authoredColorPostpassCount_;
     }
+    // A collection of genuine GPU postpasses must cover every eye pixel
+    // when no direct eye Draw or real full-eye TARGET Clear seeds the frame.
+    [[nodiscard]] bool postpass_full_eye_coverage() const noexcept {
+        return eyePostpassCoverage_.full_eye(targetWidth_, targetHeight_);
+    }
     // Only the submission owner can supply the original D3D9 full TARGET
     // seed. Later full-size game rectangle clears supersede prior eye color;
     // partial TARGET clears never seed an entire native eye.
@@ -232,6 +238,7 @@ private:
     std::uint64_t unpredicatedEyeAtLastFullClear_{};
     std::uint64_t colorDrawCount_{};
     std::uint32_t authoredColorPostpassCount_{};
+    NativeGameEyePostpassCoverage eyePostpassCoverage_{};
     struct OffscreenColorSource {
         Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
         UINT arraySlice{}, mipSlice{};

@@ -1,0 +1,20 @@
+from pathlib import Path
+root=Path(__file__).resolve().parents[1]
+cpp=(root/"src/vr/d3d11/native_game_stereo_submission.cpp").read_text(encoding="utf-8")
+hpp=(root/"src/vr/d3d11/native_game_stereo_submission.hpp").read_text(encoding="utf-8")
+cov=(root/"src/vr/d3d11/native_game_eye_postpass_coverage.hpp").read_text(encoding="utf-8")
+replay=cpp[cpp.index("bool NativeGameEyeDrawEncoder::replay_due_source_clears()"):cpp.index("bool NativeGameEyeDrawEncoder::finish_source_clear_timeline()")]
+ready=cpp[cpp.index("if (!live_game_stereo::authored_visible_eye_frame_ready("):]
+assert replay.count("eyePostpassCoverage_.record(")==2
+assert replay.count("if (proven) {")==2
+assert replay.index("if (!copy_game_surface(")<replay.index("eyePostpassCoverage_.record(")
+assert replay.index("if (!stretch_game_surface(")<replay.rindex("eyePostpassCoverage_.record(")
+assert "clipped.destX" in replay and "visibleDest.valid" in replay
+assert "eyePostpassCoverage_.reset();" in cpp
+assert "postpass_full_eye_coverage()" in ready
+assert "encoder.authored_full_color_clear_count() == 0u" in ready
+assert "encoder.color_draw_count() == 0u" in ready
+assert "NativeGameEyePostpassCoverage eyePostpassCoverage_" in hpp
+assert "native_game_offscreen_color_region_fully_covered(" in cov
+assert "native_game_offscreen_exact_rect_union(" in cov
+print("DX11 native authored GPU postpass destination eye coverage PASS")

@@ -1168,15 +1168,20 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 clear.sourceMipSlice, cameraDesc.ArraySize,
                 clear.sourceArraySlice, cameraDesc.SampleDesc.Count);
             NativeGameOffscreenColorRegion sampled{};
+            NativeGameOffscreenColorRegion visibleDest{};
             if (cameraMip.valid) {
                 const auto clipped = native_game_copy_clipped_region(
                     cameraMip.width, cameraMip.height,
                     clear.sourceBox.left, clear.sourceBox.top,
                     clear.sourceBox.right, clear.sourceBox.bottom,
                     targetWidth_, targetHeight_, clear.destX, clear.destY);
-                if (clipped.valid)
+                if (clipped.valid) {
                     sampled = {clipped.sourceLeft, clipped.sourceTop,
                                clipped.sourceRight, clipped.sourceBottom};
+                    visibleDest = {clipped.destX, clipped.destY,
+                        clipped.destX + clipped.sourceRight - clipped.sourceLeft,
+                        clipped.destY + clipped.sourceBottom - clipped.sourceTop};
+                }
             }
             const D3D11_BOX sampledBox{
                 sampled.left, sampled.top, 0u,
@@ -1202,7 +1207,10 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             // real eye color even when its on-eye geometry only updates Z.
             // Count only a postpass of an actually color-written camera
             // subresource; unrelated stale textures never certify this eye.
-            if (proven) ++authoredColorPostpassCount_;
+            if (proven) {
+                ++authoredColorPostpassCount_;
+                eyePostpassCoverage_.record(visibleDest);
+            }
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
             // The native point/linear GPU shader samples only visible
@@ -1214,6 +1222,15 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 cameraDesc.Width, cameraDesc.Height, cameraDesc.MipLevels,
                 clear.sourceMipSlice, cameraDesc.ArraySize,
                 clear.sourceArraySlice, cameraDesc.SampleDesc.Count);
+            const auto visibleDest = cameraMip.valid
+                ? native_game_stretch_clipped_region(
+                    cameraMip.width, cameraMip.height,
+                    clear.sourceBox.left, clear.sourceBox.top,
+                    clear.sourceBox.right, clear.sourceBox.bottom,
+                    targetWidth_, targetHeight_,
+                    clear.destination.left, clear.destination.top,
+                    clear.destination.right, clear.destination.bottom)
+                : NativeGameStretchClippedRegion{};
             const auto sampled = cameraMip.valid
                 ? native_game_visible_stretch_sample_region(
                     cameraMip.width, cameraMip.height,
@@ -1243,7 +1260,11 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                                       clear.destination, clear.linearFilter,
                                       clear.sourceArraySlice, clear.sourceMipSlice))
                 return false;
-            if (proven) ++authoredColorPostpassCount_;
+            if (proven && visibleDest.valid) {
+                ++authoredColorPostpassCount_;
+                eyePostpassCoverage_.record({visibleDest.left, visibleDest.top,
+                                             visibleDest.right, visibleDest.bottom});
+            }
         } else {
             return false; // Reject unrecognized source commands, never fabricate a Clear.
         }
@@ -1422,6 +1443,7 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         authoredFullColorClearCount_ = history.fullTargetClears;
         lastFullClearDrawOrdinal_ = history.lastFullClearDrawOrdinal;
         if (lastTargetClearFull_) {
+            eyePostpassCoverage_.reset();
             unpredicatedAtLastFullClear_ = unpredicatedGameDrawCount_;
             unpredicatedEyeAtLastFullClear_ = unpredicatedEyeDrawCount_;
         }
@@ -2958,6 +2980,14 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     encoder.unpredicated_at_last_full_clear(),
                     encoder.unpredicated_eye_draw_count(),
                     encoder.unpredicated_eye_at_last_full_clear()) ||
+                // Without genuine on-eye color or a game full-eye Clear,
+                // partially imported menu/HUD tiles are not a full native
+                // frame. Admit adjacent genuine Copy/Stretch destinations
+                // only when their union fills this physical eye raster.
+                (encoder.color_draw_count() == 0u &&
+                 encoder.authored_full_color_clear_count() == 0u &&
+                 encoder.authored_color_postpass_count() != 0u &&
+                 !encoder.postpass_full_eye_coverage()) ||
                 evidence.drawCount != encoder.draw_count() ||
                 !evidence.viewSignature ||
                 evidence.sourcePoseSequence != invocation.poseSequence ||
