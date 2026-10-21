@@ -1,0 +1,574 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1645KST-B0030-A0025-NEW",
+  "review_slot_kst": "2026-10-21 16:45",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "provenance": {
+    "source": "N100 actual A/B ChatGPT ImageGen locally saved unapproved candidate PNG",
+    "previously_reviewed_unique_candidate_sha256": 230,
+    "new_unique_candidate_sha256": 8,
+    "source_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": [
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-B-0030-2F4A7821.json",
+      "work/image-src/text_roi_batches/export_evidence/OUTRUN-ROI-A-0025-B6C49BDC.json"
+    ],
+    "n100_preflight": "work/c1_batch_20261021_1645/preflight.json",
+    "n100_comparison_images": [
+      "work/c1_batch_20261021_1645/compare_1.jpg",
+      "work/c1_batch_20261021_1645/compare_2.jpg",
+      "work/c1_batch_20261021_1645/compare_3.jpg",
+      "work/c1_batch_20261021_1645/compare_4.jpg"
+    ]
+  },
+  "authority": "Independent C1 source-vs-transparent-PNG lightweight QA only. No producer queue consumption, ImageGen generation, DDS final export, C2/C3 or user in-game PASS.",
+  "counts": {
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 3,
+    "fail_line_layout": 2,
+    "fail_major_style_slant": 1,
+    "fail_major_style_effect": 2,
+    "producer_rework_dimensions": 8,
+    "export_sha_match": 8,
+    "source_manifest_sha_match": 8,
+    "rgba_png": 8,
+    "visible_edge_opacity_gt32": 0
+  },
+  "reviews": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0030-2F4A7821",
+      "ordinal": 143,
+      "candidate_file": "Q086_c764dcd00ec81a15_source_k.png",
+      "source_file": "Q086_c764dcd00ec81a15_source.png",
+      "candidate_sha256": "644d189114c6117e16ec9b5db432120cb243f521341c1b7ffd89497958306e8a",
+      "source_sha256": "4f07bb5d07b1e8f448b4d865f622426fea3d3788f78d4f163148061af2bcb06c",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1851,
+        850
+      ],
+      "original_dimensions": [
+        940,
+        272
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        331,
+        71,
+        1545,
+        769
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_LINE_LAYOUT",
+      "visual_reason": "Original TUNED is one horizontal line. Korean 튜닝 is vertically stacked in two rows with enlarged outline and altered shadow. Meaning is correct, but line arrangement changes the source UI label.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0030-2F4A7821",
+      "ordinal": 144,
+      "candidate_file": "Q086_0f8a5a5f621f6a9b_source_k.png",
+      "source_file": "Q086_0f8a5a5f621f6a9b_source.png",
+      "candidate_sha256": "91ad80d88f1b60b73bc0c5a2205fb85157873ad13517da40b234b37a4673acfc",
+      "source_sha256": "4fa691594c88872f26cd4c7644289bfb534a186fea2324bcff91ef89a125522a",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Time Attack MODE",
+      "approved_korean": "타임 어택 모드",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2086,
+        754
+      ],
+      "original_dimensions": [
+        1916,
+        206
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        71,
+        2064,
+        650
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 17,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "타임 어택 모드 is accurately spelled and readable; single-line rightward-italic white type with black edge/shadow broadly matches the English source. Single left-edge alpha=1 fringe is negligible.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0030-2F4A7821",
+      "ordinal": 145,
+      "candidate_file": "Q086_6370e4e9a71aa2c9_source_k.png",
+      "source_file": "Q086_6370e4e9a71aa2c9_source.png",
+      "candidate_sha256": "98e55c59ef6cfb88f37267890edc2c9bb6e4b013f44a4075c9b868a5765df529",
+      "source_sha256": "4f07bb5d07b1e8f448b4d865f622426fea3d3788f78d4f163148061af2bcb06c",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "TUNED",
+      "approved_korean": "튜닝",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1651,
+        953
+      ],
+      "original_dimensions": [
+        940,
+        272
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        160,
+        134,
+        1613,
+        872
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_LINE_LAYOUT",
+      "visual_reason": "Original TUNED is a single horizontal word. Output divides 튜닝 vertically, adding substantially greater vertical glyph footprint and heavier outlines; not a faithful one-line UI replacement.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0030-2F4A7821",
+      "ordinal": 146,
+      "candidate_file": "Q086_09d5a2eb4ec75f6c_source_k.png",
+      "source_file": "Q086_09d5a2eb4ec75f6c_source.png",
+      "candidate_sha256": "303e1eef3a3858730cf9dd38f1d1f9797433e4b8e320341943834b65f605df46",
+      "source_sha256": "54e7701b695b294f9dc10e0c46b449b4ef101e4d475b879addd7eaadd85072a5",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Legend",
+      "approved_korean": "레전드",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2109,
+        746
+      ],
+      "original_dimensions": [
+        736,
+        260
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        361,
+        23,
+        1769,
+        714
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_SLANT",
+      "visual_reason": "Original Legend uses relatively upright rounded bold white letters with a heavy black outline; 레전드 has strongly sheared angular high-speed italic strokes and noticeably different outline/shadow. Severe glyph style/slant mismatch, not mere length difference.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0030-2F4A7821",
+      "ordinal": 147,
+      "candidate_file": "Q086_b992fc73b6a3bc92_source_k.png",
+      "source_file": "Q086_b992fc73b6a3bc92_source.png",
+      "candidate_sha256": "5f9dda4035c2645fc98416c289ead7cee5b0f380b62a62d010f08d3d7bbb8bb9",
+      "source_sha256": "e9f6b237cc0050d464b3e0784df1ef78e0394fc9c75b2ad11fadf8efc23781ec",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Heart Attack MODE",
+      "approved_korean": "하트 어택 모드",
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2027,
+        776
+      ],
+      "original_dimensions": [
+        1928,
+        737
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        25,
+        166,
+        1844,
+        639
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "하트 어택 모드 is readable, correctly mapped and isolated on alpha. Original atlas contains other unrelated UI labels and decorative art correctly absent from candidate; native UI placement remains untested.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0025-B6C49BDC",
+      "ordinal": 119,
+      "candidate_file": "Q095_b69d89272fa52a60_source_k.png",
+      "source_file": "Q095_b69d89272fa52a60_source.png",
+      "candidate_sha256": "ce274b238320eb09659b39fb008df9166d4f6c65774dfc8535664c25cacaed3a",
+      "source_sha256": "a704be71b4a379906ef95bd32bdf3636badedc7b5c9e774ddaa72b8b6195c923",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Please stand by.",
+      "approved_korean": "잠시 기다려 주세요.",
+      "source_dds_sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2126,
+        740
+      ],
+      "original_dimensions": [
+        1746,
+        607
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        41,
+        62,
+        2106,
+        654
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "잠시 기다려 주세요. is correctly spelled and legible. Yellow-white fill, blue outline and rightward italic styling match original Please stand by. closely; unrelated atlas art and Waiting for entries. are not copied.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0025-B6C49BDC",
+      "ordinal": 120,
+      "candidate_file": "Q133_d536fabb997f51a3_source_k.png",
+      "source_file": "Q133_d536fabb997f51a3_source.png",
+      "candidate_sha256": "dc864a9d9d2244ac40ae6349efa1b852d3a566f81370590a399cc305536f2aa1",
+      "source_sha256": "afea3ddf73c6c1c1f6108efa752976957bc340f02efda8d10184099c94231a5d",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "NERO",
+      "approved_korean": "네로",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2027,
+        776
+      ],
+      "original_dimensions": [
+        752,
+        288
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        154,
+        70,
+        1927,
+        760
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "Original NERO is flat upright dim-gray pixel typography. Candidate 네로 is much heavier 3D metallic black-gray lettering with thick beveled rim and shadow; major unrequested style/effect change.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0025-B6C49BDC",
+      "ordinal": 121,
+      "candidate_file": "Q133_5d57f032d1f98b12_source_k.png",
+      "source_file": "Q133_5d57f032d1f98b12_source.png",
+      "candidate_sha256": "6f2d68df8b9a6b92784d7a9bbfbc29124b80f78f8ceb47d9b226db3e864281c1",
+      "source_sha256": "3bd80116169e645f156c47b765af38d89786bb752bd42fa310f75ca1a3d2198d",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "BIANCO AVUS",
+      "approved_korean": "비앙코 아부스",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1728,
+        288
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        33,
+        7,
+        2152,
+        636
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "Original BIANCO AVUS is flat, medium-gray nonbeveled UI lettering. Candidate 비앙코 아부스 uses prominent dark metallic 3D bevel, thick outlines and shadows, materially unlike source.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
