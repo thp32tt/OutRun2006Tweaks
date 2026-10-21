@@ -2867,15 +2867,12 @@ public:
 			Module::exe_ptr(0xBAD20), RankMarkerSub_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
-        // Only the exact verified x86 E8 rival projector, before BB796
-        // queues its marker. No generic NaviPub/game sprite hooks widened.
-        if (!Settings::VRRivalDx11NativeRoute.get())
-            Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
-                Calc3D2D_RivalExactCall, Memory::HookType::Call);
-        else
-            spdlog::info(
-                "VR RIVAL DX11 REFERENCE: stock BB6F0 projector and "
-                "BB796 rival sprite calls retained");
+        // Quest3 field regression 2026-10-22: the experimental
+        // DX11-native rival route leaves the rival marker on the stock 2D
+        // projection. Restore the previously HMD-proven R26 exact projector
+        // independently from the now-correct ordinal rank path.
+        Memory::VP::InjectHook(Module::exe_ptr(0xBB6F0),
+            Calc3D2D_RivalExactCall, Memory::HookType::Call);
 		for (int addr : RankMarkerSubScreenHudCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), RankMarkerSubSemanticDest,
@@ -2905,10 +2902,12 @@ public:
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite,
 				Memory::HookType::Call);
-        if (!Settings::VRRivalDx11NativeRoute.get())
-            Memory::VP::InjectHook(
-                Module::exe_ptr(RivalMarker_SpraniCall),
-                RivalMarker_sprani, Memory::HookType::Call);
+        Memory::VP::InjectHook(
+            Module::exe_ptr(RivalMarker_SpraniCall),
+            RivalMarker_sprani, Memory::HookType::Call);
+        spdlog::info(
+            "VR RIVAL RESTORED: exact BB6F0 Calc3D2D + BB796 projected "
+            "sprani path active; ordinal rank DX11 reference unchanged");
 		for (int addr : TextGlyph_PutSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), TextGlyph_putSprite,
