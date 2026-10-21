@@ -146,7 +146,7 @@ def main():
                     try:
                         # Coverage-driven scan: a source is revisited until every
                         # reviewed phrase has a crop. OCR strategy rotates by attempt.
-                        original108=ocr_hd108.scan(max_sources=4, max_new=1000)
+                        original108=ocr_hd108.scan(max_sources=8, max_new=1000)
                         hd_sig=(original108.get("status"),
                                 original108.get("pending_sources_after"),
                                 original108.get("pending_phrases_after"))
