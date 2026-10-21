@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261022T0148KST-INVENTORY",
+  "qa_date_kst": "2026-10-22 01:48",
+  "lane": "C1",
+  "scope": "A_B_GENERATED_LOCAL_KOREAN_PNG_SHA_DEDUP_INVENTORY",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_branch_head_before": "dfb3970426d79effd4ba208f109ed14a2357d6ed",
+  "evidence_n100": "work/c1_20261022_0148_inventory_result.json",
+  "evidence_location": "work/image-src/text_roi_batches/export_evidence",
+  "prior_record": "localization/graphics/role_C1/20261022-C1-0115-IDLE.json",
+  "inventory": {
+    "export_evidence_files": 66,
+    "recorded_output_entries": 313,
+    "reviewed_sha_in_local_logs": 318,
+    "local_qa_reports_scanned": 53,
+    "new_unreviewed_local_png_sha": 0,
+    "missing_new_local_files": 0,
+    "invalid_export_evidence": 0
+  },
+  "overall": "IDLE",
+  "c1_reviewed_new": 0,
+  "c1_pass_new": 0,
+  "c1_fail_new": 0,
+  "qa_not_performed_for_absent_candidates": true,
+  "unchanged": {
+    "A_B_queue": true,
+    "no_imagegen": true,
+    "no_dds_write": true,
+    "no_deployment": true,
+    "no_C2_C3_user_game_pass": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "scoring": {
+    "change": 0,
+    "scoreboard_ai_1_before": 1695,
+    "scoreboard_ai_1_after": 1695,
+    "reason": "No new candidate SHA; inventory/status recheck, no duplicated points."
+  }
+}
