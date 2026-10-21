@@ -1,0 +1,242 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1445KST-A0020-B0027-SHA4",
+  "review_slot_kst": "2026-10-21 14:45",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "scope": "Independent lightweight C1 visual QA of four locally saved A/B ImageGen candidates. No ImageGen, producer queue consumption, DDS changes, C2/C3 or real-game PASS.",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "counts": {
+    "prior_local_sha_unique": 205,
+    "new_unique_reviewed": 4,
+    "pass_png_text_only": 2,
+    "fail_major_typography": 2,
+    "producer_rework_dimensions": 4
+  },
+  "evidence": {
+    "n100_preflight": "work/c1_batch_20261021_1445/preflight.json",
+    "n100_compare_images": [
+      "work/c1_batch_20261021_1445/compare_1.jpg",
+      "work/c1_batch_20261021_1445/compare_2.jpg"
+    ],
+    "n100_dedup_script": "work/c1_20261021_1445_dedup.py",
+    "candidate_export_sha_and_source_manifest_verified": true,
+    "all_four_distinct_from_205_prior_sha": true,
+    "all_rgba_png": true,
+    "all_alpha_border_zero": true,
+    "dimensions_mismatch_source_all_four": true
+  },
+  "results": [
+    {
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "role": "A",
+      "ordinal": 97,
+      "candidate_file": "Q121_bc6fbba21af3e09a_source_k.png",
+      "source_file": "Q121_bc6fbba21af3e09a_source.png",
+      "candidate_sha256": "c365caa14433936475f1901513fd407bebc73caeb7b3614103c0d1345d2ef731",
+      "previously_seen": [],
+      "source_sha256": "15e408ab32c6222fbe8cf644872c850b28575b4a2b9672890174b0ecc352efc2",
+      "candidate_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "Gas Pedal :",
+      "approved_korean": "가속 페달:",
+      "producer_status": "REWORK_DIMENSIONS",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1896,
+        829
+      ],
+      "original_dimensions": [
+        544,
+        238
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        127,
+        145,
+        1876,
+        788
+      ],
+      "alpha_border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_TYPOGRAPHY_WEIGHT_EFFECT",
+      "visual_reason": "Original 'Gas Pedal :' is slim white italic with small black outline/shadow; candidate '가속 페달:' has markedly thicker upright white block glyphs and a heavy navy/black extrusion. Translation/glyphs are readable; fail is severe text styling, not word-length variance.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-A-0020-59835D4F",
+      "role": "A",
+      "ordinal": 98,
+      "candidate_file": "Q135_c2ad0a061355607c_source_k.png",
+      "source_file": "Q135_c2ad0a061355607c_source.png",
+      "candidate_sha256": "a78887c1b8e35d7f4a777ae5186696db576f11be548e9d0889000f87ff5b94a9",
+      "previously_seen": [],
+      "source_sha256": "b710a472a79e6912dcd89d773298a2bd6623ad1c29a925a7346ae6dbbb55b054",
+      "candidate_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "english": "INTERMEDIATE B",
+      "approved_korean": "중급 B",
+      "producer_status": "REWORK_DIMENSIONS",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1045,
+        256
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        403,
+        86,
+        1957,
+        570
+      ],
+      "alpha_border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_COLOR_AND_WEIGHT",
+      "visual_reason": "Original 'INTERMEDIATE B' is bold block dark gray with minimal outline; candidate '중급 B' is small thin white text with shadow, losing source hierarchy, fill and weight. Source ROI also contains adjacent English text, which is not supposed to be reproduced in candidate.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0027-78D8F5F0",
+      "role": "B",
+      "ordinal": 131,
+      "candidate_file": "Q230_7feed9a108a3640f_source_k.png",
+      "source_file": "Q230_7feed9a108a3640f_source.png",
+      "candidate_sha256": "d1d41076c7e79b591520c466ac8c92a6561f003cb287ff7f83e7c6f334065851",
+      "previously_seen": [],
+      "source_sha256": "bb4e16c9b4a50ba6c8b473f130cbddd816056c81a58190958e105cf5740cfc35",
+      "candidate_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+      "english": "SOLD",
+      "approved_korean": "판매 완료",
+      "producer_status": "REWORK_DIMENSIONS",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1919,
+        819
+      ],
+      "original_dimensions": [
+        417,
+        178
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        104,
+        53,
+        1873,
+        779
+      ],
+      "alpha_border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'판매 완료' is legible white text with moderate gray shadow; the source 'SOLD' is white within a red protected pill, and the candidate correctly outputs text without inventing the red pill/background. Minor text treatment differences do not block this text-only pass.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0027-78D8F5F0",
+      "role": "B",
+      "ordinal": 132,
+      "candidate_file": "Q086_c9bba6352022ab22_source_k.png",
+      "source_file": "Q086_c9bba6352022ab22_source.png",
+      "candidate_sha256": "c7f88d5aed7b8ab9b27c6b111741fd60049ce97eb1a1b5e0d826a9e05f38b52e",
+      "previously_seen": [],
+      "source_sha256": "2ae173cdaa6785f4e982b491440b6448b4ad6b67565dd5452bc213577c3b0e1c",
+      "candidate_export_sha_match": true,
+      "source_manifest_sha_match": true,
+      "source_dds_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "english": "Floral Village",
+      "approved_korean": "플로럴 빌리지",
+      "producer_status": "REWORK_DIMENSIONS",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1204,
+        256
+      ],
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "alpha_bbox": [
+        37,
+        87,
+        2136,
+        620
+      ],
+      "alpha_border_nonzero": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'플로럴 빌리지' is readable, with a bold white fill, dark outline and rightward italic slant comparable to the source 'Floral Village'. No extraneous frame/background or English residues.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
