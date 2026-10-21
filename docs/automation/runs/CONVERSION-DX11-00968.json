@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00968",
+  "production_id": "CONVERSION-DX11-00968",
+  "event_id": "CONVERSION-DX11-00968-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00968",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "SOURCE_BUILD_VERIFIED_RUNTIME_PENDING",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "gameplay_test_performed": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "work_time_percentages": "NOT_MEASURED",
+  "time_allocation_claim": "NOT_MEASURED",
+  "source_head": "80ab93720d509200644d9018cdf136956e189792",
+  "material_result_sha": "ec651a4c0fbd37556a0800f586c3f6a22418e30e",
+  "validation_bearing_result_sha": "e994a7f4fe091c114e847bed6339c548777bb910",
+  "result_sha": "e994a7f4fe091c114e847bed6339c548777bb910",
+  "CODE_CHANGED_SHA": "ec651a4c0fbd37556a0800f586c3f6a22418e30e",
+  "score_change": 1,
+  "score_run_key": "CONVERSION-DX11-00968",
+  "scoreboard_commit": "44946e43162611c836286e6387d500a747353c44",
+  "score_previous": 1680,
+  "score_current": 1681,
+  "changed_files": [
+    "src/vr/d3d11/native_game_inert_stencil_mrt.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_stencil_game_probe_00968.cpp",
+    "tools/test_dx11_live_stencil_draw_00968.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "LIVE_D3D9_STENCIL_FRONT_BACK_STATE",
+      "FVF_AND_SM3_NATIVE_DRAW_ADMISSION",
+      "D3D11_RENDER_WITH_INERT_STENCIL",
+      "ORIGINAL_D3D9_FALLBACK"
+    ],
+    "conflict_keys": [
+      "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME:CONVERSION-DX11-00968"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha_after_observed_ci_repair"
+  },
+  "acceptance_proof": {
+    "positive": "Real source-owned D3D9 front/back ALWAYS stencil compares, mask=0 or all KEEP operations reach guarded native game Draw/DrawIndexed in FVF and SM3 via shared live admission.",
+    "negative": "Unsupported conditional stencil, CCW tests, unknown or writable operations remain D3D9Ex fail-closed; positive/negative portable C++ and source regression checks; original game input/FFB/SkyGlow unchanged.",
+    "validation_scope": "source / mandatory CI only; no game frame/HMD observation"
+  },
+  "ci": {
+    "exact_sha": "e994a7f4fe091c114e847bed6339c548777bb910",
+    "branch": "vr-dx11-native-r71",
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "runs": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39573883078,
+        "conclusion": "success"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39573882949,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "id": 39573890114,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39573890075,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39573890162,
+        "conclusion": "success"
+      }
+    ],
+    "extra_warp_run": "NOT_REQUIRED_FOR_FIVE_GATE"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: latest target branch HEAD 80ab9372 and 00967 C6 verified; did not enter DXVK.",
+    "C1_REVIEW": "PASS: identify outstanding live stencil-native Draw admission for menu/car/race source; maintain safe fallback.",
+    "C2_IMPLEMENT": "PASS: material GPU-renderer source commit ec651a4c, portable regression and Fast Gate; no notes-only result.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: repair actual Windows Build negative mutation false failure at e994a7f4; all five same-SHA mandatory workflows successful.",
+    "C4_COMMIT": "PASS: ec651a4c material game-native C++ and e994a7f4 targeted CI repair committed with task marker; no CI-skip on validation-bearing commits.",
+    "C5_PACKAGE": "NOT_REQUIRED: GitHub builds only; no Quest3 runtime deployment.",
+    "C6_RESULT": "PASS_SOURCE_BUILD_VERIFIED: C6 is separate docs-only checkpoint; material SHA ec651a4c, validated exact-SHA e994a7f4; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "REAL_GAME_DRAW_BLOCKER": "No same-SHA original OutRun menu/car/race native-drawn full-frame published-pixel evidence; Quest3/VDXR gamepad/FFB runtime observation absent.",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "Continue native full-frame real game menu/car/race DRAW/DrawIndexed and stereo OpenXR source flow after this compile-and-CI verified stencil-inert integration; preserve D3D9Ex, original input/FFB, SkyGlow and DXVK freeze.",
+  "note": "This record is checkpoint-only; not the exact-SHA five-gate result commit, not a gameplay or HMD PASS."
+}
