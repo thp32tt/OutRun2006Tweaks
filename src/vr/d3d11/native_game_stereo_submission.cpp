@@ -1210,6 +1210,11 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
             if (proven) {
                 ++authoredColorPostpassCount_;
                 eyePostpassCoverage_.record(visibleDest);
+            } else {
+                // Real GPU Copy may import an untracked game intermediate.
+                // Preserve the Copy, but it overwrote any earlier certified
+                // color in this destination. Invalidate BEFORE publication.
+                eyePostpassCoverage_.invalidate(visibleDest);
             }
         } else if (clear.kind ==
                    NativeGameEyePartialTargetClear::Kind::SourceStretch) {
@@ -1264,6 +1269,13 @@ bool NativeGameEyeDrawEncoder::replay_due_source_clears() noexcept {
                 ++authoredColorPostpassCount_;
                 eyePostpassCoverage_.record({visibleDest.left, visibleDest.top,
                                              visibleDest.right, visibleDest.bottom});
+            } else if (visibleDest.valid) {
+                // An unproven but admissible GPU Stretch changes these
+                // actual clipped XR pixels. Earlier Copy/Stretch proof is
+                // no longer current until authentic game color repaints it.
+                eyePostpassCoverage_.invalidate(
+                    {visibleDest.left, visibleDest.top,
+                     visibleDest.right, visibleDest.bottom});
             }
         } else {
             return false; // Reject unrecognized source commands, never fabricate a Clear.

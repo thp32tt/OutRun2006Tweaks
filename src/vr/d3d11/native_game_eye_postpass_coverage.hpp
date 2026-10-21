@@ -53,6 +53,49 @@ public:
         count_ = kept;
         if (count_ < kCapacity) regions_[count_++] = mosaic;
     }
+    // Chronological native game GPU compositing: a later unproven but
+    // otherwise valid game Copy/Stretch really overwrites destination pixels.
+    // Remove only those pixels from earlier proven postpasses. Keeping the
+    // old proof would publish a partially foreign menu/vehicle/race XR eye.
+    // Preserve unaffected tiles, with a conservative reset on fragmentation
+    // overflow so the authoritative D3D9 renderer remains the fallback.
+    void invalidate(NativeGameOffscreenColorRegion overwritten) noexcept {
+        if (!native_game_offscreen_color_region_valid(overwritten) || !count_)
+            return;
+        std::array<NativeGameOffscreenColorRegion, kCapacity> survivors{};
+        std::size_t kept = 0u;
+        const auto retain = [&](NativeGameOffscreenColorRegion fragment) noexcept {
+            if (!native_game_offscreen_color_region_valid(fragment))
+                return true;
+            if (kept >= kCapacity) return false;
+            survivors[kept++] = fragment;
+            return true;
+        };
+        for (std::size_t i = 0u; i < count_; ++i) {
+            const auto existing = regions_[i];
+            if (!native_game_offscreen_color_regions_intersect(existing, overwritten)) {
+                if (!retain(existing)) { reset(); return; }
+                continue;
+            }
+            const NativeGameOffscreenColorRegion hit{
+                (std::max)(existing.left, overwritten.left),
+                (std::max)(existing.top, overwritten.top),
+                (std::min)(existing.right, overwritten.right),
+                (std::min)(existing.bottom, overwritten.bottom)};
+            // Disjoint strips are the EXACT rectangle difference, including
+            // a hole fully inside a valid camera composite. Never replace
+            // them with an enclosing (falsely color-proven) bounding box.
+            if (!retain({existing.left, existing.top, existing.right, hit.top}) ||
+                !retain({existing.left, hit.bottom, existing.right, existing.bottom}) ||
+                !retain({existing.left, hit.top, hit.left, hit.bottom}) ||
+                !retain({hit.right, hit.top, existing.right, hit.bottom})) {
+                reset();
+                return;
+            }
+        }
+        regions_ = survivors;
+        count_ = kept;
+    }
     [[nodiscard]] bool full_eye(std::uint32_t width,
                                 std::uint32_t height) const noexcept {
         if (!width || !height || !count_) return false;
