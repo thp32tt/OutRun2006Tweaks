@@ -1,0 +1,487 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1345KST-B0024-B0025-SHA8",
+  "review_slot_kst": "2026-10-21 13:45",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "qa_scope": "Eight SHA-unique previously unreviewed B-generated Korean PNG candidates; C1 text-only independent QA; A/B queue untouched.",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "counts": {
+    "previous_local_sha_unique": 189,
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 6,
+    "fail_major_style_or_effect": 2,
+    "producer_rework_dimensions": 8
+  },
+  "evidence": {
+    "n100_preflight": "work/c1_batch_20261021_1345/preflight.json",
+    "n100_compare_images": [
+      "work/c1_batch_20261021_1345/compare_1.jpg",
+      "work/c1_batch_20261021_1345/compare_2.jpg",
+      "work/c1_batch_20261021_1345/compare_3.jpg",
+      "work/c1_batch_20261021_1345/compare_4.jpg"
+    ],
+    "all_source_manifest_and_export_sha_verified": true,
+    "all_rgba_png": true,
+    "all_alpha_ge16_border_zero": true,
+    "low_alpha_border_fringe_ordinals": [
+      118
+    ],
+    "inspection": "Viewed four full comparison sheets, eight candidate/source pairs; no OCR-based approval. Fail B113 (missing core source navy outline) and B117 (severe neutral-small to oversized orange-italic change); other results legible text-only with nonblocking stroke variance."
+  },
+  "results": [
+    {
+      "task_id": "OUTRUN-ROI-B-0024-FF16C6B5",
+      "role": "B",
+      "ordinal": 113,
+      "candidate_file": "Q121_381db566165d2840_source_k.png",
+      "source_file": "Q121_381db566165d2840_source.png",
+      "candidate_sha256": "e055e37066b3ee213a3e9dea5412796ea32c3d4c36cac7f50f2d68ce4b2257f7",
+      "export_sha_match": true,
+      "source_sha256": "95b6a2aa3460b607ae037ba8276d8d2d90f63bda82869eaeb16c91aadee7626f",
+      "source_sha_match": true,
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "Versus Mode.",
+      "approved_korean": "대전 모드",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        1177,
+        377
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        110,
+        9,
+        2094,
+        658
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_OUTLINE_EFFECT_MISMATCH",
+      "visual_reason": "원문 'Versus Mode.'는 노란 채움과 두꺼운 남색 외곽선이 핵심이나 결과 '대전 모드'는 남색 윤곽이 사라진 평면 노랑 글자. 문자 자체는 정확하지만 원문 효과의 중대한 누락.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0024-FF16C6B5",
+      "role": "B",
+      "ordinal": 114,
+      "candidate_file": "Q205_da350baeddba7ddb_source_k.png",
+      "source_file": "Q205_da350baeddba7ddb_source.png",
+      "candidate_sha256": "2d092b4788b366be7694404a4e2664fc66c5a240a2c2f124e1c8ad1bf27edae4",
+      "export_sha_match": true,
+      "source_sha256": "f92d9640b0e62412da2b24d8a3d10926ebfce6cf2d7b092f42cc9be7b7d981e4",
+      "source_sha_match": true,
+      "source_dds_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "english": "YES",
+      "approved_korean": "예",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1797,
+        875
+      ],
+      "source_dimensions": [
+        616,
+        300
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        298,
+        29,
+        1671,
+        843
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'예' 철자·획 명료, 회색 계열 투명 글자만 존재. 원문 대비 두꺼운 검정 윤곽은 경미/중간 미관 차이로 기록하되 가독성 하드 실패는 아님.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0024-FF16C6B5",
+      "role": "B",
+      "ordinal": 115,
+      "candidate_file": "Q205_bb52cce615c0dc6f_source_k.png",
+      "source_file": "Q205_bb52cce615c0dc6f_source.png",
+      "candidate_sha256": "883e7b4de5109197364b5584b656536404a7fcba38c70358b43bdcbcf9e0a213",
+      "export_sha_match": true,
+      "source_sha256": "3341c4682c49b09416ed3a0bee927b365a4d7f53c8313b01662a102e630f71a5",
+      "source_sha_match": true,
+      "source_dds_sha256": "1017e32a7aed5bab90aebc7473ae05d526d425bea62c09625f6453ef2b01a1d7",
+      "english": "YES",
+      "approved_korean": "예",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1802,
+        872
+      ],
+      "source_dimensions": [
+        620,
+        300
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        89,
+        41,
+        1380,
+        805
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'예' 철자·획 명료, 회색 계열 투명 글자만 존재. 검정 윤곽 두께 차이는 cosmetic note.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0024-FF16C6B5",
+      "role": "B",
+      "ordinal": 116,
+      "candidate_file": "Q121_5234a9627fec2a76_source_k.png",
+      "source_file": "Q121_5234a9627fec2a76_source.png",
+      "candidate_sha256": "6210241661efb01a2313723f251c236d831c263da9fd6479dd92627759bbd289",
+      "export_sha_match": true,
+      "source_sha256": "26f908a71b1c0222dc967f87bb721a9b1ab9b0c973bf414fdcc226f9bb5754ae",
+      "source_sha_match": true,
+      "source_dds_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "english": "You",
+      "approved_korean": "나",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1532,
+        1027
+      ],
+      "source_dimensions": [
+        373,
+        250
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        194,
+        175,
+        1197,
+        955
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'나' 정확, 원문의 흰 기울임/남색 그림자 계열 유지. 출력에 원문 주변의 다른 영어 줄·검정 UI 조각 재생성 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0024-FF16C6B5",
+      "role": "B",
+      "ordinal": 117,
+      "candidate_file": "Q135_e3eb8951461f9acb_source_k.png",
+      "source_file": "Q135_e3eb8951461f9acb_source.png",
+      "candidate_sha256": "e9971533081b519a293d7f23e5b68416ebf3692b0861e35f268601b68ac33c7c",
+      "export_sha_match": true,
+      "source_sha256": "45f76a9b13598619345d35810968457b2d432a63b409326c5540af2a54c61c28",
+      "source_sha_match": true,
+      "source_dds_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "english": "MAX SPEED",
+      "approved_korean": "최고 속도",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2059,
+        764
+      ],
+      "source_dimensions": [
+        434,
+        161
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        36,
+        72,
+        1498,
+        746
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_SCALE_MISMATCH",
+      "visual_reason": "원문의 'MAX SPEED'는 작고 중성 회색 평문인데 '최고 속도' 결과는 과도하게 크고 노랑/주황 채움·두꺼운 검정 외곽·큰 기울임으로 전환. 글자는 맞지만 원문 계열/위계와 중대 불일치; UI cell 내 안전영역도 합성 전 미확인.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0025-3580196C",
+      "role": "B",
+      "ordinal": 118,
+      "candidate_file": "Q205_95159cc596172155_source_k.png",
+      "source_file": "Q205_95159cc596172155_source.png",
+      "candidate_sha256": "9a0651c3c8c2cb993b146502d5aea7394c39a5022cf2bd5a4c7bb123350283ee",
+      "export_sha_match": true,
+      "source_sha256": "7fcf2cbd5987d30d933faf4edb97e22c53bc52866a84c6b7f0ef475b70582f8b",
+      "source_sha_match": true,
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "english": "NO",
+      "approved_korean": "아니오",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1526,
+        1031
+      ],
+      "source_dimensions": [
+        444,
+        300
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        212,
+        1490,
+        991
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 5,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'아니오' 철자·자소 명료, 짙은 회색 투명 글자. 굵은 검정 윤곽은 cosmetic note; 왼쪽 경계 alpha 1~15 픽셀 5개는 DDS 합성 전 재확인.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0025-3580196C",
+      "role": "B",
+      "ordinal": 119,
+      "candidate_file": "Q205_dd69eb41d034bf00_source_k.png",
+      "source_file": "Q205_dd69eb41d034bf00_source.png",
+      "candidate_sha256": "1a9cc235c689807af6a680b339e02dfe229adbf2fdc9a7355fb4f6ec221c7454",
+      "export_sha_match": true,
+      "source_sha256": "3341c4682c49b09416ed3a0bee927b365a4d7f53c8313b01662a102e630f71a5",
+      "source_sha_match": true,
+      "source_dds_sha256": "39e2c8c08a1b213eb963a4debe3b192f665456d7a44f3cca6aee1c16a3fbf9d7",
+      "english": "YES",
+      "approved_korean": "예",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1802,
+        872
+      ],
+      "source_dimensions": [
+        620,
+        300
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        40,
+        33,
+        1521,
+        752
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'예' 정확, 자소·내부 공간 분명, 짙은 회색 계열. 검정 외곽 차이는 cosmetic note.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0025-3580196C",
+      "role": "B",
+      "ordinal": 120,
+      "candidate_file": "Q137_618cd44e3fcb990b_source_k.png",
+      "source_file": "Q137_618cd44e3fcb990b_source.png",
+      "candidate_sha256": "35c0e8759dea902b3aa4def47c47c3e805aca665fe43f1fa19c56903620e9d4c",
+      "export_sha_match": true,
+      "source_sha256": "c39561deec348efb39070cca8371a514627692dea9de7d4c3c95a7cc21d2596f",
+      "source_sha_match": true,
+      "source_dds_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "english": "AUTOMATIC",
+      "approved_korean": "자동",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2138,
+        736
+      ],
+      "source_dimensions": [
+        956,
+        329
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        373,
+        25,
+        1813,
+        717
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'자동' 정확, 흰 굵은 글자만 렌더됨. 원본 주변 TRANSMISSION/플레이트를 출력하지 않음; 여백·UI cell 확인은 DDS 단계 별도.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "limits": {
+    "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+    "dds_final_compose": false,
+    "producer_status_unchanged": "REWORK_DIMENSIONS",
+    "imagegen_calls": 0,
+    "producer_queue_consumption": false,
+    "c2_c3_or_ingame_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_untouched": true
+  }
+}
