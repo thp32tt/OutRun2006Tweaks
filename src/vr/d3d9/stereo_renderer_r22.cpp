@@ -162,7 +162,7 @@ namespace OutRunVRStereo
             if (Settings::VREvidenceTrace)
                 spdlog::info(
                     "VR EVIDENCE STATEBLOCK APPLY_PRE present={} draw={} block={} target={} reliable={} r22Reliable={} coverageLost={} replayDepth={} shadowValid={}",
-                    PresentEpoch, TopLevelDrawSerial(),
+                    PresentEpoch, R9DrawCalls,
                     static_cast<const void*>(block), R22StateBlockApplyTarget,
                     OutRunVR::State::StateBlockTracker::Reliable() ? 1 : 0,
                     OutRunVR::State::StateBlockTracker::R22Reliable() ? 1 : 0,
@@ -194,7 +194,7 @@ namespace OutRunVRStereo
             if (Settings::VREvidenceTrace)
                 spdlog::info(
                     "VR EVIDENCE STATEBLOCK APPLY_POST present={} draw={} block={} hr=0x{:08X} reliable={} r22Reliable={} coverageLost={} replayDepth={} rasterTouched={} shadowValid={}",
-                    PresentEpoch, TopLevelDrawSerial(),
+                    PresentEpoch, R9DrawCalls,
                     static_cast<const void*>(block),
                     static_cast<unsigned>(hr),
                     OutRunVR::State::StateBlockTracker::Reliable() ? 1 : 0,
@@ -231,7 +231,7 @@ namespace OutRunVRStereo
                     if (Settings::VREvidenceTrace)
                         spdlog::info(
                             "VR EVIDENCE STATEBLOCK ALT_TARGET present={} draw={} oldTarget={} newTarget={} block={}",
-                            PresentEpoch, TopLevelDrawSerial(),
+                            PresentEpoch, R9DrawCalls,
                             R22StateBlockApplyTarget, target,
                             static_cast<const void*>(block));
                     OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
@@ -272,7 +272,7 @@ namespace OutRunVRStereo
             if (Settings::VREvidenceTrace)
                 spdlog::info(
                     "VR EVIDENCE STATEBLOCK CREATE present={} draw={} device={} type={} hr=0x{:08X} outBlock={} gameDevice={} internal={}",
-                    PresentEpoch, TopLevelDrawSerial(),
+                    PresentEpoch, R9DrawCalls,
                     static_cast<const void*>(device), static_cast<unsigned>(type),
                     static_cast<unsigned>(hr),
                     (block && *block) ? static_cast<const void*>(*block) : nullptr,
@@ -290,7 +290,7 @@ namespace OutRunVRStereo
             if (Settings::VREvidenceTrace)
                 spdlog::info(
                     "VR EVIDENCE STATEBLOCK BEGIN present={} draw={} device={} hr=0x{:08X} gameDevice={} internal={} recordingBeforeNotify={}",
-                    PresentEpoch, TopLevelDrawSerial(),
+                    PresentEpoch, R9DrawCalls,
                     static_cast<const void*>(device),
                     static_cast<unsigned>(hr),
                     IsGameDevice(device) ? 1 : 0,
@@ -313,7 +313,7 @@ namespace OutRunVRStereo
             if (Settings::VREvidenceTrace)
                 spdlog::info(
                     "VR EVIDENCE STATEBLOCK END present={} draw={} device={} hr=0x{:08X} outBlock={} gameDevice={} internal={} recording={}",
-                    PresentEpoch, TopLevelDrawSerial(),
+                    PresentEpoch, R9DrawCalls,
                     static_cast<const void*>(device),
                     static_cast<unsigned>(hr),
                     (block && *block) ? static_cast<const void*>(*block) : nullptr,
