@@ -10,16 +10,16 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00984",
   "feature_id": "DX11_MENU_RACE_CAMERA_REGION_COMPACTION_TO_GPU_EYE_POSTPASS",
   "work_key": "DX11:MENU_RACE_CAMERA_SOURCE_COMPACTION",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "source_head": "21734fdca05069ba604573779cf6fc478096d159",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "material_result_sha": "6c93e8154ffee32152d8f055efc7bb0e99e25d31",
+  "validation_bearing_result_sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db",
+  "result_sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "full_dx11_renderer_complete": false,
   "score_change": 0,
   "code_change": "YES",
@@ -36,7 +36,9 @@
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_game_camera_compact_postpass_00984.cpp",
     "tools/test_dx11_game_camera_compact_postpass_00984.py",
-    "docs/automation/runs/CONVERSION-DX11-00984.json"
+    "docs/automation/runs/CONVERSION-DX11-00984.json",
+    "tools/dx11_game_offscreen_clear_postpass_00983.cpp",
+    "tools/test_dx11_game_offscreen_clear_postpass_00983.py"
   ],
   "feature_contract": {
     "feature_id": "DX11_MENU_RACE_CAMERA_REGION_COMPACTION_TO_GPU_EYE_POSTPASS",
@@ -62,7 +64,37 @@
       }
     ]
   },
-  "acceptance_results": {},
+  "acceptance_results": {
+    "gpu_camera_segments_to_eye": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_offscreen_color_provenance.hpp",
+        "tools/dx11_game_camera_compact_postpass_00984.cpp"
+      ],
+      "validation_command": "Exact ba5da10306ef0e6004251e57ebba6fb251cb69db DX11 Fast run 39659449840 PASS: 64 adjacent GPU camera strips compact into full source region; no game/HMD runtime"
+    },
+    "source_keys_and_gaps_fail_closed": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "tools/dx11_game_camera_compact_postpass_00984.cpp",
+        "tools/test_dx11_game_camera_compact_postpass_00984.py"
+      ],
+      "validation_command": "Exact ba5da10306ef0e6004251e57ebba6fb251cb69db DX11 Fast 39659449840 PASS: reject foreign mip/eye and gaps/L-shapes, preserve game Clear and original DX9Ex fallback; no real device observed"
+    },
+    "exact_sha_required_actions": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        ".github/workflows/dx11-fast-structural.yml",
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "validation_command": "All five exact-SHA ba5da10306ef0e6004251e57ebba6fb251cb69db required GitHub Actions SUCCESS: Fast 39659449840; Backend 39659449413; Windows Build 39659450169; OpenXR 39659449375; HUD 39659449582."
+    }
+  },
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "native_stereo_eye_transport",
@@ -96,12 +128,67 @@
     "activation_guard_and_fallback": "No native activation from source change. Coverage failure denies camera postpass evidence, and original D3D9Ex graphics/gamepad/FFB/SkyGlow stays authoritative."
   },
   "pipeline": {
-    "C0_RECOVER": "GitHub HEAD/AGENTS/00983 C6 checked; 00984 marker absent",
-    "C1_REVIEW": "32-slot camera GPU color evidence ledger exhausted by adjacent Draw/Clear segments",
-    "C2_IMPLEMENT": "Exact-key rectangular union compaction for Draw and GPU Clear with local fixture",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C0_RECOVER": "PASS: GitHub latest HEAD 21734fdc, source authority, 00983 exact-SHA C6 and no 00984 overlap",
+    "C1_REVIEW": "PASS: 32-entry per-eye camera GPU footprint ledger loses legitimate adjacent Draw/Clear source coverage",
+    "C2_IMPLEMENT": "PASS: native D3D11 Draw/Clear source admission keyed exact rectangular coalescence, no invented L-shape or gap, 64-strip regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA: corrected 00983 inherited C++ constexpr test and source-link assertion under same task; five mandatory Actions on ba5da103 all success; HMD UNTESTED",
+    "C4_COMMIT": "PASS: material 6c93e8154ffee32152d8f055efc7bb0e99e25d31, failure-specific repair ba5da10306ef0e6004251e57ebba6fb251cb69db; no CI-skip on validation-bearing SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: original user-managed game/HMD deployment not claimed",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: C6 docs-only record after verified exact-SHA five gates; still not native gameplay or Quest3 PASS"
+  },
+  "feature_stage": "NATIVE_CAMERA_DRAW_CLEAR_REGION_COMPACTION_TO_STEREO_POSTPASS_BUILD_VERIFIED_NEED_HMD_TEST",
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "validation_bearing_exact_sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db",
+    "mandatory_gate_results": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39659449840,
+        "status": "success",
+        "sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39659449413,
+        "status": "success",
+        "sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db"
+      },
+      {
+        "name": "Build",
+        "run_id": 39659450169,
+        "status": "success",
+        "sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39659449375,
+        "status": "success",
+        "sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39659449582,
+        "status": "success",
+        "sha": "ba5da10306ef0e6004251e57ebba6fb251cb69db"
+      }
+    ],
+    "original_material_sha": "6c93e8154ffee32152d8f055efc7bb0e99e25d31",
+    "original_material_gate_fast_failure": {
+      "run_id": 39659185411,
+      "reason": "inherited 00983 C++ nonconstexpr fixture and stale source-link assertion",
+      "repaired_in": "ba5da10306ef0e6004251e57ebba6fb251cb69db"
+    },
+    "extra_gate": {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 39659185689,
+      "status": "success",
+      "sha": "6c93e8154ffee32152d8f055efc7bb0e99e25d31"
+    }
+  },
+  "next_action": "Continue unclosed real-game programmable Draw through camera Copy/Stretch to full native menu/car/race and OpenXR eye output; matching real-game/Quest3 runtime needed before playability promotion, original DX9Ex fallback remains. Do not use DXVK.",
+  "score": {
+    "run_key": "CONVERSION-DX11-00984",
+    "score_change_when_scoreboard_recorded": 1,
+    "scoreboard_recorded": false
   }
 }
