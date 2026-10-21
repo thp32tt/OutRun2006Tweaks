@@ -3,7 +3,7 @@
 - Purpose: reproduce all **implemented** DX9Ex changes integrated by 2026-10-21 18:57 KST without changing the active development branch.
 - Parent source revision: `b746eb6b854e40797c98ea3ecb2f5ed3a14a7f90` from `vr-d3d9ex-focus`.
 - Test branch: `test/dx9ex-all-improvements-20261021`.
-- Changes to the actual game source in this snapshot relative to the parent: **none**. The test workflow and this provenance document are the only test-specific additions.
+- Changes to the actual game/host C++ source in this snapshot relative to the parent: **none**. The test workflow and this provenance document are test-specific additions. The test branch also contains a build-script-only PowerShell XML traversal portability fix in `tools/Build-OutRunPCFast.ps1`; no game or host C++ source differs from the pinned parent.
 - Main included source fixes: stabilized driver-seat mode and camera anchor (no oscillating zoom); sticky cockpit session and camera restore; DX11 R57-style rank/rival source parity and original signed clip-W rank behavior; safer draw-distance node indexing, bounds, allocation and epoch tracking; queued D3DX telemetry ownership; existing R26 HUD/OpenXR rendering improvements through the parent revision.
 - Reviews under `docs/reviews/dx9ex/automation/` are review-only notes, **not claims that proposed code was implemented**.
 - Game DLL and OpenXR host: x86 `dinput8.dll` and x64 `outrun-vr-host.exe` via the repository's `tools/Build-OutRunPCFast.ps1` R26+HUD contract.
