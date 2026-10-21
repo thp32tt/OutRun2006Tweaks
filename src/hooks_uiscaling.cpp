@@ -3770,6 +3770,13 @@ public:
         }
         if (HudBatch.drawCount != 0)
         {
+            // Telemetry must follow the outgoing physical batch owner.
+            // Queue-boundary rendering behavior is unchanged; this only keeps
+            // +TIME and GOAL success/fallback counters from contaminating each
+            // other during the common D3DX submission path.
+            const bool outgoingStage =
+                StageOwner(HudBatch.scope, HudBatch.producer);
+
             // Before SelectSpriteQueueNode, a homogeneous PRE-QUEUE
             // direct buffer can still be submitted with its OLD scope.
             // The old unconditional !QueueRenderActive() guard missed this
@@ -3790,10 +3797,12 @@ public:
                 !FlushTracked(sprite))
             {
                 HudBatch.boundaryReady = false;
-                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+                (outgoingStage ? StageFallbacks : GoalFallbacks).fetch_add(
+                    1, std::memory_order_relaxed);
                 return;
             }
-            StageFlushes.fetch_add(1, std::memory_order_relaxed);
+            (outgoingStage ? StageFlushes : GoalFlushes).fetch_add(
+                1, std::memory_order_relaxed);
         }
         HudBatch.boundaryReady = enteringStage || enteringGoal;
     }
@@ -3810,10 +3819,14 @@ public:
             HudBatch.scope == EffectiveScope() &&
             HudBatch.producer == CurrentRenderProducerToken())
         {
+            const bool outgoingStage =
+                StageOwner(HudBatch.scope, HudBatch.producer);
             if (FlushTracked(HudBatch.sprite))
-                StageFlushes.fetch_add(1, std::memory_order_relaxed);
+                (outgoingStage ? StageFlushes : GoalFlushes).fetch_add(
+                    1, std::memory_order_relaxed);
             else
-                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+                (outgoingStage ? StageFallbacks : GoalFallbacks).fetch_add(
+                    1, std::memory_order_relaxed);
         }
         HudBatch.boundaryReady = false;
     }
