@@ -202,11 +202,14 @@ def main() -> None:
             "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)",
             "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)",
             "stencil_equivalent_to_disabled(",
+            "!game_live_stencil_inert(game, stencil)",
             "if (depth != D3DZB_FALSE) {",
             "game_native_depth_admission(",
         ))
 
     assert exact_diffuse_state_gate(bridge)
+    # Mutate the actual fixed Draw admission, not the earlier shared
+    # stencil-state capture helper; do not loosen either negative check.
     for bad, replacement in (
         ("if (!game_fvf_untextured_stage0(",
          "if (false && !game_fvf_untextured_stage0("),
@@ -216,6 +219,8 @@ def main() -> None:
          "GetRenderState(D3DRS_SCISSORTESTENABLE, &clip)"),
         ("stencil_equivalent_to_disabled(",
          "stencil_unconditionally_bypassed("),
+        ("!game_live_stencil_inert(game, stencil)",
+         "!game_live_stencil_unguarded(game, stencil)"),
         ("GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)",
          "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &clip)"),
         ("if (depth != D3DZB_FALSE) {",
@@ -223,8 +228,12 @@ def main() -> None:
         ("game_native_depth_admission(",
          "game_native_depth_unguarded("),
     ):
-        mutated = bridge.replace(bad, replacement, 1)
-        assert mutated != bridge and not exact_diffuse_state_gate(mutated), (
+        start = bridge.index("bool supported_game_state(")
+        end = bridge.index("bool translate_vertices(", start)
+        section = bridge[start:end]
+        damaged = section.replace(bad, replacement, 1)
+        mutated = bridge[:start] + damaged + bridge[end:]
+        assert damaged != section and not exact_diffuse_state_gate(mutated), (
             "untranslated game-state negative control missed: " + bad
         )
 
