@@ -68,10 +68,13 @@ def approved_phrases(q):
 def ocr_words(image, strategy=0, languages="eng"):
     """Run one deterministic OCR strategy; repeated coverage scans rotate strategies."""
     strategy=int(strategy)%OCR_STRATEGY_COUNT
+    # Alternate native and 2x recovery immediately instead of spending the
+    # first six attempts repeating only native-resolution OCR.
+    variant=(0,6,1,7,2,8,3,9,4,10,5,11)[strategy]
     rgba=image.convert("RGBA")
     composed=Image.alpha_composite(Image.new("RGBA",rgba.size,"black"),rgba).convert("L")
-    base_strategy=strategy%6
-    scale=2 if strategy>=6 else 1
+    base_strategy=variant%6
+    scale=2 if variant>=6 else 1
     psm=(11,6,12,11,6,12)[base_strategy]
     if base_strategy < 3:
         prepared=ImageOps.autocontrast(ImageOps.invert(composed))
