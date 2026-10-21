@@ -1,0 +1,577 @@
+{
+  "run_key": "OUTRUN-C1-20261021T2345KST-OLDER-BACKLOG-SHA8",
+  "prior_reviewed_sha": 308,
+  "total_unreviewed_before": 10,
+  "count": 8,
+  "records": [
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0023-DAC9BDDC",
+      "ordinal": 112,
+      "candidate_file": "Q106_87f43ebe4faec57f_source_k.png",
+      "source_file": "Q106_87f43ebe4faec57f_source.png",
+      "candidate_sha256": "97954a7a4222a40541b32bf4205364ba7bfaf0e689ef3a9748f0e85f2ee69d1f",
+      "source_sha256": "c73108c83737caa843834e4a89f2e59150769985bdc4ef2f9211de825e65d39c",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Time remaining :",
+      "approved_korean": "남은 시간:",
+      "source_dds_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+      "original_dimensions": [
+        1072,
+        349
+      ],
+      "dimensions": [
+        2098,
+        749
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        268,
+        23,
+        1984,
+        708
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘남은 시간:’ 문자 및 콜론이 승인 번역과 일치하고 획·받침 명료함. 별도 UI 아이콘/영문 잔상/프레임 출력 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0025-3580196C",
+      "ordinal": 121,
+      "candidate_file": "Q154_c77364034f64bc4e_source_k.png",
+      "source_file": "Q154_c77364034f64bc4e_source.png",
+      "candidate_sha256": "9018d8721a549e0b1bc8443f78add99f1bb2f2df4c23e76f617883f528e80381",
+      "source_sha256": "a1c989a4729904dcec5b8b49705788c93a5cab0dc9e1840031903758fa7f1586",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "SELECT LICENSE",
+      "approved_korean": "라이선스 선택",
+      "source_dds_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "original_dimensions": [
+        2345,
+        663
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        43,
+        53,
+        2158,
+        702
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘라이선스 선택’이 정확히 표시됨. 원문 빨강색 제목 계열을 유지하고 원문 주변 타 문구/배경판은 복제하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_1.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0025-3580196C",
+      "ordinal": 122,
+      "candidate_file": "Q197_e1ad4bb86f4df351_source_k.png",
+      "source_file": "Q197_e1ad4bb86f4df351_source.png",
+      "candidate_sha256": "2d44c9f9529f0b98e8d76f2529cb72ed8c1c70a73af265bb5a6b6561915ee741",
+      "source_sha256": "bc616c28ae9321c558d9e636b69e3b8b8156ff5c441de9915a537261f6753ee3",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "COMPLETE",
+      "approved_korean": "달성률",
+      "source_dds_sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+      "original_dimensions": [
+        766,
+        214
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        468,
+        116,
+        1957,
+        700
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘달성률’ 세 음절이 승인 매핑과 일치하고 명료함. 원문 COMPLETE의 콜론은 승인 한글 문구에 없는 부호이므로 한글 후보에 강제하지 않음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0028-5B8359C7",
+      "ordinal": 136,
+      "candidate_file": "Q060_f2c22b1a30bcae8f_source_k.png",
+      "source_file": "Q060_f2c22b1a30bcae8f_source.png",
+      "candidate_sha256": "39731d319ca86634fb43ed1d15f81014216fd12926293bd3ef2203868dca616c",
+      "source_sha256": "34313a7c9b5027ee2aab72b9d7b2ee61822230af3ba4f5b46d93eb637ea04621",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "RETRY",
+      "approved_korean": "재도전",
+      "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "original_dimensions": [
+        1375,
+        590
+      ],
+      "dimensions": [
+        1914,
+        822
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        57,
+        1824,
+        735
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 7,
+          "gt32": 0,
+          "max": 1
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘재도전’ 글자·외곽선 읽힘. 왼쪽 경계 alpha 1의 매우 미세한 픽셀 7개만 감지되어 실제 가독성/획 잘림 증거 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_2.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0028-5B8359C7",
+      "ordinal": 137,
+      "candidate_file": "Q094_2f40685fce51179a_source_k.png",
+      "source_file": "Q094_2f40685fce51179a_source.png",
+      "candidate_sha256": "4ccc7ee070a6676265e67a615cf76e5852046a4c30dece971f31616d0dacd65d",
+      "source_sha256": "16445645c5ca48daab8621f28ed6bff6f3bacf98100df22402afe3eebcac500f",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Single Play.",
+      "approved_korean": "싱글 플레이",
+      "source_dds_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "original_dimensions": [
+        1341,
+        553
+      ],
+      "dimensions": [
+        1952,
+        805
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        41,
+        23,
+        1934,
+        739
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘싱글 플레이’ 일치, 영문/일본어 잔상과 이미지 장면 복제 없음. 원본의 다른 레이블은 제외됨.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0029-D33C4DD4",
+      "ordinal": 141,
+      "candidate_file": "Q161_6f783d525f704b09_source_k.png",
+      "source_file": "Q161_6f783d525f704b09_source.png",
+      "candidate_sha256": "0aed8430f164d12f3d3db439904f81018e690b49589336ec3914122d52354777",
+      "source_sha256": "7fdd4ed4f1564479ca7f9db537e23ad827b65546f0b64b88e47f6f6ddeb9da6c",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "CHINA",
+      "approved_korean": "중국",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "original_dimensions": [
+        864,
+        296
+      ],
+      "dimensions": [
+        2143,
+        734
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        33,
+        64,
+        1799,
+        714
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘중국’ 두 음절 정확하며 판독 가능. 원본의 단색 회색과 달리 진한 윤곽/입체 효과 차이는 미관 경고로 남기되 치명적인 방향·가독성 문제는 없음.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_3.jpg"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0029-D33C4DD4",
+      "ordinal": 142,
+      "candidate_file": "Q188_931027062f955eee_source_k.png",
+      "source_file": "Q188_931027062f955eee_source.png",
+      "candidate_sha256": "882eebe2667f43f27d136345dc4e4dd8091ec20db1db0a8bdce0646a3beea9ba",
+      "source_sha256": "b6e1e8ce5d4513b063930bbe863a8fb3d56b7cfeb8a2045255f9929f4bde05b9",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "Try to win Hearts by meeting your girlfriend's demands!",
+      "approved_korean": "여자친구의 요구를 들어주고 하트를 획득하세요!",
+      "source_dds_sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+      "original_dimensions": [
+        1817,
+        301
+      ],
+      "dimensions": [
+        2172,
+        724
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        20,
+        87,
+        2157,
+        593
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘여자친구의 요구를 들어주고 하트를 획득하세요!’ 전체 승인 문구와 문장부호 일치. 개별 획/내부 공간 판독 가능.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_4.jpg"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0024-9BDE43D8",
+      "ordinal": 114,
+      "candidate_file": "Q205_ccfd6c0c8f718195_source_k.png",
+      "source_file": "Q205_ccfd6c0c8f718195_source.png",
+      "candidate_sha256": "6cd244a99c2c11555858b92cd2fe005d6b294ea4e9a803f86b24cebba156ae3c",
+      "source_sha256": "a3fdaa246095eeb1cbeb1b587aaeb4878d1fec4f52a63f3d1e99834bfd230c99",
+      "export_sha_match": true,
+      "manifest_source_match": true,
+      "english": "FRIENDS",
+      "approved_korean": "친구",
+      "source_dds_sha256": "a55d7923ece473218260de226159d1399a51043b9ccd0520f789c7e5da29d619",
+      "original_dimensions": [
+        499,
+        216
+      ],
+      "dimensions": [
+        1906,
+        825
+      ],
+      "format": "PNG",
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        648,
+        136,
+        1466,
+        607
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "‘친구’ 두 음절 정확하고 원본 메뉴 배경/프레임 복제 없음. 글자 판독 가능.",
+      "text_length_difference_ignored": true,
+      "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "c1_review_scope": "LOCAL_CANDIDATE_PNG_TEXT_ONLY",
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED",
+      "visual_comparison": "work/c1_batch_20261021_2345/compare_4.jpg"
+    }
+  ],
+  "qa_summary": {
+    "png_text_only_pass": 8,
+    "png_text_only_fail": 0,
+    "remaining_unreviewed_after": 2,
+    "export_sha_checks_all_match": true,
+    "candidate_sha_unique": true,
+    "producer_REWORK_DIMENSIONS_not_overridden": true,
+    "disallowed_actions": "No ImageGen, A/B queue consumption, C2/C3, DDS or in-game PASS"
+  }
+}
