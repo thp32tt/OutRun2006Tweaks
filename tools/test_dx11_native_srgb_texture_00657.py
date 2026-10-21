@@ -14,6 +14,8 @@ def connected(source: str) -> bool:
     try:
         cap = source.split("bool supported_game_state(", 1)[1].split("bool translate_vertices(", 1)[0]
         mirror = source.split("bool create_game_sampler(", 1)[1].split("bool submit(", 1)[0]
+        cube = source.split("bool mirror_cube_texture(", 1)[1].split("bool mirror_texture(", 1)[0]
+        texture2d = source.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
         # Sampler state now lives in create_game_sampler, while mirror_texture
         # uploads texture pixels and delegates to the shared native sampler.
         if "return create_game_sampler(dev, capture, levels, sampler);" not in mirror:
@@ -42,6 +44,22 @@ def connected(source: str) -> bool:
             "dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())",
             "dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())",
             "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
+        ))
+        # Each SRGB format mapping must survive independently in both live
+        # game texture routes. A mutation in the cube path must not hide behind
+        # an unchanged 2D mapping (or vice versa).
+        and all(value in cube for value in (
+            "DXGI_FORMAT_BC1_UNORM_SRGB : DXGI_FORMAT_BC1_UNORM",
+            "DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM",
+            "DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM",
+            "capture.srgbTexture ? DXGI_FORMAT_B8G8R8A8_UNORM_SRGB",
+            ": DXGI_FORMAT_B8G8R8A8_UNORM",
+        ))
+        and all(value in texture2d for value in (
+            "DXGI_FORMAT_BC1_UNORM_SRGB : DXGI_FORMAT_BC1_UNORM",
+            "DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM",
+            "DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM",
+            "DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM",
         ))
         and all(value in draw for value in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -96,6 +114,12 @@ def main() -> None:
     for old, bad in mutations:
         assert old in source, old
         assert not connected(source.replace(old, bad, 1)), "mutation survived: " + old
+        # The first occurrence may belong to a cube mirror; also mutate the
+        # 2D route on its own when both paths carry the same source fragment.
+        prefix, texture2d = source.split("bool mirror_texture(", 1)
+        if old in texture2d:
+            changed = prefix + "bool mirror_texture(" + texture2d.replace(old, bad, 1)
+            assert not connected(changed), "2D mutation survived: " + old
     formats = ("a8", "x8", "dxt1", "dxt3", "dxt5", "565", "1555", "4444", "unknown")
     valid = 0
     for fmt in formats:
