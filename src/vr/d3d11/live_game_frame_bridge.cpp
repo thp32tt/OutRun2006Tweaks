@@ -390,8 +390,16 @@ constexpr bool sm3_live_blend_regression() noexcept {
         D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) ||
         b.SrcBlendAlpha != D3D11_BLEND_SRC_ALPHA ||
         b.DestBlendAlpha != D3D11_BLEND_INV_DEST_ALPHA) return false;
+    if (!sm3_live_blend_desc(
+            D3DBLEND_BLENDFACTOR, D3DBLEND_INVBLENDFACTOR,
+            D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) ||
+        b.SrcBlend != D3D11_BLEND_BLEND_FACTOR ||
+        b.DestBlend != D3D11_BLEND_INV_BLEND_FACTOR ||
+        b.SrcBlendAlpha != D3D11_BLEND_BLEND_FACTOR ||
+        b.DestBlendAlpha != D3D11_BLEND_INV_BLEND_FACTOR)
+        return false;
     const auto saved = b;
-    return !sm3_live_blend_desc(D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,
+    return !sm3_live_blend_desc(0xdeadbeefu, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, false, 0u, 0u, 0u, b) &&
            !sm3_live_blend_desc(D3DBLEND_ONE, D3DBLEND_ONE,
                 D3DBLENDOP_MIN, false, 0u, 0u, 0u, b) &&

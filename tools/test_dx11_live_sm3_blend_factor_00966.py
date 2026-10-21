@@ -24,6 +24,10 @@ require("(argb >>  8u) & 0xffu")  # G
 require("argb         & 0xffu")  # B
 require("(argb >> 24u) & 0xffu")  # A
 require("sm3_live_masked_blend_regression()")
+require("sm3_live_blend_regression()")
+require("sm3_live_blend_desc(0xdeadbeefu, D3DBLEND_ONE")
+require("b.SrcBlendAlpha != D3D11_BLEND_BLEND_FACTOR")
+require("b.DestBlendAlpha != D3D11_BLEND_INV_BLEND_FACTOR")
 require("0xdeadbeefu")            # Unknown factors still fail-closed
 
 # The shader-bound game's D3D9 state is captured for each Draw, not sourced
