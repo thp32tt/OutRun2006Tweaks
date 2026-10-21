@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00966",
+  "production_id": "CONVERSION-DX11-00966",
+  "event_id": "CONVERSION-DX11-00966-E007",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "lane": "DX11",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00966",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_id": "DX11:LIVE_GAME_DRAW_SOURCE_CAPTURE_TO_NATIVE_FRAME",
+  "feature_branch": "feature/dx11-00966-live-source-capture",
+  "feature_stage": "C2_IMPLEMENT",
+  "status": "IN_PROGRESS",
+  "checkpoint": "SOURCE_CAPTURE_COMMITTED_CI_AND_GAME_FRAME_PENDING",
+  "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "feature_last_head": "da2f260630f29a9857d9ea99ea749ebaf1fae21c",
+  "material_result_sha": "da2f260630f29a9857d9ea99ea749ebaf1fae21c",
+  "target_head_at_recovery": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
+  "base_sha_from_dispatch": "e82835a4deb9a71a5903f00433453c3ba3b8efb8",
+  "feature_goal": "Capture real game-authored D3D9 VB/IB/UP programmable shader Draws, translate strict source state to D3D11 Draw/DrawIndexed, then prove contiguous visible native full-size game frames for menu, vehicle and race with safe opt-in and original D3D9Ex fallback.",
+  "feature_contract": {
+    "feature_id": "DX11:LIVE_GAME_DRAW_SOURCE_CAPTURE_TO_NATIVE_FRAME",
+    "acceptance_items": [
+      {
+        "id": "live_game_draw_to_visible_frame",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Real game D3D9 Draw/DrawIndexed -> D3D11 shader/resource/Draw -> complete native full-resolution visible menu/car/race frame and source ordinal coverage with exact-SHA runtime evidence"
+      },
+      {
+        "id": "safe_fallback_and_source_guard",
+        "category": "fallback_regression",
+        "expected_behavior": "Unknown/malformed source layouts, unsupported GPU/source states and stereo ambiguity fail-closed; original D3D9Ex game/input/FFB path unchanged"
+      },
+      {
+        "id": "mandatory_exact_sha_ci",
+        "category": "integrated_validation",
+        "expected_behavior": "DX11 Fast, Backend, Windows Win32 Release Build, OpenXR architecture and HUD Inspector Actions all pass for one exact validation-bearing SHA"
+      }
+    ]
+  },
+  "completed_material_scope": [
+    "Extend D3D9 game-authored live VB, IB, UP and additional-stream source capture from old >=16-byte cutoff to bounded 4..512-byte stride to allow true FLOAT3 POSITION and packed declarations",
+    "Connect same pre-admission validator to live SM3 input-layout and native Draw entrypoint while retaining strict per-element offset/format bounds and existing original D3D9 fallback",
+    "Add portable C++17 edge-case probe, Python source regression, DX11 Fast workflow entries"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_source_stride.hpp",
+    "tools/dx11_live_game_source_stride_probe_00966.cpp",
+    "tools/test_dx11_live_source_stride_00966.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "targeted_validation": {
+    "result": "PASS_SOURCE_ONLY",
+    "evidence": "Nine read-back GitHub source static invariants PASS; C++17 portable source-stride semantic compile probe PASS in ChatGPT local environment; GitHub compare branch ahead_by=1, behind_by=0 before checkpoint.",
+    "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_live_game_source_stride_probe_00966.cpp -o /tmp/dx11_game_source_stride_00966 && /tmp/dx11_game_source_stride_00966; python tools/test_dx11_live_source_stride_00966.py",
+    "caveat": "Portable C++ range semantic check executed in local environment; end-to-end complete repo Windows native compilation and GitHub Actions five gates not yet executed on this feature SHA."
+  },
+  "acceptance_results": {
+    "live_game_draw_to_visible_frame": {
+      "status": "PENDING",
+      "evidence": "No matching actual game runtime native draw/native published frame counters or pixel evidence"
+    },
+    "safe_fallback_and_source_guard": {
+      "status": "PARTIAL_SOURCE_ONLY",
+      "evidence": "Existing opt-in, D3D9 fallback and guards left intact; complete CI regression still pending"
+    },
+    "mandatory_exact_sha_ci": {
+      "status": "PENDING",
+      "evidence": "All 5 mandatory Actions not yet run at integrated feature SHA"
+    }
+  },
+  "automation_validation": "NOT_READY",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
+  "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
+  "REAL_GAME_DRAW_BLOCKER": "Existing 2026-10-18 real game native_draws=0 observation predates current source; no matching opt-in actual game evidence for current commit. Source coverage still incomplete for production native menu/vehicle/race frames.",
+  "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "NEXT_IMPLEMENTATION_ACTION": "On this same feature, continue genuine D3D9 programmable Draw capture to D3D11 full-frame output, using actual game failure cause counters and same-launch native/published pixel evidence; preserve original D3D9 fallback. After integrated feature completion run all five mandatory exact-SHA Actions once, repair causal failures, then non-force expected-sha compare behind=0 promotion.",
+  "next_actions": [
+    "Inspect real-game rejection counters/source ordinal and captured source layout against current feature SHA; fix first confirmed blocker instead of standalone probes",
+    "Ensure actual eligible_state_draws>0, native_draws>0, published native game frames>0 in same real game launch; game/HMD testing user/hardware dependent",
+    "Run mandatory five exact-SHA CI gates on integrated candidate before any feature_ready or target promotion"
+  ],
+  "feature_ready": false,
+  "promotion_performed": false,
+  "package_status": "NOT_READY",
+  "score_change": 0
+}
