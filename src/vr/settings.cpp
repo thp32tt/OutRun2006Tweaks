@@ -182,12 +182,12 @@ namespace Settings
 		"Logs renderer-boundary verification, stereo draw duplication, pose source/fallback and head-tracking diagnostics." };
     Setting<bool> VREvidenceTrace{ "VR", "EvidenceTrace", true,
         "Heavy developer evidence mode. Logs every relevant D3D9 draw route/state snapshot, D3DX batch transition, cockpit anchor decision, Present outcome and host OpenXR submission. Intentionally expensive; use only for debugging." };
-    Setting<int> VREvidenceTraceMaxDrawsPerFrame{ "VR", "EvidenceTraceMaxDrawsPerFrame", 0,
-        "Maximum detailed D3D9 draw records per Present while EvidenceTrace is enabled. 0 = unlimited. High values can cause severe frame stutter and very large logs.", Range<int>{ 0, 65535 } };
-    Setting<bool> VREvidenceTraceMatrices{ "VR", "EvidenceTraceMatrices", true,
-        "EvidenceTrace: include full world/view/projection matrix snapshots on detailed D3D9 draw records." };
-    Setting<bool> VREvidenceTraceFlushEveryPresent{ "VR", "EvidenceTraceFlushEveryPresent", true,
-        "EvidenceTrace: flush the game log at every Present so a crash still leaves the latest evidence on disk. Intentionally expensive." };
+    Setting<int> VREvidenceTraceMaxDrawsPerFrame{ "VR", "EvidenceTraceMaxDrawsPerFrame", 8,
+        "Maximum generic detailed D3D9 draw records per Present while EvidenceTrace is enabled. Named target evidence (sun/lens, rival, +TIME, GOAL/result and key scene-effect scopes) bypasses this generic budget. 0 = unlimited.", Range<int>{ 0, 65535 } };
+    Setting<bool> VREvidenceTraceMatrices{ "VR", "EvidenceTraceMatrices", false,
+        "EvidenceTrace: include full world/view/projection matrix snapshots on detailed D3D9 draw records. Default off because matrices dominate log size; enable only for a short focused capture." };
+    Setting<bool> VREvidenceTraceFlushEveryPresent{ "VR", "EvidenceTraceFlushEveryPresent", false,
+        "EvidenceTrace: flush the game log at every Present. Default off to avoid extreme I/O/log growth; normal logger flush and clean shutdown remain available." };
 }
 
 namespace OutRunVR
