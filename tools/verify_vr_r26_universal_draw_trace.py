@@ -44,6 +44,13 @@ def main():
     src = SRC.read_text(encoding="utf-8")
     hdr = HDR.read_text(encoding="utf-8")
     assert valid(src, hdr), "R26 physical Draw trace contract missing"
+    for skill in ("draw-trace", "openxr-debug", "hud-optics",
+                  "regression", "texture-debug"):
+        p = ROOT / ".github" / "skills" / ("outrun-vr-" + skill) / "SKILL.md"
+        data = p.read_text(encoding="utf-8")
+        assert data.startswith("---\\n"), p
+        assert "name: outrun-vr-" + skill in data, p
+        assert "description:" in data, p
     assert not valid(src.replace("VR R26 DRAW TRACE 5s:", "TRACE_REMOVED:", 1), hdr)
     for name in METHODS:
         sign = "HRESULT __stdcall " + name
