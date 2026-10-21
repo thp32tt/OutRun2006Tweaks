@@ -34,6 +34,18 @@ def searchable_phrase(t):
     # not literal glyphs. OCR the surrounding real text only.
     return re.sub(r"\[[^\]]+\]"," ",str(t))
 
+
+def is_english_source_phrase(t):
+    """Only English UI source text belongs to the C crop coverage target."""
+    if not isinstance(t,str) or not t.strip():
+        return False
+    visible=searchable_phrase(t)
+    # Require at least one ASCII Latin letter and reject any non-ASCII alphabetic
+    # script (Japanese/Korean/etc.). Digits and punctuation remain valid.
+    if not re.search(r"[A-Za-z]",visible):
+        return False
+    return not any(ch.isalpha() and not ch.isascii() for ch in visible)
+
 def approved_phrases(q):
     path=SOURCE/"transcriptions.jsonl"
     if not path.exists():return {}
@@ -45,14 +57,15 @@ def approved_phrases(q):
         if entry.get("status")!="transcribed_reviewed":continue
         for seg in entry.get("segments",[]):
             phrase=seg.get("source","")
-            if not isinstance(phrase,str) or not phrase.strip() or len(phrase)>180:
+            if (not isinstance(phrase,str) or not phrase.strip() or len(phrase)>180 or
+                not is_english_source_phrase(phrase)):
                 continue
             canonical=norm(searchable_phrase(phrase))
             if len(canonical)>=2 and all((ch.isprintable() or ch.isspace()) for ch in phrase):
                 trans.setdefault(canonical,phrase)
     return trans
 
-def ocr_words(image, strategy=0, languages="eng+jpn"):
+def ocr_words(image, strategy=0, languages="eng"):
     """Run one deterministic OCR strategy; repeated coverage scans rotate strategies."""
     strategy=int(strategy)%OCR_STRATEGY_COUNT
     rgba=image.convert("RGBA")
