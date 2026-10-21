@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00992",
+  "production_id": "CONVERSION-DX11-00992",
+  "event_id": "CONVERSION-DX11-00992-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00992",
+  "feature_id": "DX11_NATIVE_LIVE_SM3_INSTANCED_GAME_GEOMETRY",
+  "work_key": "DX11:LIVE_SM3_NATIVE_INSTANCED_DRAW",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "source_head": "341f573b219fca248716446f989dd95bf7350b15",
+  "material_result_sha": "cc029bf12213fed9d444442ae174f015710378ba",
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "AUTOMATION_VALIDATION": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "code_change": "YES",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "score_change": 0,
+  "summary": "Actual live D3D9 programmable indexed instancing with secondary instance-rate source streams now expands shader-visible FLOAT4 vertex attributes, isolates native IA pipeline identity and emits separate full-size native GPU Draw/DrawIndexed per source instance. Original D3D9Ex renderer/input/FFB/SkyGlow stays authoritative, DXVK frozen. Candidate source SHA cc029bf triggered mandatory Fast/Backend Gate failures ONLY because --check-latest referenced prior 00991 missing the newer visible_frame_acceptance field; this durable 00992 source-stage run record resolves the current-task metadata selection without changing gates or historical source. Windows/Quest3 runtime not asserted.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_sm3_stream_assembly.hpp",
+    "tools/dx11_live_sm3_instancing_00992.cpp",
+    "tools/test_dx11_live_sm3_instancing_00992.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11_NATIVE_LIVE_SM3_INSTANCED_GAME_GEOMETRY",
+    "goal": "Replay genuine menu/vehicle/race D3D9 SetStreamSourceFreq instanced programmable geometry through packed native D3D11 IA and discrete real GPU Draw/DrawIndexed while preserving fallback.",
+    "acceptance_items": [
+      {
+        "id": "live_d3d9_instanced_gpu_draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_sm3_stream_frequency_native_ia",
+        "expected_behavior": "Stream-zero indexed source instance count and secondary-rate payload produce distinct native D3D11 Draw or DrawIndexed per authored instance and real shader-bound pixels."
+      },
+      {
+        "id": "topology_boundary_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_topology_fragment_and_d3d9ex_preservation",
+        "expected_behavior": "Each source instance preserves independent fan/strip primitive topology, malformed frequency or missing instance payload fail closed, DX9Ex gamepad and FFB unaffected."
+      },
+      {
+        "id": "packed_stream_tests_ci",
+        "category": "integrated_validation",
+        "behavior_area": "native_shader_input_layout_vertex_mirror_and_exact_sha_gates",
+        "expected_behavior": "Packed vertex and instance data regression with positive, negative overflow and source static linkage passes along with unchanged mandatory Fast, Backend, Windows Build, OpenXR and HUD Gates."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE: game authored SetStreamSourceFreq streams and Draw/DrawIndexed snapshots",
+      "D3D11_NATIVE_DRAW: CPU-expanded FLOAT4 input layouts, native VB/IB and discrete instance draw submission",
+      "VISIBLE_FRAME_OUTPUT: existing guarded full-resolution game frame publisher, preserving D3D9Ex fallback; game runtime not yet observed"
+    ],
+    "batch_components": [
+      "C++ live game SM3 instanced stream admission and physically separate GPU indexed/linear draw replay with packed shader attribute assembly and pipeline layout identity",
+      "Portable C++ and Python input/Draw integration regressions wired into the existing required DX11 Fast Gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Original game INDEXEDDATA stream0 with INSTANCEDATA stream1 cadence 2 yields source-exact 3 instances with distinct native vertex attributes and Draw/DrawIndexed calls.",
+      "negative_regression": "Short instance record, malformed source frequency, allocation overflow, stale cached input layout and merged strip/fan primitive boundaries remain rejected.",
+      "component_integration": "Live game D3D9 stream snapshot -> SM3 declaration/source shader pair -> packed native buffer -> GPU Draw per instance -> existing guarded frame output."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_SM3_NATIVE_INSTANCED_DRAW",
+      "DX11:REAL_GAME_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_STAGE_NOT_GAMEPLAY_VERIFIED: full-resolution real game menu/vehicle/race native instanced pixels and GPU publication require exact-SHA CI and subsequent real OutRun session; observed native draw/frame counts remain UNTESTED.",
+    "activation_guard_and_fallback": "Opt-in DX11 mirror only; original D3D9 Draw HRESULT, gamepad/FFB and SkyGlow unchanged, invalid snapshot/frequency/layout fallback fails closed."
+  },
+  "ci": {
+    "status": "RUNNING_CAUSAL_METADATA_REPAIR",
+    "first_material_sha": "cc029bf12213fed9d444442ae174f015710378ba",
+    "confirmed_failure": {
+      "fast_run_id": 39695134497,
+      "backend_run_id": 39695134439,
+      "reason": "Gate --check-latest selects prior 00991 lacking visible_frame_acceptance; 00992 source task run file not yet present."
+    },
+    "required": [
+      "DX11 Fast Structural Checks",
+      "Backend Conversion Gate",
+      "Build",
+      "OpenXR VR architecture",
+      "OutRun EXE HUD Inspector CI"
+    ]
+  },
+  "next_action": "Await/check single required five-Gate suite on repair SHA; if real compile/test fails, repair under same TASK_ID. Runtime HMD/desktop tests separate; preserve native score 0 while pending."
+}
