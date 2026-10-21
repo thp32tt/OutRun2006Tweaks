@@ -2,43 +2,45 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00973",
   "production_id": "CONVERSION-DX11-00973",
-  "event_id": "CONVERSION-DX11-00973-E003",
+  "event_id": "CONVERSION-DX11-00973-E005",
   "event_type": "rollover",
   "attempt": "1/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00973",
   "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
-  "status": "IN_PROGRESS_CI_REPAIR",
-  "feature_stage": "LIVE_GAME_GPU_CUBE_RT_TO_NATIVE_SM3_CANDIDATE",
-  "checkpoint": "C3_CAUSAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_stage": "LIVE_GPU_CUBE_RT_SM3_NATIVE_FRAME_SOURCE_INTEGRATED",
+  "checkpoint": "C6_RESULT",
   "base_sha": "28fe8afab2a96f8348886fbb17a7f83d61cd3891",
-  "material_result_sha": "f8122861b788d9f3ae02d959aef610301969a4dc",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "source_head": "f8122861b788d9f3ae02d959aef610301969a4dc",
-  "automation_validation": "PENDING",
+  "material_result_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+  "validation_bearing_result_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+  "result_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+  "source_head": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "AUTOMATION_VALIDATION": "PENDING",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
   "full_dx11_renderer_complete": false,
   "gameplay_test_performed": false,
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
-  "score_change": 0,
+  "score_change": 1,
   "score_run_key": "CONVERSION-DX11-00973",
-  "score_status": "NOT_AWARDED_PENDING_INTEGRATION_AND_SCOREBOARD_DEDUP",
+  "score_status": "SSOT_RECORDED_ON_ai-dev-lab:9b68d80fef517dc1765571679e222327b2751dcf;ROLL_OVER_AND_C6_NOT_INDEPENDENT_SCORE",
   "work_time_percentages": "NOT_MEASURED",
   "changed_files": [
-    "src/vr/d3d11/live_game_frame_bridge.cpp",
-    "src/vr/d3d11/live_game_cube_rt_readback.hpp",
-    "tools/dx11_live_game_cube_rt_00973.cpp",
-    "tools/test_dx11_live_game_cube_rt_00973.py",
-    "tools/test_dx11_first_game_frame_regressions.py",
-    ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/vr-openxr.yml",
-    ".github/workflows/build.yml"
+    "docs/automation/runs/CONVERSION-DX11-00973.json",
+    "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_live_game_cube_rt_00973.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_game_rt_mips_00742.py",
+    "tools/test_dx11_live_game_cube_rt_00973.py"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -104,32 +106,38 @@
   },
   "acceptance_results": {
     "live_gpu_cube_rt_sm3_draw": {
-      "status": "UNTESTED",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
-        "src/vr/d3d11/live_game_cube_rt_readback.hpp"
-      ],
-      "validation_command": "PENDING exact-SHA CI; real game source counts UNTESTED"
-    },
-    "unreadable_or_oversized_cube_fallback": {
-      "status": "UNTESTED",
-      "evidence_paths": [
-        "tools/test_dx11_live_game_cube_rt_00973.py",
+        "src/vr/d3d11/live_game_cube_rt_readback.hpp",
         "tools/dx11_live_game_cube_rt_00973.cpp"
       ],
-      "validation_command": "PENDING DX11 Fast/Windows build"
+      "validation_command": "DX11 Fast Structural Checks run 39603402957: C++ cube-RT capacity probe + integrated native SM3 source checks; Backend Conversion Gate 39603402818 Win32 validate/readiness SUCCESS. Actual game pixels UNTESTED."
+    },
+    "unreadable_or_oversized_cube_fallback": {
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/d3d11/live_game_frame_bridge.cpp",
+        "tools/test_dx11_live_game_cube_rt_00973.py",
+        "tools/test_dx11_first_game_frame_regressions.py",
+        "tools/test_dx11_game_rt_mips_00742.py"
+      ],
+      "validation_command": "DX11 Fast #39603402957 destructive cube-face negative tests; Backend #39603402818 Windows smoke; Build #39603403009 SUCCESS. Original DX9Ex fallback preserved; game runtime UNTESTED."
     },
     "five_exact_sha_ci": {
-      "status": "UNTESTED",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         ".github/workflows/dx11-fast-structural.yml",
-        "tools/test_dx11_first_game_frame_regressions.py"
+        ".github/workflows/backend-conversion-gate.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/vr-openxr.yml",
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "PENDING new exact-SHA five workflow results"
+      "validation_command": "GitHub Actions same exact d06e0c096f54e1261cf55907f812e721f5a3f23a: Fast 39603402957; Backend 39603402818; Build 39603403009; OpenXR 39603403233; HUD 39603402679 all success."
     }
   },
   "ci": {
-    "exact_sha": null,
+    "exact_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
     "required": [
       "DX11 Fast Structural Checks",
       "Backend Conversion Gate",
@@ -137,22 +145,78 @@
       "OpenXR VR architecture",
       "OutRun EXE HUD Inspector CI"
     ],
-    "gates": {},
-    "optional": {}
+    "gates": {
+      "DX11 Fast Structural Checks": {
+        "id": 39603402957,
+        "conclusion": "success",
+        "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+      },
+      "Backend Conversion Gate": {
+        "id": 39603402818,
+        "conclusion": "success",
+        "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+      },
+      "Build": {
+        "id": 39603403009,
+        "conclusion": "success",
+        "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+      },
+      "OpenXR VR architecture": {
+        "id": 39603403233,
+        "conclusion": "success",
+        "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "id": 39603402679,
+        "conclusion": "success",
+        "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+      }
+    },
+    "artifacts": [
+      {
+        "run_id": 39603403009,
+        "id": 12347178181,
+        "name": "outrun2006tweaks-d06e0c096f54e1261cf55907f812e721f5a3f23a",
+        "digest": "sha256:ce60d4a357791a92e97a32c4c34586f820c17f39fa568204ec551a5eaa219f4e"
+      },
+      {
+        "run_id": 39603402818,
+        "id": 12348132308,
+        "name": "backend-autovalidated-d06e0c096f54e1261cf55907f812e721f5a3f23a",
+        "digest": "sha256:ea98191775a7ea7647d62d8dafa418b68621f3e4b5a2034bb31c4b4399ede2d6"
+      },
+      {
+        "run_id": 39603403233,
+        "id": 12347730954,
+        "name": "outrun-vr-host-x64",
+        "digest": "sha256:922df2de8f5942d73230ae01d11c9cfce77e58559b81f4226b02bcaf496f0a64"
+      }
+    ]
   },
   "pipeline": {
-    "C0_RECOVER": "PASS: verified controller checkpoint, target HEAD and absent 00973 run; prior 00972 exact SHA already sealed.",
-    "C1_REVIEW": "PASS: GPU-authored DEFAULT-pool reflection cube not supported in live SM3 sampler mirror.",
-    "C2_IMPLEMENT": "PASS: material source+test candidate f8122861 on isolated feature branch.",
-    "C3_VALIDATE": "IN_PROGRESS: f8122861 Fast/Backend failed on missing 00973 run; Build failed on destructive-test token collision with new cube path; causal repair committed.",
-    "C4_COMMIT": "IN_PROGRESS: validation-bearing material on feature branch, target unchanged.",
-    "C5_PACKAGE": "PENDING CI and genuine game desktop frame",
-    "C6_RESULT": "NOT_READY: actual native game pixels/HMD unobserved"
+    "C0_RECOVER": "PASS: 22:00 GitHub controller checkpoint and target 28fe8afa checked; recovered the existing 00973 feature branch and its five material/CI-repair commits, not a new task.",
+    "C1_REVIEW": "PASS: existing GPU-authored DEFAULT-pool reflection cube six-face mip snapshot is the current integrated blocker; 00477 R175 owner already complete.",
+    "C2_IMPLEMENT": "PASS: isolated feature branch material commits f8122861,68f65405,c5c01b23,48dee264,d06e0c09 implement GPU six-face RT->SYSTEMMEM->native D3D11 cube SRV and causal regression fixes; original D3D9 fallback opt-in.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: five mandatory GitHub Actions workflows and Backend Windows/readiness smoke all success at d06e0c09; verified associated Build/Backend/OpenXR/HUD artifact names and GitHub SHA256 digests. Real OutRun session UNTESTED.",
+    "C4_COMMIT": "PASS: GitHub compare target 28fe8afa -> feature d06e0c09 ahead=5 behind=0; update_ref expected_sha=28fe8afa force=false succeeded, remote target re-read = d06e0c09.",
+    "C5_PACKAGE": "AVAILABLE_GITHUB_ARTIFACTS: exact-SHA Win32 build bundle, backend-autovalidated ZIP, native VR x64 host artifact present and unexpired; no user deployment or HMD installation performed.",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED / FEATURE_READY source+five exact-SHA CI PASS; hardware native_draws/native published frame and Quest3 still UNTESTED; full DX11 gameplay NOT claimed; single score RUN_KEY recorded."
   },
-  "REAL_GAME_DRAW_BLOCKER": "No hardware evidence of any admitted real OutRun native_draws>0 or native desktop pixels. Await exact-SHA source CI and controlled desktop session.",
+  "REAL_GAME_DRAW_BLOCKER": "Real OutRun native_draws>0 and published full-size menu/car/race pixel evidence not yet observed. Complete source CI and artifact presence are not hardware game proof.",
   "NATIVE_GAME_DRAW_COUNT": "UNTESTED",
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
-  "CODE_CHANGED_SHA": "f8122861b788d9f3ae02d959aef610301969a4dc",
+  "CODE_CHANGED_SHA": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
-  "NEXT_IMPLEMENTATION_ACTION": "Repair only remaining real CI errors; then bounded exact-SHA five gates and controlled real OutRun menu/car/race test for native Draw/published full frame. Do not assert playable on CI."
+  "NEXT_IMPLEMENTATION_ACTION": "Run an early controlled OutRun menu/vehicle/race desktop test of exact material d06e0c09 with opt-in and original DX9Ex fallback; collect per-stage sm3 reject counters, native_draws and GPU desktop published frames. Repair the first measured unsupported real-game Draw state under the same integrated FULL_RESOLUTION_NATIVE_GAME_FRAME goal; Quest3 remains UNTESTED.",
+  "feature_branch": "feature/dx11-00973-live-cube-rt-game-frame",
+  "feature_ready": {
+    "status": "PASS_FEATURE_CI",
+    "material_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+    "integrated_ci_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+    "required_workflows_passed": 5,
+    "required_workflows_total": 5,
+    "promoted_target_branch": "vr-dx11-native-r71",
+    "hardware_validation": "UNTESTED",
+    "full_gameplay_native_renderer_complete": false
+  }
 }
