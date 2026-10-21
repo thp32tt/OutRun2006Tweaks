@@ -21,7 +21,7 @@ on:
       - vr-d3d9ex-focus
 
 concurrency:
-  group: outrun-pc-fast-test-${{ github.ref_name }}
+  group: outrun-pc-package-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
