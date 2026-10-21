@@ -11,7 +11,12 @@ checks = [
     'dev->CreateTexture2D(&depthDesc, nullptr,',
     'dev->CreateDepthStencilView(createdDepth.Get(), nullptr,',
     'dev->CreateDepthStencilState(&ds,',
-    'ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());',
+    # The real FVF path now binds a live linear/sRGB RTV on every Draw,
+    # preserving the same independent diagnostic DSV when depth is enabled.
+    'ID3D11RenderTargetView* gameRtv = output.nativeSrgbWrite',
+    '? s.backend.color_rtv_srgb() : s.backend.color_rtv();',
+    'ctx->OMSetRenderTargets(1u, &gameRtv,',
+    'output.nativeDepthTest ? s.diagnosticDepthView.Get() : nullptr',
     'ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),',
     'ctx->OMSetDepthStencilState(nullptr, 0);',
     'if (ib) ctx->DrawIndexed(indexCount, 0, 0);',
