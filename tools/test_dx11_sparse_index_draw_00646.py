@@ -17,8 +17,11 @@ for token in ("std::sort(sorted.begin(), sorted.end())",
 # 00737 negative controls: the real transient game IndexedUP source must
 # validate all absolute indices before any game-owned UP byte copy, bound each
 # referenced pointer, and commit compact buffers only on complete success.
+# Scope the destructive oracle to its exact gather helper. The adjacent
+# IndexedUP physical-stream function legitimately repeats the same overflow
+# guard; mutating only the gather must still fail even with that second guard.
 up_capture = span.split("inline bool game_gather_indexed_up_vertices(", 1)[1].split(
-    "} // namespace", 1)[0]
+    "inline bool game_indexed_up_physical_slots(", 1)[0]
 up_safe_tokens = (
     "minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices",
     "absoluteIndices[i] < minVertex",
