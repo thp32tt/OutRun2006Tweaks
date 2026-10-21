@@ -5387,7 +5387,10 @@ namespace OutRunVRStereo
                         FrameStereoIncomplete, n);
                 }
             }
-            return exactResult && !restored && SUCCEEDED(hr) ? E_FAIL : hr;
+            // Never return a successful physical DIP after a failed game
+            // projection restore, regardless of exact-result ownership.
+            // The left eye may already have drawn: do not replay/fallback.
+            return !restored && SUCCEEDED(hr) ? E_FAIL : hr;
         }
 
         // Pure diagnosis; never grants a render route or hides any object.

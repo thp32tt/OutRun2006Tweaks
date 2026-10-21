@@ -3770,6 +3770,11 @@ public:
         }
         if (HudBatch.drawCount != 0)
         {
+            // A deferred Flush submits the outgoing homogeneous node, not
+            // the incoming +TIME/GOAL token. Counters must describe that
+            // proven batch; do not modify the physical Flush sequence.
+            const bool outgoingGoal = HudBatch.homogeneous &&
+                GoalOwner(HudBatch.scope, HudBatch.producer);
             // Before SelectSpriteQueueNode, a homogeneous PRE-QUEUE
             // direct buffer can still be submitted with its OLD scope.
             // The old unconditional !QueueRenderActive() guard missed this
@@ -3790,10 +3795,12 @@ public:
                 !FlushTracked(sprite))
             {
                 HudBatch.boundaryReady = false;
-                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+                (outgoingGoal ? GoalFallbacks : StageFallbacks).fetch_add(
+                    1, std::memory_order_relaxed);
                 return;
             }
-            StageFlushes.fetch_add(1, std::memory_order_relaxed);
+            (outgoingGoal ? GoalFlushes : StageFlushes).fetch_add(
+                1, std::memory_order_relaxed);
         }
         HudBatch.boundaryReady = enteringStage || enteringGoal;
     }
@@ -3810,10 +3817,16 @@ public:
             HudBatch.scope == EffectiveScope() &&
             HudBatch.producer == CurrentRenderProducerToken())
         {
+            // Scope/producer and queue epoch were verified above; keep
+            // Stage and GOAL diagnostics disjoint without extra GPU work.
+            const bool outgoingGoal =
+                GoalOwner(HudBatch.scope, HudBatch.producer);
             if (FlushTracked(HudBatch.sprite))
-                StageFlushes.fetch_add(1, std::memory_order_relaxed);
+                (outgoingGoal ? GoalFlushes : StageFlushes).fetch_add(
+                    1, std::memory_order_relaxed);
             else
-                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+                (outgoingGoal ? GoalFallbacks : StageFallbacks).fetch_add(
+                    1, std::memory_order_relaxed);
         }
         HudBatch.boundaryReady = false;
     }
