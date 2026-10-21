@@ -21,6 +21,11 @@
 
 #include "ex_device_upgrade_r13.cpp"
 
+namespace Settings
+{
+    extern Setting<bool> VREvidenceTrace;
+}
+
 namespace OutRunVRD3D9ExUpgradeR13
 {
     namespace
@@ -187,6 +192,14 @@ namespace OutRunVRD3D9ExUpgradeR13
         void R14AdoptCompatDevice(IDirect3DDevice9* device) noexcept
         {
             if (!device) return;
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 ADOPT_DEVICE newDevice={} registryDevice={} shadows={} bytes={} budgetRejects={}",
+                    static_cast<const void*>(device),
+                    static_cast<const void*>(R14RegistryDevice),
+                    R14Shadows.size(),
+                    R14ShadowBytes.load(std::memory_order_acquire),
+                    R14ShadowBudgetRejects.load(std::memory_order_acquire));
 
             std::vector<R14EntryPtr> oldDeviceEntries;
             {
@@ -435,6 +448,15 @@ namespace OutRunVRD3D9ExUpgradeR13
             }
 
             ++R14ShadowCreated;
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 TRACK_SHADOW device={} gpu={} cpu={} bytes={} totalBytes={} validMask=0x{:08X} registryCount={}",
+                    static_cast<const void*>(device),
+                    static_cast<const void*>(gpu),
+                    static_cast<const void*>(cpu),
+                    entry->shadowBytes,
+                    R14ShadowBytes.load(std::memory_order_acquire),
+                    entry->validMask, R14Shadows.size());
             if (!R14FirstActiveLogged.exchange(true))
             {
                 spdlog::info(
@@ -470,6 +492,12 @@ namespace OutRunVRD3D9ExUpgradeR13
                 return false;
             }
             ++R14DirectOnlyFallbacks;
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 TRACK_DIRECT_ONLY device={} gpu={} registryCount={} totalBytes={}",
+                    static_cast<const void*>(device),
+                    static_cast<const void*>(gpu), R14Shadows.size(),
+                    R14ShadowBytes.load(std::memory_order_acquire));
             return true;
         }
 
@@ -525,8 +553,16 @@ namespace OutRunVRD3D9ExUpgradeR13
 
         ULONG __stdcall TextureReleaseDestR14(IDirect3DTexture9* texture)
         {
+            const bool trackedBefore = static_cast<bool>(R14Find(texture));
             const ULONG remaining =
                 R14TextureReleaseHook.stdcall<ULONG>(texture);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 RELEASE texture={} remaining={} trackedBefore={} internalReleaseDepth={} registryCount={} totalBytes={}",
+                    static_cast<const void*>(texture), remaining,
+                    trackedBefore ? 1 : 0, R14InternalReleaseDepth,
+                    R14Shadows.size(),
+                    R14ShadowBytes.load(std::memory_order_acquire));
             if (remaining == 0 && R14InternalReleaseDepth == 0)
                 R14Erase(texture);
             return remaining;
@@ -559,6 +595,12 @@ namespace OutRunVRD3D9ExUpgradeR13
         void __stdcall TextureGenerateMipSubLevelsDestR14(
             IDirect3DTexture9* texture)
         {
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 GENERATE_MIPS_PRE texture={} internalUploadDepth={} tracked={} totalBytes={}",
+                    static_cast<const void*>(texture), R14InternalUploadDepth,
+                    static_cast<bool>(R14Find(texture)) ? 1 : 0,
+                    R14ShadowBytes.load(std::memory_order_acquire));
             R14TextureGenerateMipSubLevelsHook.stdcall<void>(texture);
             if (R14InternalUploadDepth == 0)
             {
@@ -571,6 +613,13 @@ namespace OutRunVRD3D9ExUpgradeR13
             IDirect3DTexture9* texture, const RECT* rect)
         {
             const R14EntryPtr entry = R14Find(texture);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 ADD_DIRTY texture={} rect={},{},{},{} tracked={} internalUploadDepth={}",
+                    static_cast<const void*>(texture),
+                    rect ? rect->left : 0, rect ? rect->top : 0,
+                    rect ? rect->right : 0, rect ? rect->bottom : 0,
+                    entry ? 1 : 0, R14InternalUploadDepth);
             if (entry)
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
@@ -852,6 +901,17 @@ namespace OutRunVRD3D9ExUpgradeR13
             const HRESULT hr = R14CreateTextureR13Hook.stdcall<HRESULT>(
                 device, width, height, levels, usage, format, pool,
                 texture, sharedHandle);
+            if (Settings::VREvidenceTrace)
+                spdlog::info(
+                    "VR EVIDENCE R14 CREATE_TEXTURE device={} requested={}x{} levels={} usage=0x{:08X} format={} pool={} hr=0x{:08X} texture={} compat={} shadowBytes={} registryCount={}",
+                    static_cast<const void*>(device), width, height, levels,
+                    static_cast<unsigned>(usage), static_cast<unsigned>(format),
+                    static_cast<unsigned>(pool), static_cast<unsigned>(hr),
+                    (texture && *texture)
+                        ? static_cast<const void*>(*texture) : nullptr,
+                    OutRunVRD3D9ExUpgrade::IsCompatDevice(device) ? 1 : 0,
+                    R14ShadowBytes.load(std::memory_order_acquire),
+                    R14Shadows.size());
             if (FAILED(hr) || pool != D3DPOOL_MANAGED || !texture || !*texture ||
                 !OutRunVRD3D9ExUpgrade::IsCompatDevice(device))
                 return hr;
@@ -938,6 +998,29 @@ namespace OutRunVRD3D9ExUpgradeR13
             UINT level, D3DLOCKED_RECT* locked, const RECT* rect, DWORD flags)
         {
             const R14EntryPtr entry = R14Find(texture);
+            if (Settings::VREvidenceTrace)
+            {
+                std::uint32_t validMask = 0, dirtyMask = 0, lockedMask = 0;
+                bool retirePending = false, directOnly = false;
+                if (entry)
+                {
+                    std::lock_guard<std::mutex> evidenceLock(entry->mutex);
+                    validMask = entry->validMask;
+                    dirtyMask = entry->dirtyMask;
+                    lockedMask = entry->lockedMask;
+                    retirePending = entry->retirePending;
+                    directOnly = entry->mode == R14ShadowMode::DirectOnly;
+                }
+                spdlog::info(
+                    "VR EVIDENCE R14 LOCK_PRE texture={} level={} flags=0x{:08X} rect={},{},{},{} tracked={} directOnly={} validMask=0x{:08X} dirtyMask=0x{:08X} lockedMask=0x{:08X} retirePending={}",
+                    static_cast<const void*>(texture), level,
+                    static_cast<unsigned>(flags),
+                    rect ? rect->left : 0, rect ? rect->top : 0,
+                    rect ? rect->right : 0, rect ? rect->bottom : 0,
+                    entry ? 1 : 0, directOnly ? 1 : 0,
+                    validMask, dirtyMask, lockedMask,
+                    retirePending ? 1 : 0);
+            }
             if (!entry || level >= R14MaxTrackedLevels)
                 return R14TextureLockR13Hook.stdcall<HRESULT>(
                     texture, level, locked, rect, flags);
@@ -1138,6 +1221,26 @@ namespace OutRunVRD3D9ExUpgradeR13
             UINT level)
         {
             const R14EntryPtr entry = R14Find(texture);
+            if (Settings::VREvidenceTrace)
+            {
+                std::uint32_t validMask = 0, dirtyMask = 0, lockedMask = 0;
+                bool retirePending = false, externalWrite = false;
+                if (entry)
+                {
+                    std::lock_guard<std::mutex> evidenceLock(entry->mutex);
+                    validMask = entry->validMask;
+                    dirtyMask = entry->dirtyMask;
+                    lockedMask = entry->lockedMask;
+                    retirePending = entry->retirePending;
+                    externalWrite = entry->externalWriteDuringLock;
+                }
+                spdlog::info(
+                    "VR EVIDENCE R14 UNLOCK_PRE texture={} level={} tracked={} validMask=0x{:08X} dirtyMask=0x{:08X} lockedMask=0x{:08X} retirePending={} externalWrite={} totalBytes={}",
+                    static_cast<const void*>(texture), level,
+                    entry ? 1 : 0, validMask, dirtyMask, lockedMask,
+                    retirePending ? 1 : 0, externalWrite ? 1 : 0,
+                    R14ShadowBytes.load(std::memory_order_acquire));
+            }
             if (!entry || level >= R14MaxTrackedLevels)
                 return R14TextureUnlockR13Hook.stdcall<HRESULT>(texture, level);
 
