@@ -59,7 +59,16 @@ for old in (
     "dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())",
     "ctx->DrawIndexed(indexCount, 0, 0);",
     "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"):
-    assert old in src and not wired(src.replace(old,"false",1),decoder)
+    prefix, sep, suffix = src.partition("bool mirror_texture(")
+    assert sep, "2D RT producer missing"
+    # Distinguish the 00692 RT unpack from the preceding 00974 cube
+    # unpack; downstream Draw mutations still target the live submit path.
+    if old in suffix.split("bool capture_live_sm3_sampler(", 1)[0]:
+        broken = prefix + sep + suffix.replace(old, "false", 1)
+    else:
+        assert old in src, old
+        broken = src.replace(old, "false", 1)
+    assert not wired(broken, decoder), "00692 negative mutation escaped: " + old
     mutations+=1
 for old in ("packed_texture16::unpack_row(source, destination, width, packing);",
             "layout != Layout::rgb565"):
