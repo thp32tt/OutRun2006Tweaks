@@ -2008,9 +2008,8 @@ namespace OutRunVRStereo
         bool R30GetExactLensCentreRawWvp(float out[16]) noexcept
         {
             using namespace OutRunVR::GameSemantic;
-            if (!out || QueueRenderActive() ||
-                EffectiveScope() != RenderScope::WorldBillboard ||
-                CurrentRenderProducerToken() != ProducerToken::LensFlareCentre)
+            const auto drawCommand = CapturePhysicalDrawCommand();
+            if (!out || !drawCommand.IsDirectWorldLensCentre())
                 return false;
             std::uint64_t writeSerial = 0, writeDraw = 0;
             std::uintptr_t writeShader = 0, currentShader = 0;
@@ -2025,17 +2024,56 @@ namespace OutRunVRStereo
                     sourceScope, queueEpoch, queueNode, sourceProducer) ||
                 !GetCurrentShaderEpoch(currentShader, currentShaderEpoch))
                 return false;
-            return OutRunVR::LensCentre::OwnsRawWvp({
-                CurrentLensCentreCallEpoch,
-                OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch(),
+
+            // Keep the R26 protected path in sync with the already-reviewed
+            // R84 C993 source proof. The physical draw serial is incremented
+            // before this hook, so advancing it again makes the immediately
+            // preceding original c64 upload appear one draw too old. Also
+            // accept the exact same-call SceneEffect upload that the original
+            // C993 producer legitimately performs before restoring its
+            // WorldBillboard scope for the physical sun draw.
+            const auto writtenCall =
+                OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch();
+            const auto currentDraw = TopLevelDrawSerial();
+            const bool spatialCentreSource =
+                OutRunVR::LensCentre::AdmitsCentreRawSourceScope(
+                    sourceScope, sourceProducer, queueNode,
+                    drawCommand.lensCentreCallEpoch, writtenCall,
+                    currentDraw, writeDraw);
+            const bool owned = OutRunVR::LensCentre::OwnsRawWvp({
+                drawCommand.lensCentreCallEpoch,
+                writtenCall,
                 OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
                 OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
-                TopLevelDrawSerial() + 1u, writeDraw,
-                currentShader, writeShader, currentShaderEpoch, writeShaderEpoch,
-                sourceScope == RenderScope::WorldBillboard,
+                currentDraw, writeDraw,
+                currentShader, writeShader,
+                currentShaderEpoch, writeShaderEpoch,
+                spatialCentreSource,
                 sourceProducer == ProducerToken::LensFlareCentre,
                 queueNode == nullptr
             });
+            if (Settings::VRTelemetry)
+            {
+                static std::atomic<std::uint64_t> proofChecks{ 0 };
+                const auto n = proofChecks.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if (n <= 16 || (n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR SUN C993 SOURCE PROOF: owned={} scope={} producer={} currentCall={} writtenCall={} currentDraw={} writtenDraw={} shaderMatch={} shaderEpochMatch={} poseMatch={} noQueue={} checks={}",
+                        owned ? 1 : 0,
+                        static_cast<unsigned>(sourceScope),
+                        OutRunVR::GameSemantic::Name(sourceProducer),
+                        drawCommand.lensCentreCallEpoch, writtenCall,
+                        currentDraw, writeDraw,
+                        currentShader != 0 && currentShader == writeShader ? 1 : 0,
+                        currentShaderEpoch != 0 &&
+                            currentShaderEpoch == writeShaderEpoch ? 1 : 0,
+                        OutRunVRRenderer::GetCurrentLatchedPoseEpoch() != 0 &&
+                            OutRunVRRenderer::GetCurrentLatchedPoseEpoch() ==
+                                OutRunVRRenderer::GetLastGameWvpPoseEpoch() ? 1 : 0,
+                        queueNode == nullptr ? 1 : 0, n);
+            }
+            return owned;
         }
 
         enum class R44OverlayMatrixKind : std::uint8_t
