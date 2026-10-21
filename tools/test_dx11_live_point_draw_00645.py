@@ -29,8 +29,18 @@ assert "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in bridge
 for source in ("src/vr/d3d9/stereo_renderer_r30.cpp",
                "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"):
     caller = read(source)
+    # Three preexisting sources explicitly check POINTLIST. The active
+    # LinearUP fourth source uses the bounded shared primitive-span decoder,
+    # which already includes POINTLIST; R26-safe remains at three sources.
+    active = source == "src/vr/d3d9/stereo_renderer_r30.cpp"
     assert caller.count("topology != D3DPT_POINTLIST") == 3, source
-    assert caller.count("game_native_primitive_element_count(") == 3, source
+    assert caller.count("game_native_primitive_element_count(") == (
+        4 if active else 3), source
+    if active:
+        up = caller.split("void R30ObserveNativeLinearUP(", 1)[1].split(
+            "void R30ObserveNativeIndexedUP(", 1)[0]
+        assert "if (!live::game_native_primitive_element_count(" in up
+        assert "live::observe_linear(" in up
     assert "R30CopyVertexShadow" in caller and "R30CopyIndexShadow" in caller
     assert "live::observe_linear" in caller and "live::observe_indexed" in caller
     if source == "src/vr/d3d9/stereo_renderer_r30.cpp":
