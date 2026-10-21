@@ -1,0 +1,490 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1315KST-B0022-B0023-SHA8",
+  "review_slot_kst": "2026-10-21 13:15",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "source_head_before_review": "affb8a764f32c91c30ff86d0a07aa6e952d1fcf4",
+  "qa_scope": "Eight new SHA-unique unapproved B-generated Korean PNG candidates, not consuming producer queue; C1 independent text-only QA.",
+  "policies": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "counts": {
+    "previous_local_qa_log_files": 6,
+    "previous_local_sha_unique": 45,
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 6,
+    "fail_major_style_color_mismatch": 2,
+    "producer_rework_dimensions": 8
+  },
+  "evidence": {
+    "n100_preflight": "work/c1_batch_20261021_1315/preflight.json",
+    "n100_compare_images": [
+      "work/c1_batch_20261021_1315/compare_1.jpg",
+      "work/c1_batch_20261021_1315/compare_2.jpg",
+      "work/c1_batch_20261021_1315/compare_3.jpg",
+      "work/c1_batch_20261021_1315/compare_4.jpg"
+    ],
+    "all_source_and_export_sha_verified": true,
+    "all_rgba_png": true,
+    "all_alpha_ge16_border_zero": true,
+    "low_alpha_border_fringe_ordinals": [
+      108,
+      110
+    ],
+    "inspection": "Independently viewed each source-vs-output side by side at enlarged scale. B107 and B108 exhibit severe shift from pure white italic to thick orange/yellow beveled lettering; translation itself is correct."
+  },
+  "results": [
+    {
+      "task_id": "OUTRUN-ROI-B-0022-C3E1F522",
+      "role": "B",
+      "ordinal": 103,
+      "candidate_file": "Q052_f24e7bf199654f00_source_k.png",
+      "source_file": "Q052_f24e7bf199654f00_source.png",
+      "candidate_sha256": "37ca100f4dc4473821fc10dd4bad36b3f3ae88dd4d1add497188aa44f1ca6ad8",
+      "export_sha_match": true,
+      "source_sha256": "3152e2536da6480830750092510502ea00d930d13de378866b6437b386e849b0",
+      "source_sha_match": true,
+      "source_dds_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "english": "Goal",
+      "approved_korean": "골",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1691,
+        930
+      ],
+      "source_dimensions": [
+        351,
+        193
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        613,
+        180,
+        1075,
+        569
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'골' 자소와 짙은 남색 외곽이 가독성 있게 분리됨; 원본 진행 바/프레임을 출력에 복제하지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0022-C3E1F522",
+      "role": "B",
+      "ordinal": 104,
+      "candidate_file": "Q057_5c08380b1a8e6f3b_source_k.png",
+      "source_file": "Q057_5c08380b1a8e6f3b_source.png",
+      "candidate_sha256": "0365ea86b56b6bb9086f7564bf5fbe45dc5bc6bcdaea196bc643379bb9127de5",
+      "export_sha_match": true,
+      "source_sha256": "b3e37de1fab5df5e0029d04c119ef81829fadd71c74d0068da8373351b1aa669",
+      "source_sha_match": true,
+      "source_dds_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "english": "Technical Bonus",
+      "approved_korean": "테크니컬 보너스",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2320,
+        691
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        202,
+        123,
+        1943,
+        700
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'테크니컬 보너스' 철자 확인; 원문의 금속 그라디언트·기울기·진한 외곽과 대체로 같은 계열, 배경·비문자 아트 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0022-C3E1F522",
+      "role": "B",
+      "ordinal": 105,
+      "candidate_file": "Q057_c08e055e12638cfe_source_k.png",
+      "source_file": "Q057_c08e055e12638cfe_source.png",
+      "candidate_sha256": "8693fe72a02d1c014bef191d1297a73f89f0a14837c1e92542937febc36d5830",
+      "export_sha_match": true,
+      "source_sha256": "68849f0786d7ba60ca8acc8b8fc32727d277232343d36b1c6550fe21794b3e6e",
+      "source_sha_match": true,
+      "source_dds_sha256": "f039f935c899b222c8532584e0d79bb286c55a99c2f69df45342711298e1be05",
+      "english": "Target",
+      "approved_korean": "목표",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1738,
+        905
+      ],
+      "source_dimensions": [
+        463,
+        241
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        468,
+        81,
+        1141,
+        614
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'목표' 정확하고 검정 회색 기울기 문구의 자소 명확; 원문 자동차 아이콘을 재생성하지 않음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0022-C3E1F522",
+      "role": "B",
+      "ordinal": 106,
+      "candidate_file": "Q057_41e1741e9e5a692e_source_k.png",
+      "source_file": "Q057_41e1741e9e5a692e_source.png",
+      "candidate_sha256": "563034fd37e6694d27ecd63a2f4f13266eee30d898e8d8853fc79f4e3f2908c3",
+      "export_sha_match": true,
+      "source_sha256": "68849f0786d7ba60ca8acc8b8fc32727d277232343d36b1c6550fe21794b3e6e",
+      "source_sha_match": true,
+      "source_dds_sha256": "234b03ef02c7f5184ae35a280cfe7eb01c2e4fdfdd722737f54bb87b7cf58256",
+      "english": "Target",
+      "approved_korean": "목표",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1738,
+        905
+      ],
+      "source_dimensions": [
+        463,
+        241
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        580,
+        86,
+        1565,
+        661
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'목표' 정확하고 회색/검정 효과, 자소 가독성 유지; 비문자 출력 없음.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0022-C3E1F522",
+      "role": "B",
+      "ordinal": 107,
+      "candidate_file": "Q057_163aadb0e00ff6ac_source_k.png",
+      "source_file": "Q057_163aadb0e00ff6ac_source.png",
+      "candidate_sha256": "4cb2c88bbe022b06f95cc3b98c9f628d395193bd1667c4bc10cd541e43dc0e11",
+      "export_sha_match": true,
+      "source_sha256": "6dc4411e04da1edd0ff21165b0f36fa5823a1c741cdd9d33b395315007068069",
+      "source_sha_match": true,
+      "source_dds_sha256": "234b03ef02c7f5184ae35a280cfe7eb01c2e4fdfdd722737f54bb87b7cf58256",
+      "english": "SPECIAL REQUEST",
+      "approved_korean": "스페셜 요청",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2372,
+        928
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        274,
+        93,
+        2037,
+        676
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_COLOR_MISMATCH",
+      "visual_reason": "원본 SPECIAL REQUEST는 거의 흰색의 굵은 이탤릭 글자/그림자이나 생성물은 노랑-주황 금속 광택·짙은 파란 테두리. 경미하지 않은 원본 색·효과 이탈.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0023-DAC9BDDC",
+      "role": "B",
+      "ordinal": 108,
+      "candidate_file": "Q057_4b64dff6b3f931dd_source_k.png",
+      "source_file": "Q057_4b64dff6b3f931dd_source.png",
+      "candidate_sha256": "61b0f5950a2f2b84c06c5893a5430a3c49f07fe284177dde7d90bb646814d738",
+      "export_sha_match": true,
+      "source_sha256": "9e6362d88f632990579a2dfcfa135aeec3f04db8dc428c042abb5606eb76b72d",
+      "source_sha_match": true,
+      "source_dds_sha256": "e22210f12977306c9412a266f8d57cee20ad5cce6507f2d8e8902a93a4f1fcf3",
+      "english": "SPECIAL REQUEST",
+      "approved_korean": "스페셜 요청",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2172,
+        724
+      ],
+      "source_dimensions": [
+        2372,
+        928
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        162,
+        2110,
+        702
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 4,
+        "right": 0
+      },
+      "c1_verdict": "FAIL_MAJOR_STYLE_COLOR_MISMATCH",
+      "visual_reason": "원본의 흰색 SPECIAL REQUEST 대신 과도한 노랑-주황 메탈 채움 및 진한 남색 테두리와 크기·스타일 전환. 원문 효과 재현 실패.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0023-DAC9BDDC",
+      "role": "B",
+      "ordinal": 109,
+      "candidate_file": "Q062_77b81b0abc2938b9_source_k.png",
+      "source_file": "Q062_77b81b0abc2938b9_source.png",
+      "candidate_sha256": "a820a6fa60ecac529fde121ab5f0835bd4ccf18771de35ffef211f5b8d416638",
+      "export_sha_match": true,
+      "source_sha256": "5639940552afd59db15c707ea27e1de60e0bb4773144fd5255c4451e8d7f68ac",
+      "source_sha_match": true,
+      "source_dds_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "english": "Diverge",
+      "approved_korean": "분기",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        2040,
+        771
+      ],
+      "source_dimensions": [
+        679,
+        218
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        298,
+        71,
+        1908,
+        737
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'분기' 한글 획·받침 선명; 원본 노랑 채움/짙은 파랑 테두리 계열 유지, 배경/길 그래픽 미복제.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "task_id": "OUTRUN-ROI-B-0023-DAC9BDDC",
+      "role": "B",
+      "ordinal": 110,
+      "candidate_file": "Q062_9471064616483dc0_source_k.png",
+      "source_file": "Q062_9471064616483dc0_source.png",
+      "candidate_sha256": "5704e51c1c55c957d773fd0d1698dc3fb050ec4432729d467436ac087bab1f6b",
+      "export_sha_match": true,
+      "source_sha256": "978339aed3f7f0cef27524fc59190e97d00b99dda49c2a7364cb8fe3622ce7de",
+      "source_sha_match": true,
+      "source_dds_sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "english": "HARD",
+      "approved_korean": "어려움",
+      "producer_status": "REWORK_DIMENSIONS",
+      "candidate_dimensions": [
+        1989,
+        790
+      ],
+      "source_dimensions": [
+        578,
+        264
+      ],
+      "mode": "RGBA",
+      "format": "PNG",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        0,
+        39,
+        1935,
+        790
+      ],
+      "border_ge16": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "border_low": {
+        "top": 0,
+        "bottom": 6,
+        "left": 10,
+        "right": 0
+      },
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "'어려움' 정확, 빨간색 채움/남색 테두리/흰 외곽 유지; 알파 1-15의 좌하 경계 픽셀은 합성 전 확인 요망.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "limits": {
+    "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+    "dds_final_compose": false,
+    "producer_status_unchanged": "REWORK_DIMENSIONS",
+    "imagegen_calls": 0,
+    "producer_queue_consumption": false,
+    "c2_c3_or_ingame_pass": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_untouched": true
+  }
+}
