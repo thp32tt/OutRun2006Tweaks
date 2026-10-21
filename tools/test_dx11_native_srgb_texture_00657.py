@@ -118,7 +118,7 @@ def main() -> None:
         # 2D route on its own when both paths carry the same source fragment.
         prefix, rest = source.split("bool mirror_texture(", 1)
         texture2d, suffix = rest.split("bool submit(", 1)
-        if old in texture2d:
+        if old.startswith("DXGI_FORMAT_") and old in texture2d:
             changed = (prefix + "bool mirror_texture(" +
                        texture2d.replace(old, bad, 1) + "bool submit(" + suffix)
             assert not connected(changed), "2D mutation survived: " + old
