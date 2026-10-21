@@ -96,9 +96,23 @@ start_crop_worker() {
 if [[ "${OUTRUN_CROP_ENABLED:-true}" == "true" ]]; then
   start_crop_worker
   (
+    CROP_HEARTBEAT="/home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only/crop_worker_heartbeat.json"
+    CROP_STALL_SECONDS="${OUTRUN_CROP_STALL_SECONDS:-600}"
     while sleep 20; do
+      restart_reason=""
       if ! pgrep -f "python -u /opt/outrun/c_english_crop/loop.py" >/dev/null 2>&1; then
-        echo "$(date -Is) C crop worker missing; restarting" >>/logs/c-english-crop.log
+        restart_reason="missing"
+      elif [[ -f "$CROP_HEARTBEAT" ]]; then
+        now_epoch="$(date +%s)"
+        hb_epoch="$(stat -c %Y "$CROP_HEARTBEAT" 2>/dev/null || echo 0)"
+        if (( now_epoch - hb_epoch > CROP_STALL_SECONDS )); then
+          restart_reason="heartbeat_stale"
+        fi
+      fi
+      if [[ -n "$restart_reason" ]]; then
+        echo "$(date -Is) C crop worker $restart_reason; restarting" >>/logs/c-english-crop.log
+        pkill -f "python -u /opt/outrun/c_english_crop/loop.py" >/dev/null 2>&1 || true
+        sleep 2
         start_crop_worker
       fi
     done
