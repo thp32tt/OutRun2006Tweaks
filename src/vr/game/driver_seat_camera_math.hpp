@@ -100,6 +100,16 @@ namespace OutRunVR::DriverSeatCamera
             (requested > maximum ? maximum : requested);
     }
 
+    // Persistent DriverSeatView session gate. Native camera mode ordinals,
+    // transition timers and switch counters are intentionally NOT inputs:
+    // those values can pulse while the original camera system updates and
+    // must never eject an already requested VR cockpit.
+    inline bool PersistentDriverSeatSessionEligible(
+        bool enabled, bool gameplayActive) noexcept
+    {
+        return enabled && gameplayActive;
+    }
+
     // Canonical EXE RVA 0x84A40 uses camera+0x340 and +0x344 as
     // native mode-transition counters. Mode +0x34A may already equal the
     // selected bumper view while the original transition is still pending.
