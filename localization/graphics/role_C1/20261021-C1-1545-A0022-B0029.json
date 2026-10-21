@@ -1,0 +1,572 @@
+{
+  "schema": "outrun-c1-independent-lightweight-png-qa-v1",
+  "run_key": "OUTRUN-C1-20261021T1545KST-A0022-B0029-SHA8",
+  "review_slot_kst": "2026-10-21 15:45",
+  "reviewed_at": "2026-10-21",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "provenance": {
+    "source": "N100 actual A/B generated locally saved unapproved PNG",
+    "previous_unique_candidate_sha256": 217,
+    "previous_qa_logs": 39,
+    "distinct_new_sha256_count": 8,
+    "source_manifest": "work/image-src/text_roi_batches/production_manifest.json",
+    "export_evidence": "work/image-src/text_roi_batches/export_evidence",
+    "n100_preflight": "work/c1_batch_20261021_1545/preflight.json",
+    "n100_comparison_images": [
+      "work/c1_batch_20261021_1545/compare_1.jpg",
+      "work/c1_batch_20261021_1545/compare_2.jpg",
+      "work/c1_batch_20261021_1545/compare_3.jpg",
+      "work/c1_batch_20261021_1545/compare_4.jpg"
+    ]
+  },
+  "authority": "Independent C1 PNG text-only QA. Not ImageGen, producer queue, DDS, C2/C3 or in-game PASS. Producer REWORK_DIMENSIONS not cleared.",
+  "counts": {
+    "new_unique_reviewed": 8,
+    "pass_png_text_only": 1,
+    "fail_major_style_effect": 7,
+    "producer_rework_dimensions": 8,
+    "export_sha_match": 8,
+    "source_manifest_sha_match": 8,
+    "rgba_png": 8,
+    "visible_edge_opacity_gt32": 0
+  },
+  "reviews": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0022-93E64A09",
+      "ordinal": 104,
+      "candidate_file": "Q161_a0aa6db4d10210d3_source_k.png",
+      "source_file": "Q161_a0aa6db4d10210d3_source.png",
+      "candidate_sha256": "e16a352f53434ce9abef2848df6325c475b689a822b73f11b694deccd9c02fdf",
+      "source_sha256": "766c978796060d4570cb2199680c934cc4108c3fc1080388451e33f7aa0cfa7a",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "CANCER",
+      "approved_korean": "게자리",
+      "source_dds_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1974,
+        796
+      ],
+      "original_dimensions": [
+        476,
+        192
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        264,
+        9,
+        1799,
+        735
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "CANCER → 게자리 translation is legible, but original flat dark-gray sans-serif is replaced by a thick beveled metallic face, dark rim and heavy shadow. Major effect mismatch; nearby AQUARIUS/GEMINI are source-crop context, not candidate output.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0022-93E64A09",
+      "ordinal": 105,
+      "candidate_file": "Q201_6c6074afa1b7d20c_source_k.png",
+      "source_file": "Q201_6c6074afa1b7d20c_source.png",
+      "candidate_sha256": "673db25ffbb006c9e7360704e0872aefcbd1cc6be4e43e51ecab85899d7336bf",
+      "source_sha256": "7feaf35f751a1f2e715fdfd1558a7d2ab0a5b1663deceb9b2b8a62c02553b363",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "CONIFEROUS FOREST",
+      "approved_korean": "코니퍼러스 포레스트",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1410,
+        258
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        73,
+        138,
+        2111,
+        676
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "CONIFEROUS FOREST mapping correct, but original flat dark-gray small label becomes a very heavy beveled black/gray 3D caption; source crop includes adjacent ICE SCAPE/STAGES context not candidate artifact.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0022-93E64A09",
+      "ordinal": 106,
+      "candidate_file": "Q201_3b7fd48bbb461965_source_k.png",
+      "source_file": "Q201_3b7fd48bbb461965_source.png",
+      "candidate_sha256": "bd9565c6692ac1a1624b2df6179a7adeeb7e7cae6921e290a463f378d970afe3",
+      "source_sha256": "368db7ee99277d4f740305d61256be90e917b37e6d87e9d63ccfb1a455b9ad74",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "GHOST FOREST",
+      "approved_korean": "고스트 포레스트",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1325,
+        417
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        21,
+        194,
+        2110,
+        562
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "GHOST FOREST correctly rendered, but source flat gray label is converted to large beveled metallic 3D with heavy outline and deep shadow; other English labels in the source crop are adjacent context.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0022-93E64A09",
+      "ordinal": 107,
+      "candidate_file": "Q201_6778b69f379bb455_source_k.png",
+      "source_file": "Q201_6778b69f379bb455_source.png",
+      "candidate_sha256": "99588d1b46767d2aafd61651d3facbd5d94c447425c11eaa452ad0f10c2a82c8",
+      "source_sha256": "57a59aaea09024f3711f2e0a6a85e2e9118992548a6ac01c19e8a8ab6b30004b",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "GIANT STATUES",
+      "approved_korean": "자이언트 스태추스",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1328,
+        417
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        104,
+        108,
+        2145,
+        603
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "GIANT STATUES mapping legible, but thick metallic bevel, highlight and black drop shadow are materially unlike the original flat dark-gray type.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0022-93E64A09",
+      "ordinal": 108,
+      "candidate_file": "Q201_db8e245fa0b72388_source_k.png",
+      "source_file": "Q201_db8e245fa0b72388_source.png",
+      "candidate_sha256": "459e8abe219080b2190a85e89f621824593437678509a6d0c15b1cf6a5cd449f",
+      "source_sha256": "a817cae7d34e63b4f188dcaef7ebaa304e01a2a307820970e3eee5640a0cdd56",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "BIG FOREST",
+      "approved_korean": "빅 포레스트",
+      "source_dds_sha256": "6ac5ffd02c9162499f09f0b476176b56f0b144789f546ef34147d94e0a8451e5",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1190,
+        417
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        146,
+        45,
+        1989,
+        636
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "BIG FOREST mapping correct, but 3D extruded metallic styling/black outline departs substantially from original flat dark gray lettering.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0029-D33C4DD4",
+      "ordinal": 138,
+      "candidate_file": "Q101_1fab381961c8f33b_source_k.png",
+      "source_file": "Q101_1fab381961c8f33b_source.png",
+      "candidate_sha256": "924039a177e5314579dc20bbeabc12c2f4a017b42901b0e8960e3d626655716d",
+      "source_sha256": "cce5a11acdc845e42e6d24f4fe3ca9ed4f57395b388cd0e284abfdd011cca964",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "RANDOM",
+      "approved_korean": "무작위",
+      "source_dds_sha256": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        1890,
+        832
+      ],
+      "original_dimensions": [
+        586,
+        258
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        293,
+        203,
+        1692,
+        782
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "PASS_PNG_TEXT_ONLY",
+      "visual_reason": "RANDOM → 무작위 is clear, white italic and navy outlined with matching rightward slant; blue original panel is intentionally excluded from the requested transparent lettering-only candidate.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": true,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0029-D33C4DD4",
+      "ordinal": 139,
+      "candidate_file": "Q133_3d0299d1dd609699_source_k.png",
+      "source_file": "Q133_3d0299d1dd609699_source.png",
+      "candidate_sha256": "c6547d13c00bb18f0b3fe1cce37d1f336dd2f5089ade80df6350a8081835497a",
+      "source_sha256": "7c9b5c96ba8b4ba9eac8ca115349635d60058071e4ee6fb12ee071b3ad284a07",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "ROSSO SCUDERIA",
+      "approved_korean": "로쏘 스쿠데리아",
+      "source_dds_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "original_dimensions": [
+        1104,
+        152
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        51,
+        35,
+        2148,
+        636
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "ROSSO SCUDERIA mapping correct, but original faint flat gray all-caps becomes thick dark metallic beveled/double-outlined Hangul. Marked major style/effect mismatch.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "role": "B",
+      "task_id": "OUTRUN-ROI-B-0029-D33C4DD4",
+      "ordinal": 140,
+      "candidate_file": "Q111_e7419005169a5220_source_k.png",
+      "source_file": "Q111_e7419005169a5220_source.png",
+      "candidate_sha256": "a3f84e0c14ff7671cb958fa64a9e18a1bdd39a8065e2f9cbc2c8ce7b3614cbcb",
+      "source_sha256": "9004602140a0e472345fc73741cc00f35d47531ff5ccf0ac0272f611ca09dbd8",
+      "export_sha_match": true,
+      "manifest_sha_match": true,
+      "english": "Maximum Speed",
+      "approved_korean": "최고 속도",
+      "source_dds_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "format": "PNG",
+      "mode": "RGBA",
+      "dimensions": [
+        2099,
+        749
+      ],
+      "original_dimensions": [
+        818,
+        292
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bbox": [
+        113,
+        26,
+        1999,
+        725
+      ],
+      "edge_opacity": {
+        "top": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "bottom": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "left": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        },
+        "right": {
+          "gt0": 0,
+          "gt32": 0,
+          "max": 0
+        }
+      },
+      "producer_status": "REWORK_DIMENSIONS",
+      "c1_verdict": "FAIL_MAJOR_STYLE_EFFECT",
+      "visual_reason": "Maximum Speed source is white slanted italic plain lettering; candidate 최고 속도 is bright red embossed chrome with thick navy extrusion, a major color and style conflict.",
+      "text_length_difference_ignored": true,
+      "per_glyph_size_and_readability": "PASS",
+      "source_bbox_containment": "UNTESTED_WITHOUT_UI_COMPOSITION",
+      "c1_png_text_only_pass": false,
+      "producer_rework_dimensions_preserved": true,
+      "dds_approval": false,
+      "c2_c3_approval": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "caveat": "This is glyph-only visual QA. Source ROI crops can contain adjacent English labels/art; these are not inferred as defects in the transparent Korean candidate. Original HD UI-cell containment, saved DDS RAW/FLIP-Y, mip levels, game use are UNTESTED. All eight original and generated dimensions differ. No automatic DDS deployment or producer queue mutation."
+}
