@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "kind": "vr_ai_feature_progress",
+  "task_id": "CONVERSION-DX11-00973",
+  "production_id": "CONVERSION-DX11-00973",
+  "event_id": "CONVERSION-DX11-00973-E003",
+  "event_type": "rollover",
+  "attempt": 1,
+  "chat_rollover": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "verified_target_base_sha": "28fe8afab2a96f8348886fbb17a7f83d61cd3891",
+  "feature_id": "DX11:FULL_RESOLUTION_NATIVE_GAME_FRAME",
+  "feature_branch": "feature/dx11-00973-live-cube-rt-game-frame",
+  "feature_base_sha": "28fe8afab2a96f8348886fbb17a7f83d61cd3891",
+  "feature_last_head": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+  "feature_stage": "C3_VALIDATING_CUBE_RT_LIVE_GAME_SM3_NATIVE_DRAW",
+  "material_sha": "f8122861b788d9f3ae02d959aef610301969a4dc",
+  "validation_bearing_candidate_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a",
+  "changed_paths": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_cube_rt_readback.hpp",
+    "tools/dx11_live_game_cube_rt_00973.cpp",
+    "tools/test_dx11_live_game_cube_rt_00973.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_game_rt_mips_00742.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/vr-openxr.yml",
+    "docs/automation/runs/CONVERSION-DX11-00973.json"
+  ],
+  "acceptance_items_pending": [
+    "Wait for all five exact-SHA Actions to succeed",
+    "Perform GitHub compare behind=0 and expected target SHA check",
+    "Promote proven exact SHA to target with force=false",
+    "Verify target Actions and artifact bundles",
+    "Complete C6 record; runtime_validation remains UNTESTED"
+  ],
+  "next_action": "Read live five GitHub Actions for d06e0c09. If all SUCCESS and compare behind=0, re-fetch target HEAD and fast-forward expected_sha, force=false; otherwise repair only the failure in same TASK_ID and same FEATURE_ID. No new WARP feature.",
+  "ci_observed_at": "2026-10-21T22:03:00+09:00",
+  "gates": {
+    "OutRun EXE HUD Inspector CI": {
+      "id": 39603402679,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+    },
+    "DX11 Fast Structural Checks": {
+      "id": 39603402957,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+    },
+    "Backend Conversion Gate": {
+      "id": 39603402818,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+    },
+    "OpenXR VR architecture": {
+      "id": 39603403233,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+    },
+    "Build": {
+      "id": 39603403009,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "d06e0c096f54e1261cf55907f812e721f5a3f23a"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "game_native_draws": "UNTESTED",
+  "game_visible_pixels": "UNTESTED",
+  "dx9ex_fallback_preserved": true,
+  "note": "Checkpoint is a contemporaneous AI-authored snapshot, not controller event/attempt mutation. Original 21:30 controller checkpoint remains unchanged. Target must not be advanced on fewer than five green CI gates."
+}
