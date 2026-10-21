@@ -10,7 +10,7 @@
   "attempt": "1/3",
   "lane": "DX11",
   "status": "IN_PROGRESS",
-  "feature_stage": "C3_VALIDATE",
+  "feature_stage": "C3_SOURCE_CI_PASS_RUNTIME_PENDING",
   "feature_id": "DX11:LIVE_GAME_DRAW_SOURCE_CAPTURE_TO_NATIVE_FRAME",
   "feature_branch": "feature/dx11-00966-live-source-capture",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
@@ -21,7 +21,7 @@
   "build_failure_causal_test_repair": "e33913a260ade70adc5eb5204fa18774cef48774",
   "five_gate_path_filter_repair": "a7e49477e2c261a990858c1dfc37433017b8b591",
   "ci_candidate_sha": "a7e49477e2c261a990858c1dfc37433017b8b591",
-  "ci_validation": "FIVE_WORKFLOWS_DISPATCHED_PENDING",
+  "ci_validation": "FIVE_EXACT_SHA_SUCCESS",
   "prior_five_pass_exact_sha": "0e666581ad195cf18dbd2f8a035a493e1097f7a2",
   "runtime_validation": "UNTESTED",
   "feature_ready": false,
@@ -36,10 +36,37 @@
     ".github/workflows/outrun-exe-hud-inspector.yml"
   ],
   "remaining_acceptance_items": [
-    "Confirm all five required Actions succeed on exact a7e49477 SHA; repair actual failure only",
-    "Obtain real game same-launch opt-in native_draws>0, published frames>0 and visible menu/vehicle/race pixel proof",
-    "Preserve DX9Ex fallback, game input/FFB, fail-closed diagnostic, no stereo mono substitution",
-    "Only upon feature completion: submit FEATURE_READY, compare behind=0, expected-sha force=false promote to target and C6"
+    "Run actual opt-in game and obtain same-launch native_draws>0, native-published frames>0, visible menu/vehicle/race pixels, Quest3 evidence. Runtime UNTESTED until demonstrated.",
+    "If actual game draw or publication fails, repair observed root cause on same feature/TASK_ID, preserve original DX9Ex and game input/FFB.",
+    "After runtime evidence and complete acceptance only: FEATURE_READY, nonforce expected-sha target promotion, post-promotion exact SHA Actions, C6."
   ],
-  "next_action": "Verify exact-SHA CI a7e49477 and fix causal failures in same TASK_ID; no readiness or target promotion until actual game visible-frame acceptance."
+  "next_action": "Collect actual game Draw/visible-frame evidence for the current exact source; do not promote or mark READY based on five source-only CI gates.",
+  "exact_sha_gates": {
+    "dx11_fast": {
+      "run_id": 39547734826,
+      "conclusion": "success"
+    },
+    "backend": {
+      "run_id": 39547734730,
+      "conclusion": "success"
+    },
+    "windows_build": {
+      "run_id": 39547734735,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 39547734781,
+      "conclusion": "success"
+    },
+    "hud": {
+      "run_id": 39547734726,
+      "conclusion": "success"
+    }
+  },
+  "artifacts_verified": [
+    "outrun2006tweaks-a7e49477e2c261a990858c1dfc37433017b8b591",
+    "wheel-source-a7e49477e2c261a990858c1dfc37433017b8b591",
+    "outrun2006-vr-x86-c2-r30-hud",
+    "outrun-vr-host-x64"
+  ]
 }
