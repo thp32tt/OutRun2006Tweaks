@@ -307,13 +307,25 @@ if (-not [string]::IsNullOrWhiteSpace($env:OUTRUN_TEST_DROP_ROOT)) {
 # Never publish an older queued build over the newest test folder.
 # The runner checkout stays pinned to ExpectedSha; also verify the GitHub
 # branch tip *at publication time*, after all expensive compilation is done.
-if ($ExpectedSha) {
-    $remote = @(git ls-remote --heads origin refs/heads/vr-d3d9ex-focus)
+$hostedArtifactBuild = $env:GITHUB_ACTIONS -eq 'true'
+if ($ExpectedSha -and -not $hostedArtifactBuild) {
+    $publicationBranch = if ([string]::IsNullOrWhiteSpace($env:GITHUB_REF_NAME)) {
+        'vr-d3d9ex-focus'
+    } else {
+        $env:GITHUB_REF_NAME
+    }
+    $remote = @(git ls-remote --heads origin ("refs/heads/{0}" -f $publicationBranch))
     if ($LASTEXITCODE -ne 0 -or $remote.Count -ne 1) { throw 'PC Fast cannot verify branch tip before publication' }
     $remoteSha = ($remote[0] -split '\s+')[0]
     if ($remoteSha -ne $ExpectedSha) {
         throw "PC Fast stale build blocked before LATEST publication: expected=$ExpectedSha remote=$remoteSha"
     }
+} elseif ($ExpectedSha -and $hostedArtifactBuild) {
+    # GitHub artifacts are immutable and SHA-named. A docs-only branch advance
+    # during a long clean hosted build must not discard an already verified
+    # exact-SHA ZIP; only the persistent self-hosted LATEST path needs the
+    # branch-tip publication fence.
+    Write-Host "PC Fast hosted artifact: exact SHA package retained even if branch tip advances ($ExpectedSha)"
 }
 $latestDrop = Join-Path $dropRoot 'LATEST'
 New-Item -ItemType Directory -Force $dropRoot | Out-Null
