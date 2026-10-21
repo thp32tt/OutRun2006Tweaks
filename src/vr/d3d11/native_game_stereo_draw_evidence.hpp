@@ -263,6 +263,27 @@ static_assert(authored_visible_color_output_ready(3u, 0u, 1u, 0u, 0u, 1u, 0u));
 // XR eye. A full TARGET Clear followed by offscreen-only geometry leaves a
 // clear-colored eye, not a native game frame. Depth-only ON-EYE geometry may
 // still validate an authored full color clear (as in the original D3D9 path).
+// Several game-authored clipped TARGET Clears may form an entire eye with
+// exact GPU pixel coverage. Unlike a synthetic full-clear seed, this path
+// is admissible only after a genuine unpredicated on-eye Draw FOLLOWING the
+// most recent Clear. Offscreen-only geometry, old pixels and empty Clears
+// do not authorize OpenXR publication.
+[[nodiscard]] constexpr bool authored_partial_target_mosaic_eye_ready(
+    bool exactFullEyeClearCoverage, std::uint64_t geometryDraws,
+    std::uint64_t unpredicatedGameDraws,
+    std::uint64_t unpredicatedEyeDraws,
+    std::uint64_t unpredicatedEyeDrawsAtLastPartialClear) noexcept {
+    return exactFullEyeClearCoverage && geometryDraws != 0u &&
+        unpredicatedGameDraws != 0u &&
+        unpredicatedEyeDraws <= unpredicatedGameDraws &&
+        unpredicatedEyeDraws > unpredicatedEyeDrawsAtLastPartialClear;
+}
+static_assert(authored_partial_target_mosaic_eye_ready(true, 3, 2, 2, 1));
+static_assert(!authored_partial_target_mosaic_eye_ready(false, 3, 2, 2, 1));
+static_assert(!authored_partial_target_mosaic_eye_ready(true, 3, 2, 1, 1));
+static_assert(!authored_partial_target_mosaic_eye_ready(true, 3, 2, 0, 0));
+static_assert(!authored_partial_target_mosaic_eye_ready(true, 3, 0, 1, 0));
+static_assert(!authored_partial_target_mosaic_eye_ready(true, 3, 1, 2, 0));
 [[nodiscard]] constexpr bool authored_visible_eye_frame_ready(
     std::uint64_t geometryDraws, std::uint64_t directColorDraws,
     std::uint32_t authoredColorPostpasses,

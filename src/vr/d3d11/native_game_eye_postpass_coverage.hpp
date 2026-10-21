@@ -120,6 +120,7 @@ class NativeGameEyeColorChronology final {
 public:
     void reset_after_full_target_clear() noexcept {
         postpasses_.reset();
+        authoredClears_.reset();
         unprovenGpuRegions_.reset();
         unknownLedgerOverflow_ = false;
         completeUnknownReplacement_ = false;
@@ -130,6 +131,9 @@ public:
         if (!native_game_offscreen_color_region_valid(dest)) return;
         if (!unprovenGpuRegions_.invalidate(dest))
             unknownLedgerOverflow_ = true;
+        // A camera postpass replaces these eye pixels: do not continue
+        // counting the old TARGET Clear as physically current color.
+        (void)authoredClears_.invalidate(dest);
         postpasses_.record(dest);
         if (unprovenGpuRegions_.empty() && !unknownLedgerOverflow_)
             completeUnknownReplacement_ = false;
@@ -140,6 +144,7 @@ public:
     void record_authored_target_clear(NativeGameOffscreenColorRegion dest) noexcept {
         if (!native_game_offscreen_color_region_valid(dest)) return;
         (void)postpasses_.invalidate(dest);
+        authoredClears_.record(dest);
         if (!unprovenGpuRegions_.invalidate(dest))
             unknownLedgerOverflow_ = true;
         if (unprovenGpuRegions_.empty() && !unknownLedgerOverflow_)
@@ -150,6 +155,9 @@ public:
         std::uint32_t eyeWidth = 0u, std::uint32_t eyeHeight = 0u) noexcept {
         if (!native_game_offscreen_color_region_valid(dest)) return;
         (void)postpasses_.invalidate(dest);
+        // Foreign GPU pixels replace real game TARGET-clear pixels too.
+        // Exact union coverage must be re-established before admission.
+        (void)authoredClears_.invalidate(dest);
         // Later partial geometry cannot prove it repainted the foreign
         // region. Keep the native XR frame fail-closed until source-proven
         // GPU work covers the entire eye, or a real full-eye Clear resets it.
@@ -170,6 +178,13 @@ public:
             unprovenGpuRegions_.full_eye(eyeWidth, eyeHeight))
             completeUnknownReplacement_ = true;
     }
+    // A game can paint its entire native eye through several genuine,
+    // clipped TARGET Clears rather than one whole-RT command. Retain only
+    // exact current GPU pixels (Copy/Stretch overwrite invalidates them).
+    [[nodiscard]] bool full_authored_clear_eye(std::uint32_t width,
+                                                std::uint32_t height) const noexcept {
+        return authoredClears_.full_eye(width, height);
+    }
     [[nodiscard]] bool full_postpass_eye(std::uint32_t width,
                                          std::uint32_t height) const noexcept {
         return postpasses_.full_eye(width, height);
@@ -182,6 +197,7 @@ public:
     }
 private:
     NativeGameEyePostpassCoverage postpasses_{};
+    NativeGameEyePostpassCoverage authoredClears_{};
     NativeGameEyePostpassCoverage unprovenGpuRegions_{};
     bool unknownLedgerOverflow_{};
     bool completeUnknownReplacement_{};

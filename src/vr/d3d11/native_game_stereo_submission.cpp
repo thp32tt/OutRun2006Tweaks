@@ -1458,6 +1458,7 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
         lastFullClearDrawOrdinal_ = history.lastFullClearDrawOrdinal;
         if (lastTargetClearFull_) {
             eyeColorChronology_.reset_after_full_target_clear();
+            unpredicatedEyeAtLastPartialClear_ = unpredicatedEyeDrawCount_;
             unpredicatedAtLastFullClear_ = unpredicatedGameDrawCount_;
             unpredicatedEyeAtLastFullClear_ = unpredicatedEyeDrawCount_;
         } else if (actual) {
@@ -1469,6 +1470,9 @@ bool NativeGameEyeDrawEncoder::clear_target_argb(
                 static_cast<std::uint32_t>(actual->top),
                 static_cast<std::uint32_t>(actual->right),
                 static_cast<std::uint32_t>(actual->bottom)});
+            // No on-eye geometry issued before this final Clear can
+            // certify a freshly cleared menu/car/race image.
+            unpredicatedEyeAtLastPartialClear_ = unpredicatedEyeDrawCount_;
         }
     }
     return written;
@@ -2994,7 +2998,18 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
             if (!encoder.finish_source_clear_timeline())
                 return false;
             const auto& evidence = invocation.eye[eyeIndex];
-            if (!live_game_stereo::authored_visible_eye_frame_ready(
+            // The GPU may have painted a full menu/vehicle/race eye from
+            // several authentic, viewport-clipped TARGET Clears. Preserve
+            // that real color route when a later eye Draw supplies game
+            // geometry; do not mistake a pre-Clear draw or offscreen-only
+            // work for a complete visible eye.
+            const bool partialClearEyeReady =
+                live_game_stereo::authored_partial_target_mosaic_eye_ready(
+                    encoder.authored_partial_clear_full_eye_coverage(),
+                    encoder.draw_count(), encoder.unpredicated_game_draw_count(),
+                    encoder.unpredicated_eye_draw_count(),
+                    encoder.unpredicated_eye_at_last_partial_clear());
+            if ((!live_game_stereo::authored_visible_eye_frame_ready(
                     encoder.draw_count(), encoder.color_draw_count(),
                     encoder.authored_color_postpass_count(),
                     encoder.authored_full_color_clear_count(),
@@ -3002,7 +3017,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                     encoder.unpredicated_game_draw_count(),
                     encoder.unpredicated_at_last_full_clear(),
                     encoder.unpredicated_eye_draw_count(),
-                    encoder.unpredicated_eye_at_last_full_clear()) ||
+                    encoder.unpredicated_eye_at_last_full_clear()) &&
+                 !partialClearEyeReady) ||
                 // Without genuine on-eye color or a game full-eye Clear,
                 // partially imported menu/HUD tiles are not a full native
                 // frame. Admit adjacent genuine Copy/Stretch destinations
@@ -3010,7 +3026,8 @@ bool NativeGameStereoSubmission::render_game_eye_passes(
                 (encoder.color_draw_count() == 0u &&
                  encoder.authored_full_color_clear_count() == 0u &&
                  encoder.authored_color_postpass_count() != 0u &&
-                 !encoder.postpass_full_eye_coverage()) ||
+                 !encoder.postpass_full_eye_coverage() &&
+                 !partialClearEyeReady) ||
                 // A later unproven GPU Copy/Stretch replaces real Draw and
                  // full TARGET Clear color without rewinding Draw counts.
                  // Demand an authentic complete eye repaint or full Clear.

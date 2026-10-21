@@ -170,6 +170,15 @@ public:
     [[nodiscard]] bool postpass_full_eye_coverage() const noexcept {
         return eyeColorChronology_.full_postpass_eye(targetWidth_, targetHeight_);
     }
+    // Several authentic clipped TARGET Clears can cover all real eye
+    // pixels. They count as a seed ONLY with an unpredicated on-eye Draw
+    // after the last Clear; this does not synthesize color Draw evidence.
+    [[nodiscard]] bool authored_partial_clear_full_eye_coverage() const noexcept {
+        return eyeColorChronology_.full_authored_clear_eye(targetWidth_, targetHeight_);
+    }
+    [[nodiscard]] std::uint64_t unpredicated_eye_at_last_partial_clear() const noexcept {
+        return unpredicatedEyeAtLastPartialClear_;
+    }
     // Do not certify a native Eye from Draw/Clear evidence predating a
     // later foreign GPU Copy/Stretch. Real full-eye repaint can recover.
     [[nodiscard]] bool eye_color_chronology_safe() const noexcept {
@@ -253,6 +262,7 @@ private:
     std::array<OffscreenColorSource, 32u> offscreenColorSources_{};
     std::uint32_t authoredFullColorClearCount_{};
     std::uint64_t lastFullClearDrawOrdinal_{};
+    std::uint64_t unpredicatedEyeAtLastPartialClear_{};
     bool lastTargetClearFull_{};
     const NativeGameEyePartialTargetClear* sourceClears_{};
     std::uint32_t sourceClearEye_{}, sourceClearCursor_{};
