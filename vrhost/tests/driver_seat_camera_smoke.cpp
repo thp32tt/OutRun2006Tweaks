@@ -1,4 +1,5 @@
 #include "vr/game/driver_seat_camera_math.hpp"
+#include "vr/game/driver_seat_car_space.hpp"
 #include <cmath>
 #include <limits>
 
@@ -155,6 +156,35 @@ int main()
     if (PersistentDriverSeatSessionEligible(false, true) ||
         PersistentDriverSeatSessionEligible(true, false))
         return 25;
+
+
+    // Quest-style cockpit anchor is independent from the native PC camera.
+    // Translation comes from matrix_B0 origin + car-local forward/right/up.
+    using OutRunVR::DriverSeatCamera::ComputeCarAnchoredSeatPose;
+    using OutRunVR::DriverSeatCamera::CarAxes;
+    Vec3 questSeat{}, questLook{};
+    if (!ComputeCarAnchoredSeatPose({10.f, 20.f, 30.f},
+            {{0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}},
+            -1.35f, -0.32f, 0.65f, questSeat, questLook))
+        return 26;
+    if (!near(questSeat.x, 10.32f) ||
+        !near(questSeat.y, 20.65f) ||
+        !near(questSeat.z, 28.65f) ||
+        !near(questLook.x, 10.32f) ||
+        !near(questLook.y, 20.65f) ||
+        !near(questLook.z, 29.65f))
+        return 27;
+    const Vec3 committedQuestSeat = questSeat;
+    const Vec3 committedQuestLook = questLook;
+    if (ComputeCarAnchoredSeatPose({10.f, 20.f, 30.f},
+            {{0.f, 0.f, 0.f}, {0.f, 1.f, 0.f}},
+            -1.35f, -0.32f, 0.65f, questSeat, questLook))
+        return 28;
+    if (!near(questSeat.x, committedQuestSeat.x) ||
+        !near(questSeat.y, committedQuestSeat.y) ||
+        !near(questSeat.z, committedQuestSeat.z) ||
+        !near(questLook.z, committedQuestLook.z))
+        return 29;
 
     return 0;
 }
