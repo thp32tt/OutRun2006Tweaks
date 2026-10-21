@@ -24,7 +24,7 @@
   "NATIVE_PUBLISHED_FRAME_COUNT": "UNTESTED",
   "NEXT_SOURCE_FILE": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "NEXT_IMPLEMENTATION_ACTION": "Verify exact-SHA Gates; obtain actual menu/car/race draw evidence, then continue native program/resource/full-frame graph under existing DX9Ex fallback",
-  "CODE_CHANGED_SHA": "PENDING_POST_COMMIT",
+  "CODE_CHANGED_SHA": "38538e846d0d93375e0962c6177b330b52dd8111",
   "score_change": 0,
   "work_time_percentages": "NOT_MEASURED",
   "development_strategy": {
@@ -91,9 +91,9 @@
     ]
   },
   "acceptance_results": {
-    "full_sm3_game_interface": "PENDING_EXACT_SHA",
-    "multistream_native_mesh_safety": "PENDING_EXACT_SHA",
-    "mandatory_five_gate_exact_sha": "PENDING_EXACT_SHA"
+    "full_sm3_game_interface": "PASS_EXACT_SHA",
+    "multistream_native_mesh_safety": "PASS_EXACT_SHA",
+    "mandatory_five_gate_exact_sha": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/native_backend.cpp",
@@ -103,5 +103,7 @@
     "tools/dx11_sm3_interface_draw_probe_00964.cpp",
     "tools/test_dx11_sm3_interface_draw_00964.py",
     "docs/automation/runs/CONVERSION-DX11-00964.json"
-  ]
+  ],
+  "material_result_sha": "38538e846d0d93375e0962c6177b330b52dd8111",
+  "c6_result_note": "Reconciled acceptance results with existing exact-SHA 38538e846d0d93375e0962c6177b330b52dd8111 five-gate SUCCESS; no source rerun, no new 00964 score. HMD UNTESTED."
 }

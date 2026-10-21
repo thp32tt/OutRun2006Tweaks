@@ -3939,8 +3939,8 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
         (base.Usage & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL |
                        D3DUSAGE_AUTOGENMIPMAP)) != 0u)
         return false;
-    const bool bc1 = base.Format == D3DFMT_DXT1;
-    const bool bc3 = base.Format == D3DFMT_DXT3 || base.Format == D3DFMT_DXT5;
+    const bool bc1 = D3DFMT_DXT1 == base.Format;
+    const bool bc3 = D3DFMT_DXT3 == base.Format || D3DFMT_DXT5 == base.Format;
     const bool compressed = bc1 || bc3;
     const bool opaque = base.Format == D3DFMT_X8R8G8B8;
     if (!compressed && !opaque && base.Format != D3DFMT_A8R8G8B8)
@@ -3963,9 +3963,9 @@ bool mirror_cube_texture(ID3D11Device* dev, const TextureCapture& capture,
     }
     const DXGI_FORMAT format = bc1
         ? (capture.srgbTexture ? DXGI_FORMAT_BC1_UNORM_SRGB : DXGI_FORMAT_BC1_UNORM)
-        : base.Format == D3DFMT_DXT3
+        : D3DFMT_DXT3 == base.Format
         ? (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM)
-        : base.Format == D3DFMT_DXT5
+        : D3DFMT_DXT5 == base.Format
         ? (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM)
         : (capture.srgbTexture ? DXGI_FORMAT_B8G8R8A8_UNORM_SRGB
                                : DXGI_FORMAT_B8G8R8A8_UNORM);
