@@ -13,8 +13,8 @@
   "feature_stage": "FEATURE_READY_PROMOTED_C6_SOURCE_CI_VERIFIED",
   "feature_base_sha": "fc2065e55bf63830b91eeffbcb61b4552cfa1b46",
   "feature_last_head": "0faf8807b2cebd429496b08a66f9370535a293ec",
-  "status": "SOURCE_CI_VERIFIED_GAME_FRAME_PENDING",
-  "checkpoint": "C6_SOURCE_CI_VERIFIED_GAME_FRAME_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "full_dx11_renderer_complete": false,
@@ -144,7 +144,7 @@
     "C3_VALIDATE": "PASS_EXACT_SHA: feature branch five runs 39557705574/39557705584/39557705520/39557705443/39557705455 and post-promotion target five runs 39564130518/39564130486/39564130565/39564130437/39564130576 all SUCCESS for 0faf8807...",
     "C4_COMMIT": "PASS: target branch safely fast-forwarded to 0faf8807... from fc2065... with compare behind=0, expected_sha and force=false. Original material source commit retains exact task marker.",
     "C5_PACKAGE": "PASS_SOURCE_BUNDLE: Windows Release outrun2006tweaks-0faf8807... and backend-autovalidated-0faf8807... produced; no real game installation/HMD execution.",
-    "C6_RESULT": "PASS_DURABLE_SOURCE_CI_CHECKPOINT: this docs-only record updates exact validated source evidence after required target CI; native menu/car/race pixels, source coverage and Quest3 runtime still UNTESTED."
+    "C6_RESULT": "PASS_EXACT_SHA: five mandatory target-branch GitHub CI workflows SUCCESS for the unchanged validation-bearing source SHA 0faf8807b2cebd429496b08a66f9370535a293ec. C6 bookkeeping terminal status COMPLETE_BUILD_VERIFIED (source/build verified only); real game native published frame/gameplay/HMD RUNTIME_VALIDATION=UNTESTED. This [skip ci] commit is not a new validation-bearing or material result and awards no duplicate score."
   },
   "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
   "RUNTIME_VALIDATION": "UNTESTED",
