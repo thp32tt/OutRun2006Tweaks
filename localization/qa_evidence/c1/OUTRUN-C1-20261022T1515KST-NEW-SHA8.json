@@ -1,0 +1,964 @@
+{
+  "run_key": "OUTRUN-C1-20261022T1515KST-NEW-SHA8",
+  "source_branch": "korean-localization-recovery-20260928",
+  "scope": "8 previously unreviewed A/B ChatGPT ImageGen PNG candidates; independent C1 QA only, no queue consumption, no DDS/game approval",
+  "inventory_checked_kst": "2026-10-22T15:18:20+09:00",
+  "previously_reviewed_unique_candidate_shas": 359,
+  "pending_unique_shas_at_inventory": 19,
+  "selected_count": 8,
+  "summary": {
+    "pass_png_text_only_pending_native_placement": 7,
+    "fail_protected_art_redrawn": 1,
+    "generated_png_rgba_with_alpha": 8,
+    "source_sha_and_export_candidate_sha_verified": 8,
+    "source_and_output_dimensions_differ": 8,
+    "meaningful_alpha_border_clipping_observed": 0,
+    "full_native_placement_approved": 0
+  },
+  "evidence_n100": [
+    "work/c1_20261022_1515_inventory_result.json",
+    "work/c1_20261022_1515_metrics.json",
+    "work/c1_20261022_1515_edges.json",
+    "work/c1_20261022_1515_src.png",
+    "work/c1_20261022_1515_kor.png"
+  ],
+  "records": [
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0030-8A878854",
+      "candidate_file": "Q051_ed7b814c9e962086_source_k.png",
+      "candidate_sha256": "597052dcca854de910fd6f18b04fd862eb1bf20012f4b5c06c0dfb8e5cbcbc1a",
+      "source_file": "Q051_ed7b814c9e962086_source.png",
+      "source_sha256": "feb8f4a734dbc922aed48ff132076eea625836453aeaa78b9ddde48621e05b6d",
+      "manifest_english": "BAD NAME",
+      "approved_korean": "부적절한 이름",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1620,
+          280
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          163,
+          71,
+          1169,
+          241
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 83697,
+        "sha256": "feb8f4a734dbc922aed48ff132076eea625836453aeaa78b9ddde48621e05b6d"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          41,
+          48,
+          2096,
+          698
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 523777,
+        "sha256": "597052dcca854de910fd6f18b04fd862eb1bf20012f4b5c06c0dfb8e5cbcbc1a"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q051_ed7b814c9e962086_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            41,
+            48,
+            2096,
+            698
+          ],
+          "8": [
+            90,
+            176,
+            2089,
+            509
+          ],
+          "32": [
+            90,
+            176,
+            2087,
+            508
+          ],
+          "128": [
+            91,
+            177,
+            2086,
+            507
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "BAD NAME visible on isolated lettering ROI, candidate 부적절한 이름 readable, no added panel observed.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0030-8A878854",
+      "candidate_file": "Q051_a1d7548e0dddeebe_source_k.png",
+      "candidate_sha256": "3eb633d60233eb8b6bb6a35b0ee19166439d679be1feed7bf6823b082f5e2883",
+      "source_file": "Q051_a1d7548e0dddeebe_source.png",
+      "source_sha256": "1463e463d099ccfd95de605929aeb73a3c1d99b9a7e927d5769e88f269a9546c",
+      "manifest_english": "CHEATING",
+      "approved_korean": "부정행위",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1576,
+          280
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          147,
+          83,
+          1101,
+          261
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 81366,
+        "sha256": "1463e463d099ccfd95de605929aeb73a3c1d99b9a7e927d5769e88f269a9546c"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          43,
+          3,
+          2037,
+          699
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 569105,
+        "sha256": "3eb633d60233eb8b6bb6a35b0ee19166439d679be1feed7bf6823b082f5e2883"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q051_a1d7548e0dddeebe_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            43,
+            3,
+            2037,
+            699
+          ],
+          "8": [
+            251,
+            161,
+            1903,
+            581
+          ],
+          "32": [
+            251,
+            162,
+            1903,
+            581
+          ],
+          "128": [
+            251,
+            162,
+            1902,
+            580
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "CHEATING lettering ROI and 부정행위 match, glyphs readable.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "candidate_file": "Q051_9304c5b2429309d1_source_k.png",
+      "candidate_sha256": "a5c42284ace1c69649b25dbecc6e242c960cb56019c19898ea7d7cb050225ed4",
+      "source_file": "Q051_9304c5b2429309d1_source.png",
+      "source_sha256": "fc1fb294d22dee9dbbd406905b4e2a91336076b707f06b537446ad776e7e27e3",
+      "manifest_english": "ENTER ACCOUNT PASSWORD:",
+      "approved_korean": "계정 비밀번호 입력:",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1786,
+          164
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          120,
+          30,
+          1425,
+          121
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 65450,
+        "sha256": "fc1fb294d22dee9dbbd406905b4e2a91336076b707f06b537446ad776e7e27e3"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          122,
+          64,
+          2152,
+          627
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 396410,
+        "sha256": "a5c42284ace1c69649b25dbecc6e242c960cb56019c19898ea7d7cb050225ed4"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q051_9304c5b2429309d1_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            122,
+            64,
+            2152,
+            627
+          ],
+          "8": [
+            126,
+            242,
+            2047,
+            477
+          ],
+          "32": [
+            126,
+            242,
+            2047,
+            475
+          ],
+          "128": [
+            127,
+            242,
+            2046,
+            474
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "ENTER ACCOUNT PASSWORD: lettering ROI and 계정 비밀번호 입력: readable and match.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "candidate_file": "Q053_6783160f10e0fead_source_k.png",
+      "candidate_sha256": "400561c98fc417ebe5d5985db6dd0f15638f18900e7b88c00dcb5a09d02f3774",
+      "source_file": "Q053_6783160f10e0fead_source.png",
+      "source_sha256": "35e8a2ec725a73e306577bad0777c8a7dea137fc01dab3e8ebf75b36c61d9ad7",
+      "manifest_english": "Hit the ducks!",
+      "approved_korean": "오리를 맞히세요!",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1024,
+          278
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          22,
+          104,
+          944,
+          265
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 134634,
+        "sha256": "35e8a2ec725a73e306577bad0777c8a7dea137fc01dab3e8ebf75b36c61d9ad7"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          29,
+          0,
+          2142,
+          692
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 698618,
+        "sha256": "400561c98fc417ebe5d5985db6dd0f15638f18900e7b88c00dcb5a09d02f3774"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q053_6783160f10e0fead_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 9,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            29,
+            0,
+            2142,
+            692
+          ],
+          "8": [
+            34,
+            224,
+            2128,
+            561
+          ],
+          "32": [
+            35,
+            224,
+            2128,
+            560
+          ],
+          "128": [
+            36,
+            224,
+            2127,
+            560
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "Hit the ducks! -> 오리를 맞히세요! readable, source outline preserved in broad styling; top edge alpha=1 specks only, >=8 no edge touch.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "candidate_file": "Q053_219808ea70df894c_source_k.png",
+      "candidate_sha256": "15122a9c0d47a07ac1a8d59d374247667b1e58cf415ffeaf26ee8865bf7057c1",
+      "source_file": "Q053_219808ea70df894c_source.png",
+      "source_sha256": "f81e76e310081d7d9feeafd6af3cfbe3c98e9cfdfef9e6e17f5d3e3a4d875b4b",
+      "manifest_english": "Hit the zippers!",
+      "approved_korean": "지퍼를 맞히세요!",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1228,
+          246
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          102,
+          5,
+          1228,
+          221
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 126848,
+        "sha256": "f81e76e310081d7d9feeafd6af3cfbe3c98e9cfdfef9e6e17f5d3e3a4d875b4b"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          115,
+          9,
+          2056,
+          724
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 745947,
+        "sha256": "15122a9c0d47a07ac1a8d59d374247667b1e58cf415ffeaf26ee8865bf7057c1"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q053_219808ea70df894c_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 21,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            115,
+            9,
+            2056,
+            724
+          ],
+          "8": [
+            120,
+            185,
+            2050,
+            523
+          ],
+          "32": [
+            124,
+            188,
+            2046,
+            520
+          ],
+          "128": [
+            128,
+            192,
+            2042,
+            515
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "Hit the zippers! -> 지퍼를 맞히세요! readable; bottom edge alpha=1 specks only, >=8 no edge touch.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "candidate_file": "Q063_a23cdd8f59fc6939_source_k.png",
+      "candidate_sha256": "c13d6792f65e84d079110598a0de876b3f2c91a17f1d40f60feb0b345c8ee0c6",
+      "source_file": "Q063_a23cdd8f59fc6939_source.png",
+      "source_sha256": "c4b2280e40e633376e9493689360efff5e973b27db93621df2ea1b1d7ddd4c68",
+      "manifest_english": "GOAL",
+      "approved_korean": "골",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          280,
+          108
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          11,
+          3,
+          264,
+          101
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 26003,
+        "sha256": "c4b2280e40e633376e9493689360efff5e973b27db93621df2ea1b1d7ddd4c68"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2019,
+          779
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          0,
+          4,
+          1983,
+          761
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 731867,
+        "sha256": "c13d6792f65e84d079110598a0de876b3f2c91a17f1d40f60feb0b345c8ee0c6"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q063_a23cdd8f59fc6939_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 11,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            0,
+            4,
+            1983,
+            761
+          ],
+          "8": [
+            265,
+            145,
+            1764,
+            645
+          ],
+          "32": [
+            266,
+            145,
+            1757,
+            637
+          ],
+          "128": [
+            266,
+            146,
+            1745,
+            628
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "FAIL_REGENERATED_PROTECTED_UI_PLATE",
+      "visual_reason": "GOAL -> 골 readable but generated output redraws full red slanted UI plate/metal border, rather than Korean transparent glyph layer only; source input contains protected plate. Recrop/extract text only and preserve original plate.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0031-709B11A6",
+      "candidate_file": "Q116_a9da32ccca1ed48a_source_k.png",
+      "candidate_sha256": "0ba1c43ed87ebdaa595fc2480f797c3e4350ee335fa4e6ed982772325ebce800",
+      "source_file": "Q116_a9da32ccca1ed48a_source.png",
+      "source_sha256": "4fbe3c95680b1876324fd7eb4dc6fff4e3f3883b6f06a9a1e8382bc314d51011",
+      "manifest_english": "Heart Attack Mode",
+      "approved_korean": "하트 어택 모드",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1243,
+          154
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          4,
+          4,
+          1239,
+          150
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 83254,
+        "sha256": "4fbe3c95680b1876324fd7eb4dc6fff4e3f3883b6f06a9a1e8382bc314d51011"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          36,
+          31,
+          2150,
+          724
+        ],
+        "alpha_touches_outer_canvas": true,
+        "bytes": 751371,
+        "sha256": "0ba1c43ed87ebdaa595fc2480f797c3e4350ee335fa4e6ed982772325ebce800"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q116_a9da32ccca1ed48a_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 2,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            36,
+            31,
+            2150,
+            724
+          ],
+          "8": [
+            43,
+            190,
+            2127,
+            530
+          ],
+          "32": [
+            44,
+            191,
+            2127,
+            530
+          ],
+          "128": [
+            45,
+            191,
+            2126,
+            530
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "Heart Attack Mode -> 하트 어택 모드 readable and script style broadly consistent; original contains extensive white letter backing, preserve protected source artwork during final placement. Bottom alpha=1 specks, >=8 no edge touch.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    },
+    {
+      "role": "A",
+      "task_id": "OUTRUN-ROI-A-0032-1B0AA56D",
+      "candidate_file": "Q161_533f9569493fb2fb_source_k.png",
+      "candidate_sha256": "97d105ff33a2aef017d8a1f243ab4274ed1343042d0587632ac09921737e5422",
+      "source_file": "Q161_533f9569493fb2fb_source.png",
+      "source_sha256": "66a07e2df6608ddf0b05ef199eb521cda4173545d35e7daa886e4c64afa20de6",
+      "manifest_english": "NORWAY",
+      "approved_korean": "노르웨이",
+      "source_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          1210,
+          116
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          31,
+          3,
+          535,
+          114
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 45795,
+        "sha256": "66a07e2df6608ddf0b05ef199eb521cda4173545d35e7daa886e4c64afa20de6"
+      },
+      "candidate_metrics": {
+        "format": "PNG",
+        "mode": "RGBA",
+        "dimensions": [
+          2172,
+          724
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "alpha_bbox": [
+          57,
+          71,
+          1144,
+          595
+        ],
+        "alpha_touches_outer_canvas": false,
+        "bytes": 207280,
+        "sha256": "97d105ff33a2aef017d8a1f243ab4274ed1343042d0587632ac09921737e5422"
+      },
+      "sha_export_source_match": true,
+      "visible_korean_matches_mapping": true,
+      "edge_alpha_threshold_audit": {
+        "file": "Q161_533f9569493fb2fb_source_k.png",
+        "edge_counts": {
+          "top": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "bottom": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "left": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          },
+          "right": {
+            "1": 0,
+            "8": 0,
+            "32": 0,
+            "128": 0
+          }
+        },
+        "alpha_boxes_by_threshold": {
+          "1": [
+            57,
+            71,
+            1144,
+            595
+          ],
+          "8": [
+            61,
+            243,
+            915,
+            449
+          ],
+          "32": [
+            61,
+            243,
+            914,
+            448
+          ],
+          "128": [
+            62,
+            243,
+            911,
+            445
+          ]
+        }
+      },
+      "text_length_difference_ignored": true,
+      "c1_verdict": "PASS_PNG_TEXT_ONLY_PENDING_NATIVE_PLACEMENT",
+      "visual_reason": "NORWAY -> 노르웨이 readable and matches approved translation.",
+      "output_dimensional_change_requires_rework": true,
+      "original_native_uv_and_protected_art_placement_confirmed": false,
+      "dds_approval": false,
+      "c2_c3_ingame_pass": false
+    }
+  ],
+  "recommendation": "Rebuild GOAL as Korean glyph-only transparent layer without recreating the protected red plate; verify native source UV/cell transformation and background preservation for all 8. Do not label a text-only PNG pass as full compositing/DDS/game PASS.",
+  "limits": {
+    "imagegen_invoked": false,
+    "ab_queues_consumed": false,
+    "c2_c3_pass_created": false,
+    "dds_created_or_deployed": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changed": false
+  }
+}
