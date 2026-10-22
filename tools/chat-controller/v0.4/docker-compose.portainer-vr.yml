@@ -17,8 +17,9 @@ services:
       QUEUE_MODE: "true"
       CONVERSION_PARALLEL: "true"
       VR_FEATURE_DEVELOPMENT_ENABLED: "true"
-      # Every 30m resume the SAME live task; only terminal lanes get a new ID.
+      # Retain live TASK_ID but never chain new production immediately.
       VR_CONTINUOUS_30M_ENABLED: "true"
+      VR_SCHEDULED_DISPATCH_ENABLED: "true"
       VR_CONTINUOUS_INTERVAL_SECONDS: "1800"
       VR_FEATURE_PROMOTION_MODE: "ai"
       VR_FEATURE_POLL_SECONDS: "60"
@@ -60,7 +61,8 @@ services:
       PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      SCHEDULE_MINUTES: "10,30,50"
+      # New tasks: :00, :20 and :40 KST, once per lane per window.
+      SCHEDULE_MINUTES: "0,20,40"
       CHAT_SLOTS: "3"
       # Recover a frozen scheduler independently of the HTTP /status healthcheck.
       VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"

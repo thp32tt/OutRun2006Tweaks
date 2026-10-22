@@ -1230,7 +1230,8 @@ def vr_forced_rollover_due(active: dict, now: datetime) -> bool:
 
 async def vr_checkpoint_and_rollover(context: BrowserContext, pages: dict, q: dict, active: dict, now: datetime) -> bool:
     """Return True if rollover processing consumed this lane poll."""
-    if vr_forced_rollover_due(active, now) or vr_unconditional_resume_due(active, now):
+    if ((vr_forced_rollover_due(active, now) or vr_unconditional_resume_due(active, now))
+            and (not VR_SCHEDULED_DISPATCH_ENABLED or now.minute in SCHEDULE_MINUTES)):
         # Prefer remote checkpoint at 30m; after 40m the local atomic queue
         # checkpoint wins over indefinite WAIT_CHAT even if GitHub PUT is denied.
         remote_saved = await vr_persist_checkpoint(q, active, now, "pre_rollover")
@@ -2477,6 +2478,8 @@ async def conversion_send_lane_task(
 ) -> bool:
     """Dispatch one conversion lane without blocking the other conversion lanes."""
     now = datetime.now(TZ)
+    if not vr_scheduled_dispatch_due(q, slot_name, now):
+        return False
     reg = load_registry(now)
     slot = next((item for item in reg.slots if item.name == slot_name), None)
     if slot is None:
@@ -2620,6 +2623,10 @@ async def conversion_send_lane_task(
         write_runtime(vr_continuous_thinking_unverified=True,
                       last_action="Proceeding with development despite unverified model picker")
 
+    # Prevent UI preflight from crossing the scheduled minute before send.
+    dispatch_window = datetime.now(TZ)
+    if not vr_scheduled_dispatch_due(q, slot_name, dispatch_window):
+        return False
     result = await send_message(page, prompt_for_slot(slot, "parallel"))
     if result != "sent":
         write_runtime(
@@ -2654,6 +2661,8 @@ async def conversion_send_lane_task(
 
     production_number = int(production_id.rsplit("-", 1)[-1])
     q["counter"] = max(int(q.get("counter", 0)), production_number)
+    if VR_SCHEDULED_DISPATCH_ENABLED:
+        q.setdefault("vr_scheduled_dispatch_windows", {})[slot_name] = dispatch_window.strftime("%Y-%m-%dT%H:%M")
     q.setdefault("active_by_lane", {})[slot_name] = {
         "task_id": production_id,
         "production_id": production_id,
@@ -3354,6 +3363,16 @@ def conversion_dispatch_plan(
     )[:available]
 
 
+def vr_scheduled_dispatch_due(q: dict, slot_name: str, now: datetime) -> bool:
+    """New production: at most one dispatch per lane per scheduled KST minute."""
+    if not VR_SCHEDULED_DISPATCH_ENABLED:
+        return True
+    if now.minute not in SCHEDULE_MINUTES:
+        return False
+    window = now.strftime("%Y-%m-%dT%H:%M")
+    return q.get("vr_scheduled_dispatch_windows", {}).get(slot_name) != window
+
+
 def vr_continuous_dispatch_due(q: dict, slot_name: str, now: datetime) -> bool:
     """Never preempt a live TASK_ID merely because 30 minutes elapsed."""
     if slot_name not in {"A", "C"}:
@@ -3393,7 +3412,8 @@ async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q
             if active and active.get("phase") == "DONE":
                 active_by_lane.pop(lane_key, None)
                 save_queue_state(q)
-        if not vr_continuous_dispatch_due(q, lane_key, now):
+        if (not vr_continuous_dispatch_due(q, lane_key, now)
+                or not vr_scheduled_dispatch_due(q, lane_key, now)):
             continue
         try:
             sent = await conversion_send_lane_task(

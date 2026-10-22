@@ -110,6 +110,9 @@ PRODUCTION_COUNTER_MODE = os.getenv("PRODUCTION_COUNTER_MODE", "lane").strip().l
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
+# Restrict VR queue production starts to configured KST wall-clock minutes.
+VR_SCHEDULED_DISPATCH_ENABLED = (CONTROLLER_MODE == "conversion" and
+    os.getenv("VR_SCHEDULED_DISPATCH_ENABLED", "false").lower() == "true")
 CHAT_SLOTS = 3 if CONTROLLER_MODE == "localization" else max(1, int(os.getenv("CHAT_SLOTS", "6")))
 ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
@@ -276,6 +279,7 @@ runtime = {
     "controller_build": "2026-10-11-continuous-v4",
     "vr_continuous_30m_enabled": VR_CONTINUOUS_30M_ENABLED,
     "vr_continuous_interval_seconds": VR_CONTINUOUS_INTERVAL_SECONDS,
+    "vr_scheduled_dispatch_enabled": VR_SCHEDULED_DISPATCH_ENABLED,
     "started_at": datetime.now(TZ).isoformat(),
     "auto_send": AUTO_SEND,
     "auto_send_requested": AUTO_SEND_REQUESTED,
