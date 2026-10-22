@@ -73,4 +73,75 @@ private:
         D3D11_PS_CS_UAV_REGISTER_COUNT]{};
     NativeGameOmSlots slots_{};
 };
+
+// Preserve real-game native shader inputs while a game-authored surface copy
+// writes the native full-frame texture. D3D11 would otherwise permit a
+// write/read alias to persist into later menu/car/race Draws. Only views of
+// the destination are detached; unrelated game SRVs remain untouched.
+class ScopedNativeGameGpuTransferInputs final {
+public:
+    explicit ScopedNativeGameGpuTransferInputs(
+        ID3D11DeviceContext* context, ID3D11Resource* destination) noexcept
+        : context_(context), destination_(destination) {
+        if (context_ && destination_)
+            for (UINT stage = 0u; stage != 6u; ++stage) capture(stage);
+    }
+    ~ScopedNativeGameGpuTransferInputs() noexcept {
+        if (!context_) return;
+        for (UINT i = count_; i; --i) {
+            const auto& entry = saved_[i - 1u];
+            set(entry.stage, entry.slot, &entry.view);
+            entry.view->Release();
+        }
+    }
+    ScopedNativeGameGpuTransferInputs(
+        const ScopedNativeGameGpuTransferInputs&) = delete;
+    ScopedNativeGameGpuTransferInputs& operator=(
+        const ScopedNativeGameGpuTransferInputs&) = delete;
+private:
+    struct Entry { ID3D11ShaderResourceView* view{}; UINT stage{}, slot{}; };
+    void get(UINT stage, ID3D11ShaderResourceView** views) noexcept {
+        constexpr UINT n = D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT;
+        switch (stage) {
+        case 0u: context_->VSGetShaderResources(0u, n, views); break;
+        case 1u: context_->PSGetShaderResources(0u, n, views); break;
+        case 2u: context_->GSGetShaderResources(0u, n, views); break;
+        case 3u: context_->HSGetShaderResources(0u, n, views); break;
+        case 4u: context_->DSGetShaderResources(0u, n, views); break;
+        case 5u: context_->CSGetShaderResources(0u, n, views); break;
+        }
+    }
+    void set(UINT stage, UINT slot,
+             ID3D11ShaderResourceView* const* views) noexcept {
+        switch (stage) {
+        case 0u: context_->VSSetShaderResources(slot, 1u, views); break;
+        case 1u: context_->PSSetShaderResources(slot, 1u, views); break;
+        case 2u: context_->GSSetShaderResources(slot, 1u, views); break;
+        case 3u: context_->HSSetShaderResources(slot, 1u, views); break;
+        case 4u: context_->DSSetShaderResources(slot, 1u, views); break;
+        case 5u: context_->CSSetShaderResources(slot, 1u, views); break;
+        }
+    }
+    void capture(UINT stage) noexcept {
+        constexpr UINT n = D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT;
+        ID3D11ShaderResourceView* views[n]{};
+        get(stage, views); // Get* adds one reference for every bound SRV.
+        for (UINT slot = 0u; slot != n; ++slot) {
+            auto* view = views[slot];
+            if (!view) continue;
+            ID3D11Resource* resource = nullptr;
+            view->GetResource(&resource);
+            const bool alias = resource == destination_;
+            if (resource) resource->Release();
+            if (!alias) { view->Release(); continue; }
+            saved_[count_++] = {view, stage, slot};
+            ID3D11ShaderResourceView* empty = nullptr;
+            set(stage, slot, &empty);
+        }
+    }
+    ID3D11DeviceContext* context_{};
+    ID3D11Resource* destination_{};
+    Entry saved_[6u * D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT]{};
+    UINT count_{};
+};
 } // namespace outrun::vr::dx11::live_game_frame

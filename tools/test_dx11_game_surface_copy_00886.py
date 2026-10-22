@@ -43,6 +43,7 @@ def linked(b, h, r):
         "desc.Format == D3DFMT_X8R8G8B8",
         "dst[x] = 0xffu;",
         "context->UpdateSubresource(s.surfaceReplayScratch.Get()",
+        "ScopedNativeGameGpuTransferInputs shaderInputs(",
         "ScopedNativeGameGpuTransferOutputs outputs(context);",
         "context->CopySubresourceRegion(",
         "s.backend.color_texture(), 0u, region.left, region.top, 0u,",
@@ -50,6 +51,16 @@ def linked(b, h, r):
         "++s.surfaceReplayCount;",
     )) and (
         '#include "native_game_gpu_output_preserve.hpp"' in b
+        and "ScopedNativeGameGpuTransferInputs shaderInputs(\n                context, s.backend.color_texture());" in replay
+        and "resource == destination_" in gpu_outputs
+        and all(name in gpu_outputs for name in (
+            "VSGetShaderResources", "PSGetShaderResources",
+            "GSGetShaderResources", "HSGetShaderResources",
+            "DSGetShaderResources", "CSGetShaderResources",
+            "VSSetShaderResources", "PSSetShaderResources",
+            "GSSetShaderResources", "HSSetShaderResources",
+            "DSSetShaderResources", "CSSetShaderResources",
+        ))
         and "OMGetRenderTargets(1u, &oldColor" not in replay
         and "OMSetRenderTargets(1u, &oldColor" not in replay
         # An earlier device-loss guard already existed before UpdateSubresource.
@@ -99,6 +110,7 @@ for token in (
     "game->GetRenderTargetData(",
     "s.frameBatch.publishable(s.pending)",
     "actualIdentity.Get() != backbufferIdentity.Get()",
+    "ScopedNativeGameGpuTransferInputs shaderInputs(",
     "ScopedNativeGameGpuTransferOutputs outputs(context);",
     "context->CopySubresourceRegion(",
     "if (FAILED(device->GetDeviceRemovedReason())) return false;\n        ++s.surfaceReplayCount;",

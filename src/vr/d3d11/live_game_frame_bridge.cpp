@@ -7461,6 +7461,11 @@ bool preserve_game_surface_copy(
         // writable GPU outputs during the copy and restore the exact
         // attachments and append/consume counters on scope exit.
         {
+            // Detach any bound VS/PS/GS/HS/DS/CS read aliases of the copy
+            // destination, without disturbing unrelated gameplay SRVs.
+            // Native writable OM/CS state is separately preserved below.
+            ScopedNativeGameGpuTransferInputs shaderInputs(
+                context, s.backend.color_texture());
             ScopedNativeGameGpuTransferOutputs outputs(context);
             context->CopySubresourceRegion(
                 s.backend.color_texture(), 0u, region.left, region.top, 0u,

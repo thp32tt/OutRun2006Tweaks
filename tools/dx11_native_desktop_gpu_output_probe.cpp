@@ -5,6 +5,7 @@
 #include <cstdio>
 using Microsoft::WRL::ComPtr;
 using outrun::vr::dx11::live_game_frame::ScopedNativeGameGpuTransferOutputs;
+using outrun::vr::dx11::live_game_frame::ScopedNativeGameGpuTransferInputs;
 
 static bool run_probe() {
     const D3D_FEATURE_LEVEL requested[] = {D3D_FEATURE_LEVEL_11_0};
@@ -22,7 +23,7 @@ static bool run_probe() {
     desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     desc.SampleDesc.Count = 1u;
     desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_RENDER_TARGET;
+    desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     ComPtr<ID3D11Texture2D> source, other, dest;
     ComPtr<ID3D11RenderTargetView> first, second;
     if (FAILED(device->CreateTexture2D(&desc, nullptr, &source)) ||
@@ -115,12 +116,49 @@ static bool run_probe() {
         return false;
     const float green[] = {0.f, 1.f, 0.f, 1.f};
     context->ClearRenderTargetView(fillView.Get(), green);
+    // Reproduce real game shader inputs bound across the native GPU write.
+    ComPtr<ID3D11ShaderResourceView> destRead, otherRead;
+    if (FAILED(device->CreateShaderResourceView(
+            dest.Get(), nullptr, &destRead))) return false;
+    ComPtr<ID3D11Texture2D> unrelatedTexture;
+    if (FAILED(device->CreateTexture2D(&desc, nullptr, &unrelatedTexture)) ||
+        FAILED(device->CreateShaderResourceView(
+            unrelatedTexture.Get(), nullptr, &otherRead))) return false;
+    ID3D11ShaderResourceView* alias = destRead.Get();
+    ID3D11ShaderResourceView* separate = otherRead.Get();
+    context->VSSetShaderResources(5u, 1u, &alias);
+    context->PSSetShaderResources(7u, 1u, &alias);
+    context->CSSetShaderResources(3u, 1u, &alias);
+    context->PSSetShaderResources(1u, 1u, &separate);
     const D3D11_BOX smallRegion{0u, 0u, 0u, 16u, 16u, 1u};
+    bool detachedInputs = false;
     {
+        ScopedNativeGameGpuTransferInputs inputs(context.Get(), dest.Get());
         ScopedNativeGameGpuTransferOutputs outputs(context.Get());
+        ID3D11ShaderResourceView *vs = nullptr, *ps = nullptr, *cs = nullptr, *other = nullptr;
+        context->VSGetShaderResources(5u, 1u, &vs);
+        context->PSGetShaderResources(7u, 1u, &ps);
+        context->CSGetShaderResources(3u, 1u, &cs);
+        context->PSGetShaderResources(1u, 1u, &other);
+        detachedInputs = !vs && !ps && !cs && other == otherRead.Get();
+        if (vs) vs->Release();
+        if (ps) ps->Release();
+        if (cs) cs->Release();
+        if (other) other->Release();
         context->CopySubresourceRegion(
-            source.Get(), 0u, 8u, 8u, 0u, dest.Get(), 0u, &smallRegion);
+            dest.Get(), 0u, 8u, 8u, 0u, source.Get(), 0u, &smallRegion);
     }
+    ID3D11ShaderResourceView *vs = nullptr, *ps = nullptr, *cs = nullptr, *other = nullptr;
+    context->VSGetShaderResources(5u, 1u, &vs);
+    context->PSGetShaderResources(7u, 1u, &ps);
+    context->CSGetShaderResources(3u, 1u, &cs);
+    context->PSGetShaderResources(1u, 1u, &other);
+    const bool restoredInputs = vs == destRead.Get() && ps == destRead.Get() &&
+                                cs == destRead.Get() && other == otherRead.Get();
+    if (vs) vs->Release();
+    if (ps) ps->Release();
+    if (cs) cs->Release();
+    if (other) other->Release();
     ID3D11RenderTargetView* afterCopy[2]{};
     ID3D11UnorderedAccessView* afterPS = nullptr;
     ID3D11UnorderedAccessView* afterCS = nullptr;
@@ -135,7 +173,7 @@ static bool run_probe() {
     if (afterCS) afterCS->Release();
     {
         ScopedNativeGameGpuTransferOutputs outputs(context.Get());
-        context->CopyResource(readable.Get(), source.Get());
+        context->CopyResource(readable.Get(), dest.Get());
     }
     D3D11_MAPPED_SUBRESOURCE changed{};
     if (FAILED(context->Map(readable.Get(), 0u, D3D11_MAP_READ, 0u, &changed)))
@@ -144,14 +182,15 @@ static bool run_probe() {
     const auto* greenPixel = base
         ? base + 8u * changed.RowPitch + 8u * 4u : nullptr;
     const bool regionCopied = greenPixel &&
-        base[0] == 0u && base[1] == 0u && base[2] == 255u &&
-        greenPixel[0] == 0u && greenPixel[1] == 255u &&
-        greenPixel[2] == 0u && greenPixel[3] == 255u;
+        base[0] == 0u && base[1] == 255u && base[2] == 0u &&
+        greenPixel[0] == 0u && greenPixel[1] == 0u &&
+        greenPixel[2] == 255u && greenPixel[3] == 255u;
     context->Unmap(readable.Get(), 0u);
     context->OMSetRenderTargets(0u, nullptr, nullptr);
     ID3D11UnorderedAccessView* unbound = nullptr;
     context->CSSetUnorderedAccessViews(0u, 1u, &unbound, nullptr);
-    return preserved && copied && destinationOutputsPreserved && regionCopied;
+    return preserved && copied && destinationOutputsPreserved &&
+           detachedInputs && restoredInputs && regionCopied;
 }
 int main() {
     const bool passed = run_probe();
