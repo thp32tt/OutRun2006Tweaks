@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "vr_feature_material_checkpoint",
+  "captured_at_kst": "2026-10-23T03:09:01+09:00",
+  "task_id": "CONVERSION-DX11-01013",
+  "production_id": "CONVERSION-DX11-01013",
+  "event_id": "CONVERSION-DX11-01013-E002",
+  "event_type": "rollover",
+  "attempt": "1/3",
+  "rollover_is_failure": false,
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01013",
+  "target_branch": "vr-dx11-native-r71",
+  "target_base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
+  "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+  "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+  "feature_stage": "SOURCE_IMPLEMENTATION_IN_PROGRESS",
+  "feature_source_head_before": "f5f31afe7e27b1366e5e27cb9e6e66979ecbabd1",
+  "material_result_sha": "1ad65a8ca26012a5045520414052847b03c57744",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp"
+  ],
+  "material_change": "Accept genuine D3D9 RGB/independent alpha MIN/MAX native Draw blending in existing fixed-function and SM3 D3D11 output merger; updated positive and unsupported-opcode negative constexpr regressions.",
+  "current_ci": {
+    "status": "IN_PROGRESS",
+    "exact_sha": "1ad65a8ca26012a5045520414052847b03c57744",
+    "workflows": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "id": 39828684485
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "id": 39828684493
+      },
+      {
+        "name": "Build",
+        "id": 39828684491
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "id": 39828684653
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "id": 39828684609
+      }
+    ]
+  },
+  "prior_ci": {
+    "head_sha": "f5f31afe7e27b1366e5e27cb9e6e66979ecbabd1",
+    "mandatory_five": "SUCCESS"
+  },
+  "acceptance": {
+    "real_game_full_frame_draw": "IN_PROGRESS",
+    "dx9ex_fallback_safety": "SOURCE_PRESERVED_NOT_RUNTIME_TESTED",
+    "native_frame_exact_sha_gates": "PENDING"
+  },
+  "remaining_acceptance_items": [
+    "Collect real game exact-SHA eligible_state_draws, native_draws and published full native frame counters (UNTESTED now)",
+    "Prove one contiguous menu -> car -> race native D3D11 Draw/DrawIndexed source ordinal stream with opt-in guarded original DX9Ex fallback",
+    "Integrate/verify distinct left/right OpenXR producer-consumer release, fence/ACK, and real Quest3/VDXR test",
+    "Inspect 1ad65a8 exact-SHA mandatory five Actions; repair any actual CI defect under the same TASK_ID; do not rerun prior PASS without cause",
+    "Only after integrated acceptance compare behind=0 and expected target SHA, force=false fast-forward target"
+  ],
+  "conflict_resolution": "00477 R175 TEXCOORD6 owner record reads COMPLETE_R175_SOURCE_WARP_PARITY; this change avoids its owned pipeline_translation and R175 probe files.",
+  "feature_ready": false,
+  "target_promoted": false,
+  "runtime_validation": "UNTESTED",
+  "observed_native_game_draw_count": "UNTESTED",
+  "observed_native_published_frame_count": "UNTESTED",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "next_implementation_action": "Read exact-SHA Actions failures only if present, then obtain original OutRun live game draw rejection/counters and fix the next actual game frame blocker. Do not claim renderer ready on blend state parity."
+}
