@@ -20,3 +20,9 @@
 - Proven pre-existing: original pre-source-change parent `fbe315721c91d0fb4d15e4ed23edf945ccd5b0ac` already uses `R30BuildHudPlaneCoefficients(state, !externalF11)`, which selects the intended external-F11-only smaller plane while retaining gameplay HUD scale. The failing verifier script itself was not touched by initial SkyGlow patch.
 - ACTION=update stale invariant to require the exact `ExternalOverlaySemanticDepth && semanticOverlay2D` decision and `!externalF11` invocation, plus three destructive negative mutations. No runtime/C++ edit during this follow-up. Do not treat static repair as headset validation.
 - NEXT=rerun exact-SHA DX9Ex Active/PC Fast/Full Source/HUD/Domain gates on final integration SHA, record observed status only. RUNTIME_VALIDATION=UNTESTED.
+
+## HUD Inspector inherited declaration/definition parser correction
+
+- The initial exact-SHA HUD Inspector run #39724302173 failed in `verify_vr_visual_composition_p0.py` because `function_body` selected the forward declaration of `R30ConfigureXyzrhwWorldEffect` and then parsed `R30PrepareXyzrhwState`, where route=1u is intentionally absent. The real R30Configure definition already contains the 1u diagnostic call before this task's runtime source modification.
+- Update the verifier to explicitly seek the second `R30ConfigureXyzrhwWorldEffect` occurrence (actual definition) for route=1u, preserving the other two route checks and all three deliberate trace-removal mutation controls. This changes no in-game trace, GPU draw, F11 scale or runtime C++.
+- RUNTIME_VALIDATION=UNTESTED; a new exact-SHA test run is still required to claim validation success.

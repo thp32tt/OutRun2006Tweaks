@@ -453,7 +453,15 @@ def verify_pre_restart_hud_routes(source):
         ('bool R30ConfigureXyzrhwWorldEffect(', '1u'),
         ('HRESULT R62TryFixedFunctionSpriteIndexed(', '2u'),
     ):
-        body = function_body(source, function_name)
+        # R30ConfigureXyzrhwWorldEffect is forward-declared before
+        # R30PrepareXyzrhwState; the first `{...` after that prototype
+        # belongs to another function. Select its actual definition so
+        # every existing 0/1/2 route trace remains independently checked.
+        source_for_route = source
+        if route == '1u':
+            assert source.count(function_name) == 2, 'expected prototype and definition'
+            source_for_route = source[source.rfind(function_name):]
+        body = function_body(source_for_route, function_name)
         require('R30TracePreRestartHudDrawForm(device, ' + route + ')',
                 body, 'pre-restart HUD three-draw-route provenance')
     # A trace cannot change ScreenHud classification or the user's GPU
