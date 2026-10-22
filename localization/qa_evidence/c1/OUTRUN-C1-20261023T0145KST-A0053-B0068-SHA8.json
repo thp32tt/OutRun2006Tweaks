@@ -1,0 +1,604 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-C1-20261023T0145KST-A0053-B0068-SHA8",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "C1",
+  "checked_at_kst": "2026-10-23T01:49:24.167153+09:00",
+  "operation": "independent_lightweight_QA_existing_A_B_PNG_no_generation",
+  "scope": "Eight fresh candidate SHA: A-0053 first four + B-0068 first four; no A/B queue mutation",
+  "summary": {
+    "reviewed": 8,
+    "unique_candidate_sha": 8,
+    "previous_reviewed_sha_history": 375,
+    "duplicate_sha": 0,
+    "source_sent_sha_verified": 8,
+    "source_manifest_sha_verified": 8,
+    "candidate_export_sha_verified": 8,
+    "verified_png_rgba": 8,
+    "alpha_touching_outer_border": 0,
+    "visually_legible_and_mapping_match": 8,
+    "producer_rework_dimensions": 8,
+    "c1_pass": 0,
+    "c1_fail": 0,
+    "c1_hold": 8,
+    "hold_native_ui_placement": 8,
+    "imagegen_calls": 0,
+    "queue_consumed": 0,
+    "dds_written": 0,
+    "c2_pass": 0,
+    "c3_pass": 0,
+    "ingame_pass": 0,
+    "runtime_validation": "UNTESTED"
+  },
+  "source_contracts": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "localization/controller_roles.json"
+  ],
+  "evidence": {
+    "metric_report": "work/C1_QA_20261023_0145_metrics.json",
+    "visual_sheets": [
+      "work/C1_QA_20261023_0145_A_pairs.jpg",
+      "work/C1_QA_20261023_0145_B_pairs.jpg"
+    ],
+    "verification_script": "work/C1_QA_20261023_0145_verify.py",
+    "approved_translation_source": "work/image-src/text_roi_batches/production_manifest.json",
+    "generator_export": "work/image-src/text_roi_batches/export_evidence",
+    "note": "N100 external working files, not new GitHub-bundled image attachments"
+  },
+  "records": [
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0053-85C4F819",
+      "source_file": "Q130_1d7bc6cd31914b66_source.png",
+      "candidate_file": "Q130_1d7bc6cd31914b66_source_k.png",
+      "english": "OUTRUN2 COURSE",
+      "approved_korean": "아웃런2 코스",
+      "original_bbox": null,
+      "original_dds_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+      "source_sha256": "9fe124d51db650863f2fe07313db8023afaf79bcd968ecedddc237d9be3f6482",
+      "candidate_sha256": "f8c27c6661573e747aac70c76d00cd27e8eae4b34143a4ba100b5b80434903c2",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1620,
+          194
+        ],
+        "alpha_bbox": [
+          10,
+          19,
+          1575,
+          175
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          25,
+          53,
+          2112,
+          635
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 1,
+      "visually_observed_korean": "아웃런2 코스",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": false,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0053-85C4F819",
+      "source_file": "Q130_6fae69147274cc15_source.png",
+      "candidate_file": "Q130_6fae69147274cc15_source_k.png",
+      "english": "MIX 1 COURSE",
+      "approved_korean": "믹스 1 코스",
+      "original_bbox": null,
+      "original_dds_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+      "source_sha256": "329ad54683619160d11bc6d0254761c023cd501c381cd3df7bb024de7a839566",
+      "candidate_sha256": "6e972487ef4496c955531151a01787710bfbffd1f4cc33fb7585534368078a02",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1276,
+          192
+        ],
+        "alpha_bbox": [
+          13,
+          19,
+          1233,
+          173
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          89,
+          16,
+          2080,
+          691
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 2,
+      "visually_observed_korean": "믹스 1 코스",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": false,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0053-85C4F819",
+      "source_file": "Q135_61b333a688bb7aae_source.png",
+      "candidate_file": "Q135_61b333a688bb7aae_source_k.png",
+      "english": "PROFESSIONAL",
+      "approved_korean": "프로",
+      "original_bbox": null,
+      "original_dds_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "source_sha256": "abfbe7709ba9fd1f27d7a596724b883ae90dd126cc3a70bbbf3d1e1bc773db82",
+      "candidate_sha256": "562be67f2726a848287e2766b71ae1007ce2e30664e41b85f2e7aecf5331773d",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1098,
+          164
+        ],
+        "alpha_bbox": [
+          35,
+          18,
+          1063,
+          147
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          49,
+          31,
+          2126,
+          636
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 3,
+      "visually_observed_korean": "프로",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": false,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "A",
+      "task": "OUTRUN-ROI-A-0053-85C4F819",
+      "source_file": "Q140_2f00d0ed421bafcc_source.png",
+      "candidate_file": "Q140_2f00d0ed421bafcc_source_k.png",
+      "english": "SELECT STAGE",
+      "approved_korean": "스테이지 선택",
+      "original_bbox": null,
+      "original_dds_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+      "source_sha256": "62d6ee2866c44327ef29a5fd6ed6f8b446ce49394c713aad77d66e2d05085a3e",
+      "candidate_sha256": "578a49a26e14798987b8dc5e5884a2a2588255cea82325def549b9a13ea9de40",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1748,
+          256
+        ],
+        "alpha_bbox": [
+          9,
+          26,
+          1685,
+          231
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          63,
+          35,
+          2150,
+          658
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 4,
+      "visually_observed_korean": "스테이지 선택",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": false,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0068-5DD8D79E",
+      "source_file": "Q173_f919a129c9c2375b_source.png",
+      "candidate_file": "Q173_f919a129c9c2375b_source_k.png",
+      "english": "TULIP GARDEN",
+      "approved_korean": "튤립 가든",
+      "original_bbox": null,
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_sha256": "0dba5f308dbf3720f6f3d91c510ee35072b7a0d1928a9f2c184d4b65bb2d2187",
+      "candidate_sha256": "2ac86ed73bf6f939602aac94f674f5effc404bf36587f031e3e7a4b21d2e9bdf",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          880,
+          357
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          769,
+          357
+        ],
+        "edge_alpha_pixels": [
+          16,
+          0,
+          312,
+          225
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1969,
+          799
+        ],
+        "alpha_bbox": [
+          27,
+          25,
+          1949,
+          766
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 5,
+      "visually_observed_korean": "튤립 가든",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": true,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0068-5DD8D79E",
+      "source_file": "Q054_3d7621408b54db6e_source.png",
+      "candidate_file": "Q054_3d7621408b54db6e_source_k.png",
+      "english": "Count Green Cars!",
+      "approved_korean": "초록색 차를 세세요!",
+      "original_bbox": null,
+      "original_dds_sha256": "bd4f8247dd5b99f3a66539ed9ca29d30d27fe0b714cf302f890309d3a41786cb",
+      "source_sha256": "95b48a04f539480737d81723e55583ebcdd3f055ba3f9235fc6584d1182d3e77",
+      "candidate_sha256": "f32ecf58e52bebe84268b5f27715b34e63c700b82c048003632a6eb157d3e4dc",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          940,
+          417
+        ],
+        "alpha_bbox": [
+          0,
+          0,
+          940,
+          417
+        ],
+        "edge_alpha_pixels": [
+          0,
+          196,
+          522,
+          260
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1883,
+          835
+        ],
+        "alpha_bbox": [
+          31,
+          103,
+          1852,
+          703
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 6,
+      "visually_observed_korean": "초록색 차를 세세요!",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": true,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0068-5DD8D79E",
+      "source_file": "Q054_b2ab007aabd76b50_source.png",
+      "candidate_file": "Q054_b2ab007aabd76b50_source_k.png",
+      "english": "Keep control!",
+      "approved_korean": "차량을 제어하세요!",
+      "original_bbox": null,
+      "original_dds_sha256": "54f0203391d76783cd13b3de06a2f51fc3f54ce9b1e2f4017b4b97ab0e0780b0",
+      "source_sha256": "5e4f49186cd026931513a8a507be7e9d420353c7db37a67e27dca5b8a8a4ddfb",
+      "candidate_sha256": "85bd6565ad31e505906c58b183eba3ae3107d3e949973412818e3bfa5c265d49",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          1069,
+          405
+        ],
+        "alpha_bbox": [
+          0,
+          35,
+          1069,
+          405
+        ],
+        "edge_alpha_pixels": [
+          260,
+          156,
+          0,
+          803
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2038,
+          772
+        ],
+        "alpha_bbox": [
+          33,
+          49,
+          1980,
+          708
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 7,
+      "visually_observed_korean": "차량을 제어하세요!",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": true,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    },
+    {
+      "role": "B",
+      "task": "OUTRUN-ROI-B-0068-5DD8D79E",
+      "source_file": "Q173_ca8bde6a3337403e_source.png",
+      "candidate_file": "Q173_ca8bde6a3337403e_source_k.png",
+      "english": "LOST CITY",
+      "approved_korean": "로스트 시티",
+      "original_bbox": null,
+      "original_dds_sha256": "2c08a6fc224d2263f8c7d4e97d1bd8cfe2fad060688ef5665f78791449510cb3",
+      "source_sha256": "53ef0001aa4dc3afaff964ce9d320428a1f45b24d0315c10b0683b26d12b167a",
+      "candidate_sha256": "c2c7dbbfd4f47314f7baca1c15d1d18de5673ad19356132a8ecfdf8e7f28d8ea",
+      "already_reviewed_sha": false,
+      "source_sent_sha_match": true,
+      "source_manifest_sha_match": true,
+      "candidate_export_sha_match": true,
+      "producer_status": "REWORK_DIMENSIONS",
+      "pairing": "OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED",
+      "source": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          978,
+          212
+        ],
+        "alpha_bbox": [
+          9,
+          21,
+          927,
+          191
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "candidate": {
+        "mode": "RGBA",
+        "format": "PNG",
+        "size": [
+          2172,
+          724
+        ],
+        "alpha_bbox": [
+          24,
+          8,
+          2118,
+          609
+        ],
+        "edge_alpha_pixels": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "ordinal_in_run": 8,
+      "visually_observed_korean": "로스트 시티",
+      "glyph_legibility": "PASS_VISUAL",
+      "translation_matching": "PASS_VISUAL",
+      "png_rgba_alpha": "PASS_FILE_CHECK",
+      "alpha_border_candidate": "CLEAR",
+      "original_source_multi_text_context": false,
+      "ui_native_cell_placement": "UNVERIFIED",
+      "source_protected_pixels_after_dds_compose": "UNVERIFIED",
+      "final_c1_decision": "HOLD",
+      "reason": "GENERATOR_OUTPUT_RESIZED; NATIVE_UI_CELL_PLACEMENT_AND_PROTECTED_ART_COLLISION_NOT_DEMONSTRATED"
+    }
+  ]
+}
