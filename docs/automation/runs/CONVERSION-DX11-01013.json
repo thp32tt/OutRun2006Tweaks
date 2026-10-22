@@ -13,10 +13,10 @@
   "work_key": "DX11:R175_UNBLOCK_OR_FIRST_VISIBLE_GAME_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "7d2ece16645128103fb77effc63aa2af8d3c3c7b",
-  "material_source_sha": "e8cce7b55fd000c0f31106a13b2161f37388d7c3",
+  "material_source_sha": "a85d197badb53f4ebfa75936da60577273444c10",
   "source_implementation": {
-    "status": "LIVE_SHADER_VS3_EXPP_LOGP_R266_AND_GPU_COMPILER_WIRED_PENDING_EXACT_SHA_CI",
-    "implementation_scope": "Real game VS3 EXPP/LOGP partial-precision opcode acceptance now connects R266 register-semantic decoding to native D3D11 shader materialization; first complete playable native frame remains unproven.",
+    "status": "GAME_SM3_INDEPENDENT_ALPHA_COLOR_FACTOR_ALIASES_COMMITTED_PENDING_FULL_EXACT_SHA_GATES",
+    "implementation_scope": "Actual game D3D9 shader-bound Draw/DrawIndexed separate-alpha COLOR source/destination factors now map precisely to native D3D11 alpha-only components. Prior NOP/EXPP/LOGP, masked blend and atomic shader snapshot changes retained; complete visible game frame remains unproven.",
     "changed_files": [
       "src/vr/d3d11/native_sm3_arithmetic_codegen.hpp",
       "src/vr/d3d11/native_backend.cpp",
@@ -25,7 +25,9 @@
       "tools/dx11_sm3_nop_probe_01013.cpp",
       "src/vr/d3d11/pipeline_translation.cpp",
       "tools/dx11_sm3_partial_precision_probe_01013.cpp",
-      ".github/workflows/dx11-fast-structural.yml"
+      ".github/workflows/dx11-fast-structural.yml",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_live_sm3_blend_factor_00966.py"
     ],
     "behaviors": [
       "NRM source xyz denominator normalized into every game-written xyzw destination component; source.w provenance enforced for w writes, zero reciprocal norm saturates FLT_MAX",
@@ -33,7 +35,8 @@
       "Original D3D9 renderer, fail-closed opt-in activation and input/FFB fallback unchanged",
       "Live real-game native SM3 VS3 RCP/RSQ zero returns FLT_MAX while PS3 retains infinity; pass authentic shader stage through native_backend.cpp into shared scalar shader codegen and regress both paths.",
       "The existing native_backend.cpp real D3D9 SM3 instruction-stream decoder now accepts exact zero-payload D3DSIO_NOP without changing register state/flow/Draw order and rejects predicated/reserved-bit/operand NOP; opt-in original DX9Ex fallback unchanged.",
-      "Real D3D9 vs_3_0 EXPP/LOGP are admitted by R266 exact register source semantics and emitted by the native VS shader compiler as existing full-precision EXP/LOG GPU arithmetic; ps_3_0 forms remain fail-closed."
+      "Real D3D9 vs_3_0 EXPP/LOGP are admitted by R266 exact register source semantics and emitted by the native VS shader compiler as existing full-precision EXP/LOG GPU arithmetic; ps_3_0 forms remain fail-closed.",
+      "Translate D3D9 independent alpha SRCCOLOR/INVSRCCOLOR/DESTCOLOR/INVDESTCOLOR to D3D11 SRC_ALPHA/INV_SRC_ALPHA/DEST_ALPHA/INV_DEST_ALPHA in the real SM3 shader-bound live GPU Draw; keep unhandled SRCALPHASAT/reserved alpha factors fail-closed."
     ],
     "observed_native_game_draw_count": "UNTESTED",
     "observed_native_published_frame_count": "UNTESTED"
@@ -52,15 +55,18 @@
     "note": "Non-Windows portable probe only; production native_backend.cpp Windows build not yet executed."
   },
   "ci": {
-    "status": "CURRENT_SOURCE_QUEUED",
-    "source_sha": "e8cce7b55fd000c0f31106a13b2161f37388d7c3",
-    "fast_run_id": 39814905508,
-    "build_run_id": 39814905543,
-    "hud_run_id": 39814905490,
+    "status": "FAST_PASS_REMAINING_FOUR_QUEUED_OR_IN_PROGRESS",
+    "source_sha": "a85d197badb53f4ebfa75936da60577273444c10",
+    "fast_run_id": 39857089330,
+    "build_run_id": 39857089339,
+    "hud_run_id": 39857089388,
     "prior_source_fast_sha": "2a1a3e6408275f6045c8c9445fc5848b84bd3011",
     "prior_source_fast_run_id": 39814155650,
     "prior_source_fast_result": "SUCCESS",
-    "note": "Latest R266 decoder + VS shader opcode commit queued for exact-SHA Fast/Windows Build/HUD. Backend/OpenXR full-feature gates not requested until integrated acceptance. No real game frame or hardware proof."
+    "note": "Five exact-SHA Actions triggered; Fast success and four others not yet completed at checkpoint. Do not assume full CI PASS or runtime game/HMD proof.",
+    "backend_run_id": 39857089427,
+    "openxr_run_id": 39857089326,
+    "fast_result": "SUCCESS"
   },
   "remaining_acceptance_items": [
     "Resolve live R175 TEXCOORD6 color parity only with 00477 owner release; do not duplicate owner work",
@@ -72,16 +78,16 @@
   ],
   "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
   "real_game_draw_blocker": "Real game native Draw/DrawIndexed and published menu/race full-resolution frames are UNTESTED; no Quest3/VDXR hardware launch. The EXPP/LOGP source semantics + GPU compiler bridge is implemented but cannot be declared visible in actual game.",
-  "next_implementation_action": "Use real game-source state/shader rejection logs (liveSm3RejectStages + native issued/visible counters) after VS3 EXPP/LOGP exact-SHA CI; fix the next evidenced blocker in original D3D9 Draw/DrawIndexed -> native GPU Draw -> complete full-resolution menu/race frame, without touching R175 TEXCOORD6 00477 ownership. Preserve opt-in fail-closed DX9Ex fallback.",
+  "next_implementation_action": "At material SHA a85d197b collect exact-SHA Backend/Build/HUD/OpenXR Actions 39857089427/39857089339/39857089388/39857089326, repair only genuine failure; then use real opt-in game capture counters (eligible_state_draws, native_draws, published full native menu/race frames and left/right fence) to locate next actual game-source reject. Preserve DX9Ex fallback and 00477 ownership, do not submit FEATURE_READY before full game-frame acceptance.",
   "feature_ready": false,
   "target_promoted": false,
   "runtime_validation": "UNTESTED",
   "score_change": 0,
   "status": "IN_PROGRESS",
-  "checkpoint": "C2_IMPLEMENT",
-  "notes": "E011 rollover resumed same 01013 FEATURE_ID/BRANCH, ATTEMPT 1/3. New independent 2a1a3e source was Fast SUCCESS; upstream R266 semantic decoder was found to reject both opcodes and repaired at material source e8cce7b5. Current exact-SHA CI queued. No FEATURE_READY/target promotion/score award, 00477 ownership respected, RUNTIME_VALIDATION=UNTESTED.",
+  "checkpoint": "C3_VALIDATE_PENDING",
+  "notes": "Same 01013 feature resumed from GitHub checkpoint E007; remote run record already at E011, so event/attempt counters were not rewound. New independent alpha COLOR native Draw code+regression material commits. Fast exact-SHA success; remaining four CI pending; game/HMD UNTESTED, no target promotion or score.",
   "chat_rollovers": 6,
-  "previous_material_source_sha": "ce03d84dd51218dd3396dc9e11a830d8cb6f9d30",
+  "previous_material_source_sha": "e8cce7b55fd000c0f31106a13b2161f37388d7c3",
   "work_class": "integration",
   "classification": "A",
   "changed_files": [
@@ -93,7 +99,9 @@
     "tools/dx11_sm3_nop_probe_01013.cpp",
     "src/vr/d3d11/pipeline_translation.cpp",
     "tools/dx11_sm3_partial_precision_probe_01013.cpp",
-    ".github/workflows/dx11-fast-structural.yml"
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_live_sm3_blend_factor_00966.py"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -154,18 +162,49 @@
   "automation_validation": "PENDING_EXACT_SHA_FIVE_GATES",
   "full_dx11_renderer_complete": false,
   "targeted_validation_latest": {
-    "status": "PENDING_LATEST_SOURCE_CI",
+    "status": "PASS_FAST_EXACT_SHA_ONLY",
     "executor": "GitHub Actions DX11 Fast structural workflow",
-    "validation_command": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_sm3_partial_precision_probe_01013.cpp -o /tmp/dx11_sm3_partial_precision_01013 && /tmp/dx11_sm3_partial_precision_01013",
+    "validation_command": "GitHub Actions: DX11 Fast Structural Checks #39857089330; embedded C++ constexpr alpha factor mapping regression; tools/test_dx11_live_sm3_blend_factor_00966.py",
     "evidence_paths": [
-      "src/vr/d3d11/native_backend.cpp",
-      "src/vr/d3d11/pipeline_translation.cpp",
-      "tools/dx11_sm3_partial_precision_probe_01013.cpp"
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_live_sm3_blend_factor_00966.py"
     ],
-    "source_sha": "e8cce7b55fd000c0f31106a13b2161f37388d7c3",
-    "run_id": 39814905508,
-    "source_portable_targeted_test": "PENDING_QUEUED",
+    "source_sha": "a85d197badb53f4ebfa75936da60577273444c10",
+    "run_id": 39857089330,
+    "source_portable_targeted_test": "PASS_GITHUB_FAST",
     "windows_build_validation": "PENDING",
     "runtime_validation": "UNTESTED"
+  },
+  "feature_last_head": "a85d197badb53f4ebfa75936da60577273444c10",
+  "last_material_source_commits": [
+    "05d1a920517e89a094c1d8edd5ec19e9ad1861fe",
+    "a85d197badb53f4ebfa75936da60577273444c10"
+  ],
+  "resume_checkpoint_20261023T0620": {
+    "reason": "VR_FORCED_30_MINUTE_ROLLOVER",
+    "request_event_id": "CONVERSION-DX11-01013-E007",
+    "attempt": "1/3",
+    "feature_id": "DX11:LIVE_NATIVE_GAME_FRAME_INTEGRATION",
+    "feature_branch": "feature/dx11-01013-live-sm3-game-frame",
+    "feature_last_validated_source_sha": "a85d197badb53f4ebfa75936da60577273444c10",
+    "source_implementation_sha": "05d1a920517e89a094c1d8edd5ec19e9ad1861fe",
+    "regression_sha": "a85d197badb53f4ebfa75936da60577273444c10",
+    "ci_fast_run_id": 39857089330,
+    "ci_fast_status": "SUCCESS",
+    "ci_remaining_ids": [
+      39857089427,
+      39857089339,
+      39857089388,
+      39857089326
+    ],
+    "ci_remaining_status": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "acceptance_unfinished": [
+      "REAL_GAME_NATIVE_DRAW_AND_PUBLISHED_FULL_RES_FRAME_PROOF",
+      "MENU_VEHICLE_RACE_ORDINAL_COVERAGE",
+      "STEREO_LEFT_RIGHT_FENCE_AND_HMD_PROOF",
+      "REMAINING_EXACT_SHA_CI_AND_ARTIFACTS"
+    ],
+    "next_action": "At material SHA a85d197b collect exact-SHA Backend/Build/HUD/OpenXR Actions 39857089427/39857089339/39857089388/39857089326, repair only genuine failure; then use real opt-in game capture counters (eligible_state_draws, native_draws, published full native menu/race frames and left/right fence) to locate next actual game-source reject. Preserve DX9Ex fallback and 00477 ownership, do not submit FEATURE_READY before full game-frame acceptance."
   }
 }
