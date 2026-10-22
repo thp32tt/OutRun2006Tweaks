@@ -192,9 +192,16 @@ constexpr bool native_game_alpha_factor(DWORD f, D3D11_BLEND& out) noexcept {
     switch (f) {
     case D3DBLEND_ZERO: out = D3D11_BLEND_ZERO; return true;
     case D3DBLEND_ONE: out = D3D11_BLEND_ONE; return true;
+    // D3D9 independent alpha COLOR factor consumes only source/dest
+    // alpha; D3D11 forbids *_COLOR in alpha slots. Alias to the exact
+    // alpha component instead of vetoing an otherwise valid game frame.
+    case D3DBLEND_SRCCOLOR:
     case D3DBLEND_SRCALPHA: out = D3D11_BLEND_SRC_ALPHA; return true;
+    case D3DBLEND_INVSRCCOLOR:
     case D3DBLEND_INVSRCALPHA: out = D3D11_BLEND_INV_SRC_ALPHA; return true;
+    case D3DBLEND_DESTCOLOR:
     case D3DBLEND_DESTALPHA: out = D3D11_BLEND_DEST_ALPHA; return true;
+    case D3DBLEND_INVDESTCOLOR:
     case D3DBLEND_INVDESTALPHA: out = D3D11_BLEND_INV_DEST_ALPHA; return true;
     default: return false;
     }
@@ -235,6 +242,21 @@ constexpr bool native_game_separate_alpha_contract() noexcept {
         !native_game_separate_alpha(
             D3DBLEND_ZERO, D3DBLEND_ONE, D3DBLENDOP_MAX, src, dst, op) ||
         op != D3D11_BLEND_OP_MAX) return false;
+    // Mixed fixed-function/SM3 game frames must agree on the four legal
+    // D3D9 independent-alpha COLOR aliases; unlike RGB *_COLOR factors
+    // these read a single alpha component on both output mergers.
+    if (!native_game_separate_alpha(
+            D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR,
+            D3DBLENDOP_ADD, src, dst, op) ||
+        src != D3D11_BLEND_SRC_ALPHA ||
+        dst != D3D11_BLEND_INV_DEST_ALPHA ||
+        op != D3D11_BLEND_OP_ADD ||
+        !native_game_separate_alpha(
+            D3DBLEND_INVSRCCOLOR, D3DBLEND_DESTCOLOR,
+            D3DBLENDOP_REVSUBTRACT, src, dst, op) ||
+        src != D3D11_BLEND_INV_SRC_ALPHA ||
+        dst != D3D11_BLEND_DEST_ALPHA ||
+        op != D3D11_BLEND_OP_REV_SUBTRACT) return false;
     const auto oldSrc = src;
     const auto oldDst = dst;
     const auto oldOp = op;

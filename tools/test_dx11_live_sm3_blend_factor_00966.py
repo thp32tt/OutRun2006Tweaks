@@ -30,6 +30,21 @@ require("b.SrcBlendAlpha != D3D11_BLEND_BLEND_FACTOR")
 require("b.DestBlendAlpha != D3D11_BLEND_INV_BLEND_FACTOR")
 require("0xdeadbeefu")            # Unknown factors still fail-closed
 
+# D3D9 independent-alpha SRCCOLOR/DESTCOLOR is a legal one-component
+# game state in BOTH programmable and fixed-function Draw/DrawIndexed.
+# An otherwise valid mixed source frame must not be poisoned by the FVF
+# branch while the SM3 branch already handles these exact aliases.
+fvf_alpha = src.split("constexpr bool native_game_alpha_factor(", 1)[1].split(
+    "constexpr bool native_game_separate_alpha(", 1)[0]
+for alias in ("SRCCOLOR", "INVSRCCOLOR", "DESTCOLOR", "INVDESTCOLOR"):
+    require(f"case D3DBLEND_{alias}:", fvf_alpha)
+require("D3DBLEND_SRCCOLOR, D3DBLEND_INVDESTCOLOR,", src)
+require("D3DBLEND_INVSRCCOLOR, D3DBLEND_DESTCOLOR,", src)
+require("src != D3D11_BLEND_SRC_ALPHA", src)
+require("dst != D3D11_BLEND_INV_DEST_ALPHA", src)
+require("D3DBLEND_SRCALPHASAT, D3DBLEND_ONE,", src)
+require("D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,", src)
+
 # The shader-bound game's D3D9 state is captured for each Draw, not sourced
 # from a WARP fixture, cached initial value, or fabricated blend constant.
 game = src[src.index("bool submit_live_sm3_game_draw("):
