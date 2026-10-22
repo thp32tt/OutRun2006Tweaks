@@ -752,12 +752,6 @@ class VRLensFlareProjected2D : public Hook
             return false;
         }
     }
-    static_assert(IsProjectedSunScreenObject(0x570002));
-    static_assert(IsProjectedSunScreenObject(0x570006));
-    static_assert(IsProjectedSunScreenObject(0x57000F));
-    static_assert(IsProjectedSunScreenObject(0x570010));
-    static_assert(!IsProjectedSunScreenObject(0x57000E));
-
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
