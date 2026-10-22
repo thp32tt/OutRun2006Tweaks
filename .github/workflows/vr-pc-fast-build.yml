@@ -19,6 +19,7 @@ on:
   push:
     branches:
       - vr-d3d9ex-focus
+      - vr-d3d9ex-evidence-hud-r2
 
 concurrency:
   group: outrun-pc-package-${{ github.sha }}
