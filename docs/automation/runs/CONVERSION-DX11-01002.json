@@ -1,0 +1,184 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-01002",
+  "production_id": "CONVERSION-DX11-01002",
+  "event_id": "CONVERSION-DX11-01002-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-01002",
+  "work_key": "DX11:STEREO_GAME_EYE_SHADER_INPUT_GPU_TRANSFER",
+  "feature_id": "DX11:NATIVE_STEREO_EYE_GPU_TRANSFER_INPUT_CONTINUITY",
+  "work_class": "integration",
+  "milestone_id": "native_stereo_eye_transport",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "source_head": "d68a0a82a45f136bf006b6f0604422813f8474e9",
+  "material_result_sha": "b4772826cf266663617d7dd4d5e85347984eb920",
+  "causal_ci_repair_shas": [
+    "c782af20b548654347260dcdb58316d686ac4b35"
+  ],
+  "validation_bearing_result_sha": "c782af20b548654347260dcdb58316d686ac4b35",
+  "result_sha": "c782af20b548654347260dcdb58316d686ac4b35",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "AUTOMATION_VALIDATION": "PASS_EXACT_SHA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "full_dx11_renderer_complete": false,
+  "hmd_test_performed": false,
+  "gameplay_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_game_draw_count": "UNTESTED",
+  "native_published_frame_count": "UNTESTED",
+  "source_implementation_time_ratio": "UNMEASURED",
+  "score_change_on_bookkeeping": 0,
+  "score_change": 0,
+  "summary": "Native D3D11 game-camera and full-size L/R OpenXR shared eye GPU transfers now temporarily detach destination-aliasing game shader SRVs across VS/PS/GS/HS/DS/CS and restore prior inputs while retaining original OM MRT/DSV/PS-UAV/CS-UAV outputs. Actual C++ changes and destructive structural regression are material SHA b4772826. Inherited 01001 C6 null feature_id caused initial required CI failure; same 01002 causal metadata repair c782af20 passed all five mandatory exact-SHA GitHub Actions. This is SOURCE BUILD VERIFIED native eye transfer integration only; live game pixels, menu/car/race continuity, Quest3/VDXR, gamepad and HMD remain UNTESTED. No separate score for partial GPU state preservation or CI repair.",
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_stereo_submission.cpp",
+    "tools/test_dx11_stereo_eye_gpu_transfer_01002.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "causal_ci_repair_files": [
+    "docs/automation/runs/CONVERSION-DX11-01001.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11:NATIVE_STEREO_EYE_GPU_TRANSFER_INPUT_CONTINUITY",
+    "goal": "Preserve native menu, vehicle-select and race game shader inputs while their GPU camera color is copied or resolved into native stereo L/R transport and shader-readable game postpass textures; never lose DX9Ex fallback or falsely claim HMD output.",
+    "acceptance_items": [
+      {
+        "id": "native_eye_ring_LR_gpu_shader_input_preservation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_camera_D3D11_to_shared_OpenXR_LR_ring",
+        "expected_behavior": "Both physical shared eye destinations detach aliased SRVs from all six game shader stages only during Copy/Resolve and restore other game inputs before the following native Draw."
+      },
+      {
+        "id": "native_game_camera_and_stretch_gpu_integrity",
+        "category": "fallback_regression",
+        "behavior_area": "native_game_eye_camera_and_stretch_postpass",
+        "expected_behavior": "Both native eye camera Copy/Resolve and shader-readable stretch scratch preserve overlapping game inputs without replacing unrelated MRT, UAV and DX9Ex original outputs."
+      },
+      {
+        "id": "destructive_regression_and_five_required_gates",
+        "category": "integrated_validation",
+        "behavior_area": "CI_GPU_transfer_integration",
+        "expected_behavior": "Tampering with L, R, camera, stretch or alias filtering fails structural regression, and the required five Actions pass on the same SHA; game and HMD runtime evidence remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native_eye_ring_LR_gpu_shader_input_preservation": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_shared_eye_ring.cpp",
+        "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
+        "tools/test_dx11_stereo_eye_gpu_transfer_01002.py"
+      ],
+      "validation_command": "DX11 Fast 39730387092; Backend 39730387193; Build 39730390978; OpenXR 39730390973; HUD 39730390960; exact SHA c782af20b548654347260dcdb58316d686ac4b35; live stereo pixels UNTESTED"
+    },
+    "native_game_camera_and_stretch_gpu_integrity": {
+      "status": "PASS_BUILD",
+      "evidence_paths": [
+        "src/vr/d3d11/native_game_stereo_submission.cpp",
+        "src/vr/d3d11/native_game_gpu_output_preserve.hpp",
+        "tools/test_dx11_stereo_eye_gpu_transfer_01002.py"
+      ],
+      "validation_command": "DX11 Fast 39730387092; Backend 39730387193; Build 39730390978; OpenXR 39730390973; HUD 39730390960; exact SHA c782af20b548654347260dcdb58316d686ac4b35; D3D9 fallback hardware UNTESTED"
+    },
+    "destructive_regression_and_five_required_gates": {
+      "status": "PASS_EXACT_SHA",
+      "evidence_paths": [
+        "tools/test_dx11_stereo_eye_gpu_transfer_01002.py",
+        ".github/workflows/dx11-fast-structural.yml"
+      ],
+      "validation_command": "DX11 Fast 39730387092; Backend 39730387193; Build 39730390978; OpenXR 39730390973; HUD 39730390960; exact SHA c782af20b548654347260dcdb58316d686ac4b35; negative mutation tests PASS"
+    }
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "integration_path": [
+      "Intercepted native game camera postpasses -> D3D11 color Copy/Resolve into owned native eye target while preserving shader SRV inputs",
+      "Game L/R native eye resources -> shared-eye ring Copy/Resolve -> producer EVENT fence and source generation/ACK",
+      "Original native Draw shader inputs and OM/CS state restored -> D3D9Ex game/input/FFB remains authoritative fallback"
+    ],
+    "live_game_draw_path": [
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_OUTPUT"
+    ],
+    "batch_components": [
+      "Live D3D11 stereo shared ring source-to-L/R copy input preservation in native_shared_eye_ring.cpp",
+      "Live native game eye camera/StretchRect Resolve and cached postpass GPU input preservation in native_game_stereo_submission.cpp",
+      "Destructive source regression wired to required DX11 Fast and causal CI record repair"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "New destructive regression PASS in DX11 Fast; exact-SHA five-Gate Windows/OpenXR build success, not actual game/HMD pixels.",
+      "negative_regression": "Removing either L/R ring shader SRV suspension, camera/stretched destination preservation or destination alias classification fails test_dx11_stereo_eye_gpu_transfer_01002.py.",
+      "component_integration": "D3D11 local game camera GPU color and shader resources -> native L/R eye producer Copy/Resolve -> shared GPU OpenXR eye ring; protects DX9Ex original fallback."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_GAME_CAMERA_GPU_TRANSFER",
+      "DX11:FULL_RESOLUTION_GAME_FRAME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "SOURCE_STAGE_NATIVE_EYE_GPU_TRANSFER_BUILD_VERIFIED_NEED_REAL_MENU_CAR_RACE_QUEST3; no actual native game draw/publication telemetry",
+    "activation_guard_and_fallback": "No new native activation; original D3D9Ex Draw/Present, gamepad/FFB, SkyGlow and DXVK freeze preserved; source/device/GPU failures remain fail closed."
+  },
+  "ci": {
+    "status": "ALL_FIVE_EXACT_SHA_SUCCESS",
+    "material_source_commit": "b4772826cf266663617d7dd4d5e85347984eb920",
+    "causal_policy_repair_shas": [
+      "c782af20b548654347260dcdb58316d686ac4b35"
+    ],
+    "validation_bearing_exact_sha": "c782af20b548654347260dcdb58316d686ac4b35",
+    "required": [
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 39730387092,
+        "conclusion": "success",
+        "sha": "c782af20b548654347260dcdb58316d686ac4b35"
+      },
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 39730387193,
+        "conclusion": "success",
+        "sha": "c782af20b548654347260dcdb58316d686ac4b35"
+      },
+      {
+        "name": "Build",
+        "run_id": 39730390978,
+        "conclusion": "success",
+        "sha": "c782af20b548654347260dcdb58316d686ac4b35"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 39730390973,
+        "conclusion": "success",
+        "sha": "c782af20b548654347260dcdb58316d686ac4b35"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 39730390960,
+        "conclusion": "success",
+        "sha": "c782af20b548654347260dcdb58316d686ac4b35"
+      }
+    ],
+    "note": "Initial required Gate failure at material SHA was inherited 01001 feature_id=null; repaired as same-task metadata on validation SHA. No repeated PASS SHA requested."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: exact target branch HEAD and missing 01001 JSON confirmed, reason RUN_RECORD_NOT_FOUND.",
+    "C1_REVIEW": "PASS: source material, causal regression repair and exact-SHA successful five-Gate evidence verified from GitHub.",
+    "C2_IMPLEMENT": "ALREADY_DONE at 2411a1f5e30501cd336a2fb5b518ed5d5b5af2fe; no source changes in C6.",
+    "C3_VALIDATE": "PASS 5/5 required Actions at 9f79dd8d5e01c07a0cd405cbbc6b53de429becd1; no new workflow dispatch or rerun; runtime UNTESTED.",
+    "C4_COMMIT": "ALREADY_DONE material 2411a1f5e30501cd336a2fb5b518ed5d5b5af2fe and causal CI repair 9f79dd8d5e01c07a0cd405cbbc6b53de429becd1; no CI skip on validation-bearing commits.",
+    "C5_PACKAGE": "NOT_REQUIRED; deployment and Quest3/VDXR real-game testing are user-controlled.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA recorded in docs-only [skip ci] bookkeeping commit."
+  },
+  "feature_stage": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_implementation_action": "Continue native menu->vehicle->race D3D9 shader-bound Draw/DrawIndexed translation, frame coverage and native OpenXR submission, preserving fail-closed D3D9Ex fallback; gather exact-SHA live game draw/publication telemetry when a game session is available.",
+  "next_source_file": "src/vr/d3d11/live_game_frame_bridge.cpp",
+  "real_game_draw_blocker": "LATEST_01002_SOURCE_RUNTIME_NATIVE_GAME_DRAW_AND_PUBLISHED_FRAME_COUNTS_UNTESTED"
+}
